@@ -54,6 +54,7 @@ public class ForceProjector extends Block{
         hasLiquids = true;
         hasItems = true;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).boost().update(false);
+        entityType = ForceEntity::new;
     }
 
     @Override
@@ -98,7 +99,7 @@ public class ForceProjector extends Block{
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(phaseValid), 0.1f);
 
-        if(phaseValid && !entity.broken && entity.timer.get(timerUse, phaseUseTime)){
+        if(phaseValid && !entity.broken && entity.timer.get(timerUse, phaseUseTime) && entity.efficiency() > 0){
             entity.cons.trigger();
         }
 
@@ -108,12 +109,12 @@ public class ForceProjector extends Block{
             Effects.effect(Fx.reactorsmoke, tile.drawx() + Mathf.range(tilesize / 2f), tile.drawy() + Mathf.range(tilesize / 2f));
         }
 
-        entity.warmup = Mathf.lerpDelta(entity.warmup, entity.power.satisfaction, 0.1f);
+        entity.warmup = Mathf.lerpDelta(entity.warmup, entity.efficiency(), 0.1f);
 
 /*
-        if(entity.power.satisfaction < relativePowerDraw){
+        if(entity.power.status < relativePowerDraw){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.15f);
-            entity.power.satisfaction = 0f;
+            entity.power.status = 0f;
             if(entity.warmup <= 0.09f){
                 entity.broken = true;
             }
@@ -177,11 +178,6 @@ public class ForceProjector extends Block{
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
         Draw.blend();
         Draw.reset();
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ForceEntity();
     }
 
     class ForceEntity extends TileEntity{

@@ -14,6 +14,7 @@ import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
+import io.anuke.arc.util.serialization.Jval.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -172,8 +173,7 @@ public class Mods implements Loadable{
     /** Loads all mods from the folder, but does not call any methods on them.*/
     public void load(){
         for(FileHandle file : modDirectory.list()){
-            if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && file.child("mod.json").exists())) continue;
-
+            if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && (file.child("mod.json").exists() || file.child("mod.js").exists()))) continue;
 
             Log.debug("[Mods] Loading mod {0}", file);
             try{
@@ -206,6 +206,7 @@ public class Mods implements Loadable{
         }
 
         resolveDependencies();
+
         //sort mods to make sure servers handle them properly.
         loaded.sort(Structs.comparing(m -> m.name));
 
@@ -213,6 +214,10 @@ public class Mods implements Loadable{
     }
 
     private void resolveDependencies(){
+        Array<LoadedMod> incompatible = loaded.select(m -> !m.isSupported());
+        loaded.removeAll(incompatible);
+        disabled.addAll(incompatible);
+
         for(LoadedMod mod : Array.<LoadedMod>withArrays(loaded, disabled)){
             updateDependencies(mod);
         }
@@ -354,7 +359,7 @@ public class Mods implements Loadable{
                     FileHandle folder = contentRoot.child(type.name().toLowerCase() + "s");
                     if(folder.exists()){
                         for(FileHandle file : folder.list()){
-                            if(file.extension().equals("json")){
+                            if(file.extension().equals("json") || file.extension().equals("hjson") || file.extension().equals("js")){
                                 runs.add(new LoadRun(type, file, mod));
                             }
                         }
@@ -482,13 +487,22 @@ public class Mods implements Loadable{
             zip = zip.list()[0];
         }
 
-        FileHandle metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("plugin.json");
+        FileHandle metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("mod.js").exists() ? zip.child("mod.js") : zip.child("plugin.json");
         if(!metaf.exists()){
-            Log.warn("Mod {0} doesn't have a 'mod.json'/'plugin.json' file, skipping.", sourceFile);
+            Log.warn("Mod {0} doesn't have a 'mod.json'/'plugin.json'/'mod.js' file, skipping.", sourceFile);
             throw new IllegalArgumentException("No mod.json found.");
         }
 
-        ModMeta meta = json.fromJson(ModMeta.class, metaf.readString());
+        //try to read as hjson if possible
+        String readString = metaf.readString();
+        try{
+            readString = Jval.read(readString).toString(Jformat.plain);
+        }catch(Throwable e){
+            e.printStackTrace();
+            readString = metaf.readString();
+        }
+
+        ModMeta meta = json.fromJson(ModMeta.class, readString);
         String camelized = meta.name.replace(" ", "");
         String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
         String baseName = meta.name.toLowerCase().replace(" ", "-");
@@ -563,6 +577,18 @@ public class Mods implements Loadable{
             return !missingDependencies.isEmpty();
         }
 
+        /** @return whether this mod is supported by the game verison */
+        public boolean isSupported(){
+            if(Version.build <= 0 || meta.minGameVersion == null) return true;
+            if(meta.minGameVersion.contains(".")){
+                String[] split = meta.minGameVersion.split("\\.");
+                if(split.length == 2){
+                    return Version.build >= Strings.parseInt(split[0], 0) && Version.revision >= Strings.parseInt(split[1], 0);
+                }
+            }
+            return Version.build >= Strings.parseInt(meta.minGameVersion, 0);
+        }
+
         @Override
         public String getSteamID(){
             return Core.settings.getString(name + "-steamid", null);
@@ -632,7 +658,7 @@ public class Mods implements Loadable{
 
     /** Plugin metadata information.*/
     public static class ModMeta{
-        public String name, author, description, version, main;
+        public String name, author, description, version, main, minGameVersion;
         public Array<String> dependencies = Array.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;

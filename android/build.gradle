@@ -69,7 +69,7 @@ android{
     }
 
     defaultConfig{
-        Properties props = new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
+        Properties props = loadVersionProps()
         Integer vcode = props['androidBuildCode']?.toInteger() ?: 1
         def versionNameResult = "$versionNumber-$versionType-${getBuildVersion().replace(" ", "-")}"
 

@@ -31,6 +31,7 @@ public class LiquidSource extends Block{
         liquidCapacity = 100f;
         configurable = true;
         outputsLiquid = true;
+        entityType = LiquidSourceEntity::new;
     }
 
     @Override
@@ -104,11 +105,6 @@ public class LiquidSource extends Block{
         }
 
         table.add(cont);
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new LiquidSourceEntity();
     }
 
     @Override

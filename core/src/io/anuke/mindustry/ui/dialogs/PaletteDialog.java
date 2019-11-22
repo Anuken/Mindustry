@@ -10,10 +10,10 @@ import io.anuke.mindustry.ui.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class ColorPickDialog extends Dialog{
+public class PaletteDialog extends Dialog{
     private Cons<Color> cons;
 
-    public ColorPickDialog(){
+    public PaletteDialog(){
         super("");
         build();
     }

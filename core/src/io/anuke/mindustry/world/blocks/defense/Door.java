@@ -31,6 +31,7 @@ public class Door extends Wall{
         solid = false;
         solidifes = true;
         consumesTap = true;
+        entityType = DoorEntity::new;
     }
 
     @Remote(called = Loc.server)
@@ -87,11 +88,6 @@ public class Door extends Wall{
         }
 
         Call.onDoorToggle(null, tile, !entity.open);
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new DoorEntity();
     }
 
     public class DoorEntity extends TileEntity{

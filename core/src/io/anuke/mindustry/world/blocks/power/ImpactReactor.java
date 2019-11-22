@@ -7,7 +7,6 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -17,7 +16,7 @@ import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class ImpactReactor extends PowerGenerator{
     protected int timerUse = timers++;
@@ -39,6 +38,7 @@ public class ImpactReactor extends PowerGenerator{
         liquidCapacity = 30f;
         hasItems = true;
         outputsPower = consumesPower = true;
+        entityType = FusionReactorEntity::new;
 
         bottomRegion = reg("-bottom");
         plasmaRegions = new int[plasmas];
@@ -71,11 +71,11 @@ public class ImpactReactor extends PowerGenerator{
     public void update(Tile tile){
         FusionReactorEntity entity = tile.entity();
 
-        if(entity.cons.valid() && entity.power.satisfaction >= 0.99f){
+        if(entity.cons.valid() && entity.power.status >= 0.99f){
             boolean prevOut = getPowerProduction(tile) <= consumes.getPower().requestedPower(entity);
 
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
-            if(Mathf.isEqual(entity.warmup, 1f, 0.001f)){
+            if(Mathf.equal(entity.warmup, 1f, 0.001f)){
                 entity.warmup = 1f;
             }
 
@@ -117,13 +117,14 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name)};
+    public void drawLight(Tile tile){
+        float fract = tile.<FusionReactorEntity>entity().warmup;
+        renderer.lights.add(tile.drawx(), tile.drawy(), (110f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(plasma2).lerp(plasma1, Mathf.absin(7f, 0.2f)), 0.8f * fract);
     }
 
     @Override
-    public TileEntity newEntity(){
-        return new FusionReactorEntity();
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name)};
     }
 
     @Override
@@ -132,7 +133,7 @@ public class ImpactReactor extends PowerGenerator{
 
         FusionReactorEntity entity = tile.entity();
 
-        if(entity.warmup < 0.4f) return;
+        if(entity.warmup < 0.4f || !state.rules.reactorExplosions) return;
 
         Sounds.explosionbig.at(tile);
 

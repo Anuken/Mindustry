@@ -70,6 +70,7 @@ public class UI implements ApplicationListener, Loadable{
     public MinimapDialog minimap;
     public SchematicsDialog schematics;
     public ModsDialog mods;
+    public ColorPicker picker;
 
     public Cursor drillCursor, unloadCursor;
 
@@ -211,6 +212,7 @@ public class UI implements ApplicationListener, Loadable{
         listfrag = new PlayerListFragment();
         loadfrag = new LoadingFragment();
 
+        picker = new ColorPicker();
         editor = new MapEditorDialog();
         controls = new ControlsDialog();
         restart = new GameOverDialog();

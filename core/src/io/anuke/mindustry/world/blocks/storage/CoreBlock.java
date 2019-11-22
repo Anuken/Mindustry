@@ -36,6 +36,7 @@ public class CoreBlock extends StorageBlock{
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
         layer = Layer.overlay;
+        entityType = CoreEntity::new;
     }
 
     @Remote(called = Loc.server)
@@ -61,6 +62,11 @@ public class CoreBlock extends StorageBlock{
                 () -> Pal.items,
                 () -> e.items.total() / (float)(((CoreEntity)e).storageCapacity * content.items().count(i -> i.type == ItemType.material))
             ));
+    }
+
+    @Override
+    public void drawLight(Tile tile){
+        renderer.lights.add(tile.drawx(), tile.drawy(), 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
     }
 
     @Override
@@ -128,6 +134,14 @@ public class CoreBlock extends StorageBlock{
 
     public boolean isContainer(Tile tile){
         return tile.entity instanceof StorageBlockEntity;
+    }
+
+    @Override
+    public float handleDamage(Tile tile, float amount){
+        if(player != null && tile.getTeam() == player.getTeam()){
+            Events.fire(Trigger.teamCoreDamage);
+        }
+        return amount;
     }
 
     @Override
@@ -214,11 +228,6 @@ public class CoreBlock extends StorageBlock{
         CoreEntity entity = tile.entity();
 
         return entity.spawnPlayer != null;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new CoreEntity();
     }
 
     public class CoreEntity extends TileEntity implements SpawnerTrait{

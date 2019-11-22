@@ -50,6 +50,6 @@ public class DirectConsumerTests extends PowerTestFixture{
         consumerTile.entity.update();
         graph.update();
 
-        assertEquals(expectedSatisfaction, consumerTile.entity.power.satisfaction);
+        assertEquals(expectedSatisfaction, consumerTile.entity.power.status);
     }
 }

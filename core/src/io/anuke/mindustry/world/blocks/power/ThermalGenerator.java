@@ -1,12 +1,15 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.Attribute;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.math.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Effects.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.meta.*;
+
+import static io.anuke.mindustry.Vars.renderer;
 
 public class ThermalGenerator extends PowerGenerator{
     protected Effect generateEffect = Fx.none;
@@ -27,6 +30,12 @@ public class ThermalGenerator extends PowerGenerator{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         drawPlaceText(Core.bundle.formatFloat("bar.efficiency", sumAttribute(Attribute.heat, x, y) * 100, 1), x, y, valid);
+    }
+
+    @Override
+    public void drawLight(Tile tile){
+        GeneratorEntity entity = tile.entity();
+        renderer.lights.add(tile.drawx(), tile.drawy(), (40f + Mathf.absin(10f, 5f)) * entity.productionEfficiency * size, Color.scarlet, 0.4f);
     }
 
     @Override
