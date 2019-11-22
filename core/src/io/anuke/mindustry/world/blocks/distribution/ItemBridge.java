@@ -175,7 +175,7 @@ public class ItemBridge extends Block{
         while(it.hasNext){
             int i = it.next();
             Tile other = world.tile(i);
-            if(!linkValid(tile, other, false)){
+            if(!linkValid(tile, other, false) || other.<ItemBridgeEntity>entity().link != tile.pos()){
                 it.remove();
             }
         }
