@@ -37,6 +37,14 @@ public class EventType{
 
     public static class LaunchEvent{}
 
+    public static class LaunchItemEvent{
+        public final ItemStack stack;
+
+        public LaunchItemEvent(Item item, int amount){
+            this.stack = new ItemStack(item, amount);
+        }
+    }
+
     public static class MapMakeEvent{}
 
     public static class MapPublishEvent{}

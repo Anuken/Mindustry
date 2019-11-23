@@ -74,6 +74,9 @@ public class HostDialog extends FloatingDialog{
                         ui.showCustomConfirm("$setting.publichost.name", "$public.confirm", "$yes", "$no", () -> {
                             Core.settings.putSave("publichost", true);
                             platform.updateLobby();
+                        }, () -> {
+                            Core.settings.putSave("publichost", false);
+                            platform.updateLobby();
                         });
                     }));
                 }
