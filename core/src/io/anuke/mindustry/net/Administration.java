@@ -3,8 +3,11 @@ package io.anuke.mindustry.net;
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.mindustry.Vars;
+
 
 import static io.anuke.mindustry.Vars.headless;
+import static io.anuke.mindustry.game.EventType.*;
 
 public class Administration{
     /** All player info. Maps UUIDs to info. This persists throughout restarts. */
@@ -76,7 +79,7 @@ public class Administration{
 
         bannedIPs.add(ip);
         save();
-
+        Events.fire(new PlayerIpBanEvent(ip));
         return true;
     }
 
@@ -88,7 +91,7 @@ public class Administration{
         getCreateInfo(id).banned = true;
 
         save();
-
+        Events.fire(new PlayerBanEvent(Vars.playerGroup.find(p -> id.equals(p.uuid))));
         return true;
     }
 
@@ -108,8 +111,10 @@ public class Administration{
 
         bannedIPs.removeValue(ip, false);
 
-        if(found) save();
-
+        if(found){
+            save();
+            Events.fire(new PlayerIpUnbanEvent(ip));
+        }
         return found;
     }
 
@@ -126,7 +131,7 @@ public class Administration{
         info.banned = false;
         bannedIPs.removeAll(info.ips, false);
         save();
-
+        Events.fire(new PlayerUnbanEvent(Vars.playerGroup.find(p -> id.equals(p.uuid))));
         return true;
     }
 
