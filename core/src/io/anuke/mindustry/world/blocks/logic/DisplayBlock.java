@@ -28,7 +28,7 @@ public class DisplayBlock extends AcceptorLogicBlock{
             int x = i % w;
             int y = i / w;
 
-            if((entity.signal & (1 << i)) != 0){
+            if((entity.nextSignal & (1 << i)) != 0){
                 Fill.rect(tile.drawx() + x*xs - (w-1) * xs/2f, tile.drawy() + y*ys - (h-1) * ys/2f, dw, dh);
             }
         }

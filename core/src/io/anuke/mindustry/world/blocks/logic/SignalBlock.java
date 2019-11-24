@@ -22,8 +22,8 @@ public class SignalBlock extends LogicBlock{
         LogicEntity entity = tile.entity();
 
         table.addImageButton(Icon.pencilSmall, () -> {
-            ui.showTextInput("$block.editsignal", "", 8, entity.signal + "", true, result -> {
-                entity.signal = Strings.parseInt(result, 0);
+            ui.showTextInput("$block.editsignal", "", 8, entity.nextSignal + "", true, result -> {
+                entity.nextSignal = Strings.parseInt(result, 0);
             });
             control.input.frag.config.hideConfig();
         }).size(40f);
@@ -31,19 +31,19 @@ public class SignalBlock extends LogicBlock{
 
     @Override
     public int signal(Tile tile){
-        return tile.<LogicEntity>entity().signal;
+        return tile.<LogicEntity>entity().nextSignal;
     }
 
     @Override
     public void configured(Tile tile, @Nullable Player player, int value){
         LogicEntity entity = tile.entity();
-        entity.signal = value;
+        entity.nextSignal = value;
     }
 
     public class SignalLogicEntity extends LogicEntity{
         @Override
         public int config(){
-            return signal;
+            return nextSignal;
         }
     }
 }

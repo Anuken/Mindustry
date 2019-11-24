@@ -31,15 +31,15 @@ public abstract class LogicBlock extends Block{
     @Override
     public void update(Tile tile){
         LogicEntity entity = tile.entity();
-        entity.lastSignal = entity.signal;
-        entity.signal = signal(tile);
+        entity.lastSignal = entity.nextSignal;
+        entity.nextSignal = signal(tile);
     }
 
     @Override
     public void setBars(){
         super.setBars();
         bars.add("signal", entity -> new Bar(
-        () -> Core.bundle.format("block.signal", ((LogicEntity)entity).signal),
+        () -> Core.bundle.format("block.signal", ((LogicEntity)entity).nextSignal),
         () -> Color.clear,
         () -> 0));
     }
@@ -49,7 +49,7 @@ public abstract class LogicBlock extends Block{
         LogicEntity entity = tile.entity();
         Draw.rect("logic-base", tile.drawx(), tile.drawy());
 
-        Draw.color(entity.signal > 0 ? Pal.accent : Color.white);
+        Draw.color(entity.nextSignal > 0 ? Pal.accent : Color.white);
         super.draw(tile);
         Draw.color();
     }
@@ -74,7 +74,7 @@ public abstract class LogicBlock extends Block{
 
     public int getSignal(Tile from, Tile tile){
         if(tile == null || !(tile.block() instanceof LogicBlock) || (tile.block().rotate && tile.front() != from) || !((LogicBlock)tile.block()).doOutput) return 0;
-        return tile.<LogicEntity>entity().signal;
+        return tile.<LogicEntity>entity().lastSignal;
     }
 
     public int sfront(Tile tile){
@@ -97,19 +97,19 @@ public abstract class LogicBlock extends Block{
     public abstract int signal(Tile tile);
 
     public class LogicEntity extends TileEntity{
-        public int signal;
+        public int nextSignal;
         public int lastSignal;
 
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
-            stream.writeInt(signal);
+            stream.writeInt(nextSignal);
         }
 
         @Override
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
-            signal = stream.readInt();
+            nextSignal = lastSignal = stream.readInt();
         }
     }
 }

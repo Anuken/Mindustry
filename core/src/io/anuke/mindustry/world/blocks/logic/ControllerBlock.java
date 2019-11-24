@@ -22,7 +22,7 @@ public class ControllerBlock extends UnaryLogicBlock{
         LogicEntity entity = tile.entity();
         Tile facing = tile.front();
         if(facing != null && facing.entity != null && facing.block().controllable){
-            facing.entity.control(entity.signal != 0);
+            facing.entity.control(entity.nextSignal != 0);
         }
     }
 

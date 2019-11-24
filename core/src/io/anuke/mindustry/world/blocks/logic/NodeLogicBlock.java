@@ -36,7 +36,7 @@ public class NodeLogicBlock extends AcceptorLogicBlock{
             //when linked, accept signal
             return super.signal(tile);
         }
-        return entity.signal;
+        return entity.nextSignal;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class NodeLogicBlock extends AcceptorLogicBlock{
         Tile link = world.tile(entity.link);
         if(linkValid(tile, link)){
             NodeLogicEntity other = link.entity();
-            other.signal = entity.signal;
+            other.nextSignal = entity.nextSignal;
         }
     }
 
@@ -92,7 +92,7 @@ public class NodeLogicBlock extends AcceptorLogicBlock{
         NodeLogicEntity entity = tile.entity();
         Tile link = world.tile(entity.link);
         if(linkValid(tile, link)){
-            Draw.color(entity.signal != 0 ? Pal.accent : Color.white);
+            Draw.color(entity.nextSignal != 0 ? Pal.accent : Color.white);
             Draw.alpha(1f * Core.settings.getInt("lasersopacity") / 100f);
             Drawf.laser(Core.atlas.find("logic-laser"), Core.atlas.find("logic-laser-end"), tile.drawx(), tile.drawy(), link.drawx(), link.drawy(), 0.25f);
             Draw.reset();
