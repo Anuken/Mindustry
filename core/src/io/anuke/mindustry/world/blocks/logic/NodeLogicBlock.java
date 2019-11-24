@@ -26,12 +26,14 @@ public class NodeLogicBlock extends AcceptorLogicBlock{
         configurable = true;
         layer = Layer.power;
         rotate = false;
+        doOutput = true;
     }
 
     @Override
     public int signal(Tile tile){
         NodeLogicEntity entity = tile.entity();
         if(linkValid(tile)){
+            //when linked, accept signal
             return super.signal(tile);
         }
         return entity.signal;
@@ -40,7 +42,7 @@ public class NodeLogicBlock extends AcceptorLogicBlock{
     @Override
     public void playerPlaced(Tile tile){
         if(linkValid(tile, world.tile(lastPlaced))){
-            tile.configure(lastPlaced);
+            world.tile(lastPlaced).configure(tile.pos());
             lastPlaced = Pos.invalid;
         }else{
             lastPlaced = tile.pos();

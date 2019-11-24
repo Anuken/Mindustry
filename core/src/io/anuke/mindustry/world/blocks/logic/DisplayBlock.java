@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.logic;
 
+import io.anuke.arc.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.mindustry.world.*;
 
@@ -8,6 +9,11 @@ public class DisplayBlock extends AcceptorLogicBlock{
     public DisplayBlock(String name){
         super(name);
         rotate = false;
+    }
+
+    @Override
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name)};
     }
 
     @Override
@@ -23,7 +29,7 @@ public class DisplayBlock extends AcceptorLogicBlock{
             int y = i / w;
 
             if((entity.signal & (1 << i)) != 0){
-                Fill.rect(tile.drawx() + x*xs - w * xs/2f, tile.drawy() + y*ys - h * ys/2f, dw, dh);
+                Fill.rect(tile.drawx() + x*xs - (w-1) * xs/2f, tile.drawy() + y*ys - (h-1) * ys/2f, dw, dh);
             }
         }
     }

@@ -2,6 +2,8 @@ package io.anuke.mindustry.world.blocks.logic;
 
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.world.*;
 
@@ -12,6 +14,7 @@ public class SignalBlock extends LogicBlock{
     public SignalBlock(String name){
         super(name);
         configurable = true;
+        entityType = SignalLogicEntity::new;
     }
 
     @Override
@@ -29,5 +32,18 @@ public class SignalBlock extends LogicBlock{
     @Override
     public int signal(Tile tile){
         return tile.<LogicEntity>entity().signal;
+    }
+
+    @Override
+    public void configured(Tile tile, @Nullable Player player, int value){
+        LogicEntity entity = tile.entity();
+        entity.signal = value;
+    }
+
+    public class SignalLogicEntity extends LogicEntity{
+        @Override
+        public int config(){
+            return signal;
+        }
     }
 }
