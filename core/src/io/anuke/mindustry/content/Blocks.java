@@ -1835,7 +1835,6 @@ public class Blocks implements ContentList{
         }};
 
         //endregion
-
         //region logic
 
         switchBlock = new SwitchBlock("switch-block"){{
@@ -1887,7 +1886,10 @@ public class Blocks implements ContentList{
         adder = new BinaryLogicBlock("adder"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 4));
 
-            processor = (left, right) -> left + right;
+            processor = (left, right) -> {
+                long result = (long)left + right;
+                return (int)Math.min(result, Integer.MAX_VALUE);
+            };
         }};
 
         subtractor = new BinaryLogicBlock("subtractor"){{
