@@ -24,6 +24,7 @@ public class NodeLogicBlock extends AcceptorLogicBlock{
         super(name);
         entityType = NodeLogicEntity::new;
         configurable = true;
+        posConfig = true;
         layer = Layer.power;
         rotate = false;
         doOutput = true;

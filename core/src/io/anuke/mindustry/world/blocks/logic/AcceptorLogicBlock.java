@@ -13,6 +13,7 @@ public class AcceptorLogicBlock extends LogicBlock{
     public int signal(Tile tile){
         int max = 0;
         for(Tile other : tile.entity.proximity()){
+            if(rotate && tile.front() == other) continue;
             max |= getSignal(tile, other);
         }
         return max;

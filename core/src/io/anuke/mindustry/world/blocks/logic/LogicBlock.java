@@ -73,8 +73,11 @@ public abstract class LogicBlock extends Block{
     }
 
     public int getSignal(Tile from, Tile tile){
-        if(tile == null || !(tile.block() instanceof LogicBlock) || (tile.block().rotate && tile.front() != from) || !((LogicBlock)tile.block()).doOutput) return 0;
-        return tile.<LogicEntity>entity().lastSignal;
+        return !canSignal(from, tile) ? 0 : tile.<LogicEntity>entity().lastSignal;
+    }
+
+    public boolean canSignal(Tile from, Tile tile){
+        return tile != null && tile.block() instanceof LogicBlock && (!tile.block().rotate || tile.front() == from) && ((LogicBlock)tile.block()).doOutput;
     }
 
     public int sfront(Tile tile){
