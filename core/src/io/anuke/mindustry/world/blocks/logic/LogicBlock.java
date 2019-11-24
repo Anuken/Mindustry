@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.logic;
 
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -26,9 +27,11 @@ public abstract class LogicBlock extends Block{
         controllable = false;
     }
 
+    @CallSuper
     @Override
     public void update(Tile tile){
         LogicEntity entity = tile.entity();
+        entity.lastSignal = entity.signal;
         entity.signal = signal(tile);
     }
 
@@ -95,6 +98,7 @@ public abstract class LogicBlock extends Block{
 
     public class LogicEntity extends TileEntity{
         public int signal;
+        public int lastSignal;
 
         @Override
         public void write(DataOutput stream) throws IOException{
