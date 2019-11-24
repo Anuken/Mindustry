@@ -84,7 +84,7 @@ public class Blocks implements ContentList{
     dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad,
 
     //logic
-    switchBlock, signalBlock, analyzer, controller, relay, notGate, andGate, orGate, xorGate, adder, subtractor, divider, multiplier;
+    switchBlock, signalBlock, signalNode, analyzer, controller, relay, notGate, andGate, orGate, xorGate, adder, subtractor, divider, multiplier, displayBlock;
 
     @Override
     public void load(){
@@ -1845,6 +1845,11 @@ public class Blocks implements ContentList{
             requirements(Category.effect, ItemStack.with(Items.lead, 4));
         }};
 
+        signalNode = new NodeLogicBlock("signal-node"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+            range = 110f;
+        }};
+
         analyzer = new AnalyzerBlock("analyzer"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 4));
         }};
@@ -1908,6 +1913,11 @@ public class Blocks implements ContentList{
             requirements(Category.effect, ItemStack.with(Items.lead, 4));
 
             processor = (left, right) -> left * right;
+        }};
+
+        displayBlock = new DisplayBlock("display"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+            size = 2;
         }};
 
 

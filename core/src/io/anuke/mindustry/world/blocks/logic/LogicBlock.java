@@ -15,6 +15,7 @@ import io.anuke.mindustry.world.meta.*;
 import java.io.*;
 
 public abstract class LogicBlock extends Block{
+    protected boolean doOutput = true;
 
     public LogicBlock(String name){
         super(name);
@@ -68,25 +69,25 @@ public abstract class LogicBlock extends Block{
         !rotate ? 0 : req.rotation * 90);
     }
 
-    public int getSignal(Tile tile){
-        if(tile == null || !(tile.block() instanceof LogicBlock)) return 0;
+    public int getSignal(Tile from, Tile tile){
+        if(tile == null || !(tile.block() instanceof LogicBlock) || (tile.block().rotate && tile.front() != from) || !((LogicBlock)tile.block()).doOutput) return 0;
         return tile.<LogicEntity>entity().signal;
     }
 
     public int sfront(Tile tile){
-        return getSignal(tile.front());
+        return getSignal(tile, tile.front());
     }
 
     public int sback(Tile tile){
-        return getSignal(tile.back());
+        return getSignal(tile, tile.back());
     }
 
     public int sleft(Tile tile){
-        return getSignal(tile.left());
+        return getSignal(tile, tile.left());
     }
 
     public int sright(Tile tile){
-        return getSignal(tile.right());
+        return getSignal(tile, tile.right());
     }
 
     /** @return signal to send next frame. */
