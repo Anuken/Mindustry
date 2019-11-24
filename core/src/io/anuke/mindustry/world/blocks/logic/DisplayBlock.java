@@ -21,9 +21,9 @@ public class DisplayBlock extends AcceptorLogicBlock{
         Draw.rect(region, tile.drawx(), tile.drawy());
         LogicEntity entity = tile.entity();
 
-        float dw = 2, dh = 2, xs = 3f, ys = 3f;
+        float dw = 2, dh = 2, xs = 2f, ys = 2f;
 
-        int w = 4, h = 4;
+        int w = 5, h = 5;
         for(int i = 0; i < w * h; i++){
             int x = i % w;
             int y = i / w;

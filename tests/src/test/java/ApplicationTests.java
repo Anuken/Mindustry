@@ -339,7 +339,7 @@ public class ApplicationTests{
 
     @Test
     void allBlockTest(){
-        Tile[][] tiles = world.createTiles(256*2 + 20, 10);
+        Tile[][] tiles = world.createTiles(content.blocks().size*3 + 20, 10);
 
         world.beginMapLoad();
         for(int x = 0; x < tiles.length; x++){

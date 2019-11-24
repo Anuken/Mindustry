@@ -13,7 +13,7 @@ public class AcceptorLogicBlock extends LogicBlock{
     public int signal(Tile tile){
         int max = 0;
         for(Tile other : tile.entity.proximity()){
-            max = Math.max(getSignal(tile, other), max);
+            max |= getSignal(tile, other);
         }
         return max;
     }
