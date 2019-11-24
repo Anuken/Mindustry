@@ -132,7 +132,7 @@ public class Sorter extends Block{
     @Override
     public void buildTable(Tile tile, Table table){
         SorterEntity entity = tile.entity();
-        ItemSelection.buildItemTable(table, () -> entity.sortItem, item -> {
+        ItemSelection.buildTable(table, content.items(), () -> entity.sortItem, item -> {
             lastItem = item;
             tile.configure(item == null ? -1 : item.id);
         });

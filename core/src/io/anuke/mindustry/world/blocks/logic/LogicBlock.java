@@ -35,7 +35,7 @@ public abstract class LogicBlock extends Block{
     public void setBars(){
         super.setBars();
         bars.add("signal", entity -> new Bar(
-        () -> Core.bundle.format("block.signal", Integer.toBinaryString(((LogicEntity)entity).signal).replace("1", "[accent]1").replace("0", "[lightgray]0")),
+        () -> Core.bundle.format("block.signal", ((LogicEntity)entity).signal),
         () -> Color.clear,
         () -> 0));
     }

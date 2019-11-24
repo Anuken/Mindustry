@@ -1,24 +1,19 @@
 package io.anuke.mindustry.world.blocks.sandbox;
 
 import io.anuke.arc.*;
-import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.scene.style.*;
-import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.content;
 
 public class LiquidSource extends Block{
     private static Liquid lastLiquid;
@@ -81,30 +76,10 @@ public class LiquidSource extends Block{
     @Override
     public void buildTable(Tile tile, Table table){
         LiquidSourceEntity entity = tile.entity();
-
-        Array<Liquid> items = content.liquids();
-
-        ButtonGroup<ImageButton> group = new ButtonGroup<>();
-        group.setMinCheckCount(0);
-        Table cont = new Table();
-
-        for(int i = 0; i < items.size; i++){
-            final int f = i;
-            ImageButton button = cont.addImageButton(Tex.clear, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).size(38).group(group).get();
-            button.changed(() -> {
-                tile.configure(button.isChecked() ? items.get(f).id : -1);
-                control.input.frag.config.hideConfig();
-                lastLiquid = items.get(f);
-            });
-            button.getStyle().imageUp = new TextureRegionDrawable(items.get(i).icon(Cicon.medium));
-            button.setChecked(entity.source == items.get(i));
-
-            if(i % 4 == 3){
-                cont.row();
-            }
-        }
-
-        table.add(cont);
+        ItemSelection.buildTable(table, content.liquids(), () -> entity.source, liquid -> {
+            lastLiquid = liquid;
+            tile.configure(liquid == null ? -1 : liquid.id);
+        });
     }
 
     @Override

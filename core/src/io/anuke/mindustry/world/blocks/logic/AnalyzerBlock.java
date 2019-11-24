@@ -1,19 +1,23 @@
 package io.anuke.mindustry.world.blocks.logic;
 
 import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.func.*;
+import io.anuke.arc.scene.style.*;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
 
 public class AnalyzerBlock extends LogicBlock{
-    private static final int modeItem = 0, modeLiquid = 1, modePower = 2, selectBattery = 0, selectBalance = 1;
+    private static final int modeItem = 0, modeLiquid = 1, modePowerBalance = 2, modePowerBattery = 3;
 
     public AnalyzerBlock(String name){
         super(name);
@@ -31,8 +35,10 @@ public class AnalyzerBlock extends LogicBlock{
 
         if(back == null){
             return 0;
-        }else if(mode == modePower && back.block().hasPower){
-            return selection == selectBattery ? (int)back.entity.power.graph.getBatteryStored() : (int)back.entity.power.graph.getPowerBalance();
+        }else if(mode == modePowerBalance && back.block().hasPower){
+            return Math.round(back.entity.power.graph.getPowerBalance()*60);
+        }else if(mode == modePowerBattery && back.block().hasPower){
+            return Math.round(back.entity.power.graph.getBatteryStored());
         }else if(mode == modeItem && back.block().hasItems){
             Item item = Vars.content.item(selection);
             return item == null ? back.entity.items.total() : back.entity.items.get(item);
@@ -47,9 +53,40 @@ public class AnalyzerBlock extends LogicBlock{
     @Override
     public void buildTable(Tile tile, Table table){
         AnaylzerEntity entity = tile.entity();
-        ItemSelection.buildItemTable(table, () -> Vars.content.item(AnalyzeMode.selection(entity.mode)), item -> {
-            tile.configure(AnalyzeMode.get(modeItem, item == null ? Short.MAX_VALUE: item.id));
-        });
+        Runnable[] rebuild = {null};
+        rebuild[0] = () -> {
+            table.clearChildren();
+            ButtonGroup<Button> group = new ButtonGroup<>();
+
+            Cons2<Integer, Drawable> toggler = (mode, tex) -> {
+                table.addImageButton(tex, Styles.clearToggleTransi, () -> {
+                    entity.mode = AnalyzeMode.get(mode, 0);
+                    rebuild[0].run();
+                }).group(group).size(40f).checked(AnalyzeMode.mode(entity.mode) == mode);
+            };
+
+            toggler.get(modeItem, Icon.itemSmall);
+            toggler.get(modeLiquid, Icon.liquidSmall);
+            toggler.get(modePowerBalance, Icon.powerSmall);
+            toggler.get(modePowerBattery, Icon.batterySmall);
+            table.row();
+            Table next = table.table().colspan(4).get();
+
+            int mode = AnalyzeMode.mode(entity.mode);
+            if(mode == modeItem){
+                ItemSelection.buildTable(next, Vars.content.items(), () -> Vars.content.item(AnalyzeMode.selection(entity.mode)), item -> {
+                    tile.configure(AnalyzeMode.get(modeItem, item == null ? Short.MAX_VALUE: item.id));
+                });
+            }else if(mode == modeLiquid){
+                ItemSelection.buildTable(next, Vars.content.liquids(), () -> Vars.content.liquid(AnalyzeMode.selection(entity.mode)), item -> {
+                    tile.configure(AnalyzeMode.get(modeLiquid, item == null ? Short.MAX_VALUE: item.id));
+                });
+            }
+
+            table.pack();
+        };
+
+        rebuild[0].run();
     }
 
     @Override

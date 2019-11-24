@@ -5,27 +5,24 @@ import io.anuke.arc.func.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Cicon;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class ItemSelection{
 
-    public static void buildItemTable(Table table, Prov<Item> holder, Cons<Item> consumer){
-
-        Array<Item> items = content.items();
+    public static <T extends UnlockableContent> void buildTable(Table table, Array<T> items, Prov<T> holder, Cons<T> consumer){
 
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
         Table cont = new Table();
-        cont.defaults().size(38);
+        cont.defaults().size(40);
 
         int i = 0;
 
-        for(Item item : items){
+        for(T item : items){
             if(!data.isUnlocked(item) && world.isZone()) continue;
 
             ImageButton button = cont.addImageButton(Tex.whiteui, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).group(group).get();
