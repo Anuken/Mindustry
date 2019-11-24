@@ -80,6 +80,7 @@ public class Junction extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
+        if(tile.entity.disabled()) return false;
         JunctionEntity entity = tile.entity();
         int relative = source.relativeTo(tile.x, tile.y);
 

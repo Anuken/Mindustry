@@ -46,8 +46,9 @@ public class Router extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        RouterEntity entity = tile.entity();
+        if(tile.entity.disabled()) return false;
 
+        RouterEntity entity = tile.entity();
         return tile.getTeam() == source.getTeam() && entity.lastItem == null && entity.items.total() == 0;
     }
 

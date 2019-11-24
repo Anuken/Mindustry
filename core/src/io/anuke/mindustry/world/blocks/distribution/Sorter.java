@@ -72,6 +72,8 @@ public class Sorter extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
+        if(tile.entity.disabled()) return false;
+
         Tile to = getTileTarget(item, tile, source, false);
 
         return to != null && to.block().acceptItem(item, to, tile);

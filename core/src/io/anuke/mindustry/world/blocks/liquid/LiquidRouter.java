@@ -8,6 +8,7 @@ public class LiquidRouter extends LiquidBlock{
 
     public LiquidRouter(String name){
         super(name);
+        stopOnDisabled = true;
     }
 
     @Override

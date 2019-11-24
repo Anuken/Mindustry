@@ -8,5 +8,6 @@ public class PowerDistributor extends PowerBlock{
         super(name);
         consumesPower = false;
         outputsPower = true;
+        controllable = false;
     }
 }
