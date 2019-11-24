@@ -84,7 +84,7 @@ public class Blocks implements ContentList{
     dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad,
 
     //logic
-    switchBlock, signalBlock, signalNode, signalRouter, analyzer, controller, relay, notGate, andGate, orGate, xorGate, adder, subtractor, divider, multiplier, displayBlock;
+    switchBlock, signalBlock, signalNode, signalRouter, analyzer, controller, relay, notGate, andGate, orGate, xorGate, adder, subtractor, divider, multiplier, equalizer, comparator, displayBlock;
 
     @Override
     public void load(){
@@ -1921,12 +1921,22 @@ public class Blocks implements ContentList{
             processor = (left, right) -> left * right;
         }};
 
+        equalizer = new BinaryLogicBlock("equalizer"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> left == right ? 1 : 0;
+        }};
+
+        comparator = new BinaryLogicBlock("comparator"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> left > right ? 1 : 0;
+        }};
+
         displayBlock = new DisplayBlock("display"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 4));
             size = 2;
         }};
-
-
 
         //endregion
     }
