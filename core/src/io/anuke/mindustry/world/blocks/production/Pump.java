@@ -134,4 +134,12 @@ public class Pump extends LiquidBlock{
         return tile != null && tile.floor().liquidDrop != null;
     }
 
+    @Override
+    public Bottleneck bottleneckState(Tile tile){
+
+        // check if pump has room for liquid, same conditions apply as the solar panel check
+        if(!(tile.entity.liquids.total() < liquidCapacity - 0.001f)) return Bottleneck.output;
+
+        return super.bottleneckState(tile);
+    }
 }
