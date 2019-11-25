@@ -8,15 +8,13 @@ import io.anuke.arc.graphics.*;
 public enum Bottleneck{
     none,   // green, doing fine <3
     output, // yellow, limited by output
-    input,  // red, limited by input
-    off;    // grey, unknown
+    input;  // red, limited by input
 
     public static Color color(Bottleneck state){
         switch(state){
             case none  : return Color.green;
             case output: return Color.yellow;
             case input : return Color.red;
-            case off   : return Color.gray;
             default    : return Color.white;
         }
     }
