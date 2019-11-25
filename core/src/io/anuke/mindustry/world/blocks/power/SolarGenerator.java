@@ -27,4 +27,13 @@ public class SolarGenerator extends PowerGenerator{
         stats.remove(generationType);
         stats.add(generationType, powerProduction * 60.0f, StatUnit.powerSecond);
     }
+
+    @Override
+    public Bottleneck bottleneckState(Tile tile){
+
+        // this should probably be in better/more places, but this is just to illustrate that bottleneck can warn about power generators not connected to the grid
+        if(!tile.entity.power.graph.hasConsumers()) return Bottleneck.output;
+
+        return super.bottleneckState(tile);
+    }
 }

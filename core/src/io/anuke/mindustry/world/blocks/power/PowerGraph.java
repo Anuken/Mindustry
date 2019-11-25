@@ -233,6 +233,11 @@ public class PowerGraph{
         }
     }
 
+    // see SolarGenerator for comment
+    public boolean hasConsumers(){
+        return consumers.size > 0;
+    }
+
     public void reflow(Tile tile){
         queue.clear();
         queue.addLast(tile);
