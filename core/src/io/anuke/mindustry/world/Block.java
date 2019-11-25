@@ -249,6 +249,17 @@ public class Block extends BlockStorage{
 
         // center of bottom right block
         Draw.rect(bottleneck, tile.drawx() + (size * tilesize / 2f) - (tilesize / 2f), tile.drawy() - (size * tilesize / 2f) + (tilesize / 2f));
+        Draw.color(Bottleneck.color(bottleneckState(tile)));
+        Draw.rect(bottleneckLed, tile.drawx() + (size * tilesize / 2f) - (tilesize / 2f), tile.drawy() - (size * tilesize / 2f) + (tilesize / 2f));
+        Draw.color();
+    }
+
+    public Bottleneck bottleneckState(Tile tile){
+        if(tile.entity.cons.valid()){
+            return Bottleneck.none;
+        }
+
+        return Bottleneck.input;
     }
 
     public void drawCracks(Tile tile){
