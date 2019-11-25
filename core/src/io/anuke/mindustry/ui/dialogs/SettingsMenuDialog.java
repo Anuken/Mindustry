@@ -317,6 +317,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             graphics.checkPref("animatedshields", !mobile);
         }
         graphics.checkPref("bloom", !mobile, val -> renderer.toggleBloom(val));
+        graphics.checkPref("bottleneck", false);
         graphics.checkPref("pixelate", false, val -> {
             if(val){
                 Events.fire(Trigger.enablePixelation);
