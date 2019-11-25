@@ -144,7 +144,7 @@ public class Block extends BlockStorage{
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] variantRegions, editorVariantRegions;
-    protected TextureRegion region, editorIcon, bottleneck, bottleneckLed;
+    protected TextureRegion region, editorIcon, bottleneckFixture, bottleneckLed;
 
     protected static TextureRegion[][] cracks;
 
@@ -253,10 +253,12 @@ public class Block extends BlockStorage{
             case power:
             case units:
                 if(tile.block.hasItems || tile.block.hasLiquids || tile.block.hasPower){
-                    // center of bottom right block
-                    Draw.rect(bottleneck, tile.drawx() + (size * tilesize / 2f) - (tilesize / 2f), tile.drawy() - (size * tilesize / 2f) + (tilesize / 2f));
+                    // bottom right center x/y
+                    float brcx = tile.drawx() + (size * tilesize / 2f) - (tilesize / 2f);
+                    float brcy = tile.drawy() - (size * tilesize / 2f) + (tilesize / 2f);
+//                    Draw.rect(bottleneckFixture, brcx, brcy);
                     Draw.color(Bottleneck.color(bottleneckState(tile)));
-                    Draw.rect(bottleneckLed, tile.drawx() + (size * tilesize / 2f) - (tilesize / 2f), tile.drawy() - (size * tilesize / 2f) + (tilesize / 2f));
+                    Draw.rect(bottleneckLed, brcx, brcy);
                     Draw.color();
                 }
         }
@@ -486,8 +488,8 @@ public class Block extends BlockStorage{
             }
         }
 
-        bottleneck = Core.atlas.find("bottleneck");
         bottleneckLed = Core.atlas.find("bottleneck-led");
+        bottleneckFixture = Core.atlas.find("bottleneck-fixture");
     }
 
     /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #reg(int)}. */

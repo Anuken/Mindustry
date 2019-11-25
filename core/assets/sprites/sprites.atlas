@@ -697,7 +697,7 @@ block-select
   orig: 32, 32
   offset: 0, 0
   index: -1
-bottleneck
+bottleneck-fixture
   rotate: false
   xy: 1886, 1061
   size: 32, 32
