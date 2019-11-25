@@ -257,10 +257,14 @@ public class Block extends BlockStorage{
     public Bottleneck bottleneckState(Tile tile){
 
         for(Consume cons :tile.block.consumes.all()){
-            if (cons instanceof ConsumeItems){
+            if(cons instanceof ConsumeItems){
                 if(!tile.entity.items.has(((ConsumeItems)cons).items)){
                     return Bottleneck.input;
                 }
+            }
+
+            if(cons instanceof ConsumeLiquid && tile.entity.liquids.get(((ConsumeLiquid)cons).liquid) < ((ConsumeLiquid)cons).amount){
+                return Bottleneck.input;
             }
         }
 
