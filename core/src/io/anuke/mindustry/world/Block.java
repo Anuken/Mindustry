@@ -246,7 +246,9 @@ public class Block extends BlockStorage{
 
     public void drawBottleneck(Tile tile){
         if(tile.entity == null) return;
-        Draw.rect(bottleneck, tile.worldx() + (size * tilesize) - tilesize, tile.worldy());
+
+        // center of bottom right block
+        Draw.rect(bottleneck, tile.drawx() + (size * tilesize / 2f) - (tilesize / 2f), tile.drawy() - (size * tilesize / 2f) + (tilesize / 2f));
     }
 
     public void drawCracks(Tile tile){
