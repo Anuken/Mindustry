@@ -255,11 +255,20 @@ public class Block extends BlockStorage{
     }
 
     public Bottleneck bottleneckState(Tile tile){
-        if(tile.entity.cons.valid()){
-            return Bottleneck.none;
+
+        for(Consume cons :tile.block.consumes.all()){
+            if (cons instanceof ConsumeItems){
+                if(!tile.entity.items.has(((ConsumeItems)cons).items)){
+                    return Bottleneck.input;
+                }
+            }
         }
 
-        return Bottleneck.input;
+        if(!tile.entity.cons.valid()){
+            return Bottleneck.output;
+        }
+
+        return Bottleneck.none;
     }
 
     public void drawCracks(Tile tile){
