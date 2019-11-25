@@ -272,6 +272,9 @@ public class BlockRenderer implements Disposable{
 
             if(request.layer == Layer.block){
                 block.draw(request.tile);
+                if(true){
+                    block.drawBottleneck(request.tile);
+                }
                 if(request.tile.entity != null && request.tile.entity.damaged()){
                     block.drawCracks(request.tile);
                 }

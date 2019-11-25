@@ -144,7 +144,7 @@ public class Block extends BlockStorage{
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] variantRegions, editorVariantRegions;
-    protected TextureRegion region, editorIcon;
+    protected TextureRegion region, editorIcon, bottleneck, bottleneckLed;
 
     protected static TextureRegion[][] cracks;
 
@@ -242,6 +242,11 @@ public class Block extends BlockStorage{
     }
 
     public void drawLayer2(Tile tile){
+    }
+
+    public void drawBottleneck(Tile tile){
+        if(tile.entity == null) return;
+        Draw.rect(bottleneck, tile.worldx() + (size * tilesize) - tilesize, tile.worldy());
     }
 
     public void drawCracks(Tile tile){
@@ -454,6 +459,9 @@ public class Block extends BlockStorage{
                 }
             }
         }
+
+        bottleneck = Core.atlas.find("bottleneck");
+        bottleneckLed = Core.atlas.find("bottleneck-led");
     }
 
     /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #reg(int)}. */
