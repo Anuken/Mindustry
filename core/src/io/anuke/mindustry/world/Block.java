@@ -247,17 +247,26 @@ public class Block extends BlockStorage{
     public void drawBottleneck(Tile tile){
         if(tile.entity == null) return;
 
-        // center of bottom right block
-        Draw.rect(bottleneck, tile.drawx() + (size * tilesize / 2f) - (tilesize / 2f), tile.drawy() - (size * tilesize / 2f) + (tilesize / 2f));
-        Draw.color(Bottleneck.color(bottleneckState(tile)));
-        Draw.rect(bottleneckLed, tile.drawx() + (size * tilesize / 2f) - (tilesize / 2f), tile.drawy() - (size * tilesize / 2f) + (tilesize / 2f));
-        Draw.color();
+        switch(tile.block.category){
+            case production:
+            case crafting:
+            case power:
+            case units:
+                if(tile.block.hasItems || tile.block.hasLiquids || tile.block.hasPower){
+                    // center of bottom right block
+                    Draw.rect(bottleneck, tile.drawx() + (size * tilesize / 2f) - (tilesize / 2f), tile.drawy() - (size * tilesize / 2f) + (tilesize / 2f));
+                    Draw.color(Bottleneck.color(bottleneckState(tile)));
+                    Draw.rect(bottleneckLed, tile.drawx() + (size * tilesize / 2f) - (tilesize / 2f), tile.drawy() - (size * tilesize / 2f) + (tilesize / 2f));
+            if(!cons.met(tile.entity)) return Bottleneck.input;
+                    Draw.color();
+                }
+        }
     }
 
     public Bottleneck bottleneckState(Tile tile){
 
         for(Consume cons :tile.block.consumes.all()){
-            if(!cons.met(tile.entity)) return Bottleneck.input;
+            if(!cons.isOptional() && !cons.met(tile.entity)) return Bottleneck.input;
         }
 
         if(!tile.entity.cons.valid()){
