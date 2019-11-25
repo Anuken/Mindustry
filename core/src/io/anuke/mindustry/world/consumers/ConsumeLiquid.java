@@ -48,6 +48,11 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
     }
 
     @Override
+    public boolean met(TileEntity entity){
+        return entity.liquids.get(liquid) >= amount;
+    }
+
+    @Override
     public void display(BlockStats stats){
         stats.add(booster ? BlockStat.booster : BlockStat.input, liquid, amount * timePeriod, timePeriod == 60);
     }

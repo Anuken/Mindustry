@@ -55,6 +55,11 @@ public class ConsumePower extends Consume{
     }
 
     @Override
+    public boolean met(TileEntity entity){
+        return entity.power.status > 0f;
+    }
+
+    @Override
     public void display(BlockStats stats){
         if(buffered){
             stats.add(BlockStat.powerCapacity, capacity, StatUnit.none);

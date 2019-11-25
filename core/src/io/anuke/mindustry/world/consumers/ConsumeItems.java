@@ -65,6 +65,11 @@ public class ConsumeItems extends Consume{
     }
 
     @Override
+    public boolean met(TileEntity entity){
+        return entity.items.has(items);
+    }
+
+    @Override
     public void display(BlockStats stats){
         stats.add(booster ? BlockStat.booster : BlockStat.input, new ItemListValue(items));
     }

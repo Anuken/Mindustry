@@ -72,5 +72,9 @@ public abstract class Consume{
 
     public abstract boolean valid(TileEntity entity);
 
+    public boolean met(TileEntity entity){
+        return true;
+    };
+
     public abstract void display(BlockStats stats);
 }
