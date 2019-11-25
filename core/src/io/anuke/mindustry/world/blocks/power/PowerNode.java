@@ -357,4 +357,9 @@ public class PowerNode extends PowerBlock{
             return false;
         });
     }
+
+    @Override
+    public void drawBottleneck(Tile tile){
+        // powernodes don't need em
+    }
 }
