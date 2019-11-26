@@ -45,10 +45,14 @@ public class GenericProjector extends Block{
 
     boolean showProjection(){
         switch(projectCondition){ // Give me switch expressions or give me death
-            case always: return true;
-            case never: return false;
-            case withMender: return Core.settings.getBool("mendprojection");
-            case withOverdrive: return Core.settings.getBool("withOverdrive");
+            case always:
+                return true;
+            case never:
+                return false;
+            case withMender:
+                return Core.settings.getBool("mendprojection");
+            case withOverdrive:
+                return Core.settings.getBool("overdriveprojection");
             default:
                 throw new IllegalStateException("GenericProjector.projectCondition must be one of \"always\", \"never\", \"withMender\", \"withOverdrive\".");
         }
@@ -101,22 +105,21 @@ public class GenericProjector extends Block{
         if(shape == null){
             if(sides == 0) shape = new Circle(0, 0, range);
             else shape = new Polygon(pointsOfPolygon(sides, range));
-            return inShape(pointX, pointY, projX, projY);
         }
-        return shape.contains(pointX - projX, pointY - projY);
+        return shape.contains(projX - pointX, projY - pointY);
     }
 
     protected float[] pointsOfPolygon(int sides, float radius){
         float[] points = new float[sides * 2];
-        // x = a + r * cos(th)
-        // y = b + r * sin(th)
-        // th = 2π / (n - 1)
-        // a and b are always 0 since we image this polygon to be at (0,0)
-        // where n is side
+        // theta = 2π / n
+        // x = a + r * cos(theta)
+        // y = b + r * sin(theta)
+        // where n is the number of sides
+        // a and b are always 0, since we imagine this polygon to be at (0,0)
+        float theta = Mathf.PI2 / sides;
         for(int i = 0; i < sides * 2; i += 2){
-            float theta = Mathf.PI2 / (float)(i - 1);
-            points[i] = radius * Mathf.cos(theta);
-            points[i + 1] = radius * Mathf.sin(theta);
+            points[i] = radius * Mathf.cos(theta * i / 2);
+            points[i + 1] = radius * Mathf.sin(theta * i / 2);
         }
         return points;
     }
@@ -143,23 +146,25 @@ public class GenericProjector extends Block{
             //replace with inShape
             for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
                 for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    //if(!/*Mathf.within*/inShape(x * tilesize, y * tilesize, tile.drawx(), tile.drawy())) continue;
+                    if(!inShape(x * tilesize, y * tilesize, tile.drawx(), tile.drawy())) continue;
 
                     Tile other = world.ltile(x, y);
 
                     if(other == null) continue;
 
                     if(other.getTeamID() == tile.getTeamID() && !acted.contains(other.pos()) && other.entity != null){
-                        if(behaviour.equals("mend"))
+                        if(behaviour.equals("mend")){
                             if(other.entity.health < other.entity.maxHealth()){
                                 other.entity.healBy(other.entity.maxHealth() * (/*healPercent + entity.phaseHeat * phaseBoost*/effectivity) / 100f * entity.efficiency());
                                 Effects.effect(Fx.healBlockFull, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
                                 acted.add(other.pos());
-                            }else if(behaviour.equals("overdrive"))
-                                if(other.entity.timeScale <= entity.effectivity()){
-                                    other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
-                                    other.entity.timeScale = Math.max(other.entity.timeScale, effectivity);
-                                }
+                            }
+                        }else if(behaviour.equals("overdrive"))
+                            if(other.entity.timeScale <= entity.effectivity()){
+                                other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
+                                other.entity.timeScale = Math.max(other.entity.timeScale, effectivity);
+                            }
+
                         // other behaviours
                     }
                 }
