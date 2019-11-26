@@ -228,6 +228,9 @@ public class ContentParser{
 
                     postreads.add(() -> {
                         TechNode parnode = TechTree.all.find(t -> t.block == parent);
+                        if(parnode == null){
+                            throw new ModLoadException("Block '" + parent.name + "' isn't in the tech tree, but '" + block.name + "' requires it to be researched.", block);
+                        }
                         if(!parnode.children.contains(baseNode)){
                             parnode.children.add(baseNode);
                         }
