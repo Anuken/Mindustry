@@ -10,10 +10,8 @@ public class MultiPacker implements Disposable{
     private PixmapPacker[] packers = new PixmapPacker[PageType.all.length];
 
     public MultiPacker(){
-        //TODO 4096 may be a better choice
-        int pageSize = 2048;
-
         for(int i = 0; i < packers.length; i++){
+            int pageSize = 2048;
             packers[i] = new PixmapPacker(pageSize, pageSize, Format.RGBA8888, 2, true);
         }
     }
