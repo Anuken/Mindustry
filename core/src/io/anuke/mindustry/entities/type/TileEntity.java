@@ -15,6 +15,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.BlockDestroyEvent;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.modules.*;
 
 import java.io.*;
@@ -89,7 +90,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     /** Base efficiency. If this entity has non-buffered power, returns the power %, otherwise returns 1. */
     public float efficiency(){
-        return power != null && !block.consumes.getPower().buffered ? power.status : 1f;
+        return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
     }
 
     /** Call when nothing is happening to the entity. This increments the internal sleep timer. */

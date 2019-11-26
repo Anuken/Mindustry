@@ -6,7 +6,6 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
-import io.anuke.arc.graphics.Pixmap.*;
 import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.g2d.TextureAtlas.*;
@@ -19,6 +18,8 @@ import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.graphics.MultiPacker.*;
 import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.type.*;
 
@@ -34,7 +35,7 @@ public class Mods implements Loadable{
     private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites");
 
     private int totalSprites;
-    private PixmapPacker packer;
+    private MultiPacker packer;
 
     private Array<LoadedMod> loaded = new Array<>();
     private Array<LoadedMod> disabled = new Array<>();
@@ -80,35 +81,44 @@ public class Mods implements Loadable{
         if(loaded.isEmpty()) return;
         Time.mark();
 
-        packer = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
+        packer = new MultiPacker();
 
         for(LoadedMod mod : loaded){
-            int[] packed = {0};
-            boolean[] failed = {false};
-            mod.root.child("sprites").walk(file -> {
-                if(failed[0]) return;
-                if(file.extension().equals("png")){
-                    try(InputStream stream = file.read()){
-                        byte[] bytes = Streams.copyStreamToByteArray(stream, Math.max((int)file.length(), 512));
-                        Pixmap pixmap = new Pixmap(bytes, 0, bytes.length);
-                        packer.pack(mod.name + "-" + file.nameWithoutExtension(), pixmap);
-                        pixmap.dispose();
-                        packed[0] ++;
-                        totalSprites ++;
-                    }catch(IOException e){
-                        failed[0] = true;
-                        Core.app.post(() -> {
-                            Log.err("Error packing images for mod: {0}", mod.meta.name);
-                            e.printStackTrace();
-                            if(!headless) ui.showException(e);
-                        });
-                    }
-                }
-            });
-            Log.info("Packed {0} images for mod '{1}'.", packed[0], mod.meta.name);
+            Array<FileHandle> sprites = mod.root.child("sprites").findAll(f -> f.extension().equals("png"));
+            Array<FileHandle> overrides = mod.root.child("sprites-override").findAll(f -> f.extension().equals("png"));
+            packSprites(sprites, mod, true);
+            packSprites(overrides, mod, false);
+            Log.info("Packed {0} images for mod '{1}'.", sprites.size + overrides.size, mod.meta.name);
+            totalSprites += sprites.size + overrides.size;
+        }
+
+        for(AtlasRegion region : Core.atlas.getRegions()){
+            PageType type = getPage(region);
+            if(!packer.has(type, region.name)){
+                packer.add(type, region.name, Core.atlas.getPixmap(region));
+            }
         }
 
         Log.info("Time to pack textures: {0}", Time.elapsed());
+    }
+
+    private void packSprites(Array<FileHandle> sprites, LoadedMod mod, boolean prefix){
+        for(FileHandle file : sprites){
+            try(InputStream stream = file.read()){
+                byte[] bytes = Streams.copyStreamToByteArray(stream, Math.max((int)file.length(), 512));
+                Pixmap pixmap = new Pixmap(bytes, 0, bytes.length);
+                packer.add(getPage(file), (prefix ? mod.name + "-" : "") + file.nameWithoutExtension(), new PixmapRegion(pixmap));
+                pixmap.dispose();
+            }catch(IOException e){
+                Core.app.post(() -> {
+                    Log.err("Error packing images for mod: {0}", mod.meta.name);
+                    e.printStackTrace();
+                    if(!headless) ui.showException(e);
+                });
+                break;
+            }
+        }
+        totalSprites += sprites.size;
     }
 
     @Override
@@ -116,37 +126,58 @@ public class Mods implements Loadable{
         if(packer == null) return;
         Time.mark();
 
-        Texture editor = Core.atlas.find("clear-editor").getTexture();
-        PixmapPacker editorPacker = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
-
-        for(AtlasRegion region : Core.atlas.getRegions()){
-            if(region.getTexture() == editor){
-                editorPacker.pack(region.name, Core.atlas.getPixmap(region).crop());
-            }
-        }
-
         //get textures packed
         if(totalSprites > 0){
             TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
 
-            packer.updateTextureAtlas(Core.atlas, filter, filter, false);
+            //flush so generators can use these sprites
+            packer.flush(filter, Core.atlas);
+
             //generate new icons
             for(Array<Content> arr : content.getContentMap()){
                 arr.each(c -> {
                     if(c instanceof UnlockableContent && c.mod != null){
                         UnlockableContent u = (UnlockableContent)c;
-                        u.createIcons(packer, editorPacker);
+                        u.createIcons(packer);
                     }
                 });
             }
 
-            editorPacker.updateTextureAtlas(Core.atlas, filter, filter, false);
-            packer.updateTextureAtlas(Core.atlas, filter, filter, false);
+            Core.atlas = packer.flush(filter, new TextureAtlas());
+            Core.atlas.setErrorRegion("error");
+            Log.info("Total pages: {0}", Core.atlas.getTextures().size);
         }
 
         packer.dispose();
         packer = null;
         Log.info("Time to update textures: {0}", Time.elapsed());
+    }
+
+    //There are several pages for sprites.
+    //main page (sprites.png) - all sprites for units, weapons, placeable blocks, effects, bullets, etc
+    //environment page (sprites2.png) - all sprites for things in the environmental cache layer
+    //editor page (sprites3.png) - all sprites needed for rendering in the editor, including block icons and a few minor sprites
+    //zone page (sprites4.png) - zone previews
+    //ui page (sprites5.png) - content icons, white icons and UI elements
+
+    private PageType getPage(AtlasRegion region){
+        return
+            region.getTexture() == Core.atlas.find("white").getTexture() ? PageType.main :
+            region.getTexture() == Core.atlas.find("stone1").getTexture() ? PageType.environment :
+            region.getTexture() == Core.atlas.find("clear-editor").getTexture() ? PageType.editor :
+            region.getTexture() == Core.atlas.find("zone-groundZero").getTexture() ? PageType.zone :
+            region.getTexture() == Core.atlas.find("whiteui").getTexture() ? PageType.ui :
+            PageType.main;
+    }
+
+    private PageType getPage(FileHandle file){
+        String parent = file.parent().name();
+        return
+            parent.equals("environment") ? PageType.environment :
+            parent.equals("editor") ? PageType.editor :
+            parent.equals("zones") ? PageType.zone :
+            parent.equals("ui") || file.parent().parent().name().equals("ui") ? PageType.ui :
+            PageType.main;
     }
 
     /** Removes a mod file and marks it for requiring a restart. */
@@ -674,6 +705,14 @@ public class Mods implements Loadable{
 
         public ModLoadException(@Nullable Content content, Throwable cause){
             super(cause);
+            this.content = content;
+            if(content != null){
+                this.mod = content.mod;
+            }
+        }
+
+        public ModLoadException(String message, @Nullable Content content){
+            super(message);
             this.content = content;
             if(content != null){
                 this.mod = content.mod;
