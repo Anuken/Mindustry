@@ -7,6 +7,7 @@ public class BurnerGenerator extends ItemLiquidGenerator{
 
     public BurnerGenerator(String name){
         super(true, false, name);
+        isConservative = true;
     }
 
     @Override
