@@ -461,11 +461,11 @@ public class UI implements ApplicationListener, Loadable{
 
     public String formatAmount(int number){
         if(number >= 1000000){
-            return Strings.fixed(number / 1000000f, 1) + "[gray]mil[]";
+            return Strings.fixed(number / 1000000f, 1) + "[gray]" + Core.bundle.getOrNull("unit.millions") + "[]";
         }else if(number >= 10000){
             return number / 1000 + "[gray]k[]";
         }else if(number >= 1000){
-            return Strings.fixed(number / 1000f, 1) + "[gray]k[]";
+            return Strings.fixed(number / 1000f, 1) + "[gray]" + Core.bundle.getOrNull("unit.thousands") + "[]";
         }else{
             return number + "";
         }

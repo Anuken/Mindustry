@@ -189,9 +189,9 @@ public class BlockInventoryFragment extends Fragment{
     private String round(float f){
         f = (int)f;
         if(f >= 1000000){
-            return (int)(f / 1000000f) + "[gray]mil[]";
+            return (int)(f / 1000000f) + "[gray]" + Core.bundle.getOrNull("unit.millions") + "[]";
         }else if(f >= 1000){
-            return (int)(f / 1000) + "k";
+            return (int)(f / 1000) + Core.bundle.getOrNull("unit.thousands");
         }else{
             return (int)f + "";
         }
