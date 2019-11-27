@@ -30,6 +30,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Mods implements Loadable{
     private Json json = new Json();
+    private Scripts scripts = new Scripts();
     private ContentParser parser = new ContentParser();
     private ObjectMap<String, Array<FileHandle>> bundles = new ObjectMap<>();
     private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites");
@@ -362,6 +363,31 @@ public class Mods implements Loadable{
 
     /** Creates all the content found in mod files. */
     public void loadContent(){
+
+        Time.mark();
+
+        for(LoadedMod mod : loaded){
+            if(mod.root.child("scripts").exists()){
+                mod.scripts = mod.root.child("scripts").findAll(f -> f.extension().equals("js"));
+                Log.info("[{0}] Found {1} scripts.", mod.meta.name, mod.scripts.size);
+
+                for(FileHandle file : mod.scripts){
+                    try{
+                        scripts.run(file.readString());
+                    }catch(Throwable e){
+                        Core.app.post(() -> {
+                            Log.err("Error loading script {0} for mod {1}.", file.name(), mod.meta.name);
+                            e.printStackTrace();
+                            if(!headless) ui.showException(e);
+                        });
+                        break;
+                    }
+                }
+            }
+        }
+
+        Log.info("Time to initialize modded scripts: {0}", Time.elapsed());
+
         class LoadRun implements Comparable<LoadRun>{
             final ContentType type;
             final FileHandle file;
@@ -414,9 +440,6 @@ public class Mods implements Loadable{
 
         //this finishes parsing content fields
         parser.finishParsing();
-
-        //load content for code mods
-        each(Mod::loadContent);
     }
 
     /** @return all loaded mods. */
@@ -582,6 +605,8 @@ public class Mods implements Loadable{
         public Array<LoadedMod> dependencies = new Array<>();
         /** All missing dependencies of this mod as strings. */
         public Array<String> missingDependencies = new Array<>();
+        /** Script files to run. */
+        public Array<FileHandle> scripts = new Array<>();
 
         public LoadedMod(FileHandle file, FileHandle root, Mod mod, ModMeta meta){
             this.root = root;

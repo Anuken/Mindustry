@@ -254,6 +254,7 @@ project(":core"){
         compileJava.dependsOn(preGen)
 
         compile "org.lz4:lz4-java:1.4.1"
+        compile "org.graalvm.js:js:19.3.0"
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
         compile arcModule("extensions:arcnet")
