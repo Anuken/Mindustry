@@ -97,10 +97,10 @@ public class Door extends Wall{
         DoorEntity entity = tile.entity();
 
         if((entity.lastSignal != tile.entity.enabled()) && tile.entity.timer.get(timerToggle, 30f)){
+            entity.lastSignal = tile.entity.enabled();
             if(entity.open != tile.entity.enabled()){
                 Call.onDoorToggle(null, tile, !entity.open);
             }
-            entity.lastSignal = tile.entity.enabled();
         }
     }
 
