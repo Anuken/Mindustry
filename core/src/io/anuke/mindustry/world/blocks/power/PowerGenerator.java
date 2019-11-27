@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Pal;
@@ -46,6 +47,9 @@ public class PowerGenerator extends PowerDistributor{
     @Override
     public float getPowerProduction(Tile tile){
         return powerProduction * tile.<GeneratorEntity>entity().productionEfficiency;
+    }
+
+    public void conservePower(final Tile tile, final float percentage){
     }
 
     @Override

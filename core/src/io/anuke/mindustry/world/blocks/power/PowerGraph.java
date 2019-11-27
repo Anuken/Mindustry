@@ -188,6 +188,16 @@ public class PowerGraph{
         }
     }
 
+    public void conserveGeneration(final float percentage){
+        for(Tile producer : producers){
+            if(producer.entity == null) continue;
+            if(!(producer.block() instanceof PowerGenerator)) continue;
+            final PowerGenerator block = (PowerGenerator)producer.block();
+            if(!block.isConservative) continue;
+            block.conservePower(producer, percentage);
+        }
+    }
+
     public void update(){
         if(Core.graphics.getFrameId() == lastFrameUpdated){
             return;
@@ -218,6 +228,9 @@ public class PowerGraph{
                 }else if(powerProduced.total > powerNeeded){
                     final float batteryChargeGained = chargeBatteries(powerProduced.total - powerNeeded);
                     powerToConsume = powerProduced.total - batteryChargeGained;
+                    if(powerNeeded + batteryChargeGained < powerProduced.total && !Mathf.zero(powerProduced.optional)){
+                        conserveGeneration(Mathf.clamp(1 - (powerNeeded + batteryChargeGained - powerProduced.mandatory) / powerProduced.optional));
+                    }
                 }
             }
 

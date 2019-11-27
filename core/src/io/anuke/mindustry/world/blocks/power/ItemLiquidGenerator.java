@@ -92,6 +92,14 @@ public class ItemLiquidGenerator extends PowerGenerator{
     }
 
     @Override
+    public void conservePower(final Tile tile, final float percentage){
+        if(!isConservative) return;
+        if(Mathf.zero(getPowerProduction(tile))) return;
+        final GeneratorEntity entity = tile.entity();
+        entity.generateTime += Math.min(1f / itemDuration * entity.delta(), entity.generateTime) * percentage;
+    }
+
+    @Override
     public void update(Tile tile){
         ItemLiquidGeneratorEntity entity = tile.entity();
 
