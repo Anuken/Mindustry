@@ -210,18 +210,18 @@ public class PowerGraph{
         lastPowerProduced = powerProduced.total;
 
         if(!(consumers.size == 0 && producers.size == 0 && batteries.size == 0)){
-
+            float powerToConsume = powerProduced.total;
             if(!Mathf.equal(powerNeeded, powerProduced.total)){
                 if(powerNeeded > powerProduced.total){
-                    float powerBatteryUsed = useBatteries(powerNeeded - powerProduced.total);
-                    powerProduced.total += powerBatteryUsed;
-                    lastPowerProduced += powerBatteryUsed;
+                    final float batteryPowerUsed = useBatteries(powerNeeded - powerProduced.total);
+                    lastPowerProduced = powerToConsume = powerProduced.total + batteryPowerUsed;
                 }else if(powerProduced.total > powerNeeded){
-                    powerProduced.total -= chargeBatteries(powerProduced.total - powerNeeded);
+                    final float batteryChargeGained = chargeBatteries(powerProduced.total - powerNeeded);
+                    powerToConsume = powerProduced.total - batteryChargeGained;
                 }
             }
 
-            distributePower(powerNeeded, powerProduced.total);
+            distributePower(powerNeeded, powerToConsume);
         }
 
         powerBalance.addValue((lastPowerProduced - lastPowerNeeded) / Time.delta());
