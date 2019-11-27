@@ -4,6 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.consumers.*;
 
@@ -54,12 +55,28 @@ public class PowerGraph{
         return Mathf.clamp(lastPowerProduced / lastPowerNeeded);
     }
 
-    public float getPowerProduced(){
-        float powerProduced = 0f;
+    public static class PowerProduced{
+        public float mandatory;
+        public float optional;
+        public float total;
+    }
+    final private static PowerProduced powerProduced = new PowerProduced();
+
+    public @NonNull PowerProduced getPowerProduced(){
+        powerProduced.mandatory = 0f;
+        powerProduced.optional = 0f;
         for(Tile producer : producers){
             if(producer.entity == null) continue;
-            powerProduced += producer.block().getPowerProduction(producer) * producer.entity.delta();
+            if(!(producer.block() instanceof PowerGenerator)) continue;
+            final PowerGenerator block = (PowerGenerator)producer.block();
+            final float producerPower = block.getPowerProduction(producer) * producer.entity.delta();
+            if(block.isConservative){
+                powerProduced.optional += producerPower;
+            }else{
+                powerProduced.mandatory += producerPower;
+            }
         }
+        powerProduced.total = powerProduced.mandatory + powerProduced.optional;
         return powerProduced;
     }
 
@@ -187,24 +204,24 @@ public class PowerGraph{
         lastFrameUpdated = Core.graphics.getFrameId();
 
         float powerNeeded = getPowerNeeded();
-        float powerProduced = getPowerProduced();
+        final PowerProduced powerProduced = getPowerProduced();
 
         lastPowerNeeded = powerNeeded;
-        lastPowerProduced = powerProduced;
+        lastPowerProduced = powerProduced.total;
 
         if(!(consumers.size == 0 && producers.size == 0 && batteries.size == 0)){
 
-            if(!Mathf.equal(powerNeeded, powerProduced)){
-                if(powerNeeded > powerProduced){
-                    float powerBatteryUsed = useBatteries(powerNeeded - powerProduced);
-                    powerProduced += powerBatteryUsed;
+            if(!Mathf.equal(powerNeeded, powerProduced.total)){
+                if(powerNeeded > powerProduced.total){
+                    float powerBatteryUsed = useBatteries(powerNeeded - powerProduced.total);
+                    powerProduced.total += powerBatteryUsed;
                     lastPowerProduced += powerBatteryUsed;
-                }else if(powerProduced > powerNeeded){
-                    powerProduced -= chargeBatteries(powerProduced - powerNeeded);
+                }else if(powerProduced.total > powerNeeded){
+                    powerProduced.total -= chargeBatteries(powerProduced.total - powerNeeded);
                 }
             }
 
-            distributePower(powerNeeded, powerProduced);
+            distributePower(powerNeeded, powerProduced.total);
         }
 
         powerBalance.addValue((lastPowerProduced - lastPowerNeeded) / Time.delta());
