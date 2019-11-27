@@ -16,12 +16,12 @@ import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.modules.*;
 
 public class Conduit extends LiquidBlock implements Autotiler{
-    protected final int timerFlow = timers++;
+    public final int timerFlow = timers++;
 
-    protected TextureRegion[] topRegions = new TextureRegion[7];
-    protected TextureRegion[] botRegions = new TextureRegion[7];
+    public TextureRegion[] topRegions = new TextureRegion[7];
+    public TextureRegion[] botRegions = new TextureRegion[7];
 
-    protected float leakResistance = 1.5f;
+    public float leakResistance = 1.5f;
 
     public Conduit(String name){
         super(name);

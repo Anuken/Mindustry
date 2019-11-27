@@ -28,40 +28,39 @@ import io.anuke.mindustry.world.meta.*;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class Turret extends Block{
-    protected static final int targetInterval = 20;
+    public final int timerTarget = timers++;
+    public int targetInterval = 20;
 
-    protected final int timerTarget = timers++;
+    public Color heatColor = Pal.turretHeat;
+    public Effect shootEffect = Fx.none;
+    public Effect smokeEffect = Fx.none;
+    public Effect ammoUseEffect = Fx.none;
+    public Sound shootSound = Sounds.shoot;
 
-    protected Color heatColor = Pal.turretHeat;
-    protected Effect shootEffect = Fx.none;
-    protected Effect smokeEffect = Fx.none;
-    protected Effect ammoUseEffect = Fx.none;
-    protected Sound shootSound = Sounds.shoot;
-
-    protected int ammoPerShot = 1;
-    protected float ammoEjectBack = 1f;
-    protected float range = 50f;
-    protected float reload = 10f;
-    protected float inaccuracy = 0f;
-    protected int shots = 1;
-    protected float spread = 4f;
-    protected float recoil = 1f;
-    protected float restitution = 0.02f;
-    protected float cooldown = 0.02f;
-    protected float rotatespeed = 5f; //in degrees per tick
-    protected float shootCone = 8f;
-    protected float shootShake = 0f;
-    protected float xRand = 0f;
-    protected boolean targetAir = true;
-    protected boolean targetGround = true;
+    public int ammoPerShot = 1;
+    public float ammoEjectBack = 1f;
+    public float range = 50f;
+    public float reload = 10f;
+    public float inaccuracy = 0f;
+    public int shots = 1;
+    public float spread = 4f;
+    public float recoil = 1f;
+    public float restitution = 0.02f;
+    public float cooldown = 0.02f;
+    public float rotatespeed = 5f; //in degrees per tick
+    public float shootCone = 8f;
+    public float shootShake = 0f;
+    public float xRand = 0f;
+    public boolean targetAir = true;
+    public boolean targetGround = true;
 
     protected Vector2 tr = new Vector2();
     protected Vector2 tr2 = new Vector2();
 
-    protected TextureRegion baseRegion, heatRegion;
+    public TextureRegion baseRegion, heatRegion;
 
-    protected Cons2<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-    protected Cons2<Tile, TurretEntity> heatDrawer = (tile, entity) -> {
+    public Cons2<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+    public Cons2<Tile, TurretEntity> heatDrawer = (tile, entity) -> {
         if(entity.heat <= 0.00001f) return;
         Draw.color(heatColor, entity.heat);
         Draw.blend(Blending.additive);

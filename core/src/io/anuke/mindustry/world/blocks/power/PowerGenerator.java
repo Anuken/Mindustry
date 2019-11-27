@@ -13,7 +13,7 @@ import java.io.*;
 
 public class PowerGenerator extends PowerDistributor{
     /** The amount of power produced per tick in case of an efficiency of 1.0, which represents 100%. */
-    protected float powerProduction;
+    public float powerProduction;
     public BlockStat generationType = BlockStat.basePowerGeneration;
 
     public PowerGenerator(String name){

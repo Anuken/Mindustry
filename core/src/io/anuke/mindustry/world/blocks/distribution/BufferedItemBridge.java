@@ -7,10 +7,10 @@ import io.anuke.mindustry.world.*;
 import java.io.*;
 
 public class BufferedItemBridge extends ExtendingItemBridge{
-    protected int timerAccept = timers++;
+    public final int timerAccept = timers++;
 
-    protected float speed = 40f;
-    protected int bufferCapacity = 50;
+    public float speed = 40f;
+    public int bufferCapacity = 50;
 
     public BufferedItemBridge(String name){
         super(name);

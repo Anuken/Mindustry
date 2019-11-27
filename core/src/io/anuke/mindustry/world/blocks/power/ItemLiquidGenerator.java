@@ -20,20 +20,20 @@ import static io.anuke.mindustry.Vars.*;
  * Liquids will take priority over items.
  */
 public class ItemLiquidGenerator extends PowerGenerator{
-    protected float minItemEfficiency = 0.2f;
+    public float minItemEfficiency = 0.2f;
     /** The time in number of ticks during which a single item will produce power. */
-    protected float itemDuration = 70f;
+    public float itemDuration = 70f;
 
-    protected float minLiquidEfficiency = 0.2f;
+    public float minLiquidEfficiency = 0.2f;
     /** Maximum liquid used per frame. */
-    protected float maxLiquidGenerate = 0.4f;
+    public float maxLiquidGenerate = 0.4f;
 
-    protected Effect generateEffect = Fx.generatespark;
-    protected Effect explodeEffect = Fx.generatespark;
-    protected Color heatColor = Color.valueOf("ff9b59");
-    protected TextureRegion topRegion, liquidRegion;
-    protected boolean randomlyExplode = true;
-    protected boolean defaults = false;
+    public Effect generateEffect = Fx.generatespark;
+    public Effect explodeEffect = Fx.generatespark;
+    public Color heatColor = Color.valueOf("ff9b59");
+    public TextureRegion topRegion, liquidRegion;
+    public boolean randomlyExplode = true;
+    public boolean defaults = false;
 
     public ItemLiquidGenerator(boolean hasItems, boolean hasLiquids, String name){
         this(name);

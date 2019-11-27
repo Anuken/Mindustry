@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.meta.StatUnit;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class DoubleTurret extends ItemTurret{
-    protected float shotWidth = 2f;
+    public float shotWidth = 2f;
 
     public DoubleTurret(String name){
         super(name);

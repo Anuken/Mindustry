@@ -299,6 +299,7 @@ project(":tools"){
 
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+        compile "org.reflections:reflections:0.9.11"
 
         compile arcModule("backends:backend-sdl")
     }

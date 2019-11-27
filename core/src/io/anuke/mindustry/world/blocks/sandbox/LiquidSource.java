@@ -21,7 +21,7 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class LiquidSource extends Block{
-    private static Liquid lastLiquid;
+    public static Liquid lastLiquid;
 
     public LiquidSource(String name){
         super(name);

@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.meta.*;
 
 //TODO implement later
 public class LiquidOverflowGate extends LiquidBlock{
-    int topRegion;
+    public int topRegion;
 
     public LiquidOverflowGate(String name){
         super(name);

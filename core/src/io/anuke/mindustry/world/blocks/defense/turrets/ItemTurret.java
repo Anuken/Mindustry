@@ -22,8 +22,8 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class ItemTurret extends CooledTurret{
-    protected int maxAmmo = 30;
-    protected ObjectMap<Item, BulletType> ammo = new ObjectMap<>();
+    public int maxAmmo = 30;
+    public ObjectMap<Item, BulletType> ammo = new ObjectMap<>();
 
     public ItemTurret(String name){
         super(name);

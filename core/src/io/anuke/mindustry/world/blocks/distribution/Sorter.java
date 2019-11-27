@@ -18,7 +18,7 @@ import static io.anuke.mindustry.Vars.content;
 
 public class Sorter extends Block{
     private static Item lastItem;
-    protected boolean invert;
+    public boolean invert;
 
     public Sorter(String name){
         super(name);

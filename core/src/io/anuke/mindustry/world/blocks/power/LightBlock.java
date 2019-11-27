@@ -16,9 +16,9 @@ import static io.anuke.mindustry.Vars.*;
 public class LightBlock extends Block{
     private static int lastColor = 0;
 
-    protected float brightness = 0.9f;
-    protected float radius = 200f;
-    protected int topRegion;
+    public float brightness = 0.9f;
+    public float radius = 200f;
+    public int topRegion;
 
     public LightBlock(String name){
         super(name);

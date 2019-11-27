@@ -19,17 +19,17 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class ImpactReactor extends PowerGenerator{
-    protected int timerUse = timers++;
+    public final int timerUse = timers++;
 
-    protected int plasmas = 4;
-    protected float warmupSpeed = 0.001f;
-    protected float itemDuration = 60f;
-    protected int explosionRadius = 50;
-    protected int explosionDamage = 2000;
+    public int plasmas = 4;
+    public float warmupSpeed = 0.001f;
+    public float itemDuration = 60f;
+    public int explosionRadius = 50;
+    public int explosionDamage = 2000;
 
-    protected Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
-    protected int bottomRegion;
-    protected int[] plasmaRegions;
+    public Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
+    public int bottomRegion;
+    public int[] plasmaRegions;
 
     public ImpactReactor(String name){
         super(name);

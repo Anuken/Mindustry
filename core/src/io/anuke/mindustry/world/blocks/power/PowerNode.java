@@ -21,12 +21,12 @@ import static io.anuke.mindustry.Vars.*;
 public class PowerNode extends PowerBlock{
     protected static boolean returnValue = false;
 
-    protected ObjectSet<PowerGraph> graphs = new ObjectSet<>();
-    protected Vector2 t1 = new Vector2(), t2 = new Vector2();
-    protected TextureRegion laser, laserEnd;
+    protected final ObjectSet<PowerGraph> graphs = new ObjectSet<>();
+    protected final Vector2 t1 = new Vector2(), t2 = new Vector2();
 
-    protected float laserRange = 6;
-    protected int maxNodes = 3;
+    public TextureRegion laser, laserEnd;
+    public float laserRange = 6;
+    public int maxNodes = 3;
 
     public PowerNode(String name){
         super(name);

@@ -27,12 +27,12 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class UnitFactory extends Block{
-    protected UnitType unitType;
-    protected float produceTime = 1000f;
-    protected float launchVelocity = 0f;
-    protected TextureRegion topRegion;
-    protected int maxSpawn = 4;
-    protected int[] capacities;
+    public UnitType unitType;
+    public float produceTime = 1000f;
+    public float launchVelocity = 0f;
+    public TextureRegion topRegion;
+    public int maxSpawn = 4;
+    public int[] capacities;
 
     public UnitFactory(String name){
         super(name);

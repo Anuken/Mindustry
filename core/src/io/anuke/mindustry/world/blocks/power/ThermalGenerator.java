@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.meta.*;
 import static io.anuke.mindustry.Vars.renderer;
 
 public class ThermalGenerator extends PowerGenerator{
-    protected Effect generateEffect = Fx.none;
+    public Effect generateEffect = Fx.none;
 
     public ThermalGenerator(String name){
         super(name);

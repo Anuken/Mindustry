@@ -21,41 +21,40 @@ import io.anuke.mindustry.world.meta.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class Drill extends Block{
-    protected final static float hardnessDrillMultiplier = 50f;
+    public float hardnessDrillMultiplier = 50f;
 
     protected final ObjectIntMap<Item> oreCount = new ObjectIntMap<>();
     protected final Array<Item> itemArray = new Array<>();
 
     /** Maximum tier of blocks this drill can mine. */
-    protected int tier;
+    public int tier;
     /** Base time to drill one ore, in frames. */
-    protected float drillTime = 300;
+    public float drillTime = 300;
     /** How many times faster the drill will progress when boosted by liquid. */
-    protected float liquidBoostIntensity = 1.6f;
+    public float liquidBoostIntensity = 1.6f;
     /** Speed at which the drill speeds up. */
-    protected float warmupSpeed = 0.02f;
+    public float warmupSpeed = 0.02f;
 
     //return variables for countOre
     protected Item returnItem;
     protected int returnCount;
 
     /** Whether to draw the item this drill is mining. */
-    protected boolean drawMineItem = false;
+    public boolean drawMineItem = false;
     /** Effect played when an item is produced. This is colored. */
-    protected Effect drillEffect = Fx.mine;
+    public Effect drillEffect = Fx.mine;
     /** Speed the drill bit rotates at. */
-    protected float rotateSpeed = 2f;
+    public float rotateSpeed = 2f;
     /** Effect randomly played while drilling. */
-    protected Effect updateEffect = Fx.pulverizeSmall;
+    public Effect updateEffect = Fx.pulverizeSmall;
     /** Chance the update effect will appear. */
-    protected float updateEffectChance = 0.02f;
+    public float updateEffectChance = 0.02f;
 
-    protected boolean drawRim = false;
-
-    protected Color heatColor = Color.valueOf("ff5512");
-    protected TextureRegion rimRegion;
-    protected TextureRegion rotatorRegion;
-    protected TextureRegion topRegion;
+    public boolean drawRim = false;
+    public Color heatColor = Color.valueOf("ff5512");
+    public TextureRegion rimRegion;
+    public TextureRegion rotatorRegion;
+    public TextureRegion topRegion;
 
     public Drill(String name){
         super(name);

@@ -16,19 +16,19 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class OverdriveProjector extends Block{
-    private static Color color = Color.valueOf("feb380");
-    private static Color phase = Color.valueOf("ffd59e");
-    private static IntSet healed = new IntSet();
+    private static final IntSet healed = new IntSet();
 
-    protected int timerUse = timers++;
+    public final int timerUse = timers++;
 
-    protected TextureRegion topRegion;
-    protected float reload = 60f;
-    protected float range = 80f;
-    protected float speedBoost = 1.5f;
-    protected float speedBoostPhase = 0.75f;
-    protected float useTime = 400f;
-    protected float phaseRangeBoost = 20f;
+    public TextureRegion topRegion;
+    public float reload = 60f;
+    public float range = 80f;
+    public float speedBoost = 1.5f;
+    public float speedBoostPhase = 0.75f;
+    public float useTime = 400f;
+    public float phaseRangeBoost = 20f;
+    public Color baseColor = Color.valueOf("feb380");
+    public Color phaseColor = Color.valueOf("ffd59e");
 
     public OverdriveProjector(String name){
         super(name);
@@ -69,7 +69,7 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void drawLight(Tile tile){
-        renderer.lights.add(tile.drawx(), tile.drawy(), 50f * tile.entity.efficiency(), color, 0.7f * tile.entity.efficiency());
+        renderer.lights.add(tile.drawx(), tile.drawy(), 50f * tile.entity.efficiency(), baseColor, 0.7f * tile.entity.efficiency());
     }
 
     @Override
@@ -118,7 +118,7 @@ public class OverdriveProjector extends Block{
         OverdriveEntity entity = tile.entity();
         float realRange = range + entity.phaseHeat * phaseRangeBoost;
 
-        Drawf.dashCircle(tile.drawx(), tile.drawy(), realRange, color);
+        Drawf.dashCircle(tile.drawx(), tile.drawy(), realRange, baseColor);
     }
 
     @Override
@@ -128,7 +128,7 @@ public class OverdriveProjector extends Block{
         OverdriveEntity entity = tile.entity();
         float f = 1f - (Time.time() / 100f) % 1f;
 
-        Draw.color(color, phase, entity.phaseHeat);
+        Draw.color(baseColor, phaseColor, entity.phaseHeat);
         Draw.alpha(entity.heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
         Draw.alpha(1f);

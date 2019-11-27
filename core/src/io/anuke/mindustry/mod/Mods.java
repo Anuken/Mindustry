@@ -30,7 +30,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Mods implements Loadable{
     private Json json = new Json();
-    private Scripts scripts = new Scripts();
+    private Scripts scripts;
     private ContentParser parser = new ContentParser();
     private ObjectMap<String, Array<FileHandle>> bundles = new ObjectMap<>();
     private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites");
@@ -373,7 +373,10 @@ public class Mods implements Loadable{
 
                 for(FileHandle file : mod.scripts){
                     try{
-                        scripts.run(file.readString());
+                        if(scripts == null){
+                            scripts = new Scripts();
+                        }
+                        scripts.run(mod, file);
                     }catch(Throwable e){
                         Core.app.post(() -> {
                             Log.err("Error loading script {0} for mod {1}.", file.name(), mod.meta.name);

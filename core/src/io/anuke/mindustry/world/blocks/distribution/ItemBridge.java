@@ -20,12 +20,12 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class ItemBridge extends Block{
-    protected int timerTransport = timers++;
-    protected int range;
-    protected float transportTime = 2f;
-    protected TextureRegion endRegion, bridgeRegion, arrowRegion;
-    protected BuildRequest otherReq;
+    public final int timerTransport = timers++;
+    public int range;
+    public float transportTime = 2f;
+    public TextureRegion endRegion, bridgeRegion, arrowRegion;
 
+    private static BuildRequest otherReq;
     private static int lastPlaced = Pos.invalid;
 
     public ItemBridge(String name){

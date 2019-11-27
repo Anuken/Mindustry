@@ -20,17 +20,17 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class MassDriver extends Block{
-    protected float range;
-    protected float rotateSpeed = 0.04f;
-    protected float translation = 7f;
-    protected int minDistribute = 10;
-    protected float knockback = 4f;
-    protected float reloadTime = 100f;
-    protected Effect shootEffect = Fx.shootBig2;
-    protected Effect smokeEffect = Fx.shootBigSmoke2;
-    protected Effect recieveEffect = Fx.mineBig;
-    protected float shake = 3f;
-    protected TextureRegion baseRegion;
+    public float range;
+    public float rotateSpeed = 0.04f;
+    public float translation = 7f;
+    public int minDistribute = 10;
+    public float knockback = 4f;
+    public float reloadTime = 100f;
+    public Effect shootEffect = Fx.shootBig2;
+    public Effect smokeEffect = Fx.shootBigSmoke2;
+    public Effect recieveEffect = Fx.mineBig;
+    public float shake = 3f;
+    public TextureRegion baseRegion;
 
     public MassDriver(String name){
         super(name);

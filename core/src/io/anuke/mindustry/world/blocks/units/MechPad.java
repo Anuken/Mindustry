@@ -26,7 +26,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class MechPad extends Block{
     public @NonNull Mech mech;
-    protected float buildTime = 60 * 5;
+    public float buildTime = 60 * 5;
 
     public MechPad(String name){
         super(name);

@@ -32,7 +32,7 @@ public class Conveyor extends Block implements Autotiler{
     private final Vector2 tr2 = new Vector2();
     private TextureRegion[][] regions = new TextureRegion[7][4];
 
-    protected float speed = 0f;
+    public float speed = 0f;
 
     protected Conveyor(String name){
         super(name);

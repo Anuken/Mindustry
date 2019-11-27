@@ -18,11 +18,11 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class Door extends Wall{
-    protected final Rectangle rect = new Rectangle();
+    protected final static Rectangle rect = new Rectangle();
 
-    protected int timerToggle = timers++;
-    protected Effect openfx = Fx.dooropen;
-    protected Effect closefx = Fx.doorclose;
+    public final int timerToggle = timers++;
+    public Effect openfx = Fx.dooropen;
+    public Effect closefx = Fx.doorclose;
 
     protected TextureRegion openRegion;
 

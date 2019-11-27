@@ -11,8 +11,8 @@ import static io.anuke.mindustry.Vars.renderer;
 
 /** A GenericCrafter with a new glowing region drawn on top. */
 public class GenericSmelter extends GenericCrafter{
-    protected Color flameColor = Color.valueOf("ffc999");
-    protected TextureRegion topRegion;
+    public Color flameColor = Color.valueOf("ffc999");
+    public TextureRegion topRegion;
 
     public GenericSmelter(String name){
         super(name);

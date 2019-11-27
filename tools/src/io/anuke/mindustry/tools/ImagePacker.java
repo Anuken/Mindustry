@@ -1,4 +1,4 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.tools;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
@@ -7,6 +7,7 @@ import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.Log.LogHandler;
 import io.anuke.arc.util.Log.NoopLogHandler;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.ContentLoader;
 
 import javax.imageio.ImageIO;

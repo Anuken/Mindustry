@@ -21,17 +21,17 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class ForceProjector extends Block{
-    protected int timerUse = timers++;
-    protected float phaseUseTime = 350f;
+    public final int timerUse = timers++;
+    public float phaseUseTime = 350f;
 
-    protected float phaseRadiusBoost = 80f;
-    protected float radius = 101.7f;
-    protected float breakage = 550f;
-    protected float cooldownNormal = 1.75f;
-    protected float cooldownLiquid = 1.5f;
-    protected float cooldownBrokenBase = 0.35f;
-    protected float basePowerDraw = 0.2f;
-    protected TextureRegion topRegion;
+    public float phaseRadiusBoost = 80f;
+    public float radius = 101.7f;
+    public float breakage = 550f;
+    public float cooldownNormal = 1.75f;
+    public float cooldownLiquid = 1.5f;
+    public float cooldownBrokenBase = 0.35f;
+    public float basePowerDraw = 0.2f;
+    public TextureRegion topRegion;
 
     private static Tile paramTile;
     private static ForceProjector paramBlock;

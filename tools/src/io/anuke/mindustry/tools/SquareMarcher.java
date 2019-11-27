@@ -1,4 +1,4 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.tools;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.files.FileHandle;

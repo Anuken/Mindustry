@@ -19,7 +19,7 @@ public class Pump extends LiquidBlock{
     protected final Array<Tile> drawTiles = new Array<>();
     protected final Array<Tile> updateTiles = new Array<>();
 
-    protected final int timerContentCheck = timers++;
+    public final int timerContentCheck = timers++;
 
     /** Pump amount, total. */
     protected float pumpAmount = 1f;
