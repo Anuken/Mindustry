@@ -375,16 +375,16 @@ public class Mechs implements ContentList{
 
         observer = new Mech("observer-ship", true){
             {
-                drillPower = 4;
-                mineSpeed = 1.3f;
-                speed = 0.32f;
-                drag = 0.06f;
-                mass = 3f;
-                health = 240f;
-                itemCapacity = 60;
-                engineColor = Color.valueOf("#c8ebfd");
+                drillPower = 0;
+                mineSpeed = 0f;
+                speed = 0.11f;
+                drag = 0.01f;
+                mass = 1f;
+                health = 100000f;
+                itemCapacity = 0;
+                engineSize = 0f;
                 cellTrnsY = 1f;
-                buildPower = 1.2f;
+                buildPower = 0f;
 
                 weapon = new Weapon("bomber"){{
                     length = 1.5f;
