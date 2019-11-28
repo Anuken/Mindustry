@@ -81,7 +81,7 @@ public class Blocks implements ContentList{
     fortressFactory, repairPoint,
 
     //upgrades
-    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad, observerPad;
 
     @Override
     public void load(){
@@ -1790,6 +1790,13 @@ public class Blocks implements ContentList{
             mech = Mechs.glaive;
             size = 3;
             consumes.power(1.2f);
+        }};
+
+        observerPad = new MechPad("observer-ship-pad"){{
+            requirements(Category.upgrade, BuildVisibility.debugOnly, ItemStack.with(Items.silicon, 250, Items.metaglass, 150, Items.plastanium, 75, Items.surgealloy, 50));
+            mech = Mechs.observer;
+            size = 1;
+            consumes.power(2.6f);
         }};
 
         //endregion

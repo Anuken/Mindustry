@@ -401,6 +401,6 @@ public class Mechs implements ContentList{
             }
         };
 
-        starter = observer;
+        starter = dart;
     }
 }
