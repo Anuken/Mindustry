@@ -37,7 +37,7 @@ public class Bullets implements ContentList{
     waterShot, cryoShot, slagShot, oilShot,
 
     //environment, misc.
-    fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig, frag, eruptorShot,
+    fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig, frag, eruptorShot, none,
 
     //bombs
     bombExplosive, bombIncendiary, bombOil;
@@ -685,6 +685,12 @@ public class Bullets implements ContentList{
                     Tile tile = world.tileWorld(x + Mathf.range(8f), y + Mathf.range(8f));
                     Puddle.deposit(tile, Liquids.oil, 5f);
                 }
+            }
+        };
+
+        none = new BulletType(0, 0){
+            {
+                lifetime = 0f;
             }
         };
     }

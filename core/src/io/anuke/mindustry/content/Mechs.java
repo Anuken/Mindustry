@@ -388,13 +388,14 @@ public class Mechs implements ContentList{
                 cellTrnsY = 3f;
                 buildPower = 0f;
 
-                weapon = new Weapon("bomber"){{
-                    length = 1.5f;
-                    reload = 13f;
-                    alternate = true;
-                    ejectEffect = Fx.shellEjectSmall;
-                    bullet = Bullets.standardGlaive;
-                    shootSound = Sounds.shootSnap;
+                weapon = new Weapon("senpai notice me!"){{
+                    length = 0;
+                    lengthRand = 0;
+                    reload = 50f;
+                    alternate = false;
+                    ejectEffect = Fx.smeltsmoke;
+                    bullet = Bullets.none;
+                    shootSound = Sounds.none;
                 }};
             }
         };
