@@ -41,6 +41,7 @@ public class UnitFactory extends Block{
         hasItems = true;
         solid = false;
         flags = EnumSet.of(BlockFlag.producer);
+        entityType = UnitFactoryEntity::new;
     }
 
     @Remote(called = Loc.server)
@@ -175,14 +176,10 @@ public class UnitFactory extends Block{
             entity.cons.trigger();
         }
     }
+
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
         return capacities[item.id];
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new UnitFactoryEntity();
     }
 
     @Override

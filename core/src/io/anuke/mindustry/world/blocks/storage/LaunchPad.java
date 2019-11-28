@@ -80,6 +80,7 @@ public class LaunchPad extends StorageBlock{
                 int used = Math.min(entity.items.get(item), itemCapacity);
                 data.addItem(item, used);
                 entity.items.remove(item, used);
+                Events.fire(new LaunchItemEvent(item, used));
             }
         }
     }

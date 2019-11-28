@@ -8,7 +8,6 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -46,6 +45,7 @@ public class NuclearReactor extends PowerGenerator{
         liquidCapacity = 30;
         hasItems = true;
         hasLiquids = true;
+        entityType = NuclearReactorEntity::new;
     }
 
     @Override
@@ -91,10 +91,9 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         Liquid liquid = cliquid.liquid;
-        float liquidAmount = cliquid.amount;
 
         if(entity.heat > 0){
-            float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), entity.heat / coolantPower), liquidAmount * entity.delta());
+            float maxUsed = Math.min(entity.liquids.get(liquid), entity.heat / coolantPower);
             entity.heat -= maxUsed * coolantPower;
             entity.liquids.remove(liquid, maxUsed);
         }
@@ -179,11 +178,6 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         Draw.reset();
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new NuclearReactorEntity();
     }
 
     public static class NuclearReactorEntity extends GeneratorEntity{

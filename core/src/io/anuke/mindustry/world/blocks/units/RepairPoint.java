@@ -36,6 +36,7 @@ public class RepairPoint extends Block{
         layer2 = Layer.power;
         hasPower = true;
         outlineIcon = true;
+        entityType = RepairPointEntity::new;
     }
 
     @Override
@@ -124,11 +125,6 @@ public class RepairPoint extends Block{
         RepairPointEntity entity = tile.entity();
 
         return entity.target != null;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new RepairPointEntity();
     }
 
     public class RepairPointEntity extends TileEntity{

@@ -20,6 +20,7 @@ public class OverflowGate extends Block{
         update = true;
         group = BlockGroup.transportation;
         unloadable = false;
+        entityType = OverflowGateEntity::new;
     }
 
     @Override
@@ -127,11 +128,6 @@ public class OverflowGate extends Block{
         }
 
         return to;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new OverflowGateEntity();
     }
 
     public class OverflowGateEntity extends TileEntity{

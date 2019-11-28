@@ -27,6 +27,7 @@ public class Junction extends Block{
         instantTransfer = true;
         group = BlockGroup.transportation;
         unloadable = false;
+        entityType = JunctionEntity::new;
     }
 
     @Override
@@ -85,11 +86,6 @@ public class Junction extends Block{
             return false;
         Tile to = tile.getNearby(relative);
         return to != null && to.link().entity != null;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new JunctionEntity();
     }
 
     class JunctionEntity extends TileEntity{

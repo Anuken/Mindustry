@@ -24,6 +24,7 @@ public class Incinerator extends Block{
         hasLiquids = true;
         update = true;
         solid = true;
+        entityType = IncineratorEntity::new;
     }
 
     @Override
@@ -82,11 +83,6 @@ public class Incinerator extends Block{
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         IncineratorEntity entity = tile.entity();
         return entity.heat > 0.5f;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new IncineratorEntity();
     }
 
     public static class IncineratorEntity extends TileEntity{

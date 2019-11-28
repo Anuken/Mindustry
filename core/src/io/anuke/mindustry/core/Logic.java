@@ -5,7 +5,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.ctype.UnlockableContent;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -189,6 +189,7 @@ public class Logic implements ApplicationListener{
                 for(Item item : content.items()){
                     if(tile == null || tile.entity == null || tile.entity.items == null) continue;
                     data.addItem(item, tile.entity.items.get(item));
+                    Events.fire(new LaunchItemEvent(item, tile.entity.items.get(item)));
                 }
                 world.removeBlock(tile);
             }

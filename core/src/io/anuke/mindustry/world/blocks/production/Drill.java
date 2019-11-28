@@ -66,6 +66,7 @@ public class Drill extends Block{
         hasLiquids = true;
         liquidCapacity = 5f;
         hasItems = true;
+        entityType = DrillEntity::new;
 
         idleSound = Sounds.drill;
         idleSoundVolume = 0.003f;
@@ -131,6 +132,11 @@ public class Drill extends Block{
     @Override
     public boolean shouldConsume(Tile tile){
         return tile.entity.items.total() < itemCapacity;
+    }
+
+    @Override
+    public boolean shouldIdleSound(Tile tile){
+        return tile.entity.efficiency() > 0.01f;
     }
 
     @Override
@@ -298,11 +304,6 @@ public class Drill extends Block{
         }else{
             return isValid(tile);
         }
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new DrillEntity();
     }
 
     public int tier(){
