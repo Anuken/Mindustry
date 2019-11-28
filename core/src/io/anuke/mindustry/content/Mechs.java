@@ -382,7 +382,7 @@ public class Mechs implements ContentList{
                 mass = 1f;
                 health = 100000f;
                 itemCapacity = 0;
-                engineColor = Color.valueOf("ffffff");
+                engineColor = Color.valueOf("dcdcdc");
                 cellTrnsY = 1f;
                 buildPower = 0f;
 
