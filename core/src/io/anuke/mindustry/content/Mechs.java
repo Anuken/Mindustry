@@ -377,12 +377,13 @@ public class Mechs implements ContentList{
             {
                 drillPower = 0;
                 mineSpeed = 0f;
-                speed = 0.5f;
-                drag = 0.09f;
-                mass = 1f;
+                speed = 0.1f;
+                drag = 0.02f;
+                mass = 0.5f;
                 health = 100000f;
                 itemCapacity = 0;
                 engineColor = Color.valueOf("dcdcdc");
+                engineSize = 2f;
                 cellTrnsY = 1f;
                 buildPower = 0f;
 
