@@ -127,6 +127,9 @@ public class Units{
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
             if(e.isDead() || !predicate.get(e)) return;
 
+            // observing players cannot be targeted.
+            if(e instanceof Player && ((Player)e).mech.observing) return;
+
             float dst2 = Mathf.dst2(e.x, e.y, x, y);
             if(dst2 < range*range && (result == null || dst2 < cdist)){
                 result = e;

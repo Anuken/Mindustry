@@ -380,13 +380,14 @@ public class Mechs implements ContentList{
                 speed = 0.1f;
                 drag = 0.02f;
                 mass = 0.5f;
-                health = 1000f;
+                health = 50f;
                 itemCapacity = 0;
                 engineColor = Color.valueOf("dcdcdc");
                 engineSize = 2f;
                 engineOffset = 4f;
                 cellTrnsY = 3f;
                 buildPower = 0f;
+                observing = true;
 
                 weapon = new Weapon("senpai notice me!"){{
                     length = 0;

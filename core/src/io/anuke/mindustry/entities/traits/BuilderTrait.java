@@ -35,6 +35,12 @@ public interface BuilderTrait extends Entity, TeamTrait{
         float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : placeDistance;
         Unit unit = (Unit)this;
 
+        // observing players can't build.
+        if(unit instanceof Player && ((Player)unit).mech.observing){
+            buildQueue().clear();
+            return;
+        }
+
         Iterator<BuildRequest> it = buildQueue().iterator();
         while(it.hasNext()){
             BuildRequest req = it.next();

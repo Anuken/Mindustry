@@ -91,6 +91,7 @@ public class Tile implements Position, TargetTrait{
 
     /** Configure a tile with the current, local player. */
     public void configure(int value){
+        if(player.mech.observing) return; // observing players can't modify blocks.
         Call.onTileConfig(player, this, value);
     }
 

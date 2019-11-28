@@ -30,6 +30,7 @@ public class Mech extends UnlockableContent{
     public boolean turnCursor = true;
     public boolean canHeal = false;
     public float compoundSpeed, compoundSpeedBoost;
+    public boolean observing = false;
 
     public float weaponOffsetX, weaponOffsetY, engineOffset = 5f, engineSize = 2.5f;
     public @NonNull Weapon weapon;
