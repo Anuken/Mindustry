@@ -11,6 +11,7 @@ import java.io.*;
 
 public class OverflowGate extends Block{
     protected float speed = 1f;
+    protected boolean invert;
 
     public OverflowGate(String name){
         super(name);
@@ -80,27 +81,47 @@ public class OverflowGate extends Block{
         if(to == null) return null;
         Tile edge = Edges.getFacingEdge(tile, to);
 
-        if(!to.block().acceptItem(item, to, edge) || (to.block() instanceof OverflowGate)){
+        if(!invert){
+            if((to.block() instanceof OverflowGate) || !to.block().acceptItem(item, to, edge)){
+                Tile a = tile.getNearby(Mathf.mod(from - 1, 4));
+                Tile b = tile.getNearby(Mathf.mod(from + 1, 4));
+                boolean ac = a != null && a.block().acceptItem(item, a, edge) && !(a.block() instanceof OverflowGate);
+                boolean bc = b != null && b.block().acceptItem(item, b, edge) && !(b.block() instanceof OverflowGate);
+
+                if(!ac && !bc){
+                    return null;
+                }else if(ac && !bc){
+                    to = a;
+                }else if(!ac){
+                    to = b;
+                }else{
+                    if(tile.rotation() == 0){
+                        to = a;
+                        if(flip) tile.rotation((byte) 1);
+                    }else{
+                        to = b;
+                        if(flip) tile.rotation((byte) 0);
+                    }
+                }
+            }
+        }else{
             Tile a = tile.getNearby(Mathf.mod(from - 1, 4));
             Tile b = tile.getNearby(Mathf.mod(from + 1, 4));
             boolean ac = a != null && a.block().acceptItem(item, a, edge) && !(a.block() instanceof OverflowGate);
             boolean bc = b != null && b.block().acceptItem(item, b, edge) && !(b.block() instanceof OverflowGate);
 
             if(!ac && !bc){
-                return null;
-            }
-
-            if(ac && !bc){
-                to = a;
-            }else if(bc && !ac){
-                to = b;
+                if(!to.block().acceptItem(item, to, edge) || to.block() instanceof OverflowGate)
+                    return null;
+            }else if(ac ^ bc){
+                to = ac ? a : b;
             }else{
                 if(tile.rotation() == 0){
                     to = a;
-                    if(flip) tile.rotation((byte) 1);
+                    if(flip) tile.rotation((byte)1);
                 }else{
                     to = b;
-                    if(flip) tile.rotation((byte) 0);
+                    if(flip) tile.rotation((byte)0);
                 }
             }
         }
