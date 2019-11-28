@@ -377,8 +377,8 @@ public class Mechs implements ContentList{
             {
                 drillPower = 0;
                 mineSpeed = 0f;
-                speed = 0.11f;
-                drag = 0.01f;
+                speed = 0.5f;
+                drag = 0.09f;
                 mass = 1f;
                 health = 100000f;
                 itemCapacity = 0;
