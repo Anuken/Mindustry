@@ -16,7 +16,7 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 
 public class Mechs implements ContentList{
-    public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive;
+    public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive, observer;
 
     public static Mech starter;
 
@@ -373,6 +373,30 @@ public class Mechs implements ContentList{
             }
         };
 
-        starter = dart;
+        observer = new Mech("observer-ship", true){
+            {
+                drillPower = 4;
+                mineSpeed = 1.3f;
+                speed = 0.32f;
+                drag = 0.06f;
+                mass = 3f;
+                health = 240f;
+                itemCapacity = 60;
+                engineColor = Color.valueOf("feb380");
+                cellTrnsY = 1f;
+                buildPower = 1.2f;
+
+                weapon = new Weapon("bomber"){{
+                    length = 1.5f;
+                    reload = 13f;
+                    alternate = true;
+                    ejectEffect = Fx.shellEjectSmall;
+                    bullet = Bullets.standardGlaive;
+                    shootSound = Sounds.shootSnap;
+                }};
+            }
+        };
+
+        starter = observer;
     }
 }
