@@ -135,6 +135,11 @@ public class Drill extends Block{
     }
 
     @Override
+    public boolean shouldIdleSound(Tile tile){
+        return tile.entity.efficiency() > 0.01f;
+    }
+
+    @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Tile tile = world.tile(x, y);
         if(tile == null) return;

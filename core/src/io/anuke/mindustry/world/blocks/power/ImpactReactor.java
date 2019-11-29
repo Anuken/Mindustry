@@ -133,7 +133,7 @@ public class ImpactReactor extends PowerGenerator{
 
         FusionReactorEntity entity = tile.entity();
 
-        if(entity.warmup < 0.4f) return;
+        if(entity.warmup < 0.4f || !state.rules.reactorExplosions) return;
 
         Sounds.explosionbig.at(tile);
 

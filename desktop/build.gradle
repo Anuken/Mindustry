@@ -151,7 +151,7 @@ PackrConfig.Platform.values().each{ platform ->
                         include "${lib}steamworks4j${platform == PackrConfig.Platform.Windows64 ? '64.dll' : platform == PackrConfig.Platform.Windows32 ? '.dll' : platform == PackrConfig.Platform.Linux64 ? '.so' : '.dylib'}"
                         include "${lib}steam_api${platform == PackrConfig.Platform.Windows64 ? '64.dll' : platform == PackrConfig.Platform.Windows32 ? '.dll' : platform == PackrConfig.Platform.Linux64 ? '.so' : '.dylib'}"
                     }
-                    into "build/packr/output/"
+                    into platform != PackrConfig.Platform.MacOS ? "build/packr/output/" : "build/packr/output/${appName}.app/Contents/Resources"
                 }
             }
 

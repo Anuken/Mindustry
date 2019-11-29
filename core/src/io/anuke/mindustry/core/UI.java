@@ -429,12 +429,15 @@ public class UI implements ApplicationListener, Loadable{
     }
 
 
-    public void showCustomConfirm(String title, String text, String yes, String no, Runnable confirmed){
+    public void showCustomConfirm(String title, String text, String yes, String no, Runnable confirmed, Runnable denied){
         FloatingDialog dialog = new FloatingDialog(title);
         dialog.cont.add(text).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
-        dialog.buttons.addButton(no, dialog::hide);
+        dialog.buttons.addButton(no, () -> {
+            dialog.hide();
+            denied.run();
+        });
         dialog.buttons.addButton(yes, () -> {
             dialog.hide();
             confirmed.run();
@@ -458,11 +461,11 @@ public class UI implements ApplicationListener, Loadable{
 
     public String formatAmount(int number){
         if(number >= 1000000){
-            return Strings.fixed(number / 1000000f, 1) + "[gray]mil[]";
+            return Strings.fixed(number / 1000000f, 1) + "[gray]" + Core.bundle.getOrNull("unit.millions") + "[]";
         }else if(number >= 10000){
             return number / 1000 + "[gray]k[]";
         }else if(number >= 1000){
-            return Strings.fixed(number / 1000f, 1) + "[gray]k[]";
+            return Strings.fixed(number / 1000f, 1) + "[gray]" + Core.bundle.getOrNull("unit.thousands") + "[]";
         }else{
             return number + "";
         }

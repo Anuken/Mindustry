@@ -457,7 +457,7 @@ public class Maps{
             return maps.find(m -> m != prev || maps.size == 1);
         }),
         custom(prev -> {
-            Array<Map> maps = Array.withArrays(Vars.maps.customMaps());
+            Array<Map> maps = Array.withArrays(Vars.maps.customMaps().isEmpty() ? Vars.maps.defaultMaps() : Vars.maps.customMaps());
             maps.shuffle();
             return maps.find(m -> m != prev || maps.size == 1);
         }),

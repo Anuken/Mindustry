@@ -24,6 +24,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.graphics.MultiPacker.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -296,7 +297,7 @@ public class Block extends BlockStorage{
     }
 
     public void drawLight(Tile tile){
-        if(hasLiquids && drawLiquidLight && tile.entity.liquids.current().lightColor.a > 0.001f){
+        if(tile.entity != null && hasLiquids && drawLiquidLight && tile.entity.liquids.current().lightColor.a > 0.001f){
             drawLiquidLight(tile, tile.entity.liquids.current(), tile.entity.liquids.smoothAmount());
         }
     }
@@ -755,10 +756,10 @@ public class Block extends BlockStorage{
     }
 
     @Override
-    public void createIcons(PixmapPacker packer, PixmapPacker editor){
-        super.createIcons(packer, editor);
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
 
-        editor.pack(name + "-icon-editor", Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)).crop());
+        packer.add(PageType.editor, name + "-icon-editor", Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)));
 
         if(!synthetic()){
             PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full));
@@ -798,7 +799,7 @@ public class Block extends BlockStorage{
             }
             last = out;
 
-            packer.pack(name, out);
+            packer.add(PageType.main, name, out);
         }
 
         if(generatedIcons.length > 1){
@@ -810,7 +811,7 @@ public class Block extends BlockStorage{
                     base.draw(Core.atlas.getPixmap(generatedIcons[i]));
                 }
             }
-            packer.pack("block-" + name + "-full", base);
+            packer.add(PageType.main, "block-" + name + "-full", base);
             generatedIcons = null;
             Arrays.fill(cicons, null);
         }

@@ -5,6 +5,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.Cicon;
 
 /** Base interface for an unlockable content type. */
@@ -25,7 +26,7 @@ public abstract class UnlockableContent extends MappableContent{
 
     /** Generate any special icons for this content. Called asynchronously.*/
     @CallSuper
-    public void createIcons(PixmapPacker out, PixmapPacker editor){
+    public void createIcons(MultiPacker packer){
 
     }
 

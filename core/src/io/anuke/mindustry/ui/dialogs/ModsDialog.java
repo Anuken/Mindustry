@@ -132,7 +132,7 @@ public class ModsDialog extends FloatingDialog{
                             title.addImageTextButton(mod.enabled() ? "$mod.disable" : "$mod.enable", mod.enabled() ? Icon.arrowDownSmall : Icon.arrowUpSmall, Styles.cleart, () -> {
                                 mods.setEnabled(mod, !mod.enabled());
                                 setup();
-                            }).height(50f).margin(8f).width(130f);
+                            }).height(50f).margin(8f).width(130f).disabled(!mod.isSupported());
 
                             if(steam && !mod.hasSteamID()){
                                 title.addImageButton(Icon.loadMapSmall, Styles.cleari, () -> {
@@ -161,7 +161,10 @@ public class ModsDialog extends FloatingDialog{
                             t.labelWrap("[lightgray]" + mod.meta.description).growX();
                             t.row();
                         }
-                        if(mod.hasUnmetDependencies()){
+                        if(!mod.isSupported()){
+                            t.labelWrap(Core.bundle.format("mod.requiresversion", mod.meta.minGameVersion)).growX();
+                            t.row();
+                        }else if(mod.hasUnmetDependencies()){
                             t.labelWrap(Core.bundle.format("mod.missingdependencies", mod.missingDependencies.toString(", "))).growX();
                             t.row();
                         }

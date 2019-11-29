@@ -60,7 +60,7 @@ public class ServerControl implements ApplicationListener{
             "shufflemode", "normal",
             "bans", "",
             "admins", "",
-            "shufflemode", "all",
+            "shufflemode", "custom",
             "crashreport", false,
             "port", port,
             "logging", true,
