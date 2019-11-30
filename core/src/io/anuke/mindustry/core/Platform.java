@@ -8,6 +8,7 @@ import io.anuke.arc.func.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.type.*;
@@ -43,6 +44,11 @@ public interface Platform{
     /** Get the networking implementation.*/
     default NetProvider getNet(){
         return new ArcNetImpl();
+    }
+
+    /** Gets the scripting implementation. */
+    default Scripts createScripts(){
+        return new Scripts();
     }
 
     /** Add a text input dialog that should show up after the field is tapped. */

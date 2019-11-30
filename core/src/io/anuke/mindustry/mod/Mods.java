@@ -374,7 +374,7 @@ public class Mods implements Loadable{
                 for(FileHandle file : mod.scripts){
                     try{
                         if(scripts == null){
-                            scripts = new Scripts();
+                            scripts = platform.createScripts();
                         }
                         scripts.run(mod, file);
                     }catch(Throwable e){
