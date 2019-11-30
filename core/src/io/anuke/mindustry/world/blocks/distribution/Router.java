@@ -20,6 +20,7 @@ public class Router extends Block{
         group = BlockGroup.transportation;
         unloadable = false;
         entityType = RouterEntity::new;
+        hasShadow = false;
     }
 
     @Override
@@ -71,6 +72,11 @@ public class Router extends Block{
             }
         }
         return null;
+    }
+
+    @Override
+    public void draw(Tile tile){
+//        super.draw(tile);
     }
 
     @Override

@@ -4,9 +4,11 @@ import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.func.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
@@ -35,8 +37,11 @@ public class CoreBlock extends StorageBlock{
         flags = EnumSet.of(BlockFlag.core, BlockFlag.producer);
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
-        layer = Layer.overlay;
+        layer = Layer.lights;
         entityType = CoreEntity::new;
+        configurable = true;
+        rotate = true;
+        hasShadow = false;
     }
 
     @Remote(called = Loc.server)
@@ -66,6 +71,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void drawLight(Tile tile){
+        draw(tile);
         renderer.lights.add(tile.drawx(), tile.drawy(), 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
     }
 
@@ -146,7 +152,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public boolean canBreak(Tile tile){
-        return false;
+        return state.teams.get(tile.getTeam()).cores.size > 1;
     }
 
     @Override
@@ -204,6 +210,40 @@ public class CoreBlock extends StorageBlock{
     public void update(Tile tile){
         CoreEntity entity = tile.entity();
 
+        if(entity.state == pootis.launching){
+            entity.enginePower = Mathf.lerpDelta(entity.enginePower, 1f, 0.03f);
+            if(entity.enginePower > 0.9f) entity.state = pootis.rotating;
+        }
+
+        if(entity.state == pootis.rotating){
+            hasShadow = false;
+            Tile destination = world.tile(entity.target);
+            float angle = Angles.angle(tile.drawx(), tile.drawy(), destination.drawx(), destination.drawy());
+            entity.rotation = Mathf.lerpDelta(entity.rotation, angle, 0.03f);
+            if(Math.abs(entity.rotation - angle) < 1) entity.state = pootis.traveling;
+        }
+
+        if(entity.state == pootis.traveling){
+            entity.traveled = Mathf.clamp(entity.traveled + 0.003f, 0f, 1f);
+            if(entity.traveled == 1f) entity.state = pootis.landing;
+        }
+
+        if(entity.state == pootis.landing){
+            entity.rotation = Mathf.lerpDelta(entity.rotation, 0, 0.03f);
+            if(entity.rotation < 1f) entity.state = pootis.touchdown;
+        }
+
+        if(entity.state == pootis.touchdown){
+            entity.enginePower = Mathf.lerpDelta(entity.enginePower, 0f, 0.03f);
+            if(entity.enginePower < 0.1f){
+                // entity.state = pootis.landed;
+
+                Tile destination = world.tile(entity.target);
+                destination.setBlock(this, tile.getTeam());
+                world.removeBlock(tile);
+            };
+        }
+
         if(entity.spawnPlayer != null){
             if(!entity.spawnPlayer.isDead() || !entity.spawnPlayer.isAdded()){
                 entity.spawnPlayer = null;
@@ -237,6 +277,13 @@ public class CoreBlock extends StorageBlock{
         protected float heat;
         protected int storageCapacity;
 
+        public pootis state = pootis.landed;
+        public float enginePower;
+        public boolean liftoff;
+        public int target;
+        public float rotation;
+        public float traveled;
+
         @Override
         public boolean hasUnit(Unit unit){
             return unit == spawnPlayer;
@@ -252,4 +299,99 @@ public class CoreBlock extends StorageBlock{
             }
         }
     }
+
+    public enum pootis{
+        landed, launching, rotating, traveling, landing, touchdown,
+    }
+
+    @Override
+    public void draw(Tile tile){
+        CoreEntity entity = tile.entity();
+        drawEngines(tile);
+        Draw.rect(region, tile.drawx(), tile.drawy(), entity.rotation + 90);
+    }
+
+    public void drawEngines(Tile tile){
+        CoreEntity entity = tile.entity();
+//        float brcx = tile.drawx() + (size * tilesize / 2f) - (tilesize / 2f);
+//        float brcy = tile.drawy() - (size * tilesize / 2f) + (tilesize / 2f);
+
+//        float size = 3;
+//
+//        for(int corner=0; corner < 4; corner++){
+//            int rotation = 360 / 4 * corner;
+//
+//            Draw.color(Color.blue);
+//            Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset), y + Angles.trnsy(rotation + 180, mech.engineOffset),
+//            size + Mathf.absin(Time.time(), 2f, size / 4f));
+//
+//            Draw.color(Color.white);
+//            Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset - 1f), y + Angles.trnsy(rotation + 180, mech.engineOffset - 1f),
+//            (size + Mathf.absin(Time.time(), 2f, size / 4f)) / 2f);
+//            Draw.color();
+//        }
+
+        if(entity.state == pootis.landed) return;
+
+        Vector2 around = new Vector2(tile.drawx(), tile.drawy());
+        for(Vector2 corner : corners(tile)){
+//            Drawf.circles(corner.x, corner.y, 1f);
+
+            corner.rotateAround(around, entity.rotation);
+            float angle = Angles.angle(tile.drawx(), tile.drawy(), corner.x, corner.y);
+            float thrust = 1.25f * size * entity.enginePower;
+
+            Draw.color(Pal.lightTrail);
+            Fill.circle(corner.x + Angles.trnsx(angle, 0f), corner.y + Angles.trnsy(angle, 0f),thrust + Mathf.absin(Time.time(), 2f, thrust / 4f));
+
+            Draw.color(Color.white);
+            Fill.circle(corner.x + Angles.trnsx(angle, -1f), corner.y + Angles.trnsy(angle, -1f), (thrust + Mathf.absin(Time.time(), 2f, thrust / 4f)) / 2f);
+        }
+        Draw.color();
+    }
+
+    @Override
+    public boolean onConfigureTileTapped(Tile tile, Tile other){
+        CoreEntity entity = tile.entity();
+
+        if(entity.state == pootis.landed){
+            entity.target = other.pos();
+            entity.state = pootis.launching;
+        }
+
+        return super.onConfigureTileTapped(tile, other);
+    }
+
+    public Vector2[] corners(Tile tile){
+
+        Vector2 topRight = new Vector2(
+        tile.drawx() + (size * tilesize / 2f),
+        tile.drawy() + (size * tilesize / 2f));
+
+        Vector2 bottomRight = new Vector2(
+        tile.drawx() + (size * tilesize / 2f),
+        tile.drawy() - (size * tilesize / 2f));
+
+        Vector2 bottomLeft = new Vector2(
+        tile.drawx() - (size * tilesize / 2f),
+        tile.drawy() - (size * tilesize / 2f));
+
+        Vector2 topLeft = new Vector2(
+        tile.drawx() - (size * tilesize / 2f),
+        tile.drawy() + (size * tilesize / 2f));
+
+        return new Vector2[] {topRight, bottomRight, bottomLeft, topLeft};
+    }
+
+    // https://stackoverflow.com/a/33907440/6056864
+    public static Vector2 midpoint(float lat1, float long1, float lat2, float long2, float per) {
+
+        Vector2 from = new Vector2(lat1, long1);
+        Vector2 to = new Vector2(lat2, long2);
+        Vector2 mid = from.interpolate(to, per, Interpolation.pow3);
+
+//        Drawf.circles(mid.x, mid.y, 1f);
+        return mid;
+    }
+
 }

@@ -6,7 +6,7 @@ import io.anuke.mindustry.*;
 public enum BuildVisibility{
     hidden(() -> false),
     shown(() -> true),
-    debugOnly(() -> false),
+    debugOnly(() -> true),
     sandboxOnly(() -> Vars.state.rules.infiniteResources),
     campaignOnly(() -> Vars.world.isZone()),
     lightingOnly(() -> Vars.state.rules.lighting);

@@ -12,6 +12,8 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.storage.*;
+import io.anuke.mindustry.world.blocks.storage.CoreBlock.*;
 import io.anuke.mindustry.world.modules.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -112,10 +114,25 @@ public class Tile implements Position, TargetTrait{
     }
 
     public float drawx(){
+        if(block instanceof CoreBlock){
+            CoreEntity entity = entity();
+            if(entity!= null && entity.state != null && entity.state != pootis.landed){
+                Tile destination = world.tile(entity.target);
+                return block().offset() + CoreBlock.midpoint(worldx(), worldy(), destination.drawx(), destination.drawy(), entity.traveled) .getX();
+            }
+        }
+
         return block().offset() + worldx();
     }
 
     public float drawy(){
+        if(block instanceof CoreBlock){
+            CoreEntity entity = entity();
+            if(entity!= null && entity.state != null && entity.state != pootis.landed){
+                Tile destination = world.tile(entity.target);
+                return block().offset() + CoreBlock.midpoint(worldx(), worldy(), destination.drawx(), destination.drawy(), entity.traveled) .getY();
+            }
+        }
         return block().offset() + worldy();
     }
 
