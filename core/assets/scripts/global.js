@@ -358,3 +358,6 @@ const LiquidModule = Java.type('io.anuke.mindustry.world.modules.LiquidModule')
 const PowerModule = Java.type('io.anuke.mindustry.world.modules.PowerModule')
 const Produce = Java.type('io.anuke.mindustry.world.producers.Produce')
 const ProduceItem = Java.type('io.anuke.mindustry.world.producers.ProduceItem')
+
+const extend = Java.extend
+

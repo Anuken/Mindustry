@@ -6,7 +6,10 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.mod.Mods.*;
 import org.graalvm.polyglot.*;
 
+import java.io.*;
+
 public class Scripts{
+    private static final Class[] denied = {FileHandle.class, InputStream.class, File.class, Scripts.class, Files.class};
     private final Context context;
     private final String wrapper;
 
@@ -15,11 +18,9 @@ public class Scripts{
         Context.Builder builder = Context.newBuilder("js").allowHostClassLookup(ClassAccess.allowedClassNames::contains);
 
         HostAccess.Builder hb = HostAccess.newBuilder();
-        for(Class c : ClassAccess.allowedClasses){
-            hb.allowImplementations(c);
-            Structs.each(hb::allowAccess, c.getConstructors());
-            Structs.each(hb::allowAccess, c.getFields());
-            Structs.each(hb::allowAccess, c.getMethods());
+        hb.allowPublicAccess(true);
+        for(Class c : denied){
+            hb.denyAccess(c);
         }
         builder.allowHostAccess(hb.build());
 
