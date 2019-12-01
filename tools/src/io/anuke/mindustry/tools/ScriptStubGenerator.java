@@ -35,7 +35,7 @@ public class ScriptStubGenerator{
         Reflections reflections = new Reflections(new ConfigurationBuilder()
         .setScanners(new SubTypesScanner(false), new ResourcesScanner())
         .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0])))
-        .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix("io.anuke.mindustry"))));
+        .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix("io.anuke.mindustry")).include(FilterBuilder.prefix("io.anuke.arc.func"))));
 
         Array<Class<?>> classes = Array.with(reflections.getSubTypesOf(Object.class));
         classes.addAll(reflections.getSubTypesOf(Enum.class));
