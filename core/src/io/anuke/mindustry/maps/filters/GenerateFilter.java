@@ -42,7 +42,7 @@ public abstract class GenerateFilter{
         return Core.bundle.get("filter." + getClass().getSimpleName().toLowerCase().replace("filter", ""), getClass().getSimpleName().replace("Filter", ""));
     }
 
-    /** add the seed to a random number */
+    /** set the seed to a random number */
     public void randomize(){
         seed = Mathf.random(99999999);
     }

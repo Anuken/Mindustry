@@ -225,7 +225,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             tmpTiles.add(other);
         }
 
-        //using a add to prevent duplicates
+        //using a set to prevent duplicates
         for(Tile tile : tmpTiles){
             proximity.add(tile);
         }

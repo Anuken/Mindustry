@@ -106,7 +106,7 @@ public class Vars implements Loadable{
     public static final String multicastGroup = "227.2.7.7";
     /** if true, UI is not drawn */
     public static boolean disableUI;
-    /** if true, game is add up in mobile mode, even on desktop. used for debugging */
+    /** if true, game is set up in mobile mode, even on desktop. used for debugging */
     public static boolean testMobile;
     /** whether the game is running on a mobile device */
     public static boolean mobile;

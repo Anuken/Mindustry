@@ -145,7 +145,7 @@ public class ServerControl implements ApplicationListener{
             warn("&lyIt is highly advised to specify which version you're using by building with gradle args &lc-Pbuildversion=&lm<build>&ly.");
         }
 
-        //add up default shuffle mode
+        //set up default shuffle mode
         try{
             maps.setShuffleMode(ShuffleMode.valueOf(Core.settings.getString("shufflemode")));
         }catch(Exception e){
@@ -160,7 +160,7 @@ public class ServerControl implements ApplicationListener{
                 info("&lcGame over! Team &ly{0}&lc is victorious with &ly{1}&lc players online on map &ly{2}&lc.", event.winner.name(), playerGroup.size(), Strings.capitalize(world.getMap().name()));
             }
 
-            //add next map to be played
+            //set next map to be played
             Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(world.getMap());
             nextMapOverride = null;
             if(map != null){
@@ -278,7 +278,7 @@ public class ServerControl implements ApplicationListener{
                     err("Port must be a number between 0 and 65535.");
                     return;
                 }
-                info("&lyPort add to {0}.", port);
+                info("&lyPort set to {0}.", port);
                 Core.settings.put("port", port);
                 Core.settings.save();
             }
@@ -371,7 +371,7 @@ public class ServerControl implements ApplicationListener{
         handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
             try{
                 state.rules.waveSpacing = Difficulty.valueOf(arg[0]).waveTime * 60 * 60 * 2;
-                info("Difficulty add to '{0}'.", arg[0]);
+                info("Difficulty set to '{0}'.", arg[0]);
             }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);
             }
@@ -402,7 +402,7 @@ public class ServerControl implements ApplicationListener{
                     }
                 }else{
                     if(arg.length < 3){
-                        Log.err("Missing last argument. Specify which value to add the rule to.");
+                        Log.err("Missing last argument. Specify which value to set the rule to.");
                         return;
                     }
 
@@ -580,13 +580,13 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("shuffle", "[none/all/custom/builtin]", "Set map shuffling mode.", arg -> {
             if(arg.length == 0){
-                info("Shuffle mode current add to &ly'{0}'&lg.", maps.getShuffleMode());
+                info("Shuffle mode current set to &ly'{0}'&lg.", maps.getShuffleMode());
             }else{
                 try{
                     ShuffleMode mode = ShuffleMode.valueOf(arg[0]);
                     Core.settings.putSave("shufflemode", mode.name());
                     maps.setShuffleMode(mode);
-                    info("Shuffle mode add to &ly'{0}'&lg.", arg[0]);
+                    info("Shuffle mode set to &ly'{0}'&lg.", arg[0]);
                 }catch(Exception e){
                     err("Invalid shuffle mode.");
                 }
@@ -597,7 +597,7 @@ public class ServerControl implements ApplicationListener{
             Map res = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
             if(res != null){
                 nextMapOverride = res;
-                Log.info("Next map add to &ly'{0}'.", res.name());
+                Log.info("Next map set to &ly'{0}'.", res.name());
             }else{
                 Log.err("No map '{0}' found.", arg[0]);
             }

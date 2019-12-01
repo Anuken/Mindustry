@@ -82,7 +82,7 @@ public class MapEditor{
             }
         }
 
-        //add up missing blockparts
+        //set up missing blockparts
         for(int x = 0; x < width(); x++){
             for(int y = 0; y < height(); y++){
                 if(tiles[x][y].block().isMultiblock()){

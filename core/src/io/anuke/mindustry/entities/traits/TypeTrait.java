@@ -27,7 +27,7 @@ public interface TypeTrait{
     /**Gets a syncable type by ID.
     static Supplier<? extends TypeTrait> getTypeByID(int id){
         if(id == -1){
-            throw new IllegalArgumentException("Attempt to retrieve invalid entity type ID! Did you forget to add it in ContentLoader.registerTypes()?");
+            throw new IllegalArgumentException("Attempt to retrieve invalid entity type ID! Did you forget to set it in ContentLoader.registerTypes()?");
         }
         return registeredTypes.get(id);
     }

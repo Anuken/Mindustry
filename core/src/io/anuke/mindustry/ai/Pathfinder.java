@@ -295,7 +295,7 @@ public class Pathfinder implements Runnable{
         }
     }
 
-    /** A path target defines a add of targets for a path.*/
+    /** A path target defines a set of targets for a path.*/
     public enum PathTarget{
         enemyCores((team, out) -> {
             for(Tile other : indexer.getEnemy(team, BlockFlag.core)){
@@ -330,7 +330,7 @@ public class Pathfinder implements Runnable{
         }
     }
 
-    /** Data for a specific flow field to some add of destinations. */
+    /** Data for a specific flow field to some set of destinations. */
     class PathData{
         /** Team this path is for. */
         final Team team;

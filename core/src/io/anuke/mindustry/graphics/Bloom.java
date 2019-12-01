@@ -20,7 +20,7 @@ public class Bloom{
      * used as mask which part are glowing and which are not. see more info at:
      * http://www.gamasutra.com/view/feature/2107/realtime_glow.php
      * <p>
-     * NOTE: need to be add before bloom instance is created. After that this
+     * NOTE: need to be set before bloom instance is created. After that this
      * does nothing.
      */
     public static boolean useAlphaChannelAsMask = false;
@@ -325,7 +325,7 @@ public class Bloom{
     }
 
     /**
-     * add intensity for bloom. higher mean more brightening for spots that are
+     * set intensity for bloom. higher mean more brightening for spots that are
      * over threshold
      *
      * @param intensity multiplier for blurred texture in combining phase. must be
@@ -341,7 +341,7 @@ public class Bloom{
     }
 
     /**
-     * add intensity for original scene. under 1 mean darkening and over 1 means
+     * set intensity for original scene. under 1 mean darkening and over 1 means
      * lightening
      *
      * @param intensity multiplier for captured texture in combining phase. must be

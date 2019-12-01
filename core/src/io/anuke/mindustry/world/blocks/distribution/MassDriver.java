@@ -136,7 +136,7 @@ public class MassDriver extends Block{
                         fire(tile, link);
                         //remove waiting shooters, it's done firing
                         other.waitingShooters.remove(tile);
-                        //add both states to idle
+                        //set both states to idle
                         entity.state = DriverState.idle;
                         other.state = DriverState.idle;
                     }

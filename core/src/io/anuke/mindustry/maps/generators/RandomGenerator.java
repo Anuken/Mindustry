@@ -38,7 +38,7 @@ public abstract class RandomGenerator extends Generator{
 
     /**
      * Sets {@link #floor} and {@link #block} to the correct values as output.
-     * Before this method is called, both are add to {@link Blocks#air} as defaults.
+     * Before this method is called, both are set to {@link Blocks#air} as defaults.
      */
     public abstract void generate(int x, int y);
 }

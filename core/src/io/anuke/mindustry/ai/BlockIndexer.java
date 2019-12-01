@@ -39,7 +39,7 @@ public class BlockIndexer{
     private ObjectSet<Tile>[][] flagMap = new ObjectSet[Team.all.length][BlockFlag.all.length];
     /** Maps tile positions to their last known tile index data. */
     private IntMap<TileIndex> typeMap = new IntMap<>();
-    /** Empty add used for returning. */
+    /** Empty set used for returning. */
     private ObjectSet<Tile> emptySet = new ObjectSet<>();
     /** Array used for returning and reusing. */
     private Array<Tile> returnArray = new Array<>();
@@ -201,8 +201,8 @@ public class BlockIndexer{
     }
 
     /**
-     * Returns a add of tiles that have ores of the specified type nearby.
-     * While each tile in the add is not guaranteed to have an ore directly on it,
+     * Returns a set of tiles that have ores of the specified type nearby.
+     * While each tile in the set is not guaranteed to have an ore directly on it,
      * each tile will at least have an ore within {@link #quadrantSize} / 2 blocks of it.
      * Only specific ore types are scanned. See {@link #scanOres}.
      */
@@ -285,7 +285,7 @@ public class BlockIndexer{
         for(Team team : Team.all){
             TeamData data = state.teams.get(team);
 
-            //fast-add this quadrant to 'occupied' if the tile just placed is already of this team
+            //fast-set this quadrant to 'occupied' if the tile just placed is already of this team
             if(tile.getTeam() == data.team && tile.entity != null && tile.block().targetable){
                 structQuadrants[data.team.ordinal()].set(quadrantX, quadrantY);
                 continue; //no need to process futher

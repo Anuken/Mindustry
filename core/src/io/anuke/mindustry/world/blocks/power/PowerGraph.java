@@ -175,7 +175,7 @@ public class PowerGraph{
         if(Core.graphics.getFrameId() == lastFrameUpdated){
             return;
         }else if(!consumers.isEmpty() && consumers.first().isEnemyCheat()){
-            //when cheating, just add status to 1
+            //when cheating, just set status to 1
             for(Tile tile : consumers){
                 tile.entity.power.status = 1f;
             }
@@ -258,7 +258,7 @@ public class PowerGraph{
 
     public void remove(Tile tile){
         removeSingle(tile);
-        //begin by clearing the closed add
+        //begin by clearing the closed set
         closedSet.clear();
 
         //go through all the connections of this tile
