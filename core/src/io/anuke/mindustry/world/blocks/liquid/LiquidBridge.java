@@ -1,9 +1,10 @@
-package io.anuke.mindustry.world.blocks.distribution;
+package io.anuke.mindustry.world.blocks.liquid;
 
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.distribution.*;
 import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.world;
@@ -29,6 +30,8 @@ public class LiquidBridge extends ItemBridge{
         if(!linkValid(tile, other)){
             tryDumpLiquid(tile, entity.liquids.current());
         }else{
+            ((ItemBridgeEntity)world.tile(entity.link).entity).incoming.add(tile.pos());
+
             if(entity.cons.valid()){
                 float alpha = 0.04f;
                 if(hasPower){

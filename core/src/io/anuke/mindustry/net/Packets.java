@@ -80,7 +80,7 @@ public class Packets{
             buffer.put(mobile ? (byte)1 : 0);
             buffer.putInt(color);
             buffer.put(Base64Coder.decode(uuid));
-            buffer.putInt(mods.size);
+            buffer.put((byte)mods.size);
             for(int i = 0; i < mods.size; i++){
                 TypeIO.writeString(buffer, mods.get(i));
             }
@@ -97,7 +97,7 @@ public class Packets{
             byte[] idbytes = new byte[8];
             buffer.get(idbytes);
             uuid = new String(Base64Coder.encode(idbytes));
-            int totalMods = buffer.getInt();
+            int totalMods = buffer.get();
             mods = new Array<>(totalMods);
             for(int i = 0; i < totalMods; i++){
                 mods.add(TypeIO.readString(buffer));

@@ -64,9 +64,7 @@ public class HudFragment extends Fragment{
                     select.addImageButton(Icon.menuLargeSmall, style, ui.paused::show);
                     flip = select.addImageButton(Icon.arrowUpSmall, style, this::toggleMenus).get();
 
-                    select.addImageButton(Icon.pasteSmall, style, () -> {
-                        ui.schematics.show();
-                    });
+                    select.addImageButton(Icon.pasteSmall, style, ui.schematics::show);
 
                     select.addImageButton(Icon.pauseSmall, style, () -> {
                         if(net.active()){
@@ -347,7 +345,7 @@ public class HudFragment extends Fragment{
 
     @Remote(targets = Loc.both, forward = true, called = Loc.both)
     public static void setPlayerTeamEditor(Player player, Team team){
-        if(state.isEditor()){
+        if(state.isEditor() && player != null){
             player.setTeam(team);
         }
     }

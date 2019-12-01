@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.distribution;
+package io.anuke.mindustry.world.blocks.liquid;
 
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;

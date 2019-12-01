@@ -221,6 +221,8 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){
+            game.sliderPref("blockselecttimeout", 750, 0, 2000, 50, i -> Core.bundle.format("setting.milliseconds", i));
+
             game.checkPref("crashreport", true);
         }
 
@@ -251,7 +253,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        graphics.sliderPref("uiscale", 100, 25, 400, 5, s -> {
+        graphics.sliderPref("uiscale", 100, 25, 300, 25, s -> {
             if(ui.settings != null){
                 Core.settings.put("uiscalechanged", true);
             }
@@ -306,6 +308,9 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("position", false);
         graphics.checkPref("fps", false);
+        if(!mobile){
+            graphics.checkPref("blockselectkeys", true);
+        }
         graphics.checkPref("indicators", true);
         graphics.checkPref("animatedwater", !mobile);
         if(Shaders.shield != null){

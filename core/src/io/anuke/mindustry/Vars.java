@@ -32,8 +32,6 @@ import static io.anuke.arc.Core.settings;
 public class Vars implements Loadable{
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
-    /** Maximum number of broken blocks. TODO implement or remove.*/
-    public static final int maxBrokenBlocks = 256;
     /** Maximum schematic size.*/
     public static final int maxSchematicSize = 32;
     /** All schematic base64 starts with this string.*/
@@ -49,13 +47,15 @@ public class Vars implements Loadable{
     /** URL for discord invite. */
     public static final String discordURL = "https://discord.gg/mindustry";
     /** URL for sending crash reports to */
-    public static final String crashReportURL = "http://mins.us.to/report";
+    public static final String crashReportURL = "http://192.99.169.18/report";
     /** URL the links to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/";
+    /** URL to the JSON file containing all the global, public servers. */
+    public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers.json";
     /** URL the links to the wiki's modding guide.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?template=bug_report.md";
     /** list of built-in servers.*/
-    public static final Array<String> defaultServers = Array.with(/*"mins.us.to"*/);
+    public static final Array<String> defaultServers = Array.with();
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
     /** team of the player by default */

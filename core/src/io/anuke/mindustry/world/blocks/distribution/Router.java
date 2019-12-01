@@ -19,6 +19,7 @@ public class Router extends Block{
         itemCapacity = 1;
         group = BlockGroup.transportation;
         unloadable = false;
+        entityType = RouterEntity::new;
     }
 
     @Override
@@ -80,11 +81,6 @@ public class Router extends Block{
             entity.lastItem = null;
         }
         return result;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new RouterEntity();
     }
 
     public class RouterEntity extends TileEntity{

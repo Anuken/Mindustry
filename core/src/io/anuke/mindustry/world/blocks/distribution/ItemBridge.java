@@ -41,6 +41,7 @@ public class ItemBridge extends Block{
         hasItems = true;
         unloadable = false;
         group = BlockGroup.transportation;
+        entityType = ItemBridgeEntity::new;
     }
 
     @Override
@@ -174,7 +175,7 @@ public class ItemBridge extends Block{
         while(it.hasNext){
             int i = it.next();
             Tile other = world.tile(i);
-            if(!linkValid(tile, other, false)){
+            if(!linkValid(tile, other, false) || other.<ItemBridgeEntity>entity().link != tile.pos()){
                 it.remove();
             }
         }
@@ -297,7 +298,7 @@ public class ItemBridge extends Block{
 
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        if(tile.getTeam() != source.getTeam()) return false;
+        if(tile.getTeam() != source.getTeam() || !hasLiquids) return false;
 
         ItemBridgeEntity entity = tile.entity();
         Tile other = world.tile(entity.link);
@@ -338,11 +339,6 @@ public class ItemBridge extends Block{
         int rel2 = tile.relativeTo(to.x, to.y);
 
         return rel != rel2;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ItemBridgeEntity();
     }
 
     public boolean linkValid(Tile tile, Tile other){

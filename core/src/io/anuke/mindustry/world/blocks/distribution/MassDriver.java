@@ -42,15 +42,8 @@ public class MassDriver extends Block{
         layer = Layer.turret;
         hasPower = true;
         outlineIcon = true;
+        entityType = MassDriverEntity::new;
     }
-
-    /*
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void linkMassDriver(Player player, Tile tile, int position){
-        if(!Units.canInteract(player, tile)) return;
-        MassDriverEntity entity = tile.entity();
-        entity.link = position;
-    }*/
 
     @Override
     public void configured(Tile tile, Player player, int value){
@@ -211,11 +204,6 @@ public class MassDriver extends Block{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         //mass drivers that ouput only cannot accept items
         return tile.entity.items.total() < itemCapacity && linkValid(tile);
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new MassDriverEntity();
     }
 
     protected void fire(Tile tile, Tile target){

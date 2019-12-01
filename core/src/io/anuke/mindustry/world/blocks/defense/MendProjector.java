@@ -38,6 +38,7 @@ public class MendProjector extends Block{
         update = true;
         hasPower = true;
         hasItems = true;
+        entityType = MendEntity::new;
     }
 
     @Override
@@ -133,8 +134,8 @@ public class MendProjector extends Block{
     }
 
     @Override
-    public TileEntity newEntity(){
-        return new MendEntity();
+    public void drawLight(Tile tile){
+        renderer.lights.add(tile.drawx(), tile.drawy(), 50f * tile.entity.efficiency(), color, 0.7f * tile.entity.efficiency());
     }
 
     class MendEntity extends TileEntity{
