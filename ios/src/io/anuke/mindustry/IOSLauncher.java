@@ -12,6 +12,7 @@ import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.ui.*;
+import org.robovm.apple.coregraphics.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
 import org.robovm.objc.block.*;
@@ -124,7 +125,17 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                     NSURL url = new NSURL(to.file());
                     UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
-                    UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(p, true, () -> Log.info("Success! Presented {0}", to));
+                    UIViewController rootVc = UIApplication.getSharedApplication().getKeyWindow().getRootViewController();
+                    if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
+                        // Set up the pop-over for iPad
+                        UIPopoverPresentationController pop = p.getPopoverPresentationController();
+                        UIView mainView = rootVc.getView();
+                        pop.setSourceView(mainView);
+                        CGRect targetRect = new CGRect(mainView.getBounds().getMidX(), mainView.getBounds().getMidY(), 0, 0);
+                        pop.setSourceRect(targetRect);
+                        pop.setPermittedArrowDirections(UIPopoverArrowDirection.None);
+                    }
+                    rootVc.presentViewController(p, true, () -> Log.info("Success! Presented {0}", to));
                 }catch(Throwable t){
                     ui.showException(t);
                 }
