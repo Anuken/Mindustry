@@ -52,7 +52,7 @@ public class Mods implements Loadable{
 
     /** @return the loaded mod found by class, or null if not found. */
     public @Nullable LoadedMod getMod(Class<? extends Mod> type){
-        return loaded.find(l -> l.mod.getClass() == type);
+        return loaded.find(l -> l.mod != null && l.mod.getClass() == type);
     }
 
     /** Imports an external mod file.*/
