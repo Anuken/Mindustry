@@ -381,7 +381,7 @@ public class Mods implements Loadable{
                         Core.app.post(() -> {
                             Log.err("Error loading script {0} for mod {1}.", file.name(), mod.meta.name);
                             e.printStackTrace();
-                            if(!headless) ui.showException(e);
+                            //if(!headless) ui.showException(e);
                         });
                         break;
                     }
