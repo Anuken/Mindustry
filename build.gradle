@@ -155,6 +155,7 @@ project(":desktop"){
 
         compile "com.github.Anuken:steamworks4j:$steamworksVersion"
         compile "org.graalvm.js:js:19.3.0"
+        compile "org.graalvm.sdk:graal-sdk:19.3.0"
 
         compile arcModule("backends:backend-sdl")
         compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
