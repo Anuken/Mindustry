@@ -9,4 +9,8 @@ public class Scripts{
     public void run(LoadedMod mod, FileHandle file){
        Log.info("Skipping {0} (no scripting implenmentation)", file);
     }
+
+    public String runConsole(String text){
+        return "No scripting engine available.";
+    }
 }

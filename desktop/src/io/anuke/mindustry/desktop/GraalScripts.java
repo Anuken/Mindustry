@@ -13,10 +13,12 @@ public class GraalScripts extends Scripts{
     private static final Class[] denied = {FileHandle.class, InputStream.class, File.class, Scripts.class, Files.class, ClassAccess.class};
     private final Context context;
     private final String wrapper;
+    private final Context.Builder builder;
+    private Context console;
 
     public GraalScripts(){
         Time.mark();
-        Context.Builder builder = Context.newBuilder("js").allowHostClassLookup(ClassAccess.allowedClassNames::contains);
+        builder = Context.newBuilder("js").allowHostClassLookup(ClassAccess.allowedClassNames::contains);
 
         HostAccess.Builder hb = HostAccess.newBuilder();
         hb.allowPublicAccess(true);
@@ -33,8 +35,17 @@ public class GraalScripts extends Scripts{
         Log.info("Time to load script engine: {0}", Time.elapsed());
     }
 
+    @Override
     public void run(LoadedMod mod, FileHandle file){
         run(wrapper.replace("$SCRIPT_NAME$", mod.name + "_" +file.nameWithoutExtension().replace("-", "_").replace(" ", "_")).replace("$CODE$", file.readString()));
+    }
+
+    @Override
+    public String runConsole(String text){
+        if(console == null){
+            console = builder.build();
+        }
+        return console.eval("js", text).toString();
     }
 
     private void run(String script){

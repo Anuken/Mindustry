@@ -5,5 +5,5 @@ $CODE$
 try{
 	this["$SCRIPT_NAME$"]();
 }catch(e){
-	console.log(e)
+	print(e)
 }
