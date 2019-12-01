@@ -26,7 +26,7 @@ public class GraalScripts extends Scripts{
             hb.denyAccess(c);
         }
         builder.allowHostAccess(hb.build());
-        builder.allowExperimentalOptions(true).option("js.syntax-extensions", "true");
+        builder.allowExperimentalOptions(true);
 
         context = builder.build();
         wrapper = Core.files.internal("scripts/wrapper.js").readString();
