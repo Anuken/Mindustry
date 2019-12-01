@@ -31,7 +31,7 @@ public class Teams{
         return team == Vars.waveTeam || get(team).cores.size > 0;
     }
 
-    /** Returns a set of all teams that are enemies of this team. */
+    /** Returns a add of all teams that are enemies of this team. */
     public EnumSet<Team> enemiesOf(Team team){
         return get(team).enemies;
     }

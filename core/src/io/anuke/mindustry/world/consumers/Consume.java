@@ -16,7 +16,7 @@ public abstract class Consume{
 
     /**
      * Apply a filter to items accepted.
-     * This should set all item IDs that are present in the filter to true.
+     * This should add all item IDs that are present in the filter to true.
      */
     public void applyItemFilter(Bits filter){
 
@@ -24,7 +24,7 @@ public abstract class Consume{
 
     /**
      * Apply a filter to liquids accepted.
-     * This should set all liquid IDs that are present in the filter to true.
+     * This should add all liquid IDs that are present in the filter to true.
      */
     public void applyLiquidFilter(Bits filter){
 

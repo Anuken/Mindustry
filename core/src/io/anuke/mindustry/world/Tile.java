@@ -12,6 +12,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.meta.*;
 import io.anuke.mindustry.world.modules.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -87,6 +88,11 @@ public class Tile implements Position, TargetTrait{
         if(x <= cx - 1 && y == cy) return 0;
         if(x >= cx + 1 && y == cy) return 2;
         return -1;
+    }
+
+    public boolean configurable(){
+        if(state.rules.editor) return true;
+        return !block.sumRestriction(Restriction.unconfigurable, x, y);
     }
 
     /** Configure a tile with the current, local player. */

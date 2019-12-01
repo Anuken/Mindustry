@@ -4,6 +4,7 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.*;
 import io.anuke.mindustry.content.Blocks;
@@ -12,6 +13,7 @@ import io.anuke.mindustry.game.EventType.BlockBuildBeginEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
+import io.anuke.mindustry.world.meta.Restriction;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -155,6 +157,15 @@ public class Build{
     /** Returns whether the tile at this position is breakable by this team */
     public static boolean validBreak(Team team, int x, int y){
         Tile tile = world.ltile(x, y);
-        return tile != null && tile.block().canBreak(tile) && tile.breakable() && tile.interactable(team);
+
+        if(tile != null && tile.block().canBreak(tile) && tile.breakable() && tile.interactable(team)){
+            if(!tile.block.sumRestriction(Restriction.unremovable, x, y) || state.rules.editor){
+                return true;
+            }else{
+                Draw.rect(Core.atlas.find("unremovable"), tile.drawx(), tile.drawy());
+            }
+        }
+
+        return false;
     }
 }

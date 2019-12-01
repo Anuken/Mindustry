@@ -204,7 +204,7 @@ public class DeployDialog extends FloatingDialog{
 
         cont.add(stack).grow();
 
-        //set up direct and indirect children
+        //add up direct and indirect children
         for(ZoneNode node : nodes){
             node.allChildren.clear();
             node.allChildren.addAll(node.children);

@@ -112,7 +112,7 @@ public class PowerTests extends PowerTestFixture{
             }
         }
 
-        /** Makes sure a direct consumer stops working after power production is set to zero. */
+        /** Makes sure a direct consumer stops working after power production is add to zero. */
         @Test
         void directConsumptionStopsWithNoPower(){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(10.0f));

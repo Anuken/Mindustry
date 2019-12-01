@@ -14,6 +14,7 @@ import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.arc.Core.camera;
 import static io.anuke.mindustry.Vars.*;
@@ -285,6 +286,14 @@ public class BlockRenderer implements Disposable{
                 block.drawLayer(request.tile);
             }else if(request.layer == block.layer2){
                 block.drawLayer2(request.tile);
+            }
+
+            if(request.tile != null && request.tile.entity != null){
+                if(request.tile.block().sumRestriction(Restriction.unkillable, request.tile.x, request.tile.y)){
+                    if(request.tile.entity.health == 0.00001f){
+                        Draw.rect(Core.atlas.find("unkillable"), request.tile.drawx(), request.tile.drawy());
+                    }
+                }
             }
         }
     }

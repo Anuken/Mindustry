@@ -73,7 +73,7 @@ public class PowerTestFixture{
             }
 
             // Using the Tile(int, int, byte, byte) constructor would require us to register any fake block or tile we create
-            // Since this part shall not be part of the test and would require more work anyway, we manually set the block and floor
+            // Since this part shall not be part of the test and would require more work anyway, we manually add the block and floor
             // through reflections and then simulate part of what the changed() method does.
 
             Field field = Tile.class.getDeclaredField("block");

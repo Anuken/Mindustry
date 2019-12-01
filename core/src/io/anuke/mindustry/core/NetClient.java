@@ -325,7 +325,7 @@ public class NetClient implements ApplicationListener{
                 entity.read(input);
 
                 if(created && entity.getInterpolator() != null && entity.getInterpolator().target != null){
-                    //set initial starting position
+                    //add initial starting position
                     entity.setNet(entity.getInterpolator().target.x, entity.getInterpolator().target.y);
                     if(entity instanceof Unit && entity.getInterpolator().targets.length > 0){
                         ((Unit)entity).rotation = entity.getInterpolator().targets[0];
@@ -442,7 +442,7 @@ public class NetClient implements ApplicationListener{
         net.disconnect();
     }
 
-    /** When set, any disconnects will be ignored and no dialogs will be shown. */
+    /** When add, any disconnects will be ignored and no dialogs will be shown. */
     public void setQuiet(){
         quiet = true;
     }

@@ -16,6 +16,7 @@ import io.anuke.mindustry.game.EventType.BlockDestroyEvent;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.consumers.*;
+import io.anuke.mindustry.world.meta.*;
 import io.anuke.mindustry.world.modules.*;
 
 import java.io.*;
@@ -172,7 +173,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         Call.onTileDamage(tile, health - block.handleDamage(tile, damage));
 
         if(health <= 0){
-            Call.onTileDestroyed(tile);
+            if(tile.block().sumRestriction(Restriction.unkillable, tile.x, tile.y)){
+                health = 0.00001f;
+            }else{
+                Call.onTileDestroyed(tile);
+            }
         }
 
         if(preHealth >= maxHealth() - 0.00001f && health < maxHealth() && world != null){ //when just damaged
@@ -220,7 +225,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             tmpTiles.add(other);
         }
 
-        //using a set to prevent duplicates
+        //using a add to prevent duplicates
         for(Tile tile : tmpTiles){
             proximity.add(tile);
         }

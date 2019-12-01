@@ -237,7 +237,7 @@ public class ContentParser{
                     });
                 }
 
-                //make block visible by default if there are requirements and no visibility set
+                //make block visible by default if there are requirements and no visibility add
                 if(value.has("requirements") && block.buildVisibility == BuildVisibility.hidden){
                     block.buildVisibility = BuildVisibility.shown;
                 }

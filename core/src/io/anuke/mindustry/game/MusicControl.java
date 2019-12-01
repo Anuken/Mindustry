@@ -148,7 +148,7 @@ public class MusicControl{
         //save last random track played to prevent duplicates
         lastRandomPlayed = music;
 
-        //set fade to 1 and play it, stopping the current when it's done
+        //add fade to 1 and play it, stopping the current when it's done
         fade = 1f;
         current = music;
         current.setVolume(1f);

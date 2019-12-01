@@ -520,7 +520,7 @@ public class NetServer implements ApplicationListener{
         player.x = prevx;
         player.y = prevy;
 
-        //set interpolator target to *new* position so it moves toward it
+        //add interpolator target to *new* position so it moves toward it
         player.getInterpolator().read(player.x, player.y, newx, newy, rotation, baseRotation);
         player.velocity().set(xVelocity, yVelocity); //only for visual calculation purposes, doesn't actually update the player
 

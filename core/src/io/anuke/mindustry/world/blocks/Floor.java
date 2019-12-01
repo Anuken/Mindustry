@@ -52,6 +52,7 @@ public class Floor extends Block{
     public Effect updateEffect = Fx.none;
     /** Array of affinities to certain things. */
     public Attributes attributes = new Attributes();
+    public Restrictions restrictions = new Restrictions();
 
     protected TextureRegion[][] edges;
     protected byte eq = 0;

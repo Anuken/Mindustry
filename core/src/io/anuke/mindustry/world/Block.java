@@ -98,7 +98,7 @@ public class Block extends BlockStorage{
     public boolean conveyorPlacement;
     /**
      * The color of this block when displayed on the minimap or map preview.
-     * Do not set manually! This is overriden when loading for most blocks.
+     * Do not add manually! This is overriden when loading for most blocks.
      */
     public Color color = new Color(0, 0, 0, 1);
     /** Whether units target this block. */
@@ -372,6 +372,15 @@ public class Block extends BlockStorage{
         if(!headless && tile.getTeam() == player.getTeam() && world.isZone()){
             logic.handleContent(content);
         }
+    }
+
+    public boolean sumRestriction(Restriction attr, int x, int y){
+        Tile tile = world.tile(x, y);
+        if(tile == null) return false;
+        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+            if(other.overlay().restrictions.get(attr)) return true;
+        }
+        return false;
     }
 
     public float sumAttribute(Attribute attr, int x, int y){
@@ -910,7 +919,7 @@ public class Block extends BlockStorage{
         requirements(cat, BuildVisibility.shown, stacks);
     }
 
-    /** Sets up requirements. Use only this method to set up requirements. */
+    /** Sets up requirements. Use only this method to add up requirements. */
     protected void requirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
         this.category = cat;
         this.requirements = stacks;
