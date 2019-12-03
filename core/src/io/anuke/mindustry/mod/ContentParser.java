@@ -1,6 +1,7 @@
 package io.anuke.mindustry.mod;
 
 import io.anuke.arc.*;
+import io.anuke.arc.assets.*;
 import io.anuke.arc.audio.*;
 import io.anuke.arc.audio.mock.*;
 import io.anuke.arc.collection.Array;
@@ -69,9 +70,9 @@ public class ContentParser{
             String name = "sounds/" + data.asString();
             String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
             ModLoadingSound sound = new ModLoadingSound();
-            Core.assets.load(path, Sound.class).loaded = result -> {
-                sound.sound = (Sound)result;
-            };
+            AssetDescriptor<?> desc = Core.assets.load(path, Sound.class);
+            desc.loaded = result -> sound.sound = (Sound)result;
+            desc.errored = Throwable::printStackTrace;
             return sound;
         });
         put(Objective.class, (type, data) -> {
@@ -228,6 +229,9 @@ public class ContentParser{
 
                     postreads.add(() -> {
                         TechNode parnode = TechTree.all.find(t -> t.block == parent);
+                        if(parnode == null){
+                            throw new ModLoadException("Block '" + parent.name + "' isn't in the tech tree, but '" + block.name + "' requires it to be researched.", block);
+                        }
                         if(!parnode.children.contains(baseNode)){
                             parnode.children.add(baseNode);
                         }

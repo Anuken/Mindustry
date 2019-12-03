@@ -9,8 +9,10 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.Effects.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.graphics.MultiPacker.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.Cicon;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -86,9 +88,9 @@ public class Floor extends Block{
     }
 
     @Override
-    public void createIcons(PixmapPacker out, PixmapPacker editor){
-        super.createIcons(out, editor);
-        editor.pack("editor-" + name, Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)).crop());
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+        packer.add(PageType.editor, "editor-" + name, Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)).crop());
 
         if(blendGroup != this){
             return;
@@ -97,7 +99,7 @@ public class Floor extends Block{
         if(variants > 0){
             for(int i = 0; i < variants; i++){
                 String rname = name + (i + 1);
-                editor.pack("editor-" + rname, Core.atlas.getPixmap(rname).crop());
+                packer.add(PageType.editor, "editor-" + rname, Core.atlas.getPixmap(rname).crop());
             }
         }
 
@@ -114,7 +116,7 @@ public class Floor extends Block{
             }
         }
 
-        out.pack(name + "-edge", result);
+        packer.add(PageType.environment, name + "-edge", result);
     }
 
     @Override
