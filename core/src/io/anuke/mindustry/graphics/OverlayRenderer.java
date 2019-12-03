@@ -85,7 +85,7 @@ public class OverlayRenderer{
         if(input.frag.config.isShown()){
             Tile tile = input.frag.config.getSelectedTile();
             if(!tile.configurable()){
-                Draw.rect(Core.atlas.find("unconfigurable"), tile.drawx(), tile.drawy());
+                Draw.rect(Core.atlas.find("locked"), tile.drawx(), tile.drawy());
             }
             tile.block().drawConfigure(tile);
         }

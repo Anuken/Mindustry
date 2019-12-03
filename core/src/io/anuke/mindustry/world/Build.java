@@ -159,10 +159,10 @@ public class Build{
         Tile tile = world.ltile(x, y);
 
         if(tile != null && tile.block().canBreak(tile) && tile.breakable() && tile.interactable(team)){
-            if(!tile.block.sumRestriction(Restriction.unremovable, x, y) || state.rules.editor){
+            if(!tile.block.sumRestriction(Restriction.unremovable, x, y) || state.rules.editor || player.isLocal || player.isAdmin){ // this probably won't go well server side since no player is supplied to the method as an argument
                 return true;
             }else{
-                Draw.rect(Core.atlas.find("unremovable"), tile.drawx(), tile.drawy());
+                Draw.rect(Core.atlas.find("locked"), tile.drawx(), tile.drawy());
             }
         }
 

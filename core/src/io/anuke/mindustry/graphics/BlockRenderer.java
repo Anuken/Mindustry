@@ -291,7 +291,7 @@ public class BlockRenderer implements Disposable{
             if(request.tile != null && request.tile.entity != null){
                 if(request.tile.block().sumRestriction(Restriction.unkillable, request.tile.x, request.tile.y)){
                     if(request.tile.entity.health == 0.00001f){
-                        Draw.rect(Core.atlas.find("unkillable"), request.tile.drawx(), request.tile.drawy());
+                        Draw.rect(Core.atlas.find("locked"), request.tile.drawx(), request.tile.drawy());
                     }
                 }
             }

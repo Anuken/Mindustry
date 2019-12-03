@@ -35,7 +35,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, spawn, unconfigurable, unremovable, unkillable, immortal, deepwater, water, taintedWater, tar, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
+    air, spawn, locked, deepwater, water, taintedWater, tar, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
     holostone, rocks, sporerocks, icerocks, cliffs, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, sandBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock, saltRocks,
@@ -125,31 +125,7 @@ public class Blocks implements ContentList{
             public void draw(Tile tile){}
         };
 
-        unconfigurable = new OverlayFloor("unconfigurable"){
-            {
-                variants = 0;
-                restrictions.add(Restriction.unconfigurable);
-            }
-            public void draw(Tile tile){}
-        };
-
-        unremovable = new OverlayFloor("unremovable"){
-            {
-                variants = 0;
-                restrictions.add(Restriction.unremovable);
-            }
-            public void draw(Tile tile){}
-        };
-
-        unkillable = new OverlayFloor("unkillable"){
-            {
-                variants = 0;
-                restrictions.add(Restriction.unkillable);
-            }
-            public void draw(Tile tile){}
-        };
-
-        immortal = new OverlayFloor("immortal"){ // yea yea, i know, stupid name & icon, but i had no idea how else to name/texture it.
+        locked = new OverlayFloor("locked"){
             {
                 variants = 0;
                 restrictions.add(Restriction.unconfigurable);

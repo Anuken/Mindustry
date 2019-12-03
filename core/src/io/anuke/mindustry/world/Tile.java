@@ -91,7 +91,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean configurable(){
-        if(state.rules.editor) return true;
+        if(state.rules.editor || player.isLocal || player.isAdmin) return true; // ditto the comment in build.java
         return !block.sumRestriction(Restriction.unconfigurable, x, y);
     }
 
