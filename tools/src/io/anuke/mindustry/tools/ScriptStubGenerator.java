@@ -46,11 +46,10 @@ public class ScriptStubGenerator{
         || blacklist.contains(s -> type.getName().startsWith(base + "." + s + ".")) || nameBlacklist.contains(type.getSimpleName()));
 
         StringBuilder result = new StringBuilder("//Generated class. Do not modify.\n");
-        for(Class type : classes){
-            result.append("const ").append(type.getSimpleName()).append(" = ").append("Java.type('").append(type.getCanonicalName()).append("')\n");
-        }
-
         result.append("\n").append(new FileHandle("core/assets/scripts/base.js").readString()).append("\n");
+        for(Class type : classes){
+            result.append("const ").append(type.getSimpleName()).append(" = ").append("Packages.").append(type.getCanonicalName()).append("\n");
+        }
 
         //Log.info(result);
 
