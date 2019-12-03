@@ -6,16 +6,13 @@ import io.anuke.arc.graphics.*;
  * "port" of https://mods.factorio.com/mods/trold/Bottleneck
  */
 public enum Bottleneck{
-    none,   // green, doing fine <3
-    output, // yellow, limited by output
-    input;  // red, limited by input
+    none(Color.green),    // working smoothly
+    output(Color.yellow), // no room to output
+    input(Color.red);     // insufficient input
 
-    public static Color color(Bottleneck state){
-        switch(state){
-            case none  : return Color.green;
-            case output: return Color.yellow;
-            case input : return Color.red;
-            default    : return Color.white;
-        }
+    public final Color color;
+
+    Bottleneck(Color color){
+        this.color = color;
     }
 }

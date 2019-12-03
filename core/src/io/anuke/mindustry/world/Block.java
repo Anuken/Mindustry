@@ -257,7 +257,7 @@ public class Block extends BlockStorage{
                     // bottom right center x/y
                     float brcx = tile.drawx() + (size * tilesize / 2f) - (tilesize / 2f);
                     float brcy = tile.drawy() - (size * tilesize / 2f) + (tilesize / 2f);
-                    Draw.color(Bottleneck.color(bottleneckState(tile)));
+                    Draw.color(bottleneckState(tile).color);
                     Draw.rect(bottleneck, brcx, brcy);
                     Draw.color();
                 }
