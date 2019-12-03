@@ -28,7 +28,6 @@ allprojects{
         gdxVersion = '1.9.10'
         roboVMVersion = '2.3.8'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
-        graalVersion = '19.3.0'
         arcHash = null
 
         loadVersionProps = {
@@ -155,7 +154,6 @@ project(":desktop"){
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
         compile "com.github.Anuken:steamworks4j:$steamworksVersion"
-        compile "org.graalvm.js:js:${graalVersion}"
 
         compile arcModule("backends:backend-sdl")
         compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
@@ -259,6 +257,7 @@ project(":core"){
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
         compile arcModule("extensions:arcnet")
+        compile "org.mozilla:rhino:1.7.11"
         if(localArc() && debugged()) compile arcModule("extensions:recorder")
 
         compileOnly project(":annotations")

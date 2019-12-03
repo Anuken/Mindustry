@@ -19,10 +19,9 @@ import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.core.Version;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.desktop.steam.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
@@ -263,11 +262,6 @@ public class DesktopLauncher extends ClientLauncher{
                 dialog.get(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + cause.getClass().getSimpleName().replace("Exception", "") + (cause.getMessage() == null ? "" : ":\n" + cause.getMessage())));
             }
         });
-    }
-
-    @Override
-    public Scripts createScripts(){
-        return new GraalScripts();
     }
 
     @Override
