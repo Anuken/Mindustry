@@ -9,7 +9,7 @@ buildscript{
     }
 
     dependencies{
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.8-SNAPSHOT'
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.8'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.10"
         classpath "com.github.anuken:packr:-SNAPSHOT"
     }
@@ -26,9 +26,13 @@ allprojects{
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         gdxVersion = '1.9.10'
-        roboVMVersion = '2.3.8-SNAPSHOT'
+        roboVMVersion = '2.3.8'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
         arcHash = null
+
+        loadVersionProps = {
+            return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
+        }
 
         debugged = {
             return new File(projectDir.parent, '../Mindustry-Debug').exists() && !project.hasProperty("release") && project.hasProperty("args")
@@ -198,6 +202,27 @@ project(":core"){
         outputs.upToDateWhen{ false }
         generateLocales()
         writeVersion()
+    }
+
+    task copyChangelog{
+        doLast{
+            def props = loadVersionProps()
+            def androidVersion = props['androidBuildCode'].toInteger() - 2
+            def buildVersion = props["build"]
+            def loglines = file("../changelog").text.split("\n")
+            def maxLength = 460
+
+            def androidLogList = loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
+            def result = ""
+            androidLogList.forEach({line ->
+                if(result.length() + line.length() + 1 < maxLength){
+                    result += line + "\n"
+                }
+            })
+            def changelogs = file("../fastlane/metadata/android/en-US/changelogs/")
+            new File(changelogs, buildVersion + ".txt").text = (result)
+            new File(changelogs, androidVersion + ".txt").text = (result)
+        }
     }
 
     dependencies{

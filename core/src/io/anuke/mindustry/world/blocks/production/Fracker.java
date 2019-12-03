@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -16,6 +15,7 @@ public class Fracker extends SolidPump{
     public Fracker(String name){
         super(name);
         hasItems = true;
+        entityType = FrackerEntity::new;
     }
 
     @Override
@@ -79,15 +79,10 @@ public class Fracker extends SolidPump{
             }
 
             super.update(tile);
-            entity.accumulator += entity.delta() * entity.power.satisfaction;
+            entity.accumulator += entity.delta() * entity.efficiency();
         }else{
             tryDumpLiquid(tile, result);
         }
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new FrackerEntity();
     }
 
     @Override

@@ -1,35 +1,32 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.*;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.ui.Bar;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.consumers.*;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class NuclearReactor extends PowerGenerator{
     protected final int timerFuel = timers++;
 
     protected final Vector2 tr = new Vector2();
 
+    protected Color lightColor = Color.valueOf("7f19ea");
     protected Color coolColor = new Color(1, 1, 1, 0f);
     protected Color hotColor = Color.valueOf("ff9575a3");
     protected float itemDuration = 120; //time to consume 1 fuel
@@ -48,6 +45,7 @@ public class NuclearReactor extends PowerGenerator{
         liquidCapacity = 30;
         hasItems = true;
         hasLiquids = true;
+        entityType = NuclearReactorEntity::new;
     }
 
     @Override
@@ -93,10 +91,9 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         Liquid liquid = cliquid.liquid;
-        float liquidAmount = cliquid.amount;
 
         if(entity.heat > 0){
-            float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), entity.heat / coolantPower), liquidAmount * entity.delta());
+            float maxUsed = Math.min(entity.liquids.get(liquid), entity.heat / coolantPower);
             entity.heat -= maxUsed * coolantPower;
             entity.liquids.remove(liquid, maxUsed);
         }
@@ -127,7 +124,7 @@ public class NuclearReactor extends PowerGenerator{
 
         int fuel = entity.items.get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
 
-        if(fuel < 5 && entity.heat < 0.5f) return;
+        if((fuel < 5 && entity.heat < 0.5f) || !state.rules.reactorExplosions) return;
 
         Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
         Effects.effect(Fx.nuclearShockwave, tile.worldx(), tile.worldy());
@@ -153,6 +150,13 @@ public class NuclearReactor extends PowerGenerator{
     }
 
     @Override
+    public void drawLight(Tile tile){
+        NuclearReactorEntity entity = tile.entity();
+        float fract = entity.productionEfficiency;
+        renderer.lights.add(tile.drawx(), tile.drawy(), (90f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(lightColor).lerp(Color.scarlet, entity.heat), 0.6f * fract);
+    }
+
+    @Override
     public void draw(Tile tile){
         super.draw(tile);
 
@@ -174,11 +178,6 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         Draw.reset();
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new NuclearReactorEntity();
     }
 
     public static class NuclearReactorEntity extends GeneratorEntity{

@@ -85,6 +85,9 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
+        table.add(Core.bundle.format("item.corestorable", item.type == ItemType.material ? Core.bundle.format("yes") : Core.bundle.format("no")));
+        table.row();
+
         table.add(Core.bundle.format("item.explosiveness", (int)(item.explosiveness * 100)));
         table.row();
         table.add(Core.bundle.format("item.flammability", (int)(item.flammability * 100)));

@@ -24,6 +24,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.graphics.MultiPacker.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -89,6 +90,8 @@ public class Block extends BlockStorage{
     public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
+    /** Whether to draw the glow of the liquid for this block, if it has one. */
+    public boolean drawLiquidLight = true;
     /** Whether the config is positional and needs to be shifted. */
     public boolean posConfig;
     /** Whether this block uses conveyor-type placement mode.*/
@@ -137,6 +140,7 @@ public class Block extends BlockStorage{
 
     protected TextureRegion[] cacheRegions = {};
     protected Array<String> cacheRegionStrings = new Array<>();
+    protected Prov<TileEntity> entityType = TileEntity::new;
 
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] generatedIcons;
@@ -207,7 +211,8 @@ public class Block extends BlockStorage{
         if(tile == null || tile.entity == null || tile.entity.power == null) return out;
 
         for(Tile other : tile.entity.proximity()){
-            if(other != null && other.entity != null && other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
+            if(other != null && other.entity != null && other.entity.power != null
+            && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
             && !tile.entity.power.links.contains(other.pos())){
                 out.add(other);
             }
@@ -221,11 +226,7 @@ public class Block extends BlockStorage{
     }
 
     protected float getProgressIncrease(TileEntity entity, float baseTime){
-        float progressIncrease = 1f / baseTime * entity.delta();
-        if(hasPower){
-            progressIncrease *= entity.power.satisfaction; // Reduced increase in case of low power
-        }
-        return progressIncrease;
+        return 1f / baseTime * entity.delta() * entity.efficiency();
     }
 
     /** @return whether this block should play its active sound.*/
@@ -293,6 +294,23 @@ public class Block extends BlockStorage{
 
     public void draw(Tile tile){
         Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation() * 90 : 0);
+    }
+
+    public void drawLight(Tile tile){
+        if(tile.entity != null && hasLiquids && drawLiquidLight && tile.entity.liquids.current().lightColor.a > 0.001f){
+            drawLiquidLight(tile, tile.entity.liquids.current(), tile.entity.liquids.smoothAmount());
+        }
+    }
+
+    public void drawLiquidLight(Tile tile, Liquid liquid, float amount){
+        if(amount > 0.01f){
+            Color color = liquid.lightColor;
+            float fract = 1f;
+            float opacity = color.a * fract;
+            if(opacity > 0.001f){
+                renderer.lights.add(tile.drawx(), tile.drawy(), size * 30f * fract, color, opacity);
+            }
+        }
     }
 
     public void drawTeam(Tile tile){
@@ -364,6 +382,16 @@ public class Block extends BlockStorage{
             sum += other.floor().attributes.get(attr);
         }
         return sum;
+    }
+
+    public float percentSolid(int x, int y){
+        Tile tile = world.tile(x, y);
+        if(tile == null) return 0;
+        float sum = 0;
+        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+            sum += !other.floor.isLiquid ? 1f : 0f;
+        }
+        return sum / size / size;
     }
 
     @Override
@@ -527,8 +555,8 @@ public class Block extends BlockStorage{
             boolean buffered = cons.buffered;
             float capacity = cons.capacity;
 
-            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.satisfaction * capacity) ? "<ERROR>" : (int)(entity.power.satisfaction * capacity)) :
-                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.isZero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.satisfaction));
+            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : (int)(entity.power.status * capacity)) :
+                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status));
         }
 
         if(hasItems && configurable){
@@ -589,12 +617,12 @@ public class Block extends BlockStorage{
         }
 
         if(consumes.hasPower() && consumes.getPower().buffered){
-            power += tile.entity.power.satisfaction * consumes.getPower().capacity;
+            power += tile.entity.power.status * consumes.getPower().capacity;
         }
 
         if(hasLiquids){
 
-            tile.entity.liquids.forEach((liquid, amount) -> {
+            tile.entity.liquids.each((liquid, amount) -> {
                 float splash = Mathf.clamp(amount / 4f, 0f, 10f);
 
                 for(int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++){
@@ -704,10 +732,12 @@ public class Block extends BlockStorage{
         Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
         if(color == null) return;
 
+        float prev = Draw.scl;
+
         Draw.color(color);
         Draw.scl *= req.animScale;
         Draw.rect(region, req.drawx(), req.drawy());
-        Draw.scl /= req.animScale;
+        Draw.scl = prev;
         Draw.color();
     }
 
@@ -721,10 +751,10 @@ public class Block extends BlockStorage{
     }
 
     @Override
-    public void createIcons(PixmapPacker packer, PixmapPacker editor){
-        super.createIcons(packer, editor);
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
 
-        editor.pack(name + "-icon-editor", Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)).crop());
+        packer.add(PageType.editor, name + "-icon-editor", Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)));
 
         if(!synthetic()){
             PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full));
@@ -764,7 +794,7 @@ public class Block extends BlockStorage{
             }
             last = out;
 
-            packer.pack(name, out);
+            packer.add(PageType.main, name, out);
         }
 
         if(generatedIcons.length > 1){
@@ -776,7 +806,7 @@ public class Block extends BlockStorage{
                     base.draw(Core.atlas.getPixmap(generatedIcons[i]));
                 }
             }
-            packer.pack("block-" + name + "-full", base);
+            packer.add(PageType.main, "block-" + name + "-full", base);
             generatedIcons = null;
             Arrays.fill(cicons, null);
         }
@@ -823,8 +853,8 @@ public class Block extends BlockStorage{
         return destructible || update;
     }
 
-    public TileEntity newEntity(){
-        return new TileEntity();
+    public final TileEntity newEntity(){
+        return entityType.get();
     }
 
     /** Offset for placing and drawing multiblocks. */

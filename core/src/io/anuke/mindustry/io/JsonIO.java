@@ -4,7 +4,7 @@ import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.ctype.MappableContent;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
@@ -29,7 +29,19 @@ public class JsonIO{
                 super.writeValue(value, knownType, elementType);
             }
         }
+
+        @Override
+        protected String convertToString(Object object){
+            if(object instanceof MappableContent){
+                return ((MappableContent)object).name;
+            }
+            return super.convertToString(object);
+        }
     };
+
+    public static Json json(){
+        return json;
+    }
 
     public static String write(Object object){
         return json.toJson(object, object.getClass());

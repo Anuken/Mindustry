@@ -13,6 +13,8 @@ public class Liquid extends UnlockableContent{
 
     /** Color used in bars. */
     public @Nullable Color barColor;
+    /** Color used to draw lights. Note that the alpha channel is used to dictate brightness. */
+    public Color lightColor = Color.clear.cpy();
     /** 0-1, 0 is completely inflammable, anything above that may catch fire when exposed to heat, 0.5+ is very flammable. */
     public float flammability;
     /** temperature: 0.5 is 'room' temperature, 0 is very cold, 1 is molten hot */

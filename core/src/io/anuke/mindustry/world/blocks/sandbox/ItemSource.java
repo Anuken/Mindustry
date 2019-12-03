@@ -25,6 +25,7 @@ public class ItemSource extends Block{
         solid = true;
         group = BlockGroup.transportation;
         configurable = true;
+        entityType = ItemSourceEntity::new;
     }
 
     @Override
@@ -89,11 +90,6 @@ public class ItemSource extends Block{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         return false;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ItemSourceEntity();
     }
 
     public class ItemSourceEntity extends TileEntity{

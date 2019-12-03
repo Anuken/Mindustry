@@ -36,6 +36,7 @@ public class MendProjector extends Block{
         update = true;
         hasPower = true;
         hasItems = true;
+        entityType = MendEntity::new;
     }
 
     @Override
@@ -68,7 +69,7 @@ public class MendProjector extends Block{
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
-        if(entity.cons.optionalValid() && entity.timer.get(timerUse, useTime) && entity.power.satisfaction > 0){
+        if(entity.cons.optionalValid() && entity.timer.get(timerUse, useTime) && entity.efficiency() > 0){
             entity.cons.trigger();
         }
 
@@ -77,7 +78,7 @@ public class MendProjector extends Block{
             entity.charge = 0f;
 
             indexer.eachBlock(entity, realRange, other -> other.entity.damaged(), other -> {
-                other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.power.satisfaction);
+                other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.efficiency());
                 Effects.effect(Fx.healBlockFull, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
             });
         }
@@ -117,8 +118,8 @@ public class MendProjector extends Block{
     }
 
     @Override
-    public TileEntity newEntity(){
-        return new MendEntity();
+    public void drawLight(Tile tile){
+        renderer.lights.add(tile.drawx(), tile.drawy(), 50f * tile.entity.efficiency(), color, 0.7f * tile.entity.efficiency());
     }
 
     class MendEntity extends TileEntity{

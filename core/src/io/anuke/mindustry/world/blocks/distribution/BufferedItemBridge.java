@@ -1,10 +1,8 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.ItemBuffer;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.arc.math.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
 
 import java.io.*;
 
@@ -18,6 +16,7 @@ public class BufferedItemBridge extends ExtendingItemBridge{
         super(name);
         hasPower = false;
         hasItems = true;
+        entityType = BufferedItemBridgeEntity::new;
     }
 
     @Override
@@ -36,11 +35,6 @@ public class BufferedItemBridge extends ExtendingItemBridge{
         }else{
             entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 0f, 0.008f);
         }
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new BufferedItemBridgeEntity();
     }
 
     class BufferedItemBridgeEntity extends ItemBridgeEntity{

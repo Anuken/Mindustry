@@ -28,6 +28,7 @@ public class Sorter extends Block{
         group = BlockGroup.transportation;
         configurable = true;
         unloadable = false;
+        entityType = SorterEntity::new;
     }
 
     @Override
@@ -84,7 +85,7 @@ public class Sorter extends Block{
     }
 
     boolean isSame(Tile tile, Tile other){
-        return other != null && other.block() instanceof Sorter && other.<SorterEntity>entity().sortItem == tile.<SorterEntity>entity().sortItem;
+        return other != null && other.block() instanceof Sorter;
     }
 
     Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
@@ -136,12 +137,6 @@ public class Sorter extends Block{
             tile.configure(item == null ? -1 : item.id);
         });
     }
-
-    @Override
-    public TileEntity newEntity(){
-        return new SorterEntity();
-    }
-
 
     public class SorterEntity extends TileEntity{
         @Nullable Item sortItem;

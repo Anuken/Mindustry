@@ -354,6 +354,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
         Draw.reset();
         drawBackItems(itemtime, isLocal);
+        drawLight();
     }
 
     @Override

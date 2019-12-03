@@ -14,6 +14,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.BlockDestroyEvent;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.modules.*;
 
 import java.io.*;
@@ -84,6 +85,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait, 
     /** Scaled delta. */
     public float delta(){
         return Time.delta() * timeScale;
+    }
+
+    /** Base efficiency. If this entity has non-buffered power, returns the power %, otherwise returns 1. */
+    public float efficiency(){
+        return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
     }
 
     /** Call when nothing is happening to the entity. This increments the internal sleep timer. */
@@ -305,13 +311,17 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait, 
             loops.play(block.idleSound, this, block.idleSoundVolume);
         }
 
-        Block previous = block;
         block.update(tile);
-        if(block == previous && cons != null){
+
+        if(liquids != null){
+            liquids.update();
+        }
+
+        if(cons != null){
             cons.update();
         }
 
-        if(block == previous && power != null){
+        if(power != null){
             power.graph.update();
         }
     }

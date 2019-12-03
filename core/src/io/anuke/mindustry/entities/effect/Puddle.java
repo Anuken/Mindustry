@@ -237,6 +237,12 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
             seeds++;
         });
         Draw.color();
+
+        if(liquid.lightColor.a > 0.001f && f > 0){
+            Color color = liquid.lightColor;
+            float opacity = color.a * f;
+            renderer.lights.add(tile.drawx(), tile.drawy(),  30f * f, color, opacity * 0.8f);
+        }
     }
 
     @Override

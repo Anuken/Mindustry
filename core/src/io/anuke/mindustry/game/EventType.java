@@ -27,7 +27,8 @@ public class EventType{
         drown,
         exclusionDeath,
         suicideBomb,
-        openWiki
+        openWiki,
+        teamCoreDamage
     }
 
     public static class WinEvent{}
@@ -35,6 +36,14 @@ public class EventType{
     public static class LoseEvent{}
 
     public static class LaunchEvent{}
+
+    public static class LaunchItemEvent{
+        public final ItemStack stack;
+
+        public LaunchItemEvent(Item item, int amount){
+            this.stack = new ItemStack(item, amount);
+        }
+    }
 
     public static class MapMakeEvent{}
 
@@ -137,7 +146,7 @@ public class EventType{
         public final Player player;
         public final Item item;
         public final int amount;
-        
+
         public DepositEvent(Tile tile, Player player, Item item, int amount){
             this.tile = tile;
             this.player = player;
@@ -145,7 +154,7 @@ public class EventType{
             this.amount = amount;
         }
     }
-    
+
     /** Called when the player taps a block. */
     public static class TapEvent{
         public final Tile tile;
@@ -156,7 +165,7 @@ public class EventType{
             this.player = player;
         }
     }
-    
+
     /** Called when the player sets a specific block. */
     public static class TapConfigEvent{
         public final Tile tile;
@@ -309,7 +318,7 @@ public class EventType{
     /** Called after connecting; when a player recieves world data and is ready to play.*/
     public static class PlayerJoin{
         public final Player player;
-        
+
         public PlayerJoin(Player player){
             this.player = player;
         }
@@ -326,11 +335,45 @@ public class EventType{
 
     public static class PlayerLeave{
         public final Player player;
-        
+
         public PlayerLeave(Player player){
             this.player = player;
         }
     }
-           
+    
+    public static class PlayerBanEvent{
+        public final Player player;
+
+        public PlayerBanEvent(Player player){
+            this.player = player;
+        }
+    }
+    
+    public static class PlayerUnbanEvent{
+        public final Player player;
+
+        public PlayerUnbanEvent(Player player){
+            this.player = player;
+        }
+    }
+    
+    public static class PlayerIpBanEvent{
+        public final String ip;
+
+
+        public PlayerIpBanEvent(String ip){
+            this.ip = ip;
+        }
+    }
+    
+    public static class PlayerIpUnbanEvent{
+        public final String ip;
+
+
+        public PlayerIpUnbanEvent(String ip){
+            this.ip = ip;
+        }
+    }
+    
 }
 

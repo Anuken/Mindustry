@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
  * All tests are run with a fixed delta of 0.5 so delta considerations can be tested as well.
  * Additionally, each PowerGraph::update() call will have its own thread frame, i.e. the method will never be called twice within the same frame.
  * Both of these constraints are handled by FakeThreadHandler within PowerTestFixture.
- * Any power amount (produced, consumed, buffered) should be affected by Time.delta() but satisfaction should not!
+ * Any power amount (produced, consumed, buffered) should be affected by Time.delta() but status should not!
  */
 public class PowerTests extends PowerTestFixture{
 
@@ -29,9 +29,9 @@ public class PowerTests extends PowerTestFixture{
     class PowerGraphTests{
 
         /**
-         * Tests the satisfaction of a single consumer after a single update of the power graph which contains a single producer.
+         * Tests the status of a single consumer after a single update of the power graph which contains a single producer.
          * <p>
-         * Assumption: When the consumer requests zero power, satisfaction does not change. Default is 0.0f.
+         * Assumption: When the consumer requests zero power, status does not change. Default is 0.0f.
          */
         @TestFactory
         DynamicTest[] directConsumerSatisfactionIsAsExpected(){
@@ -61,13 +61,13 @@ public class PowerTests extends PowerTestFixture{
             assertEquals(producedPower * Time.delta(), powerGraph.getPowerProduced(), Mathf.FLOAT_ROUNDING_ERROR);
             assertEquals(requiredPower * Time.delta(), powerGraph.getPowerNeeded(), Mathf.FLOAT_ROUNDING_ERROR);
 
-            // Update and check for the expected power satisfaction of the consumer
+            // Update and check for the expected power status of the consumer
             powerGraph.update();
-            assertEquals(expectedSatisfaction, directConsumerTile.entity.power.satisfaction, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of direct consumer did not match");
+            assertEquals(expectedSatisfaction, directConsumerTile.entity.power.status, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of direct consumer did not match");
         }
 
         /**
-         * Tests the satisfaction of a single direct consumer after a single update of the power graph which contains a single producer and a single battery.
+         * Tests the status of a single direct consumer after a single update of the power graph which contains a single producer and a single battery.
          * The used battery is created with a maximum capacity of 100 and receives ten power per tick.
          */
         @TestFactory
@@ -101,14 +101,14 @@ public class PowerTests extends PowerTestFixture{
             }
             float maxCapacity = 100f;
             Tile batteryTile = createFakeTile(0, 2, createFakeBattery(maxCapacity));
-            batteryTile.entity.power.satisfaction = initialBatteryCapacity / maxCapacity;
+            batteryTile.entity.power.status = initialBatteryCapacity / maxCapacity;
 
             powerGraph.add(batteryTile);
 
             powerGraph.update();
-            assertEquals(expectedBatteryCapacity / maxCapacity, batteryTile.entity.power.satisfaction, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Expected battery satisfaction did not match");
+            assertEquals(expectedBatteryCapacity / maxCapacity, batteryTile.entity.power.status, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Expected battery status did not match");
             if(directConsumerTile != null){
-                assertEquals(expectedSatisfaction, directConsumerTile.entity.power.satisfaction, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of direct consumer did not match");
+                assertEquals(expectedSatisfaction, directConsumerTile.entity.power.status, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of direct consumer did not match");
             }
         }
 
@@ -124,13 +124,13 @@ public class PowerTests extends PowerTestFixture{
             powerGraph.add(consumerTile);
             powerGraph.update();
 
-            assertEquals(1.0f, consumerTile.entity.power.satisfaction, Mathf.FLOAT_ROUNDING_ERROR);
+            assertEquals(1.0f, consumerTile.entity.power.status, Mathf.FLOAT_ROUNDING_ERROR);
 
             powerGraph.remove(producerTile);
             powerGraph.add(consumerTile);
             powerGraph.update();
 
-            assertEquals(0.0f, consumerTile.entity.power.satisfaction, Mathf.FLOAT_ROUNDING_ERROR);
+            assertEquals(0.0f, consumerTile.entity.power.status, Mathf.FLOAT_ROUNDING_ERROR);
             if(consumerTile.block().consumes.hasPower()){
                 ConsumePower consumePower = consumerTile.block().consumes.getPower();
                 assertFalse(consumePower.valid(consumerTile.entity()));

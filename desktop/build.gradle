@@ -40,7 +40,7 @@ task dist(type: Jar, dependsOn: classes){
     from {configurations.compile.collect {zipTree(it)}}
     from files(project.assetsDir)
 
-    archiveName = "${appName}.jar"
+    archiveFileName = "${appName}.jar"
 
     manifest{
         attributes 'Main-Class': project.mainClassName
@@ -151,7 +151,7 @@ PackrConfig.Platform.values().each{ platform ->
                         include "${lib}steamworks4j${platform == PackrConfig.Platform.Windows64 ? '64.dll' : platform == PackrConfig.Platform.Windows32 ? '.dll' : platform == PackrConfig.Platform.Linux64 ? '.so' : '.dylib'}"
                         include "${lib}steam_api${platform == PackrConfig.Platform.Windows64 ? '64.dll' : platform == PackrConfig.Platform.Windows32 ? '.dll' : platform == PackrConfig.Platform.Linux64 ? '.so' : '.dylib'}"
                     }
-                    into "build/packr/output/"
+                    into platform != PackrConfig.Platform.MacOS ? "build/packr/output/" : "build/packr/output/${appName}.app/Contents/Resources"
                 }
             }
 
@@ -163,8 +163,8 @@ PackrConfig.Platform.values().each{ platform ->
 
         task "zip${platform.toString()}"(type: Zip){
             from "build/packr/output"
-            archiveName "${generateDeployName(platform.toString())}.zip"
-            destinationDir(file("../deploy"))
+            archiveFileName = "${generateDeployName(platform.toString())}.zip"
+            destinationDirectory = (file("../deploy"))
 
             doLast{
                 delete{

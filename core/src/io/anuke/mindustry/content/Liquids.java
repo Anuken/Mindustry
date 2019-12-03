@@ -19,6 +19,7 @@ public class Liquids implements ContentList{
             temperature = 1f;
             viscosity = 0.8f;
             effect = StatusEffects.melting;
+            lightColor = Color.valueOf("f0511d").a(0.4f);
         }};
 
         oil = new Liquid("oil", Color.valueOf("313131")){{
@@ -34,6 +35,7 @@ public class Liquids implements ContentList{
             heatCapacity = 0.9f;
             temperature = 0.25f;
             effect = StatusEffects.freezing;
+            lightColor = Color.valueOf("0097f5").a(0.2f);
         }};
     }
 }

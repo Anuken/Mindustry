@@ -36,6 +36,7 @@ public class CommandCenter extends Block{
         destructible = true;
         solid = true;
         configurable = true;
+        entityType = CommandCenterEntity::new;
     }
 
     @Override
@@ -120,11 +121,6 @@ public class CommandCenter extends Block{
         }
 
         Events.fire(new CommandIssueEvent(tile, command));
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new CommandCenterEntity();
     }
 
     public class CommandCenterEntity extends TileEntity{

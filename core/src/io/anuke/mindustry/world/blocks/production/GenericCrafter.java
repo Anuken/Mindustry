@@ -36,6 +36,7 @@ public class GenericCrafter extends Block{
         health = 60;
         idleSound = Sounds.machine;
         idleSoundVolume = 0.03f;
+        entityType = GenericCrafterEntity::new;
     }
 
     @Override
@@ -140,11 +141,6 @@ public class GenericCrafter extends Block{
             return false;
         }
         return outputLiquid == null || !(tile.entity.liquids.get(outputLiquid.liquid) >= liquidCapacity);
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new GenericCrafterEntity();
     }
 
     @Override

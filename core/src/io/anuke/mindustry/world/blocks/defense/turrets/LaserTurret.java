@@ -23,6 +23,7 @@ public class LaserTurret extends PowerTurret{
 
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.01f)).update(false);
         coolantMultiplier = 1f;
+        entityType = LaserTurretEntity::new;
     }
 
     @Override
@@ -97,11 +98,6 @@ public class LaserTurret extends PowerTurret{
 
         entity.bullet = Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
         entity.bulletLife = shootDuration;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new LaserTurretEntity();
     }
 
     @Override

@@ -17,7 +17,6 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
 
-import static io.anuke.arc.Core.assets;
 import static io.anuke.mindustry.Vars.*;
 
 public class MenuFragment extends Fragment{
@@ -26,8 +25,6 @@ public class MenuFragment extends Fragment{
     private MenuRenderer renderer;
 
     public MenuFragment(){
-        assets.load("sprites/logo.png", Texture.class);
-        assets.finishLoading();
         Events.on(DisposeEvent.class, event -> {
             renderer.dispose();
         });
@@ -67,7 +64,7 @@ public class MenuFragment extends Fragment{
         String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : (Version.type.equals("official") ? Version.modifier : Version.type) + " build " + Version.build + (Version.revision == 0 ? "" : "." + Version.revision));
 
         parent.fill((x, y, w, h) -> {
-            Texture logo = Core.assets.get("sprites/logo.png");
+            TextureRegion logo = Core.atlas.find("logo");
             float logoscl = Scl.scl(1);
             float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - Scl.scl(20));
             float logoh = logow * (float)logo.getHeight() / logo.getWidth();
@@ -76,7 +73,7 @@ public class MenuFragment extends Fragment{
             float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Scl.scl(30f) : 0f);
 
             Draw.color();
-            Draw.rect(Draw.wrap(logo), fx, fy, logow, logoh);
+            Draw.rect(logo, fx, fy, logow, logoh);
 
             Fonts.def.setColor(Color.white);
             Fonts.def.draw(versionText, fx, fy - logoh/2f, Align.center);
