@@ -387,3 +387,7 @@ const LiquidModule = Packages.io.anuke.mindustry.world.modules.LiquidModule
 const PowerModule = Packages.io.anuke.mindustry.world.modules.PowerModule
 const Produce = Packages.io.anuke.mindustry.world.producers.Produce
 const ProduceItem = Packages.io.anuke.mindustry.world.producers.ProduceItem
+
+var r = new JavaAdapter(Block, {});
+
+print(r.update)
