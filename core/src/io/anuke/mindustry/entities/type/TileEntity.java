@@ -82,6 +82,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait, 
         return this;
     }
 
+    public void applyBoost(float intensity, float duration){
+        timeScaleDuration = Math.max(timeScaleDuration, duration);
+        timeScale = Math.max(timeScale, intensity);
+    }
+
     /** Scaled delta. */
     public float delta(){
         return Time.delta() * timeScale;

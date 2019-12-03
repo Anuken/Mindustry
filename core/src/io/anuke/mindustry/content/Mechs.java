@@ -278,6 +278,10 @@ public class Mechs implements ContentList{
         };
 
         dart = new Mech("dart-ship", true){
+            float effectRange = 60f;
+            float effectReload = 60f * 5;
+            float effectDuration = 60f * 10f;
+
             {
                 drillPower = 1;
                 mineSpeed = 2f;
@@ -296,6 +300,28 @@ public class Mechs implements ContentList{
                     ejectEffect = Fx.shellEjectSmall;
                     bullet = Bullets.standardCopper;
                 }};
+            }
+
+            @Override
+            public void updateAlt(Player player){
+                super.updateAlt(player);
+
+                if(player.timer.get(Player.timerAbility, effectReload)){
+                    //wasHealed = false;
+
+                    Units.nearby(player.getTeam(), player.x, player.y, effectRange, unit -> {
+                        unit.applyEffect(StatusEffects.overdrive, effectDuration);
+                    });
+
+                    indexer.eachBlock(player, effectRange, other -> other.entity.damaged(), other -> {
+                        other.entity.applyBoost(1.5f, effectDuration);
+                        Effects.effect(Fx.healBlockFull, Pal.heal, other.drawx(), other.drawy(), other.block().size);
+                    });
+
+                    //if(wasHealed){
+                    Effects.effect(Fx.overdriveWave, player);
+                    //}
+                }
             }
         };
 

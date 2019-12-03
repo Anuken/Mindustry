@@ -176,7 +176,6 @@ public class Fx implements ContentList{
             Draw.color();
         });
 
-
         hitBulletSmall = new Effect(14, e -> {
             Draw.color(Color.white, Pal.lightOrange, e.fin());
 
