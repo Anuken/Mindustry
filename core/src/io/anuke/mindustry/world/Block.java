@@ -94,6 +94,8 @@ public class Block extends BlockStorage{
     public boolean drawLiquidLight = true;
     /** Whether the config is positional and needs to be shifted. */
     public boolean posConfig;
+    /** Whether to periodically sync this block across the network.*/
+    public boolean sync;
     /** Whether this block uses conveyor-type placement mode.*/
     public boolean conveyorPlacement;
     /**

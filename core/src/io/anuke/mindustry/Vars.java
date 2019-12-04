@@ -275,7 +275,7 @@ public class Vars implements Loadable{
             Core.settings.setDataDirectory(Core.files.local("saves/"));
         }
 
-        Core.settings.defaults("locale", "default");
+        Core.settings.defaults("locale", "default", "blocksync", true);
         Core.keybinds.setDefaults(Binding.values());
         Core.settings.load();
 

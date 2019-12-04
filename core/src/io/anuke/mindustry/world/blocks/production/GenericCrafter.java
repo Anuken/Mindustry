@@ -35,6 +35,7 @@ public class GenericCrafter extends Block{
         hasItems = true;
         health = 60;
         idleSound = Sounds.machine;
+        sync = true;
         idleSoundVolume = 0.03f;
         entityType = GenericCrafterEntity::new;
     }

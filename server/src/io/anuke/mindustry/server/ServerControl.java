@@ -527,6 +527,16 @@ public class ServerControl implements ApplicationListener{
             info("Player &ly'{0}'&lg has been un-whitelisted.", info.lastName);
         });
 
+        handler.register("sync", "[on/off...]", "Enable/disable block sync. Experimental.", arg -> {
+            if(arg.length == 0){
+                info("Block sync is currently &lc{0}.", Core.settings.getBool("blocksync") ? "enabled" : "disabled");
+                return;
+            }
+            boolean on = arg[0].equalsIgnoreCase("on");
+            Core.settings.putSave("blocksync", on);
+            info("Block syncing is now &lc{0}.", on ? "on" : "off");
+        });
+
         handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {
             boolean value = arg[0].equalsIgnoreCase("on");
             Core.settings.put("crashreport", value);
