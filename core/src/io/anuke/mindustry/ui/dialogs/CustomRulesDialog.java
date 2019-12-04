@@ -125,7 +125,6 @@ public class CustomRulesDialog extends FloatingDialog{
                 content.blocks().each(b -> !rules.allowance.containsKey(b) && b.isBuildable(), b -> {
                     int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
                     t.addImageButton(new TextureRegionDrawable(b.icon(Cicon.medium)), Styles.cleari, () -> {
-                        Log.info(b.category);
                         rules.allowance.put(b, 0);
                         rebuildAllowance();
                         dialog.hide();
