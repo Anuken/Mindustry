@@ -455,6 +455,8 @@ public class Block extends BlockStorage{
                 }
             }
         }
+
+        Allowance.flag(this);
     }
 
     /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #reg(int)}. */

@@ -10,7 +10,7 @@ import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.BlockBuildBeginEvent;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.world.blocks.BuildBlock;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 
 import static io.anuke.mindustry.Vars.*;
@@ -71,6 +71,8 @@ public class Build{
         if(type == null || !type.isVisible() || type.isHidden()){
             return false;
         }
+
+        if(Allowance.spent(team, type)) return false;
 
         if(state.rules.bannedBlocks.contains(type) && !(state.rules.waves && team == waveTeam)){
             return false;

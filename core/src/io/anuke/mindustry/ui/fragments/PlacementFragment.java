@@ -20,6 +20,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -215,7 +216,7 @@ public class PlacementFragment extends Fragment{
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
 
-                            if(state.rules.bannedBlocks.contains(block)){
+                            if(Allowance.spent(player.getTeam(), block)){
                                 button.forEach(elem -> elem.setColor(Color.darkGray));
                             }
                         });
@@ -304,16 +305,23 @@ public class PlacementFragment extends Fragment{
                                     }).left();
                                     req.row();
                                 }
-                            }).growX().left().margin(3);
 
-                            if(state.rules.bannedBlocks.contains(lastDisplay)){
-                                topTable.row();
-                                topTable.table(b -> {
-                                    b.addImage(Icon.cancelSmall).padRight(2).color(Color.scarlet);
-                                    b.add("$banned");
-                                    b.left();
-                                }).padTop(2).left();
-                            }
+                                if(Allowance.max(player.getTeam(), lastDisplay) != -1){
+                                    req.table(line -> {
+                                        line.left();
+                                        line.addImage(lastDisplay.icon(Cicon.small)).size(8 * 2);
+                                        line.add("$allowance").maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
+                                        line.labelWrap(() -> {
+                                            int max = Allowance.max(player.getTeam(), lastDisplay);
+                                            int now = Allowance.sum(player.getTeam(), lastDisplay);
+                                            String color = (max - now) > 0 ? "[accent]" : "[red]";
+                                            return color + (max - now) + "[white]/" + max;
+                                        }).padLeft(5);
+                                    }).left();
+                                    req.row();
+                                }
+
+                            }).growX().left().margin(3);
 
                         }else if(tileDisplayBlock() != null){ //show selected tile
                             lastDisplay = tileDisplayBlock();
@@ -411,7 +419,8 @@ public class PlacementFragment extends Fragment{
         returnArray.sort((b1, b2) -> {
             int locked = -Boolean.compare(unlocked(b1), unlocked(b2));
             if(locked != 0) return locked;
-            return Boolean.compare(state.rules.bannedBlocks.contains(b1), state.rules.bannedBlocks.contains(b2));
+            // only show them at the end if their allowance is zero to begin with, else they will keep their usual spot.
+            return Boolean.compare(Allowance.max(player.getTeam(), b1) == 0, Allowance.max(player.getTeam(), b2) == 0);
         });
         return returnArray;
     }

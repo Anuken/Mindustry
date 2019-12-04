@@ -25,24 +25,27 @@ public class CustomRulesDialog extends FloatingDialog{
     private Rules rules;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
-    private FloatingDialog banDialog;
+    private FloatingDialog allowanceDialog;
 
     public CustomRulesDialog(){
         super("$mode.custom");
 
         loadoutDialog = new LoadoutDialog();
-        banDialog = new FloatingDialog("$bannedblocks");
-        banDialog.addCloseButton();
 
-        banDialog.shown(this::rebuildBanned);
-        banDialog.buttons.addImageTextButton("$addall", Icon.arrow16Small, () -> {
-            rules.bannedBlocks.addAll(content.blocks().select(Block::isBuildable));
-            rebuildBanned();
+        allowanceDialog = new FloatingDialog("$allowance");
+        allowanceDialog.addCloseButton();
+
+        allowanceDialog.shown(this::rebuildAllowance);
+        allowanceDialog.buttons.addImageTextButton("$addall", Icon.arrow16Small, () -> {
+            for(Block block : content.blocks().select(Block::isBuildable)){
+                rules.allowance.put(block, 0);
+            }
+            rebuildAllowance();
         }).size(180, 64f);
 
-        banDialog.buttons.addImageTextButton("$clear", Icon.trash16Small, () -> {
-            rules.bannedBlocks.clear();
-            rebuildBanned();
+        allowanceDialog.buttons.addImageTextButton("$clear", Icon.trash16Small, () -> {
+            rules.allowance.clear();
+            rebuildAllowance();
         }).size(180, 64f);
 
         setFillParent(true);
@@ -50,50 +53,81 @@ public class CustomRulesDialog extends FloatingDialog{
         addCloseButton();
     }
 
-    private void rebuildBanned(){
-        float previousScroll = banDialog.cont.getChildren().isEmpty() ? 0f : ((ScrollPane)banDialog.cont.getChildren().first()).getScrollY();
-        banDialog.cont.clear();
-        banDialog.cont.pane(t -> {
+    private void rebuildAllowance(){
+
+        // todo: someday remove backwards compatibility
+        for(Block banned : rules.bannedBlocks){
+            rules.allowance.put(banned, 0);
+            rules.bannedBlocks.remove(banned);
+        }
+
+        float previousScroll = allowanceDialog.cont.getChildren().isEmpty() ? 0f : ((ScrollPane)allowanceDialog.cont.getChildren().first()).getScrollY();
+        allowanceDialog.cont.clear();
+        allowanceDialog.cont.pane(t -> {
             t.margin(10f);
 
-            if(rules.bannedBlocks.isEmpty()){
+            if(rules.allowance.isEmpty()){
                 t.add("$empty");
             }
 
-            Array<Block> array = Array.with(rules.bannedBlocks);
+            Array<Block> array = Array.with(rules.allowance.keys());
             array.sort();
 
             int cols = mobile && Core.graphics.isPortrait() ? 1 : mobile ? 2 : 3;
             int i = 0;
+            float bsize = 40f;
 
             for(Block block : array){
-                t.table(Tex.underline, b -> {
-                    b.left().margin(4f);
-                    b.addImage(block.icon(Cicon.medium)).size(Cicon.medium.size).padRight(3);
-                    b.add(block.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
+                t.table(Tex.pane, b -> {
+                    b.margin(4).marginRight(8).left();
+                    b.addButton("-", Styles.cleart, () -> {
+                        rules.allowance.put(block, Math.max(rules.allowance.get(block) - allowanceStep(rules.allowance.get(block)), 0));
+                        rebuildAllowance();
+                    }).size(bsize);
+
+                    b.addButton("+", Styles.cleart, () -> {
+                        rules.allowance.put(block, Math.min(rules.allowance.get(block) + allowanceStep(rules.allowance.get(block)), 10000));
+                        rebuildAllowance();
+                    }).size(bsize);
+
+                    b.addImageButton(Icon.pencilSmaller, Styles.cleari, () -> ui.showTextInput("$allowance", block.localizedName, 10, rules.allowance.get(block) + "", true, str -> {
+                        if(Strings.canParsePostiveInt(str)){
+                            int amount = Strings.parseInt(str);
+                            if(amount >= 0 && amount <= 10000){
+                                rules.allowance.put(block, amount);
+                                rebuildAllowance();
+                                return;
+                            }
+                        }
+                        ui.showInfo(Core.bundle.format("configure.invalid", 10000));
+                    })).size(bsize);
+
+                    b.addImage(block.icon(Cicon.small)).size(8 * 3).padRight(4).padLeft(4);
+                    b.label(() -> rules.allowance.get(block) + "").left().width(90f);
 
                     b.addImageButton(Icon.cancelSmall, Styles.clearPartiali, () -> {
-                       rules.bannedBlocks.remove(block);
-                       rebuildBanned();
+                        rules.allowance.remove(block);
+                        rebuildAllowance();
                     }).size(70f).pad(-4f).padLeft(0f);
-                }).size(300f, 70f).padRight(5);
+                }).pad(2).left().fillX();
 
                 if(++i % cols == 0){
                     t.row();
                 }
             }
         }).get().setScrollYForce(previousScroll);
-        banDialog.cont.row();
-        banDialog.cont.addImageTextButton("$add", Icon.addSmall, () -> {
+        allowanceDialog.cont.row();
+        allowanceDialog.cont.addImageTextButton("$add", Icon.addSmall, () -> {
             FloatingDialog dialog = new FloatingDialog("$add");
             dialog.cont.pane(t -> {
                 t.left().margin(14f);
                 int[] i = {0};
-                content.blocks().each(b -> !rules.bannedBlocks.contains(b) && b.isBuildable(), b -> {
+                content.blocks().each(b -> !rules.allowance.containsKey(b) && b.isBuildable(), b -> {
                     int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
                     t.addImageButton(new TextureRegionDrawable(b.icon(Cicon.medium)), Styles.cleari, () -> {
-                        rules.bannedBlocks.add(b);
-                        rebuildBanned();
+                        Log.info(b.category);
+                        rules.allowance.put(b, 0);
+                        rebuildAllowance();
                         dialog.hide();
                     }).size(60f).get().resizeImage(Cicon.medium.size);
 
@@ -152,7 +186,7 @@ public class CustomRulesDialog extends FloatingDialog{
         )).left().width(300f);
         main.row();
 
-        main.addButton("$bannedblocks", banDialog::show).left().width(300f);
+        main.addButton("$allowance", allowanceDialog::show).left().width(300f);
         main.row();
 
         title("$rules.title.player");
@@ -216,5 +250,17 @@ public class CustomRulesDialog extends FloatingDialog{
         main.row();
         main.addImage().color(Pal.accent).height(3f).padRight(100f).padBottom(20);
         main.row();
+    }
+
+    private int allowanceStep(int amount){
+        if(amount < 50){
+            return 10;
+        }else if(amount < 250){
+            return 50;
+        }else if(amount < 1000){
+            return 250;
+        }else{
+            return 1000;
+        }
     }
 }
