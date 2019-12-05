@@ -183,7 +183,7 @@ public class PowerNode extends PowerBlock{
         if(tile == other){
             if(other.entity.power.links.size == 0){
                 getPotentialLinks(tile, link -> {
-                    tile.configure(link.pos());
+                    if(!insulated(tile, link)) tile.configure(link.pos());
                 });
             }else{
                 while(entity.power.links.size > 0){
