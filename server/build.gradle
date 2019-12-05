@@ -19,6 +19,9 @@ task run(dependsOn: classes, type: JavaExec){
     if(project.hasProperty("appArgs")){
         args Eval.me(appArgs)
     }
+    if(project.hasProperty("jvmArgs")){
+        jvmArgs((List<String>)Eval.me(project.getProperties()["jvmArgs"]))
+    }
 }
 
 task debug(dependsOn: classes, type: JavaExec){
