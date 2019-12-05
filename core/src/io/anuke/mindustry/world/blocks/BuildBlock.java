@@ -280,6 +280,10 @@ public class BuildBlock extends Block{
 
             progress = Mathf.clamp(progress - amount);
 
+            if(builder instanceof Player){
+                builderID = builder.getID();
+            }
+
             if(progress <= 0 || state.rules.infiniteResources){
                 Call.onDeconstructFinish(tile, this.cblock == null ? previous : this.cblock, builderID);
             }
