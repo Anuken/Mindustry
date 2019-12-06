@@ -138,6 +138,17 @@ public class Maps{
                 Log.err(e);
             }
         }
+
+        //mod
+        mods.listFiles("maps", (mod, file) -> {
+            try{
+                Map map = loadMap(file, false);
+                map.mod = mod;
+            }catch(Exception e){
+                Log.err("Failed to load mod map file '{0}'!", file);
+                Log.err(e);
+            }
+        });
     }
 
     public void reload(){
@@ -457,7 +468,7 @@ public class Maps{
             return maps.find(m -> m != prev || maps.size == 1);
         }),
         custom(prev -> {
-            Array<Map> maps = Array.withArrays(Vars.maps.customMaps());
+            Array<Map> maps = Array.withArrays(Vars.maps.customMaps().isEmpty() ? Vars.maps.defaultMaps() : Vars.maps.customMaps());
             maps.shuffle();
             return maps.find(m -> m != prev || maps.size == 1);
         }),

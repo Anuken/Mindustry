@@ -29,6 +29,14 @@ public class JsonIO{
                 super.writeValue(value, knownType, elementType);
             }
         }
+
+        @Override
+        protected String convertToString(Object object){
+            if(object instanceof MappableContent){
+                return ((MappableContent)object).name;
+            }
+            return super.convertToString(object);
+        }
     };
 
     public static Json json(){

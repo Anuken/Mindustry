@@ -18,6 +18,7 @@ public class PowerGenerator extends PowerDistributor{
 
     public PowerGenerator(String name){
         super(name);
+        sync = true;
         baseExplosiveness = 5f;
         flags = EnumSet.of(BlockFlag.producer);
         entityType = GeneratorEntity::new;

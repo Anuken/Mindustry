@@ -143,7 +143,7 @@ public class MapsDialog extends FloatingDialog{
             button.row();
             button.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize - 20f);
             button.row();
-            button.add(map.custom ? "$custom" : map.workshop ? "$workshop" : "$builtin").color(Color.gray).padTop(3);
+            button.add(map.custom ? "$custom" : map.workshop ? "$workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.name : "$builtin").color(Color.gray).padTop(3);
 
             i++;
         }

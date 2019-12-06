@@ -5,11 +5,13 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.filters.*;
+import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -35,6 +37,8 @@ public class Map implements Comparable<Map>, Publishable{
     public IntSet teams = new IntSet();
     /** Number of enemy spawns on this map.*/
     public int spawns = 0;
+    /** Associated mod. If null, no mod is associated. */
+    public @Nullable LoadedMod mod;
 
     public Map(FileHandle file, int width, int height, StringMap tags, boolean custom, int version, int build){
         this.custom = custom;
