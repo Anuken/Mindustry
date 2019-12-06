@@ -28,6 +28,10 @@ task run(dependsOn: classes, type: JavaExec){
         args Eval.me(project.getProperties()["args"])
     }
 
+    if(project.hasProperty("jvmArgs")){
+        jvmArgs((List<String>)Eval.me(project.getProperties()["jvmArgs"]))
+    }
+
     if(args.contains("debug")){
         main = "io.anuke.mindustry.DebugLauncher"
     }
