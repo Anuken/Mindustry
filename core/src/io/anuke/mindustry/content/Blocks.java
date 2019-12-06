@@ -1003,7 +1003,7 @@ public class Blocks implements ContentList{
 
         liquidDistributor = new io.anuke.mindustry.world.blocks.liquid.LiquidRouter("liquid-distributor"){{
             requirements(Category.liquid, ItemStack.with(Items.graphite, 8, Items.metaglass, 2));
-            liquidCapacity = 40f;
+            liquidCapacity = 100f;
             size = 2;
         }};
 
