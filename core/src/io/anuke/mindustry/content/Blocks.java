@@ -61,7 +61,7 @@ public class Blocks implements ContentList{
     conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, massDriver,
 
     //liquids
-    mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
+    mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidDistributor, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
 
     //power
     combustionGenerator, thermalGenerator, turbineGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
@@ -999,6 +999,12 @@ public class Blocks implements ContentList{
         liquidRouter = new io.anuke.mindustry.world.blocks.liquid.LiquidRouter("liquid-router"){{
             requirements(Category.liquid, ItemStack.with(Items.graphite, 4, Items.metaglass, 2));
             liquidCapacity = 20f;
+        }};
+
+        liquidDistributor = new io.anuke.mindustry.world.blocks.liquid.LiquidRouter("liquid-distributor"){{
+            requirements(Category.liquid, ItemStack.with(Items.graphite, 8, Items.metaglass, 2));
+            liquidCapacity = 40f;
+            size = 2;
         }};
 
         liquidTank = new LiquidTank("liquid-tank"){{
