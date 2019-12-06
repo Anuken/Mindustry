@@ -84,6 +84,8 @@ public class Maps{
             maps.sort();
         });
 
+        Events.on(ContentReloadEvent.class, event -> reload());
+
         if(Core.assets != null){
             ((CustomLoader)Core.assets.getLoader(Content.class)).loaded = this::createAllPreviews;
         }
