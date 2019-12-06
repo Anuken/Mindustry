@@ -50,6 +50,18 @@ public class Mods implements Loadable{
         return modDirectory.child(load.name).child("config.json");
     }
 
+    /** Returns a list of files per mod subdirectory. */
+    public void listFiles(String directory, Cons2<LoadedMod, FileHandle> cons){
+        for(LoadedMod mod : loaded){
+            FileHandle file = mod.root.child(directory);
+            if(file.exists()){
+                for(FileHandle child : file.list()){
+                    cons.get(mod, child);
+                }
+            }
+        }
+    }
+
     /** @return the loaded mod found by class, or null if not found. */
     public @Nullable LoadedMod getMod(Class<? extends Mod> type){
         return loaded.find(l -> l.mod != null && l.mod.getClass() == type);
