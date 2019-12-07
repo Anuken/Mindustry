@@ -23,6 +23,7 @@ public class ScriptStubGenerator{
         Array<String> nameBlacklist = Array.with("ClientLauncher", "NetClient", "NetServer", "ClassAccess");
         Array<Class<?>> whitelist = Array.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class, AtlasRegion.class, String.class);
         Array<String> nopackage = Array.with("io.anuke.arc.func", "java.lang");
+        Array<String> imported = Array.with("io.anuke.mindustry.type", "io.anuke.mindustry.world");
 
         String fileTemplate = "package io.anuke.mindustry.mod;\n" +
         "\n" +
@@ -43,6 +44,7 @@ public class ScriptStubGenerator{
         .filterInputsBy(new FilterBuilder()
         .include(FilterBuilder.prefix("io.anuke.mindustry"))
         .include(FilterBuilder.prefix("io.anuke.arc.func"))
+        .include(FilterBuilder.prefix("io.anuke.arc.collection"))
         .include(FilterBuilder.prefix("io.anuke.arc.scene"))
         ));
 
@@ -60,7 +62,7 @@ public class ScriptStubGenerator{
         result.append("\n").append(new FileHandle("core/assets/scripts/base.js").readString()).append("\n");
         for(Class type : classes){
             if(used.contains(type.getSimpleName()) || nopackage.contains(s -> type.getName().startsWith(s))) continue;
-            result.append("const ").append(type.getSimpleName()).append(" = ").append("Packages.").append(type.getCanonicalName()).append("\n");
+            //result.append("const ").append(type.getSimpleName()).append(" = ").append("Packages.").append(type.getCanonicalName()).append("\n");
             used.add(type.getSimpleName());
         }
 
