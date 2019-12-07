@@ -385,7 +385,7 @@ public class Mods implements Loadable{
         try{
             for(LoadedMod mod : loaded){
                 if(mod.root.child("scripts").exists()){
-                    content.setCurrentMod(mod.name);
+                    content.setCurrentMod(mod);
                     mod.scripts = mod.root.child("scripts").findAll(f -> f.extension().equals("js"));
                     Log.info("[{0}] Found {1} scripts.", mod.meta.name, mod.scripts.size);
 
