@@ -103,7 +103,8 @@ public class PlacementFragment extends Fragment{
             }
         }
 
-        if(ui.chatfrag.chatOpen()) return false;
+        if(ui.chatfrag.shown() || Core.scene.hasKeyboard()) return false;
+
         for(int i = 0; i < blockSelect.length; i++){
             if(Core.input.keyTap(blockSelect[i])){
                 if(i > 9) { //select block directionally

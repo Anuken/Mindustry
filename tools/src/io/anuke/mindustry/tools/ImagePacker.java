@@ -24,7 +24,7 @@ public class ImagePacker{
 
         Log.setLogger(new NoopLogHandler());
         Vars.content = new ContentLoader();
-        Vars.content.createContent();
+        Vars.content.createBaseContent();
         Log.setLogger(new LogHandler());
 
         Files.walk(Paths.get("../../../assets-raw/sprites_out")).forEach(path -> {

@@ -198,6 +198,16 @@ public class Mods implements Loadable{
         requiresReload = true;
     }
 
+    public Scripts getScripts(){
+        if(scripts == null) scripts = platform.createScripts();
+        return scripts;
+    }
+
+    /** @return whether the scripting engine has been initialized. */
+    public boolean hasScripts(){
+        return scripts != null;
+    }
+
     public boolean requiresReload(){
         return requiresReload;
     }
@@ -353,9 +363,10 @@ public class Mods implements Loadable{
             scripts = null;
         }
         content.clear();
-        content.createContent(false);
+        content.createBaseContent();
+        content.loadColors();
         loadScripts();
-        content.createContent();
+        content.createModContent();
         loadAsync();
         loadSync();
         content.init();

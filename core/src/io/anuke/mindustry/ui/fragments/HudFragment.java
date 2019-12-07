@@ -83,7 +83,7 @@ public class HudFragment extends Fragment{
 
                     select.addImageButton(Icon.chatSmall, style,() -> {
                         if(net.active() && mobile){
-                            if(ui.chatfrag.chatOpen()){
+                            if(ui.chatfrag.shown()){
                                 ui.chatfrag.hide();
                             }else{
                                 ui.chatfrag.toggle();
@@ -131,7 +131,7 @@ public class HudFragment extends Fragment{
             }
 
             cont.update(() -> {
-                if(Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.chatOpen() && !Core.scene.hasDialog() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
+                if(Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.shown() && !Core.scene.hasDialog() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
                     toggleMenus();
                 }
             });

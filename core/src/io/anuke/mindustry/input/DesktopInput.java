@@ -122,7 +122,7 @@ public class DesktopInput extends InputHandler{
             drawSelected(sreq.x, sreq.y, sreq.block, getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
         }
 
-        if(Core.input.keyDown(Binding.schematic_select) && !ui.chatfrag.chatOpen()){
+        if(Core.input.keyDown(Binding.schematic_select) && !Core.scene.hasKeyboard()){
             drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
         }
 
@@ -139,7 +139,7 @@ public class DesktopInput extends InputHandler{
             player.isShooting = false;
         }
 
-        if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap) && (scene.getKeyboardFocus() == ui.minimap || !scene.hasDialog()) && !ui.chatfrag.chatOpen() && !(scene.getKeyboardFocus() instanceof TextField)){
+        if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap) && (scene.getKeyboardFocus() == ui.minimap || !scene.hasDialog()) && !Core.scene.hasKeyboard() && !(scene.getKeyboardFocus() instanceof TextField)){
             if(!ui.minimap.isShown()){
                 ui.minimap.show();
             }else{
@@ -293,12 +293,12 @@ public class DesktopInput extends InputHandler{
             player.clearBuilding();
         }
 
-        if(Core.input.keyTap(Binding.schematic_select) && !ui.chatfrag.chatOpen()){
+        if(Core.input.keyTap(Binding.schematic_select) && !Core.scene.hasKeyboard()){
             schemX = rawCursorX;
             schemY = rawCursorY;
         }
 
-        if(Core.input.keyTap(Binding.schematic_menu) && !ui.chatfrag.chatOpen()){
+        if(Core.input.keyTap(Binding.schematic_menu) && !Core.scene.hasKeyboard()){
             if(ui.schematics.isShown()){
                 ui.schematics.hide();
             }else{
@@ -311,7 +311,7 @@ public class DesktopInput extends InputHandler{
             selectRequests.clear();
         }
 
-        if(Core.input.keyRelease(Binding.schematic_select) && !ui.chatfrag.chatOpen()){
+        if(Core.input.keyRelease(Binding.schematic_select) && !Core.scene.hasKeyboard()){
             lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
             useSchematic(lastSchematic);
             if(selectRequests.isEmpty()){
@@ -371,10 +371,10 @@ public class DesktopInput extends InputHandler{
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
                 if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.buildQueue().size == 0 || !player.isBuilding) && !droppingItem &&
-                !tryBeginMine(selected) && player.getMineTile() == null && !ui.chatfrag.chatOpen()){
+                !tryBeginMine(selected) && player.getMineTile() == null && !Core.scene.hasKeyboard()){
                     player.isShooting = true;
                 }
-            }else if(!ui.chatfrag.chatOpen()){ //if it's out of bounds, shooting is just fine
+            }else if(!Core.scene.hasKeyboard()){ //if it's out of bounds, shooting is just fine
                 player.isShooting = true;
             }
         }else if(Core.input.keyTap(Binding.deselect) && block != null){

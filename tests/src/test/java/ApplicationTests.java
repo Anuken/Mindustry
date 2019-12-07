@@ -47,7 +47,7 @@ public class ApplicationTests{
                     net = new Net(null);
                     tree = new FileTree();
                     Vars.init();
-                    content.createContent();
+                    content.createBaseContent();
 
                     add(logic = new Logic());
                     add(netServer = new NetServer());

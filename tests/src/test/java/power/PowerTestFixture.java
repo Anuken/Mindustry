@@ -33,7 +33,7 @@ public class PowerTestFixture{
 
             }
         };
-        content.createContent();
+        content.createBaseContent();
         Log.setUseColors(false);
         Time.setDeltaProvider(() -> 0.5f);
     }

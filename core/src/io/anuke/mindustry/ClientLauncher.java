@@ -69,14 +69,12 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Musics.load();
         Sounds.load();
 
-        assets.loadRun("scriptinit", Scripts.class, () -> {}, () -> {
-            content.createContent(false);
-            mods.loadScripts();
-        });
-
         assets.loadRun("contentcreate", Content.class, () -> {
-            content.createContent();
+            content.createBaseContent();
             content.loadColors();
+        }, () -> {
+            mods.loadScripts();
+            content.createModContent();
         });
 
         add(logic = new Logic());

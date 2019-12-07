@@ -1,5 +1,5 @@
-const print = function(obj){
-    java.lang.System.out.println(obj ? String(obj) : "null")
+const log = function(context, obj){
+    Vars.mods.getScripts().log(context, obj ? String(obj) : "null")
 }
 
 const extendContent = function(classType, name, params){

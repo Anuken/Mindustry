@@ -20,7 +20,6 @@ import static io.anuke.mindustry.Vars.mods;
  */
 @SuppressWarnings("unchecked")
 public class ContentLoader{
-    private boolean loaded = false;
     private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
     private Array<Content>[] contentMap = new Array[ContentType.values().length];
     private MappableContent[][] temporaryMapper;
@@ -43,59 +42,47 @@ public class ContentLoader{
         new LegacyColorMapper(),
     };
 
+    public ContentLoader(){
+        for(ContentType type : ContentType.values()){
+            contentMap[type.ordinal()] = new Array<>();
+            contentNameMap[type.ordinal()] = new ObjectMap<>();
+        }
+    }
+
     /** Clears all initialized content.*/
     public void clear(){
         contentNameMap = new ObjectMap[ContentType.values().length];
         contentMap = new Array[ContentType.values().length];
         initialization = new ObjectSet<>();
-        loaded = false;
     }
 
-    /** Creates all content types. */
-    public void createContent(){
-        createContent(true);
+
+    /** Creates all base types. */
+    public void createBaseContent(){
+        for(ContentList list : content){
+            list.load();
+        }
     }
 
-    /** Creates all content types. */
-    public void createContent(boolean load){
-        if(loaded){
-            Log.info("Content already loaded, skipping.");
-            return;
-        }
-
-        if(contentMap[0] == null){
-            for(ContentType type : ContentType.values()){
-                contentMap[type.ordinal()] = new Array<>();
-                contentNameMap[type.ordinal()] = new ObjectMap<>();
-            }
-        }
-
-        if(load){
-
-            for(ContentList list : content){
-                list.load();
-            }
-
-            if(mods != null){
-                mods.loadContent();
-            }
-
-            //check up ID mapping, make sure it's linear
-            for(Array<Content> arr : contentMap){
-                for(int i = 0; i < arr.size; i++){
-                    int id = arr.get(i).id;
-                    if(id != i){
-                        throw new IllegalArgumentException("Out-of-order IDs for content '" + arr.get(i) + "' (expected " + i + " but got " + id + ")");
-                    }
-                }
-            }
-
-            loaded = true;
+    /** Creates mod content, if applicable. */
+    public void createModContent(){
+        if(mods != null){
+            mods.loadContent();
         }
     }
 
     /** Logs content statistics.*/
     public void logContent(){
+        //check up ID mapping, make sure it's linear (debug only)
+        for(Array<Content> arr : contentMap){
+            for(int i = 0; i < arr.size; i++){
+                int id = arr.get(i).id;
+                if(id != i){
+                    throw new IllegalArgumentException("Out-of-order IDs for content '" + arr.get(i) + "' (expected " + i + " but got " + id + ")");
+                }
+            }
+        }
+
         Log.info("--- CONTENT INFO ---");
         for(int k = 0; k < contentMap.length; k++){
             Log.info("[{0}]: loaded {1}", ContentType.values()[k].name(), contentMap[k].size);

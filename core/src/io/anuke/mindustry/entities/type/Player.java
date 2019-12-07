@@ -556,7 +556,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             updateKeyboard();
         }
 
-        isTyping = ui.chatfrag.chatOpen();
+        isTyping = ui.chatfrag.shown();
 
         updateMechanics();
 
@@ -604,7 +604,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         movement.limit(speed).scl(Time.delta());
 
-        if(!ui.chatfrag.chatOpen()){
+        if(!Core.scene.hasKeyboard()){
             velocity.add(movement.x, movement.y);
         }else{
             isShooting = false;
@@ -613,7 +613,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         updateVelocityStatus();
         moved = dst(prex, prey) > 0.001f;
 
-        if(!ui.chatfrag.chatOpen()){
+        if(!Core.scene.hasKeyboard()){
             float baseLerp = mech.getRotationAlpha(this);
             if(!isShooting() || !mech.turnCursor){
                 if(!movement.isZero()){

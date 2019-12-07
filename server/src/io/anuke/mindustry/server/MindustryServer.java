@@ -33,7 +33,9 @@ public class MindustryServer implements ApplicationListener{
 
         Vars.loadSettings();
         Vars.init();
-        content.createContent();
+        content.createBaseContent();
+        mods.loadScripts();
+        content.createModContent();
         content.init();
 
         Core.app.addListener(logic = new Logic());
