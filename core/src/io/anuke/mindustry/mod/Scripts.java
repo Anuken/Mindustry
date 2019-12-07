@@ -45,9 +45,7 @@ public class Scripts implements Disposable{
     }
 
     private String getError(Throwable t){
-        if(t instanceof EcmaError && t.getCause() != null){
-            t = t.getCause();
-        }
+        t = Strings.getFinalCause(t);
         return t.getClass().getSimpleName() + (t.getMessage() == null ? "" : ": " + t.getMessage());
     }
 
@@ -74,7 +72,7 @@ public class Scripts implements Disposable{
         try{
             context.evaluateString(scope, script, file, 1, null);
         }catch(Throwable t){
-            log(file, getError(t));
+            log(file, "[scarlet]" + getError(t));
         }
     }
 

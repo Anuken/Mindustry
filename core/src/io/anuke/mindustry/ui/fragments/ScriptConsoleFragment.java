@@ -21,7 +21,6 @@ import static io.anuke.mindustry.Vars.*;
 public class ScriptConsoleFragment extends Table{
     private final static int messagesShown = 14;
     private Array<String> messages = new Array<>();
-    private float fadetime;
     private boolean open = false, shown;
     private TextField chatfield;
     private Label fieldlabel = new Label(">");
@@ -133,7 +132,7 @@ public class ScriptConsoleFragment extends Table{
         Draw.alpha(shadowColor.a * opacity);
 
         float theight = offsety + spacing + getMarginBottom();
-        for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || open); i++){
+        for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos; i++){
 
             layout.setText(font, messages.get(i), Color.white, textWidth, Align.bottomLeft, true);
             theight += layout.height + textspacing;
@@ -142,9 +141,9 @@ public class ScriptConsoleFragment extends Table{
             font.getCache().clear();
             font.getCache().addText(messages.get(i), fontoffsetx + offsetx, offsety + theight, textWidth, Align.bottomLeft, true);
 
-            if(!open && fadetime - i < 1f && fadetime - i >= 0f){
-                font.getCache().setAlphas((fadetime - i) * opacity);
-                Draw.color(0, 0, 0, shadowColor.a * (fadetime - i) * opacity);
+            if(!open){
+                font.getCache().setAlphas(opacity);
+                Draw.color(0, 0, 0, shadowColor.a * opacity);
             }else{
                 font.getCache().setAlphas(opacity);
             }
@@ -157,9 +156,6 @@ public class ScriptConsoleFragment extends Table{
         }
 
         Draw.color();
-
-        if(fadetime > 0 && !open)
-            fadetime -= Time.delta() / 180f;
     }
 
     private void sendMessage(){
@@ -224,8 +220,5 @@ public class ScriptConsoleFragment extends Table{
 
     public void addMessage(String message){
         messages.insert(0, message);
-
-        fadetime += 1f;
-        fadetime = Math.min(fadetime, messagesShown) + 1f;
     }
 }
