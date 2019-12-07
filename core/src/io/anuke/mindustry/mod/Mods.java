@@ -30,7 +30,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Mods implements Loadable{
     private Json json = new Json();
-    private Scripts scripts;
+    private @Nullable Scripts scripts;
     private ContentParser parser = new ContentParser();
     private ObjectMap<String, Array<FileHandle>> bundles = new ObjectMap<>();
     private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites");
@@ -348,6 +348,12 @@ public class Mods implements Loadable{
         Sounds.dispose();
         Sounds.load();
         Core.assets.finishLoading();
+        if(scripts != null){
+            scripts.dispose();
+            scripts = null;
+        }
+        content.createContent(false);
+        loadScripts();
         content.clear();
         content.createContent();
         loadAsync();
@@ -361,9 +367,8 @@ public class Mods implements Loadable{
         Events.fire(new ContentReloadEvent());
     }
 
-    /** Creates all the content found in mod files. */
-    public void loadContent(){
-
+    /** This must be run on the main thread! */
+    public void loadScripts(){
         Time.mark();
 
         for(LoadedMod mod : loaded){
@@ -390,6 +395,10 @@ public class Mods implements Loadable{
         }
 
         Log.info("Time to initialize modded scripts: {0}", Time.elapsed());
+    }
+
+    /** Creates all the content found in mod files. */
+    public void loadContent(){
 
         class LoadRun implements Comparable<LoadRun>{
             final ContentType type;

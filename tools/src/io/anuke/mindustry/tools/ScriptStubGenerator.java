@@ -9,6 +9,7 @@ import org.reflections.*;
 import org.reflections.scanners.*;
 import org.reflections.util.*;
 
+import java.io.*;
 import java.util.*;
 
 public class ScriptStubGenerator{
@@ -17,7 +18,7 @@ public class ScriptStubGenerator{
         String base = "io.anuke.mindustry";
         Array<String> blacklist = Array.with("plugin", "mod", "net", "io", "tools", "gen");
         Array<String> nameBlacklist = Array.with("ClientLauncher", "NetClient", "NetServer");
-        Array<Class<?>> whitelist = Array.with(Draw.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class);
+        Array<Class<?>> whitelist = Array.with(Draw.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class);
 
         String fileTemplate = "package io.anuke.mindustry.mod;\n" +
         "\n" +

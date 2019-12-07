@@ -4,9 +4,10 @@ const print = function(obj){
     java.lang.System.out.println(obj ? String(obj) : "null")
 }
 
-const extend = function(classType, params){
-    return new JavaAdapter(classType, params)
+const extend = function(classType, name, params){
+    return new JavaAdapter(classType, params, name)
 }
+
 const Core = Packages.io.anuke.arc.Core
 const Boolc = Packages.io.anuke.arc.func.Boolc
 const Boolf = Packages.io.anuke.arc.func.Boolf
@@ -387,7 +388,5 @@ const LiquidModule = Packages.io.anuke.mindustry.world.modules.LiquidModule
 const PowerModule = Packages.io.anuke.mindustry.world.modules.PowerModule
 const Produce = Packages.io.anuke.mindustry.world.producers.Produce
 const ProduceItem = Packages.io.anuke.mindustry.world.producers.ProduceItem
-
-var r = new JavaAdapter(Block, {});
-
-print(r.update)
+const PrintStream = Packages.java.io.PrintStream
+const System = Packages.java.lang.System

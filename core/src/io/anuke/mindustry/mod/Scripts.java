@@ -7,10 +7,7 @@ import io.anuke.mindustry.*;
 import io.anuke.mindustry.mod.Mods.*;
 import org.mozilla.javascript.*;
 
-import java.io.*;
-
-public class Scripts{
-    private static final Class[] denied = {FileHandle.class, InputStream.class, File.class, Scripts.class, Files.class, ClassAccess.class};
+public class Scripts implements Disposable{
     private final Context context;
     private final String wrapper;
     private Scriptable scope;
@@ -18,12 +15,26 @@ public class Scripts{
     public Scripts(){
         Time.mark();
 
-        context = Context.enter();
-        if(Vars.mobile){
-            context.setOptimizationLevel(-1);
-        }
+        context = Vars.platform.getScriptContext();
+        context.setClassShutter(type -> ClassAccess.allowedClassNames.contains(type) || type.startsWith("adapter") || type.contains("PrintStream"));
+        context.setErrorReporter(new ErrorReporter(){
+            @Override
+            public void warning(String message, String sourceName, int line, String lineSource, int lineOffset){
 
-        //context.setClassShutter(ClassAccess.allowedClassNames::contains);
+            }
+
+            @Override
+            public void error(String message, String sourceName, int line, String lineSource, int lineOffset){
+                Log.info(message + "@" + sourceName + ":" + line);
+            }
+
+            @Override
+            public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset){
+                Log.info(message + "@" + sourceName + ":" + line);
+                return null;
+            }
+        });
+
         scope = context.initStandardObjects();
         wrapper = Core.files.internal("scripts/wrapper.js").readString();
 
@@ -32,10 +43,15 @@ public class Scripts{
     }
 
     public void run(LoadedMod mod, FileHandle file){
-        run(wrapper.replace("$SCRIPT_NAME$", mod.name + "_" +file.nameWithoutExtension().replace("-", "_").replace(" ", "_")).replace("$CODE$", file.readString()), file.name());
+        run(wrapper.replace("$SCRIPT_NAME$", mod.name + "_" + file.nameWithoutExtension().replace("-", "_").replace(" ", "_")).replace("$CODE$", file.readString()), file.name());
     }
 
     private void run(String script, String file){
-       context.evaluateString(scope, script, file, 1, null);
+        context.evaluateString(scope, script, file, 1, null);
+    }
+
+    @Override
+    public void dispose(){
+        Context.exit();
     }
 }

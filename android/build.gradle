@@ -28,6 +28,7 @@ dependencies{
     implementation project(":core")
 
     implementation arcModule("backends:backend-android")
+    implementation 'com.faendir.rhino:rhino-android:1.5.2'
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"

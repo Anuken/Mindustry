@@ -13,6 +13,7 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.*;
+import org.mozilla.javascript.*;
 
 import static io.anuke.mindustry.Vars.mobile;
 
@@ -49,6 +50,10 @@ public interface Platform{
     /** Gets the scripting implementation. */
     default Scripts createScripts(){
         return new Scripts();
+    }
+
+    default Context getScriptContext(){
+        return Context.enter();
     }
 
     /** Add a text input dialog that should show up after the field is tapped. */

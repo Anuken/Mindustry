@@ -53,35 +53,45 @@ public class ContentLoader{
 
     /** Creates all content types. */
     public void createContent(){
+        createContent(true);
+    }
+
+    /** Creates all content types. */
+    public void createContent(boolean load){
         if(loaded){
             Log.info("Content already loaded, skipping.");
             return;
         }
 
-        for(ContentType type : ContentType.values()){
-            contentMap[type.ordinal()] = new Array<>();
-            contentNameMap[type.ordinal()] = new ObjectMap<>();
-        }
-
-        for(ContentList list : content){
-            list.load();
-        }
-
-        if(mods != null){
-            mods.loadContent();
-        }
-
-        //check up ID mapping, make sure it's linear
-        for(Array<Content> arr : contentMap){
-            for(int i = 0; i < arr.size; i++){
-                int id = arr.get(i).id;
-                if(id != i){
-                    throw new IllegalArgumentException("Out-of-order IDs for content '" + arr.get(i) + "' (expected " + i + " but got " + id + ")");
-                }
+        if(contentMap[0] == null){
+            for(ContentType type : ContentType.values()){
+                contentMap[type.ordinal()] = new Array<>();
+                contentNameMap[type.ordinal()] = new ObjectMap<>();
             }
         }
 
-        loaded = true;
+        if(load){
+
+            for(ContentList list : content){
+                list.load();
+            }
+
+            if(mods != null){
+                mods.loadContent();
+            }
+
+            //check up ID mapping, make sure it's linear
+            for(Array<Content> arr : contentMap){
+                for(int i = 0; i < arr.size; i++){
+                    int id = arr.get(i).id;
+                    if(id != i){
+                        throw new IllegalArgumentException("Out-of-order IDs for content '" + arr.get(i) + "' (expected " + i + " but got " + id + ")");
+                    }
+                }
+            }
+
+            loaded = true;
+        }
     }
 
     /** Logs content statistics.*/
