@@ -1,8 +1,8 @@
 package io.anuke.mindustry.tools;
 
 import io.anuke.arc.*;
-import io.anuke.arc.collection.*;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.g2d.TextureAtlas.*;
@@ -20,8 +20,9 @@ public class ScriptStubGenerator{
     public static void main(String[] args){
         String base = "io.anuke.mindustry";
         Array<String> blacklist = Array.with("plugin", "mod", "net", "io", "tools", "gen");
-        Array<String> nameBlacklist = Array.with("ClientLauncher", "NetClient", "NetServer");
-        Array<Class<?>> whitelist = Array.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class, AtlasRegion.class);
+        Array<String> nameBlacklist = Array.with("ClientLauncher", "NetClient", "NetServer", "ClassAccess");
+        Array<Class<?>> whitelist = Array.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class, AtlasRegion.class, String.class);
+        Array<String> nopackage = Array.with("io.anuke.arc.func", "java.lang");
 
         String fileTemplate = "package io.anuke.mindustry.mod;\n" +
         "\n" +
@@ -39,7 +40,11 @@ public class ScriptStubGenerator{
         Reflections reflections = new Reflections(new ConfigurationBuilder()
         .setScanners(new SubTypesScanner(false), new ResourcesScanner())
         .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0])))
-        .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix("io.anuke.mindustry")).include(FilterBuilder.prefix("io.anuke.arc.func"))));
+        .filterInputsBy(new FilterBuilder()
+        .include(FilterBuilder.prefix("io.anuke.mindustry"))
+        .include(FilterBuilder.prefix("io.anuke.arc.func"))
+        .include(FilterBuilder.prefix("io.anuke.arc.scene"))
+        ));
 
         Array<Class<?>> classes = Array.with(reflections.getSubTypesOf(Object.class));
         classes.addAll(reflections.getSubTypesOf(Enum.class));
@@ -54,7 +59,7 @@ public class ScriptStubGenerator{
         StringBuilder result = new StringBuilder("//Generated class. Do not modify.\n");
         result.append("\n").append(new FileHandle("core/assets/scripts/base.js").readString()).append("\n");
         for(Class type : classes){
-            if(used.contains(type.getSimpleName())) continue;
+            if(used.contains(type.getSimpleName()) || nopackage.contains(s -> type.getName().startsWith(s))) continue;
             result.append("const ").append(type.getSimpleName()).append(" = ").append("Packages.").append(type.getCanonicalName()).append("\n");
             used.add(type.getSimpleName());
         }

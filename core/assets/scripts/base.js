@@ -3,7 +3,7 @@ const print = function(obj){
 }
 
 const extendContent = function(classType, name, params){
-    return new JavaAdapter(classType, params, name)
+    return new JavaAdapter(classType, params, modName + "-" + name)
 }
 
 const extend = function(classType, params){

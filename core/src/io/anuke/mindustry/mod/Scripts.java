@@ -26,7 +26,7 @@ public class Scripts implements Disposable{
     }
 
     public void run(LoadedMod mod, FileHandle file){
-        run(wrapper.replace("$SCRIPT_NAME$", mod.name + "_" + file.nameWithoutExtension().replace("-", "_").replace(" ", "_")).replace("$CODE$", file.readString()), file.name());
+        run(wrapper.replace("$SCRIPT_NAME$", mod.name + "_" + file.nameWithoutExtension().replace("-", "_").replace(" ", "_")).replace("$CODE$", file.readString()).replace("$MOD_NAME$", mod.name), file.name());
     }
 
     private void run(String script, String file){
