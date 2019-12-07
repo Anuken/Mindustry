@@ -2,14 +2,17 @@ package io.anuke.mindustry.tools;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.graphics.g2d.TextureAtlas.*;
 import io.anuke.arc.util.*;
 import org.reflections.*;
 import org.reflections.scanners.*;
 import org.reflections.util.*;
 
 import java.io.*;
+import java.lang.reflect.*;
 import java.util.*;
 
 public class ScriptStubGenerator{
@@ -18,7 +21,7 @@ public class ScriptStubGenerator{
         String base = "io.anuke.mindustry";
         Array<String> blacklist = Array.with("plugin", "mod", "net", "io", "tools", "gen");
         Array<String> nameBlacklist = Array.with("ClientLauncher", "NetClient", "NetServer");
-        Array<Class<?>> whitelist = Array.with(Draw.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class);
+        Array<Class<?>> whitelist = Array.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class, AtlasRegion.class);
 
         String fileTemplate = "package io.anuke.mindustry.mod;\n" +
         "\n" +
@@ -43,13 +46,17 @@ public class ScriptStubGenerator{
         classes.addAll(whitelist);
         classes.sort(Structs.comparing(Class::getName));
 
-        classes.removeAll(type -> type.isSynthetic() || type.isAnonymousClass() || type.isMemberClass() || type.getCanonicalName() == null
+        classes.removeAll(type -> type.isSynthetic() || type.isAnonymousClass() || type.getCanonicalName() == null || Modifier.isPrivate(type.getModifiers())
         || blacklist.contains(s -> type.getName().startsWith(base + "." + s + ".")) || nameBlacklist.contains(type.getSimpleName()));
+        classes.distinct();
+        ObjectSet<String> used = ObjectSet.with();
 
         StringBuilder result = new StringBuilder("//Generated class. Do not modify.\n");
         result.append("\n").append(new FileHandle("core/assets/scripts/base.js").readString()).append("\n");
         for(Class type : classes){
+            if(used.contains(type.getSimpleName())) continue;
             result.append("const ").append(type.getSimpleName()).append(" = ").append("Packages.").append(type.getCanonicalName()).append("\n");
+            used.add(type.getSimpleName());
         }
 
         //Log.info(result);

@@ -17,23 +17,6 @@ public class Scripts implements Disposable{
 
         context = Vars.platform.getScriptContext();
         context.setClassShutter(type -> ClassAccess.allowedClassNames.contains(type) || type.startsWith("adapter") || type.contains("PrintStream"));
-        context.setErrorReporter(new ErrorReporter(){
-            @Override
-            public void warning(String message, String sourceName, int line, String lineSource, int lineOffset){
-
-            }
-
-            @Override
-            public void error(String message, String sourceName, int line, String lineSource, int lineOffset){
-                Log.info(message + "@" + sourceName + ":" + line);
-            }
-
-            @Override
-            public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset){
-                Log.info(message + "@" + sourceName + ":" + line);
-                return null;
-            }
-        });
 
         scope = context.initStandardObjects();
         wrapper = Core.files.internal("scripts/wrapper.js").readString();

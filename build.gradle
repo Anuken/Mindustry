@@ -254,7 +254,6 @@ project(":core"){
         compileJava.dependsOn(preGen)
 
         compile "org.lz4:lz4-java:1.4.1"
-        compile "org.javadelight:delight-rhino-sandbox:0.0.10"
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
         compile arcModule("extensions:arcnet")
