@@ -18,11 +18,19 @@ public class Scripts implements Disposable{
         context = Vars.platform.getScriptContext();
         context.setClassShutter(type -> ClassAccess.allowedClassNames.contains(type) || type.startsWith("adapter") || type.contains("PrintStream"));
 
-        scope = context.initStandardObjects();
+        scope = new ImporterTopLevel(context);//context.initStandardObjects();
         wrapper = Core.files.internal("scripts/wrapper.js").readString();
 
         run(Core.files.internal("scripts/global.js").readString(), "global.js");
         Log.info("Time to load script engine: {0}", Time.elapsed());
+    }
+
+    public String runConsole(String text){
+        try{
+            return String.valueOf(context.evaluateString(scope, text, "console.js", 1, null));
+        }catch(Throwable t){
+            return t.getClass().getSimpleName() + (t.getMessage() == null ? "" : ": " + t.getMessage());
+        }
     }
 
     public void run(LoadedMod mod, FileHandle file){

@@ -352,9 +352,9 @@ public class Mods implements Loadable{
             scripts.dispose();
             scripts = null;
         }
+        content.clear();
         content.createContent(false);
         loadScripts();
-        content.clear();
         content.createContent();
         loadAsync();
         loadSync();
