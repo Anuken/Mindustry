@@ -20,8 +20,8 @@ public abstract class UnlockableContent extends MappableContent{
     public UnlockableContent(String name){
         super(name);
 
-        this.localizedName = Core.bundle.get(getContentType() + "." + name + ".name", name);
-        this.description = Core.bundle.getOrNull(getContentType() + "." + name + ".description");
+        this.localizedName = Core.bundle.get(getContentType() + "." + this.name + ".name", this.name);
+        this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
     }
 
     /** Generate any special icons for this content. Called asynchronously.*/

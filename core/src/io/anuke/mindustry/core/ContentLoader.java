@@ -3,6 +3,7 @@ package io.anuke.mindustry.core;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.ctype.*;
@@ -23,6 +24,7 @@ public class ContentLoader{
     private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
     private Array<Content>[] contentMap = new Array[ContentType.values().length];
     private MappableContent[][] temporaryMapper;
+    private @Nullable LoadedMod currentMod;
     private ObjectSet<Cons<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
         new Fx(),
@@ -144,12 +146,22 @@ public class ContentLoader{
 
     public void handleContent(Content content){
         contentMap[content.getContentType().ordinal()].add(content);
+    }
 
+    public void setCurrentMod(LoadedMod mod){
+        this.currentMod = mod;
+    }
+
+    public String transformName(String name){
+        return currentMod == null ? name : currentMod.name + "-" + name;
     }
 
     public void handleMappableContent(MappableContent content){
         if(contentNameMap[content.getContentType().ordinal()].containsKey(content.name)){
             throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + content.name + "')");
+        }
+        if(currentMod != null){
+            content.mod = currentMod;
         }
         contentNameMap[content.getContentType().ordinal()].put(content.name, content);
     }

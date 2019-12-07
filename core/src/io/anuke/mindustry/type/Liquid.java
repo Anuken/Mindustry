@@ -31,7 +31,6 @@ public class Liquid extends UnlockableContent{
     public Liquid(String name, Color color){
         super(name);
         this.color = new Color(color);
-        this.description = Core.bundle.getOrNull("liquid." + name + ".description");
     }
 
     /** For modding only.*/

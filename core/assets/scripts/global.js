@@ -5,7 +5,7 @@ const log = function(context, obj){
 }
 
 const extendContent = function(classType, name, params){
-    return new JavaAdapter(classType, params, modName + "-" + name)
+    return new JavaAdapter(classType, params, name)
 }
 
 const extend = function(classType, params){

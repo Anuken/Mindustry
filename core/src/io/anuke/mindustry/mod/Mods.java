@@ -382,27 +382,32 @@ public class Mods implements Loadable{
     public void loadScripts(){
         Time.mark();
 
-        for(LoadedMod mod : loaded){
-            if(mod.root.child("scripts").exists()){
-                mod.scripts = mod.root.child("scripts").findAll(f -> f.extension().equals("js"));
-                Log.info("[{0}] Found {1} scripts.", mod.meta.name, mod.scripts.size);
+        try{
+            for(LoadedMod mod : loaded){
+                if(mod.root.child("scripts").exists()){
+                    content.setCurrentMod(mod.name);
+                    mod.scripts = mod.root.child("scripts").findAll(f -> f.extension().equals("js"));
+                    Log.info("[{0}] Found {1} scripts.", mod.meta.name, mod.scripts.size);
 
-                for(FileHandle file : mod.scripts){
-                    try{
-                        if(scripts == null){
-                            scripts = platform.createScripts();
+                    for(FileHandle file : mod.scripts){
+                        try{
+                            if(scripts == null){
+                                scripts = platform.createScripts();
+                            }
+                            scripts.run(mod, file);
+                        }catch(Throwable e){
+                            Core.app.post(() -> {
+                                Log.err("Error loading script {0} for mod {1}.", file.name(), mod.meta.name);
+                                e.printStackTrace();
+                                //if(!headless) ui.showException(e);
+                            });
+                            break;
                         }
-                        scripts.run(mod, file);
-                    }catch(Throwable e){
-                        Core.app.post(() -> {
-                            Log.err("Error loading script {0} for mod {1}.", file.name(), mod.meta.name);
-                            e.printStackTrace();
-                            //if(!headless) ui.showException(e);
-                        });
-                        break;
                     }
                 }
             }
+        }finally{
+            content.setCurrentMod(null);
         }
 
         Log.info("Time to initialize modded scripts: {0}", Time.elapsed());

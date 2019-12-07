@@ -39,7 +39,6 @@ public class Mech extends UnlockableContent{
     public Mech(String name, boolean flying){
         super(name);
         this.flying = flying;
-        this.description = Core.bundle.get("mech." + name + ".description");
     }
 
     public Mech(String name){
