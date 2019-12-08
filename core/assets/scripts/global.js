@@ -12,9 +12,12 @@ const extend = function(classType, params){
     return new JavaAdapter(classType, params)
 }
 
+const base = {}
 importPackage(Packages.io.anuke.arc)
 importPackage(Packages.io.anuke.arc.collection)
+importPackage(Packages.io.anuke.arc.graphics)
 importPackage(Packages.io.anuke.arc.graphics.g2d)
+importPackage(Packages.io.anuke.arc.math)
 importPackage(Packages.io.anuke.arc.scene)
 importPackage(Packages.io.anuke.arc.scene.actions)
 importPackage(Packages.io.anuke.arc.scene.event)

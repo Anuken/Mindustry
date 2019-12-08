@@ -4,8 +4,10 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.g2d.TextureAtlas.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import org.reflections.*;
 import org.reflections.scanners.*;
@@ -21,7 +23,7 @@ public class ScriptStubGenerator{
         String base = "io.anuke.mindustry";
         Array<String> blacklist = Array.with("plugin", "mod", "net", "io", "tools", "gen");
         Array<String> nameBlacklist = Array.with("ClientLauncher", "NetClient", "NetServer", "ClassAccess");
-        Array<Class<?>> whitelist = Array.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class, AtlasRegion.class, String.class);
+        Array<Class<?>> whitelist = Array.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class, AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class);
         Array<String> nopackage = Array.with("io.anuke.arc.func", "java.lang", "java");
         Array<String> imported = Array.with("io.anuke.mindustry.type", "io.anuke.mindustry.world");
 
