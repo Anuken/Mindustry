@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.BlockGroup;
 
 public class Router extends Block{
-    protected float speed = 8f;
+    public float speed = 8f;
 
     public Router(String name){
         super(name);

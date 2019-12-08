@@ -491,7 +491,7 @@ public class NetClient implements ApplicationListener{
             player.pointerX, player.pointerY, player.rotation, player.baseRotation,
             player.velocity().x, player.velocity().y,
             player.getMineTile(),
-            player.isBoosting, player.isShooting, ui.chatfrag.chatOpen(), player.isBuilding,
+            player.isBoosting, player.isShooting, ui.chatfrag.shown(), player.isBuilding,
             requests,
             Core.camera.position.x, Core.camera.position.y,
             Core.camera.width * viewScale, Core.camera.height * viewScale);

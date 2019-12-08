@@ -12,11 +12,11 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public class ChargeTurret extends PowerTurret{
 
-    protected float chargeTime = 30f;
-    protected int chargeEffects = 5;
-    protected float chargeMaxDelay = 10f;
-    protected Effect chargeEffect = Fx.none;
-    protected Effect chargeBeginEffect = Fx.none;
+    public float chargeTime = 30f;
+    public int chargeEffects = 5;
+    public float chargeMaxDelay = 10f;
+    public Effect chargeEffect = Fx.none;
+    public Effect chargeBeginEffect = Fx.none;
 
     public ChargeTurret(String name){
         super(name);

@@ -15,8 +15,8 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.content;
 
 public class Unloader extends Block{
-    protected float speed = 1f;
-    protected final int timerUnload = timers++;
+    public float speed = 1f;
+    public final int timerUnload = timers++;
 
     private static Item lastItem;
 

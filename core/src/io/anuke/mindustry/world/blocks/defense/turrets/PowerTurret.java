@@ -7,8 +7,8 @@ import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
 public class PowerTurret extends CooledTurret{
-    protected @NonNull BulletType shootType;
-    protected float powerUse = 1f;
+    public @NonNull BulletType shootType;
+    public float powerUse = 1f;
 
     public PowerTurret(String name){
         super(name);

@@ -18,19 +18,18 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class MendProjector extends Block{
-    private static Color color = Color.valueOf("84f491");
-    private static Color phase = Color.valueOf("ffd59e");
-    private static IntSet healed = new IntSet();
+    private static final IntSet healed = new IntSet();
 
-    protected int timerUse = timers++;
-
-    protected TextureRegion topRegion;
-    protected float reload = 250f;
-    protected float range = 60f;
-    protected float healPercent = 12f;
-    protected float phaseBoost = 12f;
-    protected float phaseRangeBoost = 50f;
-    protected float useTime = 400f;
+    public final int timerUse = timers++;
+    public Color baseColor = Color.valueOf("84f491");
+    public Color phaseColor = Color.valueOf("ffd59e");
+    public TextureRegion topRegion;
+    public float reload = 250f;
+    public float range = 60f;
+    public float healPercent = 12f;
+    public float phaseBoost = 12f;
+    public float phaseRangeBoost = 50f;
+    public float useTime = 400f;
 
     public MendProjector(String name){
         super(name);
@@ -92,7 +91,7 @@ public class MendProjector extends Block{
 
                     if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null && other.entity.health < other.entity.maxHealth()){
                         other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.efficiency());
-                        Effects.effect(Fx.healBlockFull, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
+                        Effects.effect(Fx.healBlockFull, Tmp.c1.set(baseColor).lerp(phaseColor, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
                         healed.add(other.pos());
                     }
                 }
@@ -110,7 +109,7 @@ public class MendProjector extends Block{
         MendEntity entity = tile.entity();
         float realRange = range + entity.phaseHeat * phaseRangeBoost;
 
-        Drawf.dashCircle(tile.drawx(), tile.drawy(), realRange, color);
+        Drawf.dashCircle(tile.drawx(), tile.drawy(), realRange, baseColor);
     }
 
     @Override
@@ -120,7 +119,7 @@ public class MendProjector extends Block{
         MendEntity entity = tile.entity();
         float f = 1f - (Time.time() / 100f) % 1f;
 
-        Draw.color(color, phase, entity.phaseHeat);
+        Draw.color(baseColor, phaseColor, entity.phaseHeat);
         Draw.alpha(entity.heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
         //Draw.blend(Blending.additive);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
@@ -135,7 +134,7 @@ public class MendProjector extends Block{
 
     @Override
     public void drawLight(Tile tile){
-        renderer.lights.add(tile.drawx(), tile.drawy(), 50f * tile.entity.efficiency(), color, 0.7f * tile.entity.efficiency());
+        renderer.lights.add(tile.drawx(), tile.drawy(), 50f * tile.entity.efficiency(), baseColor, 0.7f * tile.entity.efficiency());
     }
 
     class MendEntity extends TileEntity{

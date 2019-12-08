@@ -158,7 +158,6 @@ public class Block extends BlockStorage{
 
     public Block(String name){
         super(name);
-        this.description = Core.bundle.getOrNull("block." + name + ".description");
         this.solid = false;
     }
 

@@ -24,7 +24,7 @@ import io.anuke.mindustry.world.modules.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
-    protected Mech mech = Mechs.starter;
+    public Mech mech = Mechs.starter;
 
     public CoreBlock(String name){
         super(name);

@@ -70,8 +70,11 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Sounds.load();
 
         assets.loadRun("contentcreate", Content.class, () -> {
-            content.createContent();
+            content.createBaseContent();
             content.loadColors();
+        }, () -> {
+            mods.loadScripts();
+            content.createModContent();
         });
 
         add(logic = new Logic());
@@ -193,7 +196,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
             if(assets.getCurrentLoading() != null){
                 String name = assets.getCurrentLoading().fileName.toLowerCase();
-                String key = name.contains("content") ? "content" : name.contains("mod") ? "mods" : name.contains("msav") || name.contains("maps") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
+                String key = name.contains("script") ? "scripts" : name.contains("content") ? "content" : name.contains("mod") ? "mods" : name.contains("msav") ||
+                    name.contains("maps") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
                 font.draw(bundle.get("load." + key, ""), graphics.getWidth() / 2f, graphics.getHeight() / 2f - height / 2f - Scl.scl(10f), Align.center);
             }
         }

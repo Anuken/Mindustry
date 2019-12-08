@@ -34,7 +34,6 @@ public class Item extends UnlockableContent{
     public Item(String name, Color color){
         super(name);
         this.color = color;
-        this.description = Core.bundle.getOrNull("item." + this.name + ".description");
     }
 
     public Item(String name){

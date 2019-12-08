@@ -3,6 +3,7 @@ package io.anuke.mindustry.core;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.ctype.*;
@@ -20,10 +21,10 @@ import static io.anuke.mindustry.Vars.mods;
  */
 @SuppressWarnings("unchecked")
 public class ContentLoader{
-    private boolean loaded = false;
     private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
     private Array<Content>[] contentMap = new Array[ContentType.values().length];
     private MappableContent[][] temporaryMapper;
+    private @Nullable LoadedMod currentMod;
     private ObjectSet<Cons<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
         new Fx(),
@@ -43,35 +44,40 @@ public class ContentLoader{
         new LegacyColorMapper(),
     };
 
+    public ContentLoader(){
+        clear();
+    }
+
     /** Clears all initialized content.*/
     public void clear(){
         contentNameMap = new ObjectMap[ContentType.values().length];
         contentMap = new Array[ContentType.values().length];
         initialization = new ObjectSet<>();
-        loaded = false;
-    }
-
-    /** Creates all content types. */
-    public void createContent(){
-        if(loaded){
-            Log.info("Content already loaded, skipping.");
-            return;
-        }
 
         for(ContentType type : ContentType.values()){
             contentMap[type.ordinal()] = new Array<>();
             contentNameMap[type.ordinal()] = new ObjectMap<>();
         }
+    }
 
+
+    /** Creates all base types. */
+    public void createBaseContent(){
         for(ContentList list : content){
             list.load();
         }
+    }
 
+    /** Creates mod content, if applicable. */
+    public void createModContent(){
         if(mods != null){
             mods.loadContent();
         }
+    }
 
-        //check up ID mapping, make sure it's linear
+    /** Logs content statistics.*/
+    public void logContent(){
+        //check up ID mapping, make sure it's linear (debug only)
         for(Array<Content> arr : contentMap){
             for(int i = 0; i < arr.size; i++){
                 int id = arr.get(i).id;
@@ -81,11 +87,6 @@ public class ContentLoader{
             }
         }
 
-        loaded = true;
-    }
-
-    /** Logs content statistics.*/
-    public void logContent(){
         Log.info("--- CONTENT INFO ---");
         for(int k = 0; k < contentMap.length; k++){
             Log.info("[{0}]: loaded {1}", ContentType.values()[k].name(), contentMap[k].size);
@@ -147,12 +148,22 @@ public class ContentLoader{
 
     public void handleContent(Content content){
         contentMap[content.getContentType().ordinal()].add(content);
+    }
 
+    public void setCurrentMod(LoadedMod mod){
+        this.currentMod = mod;
+    }
+
+    public String transformName(String name){
+        return currentMod == null ? name : currentMod.name + "-" + name;
     }
 
     public void handleMappableContent(MappableContent content){
         if(contentNameMap[content.getContentType().ordinal()].containsKey(content.name)){
             throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + content.name + "')");
+        }
+        if(currentMod != null){
+            content.mod = currentMod;
         }
         contentNameMap[content.getContentType().ordinal()].put(content.name, content);
     }

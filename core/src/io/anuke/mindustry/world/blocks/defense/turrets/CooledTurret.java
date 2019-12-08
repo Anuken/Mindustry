@@ -17,8 +17,8 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public class CooledTurret extends Turret{
     /** How much reload is lowered by for each unit of liquid of heat capacity. */
-    protected float coolantMultiplier = 5f;
-    protected Effect coolEffect = Fx.fuelburn;
+    public float coolantMultiplier = 5f;
+    public Effect coolEffect = Fx.fuelburn;
 
     public CooledTurret(String name){
         super(name);

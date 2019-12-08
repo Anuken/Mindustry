@@ -52,6 +52,11 @@ public class ContentParser{
                 }
             }
         });
+        put(StatusEffect.class, (type, data) -> {
+            StatusEffect effect = new StatusEffect();
+            readFields(effect, data);
+            return effect;
+        });
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
         put(BulletType.class, (type, data) -> {
             if(data.isString()){

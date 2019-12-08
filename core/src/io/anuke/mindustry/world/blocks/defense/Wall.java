@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 
 public class Wall extends Block{
-    protected int variants = 0;
+    public int variants = 0;
 
     public Wall(String name){
         super(name);

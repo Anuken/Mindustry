@@ -6,11 +6,11 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
 public class Fracker extends SolidPump{
-    protected final float itemUseTime = 100f;
+    public float itemUseTime = 100f;
 
-    protected TextureRegion liquidRegion;
-    protected TextureRegion rotatorRegion;
-    protected TextureRegion topRegion;
+    public TextureRegion liquidRegion;
+    public TextureRegion rotatorRegion;
+    public TextureRegion topRegion;
 
     public Fracker(String name){
         super(name);

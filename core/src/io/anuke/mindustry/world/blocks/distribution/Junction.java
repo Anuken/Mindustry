@@ -17,8 +17,8 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.content;
 
 public class Junction extends Block{
-    protected float speed = 26; //frames taken to go through this junction
-    protected int capacity = 6;
+    public float speed = 26; //frames taken to go through this junction
+    public int capacity = 6;
 
     public Junction(String name){
         super(name);

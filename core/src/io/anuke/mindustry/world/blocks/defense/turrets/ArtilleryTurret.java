@@ -13,7 +13,7 @@ import static io.anuke.mindustry.Vars.tilesize;
  * Artillery turrets have special shooting calculations done to hit targets.
  */
 public class ArtilleryTurret extends ItemTurret{
-    protected float velocityInaccuracy = 0f;
+    public float velocityInaccuracy = 0f;
 
     public ArtilleryTurret(String name){
         super(name);

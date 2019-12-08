@@ -30,6 +30,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Mods implements Loadable{
     private Json json = new Json();
+    private @Nullable Scripts scripts;
     private ContentParser parser = new ContentParser();
     private ObjectMap<String, Array<FileHandle>> bundles = new ObjectMap<>();
     private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites");
@@ -202,6 +203,16 @@ public class Mods implements Loadable{
         requiresReload = true;
     }
 
+    public Scripts getScripts(){
+        if(scripts == null) scripts = platform.createScripts();
+        return scripts;
+    }
+
+    /** @return whether the scripting engine has been initialized. */
+    public boolean hasScripts(){
+        return scripts != null;
+    }
+
     public boolean requiresReload(){
         return requiresReload;
     }
@@ -352,8 +363,15 @@ public class Mods implements Loadable{
         Sounds.dispose();
         Sounds.load();
         Core.assets.finishLoading();
+        if(scripts != null){
+            scripts.dispose();
+            scripts = null;
+        }
         content.clear();
-        content.createContent();
+        content.createBaseContent();
+        content.loadColors();
+        loadScripts();
+        content.createModContent();
         loadAsync();
         loadSync();
         content.init();
@@ -365,8 +383,44 @@ public class Mods implements Loadable{
         Events.fire(new ContentReloadEvent());
     }
 
+    /** This must be run on the main thread! */
+    public void loadScripts(){
+        Time.mark();
+
+        try{
+            for(LoadedMod mod : loaded){
+                if(mod.root.child("scripts").exists()){
+                    content.setCurrentMod(mod);
+                    mod.scripts = mod.root.child("scripts").findAll(f -> f.extension().equals("js"));
+                    Log.info("[{0}] Found {1} scripts.", mod.meta.name, mod.scripts.size);
+
+                    for(FileHandle file : mod.scripts){
+                        try{
+                            if(scripts == null){
+                                scripts = platform.createScripts();
+                            }
+                            scripts.run(mod, file);
+                        }catch(Throwable e){
+                            Core.app.post(() -> {
+                                Log.err("Error loading script {0} for mod {1}.", file.name(), mod.meta.name);
+                                e.printStackTrace();
+                                //if(!headless) ui.showException(e);
+                            });
+                            break;
+                        }
+                    }
+                }
+            }
+        }finally{
+            content.setCurrentMod(null);
+        }
+
+        Log.info("Time to initialize modded scripts: {0}", Time.elapsed());
+    }
+
     /** Creates all the content found in mod files. */
     public void loadContent(){
+
         class LoadRun implements Comparable<LoadRun>{
             final ContentType type;
             final FileHandle file;
@@ -419,9 +473,6 @@ public class Mods implements Loadable{
 
         //this finishes parsing content fields
         parser.finishParsing();
-
-        //load content for code mods
-        each(Mod::loadContent);
     }
 
     /** @return all loaded mods. */
@@ -587,6 +638,8 @@ public class Mods implements Loadable{
         public Array<LoadedMod> dependencies = new Array<>();
         /** All missing dependencies of this mod as strings. */
         public Array<String> missingDependencies = new Array<>();
+        /** Script files to run. */
+        public Array<FileHandle> scripts = new Array<>();
 
         public LoadedMod(FileHandle file, FileHandle root, Mod mod, ModMeta meta){
             this.root = root;

@@ -20,12 +20,12 @@ import io.anuke.mindustry.world.meta.BlockStat;
  * Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.
  */
 public class SolidPump extends Pump{
-    protected Liquid result = Liquids.water;
-    protected Effect updateEffect = Fx.none;
-    protected float updateEffectChance = 0.02f;
-    protected float rotateSpeed = 1f;
+    public Liquid result = Liquids.water;
+    public Effect updateEffect = Fx.none;
+    public float updateEffectChance = 0.02f;
+    public float rotateSpeed = 1f;
     /** Attribute that is checked when calculating output. */
-    protected Attribute attribute;
+    public Attribute attribute;
 
     public SolidPump(String name){
         super(name);

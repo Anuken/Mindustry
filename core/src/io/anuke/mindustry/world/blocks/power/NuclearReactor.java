@@ -22,22 +22,22 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class NuclearReactor extends PowerGenerator{
-    protected final int timerFuel = timers++;
+    public final int timerFuel = timers++;
 
-    protected final Vector2 tr = new Vector2();
+    public final Vector2 tr = new Vector2();
 
-    protected Color lightColor = Color.valueOf("7f19ea");
-    protected Color coolColor = new Color(1, 1, 1, 0f);
-    protected Color hotColor = Color.valueOf("ff9575a3");
-    protected float itemDuration = 120; //time to consume 1 fuel
-    protected float heating = 0.01f; //heating per frame * fullness
-    protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
-    protected int explosionRadius = 40;
-    protected int explosionDamage = 1350;
-    protected float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
-    protected float coolantPower = 0.5f;
+    public Color lightColor = Color.valueOf("7f19ea");
+    public Color coolColor = new Color(1, 1, 1, 0f);
+    public Color hotColor = Color.valueOf("ff9575a3");
+    public float itemDuration = 120; //time to consume 1 fuel
+    public float heating = 0.01f; //heating per frame * fullness
+    public float smokeThreshold = 0.3f; //threshold at which block starts smoking
+    public int explosionRadius = 40;
+    public int explosionDamage = 1350;
+    public float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
+    public float coolantPower = 0.5f;
 
-    protected TextureRegion topRegion, lightsRegion;
+    public TextureRegion topRegion, lightsRegion;
 
     public NuclearReactor(String name){
         super(name);

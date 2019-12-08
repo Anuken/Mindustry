@@ -1,4 +1,4 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.tools;
 
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
@@ -6,7 +6,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.noise.*;
-import io.anuke.mindustry.ImagePacker.*;
+import io.anuke.mindustry.tools.ImagePacker.*;
 import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;

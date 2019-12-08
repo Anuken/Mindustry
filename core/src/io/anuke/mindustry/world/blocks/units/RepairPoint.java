@@ -19,13 +19,13 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 public class RepairPoint extends Block{
     private static Rectangle rect = new Rectangle();
 
-    protected int timerTarget = timers++;
+    public int timerTarget = timers++;
 
-    protected float repairRadius = 50f;
-    protected float repairSpeed = 0.3f;
-    protected float powerUse;
-    protected TextureRegion baseRegion;
-    protected TextureRegion laser, laserEnd;
+    public float repairRadius = 50f;
+    public float repairSpeed = 0.3f;
+    public float powerUse;
+    public TextureRegion baseRegion;
+    public TextureRegion laser, laserEnd;
 
     public RepairPoint(String name){
         super(name);

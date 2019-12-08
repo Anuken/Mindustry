@@ -14,8 +14,8 @@ import io.anuke.mindustry.world.meta.values.*;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class LaserTurret extends PowerTurret{
-    protected float firingMoveFract = 0.25f;
-    protected float shootDuration = 100f;
+    public float firingMoveFract = 0.25f;
+    public float shootDuration = 100f;
 
     public LaserTurret(String name){
         super(name);

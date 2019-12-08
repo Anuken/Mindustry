@@ -8,7 +8,7 @@ import io.anuke.mindustry.world.Tile;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class BurstTurret extends ItemTurret{
-    protected float burstSpacing = 5;
+    public float burstSpacing = 5;
 
     public BurstTurret(String name){
         super(name);

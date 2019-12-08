@@ -15,8 +15,8 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 public class Incinerator extends Block{
-    protected Effect effect = Fx.fuelburn;
-    protected Color flameColor = Color.valueOf("ffad9d");
+    public Effect effect = Fx.fuelburn;
+    public Color flameColor = Color.valueOf("ffad9d");
 
     public Incinerator(String name){
         super(name);
