@@ -47,7 +47,7 @@ public class ScriptConsoleFragment extends Table{
         visible(() -> {
             if(input.keyTap(Binding.console) && !Vars.net.client() && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null)){
                 shown = !shown;
-                if(shown && !open){
+                if(shown && !open && enableConsole){
                     toggle();
                 }
                 clearChatInput();
@@ -57,7 +57,7 @@ public class ScriptConsoleFragment extends Table{
         });
 
         update(() -> {
-            if(input.keyTap(Binding.chat) && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null)){
+            if(input.keyTap(Binding.chat) && enableConsole && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null)){
                 toggle();
             }
 

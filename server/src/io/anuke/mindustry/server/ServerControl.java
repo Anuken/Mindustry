@@ -336,7 +336,7 @@ public class ServerControl implements ApplicationListener{
             if(!mods.all().isEmpty()){
                 info("Mods:");
                 for(LoadedMod mod : mods.all()){
-                    info("  &ly{0} &lcv{1}", mod.meta.name, mod.meta.version);
+                    info("  &ly{0} &lcv{1}", mod.meta.displayName(), mod.meta.version);
                 }
             }else{
                 info("No mods found.");
@@ -347,7 +347,8 @@ public class ServerControl implements ApplicationListener{
         handler.register("mod", "<name...>", "Display information about a loaded plugin.", arg -> {
             LoadedMod mod = mods.all().find(p -> p.meta.name.equalsIgnoreCase(arg[0]));
             if(mod != null){
-                info("Name: &ly{0}", mod.meta.name);
+                info("Name: &ly{0}", mod.meta.displayName());
+                info("Internal Name: &ly{0}", mod.name);
                 info("Version: &ly{0}", mod.meta.version);
                 info("Author: &ly{0}", mod.meta.author);
                 info("Path: &ly{0}", mod.file.path());

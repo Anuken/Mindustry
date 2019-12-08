@@ -100,7 +100,7 @@ public class SchematicsDialog extends FloatingDialog{
                             }else{
                                 buttons.addImageButton(Icon.trash16Small, style, () -> {
                                     if(s.mod != null){
-                                        ui.showInfo(Core.bundle.format("mod.item.remove", s.mod.meta.name));
+                                        ui.showInfo(Core.bundle.format("mod.item.remove", s.mod.meta.displayName()));
                                     }else{
                                         ui.showConfirm("$confirm", "$schematic.delete.confirm", () -> {
                                             schematics.remove(s);
