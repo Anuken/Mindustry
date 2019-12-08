@@ -158,6 +158,7 @@ public class SchematicsDialog extends FloatingDialog{
                     dialog.hide();
                     try{
                         Schematic s = Schematics.readBase64(Core.app.getClipboardText());
+                        s.removeSteamID();
                         schematics.add(s);
                         setup();
                         ui.showInfoFade("$schematic.saved");
@@ -172,6 +173,7 @@ public class SchematicsDialog extends FloatingDialog{
 
                     try{
                         Schematic s = Schematics.read(file);
+                        s.removeSteamID();
                         schematics.add(s);
                         setup();
                         showInfo(s);
