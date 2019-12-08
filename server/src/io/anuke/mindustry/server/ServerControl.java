@@ -43,6 +43,9 @@ public class ServerControl implements ApplicationListener{
     private static final int maxLogLength = 1024 * 512;
     private static final int commandSocketPort = 6859;
 
+    protected static String[] tags = {"&lc&fb[D]", "&lg&fb[I]", "&ly&fb[W]", "&lr&fb[E]", ""};
+    protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");
+
     private final CommandHandler handler = new CommandHandler("");
     private final FileHandle logFolder = Core.settings.getDataDirectory().child("logs/");
 
@@ -68,44 +71,19 @@ public class ServerControl implements ApplicationListener{
             "globalrules", "{reactorExplosions: false}"
         );
 
-        Log.setLogger(new LogHandler(){
-            DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");
+        Log.setLogger((level, text, args1) -> {
+            String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr", args1);
+            System.out.println(result);
 
-            @Override
-            public void debug(String text, Object... args){
-                print("&lc&fb" + "[DEBG] " + text, args);
+            if(Core.settings.getBool("logging")){
+                logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr", false, args1));
             }
 
-            @Override
-            public void info(String text, Object... args){
-                print("&lg&fb" + "[INFO] " + text, args);
-            }
-
-            @Override
-            public void err(String text, Object... args){
-                print("&lr&fb" + "[ERR!] " + text, args);
-            }
-
-            @Override
-            public void warn(String text, Object... args){
-                print("&ly&fb" + "[WARN] " + text, args);
-            }
-
-            @Override
-            public void print(String text, Object... args){
-                String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", args);
-                System.out.println(result);
-
-                if(Core.settings.getBool("logging")){
-                    logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", false, args));
-                }
-
-                if(socketOutput != null){
-                    try{
-                        socketOutput.println(format(text + "&fr", false, args).replace("[DEBG] ", "").replace("[WARN] ", "").replace("[INFO] ", "").replace("[ERR!] ", ""));
-                    }catch(Throwable e){
-                        err("Error occurred logging to socket: {0}", e.getClass().getSimpleName());
-                    }
+            if(socketOutput != null){
+                try{
+                    socketOutput.println(format(text + "&fr", false, args1));
+                }catch(Throwable e){
+                    err("Error occurred logging to socket: {0}", e.getClass().getSimpleName());
                 }
             }
         });

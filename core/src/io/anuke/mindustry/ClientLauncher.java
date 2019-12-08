@@ -32,8 +32,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void setup(){
+        Vars.loadLogger();
         Vars.platform = this;
-        Log.setUseColors(false);
         beginTime = Time.millis();
 
         Time.setDeltaProvider(() -> {

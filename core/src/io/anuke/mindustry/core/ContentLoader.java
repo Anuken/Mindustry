@@ -87,12 +87,12 @@ public class ContentLoader{
             }
         }
 
-        Log.info("--- CONTENT INFO ---");
+        Log.debug("--- CONTENT INFO ---");
         for(int k = 0; k < contentMap.length; k++){
-            Log.info("[{0}]: loaded {1}", ContentType.values()[k].name(), contentMap[k].size);
+            Log.debug("[{0}]: loaded {1}", ContentType.values()[k].name(), contentMap[k].size);
         }
-        Log.info("Total content loaded: {0}", Array.with(ContentType.values()).mapInt(c -> contentMap[c.ordinal()].size).sum());
-        Log.info("-------------------");
+        Log.debug("Total content loaded: {0}", Array.with(ContentType.values()).mapInt(c -> contentMap[c.ordinal()].size).sum());
+        Log.debug("-------------------");
     }
 
     /** Calls Content#init() on everything. Use only after all modules have been created.*/

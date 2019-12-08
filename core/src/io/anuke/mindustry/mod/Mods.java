@@ -101,7 +101,7 @@ public class Mods implements Loadable{
             Array<FileHandle> overrides = mod.root.child("sprites-override").findAll(f -> f.extension().equals("png"));
             packSprites(sprites, mod, true);
             packSprites(overrides, mod, false);
-            Log.info("Packed {0} images for mod '{1}'.", sprites.size + overrides.size, mod.meta.name);
+            Log.debug("Packed {0} images for mod '{1}'.", sprites.size + overrides.size, mod.meta.name);
             totalSprites += sprites.size + overrides.size;
         }
 
@@ -112,7 +112,7 @@ public class Mods implements Loadable{
             }
         }
 
-        Log.info("Time to pack textures: {0}", Time.elapsed());
+        Log.debug("Time to pack textures: {0}", Time.elapsed());
     }
 
     private void packSprites(Array<FileHandle> sprites, LoadedMod mod, boolean prefix){
@@ -158,12 +158,12 @@ public class Mods implements Loadable{
 
             Core.atlas = packer.flush(filter, new TextureAtlas());
             Core.atlas.setErrorRegion("error");
-            Log.info("Total pages: {0}", Core.atlas.getTextures().size);
+            Log.debug("Total pages: {0}", Core.atlas.getTextures().size);
         }
 
         packer.dispose();
         packer = null;
-        Log.info("Time to update textures: {0}", Time.elapsed());
+        Log.debug("Time to update textures: {0}", Time.elapsed());
     }
 
     private PageType getPage(AtlasRegion region){

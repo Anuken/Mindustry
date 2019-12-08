@@ -11,7 +11,11 @@ import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 
+import java.time.*;
+
+import static io.anuke.arc.util.Log.*;
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.server.ServerControl.*;
 
 public class ServerLauncher implements ApplicationListener{
     static String[] args;
@@ -21,6 +25,11 @@ public class ServerLauncher implements ApplicationListener{
             ServerLauncher.args = args;
             Vars.platform = new Platform(){};
             Vars.net = new Net(platform.getNet());
+
+            Log.setLogger((level, text, args1) -> {
+                String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr", args1);
+                System.out.println(result);
+            });
             new HeadlessApplication(new ServerLauncher(), null, throwable -> CrashSender.send(throwable, f -> {}));
         }catch(Throwable t){
             CrashSender.send(t, f -> {});

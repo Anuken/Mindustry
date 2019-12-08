@@ -19,7 +19,7 @@ import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class ScriptConsoleFragment extends Table{
-    private final static int messagesShown = 14;
+    private final static int messagesShown = 30;
     private Array<String> messages = new Array<>();
     private boolean open = false, shown;
     private TextField chatfield;
@@ -71,16 +71,13 @@ public class ScriptConsoleFragment extends Table{
                     historyPos--;
                     updateChat();
                 }
-                scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size - messagesShown));
             }
+
+            scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size - messagesShown));
         });
 
         history.insert(0, "");
         setup();
-
-        if(mods.hasScripts()){
-            app.post(() -> mods.getScripts().onLoad());
-        }
     }
 
     public Fragment container(){

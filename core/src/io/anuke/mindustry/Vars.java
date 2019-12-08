@@ -15,6 +15,7 @@ import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.maps.*;
@@ -25,12 +26,14 @@ import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 import java.nio.charset.*;
 import java.util.*;
 
-import static io.anuke.arc.Core.*;
+import static io.anuke.arc.Core.settings;
 
 @SuppressWarnings("unchecked")
 public class Vars implements Loadable{
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
+    /** Whether the logger is loaded. */
+    public static boolean loadedLogger = false;
     /** Maximum schematic size.*/
     public static final int maxSchematicSize = 32;
     /** All schematic base64 starts with this string.*/
@@ -268,6 +271,31 @@ public class Vars implements Loadable{
 
         mods.load();
         maps.load();
+    }
+
+    public static void loadLogger(){
+        if(loadedLogger) return;
+
+        String[] tags = {"[green][D][]", "[royal][I][]", "[yellow][W][]", "[scarlet][E][]", ""};
+        String[] stags = {"&lc&fb[D]", "&lg&fb[I]", "&ly&fb[W]", "&lr&fb[E]", ""};
+
+        Array<String> logBuffer = new Array<>();
+        Log.setLogger((level, text, args) -> {
+            String result = Log.format(text, args);
+            System.out.println(Log.format(stags[level.ordinal()] + "&fr " + text, args));
+
+            result = tags[level.ordinal()] + " " + result;
+
+            if(!headless && (ui == null || ui.scriptfrag == null)){
+                logBuffer.add(result);
+            }else if(!headless){
+                ui.scriptfrag.addMessage(result);
+            }
+        });
+
+        Events.on(ClientLoadEvent.class, e -> logBuffer.each(ui.scriptfrag::addMessage));
+
+        loadedLogger = true;
     }
 
     public static void loadSettings(){

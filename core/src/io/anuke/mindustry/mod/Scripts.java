@@ -1,20 +1,17 @@
 package io.anuke.mindustry.mod;
 
 import io.anuke.arc.*;
-import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.Log.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.mod.Mods.*;
 import org.mozilla.javascript.*;
-
-import static io.anuke.mindustry.Vars.*;
 
 public class Scripts implements Disposable{
     private final Context context;
     private final String wrapper;
     private Scriptable scope;
-    private Array<String> logBuffer = new Array<>();
 
     public Scripts(){
         Time.mark();
@@ -50,18 +47,11 @@ public class Scripts implements Disposable{
     }
 
     public void log(String source, String message){
-        Log.info("[{0}]: {1}", source, message);
-        logBuffer.add("[accent][" + source + "]:[] " + message);
-        if(!headless && ui.scriptfrag != null){
-            onLoad();
-        }
+        log(LogLevel.info, source, message);
     }
 
-    public void onLoad(){
-        if(!headless){
-            logBuffer.each(ui.scriptfrag::addMessage);
-        }
-        logBuffer.clear();
+    public void log(LogLevel level, String source, String message){
+        Log.log(level, "[{0}]: {1}", source, message);
     }
 
     public void run(LoadedMod mod, FileHandle file){
@@ -72,7 +62,7 @@ public class Scripts implements Disposable{
         try{
             context.evaluateString(scope, script, file, 1, null);
         }catch(Throwable t){
-            log(file, "[scarlet]" + getError(t));
+            log(LogLevel.err, file, "" + getError(t));
         }
     }
 
