@@ -11,8 +11,6 @@ const extendContent = function(classType, name, params){
 const extend = function(classType, params){
     return new JavaAdapter(classType, params)
 }
-
-const base = {}
 importPackage(Packages.io.anuke.arc)
 importPackage(Packages.io.anuke.arc.collection)
 importPackage(Packages.io.anuke.arc.graphics)

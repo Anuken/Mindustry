@@ -9,5 +9,3 @@ const extendContent = function(classType, name, params){
 const extend = function(classType, params){
     return new JavaAdapter(classType, params)
 }
-
-const base = {}
