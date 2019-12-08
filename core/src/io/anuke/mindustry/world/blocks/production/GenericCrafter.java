@@ -86,7 +86,7 @@ public class GenericCrafter extends Block{
 
     @Override
     public void update(Tile tile){
-        GenericCrafterEntity entity = tile.entity();
+        GenericCrafterEntity entity = tile.ent();
 
         if(entity.cons.valid()){
 

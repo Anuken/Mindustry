@@ -21,7 +21,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
 
     @Override
     public void update(Tile tile){
-        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity entity = tile.ent();
 
         entity.time += entity.cycleSpeed * Time.delta();
         entity.time2 += (entity.cycleSpeed - 1f) * Time.delta();

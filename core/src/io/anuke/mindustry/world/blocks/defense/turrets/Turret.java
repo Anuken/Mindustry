@@ -115,7 +115,7 @@ public abstract class Turret extends Block{
 
     @Override
     public void drawLayer(Tile tile){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         tr2.trns(entity.rotation, -entity.recoil);
 
@@ -143,7 +143,7 @@ public abstract class Turret extends Block{
 
     @Override
     public void update(Tile tile){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         if(!validateTarget(tile)) entity.target = null;
 
@@ -185,12 +185,12 @@ public abstract class Turret extends Block{
     }
 
     protected boolean validateTarget(Tile tile){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
         return !Units.invalidateTarget(entity.target, tile.getTeam(), tile.drawx(), tile.drawy());
     }
 
     protected void findTarget(Tile tile){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         if(targetAir && !targetGround){
             entity.target = Units.closestEnemy(tile.getTeam(), tile.drawx(), tile.drawy(), range, e -> !e.isDead() && e.isFlying());
@@ -200,7 +200,7 @@ public abstract class Turret extends Block{
     }
 
     protected void turnToTarget(Tile tile, float targetRot){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * entity.delta() * baseReloadSpeed(tile));
     }
@@ -213,7 +213,7 @@ public abstract class Turret extends Block{
     public BulletType useAmmo(Tile tile){
         if(tile.isEnemyCheat()) return peekAmmo(tile);
 
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
         AmmoEntry entry = entity.ammo.peek();
         entry.amount -= ammoPerShot;
         if(entry.amount == 0) entity.ammo.pop();
@@ -226,7 +226,7 @@ public abstract class Turret extends Block{
      * Get the ammo type that will be returned if useAmmo is called.
      */
     public BulletType peekAmmo(Tile tile){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
         return entity.ammo.peek().type();
     }
 
@@ -234,12 +234,12 @@ public abstract class Turret extends Block{
      * Returns whether the turret has ammo.
      */
     public boolean hasAmmo(Tile tile){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
         return entity.ammo.size > 0 && entity.ammo.peek().amount >= ammoPerShot;
     }
 
     protected void updateShooting(Tile tile){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         if(entity.reload >= reload){
             BulletType type = peekAmmo(tile);
@@ -253,7 +253,7 @@ public abstract class Turret extends Block{
     }
 
     protected void shoot(Tile tile, BulletType type){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         entity.recoil = recoil;
         entity.heat = 1f;
@@ -276,7 +276,7 @@ public abstract class Turret extends Block{
         Effect shootEffect = this.shootEffect == Fx.none ? peekAmmo(tile).shootEffect : this.shootEffect;
         Effect smokeEffect = this.smokeEffect == Fx.none ? peekAmmo(tile).smokeEffect : this.smokeEffect;
 
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         Effects.effect(shootEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
         Effects.effect(smokeEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
@@ -291,7 +291,7 @@ public abstract class Turret extends Block{
 
     protected void ejectEffects(Tile tile){
         if(!isTurret(tile)) return;
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         Effects.effect(ammoUseEffect, tile.drawx() - Angles.trnsx(entity.rotation, ammoEjectBack),
         tile.drawy() - Angles.trnsy(entity.rotation, ammoEjectBack), entity.rotation);

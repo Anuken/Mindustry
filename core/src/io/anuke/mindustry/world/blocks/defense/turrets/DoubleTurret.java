@@ -26,7 +26,7 @@ public class DoubleTurret extends ItemTurret{
 
     @Override
     protected void shoot(Tile tile, BulletType ammo){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
         entity.shots++;
 
         int i = Mathf.signs[entity.shots % 2];

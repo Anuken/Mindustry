@@ -48,7 +48,7 @@ public class UnitFactory extends Block{
     public static void onUnitFactorySpawn(Tile tile, int spawns){
         if(!(tile.entity instanceof UnitFactoryEntity) || !(tile.block() instanceof UnitFactory)) return;
 
-        UnitFactoryEntity entity = tile.entity();
+        UnitFactoryEntity entity = tile.ent();
         UnitFactory factory = (UnitFactory)tile.block();
 
         entity.buildTime = 0f;
@@ -110,7 +110,7 @@ public class UnitFactory extends Block{
 
     @Override
     public void unitRemoved(Tile tile, Unit unit){
-        UnitFactoryEntity entity = tile.entity();
+        UnitFactoryEntity entity = tile.ent();
         entity.spawned--;
         entity.spawned = Math.max(entity.spawned, 0);
     }
@@ -122,7 +122,7 @@ public class UnitFactory extends Block{
 
     @Override
     public void draw(Tile tile){
-        UnitFactoryEntity entity = tile.entity();
+        UnitFactoryEntity entity = tile.ent();
         TextureRegion region = unitType.icon(Cicon.full);
 
         Draw.rect(name, tile.drawx(), tile.drawy());
@@ -153,7 +153,7 @@ public class UnitFactory extends Block{
 
     @Override
     public void update(Tile tile){
-        UnitFactoryEntity entity = tile.entity();
+        UnitFactoryEntity entity = tile.ent();
 
         if(entity.spawned >= maxSpawn){
             return;
@@ -184,7 +184,7 @@ public class UnitFactory extends Block{
 
     @Override
     public boolean shouldConsume(Tile tile){
-        UnitFactoryEntity entity = tile.entity();
+        UnitFactoryEntity entity = tile.ent();
         return entity.spawned < maxSpawn;
     }
 

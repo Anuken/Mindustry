@@ -9,3 +9,7 @@ const extendContent = function(classType, name, params){
 const extend = function(classType, params){
     return new JavaAdapter(classType, params)
 }
+
+const run = method => new java.lang.Runnable(){run: method}
+const newEffect = (lifetime, renderer) => new Effects.Effect(lifetime, new Effects.EffectRenderer({render: renderer}))
+const Calls = Packages.io.anuke.mindustry.gen.Call

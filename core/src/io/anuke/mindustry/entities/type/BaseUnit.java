@@ -107,7 +107,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     public @Nullable UnitCommand getCommand(){
         if(isCommanded()){
-            return indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
+            return indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>ent().command;
         }
         return null;
     }

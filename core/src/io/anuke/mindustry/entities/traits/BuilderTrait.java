@@ -2,7 +2,6 @@ package io.anuke.mindustry.entities.traits;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.Queue;
-import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
@@ -88,7 +87,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
         }
 
         //otherwise, update it.
-        BuildEntity entity = tile.entity();
+        BuildEntity entity = tile.ent();
 
         if(entity == null){
             return;
@@ -210,7 +209,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
         }
         Tile tile = world.tile(place.x, place.y);
         if(tile != null && tile.entity instanceof BuildEntity){
-            place.progress = tile.<BuildEntity>entity().progress;
+            place.progress = tile.<BuildEntity>ent().progress;
         }
         if(tail){
             buildQueue().addLast(place);

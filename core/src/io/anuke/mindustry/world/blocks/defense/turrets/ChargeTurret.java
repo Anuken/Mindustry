@@ -25,7 +25,7 @@ public class ChargeTurret extends PowerTurret{
 
     @Override
     public void shoot(Tile tile, BulletType ammo){
-        LaserTurretEntity entity = tile.entity();
+        LaserTurretEntity entity = tile.ent();
 
         useAmmo(tile);
 
@@ -55,7 +55,7 @@ public class ChargeTurret extends PowerTurret{
 
     @Override
     public boolean shouldTurn(Tile tile){
-        LaserTurretEntity entity = tile.entity();
+        LaserTurretEntity entity = tile.ent();
         return !entity.shooting;
     }
 

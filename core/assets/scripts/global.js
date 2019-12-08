@@ -11,8 +11,13 @@ const extendContent = function(classType, name, params){
 const extend = function(classType, params){
     return new JavaAdapter(classType, params)
 }
+
+const run = method => new java.lang.Runnable(){run: method}
+const newEffect = (lifetime, renderer) => new Effects.Effect(lifetime, new Effects.EffectRenderer({render: renderer}))
+const Calls = Packages.io.anuke.mindustry.gen.Call
 importPackage(Packages.io.anuke.arc)
 importPackage(Packages.io.anuke.arc.collection)
+importPackage(Packages.io.anuke.arc.func)
 importPackage(Packages.io.anuke.arc.graphics)
 importPackage(Packages.io.anuke.arc.graphics.g2d)
 importPackage(Packages.io.anuke.arc.math)
@@ -38,6 +43,7 @@ importPackage(Packages.io.anuke.mindustry.entities.type)
 importPackage(Packages.io.anuke.mindustry.entities.type.base)
 importPackage(Packages.io.anuke.mindustry.entities.units)
 importPackage(Packages.io.anuke.mindustry.game)
+importPackage(Packages.io.anuke.mindustry.gen)
 importPackage(Packages.io.anuke.mindustry.graphics)
 importPackage(Packages.io.anuke.mindustry.input)
 importPackage(Packages.io.anuke.mindustry.maps)

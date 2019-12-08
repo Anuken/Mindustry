@@ -16,7 +16,7 @@ public class BurstTurret extends ItemTurret{
 
     @Override
     protected void shoot(Tile tile, BulletType ammo){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         entity.heat = 1f;
 

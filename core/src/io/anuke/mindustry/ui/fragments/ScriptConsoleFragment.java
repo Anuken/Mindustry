@@ -53,7 +53,7 @@ public class ScriptConsoleFragment extends Table{
                 clearChatInput();
             }
 
-            return shown && !Vars.net.client();
+            return shown && !Vars.net.active();
         });
 
         update(() -> {
@@ -163,8 +163,8 @@ public class ScriptConsoleFragment extends Table{
 
         history.insert(1, message);
 
-        addMessage("[lightgray]> " + message);
-        addMessage(mods.getScripts().runConsole(message));
+        addMessage("[lightgray]> " + message.replace("[", "[["));
+        addMessage(mods.getScripts().runConsole(message).replace("[", "[["));
     }
 
     public void toggle(){

@@ -39,7 +39,7 @@ public class Build{
         Block sub = BuildBlock.get(previous.size);
 
         world.setBlock(tile, sub, team, rotation);
-        tile.<BuildEntity>entity().setDeconstruct(previous);
+        tile.<BuildEntity>ent().setDeconstruct(previous);
         tile.entity.health = tile.entity.maxHealth() * prevPercent;
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, true)));
@@ -61,7 +61,7 @@ public class Build{
         Block sub = BuildBlock.get(result.size);
 
         world.setBlock(tile, sub, team, rotation);
-        tile.<BuildEntity>entity().setConstruct(previous, result);
+        tile.<BuildEntity>ent().setConstruct(previous, result);
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
     }

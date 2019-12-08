@@ -29,7 +29,7 @@ public class Incinerator extends Block{
 
     @Override
     public void update(Tile tile){
-        IncineratorEntity entity = tile.entity();
+        IncineratorEntity entity = tile.ent();
 
         if(entity.cons.valid()){
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.04f);
@@ -42,7 +42,7 @@ public class Incinerator extends Block{
     public void draw(Tile tile){
         super.draw(tile);
 
-        IncineratorEntity entity = tile.entity();
+        IncineratorEntity entity = tile.ent();
 
         if(entity.heat > 0f){
             float g = 0.3f;
@@ -68,7 +68,7 @@ public class Incinerator extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        IncineratorEntity entity = tile.entity();
+        IncineratorEntity entity = tile.ent();
         return entity.heat > 0.5f;
     }
 
@@ -81,7 +81,7 @@ public class Incinerator extends Block{
 
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        IncineratorEntity entity = tile.entity();
+        IncineratorEntity entity = tile.ent();
         return entity.heat > 0.5f;
     }
 

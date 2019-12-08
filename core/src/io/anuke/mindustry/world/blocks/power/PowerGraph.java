@@ -296,7 +296,7 @@ public class PowerGraph{
 
     private boolean otherConsumersAreValid(Tile tile, Consume consumePower){
         for(Consume cons : tile.block().consumes.all()){
-            if(cons != consumePower && !cons.isOptional() && !cons.valid(tile.entity())){
+            if(cons != consumePower && !cons.isOptional() && !cons.valid(tile.ent())){
                 return false;
             }
         }

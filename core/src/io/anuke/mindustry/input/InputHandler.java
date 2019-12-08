@@ -221,7 +221,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean requestMatches(BuildRequest request){
         Tile tile = world.tile(request.x, request.y);
-        return tile != null && tile.block() instanceof BuildBlock && tile.<BuildEntity>entity().cblock == request.block;
+        return tile != null && tile.block() instanceof BuildBlock && tile.<BuildEntity>ent().cblock == request.block;
     }
 
     public void drawBreaking(int x, int y){

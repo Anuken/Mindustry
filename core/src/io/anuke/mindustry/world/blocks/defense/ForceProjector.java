@@ -88,7 +88,7 @@ public class ForceProjector extends Block{
 
     @Override
     public void update(Tile tile){
-        ForceEntity entity = tile.entity();
+        ForceEntity entity = tile.ent();
 
         if(entity.shield == null){
             entity.shield = new ShieldEntity(tile);
@@ -170,7 +170,7 @@ public class ForceProjector extends Block{
     public void draw(Tile tile){
         super.draw(tile);
 
-        ForceEntity entity = tile.entity();
+        ForceEntity entity = tile.ent();
 
         if(entity.buildup <= 0f) return;
         Draw.alpha(entity.buildup / breakage * 0.75f);
@@ -214,7 +214,7 @@ public class ForceProjector extends Block{
         final ForceEntity entity;
 
         public ShieldEntity(Tile tile){
-            this.entity = tile.entity();
+            this.entity = tile.ent();
             set(tile.drawx(), tile.drawy());
         }
 

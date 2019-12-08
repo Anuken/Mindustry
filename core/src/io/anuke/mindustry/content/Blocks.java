@@ -484,7 +484,7 @@ public class Blocks implements ContentList{
             drawer = tile -> {
                 Draw.rect(region, tile.drawx(), tile.drawy());
 
-                GenericCrafterEntity entity = tile.entity();
+                GenericCrafterEntity entity = tile.ent();
 
                 Draw.alpha(Mathf.absin(entity.totalProgress, 3f, 0.9f) * entity.warmup);
                 Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
@@ -509,7 +509,7 @@ public class Blocks implements ContentList{
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name), Core.atlas.find(name + "-weave")};
 
             drawer = tile -> {
-                GenericCrafterEntity entity = tile.entity();
+                GenericCrafterEntity entity = tile.ent();
 
                 Draw.rect(reg(bottomRegion), tile.drawx(), tile.drawy());
                 Draw.rect(reg(weaveRegion), tile.drawx(), tile.drawy(), entity.totalProgress);
@@ -659,7 +659,7 @@ public class Blocks implements ContentList{
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top")};
 
             drawer = tile -> {
-                GenericCrafterEntity entity = tile.entity();
+                GenericCrafterEntity entity = tile.ent();
 
                 Draw.rect(region, tile.drawx(), tile.drawy());
                 Draw.rect(reg(frameRegions[(int)Mathf.absin(entity.totalProgress, 5f, 2.999f)]), tile.drawx(), tile.drawy());
@@ -686,7 +686,7 @@ public class Blocks implements ContentList{
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator")};
 
             drawer = tile -> {
-                GenericCrafterEntity entity = tile.entity();
+                GenericCrafterEntity entity = tile.ent();
 
                 Draw.rect(region, tile.drawx(), tile.drawy());
                 Draw.rect(reg(rotatorRegion), tile.drawx(), tile.drawy(), entity.totalProgress * 2f);

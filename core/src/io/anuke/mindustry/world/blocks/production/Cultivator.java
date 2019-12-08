@@ -43,7 +43,7 @@ public class Cultivator extends GenericCrafter{
     public void update(Tile tile){
         super.update(tile);
 
-        CultivatorEntity entity = tile.entity();
+        CultivatorEntity entity = tile.ent();
         entity.warmup = Mathf.lerpDelta(entity.warmup, entity.cons.valid() ? 1f : 0f, 0.015f);
     }
 
@@ -64,7 +64,7 @@ public class Cultivator extends GenericCrafter{
 
     @Override
     public void draw(Tile tile){
-        CultivatorEntity entity = tile.entity();
+        CultivatorEntity entity = tile.ent();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
 
@@ -99,7 +99,7 @@ public class Cultivator extends GenericCrafter{
     public void onProximityAdded(Tile tile){
         super.onProximityAdded(tile);
 
-        CultivatorEntity entity = tile.entity();
+        CultivatorEntity entity = tile.ent();
         entity.boost = sumAttribute(attribute, tile.x, tile.y);
     }
 

@@ -42,7 +42,7 @@ public class Scripts implements Disposable{
     }
 
     private String getError(Throwable t){
-        t = Strings.getFinalCause(t);
+        t.printStackTrace();
         return t.getClass().getSimpleName() + (t.getMessage() == null ? "" : ": " + t.getMessage());
     }
 

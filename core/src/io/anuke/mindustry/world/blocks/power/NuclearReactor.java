@@ -73,7 +73,7 @@ public class NuclearReactor extends PowerGenerator{
 
     @Override
     public void update(Tile tile){
-        NuclearReactorEntity entity = tile.entity();
+        NuclearReactorEntity entity = tile.ent();
 
         ConsumeLiquid cliquid = consumes.get(ConsumeType.liquid);
         Item item = consumes.<ConsumeItems>get(ConsumeType.item).items[0].item;
@@ -120,7 +120,7 @@ public class NuclearReactor extends PowerGenerator{
 
         Sounds.explosionbig.at(tile);
 
-        NuclearReactorEntity entity = tile.entity();
+        NuclearReactorEntity entity = tile.ent();
 
         int fuel = entity.items.get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
 
@@ -151,7 +151,7 @@ public class NuclearReactor extends PowerGenerator{
 
     @Override
     public void drawLight(Tile tile){
-        NuclearReactorEntity entity = tile.entity();
+        NuclearReactorEntity entity = tile.ent();
         float fract = entity.productionEfficiency;
         renderer.lights.add(tile.drawx(), tile.drawy(), (90f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(lightColor).lerp(Color.scarlet, entity.heat), 0.6f * fract);
     }
@@ -160,7 +160,7 @@ public class NuclearReactor extends PowerGenerator{
     public void draw(Tile tile){
         super.draw(tile);
 
-        NuclearReactorEntity entity = tile.entity();
+        NuclearReactorEntity entity = tile.ent();
 
         Draw.color(coolColor, hotColor, entity.heat);
         Fill.rect(tile.drawx(), tile.drawy(), size * tilesize, size * tilesize);

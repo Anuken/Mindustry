@@ -28,7 +28,7 @@ public class GenericSmelter extends GenericCrafter{
     public void draw(Tile tile){
         super.draw(tile);
 
-        GenericCrafterEntity entity = tile.entity();
+        GenericCrafterEntity entity = tile.ent();
 
         //draw glowing center
         if(entity.warmup > 0f && flameColor.a > 0.001f){
@@ -50,7 +50,7 @@ public class GenericSmelter extends GenericCrafter{
 
     @Override
     public void drawLight(Tile tile){
-        GenericCrafterEntity entity = tile.entity();
+        GenericCrafterEntity entity = tile.ent();
 
         renderer.lights.add(tile.drawx(), tile.drawy(), (60f + Mathf.absin(10f, 5f)) * entity.warmup * size, flameColor, 0.65f);
     }

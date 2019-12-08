@@ -9,6 +9,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.g2d.TextureAtlas.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.gen.*;
 import org.reflections.*;
 import org.reflections.scanners.*;
 import org.reflections.util.*;
@@ -21,10 +22,11 @@ public class ScriptStubGenerator{
 
     public static void main(String[] args){
         String base = "io.anuke.mindustry";
-        Array<String> blacklist = Array.with("plugin", "mod", "net", "io", "tools", "gen");
+        Array<String> blacklist = Array.with("plugin", "mod", "net", "io", "tools");
         Array<String> nameBlacklist = Array.with("ClientLauncher", "NetClient", "NetServer", "ClassAccess");
-        Array<Class<?>> whitelist = Array.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class, AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class);
-        Array<String> nopackage = Array.with("io.anuke.arc.func", "java.lang", "java");
+        Array<Class<?>> whitelist = Array.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class,
+            AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class, Runnable.class, Object.class, Icon.class, Tex.class, Sounds.class, Musics.class, Call.class);
+        Array<String> nopackage = Array.with("java.lang", "java");
 
         String fileTemplate = "package io.anuke.mindustry.mod;\n" +
         "\n" +

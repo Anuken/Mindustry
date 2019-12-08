@@ -98,7 +98,7 @@ public class Drill extends Block{
         float s = 0.3f;
         float ts = 0.6f;
 
-        DrillEntity entity = tile.entity();
+        DrillEntity entity = tile.ent();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
         super.drawCracks(tile);
@@ -163,7 +163,7 @@ public class Drill extends Block{
 
     @Override
     public void drawSelect(Tile tile){
-        DrillEntity entity = tile.entity();
+        DrillEntity entity = tile.ent();
 
         if(entity.dominantItem != null){
             float dx = tile.drawx() - size * tilesize/2f, dy = tile.drawy() + size * tilesize/2f;
@@ -239,7 +239,7 @@ public class Drill extends Block{
 
     @Override
     public void update(Tile tile){
-        DrillEntity entity = tile.entity();
+        DrillEntity entity = tile.ent();
 
         if(entity.dominantItem == null){
             countOre(tile);

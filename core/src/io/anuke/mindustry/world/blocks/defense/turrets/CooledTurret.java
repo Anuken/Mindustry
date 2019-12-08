@@ -50,7 +50,7 @@ public class CooledTurret extends Turret{
 
         float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
         Liquid liquid = entity.liquids.current();
 
         float used = Math.min(Math.min(entity.liquids.get(liquid), maxUsed * Time.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed(tile);

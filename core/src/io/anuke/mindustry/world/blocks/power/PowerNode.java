@@ -172,7 +172,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public boolean onConfigureTileTapped(Tile tile, Tile other){
-        TileEntity entity = tile.entity();
+        TileEntity entity = tile.ent();
         other = other.link();
 
         if(linkValid(tile, other)){
@@ -262,7 +262,7 @@ public class PowerNode extends PowerBlock{
     public void drawLayer(Tile tile){
         if(Core.settings.getInt("lasersopacity") == 0) return;
 
-        TileEntity entity = tile.entity();
+        TileEntity entity = tile.ent();
 
         for(int i = 0; i < entity.power.links.size; i++){
             Tile link = world.tile(entity.power.links.get(i));

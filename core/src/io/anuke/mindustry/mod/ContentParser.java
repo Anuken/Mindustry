@@ -165,11 +165,11 @@ public class ContentParser{
 
             Block block;
 
-            if(Vars.content.getByName(ContentType.block, name) != null){
-                block = Vars.content.getByName(ContentType.block, name);
+            if(locate(ContentType.block, name) != null){
+                block = locate(ContentType.block, name);
 
                 if(value.has("type")){
-                    throw new IllegalArgumentException("When overwriting an existing block, you must not re-declare its type. The original type will be used. Block: " + name);
+                    throw new IllegalArgumentException("When defining properties for an existing block, you must not re-declare its type. The original type will be used. Block: " + name);
                 }
             }else{
                 //TODO generate dynamically instead of doing.. this
@@ -386,14 +386,19 @@ public class ContentParser{
         }
 
         currentMod = mod;
-        boolean exists = Vars.content.getByName(type, name) != null;
+        boolean located = locate(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
         toBeParsed.add(c);
-        if(!exists){
+        if(!located){
             c.sourceFile = file;
             c.mod = mod;
         }
         return c;
+    }
+
+    private <T extends MappableContent> T locate(ContentType type, String name){
+        T first = Vars.content.getByName(type, name); //try vanilla replacement
+        return first != null ? first : Vars.content.getByName(type, currentMod.name + "-" + name);
     }
 
     private <T> T make(Class<T> type){

@@ -16,7 +16,7 @@ public class ExtendingItemBridge extends ItemBridge{
 
     @Override
     public void drawLayer(Tile tile){
-        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity entity = tile.ent();
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)) return;

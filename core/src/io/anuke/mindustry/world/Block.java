@@ -184,7 +184,7 @@ public class Block extends BlockStorage{
     }
 
     protected void updatePowerGraph(Tile tile){
-        TileEntity entity = tile.entity();
+        TileEntity entity = tile.ent();
 
         for(Tile other : getPowerConnections(tile, tempTiles)){
             if(other.entity.power != null){
@@ -483,7 +483,7 @@ public class Block extends BlockStorage{
      * Called when this block is tapped to build a UI on the table.
      * {@link #configurable} must return true for this to be called.
      */
-    public void buildTable(Tile tile, Table table){
+    public void buildConfiguration(Tile tile, Table table){
     }
 
     /** Update table alignment after configuring.*/

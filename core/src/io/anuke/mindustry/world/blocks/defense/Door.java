@@ -36,7 +36,7 @@ public class Door extends Wall{
 
     @Remote(called = Loc.server)
     public static void onDoorToggle(Player player, Tile tile, boolean open){
-        DoorEntity entity = tile.entity();
+        DoorEntity entity = tile.ent();
         if(entity != null){
             entity.open = open;
             Door door = (Door)tile.block();
@@ -59,7 +59,7 @@ public class Door extends Wall{
 
     @Override
     public void draw(Tile tile){
-        DoorEntity entity = tile.entity();
+        DoorEntity entity = tile.ent();
 
         if(!entity.open){
             Draw.rect(region, tile.drawx(), tile.drawy());
@@ -75,13 +75,13 @@ public class Door extends Wall{
 
     @Override
     public boolean isSolidFor(Tile tile){
-        DoorEntity entity = tile.entity();
+        DoorEntity entity = tile.ent();
         return !entity.open;
     }
 
     @Override
     public void tapped(Tile tile, Player player){
-        DoorEntity entity = tile.entity();
+        DoorEntity entity = tile.ent();
 
         if((Units.anyEntities(tile) && entity.open) || !tile.entity.timer.get(timerToggle, 30f)){
             return;

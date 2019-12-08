@@ -118,19 +118,19 @@ public class BuildBlock extends Block{
 
     @Override
     public String getDisplayName(Tile tile){
-        BuildEntity entity = tile.entity();
+        BuildEntity entity = tile.ent();
         return Core.bundle.format("block.constructing", entity.cblock == null ? entity.previous.localizedName : entity.cblock.localizedName);
     }
 
     @Override
     public TextureRegion getDisplayIcon(Tile tile){
-        BuildEntity entity = tile.entity();
+        BuildEntity entity = tile.ent();
         return (entity.cblock == null ? entity.previous : entity.cblock).icon(io.anuke.mindustry.ui.Cicon.full);
     }
 
     @Override
     public boolean isSolidFor(Tile tile){
-        BuildEntity entity = tile.entity();
+        BuildEntity entity = tile.ent();
         return entity == null || (entity.cblock != null && entity.cblock.solid) || entity.previous == null || entity.previous.solid;
     }
 
@@ -141,7 +141,7 @@ public class BuildBlock extends Block{
 
     @Override
     public void tapped(Tile tile, Player player){
-        BuildEntity entity = tile.entity();
+        BuildEntity entity = tile.ent();
 
         //if the target is constructible, begin constructing
         if(entity.cblock != null){
@@ -164,7 +164,7 @@ public class BuildBlock extends Block{
 
     @Override
     public void draw(Tile tile){
-        BuildEntity entity = tile.entity();
+        BuildEntity entity = tile.ent();
 
         //When breaking, don't draw the previous block... since it's the thing you were breaking
         if(entity.cblock != null && entity.previous == entity.cblock){
@@ -181,7 +181,7 @@ public class BuildBlock extends Block{
     @Override
     public void drawLayer(Tile tile){
 
-        BuildEntity entity = tile.entity();
+        BuildEntity entity = tile.ent();
 
         Shaders.blockbuild.color = Pal.accent;
 

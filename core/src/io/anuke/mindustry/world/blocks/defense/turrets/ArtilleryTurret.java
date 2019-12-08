@@ -22,7 +22,7 @@ public class ArtilleryTurret extends ItemTurret{
 
     @Override
     protected void shoot(Tile tile, BulletType ammo){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         entity.recoil = recoil;
         entity.heat = 1f;

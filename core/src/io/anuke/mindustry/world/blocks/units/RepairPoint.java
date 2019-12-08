@@ -66,14 +66,14 @@ public class RepairPoint extends Block{
 
     @Override
     public void drawLayer(Tile tile){
-        RepairPointEntity entity = tile.entity();
+        RepairPointEntity entity = tile.ent();
 
         Draw.rect(region, tile.drawx(), tile.drawy(), entity.rotation - 90);
     }
 
     @Override
     public void drawLayer2(Tile tile){
-        RepairPointEntity entity = tile.entity();
+        RepairPointEntity entity = tile.ent();
 
         if(entity.target != null &&
         Angles.angleDist(entity.angleTo(entity.target), entity.rotation) < 30f){
@@ -95,7 +95,7 @@ public class RepairPoint extends Block{
 
     @Override
     public void update(Tile tile){
-        RepairPointEntity entity = tile.entity();
+        RepairPointEntity entity = tile.ent();
 
         boolean targetIsBeingRepaired = false;
         if(entity.target != null && (entity.target.isDead() || entity.target.dst(tile) > repairRadius || entity.target.health >= entity.target.maxHealth())){
@@ -122,7 +122,7 @@ public class RepairPoint extends Block{
 
     @Override
     public boolean shouldConsume(Tile tile){
-        RepairPointEntity entity = tile.entity();
+        RepairPointEntity entity = tile.ent();
 
         return entity.target != null;
     }

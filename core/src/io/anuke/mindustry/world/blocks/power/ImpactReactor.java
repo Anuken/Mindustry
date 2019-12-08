@@ -69,7 +69,7 @@ public class ImpactReactor extends PowerGenerator{
 
     @Override
     public void update(Tile tile){
-        FusionReactorEntity entity = tile.entity();
+        FusionReactorEntity entity = tile.ent();
 
         if(entity.cons.valid() && entity.power.status >= 0.99f){
             boolean prevOut = getPowerProduction(tile) <= consumes.getPower().requestedPower(entity);
@@ -95,7 +95,7 @@ public class ImpactReactor extends PowerGenerator{
 
     @Override
     public void draw(Tile tile){
-        FusionReactorEntity entity = tile.entity();
+        FusionReactorEntity entity = tile.ent();
 
         Draw.rect(reg(bottomRegion), tile.drawx(), tile.drawy());
 
@@ -118,7 +118,7 @@ public class ImpactReactor extends PowerGenerator{
 
     @Override
     public void drawLight(Tile tile){
-        float fract = tile.<FusionReactorEntity>entity().warmup;
+        float fract = tile.<FusionReactorEntity>ent().warmup;
         renderer.lights.add(tile.drawx(), tile.drawy(), (110f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(plasma2).lerp(plasma1, Mathf.absin(7f, 0.2f)), 0.8f * fract);
     }
 
@@ -131,7 +131,7 @@ public class ImpactReactor extends PowerGenerator{
     public void onDestroyed(Tile tile){
         super.onDestroyed(tile);
 
-        FusionReactorEntity entity = tile.entity();
+        FusionReactorEntity entity = tile.ent();
 
         if(entity.warmup < 0.4f || !state.rules.reactorExplosions) return;
 

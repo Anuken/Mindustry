@@ -64,7 +64,7 @@ public class MendProjector extends Block{
 
     @Override
     public void update(Tile tile){
-        MendEntity entity = tile.entity();
+        MendEntity entity = tile.ent();
         entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() || tile.isEnemyCheat() ? 1f : 0f, 0.08f);
         entity.charge += entity.heat * entity.delta();
 
@@ -106,7 +106,7 @@ public class MendProjector extends Block{
 
     @Override
     public void drawSelect(Tile tile){
-        MendEntity entity = tile.entity();
+        MendEntity entity = tile.ent();
         float realRange = range + entity.phaseHeat * phaseRangeBoost;
 
         Drawf.dashCircle(tile.drawx(), tile.drawy(), realRange, baseColor);
@@ -116,7 +116,7 @@ public class MendProjector extends Block{
     public void draw(Tile tile){
         super.draw(tile);
 
-        MendEntity entity = tile.entity();
+        MendEntity entity = tile.ent();
         float f = 1f - (Time.time() / 100f) % 1f;
 
         Draw.color(baseColor, phaseColor, entity.phaseHeat);
