@@ -84,7 +84,16 @@ public class Maps{
             maps.sort();
         });
 
-        Events.on(ContentReloadEvent.class, event -> reload());
+        Events.on(ContentReloadEvent.class, event -> {
+            reload();
+            for(Map map : maps){
+                try{
+                    map.texture = map.previewFile().exists() ? new Texture(map.previewFile()) : new Texture(MapIO.generatePreview(map));
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
 
         if(Core.assets != null){
             ((CustomLoader)Core.assets.getLoader(Content.class)).loaded = this::createAllPreviews;
