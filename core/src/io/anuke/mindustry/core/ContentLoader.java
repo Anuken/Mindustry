@@ -45,10 +45,7 @@ public class ContentLoader{
     };
 
     public ContentLoader(){
-        for(ContentType type : ContentType.values()){
-            contentMap[type.ordinal()] = new Array<>();
-            contentNameMap[type.ordinal()] = new ObjectMap<>();
-        }
+        clear();
     }
 
     /** Clears all initialized content.*/
@@ -56,6 +53,11 @@ public class ContentLoader{
         contentNameMap = new ObjectMap[ContentType.values().length];
         contentMap = new Array[ContentType.values().length];
         initialization = new ObjectSet<>();
+
+        for(ContentType type : ContentType.values()){
+            contentMap[type.ordinal()] = new Array<>();
+            contentNameMap[type.ordinal()] = new ObjectMap<>();
+        }
     }
 
 
