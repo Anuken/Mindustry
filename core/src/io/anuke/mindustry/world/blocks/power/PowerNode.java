@@ -108,7 +108,7 @@ public class PowerNode extends PowerBlock{
         && !other.entity.proximity().contains(tile) && other.entity.power.graph != tile.entity.power.graph;
 
         tempTiles.clear();
-        Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
+        Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
             Tile other = world.ltile(x, y);
             if(valid.get(other)){
                 if(!insulated(tile, other)){
@@ -139,7 +139,7 @@ public class PowerNode extends PowerBlock{
 
         tempTiles.clear();
         graphs.clear();
-        Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
+        Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
             Tile other = world.ltile(x, y);
             if(valid.get(other) && !tempTiles.contains(other)){
                 tempTiles.add(other);
@@ -220,8 +220,8 @@ public class PowerNode extends PowerBlock{
 
         Lines.stroke(1.5f);
 
-        for(int x = (int)(tile.x - laserRange - 1); x <= tile.x + laserRange + 1; x++){
-            for(int y = (int)(tile.y - laserRange - 1); y <= tile.y + laserRange + 1; y++){
+        for(int x = (int)(tile.x - laserRange - 2); x <= tile.x + laserRange + 2; x++){
+            for(int y = (int)(tile.y - laserRange - 2); y <= tile.y + laserRange + 2; y++){
                 Tile link = world.ltile(x, y);
 
                 if(link != tile && linkValid(tile, link, false)){
