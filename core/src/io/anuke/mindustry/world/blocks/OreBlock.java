@@ -16,7 +16,7 @@ public class OreBlock extends OverlayFloor{
 
     public OreBlock(Item ore){
         super("ore-" + ore.name);
-        this.localizedName = ore.localizedName();
+        this.localizedName = ore.localizedName;
         this.itemDrop = ore;
         this.variants = 3;
         this.color.set(ore.color);
@@ -29,7 +29,7 @@ public class OreBlock extends OverlayFloor{
     }
 
     public void setup(Item ore){
-        this.localizedName = ore.localizedName();
+        this.localizedName = ore.localizedName;
         this.itemDrop = ore;
         this.color.set(ore.color);
     }
@@ -80,6 +80,6 @@ public class OreBlock extends OverlayFloor{
 
     @Override
     public String getDisplayName(Tile tile){
-        return itemDrop.localizedName();
+        return itemDrop.localizedName;
     }
 }

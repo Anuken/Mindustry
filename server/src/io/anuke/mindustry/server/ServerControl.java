@@ -357,6 +357,10 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        handler.register("js", "<script...>", "Run arbitrary Javascript.", arg -> {
+            info("&lc" + mods.getScripts().runConsole(arg[0]));
+        });
+
         handler.register("say", "<message...>", "Send a message to all players.", arg -> {
             if(!state.is(State.playing)){
                 err("Not hosting. Host a game first.");

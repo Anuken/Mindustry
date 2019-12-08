@@ -396,11 +396,6 @@ public class Block extends BlockStorage{
     }
 
     @Override
-    public String localizedName(){
-        return localizedName;
-    }
-
-    @Override
     public void displayInfo(Table table){
         ContentDisplay.displayBlock(table, this);
     }
@@ -552,7 +547,7 @@ public class Block extends BlockStorage{
             }else{
                 current = entity -> entity.liquids.current();
             }
-            bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName(),
+            bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
                     () -> current.get(entity).barColor(), () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
         }
 

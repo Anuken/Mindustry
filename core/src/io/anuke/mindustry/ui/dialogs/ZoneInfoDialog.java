@@ -96,7 +96,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                 }).growX();
 
             }else{
-                cont.add(zone.localizedName()).color(Pal.accent).growX().center();
+                cont.add(zone.localizedName).color(Pal.accent).growX().center();
                 cont.row();
                 cont.addImage().color(Pal.accent).height(3).pad(6).growX();
                 cont.row();

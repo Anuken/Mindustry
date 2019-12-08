@@ -42,11 +42,6 @@ public abstract class UnlockableContent extends MappableContent{
         return cicons[icon.ordinal()];
     }
 
-    /** Returns the localized name of this content. */
-    public abstract String localizedName();
-
-    //public abstract TextureRegion getContentIcon();
-
     /** This should show all necessary info about this content in the specified table. */
     public abstract void displayInfo(Table table);
 

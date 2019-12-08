@@ -1,10 +1,9 @@
 package io.anuke.mindustry.type;
 
-import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.mindustry.ctype.UnlockableContent;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.blocks.*;
 
@@ -51,13 +50,8 @@ public class Item extends UnlockableContent{
     }
 
     @Override
-    public String localizedName(){
-        return Core.bundle.get("item." + this.name + ".name");
-    }
-
-    @Override
     public String toString(){
-        return localizedName();
+        return localizedName;
     }
 
     @Override

@@ -392,7 +392,7 @@ public class Mods implements Loadable{
                 if(mod.root.child("scripts").exists()){
                     content.setCurrentMod(mod);
                     mod.scripts = mod.root.child("scripts").findAll(f -> f.extension().equals("js"));
-                    Log.info("[{0}] Found {1} scripts.", mod.meta.name, mod.scripts.size);
+                    Log.debug("[{0}] Found {1} scripts.", mod.meta.name, mod.scripts.size);
 
                     for(FileHandle file : mod.scripts){
                         try{
@@ -415,7 +415,7 @@ public class Mods implements Loadable{
             content.setCurrentMod(null);
         }
 
-        Log.info("Time to initialize modded scripts: {0}", Time.elapsed());
+        Log.debug("Time to initialize modded scripts: {0}", Time.elapsed());
     }
 
     /** Creates all the content found in mod files. */

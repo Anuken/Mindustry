@@ -26,7 +26,7 @@ public class Scripts implements Disposable{
         wrapper = Core.files.internal("scripts/wrapper.js").readString();
 
         run(Core.files.internal("scripts/global.js").readString(), "global.js");
-        Log.info("Time to load script engine: {0}", Time.elapsed());
+        Log.debug("Time to load script engine: {0}", Time.elapsed());
     }
 
     public String runConsole(String text){
@@ -52,7 +52,7 @@ public class Scripts implements Disposable{
     public void log(String source, String message){
         Log.info("[{0}]: {1}", source, message);
         logBuffer.add("[accent][" + source + "]:[] " + message);
-        if(!headless & ui.scriptfrag != null){
+        if(!headless && ui.scriptfrag != null){
             onLoad();
         }
     }
