@@ -16,8 +16,7 @@ import io.anuke.mindustry.ui.*;
 
 public class UnitType extends UnlockableContent{
     public @NonNull TypeID typeID;
-    public @NonNull
-    Prov<? extends BaseUnit> constructor;
+    public @NonNull Prov<? extends BaseUnit> constructor;
 
     public float health = 60;
     public float hitsize = 7f;
@@ -49,7 +48,7 @@ public class UnitType extends UnlockableContent{
         create(mainConstructor);
     }
 
-    public <T extends BaseUnit> UnitType(String name){
+    public UnitType(String name){
         super(name);
     }
 
