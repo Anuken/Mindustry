@@ -246,6 +246,10 @@ public class ContentParser{
 
                 readFields(block, value, true);
 
+                if(block.size > 8){
+                    throw new IllegalArgumentException("Blocks cannot be larger than 8x8.");
+                }
+
                 //add research tech node
                 if(research[0] != null){
                     Block parent = find(ContentType.block, research[0]);
