@@ -19,7 +19,6 @@ import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.mod.*;
-import io.anuke.mindustry.rhino.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import java.io.*;
@@ -68,7 +67,7 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public org.mozilla.javascript.Context getScriptContext(){
-                return new RhinoBuilder(getContext()).enterContext();
+                return AndroidRhinoContext.enterContext(getContext().getCacheDir());
             }
 
             @Override
