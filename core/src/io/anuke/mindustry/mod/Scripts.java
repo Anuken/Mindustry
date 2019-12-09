@@ -12,18 +12,27 @@ public class Scripts implements Disposable{
     private final Context context;
     private final String wrapper;
     private Scriptable scope;
+    private boolean errored;
 
     public Scripts(){
         Time.mark();
 
         context = Vars.platform.getScriptContext();
-        context.setClassShutter(type -> (ClassAccess.allowedClassNames.contains(type) || type.startsWith("adapter") || type.contains("PrintStream") || type.startsWith("io.anuke.mindustry")) && !type.equals("io.anuke.mindustry.mod.ClassAccess"));
+        context.setClassShutter(type -> (ClassAccess.allowedClassNames.contains(type) || type.startsWith("$Proxy") ||
+            type.startsWith("adapter") || type.contains("PrintStream") ||
+            type.startsWith("io.anuke.mindustry")) && !type.equals("io.anuke.mindustry.mod.ClassAccess"));
 
         scope = new ImporterTopLevel(context);
         wrapper = Core.files.internal("scripts/wrapper.js").readString();
 
-        run(Core.files.internal("scripts/global.js").readString(), "global.js");
+        if(!run(Core.files.internal("scripts/global.js").readString(), "global.js")){
+            errored = true;
+        }
         Log.debug("Time to load script engine: {0}", Time.elapsed());
+    }
+
+    public boolean hasErrored(){
+        return errored;
     }
 
     public String runConsole(String text){
@@ -58,11 +67,13 @@ public class Scripts implements Disposable{
         run(wrapper.replace("$SCRIPT_NAME$", mod.name + "/" + file.nameWithoutExtension()).replace("$CODE$", file.readString()).replace("$MOD_NAME$", mod.name), file.name());
     }
 
-    private void run(String script, String file){
+    private boolean run(String script, String file){
         try{
             context.evaluateString(scope, script, file, 1, null);
+            return true;
         }catch(Throwable t){
             log(LogLevel.err, file, "" + getError(t));
+            return false;
         }
     }
 

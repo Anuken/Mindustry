@@ -9,7 +9,6 @@ import android.os.Build.*;
 import android.os.*;
 import android.provider.Settings.*;
 import android.telephony.*;
-import com.faendir.rhino_android.*;
 import io.anuke.arc.*;
 import io.anuke.arc.backends.android.surfaceview.*;
 import io.anuke.arc.files.*;
@@ -20,6 +19,7 @@ import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.mod.*;
+import io.anuke.mindustry.rhino.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import java.io.*;
@@ -68,7 +68,7 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public org.mozilla.javascript.Context getScriptContext(){
-                return new RhinoAndroidHelper(Core.files.local("script-output").file()).enterContext();
+                return new RhinoBuilder(getContext()).enterContext();
             }
 
             @Override
