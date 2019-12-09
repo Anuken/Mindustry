@@ -173,20 +173,26 @@ public class ContentParser{
                 }
             }else{
                 //TODO generate dynamically instead of doing.. this
-                Class<? extends Block> type = resolve(getType(value),
-                "io.anuke.mindustry.world",
-                "io.anuke.mindustry.world.blocks",
-                "io.anuke.mindustry.world.blocks.defense",
-                "io.anuke.mindustry.world.blocks.defense.turrets",
-                "io.anuke.mindustry.world.blocks.distribution",
-                "io.anuke.mindustry.world.blocks.liquid",
-                "io.anuke.mindustry.world.blocks.logic",
-                "io.anuke.mindustry.world.blocks.power",
-                "io.anuke.mindustry.world.blocks.production",
-                "io.anuke.mindustry.world.blocks.sandbox",
-                "io.anuke.mindustry.world.blocks.storage",
-                "io.anuke.mindustry.world.blocks.units"
-                );
+                Class<? extends Block> type;
+
+                try{
+                    type = resolve(getType(value),
+                    "io.anuke.mindustry.world",
+                    "io.anuke.mindustry.world.blocks",
+                    "io.anuke.mindustry.world.blocks.defense",
+                    "io.anuke.mindustry.world.blocks.defense.turrets",
+                    "io.anuke.mindustry.world.blocks.distribution",
+                    "io.anuke.mindustry.world.blocks.liquid",
+                    "io.anuke.mindustry.world.blocks.logic",
+                    "io.anuke.mindustry.world.blocks.power",
+                    "io.anuke.mindustry.world.blocks.production",
+                    "io.anuke.mindustry.world.blocks.sandbox",
+                    "io.anuke.mindustry.world.blocks.storage",
+                    "io.anuke.mindustry.world.blocks.units"
+                    );
+                }catch(IllegalArgumentException e){
+                    type = Block.class;
+                }
 
                 block = make(type, mod + "-" + name);
             }

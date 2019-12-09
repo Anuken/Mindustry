@@ -107,6 +107,9 @@ public class DesktopLauncher extends ClientLauncher{
                 if(SteamAPI.restartAppIfNecessary(SVars.steamID)){
                     System.exit(0);
                 }
+            }catch(NullPointerException ignored){
+                steam = false;
+                Log.info("Running in offline mode.");
             }catch(Throwable e){
                 steam = false;
                 Log.err("Failed to load Steam native libraries.");
