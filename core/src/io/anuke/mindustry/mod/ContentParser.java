@@ -66,6 +66,10 @@ public class ContentParser{
             }
         });
         put(StatusEffect.class, (type, data) -> {
+            Object result = fieldOpt(StatusEffects.class, data);
+            if(result != null){
+                return result;
+            }
             StatusEffect effect = new StatusEffect(currentMod.name + "-" + data.getString("name"));
             readFields(effect, data);
             return effect;
