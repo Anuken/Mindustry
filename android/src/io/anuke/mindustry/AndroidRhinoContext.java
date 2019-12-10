@@ -12,8 +12,6 @@ import com.android.dx.merge.*;
 import dalvik.system.*;
 import io.anuke.arc.*;
 import io.anuke.arc.backends.android.surfaceview.*;
-import io.anuke.arc.util.ArcAnnotate.NonNull;
-import io.anuke.arc.util.ArcAnnotate.Nullable;
 import io.anuke.mindustry.AndroidRhinoContext.BaseAndroidClassLoader.*;
 import org.mozilla.javascript.*;
 
@@ -31,7 +29,7 @@ public class AndroidRhinoContext{
      * call this instead of {@link Context#enter()}
      * @return a context prepared for android
      */
-    public static Context enterContext(File cacheDirectory){
+    public static Context enter(File cacheDirectory){
         if(!SecurityController.hasGlobal())
             SecurityController.initGlobal(new SecurityController(){
                 @Override
@@ -172,7 +170,7 @@ public class AndroidRhinoContext{
             }
 
             @Override
-            protected Class<?> loadClass(@NonNull Dex dex, @NonNull String name) throws ClassNotFoundException{
+            protected Class<?> loadClass(Dex dex, String name) throws ClassNotFoundException{
                 try{
                     dex.writeTo(dexFile);
                 }catch(IOException e){
@@ -181,7 +179,6 @@ public class AndroidRhinoContext{
                 return new DexClassLoader(dexFile.getPath(), ((AndroidApplication)Core.app).getContext().getCacheDir().getAbsolutePath(), null, getParent()).loadClass(name);
             }
 
-            @Nullable
             @Override
             protected Dex getLastDex(){
                 if(dexFile.exists()){
@@ -202,19 +199,18 @@ public class AndroidRhinoContext{
 
         @TargetApi(Build.VERSION_CODES.O)
         static class InMemoryAndroidClassLoader extends BaseAndroidClassLoader{
-            @Nullable private Dex last;
+            private Dex last;
 
             public InMemoryAndroidClassLoader(ClassLoader parent){
                 super(parent);
             }
 
             @Override
-            protected Class<?> loadClass(@NonNull Dex dex, @NonNull String name) throws ClassNotFoundException{
+            protected Class<?> loadClass(Dex dex, String name) throws ClassNotFoundException{
                 last = dex;
                 return new InMemoryDexClassLoader(ByteBuffer.wrap(dex.getBytes()), getParent()).loadClass(name);
             }
 
-            @Nullable
             @Override
             protected Dex getLastDex(){
                 return last;

@@ -1,46 +1,45 @@
 package io.anuke.mindustry.type;
 
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.func.Prov;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.entities.units.Statuses.StatusEntry;
-import io.anuke.mindustry.ctype.Content;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Effects.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.units.Statuses.*;
 
-public class StatusEffect extends Content{
-    public float damageMultiplier = 1f; //damage dealt
-    public float armorMultiplier = 1f; //armor points
-    public float speedMultiplier = 1f; //speed
-    public Color color = Color.white.cpy(); //tint color
-
-    /** Transition handler map. */
-    private ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
-    /**
-     * Transition initializer array. Since provided effects are only available after init(), this handles putting things
-     * in the transitions map.
-     */
-    private Array<Object[]> transInit = new Array<>();
-
+public class StatusEffect extends MappableContent{
+    /** Damage dealt by the unit with the effect. */
+    public float damageMultiplier = 1f;
+    /** Unit armor multiplier. */
+    public float armorMultiplier = 1f;
+    /** Unit speed multiplier (buggy) */
+    public float speedMultiplier = 1f;
     /** Damage per frame. */
-    protected float damage;
+    public float damage;
+    /** Tint color of effect. */
+    public Color color = Color.white.cpy();
     /** Effect that happens randomly on top of the affected unit. */
-    protected Effect effect = Fx.none;
+    public Effect effect = Fx.none;
+    /** Transition handler map. */
+    protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
+    /** Called on init. */
+    protected Runnable initblock = () -> {};
 
-    @SuppressWarnings("unchecked")
+    public StatusEffect(String name){
+        super(name);
+    }
+
     @Override
     public void init(){
-        for(Object[] pair : transInit){
-            Prov<StatusEffect> sup = (Prov<StatusEffect>)pair[0];
-            TransitionHandler handler = (TransitionHandler)pair[1];
-            transitions.put(sup.get(), handler);
-        }
-        transInit.clear();
+        initblock.run();
+    }
+
+    public void init(Runnable run){
+        this.initblock = run;
     }
 
     /** Runs every tick on the affected unit while time is greater than 0. */
@@ -56,20 +55,19 @@ public class StatusEffect extends Content{
         }
     }
 
-    protected void trans(Prov<StatusEffect> effect, TransitionHandler handler){
-        transInit.add(new Object[]{effect, handler});
+    protected void trans(StatusEffect effect, TransitionHandler handler){
+        transitions.put(effect, handler);
     }
 
-    @SuppressWarnings("unchecked")
-    protected void opposite(Prov... effect){
-        for(Prov<StatusEffect> sup : effect){
+    protected void opposite(StatusEffect... effect){
+        for(StatusEffect sup : effect){
             trans(sup, (unit, time, newTime, result) -> {
                 time -= newTime * 0.5f;
                 if(time > 0){
                     result.set(this, time);
                     return;
                 }
-                result.set(sup.get(), newTime);
+                result.set(sup, newTime);
             });
         }
     }

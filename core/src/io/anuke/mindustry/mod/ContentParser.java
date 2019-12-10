@@ -66,7 +66,7 @@ public class ContentParser{
             }
         });
         put(StatusEffect.class, (type, data) -> {
-            StatusEffect effect = new StatusEffect();
+            StatusEffect effect = new StatusEffect(currentMod.name + "-" + data.getString("name"));
             readFields(effect, data);
             return effect;
         });
