@@ -5,10 +5,12 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -16,6 +18,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -66,6 +69,7 @@ public class Drill extends Block{
         liquidCapacity = 5f;
         hasItems = true;
         entityType = DrillEntity::new;
+        configurable=true;
 
         idleSound = Sounds.drill;
         idleSoundVolume = 0.003f;
@@ -88,6 +92,27 @@ public class Drill extends Block{
         rimRegion = Core.atlas.find(name + "-rim");
         rotatorRegion = Core.atlas.find(name + "-rotator");
         topRegion = Core.atlas.find(name + "-top");
+    }
+
+    @Override
+    public void buildConfiguration(Tile tile, Table table){
+        countOre(tile);
+        DrillEntity entity = tile.ent();
+        ItemSelection.buildDrillItemTable(table, itemArray, () -> entity.dominantItem, item -> {
+            tile.configure(item == null ? -1 : item.id);
+        });
+    }
+
+    @Override
+    public void configured(Tile tile, Player player, int value){
+        countOre(tile);
+        tile.<DrillEntity>ent().dominantItem = content.item(value);
+        tile.<DrillEntity>ent().dominantItems = oreCount.get(content.item(value), 0);
+    }
+
+    @Override
+    public void drawRequestConfig(BuilderTrait.BuildRequest req, Eachable<BuilderTrait.BuildRequest> list){
+        drawRequestConfigCenter(req, content.item(req.config), "center");
     }
 
     @Override
