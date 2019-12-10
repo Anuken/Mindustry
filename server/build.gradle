@@ -46,6 +46,9 @@ task dist(type: Jar){
     exclude("com/badlogic/gdx/**")
     exclude("icons/**")
     exclude("bundles/**")
+    if(!versionModifier.contains("steam")){
+        exclude("**.dll", "**.so", "**.dylib")
+    }
 
     manifest{
         attributes 'Main-Class': project.mainClassName

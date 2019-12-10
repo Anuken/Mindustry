@@ -7,13 +7,14 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 
 import java.time.*;
 
-import static io.anuke.arc.util.Log.*;
+import static io.anuke.arc.util.Log.format;
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.server.ServerControl.*;
 
@@ -63,5 +64,7 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(new ServerControl(args));
 
         mods.each(Mod::init);
+
+        Events.fire(new ServerLoadEvent());
     }
 }

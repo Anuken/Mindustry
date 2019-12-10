@@ -95,6 +95,10 @@ public class EventType{
 
     }
 
+    public static class ServerLoadEvent{
+
+    }
+
     public static class ContentReloadEvent{
 
     }
