@@ -296,7 +296,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public void update(){
         timeScaleDuration -= Time.delta();
         if(timeScaleDuration <= 0f || !block.canOverdrive){
-            timeScale = 0.1f;
+            timeScale = 0f;
         }
 
         if(health <= 0){

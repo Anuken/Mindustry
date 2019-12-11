@@ -283,7 +283,7 @@ public class BlockRenderer implements Disposable{
                 block.drawLight(request.tile);
             }else if(request.layer == block.layer){
                 block.drawLayer(request.tile);
-                if(request.tile.entity != null && request.tile.entity.timeScale == 0.1f){
+                if(request.tile.entity != null && request.tile.entity.timeScale == 0f){
                     block.drawDepowered(request.tile);
                 }
             }else if(request.layer == block.layer2){
