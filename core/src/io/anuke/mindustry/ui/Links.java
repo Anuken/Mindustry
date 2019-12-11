@@ -3,10 +3,17 @@ package io.anuke.mindustry.ui;
 import io.anuke.arc.Core;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.graphics.Pal;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static io.anuke.mindustry.Vars.ui;
 
 public class Links{
     private static LinkEntry[] links;
+    static List<String> missingLocales = new ArrayList<String>();
 
     private static void createLinks(){
         links = new LinkEntry[]{
@@ -27,6 +34,19 @@ public class Links{
         if(links == null){
             createLinks();
         }
+        if(!missingLocales.isEmpty()){
+            String key = "missinglocale";
+            if(missingLocales.size()==1){
+                key = "missinglocale.single";
+            }
+            String m = Core.bundle.getOrNull(key);
+            if(m==null)m="Locale key(s) missing:\n";
+            for(String s : missingLocales){
+                m = m+s;
+            }
+            String finalM = m;
+            Time.run(1f, ()->{ui.showErrorMessage(finalM);});
+        }
 
         return links;
     }
@@ -38,8 +58,15 @@ public class Links{
         public LinkEntry(String name, String link, Color color){
             this.name = name;
             this.color = color;
-            String desc = Core.bundle.getOrNull("link." + name + ".description");
-            this.description = desc != null ? desc : "link." + name + ".description";
+            String key = "link." + name + ".description";
+            String desc = Core.bundle.getOrNull(key);
+            if(desc == null){
+                //String m = Core.bundle.get("missinglocale");
+                //Time.run(1f,()->{ui.showErrorMessage(m + "link." + name + ".description");});
+                missingLocales.add(key+"\n"); // <- LINE 62
+                desc = key;
+            }
+            this.description = desc;
             this.link = link;
 
             String title = Core.bundle.getOrNull("link." + name + ".title");

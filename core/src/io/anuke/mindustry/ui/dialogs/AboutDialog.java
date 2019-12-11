@@ -17,6 +17,7 @@ import static io.anuke.mindustry.Vars.*;
 public class AboutDialog extends FloatingDialog{
     private Array<String> contributors = new Array<>();
     private static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds", "f-droid");
+    static LinkEntry[] linkEntries;
 
     public AboutDialog(){
         super("$about.button");
@@ -31,6 +32,7 @@ public class AboutDialog extends FloatingDialog{
     }
 
     void setup(){
+        if(linkEntries==null)linkEntries = Links.getLinks();
         cont.clear();
         buttons.clear();
 
@@ -40,7 +42,7 @@ public class AboutDialog extends FloatingDialog{
         Table in = new Table();
         ScrollPane pane = new ScrollPane(in);
 
-        for(LinkEntry link : Links.getLinks()){
+        for(LinkEntry link : linkEntries){
             if((ios || OS.isMac || steam) && bannedItems.contains(link.name)){
                 continue;
             }
