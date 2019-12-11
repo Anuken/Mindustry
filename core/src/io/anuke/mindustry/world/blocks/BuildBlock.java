@@ -240,7 +240,7 @@ public class BuildBlock extends Block{
                 builderID = builder.getID();
             }
 
-            if(progress >= 1f || state.rules.infiniteResources){
+            if(progress >= 1f){
                 constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
                 return true;
             }
@@ -269,7 +269,7 @@ public class BuildBlock extends Block{
                     if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
                         if(core != null){
                             int accepting = core.tile.block().acceptStack(requirements[i].item, accumulated, core.tile, builder);
-                            core.tile.block().handleStack(requirements[i].item, accepting, core.tile, builder);
+                            core.tile.block().handleStack(requirements[i].item, 0, core.tile, builder);
                             accumulator[i] -= accepting;
                         }else{
                             accumulator[i] -= accumulated;
@@ -284,7 +284,7 @@ public class BuildBlock extends Block{
                 builderID = builder.getID();
             }
 
-            if(progress <= 0 || state.rules.infiniteResources){
+            if(progress <= 0){
                 Call.onDeconstructFinish(tile, this.cblock == null ? previous : this.cblock, builderID);
             }
         }
@@ -292,30 +292,30 @@ public class BuildBlock extends Block{
         private float checkRequired(ItemModule inventory, float amount, boolean remove){
             float maxProgress = amount;
 
-            for(int i = 0; i < cblock.requirements.length; i++){
-                int sclamount = Math.round(state.rules.buildCostMultiplier * cblock.requirements[i].amount);
-                int required = (int)(accumulator[i]); //calculate items that are required now
-
-                if(inventory.get(cblock.requirements[i].item) == 0 && sclamount != 0){
-                    maxProgress = 0f;
-                }else if(required > 0){ //if this amount is positive...
-                    //calculate how many items it can actually use
-                    int maxUse = Math.min(required, inventory.get(cblock.requirements[i].item));
-                    //get this as a fraction
-                    float fraction = maxUse / (float)required;
-
-                    //move max progress down if this fraction is less than 1
-                    maxProgress = Math.min(maxProgress, maxProgress * fraction);
-
-                    accumulator[i] -= maxUse;
-
-                    //remove stuff that is actually used
-                    if(remove){
-                        inventory.remove(cblock.requirements[i].item, maxUse);
-                    }
-                }
-                //else, no items are required yet, so just keep going
-            }
+//            for(int i = 0; i < cblock.requirements.length; i++){
+//                int sclamount = Math.round(state.rules.buildCostMultiplier * cblock.requirements[i].amount);
+//                int required = (int)(accumulator[i]); //calculate items that are required now
+//
+//                if(inventory.get(cblock.requirements[i].item) == 0 && sclamount != 0){
+//                    maxProgress = 0f;
+//                }else if(required > 0){ //if this amount is positive...
+//                    //calculate how many items it can actually use
+//                    int maxUse = Math.min(required, inventory.get(cblock.requirements[i].item));
+//                    //get this as a fraction
+//                    float fraction = maxUse / (float)required;
+//
+//                    //move max progress down if this fraction is less than 1
+//                    maxProgress = Math.min(maxProgress, maxProgress * fraction);
+//
+//                    accumulator[i] -= maxUse;
+//
+//                    //remove stuff that is actually used
+//                    if(remove){
+//                        inventory.remove(cblock.requirements[i].item, maxUse);
+//                    }
+//                }
+//                //else, no items are required yet, so just keep going
+//            }
 
             return maxProgress;
         }
