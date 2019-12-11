@@ -24,6 +24,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
     private static final IntIntMap totals = new IntIntMap();
 
     protected Queue<BuildRequest> placeQueue = new Queue<>();
+    protected BuildRequest lastFound;
     protected boolean isBreaking;
     protected Player playerTarget;
 
@@ -57,6 +58,9 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                         buildQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y));
                     }else{
                         buildQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.rotation(), entity.cblock));
+                        if(lastFound != null && lastFound.hasConfig){
+                            buildQueue().last().configure(lastFound.config);
+                        }
                     }
                 }
 
@@ -174,6 +178,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                         BuildEntity b = tile.ent();
                         float dist = Math.min(b.dst(x, y) - placeDistance, 0);
                         if(dist / type.maxVelocity < b.buildCost * 0.9f){
+                            lastFound = req;
                             target = b;
                             this.isBreaking = req.breaking;
                             setState(build);
