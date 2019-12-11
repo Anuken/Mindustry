@@ -12,7 +12,6 @@ import com.android.dx.merge.*;
 import dalvik.system.*;
 import io.anuke.arc.*;
 import io.anuke.arc.backends.android.surfaceview.*;
-import io.anuke.mindustry.AndroidRhinoContext.BaseAndroidClassLoader.*;
 import org.mozilla.javascript.*;
 
 import java.io.*;
@@ -149,77 +148,78 @@ public class AndroidRhinoContext{
             }
             return loadedClass;
         }
+    }
 
-        /** Might be thrown in any Rhino method that loads bytecode if the loading failed. */
-        public static class FatalLoadingException extends RuntimeException{
-            FatalLoadingException(Throwable t){
-                super("Failed to define class", t);
-            }
+
+    /** Might be thrown in any Rhino method that loads bytecode if the loading failed. */
+    public static class FatalLoadingException extends RuntimeException{
+        FatalLoadingException(Throwable t){
+            super("Failed to define class", t);
+        }
+    }
+
+    static class FileAndroidClassLoader extends BaseAndroidClassLoader{
+        private static int instanceCounter = 0;
+        private final File dexFile;
+
+        public FileAndroidClassLoader(ClassLoader parent, File cacheDir){
+            super(parent);
+            int id = instanceCounter++;
+            dexFile = new File(cacheDir, id + ".dex");
+            cacheDir.mkdirs();
+            reset();
         }
 
-        static class FileAndroidClassLoader extends BaseAndroidClassLoader{
-            private static int instanceCounter = 0;
-            private final File dexFile;
-
-            public FileAndroidClassLoader(ClassLoader parent, File cacheDir){
-                super(parent);
-                int id = instanceCounter++;
-                dexFile = new File(cacheDir, id + ".dex");
-                cacheDir.mkdirs();
-                reset();
+        @Override
+        protected Class<?> loadClass(Dex dex, String name) throws ClassNotFoundException{
+            try{
+                dex.writeTo(dexFile);
+            }catch(IOException e){
+                e.printStackTrace();
             }
+            return new DexClassLoader(dexFile.getPath(), ((AndroidApplication)Core.app).getContext().getCacheDir().getAbsolutePath(), null, getParent()).loadClass(name);
+        }
 
-            @Override
-            protected Class<?> loadClass(Dex dex, String name) throws ClassNotFoundException{
+        @Override
+        protected Dex getLastDex(){
+            if(dexFile.exists()){
                 try{
-                    dex.writeTo(dexFile);
+                    return new Dex(dexFile);
                 }catch(IOException e){
                     e.printStackTrace();
                 }
-                return new DexClassLoader(dexFile.getPath(), ((AndroidApplication)Core.app).getContext().getCacheDir().getAbsolutePath(), null, getParent()).loadClass(name);
             }
-
-            @Override
-            protected Dex getLastDex(){
-                if(dexFile.exists()){
-                    try{
-                        return new Dex(dexFile);
-                    }catch(IOException e){
-                        e.printStackTrace();
-                    }
-                }
-                return null;
-            }
-
-            @Override
-            protected void reset(){
-                dexFile.delete();
-            }
+            return null;
         }
 
-        @TargetApi(Build.VERSION_CODES.O)
-        static class InMemoryAndroidClassLoader extends BaseAndroidClassLoader{
-            private Dex last;
+        @Override
+        protected void reset(){
+            dexFile.delete();
+        }
+    }
 
-            public InMemoryAndroidClassLoader(ClassLoader parent){
-                super(parent);
-            }
+    @TargetApi(Build.VERSION_CODES.O)
+    static class InMemoryAndroidClassLoader extends BaseAndroidClassLoader{
+        private Dex last;
 
-            @Override
-            protected Class<?> loadClass(Dex dex, String name) throws ClassNotFoundException{
-                last = dex;
-                return new InMemoryDexClassLoader(ByteBuffer.wrap(dex.getBytes()), getParent()).loadClass(name);
-            }
+        public InMemoryAndroidClassLoader(ClassLoader parent){
+            super(parent);
+        }
 
-            @Override
-            protected Dex getLastDex(){
-                return last;
-            }
+        @Override
+        protected Class<?> loadClass(Dex dex, String name) throws ClassNotFoundException{
+            last = dex;
+            return new InMemoryDexClassLoader(ByteBuffer.wrap(dex.getBytes()), getParent()).loadClass(name);
+        }
 
-            @Override
-            protected void reset(){
-                last = null;
-            }
+        @Override
+        protected Dex getLastDex(){
+            return last;
+        }
+
+        @Override
+        protected void reset(){
+            last = null;
         }
     }
 }
