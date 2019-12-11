@@ -239,6 +239,14 @@ public class Renderer implements ApplicationListener{
         blocks.floor.drawLayer(CacheLayer.walls);
         blocks.floor.endDraw();
 
+        if(projectorGroup.countInBounds() > 0){
+            if(settings.getBool("animatedshields") && Shaders.shield != null){
+                ProjectorTrait.projectorSets.forEach((x) -> drawProjectorSet(x.value));
+            }else{
+                projectorGroup.draw(shield -> true, ProjectorTrait::drawSimple);
+            }
+        }
+
         blocks.drawBlocks(Layer.block);
         blocks.drawFog();
 
@@ -279,13 +287,13 @@ public class Renderer implements ApplicationListener{
         overlays.drawBottom();
         playerGroup.draw(p -> p.isLocal, Player::drawBuildRequests);
 
-        if(projectorGroup.countInBounds() > 0){
-            if(settings.getBool("animatedshields") && Shaders.shield != null){
-                ProjectorTrait.projectorSets.forEach((x) -> drawProjectorSet(x.value));
-            }else{
-                projectorGroup.draw(shield -> true, ProjectorTrait::drawSimple);
-            }
-        }
+//        if(projectorGroup.countInBounds() > 0){
+//            if(settings.getBool("animatedshields") && Shaders.shield != null){
+//                ProjectorTrait.projectorSets.forEach((x) -> drawProjectorSet(x.value));
+//            }else{
+//                projectorGroup.draw(shield -> true, ProjectorTrait::drawSimple);
+//            }
+//        }
 
         overlays.drawTop();
 
