@@ -19,7 +19,7 @@ public class ScorchDecal extends Decal{
 
         if(regions[0] == null || regions[0].getTexture().isDisposed()){
             for(int i = 0; i < regions.length; i++){
-                regions[i] = Core.atlas.find("scorch" + (i + 1));
+                regions[i] = Core.atlas.find("scorch-" + (i + 1));
             }
         }
 
