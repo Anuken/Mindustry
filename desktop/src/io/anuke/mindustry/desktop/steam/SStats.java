@@ -195,17 +195,15 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(LaunchEvent.class, e -> {
-            int total = 0;
-            for(Item item : Vars.content.items()){
-                total += Vars.state.stats.itemsDelivered.get(item, 0);
-            }
-
             if(state.rules.tutorial){
                 completeTutorial.complete();
             }
 
             SStat.timesLaunched.add();
-            SStat.itemsLaunched.add(total);
+        });
+
+        Events.on(LaunchItemEvent.class, e -> {
+            SStat.itemsLaunched.add(e.stack.amount);
         });
 
         Events.on(WaveEvent.class, e -> {

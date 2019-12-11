@@ -39,15 +39,10 @@ public class Mech extends UnlockableContent{
     public Mech(String name, boolean flying){
         super(name);
         this.flying = flying;
-        this.description = Core.bundle.get("mech." + name + ".description");
     }
 
     public Mech(String name){
         this(name, false);
-    }
-
-    public String localizedName(){
-        return Core.bundle.get("mech." + name + ".name");
     }
 
     public void updateAlt(Player player){
@@ -113,6 +108,6 @@ public class Mech extends UnlockableContent{
 
     @Override
     public String toString(){
-        return localizedName();
+        return localizedName;
     }
 }

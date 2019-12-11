@@ -27,7 +27,7 @@ public class DeflectorWall extends Wall{
     public void draw(Tile tile){
         super.draw(tile);
 
-        DeflectorEntity entity = tile.entity();
+        DeflectorEntity entity = tile.ent();
 
         if(entity.hit < 0.0001f) return;
 

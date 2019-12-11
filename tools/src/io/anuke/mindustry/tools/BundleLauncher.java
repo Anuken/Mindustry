@@ -1,4 +1,4 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.tools;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.OrderedMap;

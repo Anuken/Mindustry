@@ -1,11 +1,10 @@
 package io.anuke.mindustry.type;
 
-import io.anuke.arc.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.ctype.UnlockableContent;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.ui.*;
 
 public class Liquid extends UnlockableContent{
@@ -31,7 +30,6 @@ public class Liquid extends UnlockableContent{
     public Liquid(String name, Color color){
         super(name);
         this.color = new Color(color);
-        this.description = Core.bundle.getOrNull("liquid." + name + ".description");
     }
 
     /** For modding only.*/
@@ -53,13 +51,8 @@ public class Liquid extends UnlockableContent{
     }
 
     @Override
-    public String localizedName(){
-        return Core.bundle.get("liquid." + this.name + ".name");
-    }
-
-    @Override
     public String toString(){
-        return localizedName();
+        return localizedName;
     }
 
     @Override

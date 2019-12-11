@@ -14,8 +14,8 @@ import io.anuke.mindustry.world.meta.values.*;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class LaserTurret extends PowerTurret{
-    protected float firingMoveFract = 0.25f;
-    protected float shootDuration = 100f;
+    public float firingMoveFract = 0.25f;
+    public float shootDuration = 100f;
 
     public LaserTurret(String name){
         super(name);
@@ -41,7 +41,7 @@ public class LaserTurret extends PowerTurret{
     public void update(Tile tile){
         super.update(tile);
 
-        LaserTurretEntity entity = tile.entity();
+        LaserTurretEntity entity = tile.ent();
 
         if(entity.bulletLife > 0 && entity.bullet != null){
             tr.trns(entity.rotation, size * tilesize / 2f, 0f);
@@ -59,7 +59,7 @@ public class LaserTurret extends PowerTurret{
 
     @Override
     protected void updateShooting(Tile tile){
-        LaserTurretEntity entity = tile.entity();
+        LaserTurretEntity entity = tile.ent();
 
         if(entity.bulletLife > 0 && entity.bullet != null){
             return;
@@ -87,14 +87,14 @@ public class LaserTurret extends PowerTurret{
 
     @Override
     protected void turnToTarget(Tile tile, float targetRot){
-        LaserTurretEntity entity = tile.entity();
+        LaserTurretEntity entity = tile.ent();
 
         entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * entity.delta() * (entity.bulletLife > 0f ? firingMoveFract : 1f));
     }
 
     @Override
     protected void bullet(Tile tile, BulletType type, float angle){
-        LaserTurretEntity entity = tile.entity();
+        LaserTurretEntity entity = tile.ent();
 
         entity.bullet = Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
         entity.bulletLife = shootDuration;
@@ -102,7 +102,7 @@ public class LaserTurret extends PowerTurret{
 
     @Override
     public boolean shouldActiveSound(Tile tile){
-        LaserTurretEntity entity = tile.entity();
+        LaserTurretEntity entity = tile.ent();
 
         return entity.bulletLife > 0 && entity.bullet != null;
     }

@@ -171,7 +171,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                     BuildRequest req = player.buildRequest();
                     Tile tile = world.tile(req.x, req.y);
                     if(tile != null && tile.entity instanceof BuildEntity){
-                        BuildEntity b = tile.entity();
+                        BuildEntity b = tile.ent();
                         float dist = Math.min(b.dst(x, y) - placeDistance, 0);
                         if(dist / type.maxVelocity < b.buildCost * 0.9f){
                             target = b;

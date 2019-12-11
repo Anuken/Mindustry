@@ -47,7 +47,7 @@ public class ApplicationTests{
                     net = new Net(null);
                     tree = new FileTree();
                     Vars.init();
-                    content.createContent();
+                    content.createBaseContent();
 
                     add(logic = new Logic());
                     add(netServer = new NetServer());
@@ -289,8 +289,8 @@ public class ApplicationTests{
     void buildingOverlap(){
         initBuilding();
 
-        Phantom d1 = (Phantom)UnitTypes.phantom.create(Team.sharded);
-        Phantom d2 = (Phantom)UnitTypes.phantom.create(Team.sharded);
+        BuilderDrone d1 = (BuilderDrone)UnitTypes.phantom.create(Team.sharded);
+        BuilderDrone d2 = (BuilderDrone)UnitTypes.phantom.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
@@ -311,8 +311,8 @@ public class ApplicationTests{
     void buildingDestruction(){
         initBuilding();
 
-        Phantom d1 = (Phantom)UnitTypes.phantom.create(Team.sharded);
-        Phantom d2 = (Phantom)UnitTypes.phantom.create(Team.sharded);
+        BuilderDrone d1 = (BuilderDrone)UnitTypes.phantom.create(Team.sharded);
+        BuilderDrone d2 = (BuilderDrone)UnitTypes.phantom.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);

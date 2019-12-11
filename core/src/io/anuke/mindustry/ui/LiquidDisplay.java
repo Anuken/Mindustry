@@ -33,6 +33,6 @@ public class LiquidDisplay extends Table{
             add(StatUnit.perSecond.localized()).padLeft(2).padRight(5).color(Color.lightGray);
         }
 
-        add(liquid.localizedName());
+        add(liquid.localizedName);
     }
 }

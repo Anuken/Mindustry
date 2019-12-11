@@ -65,7 +65,7 @@ public class SolidPump extends Pump{
 
     @Override
     public void draw(Tile tile){
-        SolidPumpEntity entity = tile.entity();
+        SolidPumpEntity entity = tile.ent();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
         Draw.color(tile.entity.liquids.current().color);
@@ -83,7 +83,7 @@ public class SolidPump extends Pump{
 
     @Override
     public void update(Tile tile){
-        SolidPumpEntity entity = tile.entity();
+        SolidPumpEntity entity = tile.ent();
 
         float fraction = 0f;
 
@@ -138,7 +138,7 @@ public class SolidPump extends Pump{
         super.onProximityAdded(tile);
 
         if(attribute != null){
-            SolidPumpEntity entity = tile.entity();
+            SolidPumpEntity entity = tile.ent();
             entity.boost = sumAttribute(attribute, tile.x, tile.y);
         }
     }

@@ -5,7 +5,7 @@ import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.entities.Units;
 
-public class Revenant extends FlyingUnit{
+public class HoverUnit extends FlyingUnit{
 
     @Override
     public void drawWeapons(){

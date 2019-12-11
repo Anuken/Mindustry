@@ -15,13 +15,13 @@ import io.anuke.mindustry.world.Tile;
 import java.io.*;
 
 public class Cultivator extends GenericCrafter{
-    protected static final Color plantColor = Color.valueOf("5541b1");
-    protected static final Color plantColorLight = Color.valueOf("7457ce");
-    protected static final Color bottomColor = Color.valueOf("474747");
+    public Color plantColor = Color.valueOf("5541b1");
+    public Color plantColorLight = Color.valueOf("7457ce");
+    public Color bottomColor = Color.valueOf("474747");
 
     protected TextureRegion middleRegion, topRegion;
     protected RandomXS128 random = new RandomXS128(0);
-    protected float recurrence = 6f;
+    public Attribute attribute = Attribute.spores;
 
     public Cultivator(String name){
         super(name);
@@ -41,7 +41,7 @@ public class Cultivator extends GenericCrafter{
     public void update(Tile tile){
         super.update(tile);
 
-        CultivatorEntity entity = tile.entity();
+        CultivatorEntity entity = tile.ent();
         entity.warmup = Mathf.lerpDelta(entity.warmup, entity.cons.valid() ? 1f : 0f, 0.015f);
     }
 
@@ -62,7 +62,7 @@ public class Cultivator extends GenericCrafter{
 
     @Override
     public void draw(Tile tile){
-        CultivatorEntity entity = tile.entity();
+        CultivatorEntity entity = tile.ent();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
 
@@ -97,7 +97,7 @@ public class Cultivator extends GenericCrafter{
     public void onProximityAdded(Tile tile){
         super.onProximityAdded(tile);
 
-        CultivatorEntity entity = tile.entity();
+        CultivatorEntity entity = tile.ent();
         entity.boost = sumAttribute(attribute, tile.x, tile.y);
     }
 

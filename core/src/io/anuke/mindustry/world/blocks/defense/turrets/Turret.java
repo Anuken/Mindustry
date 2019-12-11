@@ -28,40 +28,39 @@ import io.anuke.mindustry.world.meta.*;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class Turret extends Block{
-    protected static final int targetInterval = 20;
+    public final int timerTarget = timers++;
+    public int targetInterval = 20;
 
-    protected final int timerTarget = timers++;
+    public Color heatColor = Pal.turretHeat;
+    public Effect shootEffect = Fx.none;
+    public Effect smokeEffect = Fx.none;
+    public Effect ammoUseEffect = Fx.none;
+    public Sound shootSound = Sounds.shoot;
 
-    protected Color heatColor = Pal.turretHeat;
-    protected Effect shootEffect = Fx.none;
-    protected Effect smokeEffect = Fx.none;
-    protected Effect ammoUseEffect = Fx.none;
-    protected Sound shootSound = Sounds.shoot;
-
-    protected int ammoPerShot = 1;
-    protected float ammoEjectBack = 1f;
-    protected float range = 50f;
-    protected float reload = 10f;
-    protected float inaccuracy = 0f;
-    protected int shots = 1;
-    protected float spread = 4f;
-    protected float recoil = 1f;
-    protected float restitution = 0.02f;
-    protected float cooldown = 0.02f;
-    protected float rotatespeed = 5f; //in degrees per tick
-    protected float shootCone = 8f;
-    protected float shootShake = 0f;
-    protected float xRand = 0f;
-    protected boolean targetAir = true;
-    protected boolean targetGround = true;
+    public int ammoPerShot = 1;
+    public float ammoEjectBack = 1f;
+    public float range = 50f;
+    public float reload = 10f;
+    public float inaccuracy = 0f;
+    public int shots = 1;
+    public float spread = 4f;
+    public float recoil = 1f;
+    public float restitution = 0.02f;
+    public float cooldown = 0.02f;
+    public float rotatespeed = 5f; //in degrees per tick
+    public float shootCone = 8f;
+    public float shootShake = 0f;
+    public float xRand = 0f;
+    public boolean targetAir = true;
+    public boolean targetGround = true;
 
     protected Vector2 tr = new Vector2();
     protected Vector2 tr2 = new Vector2();
 
-    protected TextureRegion baseRegion, heatRegion;
+    public TextureRegion baseRegion, heatRegion;
 
-    protected Cons2<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-    protected Cons2<Tile, TurretEntity> heatDrawer = (tile, entity) -> {
+    public Cons2<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+    public Cons2<Tile, TurretEntity> heatDrawer = (tile, entity) -> {
         if(entity.heat <= 0.00001f) return;
         Draw.color(heatColor, entity.heat);
         Draw.blend(Blending.additive);
@@ -116,7 +115,7 @@ public abstract class Turret extends Block{
 
     @Override
     public void drawLayer(Tile tile){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         tr2.trns(entity.rotation, -entity.recoil);
 
@@ -144,7 +143,7 @@ public abstract class Turret extends Block{
 
     @Override
     public void update(Tile tile){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         if(!validateTarget(tile)) entity.target = null;
 
@@ -186,12 +185,12 @@ public abstract class Turret extends Block{
     }
 
     protected boolean validateTarget(Tile tile){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
         return !Units.invalidateTarget(entity.target, tile.getTeam(), tile.drawx(), tile.drawy());
     }
 
     protected void findTarget(Tile tile){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         if(targetAir && !targetGround){
             entity.target = Units.closestEnemy(tile.getTeam(), tile.drawx(), tile.drawy(), range, e -> !e.isDead() && e.isFlying());
@@ -201,7 +200,7 @@ public abstract class Turret extends Block{
     }
 
     protected void turnToTarget(Tile tile, float targetRot){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * entity.delta() * baseReloadSpeed(tile));
     }
@@ -214,7 +213,7 @@ public abstract class Turret extends Block{
     public BulletType useAmmo(Tile tile){
         if(tile.isEnemyCheat()) return peekAmmo(tile);
 
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
         AmmoEntry entry = entity.ammo.peek();
         entry.amount -= ammoPerShot;
         if(entry.amount == 0) entity.ammo.pop();
@@ -227,7 +226,7 @@ public abstract class Turret extends Block{
      * Get the ammo type that will be returned if useAmmo is called.
      */
     public BulletType peekAmmo(Tile tile){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
         return entity.ammo.peek().type();
     }
 
@@ -235,12 +234,12 @@ public abstract class Turret extends Block{
      * Returns whether the turret has ammo.
      */
     public boolean hasAmmo(Tile tile){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
         return entity.ammo.size > 0 && entity.ammo.peek().amount >= ammoPerShot;
     }
 
     protected void updateShooting(Tile tile){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         if(entity.reload >= reload){
             BulletType type = peekAmmo(tile);
@@ -254,7 +253,7 @@ public abstract class Turret extends Block{
     }
 
     protected void shoot(Tile tile, BulletType type){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         entity.recoil = recoil;
         entity.heat = 1f;
@@ -277,7 +276,7 @@ public abstract class Turret extends Block{
         Effect shootEffect = this.shootEffect == Fx.none ? peekAmmo(tile).shootEffect : this.shootEffect;
         Effect smokeEffect = this.smokeEffect == Fx.none ? peekAmmo(tile).smokeEffect : this.smokeEffect;
 
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         Effects.effect(shootEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
         Effects.effect(smokeEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
@@ -292,7 +291,7 @@ public abstract class Turret extends Block{
 
     protected void ejectEffects(Tile tile){
         if(!isTurret(tile)) return;
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         Effects.effect(ammoUseEffect, tile.drawx() - Angles.trnsx(entity.rotation, ammoEjectBack),
         tile.drawy() - Angles.trnsy(entity.rotation, ammoEjectBack), entity.rotation);

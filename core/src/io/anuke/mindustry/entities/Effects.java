@@ -4,6 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.func.Cons;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Position;
 import io.anuke.arc.util.pooling.Pools;
@@ -36,6 +37,7 @@ public class Effects{
     public static void renderEffect(int id, Effect render, Color color, float life, float rotation, float x, float y, Object data){
         container.set(id, color, life, render.lifetime, rotation, x, y, data);
         render.draw.render(container);
+        Draw.reset();
     }
 
     public static Effect getEffect(int id){

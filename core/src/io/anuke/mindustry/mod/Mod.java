@@ -15,11 +15,6 @@ public class Mod{
 
     }
 
-    /** Create any content needed here. */
-    public void loadContent(){
-
-    }
-
     /** Register any commands to be used on the server side, e.g. from the console. */
     public void registerServerCommands(CommandHandler handler){
 

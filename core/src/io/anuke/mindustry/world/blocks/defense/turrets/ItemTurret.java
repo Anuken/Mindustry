@@ -22,8 +22,8 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class ItemTurret extends CooledTurret{
-    protected int maxAmmo = 30;
-    protected ObjectMap<Item, BulletType> ammo = new ObjectMap<>();
+    public int maxAmmo = 30;
+    public ObjectMap<Item, BulletType> ammo = new ObjectMap<>();
 
     public ItemTurret(String name){
         super(name);
@@ -47,7 +47,7 @@ public class ItemTurret extends CooledTurret{
             public void build(Tile tile, Table table){
                 MultiReqImage image = new MultiReqImage();
                 content.items().each(i -> filter.get(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
-                    () -> tile.entity != null && !((ItemTurretEntity)tile.entity).ammo.isEmpty() && ((ItemEntry)tile.<ItemTurretEntity>entity().ammo.peek()).item == item)));
+                    () -> tile.entity != null && !((ItemTurretEntity)tile.entity).ammo.isEmpty() && ((ItemEntry)tile.<ItemTurretEntity>ent().ammo.peek()).item == item)));
 
                 table.add(image).size(8 * 4);
             }
@@ -79,7 +79,7 @@ public class ItemTurret extends CooledTurret{
     public void displayBars(Tile tile, Table bars){
         super.displayBars(tile, bars);
 
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         bars.add(new Bar("blocks.ammo", Pal.ammo, () -> (float)entity.totalAmmo / maxAmmo)).growX();
         bars.row();
@@ -87,7 +87,7 @@ public class ItemTurret extends CooledTurret{
 
     @Override
     public int acceptStack(Item item, int amount, Tile tile, Unit source){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         BulletType type = ammo.get(item);
 
@@ -111,7 +111,7 @@ public class ItemTurret extends CooledTurret{
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
         if(entity == null) return;
 
         if(item == Items.pyratite){
@@ -144,7 +144,7 @@ public class ItemTurret extends CooledTurret{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         return ammo != null && ammo.get(item) != null && entity.totalAmmo + ammo.get(item).ammoMultiplier <= maxAmmo;
     }

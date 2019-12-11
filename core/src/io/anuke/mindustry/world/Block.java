@@ -25,6 +25,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.graphics.MultiPacker.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -94,6 +95,8 @@ public class Block extends BlockStorage{
     public boolean drawLiquidLight = true;
     /** Whether the config is positional and needs to be shifted. */
     public boolean posConfig;
+    /** Whether to periodically sync this block across the network.*/
+    public boolean sync;
     /** Whether this block uses conveyor-type placement mode.*/
     public boolean conveyorPlacement;
     /**
@@ -157,7 +160,6 @@ public class Block extends BlockStorage{
 
     public Block(String name){
         super(name);
-        this.description = Core.bundle.getOrNull("block." + name + ".description");
         this.solid = false;
     }
 
@@ -184,7 +186,7 @@ public class Block extends BlockStorage{
     }
 
     protected void updatePowerGraph(Tile tile){
-        TileEntity entity = tile.entity();
+        TileEntity entity = tile.ent();
 
         for(Tile other : getPowerConnections(tile, tempTiles)){
             if(other.entity.power != null){
@@ -298,7 +300,7 @@ public class Block extends BlockStorage{
     }
 
     public void drawLight(Tile tile){
-        if(hasLiquids && drawLiquidLight && tile.entity.liquids.current().lightColor.a > 0.001f){
+        if(tile.entity != null && hasLiquids && drawLiquidLight && tile.entity.liquids.current().lightColor.a > 0.001f){
             drawLiquidLight(tile, tile.entity.liquids.current(), tile.entity.liquids.smoothAmount());
         }
     }
@@ -396,11 +398,6 @@ public class Block extends BlockStorage{
     }
 
     @Override
-    public String localizedName(){
-        return localizedName;
-    }
-
-    @Override
     public void displayInfo(Table table){
         ContentDisplay.displayBlock(table, this);
     }
@@ -488,7 +485,7 @@ public class Block extends BlockStorage{
      * Called when this block is tapped to build a UI on the table.
      * {@link #configurable} must return true for this to be called.
      */
-    public void buildTable(Tile tile, Table table){
+    public void buildConfiguration(Tile tile, Table table){
     }
 
     /** Update table alignment after configuring.*/
@@ -560,7 +557,7 @@ public class Block extends BlockStorage{
             }else{
                 current = entity -> entity.liquids.current();
             }
-            bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName(),
+            bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
                     () -> current.get(entity).barColor(), () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
         }
 
@@ -765,10 +762,10 @@ public class Block extends BlockStorage{
     }
 
     @Override
-    public void createIcons(PixmapPacker packer, PixmapPacker editor){
-        super.createIcons(packer, editor);
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
 
-        editor.pack(name + "-icon-editor", Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)).crop());
+        packer.add(PageType.editor, name + "-icon-editor", Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)));
 
         if(!synthetic()){
             PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full));
@@ -808,7 +805,7 @@ public class Block extends BlockStorage{
             }
             last = out;
 
-            packer.pack(name, out);
+            packer.add(PageType.main, name, out);
         }
 
         if(generatedIcons.length > 1){
@@ -820,7 +817,7 @@ public class Block extends BlockStorage{
                     base.draw(Core.atlas.getPixmap(generatedIcons[i]));
                 }
             }
-            packer.pack("block-" + name + "-full", base);
+            packer.add(PageType.main, "block-" + name + "-full", base);
             generatedIcons = null;
             Arrays.fill(cicons, null);
         }
