@@ -61,8 +61,6 @@ public class Links{
             String key = "link." + name + ".description";
             String desc = Core.bundle.getOrNull(key);
             if(desc == null){
-                //String m = Core.bundle.get("missinglocale");
-                //Time.run(1f,()->{ui.showErrorMessage(m + "link." + name + ".description");});
                 missingLocales.add(key+"\n"); // <- LINE 62
                 desc = key;
             }
