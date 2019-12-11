@@ -39,7 +39,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class ServerControl implements ApplicationListener{
     private static final int roundExtraTime = 12;
-    //in bytes: 512 kb is max
     private static final int maxLogLength = 1024 * 512;
     private static final int commandSocketPort = 6859;
 

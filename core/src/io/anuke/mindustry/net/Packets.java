@@ -63,48 +63,6 @@ public class Packets{
 
     }
 
-    public static class ConnectPacket implements Packet{
-        public int version;
-        public String versionType;
-        public Array<String> mods;
-        public String name, uuid, usid;
-        public boolean mobile;
-        public int color;
-
-        @Override
-        public void write(ByteBuffer buffer){
-            buffer.putInt(Version.build);
-            TypeIO.writeString(buffer, versionType);
-            TypeIO.writeString(buffer, name);
-            TypeIO.writeString(buffer, usid);
-            buffer.put(mobile ? (byte)1 : 0);
-            buffer.putInt(color);
-            buffer.put(Base64Coder.decode(uuid));
-            buffer.put((byte)mods.size);
-            for(int i = 0; i < mods.size; i++){
-                TypeIO.writeString(buffer, mods.get(i));
-            }
-        }
-
-        @Override
-        public void read(ByteBuffer buffer){
-            version = buffer.getInt();
-            versionType = TypeIO.readString(buffer);
-            name = TypeIO.readString(buffer);
-            usid = TypeIO.readString(buffer);
-            mobile = buffer.get() == 1;
-            color = buffer.getInt();
-            byte[] idbytes = new byte[8];
-            buffer.get(idbytes);
-            uuid = new String(Base64Coder.encode(idbytes));
-            int totalMods = buffer.get();
-            mods = new Array<>(totalMods);
-            for(int i = 0; i < totalMods; i++){
-                mods.add(TypeIO.readString(buffer));
-            }
-        }
-    }
-
     public static class InvokePacket implements Packet{
         public byte type, priority;
 
@@ -188,6 +146,48 @@ public class Packets{
             id = buffer.getInt();
             data = new byte[buffer.getShort()];
             buffer.get(data);
+        }
+    }
+
+    public static class ConnectPacket implements Packet{
+        public int version;
+        public String versionType;
+        public Array<String> mods;
+        public String name, uuid, usid;
+        public boolean mobile;
+        public int color;
+
+        @Override
+        public void write(ByteBuffer buffer){
+            buffer.putInt(Version.build);
+            TypeIO.writeString(buffer, versionType);
+            TypeIO.writeString(buffer, name);
+            TypeIO.writeString(buffer, usid);
+            buffer.put(mobile ? (byte)1 : 0);
+            buffer.put(Base64Coder.decode(uuid));
+            buffer.put((byte)color);
+            buffer.put((byte)mods.size);
+            for(int i = 0; i < mods.size; i++){
+                TypeIO.writeString(buffer, mods.get(i));
+            }
+        }
+
+        @Override
+        public void read(ByteBuffer buffer){
+            version = buffer.getInt();
+            versionType = TypeIO.readString(buffer);
+            name = TypeIO.readString(buffer);
+            usid = TypeIO.readString(buffer);
+            mobile = buffer.get() == 1;
+            color = buffer.getInt();
+            byte[] idbytes = new byte[8];
+            buffer.get(idbytes);
+            uuid = new String(Base64Coder.encode(idbytes));
+            int totalMods = buffer.get();
+            mods = new Array<>(totalMods);
+            for(int i = 0; i < totalMods; i++){
+                mods.add(TypeIO.readString(buffer));
+            }
         }
     }
 }

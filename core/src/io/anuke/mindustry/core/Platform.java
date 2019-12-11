@@ -44,7 +44,7 @@ public interface Platform{
 
     /** Get the networking implementation.*/
     default NetProvider getNet(){
-        return new ArcNetImpl();
+        return new ArcNetProvider();
     }
 
     /** Gets the scripting implementation. */
