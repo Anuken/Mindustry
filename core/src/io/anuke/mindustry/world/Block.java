@@ -146,7 +146,7 @@ public class Block extends BlockStorage{
 
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] generatedIcons;
-    protected TextureRegion[] variantRegions, editorVariantRegions;
+    protected TextureRegion[] variantRegions, editorVariantRegions, depoweredRegions;
     protected TextureRegion region, editorIcon;
 
     protected static TextureRegion[][] cracks;
@@ -253,6 +253,14 @@ public class Block extends BlockStorage{
         Draw.colorl(0.2f, 0.1f + (1f - tile.entity.healthf())* 0.6f);
         Draw.rect(region, tile.drawx(), tile.drawy(), (id%4)*90);
         Draw.color();
+    }
+
+    public void drawDepowered(Tile tile){
+        if(tile.block() instanceof BuildBlock) return;
+        Draw.color(Color.gray);
+        Draw.alpha(0.5f);
+        Draw.rect(depoweredRegions[size], tile.drawx(), tile.drawy());
+        Draw.reset();
     }
 
     /** Draw the block overlay that is shown when a cursor is over the block. */
@@ -450,6 +458,11 @@ public class Block extends BlockStorage{
                     cracks[size - 1][i] = Core.atlas.find("cracks-" + size + "-" + i);
                 }
             }
+        }
+
+        depoweredRegions = new TextureRegion[8];
+        for(int i = 0; i < depoweredRegions.length; i++){
+            depoweredRegions[i] = Core.atlas.find("depowered-" + i);
         }
     }
 

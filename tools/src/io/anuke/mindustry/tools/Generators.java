@@ -22,6 +22,24 @@ public class Generators{
 
     public static void generate(){
 
+        ImagePacker.generate("depowered", () -> {
+            for(int size = 1; size <= 8; size++){
+                int dim = size * 32;
+
+                Image image = new Image(dim, dim);
+                Image output = new Image(image.width, image.height);
+
+                for(int x = 0; x < output.width; x++){
+                    for(int y = 0; y < output.height; y++){
+
+                        output.draw(x, y, Color.white);
+                    }
+                }
+
+                output.save("depowered-" + size);
+            }
+        });
+
         ImagePacker.generate("cracks", () -> {
             RidgedPerlin r = new RidgedPerlin(1, 3);
             for(int size = 1; size <= Block.maxCrackSize; size++){
