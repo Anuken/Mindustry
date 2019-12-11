@@ -38,8 +38,7 @@ public class Links{
         public LinkEntry(String name, String link, Color color){
             this.name = name;
             this.color = color;
-            String desc = Core.bundle.getOrNull("link." + name + ".description");
-            this.description = desc != null ? desc : "link." + name + ".description";
+            this.description = Core.bundle.getNotNull("link." + name + ".description");
             this.link = link;
 
             String title = Core.bundle.getOrNull("link." + name + ".title");
