@@ -460,7 +460,7 @@ public class Block extends BlockStorage{
     }
 
     /** Returns an internally cached region by ID. */
-    protected TextureRegion reg(int id){
+    public TextureRegion reg(int id){
         return cacheRegions[id];
     }
 

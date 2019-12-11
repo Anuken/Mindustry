@@ -56,7 +56,7 @@ public class BlockRenderer implements Disposable{
             for(int x = 0; x < world.width(); x++){
                 for(int y = 0; y < world.height(); y++){
                     Tile tile = world.rawTile(x, y);
-                    if(tile.block().hasShadow){
+                    if(tile.link().block().hasShadow){
                         Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                     }
                 }
@@ -158,7 +158,7 @@ public class BlockRenderer implements Disposable{
                 Draw.color(Color.white);
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                 //then draw the shadow
-                Draw.color(!tile.block().hasShadow ? Color.white : shadowColor);
+                Draw.color(!tile.link().block().hasShadow ? Color.white : shadowColor);
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
             }
 

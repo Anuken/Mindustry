@@ -4,6 +4,7 @@ import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.Graphics.*;
 import io.anuke.arc.Graphics.Cursor.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.ArcAnnotate.*;
@@ -20,6 +21,7 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.power.*;
 import io.anuke.mindustry.world.modules.*;
 
 import java.io.*;
@@ -45,6 +47,7 @@ public class BuildBlock extends Block{
         entityType = BuildEntity::new;
 
         buildBlocks[size - 1] = this;
+        hasShadow = false;
     }
 
     /** Returns a BuildBlock by size. */
@@ -183,19 +186,40 @@ public class BuildBlock extends Block{
 
         BuildEntity entity = tile.ent();
 
-        Shaders.blockbuild.color = Pal.accent;
+//        Shaders.blockbuild.color = Pal.accent;
+//
+//        Block target = entity.cblock == null ? entity.previous : entity.cblock;
+//
+//        if(target == null) return;
+//
+//        for(TextureRegion region : target.getGeneratedIcons()){
+//            Shaders.blockbuild.region = region;
+//            Shaders.blockbuild.progress = entity.progress;
+//
+//            Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.rotation() * 90 : 0);
+//            Draw.flush();
+//        }
 
-        Block target = entity.cblock == null ? entity.previous : entity.cblock;
+        ImpactReactor daddy = (ImpactReactor)Blocks.impactReactor;
 
-        if(target == null) return;
+        float R = 50 + (200f * entity.progress);
 
-        for(TextureRegion region : target.getGeneratedIcons()){
-            Shaders.blockbuild.region = region;
-            Shaders.blockbuild.progress = entity.progress;
+        Draw.color(Color.black);
+        Draw.alpha(0.75f);
+        Draw.rect(Core.atlas.find("impact-reactor-light"), tile.drawx(), tile.drawy(), R, R, Time.time() * (12 * 6f) * 0.25f);
+        Draw.blend();
 
-            Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.rotation() * 90 : 0);
-            Draw.flush();
+        for(int i = 0; i < daddy.plasmas; i++){
+            float r = (29f + Mathf.absin(Time.time(), 2f + i * 1f, 5f - i * 0.5f)) * entity.progress + 10f;
+
+            Draw.color(daddy.plasma1, daddy.plasma2, (float)i / daddy.plasmas);
+            Draw.color(Color.valueOf("1a4654"), Color.valueOf("72bcd4"), (float)i / daddy.plasmas);
+            Draw.alpha((0.3f + Mathf.absin(Time.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * 0.5f);
+            Draw.blend(Blending.additive);
+            Draw.rect(daddy.reg(daddy.plasmaRegions[i]), tile.drawx(), tile.drawy(), r, r, Time.time() * (12 + i * 6f) * 0.25f);
+            Draw.blend();
         }
+        Draw.color();
     }
 
     public class BuildEntity extends TileEntity{

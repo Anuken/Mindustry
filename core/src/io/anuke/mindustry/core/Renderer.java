@@ -242,7 +242,7 @@ public class Renderer implements ApplicationListener{
 
         blocks.drawDestroyed();
 
-        Draw.shader(Shaders.blockbuild, true);
+//        Draw.shader(Shaders.blockbuild, true);
         blocks.drawBlocks(Layer.placement);
         Draw.shader();
 
