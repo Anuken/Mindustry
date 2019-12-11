@@ -21,6 +21,7 @@ public class Cultivator extends GenericCrafter{
 
     protected TextureRegion middleRegion, topRegion;
     protected RandomXS128 random = new RandomXS128(0);
+    protected float recurrence = 6f;
     public Attribute attribute = Attribute.spores;
 
     public Cultivator(String name){
