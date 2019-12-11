@@ -1360,7 +1360,7 @@ public class Blocks implements ContentList{
             ammo(
             Items.graphite, Bullets.artilleryDense,
             Items.silicon, Bullets.artilleryHoming,
-            Items.pyratite, Bullets.artlleryIncendiary
+            Items.pyratite, Bullets.artilleryIncendiary
             );
             reload = 60f;
             recoil = 2f;
@@ -1540,7 +1540,7 @@ public class Blocks implements ContentList{
             ammo(
             Items.graphite, Bullets.artilleryDense,
             Items.silicon, Bullets.artilleryHoming,
-            Items.pyratite, Bullets.artlleryIncendiary,
+            Items.pyratite, Bullets.artilleryIncendiary,
             Items.blastCompound, Bullets.artilleryExplosive,
             Items.plastanium, Bullets.arilleryPlastic
             );
