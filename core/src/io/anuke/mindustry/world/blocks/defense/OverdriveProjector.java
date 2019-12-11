@@ -6,6 +6,8 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.traits.ProjectorTrait;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
@@ -77,6 +79,7 @@ public class OverdriveProjector extends Block{
         OverdriveEntity entity = tile.ent();
         entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() ? 1f : 0f, 0.08f);
         entity.charge += entity.heat * Time.delta();
+        entity.rangeProg = Mathf.lerpDelta(entity.rangeProg, entity.power.status > 0 ? 1f : 0f, 0.05f);
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
@@ -138,10 +141,11 @@ public class OverdriveProjector extends Block{
         Draw.reset();
     }
 
-    class OverdriveEntity extends TileEntity{
+    class OverdriveEntity extends TileEntity implements ProjectorTrait{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
+        float rangeProg;
 
         @Override
         public void write(DataOutput stream) throws IOException{
@@ -155,6 +159,57 @@ public class OverdriveProjector extends Block{
             super.read(stream, revision);
             heat = stream.readFloat();
             phaseHeat = stream.readFloat();
+        }
+
+        float realRadius(){
+            return (range + phaseHeat * phaseRangeBoost) * rangeProg;
+        }
+
+        @Override
+        public void draw(){
+            if(Core.settings.getBool("overdriveprojection")){
+                Draw.color(color);
+                Fill.circle(x, y, realRadius());
+                Draw.color();
+            }
+        }
+
+        public void drawOver(){
+            if(Core.settings.getBool("overdriveprojection")){
+                Draw.color(Color.white);
+                Draw.alpha(1f - power.status);
+                Fill.circle(x, y, realRadius());
+                Draw.color();
+            }
+        }
+
+        public void drawSimple(){
+            if(Core.settings.getBool("overdriveprojection")){
+                float rad = realRadius();
+
+                Draw.color(color);
+                Lines.stroke(1.5f);
+                Draw.alpha(0.17f);
+                Fill.circle(x, y, rad);
+                Draw.alpha(1f);
+                Lines.circle(x, y, rad);
+                Draw.reset();
+            }
+        }
+
+        @Override
+        public Color accent(){
+            return color;
+        }
+
+        @Override
+        public String projectorSet(){
+            return "OverdriveSet";
+        }
+
+        @Override
+        public EntityGroup targetGroup(){
+            return projectorGroup;
         }
     }
 }

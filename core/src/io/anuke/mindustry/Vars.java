@@ -180,7 +180,7 @@ public class Vars implements Loadable{
     public static EntityGroup<Bullet> bulletGroup;
     public static EntityGroup<EffectEntity> effectGroup;
     public static EntityGroup<DrawTrait> groundEffectGroup;
-    public static EntityGroup<ShieldEntity> shieldGroup;
+    public static EntityGroup<ProjectorTrait> projectorGroup;
     public static EntityGroup<Puddle> puddleGroup;
     public static EntityGroup<Fire> fireGroup;
     public static EntityGroup<BaseUnit>[] unitGroups;
@@ -235,7 +235,7 @@ public class Vars implements Loadable{
         effectGroup = entities.add(EffectEntity.class, false);
         groundEffectGroup = entities.add(DrawTrait.class, false);
         puddleGroup = entities.add(Puddle.class).enableMapping();
-        shieldGroup = entities.add(ShieldEntity.class, false);
+        projectorGroup = entities.add(ProjectorTrait.class, false);
         fireGroup = entities.add(Fire.class).enableMapping();
         unitGroups = new EntityGroup[Team.all.length];
 
@@ -250,7 +250,10 @@ public class Vars implements Loadable{
                 }
             });
         }
-
+        
+        projectorGroup.setAddListener(ProjectorTrait::onAddProjector);
+        projectorGroup.setRemoveListener(ProjectorTrait::onRemoveProjector);
+        
         state = new GameState();
         data = new GlobalData();
 
