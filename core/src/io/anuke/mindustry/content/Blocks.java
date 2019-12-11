@@ -1049,10 +1049,11 @@ public class Blocks implements ContentList{
             laserRange = 30f;
         }};
 
-        pylon = new PowerNode("pylon"){{
+        pylon = new Pylon("pylon"){{
             requirements(Category.power, ItemStack.with(Items.titanium, 100));
-            size = 2;
+            size = 1;
             maxNodes = 0;
+            laserRange = 11;
         }};
 
         diode = new PowerDiode("diode"){{
