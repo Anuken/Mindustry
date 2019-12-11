@@ -244,7 +244,7 @@ public class Generators{
                 for(int i = 0; i < 3; i++){
                     //get base image to draw on
                     Image image = new Image(32, 32);
-                    Image shadow = ImagePacker.get(item.name + (i + 1));
+                    Image shadow = ImagePacker.get(item.name + "-" + (i + 1));
 
                     int offset = image.width / tilesize - 1;
 
@@ -260,9 +260,9 @@ public class Generators{
                         }
                     }
 
-                    image.draw(ImagePacker.get(item.name + (i + 1)));
-                    image.save("../blocks/environment/ore-" + item.name + (i + 1));
-                    image.save("../editor/editor-ore-" + item.name + (i + 1));
+                    image.draw(ImagePacker.get(item.name + "-" + (i + 1)));
+                    image.save("../blocks/environment/" + ore.name + "-" + (i + 1));
+                    image.save("../editor/editor-" + ore.name + "-" + (i + 1));
 
                     //save icons
                     image.save("block-" + ore.name + "-full");

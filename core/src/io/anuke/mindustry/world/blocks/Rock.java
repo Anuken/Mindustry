@@ -38,7 +38,7 @@ public class Rock extends Block{
             variantRegions = new TextureRegion[variants];
 
             for(int i = 0; i < variants; i++){
-                variantRegions[i] = Core.atlas.find(name + (i + 1));
+                variantRegions[i] = Core.atlas.find(name + "-" + (i + 1));
             }
         }
     }

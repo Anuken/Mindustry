@@ -39,7 +39,7 @@ public class OreBlock extends OverlayFloor{
     public void createIcons(MultiPacker packer){
         for(int i = 0; i < variants; i++){
             Pixmap image = new Pixmap(32, 32);
-            PixmapRegion shadow = Core.atlas.getPixmap(itemDrop.name + (i + 1));
+            PixmapRegion shadow = Core.atlas.getPixmap(name + "-" + (i + 1));
 
             int offset = image.getWidth() / tilesize - 1;
             Color color = new Color();
@@ -57,8 +57,8 @@ public class OreBlock extends OverlayFloor{
 
             image.draw(shadow);
 
-            packer.add(PageType.environment, name + (i + 1), image);
-            packer.add(PageType.editor, "editor-" + name + (i + 1), image);
+            packer.add(PageType.environment, name + "-" + (i + 1), image);
+            packer.add(PageType.editor, "editor-" + name + "-" + (i + 1), image);
 
             if(i == 0){
                 packer.add(PageType.editor, "editor-block-" + name + "-full", image);
@@ -80,6 +80,6 @@ public class OreBlock extends OverlayFloor{
 
     @Override
     public String getDisplayName(Tile tile){
-        return itemDrop.localizedName;
+        return localizedName;
     }
 }

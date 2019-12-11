@@ -27,7 +27,7 @@ public class Wall extends Block{
             variantRegions = new TextureRegion[variants];
 
             for(int i = 0; i < variants; i++){
-                variantRegions[i] = Core.atlas.find(name + (i + 1));
+                variantRegions[i] = Core.atlas.find(name + "-" + (i + 1));
             }
             region = variantRegions[0];
         }
@@ -44,7 +44,7 @@ public class Wall extends Block{
 
     @Override
     public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
+        return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "-1")};
     }
 
     @Override

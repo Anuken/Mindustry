@@ -72,7 +72,7 @@ public class Floor extends Block{
             variantRegions = new TextureRegion[variants];
 
             for(int i = 0; i < variants; i++){
-                variantRegions[i] = Core.atlas.find(name + (i + 1));
+                variantRegions[i] = Core.atlas.find(name + "-" + (i + 1));
             }
         }else{
             variantRegions = new TextureRegion[1];
@@ -98,7 +98,7 @@ public class Floor extends Block{
 
         if(variants > 0){
             for(int i = 0; i < variants; i++){
-                String rname = name + (i + 1);
+                String rname = name + "-" + (i + 1);
                 packer.add(PageType.editor, "editor-" + rname, Core.atlas.getPixmap(rname).crop());
             }
         }
