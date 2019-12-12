@@ -149,8 +149,8 @@ public class DesktopInput extends InputHandler{
 
         if(state.is(State.menu) || Core.scene.hasDialog()) return;
 
-        //zoom things
-        if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (block == null || !block.rotate) && selectRequests.isEmpty()){
+        //zoom camera
+        if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((block == null || !block.rotate) && selectRequests.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
@@ -182,7 +182,7 @@ public class DesktopInput extends InputHandler{
             selectScale = 0f;
         }
 
-        if(Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0){
+        if(!Core.input.keyDown(Binding.diagonal_placement) && Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0){
             rotation = Mathf.mod(rotation + (int)Core.input.axisTap(Binding.rotate), 4);
 
             if(sreq != null){
