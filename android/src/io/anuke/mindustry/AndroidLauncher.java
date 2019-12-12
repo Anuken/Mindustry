@@ -12,7 +12,7 @@ import android.telephony.*;
 import io.anuke.arc.*;
 import io.anuke.arc.backends.android.surfaceview.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.func.Cons;
+import io.anuke.arc.func.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.*;
@@ -63,6 +63,11 @@ public class AndroidLauncher extends AndroidApplication{
                 }catch(Exception e){
                     return super.getUUID();
                 }
+            }
+
+            @Override
+            public org.mozilla.javascript.Context getScriptContext(){
+                return AndroidRhinoContext.enter(getContext().getCacheDir());
             }
 
             @Override

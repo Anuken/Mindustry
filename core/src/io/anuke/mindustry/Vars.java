@@ -15,6 +15,7 @@ import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.maps.*;
@@ -25,14 +26,14 @@ import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 import java.nio.charset.*;
 import java.util.*;
 
-import static io.anuke.arc.Core.*;
+import static io.anuke.arc.Core.settings;
 
 @SuppressWarnings("unchecked")
 public class Vars implements Loadable{
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
-    /** Maximum number of broken blocks. TODO implement or remove.*/
-    public static final int maxBrokenBlocks = 256;
+    /** Whether the logger is loaded. */
+    public static boolean loadedLogger = false;
     /** Maximum schematic size.*/
     public static final int maxSchematicSize = 32;
     /** All schematic base64 starts with this string.*/
@@ -48,13 +49,15 @@ public class Vars implements Loadable{
     /** URL for discord invite. */
     public static final String discordURL = "https://discord.gg/mindustry";
     /** URL for sending crash reports to */
-    public static final String crashReportURL = "http://mins.us.to/report";
+    public static final String crashReportURL = "http://192.99.169.18/report";
     /** URL the links to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/";
+    /** URL to the JSON file containing all the global, public servers. */
+    public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers.json";
     /** URL the links to the wiki's modding guide.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?template=bug_report.md";
     /** list of built-in servers.*/
-    public static final Array<String> defaultServers = Array.with(/*"mins.us.to"*/);
+    public static final Array<String> defaultServers = Array.with();
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
     /** team of the player by default */
@@ -118,6 +121,8 @@ public class Vars implements Loadable{
     public static boolean headless;
     /** whether steam is enabled for this game */
     public static boolean steam;
+    /** whether typing into the console is enabled - developers only */
+    public static boolean enableConsole = false;
     /** application data directory, equivalent to {@link io.anuke.arc.Settings#getDataDirectory()} */
     public static FileHandle dataDirectory;
     /** data subdirectory used for screenshots */
@@ -268,6 +273,31 @@ public class Vars implements Loadable{
         maps.load();
     }
 
+    public static void loadLogger(){
+        if(loadedLogger) return;
+
+        String[] tags = {"[green][D][]", "[royal][I][]", "[yellow][W][]", "[scarlet][E][]", ""};
+        String[] stags = {"&lc&fb[D]", "&lg&fb[I]", "&ly&fb[W]", "&lr&fb[E]", ""};
+
+        Array<String> logBuffer = new Array<>();
+        Log.setLogger((level, text, args) -> {
+            String result = Log.format(text, args);
+            System.out.println(Log.format(stags[level.ordinal()] + "&fr " + text, args));
+
+            result = tags[level.ordinal()] + " " + result;
+
+            if(!headless && (ui == null || ui.scriptfrag == null)){
+                logBuffer.add(result);
+            }else if(!headless){
+                ui.scriptfrag.addMessage(result);
+            }
+        });
+
+        Events.on(ClientLoadEvent.class, e -> logBuffer.each(ui.scriptfrag::addMessage));
+
+        loadedLogger = true;
+    }
+
     public static void loadSettings(){
         Core.settings.setAppName(appName);
 
@@ -275,7 +305,7 @@ public class Vars implements Loadable{
             Core.settings.setDataDirectory(Core.files.local("saves/"));
         }
 
-        Core.settings.defaults("locale", "default");
+        Core.settings.defaults("locale", "default", "blocksync", true);
         Core.keybinds.setDefaults(Binding.values());
         Core.settings.load();
 

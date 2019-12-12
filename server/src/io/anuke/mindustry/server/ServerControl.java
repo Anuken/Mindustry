@@ -39,9 +39,11 @@ import static io.anuke.mindustry.Vars.*;
 
 public class ServerControl implements ApplicationListener{
     private static final int roundExtraTime = 12;
-    //in bytes: 512 kb is max
     private static final int maxLogLength = 1024 * 512;
     private static final int commandSocketPort = 6859;
+
+    protected static String[] tags = {"&lc&fb[D]", "&lg&fb[I]", "&ly&fb[W]", "&lr&fb[E]", ""};
+    protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");
 
     private final CommandHandler handler = new CommandHandler("");
     private final FileHandle logFolder = Core.settings.getDataDirectory().child("logs/");
@@ -60,7 +62,7 @@ public class ServerControl implements ApplicationListener{
             "shufflemode", "normal",
             "bans", "",
             "admins", "",
-            "shufflemode", "all",
+            "shufflemode", "custom",
             "crashreport", false,
             "port", port,
             "logging", true,
@@ -68,44 +70,19 @@ public class ServerControl implements ApplicationListener{
             "globalrules", "{reactorExplosions: false}"
         );
 
-        Log.setLogger(new LogHandler(){
-            DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");
+        Log.setLogger((level, text, args1) -> {
+            String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr", args1);
+            System.out.println(result);
 
-            @Override
-            public void debug(String text, Object... args){
-                print("&lc&fb" + "[DEBG] " + text, args);
+            if(Core.settings.getBool("logging")){
+                logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr", false, args1));
             }
 
-            @Override
-            public void info(String text, Object... args){
-                print("&lg&fb" + "[INFO] " + text, args);
-            }
-
-            @Override
-            public void err(String text, Object... args){
-                print("&lr&fb" + "[ERR!] " + text, args);
-            }
-
-            @Override
-            public void warn(String text, Object... args){
-                print("&ly&fb" + "[WARN] " + text, args);
-            }
-
-            @Override
-            public void print(String text, Object... args){
-                String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", args);
-                System.out.println(result);
-
-                if(Core.settings.getBool("logging")){
-                    logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", false, args));
-                }
-
-                if(socketOutput != null){
-                    try{
-                        socketOutput.println(format(text + "&fr", false, args).replace("[DEBG] ", "").replace("[WARN] ", "").replace("[INFO] ", "").replace("[ERR!] ", ""));
-                    }catch(Throwable e){
-                        err("Error occurred logging to socket: {0}", e.getClass().getSimpleName());
-                    }
+            if(socketOutput != null){
+                try{
+                    socketOutput.println(format(text + "&fr", false, args1));
+                }catch(Throwable e){
+                    err("Error occurred logging to socket: {0}", e.getClass().getSimpleName());
                 }
             }
         });
@@ -336,7 +313,7 @@ public class ServerControl implements ApplicationListener{
             if(!mods.all().isEmpty()){
                 info("Mods:");
                 for(LoadedMod mod : mods.all()){
-                    info("  &ly{0} &lcv{1}", mod.meta.name, mod.meta.version);
+                    info("  &ly{0} &lcv{1}", mod.meta.displayName(), mod.meta.version);
                 }
             }else{
                 info("No mods found.");
@@ -347,7 +324,8 @@ public class ServerControl implements ApplicationListener{
         handler.register("mod", "<name...>", "Display information about a loaded plugin.", arg -> {
             LoadedMod mod = mods.all().find(p -> p.meta.name.equalsIgnoreCase(arg[0]));
             if(mod != null){
-                info("Name: &ly{0}", mod.meta.name);
+                info("Name: &ly{0}", mod.meta.displayName());
+                info("Internal Name: &ly{0}", mod.name);
                 info("Version: &ly{0}", mod.meta.version);
                 info("Author: &ly{0}", mod.meta.author);
                 info("Path: &ly{0}", mod.file.path());
@@ -355,6 +333,10 @@ public class ServerControl implements ApplicationListener{
             }else{
                 info("No mod with name &ly'{0}'&lg found.");
             }
+        });
+
+        handler.register("js", "<script...>", "Run arbitrary Javascript.", arg -> {
+            info("&lc" + mods.getScripts().runConsole(arg[0]));
         });
 
         handler.register("say", "<message...>", "Send a message to all players.", arg -> {
@@ -525,6 +507,16 @@ public class ServerControl implements ApplicationListener{
 
             netServer.admins.unwhitelist(arg[0]);
             info("Player &ly'{0}'&lg has been un-whitelisted.", info.lastName);
+        });
+
+        handler.register("sync", "[on/off...]", "Enable/disable block sync. Experimental.", arg -> {
+            if(arg.length == 0){
+                info("Block sync is currently &lc{0}.", Core.settings.getBool("blocksync") ? "enabled" : "disabled");
+                return;
+            }
+            boolean on = arg[0].equalsIgnoreCase("on");
+            Core.settings.putSave("blocksync", on);
+            info("Block syncing is now &lc{0}.", on ? "on" : "off");
         });
 
         handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {

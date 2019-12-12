@@ -11,13 +11,13 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 public class ShockMine extends Block{
-    protected int timerDamage = timers++;
+    public final int timerDamage = timers++;
 
-    protected float cooldown = 80f;
-    protected float tileDamage = 5f;
-    protected float damage = 13;
-    protected int length = 10;
-    protected int tendrils = 6;
+    public float cooldown = 80f;
+    public float tileDamage = 5f;
+    public float damage = 13;
+    public int length = 10;
+    public int tendrils = 6;
 
     public ShockMine(String name){
         super(name);

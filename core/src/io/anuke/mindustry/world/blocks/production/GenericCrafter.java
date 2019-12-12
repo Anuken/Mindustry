@@ -17,16 +17,16 @@ import io.anuke.mindustry.world.meta.*;
 import java.io.*;
 
 public class GenericCrafter extends Block{
-    protected ItemStack outputItem;
-    protected LiquidStack outputLiquid;
+    public ItemStack outputItem;
+    public LiquidStack outputLiquid;
 
-    protected float craftTime = 80;
-    protected Effect craftEffect = Fx.none;
-    protected Effect updateEffect = Fx.none;
-    protected float updateEffectChance = 0.04f;
+    public float craftTime = 80;
+    public Effect craftEffect = Fx.none;
+    public Effect updateEffect = Fx.none;
+    public float updateEffectChance = 0.04f;
 
-    protected Cons<Tile> drawer = null;
-    protected Prov<TextureRegion[]> drawIcons = null;
+    public Cons<Tile> drawer = null;
+    public Prov<TextureRegion[]> drawIcons = null;
 
     public GenericCrafter(String name){
         super(name);
@@ -35,6 +35,7 @@ public class GenericCrafter extends Block{
         hasItems = true;
         health = 60;
         idleSound = Sounds.machine;
+        sync = true;
         idleSoundVolume = 0.03f;
         entityType = GenericCrafterEntity::new;
     }
@@ -85,7 +86,7 @@ public class GenericCrafter extends Block{
 
     @Override
     public void update(Tile tile){
-        GenericCrafterEntity entity = tile.entity();
+        GenericCrafterEntity entity = tile.ent();
 
         if(entity.cons.valid()){
 

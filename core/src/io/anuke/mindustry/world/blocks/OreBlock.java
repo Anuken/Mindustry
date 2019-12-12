@@ -4,6 +4,8 @@ import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.graphics.MultiPacker.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
@@ -14,7 +16,7 @@ public class OreBlock extends OverlayFloor{
 
     public OreBlock(Item ore){
         super("ore-" + ore.name);
-        this.localizedName = ore.localizedName();
+        this.localizedName = ore.localizedName;
         this.itemDrop = ore;
         this.variants = 3;
         this.color.set(ore.color);
@@ -27,14 +29,14 @@ public class OreBlock extends OverlayFloor{
     }
 
     public void setup(Item ore){
-        this.localizedName = ore.localizedName();
+        this.localizedName = ore.localizedName;
         this.itemDrop = ore;
         this.color.set(ore.color);
     }
 
     @Override
     @OverrideCallSuper
-    public void createIcons(PixmapPacker out, PixmapPacker editor){
+    public void createIcons(MultiPacker packer){
         for(int i = 0; i < variants; i++){
             Pixmap image = new Pixmap(32, 32);
             PixmapRegion shadow = Core.atlas.getPixmap(itemDrop.name + (i + 1));
@@ -55,12 +57,12 @@ public class OreBlock extends OverlayFloor{
 
             image.draw(shadow);
 
-            out.pack(name + (i + 1), image);
-            editor.pack("editor-" + name + (i + 1), image);
+            packer.add(PageType.environment, name + (i + 1), image);
+            packer.add(PageType.editor, "editor-" + name + (i + 1), image);
 
             if(i == 0){
-                editor.pack("editor-block-" + name + "-full", image);
-                out.pack("block-" + name + "-full", image);
+                packer.add(PageType.editor, "editor-block-" + name + "-full", image);
+                packer.add(PageType.main, "block-" + name + "-full", image);
             }
         }
     }
@@ -78,6 +80,6 @@ public class OreBlock extends OverlayFloor{
 
     @Override
     public String getDisplayName(Tile tile){
-        return itemDrop.localizedName();
+        return itemDrop.localizedName;
     }
 }

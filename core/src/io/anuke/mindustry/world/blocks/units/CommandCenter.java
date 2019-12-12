@@ -45,8 +45,8 @@ public class CommandCenter extends Block{
         ObjectSet<Tile> set = indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter);
 
         if(set.size > 0){
-            CommandCenterEntity entity = tile.entity();
-            CommandCenterEntity oe = set.first().entity();
+            CommandCenterEntity entity = tile.ent();
+            CommandCenterEntity oe = set.first().ent();
             entity.command = oe.command;
         }
     }
@@ -75,7 +75,7 @@ public class CommandCenter extends Block{
 
     @Override
     public void draw(Tile tile){
-        CommandCenterEntity entity = tile.entity();
+        CommandCenterEntity entity = tile.ent();
         super.draw(tile);
 
         float size = IconSize.small.size/4f;
@@ -88,8 +88,8 @@ public class CommandCenter extends Block{
     }
 
     @Override
-    public void buildTable(Tile tile, Table table){
-        CommandCenterEntity entity = tile.entity();
+    public void buildConfiguration(Tile tile, Table table){
+        CommandCenterEntity entity = tile.ent();
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         Table buttons = new Table();
 
@@ -109,7 +109,7 @@ public class CommandCenter extends Block{
 
         for(Tile center : indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter)){
             if(center.block() instanceof CommandCenter){
-                CommandCenterEntity entity = center.entity();
+                CommandCenterEntity entity = center.ent();
                 entity.command = command;
             }
         }

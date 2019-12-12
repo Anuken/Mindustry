@@ -20,20 +20,20 @@ import static io.anuke.mindustry.Vars.*;
  * Liquids will take priority over items.
  */
 public class ItemLiquidGenerator extends PowerGenerator{
-    protected float minItemEfficiency = 0.2f;
+    public float minItemEfficiency = 0.2f;
     /** The time in number of ticks during which a single item will produce power. */
-    protected float itemDuration = 70f;
+    public float itemDuration = 70f;
 
-    protected float minLiquidEfficiency = 0.2f;
+    public float minLiquidEfficiency = 0.2f;
     /** Maximum liquid used per frame. */
-    protected float maxLiquidGenerate = 0.4f;
+    public float maxLiquidGenerate = 0.4f;
 
-    protected Effect generateEffect = Fx.generatespark;
-    protected Effect explodeEffect = Fx.generatespark;
-    protected Color heatColor = Color.valueOf("ff9b59");
-    protected TextureRegion topRegion, liquidRegion;
-    protected boolean randomlyExplode = true;
-    protected boolean defaults = false;
+    public Effect generateEffect = Fx.generatespark;
+    public Effect explodeEffect = Fx.generatespark;
+    public Color heatColor = Color.valueOf("ff9b59");
+    public TextureRegion topRegion, liquidRegion;
+    public boolean randomlyExplode = true;
+    public boolean defaults = false;
 
     public ItemLiquidGenerator(boolean hasItems, boolean hasLiquids, String name){
         this(name);
@@ -87,13 +87,13 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
     @Override
     public boolean productionValid(Tile tile){
-        ItemLiquidGeneratorEntity entity = tile.entity();
+        ItemLiquidGeneratorEntity entity = tile.ent();
         return entity.generateTime > 0;
     }
 
     @Override
     public void update(Tile tile){
-        ItemLiquidGeneratorEntity entity = tile.entity();
+        ItemLiquidGeneratorEntity entity = tile.ent();
 
         //Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.
         //Power amount is delta'd by PowerGraph class already.
@@ -156,7 +156,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
     public void draw(Tile tile){
         super.draw(tile);
 
-        ItemLiquidGeneratorEntity entity = tile.entity();
+        ItemLiquidGeneratorEntity entity = tile.ent();
 
         if(hasItems){
             Draw.color(heatColor);
@@ -175,7 +175,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
     @Override
     public void drawLight(Tile tile){
-        ItemLiquidGeneratorEntity entity = tile.entity();
+        ItemLiquidGeneratorEntity entity = tile.ent();
 
         renderer.lights.add(tile.drawx(), tile.drawy(), (60f + Mathf.absin(10f, 5f)) * entity.productionEfficiency * size, Color.orange, 0.5f);
     }

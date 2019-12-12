@@ -9,24 +9,18 @@ import io.anuke.arc.backends.sdl.jni.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.func.*;
-import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
-import io.anuke.arc.scene.event.*;
-import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.Log.*;
-import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.core.Version;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.desktop.steam.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.*;
 
 import java.io.*;
 import java.net.*;
@@ -49,6 +43,7 @@ public class DesktopLauncher extends ClientLauncher{
 
     public static void main(String[] arg){
         try{
+            Vars.loadLogger();
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
                 title = "Mindustry";
                 maximized = true;
@@ -64,7 +59,6 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     public DesktopLauncher(String[] args){
-        Log.setUseColors(false);
         Version.init();
         boolean useSteam = Version.modifier.contains("steam");
         testMobile = Array.with(args).contains("-testMobile");
@@ -91,50 +85,7 @@ public class DesktopLauncher extends ClientLauncher{
                 }
             }
 
-            StringBuilder base = new StringBuilder();
-            Log.setLogger(new LogHandler(){
-                  @Override
-                  public void print(String text, Object... args){
-                      String out = Log.format(text, false, args);
-
-                      base.append(out).append("\n");
-                  }
-            });
-
             Events.on(ClientLoadEvent.class, event -> {
-                Label[] label = {null};
-                boolean[] visible = {false};
-                Core.scene.table(t -> {
-                    t.touchable(Touchable.disabled);
-                    t.top().left();
-                    t.update(() -> {
-                        if(Core.input.keyTap(KeyCode.BACKTICK) && (loadError || System.getProperty("user.name").equals("anuke") || Version.modifier.contains("beta"))){
-                            visible[0] = !visible[0];
-                        }
-
-                        t.toFront();
-                    });
-                    t.table(Styles.black3, f -> label[0] = f.add("").get()).visible(() -> visible[0]);
-                    label[0].getText().append(base);
-                });
-
-                Log.setLogger(new LogHandler(){
-                    @Override
-                    public void print(String text, Object... args){
-                        super.print(text, args);
-                        String out = Log.format(text, false, args);
-
-                        int maxlen = 2048;
-
-                        if(label[0].getText().length() > maxlen){
-                            label[0].setText(label[0].getText().substring(label[0].getText().length() - maxlen));
-                        }
-
-                        label[0].getText().append(out).append("\n");
-                        label[0].invalidateHierarchy();
-                    }
-                });
-
                 if(steamError != null){
                     Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> {
                         ui.showErrorMessage(Core.bundle.format("steam.error", (steamError.getMessage() == null) ? steamError.getClass().getSimpleName() : steamError.getClass().getSimpleName() + ": " + steamError.getMessage()));
@@ -156,6 +107,9 @@ public class DesktopLauncher extends ClientLauncher{
                 if(SteamAPI.restartAppIfNecessary(SVars.steamID)){
                     System.exit(0);
                 }
+            }catch(NullPointerException ignored){
+                steam = false;
+                Log.info("Running in offline mode.");
             }catch(Throwable e){
                 steam = false;
                 Log.err("Failed to load Steam native libraries.");
@@ -176,21 +130,8 @@ public class DesktopLauncher extends ClientLauncher{
         }
     }
 
-    void fallbackSteam(){
-        try{
-            String name = "steam_api";
-            if(OS.isMac || OS.isLinux) name = "lib" + name;
-            if(OS.isWindows && OS.is64Bit) name += "64";
-            name += (OS.isLinux ? ".so" : OS.isMac ? ".dylib" : ".dll");
-            Streams.copyStream(getClass().getResourceAsStream(name), new FileOutputStream(name));
-            System.loadLibrary(new File(name).getAbsolutePath());
-        }catch(Throwable e){
-            logSteamError(e);
-        }
-    }
-
     void initSteam(String[] args){
-        SVars.net = new SNet(new ArcNetImpl());
+        SVars.net = new SNet(new ArcNetProvider());
         SVars.stats = new SStats();
         SVars.workshop = new SWorkshop();
         SVars.user = new SUser();
@@ -281,7 +222,7 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public NetProvider getNet(){
-        return steam ? SVars.net : new ArcNetImpl();
+        return steam ? SVars.net : new ArcNetProvider();
     }
 
     @Override

@@ -1,25 +1,22 @@
 package io.anuke.mindustry.entities.effect;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.collection.IntMap;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Fill;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.pooling.Pool.Poolable;
-import io.anuke.arc.util.pooling.Pools;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.pooling.Pool.*;
+import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.type.SolidEntity;
 import io.anuke.mindustry.entities.traits.*;
-import io.anuke.mindustry.type.TypeID;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
 
 import java.io.*;
 
@@ -118,7 +115,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
         (liquid.flammability > 0.3f && dest.temperature > 0.7f)){ //flammable liquid + hot liquid
             Fire.create(tile);
             if(Mathf.chance(0.006 * amount)){
-                Call.createBullet(Bullets.fireball, x, y, Mathf.random(360f));
+                Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), 1f, 1f);
             }
         }else if(dest.temperature > 0.7f && liquid.temperature < 0.55f){ //cold liquid poured onto hot puddle
             if(Mathf.chance(0.5f * amount)){

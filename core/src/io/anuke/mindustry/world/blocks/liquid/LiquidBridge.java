@@ -21,7 +21,7 @@ public class LiquidBridge extends ItemBridge{
 
     @Override
     public void update(Tile tile){
-        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity entity = tile.ent();
 
         entity.time += entity.cycleSpeed * Time.delta();
         entity.time2 += (entity.cycleSpeed - 1f) * Time.delta();
@@ -30,6 +30,8 @@ public class LiquidBridge extends ItemBridge{
         if(!linkValid(tile, other)){
             tryDumpLiquid(tile, entity.liquids.current());
         }else{
+            ((ItemBridgeEntity)world.tile(entity.link).entity).incoming.add(tile.pos());
+
             if(entity.cons.valid()){
                 float alpha = 0.04f;
                 if(hasPower){

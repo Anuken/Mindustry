@@ -6,11 +6,11 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
 public class Fracker extends SolidPump{
-    protected final float itemUseTime = 100f;
+    public float itemUseTime = 100f;
 
-    protected TextureRegion liquidRegion;
-    protected TextureRegion rotatorRegion;
-    protected TextureRegion topRegion;
+    public TextureRegion liquidRegion;
+    public TextureRegion rotatorRegion;
+    public TextureRegion topRegion;
 
     public Fracker(String name){
         super(name);
@@ -49,7 +49,7 @@ public class Fracker extends SolidPump{
 
     @Override
     public void draw(Tile tile){
-        FrackerEntity entity = tile.entity();
+        FrackerEntity entity = tile.ent();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
         super.drawCracks(tile);
@@ -70,7 +70,7 @@ public class Fracker extends SolidPump{
 
     @Override
     public void update(Tile tile){
-        FrackerEntity entity = tile.entity();
+        FrackerEntity entity = tile.ent();
 
         if(entity.cons.valid()){
             if(entity.accumulator >= itemUseTime){

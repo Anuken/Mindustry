@@ -2,7 +2,6 @@ package io.anuke.mindustry.entities.traits;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.Queue;
-import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
@@ -35,14 +34,14 @@ public interface BuilderTrait extends Entity, TeamTrait{
         float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : placeDistance;
         Unit unit = (Unit)this;
 
-        //remove already completed build requests
-        removal.clear();
-        removal.addAll(buildQueue());
-
-        Structs.filter(buildQueue(), req -> {
+        Iterator<BuildRequest> it = buildQueue().iterator();
+        while(it.hasNext()){
+            BuildRequest req = it.next();
             Tile tile = world.tile(req.x, req.y);
-            return tile == null || (req.breaking && tile.block() == Blocks.air) || (!req.breaking && (tile.rotation() == req.rotation || !req.block.rotate) && tile.block() == req.block);
-        });
+            if(tile == null || (req.breaking && tile.block() == Blocks.air) || (!req.breaking && (tile.rotation() == req.rotation || !req.block.rotate) && tile.block() == req.block)){
+                it.remove();
+            }
+        }
 
         TileEntity core = unit.getClosestCore();
 
@@ -61,6 +60,8 @@ public interface BuilderTrait extends Entity, TeamTrait{
         }
 
         BuildRequest current = buildRequest();
+
+        if(dst(current.tile()) > finalPlaceDst) return;
 
         Tile tile = world.tile(current.x, current.y);
 
@@ -86,7 +87,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
         }
 
         //otherwise, update it.
-        BuildEntity entity = tile.entity();
+        BuildEntity entity = tile.ent();
 
         if(entity == null){
             return;
@@ -208,7 +209,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
         }
         Tile tile = world.tile(place.x, place.y);
         if(tile != null && tile.entity instanceof BuildEntity){
-            place.progress = tile.<BuildEntity>entity().progress;
+            place.progress = tile.<BuildEntity>ent().progress;
         }
         if(tail){
             buildQueue().addLast(place);
@@ -228,7 +229,6 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
     //due to iOS weirdness, this is apparently required
     class BuildDataStatic{
-        static Array<BuildRequest> removal = new Array<>();
         static Vector2[] tmptr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
     }
 
