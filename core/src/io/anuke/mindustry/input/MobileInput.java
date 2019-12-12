@@ -588,7 +588,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //zoom things
-        if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0){
+        if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (block == null || !block.rotate) && selectRequests.isEmpty()){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
