@@ -61,7 +61,7 @@ public class Links{
             String key = "link." + name + ".description";
             String desc = Core.bundle.getOrNull(key);
             if(desc == null){
-                missingLocales.add(key+"\n"); // <- LINE 62
+                missingLocales.add(key+"\n");
                 desc = key;
             }
             this.description = desc;
