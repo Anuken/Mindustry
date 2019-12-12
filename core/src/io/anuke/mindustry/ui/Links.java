@@ -45,7 +45,7 @@ public class Links{
                 m = m+s;
             }
             String finalM = m;
-            Time.run(1f, ()->{ui.showErrorMessage(finalM);});
+            Time.run(1f, () -> { ui.showErrorMessage(finalM); });
         }
 
         return links;
