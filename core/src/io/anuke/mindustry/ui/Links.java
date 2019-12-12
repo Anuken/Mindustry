@@ -42,7 +42,7 @@ public class Links{
             String m = Core.bundle.getOrNull(key);
             if(m == null) m= "Locale key(s) missing:\n";
             for(String s : missingLocales){
-                m = m+s;
+                m = m + s;
             }
             String finalM = m;
             Time.run(1f, () -> { ui.showErrorMessage(finalM); });
