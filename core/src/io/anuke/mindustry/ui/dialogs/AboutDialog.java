@@ -17,7 +17,7 @@ import static io.anuke.mindustry.Vars.*;
 public class AboutDialog extends FloatingDialog{
     private Array<String> contributors = new Array<>();
     private static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds", "f-droid");
-    static LinkEntry[] linkEntries;
+    private static LinkEntry[] linkEntries;
 
     public AboutDialog(){
         super("$about.button");
