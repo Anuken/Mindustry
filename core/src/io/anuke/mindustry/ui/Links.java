@@ -36,7 +36,7 @@ public class Links{
         }
         if(!missingLocales.isEmpty()){
             String key = "missinglocale";
-            if(missingLocales.size()==1){
+            if(missingLocales.size() == 1){
                 key = "missinglocale.single";
             }
             String m = Core.bundle.getOrNull(key);
