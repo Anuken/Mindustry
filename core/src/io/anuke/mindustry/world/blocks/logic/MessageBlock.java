@@ -147,8 +147,8 @@ public class MessageBlock extends Block{
     }
 
     public class MessageBlockEntity extends TileEntity{
-        protected String message = "";
-        protected String[] lines = {""};
+        public String message = "";
+        public String[] lines = {""};
 
         @Override
         public void write(DataOutput stream) throws IOException{
