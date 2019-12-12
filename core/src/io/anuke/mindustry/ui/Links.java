@@ -36,14 +36,18 @@ public class Links{
         }
         if(!missingLocales.isEmpty()){
             String key = "missinglocale";
+            
             if(missingLocales.size() == 1){
                 key = "missinglocale.single";
             }
+            
             String m = Core.bundle.getOrNull(key);
             if(m == null) m= "Locale key(s) missing:\n";
+            
             for(String s : missingLocales){
                 m = m + s;
             }
+            
             String finalM = m;
             Time.run(1f, () -> { ui.showErrorMessage(finalM); });
         }
@@ -57,14 +61,19 @@ public class Links{
 
         public LinkEntry(String name, String link, Color color){
             this.name = name;
+            
             this.color = color;
+            
             String key = "link." + name + ".description";
             String desc = Core.bundle.getOrNull(key);
+            
             if(desc == null){
                 missingLocales.add(key+"\n");
                 desc = key;
             }
+            
             this.description = desc;
+            
             this.link = link;
 
             String title = Core.bundle.getOrNull("link." + name + ".title");
