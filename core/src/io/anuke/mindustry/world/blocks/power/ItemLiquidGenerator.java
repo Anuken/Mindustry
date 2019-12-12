@@ -120,7 +120,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
             float maximumPossible = maxLiquidGenerate * calculationDelta;
             float used = Math.min(entity.liquids.get(liquid) * calculationDelta, maximumPossible);
 
-            entity.liquids.remove(liquid, used);
+            entity.liquids.remove(liquid, used * entity.power.graph.getUsageFraction());
             entity.productionEfficiency = baseLiquidEfficiency * used / maximumPossible;
 
             if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
@@ -137,7 +137,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
             }
 
             if(entity.generateTime > 0f){
-                entity.generateTime -= Math.min(1f / itemDuration * entity.delta(), entity.generateTime);
+                entity.generateTime -= Math.min(1f / itemDuration * entity.delta() * entity.power.graph.getUsageFraction(), entity.generateTime);
 
                 if(randomlyExplode && state.rules.reactorExplosions && Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.5f))){
                     //this block is run last so that in the event of a block destruction, no code relies on the block type

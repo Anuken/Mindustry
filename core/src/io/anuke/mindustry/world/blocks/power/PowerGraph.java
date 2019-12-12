@@ -19,7 +19,7 @@ public class PowerGraph{
     private final ObjectSet<Tile> all = new ObjectSet<>();
 
     private final WindowedMean powerBalance = new WindowedMean(60);
-    private float lastPowerProduced, lastPowerNeeded;
+    private float lastPowerProduced, lastPowerNeeded, lastUsageFraction;
 
     private long lastFrameUpdated = -1;
     private final int graphID;
@@ -52,6 +52,10 @@ public class PowerGraph{
             return 1f;
         }
         return Mathf.clamp(lastPowerProduced / lastPowerNeeded);
+    }
+
+    public float getUsageFraction(){
+        return lastUsageFraction;
     }
 
     public float getPowerProduced(){
@@ -180,7 +184,7 @@ public class PowerGraph{
                 tile.entity.power.status = 1f;
             }
 
-            lastPowerNeeded = lastPowerProduced = 1f;
+            lastPowerNeeded = lastPowerProduced = lastUsageFraction = 1f;
             return;
         }
 
@@ -188,6 +192,7 @@ public class PowerGraph{
 
         float powerNeeded = getPowerNeeded();
         float powerProduced = getPowerProduced();
+        float rawProduced = powerProduced;
 
         lastPowerNeeded = powerNeeded;
         lastPowerProduced = powerProduced;
@@ -208,6 +213,12 @@ public class PowerGraph{
         }
 
         powerBalance.addValue((lastPowerProduced - lastPowerNeeded) / Time.delta());
+
+        //overproducing: 10 / 20 = 0.5
+        //underproducing: 20 / 10 = 2 -> clamp -> 1.0
+        //nothing being produced: 20 / 0 -> 1.0
+        //nothing being consumed: 0 / 20 -> 0.0
+        lastUsageFraction = Mathf.zero(rawProduced) ? 1f : Mathf.clamp(powerNeeded / rawProduced);
     }
 
     public void add(PowerGraph graph){
