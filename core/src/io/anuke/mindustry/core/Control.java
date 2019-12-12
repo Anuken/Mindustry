@@ -262,6 +262,7 @@ public class Control implements ApplicationListener, Loadable{
                 }
             }
             state.set(State.playing);
+            state.wavetime = state.rules.waveSpacing;
             control.saves.zoneSave();
             logic.play();
             Events.fire(Trigger.newGame);
