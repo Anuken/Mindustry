@@ -19,7 +19,7 @@ import java.util.concurrent.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class ArcNetImpl implements NetProvider{
+public class ArcNetProvider implements NetProvider{
     final Client client;
     final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[256], 256);
 
@@ -27,7 +27,7 @@ public class ArcNetImpl implements NetProvider{
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();
     Thread serverThread;
 
-    public ArcNetImpl(){
+    public ArcNetProvider(){
         client = new Client(8192, 4096, new PacketSerializer());
         client.setDiscoveryPacket(packetSupplier);
         client.addListener(new NetListener(){
@@ -346,6 +346,19 @@ public class ArcNetImpl implements NetProvider{
 
     @SuppressWarnings("unchecked")
     public static class PacketSerializer implements NetSerializer{
+        static Cons2<Packet, ByteBuffer> writer = Packet::write;
+
+        @Override
+        public Object read(ByteBuffer byteBuffer){
+            byte id = byteBuffer.get();
+            if(id == -2){
+                return readFramework(byteBuffer);
+            }else{
+                Packet packet = Pools.obtain((Class<Packet>)Registrator.getByID(id).type, (Prov<Packet>)Registrator.getByID(id).constructor);
+                packet.read(byteBuffer);
+                return packet;
+            }
+        }
 
         @Override
         public void write(ByteBuffer byteBuffer, Object o){
@@ -359,19 +372,7 @@ public class ArcNetImpl implements NetProvider{
                 if(id == -1)
                     throw new RuntimeException("Unregistered class: " + o.getClass());
                 byteBuffer.put(id);
-                ((Packet)o).write(byteBuffer);
-            }
-        }
-
-        @Override
-        public Object read(ByteBuffer byteBuffer){
-            byte id = byteBuffer.get();
-            if(id == -2){
-                return readFramework(byteBuffer);
-            }else{
-                Packet packet = Pools.obtain((Class<Packet>)Registrator.getByID(id).type, (Prov<Packet>)Registrator.getByID(id).constructor);
-                packet.read(byteBuffer);
-                return packet;
+                writer.get((Packet)o, byteBuffer);
             }
         }
 

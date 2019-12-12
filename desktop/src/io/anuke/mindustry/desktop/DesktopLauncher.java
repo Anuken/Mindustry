@@ -131,7 +131,7 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     void initSteam(String[] args){
-        SVars.net = new SNet(new ArcNetImpl());
+        SVars.net = new SNet(new ArcNetProvider());
         SVars.stats = new SStats();
         SVars.workshop = new SWorkshop();
         SVars.user = new SUser();
@@ -222,7 +222,7 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public NetProvider getNet(){
-        return steam ? SVars.net : new ArcNetImpl();
+        return steam ? SVars.net : new ArcNetProvider();
     }
 
     @Override
