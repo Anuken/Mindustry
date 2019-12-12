@@ -32,7 +32,7 @@ public class AboutDialog extends FloatingDialog{
     }
 
     void setup(){
-        if(linkEntries==null)linkEntries = Links.getLinks();
+        if(linkEntries == null) linkEntries = Links.getLinks();
         cont.clear();
         buttons.clear();
 
