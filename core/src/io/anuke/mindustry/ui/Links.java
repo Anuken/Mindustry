@@ -40,7 +40,7 @@ public class Links{
                 key = "missinglocale.single";
             }
             String m = Core.bundle.getOrNull(key);
-            if(m==null)m="Locale key(s) missing:\n";
+            if(m == null) m= "Locale key(s) missing:\n";
             for(String s : missingLocales){
                 m = m+s;
             }
