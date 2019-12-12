@@ -54,8 +54,10 @@ public class PowerGraph{
         return Mathf.clamp(lastPowerProduced / lastPowerNeeded);
     }
 
+    /** @return multiplier of speed at which resources should be consumed for power generation. */
     public float getUsageFraction(){
-        return lastUsageFraction;
+        //TODO enable it later, or not?
+        return 1f; //lastUsageFraction;
     }
 
     public float getPowerProduced(){
