@@ -13,7 +13,7 @@ import static io.anuke.mindustry.Vars.ui;
 
 public class Links{
     private static LinkEntry[] links;
-    static List<String> missingLocales = new ArrayList<String>();
+    private static List<String> missingLocales = new ArrayList<String>();
 
     private static void createLinks(){
         links = new LinkEntry[]{
