@@ -25,6 +25,7 @@ public class ContentLoader{
     private Array<Content>[] contentMap = new Array[ContentType.values().length];
     private MappableContent[][] temporaryMapper;
     private @Nullable LoadedMod currentMod;
+    private @Nullable Content lastAdded;
     private ObjectSet<Cons<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
         new Fx(),
@@ -146,11 +147,27 @@ public class ContentLoader{
         //clear all content, currently not used
     }
 
+    /** Get last piece of content created for error-handling purposes. */
+    public @Nullable Content getLastAdded(){
+        return lastAdded;
+    }
+
+    /** Remove last content added in case of an exception. */
+    public void removeLast(){
+        if(lastAdded != null && contentMap[lastAdded.getContentType().ordinal()].peek() == lastAdded){
+            contentMap[lastAdded.getContentType().ordinal()].pop();
+            if(lastAdded instanceof MappableContent){
+                contentNameMap[lastAdded.getContentType().ordinal()].remove(((MappableContent)lastAdded).name);
+            }
+        }
+    }
+
     public void handleContent(Content content){
+        this.lastAdded = content;
         contentMap[content.getContentType().ordinal()].add(content);
     }
 
-    public void setCurrentMod(LoadedMod mod){
+    public void setCurrentMod(@Nullable LoadedMod mod){
         this.currentMod = mod;
     }
 

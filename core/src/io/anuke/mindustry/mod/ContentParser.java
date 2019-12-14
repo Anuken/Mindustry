@@ -258,8 +258,12 @@ public class ContentParser{
                 if(research[0] != null){
                     Block parent = find(ContentType.block, research[0]);
                     TechNode baseNode = TechTree.create(parent, block);
+                    LoadedMod cur = currentMod;
 
                     postreads.add(() -> {
+                        currentContent = block;
+                        currentMod = cur;
+
                         TechNode parnode = TechTree.all.find(t -> t.block == parent);
                         if(parnode == null){
                             throw new ModLoadException("Block '" + parent.name + "' isn't in the tech tree, but '" + block.name + "' requires it to be researched.", block);
@@ -383,6 +387,14 @@ public class ContentParser{
     }
 
     public void finishParsing(){
+        reads.each(c -> {
+            try{
+                c.run();
+            }catch(Throwable t){
+
+            }
+        });
+
         try{
             reads.each(Runnable::run);
             postreads.each(Runnable::run);

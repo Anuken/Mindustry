@@ -1,19 +1,17 @@
 package io.anuke.mindustry.ctype;
 
-import io.anuke.arc.files.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
-import io.anuke.mindustry.mod.Mods.*;
+import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.type.*;
 
 
 /** Base class for a content type that is loaded in {@link io.anuke.mindustry.core.ContentLoader}. */
 public abstract class Content implements Comparable<Content>{
     public final short id;
-    /** The mod that loaded this piece of content. */
-    public @Nullable LoadedMod mod;
-    /** File that this content was loaded from. */
-    public @Nullable FileHandle sourceFile;
+    /** Info on which mod this content was loaded from. */
+    public @Nullable ModContentInfo minfo;
+
 
     public Content(){
         this.id = (short)Vars.content.getBy(getContentType()).size;
@@ -35,6 +33,11 @@ public abstract class Content implements Comparable<Content>{
      * Use for loading regions or other image data.
      */
     public void load(){
+    }
+
+    /** @return whether an error ocurred during mod loading. */
+    public boolean hasErrored(){
+        return minfo != null && minfo.error != null;
     }
 
     @Override

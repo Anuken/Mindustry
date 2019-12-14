@@ -464,16 +464,15 @@ public class Mods implements Loadable{
 
         //make sure mod content is in proper order
         runs.sort();
-        runs.each(l -> safeRun(l.mod, () -> {
+        for(LoadRun l : runs){
             try{
                 //this binds the content but does not load it entirely
                 Content loaded = parser.parse(l.mod, l.file.nameWithoutExtension(), l.file.readString("UTF-8"), l.file, l.type);
-                Log.debug("[{0}] Loaded '{1}'.", l.mod.meta.name,
-                (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
-            }catch(Exception e){
+                Log.debug("[{0}] Loaded '{1}'.", l.mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
+            }catch(Throwable e){
                 throw new RuntimeException("Failed to parse content file '" + l.file + "' for mod '" + l.mod.meta.name + "'.", e);
             }
-        }));
+        }
 
         //this finishes parsing content fields
         parser.finishParsing();
@@ -532,7 +531,7 @@ public class Mods implements Loadable{
 
     /** Iterates through each mod with a main class.*/
     public void each(Cons<Mod> cons){
-        loaded.each(p -> p.mod != null, p -> safeRun(p, () -> cons.get(p.mod)));
+        loaded.each(p -> p.mod != null, p -> contextRun(p, () -> cons.get(p.mod)));
     }
 
     public void handleError(Throwable t, LoadedMod mod){
@@ -562,7 +561,7 @@ public class Mods implements Loadable{
         }
     }
 
-    public void safeRun(LoadedMod mod, Runnable run){
+    public void contextRun(LoadedMod mod, Runnable run){
         try{
             run.run();
         }catch(Throwable t){
