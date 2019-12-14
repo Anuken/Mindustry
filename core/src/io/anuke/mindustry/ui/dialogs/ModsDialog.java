@@ -75,7 +75,7 @@ public class ModsDialog extends FloatingDialog{
         hidden(() -> {
             if(mods.requiresReload()){
                 ui.loadAnd("$reloading", () -> {
-                    mods.all().each(mod -> {
+                    mods.eachEnabled(mod -> {
                         if(mod.hasUnmetDependencies()){
                             ui.showErrorMessage(Core.bundle.format("mod.nowdisabled", mod.name, mod.missingDependencies.toString(", ")));
                         }
@@ -107,7 +107,7 @@ public class ModsDialog extends FloatingDialog{
         cont.defaults().width(mobile ? 500 : 560f).pad(4);
         cont.add("$mod.reloadrequired").visible(mods::requiresReload).center().get().setAlignment(Align.center);
         cont.row();
-        if(!(mods.all().isEmpty() && mods.disabled().isEmpty())){
+        if(!mods.list().isEmpty()){
             cont.pane(table -> {
                 table.margin(10f).top();
                 Array<LoadedMod> all = Array.withArrays(mods.all(), mods.disabled());
