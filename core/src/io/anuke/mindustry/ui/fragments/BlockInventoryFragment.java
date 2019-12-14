@@ -101,7 +101,7 @@ public class BlockInventoryFragment extends Fragment{
                         holding = false;
                         holdTime = 0f;
 
-                        Events.fire(new WithdrawEvent(tile, player, lastItem, amount));
+                        if(net.client()) Events.fire(new WithdrawEvent(tile, player, lastItem, amount));
                     }
                 }
 
@@ -154,7 +154,7 @@ public class BlockInventoryFragment extends Fragment{
                             lastItem = item;
                             holding = true;
                             holdTime = 0f;
-                            Events.fire(new WithdrawEvent(tile, player, item, amount));
+                            if(net.client()) Events.fire(new WithdrawEvent(tile, player, item, amount));
                         }
                         return true;
                     }
