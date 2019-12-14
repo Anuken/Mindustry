@@ -383,7 +383,7 @@ public class Mods implements Loadable{
         Events.fire(new ContentReloadEvent());
 
         if(scripts != null && scripts.hasErrored()){
-            Core.app.post(() -> Core.settings.getBoolOnce("scripts-errored", () -> ui.showErrorMessage("$mod.scripts.unsupported")));
+            Core.app.post(() -> ui.showErrorMessage("$mod.scripts.unsupported"));
         }
     }
 

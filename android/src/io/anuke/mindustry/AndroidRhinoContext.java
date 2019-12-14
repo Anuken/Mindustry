@@ -13,7 +13,6 @@ import com.android.dx.merge.*;
 import dalvik.system.*;
 import io.anuke.arc.*;
 import io.anuke.arc.backends.android.surfaceview.*;
-import io.anuke.arc.util.*;
 import org.mozilla.javascript.*;
 
 import java.io.*;
@@ -180,7 +179,6 @@ public class AndroidRhinoContext{
                 e.printStackTrace();
             }
             android.content.Context context = ((AndroidApplication)Core.app).getContext();
-            Log.info(dexFile.getPath() + " " + dexFile.exists() + " " + context.getCacheDir().getAbsolutePath());
             return new DexClassLoader(dexFile.getPath(), VERSION.SDK_INT >= 21 ? context.getCodeCacheDir().getPath() : context.getCacheDir().getAbsolutePath(), null, getParent()).loadClass(name);
         }
 
