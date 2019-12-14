@@ -139,9 +139,19 @@ public class EventType{
 
     }
 
-    /** Called when a player withdraws items from a block. Tutorial only.*/
+    /** Called when the player withdraws items from a block. */
     public static class WithdrawEvent{
+        public final Tile tile;
+        public final Player player;
+        public final Item item;
+        public final int amount;
 
+        public WithdrawEvent(Tile tile, Player player, Item item, int amount){
+            this.tile = tile;
+            this.player = player;
+            this.item = item;
+            this.amount = amount;
+        }
     }
 
     /** Called when a player deposits items to a block.*/
