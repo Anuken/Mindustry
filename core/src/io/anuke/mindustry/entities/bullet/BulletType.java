@@ -137,7 +137,7 @@ public abstract class BulletType extends Content{
         }
 
         for(int i = 0; i < lightining; i++){
-            Lightning.create(b.getTeam(), Pal.surge, damage, b.x, b.y, Mathf.random(360f), lightningLength);
+            Lightning.createLighting(Lightning.nextSeed(), b.getTeam(), Pal.surge, damage, b.x, b.y, Mathf.random(360f), lightningLength);
         }
     }
 

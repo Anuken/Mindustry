@@ -149,7 +149,7 @@ public class Mods implements Loadable{
             //generate new icons
             for(Array<Content> arr : content.getContentMap()){
                 arr.each(c -> {
-                    if(c instanceof UnlockableContent && c.mod != null){
+                    if(c instanceof UnlockableContent && c.minfo != null && c.minfo.mod != null){
                         UnlockableContent u = (UnlockableContent)c;
                         u.createIcons(packer);
                     }
@@ -534,6 +534,7 @@ public class Mods implements Loadable{
         loaded.each(p -> p.mod != null, p -> contextRun(p, () -> cons.get(p.mod)));
     }
 
+    /*
     public void handleError(Throwable t, LoadedMod mod){
         Array<Throwable> causes = Strings.getCauses(t);
         Content content = null;
@@ -559,13 +560,13 @@ public class Mods implements Loadable{
         }else{
             throw new ModLoadException("Error loading mod " + mod.meta.name, t);
         }
-    }
+    }*/
 
     public void contextRun(LoadedMod mod, Runnable run){
         try{
             run.run();
         }catch(Throwable t){
-            handleError(t, mod);
+            throw new RuntimeException("Error loading mod " + mod.meta.name, t);
         }
     }
 
@@ -751,7 +752,7 @@ public class Mods implements Loadable{
         }
     }
 
-    /** Thrown when an error occurs while loading a mod.*/
+    /** Thrown when an error occurs while loading a mod.
     public static class ModLoadException extends RuntimeException{
         public Content content;
         public LoadedMod mod;
@@ -783,5 +784,5 @@ public class Mods implements Loadable{
                 this.mod = content.mod;
             }
         }
-    }
+    }*/
 }

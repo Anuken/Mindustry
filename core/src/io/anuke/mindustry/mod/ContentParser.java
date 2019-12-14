@@ -308,7 +308,7 @@ public class ContentParser{
         if(value.has(key)){
             return value.getString(key);
         }else{
-            throw new IllegalArgumentException((currentContent == null ? "" : currentContent.sourceFile + ": ") + "You are missing a \"" + key + "\". It must be added before the file can be parsed.");
+            throw new IllegalArgumentException("You are missing a \"" + key + "\". It must be added before the file can be parsed.");
         }
     }
 
@@ -433,12 +433,24 @@ public class ContentParser{
         currentMod = mod;
         boolean located = locate(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
+        c.minfo = new ModContentInfo();
+        c.minfo.sourceFile = file;
         toBeParsed.add(c);
+
         if(!located){
-            c.sourceFile = file;
-            c.mod = mod;
+            c.minfo.mod = mod;
         }
         return c;
+    }
+
+    public void markError(Content content, LoadedMod mod, FileHandle file, Throwable error){
+        if(content.minfo == null){
+            content.minfo = new ModContentInfo();
+        }
+
+        content.minfo.mod = mod;
+        content.minfo.sourceFile = file;
+        content.minfo.error = Strings.parseException(error, true);
     }
 
     private <T extends MappableContent> T locate(ContentType type, String name){

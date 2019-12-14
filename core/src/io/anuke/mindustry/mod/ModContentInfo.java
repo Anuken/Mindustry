@@ -6,7 +6,7 @@ import io.anuke.mindustry.mod.Mods.*;
 
 public class ModContentInfo{
     /** The mod that loaded this piece of content. */
-    public LoadedMod mod;
+    public @Nullable LoadedMod mod;
     /** File that this content was loaded from. */
     public FileHandle sourceFile;
     /** The error that occurred during loading, if applicable. Null if no error occurred. */
