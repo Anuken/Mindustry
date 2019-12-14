@@ -63,7 +63,7 @@ public class Bar extends Element{
         if(fraction == null) return;
 
         float computed = Mathf.clamp(fraction.get());
-        if(!Mathf.isEqual(lastValue, computed)){
+        if(!Mathf.equal(lastValue, computed)){
             blink = 1f;
             lastValue = computed;
         }

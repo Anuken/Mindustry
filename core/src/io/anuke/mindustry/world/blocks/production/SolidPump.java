@@ -20,16 +20,17 @@ import io.anuke.mindustry.world.meta.BlockStat;
  * Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.
  */
 public class SolidPump extends Pump{
-    protected Liquid result = Liquids.water;
-    protected Effect updateEffect = Fx.none;
-    protected float updateEffectChance = 0.02f;
-    protected float rotateSpeed = 1f;
+    public Liquid result = Liquids.water;
+    public Effect updateEffect = Fx.none;
+    public float updateEffectChance = 0.02f;
+    public float rotateSpeed = 1f;
     /** Attribute that is checked when calculating output. */
-    protected Attribute attribute;
+    public Attribute attribute;
 
     public SolidPump(String name){
         super(name);
         hasPower = true;
+        entityType = SolidPumpEntity::new;
     }
 
     @Override
@@ -42,7 +43,7 @@ public class SolidPump extends Pump{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         if(attribute != null){
-            drawPlaceText(Core.bundle.formatFloat("bar.efficiency", (sumAttribute(attribute, x, y) + 1f) * 100, 1), x, y, valid);
+            drawPlaceText(Core.bundle.formatFloat("bar.efficiency", (sumAttribute(attribute, x, y) + 1f) * 100 * percentSolid(x, y), 1), x, y, valid);
         }
     }
 
@@ -51,7 +52,7 @@ public class SolidPump extends Pump{
         super.setBars();
         bars.add("efficiency", entity -> new Bar(() ->
         Core.bundle.formatFloat("bar.efficiency",
-        ((((SolidPumpEntity)entity).boost + 1f) * ((SolidPumpEntity)entity).warmup) * 100, 1),
+        ((((SolidPumpEntity)entity).boost + 1f) * ((SolidPumpEntity)entity).warmup) * 100  * percentSolid(entity.tile.x, entity.tile.y), 1),
         () -> Pal.ammo,
         () -> ((SolidPumpEntity)entity).warmup));
     }
@@ -66,7 +67,7 @@ public class SolidPump extends Pump{
 
     @Override
     public void draw(Tile tile){
-        SolidPumpEntity entity = tile.entity();
+        SolidPumpEntity entity = tile.ent();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
         Draw.color(tile.entity.liquids.current().color);
@@ -84,7 +85,7 @@ public class SolidPump extends Pump{
 
     @Override
     public void update(Tile tile){
-        SolidPumpEntity entity = tile.entity();
+        SolidPumpEntity entity = tile.ent();
 
         float fraction = 0f;
 
@@ -101,7 +102,7 @@ public class SolidPump extends Pump{
         fraction += entity.boost;
 
         if(tile.entity.cons.valid() && typeLiquid(tile) < liquidCapacity - 0.001f){
-            float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction * entity.power.satisfaction);
+            float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction * entity.efficiency());
             tile.entity.liquids.add(result, maxPump);
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
             if(Mathf.chance(entity.delta() * updateEffectChance))
@@ -135,16 +136,11 @@ public class SolidPump extends Pump{
     }
 
     @Override
-    public TileEntity newEntity(){
-        return new SolidPumpEntity();
-    }
-
-    @Override
     public void onProximityAdded(Tile tile){
         super.onProximityAdded(tile);
 
         if(attribute != null){
-            SolidPumpEntity entity = tile.entity();
+            SolidPumpEntity entity = tile.ent();
             entity.boost = sumAttribute(attribute, tile.x, tile.y);
         }
     }

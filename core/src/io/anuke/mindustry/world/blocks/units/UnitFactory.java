@@ -27,12 +27,12 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class UnitFactory extends Block{
-    protected UnitType unitType;
-    protected float produceTime = 1000f;
-    protected float launchVelocity = 0f;
-    protected TextureRegion topRegion;
-    protected int maxSpawn = 4;
-    protected int[] capacities;
+    public UnitType unitType;
+    public float produceTime = 1000f;
+    public float launchVelocity = 0f;
+    public TextureRegion topRegion;
+    public int maxSpawn = 4;
+    public int[] capacities;
 
     public UnitFactory(String name){
         super(name);
@@ -41,13 +41,14 @@ public class UnitFactory extends Block{
         hasItems = true;
         solid = false;
         flags = EnumSet.of(BlockFlag.producer);
+        entityType = UnitFactoryEntity::new;
     }
 
     @Remote(called = Loc.server)
     public static void onUnitFactorySpawn(Tile tile, int spawns){
         if(!(tile.entity instanceof UnitFactoryEntity) || !(tile.block() instanceof UnitFactory)) return;
 
-        UnitFactoryEntity entity = tile.entity();
+        UnitFactoryEntity entity = tile.ent();
         UnitFactory factory = (UnitFactory)tile.block();
 
         entity.buildTime = 0f;
@@ -109,7 +110,7 @@ public class UnitFactory extends Block{
 
     @Override
     public void unitRemoved(Tile tile, Unit unit){
-        UnitFactoryEntity entity = tile.entity();
+        UnitFactoryEntity entity = tile.ent();
         entity.spawned--;
         entity.spawned = Math.max(entity.spawned, 0);
     }
@@ -121,7 +122,7 @@ public class UnitFactory extends Block{
 
     @Override
     public void draw(Tile tile){
-        UnitFactoryEntity entity = tile.entity();
+        UnitFactoryEntity entity = tile.ent();
         TextureRegion region = unitType.icon(Cicon.full);
 
         Draw.rect(name, tile.drawx(), tile.drawy());
@@ -152,15 +153,15 @@ public class UnitFactory extends Block{
 
     @Override
     public void update(Tile tile){
-        UnitFactoryEntity entity = tile.entity();
+        UnitFactoryEntity entity = tile.ent();
 
         if(entity.spawned >= maxSpawn){
             return;
         }
 
         if(entity.cons.valid() || tile.isEnemyCheat()){
-            entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier * entity.power.satisfaction;
-            entity.buildTime += entity.delta() * entity.power.satisfaction * Vars.state.rules.unitBuildSpeedMultiplier;
+            entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier * entity.efficiency();
+            entity.buildTime += entity.delta() * entity.efficiency() * Vars.state.rules.unitBuildSpeedMultiplier;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
         }else{
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
@@ -175,25 +176,16 @@ public class UnitFactory extends Block{
             entity.cons.trigger();
         }
     }
+
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
         return capacities[item.id];
     }
 
     @Override
-    public TileEntity newEntity(){
-        return new UnitFactoryEntity();
-    }
-
-    @Override
-    public boolean canProduce(Tile tile){
-        UnitFactoryEntity entity = tile.entity();
-        return entity.spawned < maxSpawn;
-    }
-
-    @Override
     public boolean shouldConsume(Tile tile){
-        return canProduce(tile);
+        UnitFactoryEntity entity = tile.ent();
+        return entity.spawned < maxSpawn;
     }
 
     public static class UnitFactoryEntity extends TileEntity{

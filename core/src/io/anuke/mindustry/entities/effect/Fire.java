@@ -10,10 +10,10 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.entities.type.TimedEntity;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.type.TypeID;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
 import java.io.*;
@@ -144,7 +144,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait{
             create(other);
 
             if(Mathf.chance(fireballChance * Time.delta() * Mathf.clamp(flammability / 10f))){
-                Call.createBullet(Bullets.fireball, x, y, Mathf.random(360f));
+                Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), 1, 1);
             }
         }
 

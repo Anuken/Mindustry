@@ -337,7 +337,7 @@ public class TechTreeDialog extends FloatingDialog{
                                 t.table(list -> {
                                     list.left();
                                     list.addImage(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
-                                    list.add(req.item.localizedName()).color(Color.lightGray);
+                                    list.add(req.item.localizedName).color(Color.lightGray);
                                     list.label(() -> " " + Math.min(data.getItem(req.item), req.amount) + " / " + req.amount)
                                     .update(l -> l.setColor(data.has(req.item, req.amount) ? Color.lightGray : Color.scarlet));
                                 }).fillX().left();

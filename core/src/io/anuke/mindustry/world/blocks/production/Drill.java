@@ -21,41 +21,40 @@ import io.anuke.mindustry.world.meta.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class Drill extends Block{
-    protected final static float hardnessDrillMultiplier = 50f;
+    public float hardnessDrillMultiplier = 50f;
 
     protected final ObjectIntMap<Item> oreCount = new ObjectIntMap<>();
     protected final Array<Item> itemArray = new Array<>();
 
     /** Maximum tier of blocks this drill can mine. */
-    protected int tier;
+    public int tier;
     /** Base time to drill one ore, in frames. */
-    protected float drillTime = 300;
+    public float drillTime = 300;
     /** How many times faster the drill will progress when boosted by liquid. */
-    protected float liquidBoostIntensity = 1.6f;
+    public float liquidBoostIntensity = 1.6f;
     /** Speed at which the drill speeds up. */
-    protected float warmupSpeed = 0.02f;
+    public float warmupSpeed = 0.02f;
 
     //return variables for countOre
     protected Item returnItem;
     protected int returnCount;
 
     /** Whether to draw the item this drill is mining. */
-    protected boolean drawMineItem = false;
+    public boolean drawMineItem = false;
     /** Effect played when an item is produced. This is colored. */
-    protected Effect drillEffect = Fx.mine;
+    public Effect drillEffect = Fx.mine;
     /** Speed the drill bit rotates at. */
-    protected float rotateSpeed = 2f;
+    public float rotateSpeed = 2f;
     /** Effect randomly played while drilling. */
-    protected Effect updateEffect = Fx.pulverizeSmall;
+    public Effect updateEffect = Fx.pulverizeSmall;
     /** Chance the update effect will appear. */
-    protected float updateEffectChance = 0.02f;
+    public float updateEffectChance = 0.02f;
 
-    protected boolean drawRim = false;
-
-    protected Color heatColor = Color.valueOf("ff5512");
-    protected TextureRegion rimRegion;
-    protected TextureRegion rotatorRegion;
-    protected TextureRegion topRegion;
+    public boolean drawRim = false;
+    public Color heatColor = Color.valueOf("ff5512");
+    public TextureRegion rimRegion;
+    public TextureRegion rotatorRegion;
+    public TextureRegion topRegion;
 
     public Drill(String name){
         super(name);
@@ -66,6 +65,7 @@ public class Drill extends Block{
         hasLiquids = true;
         liquidCapacity = 5f;
         hasItems = true;
+        entityType = DrillEntity::new;
 
         idleSound = Sounds.drill;
         idleSoundVolume = 0.003f;
@@ -98,7 +98,7 @@ public class Drill extends Block{
         float s = 0.3f;
         float ts = 0.6f;
 
-        DrillEntity entity = tile.entity();
+        DrillEntity entity = tile.ent();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
         super.drawCracks(tile);
@@ -129,8 +129,13 @@ public class Drill extends Block{
     }
 
     @Override
-    public boolean canProduce(Tile tile){
+    public boolean shouldConsume(Tile tile){
         return tile.entity.items.total() < itemCapacity;
+    }
+
+    @Override
+    public boolean shouldIdleSound(Tile tile){
+        return tile.entity.efficiency() > 0.01f;
     }
 
     @Override
@@ -158,7 +163,7 @@ public class Drill extends Block{
 
     @Override
     public void drawSelect(Tile tile){
-        DrillEntity entity = tile.entity();
+        DrillEntity entity = tile.ent();
 
         if(entity.dominantItem != null){
             float dx = tile.drawx() - size * tilesize/2f, dy = tile.drawy() + size * tilesize/2f;
@@ -186,7 +191,7 @@ public class Drill extends Block{
                 Item item = list.get(i);
 
                 table.addImage(Core.atlas.find(item.name + "1")).size(8 * 3).padRight(2).padLeft(2).padTop(3).padBottom(3);
-                table.add(item.localizedName());
+                table.add(item.localizedName);
                 if(i != list.size - 1){
                     table.add("/").padLeft(5).padRight(5);
                 }
@@ -234,7 +239,7 @@ public class Drill extends Block{
 
     @Override
     public void update(Tile tile){
-        DrillEntity entity = tile.entity();
+        DrillEntity entity = tile.ent();
 
         if(entity.dominantItem == null){
             countOre(tile);
@@ -257,9 +262,7 @@ public class Drill extends Block{
                 speed = liquidBoostIntensity;
             }
 
-            if(hasPower){
-                speed *= entity.power.satisfaction; // Drill slower when not at full power
-            }
+            speed *= entity.efficiency(); // Drill slower when not at full power
 
             entity.lastDrillSpeed = (speed * entity.dominantItems * entity.warmup) / (drillTime + hardnessDrillMultiplier * entity.dominantItem.hardness);
             entity.warmup = Mathf.lerpDelta(entity.warmup, speed, warmupSpeed);
@@ -300,11 +303,6 @@ public class Drill extends Block{
         }else{
             return isValid(tile);
         }
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new DrillEntity();
     }
 
     public int tier(){

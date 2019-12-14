@@ -25,11 +25,12 @@ public class ItemSource extends Block{
         solid = true;
         group = BlockGroup.transportation;
         configurable = true;
+        entityType = ItemSourceEntity::new;
     }
 
     @Override
     public void configured(Tile tile, Player player, int value){
-        tile.<ItemSourceEntity>entity().outputItem = content.item(value);
+        tile.<ItemSourceEntity>ent().outputItem = content.item(value);
     }
 
     @Override
@@ -59,7 +60,7 @@ public class ItemSource extends Block{
     public void draw(Tile tile){
         super.draw(tile);
 
-        ItemSourceEntity entity = tile.entity();
+        ItemSourceEntity entity = tile.ent();
         if(entity.outputItem == null) return;
 
         Draw.color(entity.outputItem.color);
@@ -69,7 +70,7 @@ public class ItemSource extends Block{
 
     @Override
     public void update(Tile tile){
-        ItemSourceEntity entity = tile.entity();
+        ItemSourceEntity entity = tile.ent();
         if(entity.outputItem == null) return;
 
         entity.items.set(entity.outputItem, 1);
@@ -78,8 +79,8 @@ public class ItemSource extends Block{
     }
 
     @Override
-    public void buildTable(Tile tile, Table table){
-        ItemSourceEntity entity = tile.entity();
+    public void buildConfiguration(Tile tile, Table table){
+        ItemSourceEntity entity = tile.ent();
         ItemSelection.buildItemTable(table, () -> entity.outputItem, item -> {
             lastItem = item;
             tile.configure(item == null ? -1 : item.id);
@@ -89,11 +90,6 @@ public class ItemSource extends Block{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         return false;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ItemSourceEntity();
     }
 
     public class ItemSourceEntity extends TileEntity{

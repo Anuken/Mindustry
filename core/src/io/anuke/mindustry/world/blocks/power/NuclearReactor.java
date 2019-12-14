@@ -1,46 +1,43 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.*;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.ui.Bar;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.consumers.*;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class NuclearReactor extends PowerGenerator{
-    protected final int timerFuel = timers++;
+    public final int timerFuel = timers++;
 
-    protected final Vector2 tr = new Vector2();
+    public final Vector2 tr = new Vector2();
 
-    protected Color coolColor = new Color(1, 1, 1, 0f);
-    protected Color hotColor = Color.valueOf("ff9575a3");
-    protected float itemDuration = 120; //time to consume 1 fuel
-    protected float heating = 0.01f; //heating per frame * fullness
-    protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
-    protected int explosionRadius = 40;
-    protected int explosionDamage = 1350;
-    protected float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
-    protected float coolantPower = 0.5f;
+    public Color lightColor = Color.valueOf("7f19ea");
+    public Color coolColor = new Color(1, 1, 1, 0f);
+    public Color hotColor = Color.valueOf("ff9575a3");
+    public float itemDuration = 120; //time to consume 1 fuel
+    public float heating = 0.01f; //heating per frame * fullness
+    public float smokeThreshold = 0.3f; //threshold at which block starts smoking
+    public int explosionRadius = 40;
+    public int explosionDamage = 1350;
+    public float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
+    public float coolantPower = 0.5f;
 
-    protected TextureRegion topRegion, lightsRegion;
+    public TextureRegion topRegion, lightsRegion;
 
     public NuclearReactor(String name){
         super(name);
@@ -48,6 +45,7 @@ public class NuclearReactor extends PowerGenerator{
         liquidCapacity = 30;
         hasItems = true;
         hasLiquids = true;
+        entityType = NuclearReactorEntity::new;
     }
 
     @Override
@@ -75,7 +73,7 @@ public class NuclearReactor extends PowerGenerator{
 
     @Override
     public void update(Tile tile){
-        NuclearReactorEntity entity = tile.entity();
+        NuclearReactorEntity entity = tile.ent();
 
         ConsumeLiquid cliquid = consumes.get(ConsumeType.liquid);
         Item item = consumes.<ConsumeItems>get(ConsumeType.item).items[0].item;
@@ -93,10 +91,9 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         Liquid liquid = cliquid.liquid;
-        float liquidAmount = cliquid.amount;
 
         if(entity.heat > 0){
-            float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), entity.heat / coolantPower), liquidAmount * entity.delta());
+            float maxUsed = Math.min(entity.liquids.get(liquid), entity.heat / coolantPower);
             entity.heat -= maxUsed * coolantPower;
             entity.liquids.remove(liquid, maxUsed);
         }
@@ -123,11 +120,11 @@ public class NuclearReactor extends PowerGenerator{
 
         Sounds.explosionbig.at(tile);
 
-        NuclearReactorEntity entity = tile.entity();
+        NuclearReactorEntity entity = tile.ent();
 
         int fuel = entity.items.get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
 
-        if(fuel < 5 && entity.heat < 0.5f) return;
+        if((fuel < 5 && entity.heat < 0.5f) || !state.rules.reactorExplosions) return;
 
         Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
         Effects.effect(Fx.nuclearShockwave, tile.worldx(), tile.worldy());
@@ -153,10 +150,17 @@ public class NuclearReactor extends PowerGenerator{
     }
 
     @Override
+    public void drawLight(Tile tile){
+        NuclearReactorEntity entity = tile.ent();
+        float fract = entity.productionEfficiency;
+        renderer.lights.add(tile.drawx(), tile.drawy(), (90f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(lightColor).lerp(Color.scarlet, entity.heat), 0.6f * fract);
+    }
+
+    @Override
     public void draw(Tile tile){
         super.draw(tile);
 
-        NuclearReactorEntity entity = tile.entity();
+        NuclearReactorEntity entity = tile.ent();
 
         Draw.color(coolColor, hotColor, entity.heat);
         Fill.rect(tile.drawx(), tile.drawy(), size * tilesize, size * tilesize);
@@ -174,11 +178,6 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         Draw.reset();
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new NuclearReactorEntity();
     }
 
     public static class NuclearReactorEntity extends GeneratorEntity{

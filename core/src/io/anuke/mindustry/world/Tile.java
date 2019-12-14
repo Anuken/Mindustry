@@ -99,7 +99,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends TileEntity> T entity(){
+    public <T extends TileEntity> T ent(){
         return (T)entity;
     }
 
@@ -316,6 +316,31 @@ public class Tile implements Position, TargetTrait{
         if(rotation == 2) return world.tile(x - 1, y);
         if(rotation == 3) return world.tile(x, y - 1);
         return null;
+    }
+
+    public Tile getNearbyLink(int rotation){
+        if(rotation == 0) return world.ltile(x + 1, y);
+        if(rotation == 1) return world.ltile(x, y + 1);
+        if(rotation == 2) return world.ltile(x - 1, y);
+        if(rotation == 3) return world.ltile(x, y - 1);
+        return null;
+    }
+
+    // ▲ ▲ ▼ ▼ ◀ ▶ ◀ ▶ B A
+    public @Nullable Tile front(){
+        return getNearbyLink((rotation + 4) % 4);
+    }
+
+    public @Nullable Tile right(){
+        return getNearbyLink((rotation + 3) % 4);
+    }
+
+    public @Nullable Tile back(){
+        return getNearbyLink((rotation + 2) % 4);
+    }
+
+    public @Nullable Tile left(){
+        return getNearbyLink((rotation + 1) % 4);
     }
 
     public boolean interactable(Team team){

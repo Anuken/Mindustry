@@ -13,13 +13,15 @@ import java.io.*;
 
 public class PowerGenerator extends PowerDistributor{
     /** The amount of power produced per tick in case of an efficiency of 1.0, which represents 100%. */
-    protected float powerProduction;
+    public float powerProduction;
     public BlockStat generationType = BlockStat.basePowerGeneration;
 
     public PowerGenerator(String name){
         super(name);
+        sync = true;
         baseExplosiveness = 5f;
         flags = EnumSet.of(BlockFlag.producer);
+        entityType = GeneratorEntity::new;
     }
 
     @Override
@@ -43,17 +45,12 @@ public class PowerGenerator extends PowerDistributor{
 
     @Override
     public float getPowerProduction(Tile tile){
-        return powerProduction * tile.<GeneratorEntity>entity().productionEfficiency;
+        return powerProduction * tile.<GeneratorEntity>ent().productionEfficiency;
     }
 
     @Override
     public boolean outputsItems(){
         return false;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new GeneratorEntity();
     }
 
     public static class GeneratorEntity extends TileEntity{

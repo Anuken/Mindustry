@@ -47,7 +47,7 @@ public class ApplicationTests{
                     net = new Net(null);
                     tree = new FileTree();
                     Vars.init();
-                    content.createContent();
+                    content.createBaseContent();
 
                     add(logic = new Logic());
                     add(netServer = new NetServer());
@@ -60,6 +60,7 @@ public class ApplicationTests{
                     super.init();
                     begins[0] = true;
                     testMap = maps.loadInternalMap("groundZero");
+                    Thread.currentThread().interrupt();
                 }
             };
 
@@ -216,13 +217,22 @@ public class ApplicationTests{
     }
 
     @Test
-    void loadOldSave(){
+    void load77Save(){
         resetWorld();
-        SaveIO.load(Core.files.internal("build77.msav"));
+        SaveIO.load(Core.files.internal("77.msav"));
 
         //just tests if the map was loaded properly and didn't crash, no validity checks currently
         assertEquals(276, world.width());
         assertEquals(10, world.height());
+    }
+
+    @Test
+    void load85Save(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("85.msav"));
+
+        assertEquals(250, world.width());
+        assertEquals(300, world.height());
     }
 
     @Test
@@ -279,8 +289,8 @@ public class ApplicationTests{
     void buildingOverlap(){
         initBuilding();
 
-        Phantom d1 = (Phantom)UnitTypes.phantom.create(Team.sharded);
-        Phantom d2 = (Phantom)UnitTypes.phantom.create(Team.sharded);
+        BuilderDrone d1 = (BuilderDrone)UnitTypes.phantom.create(Team.sharded);
+        BuilderDrone d2 = (BuilderDrone)UnitTypes.phantom.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
@@ -301,8 +311,8 @@ public class ApplicationTests{
     void buildingDestruction(){
         initBuilding();
 
-        Phantom d1 = (Phantom)UnitTypes.phantom.create(Team.sharded);
-        Phantom d2 = (Phantom)UnitTypes.phantom.create(Team.sharded);
+        BuilderDrone d1 = (BuilderDrone)UnitTypes.phantom.create(Team.sharded);
+        BuilderDrone d2 = (BuilderDrone)UnitTypes.phantom.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);

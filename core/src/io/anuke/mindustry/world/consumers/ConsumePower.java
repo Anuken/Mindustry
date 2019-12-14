@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.consumers;
 
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Tile;
@@ -41,7 +42,7 @@ public class ConsumePower extends Consume{
 
     @Override
     public void update(TileEntity entity){
-        // Nothing to do since PowerGraph directly updates entity.power.satisfaction
+        // Nothing to do since PowerGraph directly updates entity.power.status
     }
 
     @Override
@@ -49,7 +50,7 @@ public class ConsumePower extends Consume{
         if(buffered){
             return true;
         }else{
-            return entity.power.satisfaction > 0f;
+            return entity.power.status > 0f;
         }
     }
 
@@ -64,15 +65,20 @@ public class ConsumePower extends Consume{
 
     /**
      * Retrieves the amount of power which is requested for the given block and entity.
-     * @param block The block which needs power.
      * @param entity The entity which contains the power module.
      * @return The amount of power which is requested per tick.
      */
     public float requestedPower(TileEntity entity){
+        if(entity.tile.entity == null) return 0f;
         if(buffered){
-            return (1f-entity.power.satisfaction)*capacity;
+            return (1f-entity.power.status)*capacity;
         }else{
-            return usage;
+            try{
+                return usage * Mathf.num(entity.block.shouldConsume(entity.tile));
+            }catch(Exception e){
+                //HACK an error will only happen with a bar that is checking its requested power, and the entity is null/a different class
+                return 0;
+            }
         }
     }
 

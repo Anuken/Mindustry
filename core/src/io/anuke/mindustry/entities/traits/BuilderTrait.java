@@ -2,7 +2,6 @@ package io.anuke.mindustry.entities.traits;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.Queue;
-import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
@@ -34,38 +33,37 @@ public interface BuilderTrait extends Entity, TeamTrait{
     default void updateBuilding(){
         float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : placeDistance;
         Unit unit = (Unit)this;
-        //remove already completed build requests
-        removal.clear();
-        for(BuildRequest req : buildQueue()){
-            removal.add(req);
+
+        Iterator<BuildRequest> it = buildQueue().iterator();
+        while(it.hasNext()){
+            BuildRequest req = it.next();
+            Tile tile = world.tile(req.x, req.y);
+            if(tile == null || (req.breaking && tile.block() == Blocks.air) || (!req.breaking && (tile.rotation() == req.rotation || !req.block.rotate) && tile.block() == req.block)){
+                it.remove();
+            }
         }
 
-        buildQueue().clear();
+        TileEntity core = unit.getClosestCore();
 
-        for(BuildRequest request : removal){
-            Tile tile = world.tile(request.x, request.y);
+        //nothing to build.
+        if(buildRequest() == null) return;
 
-            if(!(tile == null || (request.breaking && tile.block() == Blocks.air) ||
-            (!request.breaking && (tile.rotation() == request.rotation || !request.block.rotate) && tile.block() == request.block))){
-                buildQueue().addLast(request);
+        //find the next build request
+        if(buildQueue().size > 1){
+            int total = 0;
+            BuildRequest req;
+            while((dst((req = buildRequest()).tile()) > finalPlaceDst || shouldSkip(req, core)) && total < buildQueue().size){
+                buildQueue().removeFirst();
+                buildQueue().addLast(req);
+                total++;
             }
         }
 
         BuildRequest current = buildRequest();
 
-        if(current == null){
-            return;
-        }
+        if(dst(current.tile()) > finalPlaceDst) return;
 
         Tile tile = world.tile(current.x, current.y);
-
-        if(dst(tile) > finalPlaceDst){
-            if(buildQueue().size > 1){
-                buildQueue().removeFirst();
-                buildQueue().addLast(current);
-            }
-            return;
-        }
 
         if(!(tile.block() instanceof BuildBlock)){
             if(!current.initialized && canCreateBlocks() && !current.breaking && Build.validPlace(getTeam(), current.x, current.y, current.block, current.rotation)){
@@ -78,8 +76,6 @@ public interface BuilderTrait extends Entity, TeamTrait{
             }
         }
 
-        TileEntity core = unit.getClosestCore();
-
         if(tile.entity instanceof BuildEntity && !current.initialized){
             Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking)));
             current.initialized = true;
@@ -91,7 +87,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
         }
 
         //otherwise, update it.
-        BuildEntity entity = tile.entity();
+        BuildEntity entity = tile.ent();
 
         if(entity == null){
             return;
@@ -111,7 +107,15 @@ public interface BuilderTrait extends Entity, TeamTrait{
             }
         }
 
+        current.stuck = Mathf.equal(current.progress, entity.progress);
         current.progress = entity.progress;
+    }
+
+    /** @return whether this request should be skipped, in favor of the next one. */
+    default boolean shouldSkip(BuildRequest request, @Nullable TileEntity core){
+        //requests that you have at least *started* are considered
+        if(state.rules.infiniteResources || request.breaking || !request.initialized || core == null) return false;
+        return request.stuck && !core.items.has(request.block.requirements);
     }
 
     /** Returns the queue for storing build requests. */
@@ -205,7 +209,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
         }
         Tile tile = world.tile(place.x, place.y);
         if(tile != null && tile.entity instanceof BuildEntity){
-            place.progress = tile.<BuildEntity>entity().progress;
+            place.progress = tile.<BuildEntity>ent().progress;
         }
         if(tail){
             buildQueue().addLast(place);
@@ -225,7 +229,6 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
     //due to iOS weirdness, this is apparently required
     class BuildDataStatic{
-        static Array<BuildRequest> removal = new Array<>();
         static Vector2[] tmptr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
     }
 
@@ -287,8 +290,8 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
         /** Last progress.*/
         public float progress;
-        /** Whether construction has started for this request.*/
-        public boolean initialized, worldContext = true;
+        /** Whether construction has started for this request, and other special variables.*/
+        public boolean initialized, worldContext = true, stuck;
 
         /** Visual scale. Used only for rendering.*/
         public float animScale = 0f;

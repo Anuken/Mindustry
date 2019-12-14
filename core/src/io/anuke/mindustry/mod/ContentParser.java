@@ -1,6 +1,7 @@
 package io.anuke.mindustry.mod;
 
 import io.anuke.arc.*;
+import io.anuke.arc.assets.*;
 import io.anuke.arc.audio.*;
 import io.anuke.arc.audio.mock.*;
 import io.anuke.arc.collection.Array;
@@ -10,10 +11,9 @@ import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.reflect.Field;
-import io.anuke.arc.util.reflect.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
+import io.anuke.arc.util.serialization.Jval.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.TechTree.*;
@@ -36,6 +36,19 @@ import java.lang.reflect.*;
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     private ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
+    private StringMap legacyUnitMap = StringMap.of(
+    "Dagger", "GroundUnit",
+    "Eruptor", "GroundUnit",
+    "Titan", "GroundUnit",
+    "Fortress", "GroundUnit",
+    "Crawler", "GroundUnit",
+    "Revenant", "HoverUnit",
+    "Draug", "MinerDrone",
+    "Phantom", "BuilderDrone",
+    "Spirit", "RepairDrone",
+    "Wraith", "FlyingUnit",
+    "Ghoul", "FlyingUnit"
+    );
     private ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
         put(Effect.class, (type, data) -> field(Fx.class, data));
         put(StatusEffect.class, (type, data) -> field(StatusEffects.class, data));
@@ -51,6 +64,15 @@ public class ContentParser{
                     return Schematics.read(Vars.tree.get("schematics/" + str + "." + Vars.schematicExtension));
                 }
             }
+        });
+        put(StatusEffect.class, (type, data) -> {
+            Object result = fieldOpt(StatusEffects.class, data);
+            if(result != null){
+                return result;
+            }
+            StatusEffect effect = new StatusEffect(currentMod.name + "-" + data.getString("name"));
+            readFields(effect, data);
+            return effect;
         });
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
         put(BulletType.class, (type, data) -> {
@@ -70,9 +92,9 @@ public class ContentParser{
             String name = "sounds/" + data.asString();
             String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
             ModLoadingSound sound = new ModLoadingSound();
-            Core.assets.load(path, Sound.class).loaded = result -> {
-                sound.sound = (Sound)result;
-            };
+            AssetDescriptor<?> desc = Core.assets.load(path, Sound.class);
+            desc.loaded = result -> sound.sound = (Sound)result;
+            desc.errored = Throwable::printStackTrace;
             return sound;
         });
         put(Objective.class, (type, data) -> {
@@ -105,7 +127,7 @@ public class ContentParser{
             return t;
         }
 
-        private <T> T  internalRead(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
+        private <T> T internalRead(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
             if(type != null){
                 if(classParsers.containsKey(type)){
                     try{
@@ -113,6 +135,29 @@ public class ContentParser{
                     }catch(Exception e){
                         throw new RuntimeException(e);
                     }
+                }
+
+                //try to parse "item/amount" syntax
+                try{
+                    if(type == ItemStack.class && jsonData.isString() && jsonData.asString().contains("/")){
+                        String[] split = jsonData.asString().split("/");
+
+                        return (T)fromJson(ItemStack.class, "{item: " + split[0] + ", amount: " + split[1] + "}");
+                    }
+                }catch(Throwable ignored){
+                }
+
+                //try to parse "liquid/amount" syntax
+                try{
+                    if(jsonData.isString() && jsonData.asString().contains("/")){
+                        String[] split = jsonData.asString().split("/");
+                        if(type == LiquidStack.class){
+                            return (T)fromJson(LiquidStack.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
+                        }else if(type == ConsumeLiquid.class){
+                            return (T)fromJson(ConsumeLiquid.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
+                        }
+                    }
+                }catch(Throwable ignored){
                 }
 
                 if(Content.class.isAssignableFrom(type)){
@@ -137,27 +182,34 @@ public class ContentParser{
 
             Block block;
 
-            if(Vars.content.getByName(ContentType.block, name) != null){
-                block = Vars.content.getByName(ContentType.block, name);
+            if(locate(ContentType.block, name) != null){
+                block = locate(ContentType.block, name);
 
                 if(value.has("type")){
-                    throw new IllegalArgumentException("When overwriting an existing block, you must not re-declare its type. The original type will be used. Block: " + name);
+                    throw new IllegalArgumentException("When defining properties for an existing block, you must not re-declare its type. The original type will be used. Block: " + name);
                 }
             }else{
                 //TODO generate dynamically instead of doing.. this
-                Class<? extends Block> type = resolve(getType(value),
-                "io.anuke.mindustry.world",
-                "io.anuke.mindustry.world.blocks",
-                "io.anuke.mindustry.world.blocks.defense",
-                "io.anuke.mindustry.world.blocks.defense.turrets",
-                "io.anuke.mindustry.world.blocks.distribution",
-                "io.anuke.mindustry.world.blocks.logic",
-                "io.anuke.mindustry.world.blocks.power",
-                "io.anuke.mindustry.world.blocks.production",
-                "io.anuke.mindustry.world.blocks.sandbox",
-                "io.anuke.mindustry.world.blocks.storage",
-                "io.anuke.mindustry.world.blocks.units"
-                );
+                Class<? extends Block> type;
+
+                try{
+                    type = resolve(getType(value),
+                    "io.anuke.mindustry.world",
+                    "io.anuke.mindustry.world.blocks",
+                    "io.anuke.mindustry.world.blocks.defense",
+                    "io.anuke.mindustry.world.blocks.defense.turrets",
+                    "io.anuke.mindustry.world.blocks.distribution",
+                    "io.anuke.mindustry.world.blocks.liquid",
+                    "io.anuke.mindustry.world.blocks.logic",
+                    "io.anuke.mindustry.world.blocks.power",
+                    "io.anuke.mindustry.world.blocks.production",
+                    "io.anuke.mindustry.world.blocks.sandbox",
+                    "io.anuke.mindustry.world.blocks.storage",
+                    "io.anuke.mindustry.world.blocks.units"
+                    );
+                }catch(IllegalArgumentException e){
+                    type = Block.class;
+                }
 
                 block = make(type, mod + "-" + name);
             }
@@ -182,7 +234,7 @@ public class ContentParser{
                         }else if(child.name.equals("liquid")){
                             block.consumes.add((Consume)parser.readValue(ConsumeLiquid.class, child));
                         }else if(child.name.equals("power")){
-                            if(child.isDouble()){
+                            if(child.isNumber()){
                                 block.consumes.power(child.asFloat());
                             }else{
                                 block.consumes.add((Consume)parser.readValue(ConsumePower.class, child));
@@ -198,6 +250,10 @@ public class ContentParser{
 
                 readFields(block, value, true);
 
+                if(block.size > 8){
+                    throw new IllegalArgumentException("Blocks cannot be larger than 8x8.");
+                }
+
                 //add research tech node
                 if(research[0] != null){
                     Block parent = find(ContentType.block, research[0]);
@@ -205,6 +261,9 @@ public class ContentParser{
 
                     postreads.add(() -> {
                         TechNode parnode = TechTree.all.find(t -> t.block == parent);
+                        if(parnode == null){
+                            throw new ModLoadException("Block '" + parent.name + "' isn't in the tech tree, but '" + block.name + "' requires it to be researched.", block);
+                        }
                         if(!parnode.children.contains(baseNode)){
                             parnode.children.add(baseNode);
                         }
@@ -222,8 +281,14 @@ public class ContentParser{
         ContentType.unit, (TypeParser<UnitType>)(mod, name, value) -> {
             readBundle(ContentType.unit, name, value);
 
-            Class<BaseUnit> type = resolve(getType(value), "io.anuke.mindustry.entities.type.base");
-            UnitType unit = new UnitType(mod + "-" + name, supply(type));
+            UnitType unit;
+            if(locate(ContentType.unit, name) == null){
+                Class<BaseUnit> type = resolve(legacyUnitMap.get(Strings.capitalize(getType(value)), getType(value)), "io.anuke.mindustry.entities.type.base");
+                unit = new UnitType(mod + "-" + name, supply(type));
+            }else{
+                unit = locate(ContentType.unit, name);
+            }
+
             currentContent = unit;
             read(() -> readFields(unit, value, true));
 
@@ -342,25 +407,36 @@ public class ContentParser{
             init();
         }
 
-        JsonValue value = parser.fromJson(null, json);
+        //remove extra # characters to make it valid json... apparently some people have *unquoted* # characters in their json
+        if(file.extension().equals("json")){
+            json = json.replace("#", "\\#");
+        }
+
+        JsonValue value = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
+
         if(!parsers.containsKey(type)){
             throw new SerializationException("No parsers for content type '" + type + "'");
         }
 
         currentMod = mod;
-        boolean exists = Vars.content.getByName(type, name) != null;
+        boolean located = locate(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
         toBeParsed.add(c);
-        if(!exists){
+        if(!located){
             c.sourceFile = file;
             c.mod = mod;
         }
         return c;
     }
 
+    private <T extends MappableContent> T locate(ContentType type, String name){
+        T first = Vars.content.getByName(type, name); //try vanilla replacement
+        return first != null ? first : Vars.content.getByName(type, currentMod.name + "-" + name);
+    }
+
     private <T> T make(Class<T> type){
         try{
-            java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor();
+            Constructor<T> cons = type.getDeclaredConstructor();
             cons.setAccessible(true);
             return cons.newInstance();
         }catch(Exception e){
@@ -370,7 +446,7 @@ public class ContentParser{
 
     private <T> T make(Class<T> type, String name){
         try{
-            java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor(String.class);
+            Constructor<T> cons = type.getDeclaredConstructor(String.class);
             cons.setAccessible(true);
             return cons.newInstance(name);
         }catch(Exception e){
@@ -380,7 +456,7 @@ public class ContentParser{
 
     private <T> Prov<T> supply(Class<T> type){
         try{
-            java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor();
+            Constructor<T> cons = type.getDeclaredConstructor();
             return () -> {
                 try{
                     return cons.newInstance();
@@ -445,7 +521,7 @@ public class ContentParser{
             FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
             if(metadata == null){
                 if(ignoreUnknownFields){
-                    Log.err("{0}: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
+                    Log.warn("{0}: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
                     continue;
                 }else{
                     SerializationException ex = new SerializationException("Field not found: " + child.name + " (" + type.getName() + ")");
@@ -456,7 +532,7 @@ public class ContentParser{
             Field field = metadata.field;
             try{
                 field.set(object, parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType));
-            }catch(ReflectionException ex){
+            }catch(IllegalAccessException ex){
                 throw new SerializationException("Error accessing field: " + field.getName() + " (" + type.getName() + ")", ex);
             }catch(SerializationException ex){
                 ex.addTrace(field.getName() + " (" + type.getName() + ")");

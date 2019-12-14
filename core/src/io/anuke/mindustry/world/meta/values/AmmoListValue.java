@@ -29,7 +29,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
         for(T t : map.keys()){
             BulletType type = map.get(t);
             table.addImage(icon(t)).size(3 * 8).padRight(4).right().top();
-            table.add(t.localizedName()).padRight(10).left().top();
+            table.add(t.localizedName).padRight(10).left().top();
             table.table(Tex.underline, bt -> {
                 bt.left().defaults().padRight(3).left();
 
@@ -41,9 +41,9 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
                 }
 
-                if(!Mathf.isEqual(type.ammoMultiplier, 1f))
+                if(!Mathf.equal(type.ammoMultiplier, 1f))
                     sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
-                if(!Mathf.isEqual(type.reloadMultiplier, 1f))
+                if(!Mathf.equal(type.reloadMultiplier, 1f))
                     sep(bt, Core.bundle.format("bullet.reload", Strings.fixed(type.reloadMultiplier, 1)));
 
                 if(type.knockback > 0){

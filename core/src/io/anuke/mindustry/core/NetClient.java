@@ -342,6 +342,26 @@ public class NetClient implements ApplicationListener{
         }
     }
 
+    @Remote(variants = Variant.both, priority = PacketPriority.low, unreliable = true)
+    public static void onBlockSnapshot(short amount, short dataLen, byte[] data){
+        try{
+            netClient.byteStream.setBytes(net.decompressSnapshot(data, dataLen));
+            DataInputStream input = netClient.dataStream;
+
+            for(int i = 0; i < amount; i++){
+                int pos = input.readInt();
+                Tile tile = world.tile(pos);
+                if(tile == null || tile.entity == null){
+                    Log.warn("Missing entity at {0}. Skipping block snapshot.", tile);
+                    break;
+                }
+                tile.entity.read(input, tile.entity.version());
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
     public static void onStateSnapshot(float waveTime, int wave, int enemies, short coreDataLen, byte[] coreData){
         try{
@@ -471,7 +491,7 @@ public class NetClient implements ApplicationListener{
             player.pointerX, player.pointerY, player.rotation, player.baseRotation,
             player.velocity().x, player.velocity().y,
             player.getMineTile(),
-            player.isBoosting, player.isShooting, ui.chatfrag.chatOpen(), player.isBuilding,
+            player.isBoosting, player.isShooting, ui.chatfrag.shown(), player.isBuilding,
             requests,
             Core.camera.position.x, Core.camera.position.y,
             Core.camera.width * viewScale, Core.camera.height * viewScale);

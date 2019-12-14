@@ -6,9 +6,9 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-public abstract class PowerTurret extends CooledTurret{
-    protected @NonNull BulletType shootType;
-    protected float powerUse = 1f;
+public class PowerTurret extends CooledTurret{
+    public @NonNull BulletType shootType;
+    public float powerUse = 1f;
 
     public PowerTurret(String name){
         super(name);
@@ -47,6 +47,6 @@ public abstract class PowerTurret extends CooledTurret{
 
     @Override
     protected float baseReloadSpeed(Tile tile){
-        return tile.isEnemyCheat() ? 1f : tile.entity.power.satisfaction;
+        return tile.isEnemyCheat() ? 1f : tile.entity.power.status;
     }
 }

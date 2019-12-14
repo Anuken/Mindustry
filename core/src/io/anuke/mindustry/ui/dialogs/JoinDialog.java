@@ -9,6 +9,7 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.gen.*;
@@ -32,14 +33,14 @@ public class JoinDialog extends FloatingDialog{
 
         loadServers();
 
-        buttons.add().width(60f);
-        buttons.add().growX();
+        if(!steam) buttons.add().width(60f);
+        buttons.add().growX().width(-1);
 
         addCloseButton();
 
-        buttons.add().growX();
+        buttons.add().growX().width(-1);
         if(!steam){
-            buttons.addButton("?", () -> ui.showInfo("$join.info")).size(60f, 64f);
+            buttons.addButton("?", () -> ui.showInfo("$join.info")).size(60f, 64f).width(-1);
         }
 
         add = new FloatingDialog("$joingame.title");
@@ -247,7 +248,7 @@ public class JoinDialog extends FloatingDialog{
             }
 
             ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
-                new ColorPickDialog().show(color -> {
+                new PaletteDialog().show(color -> {
                     player.color.set(color);
                     Core.settings.put("color-0", Color.rgba8888(color));
                     Core.settings.save();
@@ -271,7 +272,7 @@ public class JoinDialog extends FloatingDialog{
 
             Cell cell = ((Table)pane.getParent()).getCell(button);
 
-            if(!Mathf.isEqual(cell.minWidth(), pw)){
+            if(!Mathf.equal(cell.minWidth(), pw)){
                 cell.width(pw);
                 cell.padLeft(pad);
                 pane.getParent().invalidateHierarchy();
@@ -359,6 +360,20 @@ public class JoinDialog extends FloatingDialog{
     @SuppressWarnings("unchecked")
     private void loadServers(){
         servers = Core.settings.getObject("server-list", Array.class, Array::new);
+
+        //get servers
+        Core.net.httpGet(serverJsonURL, result -> {
+            try{
+                Jval val = Jval.read(result.getResultAsString());
+                Core.app.post(() -> {
+                    try{
+                        defaultServers.clear();
+                        val.asArray().each(child -> defaultServers.add(child.getString("address", "<invalid>")));
+                        Log.info("Fetched {0} global servers.", defaultServers.size);
+                    }catch(Throwable ignored){}
+                });
+            }catch(Throwable ignored){}
+        }, t -> {});
     }
 
     private void saveServers(){

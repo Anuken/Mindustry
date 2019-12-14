@@ -8,6 +8,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.glutils.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.io.Streams.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.*;
@@ -74,6 +75,14 @@ public class Schematics implements Loadable{
 
         platform.getWorkshopContent(Schematic.class).each(this::loadFile);
 
+        //mod-specific schematics, cannot be removed
+        mods.listFiles("schematics", (mod, file) -> {
+            Schematic s = loadFile(file);
+            if(s != null){
+                s.mod = mod;
+            }
+        });
+
         all.sort();
 
         if(shadowBuffer == null){
@@ -102,8 +111,8 @@ public class Schematics implements Loadable{
         }
     }
 
-    private void loadFile(FileHandle file){
-        if(!file.extension().equals(schematicExtension)) return;
+    private @Nullable Schematic loadFile(FileHandle file){
+        if(!file.extension().equals(schematicExtension)) return null;
 
         try{
             Schematic s = read(file);
@@ -113,9 +122,12 @@ public class Schematics implements Loadable{
             if(!s.file.parent().equals(schematicDirectory)){
                 s.tags.put("steamid", s.file.parent().name());
             }
+
+            return s;
         }catch(IOException e){
             Log.err(e);
         }
+        return null;
     }
 
     public Array<Schematic> all(){

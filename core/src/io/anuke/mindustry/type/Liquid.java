@@ -1,15 +1,19 @@
 package io.anuke.mindustry.type;
 
-import io.anuke.arc.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.ctype.UnlockableContent;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.ui.*;
 
 public class Liquid extends UnlockableContent{
-    public final Color color;
+    public final @NonNull Color color;
 
+    /** Color used in bars. */
+    public @Nullable Color barColor;
+    /** Color used to draw lights. Note that the alpha channel is used to dictate brightness. */
+    public Color lightColor = Color.clear.cpy();
     /** 0-1, 0 is completely inflammable, anything above that may catch fire when exposed to heat, 0.5+ is very flammable. */
     public float flammability;
     /** temperature: 0.5 is 'room' temperature, 0 is very cold, 1 is molten hot */
@@ -20,15 +24,12 @@ public class Liquid extends UnlockableContent{
     public float viscosity = 0.5f;
     /** how prone to exploding this liquid is, when heated. 0 = nothing, 1 = nuke */
     public float explosiveness;
-    /** the burning color of this liquid */
-    public Color flameColor = Color.valueOf("ffb763");
     /** The associated status effect. */
     public StatusEffect effect = StatusEffects.none;
 
     public Liquid(String name, Color color){
         super(name);
         this.color = new Color(color);
-        this.description = Core.bundle.getOrNull("liquid." + name + ".description");
     }
 
     /** For modding only.*/
@@ -40,19 +41,18 @@ public class Liquid extends UnlockableContent{
         return flammability < 0.1f && temperature <= 0.5f;
     }
 
+    public Color barColor(){
+        return barColor == null ? color : barColor;
+    }
+
     @Override
     public void displayInfo(Table table){
         ContentDisplay.displayLiquid(table, this);
     }
 
     @Override
-    public String localizedName(){
-        return Core.bundle.get("liquid." + this.name + ".name");
-    }
-
-    @Override
     public String toString(){
-        return localizedName();
+        return localizedName;
     }
 
     @Override

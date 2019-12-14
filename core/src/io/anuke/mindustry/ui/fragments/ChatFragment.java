@@ -24,7 +24,7 @@ public class ChatFragment extends Table{
     private final static int messagesShown = 10;
     private Array<ChatMessage> messages = new Array<>();
     private float fadetime;
-    private boolean chatOpen = false;
+    private boolean shown = false;
     private TextField chatfield;
     private Label fieldlabel = new Label(">");
     private BitmapFont font;
@@ -52,7 +52,7 @@ public class ChatFragment extends Table{
             if(!net.active() && messages.size > 0){
                 clearMessages();
 
-                if(chatOpen){
+                if(shown){
                     hide();
                 }
             }
@@ -66,7 +66,7 @@ public class ChatFragment extends Table{
                 toggle();
             }
 
-            if(chatOpen){
+            if(shown){
                 if(input.keyTap(Binding.chat_history_prev) && historyPos < history.size - 1){
                     if(historyPos == 0) history.set(0, chatfield.getText());
                     historyPos++;
@@ -123,7 +123,7 @@ public class ChatFragment extends Table{
 
         Draw.color(shadowColor);
 
-        if(chatOpen){
+        if(shown){
             Fill.crect(offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
         }
 
@@ -131,14 +131,14 @@ public class ChatFragment extends Table{
 
         float spacing = chatspace;
 
-        chatfield.visible(chatOpen);
-        fieldlabel.visible(chatOpen);
+        chatfield.visible(shown);
+        fieldlabel.visible(shown);
 
         Draw.color(shadowColor);
         Draw.alpha(shadowColor.a * opacity);
 
         float theight = offsety + spacing + getMarginBottom();
-        for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || chatOpen); i++){
+        for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || shown); i++){
 
             layout.setText(font, messages.get(i).formattedMessage, Color.white, textWidth, Align.bottomLeft, true);
             theight += layout.height + textspacing;
@@ -147,7 +147,7 @@ public class ChatFragment extends Table{
             font.getCache().clear();
             font.getCache().addText(messages.get(i).formattedMessage, fontoffsetx + offsetx, offsety + theight, textWidth, Align.bottomLeft, true);
 
-            if(!chatOpen && fadetime - i < 1f && fadetime - i >= 0f){
+            if(!shown && fadetime - i < 1f && fadetime - i >= 0f){
                 font.getCache().setAlphas((fadetime - i) * opacity);
                 Draw.color(0, 0, 0, shadowColor.a * (fadetime - i) * opacity);
             }else{
@@ -163,7 +163,7 @@ public class ChatFragment extends Table{
 
         Draw.color();
 
-        if(fadetime > 0 && !chatOpen)
+        if(fadetime > 0 && !shown)
             fadetime -= Time.delta() / 180f;
     }
 
@@ -180,9 +180,9 @@ public class ChatFragment extends Table{
 
     public void toggle(){
 
-        if(!chatOpen){
+        if(!shown){
             scene.setKeyboardFocus(chatfield);
-            chatOpen = !chatOpen;
+            shown = !shown;
             if(mobile){
                 TextInput input = new TextInput();
                 input.maxLength = maxTextLength;
@@ -199,7 +199,7 @@ public class ChatFragment extends Table{
             }
         }else{
             scene.setKeyboardFocus(null);
-            chatOpen = !chatOpen;
+            shown = !shown;
             scrollPos = 0;
             sendMessage();
         }
@@ -207,7 +207,7 @@ public class ChatFragment extends Table{
 
     public void hide(){
         scene.setKeyboardFocus(null);
-        chatOpen = false;
+        shown = false;
         clearChatInput();
     }
 
@@ -222,12 +222,8 @@ public class ChatFragment extends Table{
         chatfield.setText("");
     }
 
-    public boolean chatOpen(){
-        return chatOpen;
-    }
-
-    public int getMessagesSize(){
-        return messages.size;
+    public boolean shown(){
+        return shown;
     }
 
     public void addMessage(String message, String sender){

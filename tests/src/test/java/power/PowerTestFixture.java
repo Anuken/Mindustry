@@ -33,7 +33,7 @@ public class PowerTestFixture{
 
             }
         };
-        content.createContent();
+        content.createBaseContent();
         Log.setUseColors(false);
         Time.setDeltaProvider(() -> 0.5f);
     }
@@ -91,6 +91,13 @@ public class PowerTestFixture{
             if(block.hasLiquids) tile.entity.liquids = new LiquidModule();
             if(block.hasPower){
                 tile.entity.power = new PowerModule();
+                tile.entity.power.graph = new PowerGraph(){
+                    //assume there's always something consuming power
+                    @Override
+                    public float getUsageFraction(){
+                        return 1f;
+                    }
+                };
                 tile.entity.power.graph.add(tile);
             }
 

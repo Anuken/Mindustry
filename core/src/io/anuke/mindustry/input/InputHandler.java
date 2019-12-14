@@ -32,6 +32,7 @@ import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.BuildBlock.*;
+import io.anuke.mindustry.world.blocks.power.PowerNode;
 
 import java.util.*;
 
@@ -110,7 +111,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         int[] remaining = {accepted, accepted};
         Block block = tile.block();
 
-        Core.app.post(() -> Events.fire(new DepositEvent(tile, player)));
+        Core.app.post(() -> Events.fire(new DepositEvent(tile, player, item, accepted)));
 
         for(int i = 0; i < sent; i++){
             boolean end = i == sent - 1;
@@ -144,12 +145,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(tile == null || player == null) return;
         if(!Units.canInteract(player, tile)) return;
         tile.block().tapped(tile, player);
+        Core.app.post(() -> Events.fire(new TapEvent(tile, player)));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void onTileConfig(Player player, Tile tile, int value){
         if(tile == null || !Units.canInteract(player, tile)) return;
         tile.block().configured(tile, player, value);
+        Core.app.post(() -> Events.fire(new TapConfigEvent(tile, player, value)));
     }
 
     public Eachable<BuildRequest> allRequests(){
@@ -218,7 +221,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean requestMatches(BuildRequest request){
         Tile tile = world.tile(request.x, request.y);
-        return tile != null && tile.block() instanceof BuildBlock && tile.<BuildEntity>entity().cblock == request.block;
+        return tile != null && tile.block() instanceof BuildBlock && tile.<BuildEntity>ent().cblock == request.block;
     }
 
     public void drawBreaking(int x, int y){
@@ -452,7 +455,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawRequest(BuildRequest request){
-        drawRequest(request.x, request.y, request.block, request.rotation);
+        request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
     }
 
     /** Draws a placement icon for a specific block. */
@@ -806,7 +809,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){
         Array<Point2> points;
         boolean diagonal = Core.input.keyDown(Binding.diagonal_placement);
+
         if(Core.settings.getBool("swapdiagonal") && mobile){
+            diagonal = !diagonal;
+        }
+
+        if(block instanceof PowerNode){
             diagonal = !diagonal;
         }
 
@@ -814,6 +822,29 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
         }else{
             points = Placement.normalizeLine(startX, startY, endX, endY);
+        }
+
+        if(block instanceof PowerNode){
+            Array<Point2> skip = new Array<>();
+            
+            for(int i = 1; i < points.size; i++){
+                int overlaps = 0;
+                Point2 point = points.get(i);
+
+                //check with how many powernodes the *next* tile will overlap
+                for(int j = 0; j < i; j++){
+                    if(!skip.contains(points.get(j)) && ((PowerNode)block).overlaps(world.ltile(point.x, point.y), world.ltile(points.get(j).x, points.get(j).y))){
+                        overlaps++;
+                    }
+                }
+
+                //if it's more than one, it can bridge the gap
+                if(overlaps > 1){
+                    skip.add(points.get(i-1));
+                }
+            }
+            //remove skipped points
+            points.removeAll(skip);
         }
 
         float angle = Angles.angle(startX, startY, endX, endY);

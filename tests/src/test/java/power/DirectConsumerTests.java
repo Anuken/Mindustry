@@ -41,7 +41,7 @@ public class DirectConsumerTests extends PowerTestFixture{
         consumerTile.entity.items.add(Items.lead, leadAmount);
 
         Tile producerTile = createFakeTile(2, 0, createFakeProducerBlock(producedPower));
-        producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1f;
+        producerTile.<PowerGenerator.GeneratorEntity>ent().productionEfficiency = 1f;
 
         PowerGraph graph = new PowerGraph();
         graph.add(producerTile);
@@ -50,6 +50,6 @@ public class DirectConsumerTests extends PowerTestFixture{
         consumerTile.entity.update();
         graph.update();
 
-        assertEquals(expectedSatisfaction, consumerTile.entity.power.satisfaction);
+        assertEquals(expectedSatisfaction, consumerTile.entity.power.status);
     }
 }

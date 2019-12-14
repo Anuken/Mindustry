@@ -66,7 +66,7 @@ public class DatabaseDialog extends FloatingDialog{
 
                     if(unlocked(unlock)){
                         image.clicked(() -> Vars.ui.content.show(unlock));
-                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName())));
+                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName)));
                     }
 
                     if((++count) % maxWidth == 0){

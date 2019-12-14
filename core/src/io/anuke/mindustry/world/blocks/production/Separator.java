@@ -1,21 +1,15 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.util.ArcAnnotate.*;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
-import io.anuke.mindustry.world.consumers.ConsumeLiquidBase;
-import io.anuke.mindustry.world.consumers.ConsumeType;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.mindustry.world.meta.values.ItemFilterValue;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.production.GenericCrafter.*;
+import io.anuke.mindustry.world.consumers.*;
+import io.anuke.mindustry.world.meta.*;
+import io.anuke.mindustry.world.meta.values.*;
 
 /**
  * Extracts a random list of items from an input item and an input liquid.
@@ -39,6 +33,7 @@ public class Separator extends Block{
         hasLiquids = true;
 
         liquidRegion = reg("-liquid");
+        entityType = GenericCrafterEntity::new;
     }
 
     @Override
@@ -61,7 +56,7 @@ public class Separator extends Block{
     }
 
     @Override
-    public boolean canProduce(Tile tile){
+    public boolean shouldConsume(Tile tile){
         return tile.entity.items.total() < itemCapacity;
     }
 
@@ -69,7 +64,7 @@ public class Separator extends Block{
     public void draw(Tile tile){
         super.draw(tile);
 
-        GenericCrafterEntity entity = tile.entity();
+        GenericCrafterEntity entity = tile.ent();
 
         Draw.color(tile.entity.liquids.current().color);
         Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
@@ -83,7 +78,7 @@ public class Separator extends Block{
 
     @Override
     public void update(Tile tile){
-        GenericCrafterEntity entity = tile.entity();
+        GenericCrafterEntity entity = tile.ent();
 
         entity.totalProgress += entity.warmup * entity.delta();
 
@@ -122,10 +117,5 @@ public class Separator extends Block{
         if(entity.timer.get(timerDump, dumpTime)){
             tryDump(tile);
         }
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new GenericCrafterEntity();
     }
 }

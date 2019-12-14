@@ -11,6 +11,7 @@ import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -76,16 +77,9 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
         return create(type, parent.owner, parent.team, x, y, angle, velocityScl);
     }
 
-    /** Internal use only. */
     @Remote(called = Loc.server, unreliable = true)
-    public static void createBullet(BulletType type, float x, float y, float angle){
-        create(type, null, Team.derelict, x, y, angle);
-    }
-
-    /** ok */
-    @Remote(called = Loc.server, unreliable = true)
-    public static void createBullet(BulletType type, Team team, float x, float y, float angle){
-        create(type, null, team, x, y, angle);
+    public static void createBullet(BulletType type, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
+        create(type, null, team, x, y, angle, velocityScl, lifetimeScl, null);
     }
 
     public Entity getOwner(){
@@ -294,6 +288,7 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
     @Override
     public void draw(){
         type.draw(this);
+        renderer.lights.add(x, y, 16f, Pal.powerLight, 0.3f);
     }
 
     @Override

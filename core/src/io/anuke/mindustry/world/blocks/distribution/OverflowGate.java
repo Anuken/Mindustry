@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.meta.BlockGroup;
 import java.io.*;
 
 public class OverflowGate extends Block{
-    protected float speed = 1f;
+    public float speed = 1f;
 
     public OverflowGate(String name){
         super(name);
@@ -19,6 +19,7 @@ public class OverflowGate extends Block{
         update = true;
         group = BlockGroup.transportation;
         unloadable = false;
+        entityType = OverflowGateEntity::new;
     }
 
     @Override
@@ -28,7 +29,7 @@ public class OverflowGate extends Block{
 
     @Override
     public int removeStack(Tile tile, Item item, int amount){
-        OverflowGateEntity entity = tile.entity();
+        OverflowGateEntity entity = tile.ent();
         int result = super.removeStack(tile, item, amount);
         if(result != 0 && item == entity.lastItem){
             entity.lastItem = null;
@@ -38,7 +39,7 @@ public class OverflowGate extends Block{
 
     @Override
     public void update(Tile tile){
-        OverflowGateEntity entity = tile.entity();
+        OverflowGateEntity entity = tile.ent();
 
         if(entity.lastItem == null && entity.items.total() > 0){
             entity.items.clear();
@@ -59,14 +60,14 @@ public class OverflowGate extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        OverflowGateEntity entity = tile.entity();
+        OverflowGateEntity entity = tile.ent();
 
         return tile.getTeam() == source.getTeam() && entity.lastItem == null && entity.items.total() == 0;
     }
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        OverflowGateEntity entity = tile.entity();
+        OverflowGateEntity entity = tile.ent();
         entity.items.add(item, 1);
         entity.lastItem = item;
         entity.time = 0f;
@@ -106,11 +107,6 @@ public class OverflowGate extends Block{
         }
 
         return to;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new OverflowGateEntity();
     }
 
     public class OverflowGateEntity extends TileEntity{

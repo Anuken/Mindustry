@@ -12,6 +12,7 @@ import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.ui.*;
+import org.robovm.apple.coregraphics.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
 import org.robovm.objc.block.*;
@@ -39,7 +40,8 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
             @Override
             public void showFileChooser(boolean open, String extension, Cons<FileHandle> cons){
-                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray)null);
+                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray<NSString>)null);
+
 
                 NSArray<UIBarButtonItem> arr = new NSArray<>(new UIBarButtonItem(Core.bundle.get("cancel"), UIBarButtonItemStyle.Plain,
                     uiBarButtonItem -> cont.dismissViewController(true, () -> {})));
@@ -57,8 +59,31 @@ public class IOSLauncher extends IOSApplication.Delegate{
                     public void didPickDocumentsAtURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
                         if(documentURLs.size() < 1) return;
 
+                        NSURL url = documentURLs.first();
+                        NSFileCoordinator coord = new NSFileCoordinator(null);
+                        url.startAccessingSecurityScopedResource();
+                        try{
+                            coord.coordinateReadingItem(url, NSFileCoordinatorReadingOptions.ForUploading, result -> {
+
+                                FileHandle src = Core.files.absolute(result.getAbsoluteURL().getPath());
+                                FileHandle dst = Core.files.absolute(getDocumentsDirectory()).child(src.name());
+                                src.copyTo(dst);
+
+                                Core.app.post(() -> {
+                                    try{
+                                        cons.get(dst);
+                                    }catch(Throwable t){
+                                        ui.showException(t);
+                                    }
+                                });
+                            });
+                        }catch(Throwable e){
+                            ui.showException(e);
+                        }
+
+                        url.stopAccessingSecurityScopedResource();
+
                         cont.dismissViewController(true, () -> {});
-                        controller.importDocument(documentURLs.get(0), new NSURL(getDocumentsDirectory() + "/document"), UIDocumentBrowserImportMode.Copy, (url, error) -> cons.get(Core.files.absolute(url.getPath())));
                     }
 
                     @Override
@@ -68,7 +93,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                     @Override
                     public void didImportDocument(UIDocumentBrowserViewController controller, NSURL sourceURL, NSURL destinationURL){
-                        cons.get(Core.files.absolute(destinationURL.getAbsoluteString()));
                     }
 
                     @Override
@@ -89,24 +113,32 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                 cont.setDelegate(new ChooserDelegate());
 
-               // DispatchQueue.getMainQueue().sync(() -> {
                 UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(cont, true, () -> {});
-               // });
             }
 
             @Override
             public void shareFile(FileHandle file){
-                Log.info("Attempting to share file " + file);
-                FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
-                file.copyTo(to);
+                try{
+                    Log.info("Attempting to share file " + file);
+                    FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
+                    file.copyTo(to);
 
-                NSURL url = new NSURL(to.file());
-                UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
-
-                //DispatchQueue.getMainQueue().sync(() -> {
-                UIApplication.getSharedApplication().getKeyWindow().getRootViewController()
-                .presentViewController(p, true, () -> Log.info("Success! Presented {0}", to));
-                //});
+                    NSURL url = new NSURL(to.file());
+                    UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
+                    UIViewController rootVc = UIApplication.getSharedApplication().getKeyWindow().getRootViewController();
+                    if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
+                        // Set up the pop-over for iPad
+                        UIPopoverPresentationController pop = p.getPopoverPresentationController();
+                        UIView mainView = rootVc.getView();
+                        pop.setSourceView(mainView);
+                        CGRect targetRect = new CGRect(mainView.getBounds().getMidX(), mainView.getBounds().getMidY(), 0, 0);
+                        pop.setSourceRect(targetRect);
+                        pop.setPermittedArrowDirections(UIPopoverArrowDirection.None);
+                    }
+                    rootVc.presentViewController(p, true, () -> Log.info("Success! Presented {0}", to));
+                }catch(Throwable t){
+                    ui.showException(t);
+                }
             }
 
             @Override

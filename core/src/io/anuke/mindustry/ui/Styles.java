@@ -201,6 +201,9 @@ public class Styles{
             down = flatDown;
             up = black6;
             over = flatOver;
+            disabled = black8;
+            imageDisabledColor = Color.lightGray;
+            imageUpColor = Color.white;
         }};
         clearToggleTransi = new ImageButtonStyle(){{
             down = flatDown;

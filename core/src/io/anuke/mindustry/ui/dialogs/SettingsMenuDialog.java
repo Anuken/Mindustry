@@ -218,17 +218,21 @@ public class SettingsMenuDialog extends SettingsDialog{
                 control.setInput(new MobileInput());
             }
         }*/
-        game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Core.bundle.format("setting.seconds", i));
+        game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){
+            game.sliderPref("blockselecttimeout", 750, 0, 2000, 50, i -> Core.bundle.format("setting.milliseconds", i));
+
             game.checkPref("crashreport", true);
         }
 
         game.checkPref("savecreate", true);
-
         game.checkPref("blockreplace", true);
-
+        game.checkPref("conveyorpathfinding", true);
         game.checkPref("hints", true);
+        if(!mobile){
+            game.checkPref("buildautopause", false);
+        }
 
         if(steam && !Version.modifier.contains("beta")){
             game.checkPref("publichost", false, i -> {
@@ -249,7 +253,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        graphics.sliderPref("uiscale", 100, 25, 400, 5, s -> {
+        graphics.sliderPref("uiscale", 100, 25, 300, 25, s -> {
             if(ui.settings != null){
                 Core.settings.put("uiscalechanged", true);
             }
@@ -257,7 +261,12 @@ public class SettingsMenuDialog extends SettingsDialog{
         });
         graphics.sliderPref("fpscap", 240, 15, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
-        graphics.sliderPref("lasersopacity", 100, 0, 100, 5, s -> s + "%");
+        graphics.sliderPref("lasersopacity", 100, 0, 100, 5, s -> {
+            if(ui.settings != null){
+                Core.settings.put("preferredlaseropacity", s);
+            }
+            return s + "%";
+        });
         graphics.sliderPref("bridgeopacity", 100, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
@@ -300,6 +309,9 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("position", false);
         graphics.checkPref("fps", false);
+        if(!mobile){
+            graphics.checkPref("blockselectkeys", true);
+        }
         graphics.checkPref("indicators", true);
         graphics.checkPref("animatedwater", !mobile);
         if(Shaders.shield != null){
@@ -354,7 +366,11 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         keyDown(key -> {
             if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
-                hide();
+                if(prefs.getChildren().first() != menu){
+                    back();
+                }else{
+                    hide();
+                }
             }
         });
     }

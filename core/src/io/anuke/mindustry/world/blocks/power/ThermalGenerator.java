@@ -1,15 +1,18 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.Attribute;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.math.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Effects.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.meta.*;
+
+import static io.anuke.mindustry.Vars.renderer;
 
 public class ThermalGenerator extends PowerGenerator{
-    protected Effect generateEffect = Fx.none;
+    public Effect generateEffect = Fx.none;
 
     public ThermalGenerator(String name){
         super(name);
@@ -17,7 +20,7 @@ public class ThermalGenerator extends PowerGenerator{
 
     @Override
     public void update(Tile tile){
-        GeneratorEntity entity = tile.entity();
+        GeneratorEntity entity = tile.ent();
 
         if(entity.productionEfficiency > 0.1f && Mathf.chance(0.05 * entity.delta())){
             Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
@@ -30,10 +33,16 @@ public class ThermalGenerator extends PowerGenerator{
     }
 
     @Override
+    public void drawLight(Tile tile){
+        GeneratorEntity entity = tile.ent();
+        renderer.lights.add(tile.drawx(), tile.drawy(), (40f + Mathf.absin(10f, 5f)) * entity.productionEfficiency * size, Color.scarlet, 0.4f);
+    }
+
+    @Override
     public void onProximityAdded(Tile tile){
         super.onProximityAdded(tile);
 
-        GeneratorEntity entity = tile.entity();
+        GeneratorEntity entity = tile.ent();
         entity.productionEfficiency = sumAttribute(Attribute.heat, tile.x, tile.y);
     }
 
@@ -41,7 +50,7 @@ public class ThermalGenerator extends PowerGenerator{
     public float getPowerProduction(Tile tile){
         //in this case, productionEfficiency means 'total heat'
         //thus, it may be greater than 1.0
-        return powerProduction * tile.<GeneratorEntity>entity().productionEfficiency;
+        return powerProduction * tile.<GeneratorEntity>ent().productionEfficiency;
     }
 
     @Override

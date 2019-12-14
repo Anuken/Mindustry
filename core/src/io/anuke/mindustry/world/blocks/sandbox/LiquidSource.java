@@ -21,7 +21,7 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class LiquidSource extends Block{
-    private static Liquid lastLiquid;
+    public static Liquid lastLiquid;
 
     public LiquidSource(String name){
         super(name);
@@ -31,6 +31,7 @@ public class LiquidSource extends Block{
         liquidCapacity = 100f;
         configurable = true;
         outputsLiquid = true;
+        entityType = LiquidSourceEntity::new;
     }
 
     @Override
@@ -49,7 +50,7 @@ public class LiquidSource extends Block{
 
     @Override
     public void update(Tile tile){
-        LiquidSourceEntity entity = tile.entity();
+        LiquidSourceEntity entity = tile.ent();
 
         if(entity.source == null){
             tile.entity.liquids.clear();
@@ -68,7 +69,7 @@ public class LiquidSource extends Block{
     public void draw(Tile tile){
         super.draw(tile);
 
-        LiquidSourceEntity entity = tile.entity();
+        LiquidSourceEntity entity = tile.ent();
 
         if(entity.source != null){
             Draw.color(entity.source.color);
@@ -78,8 +79,8 @@ public class LiquidSource extends Block{
     }
 
     @Override
-    public void buildTable(Tile tile, Table table){
-        LiquidSourceEntity entity = tile.entity();
+    public void buildConfiguration(Tile tile, Table table){
+        LiquidSourceEntity entity = tile.ent();
 
         Array<Liquid> items = content.liquids();
 
@@ -107,13 +108,8 @@ public class LiquidSource extends Block{
     }
 
     @Override
-    public TileEntity newEntity(){
-        return new LiquidSourceEntity();
-    }
-
-    @Override
     public void configured(Tile tile, Player player, int value){
-        tile.<LiquidSourceEntity>entity().source = value == -1 ? null : content.liquid(value);
+        tile.<LiquidSourceEntity>ent().source = value == -1 ? null : content.liquid(value);
     }
 
     class LiquidSourceEntity extends TileEntity{

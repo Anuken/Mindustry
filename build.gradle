@@ -9,7 +9,7 @@ buildscript{
     }
 
     dependencies{
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.8-SNAPSHOT'
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.8'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.10"
         classpath "com.github.anuken:packr:-SNAPSHOT"
     }
@@ -26,9 +26,13 @@ allprojects{
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         gdxVersion = '1.9.10'
-        roboVMVersion = '2.3.8-SNAPSHOT'
-        steamworksVersion = '1e1bd5c7c042f8eb0c23a6daaa373d562f82539a'
+        roboVMVersion = '2.3.8'
+        steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
         arcHash = null
+
+        loadVersionProps = {
+            return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
+        }
 
         debugged = {
             return new File(projectDir.parent, '../Mindustry-Debug').exists() && !project.hasProperty("release") && project.hasProperty("args")
@@ -200,6 +204,27 @@ project(":core"){
         writeVersion()
     }
 
+    task copyChangelog{
+        doLast{
+            def props = loadVersionProps()
+            def androidVersion = props['androidBuildCode'].toInteger() - 2
+            def buildVersion = props["build"]
+            def loglines = file("../changelog").text.split("\n")
+            def maxLength = 460
+
+            def androidLogList = loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
+            def result = ""
+            androidLogList.forEach({line ->
+                if(result.length() + line.length() + 1 < maxLength){
+                    result += line + "\n"
+                }
+            })
+            def changelogs = file("../fastlane/metadata/android/en-US/changelogs/")
+            new File(changelogs, buildVersion + ".txt").text = (result)
+            new File(changelogs, androidVersion + ".txt").text = (result)
+        }
+    }
+
     dependencies{
         if(System.properties["user.name"] == "anuke"){
             task cleanGen{
@@ -232,6 +257,7 @@ project(":core"){
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
         compile arcModule("extensions:arcnet")
+        compile "org.mozilla:rhino:1.7.11"
         if(localArc() && debugged()) compile arcModule("extensions:recorder")
 
         compileOnly project(":annotations")
@@ -273,6 +299,7 @@ project(":tools"){
 
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+        compile "org.reflections:reflections:0.9.11"
 
         compile arcModule("backends:backend-sdl")
     }
