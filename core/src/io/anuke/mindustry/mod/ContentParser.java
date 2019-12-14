@@ -266,7 +266,7 @@ public class ContentParser{
 
                         TechNode parnode = TechTree.all.find(t -> t.block == parent);
                         if(parnode == null){
-                            throw new ModLoadException("Block '" + parent.name + "' isn't in the tech tree, but '" + block.name + "' requires it to be researched.", block);
+                            throw new IllegalArgumentException("Block '" + parent.name + "' isn't in the tech tree, but '" + block.name + "' requires it to be researched.");
                         }
                         if(!parnode.children.contains(baseNode)){
                             parnode.children.add(baseNode);
@@ -386,21 +386,18 @@ public class ContentParser{
         }
     }
 
-    public void finishParsing(){
-        reads.each(c -> {
-            try{
-                c.run();
-            }catch(Throwable t){
-
-            }
-        });
-
+    private void attempt(Runnable run){
         try{
-            reads.each(Runnable::run);
-            postreads.each(Runnable::run);
-        }catch(Exception e){
-            Vars.mods.handleError(new ModLoadException("Error occurred parsing content: " + currentContent, currentContent, e), currentMod);
+            run.run();
+        }catch(Throwable t){
+            //don't overwrite double errors
+            markError(currentContent, t);
         }
+    }
+
+    public void finishParsing(){
+        reads.each(this::attempt);
+        postreads.each(this::attempt);
         reads.clear();
         postreads.clear();
         toBeParsed.clear();
@@ -433,7 +430,6 @@ public class ContentParser{
         currentMod = mod;
         boolean located = locate(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
-        c.minfo = new ModContentInfo();
         c.minfo.sourceFile = file;
         toBeParsed.add(c);
 
@@ -444,13 +440,15 @@ public class ContentParser{
     }
 
     public void markError(Content content, LoadedMod mod, FileHandle file, Throwable error){
-        if(content.minfo == null){
-            content.minfo = new ModContentInfo();
-        }
-
         content.minfo.mod = mod;
         content.minfo.sourceFile = file;
         content.minfo.error = Strings.parseException(error, true);
+    }
+
+    public void markError(Content content, Throwable error){
+        if(content.minfo != null && !content.hasErrored()){
+            markError(content, content.minfo.mod, content.minfo.sourceFile, error);
+        }
     }
 
     private <T extends MappableContent> T locate(ContentType type, String name){

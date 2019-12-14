@@ -1,19 +1,9 @@
 package io.anuke.mindustry.mod;
 
-import io.anuke.arc.*;
-import io.anuke.arc.collection.*;
-import io.anuke.arc.graphics.*;
-import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.*;
-import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.arc.util.*;
-import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.mod.Mods.*;
-import io.anuke.mindustry.ui.*;
-
 public class ModCrashHandler{
 
     public static void handle(Throwable t){
+        /*
         Array<Throwable> list = Strings.getCauses(t);
         Throwable modCause = list.find(e -> e instanceof ModLoadException);
 
@@ -62,6 +52,6 @@ public class ModCrashHandler{
             });
         }else{
             throw new RuntimeException(t);
-        }
+        }*/
     }
 }

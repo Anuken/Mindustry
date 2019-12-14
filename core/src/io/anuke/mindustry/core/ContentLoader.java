@@ -115,8 +115,8 @@ public class ContentLoader{
                 try{
                     callable.get(content);
                 }catch(Throwable e){
-                    if(content.mod != null){
-                        mods.handleError(new ModLoadException(content, e), content.mod);
+                    if(content.minfo.mod != null){
+                        mods.handleContentError(content, e);
                     }else{
                         throw new RuntimeException(e);
                     }
@@ -180,7 +180,7 @@ public class ContentLoader{
             throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + content.name + "')");
         }
         if(currentMod != null){
-            content.mod = currentMod;
+            content.minfo.mod = currentMod;
         }
         contentNameMap[content.getContentType().ordinal()].put(content.name, content);
     }

@@ -149,7 +149,7 @@ public class Mods implements Loadable{
             //generate new icons
             for(Array<Content> arr : content.getContentMap()){
                 arr.each(c -> {
-                    if(c instanceof UnlockableContent && c.minfo != null && c.minfo.mod != null){
+                    if(c instanceof UnlockableContent && c.minfo.mod != null){
                         UnlockableContent u = (UnlockableContent)c;
                         u.createIcons(packer);
                     }
@@ -465,17 +465,25 @@ public class Mods implements Loadable{
         //make sure mod content is in proper order
         runs.sort();
         for(LoadRun l : runs){
+            Content current = content.getLastAdded();
             try{
                 //this binds the content but does not load it entirely
                 Content loaded = parser.parse(l.mod, l.file.nameWithoutExtension(), l.file.readString("UTF-8"), l.file, l.type);
                 Log.debug("[{0}] Loaded '{1}'.", l.mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
             }catch(Throwable e){
-                throw new RuntimeException("Failed to parse content file '" + l.file + "' for mod '" + l.mod.meta.name + "'.", e);
+                if(current != content.getLastAdded() && content.getLastAdded() != null){
+                    parser.markError(content.getLastAdded(), l.mod, l.file, e);
+                }
+                //throw new RuntimeException("Failed to parse content file '" + l.file + "' for mod '" + l.mod.meta.name + "'.", e);
             }
         }
 
         //this finishes parsing content fields
         parser.finishParsing();
+    }
+
+    public void handleContentError(Content content, Throwable error){
+        parser.markError(content, error);
     }
 
     /** @return all loaded mods. */

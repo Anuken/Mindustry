@@ -1,8 +1,9 @@
 package io.anuke.mindustry.ctype;
 
+import io.anuke.arc.files.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
-import io.anuke.mindustry.mod.*;
+import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.*;
 
 
@@ -10,7 +11,7 @@ import io.anuke.mindustry.type.*;
 public abstract class Content implements Comparable<Content>{
     public final short id;
     /** Info on which mod this content was loaded from. */
-    public @Nullable ModContentInfo minfo;
+    public @NonNull ModContentInfo minfo = new ModContentInfo();
 
 
     public Content(){
@@ -37,7 +38,7 @@ public abstract class Content implements Comparable<Content>{
 
     /** @return whether an error ocurred during mod loading. */
     public boolean hasErrored(){
-        return minfo != null && minfo.error != null;
+        return minfo.error != null;
     }
 
     @Override
@@ -48,5 +49,14 @@ public abstract class Content implements Comparable<Content>{
     @Override
     public String toString(){
         return getContentType().name() + "#" + id;
+    }
+
+    public static class ModContentInfo{
+        /** The mod that loaded this piece of content. */
+        public @Nullable LoadedMod mod;
+        /** File that this content was loaded from. */
+        public @Nullable FileHandle sourceFile;
+        /** The error that occurred during loading, if applicable. Null if no error occurred. */
+        public @Nullable String error;
     }
 }
