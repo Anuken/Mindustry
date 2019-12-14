@@ -32,11 +32,11 @@ public class ExtendingItemBridge extends ItemBridge{
         ex *= uptime;
         ey *= uptime;
 
-        int opacityPercentage = Core.settings.getInt("bridgeopacity");
-        if(opacityPercentage == 0) return;
+        float opacityModifier = Core.settings.getInt("bridgeopacity") / 100f;
+        if(opacityModifier == 0f) return;
+        Draw.alpha(opacityModifier);
 
         Lines.stroke(8f);
-        Draw.alpha(opacityPercentage / 100f);
         Lines.line(bridgeRegion,
         tile.worldx() + Geometry.d4[i].x * tilesize / 2f,
         tile.worldy() + Geometry.d4[i].y * tilesize / 2f,
@@ -55,7 +55,7 @@ public class ExtendingItemBridge extends ItemBridge{
         Draw.color();
 
         for(int a = 0; a < arrows; a++){
-            Draw.alpha(Mathf.absin(a / (float)arrows - entity.time / 100f, 0.1f, 1f) * uptime * opacityPercentage / 100f);
+            Draw.alpha(Mathf.absin(a / (float)arrows - entity.time / 100f, 0.1f, 1f) * uptime * opacityModifier);
             Draw.rect(arrowRegion,
             tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 6f + 2) * uptime,
             tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 6f + 2) * uptime, i * 90f);

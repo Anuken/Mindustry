@@ -219,18 +219,17 @@ public class ItemBridge extends Block{
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)) return;
 
+        float opacityModifier = Core.settings.getInt("bridgeopacity") / 100f;
+        if(opacityModifier == 0f) return;
+
         int i = tile.absoluteRelativeTo(other.x, other.y);
 
         Draw.color(Color.white, Color.black, Mathf.absin(Time.time(), 6f, 0.07f));
-        Draw.alpha(Math.max(entity.uptime, 0.25f));
+        Draw.alpha(Math.max(entity.uptime, 0.25f) * opacityModifier);
 
         Draw.rect(endRegion, tile.drawx(), tile.drawy(), i * 90 + 90);
         Draw.rect(endRegion, other.drawx(), other.drawy(), i * 90 + 270);
 
-        int opacityPercentage = Core.settings.getInt("bridgeopacity");
-        if(opacityPercentage == 0) return;
-
-        Draw.alpha(opacityPercentage / 100f);
         Lines.stroke(8f);
         Lines.line(bridgeRegion,
         tile.worldx(),
@@ -246,7 +245,7 @@ public class ItemBridge extends Block{
         Draw.color();
 
         for(int a = 0; a < arrows; a++){
-            Draw.alpha(Mathf.absin(a / (float)arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime * opacityPercentage / 100f);
+            Draw.alpha(Mathf.absin(a / (float)arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime * opacityModifier);
             Draw.rect(arrowRegion,
             tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 4f + time % 4f),
             tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 4f + time % 4f), i * 90f);
