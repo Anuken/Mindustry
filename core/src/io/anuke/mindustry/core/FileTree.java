@@ -17,6 +17,8 @@ public class FileTree implements FileHandleResolver{
     public FileHandle get(String path){
         if(files.containsKey(path)){
             return files.get(path);
+        }else if(files.containsKey("/" + path)){
+            return files.get("/" + path);
         }else{
             return Core.files.internal(path);
         }

@@ -663,7 +663,7 @@ public class Mods implements Loadable{
         /** Content with intialization code. */
         public ObjectSet<Content> erroredContent = new ObjectSet<>();
         /** Current state of this mod. */
-        public ModState state = ModState.disabled;
+        public ModState state = ModState.enabled;
 
         public LoadedMod(FileHandle file, FileHandle root, Mod main, ModMeta meta){
             this.root = root;
