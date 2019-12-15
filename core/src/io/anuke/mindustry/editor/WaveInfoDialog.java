@@ -12,6 +12,7 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;

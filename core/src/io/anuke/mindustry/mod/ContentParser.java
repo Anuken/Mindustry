@@ -138,26 +138,20 @@ public class ContentParser{
                 }
 
                 //try to parse "item/amount" syntax
-                try{
-                    if(type == ItemStack.class && jsonData.isString() && jsonData.asString().contains("/")){
-                        String[] split = jsonData.asString().split("/");
+                if(type == ItemStack.class && jsonData.isString() && jsonData.asString().contains("/")){
+                    String[] split = jsonData.asString().split("/");
 
-                        return (T)fromJson(ItemStack.class, "{item: " + split[0] + ", amount: " + split[1] + "}");
-                    }
-                }catch(Throwable ignored){
+                    return (T)fromJson(ItemStack.class, "{item: " + split[0] + ", amount: " + split[1] + "}");
                 }
 
                 //try to parse "liquid/amount" syntax
-                try{
-                    if(jsonData.isString() && jsonData.asString().contains("/")){
-                        String[] split = jsonData.asString().split("/");
-                        if(type == LiquidStack.class){
-                            return (T)fromJson(LiquidStack.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
-                        }else if(type == ConsumeLiquid.class){
-                            return (T)fromJson(ConsumeLiquid.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
-                        }
+                if(jsonData.isString() && jsonData.asString().contains("/")){
+                    String[] split = jsonData.asString().split("/");
+                    if(type == LiquidStack.class){
+                        return (T)fromJson(LiquidStack.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
+                    }else if(type == ConsumeLiquid.class){
+                        return (T)fromJson(ConsumeLiquid.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
                     }
-                }catch(Throwable ignored){
                 }
 
                 if(Content.class.isAssignableFrom(type)){
@@ -168,7 +162,7 @@ public class ContentParser{
                     T two = (T)Vars.content.getByName(ctype, jsonData.asString());
 
                     if(two != null) return two;
-                    throw new IllegalArgumentException("\"" + jsonData.name + "\": No " + ctype + " found with name '" + jsonData.asString() + "'.");
+                    throw new IllegalArgumentException("\"" + jsonData.name + "\": No " + ctype + " found with name '" + jsonData.asString() + "'.\nMake sure '" + jsonData.asString() + "' is spelled correctly, and that it really exists!\nThis may also occur because its file failed to parse.");
                 }
             }
 
@@ -442,13 +436,34 @@ public class ContentParser{
     public void markError(Content content, LoadedMod mod, FileHandle file, Throwable error){
         content.minfo.mod = mod;
         content.minfo.sourceFile = file;
-        content.minfo.error = Strings.parseException(error, true);
+        content.minfo.error = makeError(error, file);
+        if(mod != null){
+            mod.erroredContent.add(content);
+        }
     }
 
     public void markError(Content content, Throwable error){
         if(content.minfo != null && !content.hasErrored()){
             markError(content, content.minfo.mod, content.minfo.sourceFile, error);
         }
+    }
+
+    private String makeError(Throwable t, FileHandle file){
+        StringBuilder builder = new StringBuilder();
+        builder.append("[lightgray]").append("File: ").append(file.name()).append("[]\n\n");
+
+        if(t.getMessage() != null && t instanceof JsonParseException){
+            builder.append("[accent][[JsonParse][] ").append(":\n").append(t.getMessage());
+        }else{
+            Array<Throwable> causes = Strings.getCauses(t);
+            for(Throwable e : causes){
+                builder.append("[accent][[").append(e.getClass().getSimpleName().replace("Exception", ""))
+                .append("][] ")
+                .append(e.getMessage() != null ?
+                e.getMessage().replace("io.anuke.mindustry.", "").replace("io.anuke.arc.", "") : "").append("\n");
+            }
+        }
+        return builder.toString();
     }
 
     private <T extends MappableContent> T locate(ContentType type, String name){

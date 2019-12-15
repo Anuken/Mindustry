@@ -4,7 +4,6 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.mod.Mods.*;
-import io.anuke.mindustry.type.*;
 
 
 /** Base class for a content type that is loaded in {@link io.anuke.mindustry.core.ContentLoader}. */

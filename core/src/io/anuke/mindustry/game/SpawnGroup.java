@@ -4,6 +4,7 @@ import io.anuke.arc.util.serialization.Json;
 import io.anuke.arc.util.serialization.Json.Serializable;
 import io.anuke.arc.util.serialization.JsonValue;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.type.*;
 

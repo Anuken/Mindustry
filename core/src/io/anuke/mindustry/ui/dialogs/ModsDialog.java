@@ -165,6 +165,9 @@ public class ModsDialog extends FloatingDialog{
                         }else if(mod.hasUnmetDependencies()){
                             t.labelWrap(Core.bundle.format("mod.missingdependencies", mod.missingDependencies.toString(", "))).growX();
                             t.row();
+                        }else if(mod.hasContentErrors()){
+                            t.labelWrap("$mod.erroredcontent").growX();
+                            t.row();
                         }
                     }).width(mobile ? 430f : 500f);
                     table.row();

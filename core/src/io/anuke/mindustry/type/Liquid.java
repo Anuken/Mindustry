@@ -5,6 +5,7 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.ui.*;
 
 public class Liquid extends UnlockableContent{

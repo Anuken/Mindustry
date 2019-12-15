@@ -8,6 +8,7 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.ai.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.*;
@@ -195,6 +196,7 @@ public class Vars implements Loadable{
 
     public static void init(){
         Serialization.init();
+        DefaultSerializers.typeMappings.put("io.anuke.mindustry.type.ContentType", "io.anuke.mindustry.ctype.ContentType");
 
         if(loadLocales){
             //load locales

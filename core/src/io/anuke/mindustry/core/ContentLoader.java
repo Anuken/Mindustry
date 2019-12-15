@@ -7,6 +7,7 @@ import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.*;

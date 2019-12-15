@@ -9,19 +9,22 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.g2d.TextureAtlas.*;
-import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Jval.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.graphics.MultiPacker.*;
 import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 
 import java.io.*;
 import java.net.*;
@@ -41,6 +44,11 @@ public class Mods implements Loadable{
     private Array<LoadedMod> mods = new Array<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
     private boolean requiresReload;
+
+    public Mods(){
+        Events.on(ClientLoadEvent.class, e -> Core.app.post(this::checkWarnings));
+        Events.on(ContentReloadEvent.class, e -> Core.app.post(this::checkWarnings));
+    }
 
     /** Returns a file named 'config.json' in a special folder for the specified plugin.
      * Call this in init(). */
@@ -260,7 +268,7 @@ public class Mods implements Loadable{
             mod.state =
                 !mod.isSupported() ? ModState.unsupported :
                 mod.hasUnmetDependencies() ? ModState.missingDependencies :
-                !mod.enabled() /*TODO check disabled state!*/ ? ModState.disabled :
+                !mod.shouldBeEnabled() ? ModState.disabled :
                 ModState.enabled;
         }
     }
@@ -333,11 +341,66 @@ public class Mods implements Loadable{
                 try{
                     PropertiesUtils.load(bundle.getProperties(), file.reader());
                 }catch(Exception e){
-                    throw new RuntimeException("Error loading bundle: " + file + "/" + locale, e);
+                    Log.err("Error loading bundle: " + file + "/" + locale, e);
                 }
             }
             bundle = bundle.getParent();
         }
+    }
+
+    /** Check all warnings related to content and show relevant dialogs. Client only. */
+    private void checkWarnings(){
+        //show 'scripts have errored' info
+        if(scripts != null && scripts.hasErrored()){
+           Core.settings.getBoolOnce("scripts-errored2", () -> ui.showErrorMessage("$mod.scripts.unsupported"));
+        }
+
+        //show list of errored content
+        if(mods.contains(LoadedMod::hasContentErrors)){
+            ui.loadfrag.hide();
+            new Dialog(""){{
+
+                setFillParent(true);
+                cont.margin(15);
+                cont.add("$error.title");
+                cont.row();
+                cont.addImage().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
+                cont.row();
+                cont.add("$mod.errors").wrap().growX().center().get().setAlignment(Align.center);
+                cont.row();
+                cont.pane(p -> {
+                    mods.each(m -> m.enabled() && m.hasContentErrors(), m -> {
+                        p.add(m.name).color(Pal.accent).left();
+                        p.row();
+                        p.addImage().fillX().pad(4).color(Pal.accent);
+                        p.row();
+                        p.table(d -> {
+                            d.left().marginLeft(15f);
+                            for(Content c : m.erroredContent){
+                                d.add(c.minfo.sourceFile.nameWithoutExtension()).left().padRight(10);
+                                d.addImageTextButton("$details", Icon.arrowDownSmall, Styles.transt, () -> {
+                                    new Dialog(""){{
+                                        setFillParent(true);
+                                        cont.pane(e -> e.add(c.minfo.error)).grow();
+                                        cont.row();
+                                        cont.addImageTextButton("$ok", Icon.backSmall, this::hide).size(240f, 60f);
+                                    }}.show();
+                                }).size(190f, 50f).left().marginLeft(6);
+                                d.row();
+                            }
+                        }).left();
+                        p.row();
+                    });
+                });
+
+                cont.row();
+                cont.addButton("$ok", this::hide).size(300, 50);
+            }}.show();
+        }
+    }
+
+    public boolean hasContentErrors(){
+        return mods.contains(LoadedMod::hasContentErrors);
     }
 
     /** Reloads all mod content. How does this even work? I refuse to believe that it functions correctly.*/
@@ -369,10 +432,6 @@ public class Mods implements Loadable{
         requiresReload = false;
 
         Events.fire(new ContentReloadEvent());
-
-        if(scripts != null && scripts.hasErrored()){
-            Core.app.post(() -> Core.settings.getBoolOnce("scripts-errored", () -> ui.showErrorMessage("$mod.scripts.unsupported")));
-        }
     }
 
     /** This must be run on the main thread! */
@@ -396,7 +455,6 @@ public class Mods implements Loadable{
                             Core.app.post(() -> {
                                 Log.err("Error loading script {0} for mod {1}.", file.name(), mod.meta.name);
                                 e.printStackTrace();
-                                //if(!headless) ui.showException(e);
                             });
                             break;
                         }
@@ -461,8 +519,10 @@ public class Mods implements Loadable{
             }catch(Throwable e){
                 if(current != content.getLastAdded() && content.getLastAdded() != null){
                     parser.markError(content.getLastAdded(), l.mod, l.file, e);
+                }else{
+                    ErrorContent error = new ErrorContent();
+                    parser.markError(error, l.mod, l.file, e);
                 }
-                //throw new RuntimeException("Failed to parse content file '" + l.file + "' for mod '" + l.mod.meta.name + "'.", e);
             }
         }
 
@@ -599,6 +659,8 @@ public class Mods implements Loadable{
         public Array<String> missingDependencies = new Array<>();
         /** Script files to run. */
         public Array<FileHandle> scripts = new Array<>();
+        /** Content with intialization code. */
+        public ObjectSet<Content> erroredContent = new ObjectSet<>();
         /** Current state of this mod. */
         public ModState state = ModState.disabled;
 
@@ -611,11 +673,19 @@ public class Mods implements Loadable{
         }
 
         public boolean enabled(){
-            return state == ModState.enabled;
+            return state == ModState.enabled || state == ModState.contentErrors;
+        }
+
+        public boolean shouldBeEnabled(){
+            return Core.settings.getBool("mod-" + name + "-enabled", true);
         }
 
         public boolean hasUnmetDependencies(){
             return !missingDependencies.isEmpty();
+        }
+
+        public boolean hasContentErrors(){
+            return !erroredContent.isEmpty();
         }
 
         /** @return whether this mod is supported by the game verison */
@@ -711,9 +781,9 @@ public class Mods implements Loadable{
 
     public enum ModState{
         enabled,
-        disabled,
+        contentErrors,
         missingDependencies,
         unsupported,
-        contentErrors
+        disabled,
     }
 }
