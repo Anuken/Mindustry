@@ -257,8 +257,8 @@ public class Mods implements Loadable{
     }
 
     private void sortMods(){
-        //sort mods to make sure servers handle them properly.
-        mods.sort(Structs.comps(Structs.comparingInt(m -> -m.state.ordinal()), Structs.comparing(m -> m.name)));
+        //sort mods to make sure servers handle them properly and they appear correctly in the dialog
+        mods.sort(Structs.comps(Structs.comparingInt(m -> m.state.ordinal()), Structs.comparing(m -> m.name)));
     }
 
     private void resolveModState(){
