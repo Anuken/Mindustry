@@ -2,7 +2,6 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
 import io.anuke.arc.Net.*;
-import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
@@ -110,11 +109,10 @@ public class ModsDialog extends FloatingDialog{
         if(!mods.list().isEmpty()){
             cont.pane(table -> {
                 table.margin(10f).top();
-                Array<LoadedMod> all = Array.withArrays(mods.all(), mods.disabled());
 
                 boolean anyDisabled = false;
-                for(LoadedMod mod : all){
-                    if(!mod.enabled() && !anyDisabled && mods.all().size > 0){
+                for(LoadedMod mod : mods.list()){
+                    if(!mod.enabled() && !anyDisabled && mods.list().size > 0){
                         anyDisabled = true;
                         table.row();
                         table.addImage().growX().height(4f).pad(6f).color(Pal.gray);

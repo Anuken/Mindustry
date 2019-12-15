@@ -243,11 +243,14 @@ public class Mods implements Loadable{
         }
 
         resolveModState();
-
-        //sort mods to make sure servers handle them properly.
-        mods.sort(Structs.comparing(m -> m.name));
+        sortMods();
 
         buildFiles();
+    }
+
+    private void sortMods(){
+        //sort mods to make sure servers handle them properly.
+        mods.sort(Structs.comps(Structs.comparingInt(m -> -m.state.ordinal()), Structs.comparing(m -> m.name)));
     }
 
     private void resolveModState(){
@@ -483,6 +486,7 @@ public class Mods implements Loadable{
             requiresReload = true;
             mod.state = enabled ? ModState.enabled : ModState.disabled;
             mods.each(this::updateDependencies);
+            sortMods();
         }
     }
 
