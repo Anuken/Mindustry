@@ -14,7 +14,6 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -179,23 +178,23 @@ public class Drill extends Block{
         super.setStats();
 
         stats.add(BlockStat.drillTier, table -> {
-            Array<Item> list = new Array<>();
+            Array<Block> list = content.blocks().select(b -> b.isFloor() && b.asFloor().itemDrop != null && b.asFloor().itemDrop.hardness <= tier);
 
-            for(Item item : content.items()){
-                if(tier >= item.hardness && Core.atlas.has(item.name + "1")){
-                    list.add(item);
+            table.table(l -> {
+                l.left();
+
+                for(int i = 0; i < list.size; i++){
+                    Block item = list.get(i);
+
+                    l.addImage(item.icon(Cicon.small)).size(8 * 3).padRight(2).padLeft(2).padTop(3).padBottom(3);
+                    l.add(item.localizedName).left().padLeft(1).padRight(4);
+                    if(i % 5 == 4){
+                        l.row();
+                    }
                 }
-            }
+            });
 
-            for(int i = 0; i < list.size; i++){
-                Item item = list.get(i);
 
-                table.addImage(Core.atlas.find(item.name + "1")).size(8 * 3).padRight(2).padLeft(2).padTop(3).padBottom(3);
-                table.add(item.localizedName);
-                if(i != list.size - 1){
-                    table.add("/").padLeft(5).padRight(5);
-                }
-            }
         });
 
         stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
