@@ -9,19 +9,22 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.g2d.TextureAtlas.*;
-import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Jval.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.graphics.MultiPacker.*;
 import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 
 import java.io.*;
 import java.net.*;
@@ -33,15 +36,19 @@ public class Mods implements Loadable{
     private @Nullable Scripts scripts;
     private ContentParser parser = new ContentParser();
     private ObjectMap<String, Array<FileHandle>> bundles = new ObjectMap<>();
-    private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites");
+    private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites", "sprites-override");
 
     private int totalSprites;
     private MultiPacker packer;
 
-    private Array<LoadedMod> loaded = new Array<>();
-    private Array<LoadedMod> disabled = new Array<>();
+    private Array<LoadedMod> mods = new Array<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
     private boolean requiresReload;
+
+    public Mods(){
+        Events.on(ClientLoadEvent.class, e -> Core.app.post(this::checkWarnings));
+        Events.on(ContentReloadEvent.class, e -> Core.app.post(this::checkWarnings));
+    }
 
     /** Returns a file named 'config.json' in a special folder for the specified plugin.
      * Call this in init(). */
@@ -53,19 +60,19 @@ public class Mods implements Loadable{
 
     /** Returns a list of files per mod subdirectory. */
     public void listFiles(String directory, Cons2<LoadedMod, FileHandle> cons){
-        for(LoadedMod mod : loaded){
+        eachEnabled(mod -> {
             FileHandle file = mod.root.child(directory);
             if(file.exists()){
                 for(FileHandle child : file.list()){
                     cons.get(mod, child);
                 }
             }
-        }
+        });
     }
 
     /** @return the loaded mod found by class, or null if not found. */
     public @Nullable LoadedMod getMod(Class<? extends Mod> type){
-        return loaded.find(l -> l.mod != null && l.mod.getClass() == type);
+        return mods.find(m -> m.enabled() && m.main != null && m.main.getClass() == type);//loaded.find(l -> l.mod != null && l.mod.getClass() == type);
     }
 
     /** Imports an external mod file.*/
@@ -77,7 +84,7 @@ public class Mods implements Loadable{
 
         file.copyTo(dest);
         try{
-            loaded.add(loadMod(dest));
+            mods.add(loadMod(dest));
             requiresReload = true;
         }catch(IOException e){
             dest.delete();
@@ -91,19 +98,19 @@ public class Mods implements Loadable{
     /** Repacks all in-game sprites. */
     @Override
     public void loadAsync(){
-        if(loaded.isEmpty()) return;
+        if(!mods.contains(LoadedMod::enabled)) return;
         Time.mark();
 
         packer = new MultiPacker();
 
-        for(LoadedMod mod : loaded){
+        eachEnabled(mod -> {
             Array<FileHandle> sprites = mod.root.child("sprites").findAll(f -> f.extension().equals("png"));
             Array<FileHandle> overrides = mod.root.child("sprites-override").findAll(f -> f.extension().equals("png"));
             packSprites(sprites, mod, true);
             packSprites(overrides, mod, false);
             Log.debug("Packed {0} images for mod '{1}'.", sprites.size + overrides.size, mod.meta.name);
             totalSprites += sprites.size + overrides.size;
-        }
+        });
 
         for(AtlasRegion region : Core.atlas.getRegions()){
             PageType type = getPage(region);
@@ -149,7 +156,7 @@ public class Mods implements Loadable{
             //generate new icons
             for(Array<Content> arr : content.getContentMap()){
                 arr.each(c -> {
-                    if(c instanceof UnlockableContent && c.mod != null){
+                    if(c instanceof UnlockableContent && c.minfo.mod != null){
                         UnlockableContent u = (UnlockableContent)c;
                         u.createIcons(packer);
                     }
@@ -198,8 +205,7 @@ public class Mods implements Loadable{
             ui.showErrorMessage("$mod.delete.error");
             return;
         }
-        loaded.remove(mod);
-        disabled.remove(mod);
+        mods.remove(mod);
         requiresReload = true;
     }
 
@@ -225,11 +231,7 @@ public class Mods implements Loadable{
             Log.debug("[Mods] Loading mod {0}", file);
             try{
                 LoadedMod mod = loadMod(file);
-                if(mod.enabled() || headless){
-                    loaded.add(mod);
-                }else{
-                    disabled.add(mod);
-                }
+                mods.add(mod);
             }catch(Exception e){
                 Log.err("Failed to load mod file {0}. Skipping.", file);
                 Log.err(e);
@@ -240,11 +242,7 @@ public class Mods implements Loadable{
         for(FileHandle file : platform.getWorkshopContent(LoadedMod.class)){
             try{
                 LoadedMod mod = loadMod(file);
-                if(mod.enabled()){
-                    loaded.add(mod);
-                }else{
-                    disabled.add(mod);
-                }
+                mods.add(mod);
                 mod.addSteamID(file.name());
             }catch(Exception e){
                 Log.err("Failed to load mod workshop file {0}. Skipping.", file);
@@ -252,28 +250,27 @@ public class Mods implements Loadable{
             }
         }
 
-        resolveDependencies();
-
-        //sort mods to make sure servers handle them properly.
-        loaded.sort(Structs.comparing(m -> m.name));
+        resolveModState();
+        sortMods();
 
         buildFiles();
     }
 
-    private void resolveDependencies(){
-        Array<LoadedMod> incompatible = loaded.select(m -> !m.isSupported());
-        loaded.removeAll(incompatible);
-        disabled.addAll(incompatible);
+    private void sortMods(){
+        //sort mods to make sure servers handle them properly.
+        mods.sort(Structs.comps(Structs.comparingInt(m -> -m.state.ordinal()), Structs.comparing(m -> m.name)));
+    }
 
-        for(LoadedMod mod : Array.<LoadedMod>withArrays(loaded, disabled)){
-            updateDependencies(mod);
+    private void resolveModState(){
+        mods.each(this::updateDependencies);
+
+        for(LoadedMod mod : mods){
+            mod.state =
+                !mod.isSupported() ? ModState.unsupported :
+                mod.hasUnmetDependencies() ? ModState.missingDependencies :
+                !mod.shouldBeEnabled() ? ModState.disabled :
+                ModState.enabled;
         }
-
-        disabled.addAll(loaded.select(LoadedMod::hasUnmetDependencies));
-        loaded.removeAll(LoadedMod::hasUnmetDependencies);
-        disabled.each(mod -> setEnabled(mod, false));
-        disabled.distinct();
-        loaded.distinct();
     }
 
     private void updateDependencies(LoadedMod mod){
@@ -298,16 +295,16 @@ public class Mods implements Loadable{
     private Array<LoadedMod> orderedMods(){
         ObjectSet<LoadedMod> visited = new ObjectSet<>();
         Array<LoadedMod> result = new Array<>();
-        for(LoadedMod mod : loaded){
+        eachEnabled(mod -> {
             if(!visited.contains(mod)){
                 topoSort(mod, result, visited);
             }
-        }
+        });
         return result;
     }
 
     private LoadedMod locateMod(String name){
-        return loaded.find(mod -> mod.name.equals(name));
+        return mods.find(mod -> mod.enabled() && mod.name.equals(name));
     }
 
     private void buildFiles(){
@@ -344,11 +341,66 @@ public class Mods implements Loadable{
                 try{
                     PropertiesUtils.load(bundle.getProperties(), file.reader());
                 }catch(Exception e){
-                    throw new RuntimeException("Error loading bundle: " + file + "/" + locale, e);
+                    Log.err("Error loading bundle: " + file + "/" + locale, e);
                 }
             }
             bundle = bundle.getParent();
         }
+    }
+
+    /** Check all warnings related to content and show relevant dialogs. Client only. */
+    private void checkWarnings(){
+        //show 'scripts have errored' info
+        if(scripts != null && scripts.hasErrored()){
+           Core.settings.getBoolOnce("scripts-errored2", () -> ui.showErrorMessage("$mod.scripts.unsupported"));
+        }
+
+        //show list of errored content
+        if(mods.contains(LoadedMod::hasContentErrors)){
+            ui.loadfrag.hide();
+            new Dialog(""){{
+
+                setFillParent(true);
+                cont.margin(15);
+                cont.add("$error.title");
+                cont.row();
+                cont.addImage().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
+                cont.row();
+                cont.add("$mod.errors").wrap().growX().center().get().setAlignment(Align.center);
+                cont.row();
+                cont.pane(p -> {
+                    mods.each(m -> m.enabled() && m.hasContentErrors(), m -> {
+                        p.add(m.name).color(Pal.accent).left();
+                        p.row();
+                        p.addImage().fillX().pad(4).color(Pal.accent);
+                        p.row();
+                        p.table(d -> {
+                            d.left().marginLeft(15f);
+                            for(Content c : m.erroredContent){
+                                d.add(c.minfo.sourceFile.nameWithoutExtension()).left().padRight(10);
+                                d.addImageTextButton("$details", Icon.arrowDownSmall, Styles.transt, () -> {
+                                    new Dialog(""){{
+                                        setFillParent(true);
+                                        cont.pane(e -> e.add(c.minfo.error)).grow();
+                                        cont.row();
+                                        cont.addImageTextButton("$ok", Icon.backSmall, this::hide).size(240f, 60f);
+                                    }}.show();
+                                }).size(190f, 50f).left().marginLeft(6);
+                                d.row();
+                            }
+                        }).left();
+                        p.row();
+                    });
+                });
+
+                cont.row();
+                cont.addButton("$ok", this::hide).size(300, 50);
+            }}.show();
+        }
+    }
+
+    public boolean hasContentErrors(){
+        return mods.contains(LoadedMod::hasContentErrors);
     }
 
     /** Reloads all mod content. How does this even work? I refuse to believe that it functions correctly.*/
@@ -357,8 +409,7 @@ public class Mods implements Loadable{
         //TODO make it less epic
         Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
 
-        loaded.clear();
-        disabled.clear();
+        mods.clear();
         load();
         Sounds.dispose();
         Sounds.load();
@@ -381,10 +432,6 @@ public class Mods implements Loadable{
         requiresReload = false;
 
         Events.fire(new ContentReloadEvent());
-
-        if(scripts != null && scripts.hasErrored()){
-            Core.app.post(() -> ui.showErrorMessage("$mod.scripts.unsupported"));
-        }
     }
 
     /** This must be run on the main thread! */
@@ -392,7 +439,7 @@ public class Mods implements Loadable{
         Time.mark();
 
         try{
-            for(LoadedMod mod : loaded){
+            eachEnabled(mod -> {
                 if(mod.root.child("scripts").exists()){
                     content.setCurrentMod(mod);
                     mod.scripts = mod.root.child("scripts").findAll(f -> f.extension().equals("js"));
@@ -408,13 +455,12 @@ public class Mods implements Loadable{
                             Core.app.post(() -> {
                                 Log.err("Error loading script {0} for mod {1}.", file.name(), mod.meta.name);
                                 e.printStackTrace();
-                                //if(!headless) ui.showException(e);
                             });
                             break;
                         }
                     }
                 }
-            }
+            });
         }finally{
             content.setCurrentMod(null);
         }
@@ -464,56 +510,43 @@ public class Mods implements Loadable{
 
         //make sure mod content is in proper order
         runs.sort();
-        runs.each(l -> safeRun(l.mod, () -> {
+        for(LoadRun l : runs){
+            Content current = content.getLastAdded();
             try{
                 //this binds the content but does not load it entirely
                 Content loaded = parser.parse(l.mod, l.file.nameWithoutExtension(), l.file.readString("UTF-8"), l.file, l.type);
-                Log.debug("[{0}] Loaded '{1}'.", l.mod.meta.name,
-                (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
-            }catch(Exception e){
-                throw new RuntimeException("Failed to parse content file '" + l.file + "' for mod '" + l.mod.meta.name + "'.", e);
+                Log.debug("[{0}] Loaded '{1}'.", l.mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
+            }catch(Throwable e){
+                if(current != content.getLastAdded() && content.getLastAdded() != null){
+                    parser.markError(content.getLastAdded(), l.mod, l.file, e);
+                }else{
+                    ErrorContent error = new ErrorContent();
+                    parser.markError(error, l.mod, l.file, e);
+                }
             }
-        }));
+        }
 
         //this finishes parsing content fields
         parser.finishParsing();
     }
 
-    /** @return all loaded mods. */
-    public Array<LoadedMod> all(){
-        return loaded;
-    }
-
-    /** @return all disabled mods. */
-    public Array<LoadedMod> disabled(){
-        return disabled;
-    }
-
-    /** @return a list of mod names only, without versions. */
-    public Array<String> getModNames(){
-        return loaded.select(l -> !l.meta.hidden).map(l -> l.name + ":" + l.meta.version);
+    public void handleContentError(Content content, Throwable error){
+        parser.markError(content, error);
     }
 
     /** @return a list of mods and versions, in the format name:version. */
     public Array<String> getModStrings(){
-        return loaded.select(l -> !l.meta.hidden).map(l -> l.name + ":" + l.meta.version);
+        return mods.select(l -> !l.meta.hidden && l.enabled()).map(l -> l.name + ":" + l.meta.version);
     }
 
     /** Makes a mod enabled or disabled. shifts it.*/
     public void setEnabled(LoadedMod mod, boolean enabled){
         if(mod.enabled() != enabled){
             Core.settings.putSave("mod-" + mod.name + "-enabled", enabled);
-            Core.settings.save();
             requiresReload = true;
-            if(!enabled){
-                loaded.remove(mod);
-                if(!disabled.contains(mod)) disabled.add(mod);
-            }else{
-                if(!loaded.contains(mod)) loaded.add(mod);
-                disabled.remove(mod);
-            }
-            loaded.each(this::updateDependencies);
-            disabled.each(this::updateDependencies);
+            mod.state = enabled ? ModState.enabled : ModState.disabled;
+            mods.each(this::updateDependencies);
+            sortMods();
         }
     }
 
@@ -530,43 +563,25 @@ public class Mods implements Loadable{
         return result;
     }
 
-    /** Iterates through each mod with a main class.*/
-    public void each(Cons<Mod> cons){
-        loaded.each(p -> p.mod != null, p -> safeRun(p, () -> cons.get(p.mod)));
+    public Array<LoadedMod> list(){
+        return mods;
     }
 
-    public void handleError(Throwable t, LoadedMod mod){
-        Array<Throwable> causes = Strings.getCauses(t);
-        Content content = null;
-        for(Throwable e : causes){
-            if(e instanceof ModLoadException && ((ModLoadException) e).content != null){
-                content = ((ModLoadException) e).content;
-            }
-        }
-
-        String realCause = "<???>";
-        for(int i = causes.size -1 ; i >= 0; i--){
-            if(causes.get(i).getMessage() != null){
-                realCause = causes.get(i).getMessage();
-                break;
-            }
-        }
-
-        setEnabled(mod, false);
-
-        if(content != null){
-            throw new ModLoadException(Strings.format("Error loading '{0}' from mod '{1}' ({2}):\n{3}",
-                content, mod.meta.name, content.sourceFile == null ? "<unknown file>" : content.sourceFile.name(), realCause), content, t);
-        }else{
-            throw new ModLoadException("Error loading mod " + mod.meta.name, t);
-        }
+    /** Iterates through each mod with a main class. */
+    public void eachClass(Cons<Mod> cons){
+        mods.each(p -> p.main != null, p -> contextRun(p, () -> cons.get(p.main)));
     }
 
-    public void safeRun(LoadedMod mod, Runnable run){
+    /** Iterates through each enabled mod. */
+    public void eachEnabled(Cons<LoadedMod> cons){
+        mods.each(LoadedMod::enabled, cons);
+    }
+
+    public void contextRun(LoadedMod mod, Runnable run){
         try{
             run.run();
         }catch(Throwable t){
-            handleError(t, mod);
+            throw new RuntimeException("Error loading mod " + mod.meta.name, t);
         }
     }
 
@@ -589,7 +604,7 @@ public class Mods implements Loadable{
         String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
         String baseName = meta.name.toLowerCase().replace(" ", "-");
 
-        if(loaded.contains(m -> m.name.equals(baseName)) || disabled.contains(m -> m.name.equals(baseName))){
+        if(mods.contains(m -> m.name.equals(baseName))){
             throw new IllegalArgumentException("A mod with the name '" + baseName + "' is already imported.");
         }
 
@@ -633,7 +648,7 @@ public class Mods implements Loadable{
         /** The root zip file; points to the contents of this mod. In the case of folders, this is the same as the mod's file. */
         public final FileHandle root;
         /** The mod's main class; may be null. */
-        public final @Nullable Mod mod;
+        public final @Nullable Mod main;
         /** Internal mod name. Used for textures. */
         public final String name;
         /** This mod's metadata. */
@@ -644,21 +659,33 @@ public class Mods implements Loadable{
         public Array<String> missingDependencies = new Array<>();
         /** Script files to run. */
         public Array<FileHandle> scripts = new Array<>();
+        /** Content with intialization code. */
+        public ObjectSet<Content> erroredContent = new ObjectSet<>();
+        /** Current state of this mod. */
+        public ModState state = ModState.disabled;
 
-        public LoadedMod(FileHandle file, FileHandle root, Mod mod, ModMeta meta){
+        public LoadedMod(FileHandle file, FileHandle root, Mod main, ModMeta meta){
             this.root = root;
             this.file = file;
-            this.mod = mod;
+            this.main = main;
             this.meta = meta;
             this.name = meta.name.toLowerCase().replace(" ", "-");
         }
 
         public boolean enabled(){
+            return state == ModState.enabled || state == ModState.contentErrors;
+        }
+
+        public boolean shouldBeEnabled(){
             return Core.settings.getBool("mod-" + name + "-enabled", true);
         }
 
         public boolean hasUnmetDependencies(){
             return !missingDependencies.isEmpty();
+        }
+
+        public boolean hasContentErrors(){
+            return !erroredContent.isEmpty();
         }
 
         /** @return whether this mod is supported by the game verison */
@@ -752,37 +779,11 @@ public class Mods implements Loadable{
         }
     }
 
-    /** Thrown when an error occurs while loading a mod.*/
-    public static class ModLoadException extends RuntimeException{
-        public Content content;
-        public LoadedMod mod;
-
-        public ModLoadException(String message, Throwable cause){
-            super(message, cause);
-        }
-
-        public ModLoadException(String message, @Nullable Content content, Throwable cause){
-            super(message, cause);
-            this.content = content;
-            if(content != null){
-                this.mod = content.mod;
-            }
-        }
-
-        public ModLoadException(@Nullable Content content, Throwable cause){
-            super(cause);
-            this.content = content;
-            if(content != null){
-                this.mod = content.mod;
-            }
-        }
-
-        public ModLoadException(String message, @Nullable Content content){
-            super(message);
-            this.content = content;
-            if(content != null){
-                this.mod = content.mod;
-            }
-        }
+    public enum ModState{
+        enabled,
+        contentErrors,
+        missingDependencies,
+        unsupported,
+        disabled,
     }
 }

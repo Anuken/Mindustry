@@ -1,4 +1,4 @@
-package io.anuke.mindustry.type;
+package io.anuke.mindustry.ctype;
 
 /** Do not rearrange, ever! */
 public enum ContentType{
@@ -13,7 +13,8 @@ public enum ContentType{
     effect,
     zone,
     loadout,
-    typeid;
+    typeid,
+    error;
 
     public static final ContentType[] all = values();
 }

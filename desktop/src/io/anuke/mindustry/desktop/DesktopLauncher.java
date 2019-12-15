@@ -17,7 +17,6 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.desktop.steam.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.type.*;
@@ -195,12 +194,9 @@ public class DesktopLauncher extends ClientLauncher{
         boolean fbgp = badGPU;
 
         CrashSender.send(e, file -> {
-            Array<Throwable> causes = Strings.getCauses(e);
-            Throwable fc = causes.find(t -> t instanceof ModLoadException);
-            if(fc == null) fc = Strings.getFinalCause(e);
-            Throwable cause = fc;
+            Throwable fc = Strings.getFinalCause(e);
             if(!fbgp){
-                dialog.get(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + cause.getClass().getSimpleName().replace("Exception", "") + (cause.getMessage() == null ? "" : ":\n" + cause.getMessage())));
+                dialog.get(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + fc.getClass().getSimpleName().replace("Exception", "") + (fc.getMessage() == null ? "" : ":\n" + fc.getMessage())));
             }
         });
     }

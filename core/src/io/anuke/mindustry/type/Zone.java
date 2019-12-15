@@ -7,6 +7,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
@@ -172,8 +173,8 @@ public class Zone extends UnlockableContent{
 
     @Override
     public void init(){
-        if(generator instanceof MapGenerator && mod != null){
-            ((MapGenerator)generator).removePrefix(mod.name);
+        if(generator instanceof MapGenerator && minfo.mod != null){
+            ((MapGenerator)generator).removePrefix(minfo.mod.name);
         }
 
         generator.init(loadout);

@@ -10,7 +10,6 @@ import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
-import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.ui.*;
 import org.robovm.apple.coregraphics.*;
 import org.robovm.apple.foundation.*;
@@ -153,7 +152,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
         }, new IOSApplicationConfiguration(){{
-           errorHandler = ModCrashHandler::handle;
+           //errorHandler = ModCrashHandler::handle;
         }});
     }
 

@@ -88,11 +88,11 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-            play = new MobileButton(Icon.play2, "$campaign", ui.deploy::show),
-            custom = new MobileButton(Icon.playCustom, "$customgame", ui.custom::show),
-            maps = new MobileButton(Icon.load, "$loadgame", ui.load::show),
-            join = new MobileButton(Icon.add, "$joingame", ui.join::show),
-            editor = new MobileButton(Icon.editor, "$editor", ui.maps::show),
+            play = new MobileButton(Icon.play2, "$campaign", () -> checkPlay(ui.deploy::show)),
+            custom = new MobileButton(Icon.playCustom, "$customgame", () -> checkPlay(ui.custom::show)),
+            maps = new MobileButton(Icon.load, "$loadgame", () -> checkPlay(ui.load::show)),
+            join = new MobileButton(Icon.add, "$joingame", () -> checkPlay(ui.join::show)),
+            editor = new MobileButton(Icon.editor, "$editor", () -> checkPlay(ui.maps::show)),
             tools = new MobileButton(Icon.tools, "$settings", ui.settings::show),
             mods = new MobileButton(Icon.wiki, "$mods", ui.mods::show),
             donate = new MobileButton(Icon.link, "$website", () -> Core.net.openURI("https://anuke.itch.io/mindustry")),
@@ -153,13 +153,13 @@ public class MenuFragment extends Fragment{
 
             buttons(t,
                 new Buttoni("$play", Icon.play2Small,
-                    new Buttoni("$campaign", Icon.play2Small, ui.deploy::show),
-                    new Buttoni("$joingame", Icon.addSmall, ui.join::show),
-                    new Buttoni("$customgame", Icon.editorSmall, ui.custom::show),
-                    new Buttoni("$loadgame", Icon.loadSmall, ui.load::show),
-                    new Buttoni("$tutorial", Icon.infoSmall, control::playTutorial)
+                    new Buttoni("$campaign", Icon.play2Small, () -> checkPlay(ui.deploy::show)),
+                    new Buttoni("$joingame", Icon.addSmall, () -> checkPlay(ui.join::show)),
+                    new Buttoni("$customgame", Icon.editorSmall, () -> checkPlay(ui.custom::show)),
+                    new Buttoni("$loadgame", Icon.loadSmall, () -> checkPlay(ui.load::show)),
+                    new Buttoni("$tutorial", Icon.infoSmall, () -> checkPlay(control::playTutorial))
                 ),
-                new Buttoni("$editor", Icon.editorSmall, ui.maps::show), steam ? new Buttoni("$workshop", Icon.saveSmall, platform::openWorkshop) : null,
+                new Buttoni("$editor", Icon.editorSmall, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("$workshop", Icon.saveSmall, platform::openWorkshop) : null,
                 new Buttoni(Core.bundle.get("mods") + "\n" + Core.bundle.get("mods.alpha"), Icon.wikiSmall, ui.mods::show),
                 //not enough space for this button
                 //new Buttoni("$schematics", Icon.pasteSmall, ui.schematics::show),
@@ -178,6 +178,14 @@ public class MenuFragment extends Fragment{
             t.visible(() -> !t.getChildren().isEmpty());
 
         }).width(width).growY();
+    }
+
+    private void checkPlay(Runnable run){
+        if(!mods.hasContentErrors()){
+            run.run();
+        }else{
+            ui.showInfo("$mod.noerrorplay");
+        }
     }
 
     private void fadeInMenu(){

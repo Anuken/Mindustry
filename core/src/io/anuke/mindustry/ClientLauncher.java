@@ -123,7 +123,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 for(ApplicationListener listener : modules){
                     listener.init();
                 }
-                mods.each(Mod::init);
+                mods.eachClass(Mod::init);
                 finished = true;
                 Events.fire(new ClientLoadEvent());
                 super.resize(graphics.getWidth(), graphics.getHeight());

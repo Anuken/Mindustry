@@ -25,7 +25,7 @@ import static io.anuke.mindustry.gen.Tex.*;
 public class Styles{
     public static Drawable black, black9, black8, black6, black3, none, flatDown, flatOver;
     public static ButtonStyle defaultb, waveb;
-    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet;
+    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet, transt;
     public static ImageButtonStyle defaulti, nodei, righti, emptyi, emptytogglei, selecti, cleari, clearFulli, clearPartiali, clearPartial2i, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane;
     public static KeybindDialogStyle defaultKeybindDialog;
@@ -106,6 +106,14 @@ public class Styles{
             down = whiteui;
             up = pane;
             over = flatDown;
+            font = Fonts.def;
+            fontColor = Color.white;
+            disabledFontColor = Color.gray;
+        }};
+        transt = new TextButtonStyle(){{
+            down = flatDown;
+            up = none;
+            over = flatOver;
             font = Fonts.def;
             fontColor = Color.white;
             disabledFontColor = Color.gray;

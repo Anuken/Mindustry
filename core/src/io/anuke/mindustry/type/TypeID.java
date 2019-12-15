@@ -2,6 +2,7 @@ package io.anuke.mindustry.type;
 
 import io.anuke.arc.func.*;
 import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.traits.*;
 
 public class TypeID extends MappableContent{

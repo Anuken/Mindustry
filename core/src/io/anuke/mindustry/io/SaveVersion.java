@@ -6,6 +6,7 @@ import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;

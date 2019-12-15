@@ -25,7 +25,7 @@ public class ScriptStubGenerator{
         Array<String> blacklist = Array.with("plugin", "mod", "net", "io", "tools");
         Array<String> nameBlacklist = Array.with("ClientLauncher", "NetClient", "NetServer", "ClassAccess");
         Array<Class<?>> whitelist = Array.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class,
-            AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class, Runnable.class, Object.class, Icon.class, Tex.class, Sounds.class, Musics.class, Call.class);
+            AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class, Runnable.class, Object.class, Icon.class, Tex.class, Sounds.class, Musics.class, Call.class, Texture.class, TextureData.class, Pixmap.class);
         Array<String> nopackage = Array.with("java.lang", "java");
 
         String fileTemplate = "package io.anuke.mindustry.mod;\n" +

@@ -224,6 +224,10 @@ public class BuildBlock extends Block{
                 return false;
             }
 
+            if(cblock.requirements.length != accumulator.length || totalAccumulator.length != cblock.requirements.length){
+                setConstruct(previous, cblock);
+            }
+
             float maxProgress = core == null ? amount : checkRequired(core.items, amount, false);
 
             for(int i = 0; i < cblock.requirements.length; i++){
