@@ -24,7 +24,7 @@ public class Version{
     public static void init(){
         if(!enabled) return;
 
-        Fi file = OS.isAndroid || OS.isIos ? Core.files.internal("version.properties") : new Fi("version.properties", FileType.Internal);
+        Fi file = OS.isAndroid || OS.isIos ? Core.files.internal("version.properties") : new Fi("version.properties", FileType.internal);
 
         ObjectMap<String, String> map = new ObjectMap<>();
         PropertiesUtils.load(map, file.reader());

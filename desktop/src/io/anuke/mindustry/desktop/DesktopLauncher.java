@@ -50,7 +50,7 @@ public class DesktopLauncher extends ClientLauncher{
                 stencil = 0;
                 width = 900;
                 height = 700;
-                setWindowIcon(FileType.Internal, "icons/icon_64.png");
+                setWindowIcon(FileType.internal, "icons/icon_64.png");
             }});
         }catch(Throwable e){
             handleCrash(e);
