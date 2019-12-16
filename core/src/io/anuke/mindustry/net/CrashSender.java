@@ -22,6 +22,7 @@ import static io.anuke.mindustry.Vars.net;
 public class CrashSender{
 
     public static void send(Throwable exception, Cons<File> writeListener){
+
         try{
             exception.printStackTrace();
 
@@ -52,12 +53,11 @@ public class CrashSender{
 
             try{
                 File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + new SimpleDateFormat("MM_dd_yyyy_HH_mm_ss").format(new Date()) + ".txt");
-                new FileHandle(OS.getAppDataDirectoryString(Vars.appName)).child("crashes").mkdirs();
-                new FileHandle(file).writeString(parseException(exception));
+                new Fi(OS.getAppDataDirectoryString(Vars.appName)).child("crashes").mkdirs();
+                new Fi(file).writeString(parseException(exception));
                 writeListener.get(file);
             }catch(Throwable e){
-                e.printStackTrace();
-                Log.err("Failed to save local crash report.");
+                Log.err("Failed to save local crash report.", e);
             }
 
             try{

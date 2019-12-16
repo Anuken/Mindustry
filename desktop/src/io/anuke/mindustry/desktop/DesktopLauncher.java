@@ -77,8 +77,8 @@ public class DesktopLauncher extends ClientLauncher{
 
         if(useSteam){
             //delete leftover dlls
-            FileHandle file = new FileHandle(".");
-            for(FileHandle other : file.parent().list()){
+            Fi file = new Fi(".");
+            for(Fi other : file.parent().list()){
                 if(other.name().contains("steam") && (other.extension().equals("dll") || other.extension().equals("so") || other.extension().equals("dylib"))){
                     other.delete();
                 }
@@ -202,7 +202,7 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
-    public Array<FileHandle> getWorkshopContent(Class<? extends Publishable> type){
+    public Array<Fi> getWorkshopContent(Class<? extends Publishable> type){
         return !steam ? super.getWorkshopContent(type) : SVars.workshop.getWorkshopFiles(type);
     }
 

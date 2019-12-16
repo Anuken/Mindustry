@@ -6,7 +6,7 @@ import io.anuke.mindustry.*;
 
 public class Mod{
     /** @return the config file for this plugin, as the file 'mods/[plugin-name]/config.json'.*/
-    public FileHandle getConfig(){
+    public Fi getConfig(){
         return Vars.mods.getConfig(this);
     }
 

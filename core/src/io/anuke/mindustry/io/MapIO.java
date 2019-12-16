@@ -22,7 +22,7 @@ import static io.anuke.mindustry.Vars.*;
 public class MapIO{
     private static final int[] pngHeader = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
 
-    public static boolean isImage(FileHandle file){
+    public static boolean isImage(Fi file){
         try(InputStream stream = file.read(32)){
             for(int i1 : pngHeader){
                 if(stream.read() != i1){
@@ -35,7 +35,7 @@ public class MapIO{
         }
     }
 
-    public static Map createMap(FileHandle file, boolean custom) throws IOException{
+    public static Map createMap(Fi file, boolean custom) throws IOException{
         try(InputStream is = new InflaterInputStream(file.read(bufferSize)); CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
             SaveIO.readHeader(stream);
             int version = stream.readInt();
@@ -46,7 +46,7 @@ public class MapIO{
         }
     }
 
-    public static void writeMap(FileHandle file, Map map) throws IOException{
+    public static void writeMap(Fi file, Map map) throws IOException{
         try{
             SaveIO.write(file, map.tags);
         }catch(Exception e){

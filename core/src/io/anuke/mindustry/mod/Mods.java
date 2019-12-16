@@ -35,7 +35,7 @@ public class Mods implements Loadable{
     private Json json = new Json();
     private @Nullable Scripts scripts;
     private ContentParser parser = new ContentParser();
-    private ObjectMap<String, Array<FileHandle>> bundles = new ObjectMap<>();
+    private ObjectMap<String, Array<Fi>> bundles = new ObjectMap<>();
     private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites", "sprites-override");
 
     private int totalSprites;
@@ -52,18 +52,18 @@ public class Mods implements Loadable{
 
     /** Returns a file named 'config.json' in a special folder for the specified plugin.
      * Call this in init(). */
-    public FileHandle getConfig(Mod mod){
+    public Fi getConfig(Mod mod){
         ModMeta load = metas.get(mod.getClass());
         if(load == null) throw new IllegalArgumentException("Mod is not loaded yet (or missing)!");
         return modDirectory.child(load.name).child("config.json");
     }
 
     /** Returns a list of files per mod subdirectory. */
-    public void listFiles(String directory, Cons2<LoadedMod, FileHandle> cons){
+    public void listFiles(String directory, Cons2<LoadedMod, Fi> cons){
         eachEnabled(mod -> {
-            FileHandle file = mod.root.child(directory);
+            Fi file = mod.root.child(directory);
             if(file.exists()){
-                for(FileHandle child : file.list()){
+                for(Fi child : file.list()){
                     cons.get(mod, child);
                 }
             }
@@ -76,8 +76,8 @@ public class Mods implements Loadable{
     }
 
     /** Imports an external mod file.*/
-    public void importMod(FileHandle file) throws IOException{
-        FileHandle dest = modDirectory.child(file.name());
+    public void importMod(Fi file) throws IOException{
+        Fi dest = modDirectory.child(file.name());
         if(dest.exists()){
             throw new IOException("A mod with the same filename already exists!");
         }
@@ -104,8 +104,8 @@ public class Mods implements Loadable{
         packer = new MultiPacker();
 
         eachEnabled(mod -> {
-            Array<FileHandle> sprites = mod.root.child("sprites").findAll(f -> f.extension().equals("png"));
-            Array<FileHandle> overrides = mod.root.child("sprites-override").findAll(f -> f.extension().equals("png"));
+            Array<Fi> sprites = mod.root.child("sprites").findAll(f -> f.extension().equals("png"));
+            Array<Fi> overrides = mod.root.child("sprites-override").findAll(f -> f.extension().equals("png"));
             packSprites(sprites, mod, true);
             packSprites(overrides, mod, false);
             Log.debug("Packed {0} images for mod '{1}'.", sprites.size + overrides.size, mod.meta.name);
@@ -122,8 +122,8 @@ public class Mods implements Loadable{
         Log.debug("Time to pack textures: {0}", Time.elapsed());
     }
 
-    private void packSprites(Array<FileHandle> sprites, LoadedMod mod, boolean prefix){
-        for(FileHandle file : sprites){
+    private void packSprites(Array<Fi> sprites, LoadedMod mod, boolean prefix){
+        for(Fi file : sprites){
             try(InputStream stream = file.read()){
                 byte[] bytes = Streams.copyStreamToByteArray(stream, Math.max((int)file.length(), 512));
                 Pixmap pixmap = new Pixmap(bytes, 0, bytes.length);
@@ -183,7 +183,7 @@ public class Mods implements Loadable{
             PageType.main;
     }
 
-    private PageType getPage(FileHandle file){
+    private PageType getPage(Fi file){
         String parent = file.parent().name();
         return
             parent.equals("environment") ? PageType.environment :
@@ -195,7 +195,7 @@ public class Mods implements Loadable{
 
     /** Removes a mod file and marks it for requiring a restart. */
     public void removeMod(LoadedMod mod){
-        if(mod.root instanceof ZipFileHandle){
+        if(mod.root instanceof ZipFi){
             mod.root.delete();
         }
 
@@ -225,7 +225,7 @@ public class Mods implements Loadable{
 
     /** Loads all mods from the folder, but does not call any methods on them.*/
     public void load(){
-        for(FileHandle file : modDirectory.list()){
+        for(Fi file : modDirectory.list()){
             if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && (file.child("mod.json").exists() || file.child("mod.hjson").exists()))) continue;
 
             Log.debug("[Mods] Loading mod {0}", file);
@@ -239,7 +239,7 @@ public class Mods implements Loadable{
         }
 
         //load workshop mods now
-        for(FileHandle file : platform.getWorkshopContent(LoadedMod.class)){
+        for(Fi file : platform.getWorkshopContent(LoadedMod.class)){
             try{
                 LoadedMod mod = loadMod(file);
                 mods.add(mod);
@@ -311,7 +311,7 @@ public class Mods implements Loadable{
         for(LoadedMod mod : orderedMods()){
             boolean zipFolder = !mod.file.isDirectory() && mod.root.parent() != null;
             String parentName = zipFolder ? mod.root.name() : null;
-            for(FileHandle file : mod.root.list()){
+            for(Fi file : mod.root.list()){
                 //ignore special folders like bundles or sprites
                 if(file.isDirectory() && !specialFolders.contains(file.name())){
                     //TODO calling child/parent on these files will give you gibberish; create wrapper class.
@@ -321,9 +321,9 @@ public class Mods implements Loadable{
             }
 
             //load up bundles.
-            FileHandle folder = mod.root.child("bundles");
+            Fi folder = mod.root.child("bundles");
             if(folder.exists()){
-                for(FileHandle file : folder.list()){
+                for(Fi file : folder.list()){
                     if(file.name().startsWith("bundle") && file.extension().equals("properties")){
                         String name = file.nameWithoutExtension();
                         bundles.getOr(name, Array::new).add(file);
@@ -337,7 +337,7 @@ public class Mods implements Loadable{
         while(bundle != null){
             String str = bundle.getLocale().toString();
             String locale = "bundle" + (str.isEmpty() ? "" : "_" + str);
-            for(FileHandle file : bundles.getOr(locale, Array::new)){
+            for(Fi file : bundles.getOr(locale, Array::new)){
                 try{
                     PropertiesUtils.load(bundle.getProperties(), file.reader());
                 }catch(Exception e){
@@ -446,7 +446,7 @@ public class Mods implements Loadable{
                     mod.scripts = mod.root.child("scripts").findAll(f -> f.extension().equals("js"));
                     Log.debug("[{0}] Found {1} scripts.", mod.meta.name, mod.scripts.size);
 
-                    for(FileHandle file : mod.scripts){
+                    for(Fi file : mod.scripts){
                         try{
                             if(scripts == null){
                                 scripts = platform.createScripts();
@@ -474,10 +474,10 @@ public class Mods implements Loadable{
 
         class LoadRun implements Comparable<LoadRun>{
             final ContentType type;
-            final FileHandle file;
+            final Fi file;
             final LoadedMod mod;
 
-            public LoadRun(ContentType type, FileHandle file, LoadedMod mod){
+            public LoadRun(ContentType type, Fi file, LoadedMod mod){
                 this.type = type;
                 this.file = file;
                 this.mod = mod;
@@ -495,11 +495,11 @@ public class Mods implements Loadable{
 
         for(LoadedMod mod : orderedMods()){
             if(mod.root.child("content").exists()){
-                FileHandle contentRoot = mod.root.child("content");
+                Fi contentRoot = mod.root.child("content");
                 for(ContentType type : ContentType.all){
-                    FileHandle folder = contentRoot.child(type.name().toLowerCase() + "s");
+                    Fi folder = contentRoot.child(type.name().toLowerCase() + "s");
                     if(folder.exists()){
-                        for(FileHandle file : folder.list()){
+                        for(Fi file : folder.list()){
                             if(file.extension().equals("json") || file.extension().equals("hjson")){
                                 runs.add(new LoadRun(type, file, mod));
                             }
@@ -588,13 +588,13 @@ public class Mods implements Loadable{
 
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods.*/
-    private LoadedMod loadMod(FileHandle sourceFile) throws Exception{
-        FileHandle zip = sourceFile.isDirectory() ? sourceFile : new ZipFileHandle(sourceFile);
+    private LoadedMod loadMod(Fi sourceFile) throws Exception{
+        Fi zip = sourceFile.isDirectory() ? sourceFile : new ZipFi(sourceFile);
         if(zip.list().length == 1 && zip.list()[0].isDirectory()){
             zip = zip.list()[0];
         }
 
-        FileHandle metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("mod.hjson").exists() ? zip.child("mod.hjson") : zip.child("plugin.json");
+        Fi metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("mod.hjson").exists() ? zip.child("mod.hjson") : zip.child("plugin.json");
         if(!metaf.exists()){
             Log.warn("Mod {0} doesn't have a 'mod.json'/'plugin.json'/'mod.js' file, skipping.", sourceFile);
             throw new IllegalArgumentException("No mod.json found.");
@@ -611,7 +611,7 @@ public class Mods implements Loadable{
 
         Mod mainMod;
 
-        FileHandle mainFile = zip;
+        Fi mainFile = zip;
         String[] path = (mainClass.replace('.', '/') + ".class").split("/");
         for(String str : path){
             if(!str.isEmpty()){
@@ -645,9 +645,9 @@ public class Mods implements Loadable{
     /** Represents a plugin that has been loaded from a jar file.*/
     public static class LoadedMod implements Publishable{
         /** The location of this mod's zip file/folder on the disk. */
-        public final FileHandle file;
+        public final Fi file;
         /** The root zip file; points to the contents of this mod. In the case of folders, this is the same as the mod's file. */
-        public final FileHandle root;
+        public final Fi root;
         /** The mod's main class; may be null. */
         public final @Nullable Mod main;
         /** Internal mod name. Used for textures. */
@@ -659,13 +659,13 @@ public class Mods implements Loadable{
         /** All missing dependencies of this mod as strings. */
         public Array<String> missingDependencies = new Array<>();
         /** Script files to run. */
-        public Array<FileHandle> scripts = new Array<>();
+        public Array<Fi> scripts = new Array<>();
         /** Content with intialization code. */
         public ObjectSet<Content> erroredContent = new ObjectSet<>();
         /** Current state of this mod. */
         public ModState state = ModState.enabled;
 
-        public LoadedMod(FileHandle file, FileHandle root, Mod main, ModMeta meta){
+        public LoadedMod(Fi file, Fi root, Mod main, ModMeta meta){
             this.root = root;
             this.file = file;
             this.main = main;
@@ -734,12 +734,12 @@ public class Mods implements Loadable{
         }
 
         @Override
-        public FileHandle createSteamFolder(String id){
+        public Fi createSteamFolder(String id){
             return file;
         }
 
         @Override
-        public FileHandle createSteamPreview(String id){
+        public Fi createSteamPreview(String id){
             return file.child("preview.png");
         }
 

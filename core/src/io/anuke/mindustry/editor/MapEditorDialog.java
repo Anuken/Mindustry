@@ -133,7 +133,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }else{
                     ui.loadAnd(() -> {
                         try{
-                            FileHandle result = Core.files.local(editor.getTags().get("name", "unknown") + "." + mapExtension);
+                            Fi result = Core.files.local(editor.getTags().get("name", "unknown") + "." + mapExtension);
                             MapIO.writeMap(result, editor.createMap(result));
                             platform.shareFile(result);
                         }catch(Exception e){
@@ -381,7 +381,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         editor.renderer().dispose();
     }
 
-    public void beginEditMap(FileHandle file){
+    public void beginEditMap(Fi file){
         ui.loadAnd(() -> {
             try{
                 shownWithMap = true;

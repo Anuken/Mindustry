@@ -16,7 +16,8 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     public final Array<Stile> tiles;
     public StringMap tags;
     public int width, height;
-    public @Nullable FileHandle file;
+    public @Nullable
+    Fi file;
     /** Associated mod. If null, no mod is associated with this schematic. */
     public @Nullable LoadedMod mod;
 
@@ -94,15 +95,15 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     }
 
     @Override
-    public FileHandle createSteamFolder(String id){
-        FileHandle directory = tmpDirectory.child("schematic_" + id).child("schematic." + schematicExtension);
+    public Fi createSteamFolder(String id){
+        Fi directory = tmpDirectory.child("schematic_" + id).child("schematic." + schematicExtension);
         file.copyTo(directory);
         return directory;
     }
 
     @Override
-    public FileHandle createSteamPreview(String id){
-        FileHandle preview = tmpDirectory.child("schematic_preview_" + id + ".png");
+    public Fi createSteamPreview(String id){
+        Fi preview = tmpDirectory.child("schematic_preview_" + id + ".png");
         schematics.savePreview(this, preview);
         return preview;
     }

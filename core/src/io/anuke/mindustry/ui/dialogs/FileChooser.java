@@ -18,20 +18,20 @@ import java.util.*;
 import static io.anuke.mindustry.Vars.platform;
 
 public class FileChooser extends FloatingDialog{
-    private static final FileHandle homeDirectory = Core.files.absolute(Core.files.getExternalStoragePath());
-    private static FileHandle lastDirectory = homeDirectory;
+    private static final Fi homeDirectory = Core.files.absolute(Core.files.getExternalStoragePath());
+    private static Fi lastDirectory = homeDirectory;
 
     private Table files;
-    private FileHandle directory = lastDirectory;
+    private Fi directory = lastDirectory;
     private ScrollPane pane;
     private TextField navigation, filefield;
     private TextButton ok;
     private FileHistory stack = new FileHistory();
-    private Boolf<FileHandle> filter;
-    private Cons<FileHandle> selectListener;
+    private Boolf<Fi> filter;
+    private Cons<Fi> selectListener;
     private boolean open;
 
-    public FileChooser(String title, Boolf<FileHandle> filter, boolean open, Cons<FileHandle> result){
+    public FileChooser(String title, Boolf<Fi> filter, boolean open, Cons<Fi> result){
         super(title);
         setFillParent(true);
         this.open = open;
@@ -154,8 +154,8 @@ public class FileChooser extends FloatingDialog{
         }
     }
 
-    private FileHandle[] getFileNames(){
-        FileHandle[] handles = directory.list(file -> !file.getName().startsWith("."));
+    private Fi[] getFileNames(){
+        Fi[] handles = directory.list(file -> !file.getName().startsWith("."));
 
         Arrays.sort(handles, (a, b) -> {
             if(a.isDirectory() && !b.isDirectory()) return -1;
@@ -183,7 +183,7 @@ public class FileChooser extends FloatingDialog{
 
         files.clearChildren();
         files.top().left();
-        FileHandle[] names = getFileNames();
+        Fi[] names = getFileNames();
 
         Image upimage = new Image(Icon.folderParentSmall);
         TextButton upbutton = new TextButton(".." + directory.toString(), Styles.clearTogglet);
@@ -204,7 +204,7 @@ public class FileChooser extends FloatingDialog{
         ButtonGroup<TextButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
 
-        for(FileHandle file : names){
+        for(Fi file : names){
             if(!file.isDirectory() && !filter.get(file)) continue; //skip non-filtered files
 
             String filename = file.name();
@@ -255,14 +255,14 @@ public class FileChooser extends FloatingDialog{
     }
 
     public class FileHistory{
-        private Array<FileHandle> history = new Array<>();
+        private Array<Fi> history = new Array<>();
         private int index;
 
         public FileHistory(){
 
         }
 
-        public void push(FileHandle file){
+        public void push(Fi file){
             if(index != history.size) history.truncate(index);
             history.add(file);
             index++;
@@ -296,7 +296,7 @@ public class FileChooser extends FloatingDialog{
 
             System.out.println("\n\n\n\n\n\n");
             int i = 0;
-            for(FileHandle file : history){
+            for(Fi file : history){
                 i++;
                 if(index == i){
                     System.out.println("[[" + file.toString() + "]]");

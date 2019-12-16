@@ -46,9 +46,9 @@ public class ServerControl implements ApplicationListener{
     protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");
 
     private final CommandHandler handler = new CommandHandler("");
-    private final FileHandle logFolder = Core.settings.getDataDirectory().child("logs/");
+    private final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
 
-    private FileHandle currentLogFile;
+    private Fi currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
     private Gamemode lastMode = Gamemode.survival;
@@ -746,7 +746,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            FileHandle file = saveDirectory.child(arg[0] + "." + saveExtension);
+            Fi file = saveDirectory.child(arg[0] + "." + saveExtension);
 
             if(!SaveIO.isSaveValid(file)){
                 err("No (valid) save data found for slot.");
@@ -772,7 +772,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            FileHandle file = saveDirectory.child(arg[0] + "." + saveExtension);
+            Fi file = saveDirectory.child(arg[0] + "." + saveExtension);
 
             Core.app.post(() -> {
                 SaveIO.save(file);
@@ -782,7 +782,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("saves", "List all saves in the save directory.", arg -> {
             info("Save files: ");
-            for(FileHandle file : saveDirectory.list()){
+            for(Fi file : saveDirectory.list()){
                 if(file.extension().equals(saveExtension)){
                     info("| &ly{0}", file.nameWithoutExtension());
                 }

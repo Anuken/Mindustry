@@ -405,7 +405,7 @@ public class ContentParser{
      * @param file file that this content is being parsed from
      * @return the content that was parsed
      */
-    public Content parse(LoadedMod mod, String name, String json, FileHandle file, ContentType type) throws Exception{
+    public Content parse(LoadedMod mod, String name, String json, Fi file, ContentType type) throws Exception{
         if(contentTypes.isEmpty()){
             init();
         }
@@ -433,7 +433,7 @@ public class ContentParser{
         return c;
     }
 
-    public void markError(Content content, LoadedMod mod, FileHandle file, Throwable error){
+    public void markError(Content content, LoadedMod mod, Fi file, Throwable error){
         content.minfo.mod = mod;
         content.minfo.sourceFile = file;
         content.minfo.error = makeError(error, file);
@@ -448,7 +448,7 @@ public class ContentParser{
         }
     }
 
-    private String makeError(Throwable t, FileHandle file){
+    private String makeError(Throwable t, Fi file){
         StringBuilder builder = new StringBuilder();
         builder.append("[lightgray]").append("File: ").append(file.name()).append("[]\n\n");
 

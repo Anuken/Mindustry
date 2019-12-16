@@ -17,7 +17,7 @@ public class MapPreviewLoader extends TextureLoader{
     }
 
     @Override
-    public void loadAsync(AssetManager manager, String fileName, FileHandle file, TextureParameter parameter){
+    public void loadAsync(AssetManager manager, String fileName, Fi file, TextureParameter parameter){
         try{
             super.loadAsync(manager, fileName, file.sibling(file.nameWithoutExtension()), parameter);
         }catch(Exception e){
@@ -28,7 +28,7 @@ public class MapPreviewLoader extends TextureLoader{
     }
 
     @Override
-    public Texture loadSync(AssetManager manager, String fileName, FileHandle file, TextureParameter parameter){
+    public Texture loadSync(AssetManager manager, String fileName, Fi file, TextureParameter parameter){
         try{
             return super.loadSync(manager, fileName, file, parameter);
         }catch(Throwable e){
@@ -43,7 +43,7 @@ public class MapPreviewLoader extends TextureLoader{
     }
 
     @Override
-    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, TextureParameter parameter){
+    public Array<AssetDescriptor> getDependencies(String fileName, Fi file, TextureParameter parameter){
         return Array.with(new AssetDescriptor<>("contentcreate", Content.class));
     }
 

@@ -46,7 +46,7 @@ public class ModsDialog extends FloatingDialog{
                             ui.loadfrag.hide();
                         }else{
                             try{
-                                FileHandle file = tmpDirectory.child(text.replace("/", "") + ".zip");
+                                Fi file = tmpDirectory.child(text.replace("/", "") + ".zip");
                                 Streams.copyStream(result.getResultAsStream(), file.write(false));
                                 mods.importMod(file);
                                 file.delete();

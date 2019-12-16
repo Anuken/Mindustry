@@ -125,21 +125,21 @@ public class Vars implements Loadable{
     /** whether typing into the console is enabled - developers only */
     public static boolean enableConsole = false;
     /** application data directory, equivalent to {@link io.anuke.arc.Settings#getDataDirectory()} */
-    public static FileHandle dataDirectory;
+    public static Fi dataDirectory;
     /** data subdirectory used for screenshots */
-    public static FileHandle screenshotDirectory;
+    public static Fi screenshotDirectory;
     /** data subdirectory used for custom mmaps */
-    public static FileHandle customMapDirectory;
+    public static Fi customMapDirectory;
     /** data subdirectory used for custom mmaps */
-    public static FileHandle mapPreviewDirectory;
+    public static Fi mapPreviewDirectory;
     /** tmp subdirectory for map conversion */
-    public static FileHandle tmpDirectory;
+    public static Fi tmpDirectory;
     /** data subdirectory used for saves */
-    public static FileHandle saveDirectory;
+    public static Fi saveDirectory;
     /** data subdirectory used for mods */
-    public static FileHandle modDirectory;
+    public static Fi modDirectory;
     /** data subdirectory used for schematics */
-    public static FileHandle schematicDirectory;
+    public static Fi schematicDirectory;
     /** map file extension */
     public static final String mapExtension = "msav";
     /** save file extension */
@@ -317,7 +317,7 @@ public class Vars implements Loadable{
 
         try{
             //try loading external bundle
-            FileHandle handle = Core.files.local("bundle");
+            Fi handle = Core.files.local("bundle");
 
             Locale locale = Locale.ENGLISH;
             Core.bundle = I18NBundle.createBundle(handle, locale);
@@ -330,7 +330,7 @@ public class Vars implements Loadable{
         }catch(Throwable e){
             //no external bundle found
 
-            FileHandle handle = Core.files.internal("bundles/bundle");
+            Fi handle = Core.files.internal("bundles/bundle");
             Locale locale;
             String loc = Core.settings.getString("locale");
             if(loc.equals("default")){

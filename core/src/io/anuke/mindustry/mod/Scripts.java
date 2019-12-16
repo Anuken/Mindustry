@@ -63,7 +63,7 @@ public class Scripts implements Disposable{
         Log.log(level, "[{0}]: {1}", source, message);
     }
 
-    public void run(LoadedMod mod, FileHandle file){
+    public void run(LoadedMod mod, Fi file){
         run(wrapper.replace("$SCRIPT_NAME$", mod.name + "/" + file.nameWithoutExtension()).replace("$CODE$", file.readString()).replace("$MOD_NAME$", mod.name), file.name());
     }
 

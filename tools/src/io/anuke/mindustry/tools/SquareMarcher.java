@@ -1,7 +1,7 @@
 package io.anuke.mindustry.tools;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.files.Fi;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -19,7 +19,7 @@ public class SquareMarcher{
         this.buffer = new FrameBuffer(resolution, resolution);
     }
 
-    void render(Pixmap pixmap, FileHandle file){
+    void render(Pixmap pixmap, Fi file){
         boolean[][] grid = new boolean[pixmap.getWidth()][pixmap.getHeight()];
 
         for(int x = 0; x < pixmap.getWidth(); x++){

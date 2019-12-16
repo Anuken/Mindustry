@@ -26,7 +26,7 @@ public class LegacyMapIO{
     private static final Json json = new Json();
 
     /* Convert a map from the old format to the new format. */
-    public static void convertMap(FileHandle in, FileHandle out) throws IOException{
+    public static void convertMap(Fi in, Fi out) throws IOException{
         Map map = readMap(in, true);
 
         String waves = map.tags.get("waves", "[]");
@@ -45,7 +45,7 @@ public class LegacyMapIO{
         MapIO.writeMap(out, map);
     }
 
-    public static Map readMap(FileHandle file, boolean custom) throws IOException{
+    public static Map readMap(Fi file, boolean custom) throws IOException{
         try(DataInputStream stream = new DataInputStream(file.read(1024))){
             StringMap tags = new StringMap();
 
@@ -76,11 +76,11 @@ public class LegacyMapIO{
         readTiles(map.file, map.width, map.height, tiles);
     }
 
-    private static void readTiles(FileHandle file, int width, int height, Tile[][] tiles) throws IOException{
+    private static void readTiles(Fi file, int width, int height, Tile[][] tiles) throws IOException{
         readTiles(file, width, height, (x, y) -> tiles[x][y]);
     }
 
-    private static void readTiles(FileHandle file, int width, int height, TileProvider tiles) throws IOException{
+    private static void readTiles(Fi file, int width, int height, TileProvider tiles) throws IOException{
         try(BufferedInputStream input = file.read(bufferSize)){
 
             //read map

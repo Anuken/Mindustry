@@ -22,7 +22,7 @@ public class Map implements Comparable<Map>, Publishable{
     /** Metadata. Author description, display name, etc. */
     public final StringMap tags;
     /** Base file of this map. File can be named anything at all. */
-    public final FileHandle file;
+    public final Fi file;
     /** Format version. */
     public final int version;
     /** Whether this map is managed, e.g. downloaded from the Steam workshop.*/
@@ -40,7 +40,7 @@ public class Map implements Comparable<Map>, Publishable{
     /** Associated mod. If null, no mod is associated. */
     public @Nullable LoadedMod mod;
 
-    public Map(FileHandle file, int width, int height, StringMap tags, boolean custom, int version, int build){
+    public Map(Fi file, int width, int height, StringMap tags, boolean custom, int version, int build){
         this.custom = custom;
         this.tags = tags;
         this.file = file;
@@ -50,11 +50,11 @@ public class Map implements Comparable<Map>, Publishable{
         this.build = build;
     }
 
-    public Map(FileHandle file, int width, int height, StringMap tags, boolean custom, int version){
+    public Map(Fi file, int width, int height, StringMap tags, boolean custom, int version){
         this(file, width, height, tags, custom, version, -1);
     }
 
-    public Map(FileHandle file, int width, int height, StringMap tags, boolean custom){
+    public Map(Fi file, int width, int height, StringMap tags, boolean custom){
         this(file, width, height, tags, custom, -1);
     }
 
@@ -70,11 +70,11 @@ public class Map implements Comparable<Map>, Publishable{
         return texture == null ? Core.assets.get("sprites/error.png") : texture;
     }
 
-    public FileHandle previewFile(){
+    public Fi previewFile(){
         return Vars.mapPreviewDirectory.child((workshop ? file.parent().name() : file.nameWithoutExtension()) + ".png");
     }
 
-    public FileHandle cacheFile(){
+    public Fi cacheFile(){
         return Vars.mapPreviewDirectory.child(workshop ? file.parent().name() + "-workshop-cache.dat" : file.nameWithoutExtension() + "-cache.dat");
     }
 
@@ -184,14 +184,14 @@ public class Map implements Comparable<Map>, Publishable{
     }
 
     @Override
-    public FileHandle createSteamFolder(String id){
-        FileHandle mapFile = tmpDirectory.child("map_" + id).child("map.msav");
+    public Fi createSteamFolder(String id){
+        Fi mapFile = tmpDirectory.child("map_" + id).child("map.msav");
         file.copyTo(mapFile);
         return mapFile.parent();
     }
 
     @Override
-    public FileHandle createSteamPreview(String id){
+    public Fi createSteamPreview(String id){
         return previewFile();
     }
 

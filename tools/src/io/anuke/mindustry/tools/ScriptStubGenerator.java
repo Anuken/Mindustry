@@ -62,7 +62,7 @@ public class ScriptStubGenerator{
         ObjectSet<String> used = ObjectSet.with();
 
         StringBuilder result = new StringBuilder("//Generated class. Do not modify.\n");
-        result.append("\n").append(new FileHandle("core/assets/scripts/base.js").readString()).append("\n");
+        result.append("\n").append(new Fi("core/assets/scripts/base.js").readString()).append("\n");
         for(Class type : classes){
             if(used.contains(type.getPackage().getName()) || nopackage.contains(s -> type.getName().startsWith(s))) continue;
             result.append("importPackage(Packages.").append(type.getPackage().getName()).append(")\n");
@@ -71,8 +71,8 @@ public class ScriptStubGenerator{
 
         //Log.info(result);
 
-        new FileHandle("core/assets/scripts/global.js").writeString(result.toString());
-        new FileHandle("core/src/io/anuke/mindustry/mod/ClassAccess.java").writeString(fileTemplate
+        new Fi("core/assets/scripts/global.js").writeString(result.toString());
+        new Fi("core/src/io/anuke/mindustry/mod/ClassAccess.java").writeString(fileTemplate
             .replace("$ALLOWED_CLASSES$", classes.toString(", ", type -> type.getName() + ".class"))
             .replace("$ALLOWED_CLASS_NAMES$", classes.toString(", ", type -> "\"" + type.getName() + "\"")));
     }
