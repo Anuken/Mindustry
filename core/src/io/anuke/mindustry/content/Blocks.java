@@ -1834,7 +1834,7 @@ public class Blocks implements ContentList{
 
         largeIlluminator = new LightBlock("large-illuminator"){{
             requirements(Category.effect, BuildVisibility.lightingOnly, ItemStack.with(Items.graphite, 8, Items.silicon, 4));
-            brightness = 1.34f;
+            brightness = 0.78f;
             radius = 240f;
             consumes.power(0.1f);
             size = 2;
