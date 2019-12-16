@@ -44,8 +44,8 @@ public class CrashSender{
                     }else{
                         Version.build = Strings.canParseInt(map.get("build")) ? Integer.parseInt(map.get("build")) : -1;
                     }
-                }catch(Throwable ignored){
-                    ignored.printStackTrace();
+                }catch(Throwable e){
+                    e.printStackTrace();
                     Log.err("Failed to parse version.");
                 }
             }
@@ -67,6 +67,14 @@ public class CrashSender{
                 }
             }catch(Throwable ignored){
                 //if there's no settings init we don't know what the user wants but chances are it's an important crash, so send it anyway
+            }
+
+            try{
+                //check any mods - if there are any, don't send reports
+                if(Vars.mods != null && !Vars.mods.list().isEmpty()){
+                    return;
+                }
+            }catch(Throwable ignored){
             }
 
             //do not send exceptions that occur for versions that can't be parsed
