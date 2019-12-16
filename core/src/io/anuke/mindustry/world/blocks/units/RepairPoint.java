@@ -14,7 +14,9 @@ import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.mindustry.world.meta.*;
+
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class RepairPoint extends Block{
     private static Rectangle rect = new Rectangle();
@@ -49,6 +51,12 @@ public class RepairPoint extends Block{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+        stats.add(BlockStat.range, repairRadius / tilesize, StatUnit.blocks);
+    }
+
+    @Override
     public void init(){
         consumes.powerCond(powerUse, entity -> ((RepairPointEntity)entity).target != null);
         super.init();
@@ -57,6 +65,11 @@ public class RepairPoint extends Block{
     @Override
     public void drawSelect(Tile tile){
         Drawf.dashCircle(tile.drawx(), tile.drawy(), repairRadius, Pal.accent);
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), repairRadius, Pal.accent);
     }
 
     @Override
