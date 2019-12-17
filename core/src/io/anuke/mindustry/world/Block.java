@@ -541,15 +541,28 @@ public class Block extends BlockStorage{
         bars.add("health", entity -> new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.white));
 
         if(hasLiquids){
-            Func<TileEntity, Liquid> current;
-            if(consumes.has(ConsumeType.liquid) && consumes.get(ConsumeType.liquid) instanceof ConsumeLiquid){
-                Liquid liquid = consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
-                current = entity -> liquid;
-            }else{
-                current = entity -> entity.liquids.current();
+            boolean useCurrent = true;
+            float liquidStored = 0;
+            String liquidName = "";
+            Liquid liquid;
+            if(consumes.has(ConsumeType.liquid) && consumes.get(ConsumeType.liquid) instanceof ConsumeLiquidBase){
+                if(consumes.get(ConsumeType.liquid) instanceof ConsumeLiquid){
+                    liquid = consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
+                }else if(consumes.get(ConsumeType.liquid) instanceof ConsumeLiquids){
+                    useCurrent = false;
+                    LiquidStack[] liquids = consumes.<ConsumeLiquids>get(ConsumeType.liquid).liquids;
+                    liquid = liquids[0].liquid;
+                    liquidName = Core.bundle.get("content.liquid.name");
+
+                    float sum = 0;
+                    for(LiquidStack stack : liquids){
+                        sum += stack.amount;
+                    }
+                    liquidStored = sum / liquids.length; // Display average of all stored liquids.
+                }
             }
-            bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
-                    () -> current.get(entity).barColor(), () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
+            bars.add("liquid", entity -> new Bar(() -> (useCurrent ? entity.liquids.get(entity.liquids.current()) : liquidStored) <= 0.001f ? Core.bundle.get("bar.liquid") : (useCurrent ? entity.liquids.current().localizedName : liquidName),
+                    () -> liquid.barColor(), () -> (useCurrent ? entity.liquids.get(entity.liquids.current()) : liquidStored) / liquidCapacity));
         }
 
         if(hasPower && consumes.hasPower()){

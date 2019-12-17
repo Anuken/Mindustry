@@ -227,6 +227,8 @@ public class ContentParser{
                             block.consumes.add((Consume)parser.readValue(ConsumeItems.class, child));
                         }else if(child.name.equals("liquid")){
                             block.consumes.add((Consume)parser.readValue(ConsumeLiquid.class, child));
+                        }else if(child.name.equals("liquids")){
+                            block.consumes.add((Consume)parser.readValue(ConsumeLiquids.class, child));
                         }else if(child.name.equals("power")){
                             if(child.isNumber()){
                                 block.consumes.power(child.asFloat());
