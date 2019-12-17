@@ -10,9 +10,9 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 
 public class DatabaseDialog extends FloatingDialog{

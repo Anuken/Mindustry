@@ -13,15 +13,15 @@ import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
-import static io.anuke.mindustry.Vars.updateEditorOnChange;
+import static io.anuke.mindustry.Vars.*;
 
 public abstract class FilterOption{
-    public static final Boolf<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full));
-    public static final Boolf<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full));
-    public static final Boolf<Block> floorsOptional = b -> b == Blocks.air || ((b instanceof Floor && !(b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full)));
-    public static final Boolf<Block> wallsOptional = b -> b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full)));
-    public static final Boolf<Block> wallsOresOptional = b -> b == Blocks.air || (((!b.synthetic() && !(b instanceof Floor)) || (b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full)));
-    public static final Boolf<Block> oresOnly = b -> b instanceof OverlayFloor && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full));
+    public static final Boolf<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full));
+    public static final Boolf<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full));
+    public static final Boolf<Block> floorsOptional = b -> b == Blocks.air || ((b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full)));
+    public static final Boolf<Block> wallsOptional = b -> b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full)));
+    public static final Boolf<Block> wallsOresOptional = b -> b == Blocks.air || (((!b.synthetic() && !(b instanceof Floor)) || (b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full)));
+    public static final Boolf<Block> oresOnly = b -> b instanceof OverlayFloor && !headless && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full));
     public static final Boolf<Block> anyOptional = b -> floorsOnly.get(b) || wallsOnly.get(b) || oresOnly.get(b) || b == Blocks.air;
 
     public abstract void build(Table table);

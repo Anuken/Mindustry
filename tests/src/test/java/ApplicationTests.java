@@ -16,7 +16,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.*;
-import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.BlockPart;

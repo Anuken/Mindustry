@@ -95,7 +95,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                 Core.settings.putAll(map);
                 Core.settings.save();
 
-                for(FileHandle file : dataDirectory.list()){
+                for(Fi file : dataDirectory.list()){
                     file.deleteDirectory();
                 }
 
@@ -106,7 +106,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.addButton("$data.export", style, () -> {
                 if(ios){
-                    FileHandle file = Core.files.local("mindustry-data-export.zip");
+                    Fi file = Core.files.local("mindustry-data-export.zip");
                     try{
                         data.exportData(file);
                     }catch(Exception e){

@@ -6,6 +6,7 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.type.*;

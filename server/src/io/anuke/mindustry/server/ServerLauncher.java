@@ -43,11 +43,11 @@ public class ServerLauncher implements ApplicationListener{
         loadLocales = false;
         headless = true;
 
-        FileHandle plugins = Core.settings.getDataDirectory().child("plugins");
+        Fi plugins = Core.settings.getDataDirectory().child("plugins");
         if(plugins.isDirectory() && plugins.list().length > 0 && !plugins.sibling("mods").exists()){
             Log.warn("[IMPORTANT NOTICE] &lrPlugins have been detected.&ly Automatically moving all contents of the plugin folder into the 'mods' folder. The original folder will not be removed; please do so manually.");
             plugins.sibling("mods").mkdirs();
-            for(FileHandle file : plugins.list()){
+            for(Fi file : plugins.list()){
                 file.copyTo(plugins.sibling("mods"));
             }
         }
@@ -63,7 +63,7 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(netServer = new NetServer());
         Core.app.addListener(new ServerControl(args));
 
-        mods.each(Mod::init);
+        mods.eachClass(Mod::init);
 
         Events.fire(new ServerLoadEvent());
     }

@@ -12,7 +12,7 @@ public class SavePreviewLoader extends TextureLoader{
     }
 
     @Override
-    public void loadAsync(AssetManager manager, String fileName, FileHandle file, TextureParameter parameter){
+    public void loadAsync(AssetManager manager, String fileName, Fi file, TextureParameter parameter){
         try{
             super.loadAsync(manager, fileName, file.sibling(file.nameWithoutExtension()), parameter);
         }catch(Exception e){

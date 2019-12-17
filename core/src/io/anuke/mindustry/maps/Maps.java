@@ -105,7 +105,7 @@ public class Maps{
      * Does not add this map to the map list.
      */
     public Map loadInternalMap(String name){
-        FileHandle file = tree.get("maps/" + name + "." + mapExtension);
+        Fi file = tree.get("maps/" + name + "." + mapExtension);
 
         try{
             return MapIO.createMap(file, false);
@@ -119,7 +119,7 @@ public class Maps{
         //defaults; must work
         try{
             for(String name : defaultMapNames){
-                FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
+                Fi file = Core.files.internal("maps/" + name + "." + mapExtension);
                 loadMap(file, false);
             }
         }catch(IOException e){
@@ -127,7 +127,7 @@ public class Maps{
         }
 
         //custom
-        for(FileHandle file : customMapDirectory.list()){
+        for(Fi file : customMapDirectory.list()){
             try{
                 if(file.extension().equalsIgnoreCase(mapExtension)){
                     loadMap(file, true);
@@ -139,7 +139,7 @@ public class Maps{
         }
 
         //workshop
-        for(FileHandle file : platform.getWorkshopContent(Map.class)){
+        for(Fi file : platform.getWorkshopContent(Map.class)){
             try{
                 Map map = loadMap(file, false);
                 map.workshop = true;
@@ -183,7 +183,7 @@ public class Maps{
             StringMap tags = new StringMap(baseTags);
             String name = tags.get("name");
             if(name == null) throw new IllegalArgumentException("Can't save a map with no name. How did this happen?");
-            FileHandle file;
+            Fi file;
 
             //find map with the same exact display name
             Map other = maps.find(m -> m.name().equals(name));
@@ -244,8 +244,8 @@ public class Maps{
     }
 
     /** Import a map, then save it. This updates all values and stored data necessary. */
-    public void importMap(FileHandle file) throws IOException{
-        FileHandle dest = findFile();
+    public void importMap(Fi file) throws IOException{
+        Fi dest = findFile();
         file.copyTo(dest);
 
         Map map = loadMap(dest, true);
@@ -446,7 +446,7 @@ public class Maps{
     }
 
     /** Find a new filename to put a map to. */
-    private FileHandle findFile(){
+    private Fi findFile(){
         //find a map name that isn't used.
         int i = maps.size;
         while(customMapDirectory.child("map_" + i + "." + mapExtension).exists()){
@@ -455,7 +455,7 @@ public class Maps{
         return customMapDirectory.child("map_" + i + "." + mapExtension);
     }
 
-    private Map loadMap(FileHandle file, boolean custom) throws IOException{
+    private Map loadMap(Fi file, boolean custom) throws IOException{
         Map map = MapIO.createMap(file, custom);
 
         if(map.name() == null){

@@ -1,24 +1,24 @@
 package io.anuke.mindustry.tools;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
+import io.anuke.arc.graphics.g2d.TextureAtlas.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.Log.*;
 import io.anuke.mindustry.*;
-import io.anuke.mindustry.core.ContentLoader;
+import io.anuke.mindustry.core.*;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.nio.file.*;
+import javax.imageio.*;
+import java.awt.image.*;
+import java.io.*;
 
 public class ImagePacker{
     static ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
     static ObjectMap<TextureRegion, BufferedImage> imageCache = new ObjectMap<>();
 
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args){
         Vars.headless = true;
 
         Log.setLogger(new NoopLogHandler());
@@ -26,14 +26,11 @@ public class ImagePacker{
         Vars.content.createBaseContent();
         Log.setLogger(new DefaultLogHandler());
 
-        Files.walk(Paths.get("../../../assets-raw/sprites_out")).forEach(path -> {
+        Fi.get("../../../assets-raw/sprites_out").walk(path -> {
+            String fname = path.nameWithoutExtension();
+
             try{
-                if(Files.isDirectory(path)) return;
-
-                String fname = path.getFileName().toString();
-                fname = fname.substring(0, fname.length() - 4);
-
-                BufferedImage image = ImageIO.read(path.toFile());
+                BufferedImage image = ImageIO.read(path.file());
                 GenRegion region = new GenRegion(fname, path){
 
                     @Override
@@ -59,9 +56,8 @@ public class ImagePacker{
 
                 regionCache.put(fname, region);
                 imageCache.put(region, image);
-
             }catch(IOException e){
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         });
 
@@ -134,9 +130,9 @@ public class ImagePacker{
     static class GenRegion extends AtlasRegion{
         String name;
         boolean invalid;
-        Path path;
+        Fi path;
 
-        GenRegion(String name, Path path){
+        GenRegion(String name, Fi path){
             this.name = name;
             this.path = path;
         }

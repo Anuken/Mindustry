@@ -17,7 +17,6 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.desktop.steam.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.type.*;
@@ -51,7 +50,7 @@ public class DesktopLauncher extends ClientLauncher{
                 stencil = 0;
                 width = 900;
                 height = 700;
-                setWindowIcon(FileType.Internal, "icons/icon_64.png");
+                setWindowIcon(FileType.internal, "icons/icon_64.png");
             }});
         }catch(Throwable e){
             handleCrash(e);
@@ -78,8 +77,8 @@ public class DesktopLauncher extends ClientLauncher{
 
         if(useSteam){
             //delete leftover dlls
-            FileHandle file = new FileHandle(".");
-            for(FileHandle other : file.parent().list()){
+            Fi file = new Fi(".");
+            for(Fi other : file.parent().list()){
                 if(other.name().contains("steam") && (other.extension().equals("dll") || other.extension().equals("so") || other.extension().equals("dylib"))){
                     other.delete();
                 }
@@ -195,18 +194,15 @@ public class DesktopLauncher extends ClientLauncher{
         boolean fbgp = badGPU;
 
         CrashSender.send(e, file -> {
-            Array<Throwable> causes = Strings.getCauses(e);
-            Throwable fc = causes.find(t -> t instanceof ModLoadException);
-            if(fc == null) fc = Strings.getFinalCause(e);
-            Throwable cause = fc;
+            Throwable fc = Strings.getFinalCause(e);
             if(!fbgp){
-                dialog.get(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + cause.getClass().getSimpleName().replace("Exception", "") + (cause.getMessage() == null ? "" : ":\n" + cause.getMessage())));
+                dialog.get(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + fc.getClass().getSimpleName().replace("Exception", "") + (fc.getMessage() == null ? "" : ":\n" + fc.getMessage())));
             }
         });
     }
 
     @Override
-    public Array<FileHandle> getWorkshopContent(Class<? extends Publishable> type){
+    public Array<Fi> getWorkshopContent(Class<? extends Publishable> type){
         return !steam ? super.getWorkshopContent(type) : SVars.workshop.getWorkshopFiles(type);
     }
 

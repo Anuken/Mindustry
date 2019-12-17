@@ -35,7 +35,7 @@ public interface Platform{
     default void viewListingID(String mapid){}
 
     /** Steam: Return external workshop maps to be loaded.*/
-    default Array<FileHandle> getWorkshopContent(Class<? extends Publishable> type){
+    default Array<Fi> getWorkshopContent(Class<? extends Publishable> type){
         return new Array<>(0);
     }
 
@@ -100,7 +100,7 @@ public interface Platform{
     }
 
     /** Only used for iOS or android: open the share menu for a map or save. */
-    default void shareFile(FileHandle file){
+    default void shareFile(Fi file){
     }
 
     /**
@@ -109,7 +109,7 @@ public interface Platform{
      * @param open Whether to open or save files
      * @param extension File extension to filter
      */
-    default void showFileChooser(boolean open, String extension, Cons<FileHandle> cons){
+    default void showFileChooser(boolean open, String extension, Cons<Fi> cons){
         new FileChooser(open ? "$open" : "$save", file -> file.extension().toLowerCase().equals(extension), open, file -> {
             if(!open){
                 cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));

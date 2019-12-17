@@ -150,7 +150,7 @@ public class DesktopInput extends InputHandler{
         if(state.is(State.menu) || Core.scene.hasDialog()) return;
 
         //zoom camera
-        if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((block == null || !block.rotate) && selectRequests.isEmpty()))){
+        if(!Core.scene.hasScroll() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
@@ -164,11 +164,6 @@ public class DesktopInput extends InputHandler{
         //deselect if not placing
         if(!isPlacing() && mode == placing){
             mode = none;
-        }
-
-        if(mode != none || isPlacing()){
-            selectRequests.clear();
-            lastSchematic = null;
         }
 
         if(player.isShooting && !canShoot()){
@@ -354,7 +349,9 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
             BuildRequest req = getRequest(cursorX, cursorY);
 
-            if(!selectRequests.isEmpty()){
+            if(Core.input.keyDown(Binding.break_block)){
+                mode = none;
+            }else if(!selectRequests.isEmpty()){
                 flushRequests(selectRequests);
             }else if(isPlacing()){
                 selectX = cursorX;
@@ -376,9 +373,12 @@ public class DesktopInput extends InputHandler{
             }else if(!Core.scene.hasKeyboard()){ //if it's out of bounds, shooting is just fine
                 player.isShooting = true;
             }
-        }else if(Core.input.keyTap(Binding.deselect) && block != null){
+        }else if(Core.input.keyTap(Binding.deselect) && isPlacing()){
             block = null;
             mode = none;
+        }else if(Core.input.keyTap(Binding.deselect) && !selectRequests.isEmpty()){
+            selectRequests.clear();
+            lastSchematic = null;
         }else if(Core.input.keyTap(Binding.break_block) && !Core.scene.hasMouse()){
             //is recalculated because setting the mode to breaking removes potential multiblock cursor offset
             deleting = false;

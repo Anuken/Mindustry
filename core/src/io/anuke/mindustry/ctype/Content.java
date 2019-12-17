@@ -4,16 +4,14 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.mod.Mods.*;
-import io.anuke.mindustry.type.*;
 
 
 /** Base class for a content type that is loaded in {@link io.anuke.mindustry.core.ContentLoader}. */
 public abstract class Content implements Comparable<Content>{
     public final short id;
-    /** The mod that loaded this piece of content. */
-    public @Nullable LoadedMod mod;
-    /** File that this content was loaded from. */
-    public @Nullable FileHandle sourceFile;
+    /** Info on which mod this content was loaded from. */
+    public @NonNull ModContentInfo minfo = new ModContentInfo();
+
 
     public Content(){
         this.id = (short)Vars.content.getBy(getContentType()).size;
@@ -37,6 +35,11 @@ public abstract class Content implements Comparable<Content>{
     public void load(){
     }
 
+    /** @return whether an error ocurred during mod loading. */
+    public boolean hasErrored(){
+        return minfo.error != null;
+    }
+
     @Override
     public int compareTo(Content c){
         return Integer.compare(id, c.id);
@@ -45,5 +48,15 @@ public abstract class Content implements Comparable<Content>{
     @Override
     public String toString(){
         return getContentType().name() + "#" + id;
+    }
+
+    public static class ModContentInfo{
+        /** The mod that loaded this piece of content. */
+        public @Nullable LoadedMod mod;
+        /** File that this content was loaded from. */
+        public @Nullable
+        Fi sourceFile;
+        /** The error that occurred during loading, if applicable. Null if no error occurred. */
+        public @Nullable String error;
     }
 }

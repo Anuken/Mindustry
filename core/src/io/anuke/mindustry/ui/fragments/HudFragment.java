@@ -17,6 +17,7 @@ import io.anuke.arc.scene.ui.ImageButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;

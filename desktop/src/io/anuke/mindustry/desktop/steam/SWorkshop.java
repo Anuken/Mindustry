@@ -21,7 +21,7 @@ import static io.anuke.mindustry.Vars.*;
 public class SWorkshop implements SteamUGCCallback{
     public final SteamUGC ugc = new SteamUGC(this);
 
-    private ObjectMap<Class<? extends Publishable>, Array<FileHandle>> workshopFiles = new ObjectMap<>();
+    private ObjectMap<Class<? extends Publishable>, Array<Fi>> workshopFiles = new ObjectMap<>();
     private ObjectMap<SteamUGCQuery, Cons2<Array<SteamUGCDetails>, SteamResult>> detailHandlers = new ObjectMap<>();
     private Array<Cons<SteamPublishedFileID>> itemHandlers = new Array<>();
     private ObjectMap<SteamPublishedFileID, Runnable> updatedHandlers = new ObjectMap<>();
@@ -32,9 +32,9 @@ public class SWorkshop implements SteamUGCCallback{
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getSubscribedItems(ids);
 
-        Array<FileHandle> folders = Array.with(ids).map(f -> {
+        Array<Fi> folders = Array.with(ids).map(f -> {
             ugc.getItemInstallInfo(f, info);
-            return new FileHandle(info.getFolder());
+            return new Fi(info.getFolder());
         }).select(f -> f != null && f.list().length > 0);
 
         workshopFiles.put(Map.class, folders.select(f -> f.list().length == 1 && f.list()[0].extension().equals(mapExtension)).map(f -> f.list()[0]));
@@ -50,7 +50,7 @@ public class SWorkshop implements SteamUGCCallback{
         });
     }
 
-    public Array<FileHandle> getWorkshopFiles(Class<? extends Publishable> type){
+    public Array<Fi> getWorkshopFiles(Class<? extends Publishable> type){
         return workshopFiles.getOr(type, () -> new Array<>(0));
     }
 

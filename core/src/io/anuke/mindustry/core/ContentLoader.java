@@ -7,6 +7,7 @@ import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.*;
@@ -25,6 +26,7 @@ public class ContentLoader{
     private Array<Content>[] contentMap = new Array[ContentType.values().length];
     private MappableContent[][] temporaryMapper;
     private @Nullable LoadedMod currentMod;
+    private @Nullable Content lastAdded;
     private ObjectSet<Cons<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
         new Fx(),
@@ -114,8 +116,8 @@ public class ContentLoader{
                 try{
                     callable.get(content);
                 }catch(Throwable e){
-                    if(content.mod != null){
-                        mods.handleError(new ModLoadException(content, e), content.mod);
+                    if(content.minfo.mod != null){
+                        mods.handleContentError(content, e);
                     }else{
                         throw new RuntimeException(e);
                     }
@@ -146,11 +148,27 @@ public class ContentLoader{
         //clear all content, currently not used
     }
 
+    /** Get last piece of content created for error-handling purposes. */
+    public @Nullable Content getLastAdded(){
+        return lastAdded;
+    }
+
+    /** Remove last content added in case of an exception. */
+    public void removeLast(){
+        if(lastAdded != null && contentMap[lastAdded.getContentType().ordinal()].peek() == lastAdded){
+            contentMap[lastAdded.getContentType().ordinal()].pop();
+            if(lastAdded instanceof MappableContent){
+                contentNameMap[lastAdded.getContentType().ordinal()].remove(((MappableContent)lastAdded).name);
+            }
+        }
+    }
+
     public void handleContent(Content content){
+        this.lastAdded = content;
         contentMap[content.getContentType().ordinal()].add(content);
     }
 
-    public void setCurrentMod(LoadedMod mod){
+    public void setCurrentMod(@Nullable LoadedMod mod){
         this.currentMod = mod;
     }
 
@@ -163,7 +181,7 @@ public class ContentLoader{
             throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + content.name + "')");
         }
         if(currentMod != null){
-            content.mod = currentMod;
+            content.minfo.mod = currentMod;
         }
         contentNameMap[content.getContentType().ordinal()].put(content.name, content);
     }

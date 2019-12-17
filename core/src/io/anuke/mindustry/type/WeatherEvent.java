@@ -1,6 +1,7 @@
 package io.anuke.mindustry.type;
 
 import io.anuke.mindustry.ctype.Content;
+import io.anuke.mindustry.ctype.ContentType;
 
 //currently unimplemented, see trello for implementation plans
 public class WeatherEvent extends Content{

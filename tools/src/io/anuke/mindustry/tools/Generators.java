@@ -1,20 +1,18 @@
 package io.anuke.mindustry.tools;
 
 import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.noise.*;
-import io.anuke.mindustry.tools.ImagePacker.*;
 import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.tools.ImagePacker.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
-
-import java.io.*;
-import java.nio.file.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -73,17 +71,13 @@ public class Generators{
             for(Block block : content.blocks()){
                 TextureRegion[] regions = block.getGeneratedIcons();
 
-                try{
-                    if(block instanceof Floor){
-                        block.load();
-                        for(TextureRegion region : block.variantRegions()){
-                            GenRegion gen = (GenRegion)region;
-                            if(gen.path == null) continue;
-                            Files.copy(gen.path, Paths.get("../editor/editor-" + gen.path.getFileName()));
-                        }
+                if(block instanceof Floor){
+                    block.load();
+                    for(TextureRegion region : block.variantRegions()){
+                        GenRegion gen = (GenRegion)region;
+                        if(gen.path == null) continue;
+                        gen.path.copyTo(Fi.get("../editor/editor-" + gen.path.name()));
                     }
-                }catch(IOException e){
-                    throw new RuntimeException(e);
                 }
 
                 if(regions.length == 0){
@@ -120,11 +114,7 @@ public class Generators{
                             }
                         }
 
-                        try{
-                            Files.delete(region.path);
-                        }catch(IOException e){
-                            e.printStackTrace();
-                        }
+                        region.path.delete();
 
                         out.save(block.name);
                     }

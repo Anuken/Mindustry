@@ -219,7 +219,7 @@ public class NetServer implements ApplicationListener{
 
     @Override
     public void init(){
-        mods.each(mod -> mod.registerClientCommands(clientCommands));
+        mods.eachClass(mod -> mod.registerClientCommands(clientCommands));
     }
 
     private void registerCommands(){

@@ -1542,7 +1542,7 @@ public class Blocks implements ContentList{
             Items.silicon, Bullets.artilleryHoming,
             Items.pyratite, Bullets.artilleryIncendiary,
             Items.blastCompound, Bullets.artilleryExplosive,
-            Items.plastanium, Bullets.arilleryPlastic
+            Items.plastanium, Bullets.artilleryPlastic
             );
             size = 3;
             shots = 4;

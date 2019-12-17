@@ -138,26 +138,20 @@ public class ContentParser{
                 }
 
                 //try to parse "item/amount" syntax
-                try{
-                    if(type == ItemStack.class && jsonData.isString() && jsonData.asString().contains("/")){
-                        String[] split = jsonData.asString().split("/");
+                if(type == ItemStack.class && jsonData.isString() && jsonData.asString().contains("/")){
+                    String[] split = jsonData.asString().split("/");
 
-                        return (T)fromJson(ItemStack.class, "{item: " + split[0] + ", amount: " + split[1] + "}");
-                    }
-                }catch(Throwable ignored){
+                    return (T)fromJson(ItemStack.class, "{item: " + split[0] + ", amount: " + split[1] + "}");
                 }
 
                 //try to parse "liquid/amount" syntax
-                try{
-                    if(jsonData.isString() && jsonData.asString().contains("/")){
-                        String[] split = jsonData.asString().split("/");
-                        if(type == LiquidStack.class){
-                            return (T)fromJson(LiquidStack.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
-                        }else if(type == ConsumeLiquid.class){
-                            return (T)fromJson(ConsumeLiquid.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
-                        }
+                if(jsonData.isString() && jsonData.asString().contains("/")){
+                    String[] split = jsonData.asString().split("/");
+                    if(type == LiquidStack.class){
+                        return (T)fromJson(LiquidStack.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
+                    }else if(type == ConsumeLiquid.class){
+                        return (T)fromJson(ConsumeLiquid.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
                     }
-                }catch(Throwable ignored){
                 }
 
                 if(Content.class.isAssignableFrom(type)){
@@ -168,7 +162,7 @@ public class ContentParser{
                     T two = (T)Vars.content.getByName(ctype, jsonData.asString());
 
                     if(two != null) return two;
-                    throw new IllegalArgumentException("\"" + jsonData.name + "\": No " + ctype + " found with name '" + jsonData.asString() + "'.");
+                    throw new IllegalArgumentException("\"" + jsonData.name + "\": No " + ctype + " found with name '" + jsonData.asString() + "'.\nMake sure '" + jsonData.asString() + "' is spelled correctly, and that it really exists!\nThis may also occur because its file failed to parse.");
                 }
             }
 
@@ -258,11 +252,15 @@ public class ContentParser{
                 if(research[0] != null){
                     Block parent = find(ContentType.block, research[0]);
                     TechNode baseNode = TechTree.create(parent, block);
+                    LoadedMod cur = currentMod;
 
                     postreads.add(() -> {
+                        currentContent = block;
+                        currentMod = cur;
+
                         TechNode parnode = TechTree.all.find(t -> t.block == parent);
                         if(parnode == null){
-                            throw new ModLoadException("Block '" + parent.name + "' isn't in the tech tree, but '" + block.name + "' requires it to be researched.", block);
+                            throw new IllegalArgumentException("Block '" + parent.name + "' isn't in the tech tree, but '" + block.name + "' requires it to be researched.");
                         }
                         if(!parnode.children.contains(baseNode)){
                             parnode.children.add(baseNode);
@@ -304,7 +302,7 @@ public class ContentParser{
         if(value.has(key)){
             return value.getString(key);
         }else{
-            throw new IllegalArgumentException((currentContent == null ? "" : currentContent.sourceFile + ": ") + "You are missing a \"" + key + "\". It must be added before the file can be parsed.");
+            throw new IllegalArgumentException("You are missing a \"" + key + "\". It must be added before the file can be parsed.");
         }
     }
 
@@ -382,13 +380,18 @@ public class ContentParser{
         }
     }
 
-    public void finishParsing(){
+    private void attempt(Runnable run){
         try{
-            reads.each(Runnable::run);
-            postreads.each(Runnable::run);
-        }catch(Exception e){
-            Vars.mods.handleError(new ModLoadException("Error occurred parsing content: " + currentContent, currentContent, e), currentMod);
+            run.run();
+        }catch(Throwable t){
+            //don't overwrite double errors
+            markError(currentContent, t);
         }
+    }
+
+    public void finishParsing(){
+        reads.each(this::attempt);
+        postreads.each(this::attempt);
         reads.clear();
         postreads.clear();
         toBeParsed.clear();
@@ -402,7 +405,7 @@ public class ContentParser{
      * @param file file that this content is being parsed from
      * @return the content that was parsed
      */
-    public Content parse(LoadedMod mod, String name, String json, FileHandle file, ContentType type) throws Exception{
+    public Content parse(LoadedMod mod, String name, String json, Fi file, ContentType type) throws Exception{
         if(contentTypes.isEmpty()){
             init();
         }
@@ -421,12 +424,46 @@ public class ContentParser{
         currentMod = mod;
         boolean located = locate(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
+        c.minfo.sourceFile = file;
         toBeParsed.add(c);
+
         if(!located){
-            c.sourceFile = file;
-            c.mod = mod;
+            c.minfo.mod = mod;
         }
         return c;
+    }
+
+    public void markError(Content content, LoadedMod mod, Fi file, Throwable error){
+        content.minfo.mod = mod;
+        content.minfo.sourceFile = file;
+        content.minfo.error = makeError(error, file);
+        if(mod != null){
+            mod.erroredContent.add(content);
+        }
+    }
+
+    public void markError(Content content, Throwable error){
+        if(content.minfo != null && !content.hasErrored()){
+            markError(content, content.minfo.mod, content.minfo.sourceFile, error);
+        }
+    }
+
+    private String makeError(Throwable t, Fi file){
+        StringBuilder builder = new StringBuilder();
+        builder.append("[lightgray]").append("File: ").append(file.name()).append("[]\n\n");
+
+        if(t.getMessage() != null && t instanceof JsonParseException){
+            builder.append("[accent][[JsonParse][] ").append(":\n").append(t.getMessage());
+        }else{
+            Array<Throwable> causes = Strings.getCauses(t);
+            for(Throwable e : causes){
+                builder.append("[accent][[").append(e.getClass().getSimpleName().replace("Exception", ""))
+                .append("][] ")
+                .append(e.getMessage() != null ?
+                e.getMessage().replace("io.anuke.mindustry.", "").replace("io.anuke.arc.", "") : "").append("\n");
+            }
+        }
+        return builder.toString();
     }
 
     private <T extends MappableContent> T locate(ContentType type, String name){
