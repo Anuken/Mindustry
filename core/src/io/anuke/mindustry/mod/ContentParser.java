@@ -437,6 +437,7 @@ public class ContentParser{
         content.minfo.mod = mod;
         content.minfo.sourceFile = file;
         content.minfo.error = makeError(error, file);
+        content.minfo.baseError = error;
         if(mod != null){
             mod.erroredContent.add(content);
         }
