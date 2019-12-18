@@ -19,17 +19,17 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class ImpactReactor extends PowerGenerator{
-    protected int timerUse = timers++;
+    public final int timerUse = timers++;
 
-    protected int plasmas = 4;
-    protected float warmupSpeed = 0.001f;
-    protected float itemDuration = 60f;
-    protected int explosionRadius = 50;
-    protected int explosionDamage = 2000;
+    public int plasmas = 4;
+    public float warmupSpeed = 0.001f;
+    public float itemDuration = 60f;
+    public int explosionRadius = 50;
+    public int explosionDamage = 2000;
 
-    protected Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
-    protected int bottomRegion;
-    protected int[] plasmaRegions;
+    public Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
+    public int bottomRegion;
+    public int[] plasmaRegions;
 
     public ImpactReactor(String name){
         super(name);
@@ -69,7 +69,7 @@ public class ImpactReactor extends PowerGenerator{
 
     @Override
     public void update(Tile tile){
-        FusionReactorEntity entity = tile.entity();
+        FusionReactorEntity entity = tile.ent();
 
         if(entity.cons.valid() && entity.power.status >= 0.99f){
             boolean prevOut = getPowerProduction(tile) <= consumes.getPower().requestedPower(entity);
@@ -95,7 +95,7 @@ public class ImpactReactor extends PowerGenerator{
 
     @Override
     public void draw(Tile tile){
-        FusionReactorEntity entity = tile.entity();
+        FusionReactorEntity entity = tile.ent();
 
         Draw.rect(reg(bottomRegion), tile.drawx(), tile.drawy());
 
@@ -118,7 +118,7 @@ public class ImpactReactor extends PowerGenerator{
 
     @Override
     public void drawLight(Tile tile){
-        float fract = tile.<FusionReactorEntity>entity().warmup;
+        float fract = tile.<FusionReactorEntity>ent().warmup;
         renderer.lights.add(tile.drawx(), tile.drawy(), (110f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(plasma2).lerp(plasma1, Mathf.absin(7f, 0.2f)), 0.8f * fract);
     }
 
@@ -131,7 +131,7 @@ public class ImpactReactor extends PowerGenerator{
     public void onDestroyed(Tile tile){
         super.onDestroyed(tile);
 
-        FusionReactorEntity entity = tile.entity();
+        FusionReactorEntity entity = tile.ent();
 
         if(entity.warmup < 0.4f || !state.rules.reactorExplosions) return;
 

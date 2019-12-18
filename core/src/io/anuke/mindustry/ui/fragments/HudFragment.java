@@ -17,6 +17,7 @@ import io.anuke.arc.scene.ui.ImageButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
@@ -83,7 +84,7 @@ public class HudFragment extends Fragment{
 
                     select.addImageButton(Icon.chatSmall, style,() -> {
                         if(net.active() && mobile){
-                            if(ui.chatfrag.chatOpen()){
+                            if(ui.chatfrag.shown()){
                                 ui.chatfrag.hide();
                             }else{
                                 ui.chatfrag.toggle();
@@ -131,7 +132,7 @@ public class HudFragment extends Fragment{
             }
 
             cont.update(() -> {
-                if(Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.chatOpen() && !Core.scene.hasDialog() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
+                if(Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.shown() && !Core.scene.hasDialog() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
                     toggleMenus();
                 }
             });

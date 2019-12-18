@@ -18,7 +18,7 @@ public class Bullets implements ContentList{
     public static BulletType
 
     //artillery
-    artilleryDense, arilleryPlastic, artilleryPlasticFrag, artilleryHoming, artlleryIncendiary, artilleryExplosive, artilleryUnit,
+    artilleryDense, artilleryPlastic, artilleryPlasticFrag, artilleryHoming, artilleryIncendiary, artilleryExplosive, artilleryUnit,
 
     //flak
     flakScrap, flakLead, flakPlastic, flakExplosive, flakSurge, flakGlass, glassFrag,
@@ -65,7 +65,7 @@ public class Bullets implements ContentList{
             despawnEffect = Fx.none;
         }};
 
-        arilleryPlastic = new ArtilleryBulletType(3.4f, 0, "shell"){{
+        artilleryPlastic = new ArtilleryBulletType(3.4f, 0, "shell"){{
             hitEffect = Fx.plasticExplosion;
             knockback = 1f;
             lifetime = 55f;
@@ -91,7 +91,7 @@ public class Bullets implements ContentList{
             homingRange = 50f;
         }};
 
-        artlleryIncendiary = new ArtilleryBulletType(3f, 0, "shell"){{
+        artilleryIncendiary = new ArtilleryBulletType(3f, 0, "shell"){{
             hitEffect = Fx.blastExplosion;
             knockback = 0.8f;
             lifetime = 60f;

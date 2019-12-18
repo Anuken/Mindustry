@@ -100,7 +100,7 @@ public class SchematicsDialog extends FloatingDialog{
                             }else{
                                 buttons.addImageButton(Icon.trash16Small, style, () -> {
                                     if(s.mod != null){
-                                        ui.showInfo(Core.bundle.format("mod.item.remove", s.mod.meta.name));
+                                        ui.showInfo(Core.bundle.format("mod.item.remove", s.mod.meta.displayName()));
                                     }else{
                                         ui.showConfirm("$confirm", "$schematic.delete.confirm", () -> {
                                             schematics.remove(s);
@@ -158,6 +158,7 @@ public class SchematicsDialog extends FloatingDialog{
                     dialog.hide();
                     try{
                         Schematic s = Schematics.readBase64(Core.app.getClipboardText());
+                        s.removeSteamID();
                         schematics.add(s);
                         setup();
                         ui.showInfoFade("$schematic.saved");
@@ -172,6 +173,7 @@ public class SchematicsDialog extends FloatingDialog{
 
                     try{
                         Schematic s = Schematics.read(file);
+                        s.removeSteamID();
                         schematics.add(s);
                         setup();
                         showInfo(s);

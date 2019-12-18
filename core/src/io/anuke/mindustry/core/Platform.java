@@ -8,10 +8,12 @@ import io.anuke.arc.func.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.*;
+import org.mozilla.javascript.*;
 
 import static io.anuke.mindustry.Vars.mobile;
 
@@ -33,7 +35,7 @@ public interface Platform{
     default void viewListingID(String mapid){}
 
     /** Steam: Return external workshop maps to be loaded.*/
-    default Array<FileHandle> getWorkshopContent(Class<? extends Publishable> type){
+    default Array<Fi> getWorkshopContent(Class<? extends Publishable> type){
         return new Array<>(0);
     }
 
@@ -42,7 +44,18 @@ public interface Platform{
 
     /** Get the networking implementation.*/
     default NetProvider getNet(){
-        return new ArcNetImpl();
+        return new ArcNetProvider();
+    }
+
+    /** Gets the scripting implementation. */
+    default Scripts createScripts(){
+        return new Scripts();
+    }
+
+    default Context getScriptContext(){
+        Context c = Context.enter();
+        c.setOptimizationLevel(9);
+        return c;
     }
 
     /** Add a text input dialog that should show up after the field is tapped. */
@@ -87,7 +100,7 @@ public interface Platform{
     }
 
     /** Only used for iOS or android: open the share menu for a map or save. */
-    default void shareFile(FileHandle file){
+    default void shareFile(Fi file){
     }
 
     /**
@@ -96,7 +109,7 @@ public interface Platform{
      * @param open Whether to open or save files
      * @param extension File extension to filter
      */
-    default void showFileChooser(boolean open, String extension, Cons<FileHandle> cons){
+    default void showFileChooser(boolean open, String extension, Cons<Fi> cons){
         new FileChooser(open ? "$open" : "$save", file -> file.extension().toLowerCase().equals(extension), open, file -> {
             if(!open){
                 cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));

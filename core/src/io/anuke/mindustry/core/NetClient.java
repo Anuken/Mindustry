@@ -11,6 +11,7 @@ import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.traits.*;
@@ -22,7 +23,6 @@ import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.type.TypeID;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.modules.*;
@@ -491,7 +491,7 @@ public class NetClient implements ApplicationListener{
             player.pointerX, player.pointerY, player.rotation, player.baseRotation,
             player.velocity().x, player.velocity().y,
             player.getMineTile(),
-            player.isBoosting, player.isShooting, ui.chatfrag.chatOpen(), player.isBuilding,
+            player.isBoosting, player.isShooting, ui.chatfrag.shown(), player.isBuilding,
             requests,
             Core.camera.position.x, Core.camera.position.y,
             Core.camera.width * viewScale, Core.camera.height * viewScale);

@@ -6,7 +6,7 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.ctype.UnlockableContent;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.type.*;
 
@@ -35,8 +35,8 @@ public class GlobalData{
         });
     }
 
-    public void exportData(FileHandle file) throws IOException{
-        Array<FileHandle> files = new Array<>();
+    public void exportData(Fi file) throws IOException{
+        Array<Fi> files = new Array<>();
         files.add(Core.settings.getSettingsFile());
         files.addAll(customMapDirectory.list());
         files.addAll(saveDirectory.list());
@@ -46,7 +46,7 @@ public class GlobalData{
         String base = Core.settings.getDataDirectory().path();
 
         try(OutputStream fos = file.write(false, 2048); ZipOutputStream zos = new ZipOutputStream(fos)){
-            for(FileHandle add : files){
+            for(Fi add : files){
                 if(add.isDirectory()) continue;
                 zos.putNextEntry(new ZipEntry(add.path().substring(base.length())));
                 Streams.copyStream(add.read(), zos);
@@ -56,12 +56,12 @@ public class GlobalData{
         }
     }
 
-    public void importData(FileHandle file){
-        FileHandle dest = Core.files.local("zipdata.zip");
+    public void importData(Fi file){
+        Fi dest = Core.files.local("zipdata.zip");
         file.copyTo(dest);
-        FileHandle zipped = new ZipFileHandle(dest);
+        Fi zipped = new ZipFi(dest);
 
-        FileHandle base = Core.settings.getDataDirectory();
+        Fi base = Core.settings.getDataDirectory();
         if(!zipped.child("settings.bin").exists()){
             throw new IllegalArgumentException("Not valid save data.");
         }

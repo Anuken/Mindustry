@@ -22,6 +22,7 @@ import static io.anuke.mindustry.Vars.net;
 public class CrashSender{
 
     public static void send(Throwable exception, Cons<File> writeListener){
+
         try{
             exception.printStackTrace();
 
@@ -44,20 +45,19 @@ public class CrashSender{
                     }else{
                         Version.build = Strings.canParseInt(map.get("build")) ? Integer.parseInt(map.get("build")) : -1;
                     }
-                }catch(Throwable ignored){
-                    ignored.printStackTrace();
+                }catch(Throwable e){
+                    e.printStackTrace();
                     Log.err("Failed to parse version.");
                 }
             }
 
             try{
                 File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + new SimpleDateFormat("MM_dd_yyyy_HH_mm_ss").format(new Date()) + ".txt");
-                new FileHandle(OS.getAppDataDirectoryString(Vars.appName)).child("crashes").mkdirs();
-                new FileHandle(file).writeString(parseException(exception));
+                new Fi(OS.getAppDataDirectoryString(Vars.appName)).child("crashes").mkdirs();
+                new Fi(file).writeString(parseException(exception));
                 writeListener.get(file);
             }catch(Throwable e){
-                e.printStackTrace();
-                Log.err("Failed to save local crash report.");
+                Log.err("Failed to save local crash report.", e);
             }
 
             try{
@@ -67,6 +67,14 @@ public class CrashSender{
                 }
             }catch(Throwable ignored){
                 //if there's no settings init we don't know what the user wants but chances are it's an important crash, so send it anyway
+            }
+
+            try{
+                //check any mods - if there are any, don't send reports
+                if(Vars.mods != null && !Vars.mods.list().isEmpty()){
+                    return;
+                }
+            }catch(Throwable ignored){
             }
 
             //do not send exceptions that occur for versions that can't be parsed

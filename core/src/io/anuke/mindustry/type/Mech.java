@@ -5,6 +5,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.graphics.Pal;
@@ -39,15 +40,10 @@ public class Mech extends UnlockableContent{
     public Mech(String name, boolean flying){
         super(name);
         this.flying = flying;
-        this.description = Core.bundle.get("mech." + name + ".description");
     }
 
     public Mech(String name){
         this(name, false);
-    }
-
-    public String localizedName(){
-        return Core.bundle.get("mech." + name + ".name");
     }
 
     public void updateAlt(Player player){
@@ -113,6 +109,6 @@ public class Mech extends UnlockableContent{
 
     @Override
     public String toString(){
-        return localizedName();
+        return localizedName;
     }
 }

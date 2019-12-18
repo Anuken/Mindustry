@@ -13,7 +13,7 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.core.Version;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.net.ArcNetImpl.*;
+import io.anuke.mindustry.net.ArcNetProvider.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.Packets.*;

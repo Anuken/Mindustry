@@ -52,7 +52,7 @@ public class Logic implements ApplicationListener{
 
             if(block instanceof BuildBlock){
 
-                BuildEntity entity = tile.entity();
+                BuildEntity entity = tile.ent();
 
                 //update block to reflect the fact that something was being constructed
                 if(entity.cblock != null && entity.cblock.synthetic()){

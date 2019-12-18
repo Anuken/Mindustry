@@ -66,6 +66,10 @@ public class NetServer implements ApplicationListener{
         });
 
         net.handleServer(ConnectPacket.class, (con, packet) -> {
+            if(con.address.startsWith("steam:")){
+                packet.uuid = con.address.substring("steam:".length());
+            }
+
             String uuid = packet.uuid;
 
             if(admins.isIPBanned(con.address)) return;
@@ -215,7 +219,7 @@ public class NetServer implements ApplicationListener{
 
     @Override
     public void init(){
-        mods.each(mod -> mod.registerClientCommands(clientCommands));
+        mods.eachClass(mod -> mod.registerClientCommands(clientCommands));
     }
 
     private void registerCommands(){

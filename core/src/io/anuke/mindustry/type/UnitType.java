@@ -8,6 +8,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
@@ -16,8 +17,7 @@ import io.anuke.mindustry.ui.*;
 
 public class UnitType extends UnlockableContent{
     public @NonNull TypeID typeID;
-    public @NonNull
-    Prov<? extends BaseUnit> constructor;
+    public @NonNull Prov<? extends BaseUnit> constructor;
 
     public float health = 60;
     public float hitsize = 7f;
@@ -49,9 +49,8 @@ public class UnitType extends UnlockableContent{
         create(mainConstructor);
     }
 
-    public <T extends BaseUnit> UnitType(String name){
+    public UnitType(String name){
         super(name);
-        this.description = Core.bundle.getOrNull("unit." + name + ".description");
     }
 
     public <T extends BaseUnit> void create(Prov<T> mainConstructor){
@@ -63,11 +62,6 @@ public class UnitType extends UnlockableContent{
     @Override
     public void displayInfo(Table table){
         ContentDisplay.displayUnit(table, this);
-    }
-
-    @Override
-    public String localizedName(){
-        return Core.bundle.get("unit." + name + ".name");
     }
 
     @Override

@@ -20,12 +20,12 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class ItemBridge extends Block{
-    protected int timerTransport = timers++;
-    protected int range;
-    protected float transportTime = 2f;
-    protected TextureRegion endRegion, bridgeRegion, arrowRegion;
-    protected BuildRequest otherReq;
+    public final int timerTransport = timers++;
+    public int range;
+    public float transportTime = 2f;
+    public TextureRegion endRegion, bridgeRegion, arrowRegion;
 
+    private static BuildRequest otherReq;
     private static int lastPlaced = Pos.invalid;
 
     public ItemBridge(String name){
@@ -46,7 +46,7 @@ public class ItemBridge extends Block{
 
     @Override
     public void configured(Tile tile, Player player, int value){
-        tile.<ItemBridgeEntity>entity().link = value;
+        tile.<ItemBridgeEntity>ent().link = value;
     }
 
     @Override
@@ -126,7 +126,7 @@ public class ItemBridge extends Block{
 
     @Override
     public void drawConfigure(Tile tile){
-        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity entity = tile.ent();
 
         Draw.color(Pal.accent);
         Lines.stroke(1f);
@@ -151,7 +151,7 @@ public class ItemBridge extends Block{
 
     @Override
     public boolean onConfigureTileTapped(Tile tile, Tile other){
-        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity entity = tile.ent();
 
         if(linkValid(tile, other)){
             if(entity.link == other.pos()){
@@ -166,7 +166,7 @@ public class ItemBridge extends Block{
 
     @Override
     public void update(Tile tile){
-        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity entity = tile.ent();
 
         entity.time += entity.cycleSpeed * entity.delta();
         entity.time2 += (entity.cycleSpeed - 1f) * entity.delta();
@@ -175,7 +175,7 @@ public class ItemBridge extends Block{
         while(it.hasNext){
             int i = it.next();
             Tile other = world.tile(i);
-            if(!linkValid(tile, other, false) || other.<ItemBridgeEntity>entity().link != tile.pos()){
+            if(!linkValid(tile, other, false) || other.<ItemBridgeEntity>ent().link != tile.pos()){
                 it.remove();
             }
         }
@@ -198,7 +198,7 @@ public class ItemBridge extends Block{
     }
 
     public void updateTransport(Tile tile, Tile other){
-        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity entity = tile.ent();
 
         if(entity.uptime >= 0.5f && entity.timer.get(timerTransport, transportTime)){
             Item item = entity.items.take();
@@ -214,7 +214,7 @@ public class ItemBridge extends Block{
 
     @Override
     public void drawLayer(Tile tile){
-        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity entity = tile.ent();
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)) return;
@@ -254,7 +254,7 @@ public class ItemBridge extends Block{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         if(tile.getTeam() != source.getTeam()) return false;
 
-        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity entity = tile.ent();
         Tile other = world.tile(entity.link);
 
         if(linkValid(tile, other)){
@@ -263,7 +263,7 @@ public class ItemBridge extends Block{
 
             if(rel == rel2) return false;
         }else{
-            return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>entity().link == tile.pos() && tile.entity.items.total() < itemCapacity;
+            return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>ent().link == tile.pos() && tile.entity.items.total() < itemCapacity;
         }
 
         return tile.entity.items.total() < itemCapacity;
@@ -272,7 +272,7 @@ public class ItemBridge extends Block{
 
     @Override
     public boolean canDumpLiquid(Tile tile, Tile to, Liquid liquid){
-        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity entity = tile.ent();
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)){
@@ -300,7 +300,7 @@ public class ItemBridge extends Block{
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         if(tile.getTeam() != source.getTeam() || !hasLiquids) return false;
 
-        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity entity = tile.ent();
         Tile other = world.tile(entity.link);
 
         if(linkValid(tile, other)){
@@ -308,7 +308,7 @@ public class ItemBridge extends Block{
             int rel2 = tile.relativeTo(source.x, source.y);
 
             if(rel == rel2) return false;
-        }else if(!(source.block() instanceof ItemBridge && source.<ItemBridgeEntity>entity().link == tile.pos())){
+        }else if(!(source.block() instanceof ItemBridge && source.<ItemBridgeEntity>ent().link == tile.pos())){
             return false;
         }
 
@@ -317,7 +317,7 @@ public class ItemBridge extends Block{
 
     @Override
     public boolean canDump(Tile tile, Tile to, Item item){
-        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity entity = tile.ent();
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)){
@@ -355,7 +355,7 @@ public class ItemBridge extends Block{
             return false;
         }
 
-        return other.block() == this && (!checkDouble || other.<ItemBridgeEntity>entity().link != tile.pos());
+        return other.block() == this && (!checkDouble || other.<ItemBridgeEntity>ent().link != tile.pos());
     }
 
     public static class ItemBridgeEntity extends TileEntity{

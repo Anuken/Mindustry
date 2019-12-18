@@ -16,12 +16,12 @@ import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.modules.*;
 
 public class Conduit extends LiquidBlock implements Autotiler{
-    protected final int timerFlow = timers++;
+    public final int timerFlow = timers++;
 
-    protected TextureRegion[] topRegions = new TextureRegion[7];
-    protected TextureRegion[] botRegions = new TextureRegion[7];
+    public TextureRegion[] topRegions = new TextureRegion[7];
+    public TextureRegion[] botRegions = new TextureRegion[7];
 
-    protected float leakResistance = 1.5f;
+    public float leakResistance = 1.5f;
 
     public Conduit(String name){
         super(name);
@@ -47,7 +47,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public void onProximityUpdate(Tile tile){
         super.onProximityUpdate(tile);
 
-        ConduitEntity entity = tile.entity();
+        ConduitEntity entity = tile.ent();
         int[] bits = buildBlending(tile, tile.rotation(), null, true);
         entity.blendbits = bits[0];
     }
@@ -91,7 +91,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     @Override
     public void draw(Tile tile){
-        ConduitEntity entity = tile.entity();
+        ConduitEntity entity = tile.ent();
         LiquidModule mod = tile.entity.liquids;
         int rotation = tile.rotation() * 90;
 
@@ -108,7 +108,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     @Override
     public void update(Tile tile){
-        ConduitEntity entity = tile.entity();
+        ConduitEntity entity = tile.ent();
         entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.liquids.total() / liquidCapacity, 0.05f);
 
         if(tile.entity.liquids.total() > 0.001f && tile.entity.timer.get(timerFlow, 1)){

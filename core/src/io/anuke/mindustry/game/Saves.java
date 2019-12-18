@@ -27,7 +27,7 @@ public class Saves{
     private AsyncExecutor previewExecutor = new AsyncExecutor(1);
     private boolean saving;
     private float time;
-    private FileHandle zoneFile;
+    private Fi zoneFile;
 
     private long totalPlaytime;
     private long lastTimestamp;
@@ -48,7 +48,7 @@ public class Saves{
         saves.clear();
         zoneFile = saveDirectory.child("-1.msav");
 
-        for(FileHandle file : saveDirectory.list()){
+        for(Fi file : saveDirectory.list()){
             if(!file.name().contains("backup") && SaveIO.isSaveValid(file)){
                 SaveSlot slot = new SaveSlot(file);
                 saves.add(slot);
@@ -121,7 +121,7 @@ public class Saves{
         return slot;
     }
 
-    public SaveSlot importSave(FileHandle file) throws IOException{
+    public SaveSlot importSave(Fi file) throws IOException{
         SaveSlot slot = new SaveSlot(getNextSlotFile());
         slot.importFile(file);
         slot.setName(file.nameWithoutExtension());
@@ -136,9 +136,9 @@ public class Saves{
         return slot == null || slot.getZone() == null ? null : slot;
     }
 
-    public FileHandle getNextSlotFile(){
+    public Fi getNextSlotFile(){
         int i = 0;
-        FileHandle file;
+        Fi file;
         while((file = saveDirectory.child(i + "." + saveExtension)).exists()){
             i ++;
         }
@@ -151,11 +151,11 @@ public class Saves{
 
     public class SaveSlot{
         //public final int index;
-        public final FileHandle file;
+        public final Fi file;
         boolean requestedPreview;
         SaveMeta meta;
 
-        public SaveSlot(FileHandle file){
+        public SaveSlot(Fi file){
             this.file = file;
         }
 
@@ -216,11 +216,11 @@ public class Saves{
             return file.nameWithoutExtension();
         }
 
-        private FileHandle previewFile(){
+        private Fi previewFile(){
             return mapPreviewDirectory.child("save_slot_" + index() + ".png");
         }
 
-        private FileHandle loadPreviewFile(){
+        private Fi loadPreviewFile(){
             return previewFile().sibling(previewFile().name() + ".spreview");
         }
 
@@ -293,7 +293,7 @@ public class Saves{
             Core.settings.save();
         }
 
-        public void importFile(FileHandle from) throws IOException{
+        public void importFile(Fi from) throws IOException{
             try{
                 from.copyTo(file);
             }catch(Exception e){
@@ -301,7 +301,7 @@ public class Saves{
             }
         }
 
-        public void exportFile(FileHandle to) throws IOException{
+        public void exportFile(Fi to) throws IOException{
             try{
                 file.copyTo(to);
             }catch(Exception e){

@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.meta.StatUnit;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class DoubleTurret extends ItemTurret{
-    protected float shotWidth = 2f;
+    public float shotWidth = 2f;
 
     public DoubleTurret(String name){
         super(name);
@@ -26,7 +26,7 @@ public class DoubleTurret extends ItemTurret{
 
     @Override
     protected void shoot(Tile tile, BulletType ammo){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
         entity.shots++;
 
         int i = Mathf.signs[entity.shots % 2];

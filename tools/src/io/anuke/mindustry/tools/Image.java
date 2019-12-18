@@ -1,9 +1,9 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.tools;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.util.Structs;
-import io.anuke.mindustry.ImagePacker.GenRegion;
+import io.anuke.mindustry.tools.ImagePacker.GenRegion;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

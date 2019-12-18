@@ -14,18 +14,20 @@ import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.mindustry.world.meta.*;
+
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class RepairPoint extends Block{
     private static Rectangle rect = new Rectangle();
 
-    protected int timerTarget = timers++;
+    public int timerTarget = timers++;
 
-    protected float repairRadius = 50f;
-    protected float repairSpeed = 0.3f;
-    protected float powerUse;
-    protected TextureRegion baseRegion;
-    protected TextureRegion laser, laserEnd;
+    public float repairRadius = 50f;
+    public float repairSpeed = 0.3f;
+    public float powerUse;
+    public TextureRegion baseRegion;
+    public TextureRegion laser, laserEnd;
 
     public RepairPoint(String name){
         super(name);
@@ -49,6 +51,12 @@ public class RepairPoint extends Block{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+        stats.add(BlockStat.range, repairRadius / tilesize, StatUnit.blocks);
+    }
+
+    @Override
     public void init(){
         consumes.powerCond(powerUse, entity -> ((RepairPointEntity)entity).target != null);
         super.init();
@@ -60,20 +68,25 @@ public class RepairPoint extends Block{
     }
 
     @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), repairRadius, Pal.accent);
+    }
+
+    @Override
     public void draw(Tile tile){
         Draw.rect(baseRegion, tile.drawx(), tile.drawy());
     }
 
     @Override
     public void drawLayer(Tile tile){
-        RepairPointEntity entity = tile.entity();
+        RepairPointEntity entity = tile.ent();
 
         Draw.rect(region, tile.drawx(), tile.drawy(), entity.rotation - 90);
     }
 
     @Override
     public void drawLayer2(Tile tile){
-        RepairPointEntity entity = tile.entity();
+        RepairPointEntity entity = tile.ent();
 
         if(entity.target != null &&
         Angles.angleDist(entity.angleTo(entity.target), entity.rotation) < 30f){
@@ -95,7 +108,7 @@ public class RepairPoint extends Block{
 
     @Override
     public void update(Tile tile){
-        RepairPointEntity entity = tile.entity();
+        RepairPointEntity entity = tile.ent();
 
         boolean targetIsBeingRepaired = false;
         if(entity.target != null && (entity.target.isDead() || entity.target.dst(tile) > repairRadius || entity.target.health >= entity.target.maxHealth())){
@@ -122,7 +135,7 @@ public class RepairPoint extends Block{
 
     @Override
     public boolean shouldConsume(Tile tile){
-        RepairPointEntity entity = tile.entity();
+        RepairPointEntity entity = tile.ent();
 
         return entity.target != null;
     }

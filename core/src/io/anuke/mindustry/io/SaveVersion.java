@@ -6,6 +6,7 @@ import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
@@ -84,7 +85,6 @@ public abstract class SaveVersion extends SaveFileReader{
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
         if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
         lastReadBuild = map.getInt("build", -1);
-        String[] mods = JsonIO.read(String[].class, map.get("mods", "[]"));
 
         Map worldmap = maps.byName(map.get("mapname", "\\\\\\"));
         world.setMap(worldmap == null ? new Map(StringMap.of(

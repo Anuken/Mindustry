@@ -7,16 +7,18 @@ import io.anuke.arc.files.*;
 
 /** Handles files in a modded context. */
 public class FileTree implements FileHandleResolver{
-    private ObjectMap<String, FileHandle> files = new ObjectMap<>();
+    private ObjectMap<String, Fi> files = new ObjectMap<>();
 
-    public void addFile(String path, FileHandle f){
+    public void addFile(String path, Fi f){
         files.put(path, f);
     }
 
     /** Gets an asset file.*/
-    public FileHandle get(String path){
+    public Fi get(String path){
         if(files.containsKey(path)){
             return files.get(path);
+        }else if(files.containsKey("/" + path)){
+            return files.get("/" + path);
         }else{
             return Core.files.internal(path);
         }
@@ -28,7 +30,7 @@ public class FileTree implements FileHandleResolver{
     }
 
     @Override
-    public FileHandle resolve(String fileName){
+    public Fi resolve(String fileName){
         return get(fileName);
     }
 }

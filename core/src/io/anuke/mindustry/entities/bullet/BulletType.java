@@ -4,6 +4,7 @@ import io.anuke.arc.audio.*;
 import io.anuke.arc.math.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.ctype.Content;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.effect.*;
@@ -137,7 +138,7 @@ public abstract class BulletType extends Content{
         }
 
         for(int i = 0; i < lightining; i++){
-            Lightning.create(b.getTeam(), Pal.surge, damage, b.x, b.y, Mathf.random(360f), lightningLength);
+            Lightning.createLighting(Lightning.nextSeed(), b.getTeam(), Pal.surge, damage, b.x, b.y, Mathf.random(360f), lightningLength);
         }
     }
 
@@ -150,7 +151,7 @@ public abstract class BulletType extends Content{
     public void update(Bullet b){
 
         if(homingPower > 0.0001f){
-            TargetTrait target = Units.closestTarget(b.getTeam(), b.x, b.y, homingRange);
+            TargetTrait target = Units.closestTarget(b.getTeam(), b.x, b.y, homingRange, e -> !e.isFlying() || collidesAir);
             if(target != null){
                 b.velocity().setAngle(Mathf.slerpDelta(b.velocity().angle(), b.angleTo(target), 0.08f));
             }

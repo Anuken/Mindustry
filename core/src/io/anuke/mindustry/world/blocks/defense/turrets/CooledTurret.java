@@ -17,8 +17,8 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public class CooledTurret extends Turret{
     /** How much reload is lowered by for each unit of liquid of heat capacity. */
-    protected float coolantMultiplier = 5f;
-    protected Effect coolEffect = Fx.fuelburn;
+    public float coolantMultiplier = 5f;
+    public Effect coolEffect = Fx.fuelburn;
 
     public CooledTurret(String name){
         super(name);
@@ -50,7 +50,7 @@ public class CooledTurret extends Turret{
 
         float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
         Liquid liquid = entity.liquids.current();
 
         float used = Math.min(Math.min(entity.liquids.get(liquid), maxUsed * Time.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed(tile);

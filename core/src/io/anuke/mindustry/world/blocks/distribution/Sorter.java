@@ -18,7 +18,7 @@ import static io.anuke.mindustry.Vars.content;
 
 public class Sorter extends Block{
     private static Item lastItem;
-    protected boolean invert;
+    public boolean invert;
 
     public Sorter(String name){
         super(name);
@@ -45,7 +45,7 @@ public class Sorter extends Block{
 
     @Override
     public void configured(Tile tile, Player player, int value){
-        tile.<SorterEntity>entity().sortItem = content.item(value);
+        tile.<SorterEntity>ent().sortItem = content.item(value);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class Sorter extends Block{
     public void draw(Tile tile){
         super.draw(tile);
 
-        SorterEntity entity = tile.entity();
+        SorterEntity entity = tile.ent();
         if(entity.sortItem == null) return;
 
         Draw.color(entity.sortItem.color);
@@ -67,7 +67,7 @@ public class Sorter extends Block{
 
     @Override
     public int minimapColor(Tile tile){
-        return tile.<SorterEntity>entity().sortItem == null ? 0 : tile.<SorterEntity>entity().sortItem.color.rgba();
+        return tile.<SorterEntity>ent().sortItem == null ? 0 : tile.<SorterEntity>ent().sortItem.color.rgba();
     }
 
     @Override
@@ -89,7 +89,7 @@ public class Sorter extends Block{
     }
 
     Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
-        SorterEntity entity = dest.entity();
+        SorterEntity entity = dest.ent();
 
         int dir = source.relativeTo(dest.x, dest.y);
         if(dir == -1) return null;
@@ -130,8 +130,8 @@ public class Sorter extends Block{
     }
 
     @Override
-    public void buildTable(Tile tile, Table table){
-        SorterEntity entity = tile.entity();
+    public void buildConfiguration(Tile tile, Table table){
+        SorterEntity entity = tile.ent();
         ItemSelection.buildItemTable(table, () -> entity.sortItem, item -> {
             lastItem = item;
             tile.configure(item == null ? -1 : item.id);

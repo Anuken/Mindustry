@@ -40,8 +40,7 @@ public enum Binding implements KeyBind{
     block_select_08(KeyCode.NUM_8),
     block_select_09(KeyCode.NUM_9),
     block_select_10(KeyCode.NUM_0),
-    zoom_hold(KeyCode.CONTROL_LEFT, "view"),
-    zoom(new Axis(KeyCode.SCROLL)),
+    zoom(new Axis(KeyCode.SCROLL), "view"),
     menu(Core.app.getType() == ApplicationType.Android ? KeyCode.BACK : KeyCode.ESCAPE),
     fullscreen(KeyCode.F11),
     pause(KeyCode.SPACE),
@@ -54,6 +53,7 @@ public enum Binding implements KeyBind{
     chat_history_prev(KeyCode.UP),
     chat_history_next(KeyCode.DOWN),
     chat_scroll(new Axis(KeyCode.SCROLL)),
+    console(KeyCode.F8),
     ;
 
     private final KeybindValue defaultValue;

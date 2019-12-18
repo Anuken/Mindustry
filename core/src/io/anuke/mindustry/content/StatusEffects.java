@@ -15,61 +15,71 @@ public class StatusEffects implements ContentList{
     @Override
     public void load(){
 
-        none = new StatusEffect();
+        none = new StatusEffect("none");
 
-        burning = new StatusEffect(){{
+        burning = new StatusEffect("burning"){{
             damage = 0.06f;
             effect = Fx.burning;
 
-            opposite(() -> wet, () -> freezing);
-            trans(() -> tarred, ((unit, time, newTime, result) -> {
-                unit.damage(1f);
-                Effects.effect(Fx.burning, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
-                result.set(this, Math.min(time + newTime, 300f));
-            }));
+            init(() -> {
+                opposite(wet,freezing);
+                trans(tarred, ((unit, time, newTime, result) -> {
+                    unit.damage(1f);
+                    Effects.effect(Fx.burning, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
+                    result.set(this, Math.min(time + newTime, 300f));
+                }));
+            });
         }};
 
-        freezing = new StatusEffect(){{
+        freezing = new StatusEffect("freezing"){{
             speedMultiplier = 0.6f;
             armorMultiplier = 0.8f;
             effect = Fx.freezing;
 
-            opposite(() -> melting, () -> burning);
+            init(() -> {
+                opposite(melting, burning);
+            });
         }};
 
-        wet = new StatusEffect(){{
+        wet = new StatusEffect("wet"){{
             speedMultiplier = 0.9f;
             effect = Fx.wet;
 
-            trans(() -> shocked, ((unit, time, newTime, result) -> {
-                unit.damage(20f);
-                if(unit.getTeam() == waveTeam){
-                    Events.fire(Trigger.shock);
-                }
-                result.set(this, time);
-            }));
-            opposite(() -> burning);
+            init(() -> {
+                trans(shocked, ((unit, time, newTime, result) -> {
+                    unit.damage(20f);
+                    if(unit.getTeam() == waveTeam){
+                        Events.fire(Trigger.shock);
+                    }
+                    result.set(this, time);
+                }));
+                opposite(burning);
+            });
         }};
 
-        melting = new StatusEffect(){{
+        melting = new StatusEffect("melting"){{
             speedMultiplier = 0.8f;
             armorMultiplier = 0.8f;
             damage = 0.3f;
             effect = Fx.melting;
 
-            trans(() -> tarred, ((unit, time, newTime, result) -> result.set(this, Math.min(time + newTime / 2f, 140f))));
-            opposite(() -> wet, () -> freezing);
+            init(() -> {
+                trans(tarred, ((unit, time, newTime, result) -> result.set(this, Math.min(time + newTime / 2f, 140f))));
+                opposite(wet, freezing);
+            });
         }};
 
-        tarred = new StatusEffect(){{
+        tarred = new StatusEffect("tarred"){{
             speedMultiplier = 0.6f;
             effect = Fx.oily;
 
-            trans(() -> melting, ((unit, time, newTime, result) -> result.set(burning, newTime + time)));
-            trans(() -> burning, ((unit, time, newTime, result) -> result.set(burning, newTime + time)));
+            init(() -> {
+                trans(melting, ((unit, time, newTime, result) -> result.set(burning, newTime + time)));
+                trans(burning, ((unit, time, newTime, result) -> result.set(burning, newTime + time)));
+            });
         }};
 
-        overdrive = new StatusEffect(){{
+        overdrive = new StatusEffect("overdrive"){{
             armorMultiplier = 0.95f;
             speedMultiplier = 1.15f;
             damageMultiplier = 1.4f;
@@ -77,20 +87,20 @@ public class StatusEffects implements ContentList{
             effect = Fx.overdriven;
         }};
 
-        shielded = new StatusEffect(){{
+        shielded = new StatusEffect("shielded"){{
             armorMultiplier = 3f;
         }};
 
-        boss = new StatusEffect(){{
+        boss = new StatusEffect("boss"){{
             armorMultiplier = 3f;
             damageMultiplier = 3f;
             speedMultiplier = 1.1f;
         }};
 
-        shocked = new StatusEffect();
+        shocked = new StatusEffect("shocked");
 
         //no effects, just small amounts of damage.
-        corroded = new StatusEffect(){{
+        corroded = new StatusEffect("corroded"){{
             damage = 0.1f;
         }};
     }

@@ -10,7 +10,6 @@ import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
-import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.ui.*;
 import org.robovm.apple.coregraphics.*;
 import org.robovm.apple.foundation.*;
@@ -39,7 +38,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
         return new IOSApplication(new ClientLauncher(){
 
             @Override
-            public void showFileChooser(boolean open, String extension, Cons<FileHandle> cons){
+            public void showFileChooser(boolean open, String extension, Cons<Fi> cons){
                 UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray<NSString>)null);
 
 
@@ -65,8 +64,8 @@ public class IOSLauncher extends IOSApplication.Delegate{
                         try{
                             coord.coordinateReadingItem(url, NSFileCoordinatorReadingOptions.ForUploading, result -> {
 
-                                FileHandle src = Core.files.absolute(result.getAbsoluteURL().getPath());
-                                FileHandle dst = Core.files.absolute(getDocumentsDirectory()).child(src.name());
+                                Fi src = Core.files.absolute(result.getAbsoluteURL().getPath());
+                                Fi dst = Core.files.absolute(getDocumentsDirectory()).child(src.name());
                                 src.copyTo(dst);
 
                                 Core.app.post(() -> {
@@ -117,10 +116,10 @@ public class IOSLauncher extends IOSApplication.Delegate{
             }
 
             @Override
-            public void shareFile(FileHandle file){
+            public void shareFile(Fi file){
                 try{
                     Log.info("Attempting to share file " + file);
-                    FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
+                    Fi to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
                     file.copyTo(to);
 
                     NSURL url = new NSURL(to.file());
@@ -153,7 +152,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
         }, new IOSApplicationConfiguration(){{
-           errorHandler = ModCrashHandler::handle;
+           //errorHandler = ModCrashHandler::handle;
         }});
     }
 
@@ -197,7 +196,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
     void openURL(NSURL url){
 
         Core.app.post(() -> Core.app.post(() -> {
-            FileHandle file = Core.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
+            Fi file = Core.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
             Core.files.absolute(url.getPath()).copyTo(file);
 
             if(file.extension().equalsIgnoreCase(saveExtension)){ //open save

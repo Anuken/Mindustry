@@ -21,12 +21,12 @@ import static io.anuke.mindustry.Vars.*;
 public class PowerNode extends PowerBlock{
     protected static boolean returnValue = false;
 
-    protected ObjectSet<PowerGraph> graphs = new ObjectSet<>();
-    protected Vector2 t1 = new Vector2(), t2 = new Vector2();
-    protected TextureRegion laser, laserEnd;
+    protected final ObjectSet<PowerGraph> graphs = new ObjectSet<>();
+    protected final Vector2 t1 = new Vector2(), t2 = new Vector2();
 
-    protected float laserRange = 6;
-    protected int maxNodes = 3;
+    public TextureRegion laser, laserEnd;
+    public float laserRange = 6;
+    public int maxNodes = 3;
 
     public PowerNode(String name){
         super(name);
@@ -108,7 +108,7 @@ public class PowerNode extends PowerBlock{
         && !other.entity.proximity().contains(tile) && other.entity.power.graph != tile.entity.power.graph;
 
         tempTiles.clear();
-        Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
+        Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
             Tile other = world.ltile(x, y);
             if(valid.get(other)){
                 if(!insulated(tile, other)){
@@ -139,7 +139,7 @@ public class PowerNode extends PowerBlock{
 
         tempTiles.clear();
         graphs.clear();
-        Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
+        Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
             Tile other = world.ltile(x, y);
             if(valid.get(other) && !tempTiles.contains(other)){
                 tempTiles.add(other);
@@ -172,7 +172,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public boolean onConfigureTileTapped(Tile tile, Tile other){
-        TileEntity entity = tile.entity();
+        TileEntity entity = tile.ent();
         other = other.link();
 
         if(linkValid(tile, other)){
@@ -183,7 +183,7 @@ public class PowerNode extends PowerBlock{
         if(tile == other){
             if(other.entity.power.links.size == 0){
                 getPotentialLinks(tile, link -> {
-                    tile.configure(link.pos());
+                    if(!insulated(tile, link)) tile.configure(link.pos());
                 });
             }else{
                 while(entity.power.links.size > 0){
@@ -220,8 +220,8 @@ public class PowerNode extends PowerBlock{
 
         Lines.stroke(1.5f);
 
-        for(int x = (int)(tile.x - laserRange - 1); x <= tile.x + laserRange + 1; x++){
-            for(int y = (int)(tile.y - laserRange - 1); y <= tile.y + laserRange + 1; y++){
+        for(int x = (int)(tile.x - laserRange - 2); x <= tile.x + laserRange + 2; x++){
+            for(int y = (int)(tile.y - laserRange - 2); y <= tile.y + laserRange + 2; y++){
                 Tile link = world.ltile(x, y);
 
                 if(link != tile && linkValid(tile, link, false)){
@@ -262,7 +262,7 @@ public class PowerNode extends PowerBlock{
     public void drawLayer(Tile tile){
         if(Core.settings.getInt("lasersopacity") == 0) return;
 
-        TileEntity entity = tile.entity();
+        TileEntity entity = tile.ent();
 
         for(int i = 0; i < entity.power.links.size; i++){
             Tile link = world.tile(entity.power.links.get(i));

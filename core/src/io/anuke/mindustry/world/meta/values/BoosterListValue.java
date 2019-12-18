@@ -33,7 +33,7 @@ public class BoosterListValue implements StatValue{
                 if(!filter.get(liquid)) continue;
 
                 c.addImage(liquid.icon(Cicon.medium)).size(3 * 8).padRight(4).right().top();
-                c.add(liquid.localizedName()).padRight(10).left().top();
+                c.add(liquid.localizedName).padRight(10).left().top();
                 c.table(Tex.underline, bt -> {
                     bt.left().defaults().padRight(3).left();
 

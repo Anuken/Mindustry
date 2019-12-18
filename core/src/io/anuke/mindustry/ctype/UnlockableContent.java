@@ -20,8 +20,8 @@ public abstract class UnlockableContent extends MappableContent{
     public UnlockableContent(String name){
         super(name);
 
-        this.localizedName = Core.bundle.get(getContentType() + "." + name + ".name", name);
-        this.description = Core.bundle.getOrNull(getContentType() + "." + name + ".description");
+        this.localizedName = Core.bundle.get(getContentType() + "." + this.name + ".name", this.name);
+        this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
     }
 
     /** Generate any special icons for this content. Called asynchronously.*/
@@ -41,11 +41,6 @@ public abstract class UnlockableContent extends MappableContent{
         }
         return cicons[icon.ordinal()];
     }
-
-    /** Returns the localized name of this content. */
-    public abstract String localizedName();
-
-    //public abstract TextureRegion getContentIcon();
 
     /** This should show all necessary info about this content in the specified table. */
     public abstract void displayInfo(Table table);

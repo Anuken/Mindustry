@@ -44,7 +44,11 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
 
     /** Create a lighting branch at a location. Use Team.none to damage everyone. */
     public static void create(Team team, Color color, float damage, float x, float y, float targetAngle, int length){
-        Call.createLighting(lastSeed++, team, color, damage, x, y, targetAngle, length);
+        Call.createLighting(nextSeed(), team, color, damage, x, y, targetAngle, length);
+    }
+
+    public static int nextSeed(){
+        return lastSeed++;
     }
 
     /** Do not invoke! */
