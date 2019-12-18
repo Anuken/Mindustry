@@ -17,7 +17,6 @@ import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Jval.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.ctype.*;
-import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -410,6 +409,7 @@ public class Mods implements Loadable{
         Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
 
         mods.clear();
+        Core.bundle =  I18NBundle.createBundle(Core.files.internal("bundles/bundle"), Core.bundle.getLocale());
         load();
         Sounds.dispose();
         Sounds.load();
