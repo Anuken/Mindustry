@@ -153,17 +153,11 @@ public class Packets{
         public int version;
         public String versionType;
         @Deprecated
-        public Array<String> mods = new Array<>();
+        public Array<String> mods;
+        public Array<String> meta;
         public String name, uuid, usid;
         public boolean mobile;
         public int color;
-
-        /**
-         * Custom (string) metadata, format: category-key:value
-         */
-        public Array<String> meta(){
-            return mods;
-        }
 
         @Override
         public void write(ByteBuffer buffer){

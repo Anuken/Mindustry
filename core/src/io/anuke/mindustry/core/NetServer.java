@@ -104,14 +104,11 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            Array<String> meta = packet.meta();
+            Log.info(packet.mods);
+            Metadata meta = (new Metadata()).unpack(packet.mods);
+
             Array<String> extraMods = new Array<>();
-            Array<String> securityLevel = new Array<>();
-            meta.each(string -> {
-                Log.info(string);
-                if(string.startsWith("mod-")) extraMods.add(string.replace("mod-", ""));
-                if(string.startsWith("securitylevel-")) securityLevel.add(string.replace("securitylevel-", ""));
-            });
+            if(meta.categories.get("mod") != null) meta.categories.get("mod").each((key, value) -> extraMods.add(key + ":" + value));
 
             Array<String> missingMods = mods.getIncompatibility(extraMods);
 
@@ -145,10 +142,11 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            String checkpoint = securityLevel.find(mod -> mod.startsWith("checkpoint:"));
             int level = 0;
-            if(checkpoint != null){
-                level = Player.securityLevel(packet.uuid, Integer.parseInt(checkpoint.replace("checkpoint:", "")));
+            if(meta.categories.get("securitylevel") != null){
+                if(meta.categories.get("securitylevel").get("checkpoint") != null){
+                    level = Player.securityLevel(packet.uuid, Integer.parseInt(meta.categories.get("securitylevel").get("checkpoint")));
+                }
             }
 
             if(admins.getSecurityLevel() > level){

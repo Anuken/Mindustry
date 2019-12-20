@@ -540,9 +540,13 @@ public class Mods implements Loadable{
         return mods.select(l -> !l.meta.hidden && l.enabled()).map(l -> l.name + ":" + l.meta.version);
     }
 
-    /** @return a list of mods and versions, in the format mod-name:version. */
-    public Array<String> getMetaStrings(){
-        return getModStrings().map(string -> "mod-" + string);
+    /** @return a map of mods keyed by their name and valued by their version. */
+    public StringMap getMetaStrings(){
+        StringMap map = new StringMap();
+        mods.select(l -> !l.meta.hidden && l.enabled()).each(l -> {
+            map.put(l.name, l.meta.version);
+        });
+        return map;
     }
 
     /** Makes a mod enabled or disabled. shifts it.*/

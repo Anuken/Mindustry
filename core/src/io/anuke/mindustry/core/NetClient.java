@@ -75,10 +75,15 @@ public class NetClient implements ApplicationListener{
                 net.disconnect();
             });
 
+            Metadata meta = new Metadata();
+            meta.categories.put("mod", mods.getMetaStrings());
+            meta.categories.put("securitylevel", new StringMap(){{
+                put("checkpoint", Integer.toString(Core.settings.getInt("securitylevel-checkpoint", 0)));
+            }});
+
             ConnectPacket c = new ConnectPacket();
             c.name = player.name;
-            c.meta().addAll(mods.getMetaStrings());
-            c.meta().add("securitylevel-checkpoint:" + Core.settings.getInt("securitylevel-checkpoint", 0));
+            c.mods = meta.pack();
             c.mobile = mobile;
             c.versionType = Version.type;
             c.color = Color.rgba8888(player.color);
