@@ -273,7 +273,7 @@ public class JoinDialog extends FloatingDialog{
                 int old = securityLevel();
 
                 // try x improvements per tick, as to not fry or freeze the device.
-                if(player.improveSecurityLevel(platform.getUUID(), 1000)){
+                if(player.improveSecurityLevel(platform.getUUID(), 10000)){
                     level.clear();
                     level.add("[accent]" + securityLevel() + "[]").grow().pad(8).get();
 
