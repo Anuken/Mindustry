@@ -150,7 +150,7 @@ public class DesktopInput extends InputHandler{
         if(state.is(State.menu) || Core.scene.hasDialog()) return;
 
         //zoom camera
-        if(!Core.scene.hasScroll() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
+        if(!Core.scene.hasScroll() && !ui.chatfrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
