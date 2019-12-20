@@ -762,16 +762,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
      * (should probably use arc libraries instead of java ones)
      */
     public static int securityLevel(String uuid, int salt){
-        uuid += salt; // much glueing together, much wow - doge
-        try{
-            MessageDigest digest = MessageDigest.getInstance("SHA-1");
-            digest.update(uuid.getBytes(StandardCharsets.UTF_8), 0, uuid.length());
-            String sha1 = String.format("%040x", new BigInteger(1, digest.digest()));
-            return sha1.replaceFirst("^(0*).*", "$1").length();
-        }catch(NoSuchAlgorithmException e){
-            e.printStackTrace();
-            return 0;
-        }
+        return sha1(uuid + salt).replaceFirst("^(0*).*", "$1").length();
     }
 
     /**
@@ -801,6 +792,17 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         Core.settings.putSave("securitylevel-pepper", counter);
         return false;
+    }
+
+    private static String sha1(String string){
+        try{
+            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            digest.update(string.getBytes(StandardCharsets.UTF_8), 0, string.length());
+            return String.format("%040x", new BigInteger(1, digest.digest()));
+        }catch(NoSuchAlgorithmException e){
+            e.printStackTrace();
+            return "";
+        }
     }
 
     public void sendMessage(String text){
