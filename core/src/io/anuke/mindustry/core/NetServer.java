@@ -144,8 +144,8 @@ public class NetServer implements ApplicationListener{
 
             int level = 0;
             if(meta.categories.get("securitylevel") != null){
-                if(meta.categories.get("securitylevel").get("checkpoint") != null){
-                    level = Player.securityLevel(packet.uuid, Integer.parseInt(meta.categories.get("securitylevel").get("checkpoint")));
+                if(meta.categories.get("securitylevel").get("salt") != null){
+                    level = Player.securityLevel(packet.uuid, Integer.parseInt(meta.categories.get("securitylevel").get("salt")));
                 }
             }
 

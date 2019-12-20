@@ -444,6 +444,6 @@ public class JoinDialog extends FloatingDialog{
     }
 
     private int securityLevel(){
-        return player.securityLevel(platform.getUUID(), Core.settings.getInt("securitylevel-checkpoint", 0));
+        return player.securityLevel(platform.getUUID(), Core.settings.getInt("securitylevel-salt", 0));
     }
 }

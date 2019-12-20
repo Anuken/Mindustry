@@ -78,7 +78,7 @@ public class NetClient implements ApplicationListener{
             Metadata meta = new Metadata();
             meta.categories.put("mod", mods.getMetaStrings());
             meta.categories.put("securitylevel", new StringMap(){{
-                put("checkpoint", Integer.toString(Core.settings.getInt("securitylevel-checkpoint", 0)));
+                put("salt", Integer.toString(Core.settings.getInt("securitylevel-salt", 0)));
                 put("version", "sha1");
             }});
 

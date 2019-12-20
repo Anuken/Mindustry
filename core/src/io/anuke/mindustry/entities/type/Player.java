@@ -781,25 +781,25 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public boolean improveSecurityLevel(String uuid, int attempts){
 
         // retrieve the current security level
-        int checkpoint = Core.settings.getInt("securitylevel-checkpoint", 0);
-        int level = securityLevel(uuid, checkpoint);
+        int salt = Core.settings.getInt("securitylevel-salt", 0);
+        int level = securityLevel(uuid, salt);
 
         // if the current security level is 0, invalidate the progress towards the next one
-        if(level == 0) Core.settings.put("securitylevel-counter", 0);
+        if(level == 0) Core.settings.put("securitylevel-pepper", 0);
 
         // retrieve progress
-        int counter = Core.settings.getInt("securitylevel-counter");
+        int counter = Core.settings.getInt("securitylevel-pepper");
 
         for(int i=0;i < attempts;i++){
             if(securityLevel(uuid, ++counter) > level){
-                Core.settings.put("securitylevel-counter", counter);
-                Core.settings.put("securitylevel-checkpoint", counter);
+                Core.settings.put("securitylevel-pepper", counter);
+                Core.settings.put("securitylevel-salt", counter);
                 Core.settings.save();
                 return true;
             }
         }
 
-        Core.settings.put("securitylevel-counter", counter);
+        Core.settings.put("securitylevel-pepper", counter);
         Core.settings.save();
         return false;
     }
