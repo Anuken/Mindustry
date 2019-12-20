@@ -799,8 +799,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             }
         }
 
-        Core.settings.put("securitylevel-pepper", counter);
-        Core.settings.save();
+        Core.settings.putSave("securitylevel-pepper", counter);
         return false;
     }
 
