@@ -152,10 +152,18 @@ public class Packets{
     public static class ConnectPacket implements Packet{
         public int version;
         public String versionType;
-        public Array<String> mods;
+        @Deprecated
+        public Array<String> mods = new Array<>();
         public String name, uuid, usid;
         public boolean mobile;
         public int color;
+
+        /**
+         * Custom (string) metadata, format: category-key:value
+         */
+        public Array<String> meta(){
+            return mods;
+        }
 
         @Override
         public void write(ByteBuffer buffer){

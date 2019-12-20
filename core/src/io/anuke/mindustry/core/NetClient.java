@@ -77,8 +77,8 @@ public class NetClient implements ApplicationListener{
 
             ConnectPacket c = new ConnectPacket();
             c.name = player.name;
-            c.mods = mods.getModStrings();
-            c.mods.add("securitylevel:" + Core.settings.getInt("securitylevel-checkpoint", 0));
+            c.meta().addAll(mods.getMetaStrings());
+            c.meta().add("securitylevel-checkpoint:" + Core.settings.getInt("securitylevel-checkpoint", 0));
             c.mobile = mobile;
             c.versionType = Version.type;
             c.color = Color.rgba8888(player.color);

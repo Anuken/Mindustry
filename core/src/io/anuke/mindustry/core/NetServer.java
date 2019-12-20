@@ -104,20 +104,14 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            Array<String> extraMods = packet.mods.copy();
-
-            String securityCheckpoint = extraMods.find(mod -> mod.startsWith("securitylevel:"));
-            int securityLevel = 0;
-            if(securityCheckpoint != null){
-                extraMods.remove(securityCheckpoint);
-                securityLevel = Player.securityLevel(packet.uuid, Integer.parseInt(securityCheckpoint.replace("securitylevel:", "")));
-            }
-
-            if(admins.getSecurityLevel() > securityLevel){
-                con.kick("Server requires security level [accent]"+ admins.getSecurityLevel() +"[].");
-                return;
-            }
-
+            Array<String> meta = packet.meta();
+            Array<String> extraMods = new Array<>();
+            Array<String> securityLevel = new Array<>();
+            meta.each(string -> {
+                Log.info(string);
+                if(string.startsWith("mod-")) extraMods.add(string.replace("mod-", ""));
+                if(string.startsWith("securitylevel-")) securityLevel.add(string.replace("securitylevel-", ""));
+            });
 
             Array<String> missingMods = mods.getIncompatibility(extraMods);
 
@@ -148,6 +142,17 @@ public class NetServer implements ApplicationListener{
 
             if(packet.versionType == null || ((packet.version == -1 || !packet.versionType.equals(Version.type)) && Version.build != -1 && !admins.allowsCustomClients())){
                 con.kick(!Version.type.equals(packet.versionType) ? KickReason.typeMismatch : KickReason.customClient);
+                return;
+            }
+
+            String checkpoint = securityLevel.find(mod -> mod.startsWith("checkpoint:"));
+            int level = 0;
+            if(checkpoint != null){
+                level = Player.securityLevel(packet.uuid, Integer.parseInt(checkpoint.replace("checkpoint:", "")));
+            }
+
+            if(admins.getSecurityLevel() > level){
+                con.kick("Server requires security level [accent]"+ admins.getSecurityLevel() +"[].");
                 return;
             }
 
