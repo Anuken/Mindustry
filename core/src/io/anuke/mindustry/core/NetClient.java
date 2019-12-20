@@ -79,6 +79,7 @@ public class NetClient implements ApplicationListener{
             meta.categories.put("mod", mods.getMetaStrings());
             meta.categories.put("securitylevel", new StringMap(){{
                 put("checkpoint", Integer.toString(Core.settings.getInt("securitylevel-checkpoint", 0)));
+                put("version", "sha1");
             }});
 
             ConnectPacket c = new ConnectPacket();
