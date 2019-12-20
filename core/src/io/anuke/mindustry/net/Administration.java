@@ -32,6 +32,14 @@ public class Administration{
         Core.settings.putSave("playerlimit", limit);
     }
 
+    public int getSecurityLevel(){
+        return Core.settings.getInt("securitylevel", 0);
+    }
+
+    public void setSecurityLevel(int level){
+        Core.settings.putSave("securitylevel", level);
+    }
+
     public void setStrict(boolean on){
         Core.settings.putSave("strict", on);
     }

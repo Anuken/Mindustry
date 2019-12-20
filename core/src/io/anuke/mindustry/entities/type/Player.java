@@ -30,6 +30,9 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
+import java.math.*;
+import java.nio.charset.*;
+import java.security.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -753,6 +756,53 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     //endregion
 
     //region utility methods
+
+    /**
+     * Hash uuid & salt together and return the leading zeroes.
+     * (should probably use arc libraries instead of java ones)
+     */
+    public static int securityLevel(String uuid, int salt){
+        uuid += salt; // much glueing together, much wow - doge
+        try{
+            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            digest.update(uuid.getBytes(StandardCharsets.UTF_8), 0, uuid.length());
+            String sha1 = String.format("%040x", new BigInteger(1, digest.digest()));
+            return sha1.replaceFirst("^(0*).*", "$1").length();
+        }catch(NoSuchAlgorithmException e){
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * Try x times to improve the security level by 1 or more.
+     * (progress gets saved)
+     */
+    public boolean improveSecurityLevel(String uuid, int attempts){
+
+        // retrieve the current security level
+        int checkpoint = Core.settings.getInt("securitylevel-checkpoint", 0);
+        int level = securityLevel(uuid, checkpoint);
+
+        // if the current security level is 0, invalidate the progress towards the next one
+        if(level == 0) Core.settings.put("securitylevel-counter", 0);
+
+        // retrieve progress
+        int counter = Core.settings.getInt("securitylevel-counter");
+
+        for(int i=0;i < attempts;i++){
+            if(securityLevel(uuid, ++counter) > level){
+                Core.settings.put("securitylevel-counter", counter);
+                Core.settings.put("securitylevel-checkpoint", counter);
+                Core.settings.save();
+                return true;
+            }
+        }
+
+        Core.settings.put("securitylevel-counter", counter);
+        Core.settings.save();
+        return false;
+    }
 
     public void sendMessage(String text){
         if(isLocal){

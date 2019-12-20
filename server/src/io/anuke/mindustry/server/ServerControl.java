@@ -467,6 +467,26 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        handler.register("securitylevel", "[somenumber]", "Set the server security level.", arg -> {
+            if(arg.length == 0){
+                info("Security level is currently &lc{0}.", netServer.admins.getSecurityLevel());
+                return;
+            }
+            if(arg[0].equals("0")){
+                netServer.admins.setSecurityLevel(0);
+                info("Security level disabled.");
+                return;
+            }
+
+            if(Strings.canParsePostiveInt(arg[0]) && Strings.parseInt(arg[0]) > 0){
+                int lev = Strings.parseInt(arg[0]);
+                netServer.admins.setSecurityLevel(lev);
+                info("Security level is now &lc{0}.", lev);
+            }else{
+                err("Level must be a number above 0.");
+            }
+        });
+
         handler.register("whitelist", "[on/off...]", "Enable/disable whitelisting.", arg -> {
             if(arg.length == 0){
                 info("Whitelist is currently &lc{0}.", netServer.admins.isWhitelistEnabled() ? "on" : "off");

@@ -257,6 +257,34 @@ public class JoinDialog extends FloatingDialog{
             button.update(() -> button.getStyle().imageUpColor = player.color);
         }).width(w).height(70f).pad(4);
         cont.row();
+
+        cont.table(t -> {
+            t.add("$securitylevel").padRight(10);
+            final boolean[] improving = {false};
+
+            Table level = new Table();
+            level.add("[accent]" + securityLevel() + "[]").grow().pad(8).get();
+            t.add(level).grow().pad(8).get();
+
+            ImageButton button = t.addImageButton(Core.atlas.drawable("icon-upgrade"), Styles.defaulti, 40, () -> improving[0] = true).size(54f).get();
+            button.update(() -> {
+                if(!improving[0]) return;
+
+                int old = securityLevel();
+
+                // try x improvements per tick, as to not fry or freeze the device.
+                if(player.improveSecurityLevel(platform.getUUID(), 1000)){
+                    level.clear();
+                    level.add("[accent]" + securityLevel() + "[]").grow().pad(8).get();
+
+                    ui.showText("$securitylevel.improved", Core.bundle.format("securitylevel.changed", old, securityLevel()));
+                    improving[0] = false;
+                }
+            });
+            button.setDisabled(() -> improving[0]);
+        }).width(w).height(70f).pad(4);
+        cont.row();
+
         cont.add(pane).width(w + 38).pad(0);
         cont.row();
         cont.addCenteredImageTextButton("$server.add", Icon.add, () -> {
@@ -413,5 +441,9 @@ public class JoinDialog extends FloatingDialog{
 
         public Server(){
         }
+    }
+
+    private int securityLevel(){
+        return player.securityLevel(platform.getUUID(), Core.settings.getInt("securitylevel-checkpoint", 0));
     }
 }

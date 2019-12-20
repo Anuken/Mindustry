@@ -105,6 +105,20 @@ public class NetServer implements ApplicationListener{
             }
 
             Array<String> extraMods = packet.mods.copy();
+
+            String securityCheckpoint = extraMods.find(mod -> mod.startsWith("securitylevel:"));
+            int securityLevel = 0;
+            if(securityCheckpoint != null){
+                extraMods.remove(securityCheckpoint);
+                securityLevel = Player.securityLevel(packet.uuid, Integer.parseInt(securityCheckpoint.replace("securitylevel:", "")));
+            }
+
+            if(admins.getSecurityLevel() > securityLevel){
+                con.kick("Server requires security level [accent]"+ admins.getSecurityLevel() +"[].");
+                return;
+            }
+
+
             Array<String> missingMods = mods.getIncompatibility(extraMods);
 
             if(!extraMods.isEmpty() || !missingMods.isEmpty()){
