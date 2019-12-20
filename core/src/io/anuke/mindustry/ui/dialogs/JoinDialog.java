@@ -12,6 +12,7 @@ import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Packets.*;
@@ -444,6 +445,6 @@ public class JoinDialog extends FloatingDialog{
     }
 
     private int securityLevel(){
-        return player.securityLevel(platform.getUUID(), Core.settings.getInt("securitylevel-salt", 0));
+        return Player.securityLevel(platform.getUUID(), Core.settings.getInt("securitylevel-salt", 0));
     }
 }

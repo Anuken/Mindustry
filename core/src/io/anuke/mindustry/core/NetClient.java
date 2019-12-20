@@ -79,6 +79,7 @@ public class NetClient implements ApplicationListener{
             meta.categories.put("mod", mods.getMetaStrings());
             meta.categories.put("securitylevel", new StringMap(){{
                 put("salt", Integer.toString(Core.settings.getInt("securitylevel-salt", 0)));
+                put("claim", Integer.toString(Player.securityLevel(platform.getUUID(), Integer.parseInt(get("salt")))));
                 put("version", "sha1");
             }});
 
