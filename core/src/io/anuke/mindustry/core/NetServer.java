@@ -104,8 +104,8 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            Log.info(packet.mods);
-            Metadata meta = (new Metadata()).unpack(packet.mods);
+            Log.info(packet.meta);
+            Metadata meta = (new Metadata()).unpack(packet.meta);
 
             Array<String> extraMods = new Array<>();
             if(meta.categories.get("mod") != null) meta.categories.get("mod").each((key, value) -> extraMods.add(key + ":" + value));

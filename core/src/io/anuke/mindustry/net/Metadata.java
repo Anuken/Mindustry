@@ -1,6 +1,7 @@
 package io.anuke.mindustry.net;
 
 import io.anuke.arc.collection.*;
+import io.anuke.arc.util.Log;
 
 import java.util.regex.*;
 
@@ -26,8 +27,12 @@ public class Metadata{
         meta.each(string -> {
             Matcher m = p.matcher(string);
             if(m.find()){
-                if(categories.get(m.group(0)) == null) categories.put(m.group(0), new StringMap());
-                categories.get(m.group(0)).put(m.group(1), m.group(2));
+                if(categories.get(m.group(1)) == null) categories.put(m.group(1), new StringMap());
+                categories.get(m.group(1)).put(m.group(2), m.group(3));
+//                Log.info("match:");
+//                Log.info(m.group(1));
+//                Log.info(m.group(2));
+//                Log.info(m.group(3));
             }
         });
 

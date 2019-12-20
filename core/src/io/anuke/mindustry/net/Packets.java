@@ -185,10 +185,10 @@ public class Packets{
             byte[] idbytes = new byte[8];
             buffer.get(idbytes);
             uuid = new String(Base64Coder.encode(idbytes));
-            int totalMods = buffer.get();
-            mods = new Array<>(totalMods);
-            for(int i = 0; i < totalMods; i++){
-                mods.add(TypeIO.readString(buffer));
+            int totalMeta = buffer.get();
+            meta = new Array<>(totalMeta);
+            for(int i = 0; i < totalMeta; i++){
+                meta.add(TypeIO.readString(buffer));
             }
         }
     }
