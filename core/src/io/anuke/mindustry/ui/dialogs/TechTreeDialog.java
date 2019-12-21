@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
@@ -24,6 +25,7 @@ import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.ui.layout.*;
 import io.anuke.mindustry.ui.layout.TreeLayout.*;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -287,9 +289,13 @@ public class TechTreeDialog extends FloatingDialog{
 
         void unlock(TechNode node){
             if(state.rules.techtree){
-                state.rules.unlocked.add(node.block);
-                data.removeItems(state.rules.launched, node.requirements);
-                Call.onSetRules(state.rules);
+                if(net.server()){
+                    state.rules.unlocked.add(node.block);
+                    data.removeItems(state.rules.launched, node.requirements);
+                    Call.onSetRules(state.rules);
+                }else{
+//                    Call.unlockTechtreeBlock(node.block);
+                }
             }else{
                 data.unlockContent(node.block);
                 data.removeItems(node.requirements);
@@ -304,6 +310,11 @@ public class TechTreeDialog extends FloatingDialog{
             Sounds.unlock.play();
             Events.fire(new ResearchEvent(node.block));
         }
+
+//        @Remote(targets = Loc.server, called = Loc.both)
+//        void unlockTechtreeBlock(Block block){
+//            unlock(nodes.select(node -> node.node.block == block).first().node);
+//        }
 
         void rebuild(){
             ImageButton button = hoverNode;
