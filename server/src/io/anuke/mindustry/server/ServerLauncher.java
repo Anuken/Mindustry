@@ -7,8 +7,10 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.mod.*;
+import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 
@@ -58,6 +60,19 @@ public class ServerLauncher implements ApplicationListener{
         mods.loadScripts();
         content.createModContent();
         content.init();
+        if(mods.hasContentErrors()){
+            Log.err("Error occurred loading mod content:");
+            for(LoadedMod mod : mods.list()){
+                if(mod.hasContentErrors()){
+                    Log.err("| &ly[{0}]", mod.name);
+                    for(Content cont : mod.erroredContent){
+                        Log.err("| | &y{0}: &c{1}", cont.minfo.sourceFile.name(), Strings.getSimpleMessage(cont.minfo.baseError).replace("\n", " "));
+                    }
+                }
+            }
+            Log.err("The server will now exit.");
+            System.exit(1);
+        }
 
         Core.app.addListener(logic = new Logic());
         Core.app.addListener(netServer = new NetServer());

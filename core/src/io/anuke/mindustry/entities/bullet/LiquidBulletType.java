@@ -14,7 +14,8 @@ import io.anuke.mindustry.world.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class LiquidBulletType extends BulletType{
-    @NonNull Liquid liquid;
+    public @NonNull Liquid liquid;
+    public float puddleSize = 5f;
 
     public LiquidBulletType(@Nullable Liquid liquid){
         super(3.5f, 0);
@@ -67,7 +68,7 @@ public class LiquidBulletType extends BulletType{
     @Override
     public void hit(Bullet b, float hitx, float hity){
         Effects.effect(hitEffect, liquid.color, hitx, hity);
-        Puddle.deposit(world.tileWorld(hitx, hity), liquid, 5f);
+        Puddle.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
 
         if(liquid.temperature <= 0.5f && liquid.flammability < 0.3f){
             float intensity = 400f;

@@ -51,7 +51,6 @@ public class ContentParser{
     );
     private ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
         put(Effect.class, (type, data) -> field(Fx.class, data));
-        put(StatusEffect.class, (type, data) -> field(StatusEffects.class, data));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
             if(result != null){
@@ -437,6 +436,7 @@ public class ContentParser{
         content.minfo.mod = mod;
         content.minfo.sourceFile = file;
         content.minfo.error = makeError(error, file);
+        content.minfo.baseError = error;
         if(mod != null){
             mod.erroredContent.add(content);
         }

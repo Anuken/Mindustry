@@ -262,7 +262,7 @@ public class PlacementFragment extends Fragment{
                                 if(!mobile && Core.settings.getBool("blockselectkeys")){
                                     Array<Block> blocks = getByCategory(currentCategory);
                                     for(int i = 0; i < blocks.size; i++){
-                                        if(blocks.get(i) == lastDisplay){
+                                        if(blocks.get(i) == lastDisplay && (i + 1) / 10 - 1 < blockSelect.length){
                                             keyCombo = Core.bundle.format("placement.blockselectkeys", Core.keybinds.get(blockSelect[currentCategory.ordinal()]).key.toString())
                                                 + (i < 10 ? "" : Core.keybinds.get(blockSelect[(i + 1) / 10 - 1]).key.toString() + ",")
                                                 + Core.keybinds.get(blockSelect[i % 10]).key.toString() + "]";
