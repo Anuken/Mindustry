@@ -25,7 +25,14 @@ public class CustomRulesDialog extends FloatingDialog{
     private Rules rules;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
-    private FloatingDialog banDialog;
+    private FloatingDialog banDialog, techtreeDialog;
+
+    // blocks required to unlock the rest of the tech tree
+    public static Block[] defaultTechtree = new Block[]{
+    Blocks.combustionGenerator,
+    Blocks.router, Blocks.launchPad,
+    Blocks.graphitePress, Blocks.siliconSmelter
+    };
 
     public CustomRulesDialog(){
         super("$mode.custom");
@@ -43,6 +50,21 @@ public class CustomRulesDialog extends FloatingDialog{
         banDialog.buttons.addImageTextButton("$clear", Icon.trash16Small, () -> {
             rules.bannedBlocks.clear();
             rebuildBanned();
+        }).size(180, 64f);
+
+        techtreeDialog = new FloatingDialog("$techtree");
+        techtreeDialog.addCloseButton();
+
+        techtreeDialog.shown(this::rebuildTechtree);
+        techtreeDialog.buttons.addImageTextButton("$addall", Icon.arrow16Small, () -> {
+            rules.unlocked.addAll(content.blocks().select(Block::isBuildable));
+            rebuildTechtree();
+        }).size(180, 64f);
+
+        techtreeDialog.buttons.addImageTextButton("$clear", Icon.trash16Small, () -> {
+            rules.unlocked.clear();
+            rules.unlocked.addAll(defaultTechtree);
+            rebuildTechtree();
         }).size(180, 64f);
 
         setFillParent(true);
@@ -108,6 +130,65 @@ public class CustomRulesDialog extends FloatingDialog{
         }).size(300f, 64f);
     }
 
+    private void rebuildTechtree(){
+        float previousScroll = techtreeDialog.cont.getChildren().isEmpty() ? 0f : ((ScrollPane)techtreeDialog.cont.getChildren().first()).getScrollY();
+        techtreeDialog.cont.clear();
+        techtreeDialog.cont.pane(t -> {
+            t.margin(10f);
+
+            if(rules.unlocked.isEmpty()){
+                t.add("$empty");
+            }
+
+            Array<Block> array = Array.with(rules.unlocked);
+            array.sort();
+
+            int cols = mobile && Core.graphics.isPortrait() ? 1 : mobile ? 2 : 3;
+            int i = 0;
+
+            for(Block block : array){
+                t.table(Tex.underline, b -> {
+                    b.left().margin(4f);
+                    b.addImage(block.icon(Cicon.medium)).size(Cicon.medium.size).padRight(3);
+                    b.add(block.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
+
+                    b.addImageButton(Icon.cancelSmall, Styles.clearPartiali, () -> {
+                        rules.unlocked.remove(block);
+                        rebuildTechtree();
+                    }).size(70f).pad(-4f).padLeft(0f);
+                }).size(300f, 70f).padRight(5);
+
+                if(++i % cols == 0){
+                    t.row();
+                }
+            }
+        }).get().setScrollYForce(previousScroll);
+        techtreeDialog.cont.row();
+        techtreeDialog.cont.addImageTextButton("$add", Icon.addSmall, () -> {
+            FloatingDialog dialog = new FloatingDialog("$add");
+            dialog.cont.pane(t -> {
+                t.left().margin(14f);
+                int[] i = {0};
+                content.blocks().each(b -> !rules.unlocked.contains(b) && b.isBuildable(), b -> {
+                    int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
+                    t.addImageButton(new TextureRegionDrawable(b.icon(Cicon.medium)), Styles.cleari, () -> {
+                        rules.unlocked.add(b);
+                        rebuildTechtree();
+                        dialog.hide();
+                    }).size(60f).get().resizeImage(Cicon.medium.size);
+
+                    if(++i[0] % cols == 0){
+                        t.row();
+                    }
+                });
+            });
+
+            dialog.addCloseButton();
+            dialog.show();
+        }).size(300f, 64f);
+    }
+
+
     public void show(Rules rules, Prov<Rules> resetter){
         this.rules = rules;
         this.resetter = resetter;
@@ -153,6 +234,12 @@ public class CustomRulesDialog extends FloatingDialog{
         main.row();
 
         main.addButton("$bannedblocks", banDialog::show).left().width(300f);
+        main.row();
+        check("$rules.techtree", b -> {
+            rules.techtree = b;
+            if(rules.unlocked.isEmpty()) rules.unlocked.addAll(defaultTechtree);
+        }, () -> rules.techtree);
+        main.addButton("$techtree", techtreeDialog::show).left().width(300f).disabled(lambda -> !rules.techtree);
         main.row();
 
         title("$rules.title.player");

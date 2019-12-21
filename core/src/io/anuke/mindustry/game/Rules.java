@@ -79,13 +79,9 @@ public class Rules{
     /** Ambient light color, used when lighting is enabled. */
     public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
     /** Use the techtree or unlock everything. */
-    public boolean techtree = true;
-    /** Which blocks are unlocked in the tech tree by default. */
-    public Array<Block> unlocked = new Array<Block>(){{
-        add(Blocks.combustionGenerator);
-        add(Blocks.router, Blocks.launchPad);
-        add(Blocks.graphitePress, Blocks.siliconSmelter);
-    }};
+    public boolean techtree = false;
+    /** Which blocks are unlocked in the tech tree. */
+    public Array<Block> unlocked = new Array<>();
     /** Launched items. */
     public ObjectIntMap<Item> launched = new ObjectIntMap<>();
 
