@@ -1,6 +1,9 @@
 package io.anuke.mindustry.entities.type.base;
 
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
@@ -10,6 +13,7 @@ import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
@@ -77,6 +81,7 @@ public class RepairDrone extends BaseDrone{
                 if(target.dst(RepairDrone.this) > type.range){
                     circle(type.range * 0.9f);
                 }else{
+
                     if(Mathf.chance(Time.delta() * 0.25)){
                         liquid.liquid = getSpawner().entity.liquids.current();
 
@@ -123,6 +128,20 @@ public class RepairDrone extends BaseDrone{
             }
         }
     };
+
+    @Override
+    public void drawUnder(){
+        super.drawUnder();
+
+        if(state.current() != refill || target.dst(RepairDrone.this) > type.range) return;
+
+        float flashScl = 0.3f;
+        Draw.color(Color.lightGray, liquid.liquid.color, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
+        Draw.blend(Blending.additive);
+        Drawf.laser(Core.atlas.find("minelaser"), Core.atlas.find("minelaser-end"), x, y, getSpawner().drawx(), getSpawner().drawy(), 0.75f);
+        Draw.blend();
+        Draw.color();
+    }
 
     private Array<Fire> fires(){
         return fireGroup.all();
