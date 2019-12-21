@@ -1036,7 +1036,7 @@ public class Blocks implements ContentList{
         }};
 
         powerNodeReinforced = new PowerNode("power-node-reinforced"){{
-            requirements(Category.power, ItemStack.with(Items.copper, 1, Items.lead, 3, Items.metaglass, 5, Items.thorium, 10));
+            requirements(Category.power, ItemStack.with(Items.copper, 1, Items.lead, 3, Items.metaglass, 4, Items.thorium, 8));
             size = 1;
             maxNodes = 4;
             laserRange = 5;
