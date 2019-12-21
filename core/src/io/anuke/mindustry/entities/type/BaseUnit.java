@@ -238,6 +238,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
+    public Weapon getSecondary(){
+        return type.secondary;
+    }
+
+    @Override
     public TextureRegion getIconRegion(){
         return type.icon(Cicon.full);
     }
@@ -245,6 +250,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public int getItemCapacity(){
         return type.itemCapacity;
+    }
+
+    @Override
+    public int getLiquidCapacity(){
+        return type.liquidCapacity;
     }
 
     @Override

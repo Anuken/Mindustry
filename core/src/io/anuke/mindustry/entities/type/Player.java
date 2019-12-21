@@ -154,6 +154,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     @Override
+    public Weapon getSecondary(){
+        return null;
+    }
+
+    @Override
     public float getMinePower(){
         return mech.mineSpeed;
     }
@@ -165,6 +170,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public int getItemCapacity(){
+        return mech.itemCapacity;
+    }
+
+    @Override
+    public int getLiquidCapacity(){
         return mech.itemCapacity;
     }
 

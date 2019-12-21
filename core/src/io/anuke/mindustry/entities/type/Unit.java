@@ -46,6 +46,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     protected final Interpolator interpolator = new Interpolator();
     protected final Statuses status = new Statuses();
     protected final ItemStack item = new ItemStack(content.item(0), 0);
+    protected final LiquidStack liquid = new LiquidStack(content.liquid(0), 0);
 
     protected Team team = Team.sharded;
     protected float drownTime, hitTime;
@@ -400,6 +401,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
         Draw.color();
 
+        drawBackLiquids(liquid.amount > 0 ? 1f : 0f, false);
         drawBackItems(item.amount > 0 ? 1f : 0f, false);
 
         drawLight();
@@ -408,6 +410,39 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public void drawLight(){
         renderer.lights.add(x, y, 50f, Pal.powerLight, 0.6f);
     }
+
+    public void drawBackLiquids(float itemtime, boolean number){
+        //draw back items
+        if(itemtime > 0.01f && liquid.liquid != null){
+            float backTrns = 5f;
+            float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * itemtime;
+
+            Draw.mixcol(Pal.accent, Mathf.absin(Time.time(), 5f, 0.5f));
+            Draw.rect(liquid.liquid.icon(Cicon.medium),
+            x + Angles.trnsx(rotation + 180f, backTrns),
+            y + Angles.trnsy(rotation + 180f, backTrns),
+            size, size, rotation);
+
+            Draw.mixcol();
+
+            Lines.stroke(1f, Pal.accent);
+            Lines.circle(
+            x + Angles.trnsx(rotation + 180f, backTrns),
+            y + Angles.trnsy(rotation + 180f, backTrns),
+            (3f + Mathf.absin(Time.time(), 5f, 1f)) * itemtime);
+
+            if(number){
+                Fonts.outline.draw(liquid.amount + "",
+                x + Angles.trnsx(rotation + 180f, backTrns),
+                y + Angles.trnsy(rotation + 180f, backTrns) - 3,
+                Pal.accent, 0.25f * itemtime / Scl.scl(1f), false, Align.center
+                );
+            }
+        }
+
+        Draw.reset();
+    }
+
 
     public void drawBackItems(float itemtime, boolean number){
         //draw back items
@@ -465,7 +500,11 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public abstract Weapon getWeapon();
 
+    public abstract Weapon getSecondary();
+
     public abstract int getItemCapacity();
+
+    public abstract int getLiquidCapacity();
 
     public abstract float mass();
 

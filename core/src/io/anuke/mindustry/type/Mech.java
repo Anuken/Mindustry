@@ -28,6 +28,7 @@ public class Mech extends UnlockableContent{
     public float buildPower = 1f;
     public Color engineColor = Pal.boostTo;
     public int itemCapacity = 30;
+    public int liquidCapacity = 0;
     public boolean turnCursor = true;
     public boolean canHeal = false;
     public float compoundSpeed, compoundSpeedBoost;

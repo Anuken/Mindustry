@@ -35,9 +35,10 @@ public class UnitType extends UnlockableContent{
     public float maxVelocity = 5f;
     public float retreatPercent = 0.6f;
     public int itemCapacity = 30;
+    public int liquidCapacity = 0;
     public ObjectSet<Item> toMine = ObjectSet.with(Items.lead, Items.copper);
     public float buildPower = 0.3f, minePower = 0.7f;
-    public @NonNull Weapon weapon;
+    public @NonNull Weapon weapon, secondary;
     public float weaponOffsetY, engineOffset = 6f, engineSize = 2f;
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;

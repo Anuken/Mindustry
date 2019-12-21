@@ -41,6 +41,7 @@ public class UnitTypes implements ContentList{
             health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
+            liquidCapacity = 5;
             weapon = new Weapon(){{
                 length = 1.5f;
                 reload = 40f;
@@ -50,6 +51,17 @@ public class UnitTypes implements ContentList{
                 recoil = 2f;
                 bullet = Bullets.healBulletBig;
                 shootSound = Sounds.pew;
+            }};
+            secondary = new Weapon(){{
+                length = 1.5f;
+                reload = 10f;
+                width = 0.5f;
+                alternate = true;
+                ejectEffect = Fx.none;
+                recoil = 2f;
+                inaccuracy = 20f;
+                bullet = Bullets.cryoShot;
+                shootSound = Sounds.splash;
             }};
         }};
 
