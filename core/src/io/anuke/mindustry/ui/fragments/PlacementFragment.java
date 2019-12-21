@@ -426,6 +426,7 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean unlocked(Block block){
+        if(state.rules.techtree) return state.rules.unlocked.contains(block) || block.alwaysUnlocked;
         return !world.isZone() || data.isUnlocked(block);
     }
 

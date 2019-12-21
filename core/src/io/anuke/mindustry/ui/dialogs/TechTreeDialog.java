@@ -161,7 +161,7 @@ public class TechTreeDialog extends FloatingDialog{
     }
 
     boolean locked(TechNode node){
-        return node.block.locked();
+        return state.rules.techtree ? (!state.rules.unlocked.contains(node.block) && !node.block.alwaysUnlocked()) : node.block.locked();
     }
 
     class LayoutNode extends TreeNode<LayoutNode>{
@@ -228,7 +228,7 @@ public class TechTreeDialog extends FloatingDialog{
                                 }
                             });
                         }
-                    }else if(data.hasItems(node.node.requirements) && locked(node.node)){
+                    }else if(data.hasItems(state.rules.techtree ? state.rules.launched : data.items(), node.node.requirements) && locked(node.node)){
                         unlock(node.node);
                     }
                 });
@@ -286,8 +286,15 @@ public class TechTreeDialog extends FloatingDialog{
         }
 
         void unlock(TechNode node){
-            data.unlockContent(node.block);
-            data.removeItems(node.requirements);
+            if(state.rules.techtree){
+                state.rules.unlocked.add(node.block);
+                data.removeItems(state.rules.launched, node.requirements);
+                Call.onSetRules(state.rules);
+            }else{
+                data.unlockContent(node.block);
+                data.removeItems(node.requirements);
+            }
+
             showToast(Core.bundle.format("researched", node.block.localizedName));
             checkNodes(root);
             hoverNode = null;
@@ -339,7 +346,7 @@ public class TechTreeDialog extends FloatingDialog{
                                     list.addImage(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
                                     list.add(req.item.localizedName).color(Color.lightGray);
                                     list.label(() -> " " + Math.min(data.getItem(req.item), req.amount) + " / " + req.amount)
-                                    .update(l -> l.setColor(data.has(req.item, req.amount) ? Color.lightGray : Color.scarlet));
+                                    .update(l -> l.setColor(data.has(state.rules.techtree ? state.rules.launched : data.items(), req.item, req.amount) ? Color.lightGray : Color.scarlet));
                                 }).fillX().left();
                                 t.row();
                             }

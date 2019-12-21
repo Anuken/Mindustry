@@ -95,8 +95,12 @@ public class GlobalData{
     }
 
     public boolean hasItems(ItemStack[] stacks){
+        return hasItems(items, stacks);
+    }
+
+    public boolean hasItems(ObjectIntMap<Item> source, ItemStack[] stacks){
         for(ItemStack stack : stacks){
-            if(!has(stack.item, stack.amount)){
+            if(!has(source, stack.item, stack.amount)){
                 return false;
             }
         }
@@ -105,10 +109,13 @@ public class GlobalData{
     }
 
     public void removeItems(ItemStack[] stacks){
+        removeItems(items, stacks);
+    }
+
+    public void removeItems(ObjectIntMap<Item> source, ItemStack[] stacks){
         for(ItemStack stack : stacks){
-            items.getAndIncrement(stack.item, 0, -stack.amount);
+            source.getAndIncrement(stack.item, 0, -stack.amount);
         }
-        modified = true;
     }
 
     public void removeItems(Array<ItemStack> stacks){
@@ -120,6 +127,10 @@ public class GlobalData{
 
     public boolean has(Item item, int amount){
         return items.get(item, 0) >= amount;
+    }
+
+    public boolean has(ObjectIntMap<Item> source, Item item, int amount){
+        return source.get(item, 0) >= amount;
     }
 
     public ObjectIntMap<Item> items(){

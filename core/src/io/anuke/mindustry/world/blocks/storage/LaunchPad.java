@@ -10,6 +10,7 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
@@ -17,8 +18,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-import static io.anuke.mindustry.Vars.data;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class LaunchPad extends StorageBlock{
     public final int timerLaunch = timers++;
@@ -73,12 +73,17 @@ public class LaunchPad extends StorageBlock{
     public void update(Tile tile){
         TileEntity entity = tile.entity;
 
-        if(world.isZone() && entity.cons.valid() && world.isZone() && entity.items.total() >= itemCapacity && entity.timer.get(timerLaunch, launchTime / entity.timeScale)){
+        if((world.isZone() || state.rules.techtree) && entity.cons.valid() && (world.isZone() || state.rules.techtree) && entity.items.total() >= itemCapacity && entity.timer.get(timerLaunch, launchTime / entity.timeScale)){
             for(Item item : Vars.content.items()){
                 Events.fire(Trigger.itemLaunch);
                 Effects.effect(Fx.padlaunch, tile);
                 int used = Math.min(entity.items.get(item), itemCapacity);
-                data.addItem(item, used);
+                if(state.rules.techtree){
+                    state.rules.launched.getAndIncrement(item, 0, used);
+                    Call.onSetRules(state.rules);
+                }else{
+                    data.addItem(item, used);
+                }
                 entity.items.remove(item, used);
                 Events.fire(new LaunchItemEvent(item, used));
             }

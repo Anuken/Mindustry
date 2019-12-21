@@ -41,7 +41,7 @@ public class PausedDialog extends FloatingDialog{
             cont.addButton("$back", this::hide).colspan(2).width(dw * 2 + 20f);
 
             cont.row();
-            if(world.isZone()){
+            if(world.isZone() || state.rules.techtree){
                 cont.addButton("$techtree", ui.tech::show);
             }else{
                 cont.addButton("$database", ui.database::show);

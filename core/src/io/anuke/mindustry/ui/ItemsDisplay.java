@@ -23,7 +23,7 @@ public class ItemsDisplay extends Table{
 
         table(Tex.button,t -> {
             t.margin(10).marginLeft(15).marginTop(15f);
-            t.label(() -> state.is(State.menu) ? "$launcheditems" : "$launchinfo").colspan(3).padBottom(4).left().colspan(3).width(210f).wrap();
+            t.label(() -> state.is(State.menu) || state.rules.techtree ? "$launcheditems" : "$launchinfo").colspan(3).padBottom(4).left().colspan(3).width(210f).wrap();
             t.row();
             for(Item item : content.items()){
                 if(item.type == ItemType.material && data.isUnlocked(item)){
@@ -38,10 +38,12 @@ public class ItemsDisplay extends Table{
 
     private String format(Item item){
         builder.setLength(0);
-        builder.append(ui.formatAmount(data.items().get(item, 0)));
+        builder.append(ui.formatAmount(state.rules.techtree ? state.rules.launched.get(item, 0) : data.items().get(item, 0)));
         if(!state.is(State.menu) && !state.teams.get(player.getTeam()).cores.isEmpty() && state.teams.get(player.getTeam()).cores.first().entity != null && state.teams.get(player.getTeam()).cores.first().entity.items.get(item) > 0){
-            builder.append(" [unlaunched]+ ");
-            builder.append(ui.formatAmount(state.teams.get(player.getTeam()).cores.first().entity.items.get(item)));
+            if(!state.rules.techtree){
+                builder.append(" [unlaunched]+ ");
+                builder.append(ui.formatAmount(state.teams.get(player.getTeam()).cores.first().entity.items.get(item)));
+            }
         }
         return builder.toString();
     }
