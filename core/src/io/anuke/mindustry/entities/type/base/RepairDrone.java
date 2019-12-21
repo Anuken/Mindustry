@@ -133,7 +133,8 @@ public class RepairDrone extends BaseDrone{
     public void drawUnder(){
         super.drawUnder();
 
-        if(state.current() != refill || target.dst(RepairDrone.this) > type.range) return;
+        if(target == null) return;
+        if(state.current() != refill || target.dst(RepairDrone.this) > type.range || target != getSpawner()) return;
 
         float flashScl = 0.3f;
         Draw.color(Color.lightGray, liquid.liquid.color, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
