@@ -226,6 +226,10 @@ public class TechTree implements ContentList{
                             });
                         });
 
+                        node(powerNodeReinforced, () -> {
+
+                        });
+
                         node(battery, () -> {
                             node(batteryLarge, () -> {
 

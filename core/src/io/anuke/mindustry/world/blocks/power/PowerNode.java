@@ -9,6 +9,7 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
@@ -135,7 +136,7 @@ public class PowerNode extends PowerBlock{
         Boolf<Tile> valid = other -> other != null && other != tile && other.entity != null && other.entity.power != null &&
         ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) &&
         overlaps(tile.x * tilesize + offset(), tile.y * tilesize + offset(), other, laserRange * tilesize) && other.getTeam() == player.getTeam()
-        && !other.entity.proximity().contains(tile) && !graphs.contains(other.entity.power.graph);
+        && !other.entity.proximity().contains(tile) && !graphs.contains(other.entity.power.graph) && aligned(tile, other);
 
         tempTiles.clear();
         graphs.clear();
@@ -286,7 +287,7 @@ public class PowerNode extends PowerBlock{
     }
 
     public boolean linkValid(Tile tile, Tile link, boolean checkMaxNodes){
-        if(tile == link || link == null || link.entity == null || tile.entity == null || !link.block().hasPower || tile.getTeam() != link.getTeam()) return false;
+        if(tile == link || link == null || link.entity == null || tile.entity == null || !link.block().hasPower || tile.getTeam() != link.getTeam() || !aligned(tile, link)) return false;
 
         if(overlaps(tile, link, laserRange * tilesize) || (link.block() instanceof PowerNode && overlaps(link, tile, link.<PowerNode>cblock().laserRange * tilesize))){
             if(checkMaxNodes && link.block() instanceof PowerNode){
@@ -344,6 +345,30 @@ public class PowerNode extends PowerBlock{
         returnValue = false;
         insulators(x, y, x2, y2, cause -> returnValue = true);
         return returnValue;
+    }
+
+    protected boolean aligned(Tile tile, Tile other){
+        // if either block is reinforced power node run the alignment check
+        if(tile.block() == Blocks.powerNodeReinforced || other.block() == Blocks.powerNodeReinforced){
+
+            // if there is no block from which is checked, return false when the held block is even
+            if(control.input.block != null && control.input.block.size % 2 == 0) return false;
+
+            // check if the resulting laser lines run run perfectly along any matching axis
+            float x1 = tile.drawx(), y1 = tile.drawy(),
+            x2 = other.drawx(), y2 = other.drawy();
+            float angle1 = Angles.angle(x1, y1, x2, y2);
+            t1.trns(angle1, tile.block().size * tilesize / 2f - 1.5f);
+            t2.trns(angle1 + 180f, other.block().size * tilesize / 2f - 1.5f);
+            x1 += t1.x;
+            y1 += t1.y;
+            x2 += t2.x;
+            y2 += t2.y;
+
+            return x1 == x2 || y1 == y2; // fixme: de-duplicate above laser check code
+        }
+
+        return true;
     }
 
     public static void insulators(int x, int y, int x2, int y2, Cons<Tile> iterator){
