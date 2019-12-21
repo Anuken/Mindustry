@@ -196,7 +196,7 @@ public class NetClient implements ApplicationListener{
     public static String colorizeName(int id, String name){
         Player player = playerGroup.getByID(id);
         if(name == null || player == null) return null;
-        return "[#" + player.color.toString().toUpperCase() + "]" + name;
+        return "[#" + player.color.toString().toUpperCase() + "]" + name.replace("[teamcolor]", "[#" + player.getTeam().color.toString().toUpperCase() + "]");
     }
 
     @Remote(called = Loc.client, variants = Variant.one)
