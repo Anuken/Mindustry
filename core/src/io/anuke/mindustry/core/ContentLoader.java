@@ -265,4 +265,12 @@ public class ContentLoader{
     public Array<UnitType> units(){
         return getBy(ContentType.unit);
     }
+
+    public Array<Mech> mechs(){
+        return getBy(ContentType.mech);
+    }
+
+    public Mech mech(int id){
+        return (Mech)getByID(ContentType.mech, id);
+    }
 }

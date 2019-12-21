@@ -25,7 +25,7 @@ public class CustomRulesDialog extends FloatingDialog{
     private Rules rules;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
-    private FloatingDialog banDialog;
+    private FloatingDialog banDialog, mechDialog;
 
     public CustomRulesDialog(){
         super("$mode.custom");
@@ -44,6 +44,10 @@ public class CustomRulesDialog extends FloatingDialog{
             rules.bannedBlocks.clear();
             rebuildBanned();
         }).size(180, 64f);
+
+        mechDialog = new FloatingDialog("$content.mech.name");
+        mechDialog.addCloseButton();
+        mechDialog.shown(this::rebuildMech);
 
         setFillParent(true);
         shown(this::setup);
@@ -73,8 +77,8 @@ public class CustomRulesDialog extends FloatingDialog{
                     b.add(block.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
 
                     b.addImageButton(Icon.cancelSmall, Styles.clearPartiali, () -> {
-                       rules.bannedBlocks.remove(block);
-                       rebuildBanned();
+                        rules.bannedBlocks.remove(block);
+                        rebuildBanned();
                     }).size(70f).pad(-4f).padLeft(0f);
                 }).size(300f, 70f).padRight(5);
 
@@ -107,6 +111,21 @@ public class CustomRulesDialog extends FloatingDialog{
             dialog.show();
         }).size(300f, 64f);
     }
+
+    private void rebuildMech(){
+        mechDialog.cont.clear();
+        mechDialog.cont.pane(t -> {
+            t.left().margin(14f);
+            int[] i = {0};
+            content.mechs().each(m -> true, m -> {
+                t.addImageButton(new TextureRegionDrawable(m.icon(Cicon.medium)), Styles.clearTogglei, () -> {
+                    rules.starter = m;
+                    mechDialog.hide();
+                }).checked(rules.starter == m).size(60f).get().resizeImage(Cicon.medium.size);
+            });
+        });
+    }
+
 
     public void show(Rules rules, Prov<Rules> resetter){
         this.rules = rules;
@@ -158,6 +177,12 @@ public class CustomRulesDialog extends FloatingDialog{
         title("$rules.title.player");
         number("$rules.playerhealthmultiplier", f -> rules.playerHealthMultiplier = f, () -> rules.playerHealthMultiplier);
         number("$rules.playerdamagemultiplier", f -> rules.playerDamageMultiplier = f, () -> rules.playerDamageMultiplier);
+        main.addButton(b -> {
+//            b.left();
+//            b.addImage(new TextureRegionDrawable(rules.starter.icon(Cicon.medium))).margin(4).size(50f).padRight(10);
+            b.add("$rules.defaultmech");
+        }, mechDialog::show).left().width(300f);
+        main.row();
 
         title("$rules.title.unit");
         check("$rules.unitdrops", b -> rules.unitDrops = b, () -> rules.unitDrops, () -> true);

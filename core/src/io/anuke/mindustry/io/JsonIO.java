@@ -95,6 +95,20 @@ public class JsonIO{
             }
         });
 
+        json.setSerializer(Mech.class, new Serializer<Mech>(){
+            @Override
+            public void write(Json json, Mech object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public Mech read(Json json, JsonValue jsonData, Class type){
+                if(jsonData.asString() == null) return Mechs.fallback;
+                Mech m =  Vars.content.getByName(ContentType.mech, jsonData.asString());
+                return m == null ? Mechs.fallback : m;
+            }
+        });
+
         json.setSerializer(Block.class, new Serializer<Block>(){
             @Override
             public void write(Json json, Block object, Class knownType){

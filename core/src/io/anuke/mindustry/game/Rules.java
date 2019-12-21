@@ -78,6 +78,8 @@ public class Rules{
     public boolean lighting = false;
     /** Ambient light color, used when lighting is enabled. */
     public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
+    /** Default mech the core spawns you as. */
+    public Mech starter = Mechs.fallback;
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
     public Rules copy(){

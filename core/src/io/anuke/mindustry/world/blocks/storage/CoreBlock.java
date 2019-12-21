@@ -24,8 +24,6 @@ import io.anuke.mindustry.world.modules.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
-    public Mech mech = Mechs.starter;
-
     public CoreBlock(String name){
         super(name);
 
@@ -186,7 +184,7 @@ public class CoreBlock extends StorageBlock{
         CoreEntity entity = tile.ent();
 
         if(entity.heat > 0.001f){
-            RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.spawnPlayer, mech);
+            RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.spawnPlayer, state.rules.starter);
         }
     }
 
@@ -247,7 +245,7 @@ public class CoreBlock extends StorageBlock{
             if(!netServer.isWaitingForPlayers() && spawnPlayer == null){
                 spawnPlayer = player;
                 progress = 0f;
-                player.mech = mech;
+                player.mech = state.rules.starter;
                 player.beginRespawning(this);
             }
         }

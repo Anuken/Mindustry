@@ -55,7 +55,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
     public Color color = new Color();
-    public Mech mech = Mechs.starter;
+    public Mech mech = Mechs.fallback;
     public SpawnerTrait spawner, lastSpawner;
     public int respawns;
 
@@ -810,7 +810,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         health = maxHealth();
         mining = null;
         boostHeat = drownTime = hitTime = 0f;
-        mech = Mechs.starter;
+        mech = Mechs.fallback;
         placeQueue.clear();
         respawns = state.rules.respawns;
     }

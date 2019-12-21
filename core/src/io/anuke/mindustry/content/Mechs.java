@@ -18,7 +18,7 @@ import io.anuke.mindustry.type.*;
 public class Mechs implements ContentList{
     public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive;
 
-    public static Mech starter;
+    public static Mech fallback;
 
     @Override
     public void load(){
@@ -373,6 +373,6 @@ public class Mechs implements ContentList{
             }
         };
 
-        starter = dart;
+        fallback = dart;
     }
 }

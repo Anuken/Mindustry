@@ -80,7 +80,7 @@ public class Blocks implements ContentList{
     fortressFactory, repairPoint,
 
     //upgrades
-    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    alphaPad,dartPad, deltaPad, javelinPad, tauPad, tridentPad, omegaPad, glaivePad;
 
     @Override
     public void load(){
@@ -1744,11 +1744,19 @@ public class Blocks implements ContentList{
         //endregion
         //region upgrades
 
-        dartPad = new MechPad("dart-mech-pad"){{
+        alphaPad = new MechPad("alpha-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 100, Items.graphite, 50, Items.copper, 75));
             mech = Mechs.alpha;
             size = 2;
             consumes.power(0.5f);
+        }};
+
+        dartPad = new MechPad("dart-mech-pad"){{
+            requirements(Category.upgrade, ItemStack.with(Items.copper, 200, Items.graphite, 25, Items.lead, 50));
+            mech = Mechs.dart;
+            size = 2;
+            consumes.power(0.5f);
+            alwaysUnlocked = true;
         }};
 
         deltaPad = new MechPad("delta-mech-pad"){{
@@ -1758,9 +1766,23 @@ public class Blocks implements ContentList{
             consumes.power(0.7f);
         }};
 
+        javelinPad = new MechPad("javelin-ship-pad"){{
+            requirements(Category.upgrade, ItemStack.with(Items.lead, 175, Items.silicon, 225, Items.titanium, 250, Items.plastanium, 200, Items.phasefabric, 100));
+            mech = Mechs.javelin;
+            size = 2;
+            consumes.power(0.8f);
+        }};
+
         tauPad = new MechPad("tau-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 125, Items.titanium, 125, Items.copper, 125, Items.silicon, 125));
             mech = Mechs.tau;
+            size = 2;
+            consumes.power(1f);
+        }};
+
+        tridentPad = new MechPad("trident-ship-pad"){{
+            requirements(Category.upgrade, ItemStack.with(Items.lead, 125, Items.copper, 125, Items.silicon, 125, Items.titanium, 150, Items.plastanium, 100));
+            mech = Mechs.trident;
             size = 2;
             consumes.power(1f);
         }};
@@ -1770,20 +1792,6 @@ public class Blocks implements ContentList{
             mech = Mechs.omega;
             size = 3;
             consumes.power(1.2f);
-        }};
-
-        javelinPad = new MechPad("javelin-ship-pad"){{
-            requirements(Category.upgrade, ItemStack.with(Items.lead, 175, Items.silicon, 225, Items.titanium, 250, Items.plastanium, 200, Items.phasefabric, 100));
-            mech = Mechs.javelin;
-            size = 2;
-            consumes.power(0.8f);
-        }};
-
-        tridentPad = new MechPad("trident-ship-pad"){{
-            requirements(Category.upgrade, ItemStack.with(Items.lead, 125, Items.copper, 125, Items.silicon, 125, Items.titanium, 150, Items.plastanium, 100));
-            mech = Mechs.trident;
-            size = 2;
-            consumes.power(1f);
         }};
 
         glaivePad = new MechPad("glaive-ship-pad"){{

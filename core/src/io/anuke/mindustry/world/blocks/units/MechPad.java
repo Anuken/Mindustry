@@ -67,7 +67,7 @@ public class MechPad extends Block{
         if(entity.player == null) return;
         Mech mech = ((MechPad)tile.block()).mech;
         boolean resetSpawner = !entity.sameMech && entity.player.mech == mech;
-        entity.player.mech = !entity.sameMech && entity.player.mech == mech ? Mechs.starter : mech;
+        entity.player.mech = !entity.sameMech && entity.player.mech == mech ? state.rules.starter : mech;
 
         Player player = entity.player;
 
@@ -112,7 +112,7 @@ public class MechPad extends Block{
         MechFactoryEntity entity = tile.ent();
 
         if(entity.player != null){
-            RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.player, (!entity.sameMech && entity.player.mech == mech ? mech : Mechs.starter));
+            RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.player, (!entity.sameMech && entity.player.mech == mech ? mech : state.rules.starter));
         }
     }
 
