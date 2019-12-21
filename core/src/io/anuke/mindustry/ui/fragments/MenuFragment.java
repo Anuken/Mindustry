@@ -61,7 +61,8 @@ public class MenuFragment extends Fragment{
             parent.fill(c -> c.bottom().right().addButton("", Styles.discordt, ui.discord::show).size(84, 45));
         }
 
-        String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : (Version.type.equals("official") ? Version.modifier : Version.type) + " build " + Version.build + (Version.revision == 0 ? "" : "." + Version.revision));
+        String versionText = (Version.build == -1) ? Core.bundles.get("version.custombuild") : Core.bundles.format("version.build", (Version.type == "official") ? Version.modifier : Version.type, Version.build + (Version.revision == 0 ? "" : ("." + Version.revision)));
+        //String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : (Version.type.equals("official") ? Version.modifier : Version.type) + " build " + Version.build + (Version.revision == 0 ? "" : "." + Version.revision));
 
         parent.fill((x, y, w, h) -> {
             TextureRegion logo = Core.atlas.find("logo");
