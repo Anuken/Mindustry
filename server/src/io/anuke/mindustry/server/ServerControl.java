@@ -55,6 +55,7 @@ public class ServerControl implements ApplicationListener{
     private @Nullable Map nextMapOverride;
 
     private Thread socketThread;
+    private ServerSocket serverSocket;
     private PrintWriter socketOutput;
 
     public ServerControl(String[] args){
@@ -964,33 +965,39 @@ public class ServerControl implements ApplicationListener{
         if(on && socketThread == null){
             socketThread = new Thread(() -> {
                 try{
-                    try(ServerSocket socket = new ServerSocket()){
-                        socket.bind(new InetSocketAddress("localhost", commandSocketPort));
-                        while(true){
-                            Socket client = socket.accept();
-                            info("&lmRecieved command socket connection: &lb{0}", socket.getLocalSocketAddress());
-                            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                            socketOutput = new PrintWriter(client.getOutputStream(), true);
-                            String line;
-                            while(client.isConnected() && (line = in.readLine()) != null){
-                                String result = line;
-                                Core.app.post(() -> handleCommandString(result));
-                            }
-                            info("&lmLost command socket connection: &lb{0}", socket.getLocalSocketAddress());
-                            socketOutput = null;
+                    serverSocket = new ServerSocket();
+                    serverSocket.bind(new InetSocketAddress("localhost", commandSocketPort));
+                    while(true){
+                        Socket client = serverSocket.accept();
+                        info("&lmRecieved command socket connection: &lb{0}", serverSocket.getLocalSocketAddress());
+                        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                        socketOutput = new PrintWriter(client.getOutputStream(), true);
+                        String line;
+                        while(client.isConnected() && (line = in.readLine()) != null){
+                            String result = line;
+                            Core.app.post(() -> handleCommandString(result));
                         }
+                        info("&lmLost command socket connection: &lb{0}", serverSocket.getLocalSocketAddress());
+                        socketOutput = null;
                     }
                 }catch(BindException b){
                     err("Command input socket already in use. Is another instance of the server running?");
                 }catch(IOException e){
-                    err("Terminating socket server.");
-                    e.printStackTrace();
+                    if(!e.getMessage().equals("Socket closed")){
+                        err("Terminating socket server.");
+                        e.printStackTrace();
+                    }
                 }
             });
             socketThread.setDaemon(true);
             socketThread.start();
         }else if(socketThread != null){
             socketThread.interrupt();
+            try{
+                serverSocket.close();
+            }catch(IOException e){
+                e.printStackTrace();
+            }
             socketThread = null;
             socketOutput = null;
         }
