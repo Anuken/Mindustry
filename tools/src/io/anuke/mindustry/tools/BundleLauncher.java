@@ -47,7 +47,6 @@ public class BundleLauncher{
             }
 
             Func2<String, String, String> processor = (key, value) -> (key + " = " + value).replace("\\", "\\\\").replace("\n", "\\n") + "\n";
-
             Fi output = child.sibling("output/" + child.name());
 
             Log.info("&lc{0} keys added.", added);
