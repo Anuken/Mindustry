@@ -509,6 +509,42 @@ public class ServerControl implements ApplicationListener{
             info("Player &ly'{0}'&lg has been un-whitelisted.", info.lastName);
         });
 
+        handler.register("auth", "[on/off...]", "Enable/disable authentication.", arg -> {
+            if(arg.length == 0){
+                info("Authentication is currently &lc{0}.", auth.enabled() ? "on" : "off");
+                return;
+            }
+            boolean on = arg[0].equalsIgnoreCase("on");
+            auth.setEnabled(on);
+            info("Authentication is now &lc{0}.", on ? "on" : "off");
+        });
+
+        handler.register("auth-server", "[<url>]", "Set the authentication server", arg -> {
+            if(arg.length == 0){
+                info("Currently using &lc{0}&lg to authenticate users.", auth.getAuthenticationServer());
+                return;
+            }
+            String server = arg[0];
+            try {
+                new URL(server);
+            } catch (MalformedURLException ex) {
+                info("Invalid URL specified: &lc{0}", server);
+                return;
+            }
+            auth.setAuthenticationServer(server);
+            info("Authentication server set to &lc{0}", server);
+        });
+
+        handler.register("auth-ipverify", "[on/off...]", "Enable/disable authentication IP verification.", arg -> {
+            if(arg.length == 0){
+                info("IP verification is currently &lc{0}.", auth.getVerifyIp() ? "on" : "off");
+                return;
+            }
+            boolean on = arg[0].equalsIgnoreCase("on");
+            auth.setVerifyIp(on);
+            info("IP verification is now &lc{0}.", on ? "on" : "off");
+        });
+
         handler.register("sync", "[on/off...]", "Enable/disable block sync. Experimental.", arg -> {
             if(arg.length == 0){
                 info("Block sync is currently &lc{0}.", Core.settings.getBool("blocksync") ? "enabled" : "disabled");

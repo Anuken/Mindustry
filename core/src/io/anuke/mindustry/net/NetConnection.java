@@ -24,6 +24,10 @@ public abstract class NetConnection{
     public long lastRecievedClientTime;
 
     public boolean hasConnected, hasBegunConnecting, hasDisconnected;
+    /** Was authentication requested? */
+    public boolean authenticationRequested = false;
+    /** Is the user authenticated? */
+    public boolean authenticated = false;
     public float viewWidth, viewHeight, viewX, viewY;
 
     public NetConnection(String address){

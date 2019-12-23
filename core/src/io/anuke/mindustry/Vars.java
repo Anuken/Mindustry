@@ -21,6 +21,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.mod.*;
+import io.anuke.mindustry.net.Authentication;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
@@ -57,6 +58,8 @@ public class Vars implements Loadable{
     public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers.json";
     /** URL the links to the wiki's modding guide.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?template=bug_report.md";
+    /** Default authentication server */
+    public static final String defaultAuthServer = "https://mindustryauth.hellomouse.net/";
     /** list of built-in servers.*/
     public static final Array<String> defaultServers = Array.with();
     /** maximum distance between mine and core that supports automatic transferring */
@@ -174,6 +177,7 @@ public class Vars implements Loadable{
     public static UI ui;
     public static NetServer netServer;
     public static NetClient netClient;
+    public static Authentication auth;
 
     public static Entities entities;
     public static EntityGroup<Player> playerGroup;
@@ -229,6 +233,7 @@ public class Vars implements Loadable{
         spawner = new WaveSpawner();
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
+        auth = new Authentication();
 
         entities = new Entities();
         playerGroup = entities.add(Player.class).enableMapping();

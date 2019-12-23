@@ -72,6 +72,7 @@ public class UI implements ApplicationListener, Loadable{
     public SchematicsDialog schematics;
     public ModsDialog mods;
     public ColorPicker picker;
+    public LoginDialog login;
 
     public Cursor drillCursor, unloadCursor;
 
@@ -238,6 +239,7 @@ public class UI implements ApplicationListener, Loadable{
         minimap = new MinimapDialog();
         mods = new ModsDialog();
         schematics = new SchematicsDialog();
+        login = new LoginDialog();
 
         Group group = Core.scene.root;
 

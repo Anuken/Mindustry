@@ -202,11 +202,11 @@ public class NetServer implements ApplicationListener{
                 Log.info("Auto-assigned player {0} to team {1}.", player.name, player.getTeam());
             }
 
-            sendWorldData(player);
-
-            platform.updateRPC();
-
-            Events.fire(new PlayerConnect(player));
+            if(auth.enabled()){
+                auth.handleConnect(player);
+            }else{
+                finalizeConnect(player);
+            }
         });
 
         net.handleServer(InvokePacket.class, (con, packet) -> {
@@ -448,6 +448,12 @@ public class NetServer implements ApplicationListener{
         player.con.hasDisconnected = true;
     }
 
+    public void finalizeConnect(Player player){
+        sendWorldData(player);
+        platform.updateRPC();
+        Events.fire(new PlayerConnect(player));
+    }
+
     @Remote(targets = Loc.client, unreliable = true)
     public static void onClientShapshot(
         Player player,
@@ -572,11 +578,16 @@ public class NetServer implements ApplicationListener{
     @Remote(targets = Loc.client)
     public static void connectConfirm(Player player){
         if(player.con == null || player.con.hasConnected) return;
+        if(auth.enabled() && !player.con.authenticated) return;
 
         player.add();
         player.con.hasConnected = true;
-        Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
-        Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
+        String name = "[accent]" + player.name + "[accent]";
+        if(player.username != null){
+            name += " (" + player.username + ")";
+        }
+        Call.sendMessage(name + " has connected.");
+        Log.info("&lm[{1}] &y{0} ({2}) has connected. ", player.name, player.uuid, player.username);
 
         Events.fire(new PlayerJoin(player));
     }

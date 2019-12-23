@@ -50,6 +50,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public String name = "noname";
     public @Nullable
     String uuid, usid;
+    /** Player username, if authenticated */
+    public String username;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
     public boolean buildWasAutoPaused = false;
     public float boostHeat, shootHeat, destructTime;
@@ -896,6 +898,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
         TypeIO.writeStringData(buffer, name);
+        TypeIO.writeStringData(buffer, username);
         buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2) | (Pack.byteValue(isTyping) << 3)| (Pack.byteValue(isBuilding) << 4));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
@@ -913,6 +916,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         super.readSave(buffer, version());
 
         name = TypeIO.readStringData(buffer);
+        username = TypeIO.readStringData(buffer);
         byte bools = buffer.readByte();
         isAdmin = (bools & 1) != 0;
         dead = (bools & 2) != 0;

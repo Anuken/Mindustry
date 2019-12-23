@@ -60,6 +60,7 @@ public class LoadingFragment extends Fragment{
     public void show(String text){
         table.<Label>find("namelabel").setColor(Color.white);
         bar.visible(false);
+        button.visible(false);
         table.clearActions();
         table.touchable(Touchable.enabled);
         table.<Label>find("namelabel").setText(text);

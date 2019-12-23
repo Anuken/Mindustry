@@ -49,6 +49,10 @@ public class NetClient implements ApplicationListener{
     private float timeoutTime = 0f;
     /** Last sent client snapshot ID. */
     private int lastSent;
+    /** Has server already requested authentication? */
+    public boolean authenticationRequested = false;
+    /** Whether the client is authenticating */
+    public boolean authenticating = false;
 
     /** List of entities that were removed, and need not be added while syncing. */
     private IntSet removed = new IntSet();
@@ -70,9 +74,7 @@ public class NetClient implements ApplicationListener{
 
             ui.loadfrag.setButton(() -> {
                 ui.loadfrag.hide();
-                connecting = false;
-                quiet = true;
-                net.disconnect();
+                netClient.disconnectQuietly();
             });
 
             ConnectPacket c = new ConnectPacket();
@@ -101,6 +103,11 @@ public class NetClient implements ApplicationListener{
             state.set(State.menu);
             logic.reset();
             platform.updateRPC();
+
+            if(ui.login.isShown()){
+                auth.loginInfo = null;
+                ui.login.hide();
+            }
 
             if(quiet) return;
 
@@ -273,9 +280,7 @@ public class NetClient implements ApplicationListener{
 
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
-            netClient.connecting = false;
-            netClient.quiet = true;
-            net.disconnect();
+            netClient.disconnectQuietly();
         });
     }
 
@@ -402,7 +407,8 @@ public class NetClient implements ApplicationListener{
             if(!connecting) sync();
         }else if(!connecting){
             net.disconnect();
-        }else{ //...must be connecting
+        }else if(!authenticating){ //...must be connecting
+            // ensure timeout does not happen when user is trying to log in
             timeoutTime += Time.delta();
             if(timeoutTime > dataTimeout){
                 Log.err("Failed to load data!");
@@ -430,7 +436,7 @@ public class NetClient implements ApplicationListener{
         net.setClientLoaded(true);
         Core.app.post(Call::connectConfirm);
         Time.runTask(40f, platform::updateRPC);
-        Core.app.post(() -> ui.loadfrag.hide());
+        Core.app.post(ui.loadfrag::hide);
     }
 
     private void reset(){
@@ -441,6 +447,8 @@ public class NetClient implements ApplicationListener{
         quietReset = false;
         quiet = false;
         lastSent = 0;
+        authenticationRequested = false;
+        authenticating = false;
 
         entities.clear();
         ui.chatfrag.clearMessages();
