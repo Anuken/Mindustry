@@ -525,9 +525,9 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
             String server = arg[0];
-            try {
+            try{
                 new URL(server);
-            } catch (MalformedURLException ex) {
+            }catch(MalformedURLException ex){
                 info("Invalid URL specified: &lc{0}", server);
                 return;
             }

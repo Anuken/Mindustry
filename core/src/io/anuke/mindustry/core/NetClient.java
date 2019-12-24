@@ -160,9 +160,10 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    //called when a server recieves a chat message from a player
+    //called when a server receives a chat message from a player
     @Remote(called = Loc.server, targets = Loc.client)
     public static void sendChatMessage(Player player, String message){
+        if(!player.isAdded()) return;
         if(message.length() > maxTextLength){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
         }
