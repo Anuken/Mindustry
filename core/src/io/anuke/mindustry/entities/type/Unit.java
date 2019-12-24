@@ -25,9 +25,6 @@ import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
-import io.anuke.mindustry.world.blocks.units.RepairPoint;
-import io.anuke.mindustry.world.blocks.units.TractorBeam;
-import io.anuke.mindustry.world.meta.BlockFlag;
 
 import java.io.*;
 
@@ -284,15 +281,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 if(withinDst(spawn.worldx(), spawn.worldy(), relativeSize)){
                     velocity.add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta()));
                 }
-            }
-        }
-
-        //apply tractor beams to flying units
-        if(isFlying()){
-            for(Tile tractor : indexer.getEnemy(team, BlockFlag.tractor)){
-                RepairPoint.RepairPointEntity entity = (RepairPoint.RepairPointEntity) tractor.entity;
-                if(entity.target != this) break;
-                velocity.sub(Tmp.v1.set(this).sub(tractor.worldx(), tractor.worldy()).setLength(0.1f * entity.efficiency()).scl(0.45f * Time.delta()));
             }
         }
 
