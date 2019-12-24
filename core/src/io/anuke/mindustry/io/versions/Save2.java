@@ -1,8 +1,8 @@
 package io.anuke.mindustry.io.versions;
 
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.io.*;
-import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.type.TypeID;
 
 import java.io.*;

@@ -2,7 +2,6 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
 import io.anuke.arc.Net.*;
-import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
@@ -47,7 +46,7 @@ public class ModsDialog extends FloatingDialog{
                             ui.loadfrag.hide();
                         }else{
                             try{
-                                FileHandle file = tmpDirectory.child(text.replace("/", "") + ".zip");
+                                Fi file = tmpDirectory.child(text.replace("/", "") + ".zip");
                                 Streams.copyStream(result.getResultAsStream(), file.write(false));
                                 mods.importMod(file);
                                 file.delete();
@@ -75,7 +74,7 @@ public class ModsDialog extends FloatingDialog{
         hidden(() -> {
             if(mods.requiresReload()){
                 ui.loadAnd("$reloading", () -> {
-                    mods.all().each(mod -> {
+                    mods.eachEnabled(mod -> {
                         if(mod.hasUnmetDependencies()){
                             ui.showErrorMessage(Core.bundle.format("mod.nowdisabled", mod.name, mod.missingDependencies.toString(", ")));
                         }
@@ -107,14 +106,13 @@ public class ModsDialog extends FloatingDialog{
         cont.defaults().width(mobile ? 500 : 560f).pad(4);
         cont.add("$mod.reloadrequired").visible(mods::requiresReload).center().get().setAlignment(Align.center);
         cont.row();
-        if(!(mods.all().isEmpty() && mods.disabled().isEmpty())){
+        if(!mods.list().isEmpty()){
             cont.pane(table -> {
                 table.margin(10f).top();
-                Array<LoadedMod> all = Array.withArrays(mods.all(), mods.disabled());
 
                 boolean anyDisabled = false;
-                for(LoadedMod mod : all){
-                    if(!mod.enabled() && !anyDisabled && mods.all().size > 0){
+                for(LoadedMod mod : mods.list()){
+                    if(!mod.enabled() && !anyDisabled && mods.list().size > 0){
                         anyDisabled = true;
                         table.row();
                         table.addImage().growX().height(4f).pad(6f).color(Pal.gray);
@@ -126,13 +124,13 @@ public class ModsDialog extends FloatingDialog{
                         t.margin(14f).left();
                         t.table(title -> {
                             title.left();
-                            title.add("[accent]" + mod.meta.name + "[lightgray] v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + "")).width(200f).wrap();
+                            title.add("[accent]" + mod.meta.displayName() + "[lightgray] v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + "")).width(200f).wrap();
                             title.add().growX();
 
                             title.addImageTextButton(mod.enabled() ? "$mod.disable" : "$mod.enable", mod.enabled() ? Icon.arrowDownSmall : Icon.arrowUpSmall, Styles.cleart, () -> {
                                 mods.setEnabled(mod, !mod.enabled());
                                 setup();
-                            }).height(50f).margin(8f).width(130f);
+                            }).height(50f).margin(8f).width(130f).disabled(!mod.isSupported());
 
                             if(steam && !mod.hasSteamID()){
                                 title.addImageButton(Icon.loadMapSmall, Styles.cleari, () -> {
@@ -161,8 +159,14 @@ public class ModsDialog extends FloatingDialog{
                             t.labelWrap("[lightgray]" + mod.meta.description).growX();
                             t.row();
                         }
-                        if(mod.hasUnmetDependencies()){
+                        if(!mod.isSupported()){
+                            t.labelWrap(Core.bundle.format("mod.requiresversion", mod.meta.minGameVersion)).growX();
+                            t.row();
+                        }else if(mod.hasUnmetDependencies()){
                             t.labelWrap(Core.bundle.format("mod.missingdependencies", mod.missingDependencies.toString(", "))).growX();
+                            t.row();
+                        }else if(mod.hasContentErrors()){
+                            t.labelWrap("$mod.erroredcontent").growX();
                             t.row();
                         }
                     }).width(mobile ? 430f : 500f);

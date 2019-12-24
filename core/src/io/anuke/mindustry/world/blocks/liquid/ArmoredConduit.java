@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 
 public class ArmoredConduit extends Conduit{
-    protected TextureRegion capRegion;
+    public TextureRegion capRegion;
 
     public ArmoredConduit(String name){
         super(name);

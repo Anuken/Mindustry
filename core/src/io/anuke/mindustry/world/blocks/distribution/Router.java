@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.BlockGroup;
 
 public class Router extends Block{
-    protected float speed = 8f;
+    public float speed = 8f;
 
     public Router(String name){
         super(name);
@@ -19,11 +19,12 @@ public class Router extends Block{
         itemCapacity = 1;
         group = BlockGroup.transportation;
         unloadable = false;
+        entityType = RouterEntity::new;
     }
 
     @Override
     public void update(Tile tile){
-        RouterEntity entity = tile.entity();
+        RouterEntity entity = tile.ent();
 
         if(entity.lastItem == null && entity.items.total() > 0){
             entity.items.clear();
@@ -44,14 +45,14 @@ public class Router extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        RouterEntity entity = tile.entity();
+        RouterEntity entity = tile.ent();
 
         return tile.getTeam() == source.getTeam() && entity.lastItem == null && entity.items.total() == 0;
     }
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        RouterEntity entity = tile.entity();
+        RouterEntity entity = tile.ent();
         entity.items.add(item, 1);
         entity.lastItem = item;
         entity.time = 0f;
@@ -74,17 +75,12 @@ public class Router extends Block{
 
     @Override
     public int removeStack(Tile tile, Item item, int amount){
-        RouterEntity entity = tile.entity();
+        RouterEntity entity = tile.ent();
         int result = super.removeStack(tile, item, amount);
         if(result != 0 && item == entity.lastItem){
             entity.lastItem = null;
         }
         return result;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new RouterEntity();
     }
 
     public class RouterEntity extends TileEntity{

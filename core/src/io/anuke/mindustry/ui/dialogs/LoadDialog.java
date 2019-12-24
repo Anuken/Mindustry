@@ -101,7 +101,7 @@ public class LoadDialog extends FloatingDialog{
                             });
                         }else{
                             try{
-                                FileHandle file = Core.files.local("save-" + slot.getName() + "." + saveExtension);
+                                Fi file = Core.files.local("save-" + slot.getName() + "." + saveExtension);
                                 slot.exportFile(file);
                                 platform.shareFile(file);
                             }catch(Exception e){

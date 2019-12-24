@@ -2,20 +2,20 @@ package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
 public class Fracker extends SolidPump{
-    protected final float itemUseTime = 100f;
+    public float itemUseTime = 100f;
 
-    protected TextureRegion liquidRegion;
-    protected TextureRegion rotatorRegion;
-    protected TextureRegion topRegion;
+    public TextureRegion liquidRegion;
+    public TextureRegion rotatorRegion;
+    public TextureRegion topRegion;
 
     public Fracker(String name){
         super(name);
         hasItems = true;
+        entityType = FrackerEntity::new;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class Fracker extends SolidPump{
 
     @Override
     public void draw(Tile tile){
-        FrackerEntity entity = tile.entity();
+        FrackerEntity entity = tile.ent();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
         super.drawCracks(tile);
@@ -70,7 +70,7 @@ public class Fracker extends SolidPump{
 
     @Override
     public void update(Tile tile){
-        FrackerEntity entity = tile.entity();
+        FrackerEntity entity = tile.ent();
 
         if(entity.cons.valid()){
             if(entity.accumulator >= itemUseTime){
@@ -83,11 +83,6 @@ public class Fracker extends SolidPump{
         }else{
             tryDumpLiquid(tile, result);
         }
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new FrackerEntity();
     }
 
     @Override

@@ -50,7 +50,7 @@ public class BlockConfigFragment extends Fragment{
 
         table.visible(true);
         table.clear();
-        tile.block().buildTable(tile, table);
+        tile.block().buildConfiguration(tile, table);
         table.pack();
         table.setTransform(true);
         table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),

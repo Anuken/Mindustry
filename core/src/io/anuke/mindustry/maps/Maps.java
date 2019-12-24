@@ -8,10 +8,12 @@ import io.anuke.arc.collection.IntSet.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.async.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -34,8 +36,29 @@ public class Maps{
     /** Serializer for meta. */
     private Json json = new Json();
 
+    private ShuffleMode shuffleMode = ShuffleMode.all;
+    private @Nullable MapProvider shuffler;
+
     private AsyncExecutor executor = new AsyncExecutor(2);
     private ObjectSet<Map> previewList = new ObjectSet<>();
+
+    public ShuffleMode getShuffleMode(){
+        return shuffleMode;
+    }
+
+    public void setShuffleMode(ShuffleMode mode){
+        this.shuffleMode = mode;
+    }
+
+    /** Set the provider for the map(s) to be played on. Will override the default shuffle mode setting.*/
+    public void setMapProvider(MapProvider provider){
+        this.shuffler = provider;
+    }
+
+    /** @return the next map to shuffle to. May be null, in which case the server should be stopped. */
+    public @Nullable Map getNextMap(@Nullable Map previous){
+        return shuffler != null ? shuffler.next(previous) : shuffleMode.next(previous);
+    }
 
     /** Returns a list of all maps, including custom ones. */
     public Array<Map> all(){
@@ -61,6 +84,18 @@ public class Maps{
             maps.sort();
         });
 
+        Events.on(ContentReloadEvent.class, event -> {
+            reload();
+            for(Map map : maps){
+                try{
+                    map.texture = map.previewFile().exists() ? new Texture(map.previewFile()) : new Texture(MapIO.generatePreview(map));
+                    readCache(map);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
         if(Core.assets != null){
             ((CustomLoader)Core.assets.getLoader(Content.class)).loaded = this::createAllPreviews;
         }
@@ -71,7 +106,7 @@ public class Maps{
      * Does not add this map to the map list.
      */
     public Map loadInternalMap(String name){
-        FileHandle file = tree.get("maps/" + name + "." + mapExtension);
+        Fi file = tree.get("maps/" + name + "." + mapExtension);
 
         try{
             return MapIO.createMap(file, false);
@@ -85,7 +120,7 @@ public class Maps{
         //defaults; must work
         try{
             for(String name : defaultMapNames){
-                FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
+                Fi file = Core.files.internal("maps/" + name + "." + mapExtension);
                 loadMap(file, false);
             }
         }catch(IOException e){
@@ -93,7 +128,7 @@ public class Maps{
         }
 
         //custom
-        for(FileHandle file : customMapDirectory.list()){
+        for(Fi file : customMapDirectory.list()){
             try{
                 if(file.extension().equalsIgnoreCase(mapExtension)){
                     loadMap(file, true);
@@ -105,7 +140,7 @@ public class Maps{
         }
 
         //workshop
-        for(FileHandle file : platform.getWorkshopContent(Map.class)){
+        for(Fi file : platform.getWorkshopContent(Map.class)){
             try{
                 Map map = loadMap(file, false);
                 map.workshop = true;
@@ -115,6 +150,17 @@ public class Maps{
                 Log.err(e);
             }
         }
+
+        //mod
+        mods.listFiles("maps", (mod, file) -> {
+            try{
+                Map map = loadMap(file, false);
+                map.mod = mod;
+            }catch(Exception e){
+                Log.err("Failed to load mod map file '{0}'!", file);
+                Log.err(e);
+            }
+        });
     }
 
     public void reload(){
@@ -138,7 +184,7 @@ public class Maps{
             StringMap tags = new StringMap(baseTags);
             String name = tags.get("name");
             if(name == null) throw new IllegalArgumentException("Can't save a map with no name. How did this happen?");
-            FileHandle file;
+            Fi file;
 
             //find map with the same exact display name
             Map other = maps.find(m -> m.name().equals(name));
@@ -199,8 +245,8 @@ public class Maps{
     }
 
     /** Import a map, then save it. This updates all values and stored data necessary. */
-    public void importMap(FileHandle file) throws IOException{
-        FileHandle dest = findFile();
+    public void importMap(Fi file) throws IOException{
+        Fi dest = findFile();
         file.copyTo(dest);
 
         Map map = loadMap(dest, true);
@@ -401,7 +447,7 @@ public class Maps{
     }
 
     /** Find a new filename to put a map to. */
-    private FileHandle findFile(){
+    private Fi findFile(){
         //find a map name that isn't used.
         int i = maps.size;
         while(customMapDirectory.child("map_" + i + "." + mapExtension).exists()){
@@ -410,7 +456,7 @@ public class Maps{
         return customMapDirectory.child("map_" + i + "." + mapExtension);
     }
 
-    private Map loadMap(FileHandle file, boolean custom) throws IOException{
+    private Map loadMap(Fi file, boolean custom) throws IOException{
         Map map = MapIO.createMap(file, custom);
 
         if(map.name() == null){
@@ -422,4 +468,37 @@ public class Maps{
         return map;
     }
 
+    public interface MapProvider{
+        @Nullable Map next(@Nullable Map previous);
+    }
+
+    public enum ShuffleMode implements MapProvider{
+        none(map -> null),
+        all(prev -> {
+            Array<Map> maps = Array.withArrays(Vars.maps.defaultMaps(), Vars.maps.customMaps());
+            maps.shuffle();
+            return maps.find(m -> m != prev || maps.size == 1);
+        }),
+        custom(prev -> {
+            Array<Map> maps = Array.withArrays(Vars.maps.customMaps().isEmpty() ? Vars.maps.defaultMaps() : Vars.maps.customMaps());
+            maps.shuffle();
+            return maps.find(m -> m != prev || maps.size == 1);
+        }),
+        builtin(prev -> {
+            Array<Map> maps = Array.withArrays(Vars.maps.defaultMaps());
+            maps.shuffle();
+            return maps.find(m -> m != prev || maps.size == 1);
+        });
+
+        private final MapProvider provider;
+
+        ShuffleMode(MapProvider provider){
+            this.provider = provider;
+        }
+
+        @Override
+        public Map next(@Nullable Map previous){
+            return provider.next(previous);
+        }
+    }
 }

@@ -17,8 +17,8 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.content;
 
 public class Junction extends Block{
-    protected float speed = 26; //frames taken to go through this junction
-    protected int capacity = 6;
+    public float speed = 26; //frames taken to go through this junction
+    public int capacity = 6;
 
     public Junction(String name){
         super(name);
@@ -27,6 +27,7 @@ public class Junction extends Block{
         instantTransfer = true;
         group = BlockGroup.transportation;
         unloadable = false;
+        entityType = JunctionEntity::new;
     }
 
     @Override
@@ -41,7 +42,7 @@ public class Junction extends Block{
 
     @Override
     public void update(Tile tile){
-        JunctionEntity entity = tile.entity();
+        JunctionEntity entity = tile.ent();
         DirectionalItemBuffer buffer = entity.buffer;
 
         for(int i = 0; i < 4; i++){
@@ -71,25 +72,20 @@ public class Junction extends Block{
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        JunctionEntity entity = tile.entity();
+        JunctionEntity entity = tile.ent();
         int relative = source.relativeTo(tile.x, tile.y);
         entity.buffer.accept(relative, item);
     }
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        JunctionEntity entity = tile.entity();
+        JunctionEntity entity = tile.ent();
         int relative = source.relativeTo(tile.x, tile.y);
 
         if(entity == null || relative == -1 || !entity.buffer.accepts(relative))
             return false;
         Tile to = tile.getNearby(relative);
         return to != null && to.link().entity != null;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new JunctionEntity();
     }
 
     class JunctionEntity extends TileEntity{

@@ -42,6 +42,7 @@ public class UI implements ApplicationListener, Loadable{
     public MenuFragment menufrag;
     public HudFragment hudfrag;
     public ChatFragment chatfrag;
+    public ScriptConsoleFragment scriptfrag;
     public PlayerListFragment listfrag;
     public LoadingFragment loadfrag;
 
@@ -137,7 +138,7 @@ public class UI implements ApplicationListener, Loadable{
         Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
         Core.assets.setLoader(BitmapFont.class, null, new FreetypeFontLoader(resolver){
             @Override
-            public BitmapFont loadSync(AssetManager manager, String fileName, FileHandle file, FreeTypeFontLoaderParameter parameter){
+            public BitmapFont loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
                 if(fileName.equals("outline")){
                     parameter.fontParameters.borderWidth = Scl.scl(2f);
                     parameter.fontParameters.spaceX -= parameter.fontParameters.borderWidth;
@@ -211,6 +212,7 @@ public class UI implements ApplicationListener, Loadable{
         chatfrag = new ChatFragment();
         listfrag = new PlayerListFragment();
         loadfrag = new LoadingFragment();
+        scriptfrag = new ScriptConsoleFragment();
 
         picker = new ColorPicker();
         editor = new MapEditorDialog();
@@ -253,6 +255,7 @@ public class UI implements ApplicationListener, Loadable{
         menufrag.build(menuGroup);
         chatfrag.container().build(hudGroup);
         listfrag.build(hudGroup);
+        scriptfrag.container().build(hudGroup);
         loadfrag.build(group);
         new FadeInFragment().build(group);
     }
@@ -371,6 +374,37 @@ public class UI implements ApplicationListener, Loadable{
         }}.show();
     }
 
+    public void showExceptions(String text, String... messages){
+        loadfrag.hide();
+        new Dialog(""){{
+
+            setFillParent(true);
+            cont.margin(15);
+            cont.add("$error.title").colspan(2);
+            cont.row();
+            cont.addImage().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
+            cont.row();
+            cont.add(text).colspan(2).wrap().growX().center().get().setAlignment(Align.center);
+            cont.row();
+
+            //cont.pane(p -> {
+                for(int i = 0; i < messages.length; i += 2){
+                    String btext = messages[i];
+                    String details = messages[i + 1];
+                    Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(details).color(Color.lightGray).left()), true);
+
+                    cont.add(btext).right();
+                    cont.addButton("$details", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().left();
+                    cont.row();
+                    cont.add(col).colspan(2).pad(2);
+                    cont.row();
+                }
+            //}).colspan(2);
+
+            cont.addButton("$ok", this::hide).size(300, 50).fillX().colspan(2);
+        }}.show();
+    }
+
     public void showText(String titleText, String text){
         showText(titleText, text, Align.center);
     }
@@ -429,12 +463,15 @@ public class UI implements ApplicationListener, Loadable{
     }
 
 
-    public void showCustomConfirm(String title, String text, String yes, String no, Runnable confirmed){
+    public void showCustomConfirm(String title, String text, String yes, String no, Runnable confirmed, Runnable denied){
         FloatingDialog dialog = new FloatingDialog(title);
         dialog.cont.add(text).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
-        dialog.buttons.addButton(no, dialog::hide);
+        dialog.buttons.addButton(no, () -> {
+            dialog.hide();
+            denied.run();
+        });
         dialog.buttons.addButton(yes, () -> {
             dialog.hide();
             confirmed.run();
@@ -458,11 +495,11 @@ public class UI implements ApplicationListener, Loadable{
 
     public String formatAmount(int number){
         if(number >= 1000000){
-            return Strings.fixed(number / 1000000f, 1) + "[gray]mil[]";
+            return Strings.fixed(number / 1000000f, 1) + "[gray]" + Core.bundle.getOrNull("unit.millions") + "[]";
         }else if(number >= 10000){
             return number / 1000 + "[gray]k[]";
         }else if(number >= 1000){
-            return Strings.fixed(number / 1000f, 1) + "[gray]k[]";
+            return Strings.fixed(number / 1000f, 1) + "[gray]" + Core.bundle.getOrNull("unit.thousands") + "[]";
         }else{
             return number + "";
         }

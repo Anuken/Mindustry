@@ -26,7 +26,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class MechPad extends Block{
     public @NonNull Mech mech;
-    protected float buildTime = 60 * 5;
+    public float buildTime = 60 * 5;
 
     public MechPad(String name){
         super(name);
@@ -35,6 +35,7 @@ public class MechPad extends Block{
         hasPower = true;
         layer = Layer.overlay;
         flags = EnumSet.of(BlockFlag.mechPad);
+        entityType = MechFactoryEntity::new;
     }
 
     @Override
@@ -46,9 +47,9 @@ public class MechPad extends Block{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void onMechFactoryTap(Player player, Tile tile){
-        if(player == null || !(tile.block() instanceof MechPad) || !checkValidTap(tile, player)) return;
+        if(player == null || tile == null || !(tile.block() instanceof MechPad) || !checkValidTap(tile, player)) return;
 
-        MechFactoryEntity entity = tile.entity();
+        MechFactoryEntity entity = tile.ent();
 
         if(!entity.cons.valid()) return;
         player.beginRespawning(entity);
@@ -59,7 +60,7 @@ public class MechPad extends Block{
     public static void onMechFactoryDone(Tile tile){
         if(!(tile.entity instanceof MechFactoryEntity)) return;
 
-        MechFactoryEntity entity = tile.entity();
+        MechFactoryEntity entity = tile.ent();
 
         Effects.effect(Fx.spawn, entity);
 
@@ -79,7 +80,7 @@ public class MechPad extends Block{
     }
 
     protected static boolean checkValidTap(Tile tile, Player player){
-        MechFactoryEntity entity = tile.entity();
+        MechFactoryEntity entity = tile.ent();
         return !player.isDead() && tile.interactable(player.getTeam()) && Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize &&
         Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize && entity.cons.valid() && entity.player == null;
     }
@@ -96,7 +97,7 @@ public class MechPad extends Block{
 
     @Override
     public void tapped(Tile tile, Player player){
-        MechFactoryEntity entity = tile.entity();
+        MechFactoryEntity entity = tile.ent();
 
         if(checkValidTap(tile, player)){
             Call.onMechFactoryTap(player, tile);
@@ -108,7 +109,7 @@ public class MechPad extends Block{
 
     @Override
     public void drawLayer(Tile tile){
-        MechFactoryEntity entity = tile.entity();
+        MechFactoryEntity entity = tile.ent();
 
         if(entity.player != null){
             RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.player, (!entity.sameMech && entity.player.mech == mech ? mech : Mechs.starter));
@@ -117,7 +118,7 @@ public class MechPad extends Block{
 
     @Override
     public void update(Tile tile){
-        MechFactoryEntity entity = tile.entity();
+        MechFactoryEntity entity = tile.ent();
 
         if(entity.player != null){
             entity.player.set(tile.drawx(), tile.drawy());
@@ -132,11 +133,6 @@ public class MechPad extends Block{
         }else{
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
         }
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new MechFactoryEntity();
     }
 
     public class MechFactoryEntity extends TileEntity implements SpawnerTrait{

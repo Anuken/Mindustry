@@ -1,11 +1,10 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.WindowedMean;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.consumers.*;
 
 public class PowerGraph{
@@ -20,7 +19,7 @@ public class PowerGraph{
     private final ObjectSet<Tile> all = new ObjectSet<>();
 
     private final WindowedMean powerBalance = new WindowedMean(60);
-    private float lastPowerProduced, lastPowerNeeded;
+    private float lastPowerProduced, lastPowerNeeded, lastUsageFraction;
 
     private long lastFrameUpdated = -1;
     private final int graphID;
@@ -53,6 +52,12 @@ public class PowerGraph{
             return 1f;
         }
         return Mathf.clamp(lastPowerProduced / lastPowerNeeded);
+    }
+
+    /** @return multiplier of speed at which resources should be consumed for power generation. */
+    public float getUsageFraction(){
+        //TODO enable it later, or not?
+        return 1f; //lastUsageFraction;
     }
 
     public float getPowerProduced(){
@@ -181,6 +186,7 @@ public class PowerGraph{
                 tile.entity.power.status = 1f;
             }
 
+            lastPowerNeeded = lastPowerProduced = lastUsageFraction = 1f;
             return;
         }
 
@@ -188,25 +194,33 @@ public class PowerGraph{
 
         float powerNeeded = getPowerNeeded();
         float powerProduced = getPowerProduced();
+        float rawProduced = powerProduced;
 
         lastPowerNeeded = powerNeeded;
         lastPowerProduced = powerProduced;
 
-        powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
+        if(!(consumers.size == 0 && producers.size == 0 && batteries.size == 0)){
 
-        if(consumers.size == 0 && producers.size == 0 && batteries.size == 0){
-            return;
-        }
-
-        if(!Mathf.equal(powerNeeded, powerProduced)){
-            if(powerNeeded > powerProduced){
-                powerProduced += useBatteries(powerNeeded - powerProduced);
-            }else if(powerProduced > powerNeeded){
-                powerProduced -= chargeBatteries(powerProduced - powerNeeded);
+            if(!Mathf.equal(powerNeeded, powerProduced)){
+                if(powerNeeded > powerProduced){
+                    float powerBatteryUsed = useBatteries(powerNeeded - powerProduced);
+                    powerProduced += powerBatteryUsed;
+                    lastPowerProduced += powerBatteryUsed;
+                }else if(powerProduced > powerNeeded){
+                    powerProduced -= chargeBatteries(powerProduced - powerNeeded);
+                }
             }
+
+            distributePower(powerNeeded, powerProduced);
         }
 
-        distributePower(powerNeeded, powerProduced);
+        powerBalance.addValue((lastPowerProduced - lastPowerNeeded) / Time.delta());
+
+        //overproducing: 10 / 20 = 0.5
+        //underproducing: 20 / 10 = 2 -> clamp -> 1.0
+        //nothing being produced: 20 / 0 -> 1.0
+        //nothing being consumed: 0 / 20 -> 0.0
+        lastUsageFraction = Mathf.zero(rawProduced) ? 1f : Mathf.clamp(powerNeeded / rawProduced);
     }
 
     public void add(PowerGraph graph){
@@ -295,7 +309,7 @@ public class PowerGraph{
 
     private boolean otherConsumersAreValid(Tile tile, Consume consumePower){
         for(Consume cons : tile.block().consumes.all()){
-            if(cons != consumePower && !cons.isOptional() && !cons.valid(tile.entity())){
+            if(cons != consumePower && !cons.isOptional() && !cons.valid(tile.ent())){
                 return false;
             }
         }

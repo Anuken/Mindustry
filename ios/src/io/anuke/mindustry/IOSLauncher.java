@@ -10,8 +10,8 @@ import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
-import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.ui.*;
+import org.robovm.apple.coregraphics.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
 import org.robovm.objc.block.*;
@@ -38,7 +38,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
         return new IOSApplication(new ClientLauncher(){
 
             @Override
-            public void showFileChooser(boolean open, String extension, Cons<FileHandle> cons){
+            public void showFileChooser(boolean open, String extension, Cons<Fi> cons){
                 UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray<NSString>)null);
 
 
@@ -58,129 +58,31 @@ public class IOSLauncher extends IOSApplication.Delegate{
                     public void didPickDocumentsAtURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
                         if(documentURLs.size() < 1) return;
 
-                        cont.dismissViewController(true, () -> {});
+                        NSURL url = documentURLs.first();
                         NSFileCoordinator coord = new NSFileCoordinator(null);
-
+                        url.startAccessingSecurityScopedResource();
                         try{
-                            coord.coordinateReadingItem(documentURLs.get(0), NSFileCoordinatorReadingOptions.None, url -> {
-                                if(url.startAccessingSecurityScopedResource()){
+                            coord.coordinateReadingItem(url, NSFileCoordinatorReadingOptions.ForUploading, result -> {
+
+                                Fi src = Core.files.absolute(result.getAbsoluteURL().getPath());
+                                Fi dst = Core.files.absolute(getDocumentsDirectory()).child(src.name());
+                                src.copyTo(dst);
+
+                                Core.app.post(() -> {
                                     try{
-                                        controller.importDocument(url, new NSURL(getDocumentsDirectory() + "/document"), UIDocumentBrowserImportMode.Copy, (result, error) -> {
-                                            if(error != null){
-                                                ui.showErrorMessage("Import error.\n" + error.getLocalizedFailureReason() + "\n" + error.getLocalizedDescription());
-                                            }else{
-                                                try{
-                                                    cons.get(Core.files.absolute(url.getPath()));
-                                                }catch(Throwable t){
-                                                    ui.showException(t);
-                                                }
-                                            }
-                                        });
+                                        cons.get(dst);
                                     }catch(Throwable t){
                                         ui.showException(t);
                                     }
-
-                                    /*
-
-                                    try{
-                                        int[] tread = {0};
-
-                                        cons.get(new FileHandle(url.getPath()){
-                                            @Override
-                                            public InputStream read(){
-                                                NSInputStream stream = new NSInputStream(url);
-
-                                                return new InputStream(){
-                                                    byte[] tmp = {0};
-
-                                                    @Override
-                                                    public int read() throws IOException{
-                                                        read(tmp);
-                                                        return tmp[0];
-                                                    }
-
-                                                    @Override
-                                                    public int read(byte[] bytes, int offset, int length){
-                                                        int read = (int)stream.read(bytes, offset, length);
-                                                        tread[0] += read;
-                                                        return read;
-                                                    }
-                                                };
-                                            }
-                                        });
-                                        Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> ui.showInfo("Read " + tread[0]))));
-                                        //cons.get(new FileHandle(url.getAbsoluteString()));
-                                    }catch(Throwable t){
-                                        ui.showException(t);
-
-                                        try{
-                                            cons.get(new FileHandle(url.getPath()));
-                                        }catch(Throwable t2){
-                                            ui.showException(t2);
-
-                                            try{
-                                                cons.get(new FileHandle(url.getAbsoluteURL().getPath()));
-                                            }catch(Throwable t3){
-                                                ui.showException(t3);
-                                            }
-                                        }
-                                    }*/
-                                }else{
-                                    ui.showErrorMessage("Failed to access file.");
-                                }
-
-                                /*
-                                try{
-                                    int[] tread = {0};
-
-                                    cons.get(new FileHandle(url.getPath()){
-                                        @Override
-                                        public InputStream read(){
-                                            NSInputStream stream = new NSInputStream(url);
-
-                                            return new InputStream(){
-                                                byte[] tmp = {0};
-
-                                                @Override
-                                                public int read() throws IOException{
-                                                    read(tmp);
-                                                    return tmp[0];
-                                                }
-
-                                                @Override
-                                                public int read(byte[] bytes, int offset, int length){
-                                                    int read = (int)stream.read(bytes, offset, length);
-                                                    tread[0] += read;
-                                                    return read;
-                                                }
-                                            };
-                                        }
-                                    });
-                                    Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> ui.showInfo("Read " + tread[0]))));
-                                }catch(Throwable t){
-                                    ui.showException(t);
-                                }*/
+                                });
                             });
-                        }catch(Throwable t){
-                            ui.showException(t);
+                        }catch(Throwable e){
+                            ui.showException(e);
                         }
-                        /*
 
-                        try{
-                            controller.importDocument(documentURLs.get(0), new NSURL(getDocumentsDirectory() + "/document"), UIDocumentBrowserImportMode.Copy, (url, error) -> {
-                                if(error != null){
-                                   ui.showErrorMessage("Import error.\n" + error.getLocalizedFailureReason() + "\n" + error.getLocalizedDescription());
-                                }else{
-                                    try{
-                                        cons.get(Core.files.absolute(url.getPath()));
-                                    }catch(Throwable t){
-                                        ui.showException(t);
-                                    }
-                                }
-                            });
-                        }catch(Throwable t){
-                            ui.showException(t);
-                        }*/
+                        url.stopAccessingSecurityScopedResource();
+
+                        cont.dismissViewController(true, () -> {});
                     }
 
                     @Override
@@ -190,7 +92,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                     @Override
                     public void didImportDocument(UIDocumentBrowserViewController controller, NSURL sourceURL, NSURL destinationURL){
-                        //cons.get(Core.files.absolute(destinationURL.getAbsoluteString()));
                     }
 
                     @Override
@@ -215,15 +116,25 @@ public class IOSLauncher extends IOSApplication.Delegate{
             }
 
             @Override
-            public void shareFile(FileHandle file){
+            public void shareFile(Fi file){
                 try{
                     Log.info("Attempting to share file " + file);
-                    FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
+                    Fi to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
                     file.copyTo(to);
 
                     NSURL url = new NSURL(to.file());
                     UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
-                    UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(p, true, () -> Log.info("Success! Presented {0}", to));
+                    UIViewController rootVc = UIApplication.getSharedApplication().getKeyWindow().getRootViewController();
+                    if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
+                        // Set up the pop-over for iPad
+                        UIPopoverPresentationController pop = p.getPopoverPresentationController();
+                        UIView mainView = rootVc.getView();
+                        pop.setSourceView(mainView);
+                        CGRect targetRect = new CGRect(mainView.getBounds().getMidX(), mainView.getBounds().getMidY(), 0, 0);
+                        pop.setSourceRect(targetRect);
+                        pop.setPermittedArrowDirections(UIPopoverArrowDirection.None);
+                    }
+                    rootVc.presentViewController(p, true, () -> Log.info("Success! Presented {0}", to));
                 }catch(Throwable t){
                     ui.showException(t);
                 }
@@ -241,7 +152,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
         }, new IOSApplicationConfiguration(){{
-           errorHandler = ModCrashHandler::handle;
+           //errorHandler = ModCrashHandler::handle;
         }});
     }
 
@@ -285,7 +196,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
     void openURL(NSURL url){
 
         Core.app.post(() -> Core.app.post(() -> {
-            FileHandle file = Core.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
+            Fi file = Core.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
             Core.files.absolute(url.getPath()).copyTo(file);
 
             if(file.extension().equalsIgnoreCase(saveExtension)){ //open save

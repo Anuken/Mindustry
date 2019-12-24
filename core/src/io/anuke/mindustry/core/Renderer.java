@@ -456,7 +456,7 @@ public class Renderer implements ApplicationListener{
         buffer.end();
         Pixmap fullPixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
         BufferUtils.copy(lines, 0, fullPixmap.getPixels(), lines.length);
-        FileHandle file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
+        Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
         PixmapIO.writePNG(file, fullPixmap);
         fullPixmap.dispose();
         ui.showInfoFade(Core.bundle.format("screenshot", file.toString()));

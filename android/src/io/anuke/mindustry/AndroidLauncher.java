@@ -12,13 +12,12 @@ import android.telephony.*;
 import io.anuke.arc.*;
 import io.anuke.arc.backends.android.surfaceview.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.func.Cons;
+import io.anuke.arc.func.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
-import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import java.io.*;
@@ -66,11 +65,16 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public void shareFile(FileHandle file){
+            public org.mozilla.javascript.Context getScriptContext(){
+                return AndroidRhinoContext.enter(getContext().getCacheDir());
             }
 
             @Override
-            public void showFileChooser(boolean open, String extension, Cons<FileHandle> cons){
+            public void shareFile(Fi file){
+            }
+
+            @Override
+            public void showFileChooser(boolean open, String extension, Cons<Fi> cons){
                 if(VERSION.SDK_INT >= VERSION_CODES.Q){
                     Intent intent = new Intent(open ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -81,7 +85,7 @@ public class AndroidLauncher extends AndroidApplication{
 
                             if(uri.getPath().contains("(invalid)")) return;
 
-                            Core.app.post(() -> Core.app.post(() -> cons.get(new FileHandle(uri.getPath()){
+                            Core.app.post(() -> Core.app.post(() -> cons.get(new Fi(uri.getPath()){
                                 @Override
                                 public InputStream read(){
                                     try{
@@ -139,7 +143,7 @@ public class AndroidLauncher extends AndroidApplication{
             useImmersiveMode = true;
             depth = 0;
             hideStatusBar = true;
-            errorHandler = ModCrashHandler::handle;
+            //errorHandler = ModCrashHandler::handle;
         }});
         checkFiles(getIntent());
     }
@@ -181,7 +185,7 @@ public class AndroidLauncher extends AndroidApplication{
                 Core.app.post(() -> Core.app.post(() -> {
                     if(save){ //open save
                         System.out.println("Opening save.");
-                        FileHandle file = Core.files.local("temp-save." + saveExtension);
+                        Fi file = Core.files.local("temp-save." + saveExtension);
                         file.write(inStream, false);
                         if(SaveIO.isSaveValid(file)){
                             try{
@@ -194,7 +198,7 @@ public class AndroidLauncher extends AndroidApplication{
                             ui.showErrorMessage("$save.import.invalid");
                         }
                     }else if(map){ //open map
-                        FileHandle file = Core.files.local("temp-map." + mapExtension);
+                        Fi file = Core.files.local("temp-map." + mapExtension);
                         file.write(inStream, false);
                         Core.app.post(() -> {
                             System.out.println("Opening map.");

@@ -28,6 +28,7 @@ public class PowerModule extends BlockModule{
 
     @Override
     public void read(DataInput stream) throws IOException{
+        links.clear();
         short amount = stream.readShort();
         for(int i = 0; i < amount; i++){
             links.add(stream.readInt());

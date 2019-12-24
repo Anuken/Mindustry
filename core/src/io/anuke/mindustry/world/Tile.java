@@ -99,7 +99,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends TileEntity> T entity(){
+    public <T extends TileEntity> T ent(){
         return (T)entity;
     }
 

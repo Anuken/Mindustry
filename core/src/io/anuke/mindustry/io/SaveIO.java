@@ -1,7 +1,7 @@
 package io.anuke.mindustry.io;
 
 import io.anuke.arc.collection.*;
-import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.files.Fi;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.arc.util.io.FastDeflaterOutputStream;
 import io.anuke.mindustry.Vars;
@@ -34,7 +34,7 @@ public class SaveIO{
         return versions.get(version);
     }
 
-    public static void save(FileHandle file){
+    public static void save(Fi file){
         boolean exists = file.exists();
         if(exists) file.moveTo(backupFileFor(file));
         try{
@@ -45,15 +45,15 @@ public class SaveIO{
         }
     }
 
-    public static DataInputStream getStream(FileHandle file){
+    public static DataInputStream getStream(Fi file){
         return new DataInputStream(new InflaterInputStream(file.read(bufferSize)));
     }
 
-    public static DataInputStream getBackupStream(FileHandle file){
+    public static DataInputStream getBackupStream(Fi file){
         return new DataInputStream(new InflaterInputStream(backupFileFor(file).read(bufferSize)));
     }
 
-    public static boolean isSaveValid(FileHandle file){
+    public static boolean isSaveValid(Fi file){
         try{
             return isSaveValid(new DataInputStream(new InflaterInputStream(file.read(bufferSize))));
         }catch(Exception e){
@@ -71,7 +71,7 @@ public class SaveIO{
         }
     }
 
-    public static SaveMeta getMeta(FileHandle file){
+    public static SaveMeta getMeta(Fi file){
         try{
             return getMeta(getStream(file));
         }catch(Exception e){
@@ -92,19 +92,19 @@ public class SaveIO{
         }
     }
 
-    public static FileHandle fileFor(int slot){
+    public static Fi fileFor(int slot){
         return saveDirectory.child(slot + "." + Vars.saveExtension);
     }
 
-    public static FileHandle backupFileFor(FileHandle file){
+    public static Fi backupFileFor(Fi file){
         return file.sibling(file.name() + "-backup." + file.extension());
     }
 
-    public static void write(FileHandle file, StringMap tags){
+    public static void write(Fi file, StringMap tags){
         write(new FastDeflaterOutputStream(file.write(false, bufferSize)), tags);
     }
 
-    public static void write(FileHandle file){
+    public static void write(Fi file){
         write(file, null);
     }
 
@@ -122,17 +122,17 @@ public class SaveIO{
         }
     }
 
-    public static void load(FileHandle file) throws SaveException{
+    public static void load(Fi file) throws SaveException{
         load(file, world.context);
     }
 
-    public static void load(FileHandle file, WorldContext context) throws SaveException{
+    public static void load(Fi file, WorldContext context) throws SaveException{
         try{
             //try and load; if any exception at all occurs
             load(new InflaterInputStream(file.read(bufferSize)), context);
         }catch(SaveException e){
             e.printStackTrace();
-            FileHandle backup = file.sibling(file.name() + "-backup." + file.extension());
+            Fi backup = file.sibling(file.name() + "-backup." + file.extension());
             if(backup.exists()){
                 load(new InflaterInputStream(backup.read(bufferSize)), context);
             }else{

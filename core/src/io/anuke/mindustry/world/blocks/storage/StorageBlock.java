@@ -11,11 +11,12 @@ public abstract class StorageBlock extends Block{
     public StorageBlock(String name){
         super(name);
         hasItems = true;
+        entityType = StorageBlockEntity::new;
     }
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        StorageBlockEntity entity = tile.entity();
+        StorageBlockEntity entity = tile.ent();
         return entity.linkedCore != null ? entity.linkedCore.block().acceptItem(item, entity.linkedCore, source) : tile.entity.items.get(item) < getMaximumAccepted(tile, item);
     }
 
@@ -26,7 +27,7 @@ public abstract class StorageBlock extends Block{
 
     @Override
     public void drawSelect(Tile tile){
-        StorageBlockEntity entity = tile.entity();
+        StorageBlockEntity entity = tile.ent();
         if(entity.linkedCore != null){
             entity.linkedCore.block().drawSelect(entity.linkedCore);
         }
@@ -67,11 +68,6 @@ public abstract class StorageBlock extends Block{
         }else{
             return entity.items.has(item);
         }
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new StorageBlockEntity();
     }
 
     public class StorageBlockEntity extends TileEntity{

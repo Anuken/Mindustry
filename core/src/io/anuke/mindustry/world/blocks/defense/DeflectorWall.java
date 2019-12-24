@@ -20,13 +20,14 @@ public class DeflectorWall extends Wall{
 
     public DeflectorWall(String name){
         super(name);
+        entityType = DeflectorEntity::new;
     }
 
     @Override
     public void draw(Tile tile){
         super.draw(tile);
 
-        DeflectorEntity entity = tile.entity();
+        DeflectorEntity entity = tile.ent();
 
         if(entity.hit < 0.0001f) return;
 
@@ -70,11 +71,6 @@ public class DeflectorWall extends Wall{
         bullet.deflect();
 
         ((DeflectorEntity)entity).hit = 1f;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new DeflectorEntity();
     }
 
     public static class DeflectorEntity extends TileEntity{

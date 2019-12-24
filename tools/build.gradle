@@ -297,7 +297,7 @@ task pack(dependsOn: classes){
         //run generation task; generate all needed sprites
         file(genFolder).mkdirs()
         javaexec{
-            main = "io.anuke.mindustry.ImagePacker"
+            main = "io.anuke.mindustry.tools.ImagePacker"
             classpath = sourceSets.main.runtimeClasspath
             standardInput = System.in
             workingDir = genFolder
@@ -310,7 +310,7 @@ task pack(dependsOn: classes){
             }
 
             jvmArgs("-Djava.awt.headless=true")
-            main = "io.anuke.mindustry.Upscaler"
+            main = "io.anuke.mindustry.tools.Upscaler"
             classpath = sourceSets.main.runtimeClasspath
             standardInput = System.in
             workingDir = "../core/assets-raw/sprites_out/ui/icons"
@@ -351,7 +351,7 @@ task pack(dependsOn: classes){
 task genSprites(dependsOn: classes, type: JavaExec){
     finalizedBy 'antialiasGen'
 
-    main = "io.anuke.mindustry.ImagePacker"
+    main = "io.anuke.mindustry.tools.ImagePacker"
     classpath = sourceSets.main.runtimeClasspath
     jvmArgs("-Djava.awt.headless=true")
     standardInput = System.in
@@ -361,7 +361,7 @@ task genSprites(dependsOn: classes, type: JavaExec){
 task updateBundles(dependsOn: classes, type: JavaExec){
     file(genFolder).mkdirs()
 
-    main = "io.anuke.mindustry.BundleLauncher"
+    main = "io.anuke.mindustry.tools.BundleLauncher"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = "../core/assets/bundles/"

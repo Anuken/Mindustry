@@ -3,9 +3,11 @@ package io.anuke.mindustry.core;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.*;
@@ -20,10 +22,11 @@ import static io.anuke.mindustry.Vars.mods;
  */
 @SuppressWarnings("unchecked")
 public class ContentLoader{
-    private boolean loaded = false;
     private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
     private Array<Content>[] contentMap = new Array[ContentType.values().length];
     private MappableContent[][] temporaryMapper;
+    private @Nullable LoadedMod currentMod;
+    private @Nullable Content lastAdded;
     private ObjectSet<Cons<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
         new Fx(),
@@ -43,35 +46,40 @@ public class ContentLoader{
         new LegacyColorMapper(),
     };
 
+    public ContentLoader(){
+        clear();
+    }
+
     /** Clears all initialized content.*/
     public void clear(){
         contentNameMap = new ObjectMap[ContentType.values().length];
         contentMap = new Array[ContentType.values().length];
         initialization = new ObjectSet<>();
-        loaded = false;
-    }
-
-    /** Creates all content types. */
-    public void createContent(){
-        if(loaded){
-            Log.info("Content already loaded, skipping.");
-            return;
-        }
 
         for(ContentType type : ContentType.values()){
             contentMap[type.ordinal()] = new Array<>();
             contentNameMap[type.ordinal()] = new ObjectMap<>();
         }
+    }
 
+
+    /** Creates all base types. */
+    public void createBaseContent(){
         for(ContentList list : content){
             list.load();
         }
+    }
 
+    /** Creates mod content, if applicable. */
+    public void createModContent(){
         if(mods != null){
             mods.loadContent();
         }
+    }
 
-        //check up ID mapping, make sure it's linear
+    /** Logs content statistics.*/
+    public void logContent(){
+        //check up ID mapping, make sure it's linear (debug only)
         for(Array<Content> arr : contentMap){
             for(int i = 0; i < arr.size; i++){
                 int id = arr.get(i).id;
@@ -81,17 +89,12 @@ public class ContentLoader{
             }
         }
 
-        loaded = true;
-    }
-
-    /** Logs content statistics.*/
-    public void logContent(){
-        Log.info("--- CONTENT INFO ---");
+        Log.debug("--- CONTENT INFO ---");
         for(int k = 0; k < contentMap.length; k++){
-            Log.info("[{0}]: loaded {1}", ContentType.values()[k].name(), contentMap[k].size);
+            Log.debug("[{0}]: loaded {1}", ContentType.values()[k].name(), contentMap[k].size);
         }
-        Log.info("Total content loaded: {0}", Array.with(ContentType.values()).mapInt(c -> contentMap[c.ordinal()].size).sum());
-        Log.info("-------------------");
+        Log.debug("Total content loaded: {0}", Array.with(ContentType.values()).mapInt(c -> contentMap[c.ordinal()].size).sum());
+        Log.debug("-------------------");
     }
 
     /** Calls Content#init() on everything. Use only after all modules have been created.*/
@@ -113,8 +116,8 @@ public class ContentLoader{
                 try{
                     callable.get(content);
                 }catch(Throwable e){
-                    if(content.mod != null){
-                        mods.handleError(new ModLoadException(content, e), content.mod);
+                    if(content.minfo.mod != null){
+                        mods.handleContentError(content, e);
                     }else{
                         throw new RuntimeException(e);
                     }
@@ -145,14 +148,40 @@ public class ContentLoader{
         //clear all content, currently not used
     }
 
-    public void handleContent(Content content){
-        contentMap[content.getContentType().ordinal()].add(content);
+    /** Get last piece of content created for error-handling purposes. */
+    public @Nullable Content getLastAdded(){
+        return lastAdded;
+    }
 
+    /** Remove last content added in case of an exception. */
+    public void removeLast(){
+        if(lastAdded != null && contentMap[lastAdded.getContentType().ordinal()].peek() == lastAdded){
+            contentMap[lastAdded.getContentType().ordinal()].pop();
+            if(lastAdded instanceof MappableContent){
+                contentNameMap[lastAdded.getContentType().ordinal()].remove(((MappableContent)lastAdded).name);
+            }
+        }
+    }
+
+    public void handleContent(Content content){
+        this.lastAdded = content;
+        contentMap[content.getContentType().ordinal()].add(content);
+    }
+
+    public void setCurrentMod(@Nullable LoadedMod mod){
+        this.currentMod = mod;
+    }
+
+    public String transformName(String name){
+        return currentMod == null ? name : currentMod.name + "-" + name;
     }
 
     public void handleMappableContent(MappableContent content){
         if(contentNameMap[content.getContentType().ordinal()].containsKey(content.name)){
             throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + content.name + "')");
+        }
+        if(currentMod != null){
+            content.minfo.mod = currentMod;
         }
         contentNameMap[content.getContentType().ordinal()].put(content.name, content);
     }
