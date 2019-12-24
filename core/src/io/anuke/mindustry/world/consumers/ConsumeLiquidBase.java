@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.consumers;
 
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.type.LiquidStack;
 
 public abstract class ConsumeLiquidBase extends Consume{
     /** amount used per frame */
@@ -22,7 +23,10 @@ public abstract class ConsumeLiquidBase extends Consume{
         return ConsumeType.liquid;
     }
 
-    protected float use(TileEntity entity){
-        return Math.min(amount * entity.delta(), entity.block.liquidCapacity);
-    }
+    public boolean canAdd(TileEntity entity, LiquidStack stack){
+		return (amount + stack.amount) > entity.block.liquidCapacity;
+	}
+
+    protected float use(TileEntity entity){ return use(entity, amount); }
+    protected float use(TileEntity entity, float amountOverride){ return Math.min(amountOverride * entity.delta(), entity.block.liquidCapacity); }
 }
