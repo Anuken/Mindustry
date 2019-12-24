@@ -66,7 +66,7 @@ public class ContentDisplay{
 
         table.table(title -> {
             title.addImage(item.icon(Cicon.xlarge)).size(8 * 6);
-            title.add("[accent]" + item.localizedName()).padLeft(5);
+            title.add("[accent]" + item.localizedName).padLeft(5);
         });
 
         table.row();
@@ -100,7 +100,7 @@ public class ContentDisplay{
 
         table.table(title -> {
             title.addImage(liquid.icon(Cicon.xlarge)).size(8 * 6);
-            title.add("[accent]" + liquid.localizedName()).padLeft(5);
+            title.add("[accent]" + liquid.localizedName).padLeft(5);
         });
 
         table.row();
@@ -134,7 +134,7 @@ public class ContentDisplay{
     public static void displayMech(Table table, Mech mech){
         table.table(title -> {
             title.addImage(mech.icon(Cicon.xlarge)).size(8 * 6);
-            title.add("[accent]" + mech.localizedName()).padLeft(5);
+            title.add("[accent]" + mech.localizedName).padLeft(5);
         });
         table.left().defaults().left();
 
@@ -182,7 +182,7 @@ public class ContentDisplay{
     public static void displayUnit(Table table, UnitType unit){
         table.table(title -> {
             title.addImage(unit.icon(Cicon.xlarge)).size(8 * 6);
-            title.add("[accent]" + unit.localizedName()).padLeft(5);
+            title.add("[accent]" + unit.localizedName).padLeft(5);
         });
 
         table.row();

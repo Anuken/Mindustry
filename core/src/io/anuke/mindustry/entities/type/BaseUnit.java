@@ -9,6 +9,7 @@ import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.units.*;
@@ -107,7 +108,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     public @Nullable UnitCommand getCommand(){
         if(isCommanded()){
-            return indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
+            return indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>ent().command;
         }
         return null;
     }

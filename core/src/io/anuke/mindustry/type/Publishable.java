@@ -20,9 +20,9 @@ public interface Publishable{
     /** @return the tag that this content has. e.g. 'schematic' or 'map'. */
     String steamTag();
     /** @return a folder with everything needed for this piece of content in it; does not need to be a copy. */
-    FileHandle createSteamFolder(String id);
+    Fi createSteamFolder(String id);
     /** @return a preview file PNG. */
-    FileHandle createSteamPreview(String id);
+    Fi createSteamPreview(String id);
     /** @return any extra tags to add to this item.*/
     default Array<String> extraTags(){
         return new Array<>(0);

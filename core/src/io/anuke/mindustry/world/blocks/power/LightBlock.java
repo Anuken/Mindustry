@@ -16,9 +16,9 @@ import static io.anuke.mindustry.Vars.*;
 public class LightBlock extends Block{
     private static int lastColor = 0;
 
-    protected float brightness = 0.9f;
-    protected float radius = 200f;
-    protected int topRegion;
+    public float brightness = 0.9f;
+    public float radius = 200f;
+    public int topRegion;
 
     public LightBlock(String name){
         super(name);
@@ -39,7 +39,7 @@ public class LightBlock extends Block{
     @Override
     public void draw(Tile tile){
         super.draw(tile);
-        LightEntity entity = tile.entity();
+        LightEntity entity = tile.ent();
 
         Draw.blend(Blending.additive);
         Draw.color(Tmp.c1.set(entity.color), entity.efficiency() * 0.3f);
@@ -49,8 +49,8 @@ public class LightBlock extends Block{
     }
 
     @Override
-    public void buildTable(Tile tile, Table table){
-        LightEntity entity = tile.entity();
+    public void buildConfiguration(Tile tile, Table table){
+        LightEntity entity = tile.ent();
 
         table.addImageButton(Icon.pencilSmall, () -> {
             ui.picker.show(Tmp.c1.set(entity.color).a(0.5f), false, res -> {
@@ -63,12 +63,12 @@ public class LightBlock extends Block{
 
     @Override
     public void configured(Tile tile, Player player, int value){
-        tile.<LightEntity>entity().color = value;
+        tile.<LightEntity>ent().color = value;
     }
 
     @Override
     public void drawLight(Tile tile){
-        LightEntity entity = tile.entity();
+        LightEntity entity = tile.ent();
         renderer.lights.add(tile.drawx(), tile.drawy(), radius, Tmp.c1.set(entity.color), brightness * tile.entity.efficiency());
     }
 

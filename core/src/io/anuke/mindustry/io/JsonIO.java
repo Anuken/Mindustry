@@ -5,6 +5,7 @@ import io.anuke.arc.util.serialization.Json.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;

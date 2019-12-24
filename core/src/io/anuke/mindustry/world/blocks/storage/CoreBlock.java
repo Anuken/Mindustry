@@ -24,7 +24,7 @@ import io.anuke.mindustry.world.modules.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
-    protected Mech mech = Mechs.starter;
+    public Mech mech = Mechs.starter;
 
     public CoreBlock(String name){
         super(name);
@@ -43,7 +43,7 @@ public class CoreBlock extends StorageBlock{
     public static void onUnitRespawn(Tile tile, Player player){
         if(player == null || tile.entity == null) return;
 
-        CoreEntity entity = tile.entity();
+        CoreEntity entity = tile.ent();
         Effects.effect(Fx.spawn, entity);
         entity.progress = 0;
         entity.spawnPlayer = player;
@@ -76,13 +76,13 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
-        CoreEntity entity = tile.entity();
+        CoreEntity entity = tile.ent();
         return item.type == ItemType.material ? entity.storageCapacity : 0;
     }
 
     @Override
     public void onProximityUpdate(Tile tile){
-        CoreEntity entity = tile.entity();
+        CoreEntity entity = tile.ent();
 
         for(Tile other : state.teams.get(tile.getTeam()).cores){
             if(other != tile){
@@ -94,7 +94,7 @@ public class CoreBlock extends StorageBlock{
         entity.storageCapacity = itemCapacity + entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         entity.proximity().each(this::isContainer, t -> {
             t.entity.items = entity.items;
-            t.<StorageBlockEntity>entity().linkedCore = tile;
+            t.<StorageBlockEntity>ent().linkedCore = tile;
         });
 
         for(Tile other : state.teams.get(tile.getTeam()).cores){
@@ -109,7 +109,7 @@ public class CoreBlock extends StorageBlock{
         }
 
         for(Tile other : state.teams.get(tile.getTeam()).cores){
-            CoreEntity oe = other.entity();
+            CoreEntity oe = other.ent();
             oe.storageCapacity = entity.storageCapacity;
         }
     }
@@ -183,7 +183,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void drawLayer(Tile tile){
-        CoreEntity entity = tile.entity();
+        CoreEntity entity = tile.ent();
 
         if(entity.heat > 0.001f){
             RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.spawnPlayer, mech);
@@ -202,7 +202,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void update(Tile tile){
-        CoreEntity entity = tile.entity();
+        CoreEntity entity = tile.ent();
 
         if(entity.spawnPlayer != null){
             if(!entity.spawnPlayer.isDead() || !entity.spawnPlayer.isAdded()){
@@ -225,7 +225,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public boolean shouldActiveSound(Tile tile){
-        CoreEntity entity = tile.entity();
+        CoreEntity entity = tile.ent();
 
         return entity.spawnPlayer != null;
     }

@@ -6,10 +6,10 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.MapIO.*;
 import io.anuke.mindustry.maps.*;
-import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.LegacyColorMapper.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -25,7 +25,7 @@ public class LegacyMapIO{
     private static final ObjectMap<String, String> fallback = ObjectMap.of("alpha-dart-mech-pad", "dart-mech-pad");
     private static final Json json = new Json();
 
-    public static Map readMap(FileHandle file, boolean custom) throws IOException{
+    public static Map readMap(Fi file, boolean custom) throws IOException{
         try(DataInputStream stream = new DataInputStream(file.read(1024))){
             StringMap tags = new StringMap();
 
@@ -56,11 +56,11 @@ public class LegacyMapIO{
         readTiles(map.file, map.width, map.height, tiles);
     }
 
-    private static void readTiles(FileHandle file, int width, int height, Tile[][] tiles) throws IOException{
+    private static void readTiles(Fi file, int width, int height, Tile[][] tiles) throws IOException{
         readTiles(file, width, height, (x, y) -> tiles[x][y]);
     }
 
-    private static void readTiles(FileHandle file, int width, int height, TileProvider tiles) throws IOException{
+    private static void readTiles(Fi file, int width, int height, TileProvider tiles) throws IOException{
         try(BufferedInputStream input = file.read(bufferSize)){
 
             //read map

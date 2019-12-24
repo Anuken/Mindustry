@@ -10,6 +10,7 @@ import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -103,7 +104,8 @@ public class PlacementFragment extends Fragment{
             }
         }
 
-        if(ui.chatfrag.chatOpen()) return false;
+        if(ui.chatfrag.shown() || Core.scene.hasKeyboard()) return false;
+
         for(int i = 0; i < blockSelect.length; i++){
             if(Core.input.keyTap(blockSelect[i])){
                 if(i > 9) { //select block directionally
@@ -260,7 +262,7 @@ public class PlacementFragment extends Fragment{
                                 if(!mobile && Core.settings.getBool("blockselectkeys")){
                                     Array<Block> blocks = getByCategory(currentCategory);
                                     for(int i = 0; i < blocks.size; i++){
-                                        if(blocks.get(i) == lastDisplay){
+                                        if(blocks.get(i) == lastDisplay && (i + 1) / 10 - 1 < blockSelect.length){
                                             keyCombo = Core.bundle.format("placement.blockselectkeys", Core.keybinds.get(blockSelect[currentCategory.ordinal()]).key.toString())
                                                 + (i < 10 ? "" : Core.keybinds.get(blockSelect[(i + 1) / 10 - 1]).key.toString() + ",")
                                                 + Core.keybinds.get(blockSelect[i % 10]).key.toString() + "]";
@@ -460,6 +462,6 @@ public class PlacementFragment extends Fragment{
 
     /** Returns the block currently being hovered over in the world. */
     Block tileDisplayBlock(){
-        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.drop() != null ? hoverTile.overlay().itemDrop != null ? hoverTile.overlay() : hoverTile.floor() : null;
+        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.drop() != null  && hoverTile.block() == Blocks.air ? hoverTile.overlay().itemDrop != null ? hoverTile.overlay() : hoverTile.floor() : null;
     }
 }

@@ -6,6 +6,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.type.*;

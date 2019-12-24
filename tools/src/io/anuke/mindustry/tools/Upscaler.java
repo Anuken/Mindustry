@@ -1,4 +1,4 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.tools;
 
 import io.anuke.arc.*;
 import io.anuke.arc.backends.sdl.*;
@@ -24,17 +24,17 @@ public class Upscaler{
         Core.batch = new SpriteBatch();
         Core.atlas = new TextureAtlas();
         Core.atlas.addRegion("white", Pixmaps.blankTextureRegion());
-        FileHandle file = Core.files.local("");
+        Fi file = Core.files.local("");
 
         Log.info("Upscaling icons...");
         Time.mark();
-        FileHandle[] list = file.list();
+        Fi[] list = file.list();
 
         for(IconSize size : IconSize.values()){
             String suffix = size == IconSize.def ? "" : "-" + size.name();
             SquareMarcher marcher = new SquareMarcher(size.size);
 
-            for(FileHandle img : list){
+            for(Fi img : list){
                 if(img.extension().equals("png")){
                     marcher.render(new Pixmap(img), img.sibling(img.nameWithoutExtension() + suffix + ".png"));
                 }

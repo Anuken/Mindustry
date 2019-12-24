@@ -1,4 +1,4 @@
-package io.anuke.mindustry.type;
+package io.anuke.mindustry.ctype;
 
 /** Do not rearrange, ever! */
 public enum ContentType{
@@ -14,6 +14,7 @@ public enum ContentType{
     zone,
     loadout,
     typeid,
+    error,
     planet;
 
     public static final ContentType[] all = values();

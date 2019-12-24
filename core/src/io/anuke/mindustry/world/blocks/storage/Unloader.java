@@ -15,8 +15,8 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.content;
 
 public class Unloader extends Block{
-    protected float speed = 1f;
-    protected final int timerUnload = timers++;
+    public float speed = 1f;
+    public final int timerUnload = timers++;
 
     private static Item lastItem;
 
@@ -56,12 +56,12 @@ public class Unloader extends Block{
     @Override
     public void configured(Tile tile, Player player, int value){
         tile.entity.items.clear();
-        tile.<UnloaderEntity>entity().sortItem = content.item(value);
+        tile.<UnloaderEntity>ent().sortItem = content.item(value);
     }
 
     @Override
     public void update(Tile tile){
-        UnloaderEntity entity = tile.entity();
+        UnloaderEntity entity = tile.ent();
 
         if(tile.entity.timer.get(timerUnload, speed / entity.timeScale) && tile.entity.items.total() == 0){
             for(Tile other : tile.entity.proximity()){
@@ -113,7 +113,7 @@ public class Unloader extends Block{
     public void draw(Tile tile){
         super.draw(tile);
 
-        UnloaderEntity entity = tile.entity();
+        UnloaderEntity entity = tile.ent();
 
         Draw.color(entity.sortItem == null ? Color.clear : entity.sortItem.color);
         Draw.rect("unloader-center", tile.worldx(), tile.worldy());
@@ -121,8 +121,8 @@ public class Unloader extends Block{
     }
 
     @Override
-    public void buildTable(Tile tile, Table table){
-        UnloaderEntity entity = tile.entity();
+    public void buildConfiguration(Tile tile, Table table){
+        UnloaderEntity entity = tile.ent();
         ItemSelection.buildItemTable(table, () -> entity.sortItem, item -> {
             lastItem = item;
             tile.configure(item == null ? -1 : item.id);

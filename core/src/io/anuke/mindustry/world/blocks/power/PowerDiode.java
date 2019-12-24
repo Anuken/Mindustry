@@ -13,7 +13,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 
 public class PowerDiode extends Block{
-    protected TextureRegion arrow;
+    public TextureRegion arrow;
 
     public PowerDiode(String name){
         super(name);
@@ -50,7 +50,7 @@ public class PowerDiode extends Block{
     }
 
     // battery % of the graph on either side, defaults to zero
-    protected float bar(Tile tile){
+    public float bar(Tile tile){
         return (tile != null && tile.block().hasPower) ? tile.entity.power.graph.getBatteryStored() / tile.entity.power.graph.getTotalBatteryCapacity() : 0f;
     }
 

@@ -8,16 +8,17 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.glutils.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.io.Streams.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.ContentType;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Schematic.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.input.Placement.*;
-import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.production.*;
@@ -68,11 +69,19 @@ public class Schematics implements Loadable{
     public void load(){
         all.clear();
 
-        for(FileHandle file : schematicDirectory.list()){
+        for(Fi file : schematicDirectory.list()){
             loadFile(file);
         }
 
         platform.getWorkshopContent(Schematic.class).each(this::loadFile);
+
+        //mod-specific schematics, cannot be removed
+        mods.listFiles("schematics", (mod, file) -> {
+            Schematic s = loadFile(file);
+            if(s != null){
+                s.mod = mod;
+            }
+        });
 
         all.sort();
 
@@ -102,8 +111,8 @@ public class Schematics implements Loadable{
         }
     }
 
-    private void loadFile(FileHandle file){
-        if(!file.extension().equals(schematicExtension)) return;
+    private @Nullable Schematic loadFile(Fi file){
+        if(!file.extension().equals(schematicExtension)) return null;
 
         try{
             Schematic s = read(file);
@@ -113,9 +122,12 @@ public class Schematics implements Loadable{
             if(!s.file.parent().equals(schematicDirectory)){
                 s.tags.put("steamid", s.file.parent().name());
             }
+
+            return s;
         }catch(IOException e){
             Log.err(e);
         }
+        return null;
     }
 
     public Array<Schematic> all(){
@@ -132,7 +144,7 @@ public class Schematics implements Loadable{
         }
     }
 
-    public void savePreview(Schematic schematic, FileHandle file){
+    public void savePreview(Schematic schematic, Fi file){
         FrameBuffer buffer = getBuffer(schematic);
         Draw.flush();
         buffer.begin();
@@ -260,7 +272,7 @@ public class Schematics implements Loadable{
     public void add(Schematic schematic){
         all.add(schematic);
         try{
-            FileHandle file = schematicDirectory.child(Time.millis() + "." + schematicExtension);
+            Fi file = schematicDirectory.child(Time.millis() + "." + schematicExtension);
             write(schematic, file);
             schematic.file = file;
         }catch(Exception e){
@@ -360,7 +372,7 @@ public class Schematics implements Loadable{
         return read(new ByteArrayInputStream(Base64Coder.decode(schematic)));
     }
 
-    public static Schematic read(FileHandle file) throws IOException{
+    public static Schematic read(Fi file) throws IOException{
         Schematic s = read(new DataInputStream(file.read(1024)));
         if(!s.tags.containsKey("name")){
             s.tags.put("name", file.nameWithoutExtension());
@@ -413,7 +425,7 @@ public class Schematics implements Loadable{
         }
     }
 
-    public static void write(Schematic schematic, FileHandle file) throws IOException{
+    public static void write(Schematic schematic, Fi file) throws IOException{
         write(schematic, file.write(false, 1024));
     }
 

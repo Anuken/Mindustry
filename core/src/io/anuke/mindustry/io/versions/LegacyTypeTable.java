@@ -12,6 +12,60 @@ Latest data: [build 81]
 0 = Player
 1 = Fire
 2 = Puddle
+3 = MinerDrone
+4 = RepairDrone
+5 = BuilderDrone
+6 = GroundUnit
+7 = GroundUnit
+8 = GroundUnit
+9 = GroundUnit
+10 = GroundUnit
+11 = FlyingUnit
+12 = FlyingUnit
+13 = Revenant
+
+Before removal of lightining/bullet: [build 80]
+
+0 = Player
+1 = Fire
+2 = Puddle
+3 = Bullet
+4 = Lightning
+5 = MinerDrone
+6 = RepairDrone
+7 = BuilderDrone
+8 = GroundUnit
+9 = GroundUnit
+10 = GroundUnit
+11 = GroundUnit
+12 = GroundUnit
+13 = FlyingUnit
+14 = FlyingUnit
+15 = Revenant
+
+Before addition of new units: [build 79 and below]
+
+0 = Player
+1 = Fire
+2 = Puddle
+3 = Bullet
+4 = Lightning
+5 = RepairDrone
+6 = GroundUnit
+7 = GroundUnit
+8 = GroundUnit
+9 = GroundUnit
+10 = GroundUnit
+11 = FlyingUnit
+12 = FlyingUnit
+13 = BuilderDrone
+14 = Revenant
+ */
+public class LegacyTypeTable{
+    /*
+    0 = Player
+1 = Fire
+2 = Puddle
 3 = Draug
 4 = Spirit
 5 = Phantom
@@ -23,45 +77,7 @@ Latest data: [build 81]
 11 = Wraith
 12 = Ghoul
 13 = Revenant
-
-Before removal of lightining/bullet: [build 80]
-
-0 = Player
-1 = Fire
-2 = Puddle
-3 = Bullet
-4 = Lightning
-5 = Draug
-6 = Spirit
-7 = Phantom
-8 = Dagger
-9 = Crawler
-10 = Titan
-11 = Fortress
-12 = Eruptor
-13 = Wraith
-14 = Ghoul
-15 = Revenant
-
-Before addition of new units: [build 79 and below]
-
-0 = Player
-1 = Fire
-2 = Puddle
-3 = Bullet
-4 = Lightning
-5 = Spirit
-6 = Dagger
-7 = Crawler
-8 = Titan
-9 = Fortress
-10 = Eruptor
-11 = Wraith
-12 = Ghoul
-13 = Phantom
-14 = Revenant
- */
-public class LegacyTypeTable{
+     */
     private static final Prov[] build81Table = {
         Player::new,
         Fire::new,

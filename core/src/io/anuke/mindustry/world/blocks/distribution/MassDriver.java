@@ -20,17 +20,17 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class MassDriver extends Block{
-    protected float range;
-    protected float rotateSpeed = 0.04f;
-    protected float translation = 7f;
-    protected int minDistribute = 10;
-    protected float knockback = 4f;
-    protected float reloadTime = 100f;
-    protected Effect shootEffect = Fx.shootBig2;
-    protected Effect smokeEffect = Fx.shootBigSmoke2;
-    protected Effect recieveEffect = Fx.mineBig;
-    protected float shake = 3f;
-    protected TextureRegion baseRegion;
+    public float range;
+    public float rotateSpeed = 0.04f;
+    public float translation = 7f;
+    public int minDistribute = 10;
+    public float knockback = 4f;
+    public float reloadTime = 100f;
+    public Effect shootEffect = Fx.shootBig2;
+    public Effect smokeEffect = Fx.shootBigSmoke2;
+    public Effect recieveEffect = Fx.mineBig;
+    public float shake = 3f;
+    public TextureRegion baseRegion;
 
     public MassDriver(String name){
         super(name);
@@ -47,7 +47,7 @@ public class MassDriver extends Block{
 
     @Override
     public void configured(Tile tile, Player player, int value){
-        tile.<MassDriverEntity>entity().link = value;
+        tile.<MassDriverEntity>ent().link = value;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class MassDriver extends Block{
 
     @Override
     public void update(Tile tile){
-        MassDriverEntity entity = tile.entity();
+        MassDriverEntity entity = tile.ent();
         Tile link = world.tile(entity.link);
         boolean hasLink = linkValid(tile);
 
@@ -120,7 +120,7 @@ public class MassDriver extends Block{
                 tile.entity.items.total() >= minDistribute && //must shoot minimum amount of items
                 link.block().itemCapacity - link.entity.items.total() >= minDistribute //must have minimum amount of space
             ){
-                MassDriverEntity other = link.entity();
+                MassDriverEntity other = link.ent();
                 other.waitingShooters.add(tile);
 
                 if(entity.reload <= 0.0001f){
@@ -152,7 +152,7 @@ public class MassDriver extends Block{
 
     @Override
     public void drawLayer(Tile tile){
-        MassDriverEntity entity = tile.entity();
+        MassDriverEntity entity = tile.ent();
 
         Draw.rect(region,
         tile.drawx() + Angles.trnsx(entity.rotation + 180f, entity.reload * knockback),
@@ -172,7 +172,7 @@ public class MassDriver extends Block{
         Lines.stroke(1f);
         Drawf.circles(tile.drawx(), tile.drawy(), (tile.block().size / 2f + 1) * tilesize + sin - 2f, Pal.accent);
 
-        MassDriverEntity entity = tile.entity();
+        MassDriverEntity entity = tile.ent();
 
         if(linkValid(tile)){
             Tile target = world.tile(entity.link);
@@ -187,7 +187,7 @@ public class MassDriver extends Block{
     public boolean onConfigureTileTapped(Tile tile, Tile other){
         if(tile == other) return false;
 
-        MassDriverEntity entity = tile.entity();
+        MassDriverEntity entity = tile.ent();
 
         if(entity.link == other.pos()){
             tile.configure(-1);
@@ -207,8 +207,8 @@ public class MassDriver extends Block{
     }
 
     protected void fire(Tile tile, Tile target){
-        MassDriverEntity entity = tile.entity();
-        MassDriverEntity other = target.entity();
+        MassDriverEntity entity = tile.ent();
+        MassDriverEntity other = target.ent();
 
         //reset reload, use power.
         entity.reload = 1f;
@@ -264,13 +264,13 @@ public class MassDriver extends Block{
     protected boolean shooterValid(Tile tile, Tile other){
         if(other == null) return true;
         if(!(other.block() instanceof MassDriver)) return false;
-        MassDriverEntity entity = other.entity();
+        MassDriverEntity entity = other.ent();
         return entity.link == tile.pos() && tile.dst(other) <= range;
     }
 
     protected boolean linkValid(Tile tile){
         if(tile == null) return false;
-        MassDriverEntity entity = tile.entity();
+        MassDriverEntity entity = tile.ent();
         if(entity == null || entity.link == -1) return false;
         Tile link = world.tile(entity.link);
 

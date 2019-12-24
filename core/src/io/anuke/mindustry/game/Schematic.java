@@ -5,6 +5,7 @@ import io.anuke.arc.collection.IntIntMap.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.storage.*;
@@ -15,9 +16,12 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     public final Array<Stile> tiles;
     public StringMap tags;
     public int width, height;
-    public @Nullable FileHandle file;
+    public @Nullable
+    Fi file;
+    /** Associated mod. If null, no mod is associated with this schematic. */
+    public @Nullable LoadedMod mod;
 
-    public Schematic(Array<Stile> tiles, StringMap tags, int width, int height){
+    public Schematic(Array<Stile> tiles, @NonNull StringMap tags, int width, int height){
         this.tiles = tiles;
         this.tags = tags;
         this.width = width;
@@ -91,15 +95,15 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     }
 
     @Override
-    public FileHandle createSteamFolder(String id){
-        FileHandle directory = tmpDirectory.child("schematic_" + id).child("schematic." + schematicExtension);
+    public Fi createSteamFolder(String id){
+        Fi directory = tmpDirectory.child("schematic_" + id).child("schematic." + schematicExtension);
         file.copyTo(directory);
         return directory;
     }
 
     @Override
-    public FileHandle createSteamPreview(String id){
-        FileHandle preview = tmpDirectory.child("schematic_preview_" + id + ".png");
+    public Fi createSteamPreview(String id){
+        Fi preview = tmpDirectory.child("schematic_preview_" + id + ".png");
         schematics.savePreview(this, preview);
         return preview;
     }

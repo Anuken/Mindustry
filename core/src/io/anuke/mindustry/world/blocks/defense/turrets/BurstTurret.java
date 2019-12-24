@@ -8,7 +8,7 @@ import io.anuke.mindustry.world.Tile;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class BurstTurret extends ItemTurret{
-    protected float burstSpacing = 5;
+    public float burstSpacing = 5;
 
     public BurstTurret(String name){
         super(name);
@@ -16,7 +16,7 @@ public class BurstTurret extends ItemTurret{
 
     @Override
     protected void shoot(Tile tile, BulletType ammo){
-        TurretEntity entity = tile.entity();
+        TurretEntity entity = tile.ent();
 
         entity.heat = 1f;
 

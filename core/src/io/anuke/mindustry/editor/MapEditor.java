@@ -1,7 +1,7 @@
 package io.anuke.mindustry.editor;
 
 import io.anuke.arc.collection.StringMap;
-import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.files.Fi;
 import io.anuke.arc.func.Cons;
 import io.anuke.arc.func.Boolf;
 import io.anuke.arc.graphics.Pixmap;
@@ -107,7 +107,7 @@ public class MapEditor{
         }
     }
 
-    public Map createMap(FileHandle file){
+    public Map createMap(Fi file){
         return new Map(file, width(), height(), new StringMap(tags), true);
     }
 

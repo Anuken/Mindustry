@@ -21,9 +21,9 @@ import static io.anuke.mindustry.Vars.data;
 import static io.anuke.mindustry.Vars.world;
 
 public class LaunchPad extends StorageBlock{
-    protected final int timerLaunch = timers++;
+    public final int timerLaunch = timers++;
     /** Time inbetween launches. */
-    protected float launchTime;
+    public float launchTime;
 
     public LaunchPad(String name){
         super(name);
