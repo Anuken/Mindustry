@@ -222,6 +222,10 @@ public class Mods implements Loadable{
         return requiresReload;
     }
 
+    public void requiresReload(boolean requiresReload){
+        this.requiresReload = requiresReload;
+    }
+
     /** Loads all mods from the folder, but does not call any methods on them.*/
     public void load(){
         for(Fi file : modDirectory.list()){
