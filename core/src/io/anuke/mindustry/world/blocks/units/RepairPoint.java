@@ -47,9 +47,9 @@ public class RepairPoint extends Block{
     public void load(){
         super.load();
 
-        baseRegion = Core.atlas.find(name + "-base");
         laser = Core.atlas.find("laser");
         laserEnd = Core.atlas.find("laser-end");
+        baseRegion = Core.atlas.find(name + "-base");
     }
 
     @Override

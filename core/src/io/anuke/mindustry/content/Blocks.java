@@ -1746,6 +1746,7 @@ public class Blocks implements ContentList{
             repairSpeed = 0.5f;
             repairRadius = 200f;
             powerUse = 5f;
+            size = 2;
         }};
 
         //endregion

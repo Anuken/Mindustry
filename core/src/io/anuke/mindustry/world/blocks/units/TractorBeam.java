@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.units;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.Units;
@@ -92,6 +93,12 @@ public class TractorBeam extends RepairPoint{
 
         laser = Core.atlas.find("coldfusion-laser");
         laserEnd = Core.atlas.find("coldfusion-laser-end");
+        baseRegion = Core.atlas.find("block-" + size);
+    }
+
+    @Override
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find("block-" + size), Core.atlas.find(name)};
     }
 
     @Override
