@@ -241,7 +241,9 @@ public class TechTree implements ContentList{
                                 });
 
                                 node(repairPoint, () -> {
+                                    node(tractorBeam, () -> {
 
+                                    });
                                 });
                             });
                         });
