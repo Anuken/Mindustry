@@ -1,15 +1,15 @@
 package mindustry.content;
 
-import mindustry.ctype.ContentList;
-import mindustry.game.*;
+import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
+import mindustry.game.*;
 import mindustry.maps.generators.*;
-import mindustry.maps.generators.MapGenerator.*;
 import mindustry.maps.zonegen.*;
 import mindustry.type.*;
 
 import static arc.struct.Array.with;
 import static mindustry.content.Items.*;
+import static mindustry.content.Planets.starter;
 import static mindustry.type.ItemStack.list;
 
 public class Zones implements ContentList{

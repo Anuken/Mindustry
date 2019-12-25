@@ -2,6 +2,7 @@ package mindustry.maps.filters;
 
 import arc.struct.*;
 import arc.math.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.maps.filters.FilterOption.*;
