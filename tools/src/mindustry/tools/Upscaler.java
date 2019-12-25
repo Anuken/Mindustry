@@ -1,7 +1,7 @@
 package mindustry.tools;
 
 import arc.*;
-import io.anuke.arc.backends.sdl.*;
+import arc.backend.sdl.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;

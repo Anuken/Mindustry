@@ -329,7 +329,7 @@ public class Maps{
             return filters;
         }else{
             try{
-                return JsonIO.read(Array.class, str.replace("mindustrz", "mindustry"));
+                return JsonIO.read(Array.class, str);
             }catch(Exception e){
                 e.printStackTrace();
                 return readFilters("");
