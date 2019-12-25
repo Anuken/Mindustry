@@ -90,7 +90,9 @@ public class PlayerListFragment extends Fragment{
             table.add(new Image(user.getIconRegion()).setScaling(Scaling.none)).grow();
 
             button.add(table).size(h);
-            button.labelWrap("[#" + user.color.toString().toUpperCase() + "]" + user.name).width(170f).pad(10);
+            String displayName = "[#" + user.color.toString().toUpperCase() + "]" + user.name;
+            if(player.username != null) displayName += "\n[accent]" + player.username;
+            button.labelWrap(displayName).width(170f).pad(10);
             button.add().grow();
 
             button.addImage(Icon.admin).visible(() -> user.isAdmin && !(!user.isLocal && net.server())).padRight(5).get().updateVisibility();
