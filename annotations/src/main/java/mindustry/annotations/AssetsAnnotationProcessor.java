@@ -91,7 +91,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
                 if(SourceVersion.isKeyword(varname)) varname += "s";
 
                 ttype.addField(ClassName.bestGuess(dtype), varname, Modifier.STATIC, Modifier.PUBLIC);
-                tload.addStatement(varname + " = ("+dtype+")io.anuke.arc.Core.atlas.drawable($S)", sfilen);
+                tload.addStatement(varname + " = ("+dtype+")arc.Core.atlas.drawable($S)", sfilen);
             }
         });
 
@@ -100,7 +100,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
             t.getEnclosedElements().stream().filter(e -> e.getKind() == ElementKind.FIELD).forEach(field -> {
                 String fname = field.getSimpleName().toString();
                 if(fname.startsWith("default")){
-                    loadStyles.addStatement("io.anuke.arc.Core.scene.addStyle(" + field.asType().toString() + ".class, mindustry.ui.Styles." + fname + ")");
+                    loadStyles.addStatement("arc.Core.scene.addStyle(" + field.asType().toString() + ".class, mindustry.ui.Styles." + fname + ")");
                 }
             });
         }
@@ -136,11 +136,11 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
 
             String filepath = path.substring(path.lastIndexOf("/") + 1) + "/" + fname;
 
-            String filename = "io.anuke.arc.Core.app.getType() != io.anuke.arc.Application.ApplicationType.iOS ? \"" + filepath + "\" : \"" + filepath.replace(".ogg", ".mp3")+"\"";
+            String filename = "arc.Core.app.getType() != arc.Application.ApplicationType.iOS ? \"" + filepath + "\" : \"" + filepath.replace(".ogg", ".mp3")+"\"";
 
-            loadBegin.addStatement("io.anuke.arc.Core.assets.load("+filename +", "+rtype+".class).loaded = a -> " + name + " = ("+rtype+")a", filepath, filepath.replace(".ogg", ".mp3"));
+            loadBegin.addStatement("arc.Core.assets.load("+filename +", "+rtype+".class).loaded = a -> " + name + " = ("+rtype+")a", filepath, filepath.replace(".ogg", ".mp3"));
 
-            dispose.addStatement("io.anuke.arc.Core.assets.unload(" + filename + ")");
+            dispose.addStatement("arc.Core.assets.unload(" + filename + ")");
             dispose.addStatement(name + " = null");
             type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.audio.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1)+ "()").build());
         });

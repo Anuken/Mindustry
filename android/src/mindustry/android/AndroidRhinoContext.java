@@ -1,8 +1,10 @@
-package io.anuke.mindustry;
+package mindustry.android;
 
 import android.annotation.*;
 import android.os.*;
 import android.os.Build.*;
+import arc.*;
+import arc.backend.android.*;
 import com.android.dex.*;
 import com.android.dx.cf.direct.*;
 import com.android.dx.command.dexer.*;
@@ -11,8 +13,6 @@ import com.android.dx.dex.cf.*;
 import com.android.dx.dex.file.DexFile;
 import com.android.dx.merge.*;
 import dalvik.system.*;
-import io.anuke.arc.*;
-import io.anuke.arc.backends.android.surfaceview.*;
 import org.mozilla.javascript.*;
 
 import java.io.*;
@@ -178,7 +178,7 @@ public class AndroidRhinoContext{
             }catch(IOException e){
                 e.printStackTrace();
             }
-            android.content.Context context = ((AndroidApplication)Core.app).getContext();
+            android.content.Context context = ((AndroidApplication) Core.app).getContext();
             return new DexClassLoader(dexFile.getPath(), VERSION.SDK_INT >= 21 ? context.getCodeCacheDir().getPath() : context.getCacheDir().getAbsolutePath(), null, getParent()).loadClass(name);
         }
 

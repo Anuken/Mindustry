@@ -1,4 +1,4 @@
-package io.anuke.mindustry;
+package mindustry.ios;
 
 import arc.*;
 import com.badlogic.gdx.backends.iosrobovm.*;

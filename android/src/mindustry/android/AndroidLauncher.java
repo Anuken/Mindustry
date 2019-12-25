@@ -1,4 +1,4 @@
-package io.anuke.mindustry;
+package mindustry.android;
 
 import android.*;
 import android.app.*;
@@ -9,13 +9,14 @@ import android.os.Build.*;
 import android.os.*;
 import android.provider.Settings.*;
 import android.telephony.*;
-import io.anuke.arc.*;
-import io.anuke.arc.backends.android.surfaceview.*;
+import arc.*;
+import arc.backend.android.*;
 import arc.files.*;
 import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.serialization.*;
+import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.io.*;
 import mindustry.ui.dialogs.*;
@@ -24,7 +25,8 @@ import java.io.*;
 import java.lang.System;
 import java.util.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static mindustry.Vars.*;
+
 
 public class AndroidLauncher extends AndroidApplication{
     public static final int PERMISSION_REQUEST_CODE = 1;
