@@ -1,7 +1,7 @@
 package mindustry.world.blocks.defense.turrets;
 
 import arc.math.Mathf;
-import arc.math.geom.Vector2;
+import arc.math.geom.Vec2;
 import mindustry.entities.Predict;
 import mindustry.entities.type.Bullet;
 import mindustry.entities.bullet.BulletType;
@@ -31,7 +31,7 @@ public class ArtilleryTurret extends ItemTurret{
 
         tr.trns(entity.rotation, size * tilesize / 2);
 
-        Vector2 predict = Predict.intercept(tile, entity.target, type.speed);
+        Vec2 predict = Predict.intercept(tile, entity.target, type.speed);
 
         float dst = entity.dst(predict.x, predict.y);
         float maxTraveled = type.lifetime * type.speed;

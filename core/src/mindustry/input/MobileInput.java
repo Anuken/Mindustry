@@ -36,7 +36,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     private final float edgePan = Scl.scl(60f);
 
     //gesture data
-    private Vector2 vector = new Vector2();
+    private Vec2 vector = new Vec2();
     private float lastZoom = -1;
 
     /** Position where the player started dragging a line. */

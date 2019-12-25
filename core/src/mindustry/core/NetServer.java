@@ -32,7 +32,7 @@ import static mindustry.Vars.*;
 public class NetServer implements ApplicationListener{
     private final static int maxSnapshotSize = 430, timerBlockSync = 0;
     private final static float serverSyncTime = 12, kickDuration = 30 * 1000, blockSyncTime = 60 * 10;
-    private final static Vector2 vector = new Vector2();
+    private final static Vec2 vector = new Vec2();
     private final static Rectangle viewport = new Rectangle();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
     private final static float correctDist = 16f;

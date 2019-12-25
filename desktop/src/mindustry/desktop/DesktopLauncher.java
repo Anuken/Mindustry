@@ -1,17 +1,17 @@
 package mindustry.desktop;
 
 import arc.*;
-import club.minnced.discord.rpc.*;
-import com.codedisaster.steamworks.*;
 import arc.Files.*;
-import io.anuke.arc.backends.sdl.*;
-import io.anuke.arc.backends.sdl.jni.*;
-import arc.struct.*;
+import arc.backend.sdl.*;
 import arc.files.*;
 import arc.func.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
+import club.minnced.discord.rpc.*;
+import com.codedisaster.steamworks.*;
+import io.anuke.arc.backends.sdl.jni.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;

@@ -120,7 +120,7 @@ public class Renderer implements ApplicationListener{
             landTime = 0f;
             graphics.clear(Color.black);
         }else{
-            Vector2 position = Tmp.v3.set(player);
+            Vec2 position = Tmp.v3.set(player);
 
             if(player.isDead()){
                 TileEntity core = player.getClosestCore();

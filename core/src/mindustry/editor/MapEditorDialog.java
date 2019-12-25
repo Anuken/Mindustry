@@ -475,7 +475,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                             }
 
                             table.update(() -> {
-                                Vector2 v = button.localToStageCoordinates(Tmp.v1.setZero());
+                                Vec2 v = button.localToStageCoordinates(Tmp.v1.setZero());
                                 table.setPosition(v.x, v.y, Align.topLeft);
                                 if(!isShown()){
                                     table.remove();

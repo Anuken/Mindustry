@@ -433,7 +433,7 @@ public class PlacementFragment extends Fragment{
     Block getSelected(){
         Block toDisplay = null;
 
-        Vector2 v = topTable.stageToLocalCoordinates(Core.input.mouse());
+        Vec2 v = topTable.stageToLocalCoordinates(Core.input.mouse());
 
         //setup hovering tile
         if(!Core.scene.hasMouse() && topTable.hit(v.x, v.y, false) == null){

@@ -489,7 +489,7 @@ public class Block extends BlockStorage{
 
     /** Update table alignment after configuring.*/
     public void updateTableAlign(Tile tile, Table table){
-        Vector2 pos = Core.input.mouseScreen(tile.drawx(), tile.drawy() - tile.block().size * tilesize / 2f - 1);
+        Vec2 pos = Core.input.mouseScreen(tile.drawx(), tile.drawy() - tile.block().size * tilesize / 2f - 1);
         table.setPosition(pos.x, pos.y, Align.top);
     }
 

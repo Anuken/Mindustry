@@ -18,8 +18,8 @@ public class EntityCollisions{
 
     //tile collisions
     private Rectangle tmp = new Rectangle();
-    private Vector2 vector = new Vector2();
-    private Vector2 l1 = new Vector2();
+    private Vec2 vector = new Vec2();
+    private Vec2 l1 = new Vec2();
     private Rectangle r1 = new Rectangle();
     private Rectangle r2 = new Rectangle();
 
@@ -72,7 +72,7 @@ public class EntityCollisions{
                     tmp.setSize(tilesize).setCenter(wx * tilesize, wy * tilesize);
 
                     if(tmp.overlaps(rect)){
-                        Vector2 v = Geometry.overlap(rect, tmp, x);
+                        Vec2 v = Geometry.overlap(rect, tmp, x);
                         rect.x += v.x;
                         rect.y += v.y;
                     }
@@ -157,7 +157,7 @@ public class EntityCollisions{
     }
 
     private boolean collide(float x1, float y1, float w1, float h1, float vx1, float vy1,
-                            float x2, float y2, float w2, float h2, float vx2, float vy2, Vector2 out){
+                            float x2, float y2, float w2, float h2, float vx2, float vy2, Vec2 out){
         float px = vx1, py = vy1;
 
         vx1 -= vx2;

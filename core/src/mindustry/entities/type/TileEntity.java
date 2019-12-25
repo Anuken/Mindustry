@@ -5,7 +5,7 @@ import arc.Events;
 import arc.struct.Array;
 import arc.struct.ObjectSet;
 import arc.math.geom.Point2;
-import arc.math.geom.Vector2;
+import arc.math.geom.Vec2;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.entities.EntityGroup;
@@ -288,8 +288,8 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     }
 
     @Override
-    public Vector2 velocity(){
-        return Vector2.ZERO;
+    public Vec2 velocity(){
+        return Vec2.ZERO;
     }
 
     @Override

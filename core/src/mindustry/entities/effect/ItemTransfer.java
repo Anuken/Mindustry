@@ -6,7 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.Interpolation;
 import arc.math.Mathf;
 import arc.math.geom.Position;
-import arc.math.geom.Vector2;
+import arc.math.geom.Vec2;
 import arc.util.Time;
 import arc.util.pooling.Pools;
 import mindustry.entities.*;
@@ -20,9 +20,9 @@ import mindustry.world.Tile;
 import static mindustry.Vars.*;
 
 public class ItemTransfer extends TimedEntity implements DrawTrait{
-    private Vector2 from = new Vector2();
-    private Vector2 current = new Vector2();
-    private Vector2 tovec = new Vector2();
+    private Vec2 from = new Vec2();
+    private Vec2 current = new Vec2();
+    private Vec2 tovec = new Vec2();
     private Item item;
     private float seed;
     private Position to;

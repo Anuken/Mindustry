@@ -28,8 +28,8 @@ public class Conveyor extends Block implements Autotiler{
     private static ItemPos drawpos = new ItemPos();
     private static ItemPos pos1 = new ItemPos();
     private static ItemPos pos2 = new ItemPos();
-    private final Vector2 tr1 = new Vector2();
-    private final Vector2 tr2 = new Vector2();
+    private final Vec2 tr1 = new Vec2();
+    private final Vec2 tr2 = new Vec2();
     private TextureRegion[][] regions = new TextureRegion[7][4];
 
     public float speed = 0f;
@@ -283,7 +283,7 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public void getStackOffset(Item item, Tile tile, Vector2 trns){
+    public void getStackOffset(Item item, Tile tile, Vec2 trns){
         trns.trns(tile.rotation() * 90 + 180f, tilesize / 2f);
     }
 

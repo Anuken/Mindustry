@@ -229,7 +229,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
     //due to iOS weirdness, this is apparently required
     class BuildDataStatic{
-        static Vector2[] tmptr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
+        static Vec2[] tmptr = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
     }
 
     /** Draw placement effects for an entity. */

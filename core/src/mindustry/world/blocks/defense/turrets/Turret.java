@@ -10,7 +10,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Angles;
 import arc.math.Mathf;
-import arc.math.geom.Vector2;
+import arc.math.geom.Vec2;
 import arc.util.Time;
 import mindustry.content.Fx;
 import mindustry.entities.*;
@@ -54,8 +54,8 @@ public abstract class Turret extends Block{
     public boolean targetAir = true;
     public boolean targetGround = true;
 
-    protected Vector2 tr = new Vector2();
-    protected Vector2 tr2 = new Vector2();
+    protected Vec2 tr = new Vec2();
+    protected Vec2 tr2 = new Vec2();
 
     public TextureRegion baseRegion, heatRegion;
 
@@ -162,7 +162,7 @@ public abstract class Turret extends Block{
                 float speed = type.speed;
                 if(speed < 0.1f) speed = 9999999f;
 
-                Vector2 result = Predict.intercept(entity, entity.target, speed);
+                Vec2 result = Predict.intercept(entity, entity.target, speed);
                 if(result.isZero()){
                     result.set(entity.target.getX(), entity.target.getY());
                 }

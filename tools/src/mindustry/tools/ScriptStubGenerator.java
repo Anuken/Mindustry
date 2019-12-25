@@ -21,7 +21,7 @@ import java.util.*;
 public class ScriptStubGenerator{
 
     public static void main(String[] args){
-        String base = "io.anuke.mindustry";
+        String base = "mindustry";
         Array<String> blacklist = Array.with("plugin", "mod", "net", "io", "tools");
         Array<String> nameBlacklist = Array.with("ClientLauncher", "NetClient", "NetServer", "ClassAccess");
         Array<Class<?>> whitelist = Array.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class,
@@ -45,7 +45,7 @@ public class ScriptStubGenerator{
         .setScanners(new SubTypesScanner(false), new ResourcesScanner())
         .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0])))
         .filterInputsBy(new FilterBuilder()
-        .include(FilterBuilder.prefix("io.anuke.mindustry"))
+        .include(FilterBuilder.prefix("mindustry"))
         .include(FilterBuilder.prefix("arc.func"))
         .include(FilterBuilder.prefix("arc.struct"))
         .include(FilterBuilder.prefix("arc.scene"))
@@ -72,7 +72,7 @@ public class ScriptStubGenerator{
         //Log.info(result);
 
         new Fi("core/assets/scripts/global.js").writeString(result.toString());
-        new Fi("core/src/io/anuke/mindustry/mod/ClassAccess.java").writeString(fileTemplate
+        new Fi("core/src/mindustry/mod/ClassAccess.java").writeString(fileTemplate
             .replace("$ALLOWED_CLASSES$", classes.toString(", ", type -> type.getName() + ".class"))
             .replace("$ALLOWED_CLASS_NAMES$", classes.toString(", ", type -> "\"" + type.getName() + "\"")));
     }

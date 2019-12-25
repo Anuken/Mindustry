@@ -65,7 +65,7 @@ public class FlyingUnit extends BaseUnit{
                             getWeapon().update(FlyingUnit.this, wx + Tmp.v2.x, wy + Tmp.v2.y, weaponAngles[wi], left);
                         }
                     }else{
-                        Vector2 to = Predict.intercept(FlyingUnit.this, target, ammo.speed);
+                        Vec2 to = Predict.intercept(FlyingUnit.this, target, ammo.speed);
                         getWeapon().update(FlyingUnit.this, to.x, to.y);
                     }
                 }

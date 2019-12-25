@@ -71,7 +71,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     private float walktime, itemtime;
     private Queue<BuildRequest> placeQueue = new Queue<>();
     private Tile mining;
-    private Vector2 movement = new Vector2();
+    private Vec2 movement = new Vec2();
     private boolean moved;
 
     //endregion
@@ -598,7 +598,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             movement.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2) * 0.005f, -1, 1) * speed;
         }
 
-        Vector2 vec = Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY());
+        Vec2 vec = Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY());
         pointerX = vec.x;
         pointerY = vec.y;
         updateShooting();
@@ -738,7 +738,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                     rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
                 }
 
-                Vector2 intercept = Predict.intercept(this, target, getWeapon().bullet.speed);
+                Vec2 intercept = Predict.intercept(this, target, getWeapon().bullet.speed);
 
                 pointerX = intercept.x;
                 pointerY = intercept.y;

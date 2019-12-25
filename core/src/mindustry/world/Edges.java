@@ -12,7 +12,7 @@ public class Edges{
     private static final int maxRadius = 12;
     private static Point2[][] edges = new Point2[maxSize][0];
     private static Point2[][] edgeInside = new Point2[maxSize][0];
-    private static Vector2[][] polygons = new Vector2[maxRadius * 2][0];
+    private static Vec2[][] polygons = new Vec2[maxRadius * 2][0];
 
     static{
         for(int i = 0; i < maxRadius * 2; i++){
@@ -60,7 +60,7 @@ public class Edges{
          tiley + Mathf.clamp(other.y - tiley, -(size - 1) / 2, (size / 2)));
     }
 
-    public static Vector2[] getPixelPolygon(float radius){
+    public static Vec2[] getPixelPolygon(float radius){
         if(radius < 1 || radius > maxRadius)
             throw new RuntimeException("Polygon size must be between 1 and " + maxRadius);
         return polygons[(int)(radius * 2) - 1];

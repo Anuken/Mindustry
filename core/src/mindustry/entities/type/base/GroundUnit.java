@@ -20,7 +20,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class GroundUnit extends BaseUnit{
-    protected static Vector2 vec = new Vector2();
+    protected static Vec2 vec = new Vec2();
 
     protected float walkTime;
     protected float stuckTime;
@@ -175,7 +175,7 @@ public class GroundUnit extends BaseUnit{
                 if(Angles.near(angleTo(target), rotation, 13f)){
                     BulletType ammo = getWeapon().bullet;
 
-                    Vector2 to = Predict.intercept(GroundUnit.this, target, ammo.speed);
+                    Vec2 to = Predict.intercept(GroundUnit.this, target, ammo.speed);
 
                     getWeapon().update(GroundUnit.this, to.x, to.y);
                 }

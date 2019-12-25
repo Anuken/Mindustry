@@ -187,7 +187,7 @@ public class MapGenerateDialog extends FloatingDialog{
                     return;
                 }
 
-                Vector2 v = pane.stageToLocalCoordinates(Core.input.mouse());
+                Vec2 v = pane.stageToLocalCoordinates(Core.input.mouse());
 
                 if(v.x >= 0 && v.y >= 0 && v.x <= pane.getWidth() && v.y <= pane.getHeight()){
                     Core.scene.setScrollFocus(pane);

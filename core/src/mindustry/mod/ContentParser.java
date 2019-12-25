@@ -460,7 +460,7 @@ public class ContentParser{
                 builder.append("[accent][[").append(e.getClass().getSimpleName().replace("Exception", ""))
                 .append("][] ")
                 .append(e.getMessage() != null ?
-                e.getMessage().replace("io.anuke.mindustry.", "").replace("io.anuke.arc.", "") : "").append("\n");
+                e.getMessage().replace("mindustry.", "").replace("arc.", "") : "").append("\n");
             }
         }
         return builder.toString();

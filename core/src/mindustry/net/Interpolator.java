@@ -6,14 +6,14 @@ import arc.util.*;
 
 public class Interpolator{
     //used for movement
-    public Vector2 target = new Vector2();
-    public Vector2 last = new Vector2();
+    public Vec2 target = new Vec2();
+    public Vec2 last = new Vec2();
     public float[] targets = {};
     public float[] lasts = {};
     public long lastUpdated, updateSpacing;
 
     //current state
-    public Vector2 pos = new Vector2();
+    public Vec2 pos = new Vec2();
     public float[] values = {};
 
     public void read(float cx, float cy, float x, float y, float... target1ds){

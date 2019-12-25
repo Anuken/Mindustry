@@ -27,9 +27,9 @@ public class MapView extends Element implements GestureListener{
     private float zoom = 1f;
     private boolean grid = false;
     private GridImage image = new GridImage(0, 0);
-    private Vector2 vec = new Vector2();
+    private Vec2 vec = new Vec2();
     private Rectangle rect = new Rectangle();
-    private Vector2[][] brushPolygons = new Vector2[MapEditor.brushSizes.length][0];
+    private Vec2[][] brushPolygons = new Vec2[MapEditor.brushSizes.length][0];
 
     private boolean drawing;
     private int lastx, lasty;
@@ -214,7 +214,7 @@ public class MapView extends Element implements GestureListener{
         }
     }
 
-    private Vector2 unproject(int x, int y){
+    private Vec2 unproject(int x, int y){
         float ratio = 1f / ((float)editor.width() / editor.height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;
@@ -268,9 +268,9 @@ public class MapView extends Element implements GestureListener{
 
         if((!editor.drawBlock.isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
             if(tool == EditorTool.line && drawing){
-                Vector2 v1 = unproject(startx, starty).add(x, y);
+                Vec2 v1 = unproject(startx, starty).add(x, y);
                 float sx = v1.x, sy = v1.y;
-                Vector2 v2 = unproject(lastx, lasty).add(x, y);
+                Vec2 v2 = unproject(lastx, lasty).add(x, y);
 
                 Lines.poly(brushPolygons[index], sx, sy, scaling);
                 Lines.poly(brushPolygons[index], v2.x, v2.y, scaling);
@@ -278,7 +278,7 @@ public class MapView extends Element implements GestureListener{
 
             if((tool.edit || (tool == EditorTool.line && !drawing)) && (!mobile || drawing)){
                 Point2 p = project(mousex, mousey);
-                Vector2 v = unproject(p.x, p.y).add(x, y);
+                Vec2 v = unproject(p.x, p.y).add(x, y);
 
                 //pencil square outline
                 if(tool == EditorTool.pencil && tool.mode == 1){
@@ -290,7 +290,7 @@ public class MapView extends Element implements GestureListener{
         }else{
             if((tool.edit || tool == EditorTool.line) && (!mobile || drawing)){
                 Point2 p = project(mousex, mousey);
-                Vector2 v = unproject(p.x, p.y).add(x, y);
+                Vec2 v = unproject(p.x, p.y).add(x, y);
                 float offset = (editor.drawBlock.size % 2 == 0 ? scaling / 2f : 0f);
                 Lines.square(
                 v.x + scaling / 2f + offset,
@@ -332,7 +332,7 @@ public class MapView extends Element implements GestureListener{
     }
 
     @Override
-    public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2){
+    public boolean pinch(Vec2 initialPointer1, Vec2 initialPointer2, Vec2 pointer1, Vec2 pointer2){
         return false;
     }
 

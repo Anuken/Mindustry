@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
 public class NuclearReactor extends PowerGenerator{
     public final int timerFuel = timers++;
 
-    public final Vector2 tr = new Vector2();
+    public final Vec2 tr = new Vec2();
 
     public Color lightColor = Color.valueOf("7f19ea");
     public Color coolColor = new Color(1, 1, 1, 0f);

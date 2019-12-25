@@ -11,7 +11,7 @@ public interface SolidTrait extends QuadTreeObject, MoveTrait, VelocityTrait, En
 
     void hitboxTile(Rectangle rectangle);
 
-    Vector2 lastPosition();
+    Vec2 lastPosition();
 
     default boolean collidesGrid(int x, int y){
         return true;

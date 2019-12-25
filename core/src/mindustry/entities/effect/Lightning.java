@@ -35,7 +35,7 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     private static final float hitRange = 30f;
     private static int lastSeed = 0;
 
-    private Array<Vector2> lines = new Array<>();
+    private Array<Vec2> lines = new Array<>();
     private Color color = Pal.lancerLaser;
 
     /** For pooling use only. Do not call directly! */
@@ -70,7 +70,7 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
 
         for(int i = 0; i < length / 2; i++){
             Bullet.create(Bullets.damageLightning, l, team, x, y, 0f, 1f, 1f, dmg);
-            l.lines.add(new Vector2(x + Mathf.range(3f), y + Mathf.range(3f)));
+            l.lines.add(new Vec2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
             if(l.lines.size > 1){
                 bhit[0] = false;

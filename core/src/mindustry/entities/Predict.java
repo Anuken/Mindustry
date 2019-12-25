@@ -9,8 +9,8 @@ import mindustry.entities.traits.*;
  * Class for predicting shoot angles based on velocities of targets.
  */
 public class Predict{
-    private static Vector2 vec = new Vector2();
-    private static Vector2 vresult = new Vector2();
+    private static Vec2 vec = new Vec2();
+    private static Vec2 vresult = new Vec2();
 
     /**
      * Calculates of intercept of a stationary and moving target. Do not call from multiple threads!
@@ -23,7 +23,7 @@ public class Predict{
      * @param v speed of bullet
      * @return the intercept location
      */
-    public static Vector2 intercept(float srcx, float srcy, float dstx, float dsty, float dstvx, float dstvy, float v){
+    public static Vec2 intercept(float srcx, float srcy, float dstx, float dsty, float dstvx, float dstvy, float v){
         dstvx /= Time.delta();
         dstvy /= Time.delta();
         float tx = dstx - srcx,
@@ -35,10 +35,10 @@ public class Predict{
         float c = tx * tx + ty * ty;
 
         // Solve quadratic
-        Vector2 ts = quad(a, b, c);
+        Vec2 ts = quad(a, b, c);
 
         // Find smallest positive solution
-        Vector2 sol = vresult.set(dstx, dsty);
+        Vec2 sol = vresult.set(dstx, dsty);
         if(ts != null){
             float t0 = ts.x, t1 = ts.y;
             float t = Math.min(t0, t1);
@@ -54,12 +54,12 @@ public class Predict{
     /**
      * See {@link #intercept(float, float, float, float, float, float, float)}.
      */
-    public static Vector2 intercept(TargetTrait src, TargetTrait dst, float v){
+    public static Vec2 intercept(TargetTrait src, TargetTrait dst, float v){
         return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dst.getTargetVelocityX() - src.getTargetVelocityX()/2f, dst.getTargetVelocityY() - src.getTargetVelocityY()/2f, v);
     }
 
-    private static Vector2 quad(float a, float b, float c){
-        Vector2 sol = null;
+    private static Vec2 quad(float a, float b, float c){
+        Vec2 sol = null;
         if(Math.abs(a) < 1e-6){
             if(Math.abs(b) < 1e-6){
                 sol = Math.abs(c) < 1e-6 ? vec.set(0, 0) : null;

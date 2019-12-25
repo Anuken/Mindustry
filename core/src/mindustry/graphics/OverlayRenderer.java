@@ -122,7 +122,7 @@ public class OverlayRenderer{
 
         //draw selected block
         if(input.block == null && !Core.scene.hasMouse()){
-            Vector2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
+            Vec2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
             Tile tile = world.ltileWorld(vec.x, vec.y);
 
             if(tile != null && tile.block() != Blocks.air && tile.getTeam() == player.getTeam()){
@@ -139,7 +139,7 @@ public class OverlayRenderer{
 
         //draw selection overlay when dropping item
         if(input.isDroppingItem()){
-            Vector2 v = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
+            Vec2 v = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
             float size = 8;
             Draw.rect(player.item().item.icon(Cicon.medium), v.x, v.y, size, size);
             Draw.color(Pal.accent);

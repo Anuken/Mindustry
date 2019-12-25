@@ -52,7 +52,7 @@ public class DeflectorWall extends Wall{
 
         bullet.hitbox(rect2);
 
-        Vector2 position = Geometry.raycastRect(bullet.x - bullet.velocity().x*Time.delta(), bullet.y - bullet.velocity().y*Time.delta(), bullet.x + bullet.velocity().x*Time.delta(), bullet.y + bullet.velocity().y*Time.delta(),
+        Vec2 position = Geometry.raycastRect(bullet.x - bullet.velocity().x*Time.delta(), bullet.y - bullet.velocity().y*Time.delta(), bullet.x + bullet.velocity().x*Time.delta(), bullet.y + bullet.velocity().y*Time.delta(),
         rect.setSize(size * tilesize + rect2.width*2 + rect2.height*2).setCenter(entity.x, entity.y));
 
         if(position != null){

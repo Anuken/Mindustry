@@ -53,7 +53,7 @@ public class LoopControl{
     private class SoundData{
         float volume;
         float total;
-        Vector2 sum = new Vector2();
+        Vec2 sum = new Vec2();
 
         int soundID;
         float curVolume;

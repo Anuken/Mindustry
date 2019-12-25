@@ -97,7 +97,7 @@ public class RemoteWriteGenerator{
         if(!forwarded && methodEntry.local != Loc.none){
             //add in local checks
             if(methodEntry.local != Loc.both){
-                method.beginControlFlow("if(" + getCheckString(methodEntry.local) + " || !io.anuke.mindustry.Vars.net.active())");
+                method.beginControlFlow("if(" + getCheckString(methodEntry.local) + " || !mindustry.Vars.net.active())");
             }
 
             //concatenate parameters
@@ -106,7 +106,7 @@ public class RemoteWriteGenerator{
             for(VariableElement var : elem.getParameters()){
                 //special case: calling local-only methods uses the local player
                 if(index == 0 && methodEntry.where == Loc.client){
-                    results.append("io.anuke.mindustry.Vars.player");
+                    results.append("mindustry.Vars.player");
                 }else{
                     results.append(var.getSimpleName());
                 }
@@ -159,7 +159,7 @@ public class RemoteWriteGenerator{
             boolean writePlayerSkipCheck = methodEntry.where == Loc.both && i == 0;
 
             if(writePlayerSkipCheck){ //write begin check
-                method.beginControlFlow("if(io.anuke.mindustry.Vars.net.server())");
+                method.beginControlFlow("if(mindustry.Vars.net.server())");
             }
 
             if(Utils.isPrimitive(typeName)){ //check if it's a primitive, and if so write it
@@ -194,12 +194,12 @@ public class RemoteWriteGenerator{
 
         if(forwarded){ //forward packet
             if(!methodEntry.local.isClient){ //if the client doesn't get it called locally, forward it back after validation
-                sendString = "io.anuke.mindustry.Vars.net.send(";
+                sendString = "mindustry.Vars.net.send(";
             }else{
-                sendString = "io.anuke.mindustry.Vars.net.sendExcept(exceptConnection, ";
+                sendString = "mindustry.Vars.net.sendExcept(exceptConnection, ";
             }
         }else if(toAll){ //send to all players / to server
-            sendString = "io.anuke.mindustry.Vars.net.send(";
+            sendString = "mindustry.Vars.net.send(";
         }else{ //send to specific client from server
             sendString = "playerConnection.send(";
         }
@@ -217,8 +217,8 @@ public class RemoteWriteGenerator{
     }
 
     private String getCheckString(Loc loc){
-        return loc.isClient && loc.isServer ? "io.anuke.mindustry.Vars.net.server() || io.anuke.mindustry.Vars.net.client()" :
-        loc.isClient ? "io.anuke.mindustry.Vars.net.client()" :
-        loc.isServer ? "io.anuke.mindustry.Vars.net.server()" : "false";
+        return loc.isClient && loc.isServer ? "mindustry.Vars.net.server() || mindustry.Vars.net.client()" :
+        loc.isClient ? "mindustry.Vars.net.client()" :
+        loc.isServer ? "mindustry.Vars.net.server()" : "false";
     }
 }

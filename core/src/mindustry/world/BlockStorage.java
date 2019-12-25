@@ -2,7 +2,7 @@ package mindustry.world;
 
 import arc.struct.Array;
 import arc.math.Mathf;
-import arc.math.geom.Vector2;
+import arc.math.geom.Vec2;
 import arc.util.*;
 import mindustry.Vars;
 import mindustry.content.Fx;
@@ -83,7 +83,7 @@ public abstract class BlockStorage extends UnlockableContent{
     }
 
     /** Returns offset for stack placement. */
-    public void getStackOffset(Item item, Tile tile, Vector2 trns){
+    public void getStackOffset(Item item, Tile tile, Vec2 trns){
 
     }
 

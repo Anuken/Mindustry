@@ -1,11 +1,11 @@
 package mindustry.entities.traits;
 
-import arc.math.geom.Vector2;
+import arc.math.geom.Vec2;
 import arc.util.Time;
 
 public interface VelocityTrait extends MoveTrait{
 
-    Vector2 velocity();
+    Vec2 velocity();
 
     default void applyImpulse(float x, float y){
         velocity().x += x / mass();

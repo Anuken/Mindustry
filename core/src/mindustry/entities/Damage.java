@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
 public class Damage{
     private static Rectangle rect = new Rectangle();
     private static Rectangle hitrect = new Rectangle();
-    private static Vector2 tr = new Vector2();
+    private static Vec2 tr = new Vec2();
     private static GridBits bits = new GridBits(30, 30);
     private static IntQueue propagation = new IntQueue();
     private static IntSet collidedBlocks = new IntSet();
@@ -133,7 +133,7 @@ public class Damage{
             other.width += expand * 2;
             other.height += expand * 2;
 
-            Vector2 vec = Geometry.raycastRect(x, y, x2, y2, other);
+            Vec2 vec = Geometry.raycastRect(x, y, x2, y2, other);
 
             if(vec != null){
                 Effects.effect(effect, vec.x, vec.y);

@@ -56,7 +56,7 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
 
         bullet.velocity.set(0, type.speed).setAngle(angle).scl(velocityScl);
         if(type.keepVelocity){
-            bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait)owner).velocity() : Vector2.ZERO);
+            bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait)owner).velocity() : Vec2.ZERO);
         }
 
         bullet.team = team;
@@ -297,7 +297,7 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
     }
 
     @Override
-    public Vector2 velocity(){
+    public Vec2 velocity(){
         return velocity;
     }
 

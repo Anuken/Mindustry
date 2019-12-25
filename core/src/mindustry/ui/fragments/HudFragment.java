@@ -208,7 +208,7 @@ public class HudFragment extends Fragment{
                             if(b.isChecked()){
                                 Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
                                 if(e == null){
-                                    Vector2 world = Core.input.mouseWorld();
+                                    Vec2 world = Core.input.mouseWorld();
                                     Units.nearby(world.x, world.y, 1f, 1f, unit -> {
                                         if(!found[0] && unit instanceof BaseUnit){
                                             if(Core.input.keyTap(KeyCode.MOUSE_LEFT)){

@@ -22,7 +22,7 @@ public class PowerNode extends PowerBlock{
     protected static boolean returnValue = false;
 
     protected final ObjectSet<PowerGraph> graphs = new ObjectSet<>();
-    protected final Vector2 t1 = new Vector2(), t2 = new Vector2();
+    protected final Vec2 t1 = new Vec2(), t2 = new Vec2();
 
     public TextureRegion laser, laserEnd;
     public float laserRange = 6;

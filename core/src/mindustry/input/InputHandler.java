@@ -43,7 +43,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     final static float playerSelectRange = mobile ? 17f : 11f;
     /** Maximum line length. */
     final static int maxLength = 100;
-    final static Vector2 stackTrns = new Vector2();
+    final static Vec2 stackTrns = new Vec2();
     final static Rectangle r1 = new Rectangle(), r2 = new Rectangle();
     /** Distance on the back from where items originate. */
     final static float backTrns = 3f;
@@ -120,7 +120,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                 ItemTransfer.create(item,
                 player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
-                new Vector2(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
+                new Vec2(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
                     if(tile.block() != block || tile.entity == null || tile.entity.items == null) return;
 
                     tile.block().handleStack(item, removed, tile, player);
@@ -639,7 +639,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     int tileX(float cursorX){
-        Vector2 vec = Core.input.mouseWorld(cursorX, 0);
+        Vec2 vec = Core.input.mouseWorld(cursorX, 0);
         if(selectedBlock()){
             vec.sub(block.offset(), block.offset());
         }
@@ -647,7 +647,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     int tileY(float cursorY){
-        Vector2 vec = Core.input.mouseWorld(0, cursorY);
+        Vec2 vec = Core.input.mouseWorld(0, cursorY);
         if(selectedBlock()){
             vec.sub(block.offset(), block.offset());
         }

@@ -11,7 +11,7 @@ import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
 public class MirrorFilter extends GenerateFilter{
-    private final Vector2 v1 = new Vector2(), v2 = new Vector2(), v3 = new Vector2();
+    private final Vec2 v1 = new Vec2(), v2 = new Vec2(), v3 = new Vec2();
 
     int angle = 45;
 
@@ -44,12 +44,12 @@ public class MirrorFilter extends GenerateFilter{
     public void draw(Image image){
         super.draw(image);
 
-        Vector2 vsize = Scaling.fit.apply(image.getDrawable().getMinWidth(), image.getDrawable().getMinHeight(), image.getWidth(), image.getHeight());
+        Vec2 vsize = Scaling.fit.apply(image.getDrawable().getMinWidth(), image.getDrawable().getMinHeight(), image.getWidth(), image.getHeight());
         float imageWidth = Math.max(vsize.x, vsize.y);
         float imageHeight = Math.max(vsize.y, vsize.x);
 
         float size = Math.max(image.getWidth() *2, image.getHeight()*2);
-        Cons<Vector2> clamper = v ->
+        Cons<Vec2> clamper = v ->
             v.clamp(
                 image.getX() + image.getWidth()/2f - imageWidth/2f,
                 image.getX() + image.getWidth()/2f + imageWidth/2f,
@@ -64,7 +64,7 @@ public class MirrorFilter extends GenerateFilter{
         Draw.reset();
     }
 
-    void mirror(Vector2 p, float x0, float y0, float x1, float y1){
+    void mirror(Vec2 p, float x0, float y0, float x1, float y1){
         //special case: uneven map mirrored at 45 degree angle
         if(in.width != in.height && angle % 90 != 0){
             p.x = (p.x - in.width/2f) * -1 + in.width/2f;
@@ -80,7 +80,7 @@ public class MirrorFilter extends GenerateFilter{
         }
     }
 
-    boolean left(Vector2 a, Vector2 b, Vector2 c){
+    boolean left(Vec2 a, Vec2 b, Vec2 c){
         return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
     }
 }
