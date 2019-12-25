@@ -147,7 +147,7 @@ public class Authentication{
                 Call.sendAuthenticationResponse(auth.getUsernameForServer(authServer), response.result);
                 return;
             }
-            if(response.errorCode.equals("INVALID_SESSION")){
+            if("INVALID_SESSION".equals(response.errorCode)){
                 auth.tryLogin(authServer, () -> auth.doConnect(authServer, serverIdHash).done(response2 -> {
                     if(response2.success){
                         ui.loadfrag.show("$connecting.data");
@@ -159,7 +159,7 @@ public class Authentication{
                         Call.sendAuthenticationResponse(auth.getUsernameForServer(authServer), response2.result);
                         return;
                     }
-                    disconnectAndShowApiError(response);
+                    disconnectAndShowApiError(response2);
                 }));
             }else{
                 // unexpected error
