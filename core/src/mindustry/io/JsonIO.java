@@ -53,11 +53,11 @@ public class JsonIO{
     }
 
     public static <T> T read(Class<T> type, String string){
-        return json.fromJson(type, string);
+        return json.fromJson(type, string.replace("io.anuke.", ""));
     }
 
     public static <T> T read(Class<T> type, T base, String string){
-        return jsonBase.fromBaseJson(type, base, string);
+        return jsonBase.fromBaseJson(type, base, string.replace("io.anuke.", ""));
     }
 
     public static String print(String in){

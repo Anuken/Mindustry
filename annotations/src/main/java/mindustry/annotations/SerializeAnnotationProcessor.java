@@ -8,6 +8,7 @@ import javax.lang.model.*;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.*;
 import javax.lang.model.util.*;
+import javax.tools.Diagnostic.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
@@ -43,7 +44,7 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
 
                 TypeSpec.Builder serializer = TypeSpec.anonymousClassBuilder("")
                 .addSuperinterface(ParameterizedTypeName.get(
-                ClassName.bestGuess("io.anuke.arc.Settings.TypeSerializer"), type));
+                ClassName.bestGuess("arc.Settings.TypeSerializer"), type));
 
                 MethodSpec.Builder writeMethod = MethodSpec.methodBuilder("write")
                 .returns(void.class)
@@ -73,8 +74,8 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                         writeMethod.addStatement("stream.write" + capName + "(object." + name + ")");
                         readMethod.addStatement("object." + name + "= stream.read" + capName + "()");
                     }else{
-                        writeMethod.addStatement("io.anuke.arc.Core.settings.getSerializer(" + typeName + ".class).write(stream, object." + name + ")");
-                        readMethod.addStatement("object." + name + " = (" + typeName + ")io.anuke.arc.Core.settings.getSerializer(" + typeName + ".class).read(stream)");
+                        writeMethod.addStatement("arc.Core.settings.getSerializer(" + typeName + ".class).write(stream, object." + name + ")");
+                        readMethod.addStatement("object." + name + " = (" + typeName + ")arc.Core.settings.getSerializer(" + typeName + ".class).read(stream)");
                     }
                 }
 
@@ -83,7 +84,7 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                 serializer.addMethod(writeMethod.build());
                 serializer.addMethod(readMethod.build());
 
-                method.addStatement("io.anuke.arc.Core.settings.setSerializer($N, $L)", Utils.elementUtils.getBinaryName(elem).toString().replace('$', '.') + ".class", serializer.build());
+                method.addStatement("arc.Core.settings.setSerializer($N, $L)", Utils.elementUtils.getBinaryName(elem).toString().replace('$', '.') + ".class", serializer.build());
 
                 name(writeMethod, "write" + simpleTypeName);
                 name(readMethod, "read" + simpleTypeName);
