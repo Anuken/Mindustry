@@ -1,12 +1,12 @@
 package power;
 
-import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.power.PowerGenerator;
-import io.anuke.mindustry.world.blocks.power.PowerGraph;
-import io.anuke.mindustry.world.blocks.units.UnitFactory;
+import mindustry.content.Items;
+import mindustry.content.UnitTypes;
+import mindustry.type.ItemStack;
+import mindustry.world.Tile;
+import mindustry.world.blocks.power.PowerGenerator;
+import mindustry.world.blocks.power.PowerGraph;
+import mindustry.world.blocks.units.UnitFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -3,7 +3,7 @@ apply plugin: "java"
 sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = ["src/"]
 
-project.ext.mainClassName = "io.anuke.mindustry.server.ServerLauncher"
+project.ext.mainClassName = "mindustry.server.ServerLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
 ext.getServerFolder = {

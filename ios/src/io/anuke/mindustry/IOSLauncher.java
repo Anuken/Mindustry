@@ -1,16 +1,17 @@
 package io.anuke.mindustry;
 
+import arc.*;
 import com.badlogic.gdx.backends.iosrobovm.*;
-import io.anuke.arc.*;
-import io.anuke.arc.files.*;
-import io.anuke.arc.func.*;
-import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.arc.util.*;
-import io.anuke.arc.util.io.*;
-import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.Saves.*;
-import io.anuke.mindustry.io.*;
-import io.anuke.mindustry.ui.*;
+import arc.files.*;
+import arc.func.*;
+import arc.scene.ui.layout.*;
+import arc.util.*;
+import arc.util.io.*;
+import mindustry.*;
+import mindustry.game.EventType.*;
+import mindustry.game.Saves.*;
+import mindustry.io.*;
+import mindustry.ui.*;
 import org.robovm.apple.coregraphics.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
@@ -20,7 +21,7 @@ import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static mindustry.Vars.*;
 import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
 
 public class IOSLauncher extends IOSApplication.Delegate{

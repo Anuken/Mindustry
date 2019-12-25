@@ -1,5 +1,5 @@
-import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.io.TypeIO;
+import mindustry.game.*;
+import mindustry.io.TypeIO;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
