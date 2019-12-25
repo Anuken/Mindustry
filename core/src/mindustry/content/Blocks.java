@@ -1388,15 +1388,6 @@ public class Blocks implements ContentList{
             range = 110f;
             health = 250 * size * size;
             shootSound = Sounds.splash;
-
-            drawer = (tile, entity) -> {
-                Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-
-                Draw.color(entity.liquids.current().color);
-                Draw.alpha(entity.liquids.total() / liquidCapacity);
-                Draw.rect(name + "-liquid", tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-                Draw.color();
-            };
         }};
 
         lancer = new ChargeTurret("lancer"){{
