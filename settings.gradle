@@ -28,6 +28,7 @@ if(!hasProperty("release")){
         use(':Arc:extensions:recorder')
         use(':Arc:extensions:arcnet')
         use(':Arc:extensions:packer')
+        use(':Arc:extensions:g3d')
         use(':Arc:backends')
         use(':Arc:backends:backend-sdl')
         use(':Arc:backends:backend-lwjgl3')
