@@ -166,7 +166,6 @@ project(":ios"){
 
     task incrementConfig{
         def vfile = file('robovm.properties')
-
         def props = new Properties()
         if(vfile.exists()){
             props.load(new FileInputStream(vfile))
