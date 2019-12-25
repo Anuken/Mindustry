@@ -1,9 +1,9 @@
 package mindustry.maps.zonegen;
 
-import arc.math.Mathf;
-import mindustry.content.Blocks;
-import mindustry.maps.generators.BasicGenerator;
-import mindustry.world.Tile;
+import arc.math.*;
+import mindustry.content.*;
+import mindustry.maps.generators.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.schematics;
 

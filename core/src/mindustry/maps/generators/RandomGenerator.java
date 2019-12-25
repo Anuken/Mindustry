@@ -1,10 +1,9 @@
 package mindustry.maps.generators;
 
-import arc.struct.StringMap;
-import mindustry.content.Blocks;
-import mindustry.maps.Map;
-import mindustry.world.Block;
-import mindustry.world.Tile;
+import arc.struct.*;
+import mindustry.content.*;
+import mindustry.maps.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.world;
 

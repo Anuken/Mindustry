@@ -1,16 +1,16 @@
 package mindustry.type;
 
-import io.anuke.annotations.Annotations.*;
-import io.anuke.arc.util.ArcAnnotate.*;
-import io.anuke.mindustry.ctype.*;
-import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.traits.*;
-import io.anuke.mindustry.entities.type.*;
+import arc.util.ArcAnnotate.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.ctype.*;
+import mindustry.entities.*;
+import mindustry.entities.traits.*;
+import mindustry.entities.type.*;
 import mindustry.type.Weather.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static mindustry.Vars.*;
 
 public abstract class Weather<T extends WeatherEntity> extends MappableContent{
     protected float duration = 100f;
@@ -34,7 +34,8 @@ public abstract class Weather<T extends WeatherEntity> extends MappableContent{
         /** How long this event has been occuring in ticks. */
         protected float life;
         /** Type of weather that is being simulated. */
-        protected @NonNull Weather weather;
+        protected @NonNull
+        Weather weather;
 
         public WeatherEntity(Weather weather){
             this.weather = weather;

@@ -1,7 +1,7 @@
 package mindustry.type;
 
-import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.mindustry.ctype.*;
+import arc.scene.ui.layout.*;
+import mindustry.ctype.*;
 
 //TODO add full icon for this planet
 public class Planet extends UnlockableContent{

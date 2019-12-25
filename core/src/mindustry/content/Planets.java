@@ -1,6 +1,6 @@
 package mindustry.content;
 
-import io.anuke.mindustry.ctype.*;
+import mindustry.ctype.*;
 import mindustry.type.*;
 
 public class Planets implements ContentList{

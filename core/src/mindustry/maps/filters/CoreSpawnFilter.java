@@ -1,12 +1,12 @@
 package mindustry.maps.filters;
 
-import io.anuke.arc.collection.*;
-import io.anuke.arc.util.*;
-import io.anuke.mindustry.maps.filters.FilterOption.*;
-import io.anuke.mindustry.world.blocks.storage.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static mindustry.Vars.*;
 
 /** Selects X spawns from the core spawn pool.*/
 public class CoreSpawnFilter extends GenerateFilter{

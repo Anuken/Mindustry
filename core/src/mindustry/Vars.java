@@ -22,6 +22,7 @@ import mindustry.input.*;
 import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.Net;
+import mindustry.type.Weather.*;
 import mindustry.world.blocks.defense.ForceProjector.*;
 
 import java.nio.charset.*;

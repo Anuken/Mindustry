@@ -1,8 +1,9 @@
 package mindustry.maps.filters;
 
-import io.anuke.arc.collection.*;
-import io.anuke.arc.util.*;
-import io.anuke.mindustry.maps.filters.FilterOption.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.content.*;
+import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
 /** Selects X spawns from the spawn pool.*/
