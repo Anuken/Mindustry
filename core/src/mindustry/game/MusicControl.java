@@ -94,7 +94,7 @@ public class MusicControl{
         }
 
         //dark based on enemies
-        return Mathf.chance(state.enemies() / 70f + 0.1f);
+        return Mathf.chance(state.enemies / 70f + 0.1f);
     }
 
     /** Plays and fades in a music track. This must be called every frame.

@@ -2,7 +2,6 @@ package mindustry.core;
 
 import arc.*;
 import mindustry.entities.type.*;
-import mindustry.entities.type.base.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 
@@ -26,12 +25,8 @@ public class GameState{
     /** Current game state. */
     private State state = State.menu;
 
-    public int enemies(){
-        return net.client() ? enemies : unitGroups[(int) waveTeam.id].count(b -> !(b instanceof BaseDrone));
-    }
-
     public BaseUnit boss(){
-        return unitGroups[(int) waveTeam.id].find(BaseUnit::isBoss);
+        return unitGroup.find(u -> u.isBoss() && u.getTeam() == waveTeam);
     }
 
     public void set(State astate){

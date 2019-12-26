@@ -184,7 +184,7 @@ public class Vars implements Loadable{
     public static EntityGroup<ShieldEntity> shieldGroup;
     public static EntityGroup<Puddle> puddleGroup;
     public static EntityGroup<Fire> fireGroup;
-    public static EntityGroup<BaseUnit>[] unitGroups;
+    public static EntityGroup<BaseUnit> unitGroup;
 
     public static Player player;
 
@@ -239,11 +239,7 @@ public class Vars implements Loadable{
         puddleGroup = entities.add(Puddle.class).enableMapping();
         shieldGroup = entities.add(ShieldEntity.class, false);
         fireGroup = entities.add(Fire.class).enableMapping();
-        unitGroups = new EntityGroup[Team.all.length];
-
-        for(Team team : Team.all){
-            unitGroups[(int) team.id] = entities.add(BaseUnit.class).enableMapping();
-        }
+        unitGroup = entities.add(BaseUnit.class).enableMapping();
 
         for(EntityGroup<?> group : entities.all()){
             group.setRemoveListener(entity -> {

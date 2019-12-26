@@ -557,7 +557,7 @@ public class HudFragment extends Fragment{
     }
 
     private boolean canLaunch(){
-        return inLaunchWave() && state.enemies() <= 0;
+        return inLaunchWave() && state.enemies <= 0;
     }
 
     private void toggleMenus(){
@@ -604,7 +604,7 @@ public class HudFragment extends Fragment{
 
             if(inLaunchWave()){
                 builder.append("[#");
-                Tmp.c1.set(Color.white).lerp(state.enemies() > 0 ? Color.white : Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)).toString(builder);
+                Tmp.c1.set(Color.white).lerp(state.enemies > 0 ? Color.white : Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)).toString(builder);
                 builder.append("]");
 
                 if(!canLaunch()){
@@ -618,18 +618,18 @@ public class HudFragment extends Fragment{
                 builder.append("[]\n");
             }
 
-            if(state.enemies() > 0){
-                if(state.enemies() == 1){
-                    builder.append(enemyf.get(state.enemies()));
+            if(state.enemies > 0){
+                if(state.enemies == 1){
+                    builder.append(enemyf.get(state.enemies));
                 }else{
-                    builder.append(enemiesf.get(state.enemies()));
+                    builder.append(enemiesf.get(state.enemies));
                 }
                 builder.append("\n");
             }
 
             if(state.rules.waveTimer){
                 builder.append((state.rules.waitForWaveToEnd && unitGroups[(int) waveTeam.id].size() > 0) ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60))));
-            }else if(state.enemies() == 0){
+            }else if(state.enemies == 0){
                 builder.append(Core.bundle.get("waiting"));
             }
 
@@ -646,7 +646,7 @@ public class HudFragment extends Fragment{
     }
 
     private boolean canSkipWave(){
-        return state.rules.waves && ((net.server() || player.isAdmin) || !net.active()) && state.enemies() == 0 && !spawner.isSpawning() && !state.rules.tutorial;
+        return state.rules.waves && ((net.server() || player.isAdmin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning() && !state.rules.tutorial;
     }
 
     private void addPlayButton(Table table){

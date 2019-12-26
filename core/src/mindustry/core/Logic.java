@@ -1,8 +1,8 @@
 package mindustry.core;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
@@ -212,12 +212,15 @@ public class Logic implements ApplicationListener{
     public void update(){
 
         if(!state.is(State.menu)){
+            if(!net.client()){
+                state.enemies = unitGroup.count(b -> b.getTeam() == waveTeam && b.countsAsEnemy());
+            }
 
             if(!state.isPaused()){
                 Time.update();
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
-                    if(!state.rules.waitForWaveToEnd || unitGroups[(int) waveTeam.id].size() == 0){
+                    if(!state.rules.waitForWaveToEnd || state.enemies == 0){
                         state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
                     }
                 }
@@ -232,20 +235,15 @@ public class Logic implements ApplicationListener{
                 }
 
                 if(!state.isEditor()){
-                    for(EntityGroup group : unitGroups){
-                        group.update();
-                    }
-
+                    unitGroup.update();
                     puddleGroup.update();
                     shieldGroup.update();
                     bulletGroup.update();
                     tileGroup.update();
                     fireGroup.update();
                 }else{
-                    for(EntityGroup<?> group : unitGroups){
-                        group.updateEvents();
-                        collisions.updatePhysics(group);
-                    }
+                    unitGroup.updateEvents();
+                    collisions.updatePhysics(unitGroup);
                 }
 
 
@@ -257,12 +255,8 @@ public class Logic implements ApplicationListener{
                 }
 
                 if(!state.isEditor()){
-
-                    for(EntityGroup group : unitGroups){
-                        if(group.isEmpty()) continue;
-                        collisions.collideGroups(bulletGroup, group);
-                    }
-
+                    //bulletGroup
+                    collisions.collideGroups(bulletGroup, unitGroup);
                     collisions.collideGroups(bulletGroup, playerGroup);
                 }
             }

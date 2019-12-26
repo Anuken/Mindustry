@@ -126,6 +126,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         this.team = team;
     }
 
+    /** @return whether this unit counts toward the enemy amount in the wave UI. */
+    public boolean countsAsEnemy(){
+        return true;
+    }
+
     public UnitType getType(){
         return type;
     }
