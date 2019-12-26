@@ -1,12 +1,23 @@
 package mindustry.game;
 
+import arc.func.*;
 import arc.struct.*;
 import mindustry.*;
+import mindustry.entities.type.*;
 import mindustry.world.*;
 
 /** Class for various team-based utilities. */
 public class Teams{
-    private TeamData[] map = new TeamData[256];
+    /** Maps team IDs to team data. */
+    private Array<TeamData> map = new Array<>();
+    /** Active teams. */
+    private Array<TeamData> active = new Array<>();
+
+    public <T> T eachEnemyCore(Team team, Func<TileEntity, T> ret){
+        T out = null;
+        //todo each enemy, each enemy core...
+        return out;
+    }
 
     /**
      * Register a team.

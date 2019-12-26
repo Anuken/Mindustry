@@ -128,9 +128,9 @@ public class Vars implements Loadable{
     public static Fi dataDirectory;
     /** data subdirectory used for screenshots */
     public static Fi screenshotDirectory;
-    /** data subdirectory used for custom mmaps */
+    /** data subdirectory used for custom maps */
     public static Fi customMapDirectory;
-    /** data subdirectory used for custom mmaps */
+    /** data subdirectory used for custom map previews */
     public static Fi mapPreviewDirectory;
     /** tmp subdirectory for map conversion */
     public static Fi tmpDirectory;
