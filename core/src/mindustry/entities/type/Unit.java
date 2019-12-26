@@ -1,12 +1,12 @@
 package mindustry.entities.type;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
@@ -16,13 +16,11 @@ import mindustry.entities.traits.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
-import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
@@ -158,7 +156,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         this.item.amount = itemAmount;
         this.item.item = content.item(itemID);
         this.dead = dead;
-        this.team = Team.all[team];
+        this.team = Team.get(team);
         this.health = health;
         this.x = x;
         this.y = y;
@@ -169,7 +167,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public void writeSave(DataOutput stream, boolean net) throws IOException{
         if(item.item == null) item.item = Items.copper;
 
-        stream.writeByte((int) team.id);
+        stream.writeByte((int)team.id);
         stream.writeBoolean(isDead());
         stream.writeFloat(net ? interpolator.target.x : x);
         stream.writeFloat(net ? interpolator.target.y : y);
@@ -217,13 +215,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         float fsize = getSize() / radScl;
         moveVector.setZero();
         float cx = x - fsize/2f, cy = y - fsize/2f;
-
-        for(Team team : Team.all){
-            if(team != getTeam() || !(this instanceof Player)){
-                avoid(unitGroups[(int) team.id].intersect(cx, cy, fsize, fsize));
-            }
-        }
-
+        avoid(unitGroup.intersect(cx, cy, fsize, fsize));
         if(!(this instanceof Player)){
             avoid(playerGroup.intersect(cx, cy, fsize, fsize));
         }
@@ -242,14 +234,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public @Nullable TileEntity getClosestCore(){
-        TeamData data = state.teams.get(team);
-
-        Tile tile = Geometry.findClosest(x, y, data.cores);
-        if(tile == null){
-            return null;
-        }else{
-            return tile.entity;
-        }
+        return state.teams.closestCore(x, y, team);
     }
 
     public Floor getFloorOn(){
@@ -275,7 +260,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         }
 
         //apply knockback based on spawns
-        if(getTeam() != waveTeam){
+        if(getTeam() != state.rules.waveTeam){
             float relativeSize = state.rules.dropZoneRadius + getSize()/2f + 1f;
             for(Tile spawn : spawner.getGroundSpawns()){
                 if(withinDst(spawn.worldx(), spawn.worldy(), relativeSize)){

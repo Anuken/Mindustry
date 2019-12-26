@@ -53,7 +53,7 @@ public class Pathfinder implements Runnable{
             }
 
             //special preset which may help speed things up; this is optional
-            preloadPath(waveTeam, PathTarget.enemyCores);
+            preloadPath(state.rules.waveTeam, PathTarget.enemyCores);
 
             start();
         });
@@ -84,8 +84,8 @@ public class Pathfinder implements Runnable{
     }
 
     public int debugValue(Team team, int x, int y){
-        if(pathMap[(int) team.id][PathTarget.enemyCores.ordinal()] == null) return 0;
-        return pathMap[(int) team.id][PathTarget.enemyCores.ordinal()].weights[x][y];
+        if(pathMap[(int)team.id][PathTarget.enemyCores.ordinal()] == null) return 0;
+        return pathMap[(int)team.id][PathTarget.enemyCores.ordinal()].weights[x][y];
     }
 
     /** Update a tile in the internal pathfinding grid. Causes a complete pathfinding reclaculation. */
@@ -149,12 +149,12 @@ public class Pathfinder implements Runnable{
     public Tile getTargetTile(Tile tile, Team team, PathTarget target){
         if(tile == null) return null;
 
-        PathData data = pathMap[(int) team.id][target.ordinal()];
+        PathData data = pathMap[(int)team.id][target.ordinal()];
 
         if(data == null){
             //if this combination is not found, create it on request
-            if(!created.get((int) team.id, target.ordinal())){
-                created.set((int) team.id, target.ordinal());
+            if(!created.get((int)team.id, target.ordinal())){
+                created.set((int)team.id, target.ordinal());
                 //grab targets since this is run on main thread
                 IntArray targets = target.getTargets(team, new IntArray());
                 queue.post(() -> createPath(team, target, targets));
@@ -188,7 +188,7 @@ public class Pathfinder implements Runnable{
     /** @return whether a tile can be passed through by this team. Pathfinding thread only.*/
     private boolean passable(int x, int y, Team team){
         int tile = tiles[x][y];
-        return PathTile.passable(tile) || (PathTile.team(tile) != (int) team.id && PathTile.team(tile) != (int) Team.derelict.id);
+        return PathTile.passable(tile) || (PathTile.team(tile) != (int)team.id && PathTile.team(tile) != (int)Team.derelict.id);
     }
 
     /**
@@ -238,7 +238,7 @@ public class Pathfinder implements Runnable{
         PathData path = new PathData(team, target, world.width(), world.height());
 
         list.add(path);
-        pathMap[(int) team.id][target.ordinal()] = path;
+        pathMap[(int)team.id][target.ordinal()] = path;
 
         //grab targets from passed array
         synchronized(path.targets){
@@ -303,7 +303,7 @@ public class Pathfinder implements Runnable{
             }
 
             //spawn points are also enemies.
-            if(state.rules.waves && team == defaultTeam){
+            if(state.rules.waves && team == state.rules.defaultTeam){
                 for(Tile other : spawner.getGroundSpawns()){
                     out.add(other.pos());
                 }

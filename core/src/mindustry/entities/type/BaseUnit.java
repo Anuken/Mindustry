@@ -185,23 +185,16 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         }
     }
 
-    public Tile getClosest(BlockFlag flag){
+    public @Nullable Tile getClosest(BlockFlag flag){
         return Geometry.findClosest(x, y, indexer.getAllied(team, flag));
     }
 
-    public Tile getClosestSpawner(){
+    public @Nullable Tile getClosestSpawner(){
         return Geometry.findClosest(x, y, Vars.spawner.getGroundSpawns());
     }
 
-    public TileEntity getClosestEnemyCore(){
-        for(Team enemy : Vars.state.teams.enemiesOf(team)){
-            Tile tile = Geometry.findClosest(x, y, Vars.state.teams.get(enemy).cores);
-            if(tile != null){
-                return tile.entity;
-            }
-        }
-
-        return null;
+    public @Nullable TileEntity getClosestEnemyCore(){
+        return Vars.state.teams.closestEnemyCore(x, y, team);
     }
 
     public UnitState getStartState(){
@@ -370,7 +363,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public EntityGroup targetGroup(){
-        return unitGroups[(int) team.id];
+        return unitGroup;
     }
 
     @Override

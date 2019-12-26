@@ -63,7 +63,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(PlayEvent.class, event -> {
-            player.setTeam(state.rules.pvp ? netServer.assignTeam(player, playerGroup.all()) : defaultTeam);
+            player.setTeam(state.rules.pvp ? netServer.assignTeam(player, playerGroup.all()) : state.rules.defaultTeam);
             player.setDead(true);
             player.add();
 
@@ -256,9 +256,9 @@ public class Control implements ApplicationListener, Loadable{
             world.loadGenerator(zone.generator);
             zone.rules.get(state.rules);
             state.rules.zone = zone;
-            for(Tile core : state.teams.get(defaultTeam).cores){
+            for(TileEntity core : state.teams.playerCores()){
                 for(ItemStack stack : zone.getStartingItems()){
-                    core.entity.items.add(stack.item, stack.amount);
+                    core.items.add(stack.item, stack.amount);
                 }
             }
             state.set(State.playing);
@@ -294,8 +294,8 @@ public class Control implements ApplicationListener, Loadable{
 
             Geometry.circle(coreb.x, coreb.y, 10, (cx, cy) -> {
                 Tile tile = world.ltile(cx, cy);
-                if(tile != null && tile.getTeam() == defaultTeam && !(tile.block() instanceof CoreBlock)){
-                    world.removeBlock(tile);
+                if(tile != null && tile.getTeam() == state.rules.defaultTeam && !(tile.block() instanceof CoreBlock)){
+                    tile.remove();
                 }
             });
 
@@ -305,13 +305,13 @@ public class Control implements ApplicationListener, Loadable{
 
             zone.rules.get(state.rules);
             state.rules.zone = zone;
-            for(Tile core : state.teams.get(defaultTeam).cores){
+            for(TileEntity core : state.teams.playerCores()){
                 for(ItemStack stack : zone.getStartingItems()){
-                    core.entity.items.add(stack.item, stack.amount);
+                    core.items.add(stack.item, stack.amount);
                 }
             }
-            Tile core = state.teams.get(defaultTeam).cores.first();
-            core.entity.items.clear();
+            TileEntity core = state.teams.playerCores().first();
+            core.items.clear();
 
             logic.play();
             state.rules.waveTimer = false;
@@ -434,9 +434,9 @@ public class Control implements ApplicationListener, Loadable{
             input.update();
 
             if(world.isZone()){
-                for(Tile tile : state.teams.get(player.getTeam()).cores){
+                for(TileEntity tile : state.teams.cores(player.getTeam())){
                     for(Item item : content.items()){
-                        if(tile.entity != null && tile.entity.items.has(item)){
+                        if(tile.items.has(item)){
                             data.unlockContent(item);
                         }
                     }

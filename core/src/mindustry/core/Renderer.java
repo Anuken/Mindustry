@@ -18,11 +18,10 @@ import mindustry.entities.effect.*;
 import mindustry.entities.effect.GroundEffectEntity.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
-import mindustry.ui.Cicon;
+import mindustry.ui.*;
 import mindustry.world.blocks.defense.ForceProjector.*;
 
 import static arc.Core.*;
@@ -344,11 +343,7 @@ public class Renderer implements ApplicationListener{
             Draw.rect("circle-shadow", u.x, u.y, size * rad, size * rad);
         };
 
-        for(EntityGroup<? extends BaseUnit> group : unitGroups){
-            if(!group.isEmpty()){
-                group.draw(unit -> !unit.isDead(), draw::get);
-            }
-        }
+        unitGroup.draw(unit -> !unit.isDead(), draw::get);
 
         if(!playerGroup.isEmpty()){
             playerGroup.draw(unit -> !unit.isDead(), draw::get);
@@ -361,34 +356,21 @@ public class Renderer implements ApplicationListener{
         float trnsX = -12, trnsY = -13;
         Draw.color(0, 0, 0, 0.22f);
 
-        for(EntityGroup<? extends BaseUnit> group : unitGroups){
-            if(!group.isEmpty()){
-                group.draw(unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
-            }
-        }
-
-        if(!playerGroup.isEmpty()){
-            playerGroup.draw(unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
-        }
+        unitGroup.draw(unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
+        playerGroup.draw(unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
 
         Draw.color();
     }
 
     private void drawAllTeams(boolean flying){
-        for(Team team : Team.all){
-            EntityGroup<BaseUnit> group = unitGroups[(int) team.id];
+        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
+        playerGroup.draw(p -> p.isFlying() == flying && !p.isDead(), Unit::drawUnder);
 
-            if(group.count(p -> p.isFlying() == flying) + playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
+        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
+        playerGroup.draw(p -> p.isFlying() == flying, Unit::drawAll);
 
-            unitGroups[(int) team.id].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
-            playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
-
-            unitGroups[(int) team.id].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
-            playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
-
-            unitGroups[(int) team.id].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
-            playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
-        }
+        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
+        playerGroup.draw(p -> p.isFlying() == flying, Unit::drawOver);
     }
 
     public void scaleCamera(float amount){

@@ -168,7 +168,7 @@ public class HudFragment extends Fragment{
                     t.table(teams -> {
                         teams.left();
                         int i = 0;
-                        for(Team team : Team.all){
+                        for(Team team : Team.base()){
                             ImageButton button = teams.addImageButton(Tex.whiteui, Styles.clearTogglePartiali, 40f, () -> Call.setPlayerTeamEditor(player, team))
                                 .size(50f).margin(6f).get();
                             button.getImageCell().grow();
@@ -287,7 +287,7 @@ public class HudFragment extends Fragment{
             });
 
             t.top().visible(() -> {
-                if(state.is(State.menu) || state.teams.get(player.getTeam()).cores.size == 0 || state.teams.get(player.getTeam()).cores.first().entity == null){
+                if(state.is(State.menu) || !state.teams.get(player.getTeam()).hasCore()){
                     coreAttackTime[0] = 0f;
                     return false;
                 }
@@ -628,7 +628,7 @@ public class HudFragment extends Fragment{
             }
 
             if(state.rules.waveTimer){
-                builder.append((state.rules.waitForWaveToEnd && unitGroups[(int) waveTeam.id].size() > 0) ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60))));
+                builder.append((state.rules.waitForWaveToEnd && state.enemies > 0 ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60)))));
             }else if(state.enemies == 0){
                 builder.append(Core.bundle.get("waiting"));
             }

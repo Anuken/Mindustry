@@ -10,6 +10,7 @@ import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.maps.*;
 import mindustry.world.*;
+import mindustry.world.LegacyColorMapper.*;
 import mindustry.world.blocks.storage.*;
 
 import java.io.*;
@@ -91,7 +92,7 @@ public class MapIO{
                 public void setTeam(Team team){
                     super.setTeam(team);
                     if(block instanceof CoreBlock){
-                        map.teams.add((int) team.id);
+                        map.teams.add((int)team.id);
                     }
                 }
             };
@@ -148,6 +149,28 @@ public class MapIO{
             return team.intColor;
         }
         return Color.rgba8888(wall.solid ? wall.color : ore == Blocks.air ? floor.color : ore.color);
+    }
+
+    /** Reads a pixmap in the 3.5 pixmap format. */
+    public static void readPixmap(Pixmap pixmap, Tile[][] tiles){
+        for(int x = 0; x < pixmap.getWidth(); x++){
+            for(int y = 0; y < pixmap.getHeight(); y++){
+                int color = pixmap.getPixel(x, pixmap.getHeight() - 1 - y);
+                LegacyBlock block = LegacyColorMapper.get(color);
+                Tile tile = tiles[x][y];
+
+                tile.setFloor(block.floor);
+                tile.setBlock(block.wall);
+                if(block.ore != null) tile.setOverlay(block.ore);
+
+                //place core
+                if(color == Color.rgba8888(Color.green)){
+                    //actual core parts
+                    tile.setBlock(Blocks.coreShard);
+                    tile.setTeam(Team.sharded);
+                }
+            }
+        }
     }
 
     interface TileProvider{

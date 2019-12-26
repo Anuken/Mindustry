@@ -84,12 +84,12 @@ public class CoreBlock extends StorageBlock{
     public void onProximityUpdate(Tile tile){
         CoreEntity entity = tile.ent();
 
-        for(Tile other : state.teams.get(tile.getTeam()).cores){
-            if(other != tile){
-                entity.items = other.entity.items;
+        for(TileEntity other : state.teams.cores(tile.getTeam())){
+            if(other.tile != tile){
+                entity.items = other.items;
             }
         }
-        state.teams.get(tile.getTeam()).cores.add(tile);
+        state.teams.registerCore(entity);
 
         entity.storageCapacity = itemCapacity + entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         entity.proximity().each(this::isContainer, t -> {
@@ -97,9 +97,9 @@ public class CoreBlock extends StorageBlock{
             t.<StorageBlockEntity>ent().linkedCore = tile;
         });
 
-        for(Tile other : state.teams.get(tile.getTeam()).cores){
-            if(other == tile) continue;
-            entity.storageCapacity += other.block().itemCapacity + other.entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
+        for(TileEntity other : state.teams.cores(tile.getTeam())){
+            if(other.tile == tile) continue;
+            entity.storageCapacity += other.block.itemCapacity + entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         }
 
         if(!world.isGenerating()){
@@ -108,9 +108,8 @@ public class CoreBlock extends StorageBlock{
             }
         }
 
-        for(Tile other : state.teams.get(tile.getTeam()).cores){
-            CoreEntity oe = other.ent();
-            oe.storageCapacity = entity.storageCapacity;
+        for(CoreEntity other : state.teams.cores(tile.getTeam())){
+            other.storageCapacity = entity.storageCapacity;
         }
     }
 
@@ -151,8 +150,9 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void removed(Tile tile){
+        CoreEntity entity = tile.ent();
         int total = tile.entity.proximity().count(e -> e.entity.items == tile.entity.items);
-        float fract = 1f / total / state.teams.get(tile.getTeam()).cores.size;
+        float fract = 1f / total / state.teams.cores(tile.getTeam()).size;
 
         tile.entity.proximity().each(e -> isContainer(e) && e.entity.items == tile.entity.items, t -> {
             StorageBlockEntity ent = (StorageBlockEntity)t.entity;
@@ -163,22 +163,23 @@ public class CoreBlock extends StorageBlock{
             }
         });
 
-        state.teams.get(tile.getTeam()).cores.remove(tile);
+        state.teams.unregisterCore(entity);
 
-        int max = itemCapacity * state.teams.get(tile.getTeam()).cores.size;
+        int max = itemCapacity * state.teams.cores(tile.getTeam()).size;
         for(Item item : content.items()){
             tile.entity.items.set(item, Math.min(tile.entity.items.get(item), max));
         }
 
-        for(Tile other : state.teams.get(tile.getTeam()).cores){
-            other.block().onProximityUpdate(other);
+        for(CoreEntity other : state.teams.cores(tile.getTeam())){
+            other.block.onProximityUpdate(other.tile);
         }
     }
 
     @Override
     public void placed(Tile tile){
         super.placed(tile);
-        state.teams.get(tile.getTeam()).cores.add(tile);
+        CoreEntity entity = tile.ent();
+        state.teams.registerCore(entity);
     }
 
     @Override

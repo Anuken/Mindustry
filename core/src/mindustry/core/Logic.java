@@ -107,9 +107,9 @@ public class Logic implements ApplicationListener{
 
         //add starting items
         if(!world.isZone()){
-            for(Team team : Team.all){
-                if(!state.teams.get(team).cores.isEmpty()){
-                    TileEntity entity = state.teams.get(team).cores.first().entity;
+            for(TeamData team : state.teams.getActive()){
+                if(team.hasCore()){
+                    TileEntity entity = team.core();
                     entity.items.clear();
                     for(ItemStack stack : state.rules.loadout){
                         entity.items.add(stack.item, stack.amount);
@@ -143,23 +143,23 @@ public class Logic implements ApplicationListener{
     }
 
     private void checkGameOver(){
-        if(!state.rules.attackMode && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
+        if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
             state.gameOver = true;
-            Events.fire(new GameOverEvent(waveTeam));
+            Events.fire(new GameOverEvent(state.rules.waveTeam));
         }else if(state.rules.attackMode){
             Team alive = null;
 
-            for(Team team : Team.all){
-                if(state.teams.get(team).cores.size > 0){
+            for(TeamData team : state.teams.getActive()){
+                if(team.hasCore()){
                     if(alive != null){
                         return;
                     }
-                    alive = team;
+                    alive = team.team;
                 }
             }
 
             if(alive != null && !state.gameOver){
-                if(world.isZone() && alive == defaultTeam){
+                if(world.isZone() && alive == state.rules.defaultTeam){
                     //in attack maps, a victorious game over is equivalent to a launch
                     Call.launchZone();
                 }else{
@@ -176,7 +176,7 @@ public class Logic implements ApplicationListener{
             ui.hudfrag.showLaunch();
         }
 
-        for(Tile tile : state.teams.get(defaultTeam).cores){
+        for(TileEntity tile : state.teams.playerCores()){
             Effects.effect(Fx.launch, tile);
         }
 
@@ -185,19 +185,18 @@ public class Logic implements ApplicationListener{
         }
 
         Time.runTask(30f, () -> {
-            for(Tile tile : state.teams.get(defaultTeam).cores){
+            for(TileEntity entity : state.teams.playerCores()){
                 for(Item item : content.items()){
-                    if(tile == null || tile.entity == null || tile.entity.items == null) continue;
-                    data.addItem(item, tile.entity.items.get(item));
-                    Events.fire(new LaunchItemEvent(item, tile.entity.items.get(item)));
+                    data.addItem(item, entity.items.get(item));
+                    Events.fire(new LaunchItemEvent(item, entity.items.get(item)));
                 }
-                world.removeBlock(tile);
+                entity.tile.remove();
             }
             state.launched = true;
             state.gameOver = true;
             Events.fire(new LaunchEvent());
             //manually fire game over event now
-            Events.fire(new GameOverEvent(defaultTeam));
+            Events.fire(new GameOverEvent(state.rules.defaultTeam));
         });
     }
 
@@ -213,7 +212,7 @@ public class Logic implements ApplicationListener{
 
         if(!state.is(State.menu)){
             if(!net.client()){
-                state.enemies = unitGroup.count(b -> b.getTeam() == waveTeam && b.countsAsEnemy());
+                state.enemies = unitGroup.count(b -> b.getTeam() == state.rules.waveTeam && b.countsAsEnemy());
             }
 
             if(!state.isPaused()){

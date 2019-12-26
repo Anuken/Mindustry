@@ -38,7 +38,7 @@ public class Build{
         Block previous = tile.block();
         Block sub = BuildBlock.get(previous.size);
 
-        world.setBlock(tile, sub, team, rotation);
+        tile.set(sub, team, rotation);
         tile.<BuildEntity>ent().setDeconstruct(previous);
         tile.entity.health = tile.entity.maxHealth() * prevPercent;
 
@@ -60,7 +60,7 @@ public class Build{
         Block previous = tile.block();
         Block sub = BuildBlock.get(result.size);
 
-        world.setBlock(tile, sub, team, rotation);
+        tile.set(sub, team, rotation);
         tile.<BuildEntity>ent().setConstruct(previous, result);
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
@@ -72,7 +72,7 @@ public class Build{
             return false;
         }
 
-        if(state.rules.bannedBlocks.contains(type) && !(state.rules.waves && team == waveTeam)){
+        if(state.rules.bannedBlocks.contains(type) && !(state.rules.waves && team == state.rules.waveTeam)){
             return false;
         }
 
@@ -80,13 +80,8 @@ public class Build{
             return false;
         }
 
-        //check for enemy cores
-        for(Team enemy : state.teams.enemiesOf(team)){
-            for(Tile core : state.teams.get(enemy).cores){
-                if(Mathf.dst(x * tilesize + type.offset(), y * tilesize + type.offset(), core.drawx(), core.drawy()) < state.rules.enemyCoreBuildRadius + type.size * tilesize / 2f){
-                    return false;
-                }
-            }
+        if(!state.teams.eachEnemyCore(team, core -> Mathf.dst(x * tilesize + type.offset(), y * tilesize + type.offset(), core.x, core.y) < state.rules.enemyCoreBuildRadius + type.size * tilesize / 2f)){
+            return false;
         }
 
         Tile tile = world.tile(x, y);

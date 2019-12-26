@@ -10,13 +10,12 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.type.*;
-import mindustry.game.*;
 import mindustry.input.*;
-import mindustry.type.Category;
-import mindustry.ui.Cicon;
+import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.units.MechPad;
-import mindustry.world.meta.BlockFlag;
+import mindustry.world.blocks.units.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -95,17 +94,15 @@ public class OverlayRenderer{
         Lines.stroke(buildFadeTime * 2f);
 
         if(buildFadeTime > 0.005f){
-            for(Team enemy : state.teams.enemiesOf(player.getTeam())){
-                for(Tile core : state.teams.get(enemy).cores){
-                    float dst = Mathf.dst(player.x, player.y, core.drawx(), core.drawy());
-                    if(dst < state.rules.enemyCoreBuildRadius * 1.5f){
-                        Draw.color(Color.darkGray);
-                        Lines.circle(core.drawx(), core.drawy() - 2, state.rules.enemyCoreBuildRadius);
-                        Draw.color(Pal.accent, enemy.color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
-                        Lines.circle(core.drawx(), core.drawy(), state.rules.enemyCoreBuildRadius);
-                    }
+            state.teams.eachEnemyCore(player.getTeam(), core -> {
+                float dst = core.dst(player);
+                if(dst < state.rules.enemyCoreBuildRadius * 1.5f){
+                    Draw.color(Color.darkGray);
+                    Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
+                    Draw.color(Pal.accent, core.getTeam().color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
+                    Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
                 }
-            }
+            });
         }
 
         Lines.stroke(2f);

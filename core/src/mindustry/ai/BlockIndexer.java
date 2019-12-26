@@ -103,7 +103,7 @@ public class BlockIndexer{
     }
 
     private ObjectSet<Tile>[] getFlagged(Team team){
-        return flagMap[(int) team.id];
+        return flagMap[(int)team.id];
     }
 
     /** @return whether this item is present on this map.*/
@@ -115,11 +115,11 @@ public class BlockIndexer{
     public ObjectSet<Tile> getDamaged(Team team){
         returnArray.clear();
 
-        if(damagedTiles[(int) team.id] == null){
-            damagedTiles[(int) team.id] = new ObjectSet<>();
+        if(damagedTiles[(int)team.id] == null){
+            damagedTiles[(int)team.id] = new ObjectSet<>();
         }
 
-        ObjectSet<Tile> set = damagedTiles[(int) team.id];
+        ObjectSet<Tile> set = damagedTiles[(int)team.id];
         for(Tile tile : set){
             if((tile.entity == null || tile.entity.getTeam() != team || !tile.entity.damaged()) || tile.block() instanceof BuildBlock){
                 returnArray.add(tile);
@@ -135,7 +135,7 @@ public class BlockIndexer{
 
     /** Get all allied blocks with a flag. */
     public ObjectSet<Tile> getAllied(Team team, BlockFlag type){
-        return flagMap[(int) team.id][type.ordinal()];
+        return flagMap[(int)team.id][type.ordinal()];
     }
 
     /** Get all enemy blocks with a flag. */
@@ -155,11 +155,11 @@ public class BlockIndexer{
     }
 
     public void notifyTileDamaged(TileEntity entity){
-        if(damagedTiles[(int) entity.getTeam().id] == null){
-            damagedTiles[(int) entity.getTeam().id] = new ObjectSet<>();
+        if(damagedTiles[(int)entity.getTeam().id] == null){
+            damagedTiles[(int)entity.getTeam().id] = new ObjectSet<>();
         }
 
-        ObjectSet<Tile> set = damagedTiles[(int) entity.getTeam().id];
+        ObjectSet<Tile> set = damagedTiles[(int)entity.getTeam().id];
         set.add(entity.tile);
     }
 
@@ -287,11 +287,11 @@ public class BlockIndexer{
 
             //fast-set this quadrant to 'occupied' if the tile just placed is already of this team
             if(tile.getTeam() == data.team && tile.entity != null && tile.block().targetable){
-                structQuadrants[(int) data.team.id].set(quadrantX, quadrantY);
+                structQuadrants[(int)data.team.id].set(quadrantX, quadrantY);
                 continue; //no need to process futher
             }
 
-            structQuadrants[(int) data.team.id].set(quadrantX, quadrantY, false);
+            structQuadrants[(int)data.team.id].set(quadrantX, quadrantY, false);
 
             outer:
             for(int x = quadrantX * quadrantSize; x < world.width() && x < (quadrantX + 1) * quadrantSize; x++){
@@ -299,7 +299,7 @@ public class BlockIndexer{
                     Tile result = world.ltile(x, y);
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
                     if(result.entity != null && result.getTeam() == data.team){
-                        structQuadrants[(int) data.team.id].set(quadrantX, quadrantY);
+                        structQuadrants[(int)data.team.id].set(quadrantX, quadrantY);
                         break outer;
                     }
                 }
@@ -308,7 +308,7 @@ public class BlockIndexer{
     }
 
     private boolean getQuad(Team team, int quadrantX, int quadrantY){
-        return structQuadrants[(int) team.id].get(quadrantX, quadrantY);
+        return structQuadrants[(int)team.id].get(quadrantX, quadrantY);
     }
 
     private int quadWidth(){

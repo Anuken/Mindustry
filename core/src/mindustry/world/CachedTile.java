@@ -16,7 +16,7 @@ public class CachedTile extends Tile{
 
     @Override
     public Team getTeam(){
-        return Team.all[getTeamID()];
+        return Team.get(getTeamID());
     }
 
     @Override

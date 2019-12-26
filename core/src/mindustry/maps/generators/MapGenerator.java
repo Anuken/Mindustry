@@ -74,7 +74,7 @@ public class MapGenerator extends Generator{
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                if(tiles[x][y].block() instanceof CoreBlock && tiles[x][y].getTeam() == defaultTeam){
+                if(tiles[x][y].block() instanceof CoreBlock && tiles[x][y].getTeam() == state.rules.defaultTeam){
                     players.add(new Point2(x, y));
                     tiles[x][y].setBlock(Blocks.air);
                 }

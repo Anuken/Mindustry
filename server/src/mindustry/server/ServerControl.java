@@ -292,7 +292,7 @@ public class ServerControl implements ApplicationListener{
                 info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name()), state.wave);
 
                 if(state.rules.waves){
-                    info("&ly  {0} enemies.", unitGroups[(int) Team.crux.id].size());
+                    info("&ly  {0} enemies.", unitGroups[(int)Team.crux.id].size());
                 }else{
                     info("&ly  {0} seconds until next wave.", (int)(state.wavetime / 60));
                 }
@@ -421,14 +421,14 @@ public class ServerControl implements ApplicationListener{
             try{
                 Team team = arg.length == 0 ? Team.sharded : Team.valueOf(arg[0]);
 
-                if(state.teams.get(team).cores.isEmpty()){
+                if(state.teams.cores(team).isEmpty()){
                     err("That team has no cores.");
                     return;
                 }
 
                 for(Item item : content.items()){
                     if(item.type == ItemType.material){
-                        state.teams.get(team).cores.first().entity.items.set(item, state.teams.get(team).cores.first().block().itemCapacity);
+                        state.teams.cores(team).first().entity.items.set(item, state.teams.cores(team).first().block().itemCapacity);
                     }
                 }
 

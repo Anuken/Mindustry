@@ -17,11 +17,13 @@ import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
 import java.nio.*;
@@ -402,18 +404,16 @@ public class NetServer implements ApplicationListener{
 
     public Team assignTeam(Player current, Iterable<Player> players){
         //find team with minimum amount of players and auto-assign player to that.
-        return Structs.findMin(Team.all, team -> {
-            if(state.teams.isActive(team) && !state.teams.get(team).cores.isEmpty()){
-                int count = 0;
-                for(Player other : players){
-                    if(other.getTeam() == team && other != current){
-                        count++;
-                    }
+        TeamData re = state.teams.getActive().min(data -> {
+            int count = 0;
+            for(Player other : players){
+                if(other.getTeam() == data.team && other != current){
+                    count++;
                 }
-                return count;
             }
-            return Integer.MAX_VALUE;
+            return count;
         });
+        return re == null ? null : re.team;
     }
 
     public void sendWorldData(Player player){
@@ -584,8 +584,8 @@ public class NetServer implements ApplicationListener{
     public boolean isWaitingForPlayers(){
         if(state.rules.pvp){
             int used = 0;
-            for(Team t : Team.all){
-                if(playerGroup.count(p -> p.getTeam() == t) > 0){
+            for(TeamData t : state.teams.getActive()){
+                if(playerGroup.count(p -> p.getTeam() == t.team) > 0){
                     used++;
                 }
             }
@@ -647,13 +647,13 @@ public class NetServer implements ApplicationListener{
 
     public void writeEntitySnapshot(Player player) throws IOException{
         syncStream.reset();
-        ObjectSet<Tile> cores = state.teams.get(player.getTeam()).cores;
+        Array<CoreEntity> cores = state.teams.cores(player.getTeam());
 
         dataStream.writeByte(cores.size);
 
-        for(Tile tile : cores){
-            dataStream.writeInt(tile.pos());
-            tile.entity.items.write(dataStream);
+        for(CoreEntity entity : cores){
+            dataStream.writeInt(entity.tile.pos());
+            entity.items.write(dataStream);
         }
 
         dataStream.close();

@@ -217,7 +217,7 @@ public abstract class SaveVersion extends SaveFileReader{
         Array<TeamData> data = state.teams.getActive();
         stream.writeInt(data.size);
         for(TeamData team : data){
-            stream.writeInt((int) team.team.id);
+            stream.writeInt((int)team.team.id);
             stream.writeInt(team.brokenBlocks.size);
             for(BrokenBlock block : team.brokenBlocks){
                 stream.writeShort(block.x);
@@ -258,7 +258,7 @@ public abstract class SaveVersion extends SaveFileReader{
     public void readEntities(DataInput stream) throws IOException{
         int teamc = stream.readInt();
         for(int i = 0; i < teamc; i++){
-            Team team = Team.all[stream.readInt()];
+            Team team = Team.get(stream.readInt());
             TeamData data = state.teams.get(team);
             int blocks = stream.readInt();
             for(int j = 0; j < blocks; j++){

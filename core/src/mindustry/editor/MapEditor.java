@@ -10,7 +10,6 @@ import arc.util.Structs;
 import mindustry.content.Blocks;
 import mindustry.game.Team;
 import mindustry.gen.TileOp;
-import mindustry.io.LegacyMapIO;
 import mindustry.io.MapIO;
 import mindustry.maps.Map;
 import mindustry.world.*;
@@ -65,7 +64,7 @@ public class MapEditor{
         reset();
 
         createTiles(pixmap.getWidth(), pixmap.getHeight());
-        load(() -> LegacyMapIO.readPixmap(pixmap, tiles()));
+        load(() -> MapIO.readPixmap(pixmap, tiles()));
         renderer.resize(width(), height());
     }
 
@@ -86,7 +85,7 @@ public class MapEditor{
         for(int x = 0; x < width(); x++){
             for(int y = 0; y < height(); y++){
                 if(tiles[x][y].block().isMultiblock()){
-                    world.setBlock(tiles[x][y], tiles[x][y].block(), tiles[x][y].getTeam());
+                    tiles[x][y].set(tiles[x][y].block(), tiles[x][y].getTeam());
                 }
             }
         }
@@ -176,7 +175,7 @@ public class MapEditor{
                 }
             }
 
-            world.setBlock(tile(x, y), drawBlock, drawTeam);
+            tile(x, y).set(drawBlock, drawTeam);
         }else{
             boolean isFloor = drawBlock.isFloor() && drawBlock != Blocks.air;
 
@@ -185,7 +184,7 @@ public class MapEditor{
 
                 //remove linked tiles blocking the way
                 if(!isFloor && (tile.isLinked() || tile.block().isMultiblock())){
-                    world.removeBlock(tile.link());
+                    tile.link().remove();
                 }
 
                 if(isFloor){

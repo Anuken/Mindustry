@@ -124,7 +124,8 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     @CallSuper
     public void write(DataOutput stream) throws IOException{
         stream.writeShort((short)health);
-        stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.rotation())); //team + rotation
+        stream.writeByte(Pack.byteByte((byte)8, tile.rotation())); //rotation + marker to indicate that team is moved (8 isn't valid)
+        stream.writeByte(tile.getTeamID());
         if(items != null) items.write(stream);
         if(power != null) power.write(stream);
         if(liquids != null) liquids.write(stream);
@@ -134,11 +135,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     @CallSuper
     public void read(DataInput stream, byte revision) throws IOException{
         health = stream.readUnsignedShort();
-        byte tr = stream.readByte();
-        byte team = Pack.leftByte(tr);
-        byte rotation = Pack.rightByte(tr);
+        byte packedrot = stream.readByte();
+        byte team = Pack.leftByte(packedrot) == 8 ? stream.readByte() : Pack.leftByte(packedrot);
+        byte rotation = Pack.rightByte(packedrot);
 
-        tile.setTeam(Team.all[team]);
+        tile.setTeam(Team.get(team));
         tile.rotation(rotation);
 
         if(items != null) items.read(stream);
@@ -277,7 +278,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             Events.fire(new BlockDestroyEvent(tile));
             block.breakSound.at(tile);
             block.onDestroyed(tile);
-            world.removeBlock(tile);
+            tile.remove();
             remove();
         }
     }

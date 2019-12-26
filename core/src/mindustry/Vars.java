@@ -61,10 +61,6 @@ public class Vars implements Loadable{
     public static final Array<String> defaultServers = Array.with();
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
-    /** team of the player by default */
-    public static final Team defaultTeam = Team.sharded;
-    /** team of the enemy in waves/sectors */
-    public static final Team waveTeam = Team.crux;
     /** whether to enable editing of units in the editor */
     public static final boolean enableUnitEditing = false;
     /** max chat message length */

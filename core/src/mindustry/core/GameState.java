@@ -26,7 +26,7 @@ public class GameState{
     private State state = State.menu;
 
     public BaseUnit boss(){
-        return unitGroup.find(u -> u.isBoss() && u.getTeam() == waveTeam);
+        return unitGroup.find(u -> u.isBoss() && u.getTeam() == rules.waveTeam);
     }
 
     public void set(State astate){

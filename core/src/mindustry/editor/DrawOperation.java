@@ -69,7 +69,7 @@ public class DrawOperation{
             }else if(type == OpType.rotation.ordinal()){
                 tile.rotation(to);
             }else if(type == OpType.team.ordinal()){
-                tile.setTeam(Team.all[to]);
+                tile.setTeam(Team.get(to));
             }else if(type == OpType.overlay.ordinal()){
                 tile.setOverlayID(to);
             }
