@@ -337,6 +337,7 @@ public class BuildBlock extends Block{
         }
 
         public void setDeconstruct(Block previous){
+            if(previous == null) return;
             this.previous = previous;
             this.progress = 1f;
             if(previous.buildCost >= 0.01f){
