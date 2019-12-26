@@ -415,7 +415,7 @@ public class MapGenerateDialog extends FloatingDialog{
             this.floor = floor.id;
             this.block = wall.id;
             this.ore = ore.id;
-            this.team = (byte)team.ordinal();
+            this.team = (byte) (int) team.id;
             this.rotation = (byte)rotation;
         }
 

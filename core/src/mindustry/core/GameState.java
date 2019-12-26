@@ -27,11 +27,11 @@ public class GameState{
     private State state = State.menu;
 
     public int enemies(){
-        return net.client() ? enemies : unitGroups[waveTeam.ordinal()].count(b -> !(b instanceof BaseDrone));
+        return net.client() ? enemies : unitGroups[(int) waveTeam.id].count(b -> !(b instanceof BaseDrone));
     }
 
     public BaseUnit boss(){
-        return unitGroups[waveTeam.ordinal()].find(BaseUnit::isBoss);
+        return unitGroups[(int) waveTeam.id].find(BaseUnit::isBoss);
     }
 
     public void set(State astate){

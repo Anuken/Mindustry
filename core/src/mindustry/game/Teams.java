@@ -6,23 +6,22 @@ import mindustry.world.*;
 
 /** Class for various team-based utilities. */
 public class Teams{
-    private TeamData[] map = new TeamData[Team.all.length];
+    private TeamData[] map = new TeamData[256];
 
     /**
      * Register a team.
      * @param team The team type enum.
-     * @param enemies The array of enemies of this team. Any team not in this array is considered neutral.
      */
-    public void add(Team team, Team... enemies){
-        map[team.ordinal()] = new TeamData(team, EnumSet.of(enemies));
+    public void add(Team team){
+        map[team.id] = new TeamData(team);
     }
 
     /** Returns team data by type. */
     public TeamData get(Team team){
-        if(map[team.ordinal()] == null){
-            add(team, Array.with(Team.all).select(t -> t != team).toArray(Team.class));
+        if(map[team.id] == null){
+            add(team);
         }
-        return map[team.ordinal()];
+        return map[team.id];
     }
 
     /** Returns whether a team is active, e.g. whether it has any cores remaining. */
@@ -31,14 +30,10 @@ public class Teams{
         return team == Vars.waveTeam || get(team).cores.size > 0;
     }
 
-    /** Returns a set of all teams that are enemies of this team. */
-    public EnumSet<Team> enemiesOf(Team team){
-        return get(team).enemies;
-    }
-
     /** Returns whether {@param other} is an enemy of {@param #team}. */
     public boolean areEnemies(Team team, Team other){
-        return enemiesOf(team).contains(other);
+        //todo what about derelict?
+        return team != other;
     }
 
     /** Allocates a new array with the active teams.
@@ -49,13 +44,11 @@ public class Teams{
 
     public static class TeamData{
         public final ObjectSet<Tile> cores = new ObjectSet<>();
-        public final EnumSet<Team> enemies;
         public final Team team;
         public Queue<BrokenBlock> brokenBlocks = new Queue<>();
 
-        public TeamData(Team team, EnumSet<Team> enemies){
+        public TeamData(Team team){
             this.team = team;
-            this.enemies = enemies;
         }
     }
 

@@ -91,7 +91,7 @@ public class MapIO{
                 public void setTeam(Team team){
                     super.setTeam(team);
                     if(block instanceof CoreBlock){
-                        map.teams.add(team.ordinal());
+                        map.teams.add((int) team.id);
                     }
                 }
             };

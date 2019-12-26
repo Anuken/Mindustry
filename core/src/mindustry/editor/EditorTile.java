@@ -74,7 +74,7 @@ public class EditorTile extends Tile{
             return;
         }
 
-        if(getTeamID() == team.ordinal()) return;
+        if(getTeamID() == (int) team.id) return;
         op(OpType.team, getTeamID());
         super.setTeam(team);
     }

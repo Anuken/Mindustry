@@ -242,7 +242,7 @@ public class Vars implements Loadable{
         unitGroups = new EntityGroup[Team.all.length];
 
         for(Team team : Team.all){
-            unitGroups[team.ordinal()] = entities.add(BaseUnit.class).enableMapping();
+            unitGroups[(int) team.id] = entities.add(BaseUnit.class).enableMapping();
         }
 
         for(EntityGroup<?> group : entities.all()){

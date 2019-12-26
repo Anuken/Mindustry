@@ -84,8 +84,8 @@ public class Pathfinder implements Runnable{
     }
 
     public int debugValue(Team team, int x, int y){
-        if(pathMap[team.ordinal()][PathTarget.enemyCores.ordinal()] == null) return 0;
-        return pathMap[team.ordinal()][PathTarget.enemyCores.ordinal()].weights[x][y];
+        if(pathMap[(int) team.id][PathTarget.enemyCores.ordinal()] == null) return 0;
+        return pathMap[(int) team.id][PathTarget.enemyCores.ordinal()].weights[x][y];
     }
 
     /** Update a tile in the internal pathfinding grid. Causes a complete pathfinding reclaculation. */
@@ -149,12 +149,12 @@ public class Pathfinder implements Runnable{
     public Tile getTargetTile(Tile tile, Team team, PathTarget target){
         if(tile == null) return null;
 
-        PathData data = pathMap[team.ordinal()][target.ordinal()];
+        PathData data = pathMap[(int) team.id][target.ordinal()];
 
         if(data == null){
             //if this combination is not found, create it on request
-            if(!created.get(team.ordinal(), target.ordinal())){
-                created.set(team.ordinal(), target.ordinal());
+            if(!created.get((int) team.id, target.ordinal())){
+                created.set((int) team.id, target.ordinal());
                 //grab targets since this is run on main thread
                 IntArray targets = target.getTargets(team, new IntArray());
                 queue.post(() -> createPath(team, target, targets));
@@ -188,7 +188,7 @@ public class Pathfinder implements Runnable{
     /** @return whether a tile can be passed through by this team. Pathfinding thread only.*/
     private boolean passable(int x, int y, Team team){
         int tile = tiles[x][y];
-        return PathTile.passable(tile) || (PathTile.team(tile) != team.ordinal() && PathTile.team(tile) != Team.derelict.ordinal());
+        return PathTile.passable(tile) || (PathTile.team(tile) != (int) team.id && PathTile.team(tile) != (int) Team.derelict.id);
     }
 
     /**
@@ -238,7 +238,7 @@ public class Pathfinder implements Runnable{
         PathData path = new PathData(team, target, world.width(), world.height());
 
         list.add(path);
-        pathMap[team.ordinal()][target.ordinal()] = path;
+        pathMap[(int) team.id][target.ordinal()] = path;
 
         //grab targets from passed array
         synchronized(path.targets){

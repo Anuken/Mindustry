@@ -169,7 +169,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public void writeSave(DataOutput stream, boolean net) throws IOException{
         if(item.item == null) item.item = Items.copper;
 
-        stream.writeByte(team.ordinal());
+        stream.writeByte((int) team.id);
         stream.writeBoolean(isDead());
         stream.writeFloat(net ? interpolator.target.x : x);
         stream.writeFloat(net ? interpolator.target.y : y);
@@ -220,7 +220,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         for(Team team : Team.all){
             if(team != getTeam() || !(this instanceof Player)){
-                avoid(unitGroups[team.ordinal()].intersect(cx, cy, fsize, fsize));
+                avoid(unitGroups[(int) team.id].intersect(cx, cy, fsize, fsize));
             }
         }
 

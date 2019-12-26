@@ -87,7 +87,7 @@ public class TypeIO{
 
     @WriteClass(BaseUnit.class)
     public static void writeBaseUnit(ByteBuffer buffer, BaseUnit unit){
-        buffer.put((byte)unit.getTeam().ordinal());
+        buffer.put((byte) (int) unit.getTeam().id);
         buffer.putInt(unit.getID());
     }
 
@@ -194,7 +194,7 @@ public class TypeIO{
 
     @WriteClass(Team.class)
     public static void writeTeam(ByteBuffer buffer, Team reason){
-        buffer.put((byte)reason.ordinal());
+        buffer.put((byte) (int) reason.id);
     }
 
     @ReadClass(Team.class)

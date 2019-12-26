@@ -58,7 +58,7 @@ public class CommandCenter extends Block{
         ObjectSet<Tile> set = indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter);
 
         if(set.size == 1){
-            for(BaseUnit unit : unitGroups[tile.getTeam().ordinal()].all()){
+            for(BaseUnit unit : unitGroups[(int) tile.getTeam().id].all()){
                 unit.onCommand(UnitCommand.all[0]);
             }
         }
@@ -116,7 +116,7 @@ public class CommandCenter extends Block{
 
         Team team = (player == null ? tile.getTeam() : player.getTeam());
 
-        for(BaseUnit unit : unitGroups[team.ordinal()].all()){
+        for(BaseUnit unit : unitGroups[(int) team.id].all()){
             unit.onCommand(command);
         }
 

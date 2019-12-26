@@ -141,7 +141,7 @@ public enum EditorTool{
                 if(tile.link().synthetic()){
                     Team dest = tile.getTeam();
                     if(dest == editor.drawTeam) return;
-                    fill(editor, x, y, false, t -> t.getTeamID() == dest.ordinal() && t.link().synthetic(), t -> t.setTeam(editor.drawTeam));
+                    fill(editor, x, y, false, t -> t.getTeamID() == (int) dest.id && t.link().synthetic(), t -> t.setTeam(editor.drawTeam));
                 }
             }
         }

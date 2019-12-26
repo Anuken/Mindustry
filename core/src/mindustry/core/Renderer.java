@@ -376,17 +376,17 @@ public class Renderer implements ApplicationListener{
 
     private void drawAllTeams(boolean flying){
         for(Team team : Team.all){
-            EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
+            EntityGroup<BaseUnit> group = unitGroups[(int) team.id];
 
             if(group.count(p -> p.isFlying() == flying) + playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 
-            unitGroups[team.ordinal()].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
+            unitGroups[(int) team.id].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
             playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
 
-            unitGroups[team.ordinal()].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
+            unitGroups[(int) team.id].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
             playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
 
-            unitGroups[team.ordinal()].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
+            unitGroups[(int) team.id].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
             playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
         }
     }

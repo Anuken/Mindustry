@@ -106,8 +106,8 @@ public class ApplicationTests{
         Time.update();
         Time.update();
         Time.setDeltaProvider(() -> 1f);
-        unitGroups[waveTeam.ordinal()].updateEvents();
-        assertFalse(unitGroups[waveTeam.ordinal()].isEmpty(), "No enemies spawned.");
+        unitGroups[(int) waveTeam.id].updateEvents();
+        assertFalse(unitGroups[(int) waveTeam.id].isEmpty(), "No enemies spawned.");
     }
 
     @Test

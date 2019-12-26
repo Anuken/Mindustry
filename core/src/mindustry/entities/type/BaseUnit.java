@@ -365,7 +365,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public EntityGroup targetGroup(){
-        return unitGroups[team.ordinal()];
+        return unitGroups[(int) team.id];
     }
 
     @Override

@@ -114,7 +114,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
     public BuilderDrone(){
         if(reset.check()){
             Events.on(BuildSelectEvent.class, event -> {
-                EntityGroup<BaseUnit> group = unitGroups[event.team.ordinal()];
+                EntityGroup<BaseUnit> group = unitGroups[(int) event.team.id];
 
                 if(!(event.tile.entity instanceof BuildEntity)) return;
 

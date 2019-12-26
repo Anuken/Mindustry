@@ -157,7 +157,7 @@ public class Units{
 
     /** Iterates over all units in a rectangle. */
     public static void nearby(Team team, float x, float y, float width, float height, Cons<Unit> cons){
-        unitGroups[team.ordinal()].intersect(x, y, width, height, cons);
+        unitGroups[(int) team.id].intersect(x, y, width, height, cons);
         playerGroup.intersect(x, y, width, height, player -> {
             if(player.getTeam() == team){
                 cons.get(player);
@@ -167,7 +167,7 @@ public class Units{
 
     /** Iterates over all units in a circle around this position. */
     public static void nearby(Team team, float x, float y, float radius, Cons<Unit> cons){
-        unitGroups[team.ordinal()].intersect(x - radius, y - radius, radius*2f, radius*2f, unit -> {
+        unitGroups[(int) team.id].intersect(x - radius, y - radius, radius*2f, radius*2f, unit -> {
             if(unit.withinDst(x, y, radius)){
                 cons.get(unit);
             }
@@ -183,7 +183,7 @@ public class Units{
     /** Iterates over all units in a rectangle. */
     public static void nearby(float x, float y, float width, float height, Cons<Unit> cons){
         for(Team team : Team.all){
-            unitGroups[team.ordinal()].intersect(x, y, width, height, cons);
+            unitGroups[(int) team.id].intersect(x, y, width, height, cons);
         }
 
         playerGroup.intersect(x, y, width, height, cons);
@@ -199,7 +199,7 @@ public class Units{
         EnumSet<Team> targets = state.teams.enemiesOf(team);
 
         for(Team other : targets){
-            unitGroups[other.ordinal()].intersect(x, y, width, height, cons);
+            unitGroups[(int) other.id].intersect(x, y, width, height, cons);
         }
 
         playerGroup.intersect(x, y, width, height, player -> {
@@ -217,7 +217,7 @@ public class Units{
     /** Iterates over all units. */
     public static void all(Cons<Unit> cons){
         for(Team team : Team.all){
-            unitGroups[team.ordinal()].all().each(cons);
+            unitGroups[(int) team.id].all().each(cons);
         }
 
         playerGroup.all().each(cons);
