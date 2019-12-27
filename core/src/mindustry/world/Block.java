@@ -99,6 +99,8 @@ public class Block extends BlockStorage{
     public boolean sync;
     /** Whether this block uses conveyor-type placement mode.*/
     public boolean conveyorPlacement;
+    /** Whether this block uses is compatible with compressed.*/
+    public boolean compressable;
     /**
      * The color of this block when displayed on the minimap or map preview.
      * Do not set manually! This is overriden when loading for most blocks.

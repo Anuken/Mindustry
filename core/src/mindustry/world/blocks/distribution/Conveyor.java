@@ -30,7 +30,7 @@ public class Conveyor extends Block implements Autotiler{
     private static ItemPos pos2 = new ItemPos();
     private final Vec2 tr1 = new Vec2();
     private final Vec2 tr2 = new Vec2();
-    private TextureRegion[][] regions = new TextureRegion[7][4];
+    protected TextureRegion[][] regions = new TextureRegion[7][4];
 
     public float speed = 0f;
 
