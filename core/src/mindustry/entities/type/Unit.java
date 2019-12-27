@@ -167,7 +167,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public void writeSave(DataOutput stream, boolean net) throws IOException{
         if(item.item == null) item.item = Items.copper;
 
-        stream.writeByte((int)team.id);
+        stream.writeByte(team.id);
         stream.writeBoolean(isDead());
         stream.writeFloat(net ? interpolator.target.x : x);
         stream.writeFloat(net ? interpolator.target.y : y);

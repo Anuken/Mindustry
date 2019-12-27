@@ -92,7 +92,7 @@ public class MapIO{
                 public void setTeam(Team team){
                     super.setTeam(team);
                     if(block instanceof CoreBlock){
-                        map.teams.add((int)team.id);
+                        map.teams.add(team.id);
                     }
                 }
             };
@@ -146,7 +146,7 @@ public class MapIO{
 
     public static int colorFor(Block floor, Block wall, Block ore, Team team){
         if(wall.synthetic()){
-            return team.intColor;
+            return team.color.rgba();
         }
         return Color.rgba8888(wall.solid ? wall.color : ore == Blocks.air ? floor.color : ore.color);
     }

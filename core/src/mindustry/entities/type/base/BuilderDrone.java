@@ -114,12 +114,10 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
     public BuilderDrone(){
         if(reset.check()){
             Events.on(BuildSelectEvent.class, event -> {
-                EntityGroup<BaseUnit> group = unitGroups[(int)event.team.id];
-
                 if(!(event.tile.entity instanceof BuildEntity)) return;
 
-                for(BaseUnit unit : group.all()){
-                    if(unit instanceof BuilderDrone){
+                for(BaseUnit unit : unitGroup.all()){
+                    if(unit instanceof BuilderDrone && unit.getTeam() == getTeam()){
                         BuilderDrone drone = (BuilderDrone)unit;
                         if(drone.isBuilding()){
                             //stop building if opposite building begins.

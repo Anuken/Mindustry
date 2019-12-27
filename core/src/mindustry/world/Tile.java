@@ -146,7 +146,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public void setTeam(Team team){
-        this.team = (byte) (int)team.id;
+        this.team = (byte) team.id;
     }
 
     public byte getTeamID(){
@@ -156,7 +156,7 @@ public class Tile implements Position, TargetTrait{
     public void setBlock(@NonNull Block type, Team team, int rotation){
         preChanged();
         this.block = type;
-        this.team = (byte) (int)team.id;
+        this.team = (byte) team.id;
         this.rotation = (byte)Mathf.mod(rotation, 4);
         changed();
     }

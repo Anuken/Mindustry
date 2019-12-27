@@ -33,7 +33,7 @@ task run(dependsOn: classes, type: JavaExec){
     }
 
     if(args.contains("debug")){
-        main = "io.anuke.mindustry.DebugLauncher"
+        main = "mindustry.debug.DebugLauncher"
     }
 }
 

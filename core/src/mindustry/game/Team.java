@@ -6,10 +6,9 @@ import arc.util.*;
 import mindustry.graphics.*;
 
 public class Team implements Comparable<Team>{
-    public final Color color;
-    public final int intColor;
-    public final String name;
     public final byte id;
+    public final Color color;
+    public String name;
 
     /** All 256 registered teams. */
     private static final Team[] all = new Team[256];
@@ -48,7 +47,6 @@ public class Team implements Comparable<Team>{
     protected Team(int id, String name, Color color){
         this.name = name;
         this.color = color;
-        this.intColor = Color.rgba8888(color);
         this.id = (byte)id;
 
         int us = Pack.u(this.id);

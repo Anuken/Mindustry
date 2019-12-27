@@ -3,12 +3,12 @@ package mindustry.game;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.entities.type.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 /** Class for various team-based utilities. */
 public class Teams{
@@ -31,6 +31,10 @@ public class Teams{
 
     public @Nullable CoreEntity closestCore(float x, float y, Team team){
         return Geometry.findClosest(x, y, get(team).cores);
+    }
+
+    public Array<Team> enemiesOf(Team team){
+        return get(team).enemies;
     }
 
     public boolean eachEnemyCore(Team team, Boolf<CoreEntity> ret){
@@ -104,6 +108,8 @@ public class Teams{
         //register in active list if needed
         if(data.active() && !active.contains(data)){
             active.add(data);
+            updateEnemies();
+            indexer.updateTeamIndex(data.team);
         }
     }
 
@@ -114,12 +120,24 @@ public class Teams{
         //unregister in active list
         if(!data.active()){
             active.remove(data);
+            updateEnemies();
+        }
+    }
+
+    private void updateEnemies(){
+        for(TeamData data : active){
+            data.enemies.clear();
+            for(TeamData other : active){
+                if(areEnemies(data.team, other.team)){
+                    data.enemies.add(other.team);
+                }
+            }
         }
     }
 
     public class TeamData{
-        private final Array<CoreEntity> cores = new Array<>();
-
+        public final Array<CoreEntity> cores = new Array<>();
+        public final Array<Team> enemies = new Array<>();
         public final Team team;
         public Queue<BrokenBlock> brokenBlocks = new Queue<>();
 
