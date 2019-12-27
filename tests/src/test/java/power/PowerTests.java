@@ -3,6 +3,8 @@ package power;
 import arc.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
+import mindustry.core.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
@@ -23,6 +25,7 @@ public class PowerTests extends PowerTestFixture{
     @BeforeAll
     static void init(){
         Core.graphics = new FakeGraphics();
+        Vars.state = new GameState();
     }
 
     @Nested
