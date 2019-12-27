@@ -1,9 +1,9 @@
 package power;
 
-import io.anuke.arc.Graphics;
-import io.anuke.arc.Graphics.Cursor.SystemCursor;
-import io.anuke.arc.graphics.*;
-import io.anuke.arc.graphics.glutils.GLVersion;
+import arc.Graphics;
+import arc.Graphics.Cursor.SystemCursor;
+import arc.graphics.*;
+import arc.graphics.gl.GLVersion;
 
 public class FakeGraphics extends Graphics{
     static int frame;

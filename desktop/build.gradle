@@ -6,7 +6,7 @@ apply plugin: "java"
 sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
 
-project.ext.mainClassName = "io.anuke.mindustry.desktop.DesktopLauncher"
+project.ext.mainClassName = "mindustry.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
 def enableTemplates = true
@@ -28,8 +28,12 @@ task run(dependsOn: classes, type: JavaExec){
         args Eval.me(project.getProperties()["args"])
     }
 
+    if(project.hasProperty("jvmArgs")){
+        jvmArgs((List<String>)Eval.me(project.getProperties()["jvmArgs"]))
+    }
+
     if(args.contains("debug")){
-        main = "io.anuke.mindustry.DebugLauncher"
+        main = "mindustry.debug.DebugLauncher"
     }
 }
 

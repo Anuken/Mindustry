@@ -1,0 +1,3 @@
+-Solución de bugs
+-Actualizadas algunas traducciones
+-Agregada la opción de volver atrás al cargar ciertos mods antiguos.
