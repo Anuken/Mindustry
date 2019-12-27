@@ -300,7 +300,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if(Core.input.keyTap(Binding.clear_building)){
+        if(Core.input.keyTap(Binding.clear_building) || isPlacing()){
             lastSchematic = null;
             selectRequests.clear();
         }

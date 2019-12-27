@@ -85,6 +85,7 @@ public class Mods implements Loadable{
         try{
             mods.add(loadMod(dest));
             requiresReload = true;
+            sortMods();
         }catch(IOException e){
             dest.delete();
             throw e;
