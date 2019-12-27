@@ -271,7 +271,7 @@ public class Tutorial{
         }
 
         static int item(Item item){
-            return state.teams.get(state.rules.defaultTeam).noCores() ? 0 : state.teams.playerCores().first().items.get(item);
+            return state.rules.defaultTeam.data().noCores() ? 0 : state.rules.defaultTeam.core().items.get(item);
         }
 
         static boolean toggled(String name){

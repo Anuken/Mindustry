@@ -237,15 +237,15 @@ public class GroundUnit extends BaseUnit{
 
     protected void moveAwayFromCore(){
         Team enemy = null;
-        for(Team team : Vars.state.teams.enemiesOf(team)){
-            if(Vars.state.teams.isActive(team)){
+        for(Team team : Vars.team.enemies()){
+            if(team.active()){
                 enemy = team;
                 break;
             }
         }
 
         if(enemy == null){
-            for(Team team : Vars.state.teams.enemiesOf(team)){
+            for(Team team : Vars.team.enemies()){
                 enemy = team;
                 break;
             }

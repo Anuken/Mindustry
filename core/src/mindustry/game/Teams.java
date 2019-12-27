@@ -161,7 +161,7 @@ public class Teams{
             return cores.isEmpty();
         }
 
-        public TileEntity core(){
+        public CoreEntity core(){
             return cores.first();
         }
     }

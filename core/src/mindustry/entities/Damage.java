@@ -259,7 +259,7 @@ public class Damage{
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
-                if(tile != null && tile.entity != null && (team == null || state.teams.areEnemies(team, tile.getTeam())) && Mathf.dst(dx, dy) <= trad){
+                if(tile != null && tile.entity != null && (team == null ||team.isEnemy(tile.getTeam())) && Mathf.dst(dx, dy) <= trad){
                     tile.entity.damage(damage);
                 }
             }

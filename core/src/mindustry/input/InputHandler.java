@@ -402,7 +402,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        for(BrokenBlock req : state.teams.get(player.getTeam()).brokenBlocks){
+        for(BrokenBlock req : player.getTeam().data().brokenBlocks){
             Block block = content.block(req.block);
             if(block.bounds(req.x, req.y, Tmp.r2).overlaps(Tmp.r1)){
                 drawSelected(req.x, req.y, content.block(req.block), Pal.remove);

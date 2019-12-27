@@ -2,8 +2,13 @@ package mindustry.game;
 
 import arc.*;
 import arc.graphics.*;
+import arc.struct.*;
 import arc.util.*;
+import mindustry.game.Teams.*;
 import mindustry.graphics.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
+
+import static mindustry.Vars.*;
 
 public class Team implements Comparable<Team>{
     public final byte id;
@@ -52,6 +57,30 @@ public class Team implements Comparable<Team>{
         int us = Pack.u(this.id);
         if(us < 6) baseTeams[us] = this;
         all[us] = this;
+    }
+
+    public Array<Team> enemies(){
+        return state.teams.enemiesOf(this);
+    }
+
+    public TeamData data(){
+        return state.teams.get(this);
+    }
+
+    public CoreEntity core(){
+        return data().core();
+    }
+
+    public boolean active(){
+        return state.teams.isActive(this);
+    }
+
+    public boolean isEnemy(Team other){
+        return state.teams.areEnemies(this, other);
+    }
+
+    public Array<CoreEntity> cores(){
+        return state.teams.cores(this);
     }
 
     public String localized(){

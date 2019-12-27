@@ -83,7 +83,7 @@ public class Units{
     public static TileEntity findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
         if(team == Team.derelict) return null;
 
-        for(Team enemy : state.teams.enemiesOf(team)){
+        for(Team enemy : team.enemies()){
             TileEntity entity = indexer.findTile(enemy, x, y, range, pred, true);
             if(entity != null){
                 return entity;
@@ -195,13 +195,13 @@ public class Units{
     /** Iterates over all units that are enemies of this team. */
     public static void nearbyEnemies(Team team, float x, float y, float width, float height, Cons<Unit> cons){
         unitGroup.intersect(x, y, width, height, u -> {
-            if(state.teams.areEnemies(team, u.getTeam())){
+            if(team.isEnemy(u.getTeam())){
                 cons.get(u);
             }
         });
 
         playerGroup.intersect(x, y, width, height, player -> {
-            if(state.teams.areEnemies(team, player.getTeam())){
+            if(team.isEnemy(player.getTeam())){
                 cons.get(player);
             }
         });

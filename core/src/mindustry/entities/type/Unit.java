@@ -88,7 +88,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         if(isDead()) return false;
 
         if(other instanceof DamageTrait){
-            return other instanceof TeamTrait && state.teams.areEnemies((((TeamTrait)other).getTeam()), team);
+            return other instanceof TeamTrait && (((TeamTrait)other).getTeam()).isEnemy(team);
         }else{
             return other instanceof Unit && ((Unit)other).isFlying() == isFlying();
         }

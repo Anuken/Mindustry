@@ -162,7 +162,7 @@ public class BlockIndexer{
     /** Get all enemy blocks with a flag. */
     public Array<Tile> getEnemy(Team team, BlockFlag type){
         returnArray.clear();
-        for(Team enemy : state.teams.enemiesOf(team)){
+        for(Team enemy : team.enemies()){
             if(state.teams.isActive(enemy)){
                 ObjectSet<Tile> set = getFlagged(enemy)[type.ordinal()];
                 if(set != null){

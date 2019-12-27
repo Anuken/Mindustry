@@ -64,7 +64,7 @@ public class SStats implements SteamUserStatsCallback{
                 active50Crawlers.complete();
             }
 
-            for(TileEntity entity : state.teams.get(player.getTeam()).cores){
+            for(TileEntity entity : player.getTeam().cores()){
                 if(!content.items().contains(i -> i.type == ItemType.material && entity.items.get(i) < entity.block.itemCapacity)){
                     fillCoreAllCampaign.complete();
                     break;
