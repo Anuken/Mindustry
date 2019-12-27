@@ -1,11 +1,13 @@
 package power;
 
-import io.anuke.arc.*;
-import io.anuke.arc.math.*;
-import io.anuke.arc.util.*;
-import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.power.*;
-import io.anuke.mindustry.world.consumers.*;
+import arc.*;
+import arc.math.*;
+import arc.util.*;
+import mindustry.*;
+import mindustry.core.*;
+import mindustry.world.*;
+import mindustry.world.blocks.power.*;
+import mindustry.world.consumers.*;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,6 +25,7 @@ public class PowerTests extends PowerTestFixture{
     @BeforeAll
     static void init(){
         Core.graphics = new FakeGraphics();
+        Vars.state = new GameState();
     }
 
     @Nested

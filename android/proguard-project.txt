@@ -22,8 +22,8 @@
 -verbose
 -verbose
 -ignorewarnings
--keep class io.anuke.mindustry.game.Rules
--keep class io.anuke.mindustry.desktop.DesktopLauncher
+-keep class mindustry.game.Rules
+-keep class mindustry.desktop.DesktopLauncher
 -keepclasseswithmembers public class * {
     public static void main(java.lang.String[]);
 }

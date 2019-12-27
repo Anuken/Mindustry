@@ -31,7 +31,7 @@ Import [this style file](.github/Mindustry-CodeStyle-IJ.xml) into IntelliJ to ge
 
 #### Do not use incompatible Java features (java.util.function, java.awt).
 Android [does not support](https://developer.android.com/studio/write/java8-support#supported_features) many of Java 8's features, such as the packages `java.util.function`, `java.util.stream` or `forEach` in collections. Do not use these in your code.  
-If you need to use functional interfaces, use the ones in `io.anuke.arc.func`, which are more or less the same with different naming schemes.
+If you need to use functional interfaces, use the ones in `arc.func`, which are more or less the same with different naming schemes.
   
 The same applies to any class *outside* of the standard `java.[n]io` / `java.net` / `java.util` packages: Most of them are not supported.  
 `java.awt` is one of these packages: do not use it, ever. It is not supported on any platform, even desktop - the entire package is removed during JRE minimization.
@@ -39,7 +39,7 @@ In general, if you are using IntelliJ, you should be warned about platform incom
 
 
 #### Use `arc` collections and classes when possible.
-Instead of using `java.util.List`, `java.util.HashMap`, and other standard Java collections, use `Array`, `ObjectMap` and other equivalents from `io.anuke.arc.collection`. 
+Instead of using `java.util.List`, `java.util.HashMap`, and other standard Java collections, use `Array`, `ObjectMap` and other equivalents from `arc.struct`.
 Why? Because that's what the rest of the codebase uses, and the standard collections have a lot of cruft and usability issues associated with them.  
 In the rare case that concurrency is required, you may use the standard Java classes for that purpose (e.g. `CopyOnWriteArrayList`).  
 
@@ -47,7 +47,7 @@ What you'll usually need to change:
 - `HashSet` -> `ObjectSet`
 - `HashMap` -> `ObjectMap`
 - `List` / `ArrayList` / `Stack` -> `Array`
-- `java.util.Queue` -> `io.anuke.arc.collection.Queue`
+- `java.util.Queue` -> `arc.struct.Queue`
 - *Many others*
 
 

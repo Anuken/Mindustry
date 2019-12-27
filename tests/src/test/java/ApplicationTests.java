@@ -1,28 +1,28 @@
-import io.anuke.arc.ApplicationCore;
-import io.anuke.arc.Core;
-import io.anuke.arc.backends.headless.HeadlessApplication;
-import io.anuke.arc.collection.*;
-import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
-import io.anuke.mindustry.entities.type.BaseUnit;
-import io.anuke.mindustry.entities.type.base.*;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.io.SaveIO;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.net.*;
-import io.anuke.mindustry.ctype.ContentType;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.BlockPart;
+import arc.ApplicationCore;
+import arc.Core;
+import arc.backend.headless.HeadlessApplication;
+import arc.struct.*;
+import arc.math.geom.Point2;
+import arc.util.Log;
+import arc.util.Time;
+import mindustry.Vars;
+import mindustry.content.*;
+import mindustry.core.GameState.State;
+import mindustry.core.*;
+import mindustry.entities.traits.BuilderTrait.BuildRequest;
+import mindustry.entities.type.BaseUnit;
+import mindustry.entities.type.base.*;
+import mindustry.game.Team;
+import mindustry.io.SaveIO;
+import mindustry.maps.Map;
+import mindustry.net.*;
+import mindustry.ctype.ContentType;
+import mindustry.type.Item;
+import mindustry.world.*;
+import mindustry.world.blocks.BlockPart;
 import org.junit.jupiter.api.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static mindustry.Vars.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationTests{
@@ -106,8 +106,8 @@ public class ApplicationTests{
         Time.update();
         Time.update();
         Time.setDeltaProvider(() -> 1f);
-        unitGroups[waveTeam.ordinal()].updateEvents();
-        assertFalse(unitGroups[waveTeam.ordinal()].isEmpty(), "No enemies spawned.");
+        unitGroup.update();
+        assertFalse(unitGroup.isEmpty(), "No enemies spawned.");
     }
 
     @Test
@@ -128,7 +128,7 @@ public class ApplicationTests{
         createMap();
         int bx = 4;
         int by = 4;
-        world.setBlock(world.tile(bx, by), Blocks.coreShard, Team.sharded);
+        world.tile(bx, by).set(Blocks.coreShard, Team.sharded);
         assertEquals(world.tile(bx, by).getTeam(), Team.sharded);
         for(int x = bx - 1; x <= bx + 1; x++){
             for(int y = by - 1; y <= by + 1; y++){
@@ -198,7 +198,7 @@ public class ApplicationTests{
     @Test
     void save(){
         world.loadMap(testMap);
-        assertTrue(state.teams.get(defaultTeam).cores.size > 0);
+        assertTrue(state.teams.playerCores().size > 0);
         SaveIO.save(saveDirectory.child("0.msav"));
     }
 
@@ -213,7 +213,7 @@ public class ApplicationTests{
 
         assertEquals(world.width(), map.width);
         assertEquals(world.height(), map.height);
-        assertTrue(state.teams.get(defaultTeam).cores.size > 0);
+        assertTrue(state.teams.playerCores().size > 0);
     }
 
     @Test
@@ -379,12 +379,12 @@ public class ApplicationTests{
         createMap();
 
         Tile core = world.tile(5, 5);
-        world.setBlock(core, Blocks.coreShard, Team.sharded);
+        core.set(Blocks.coreShard, Team.sharded);
         for(Item item : content.items()){
             core.entity.items.set(item, 3000);
         }
 
-        assertEquals(core, state.teams.get(Team.sharded).cores.first());
+        assertEquals(core.entity, state.teams.get(Team.sharded).core());
     }
 
     void depositTest(Block block, Item item){
