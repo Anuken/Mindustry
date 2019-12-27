@@ -25,7 +25,7 @@ public class ArtilleryBulletType extends BasicBulletType{
     }
 
     @Override
-    public void update(mindustry.entities.type.Bullet b){
+    public void update(Bullet b){
         super.update(b);
 
         if(b.timer.get(0, 3 + b.fslope() * 2f)){
