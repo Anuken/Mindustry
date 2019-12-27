@@ -125,6 +125,10 @@ public class Teams{
     }
 
     private void updateEnemies(){
+        if(!active.contains(get(state.rules.waveTeam))){
+            active.add(get(state.rules.waveTeam));
+        }
+
         for(TeamData data : active){
             data.enemies.clear();
             for(TeamData other : active){

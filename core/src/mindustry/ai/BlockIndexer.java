@@ -112,6 +112,8 @@ public class BlockIndexer{
 
     /** Updates all the structure quadrants for a newly activated team. */
     public void updateTeamIndex(Team team){
+        if(structQuadrants == null) return;
+
         //go through every tile... ouch
         for(int x = 0; x < world.width(); x++){
             for(int y = 0; y < world.height(); y++){
