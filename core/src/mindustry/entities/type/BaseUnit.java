@@ -352,13 +352,13 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public void hitbox(Rectangle rectangle){
-        rectangle.setSize(type.hitsize).setCenter(x, y);
+    public void hitbox(Rect rect){
+        rect.setSize(type.hitsize).setCenter(x, y);
     }
 
     @Override
-    public void hitboxTile(Rectangle rectangle){
-        rectangle.setSize(type.hitsizeTile).setCenter(x, y);
+    public void hitboxTile(Rect rect){
+        rect.setSize(type.hitsizeTile).setCenter(x, y);
     }
 
     @Override

@@ -33,14 +33,31 @@ import static mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
     private final static int maxSnapshotSize = 430, timerBlockSync = 0;
-    private final static float serverSyncTime = 12, kickDuration = 30 * 1000, blockSyncTime = 60 * 10;
+    private final static float serverSyncTime = 12, kickDuration = 30 * 1000, blockSyncTime = 60 * 8;
     private final static Vec2 vector = new Vec2();
-    private final static Rectangle viewport = new Rectangle();
+    private final static Rect viewport = new Rect();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
     private final static float correctDist = 16f;
 
     public final Administration admins = new Administration();
     public final CommandHandler clientCommands = new CommandHandler("/");
+    public TeamAssigner assigner = (player, players) -> {
+        if(state.rules.pvp){
+            //find team with minimum amount of players and auto-assign player to that.
+            TeamData re = state.teams.getActive().min(data -> {
+                int count = 0;
+                for(Player other : players){
+                    if(other.getTeam() == data.team && other != player){
+                        count++;
+                    }
+                }
+                return count;
+            });
+            return re == null ? null : re.team;
+        }
+
+        return state.rules.defaultTeam;
+    };
 
     private boolean closing = false;
     private Interval timer = new Interval();
@@ -199,10 +216,8 @@ public class NetServer implements ApplicationListener{
             con.player = player;
 
             //playing in pvp mode automatically assigns players to teams
-            if(state.rules.pvp){
-                player.setTeam(assignTeam(player, playerGroup.all()));
-                Log.info("Auto-assigned player {0} to team {1}.", player.name, player.getTeam());
-            }
+            player.setTeam(assignTeam(player, playerGroup.all()));
+            Log.info("Auto-assigned player {0} to team {1}.", player.name, player.getTeam());
 
             sendWorldData(player);
 
@@ -403,17 +418,7 @@ public class NetServer implements ApplicationListener{
     }
 
     public Team assignTeam(Player current, Iterable<Player> players){
-        //find team with minimum amount of players and auto-assign player to that.
-        TeamData re = state.teams.getActive().min(data -> {
-            int count = 0;
-            for(Player other : players){
-                if(other.getTeam() == data.team && other != current){
-                    count++;
-                }
-            }
-            return count;
-        });
-        return re == null ? null : re.team;
+        return assigner.assign(current, players);
     }
 
     public void sendWorldData(Player player){
@@ -783,5 +788,9 @@ public class NetServer implements ApplicationListener{
         }catch(IOException e){
             e.printStackTrace();
         }
+    }
+
+    public interface TeamAssigner{
+        Team assign(Player player, Iterable<Player> players);
     }
 }

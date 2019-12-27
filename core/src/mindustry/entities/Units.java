@@ -12,7 +12,7 @@ import static mindustry.Vars.*;
 
 /** Utility class for unit and team interactions.*/
 public class Units{
-    private static Rectangle hitrect = new Rectangle();
+    private static Rect hitrect = new Rect();
     private static Unit result;
     private static float cdist;
     private static boolean boolResult;
@@ -188,7 +188,7 @@ public class Units{
     }
 
     /** Iterates over all units in a rectangle. */
-    public static void nearby(Rectangle rect, Cons<Unit> cons){
+    public static void nearby(Rect rect, Cons<Unit> cons){
         nearby(rect.x, rect.y, rect.width, rect.height, cons);
     }
 
@@ -208,7 +208,7 @@ public class Units{
     }
 
     /** Iterates over all units that are enemies of this team. */
-    public static void nearbyEnemies(Team team, Rectangle rect, Cons<Unit> cons){
+    public static void nearbyEnemies(Team team, Rect rect, Cons<Unit> cons){
         nearbyEnemies(team, rect.x, rect.y, rect.width, rect.height, cons);
     }
 

@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 public class OverlayRenderer{
     private static final float indicatorLength = 14f;
     private static final float spawnerMargin = tilesize*11f;
-    private static final Rectangle rect = new Rectangle();
+    private static final Rect rect = new Rect();
     private float buildFadeTime;
 
     public void drawBottom(){

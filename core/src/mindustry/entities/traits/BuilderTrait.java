@@ -343,7 +343,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
             return this;
         }
 
-        public Rectangle bounds(Rectangle rect){
+        public Rect bounds(Rect rect){
             if(breaking){
                 return rect.set(-100f, -100f, 0f, 0f);
             }else{

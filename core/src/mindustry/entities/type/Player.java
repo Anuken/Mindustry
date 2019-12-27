@@ -41,7 +41,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     private static final int timerShootRight = 1;
     private static final float liftoffBoost = 0.2f;
 
-    private static final Rectangle rect = new Rectangle();
+    private static final Rect rect = new Rect();
 
     //region instance variables
 
@@ -93,13 +93,13 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     @Override
-    public void hitbox(Rectangle rectangle){
-        rectangle.setSize(mech.hitsize).setCenter(x, y);
+    public void hitbox(Rect rect){
+        rect.setSize(mech.hitsize).setCenter(x, y);
     }
 
     @Override
-    public void hitboxTile(Rectangle rectangle){
-        rectangle.setSize(mech.hitsize * 2f / 3f).setCenter(x, y);
+    public void hitboxTile(Rect rect){
+        rect.setSize(mech.hitsize * 2f / 3f).setCenter(x, y);
     }
 
     @Override

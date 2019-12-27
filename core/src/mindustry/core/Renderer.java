@@ -41,7 +41,7 @@ public class Renderer implements ApplicationListener{
     private float camerascale = targetscale;
     private float landscale = 0f, landTime;
     private float minZoomScl = Scl.scl(0.01f);
-    private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
+    private Rect rect = new Rect(), rect2 = new Rect();
     private float shakeIntensity, shaketime;
 
     public Renderer(){
@@ -56,8 +56,8 @@ public class Renderer implements ApplicationListener{
         Effects.setEffectProvider((effect, color, x, y, rotation, data) -> {
             if(effect == Fx.none) return;
             if(Core.settings.getBool("effects")){
-                Rectangle view = camera.bounds(rect);
-                Rectangle pos = rect2.setSize(effect.size).setCenter(x, y);
+                Rect view = camera.bounds(rect);
+                Rect pos = rect2.setSize(effect.size).setCenter(x, y);
 
                 if(view.overlaps(pos)){
 

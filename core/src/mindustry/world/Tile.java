@@ -327,7 +327,7 @@ public class Tile implements Position, TargetTrait{
         return tmpArray;
     }
 
-    public Rectangle getHitbox(Rectangle rect){
+    public Rect getHitbox(Rect rect){
         return rect.setSize(block().size * tilesize).setCenter(drawx(), drawy());
     }
 

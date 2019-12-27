@@ -20,7 +20,7 @@ public class JsonIO{
 
         @Override
         public void writeValue(Object value, Class knownType, Class elementType){
-            if(value instanceof mindustry.ctype.MappableContent){
+            if(value instanceof MappableContent){
                 try{
                     getWriter().value(((MappableContent)value).name);
                 }catch(IOException e){
@@ -92,6 +92,18 @@ public class JsonIO{
                 if(jsonData.asString() == null) return Items.copper;
                 Item i =  Vars.content.getByName(ContentType.item, jsonData.asString());
                 return i == null ? Items.copper : i;
+            }
+        });
+
+        json.setSerializer(Team.class, new Serializer<Team>(){
+            @Override
+            public void write(Json json, Team object, Class knownType){
+                json.writeValue(object.id);
+            }
+
+            @Override
+            public Team read(Json json, JsonValue jsonData, Class type){
+                return Team.get(jsonData.asInt());
             }
         });
 

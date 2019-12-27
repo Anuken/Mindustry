@@ -22,8 +22,8 @@ import static mindustry.Vars.*;
 
 /** Utility class for damaging in an area. */
 public class Damage{
-    private static Rectangle rect = new Rectangle();
-    private static Rectangle hitrect = new Rectangle();
+    private static Rect rect = new Rect();
+    private static Rect hitrect = new Rect();
     private static Vec2 tr = new Vec2();
     private static GridBits bits = new GridBits(30, 30);
     private static IntQueue propagation = new IntQueue();
@@ -127,7 +127,7 @@ public class Damage{
 
         Cons<Unit> cons = e -> {
             e.hitbox(hitrect);
-            Rectangle other = hitrect;
+            Rect other = hitrect;
             other.y -= expand;
             other.x -= expand;
             other.width += expand * 2;

@@ -1,13 +1,13 @@
 package mindustry.entities.bullet;
 
-import arc.math.geom.Rectangle;
+import arc.math.geom.Rect;
 import arc.util.Time;
 import mindustry.content.Fx;
 import mindustry.entities.Units;
 import mindustry.entities.type.Bullet;
 
 public class FlakBulletType extends BasicBulletType{
-    protected static Rectangle rect = new Rectangle();
+    protected static Rect rect = new Rect();
     protected float explodeRange = 30f;
 
     public FlakBulletType(float speed, float damage){

@@ -31,7 +31,7 @@ public class TechTreeDialog extends FloatingDialog{
     private final float nodeSize = Scl.scl(60f);
     private ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
     private TechTreeNode root = new TechTreeNode(TechTree.root, null);
-    private Rectangle bounds = new Rectangle();
+    private Rect bounds = new Rect();
     private ItemsDisplay items;
     private View view;
 
@@ -123,7 +123,7 @@ public class TechTreeDialog extends FloatingDialog{
             miny = Math.min(n.y - n.height/2f, miny);
             maxy = Math.max(n.y + n.height/2f, maxy);
         }
-        bounds = new Rectangle(minx, miny, maxx - minx, maxy - miny);
+        bounds = new Rect(minx, miny, maxx - minx, maxy - miny);
         bounds.y += nodeSize*1.5f;
     }
 

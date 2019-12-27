@@ -82,6 +82,8 @@ public class Rules{
     public Team defaultTeam = Team.sharded;
     /** team of the enemy in waves/sectors */
     public Team waveTeam = Team.crux;
+    /** special tags for additional info */
+    public StringMap tags = new StringMap();
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
     public Rules copy(){
