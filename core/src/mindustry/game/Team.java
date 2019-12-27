@@ -2,6 +2,7 @@ package mindustry.game;
 
 import arc.*;
 import arc.graphics.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.game.Teams.*;
@@ -29,10 +30,12 @@ public class Team implements Comparable<Team>{
         blue = new Team(5, "blue", Color.royal.cpy());
 
     static{
+        Mathf.random.setSeed(7);
         //create the whole 256 placeholder teams
         for(int i = 6; i < all.length; i++){
-            new Team(i, "team#" + i, Color.HSVtoRGB(360f * (float)(i) / all.length * 10, 100f * 0.8f, 100f * 0.8f, 1f));
+            new Team(i, "team#" + i, Color.HSVtoRGB(360f * Mathf.random(), 100f * Mathf.random(0.6f, 1f), 100f * Mathf.random(0.8f, 1f), 1f));
         }
+        Mathf.random.setSeed(new RandomXS128().nextLong());
     }
 
     public static Team get(int id){
