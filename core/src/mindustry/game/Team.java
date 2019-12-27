@@ -31,7 +31,7 @@ public class Team implements Comparable<Team>{
     static{
         //create the whole 256 placeholder teams
         for(int i = 6; i < all.length; i++){
-            new Team(i, "team#" + i, Color.HSVtoRGB(360f * (float)(i) / all.length, 100f, 100f, 1f));
+            new Team(i, "team#" + i, Color.HSVtoRGB(360f * (float)(i) / all.length * 10, 100f * 0.8f, 100f * 0.8f, 1f));
         }
     }
 
@@ -90,5 +90,10 @@ public class Team implements Comparable<Team>{
     @Override
     public int compareTo(Team team){
         return Integer.compare(id, team.id);
+    }
+
+    @Override
+    public String toString(){
+        return name;
     }
 }

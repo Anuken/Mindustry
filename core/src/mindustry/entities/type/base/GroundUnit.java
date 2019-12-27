@@ -237,7 +237,7 @@ public class GroundUnit extends BaseUnit{
 
     protected void moveAwayFromCore(){
         Team enemy = null;
-        for(Team team : Vars.team.enemies()){
+        for(Team team : team.enemies()){
             if(team.active()){
                 enemy = team;
                 break;
@@ -245,7 +245,7 @@ public class GroundUnit extends BaseUnit{
         }
 
         if(enemy == null){
-            for(Team team : Vars.team.enemies()){
+            for(Team team : team.enemies()){
                 enemy = team;
                 break;
             }
