@@ -170,7 +170,6 @@ public class ServerControl implements ApplicationListener{
         toggleSocket(Config.socketInput.bool());
 
         info("&lcServer loaded. Type &ly'help'&lc for help.");
-        System.out.print("> ");
     }
 
     private void registerCommands(){
@@ -822,8 +821,6 @@ public class ServerControl implements ApplicationListener{
         }else if(response.type == ResponseType.manyArguments){
             err("Too many command arguments. Usage: " + response.command.text + " " + response.command.paramText);
         }
-
-        System.out.print("> ");
     }
 
     private void play(boolean wait, Runnable run){

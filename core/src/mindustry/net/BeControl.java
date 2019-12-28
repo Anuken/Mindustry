@@ -84,6 +84,7 @@ public class BeControl{
         if(!updateAvailable) return;
 
         if(!headless){
+            checkUpdates = false;
             ui.showCustomConfirm(Core.bundle.format("be.update", "") + " " + updateBuild, "$be.update.confirm", "$ok", "$be.ignore", () -> {
                 boolean[] cancel = {false};
                 float[] progress = {0};
