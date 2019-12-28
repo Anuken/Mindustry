@@ -461,7 +461,7 @@ public class ServerControl implements ApplicationListener{
             try{
                 Config c = Config.valueOf(arg[0]);
                 if(arg.length == 1){
-                    Log.info("&lc'{0}'&lg is currently &lc{0}.", c.name(), c.get());
+                    Log.info("&lc'{0}'&lg is currently &lc{1}.", c.name(), c.get());
                 }else{
                     if(c.isBool()){
                         c.set(arg[1].equals("on") || arg[1].equals("true"));
