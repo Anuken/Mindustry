@@ -106,8 +106,8 @@ public class ApplicationTests{
         Time.update();
         Time.update();
         Time.setDeltaProvider(() -> 1f);
-        unitGroups[waveTeam.ordinal()].updateEvents();
-        assertFalse(unitGroups[waveTeam.ordinal()].isEmpty(), "No enemies spawned.");
+        unitGroup.update();
+        assertFalse(unitGroup.isEmpty(), "No enemies spawned.");
     }
 
     @Test
@@ -128,7 +128,7 @@ public class ApplicationTests{
         createMap();
         int bx = 4;
         int by = 4;
-        world.setBlock(world.tile(bx, by), Blocks.coreShard, Team.sharded);
+        world.tile(bx, by).set(Blocks.coreShard, Team.sharded);
         assertEquals(world.tile(bx, by).getTeam(), Team.sharded);
         for(int x = bx - 1; x <= bx + 1; x++){
             for(int y = by - 1; y <= by + 1; y++){
@@ -198,7 +198,7 @@ public class ApplicationTests{
     @Test
     void save(){
         world.loadMap(testMap);
-        assertTrue(state.teams.get(defaultTeam).cores.size > 0);
+        assertTrue(state.teams.playerCores().size > 0);
         SaveIO.save(saveDirectory.child("0.msav"));
     }
 
@@ -213,7 +213,7 @@ public class ApplicationTests{
 
         assertEquals(world.width(), map.width);
         assertEquals(world.height(), map.height);
-        assertTrue(state.teams.get(defaultTeam).cores.size > 0);
+        assertTrue(state.teams.playerCores().size > 0);
     }
 
     @Test
@@ -379,12 +379,12 @@ public class ApplicationTests{
         createMap();
 
         Tile core = world.tile(5, 5);
-        world.setBlock(core, Blocks.coreShard, Team.sharded);
+        core.set(Blocks.coreShard, Team.sharded);
         for(Item item : content.items()){
             core.entity.items.set(item, 3000);
         }
 
-        assertEquals(core, state.teams.get(Team.sharded).cores.first());
+        assertEquals(core.entity, state.teams.get(Team.sharded).core());
     }
 
     void depositTest(Block block, Item item){

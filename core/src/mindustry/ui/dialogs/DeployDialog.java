@@ -33,7 +33,7 @@ public class DeployDialog extends FloatingDialog{
     private final float nodeSize = Scl.scl(230f);
     private ObjectSet<ZoneNode> nodes = new ObjectSet<>();
     private ZoneInfoDialog info = new ZoneInfoDialog();
-    private Rectangle bounds = new Rectangle();
+    private Rect bounds = new Rect();
     private View view = new View();
 
     public DeployDialog(){

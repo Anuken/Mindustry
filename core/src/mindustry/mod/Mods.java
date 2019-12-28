@@ -2,7 +2,6 @@ package mindustry.mod;
 
 import arc.*;
 import arc.assets.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -10,6 +9,7 @@ import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.scene.ui.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
@@ -85,6 +85,7 @@ public class Mods implements Loadable{
         try{
             mods.add(loadMod(dest));
             requiresReload = true;
+            sortMods();
         }catch(IOException e){
             dest.delete();
             throw e;
@@ -142,6 +143,17 @@ public class Mods implements Loadable{
 
     @Override
     public void loadSync(){
+        for(LoadedMod mod : mods){
+            //try to load icon for each mod that can have one
+            if(mod.root.child("icon.png").exists()){
+                try{
+                    mod.iconTexture = new Texture(mod.root.child("icon.png"));
+                }catch(Throwable t){
+                    Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
+                }
+            }
+        }
+
         if(packer == null) return;
         Time.mark();
 
@@ -408,6 +420,7 @@ public class Mods implements Loadable{
         //TODO make it less epic
         Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
 
+        mods.each(LoadedMod::dispose);
         mods.clear();
         Core.bundle =  I18NBundle.createBundle(Core.files.internal("bundles/bundle"), Core.bundle.getLocale());
         load();
@@ -643,7 +656,7 @@ public class Mods implements Loadable{
     }
 
     /** Represents a plugin that has been loaded from a jar file.*/
-    public static class LoadedMod implements Publishable{
+    public static class LoadedMod implements Publishable, Disposable{
         /** The location of this mod's zip file/folder on the disk. */
         public final Fi file;
         /** The root zip file; points to the contents of this mod. In the case of folders, this is the same as the mod's file. */
@@ -664,6 +677,8 @@ public class Mods implements Loadable{
         public ObjectSet<Content> erroredContent = new ObjectSet<>();
         /** Current state of this mod. */
         public ModState state = ModState.enabled;
+        /** Icon texture. Should be disposed. */
+        public @Nullable Texture iconTexture;
 
         public LoadedMod(Fi file, Fi root, Mod main, ModMeta meta){
             this.root = root;
@@ -699,6 +714,13 @@ public class Mods implements Loadable{
                 }
             }
             return Version.build >= Strings.parseInt(meta.minGameVersion, 0);
+        }
+
+        @Override
+        public void dispose(){
+            if(iconTexture != null){
+                iconTexture.dispose();
+            }
         }
 
         @Override

@@ -27,8 +27,8 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
     private static final float maxLiquid = 70f;
     private static final int maxGeneration = 2;
     private static final Color tmp = new Color();
-    private static final Rectangle rect = new Rectangle();
-    private static final Rectangle rect2 = new Rectangle();
+    private static final Rect rect = new Rect();
+    private static final Rect rect2 = new Rect();
     private static int seeds;
 
     private int loadedPosition = -1;
@@ -151,13 +151,13 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
     }
 
     @Override
-    public void hitbox(Rectangle rectangle){
-        rectangle.setCenter(x, y).setSize(tilesize);
+    public void hitbox(Rect rect){
+        rect.setCenter(x, y).setSize(tilesize);
     }
 
     @Override
-    public void hitboxTile(Rectangle rectangle){
-        rectangle.setCenter(x, y).setSize(0f);
+    public void hitboxTile(Rect rect){
+        rect.setCenter(x, y).setSize(0f);
     }
 
     @Override

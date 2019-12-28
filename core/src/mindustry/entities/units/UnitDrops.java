@@ -7,13 +7,14 @@ import mindustry.entities.type.BaseUnit;
 import mindustry.entities.type.TileEntity;
 import mindustry.gen.Call;
 import mindustry.type.Item;
+import static mindustry.Vars.*;
 
 public class UnitDrops{
     private static Item[] dropTable;
 
     public static void dropItems(BaseUnit unit){
         //items only dropped in waves for enemy team
-        if(unit.getTeam() != Vars.waveTeam || !Vars.state.rules.unitDrops){
+        if(unit.getTeam() != state.rules.waveTeam || !Vars.state.rules.unitDrops){
             return;
         }
 

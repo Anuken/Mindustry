@@ -87,7 +87,7 @@ public class TypeIO{
 
     @WriteClass(BaseUnit.class)
     public static void writeBaseUnit(ByteBuffer buffer, BaseUnit unit){
-        buffer.put((byte)unit.getTeam().ordinal());
+        buffer.put((byte) (int)unit.getTeam().id);
         buffer.putInt(unit.getID());
     }
 
@@ -95,7 +95,7 @@ public class TypeIO{
     public static BaseUnit readBaseUnit(ByteBuffer buffer){
         byte tid = buffer.get();
         int id = buffer.getInt();
-        return unitGroups[tid].getByID(id);
+        return unitGroup.getByID(id);
     }
 
     @WriteClass(Tile.class)
@@ -194,12 +194,12 @@ public class TypeIO{
 
     @WriteClass(Team.class)
     public static void writeTeam(ByteBuffer buffer, Team reason){
-        buffer.put((byte)reason.ordinal());
+        buffer.put((byte) (int)reason.id);
     }
 
     @ReadClass(Team.class)
     public static Team readTeam(ByteBuffer buffer){
-        return Team.all[buffer.get()];
+        return Team.get(buffer.get());
     }
 
     @WriteClass(UnitCommand.class)

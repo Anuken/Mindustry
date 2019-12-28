@@ -57,7 +57,7 @@ public class BuildBlock extends Block{
     public static void onDeconstructFinish(Tile tile, Block block, int builderID){
         Team team = tile.getTeam();
         Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
-        world.removeBlock(tile);
+        tile.remove();
         Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, true));
         if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
     }
@@ -66,7 +66,7 @@ public class BuildBlock extends Block{
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         if(tile == null) return;
         float healthf = tile.entity == null ? 1f : tile.entity.healthf();
-        world.setBlock(tile, block, team, rotation);
+        tile.set(block, team, rotation);
         if(tile.entity != null){
             tile.entity.health = block.health * healthf;
         }
@@ -337,6 +337,7 @@ public class BuildBlock extends Block{
         }
 
         public void setDeconstruct(Block previous){
+            if(previous == null) return;
             this.previous = previous;
             this.progress = 1f;
             if(previous.buildCost >= 0.01f){

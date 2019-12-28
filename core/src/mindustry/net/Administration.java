@@ -1,10 +1,11 @@
 package mindustry.net;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.struct.*;
-import mindustry.Vars;
-
+import arc.util.ArcAnnotate.*;
+import mindustry.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.entities.type.*;
 
 import static mindustry.Vars.headless;
 import static mindustry.game.EventType.*;
@@ -14,6 +15,7 @@ public class Administration{
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
     private Array<String> bannedIPs = new Array<>();
     private Array<String> whitelist = new Array<>();
+    private Array<ChatFilter> chatFilters = new Array<>();
 
     public Administration(){
         Core.settings.defaults(
@@ -22,6 +24,23 @@ public class Administration{
         );
 
         load();
+    }
+
+    /** Adds a chat filter. This will transform the chat messages of every player.
+     * This functionality can be used to implement things like swear filters and special commands.
+     * Note that commands (starting with /) are not filtered.*/
+    public void addChatFilter(ChatFilter filter){
+        chatFilters.add(filter);
+    }
+
+    /** Filters out a chat message. */
+    public @Nullable String filterMessage(Player player, String message){
+        String current = message;
+        for(ChatFilter f : chatFilters){
+            current = f.filter(player, message);
+            if(current == null) return null;
+        }
+        return current;
     }
 
     public int getPlayerLimit(){
@@ -332,6 +351,11 @@ public class Administration{
 
         public PlayerInfo(){
         }
+    }
+
+    public interface ChatFilter{
+        /** @return the filtered message; a null string signals that the message should not be sent. */
+        @Nullable String filter(Player player, String message);
     }
 
     public static class TraceInfo{

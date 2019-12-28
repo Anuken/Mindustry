@@ -300,7 +300,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if(Core.input.keyTap(Binding.clear_building)){
+        if(Core.input.keyTap(Binding.clear_building) || isPlacing()){
             lastSchematic = null;
             selectRequests.clear();
         }
@@ -397,7 +397,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(mode == placing && block != null){
-            if(!overrideLineRotation && !Core.input.keyDown(Binding.diagonal_placement) && (selectX != cursorX || selectY != cursorY) && ((int) Core.input.axisTap(Binding.rotate) != 0)){
+            if(!overrideLineRotation && !Core.input.keyDown(Binding.diagonal_placement) && (selectX != cursorX || selectY != cursorY) && ((int)Core.input.axisTap(Binding.rotate) != 0)){
                 rotation = ((int)((Angles.angle(selectX, selectY, cursorX, cursorY) + 45) / 90f)) % 4;
                 overrideLineRotation = true;
             }

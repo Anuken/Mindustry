@@ -66,8 +66,8 @@ public class BranchTreeLayout implements TreeLayout{
         }
     }
 
-    public Rectangle getBounds(){
-        return new Rectangle(boundsLeft, boundsBottom, boundsRight - boundsLeft, boundsTop - boundsBottom);
+    public Rect getBounds(){
+        return new Rect(boundsLeft, boundsBottom, boundsRight - boundsLeft, boundsTop - boundsBottom);
     }
 
     private void calcSizeOfLevels(TreeNode node, int level){

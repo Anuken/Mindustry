@@ -18,7 +18,7 @@ import java.io.*;
 import static mindustry.Vars.*;
 
 public class Door extends Wall{
-    protected final static Rectangle rect = new Rectangle();
+    protected final static Rect rect = new Rect();
 
     public final int timerToggle = timers++;
     public Effect openfx = Fx.dooropen;

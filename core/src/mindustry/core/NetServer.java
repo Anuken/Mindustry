@@ -17,11 +17,13 @@ import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
 import java.nio.*;
@@ -31,14 +33,31 @@ import static mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
     private final static int maxSnapshotSize = 430, timerBlockSync = 0;
-    private final static float serverSyncTime = 12, kickDuration = 30 * 1000, blockSyncTime = 60 * 10;
+    private final static float serverSyncTime = 12, kickDuration = 30 * 1000, blockSyncTime = 60 * 8;
     private final static Vec2 vector = new Vec2();
-    private final static Rectangle viewport = new Rectangle();
+    private final static Rect viewport = new Rect();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
     private final static float correctDist = 16f;
 
     public final Administration admins = new Administration();
     public final CommandHandler clientCommands = new CommandHandler("/");
+    public TeamAssigner assigner = (player, players) -> {
+        if(state.rules.pvp){
+            //find team with minimum amount of players and auto-assign player to that.
+            TeamData re = state.teams.getActive().min(data -> {
+                int count = 0;
+                for(Player other : players){
+                    if(other.getTeam() == data.team && other != player){
+                        count++;
+                    }
+                }
+                return count;
+            });
+            return re == null ? null : re.team;
+        }
+
+        return state.rules.defaultTeam;
+    };
 
     private boolean closing = false;
     private Interval timer = new Interval();
@@ -197,10 +216,8 @@ public class NetServer implements ApplicationListener{
             con.player = player;
 
             //playing in pvp mode automatically assigns players to teams
-            if(state.rules.pvp){
-                player.setTeam(assignTeam(player, playerGroup.all()));
-                Log.info("Auto-assigned player {0} to team {1}.", player.name, player.getTeam());
-            }
+            player.setTeam(assignTeam(player, playerGroup.all()));
+            Log.info("Auto-assigned player {0} to team {1}.", player.name, player.getTeam());
 
             sendWorldData(player);
 
@@ -401,19 +418,7 @@ public class NetServer implements ApplicationListener{
     }
 
     public Team assignTeam(Player current, Iterable<Player> players){
-        //find team with minimum amount of players and auto-assign player to that.
-        return Structs.findMin(Team.all, team -> {
-            if(state.teams.isActive(team) && !state.teams.get(team).cores.isEmpty()){
-                int count = 0;
-                for(Player other : players){
-                    if(other.getTeam() == team && other != current){
-                        count++;
-                    }
-                }
-                return count;
-            }
-            return Integer.MAX_VALUE;
-        });
+        return assigner.assign(current, players);
     }
 
     public void sendWorldData(Player player){
@@ -584,8 +589,8 @@ public class NetServer implements ApplicationListener{
     public boolean isWaitingForPlayers(){
         if(state.rules.pvp){
             int used = 0;
-            for(Team t : Team.all){
-                if(playerGroup.count(p -> p.getTeam() == t) > 0){
+            for(TeamData t : state.teams.getActive()){
+                if(playerGroup.count(p -> p.getTeam() == t.team) > 0){
                     used++;
                 }
             }
@@ -647,20 +652,20 @@ public class NetServer implements ApplicationListener{
 
     public void writeEntitySnapshot(Player player) throws IOException{
         syncStream.reset();
-        ObjectSet<Tile> cores = state.teams.get(player.getTeam()).cores;
+        Array<CoreEntity> cores = state.teams.cores(player.getTeam());
 
         dataStream.writeByte(cores.size);
 
-        for(Tile tile : cores){
-            dataStream.writeInt(tile.pos());
-            tile.entity.items.write(dataStream);
+        for(CoreEntity entity : cores){
+            dataStream.writeInt(entity.tile.pos());
+            entity.items.write(dataStream);
         }
 
         dataStream.close();
         byte[] stateBytes = syncStream.toByteArray();
 
         //write basic state data.
-        Call.onStateSnapshot(player.con, state.wavetime, state.wave, state.enemies(), (short)stateBytes.length, net.compressSnapshot(stateBytes));
+        Call.onStateSnapshot(player.con, state.wavetime, state.wave, state.enemies, (short)stateBytes.length, net.compressSnapshot(stateBytes));
 
         viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
 
@@ -783,5 +788,9 @@ public class NetServer implements ApplicationListener{
         }catch(IOException e){
             e.printStackTrace();
         }
+    }
+
+    public interface TeamAssigner{
+        Team assign(Player player, Iterable<Player> players);
     }
 }

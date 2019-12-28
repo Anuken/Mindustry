@@ -15,8 +15,8 @@ public class DeflectorWall extends Wall{
     public static final float hitTime = 10f;
 
     protected float maxDamageDeflect = 10f;
-    protected Rectangle rect = new Rectangle();
-    protected Rectangle rect2 = new Rectangle();
+    protected Rect rect = new Rect();
+    protected Rect rect2 = new Rect();
 
     public DeflectorWall(String name){
         super(name);

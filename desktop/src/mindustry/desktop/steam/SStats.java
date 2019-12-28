@@ -1,9 +1,9 @@
 package mindustry.desktop.steam;
 
 import arc.*;
-import com.codedisaster.steamworks.*;
 import arc.struct.*;
 import arc.util.*;
+import com.codedisaster.steamworks.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.type.*;
@@ -11,7 +11,6 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Stats.*;
 import mindustry.type.*;
-import mindustry.world.*;
 
 import static mindustry.Vars.*;
 import static mindustry.desktop.steam.SAchievement.*;
@@ -55,18 +54,18 @@ public class SStats implements SteamUserStatsCallback{
 
     private void checkUpdate(){
         if(campaign()){
-            SStat.maxUnitActive.max(unitGroups[player.getTeam().ordinal()].size());
+            SStat.maxUnitActive.max(unitGroup.count(t -> t.getTeam() == player.getTeam()));
 
-            if(unitGroups[player.getTeam().ordinal()].count(u -> u.getType() == UnitTypes.phantom) >= 10){
+            if(unitGroup.count(u -> u.getType() == UnitTypes.phantom && u.getTeam() == player.getTeam()) >= 10){
                 active10Phantoms.complete();
             }
 
-            if(unitGroups[player.getTeam().ordinal()].count(u -> u.getType() == UnitTypes.crawler) >= 50){
+            if(unitGroup.count(u -> u.getType() == UnitTypes.crawler && u.getTeam() == player.getTeam()) >= 50){
                 active50Crawlers.complete();
             }
 
-            for(Tile tile : state.teams.get(player.getTeam()).cores){
-                if(!content.items().contains(i -> i.type == ItemType.material && tile.entity.items.get(i) < tile.block().itemCapacity)){
+            for(TileEntity entity : player.getTeam().cores()){
+                if(!content.items().contains(i -> i.type == ItemType.material && entity.items.get(i) < entity.block.itemCapacity)){
                     fillCoreAllCampaign.complete();
                     break;
                 }

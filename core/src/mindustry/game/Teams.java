@@ -1,61 +1,168 @@
 package mindustry.game;
 
+import arc.func.*;
+import arc.math.geom.*;
 import arc.struct.*;
-import mindustry.*;
-import mindustry.world.*;
+import arc.util.ArcAnnotate.*;
+import arc.util.*;
+import mindustry.entities.type.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
+
+import static mindustry.Vars.*;
 
 /** Class for various team-based utilities. */
 public class Teams{
-    private TeamData[] map = new TeamData[Team.all.length];
+    /** Maps team IDs to team data. */
+    private TeamData[] map = new TeamData[256];
+    /** Active teams. */
+    private Array<TeamData> active = new Array<>();
 
-    /**
-     * Register a team.
-     * @param team The team type enum.
-     * @param enemies The array of enemies of this team. Any team not in this array is considered neutral.
-     */
-    public void add(Team team, Team... enemies){
-        map[team.ordinal()] = new TeamData(team, EnumSet.of(enemies));
+    public @Nullable CoreEntity closestEnemyCore(float x, float y, Team team){
+        for(TeamData data : active){
+            if(areEnemies(team, data.team)){
+                CoreEntity tile = Geometry.findClosest(x, y, data.cores);
+                if(tile != null){
+                    return tile;
+                }
+            }
+        }
+        return null;
+    }
+
+    public @Nullable CoreEntity closestCore(float x, float y, Team team){
+        return Geometry.findClosest(x, y, get(team).cores);
+    }
+
+    public Array<Team> enemiesOf(Team team){
+        return get(team).enemies;
+    }
+
+    public boolean eachEnemyCore(Team team, Boolf<CoreEntity> ret){
+        for(TeamData data : active){
+            if(areEnemies(team, data.team)){
+                for(CoreEntity tile : data.cores){
+                    if(ret.get(tile)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public void eachEnemyCore(Team team, Cons<TileEntity> ret){
+        for(TeamData data : active){
+            if(areEnemies(team, data.team)){
+                for(TileEntity tile : data.cores){
+                    ret.get(tile);
+                }
+            }
+        }
     }
 
     /** Returns team data by type. */
     public TeamData get(Team team){
-        if(map[team.ordinal()] == null){
-            add(team, Array.with(Team.all).select(t -> t != team).toArray(Team.class));
+        if(map[Pack.u(team.id)] == null){
+            map[Pack.u(team.id)] = new TeamData(team);
         }
-        return map[team.ordinal()];
+        return map[Pack.u(team.id)];
+    }
+
+    public Array<CoreEntity> playerCores(){
+        return get(state.rules.defaultTeam).cores;
+    }
+
+    /** Do not modify! */
+    public Array<CoreEntity> cores(Team team){
+        return get(team).cores;
     }
 
     /** Returns whether a team is active, e.g. whether it has any cores remaining. */
     public boolean isActive(Team team){
         //the enemy wave team is always active
-        return team == Vars.waveTeam || get(team).cores.size > 0;
-    }
-
-    /** Returns a set of all teams that are enemies of this team. */
-    public EnumSet<Team> enemiesOf(Team team){
-        return get(team).enemies;
+        return team == state.rules.waveTeam || get(team).cores.size > 0;
     }
 
     /** Returns whether {@param other} is an enemy of {@param #team}. */
     public boolean areEnemies(Team team, Team other){
-        return enemiesOf(team).contains(other);
+        //todo what about derelict?
+        return team != other;
     }
 
-    /** Allocates a new array with the active teams.
-     * Never call in the main game loop.*/
+    public boolean canInteract(Team team, Team other){
+        return team == other || other == Team.derelict;
+    }
+
+    /** Do not modify. */
     public Array<TeamData> getActive(){
-        return Array.select(map, t -> t != null);
+        return active;
     }
 
-    public static class TeamData{
-        public final ObjectSet<Tile> cores = new ObjectSet<>();
-        public final EnumSet<Team> enemies;
+    public void registerCore(CoreEntity core){
+        TeamData data = get(core.getTeam());
+        //add core if not present
+        if(!data.cores.contains(core)){
+            data.cores.add(core);
+        }
+
+        //register in active list if needed
+        if(data.active() && !active.contains(data)){
+            active.add(data);
+            updateEnemies();
+            indexer.updateTeamIndex(data.team);
+        }
+    }
+
+    public void unregisterCore(CoreEntity entity){
+        TeamData data = get(entity.getTeam());
+        //remove core
+        data.cores.remove(entity);
+        //unregister in active list
+        if(!data.active()){
+            active.remove(data);
+            updateEnemies();
+        }
+    }
+
+    private void updateEnemies(){
+        if(!active.contains(get(state.rules.waveTeam))){
+            active.add(get(state.rules.waveTeam));
+        }
+
+        for(TeamData data : active){
+            data.enemies.clear();
+            for(TeamData other : active){
+                if(areEnemies(data.team, other.team)){
+                    data.enemies.add(other.team);
+                }
+            }
+        }
+    }
+
+    public class TeamData{
+        public final Array<CoreEntity> cores = new Array<>();
+        public final Array<Team> enemies = new Array<>();
         public final Team team;
         public Queue<BrokenBlock> brokenBlocks = new Queue<>();
 
-        public TeamData(Team team, EnumSet<Team> enemies){
+        public TeamData(Team team){
             this.team = team;
-            this.enemies = enemies;
+        }
+
+        public boolean active(){
+            return team == state.rules.waveTeam || cores.size > 0;
+        }
+
+        public boolean hasCore(){
+            return cores.size > 0;
+        }
+
+        public boolean noCores(){
+            return cores.isEmpty();
+        }
+
+        public CoreEntity core(){
+            return cores.first();
         }
     }
 

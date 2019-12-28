@@ -1,15 +1,14 @@
 package mindustry.editor;
 
-import arc.struct.IntArray;
 import arc.func.*;
-import arc.math.Mathf;
-import arc.math.geom.Bresenham2;
-import arc.util.Structs;
-import mindustry.Vars;
-import mindustry.content.Blocks;
-import mindustry.game.Team;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.content.*;
+import mindustry.game.*;
 import mindustry.world.*;
-import mindustry.world.blocks.BlockPart;
+import mindustry.world.blocks.*;
 
 public enum EditorTool{
     zoom,
@@ -80,7 +79,7 @@ public enum EditorTool{
             editor.drawCircle(x, y, tile -> {
                 if(mode == -1){
                     //erase block
-                    Vars.world.removeBlock(tile);
+                    tile.remove();
                 }else if(mode == 0){
                     //erase ore
                     tile.clearOverlay();
@@ -141,7 +140,7 @@ public enum EditorTool{
                 if(tile.link().synthetic()){
                     Team dest = tile.getTeam();
                     if(dest == editor.drawTeam) return;
-                    fill(editor, x, y, false, t -> t.getTeamID() == dest.ordinal() && t.link().synthetic(), t -> t.setTeam(editor.drawTeam));
+                    fill(editor, x, y, false, t -> t.getTeamID() == (int)dest.id && t.link().synthetic(), t -> t.setTeam(editor.drawTeam));
                 }
             }
         }

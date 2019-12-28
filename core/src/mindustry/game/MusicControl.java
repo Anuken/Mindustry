@@ -83,7 +83,7 @@ public class MusicControl{
 
     /** Whether to play dark music.*/
     private boolean isDark(){
-        if(!state.teams.get(player.getTeam()).cores.isEmpty() && state.teams.get(player.getTeam()).cores.first().entity.healthf() < 0.85f){
+        if(state.teams.get(player.getTeam()).hasCore() && state.teams.get(player.getTeam()).core().healthf() < 0.85f){
             //core damaged -> dark
             return true;
         }
@@ -94,7 +94,7 @@ public class MusicControl{
         }
 
         //dark based on enemies
-        return Mathf.chance(state.enemies() / 70f + 0.1f);
+        return Mathf.chance(state.enemies / 70f + 0.1f);
     }
 
     /** Plays and fades in a music track. This must be called every frame.

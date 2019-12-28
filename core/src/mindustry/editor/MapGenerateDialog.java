@@ -138,7 +138,7 @@ public class MapGenerateDialog extends FloatingDialog{
                         tile.rotation(write.rotation);
                         tile.setFloor((Floor)content.block(write.floor));
                         tile.setBlock(content.block(write.block));
-                        tile.setTeam(Team.all[write.team]);
+                        tile.setTeam(Team.get(write.team));
                         tile.setOverlay(content.block(write.ore));
                     }
                 }
@@ -367,7 +367,7 @@ public class MapGenerateDialog extends FloatingDialog{
                             GenTile tile = buffer1[px][py];
                             input.apply(x, y, content.block(tile.floor), content.block(tile.block), content.block(tile.ore));
                             filter.apply(input);
-                            buffer2[px][py].set(input.floor, input.block, input.ore, Team.all[tile.team], tile.rotation);
+                            buffer2[px][py].set(input.floor, input.block, input.ore, Team.get(tile.team), tile.rotation);
                         }
                     }
                     for(int px = 0; px < pixmap.getWidth(); px++){
@@ -415,7 +415,7 @@ public class MapGenerateDialog extends FloatingDialog{
             this.floor = floor.id;
             this.block = wall.id;
             this.ore = ore.id;
-            this.team = (byte)team.ordinal();
+            this.team = (byte) team.id;
             this.rotation = (byte)rotation;
         }
 
@@ -437,7 +437,7 @@ public class MapGenerateDialog extends FloatingDialog{
             ctile.setBlock(content.block(block));
             ctile.setOverlay(content.block(ore));
             ctile.rotation(rotation);
-            ctile.setTeam(Team.all[team]);
+            ctile.setTeam(Team.get(team));
             return ctile;
         }
     }

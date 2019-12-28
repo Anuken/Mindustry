@@ -52,7 +52,7 @@ public class ZoneTests{
                         if(tile.drop() != null){
                             resources.add(tile.drop());
                         }
-                        if(tile.block() instanceof CoreBlock && tile.getTeam() == defaultTeam){
+                        if(tile.block() instanceof CoreBlock && tile.getTeam() == state.rules.defaultTeam){
                             hasSpawnPoint = true;
                         }
                     }
@@ -69,7 +69,7 @@ public class ZoneTests{
                 }
 
                 assertTrue(hasSpawnPoint, "Zone \"" + zone.name + "\" has no spawn points.");
-                assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && !state.teams.get(waveTeam).cores.isEmpty()), "Zone \"" + zone.name + "\" has no enemy spawn points: " + spawner.countSpawns());
+                assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && state.teams.get(state.rules.waveTeam).hasCore()), "Zone \"" + zone.name + "\" has no enemy spawn points: " + spawner.countSpawns());
 
                 for(Item item : resources){
                     assertTrue(zone.resources.contains(item), "Zone \"" + zone.name + "\" is missing item in resource list: \"" + item.name + "\"");

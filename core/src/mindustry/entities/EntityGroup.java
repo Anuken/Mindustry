@@ -19,13 +19,13 @@ public class EntityGroup<T extends Entity>{
     private final Array<T> entitiesToRemove = new Array<>(false, 32);
     private final Array<T> entitiesToAdd = new Array<>(false, 32);
     private final Array<T> intersectArray = new Array<>();
-    private final Rectangle intersectRect = new Rectangle();
+    private final Rect intersectRect = new Rect();
     private IntMap<T> map;
     private QuadTree tree;
     private Cons<T> removeListener;
     private Cons<T> addListener;
 
-    private final Rectangle viewport = new Rectangle();
+    private final Rect viewport = new Rect();
     private int count = 0;
 
     public EntityGroup(int id, Class<T> type, boolean useTree){
@@ -34,7 +34,7 @@ public class EntityGroup<T extends Entity>{
         this.type = type;
 
         if(useTree){
-            tree = new QuadTree<>(new Rectangle(0, 0, 0, 0));
+            tree = new QuadTree<>(new Rect(0, 0, 0, 0));
         }
     }
 
@@ -180,7 +180,7 @@ public class EntityGroup<T extends Entity>{
     /** Resizes the internal quadtree, if it is enabled.*/
     public void resize(float x, float y, float w, float h){
         if(useTree){
-            tree = new QuadTree<>(new Rectangle(x, y, w, h));
+            tree = new QuadTree<>(new Rect(x, y, w, h));
         }
     }
 

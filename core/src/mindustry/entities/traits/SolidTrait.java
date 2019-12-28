@@ -7,9 +7,9 @@ import mindustry.Vars;
 
 public interface SolidTrait extends QuadTreeObject, MoveTrait, VelocityTrait, Entity, Position{
 
-    void hitbox(Rectangle rectangle);
+    void hitbox(Rect rect);
 
-    void hitboxTile(Rectangle rectangle);
+    void hitboxTile(Rect rect);
 
     Vec2 lastPosition();
 

@@ -135,7 +135,7 @@ public class ServerControl implements ApplicationListener{
             if(state.rules.waves){
                 info("&lcGame over! Reached wave &ly{0}&lc with &ly{1}&lc players online on map &ly{2}&lc.", state.wave, playerGroup.size(), Strings.capitalize(world.getMap().name()));
             }else{
-                info("&lcGame over! Team &ly{0}&lc is victorious with &ly{1}&lc players online on map &ly{2}&lc.", event.winner.name(), playerGroup.size(), Strings.capitalize(world.getMap().name()));
+                info("&lcGame over! Team &ly{0}&lc is victorious with &ly{1}&lc players online on map &ly{2}&lc.", event.winner.name, playerGroup.size(), Strings.capitalize(world.getMap().name()));
             }
 
             //set next map to be played
@@ -143,7 +143,7 @@ public class ServerControl implements ApplicationListener{
             nextMapOverride = null;
             if(map != null){
                 Call.onInfoMessage((state.rules.pvp
-                ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
+                ? "[YELLOW]The " + event.winner.name + " team is victorious![]" : "[SCARLET]Game over![]")
                 + "\nNext selected map:[accent] " + map.name() + "[]"
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
                 "\nNew game begins in " + roundExtraTime + "[] seconds.");
@@ -292,7 +292,7 @@ public class ServerControl implements ApplicationListener{
                 info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name()), state.wave);
 
                 if(state.rules.waves){
-                    info("&ly  {0} enemies.", unitGroups[Team.crux.ordinal()].size());
+                    info("&ly  {0} enemies.", state.enemies);
                 }else{
                     info("&ly  {0} seconds until next wave.", (int)(state.wavetime / 60));
                 }
@@ -418,24 +418,26 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            try{
-                Team team = arg.length == 0 ? Team.sharded : Team.valueOf(arg[0]);
+            Team team = arg.length == 0 ? Team.sharded : Structs.find(Team.all(), t -> t.name.equals(arg[0]));
 
-                if(state.teams.get(team).cores.isEmpty()){
-                    err("That team has no cores.");
-                    return;
-                }
-
-                for(Item item : content.items()){
-                    if(item.type == ItemType.material){
-                        state.teams.get(team).cores.first().entity.items.set(item, state.teams.get(team).cores.first().block().itemCapacity);
-                    }
-                }
-
-                info("Core filled.");
-            }catch(IllegalArgumentException ignored){
-                err("No such team exists.");
+            if(team == null){
+                err("No team with that name found.");
+                return;
             }
+
+            if(state.teams.cores(team).isEmpty()){
+                err("That team has no cores.");
+                return;
+            }
+
+            for(Item item : content.items()){
+                if(item.type == ItemType.material){
+                    state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().block.itemCapacity);
+                }
+            }
+
+            info("Core filled.");
+
         });
 
         handler.register("name", "[name...]", "Change the server display name.", arg -> {

@@ -32,6 +32,10 @@ public abstract class BaseDrone extends FlyingUnit{
         }
     };
 
+    public boolean countsAsEnemy(){
+        return false;
+    }
+
     @Override
     public void onCommand(UnitCommand command){
         //do nothing, normal commands are not applicable here
