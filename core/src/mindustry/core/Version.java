@@ -9,9 +9,9 @@ import arc.util.io.*;
 
 public class Version{
     /** Build type. 'official' for official releases; 'custom' or 'bleeding edge' are also used. */
-    public static String type;
+    public static String type = "unknown";
     /** Build modifier, e.g. 'alpha' or 'release' */
-    public static String modifier;
+    public static String modifier = "unknown";
     /** Number specifying the major version, e.g. '4' */
     public static int number;
     /** Build number, e.g. '43'. set to '-1' for custom builds. */

@@ -257,7 +257,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean solid(){
-        return block.solid || block.isSolidFor(this) || (isLinked() && link().solid());
+        return block.solid || block.isSolidFor(this) || (isLinked() && link() != this && link().solid());
     }
 
     public boolean breakable(){

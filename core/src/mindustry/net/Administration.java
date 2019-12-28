@@ -18,11 +18,6 @@ public class Administration{
     private Array<ChatFilter> chatFilters = new Array<>();
 
     public Administration(){
-        Core.settings.defaults(
-            "strict", true,
-            "servername", "Server"
-        );
-
         load();
     }
 
@@ -51,21 +46,12 @@ public class Administration{
         Core.settings.putSave("playerlimit", limit);
     }
 
-    public void setStrict(boolean on){
-        Core.settings.putSave("strict", on);
-    }
-
     public boolean getStrict(){
-        return Core.settings.getBool("strict");
+        return Config.strict.bool();
     }
 
     public boolean allowsCustomClients(){
-        return Core.settings.getBool("allow-custom", !headless);
-    }
-
-    public void setCustomClients(boolean allowed){
-        Core.settings.put("allow-custom", allowed);
-        Core.settings.save();
+        return Config.allowCustomClients.bool();
     }
 
     /** Call when a player joins to update their information here. */
@@ -219,11 +205,7 @@ public class Administration{
     }
 
     public boolean isWhitelistEnabled(){
-        return Core.settings.getBool("whitelist", false);
-    }
-
-    public void setWhitelist(boolean enabled){
-        Core.settings.putSave("whitelist", enabled);
+        return Config.whitelist.bool();
     }
 
     public boolean isWhitelisted(String id, String usid){
@@ -331,6 +313,79 @@ public class Administration{
         playerInfo = Core.settings.getObject("player-info", ObjectMap.class, ObjectMap::new);
         bannedIPs = Core.settings.getObject("banned-ips", Array.class, Array::new);
         whitelist = Core.settings.getObject("whitelisted", Array.class, Array::new);
+    }
+
+    /** Server configuration definition. Each config value can be a string, boolean or number. */
+    public enum Config{
+        name("The server name as displayed on clients.", "Server", "servername"),
+        port("The port to host on.", Vars.port),
+        autoUpdate("Whether to auto-restart when a new update arrives.", false),
+        crashReport("Whether to send crash reports.", false, "crashreport"),
+        logging("Whether to log everything to files.", true),
+        strict("Whether strict mode is on - corrects positions and prevents duplicate UUIDs.", true),
+        socketInput("Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
+        socketInputPort("The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),
+        socketInputAddress("The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
+        allowCustomClients("Whether custom clients are allowed to connect.", !headless, "allow-custom"),
+        whitelist("Whether the whitelist is used.", false);
+
+        public static final Config[] all = values();
+
+        public final Object defaultValue;
+        public final String key, description;
+        final Runnable changed;
+
+        Config(String description, Object def){
+            this(description, def, null, null);
+        }
+
+        Config(String description, Object def, String key){
+            this(description, def, key, null);
+        }
+
+        Config(String description, Object def, Runnable changed){
+            this(description, def, null, changed);
+        }
+
+        Config(String description, Object def, String key, Runnable changed){
+            this.description = description;
+            this.key = key == null ? name() : key;
+            this.defaultValue = def;
+            this.changed = changed == null ? () -> {} : changed;
+        }
+
+        public boolean isNum(){
+            return defaultValue instanceof Integer;
+        }
+
+        public boolean isBool(){
+            return defaultValue instanceof Boolean;
+        }
+
+        public boolean isString(){
+            return defaultValue instanceof String;
+        }
+
+        public Object get(){
+            return Core.settings.get(key, defaultValue);
+        }
+
+        public boolean bool(){
+            return Core.settings.getBool(key, (Boolean)defaultValue);
+        }
+
+        public int num(){
+            return Core.settings.getInt(key, (Integer)defaultValue);
+        }
+
+        public String string(){
+            return Core.settings.getString(key, (String)defaultValue);
+        }
+
+        public void set(Object value){
+            Core.settings.putSave(key, value);
+            changed.run();
+        }
     }
 
     @Serialize

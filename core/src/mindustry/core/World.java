@@ -217,7 +217,7 @@ public class World{
     public void loadMap(Map map, Rules checkRules){
         try{
             SaveIO.load(map.file, new FilterContext(map));
-        }catch(Exception e){
+        }catch(Throwable e){
             Log.err(e);
             if(!headless){
                 ui.showErrorMessage("$map.invalid");

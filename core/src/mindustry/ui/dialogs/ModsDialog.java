@@ -32,7 +32,7 @@ public class ModsDialog extends FloatingDialog{
 
         buttons.row();
 
-        buttons.addImageTextButton("$mods.guide", Icon.wiki,
+        buttons.addImageTextButton("$mods.guide", Icon.link,
         () -> Core.net.openURI(modGuideURL))
         .size(210, 64f);
 

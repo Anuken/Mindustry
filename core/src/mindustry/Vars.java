@@ -21,6 +21,7 @@ import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.maps.*;
 import mindustry.mod.*;
+import mindustry.net.*;
 import mindustry.net.Net;
 import mindustry.world.blocks.defense.ForceProjector.*;
 
@@ -136,6 +137,8 @@ public class Vars implements Loadable{
     public static Fi modDirectory;
     /** data subdirectory used for schematics */
     public static Fi schematicDirectory;
+    /** data subdirectory used for bleeding edge build versions */
+    public static Fi bebuildDirectory;
     /** map file extension */
     public static final String mapExtension = "msav";
     /** save file extension */
@@ -157,6 +160,7 @@ public class Vars implements Loadable{
     public static Platform platform = new Platform(){};
     public static Mods mods;
     public static Schematics schematics = new Schematics();
+    public static BeControl becontrol;
 
     public static World world;
     public static Maps maps;
@@ -220,6 +224,7 @@ public class Vars implements Loadable{
         defaultWaves = new DefaultWaves();
         collisions = new EntityCollisions();
         world = new World();
+        becontrol = new BeControl();
 
         maps = new Maps();
         spawner = new WaveSpawner();
@@ -260,6 +265,7 @@ public class Vars implements Loadable{
         tmpDirectory = dataDirectory.child("tmp/");
         modDirectory = dataDirectory.child("mods/");
         schematicDirectory = dataDirectory.child("schematics/");
+        bebuildDirectory = dataDirectory.child("be_builds/");
 
         modDirectory.mkdirs();
 

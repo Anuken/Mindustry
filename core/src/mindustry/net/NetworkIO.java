@@ -1,12 +1,12 @@
 package mindustry.net;
 
-import arc.*;
 import arc.util.*;
 import mindustry.core.*;
 import mindustry.entities.type.*;
 import mindustry.game.*;
 import mindustry.io.*;
 import mindustry.maps.Map;
+import mindustry.net.Administration.*;
 
 import java.io.*;
 import java.nio.*;
@@ -62,7 +62,7 @@ public class NetworkIO{
     }
 
     public static ByteBuffer writeServerData(){
-        String name = (headless ? Core.settings.getString("servername") : player.name);
+        String name = (headless ? Config.name.string() : player.name);
         String map = world.getMap() == null ? "None" : world.getMap().name();
 
         ByteBuffer buffer = ByteBuffer.allocate(256);
