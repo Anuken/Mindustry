@@ -307,10 +307,9 @@ public class Mechs implements ContentList{
                 super.updateAlt(player);
 
                 if(player.timer.get(Player.timerAbility, effectReload)){
-                    //wasHealed = false;
 
                     Units.nearby(player.getTeam(), player.x, player.y, effectRange, unit -> {
-                        unit.applyEffect(StatusEffects.overdrive, effectDuration);
+                        //unit.applyEffect(StatusEffects.overdrive, effectDuration);
                     });
 
                     indexer.eachBlock(player, effectRange, other -> other.entity.damaged(), other -> {
@@ -318,9 +317,7 @@ public class Mechs implements ContentList{
                         Effects.effect(Fx.healBlockFull, Pal.heal, other.drawx(), other.drawy(), other.block().size);
                     });
 
-                    //if(wasHealed){
                     Effects.effect(Fx.overdriveWave, player);
-                    //}
                 }
             }
         };

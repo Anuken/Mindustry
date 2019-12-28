@@ -166,33 +166,42 @@ public enum EditorTool{
                 stack.clear();
                 stack.add(Pos.get(x, y));
 
-                while(stack.size > 0){
-                    int popped = stack.pop();
-                    x = Pos.x(popped);
-                    y = Pos.y(popped);
+                try{
+                    while(stack.size > 0 && stack.size < width*height){
+                        int popped = stack.pop();
+                        x = Pos.x(popped);
+                        y = Pos.y(popped);
 
-                    x1 = x;
-                    while(x1 >= 0 && tester.get(editor.tile(x1, y))) x1--;
-                    x1++;
-                    boolean spanAbove = false, spanBelow = false;
-                    while(x1 < width && tester.get(editor.tile(x1, y))){
-                        filler.get(editor.tile(x1, y));
-
-                        if(!spanAbove && y > 0 && tester.get(editor.tile(x1, y - 1))){
-                            stack.add(Pos.get(x1, y - 1));
-                            spanAbove = true;
-                        }else if(spanAbove && !tester.get(editor.tile(x1, y - 1))){
-                            spanAbove = false;
-                        }
-
-                        if(!spanBelow && y < height - 1 && tester.get(editor.tile(x1, y + 1))){
-                            stack.add(Pos.get(x1, y + 1));
-                            spanBelow = true;
-                        }else if(spanBelow && y < height - 1 && !tester.get(editor.tile(x1, y + 1))){
-                            spanBelow = false;
-                        }
+                        x1 = x;
+                        while(x1 >= 0 && tester.get(editor.tile(x1, y))) x1--;
                         x1++;
+                        boolean spanAbove = false, spanBelow = false;
+                        while(x1 < width && tester.get(editor.tile(x1, y))){
+                            filler.get(editor.tile(x1, y));
+
+                            if(!spanAbove && y > 0 && tester.get(editor.tile(x1, y - 1))){
+                                stack.add(Pos.get(x1, y - 1));
+                                spanAbove = true;
+                            }else if(spanAbove && !tester.get(editor.tile(x1, y - 1))){
+                                spanAbove = false;
+                            }
+
+                            if(!spanBelow && y < height - 1 && tester.get(editor.tile(x1, y + 1))){
+                                stack.add(Pos.get(x1, y + 1));
+                                spanBelow = true;
+                            }else if(spanBelow && y < height - 1 && !tester.get(editor.tile(x1, y + 1))){
+                                spanBelow = false;
+                            }
+                            x1++;
+                        }
                     }
+                    stack.clear();
+                }catch(OutOfMemoryError e){
+                    //hack
+                    stack = null;
+                    System.gc();
+                    e.printStackTrace();
+                    stack = new IntArray();
                 }
             }
         }

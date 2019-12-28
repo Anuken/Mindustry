@@ -107,9 +107,7 @@ public class MendProjector extends Block{
 
         Draw.color(baseColor, phaseColor, entity.phaseHeat);
         Draw.alpha(entity.heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
-        //Draw.blend(Blending.additive);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
-        //Draw.blend();
 
         Draw.alpha(1f);
         Lines.stroke((2f * f + 0.2f) * entity.heat);

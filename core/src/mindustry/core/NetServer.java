@@ -1,14 +1,14 @@
 package mindustry.core;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
@@ -295,9 +295,11 @@ public class NetServer implements ApplicationListener{
             void vote(Player player, int d){
                 votes += d;
                 voted.addAll(player.uuid, admins.getInfo(player.uuid).lastIP);
-                        
-                Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted to kick[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
-                            player.name, target.name, votes, votesRequired()));
+
+                if(!checkPass()){
+                    Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted to kick[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
+                    player.name, target.name, votes, votesRequired()));
+                }
             }
 
             boolean checkPass(){
@@ -654,7 +656,7 @@ public class NetServer implements ApplicationListener{
         syncStream.reset();
         Array<CoreEntity> cores = state.teams.cores(player.getTeam());
 
-        dataStream.writeByte(cores.size);
+        dataStream.writeInt(cores.size);
 
         for(CoreEntity entity : cores){
             dataStream.writeInt(entity.tile.pos());
