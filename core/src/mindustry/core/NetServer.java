@@ -295,9 +295,10 @@ public class NetServer implements ApplicationListener{
             void vote(Player player, int d){
                 votes += d;
                 voted.addAll(player.uuid, admins.getInfo(player.uuid).lastIP);
-                        
-                Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted to kick[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
-                            player.name, target.name, votes, votesRequired()));
+                if(!checkPass()){
+                    Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted to kick[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
+                                player.name, target.name, votes, votesRequired()));
+                }
             }
 
             boolean checkPass(){
@@ -373,7 +374,8 @@ public class NetServer implements ApplicationListener{
         });
 
         clientCommands.<Player>register("vote", "<y/n>", "Vote to kick the current player.", (arg, player) -> {
-            if(currentlyKicking[0] == null){
+            VoteSession session = currentlyKicking[0];
+            if(session == null){
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
                 if(player.isLocal){
@@ -396,9 +398,9 @@ public class NetServer implements ApplicationListener{
                     player.sendMessage("[scarlet]Vote either 'y' (yes) or 'n' (no).");
                     return;
                 }
-
+                
                 int sign = arg[0].toLowerCase().equals("y") ? 1 : -1;
-                currentlyKicking[0].vote(player, sign);
+                session.vote(player, sign);
             }
         });
 
