@@ -117,6 +117,7 @@ public class BeControl{
                 Log.info("&lcAuto-downloading next version...");
 
                 try{
+                    //download new file from github
                     Fi source = Fi.get(BeControl.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
                     Fi dest = source.sibling("server-be-" + updateBuild + ".jar");
 
@@ -126,6 +127,7 @@ public class BeControl{
                     () -> false,
                     () -> {
                         Log.info("&lcVersion downloaded, exiting. Note that if you are not using the run-server script, the server will not restart automatically.");
+                        //replace old file with new
                         dest.copyTo(source);
                         dest.delete();
                         System.exit(2); //this will cause a restart if using the script
@@ -136,7 +138,6 @@ public class BeControl{
                 }
             }
             checkUpdates = false;
-            //todo server updates
         }
     }
 
