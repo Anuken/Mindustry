@@ -32,9 +32,9 @@ public class ModsDialog extends FloatingDialog{
 
         buttons.row();
 
-        buttons.addImageTextButton("$mods.guide", Icon.wiki,
-        () -> Core.net.openURI(modGuideURL))
-        .size(210, 64f);
+       buttons.addImageTextButton("$mods.guide", Icon.wiki, () -> {
+            ui.showConfirm("$mods.guide","$mods.guide.open", () -> {Core.net.openURI(modGuideURL);});
+        }).size(210, 64f);
 
         buttons.addImageTextButton("$mod.import.github", Icon.github, () -> {
             ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
