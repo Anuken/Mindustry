@@ -90,11 +90,17 @@ public class ServerControl implements ApplicationListener{
         registerCommands();
 
         Core.app.post(() -> {
-            String[] commands = {};
+            Array<String> commands = new Array<>();
 
             if(args.length > 0){
-                commands = Strings.join(" ", args).split(",");
-                info("&lmFound {0} command-line arguments to parse.", commands.length);
+                commands.addAll(Strings.join(" ", args).split(","));
+                info("&lmFound {0} command-line arguments to parse.", commands.size);
+            }
+
+            if(!Config.startCommands.string().isEmpty()){
+                String[] startup = Strings.join(" ", Config.startCommands.string()).split(",");
+                info("&lmFound {0} startup commands.", startup.length);
+                commands.addAll(startup);
             }
 
             for(String s : commands){
@@ -102,7 +108,6 @@ public class ServerControl implements ApplicationListener{
                 if(response.type != ResponseType.valid){
                     err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
                     err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
-                    System.exit(1);
                 }
             }
         });
@@ -443,7 +448,7 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("config", "[name] [value]", "Configure server settings.", arg -> {
+        handler.register("config", "[name] [value...]", "Configure server settings.", arg -> {
             if(arg.length == 0){
                 info("&lyAll config values:");
                 for(Config c : Config.all){
