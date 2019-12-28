@@ -103,6 +103,10 @@ public class DesktopInput extends InputHandler{
             if(req != null){
                 drawSelected(req.x, req.y, req.breaking ? req.tile().block() : req.block, Pal.accent);
             }
+
+            if(Core.input.keyDown(Binding.select_multiple) && !Core.scene.hasKeyboard()){
+                drawSelection(selectX, selectY, cursorX, cursorY, maxLength);
+            }
         }
 
         //draw schematic requests
@@ -394,6 +398,13 @@ public class DesktopInput extends InputHandler{
             }
         }else{
             deleting = false;
+        }
+
+        if(mode == none && !isPlacing()) {
+            if(Core.input.keyTap(Binding.select_multiple) && !Core.scene.hasKeyboard()){
+                selectX = cursorX;
+                selectY = cursorY;
+            }
         }
 
         if(mode == placing && block != null){
