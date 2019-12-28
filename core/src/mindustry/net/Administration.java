@@ -319,7 +319,7 @@ public class Administration{
     public enum Config{
         name("The server name as displayed on clients.", "Server", "servername"),
         port("The port to host on.", Vars.port),
-        autoUpdate("Whether to auto-restart when a new update arrives.", false),
+        autoUpdate("Whether to auto-update and exit when a new bleeding-edge update arrives.", false),
         crashReport("Whether to send crash reports.", false, "crashreport"),
         logging("Whether to log everything to files.", true),
         strict("Whether strict mode is on - corrects positions and prevents duplicate UUIDs.", true),

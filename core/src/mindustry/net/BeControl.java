@@ -126,7 +126,7 @@ public class BeControl{
                     progress -> {},
                     () -> false,
                     () -> {
-                        Log.info("&lcVersion downloaded, exiting. Note that if you are not using the run-server script, the server will not restart automatically.");
+                        Log.info("&lcVersion downloaded, exiting. Note that if you are not using a auto-restart script, the server will not restart automatically.");
                         //replace old file with new
                         dest.copyTo(source);
                         dest.delete();
