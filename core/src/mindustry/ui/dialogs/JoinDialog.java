@@ -288,7 +288,13 @@ public class JoinDialog extends FloatingDialog{
         local.table(Tex.button, t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering.any") + Strings.animated(Time.time(), 4, 10f, ".")).pad(10f)).growX();
         net.discoverServers(this::addLocalHost, this::finishLocalHosts);
         for(String host : defaultServers){
-            net.pingHost(host, port, this::addLocalHost, e -> {});
+            String address = host;
+            int p = port;
+            if(host.contains(":")){
+                address = host.split(":")[0];
+                p = Strings.parseInt(host.split(":")[1]);
+            }
+            net.pingHost(address, p, this::addLocalHost, e -> {});
         }
     }
 
