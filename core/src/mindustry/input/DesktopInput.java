@@ -411,19 +411,15 @@ public class DesktopInput extends InputHandler{
 
             if(Core.input.keyRelease(Binding.select_multiple) && !Core.scene.hasKeyboard()){
                 NormalizeResult result = Placement.normalizeArea(selectX, selectY, cursorX, cursorY, 0, false, 100);
-                ObjectSet<BaseEntity> entities = new ObjectSet<>();
+                selectedEntities.clear();
                 for(int cx = result.x; cx <= result.x2; cx++){
                     for(int cy = result.y; cy <= result.y2; cy++){
                         Tile tile = world.ltile(cx, cy);
-                        if(tile != null && tile.entity != null){
-                            BaseEntity entity = tile.entity;
-                            if(!entities.contains(entity)){
-                                entities.add(entity);
-                            }
+                        if (tile != null && tile.entity != null){
+                            selectedEntities.add(tile.entity);
                         }
                     }
                 }
-                selectedEntities = entities;
             }
         }
 
