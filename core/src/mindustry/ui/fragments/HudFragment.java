@@ -31,6 +31,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.Cicon;
 import mindustry.ui.dialogs.*;
+import mindustry.world.blocks.production.*;
 
 import static mindustry.Vars.*;
 
@@ -342,6 +343,26 @@ public class HudFragment extends Fragment{
         });
 
         blockfrag.build(parent);
+
+        if(!mobile){
+            parent.fill(cumulativeProductionFragment -> {
+                cumulativeProductionFragment.bottom().left();
+                cumulativeProductionFragment.table(Tex.buttonEdge3).update(table -> {
+                    table.clear();
+                    table.add("Production Speed:").growX();
+                    float cumulativeSpeed = 0.0f;
+                    for(TileEntity entity: control.input.selectedEntities){
+                        if(entity.block instanceof Drill){
+                            Drill drill = (Drill) entity.block;
+                            final float speed = drill.getLastDrillSpeedPerSecond(entity);
+                            cumulativeSpeed += speed;
+                        }
+                    }
+                    table.row();
+                    table.add(Strings.fixed(cumulativeSpeed, 2));
+                }).visible(() -> !control.input.selectedEntities.isEmpty());
+            });
+        }
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.both)
