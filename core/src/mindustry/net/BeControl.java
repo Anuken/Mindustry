@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 /** Handles control of bleeding edge builds. */
 public class BeControl{
-    private static final int updateInterval = 60;
+    private static final int updateInterval = 60 * 2;
 
     private AsyncExecutor executor = new AsyncExecutor(1);
     private boolean checkUpdates = true;
@@ -64,7 +64,6 @@ public class BeControl{
                 }
             }else{
                 Core.app.post(() -> done.get(false));
-                Log.err("Update check responded with: {0}", res.getStatus());
             }
         }, error -> {
             if(!headless){

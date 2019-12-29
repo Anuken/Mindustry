@@ -82,6 +82,7 @@ public class MinimapRenderer implements Disposable{
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
 
         for(Unit unit : units){
+            if(unit.isDead()) continue;
             float rx = (unit.x - rect.x) / rect.width * w;
             float ry = (unit.y - rect.y) / rect.width * h;
 
