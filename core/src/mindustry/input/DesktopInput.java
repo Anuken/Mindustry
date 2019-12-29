@@ -136,9 +136,9 @@ public class DesktopInput extends InputHandler{
             ui.listfrag.toggle();
         }
 
-        if(player.getClosestCore() == null && !ui.chatfrag.shown()){
+        if((player.getClosestCore() == null || state.isPaused()) && !ui.chatfrag.shown()){
             //move camera around
-            float camSpeed = 6f;
+            float camSpeed = !Core.input.keyDown(Binding.dash) ? 3f : 8f;
             Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta() * camSpeed));
         }
 
