@@ -140,18 +140,19 @@ public class DesktopInput extends InputHandler{
             //move camera around
             float camSpeed = !Core.input.keyDown(Binding.dash) ? 3f : 8f;
             Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta() * camSpeed));
+
+            if(Core.input.keyDown(Binding.mouse_move)){
+                Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * camSpeed;
+                Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * camSpeed;
+            }
         }
 
         if(Core.input.keyRelease(Binding.select)){
             player.isShooting = false;
         }
 
-        if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap) && (scene.getKeyboardFocus() == ui.minimap || !scene.hasDialog()) && !Core.scene.hasKeyboard() && !(scene.getKeyboardFocus() instanceof TextField)){
-            if(!ui.minimap.isShown()){
-                ui.minimap.show();
-            }else{
-                ui.minimap.hide();
-            }
+        if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap) && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
+            ui.minimapfrag.toggle();
         }
 
         if(state.is(State.menu) || Core.scene.hasDialog()) return;

@@ -96,7 +96,7 @@ public class OverlayRenderer{
         if(buildFadeTime > 0.005f){
             state.teams.eachEnemyCore(player.getTeam(), core -> {
                 float dst = core.dst(player);
-                if(dst < state.rules.enemyCoreBuildRadius * 1.5f){
+                if(dst < state.rules.enemyCoreBuildRadius * 2.2f){
                     Draw.color(Color.darkGray);
                     Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
                     Draw.color(Pal.accent, core.getTeam().color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));

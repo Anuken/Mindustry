@@ -9,6 +9,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.entities.*;
 import mindustry.entities.type.*;
@@ -42,7 +43,7 @@ public class MinimapRenderer implements Disposable{
         return pixmap;
     }
 
-    public Texture getTexture(){
+    public @Nullable Texture getTexture(){
         return texture;
     }
 
@@ -70,8 +71,13 @@ public class MinimapRenderer implements Disposable{
         region = new TextureRegion(texture);
     }
 
-    public void drawEntities(float x, float y, float w, float h, boolean withLabels){
-        updateUnitArray();
+    public void drawEntities(float x, float y, float w, float h, float scaling, boolean withLabels){
+        if(!withLabels){
+            updateUnitArray();
+        }else{
+            units.clear();
+            Units.all(units::add);
+        }
 
         float sz = baseSize * zoom;
         float dx = (Core.camera.position.x / tilesize);
@@ -83,8 +89,8 @@ public class MinimapRenderer implements Disposable{
 
         for(Unit unit : units){
             if(unit.isDead()) continue;
-            float rx = (unit.x - rect.x) / rect.width * w;
-            float ry = (unit.y - rect.y) / rect.width * h;
+            float rx = !withLabels ? (unit.x - rect.x) / rect.width * w : unit.x / (world.width() * tilesize) * w;
+            float ry = !withLabels ? (unit.y - rect.y) / rect.width * h : unit.y / (world.height() * tilesize) * h;
 
             if(withLabels && unit instanceof Player){
                 Player pl = (Player) unit;
@@ -94,18 +100,19 @@ public class MinimapRenderer implements Disposable{
                 }
             }
 
-            Draw.color(unit.getTeam().color);
-            Fill.rect(x + rx, y + ry, Scl.scl(baseSize / 2f), Scl.scl(baseSize / 2f));
+            Draw.mixcol(unit.getTeam().color, 1f);
+            float scale = Scl.scl(1f) / 2f * scaling;
+            Draw.rect(unit.getIconRegion(), x + rx, y + ry, unit.getIconRegion().getWidth() * scale, unit.getIconRegion().getHeight() * scale, unit.rotation - 90);
         }
 
-        Draw.color();
+        Draw.reset();
     }
 
     public void drawEntities(float x, float y, float w, float h){
-        drawEntities(x, y, w, h, true);
+        drawEntities(x, y, w, h, 1f, true);
     }
 
-    public TextureRegion getRegion(){
+    public @Nullable TextureRegion getRegion(){
         if(texture == null) return null;
 
         float sz = Mathf.clamp(baseSize * zoom, baseSize, Math.min(world.width(), world.height()));
