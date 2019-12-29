@@ -183,7 +183,7 @@ public class Conveyor extends Block implements Autotiler{
         Tile next = tile.getNearby(tile.rotation());
         if(next != null) next = next.link();
 
-        float nextMax = next != null && next.block() instanceof Conveyor && next.block().acceptItem(null, next, tile) ? 1f - Math.max(itemSpace - next.<ConveyorEntity>ent().minitem, 0) : 1f;
+        float nextMax = next != null && next.block() instanceof Conveyor && !next.block().compressable && next.block().acceptItem(null, next, tile) ? 1f - Math.max(itemSpace - next.<ConveyorEntity>ent().minitem, 0) : 1f;
         int minremove = Integer.MAX_VALUE;
 
         for(int i = entity.convey.size - 1; i >= 0; i--){
@@ -210,7 +210,7 @@ public class Conveyor extends Block implements Autotiler{
             pos.y = Mathf.clamp(pos.y, 0, nextMax);
 
             if(pos.y >= 0.9999f && offloadDir(tile, pos.item)){
-                if(next != null && next.block() instanceof Conveyor){
+                if(next != null && next.block() instanceof Conveyor && !next.block().compressable){
                     ConveyorEntity othere = next.ent();
 
                     ItemPos ni = pos2.set(othere.convey.get(othere.lastInserted), ItemPos.updateShorts);
