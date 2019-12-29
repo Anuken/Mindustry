@@ -92,7 +92,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Tile tile){
-        if(player == null || player.timer == null || !player.timer.get(Player.timerTransfer, 40)) return;
+        if(player == null || player.timer == null) return;
         if(net.server() && (player.item().amount <= 0 || player.isTransferring|| !Units.canInteract(player, tile))){
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
@@ -725,7 +725,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void tryDropItems(Tile tile, float x, float y){
-        if(!droppingItem || player.item().amount <= 0 || canTapPlayer(x, y) || state.isPaused() || !player.timer.check(Player.timerTransfer, 40)){
+        if(!droppingItem || player.item().amount <= 0 || canTapPlayer(x, y) || state.isPaused() ){
             droppingItem = false;
             return;
         }

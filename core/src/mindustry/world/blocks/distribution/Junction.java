@@ -58,7 +58,7 @@ public class Junction extends Block{
                     if(dest != null) dest = dest.link();
 
                     //skip blocks that don't want the item, keep waiting until they do
-                    if(dest == null || !dest.block().acceptItem(item, dest, tile)){
+                    if(dest == null || !dest.block().acceptItem(item, dest, tile) || dest.getTeam() != tile.getTeam()){
                         continue;
                     }
 
@@ -82,10 +82,9 @@ public class Junction extends Block{
         JunctionEntity entity = tile.ent();
         int relative = source.relativeTo(tile.x, tile.y);
 
-        if(entity == null || relative == -1 || !entity.buffer.accepts(relative))
-            return false;
+        if(entity == null || relative == -1 || !entity.buffer.accepts(relative)) return false;
         Tile to = tile.getNearby(relative);
-        return to != null && to.link().entity != null;
+        return to != null && to.link().entity != null && to.getTeam() == tile.getTeam();
     }
 
     class JunctionEntity extends TileEntity{

@@ -1,5 +1,6 @@
 package mindustry.entities.type;
 
+import arc.math.*;
 import mindustry.annotations.Annotations.*;
 import arc.Events;
 import arc.struct.Array;
@@ -165,8 +166,15 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         Call.onTileDestroyed(tile);
     }
 
+    @Override
     public void damage(float damage){
         if(dead) return;
+
+        if(Mathf.zero(state.rules.blockHealthMultiplier)){
+            damage = health + 1;
+        }else{
+            damage /= state.rules.blockHealthMultiplier;
+        }
 
         float preHealth = health;
 

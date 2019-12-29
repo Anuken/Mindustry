@@ -34,6 +34,8 @@ public class Rules{
     public float unitHealthMultiplier = 1f;
     /** How much health players start with. */
     public float playerHealthMultiplier = 1f;
+    /** How much health blocks start with. */
+    public float blockHealthMultiplier = 1f;
     /** How much damage player mechs deal. */
     public float playerDamageMultiplier = 1f;
     /** How much damage any other units deal. */

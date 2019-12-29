@@ -74,7 +74,7 @@ public class Sorter extends Block{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         Tile to = getTileTarget(item, tile, source, false);
 
-        return to != null && to.block().acceptItem(item, to, tile);
+        return to != null && to.block().acceptItem(item, to, tile) && to.getTeam() == tile.getTeam();
     }
 
     @Override
