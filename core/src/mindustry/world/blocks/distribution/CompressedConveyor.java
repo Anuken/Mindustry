@@ -116,4 +116,9 @@ public class CompressedConveyor extends ArmoredConveyor{
     public void handleStack(Item item, int amount, Tile tile, Unit source){
         //
     }
+    
+    @Override
+    public boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return super.blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock.compressable;
+    }
 }
