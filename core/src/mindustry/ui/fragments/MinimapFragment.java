@@ -9,6 +9,7 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
 import mindustry.gen.*;
+import mindustry.input.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
@@ -46,7 +47,7 @@ public class MinimapFragment extends Fragment{
             elem.setFillParent(true);
             elem.setBounds(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
 
-            if(Core.input.keyTap(KeyCode.ESCAPE) || Core.input.keyTap(KeyCode.BACK)){
+            if(Core.input.keyTap(Binding.menu)){
                 shown = false;
             }
         });
@@ -98,10 +99,7 @@ public class MinimapFragment extends Fragment{
             t.row();
             t.add().growY();
             t.row();
-
-            if(mobile){
-                t.addImageTextButton("$back", Icon.backSmall, () -> shown = false).size(220f, 60f).pad(12f);
-            }
+            t.addImageTextButton("$back", Icon.backSmall, () -> shown = false).size(220f, 60f).pad(10f);
         });
     }
 
