@@ -179,6 +179,8 @@ public class ServerControl implements ApplicationListener{
         toggleSocket(Config.socketInput.bool());
 
         info("&lcServer loaded. Type &ly'help'&lc for help.");
+        
+        Events.fire(new ServerLoaded());
     }
 
     private void registerCommands(){
