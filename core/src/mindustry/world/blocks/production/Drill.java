@@ -77,7 +77,7 @@ public class Drill extends Block{
         bars.add("drillspeed", e -> {
             DrillEntity entity = (DrillEntity)e;
 
-            return new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(entity.lastDrillSpeed * 60 * entity.timeScale, 2)), () -> Pal.ammo, () -> entity.warmup);
+            return new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(getLastDrillSpeedPerSecond(entity), 2)), () -> Pal.ammo, () -> entity.warmup);
         });
     }
 
@@ -316,6 +316,11 @@ public class Drill extends Block{
         if(tile == null) return false;
         Item drops = tile.drop();
         return drops != null && drops.hardness <= tier;
+    }
+
+    public float getLastDrillSpeedPerSecond(TileEntity tileEntity){
+        DrillEntity entity = (DrillEntity) tileEntity;
+        return entity.lastDrillSpeed * 60 * entity.timeScale;
     }
 
     public static class DrillEntity extends TileEntity{
