@@ -249,6 +249,7 @@ public class Schematics implements Loadable{
 
     public void placeLoadout(Schematic schem, int x, int y){
         Stile coreTile = schem.tiles.find(s -> s.block instanceof CoreBlock);
+        if(coreTile == null) throw new IllegalArgumentException("Schematic has no core tile. Exiting.");
         int ox = x - coreTile.x, oy = y - coreTile.y;
         schem.tiles.each(st -> {
             Tile tile = world.tile(st.x + ox, st.y + oy);
