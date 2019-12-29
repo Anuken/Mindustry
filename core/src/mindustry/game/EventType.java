@@ -394,5 +394,6 @@ public class EventType{
         }
     }
     
+    public static class ServerLoaded{}
 }
 
