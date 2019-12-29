@@ -323,6 +323,11 @@ public class Drill extends Block{
         return entity.lastDrillSpeed * 60 * entity.timeScale;
     }
 
+    public Item getDominantItem(Tile tile){
+        DrillEntity entity = (DrillEntity) tile.entity;
+        return entity.dominantItem;
+    }
+
     public static class DrillEntity extends TileEntity{
         float progress;
         int index;

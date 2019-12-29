@@ -349,17 +349,26 @@ public class HudFragment extends Fragment{
                 cumulativeProductionFragment.bottom().left();
                 cumulativeProductionFragment.table(Tex.buttonEdge3).update(table -> {
                     table.clear();
-                    table.add("Production Speed:").growX();
-                    float cumulativeSpeed = 0.0f;
+                    table.add("Production Speed:").colspan(3);
+                    ObjectFloatMap<Item> cumulativeSpeedPerItem = new ObjectFloatMap<>();
                     for(TileEntity entity: control.input.selectedEntities){
                         if(entity.block instanceof Drill){
                             Drill drill = (Drill) entity.block;
-                            final float speed = drill.getLastDrillSpeedPerSecond(entity);
-                            cumulativeSpeed += speed;
+                            Item item = drill.getDominantItem(entity.tile);
+                            float speed = cumulativeSpeedPerItem.get(item, 0.0f);
+                            speed += drill.getLastDrillSpeedPerSecond(entity);
+                            cumulativeSpeedPerItem.put(item, speed);
                         }
                     }
-                    table.row();
-                    table.add(Strings.fixed(cumulativeSpeed, 2));
+                    for(Item item: content.items()){
+                        if(cumulativeSpeedPerItem.containsKey(item)){
+                            final float speed = cumulativeSpeedPerItem.get(item, 0.0f);
+                            table.row();
+                            table.addImage(item.icon(Cicon.small)).size(24).fill().left();
+                            table.add(item.localizedName).left().color(Color.lightGray).padLeft(5).expandX();
+                            table.add(Strings.fixed(speed, 2) + "/s").right().padLeft(10);
+                        }
+                    }
                 }).visible(() -> !control.input.selectedEntities.isEmpty());
             });
         }
