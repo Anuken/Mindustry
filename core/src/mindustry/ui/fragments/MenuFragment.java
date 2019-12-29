@@ -59,6 +59,18 @@ public class MenuFragment extends Fragment{
         if(mobile){
             parent.fill(c -> c.bottom().left().addButton("", Styles.infot, ui.about::show).size(84, 45));
             parent.fill(c -> c.bottom().right().addButton("", Styles.discordt, ui.discord::show).size(84, 45));
+        }else if(becontrol.active()){
+            parent.fill(c -> c.bottom().right().addImageTextButton("$be.check", Icon.refreshSmall, () -> {
+                ui.loadfrag.show();
+                becontrol.checkUpdate(result -> {
+                    ui.loadfrag.hide();
+                    if(!result){
+                        ui.showInfo("$be.noupdates");
+                    }
+                });
+            }).size(200, 60).update(t -> {
+                t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white);
+            }));
         }
 
         String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : (Version.type.equals("official") ? Version.modifier : Version.type) + " build " + Version.build + (Version.revision == 0 ? "" : "." + Version.revision));

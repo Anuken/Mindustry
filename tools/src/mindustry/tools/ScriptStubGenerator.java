@@ -26,7 +26,7 @@ public class ScriptStubGenerator{
         Array<String> nameBlacklist = Array.with("ClientLauncher", "NetClient", "NetServer", "ClassAccess");
         Array<Class<?>> whitelist = Array.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class,
             AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class, Runnable.class, Object.class, Icon.class, Tex.class,
-            Sounds.class, Musics.class, Call.class, Texture.class, TextureData.class, Pixmap.class, I18NBundle.class);
+            Sounds.class, Musics.class, Call.class, Texture.class, TextureData.class, Pixmap.class, I18NBundle.class, Interval.class, DataInput.class, DataOutput.class, DataInputStream.class, DataOutputStream.class);
         Array<String> nopackage = Array.with("java.lang", "java");
 
         String fileTemplate = "package mindustry.mod;\n" +
@@ -49,6 +49,7 @@ public class ScriptStubGenerator{
         .include(FilterBuilder.prefix("arc.func"))
         .include(FilterBuilder.prefix("arc.struct"))
         .include(FilterBuilder.prefix("arc.scene"))
+        .include(FilterBuilder.prefix("arc.math"))
         ));
 
         Array<Class<?>> classes = Array.with(reflections.getSubTypesOf(Object.class));

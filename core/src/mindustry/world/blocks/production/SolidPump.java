@@ -4,6 +4,7 @@ import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
+import arc.util.*;
 import mindustry.content.Fx;
 import mindustry.content.Liquids;
 import mindustry.entities.Effects;
@@ -51,8 +52,8 @@ public class SolidPump extends Pump{
     public void setBars(){
         super.setBars();
         bars.add("efficiency", entity -> new Bar(() ->
-        Core.bundle.formatFloat("bar.efficiency",
-        ((((SolidPumpEntity)entity).boost + 1f) * ((SolidPumpEntity)entity).warmup) * 100  * percentSolid(entity.tile.x, entity.tile.y), 1),
+        Core.bundle.formatFloat("bar.pumpspeed",
+        ((SolidPumpEntity)entity).lastPump / Time.delta() * 60, 1),
         () -> Pal.ammo,
         () -> ((SolidPumpEntity)entity).warmup));
     }
@@ -104,11 +105,13 @@ public class SolidPump extends Pump{
         if(tile.entity.cons.valid() && typeLiquid(tile) < liquidCapacity - 0.001f){
             float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction * entity.efficiency());
             tile.entity.liquids.add(result, maxPump);
+            entity.lastPump = maxPump;
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
             if(Mathf.chance(entity.delta() * updateEffectChance))
                 Effects.effect(updateEffect, entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
+            entity.lastPump = 0f;
         }
 
         entity.pumpTime += entity.warmup * entity.delta();
@@ -153,5 +156,6 @@ public class SolidPump extends Pump{
         public float warmup;
         public float pumpTime;
         public float boost;
+        public float lastPump;
     }
 }

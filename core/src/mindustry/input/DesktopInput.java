@@ -10,6 +10,7 @@ import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.traits.BuilderTrait.*;
@@ -133,6 +134,12 @@ public class DesktopInput extends InputHandler{
     public void update(){
         if(net.active() && Core.input.keyTap(Binding.player_list)){
             ui.listfrag.toggle();
+        }
+
+        if(player.getClosestCore() == null){
+            //move camera around
+            float camSpeed = 6f;
+            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta() * camSpeed));
         }
 
         if(Core.input.keyRelease(Binding.select)){
