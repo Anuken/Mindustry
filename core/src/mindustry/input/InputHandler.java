@@ -55,6 +55,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public int rotation;
     public boolean droppingItem;
     public Group uiGroup;
+    public ObjectSet<BaseEntity> selectedEntities;
 
     protected @Nullable Schematic lastSchematic;
     protected GestureDetector detector;

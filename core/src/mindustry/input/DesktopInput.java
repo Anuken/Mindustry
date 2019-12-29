@@ -9,14 +9,17 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.*;
+import mindustry.entities.type.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.Placement.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
@@ -404,6 +407,23 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyTap(Binding.select_multiple) && !Core.scene.hasKeyboard()){
                 selectX = cursorX;
                 selectY = cursorY;
+            }
+
+            if(Core.input.keyRelease(Binding.select_multiple) && !Core.scene.hasKeyboard()){
+                NormalizeResult result = Placement.normalizeArea(selectX, selectY, cursorX, cursorY, 0, false, 100);
+                ObjectSet<BaseEntity> entities = new ObjectSet<>();
+                for(int cx = result.x; cx <= result.x2; cx++){
+                    for(int cy = result.y; cy <= result.y2; cy++){
+                        Tile tile = world.ltile(cx, cy);
+                        if(tile != null && tile.entity != null){
+                            BaseEntity entity = tile.entity;
+                            if(!entities.contains(entity)){
+                                entities.add(entity);
+                            }
+                        }
+                    }
+                }
+                selectedEntities = entities;
             }
         }
 
