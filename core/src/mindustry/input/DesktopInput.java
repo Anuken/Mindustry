@@ -136,7 +136,7 @@ public class DesktopInput extends InputHandler{
             ui.listfrag.toggle();
         }
 
-        if(player.getClosestCore() == null){
+        if(player.getClosestCore() == null && !ui.chatfrag.shown()){
             //move camera around
             float camSpeed = 6f;
             Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta() * camSpeed));
@@ -157,7 +157,7 @@ public class DesktopInput extends InputHandler{
         if(state.is(State.menu) || Core.scene.hasDialog()) return;
 
         //zoom camera
-        if(!Core.scene.hasScroll() && !ui.chatfrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
+        if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonal_placement)) && !ui.chatfrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
