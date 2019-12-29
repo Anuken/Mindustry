@@ -18,105 +18,55 @@ public class TechTree implements ContentList{
 
         root = node(coreShard, () -> {
 
-            node(conveyor, () -> {
+            node(conveyor, () -> node(junction, () -> {
+                node(itemBridge);
+                node(router, () -> {
+                    node(launchPad, () -> node(launchPadLarge));
 
-                node(junction, () -> {
-                    node(itemBridge);
-                    node(router, () -> {
-                        node(launchPad, () -> {
-                            node(launchPadLarge, () -> {
+                    node(distributor);
+                    node(sorter, () -> {
+                        node(invertedSorter);
+                        node(message);
+                        node(overflowGate, () -> node(invertedOverflowGate));
+                    });
+                    node(container, () -> {
+                        node(unloader);
+                        node(vault);
+                    });
 
-                            });
-                        });
-
-                        node(distributor);
-                        node(sorter, () -> {
-                            node(invertedSorter);
-                            node(message);
-                            node(overflowGate, () -> node(invertedOverflowGate));
-                        });
-                        node(container, () -> {
-                            node(unloader);
-                            node(vault, () -> {
-
-                            });
-                        });
-
-                        node(titaniumConveyor, () -> {
-                            node(phaseConveyor, () -> {
-                                node(massDriver, () -> {
-
-                                });
-                            });
-
-                            node(armoredConveyor, () -> {
-
-                            });
-                        });
+                    node(titaniumConveyor, () -> {
+                        node(phaseConveyor, () -> node(massDriver));
+                        node(armoredConveyor);
                     });
                 });
-            });
+            }));
 
             node(duo, () -> {
-                node(scatter, () -> {
-                    node(hail, () -> {
+                node(scatter, () -> node(hail, () -> node(salvo, () -> {
+                    node(swarmer, () -> node(cyclone, () -> node(spectre)));
+                    node(ripple, () -> node(fuse));
+                })));
 
-                        node(salvo, () -> {
-                            node(swarmer, () -> {
-                                node(cyclone, () -> {
-                                    node(spectre, () -> {
-
-                                    });
-                                });
-                            });
-
-                            node(ripple, () -> {
-                                node(fuse, () -> {
-
-                                });
-                            });
-                        });
+                node(scorch, () -> node(arc, () -> {
+                    node(wave);
+                    node(lancer, () -> {
+                        node(meltdown);
+                        node(shockMine);
                     });
-                });
-
-                node(scorch, () -> {
-                    node(arc, () -> {
-                        node(wave, () -> {
-
-                        });
-
-                        node(lancer, () -> {
-                            node(meltdown, () -> {
-
-                            });
-
-                            node(shockMine, () -> {
-
-                            });
-                        });
-                    });
-                });
+                }));
 
 
                 node(copperWall, () -> {
                     node(copperWallLarge);
                     node(titaniumWall, () -> {
-                        node(door, () -> {
-                            node(doorLarge);
-                        });
-                        node(plastaniumWall, () -> {
-                            node(plastaniumWallLarge, () -> {
-
-                            });
-                        });
+                        node(door, () -> node(doorLarge));
+                        node(plastaniumWall, () -> node(plastaniumWallLarge));
                         node(titaniumWallLarge);
                         node(thoriumWall, () -> {
                             node(thoriumWallLarge);
                             node(surgeWall, () -> {
                                 node(surgeWallLarge);
-                                node(phaseWall, () -> {
-                                    node(phaseWallLarge);
-                                });
+                                node(phaseWall, () -> node(phaseWallLarge));
                             });
                         });
                     });
@@ -126,190 +76,75 @@ public class TechTree implements ContentList{
             node(mechanicalDrill, () -> {
                 node(graphitePress, () -> {
                     node(pneumaticDrill, () -> {
-                        node(cultivator, () -> {
-
-                        });
-
+                        node(cultivator);
                         node(laserDrill, () -> {
-                            node(blastDrill, () -> {
-
-                            });
-
-                            node(waterExtractor, () -> {
-                                node(oilExtractor, () -> {
-
-                                });
-                            });
+                            node(blastDrill);
+                            node(waterExtractor, () -> node(oilExtractor));
                         });
                     });
 
-                    node(pyratiteMixer, () -> {
-                        node(blastMixer, () -> {
-
-                        });
-                    });
+                    node(pyratiteMixer, () -> node(blastMixer));
 
                     node(siliconSmelter, () -> {
-
                         node(sporePress, () -> {
-                            node(coalCentrifuge, () -> {
-
-                            });
-                            node(multiPress, () -> {
-
-                            });
-
-                            node(plastaniumCompressor, () -> {
-                                node(phaseWeaver, () -> {
-
-                                });
-                            });
+                            node(coalCentrifuge);
+                            node(multiPress);
+                            node(plastaniumCompressor, () -> node(phaseWeaver));
                         });
 
-                        node(kiln, () -> {
-                            node(incinerator, () -> {
-                                node(melter, () -> {
-                                    node(surgeSmelter, () -> {
-
-                                    });
-
-                                    node(separator, () -> {
-                                        node(pulverizer, () -> {
-
-                                        });
-                                    });
-
-                                    node(cryofluidMixer, () -> {
-
-                                    });
-                                });
-                            });
-                        });
+                        node(kiln, () -> node(incinerator, () -> node(melter, () -> {
+                            node(surgeSmelter);
+                            node(separator, () -> node(pulverizer));
+                            node(cryofluidMixer);
+                        })));
                     });
                 });
 
 
-                node(mechanicalPump, () -> {
-                    node(conduit, () -> {
-                        node(liquidJunction, () -> {
-                            node(liquidRouter, () -> {
-                                node(liquidTank);
-
-                                node(pulseConduit, () -> {
-                                    node(phaseConduit, () -> {
-
-                                    });
-
-                                    node(platedConduit, () -> {
-
-                                    });
-                                });
-
-                                node(rotaryPump, () -> {
-                                    node(thermalPump, () -> {
-
-                                    });
-                                });
-                            });
-                            node(bridgeConduit);
+                node(mechanicalPump, () -> node(conduit, () -> node(liquidJunction, () -> {
+                    node(liquidRouter, () -> {
+                        node(liquidTank);
+                        node(pulseConduit, () -> {
+                            node(phaseConduit);
+                            node(platedConduit);
                         });
+
+                        node(rotaryPump, () -> node(thermalPump));
                     });
-                });
+
+                    node(bridgeConduit);
+                })));
 
                 node(combustionGenerator, () -> {
                     node(powerNode, () -> {
-                        node(powerNodeLarge, () -> {
-                            node(diode, () -> {
-                                node(surgeTower, () -> {
+                        node(powerNodeLarge, () -> node(diode, () -> node(surgeTower)));
+                        node(battery, () -> node(batteryLarge));
+                        node(mender, () -> node(mendProjector, () -> {
+                            node(forceProjector, () -> node(overdriveProjector));
+                            node(repairPoint);
+                        }));
 
-                                });
-                            });
-                        });
+                        node(turbineGenerator, () -> node(thermalGenerator, () -> node(differentialGenerator, () -> node(thoriumReactor, () -> {
+                            node(impactReactor);
+                            node(rtgGenerator);
+                        }))));
 
-                        node(battery, () -> {
-                            node(batteryLarge, () -> {
-
-                            });
-                        });
-
-                        node(mender, () -> {
-                            node(mendProjector, () -> {
-                                node(forceProjector, () -> {
-                                    node(overdriveProjector, () -> {
-
-                                    });
-                                });
-
-                                node(repairPoint, () -> {
-
-                                });
-                            });
-                        });
-
-                        node(turbineGenerator, () -> {
-                            node(thermalGenerator, () -> {
-                                node(differentialGenerator, () -> {
-                                    node(thoriumReactor, () -> {
-                                        node(impactReactor, () -> {
-
-                                        });
-
-                                        node(rtgGenerator, () -> {
-
-                                        });
-                                    });
-                                });
-                            });
-                        });
-
-                        node(solarPanel, () -> {
-                            node(largeSolarPanel, () -> {
-
-                            });
-                        });
+                        node(solarPanel, () -> node(largeSolarPanel));
                     });
 
                     node(draugFactory, () -> {
-                        node(spiritFactory, () -> {
-                            node(phantomFactory);
-                        });
-
+                        node(spiritFactory, () -> node(phantomFactory));
                         node(daggerFactory, () -> {
                             node(commandCenter, () -> {});
-                            node(crawlerFactory, () -> {
-                                node(titanFactory, () -> {
-                                    node(fortressFactory, () -> {
-
-                                    });
-                                });
-                            });
-
-                            node(wraithFactory, () -> {
-                                node(ghoulFactory, () -> {
-                                    node(revenantFactory, () -> {
-
-                                    });
-                                });
-                            });
+                            node(crawlerFactory, () -> node(titanFactory, () -> node(fortressFactory)));
+                            node(wraithFactory, () -> node(ghoulFactory, () -> node(revenantFactory)));
                         });
                     });
 
-                    node(dartPad, () -> {
-                        node(deltaPad, () -> {
-
-                            node(javelinPad, () -> {
-                                node(tridentPad, () -> {
-                                    node(glaivePad);
-                                });
-                            });
-
-                            node(tauPad, () -> {
-                                node(omegaPad, () -> {
-
-                                });
-                            });
-                        });
-                    });
+                    node(dartPad, () -> node(deltaPad, () -> {
+                        node(javelinPad, () -> node(tridentPad, () -> node(glaivePad)));
+                        node(tauPad, () -> node(omegaPad));
+                    }));
                 });
             });
         });
