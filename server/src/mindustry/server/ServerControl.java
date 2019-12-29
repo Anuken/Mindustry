@@ -251,7 +251,7 @@ public class ServerControl implements ApplicationListener{
 
                 info("Map loaded.");
 
-                host();
+                netServer.openServer();
             }catch(MapException e){
                 Log.err(e.map.name() + ": " + e.getMessage());
             }
@@ -711,8 +711,8 @@ public class ServerControl implements ApplicationListener{
                     SaveIO.load(file);
                     state.rules.zone = null;
                     info("Save loaded.");
-                    host();
                     state.set(State.playing);
+                    netServer.openServer();
                 }catch(Throwable t){
                     err("Failed to load save. Outdated or corrupt file.");
                 }
@@ -866,19 +866,6 @@ public class ServerControl implements ApplicationListener{
             Timer.schedule(lastTask, roundExtraTime);
         }else{
             r.run();
-        }
-    }
-
-    private void host(){
-        try{
-            net.host(Config.port.num());
-            info("&lcOpened a server on port {0}.", Config.port.num());
-        }catch(BindException e){
-            Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");
-            state.set(State.menu);
-        }catch(IOException e){
-            err(e);
-            state.set(State.menu);
         }
     }
 

@@ -1,14 +1,14 @@
 package mindustry.core;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
@@ -26,9 +26,11 @@ import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
+import java.net.*;
 import java.nio.*;
 import java.util.zip.*;
 
+import static arc.util.Log.*;
 import static mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
@@ -598,6 +600,7 @@ public class NetServer implements ApplicationListener{
         return false;
     }
 
+    @Override
     public void update(){
 
         if(!headless && !closing && net.server() && state.is(State.menu)){
@@ -612,6 +615,20 @@ public class NetServer implements ApplicationListener{
 
         if(!state.is(State.menu) && net.server()){
             sync();
+        }
+    }
+
+    /** Should only be used on the headless backend. */
+    public void openServer(){
+        try{
+            net.host(Config.port.num());
+            info("&lcOpened a server on port {0}.", Config.port.num());
+        }catch(BindException e){
+            Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");
+            state.set(State.menu);
+        }catch(IOException e){
+            err(e);
+            state.set(State.menu);
         }
     }
 
