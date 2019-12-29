@@ -92,6 +92,11 @@ public class MinimapRenderer implements Disposable{
             float rx = !withLabels ? (unit.x - rect.x) / rect.width * w : unit.x / (world.width() * tilesize) * w;
             float ry = !withLabels ? (unit.y - rect.y) / rect.width * h : unit.y / (world.height() * tilesize) * h;
 
+            Draw.mixcol(unit.getTeam().color, 1f);
+            float scale = Scl.scl(1f) / 2f * scaling;
+            Draw.rect(unit.getIconRegion(), x + rx, y + ry, unit.getIconRegion().getWidth() * scale, unit.getIconRegion().getHeight() * scale, unit.rotation - 90);
+            Draw.reset();
+
             if(withLabels && unit instanceof Player){
                 Player pl = (Player) unit;
                 if(!pl.isLocal){
@@ -99,10 +104,6 @@ public class MinimapRenderer implements Disposable{
                     drawLabel(x + rx, y + ry, pl.name, unit.getTeam().color);
                 }
             }
-
-            Draw.mixcol(unit.getTeam().color, 1f);
-            float scale = Scl.scl(1f) / 2f * scaling;
-            Draw.rect(unit.getIconRegion(), x + rx, y + ry, unit.getIconRegion().getWidth() * scale, unit.getIconRegion().getHeight() * scale, unit.rotation - 90);
         }
 
         Draw.reset();
