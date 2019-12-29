@@ -217,7 +217,6 @@ public class NetServer implements ApplicationListener{
 
             //playing in pvp mode automatically assigns players to teams
             player.setTeam(assignTeam(player, playerGroup.all()));
-            Log.info("Auto-assigned player {0} to team {1}.", player.name, player.getTeam());
 
             sendWorldData(player);
 

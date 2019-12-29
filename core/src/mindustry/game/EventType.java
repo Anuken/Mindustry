@@ -29,7 +29,8 @@ public class EventType{
         suicideBomb,
         openWiki,
         teamCoreDamage,
-        socketConfigChanged
+        socketConfigChanged,
+        update
     }
 
     public static class WinEvent{}

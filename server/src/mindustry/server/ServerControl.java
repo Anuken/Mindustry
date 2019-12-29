@@ -163,6 +163,15 @@ public class ServerControl implements ApplicationListener{
             toggleSocket(Config.socketInput.bool());
         });
 
+        Events.on(PlayEvent.class, e -> {
+            try{
+                JsonValue value = JsonIO.json().fromJson(null, Core.settings.getString("globalrules"));
+                JsonIO.json().readFields(state.rules, value);
+            }catch(Throwable t){
+                Log.err("Error applying custom rules, proceeding without them.", t);
+            }
+        });
+
         if(!mods.list().isEmpty()){
             info("&lc{0} mods loaded.", mods.list().size);
         }
@@ -238,7 +247,6 @@ public class ServerControl implements ApplicationListener{
             try{
                 world.loadMap(result, result.applyRules(lastMode));
                 state.rules = result.applyRules(preset);
-                applyRules();
                 logic.play();
 
                 info("Map loaded.");
@@ -390,7 +398,7 @@ public class ServerControl implements ApplicationListener{
                         base.addChild(arg[1], value);
                         Log.info("Changed rule: &ly{0}", value.toString().replace("\n", " "));
                     }catch(Throwable e){
-                        Log.err("Error parsing rule JSON", e);
+                        Log.err("Error parsing rule JSON: {0}", e.getMessage());
                     }
                 }
 
@@ -777,15 +785,6 @@ public class ServerControl implements ApplicationListener{
         mods.eachClass(p -> p.registerClientCommands(netServer.clientCommands));
     }
 
-    private void applyRules(){
-        try{
-            JsonValue value = JsonIO.json().fromJson(null, Core.settings.getString("globalrules"));
-            JsonIO.json().readFields(state.rules, value);
-        }catch(Throwable t){
-            Log.err("Error applying custom rules, proceeding without them.", t);
-        }
-    }
-
     private void readCommands(){
 
         Scanner scan = new Scanner(System.in);
@@ -836,9 +835,8 @@ public class ServerControl implements ApplicationListener{
 
             Call.onWorldDataBegin();
             run.run();
-            logic.play();
             state.rules = world.getMap().applyRules(lastMode);
-            applyRules();
+            logic.play();
 
             for(Player p : players){
                 if(p.con == null) continue;

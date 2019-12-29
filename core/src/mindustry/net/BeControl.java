@@ -11,6 +11,7 @@ import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.Administration.*;
+import mindustry.net.Packets.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
@@ -126,13 +127,16 @@ public class BeControl{
                     len -> Core.app.post(() -> Log.info("&ly| Size: {0} MB.", Strings.fixed((float)len / 1024 / 1024, 2))),
                     progress -> {},
                     () -> false,
-                    () -> {
+                    () -> Core.app.post(() -> {
+                        netServer.kickAll(KickReason.serverRestarting);
+                        Threads.sleep(32);
+
                         Log.info("&lcVersion downloaded, exiting. Note that if you are not using a auto-restart script, the server will not restart automatically.");
                         //replace old file with new
                         dest.copyTo(source);
                         dest.delete();
                         System.exit(2); //this will cause a restart if using the script
-                    },
+                    }),
                     Throwable::printStackTrace);
                 }catch(Exception e){
                     e.printStackTrace();
