@@ -339,7 +339,8 @@ public class Schematics implements Loadable{
             for(int cy = oy; cy <= oy2; cy++){
                 Tile tile = world.ltile(cx, cy);
 
-                if(tile != null && tile.entity != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock) && tile.entity.block.isVisible()){
+                if(tile != null && tile.entity != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
+                    && (tile.entity.block.isVisible() || (tile.entity.block instanceof CoreBlock && Core.settings.getBool("coreselect")))){
                     int config = tile.entity.config();
                     if(tile.block().posConfig){
                         config = Pos.get(Pos.x(config) + offsetX, Pos.y(config) + offsetY);
@@ -368,8 +369,12 @@ public class Schematics implements Loadable{
     //region IO methods
 
     /** Loads a schematic from base64. May throw an exception. */
-    public static Schematic readBase64(String schematic) throws IOException{
-        return read(new ByteArrayInputStream(Base64Coder.decode(schematic)));
+    public static Schematic readBase64(String schematic){
+        try{
+            return read(new ByteArrayInputStream(Base64Coder.decode(schematic)));
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
     }
 
     public static Schematic read(Fi file) throws IOException{
