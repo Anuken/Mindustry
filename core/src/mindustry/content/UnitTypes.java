@@ -25,7 +25,7 @@ public class UnitTypes implements ContentList{
             mass = 0.5f;
             health = 50;
             rotatespeed = 0.1f;
-            itemCapacity = 10;
+            itemCapacity = 16;
             weapon = new Weapon(){{
                 length = 1.5f;
                 reload = 28f;

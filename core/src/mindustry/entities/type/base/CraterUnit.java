@@ -119,4 +119,18 @@ public class CraterUnit extends GroundUnit{
     public boolean loading(){
         return state.is(load);
     }
+
+    /**
+     * Since normal conveyors get faster when boosted,
+     * this piece of code changes their capacity,
+     * make sure capacity is dividable by 4,
+     * for the best user experience.
+     */
+    @Override
+    public int getItemCapacity(){
+
+        if(on() == null || on().entity == null) return type.itemCapacity;
+
+        return Mathf.round(type.itemCapacity * on().entity.timeScale);
+    }
 }
