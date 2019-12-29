@@ -7,11 +7,13 @@ import arc.graphics.*;
 import arc.math.geom.*;
 import mindustry.entities.traits.*;
 
+import java.util.*;
+
 import static mindustry.Vars.collisions;
 
 /** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")
-public class EntityGroup<T extends Entity>{
+public class EntityGroup<T extends Entity> implements Iterable<T>{
     private final boolean useTree;
     private final int id;
     private final Class<T> type;
@@ -253,8 +255,13 @@ public class EntityGroup<T extends Entity>{
         return null;
     }
 
-    /** Returns the logic-only array for iteration. */
+    /** Returns the array for iteration. */
     public Array<T> all(){
         return entityArray;
+    }
+
+    @Override
+    public Iterator<T> iterator(){
+        return entityArray.iterator();
     }
 }

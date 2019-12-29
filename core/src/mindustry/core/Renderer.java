@@ -125,7 +125,7 @@ public class Renderer implements ApplicationListener{
                 TileEntity core = player.getClosestCore();
                 if(core != null && player.spawner == null){
                     camera.position.lerpDelta(core.x, core.y, 0.08f);
-                }else{
+                }else if(core != null){
                     camera.position.lerpDelta(position, 0.08f);
                 }
             }else if(control.input instanceof DesktopInput){
