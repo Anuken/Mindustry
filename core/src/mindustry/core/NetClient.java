@@ -162,6 +162,8 @@ public class NetClient implements ApplicationListener{
 
         String original = message;
 
+        Events.fire(new PlayerChatEvent(player, message, original));
+        
         //check if it's a command
         CommandResponse response = netServer.clientCommands.handleMessage(message, player);
         if(response.type == ResponseType.noCommand){ //no command to handle
@@ -197,8 +199,6 @@ public class NetClient implements ApplicationListener{
                 player.sendMessage(text);
             }
         }
-
-        Events.fire(new PlayerChatEvent(player, message, original));
     }
 
     public static String colorizeName(int id, String name){
