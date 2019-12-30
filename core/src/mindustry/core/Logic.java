@@ -209,6 +209,7 @@ public class Logic implements ApplicationListener{
 
     @Override
     public void update(){
+        Events.fire(Trigger.update);
 
         if(!state.is(State.menu)){
             if(!net.client()){
@@ -260,7 +261,7 @@ public class Logic implements ApplicationListener{
                 }
             }
 
-            if(!net.client() && !world.isInvalidMap() && !state.isEditor()){
+            if(!net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver){
                 checkGameOver();
             }
         }

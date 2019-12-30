@@ -1234,7 +1234,7 @@ public class Blocks implements ContentList{
         //region storage
 
         coreShard = new CoreBlock("core-shard"){{
-            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with(Items.titanium, 4000));
+            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with());
             alwaysUnlocked = true;
 
             health = 1100;
@@ -1243,7 +1243,7 @@ public class Blocks implements ContentList{
         }};
 
         coreFoundation = new CoreBlock("core-foundation"){{
-            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with(Items.titanium, 400, Items.silicon, 3000));
+            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with());
 
             health = 2000;
             itemCapacity = 9000;
@@ -1251,7 +1251,7 @@ public class Blocks implements ContentList{
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
-            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with(Items.titanium, 4000, Items.silicon, 2000, Items.surgealloy, 3000));
+            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with());
 
             health = 4000;
             itemCapacity = 13000;

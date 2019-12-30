@@ -16,5 +16,5 @@ const boolp = method => new Boolp(){get: method}
 const cons = method => new Cons(){get: method}
 const prov = method => new Prov(){get: method}
 const newEffect = (lifetime, renderer) => new Effects.Effect(lifetime, new Effects.EffectRenderer({render: renderer}))
-Call = Packages.io.anuke.mindustry.gen.Call
+Call = Packages.mindustry.gen.Call
 const Calls = Call //backwards compat

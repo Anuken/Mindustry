@@ -43,6 +43,7 @@ public class UI implements ApplicationListener, Loadable{
     public HudFragment hudfrag;
     public ChatFragment chatfrag;
     public ScriptConsoleFragment scriptfrag;
+    public MinimapFragment minimapfrag;
     public PlayerListFragment listfrag;
     public LoadingFragment loadfrag;
 
@@ -68,7 +69,7 @@ public class UI implements ApplicationListener, Loadable{
     public ContentInfoDialog content;
     public DeployDialog deploy;
     public TechTreeDialog tech;
-    public MinimapDialog minimap;
+    //public MinimapDialog minimap;
     public SchematicsDialog schematics;
     public ModsDialog mods;
     public ColorPicker picker;
@@ -210,6 +211,7 @@ public class UI implements ApplicationListener, Loadable{
         menufrag = new MenuFragment();
         hudfrag = new HudFragment();
         chatfrag = new ChatFragment();
+        minimapfrag = new MinimapFragment();
         listfrag = new PlayerListFragment();
         loadfrag = new LoadingFragment();
         scriptfrag = new ScriptConsoleFragment();
@@ -235,7 +237,6 @@ public class UI implements ApplicationListener, Loadable{
         content = new ContentInfoDialog();
         deploy = new DeployDialog();
         tech = new TechTreeDialog();
-        minimap = new MinimapDialog();
         mods = new ModsDialog();
         schematics = new SchematicsDialog();
 
@@ -254,6 +255,7 @@ public class UI implements ApplicationListener, Loadable{
         hudfrag.build(hudGroup);
         menufrag.build(menuGroup);
         chatfrag.container().build(hudGroup);
+        minimapfrag.build(hudGroup);
         listfrag.build(hudGroup);
         scriptfrag.container().build(hudGroup);
         loadfrag.build(group);

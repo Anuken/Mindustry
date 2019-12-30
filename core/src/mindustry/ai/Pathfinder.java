@@ -139,7 +139,7 @@ public class Pathfinder implements Runnable{
                     //stop looping when interrupted externally
                     return;
                 }
-            }catch(Exception e){
+            }catch(Throwable e){
                 e.printStackTrace();
             }
         }

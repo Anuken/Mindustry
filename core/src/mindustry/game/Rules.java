@@ -34,6 +34,8 @@ public class Rules{
     public float unitHealthMultiplier = 1f;
     /** How much health players start with. */
     public float playerHealthMultiplier = 1f;
+    /** How much health blocks start with. */
+    public float blockHealthMultiplier = 1f;
     /** How much damage player mechs deal. */
     public float playerDamageMultiplier = 1f;
     /** How much damage any other units deal. */
@@ -70,6 +72,8 @@ public class Rules{
     public boolean editor = false;
     /** Whether the tutorial is enabled. False by default. */
     public boolean tutorial = false;
+    /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
+    public boolean canGameOver = true;
     /** Starting items put in cores */
     public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 100));
     /** Blocks that cannot be placed. */

@@ -18,13 +18,14 @@ const boolp = method => new Boolp(){get: method}
 const cons = method => new Cons(){get: method}
 const prov = method => new Prov(){get: method}
 const newEffect = (lifetime, renderer) => new Effects.Effect(lifetime, new Effects.EffectRenderer({render: renderer}))
-Call = Packages.io.anuke.mindustry.gen.Call
+Call = Packages.mindustry.gen.Call
 const Calls = Call //backwards compat
 importPackage(Packages.arc)
 importPackage(Packages.arc.func)
 importPackage(Packages.arc.graphics)
 importPackage(Packages.arc.graphics.g2d)
 importPackage(Packages.arc.math)
+importPackage(Packages.arc.math.geom)
 importPackage(Packages.arc.scene)
 importPackage(Packages.arc.scene.actions)
 importPackage(Packages.arc.scene.event)
