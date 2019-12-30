@@ -376,7 +376,7 @@ public class Tile implements Position, TargetTrait{
         return state.teams.canInteract(team, getTeam());
     }
 
-    public Item drop(){
+    public @Nullable Item drop(){
         return overlay == Blocks.air || overlay.itemDrop == null ? floor.itemDrop : overlay.itemDrop;
     }
 
