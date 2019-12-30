@@ -92,19 +92,12 @@ public class CompressedConveyor extends ArmoredConveyor{
             Events.fire(new UnitCreateEvent(entity.crater));
         }
 
-        if(entity.crater.item().amount > 0 && entity.crater.item().item != item) return false;
-        if(entity.crater.item().amount >= entity.crater.getItemCapacity()) return false;
-
-        return true;
+        return entity.crater.acceptItem(item);
     }
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        CompressedConveyorEntity entity = tile.ent();
-
-        entity.crater.item().item = item;
-        entity.crater.item().amount++;
-        entity.crater.inactivity = 0;
+        ((CompressedConveyorEntity)tile.ent()).crater.handleItem(item);
     }
 
     @Override

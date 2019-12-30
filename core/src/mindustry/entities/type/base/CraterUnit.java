@@ -1,6 +1,7 @@
 package mindustry.entities.type.base;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
@@ -11,6 +12,7 @@ import mindustry.entities.Effects.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
@@ -18,23 +20,25 @@ import mindustry.world.blocks.distribution.*;
 import static mindustry.Vars.*;
 
 public class CraterUnit extends GroundUnit{
+    private final Effect io = Fx.plasticburn; // effect to play when poofing in and out of existence
+    private int inactivity = 0;
 
-    public final Effect io = Fx.plasticburn;
-    public int inactivity = 0;
-
-    public final UnitState
+    private final UnitState
 
     load = new UnitState(){
         public void update(){
+            // launch when crater is full         || launch when it got bumped   || launch when idling
             if(item().amount >= getItemCapacity() || !velocity.isZero(1f) || inactivity++ > 120) state.set(move);
         }
     },
     move = new UnitState(){
         public void update(){
+            // move in the direction/rotation of the block its currently on
             velocity.add(vec.trnsExact(angleTo(on().front()), type.speed * Time.delta()));
             rotation = Mathf.slerpDelta(rotation, baseRotation, type.rotatespeed);
 
-            if(dst(on()) < 2.5f && on().block() instanceof CompressedConveyor && ((CompressedConveyor) on().block()).end(on())){
+            // switch to unload when on an end tile
+            if(dst(on()) < 2.5f && on(Track.end)){
                 state.set(unload);
             }
         }
@@ -42,16 +46,22 @@ public class CraterUnit extends GroundUnit{
     unload = new UnitState(){
         public void update(){
 
-            if(on().block() instanceof CompressedConveyor && !((CompressedConveyor)on().block()).end(on())){
+            /*
+              Switch back to moving when:
+              - some unit bumped it off
+              - track got extended
+             */
+            if(!on(Track.end)){
                 state.set(move);
                 return;
             }
 
-            if(item().amount-- > 0){
-                int rot = on().rotation();
-                on().block().offloadNear(on(), item().item);
-                on().rotation(rot);
-            }
+            if(item.amount == 0) return; // update will take care of poofing
+
+            // try to unload
+            int rot = on().rotation();
+            on().block().offloadNear(on(), item().item);
+            on().rotation(rot);
         }
     };
 
@@ -62,7 +72,7 @@ public class CraterUnit extends GroundUnit{
 
     @Override
     public void drawStats(){
-        if(item.amount > 0) drawBackItems();
+        drawBackItems();
         drawLight();
     }
 
@@ -70,8 +80,9 @@ public class CraterUnit extends GroundUnit{
     public void update(){
         super.update();
 
+        // in the void  || not on a valid track       || is empty
         if(on() == null || !on().block().compressable || item.amount == 0){
-            Effects.effect(io, x, y);
+            Effects.effect(io, x, y); // poof out of existence
             kill();
         }
     }
@@ -79,13 +90,13 @@ public class CraterUnit extends GroundUnit{
     @Override
     public void added(){
         super.added();
-        Effects.effect(io, x, y);
-        baseRotation = rotation;
+        Effects.effect(io, x, y); // poof into existence
+        baseRotation = rotation; // needed to prevent wobble: load > move
     }
 
     @Override
     public void onDeath(){
-        Events.fire(new UnitDestroyEvent(this));
+        Events.fire(new UnitDestroyEvent(this)); // prevent deathrattle (explosion/sound/etc)
     }
 
     @Override
@@ -93,11 +104,17 @@ public class CraterUnit extends GroundUnit{
         return false;
     }
 
+    public boolean on(Track track){
+        return track.check.get(on());
+    }
+
     public Tile on(){
         return world.ltileWorld(x, y);
     }
 
     private void drawBackItems(){
+        if(item.amount == 0) return;
+
         float itemtime = 0.5f;
         float backTrns = 0f;
 
@@ -120,6 +137,19 @@ public class CraterUnit extends GroundUnit{
         return state.is(load);
     }
 
+    public boolean acceptItem(Item item){
+        if(this.item.amount > 0 && this.item.item != item) return false;
+        if(this.item.amount >= getItemCapacity()) return false;
+
+        return true;
+    }
+
+    public void handleItem(Item item){
+        this.item.item = item;
+        this.inactivity = 0;
+        this.item.amount++;
+    }
+
     /**
      * Since normal conveyors get faster when boosted,
      * this piece of code changes their capacity,
@@ -128,9 +158,18 @@ public class CraterUnit extends GroundUnit{
      */
     @Override
     public int getItemCapacity(){
-
         if(on() == null || on().entity == null) return type.itemCapacity;
 
         return Mathf.round(type.itemCapacity * on().entity.timeScale);
+    }
+
+    enum Track{
+        end(tile -> tile.block() instanceof CompressedConveyor && ((CompressedConveyor) tile.block()).end(tile));
+
+        public final Boolf<Tile> check;
+
+        Track(Boolf<Tile> check){
+            this.check = check;
+        }
     }
 }
