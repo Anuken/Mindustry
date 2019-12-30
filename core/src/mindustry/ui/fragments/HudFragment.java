@@ -349,7 +349,7 @@ public class HudFragment extends Fragment{
                 cumulativeProductionFragment.bottom().left();
                 cumulativeProductionFragment.table(Tex.buttonEdge3).update(table -> {
                     table.clear();
-                    table.add("Production Speed:").colspan(3);
+                    table.add("$production_speed").colspan(3);
                     ObjectFloatMap<Item> cumulativeSpeedPerItem = new ObjectFloatMap<>();
                     for(TileEntity entity: control.input.selectedEntities){
                         if(entity.block instanceof Drill){
