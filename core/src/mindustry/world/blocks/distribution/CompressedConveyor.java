@@ -10,9 +10,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 
 public class CompressedConveyor extends ArmoredConveyor{
-    protected TextureRegion start;
-    public TextureRegion end;
-
+    private TextureRegion[] regions = new TextureRegion[6];
     protected static int cooldown = 10;
 
     public CompressedConveyor(String name){
@@ -23,15 +21,9 @@ public class CompressedConveyor extends ArmoredConveyor{
 
     @Override
     public void load(){
-        int i;
-        for(i = 0; i < regions.length; i++){
-            for(int j = 0; j < 4; j++){
-                regions[i][j] = Core.atlas.find(name + "-" + i + "-" + 0);
-            }
+        for(int i = 0; i < regions.length; i++){
+            regions[i] = Core.atlas.find(name + "-" + i);
         }
-
-        start = Core.atlas.find(name + "-5-0");
-        end   = Core.atlas.find(name + "-6-0");
     }
 
     @Override
@@ -39,8 +31,8 @@ public class CompressedConveyor extends ArmoredConveyor{
         super.draw(tile);
 
         if(start(tile) && end(tile)) return;
-        if(start(tile)) Draw.rect(start, tile.drawx(), tile.drawy(), tile.rotation() * 90);
-        if(  end(tile)) Draw.rect(  end, tile.drawx(), tile.drawy(), tile.rotation() * 90);
+        if(start(tile)) Draw.rect(regions[5], tile.drawx(), tile.drawy(), tile.rotation() * 90);
+        if(  end(tile)) Draw.rect(regions[6], tile.drawx(), tile.drawy(), tile.rotation() * 90);
     }
 
     protected boolean start(Tile tile){
