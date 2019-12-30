@@ -55,12 +55,8 @@ public class CraterUnit extends GroundUnit{
                 return;
             }
 
-            if(item.amount-- <= 0) return; // update will take care of poofing
-
-            // try to unload
-            int rot = on().rotation();
-            on().block().offloadNear(on(), item.item);
-            on().rotation(rot);
+            if(item.amount == 0) return; // update will take care of poofing
+            if(on().block().offloadDir(on(), item.item)) item.amount--;
         }
     };
 
@@ -89,7 +85,7 @@ public class CraterUnit extends GroundUnit{
     @Override
     public void added(){
         super.added();
-        Effects.effect(io, x, y); // poof into existence
+        Effects.effect(io, x, y); // poof in to existence
         baseRotation = rotation; // needed to prevent wobble: load > move
     }
 

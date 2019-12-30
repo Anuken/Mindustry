@@ -21,7 +21,7 @@ public class UnitTypes implements ContentList{
             maxVelocity = 0.75f;
             speed = 0.1f;
             drag = 0.25f;
-            hitsize = 4f;
+            hitsize = 3.5f;
             mass = 0.5f;
             health = 50;
             rotatespeed = 0.1f;
