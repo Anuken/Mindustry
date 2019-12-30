@@ -93,8 +93,8 @@ public class MinimapRenderer implements Disposable{
             float ry = !withLabels ? (unit.y - rect.y) / rect.width * h : unit.y / (world.height() * tilesize) * h;
 
             Draw.mixcol(unit.getTeam().color, 1f);
-            float scale = Scl.scl(1f) / 2f * scaling;
-            Draw.rect(unit.getIconRegion(), x + rx, y + ry, unit.getIconRegion().getWidth() * scale, unit.getIconRegion().getHeight() * scale, unit.rotation - 90);
+            float scale = Scl.scl(1f) / 2f * scaling * 32f;
+            Draw.rect(unit.getIconRegion(), x + rx, y + ry, scale, scale, unit.rotation - 90);
             Draw.reset();
 
             if(withLabels && unit instanceof Player){

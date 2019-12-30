@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 public class MinimapFragment extends Fragment{
     private boolean shown;
     private float panx, pany, zoom = 1f, lastZoom = -1;
-    private float baseSize = Scl.scl(1000f);
+    private float baseSize = Scl.scl(5f);
     private Element elem;
 
     @Override
@@ -25,16 +25,17 @@ public class MinimapFragment extends Fragment{
         elem = parent.fill((x, y, w, h) -> {
             w = Core.graphics.getWidth();
             h = Core.graphics.getHeight();
-            float size = baseSize * zoom;
+            float size = baseSize * zoom * world.width();
 
             Draw.color(Color.black);
             Fill.crect(x, y, w, h);
 
             if(renderer.minimap.getTexture() != null){
                 Draw.color();
+                float ratio = (float)renderer.minimap.getTexture().getHeight() / renderer.minimap.getTexture().getWidth();
                 TextureRegion reg = Draw.wrap(renderer.minimap.getTexture());
-                Draw.rect(reg, w/2f + panx*zoom, h/2f + pany*zoom, size, size);
-                renderer.minimap.drawEntities(w/2f + panx*zoom - size/2f, h/2f + pany*zoom - size/2f, size, size, zoom, true);
+                Draw.rect(reg, w/2f + panx*zoom, h/2f + pany*zoom, size, size * ratio);
+                renderer.minimap.drawEntities(w/2f + panx*zoom - size/2f, h/2f + pany*zoom - size/2f * ratio, size, size * ratio, zoom, true);
             }
 
             Draw.reset();
