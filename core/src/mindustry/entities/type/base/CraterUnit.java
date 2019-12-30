@@ -55,11 +55,11 @@ public class CraterUnit extends GroundUnit{
                 return;
             }
 
-            if(item.amount == 0) return; // update will take care of poofing
+            if(item.amount-- <= 0) return; // update will take care of poofing
 
             // try to unload
             int rot = on().rotation();
-            on().block().offloadNear(on(), item().item);
+            on().block().offloadNear(on(), item.item);
             on().rotation(rot);
         }
     };
@@ -149,6 +149,7 @@ public class CraterUnit extends GroundUnit{
         if(this.item.amount > 0 && this.item.item != item) return false;
         if(this.item.amount >= getItemCapacity()) return false;
 
+//        return on(Track.start);
         return true;
     }
 
