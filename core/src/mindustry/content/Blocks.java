@@ -902,6 +902,7 @@ public class Blocks implements ContentList{
             speed = 26;
             capacity = 12;
             health = 30;
+            buildCostMultiplier = 4f;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
@@ -930,7 +931,6 @@ public class Blocks implements ContentList{
 
         router = new Router("router"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 3));
-
         }};
 
         distributor = new Router("distributor"){{
