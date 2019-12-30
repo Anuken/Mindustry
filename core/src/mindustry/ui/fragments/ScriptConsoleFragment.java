@@ -53,7 +53,7 @@ public class ScriptConsoleFragment extends Table{
                 clearChatInput();
             }
 
-            return shown;
+            return shown && Vars.net.active();
         });
 
         update(() -> {

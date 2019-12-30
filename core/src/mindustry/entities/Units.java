@@ -83,13 +83,7 @@ public class Units{
     public static TileEntity findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
         if(team == Team.derelict) return null;
 
-        for(Team enemy : team.enemies()){
-            TileEntity entity = indexer.findTile(enemy, x, y, range, pred, true);
-            if(entity != null){
-                return entity;
-            }
-        }
-        return null;
+        return indexer.findEnemyTile(team, x, y, range, pred);
     }
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */

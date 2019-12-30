@@ -1,11 +1,11 @@
 package mindustry.server;
 
 import arc.*;
+import arc.files.*;
 import arc.struct.*;
 import arc.struct.Array.*;
-import arc.files.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.Timer;
 import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
@@ -292,7 +292,7 @@ public class ServerControl implements ApplicationListener{
                     info("&ly  {0} seconds until next wave.", (int)(state.wavetime / 60));
                 }
 
-                info("  &ly{0} FPS, {1} MB used.", (int)(60f / Time.delta()), Core.app.getJavaHeap() / 1024 / 1024);
+                info("  &ly{0} FPS, {1} MB used.", Core.graphics.getFramesPerSecond(), Core.app.getJavaHeap() / 1024 / 1024);
 
                 if(playerGroup.size() > 0){
                     info("  &lyPlayers: {0}", playerGroup.size());

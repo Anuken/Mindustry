@@ -5,11 +5,11 @@ import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
-import mindustry.game.Teams.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -34,6 +34,8 @@ public class BlockIndexer{
     private ObjectSet<Tile>[] damagedTiles = new ObjectSet[Team.all().length];
     /**All ores available on this map.*/
     private ObjectSet<Item> allOres = new ObjectSet<>();
+    /**Stores teams that are present here as tiles.*/
+    private ObjectSet<Team> activeTeams = new ObjectSet<>();
 
     /** Maps teams to a map of flagged tiles by type. */
     private ObjectSet<Tile>[][] flagMap = new ObjectSet[Team.all().length][BlockFlag.all.length];
@@ -104,10 +106,11 @@ public class BlockIndexer{
     }
 
     private GridBits structQuadrant(Team t){
-        if(structQuadrants[t.id] == null){
-            structQuadrants[t.id] = new GridBits(Mathf.ceil(world.width() / (float)quadrantSize), Mathf.ceil(world.height() / (float)quadrantSize));
+        int id = Pack.u(t.id);
+        if(structQuadrants[id] == null){
+            structQuadrants[id] = new GridBits(Mathf.ceil(world.width() / (float)quadrantSize), Mathf.ceil(world.height() / (float)quadrantSize));
         }
-        return structQuadrants[t.id];
+        return structQuadrants[id];
     }
 
     /** Updates all the structure quadrants for a newly activated team. */
@@ -184,6 +187,19 @@ public class BlockIndexer{
         set.add(entity.tile);
     }
 
+    public TileEntity findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
+        for(Team enemy : activeTeams){
+            if(!team.isEnemy(enemy)) continue;
+
+            TileEntity entity = indexer.findTile(enemy, x, y, range, pred, true);
+            if(entity != null){
+                return entity;
+            }
+        }
+
+        return null;
+    }
+
     public TileEntity findTile(Team team, float x, float y, float range, Boolf<Tile> pred){
         return findTile(team, x, y, range, pred, false);
     }
@@ -209,7 +225,7 @@ public class BlockIndexer{
                         TileEntity e = other.entity;
 
                         float ndst = Mathf.dst(x, y, e.x, e.y);
-                        if(ndst < range && (closest == null || ndst < dst || (usePriority && closest.block.priority.ordinal() < e.block.priority.ordinal()))){
+                        if(ndst < range && (closest == null || ndst < dst || (usePriority && closest.block.priority.ordinal() <= e.block.priority.ordinal()))){
                             dst = ndst;
                             closest = e;
                         }
@@ -263,6 +279,7 @@ public class BlockIndexer{
             }
             typeMap.put(tile.pos(), new TileIndex(tile.block().flags, tile.getTeam()));
         }
+        activeTeams.add(tile.getTeam());
 
         if(ores == null) return;
 
@@ -301,13 +318,12 @@ public class BlockIndexer{
         //this quadrant is now 'dirty', re-scan the whole thing
         int quadrantX = tile.x / quadrantSize;
         int quadrantY = tile.y / quadrantSize;
-        int index = quadrantX + quadrantY * quadWidth();
 
-        for(TeamData data : state.teams.getActive()){
-            GridBits bits = structQuadrant(data.team);
+        for(Team team : activeTeams){
+            GridBits bits = structQuadrant(team);
 
             //fast-set this quadrant to 'occupied' if the tile just placed is already of this team
-            if(tile.getTeam() == data.team && tile.entity != null && tile.block().targetable){
+            if(tile.getTeam() == team && tile.entity != null && tile.block().targetable){
                 bits.set(quadrantX, quadrantY);
                 continue; //no need to process futher
             }
@@ -319,7 +335,7 @@ public class BlockIndexer{
                 for(int y = quadrantY * quadrantSize; y < world.height() && y < (quadrantY + 1) * quadrantSize; y++){
                     Tile result = world.ltile(x, y);
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
-                    if(result.entity != null && result.getTeam() == data.team){
+                    if(result.entity != null && result.getTeam() == team){
                         bits.set(quadrantX, quadrantY);
                         break outer;
                     }

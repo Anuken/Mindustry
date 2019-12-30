@@ -568,6 +568,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     protected void updateKeyboard(){
         Tile tile = world.tileWorld(x, y);
+        boolean canMove = !Core.scene.hasKeyboard() || ui.minimapfrag.shown();
 
         isBoosting = Core.input.keyDown(Binding.dash) && !mech.flying;
 
@@ -594,8 +595,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         if(Core.input.keyDown(Binding.mouse_move)){
-            movement.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2) * 0.005f, -1, 1) * speed;
-            movement.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2) * 0.005f, -1, 1) * speed;
+            movement.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * speed;
+            movement.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * speed;
         }
 
         Vec2 vec = Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY());
@@ -605,7 +606,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         movement.limit(speed).scl(Time.delta());
 
-        if(!Core.scene.hasKeyboard()){
+        if(canMove){
             velocity.add(movement.x, movement.y);
         }else{
             isShooting = false;
@@ -614,7 +615,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         updateVelocityStatus();
         moved = dst(prex, prey) > 0.001f;
 
-        if(!Core.scene.hasKeyboard()){
+        if(canMove){
             float baseLerp = mech.getRotationAlpha(this);
             if(!isShooting() || !mech.turnCursor){
                 if(!movement.isZero()){

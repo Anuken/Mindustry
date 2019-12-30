@@ -151,7 +151,7 @@ public class CoreBlock extends StorageBlock{
     @Override
     public void removed(Tile tile){
         CoreEntity entity = tile.ent();
-        int total = tile.entity.proximity().count(e -> e.entity.items == tile.entity.items);
+        int total = tile.entity.proximity().count(e -> e.entity != null && e.entity.items != null && e.entity.items == tile.entity.items);
         float fract = 1f / total / state.teams.cores(tile.getTeam()).size;
 
         tile.entity.proximity().each(e -> isContainer(e) && e.entity.items == tile.entity.items, t -> {
