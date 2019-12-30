@@ -108,7 +108,9 @@ public class DesktopInput extends InputHandler{
             }
 
             if(Core.input.keyDown(Binding.select_multiple) && !Core.scene.hasKeyboard()){
-                drawSelection(selectX, selectY, cursorX, cursorY, maxLength);
+                if(cursorX != selectX && cursorY != selectY){
+                    drawSelection(selectX, selectY, cursorX, cursorY, maxLength);
+                }
             }
         }
 
@@ -410,13 +412,17 @@ public class DesktopInput extends InputHandler{
             }
 
             if(Core.input.keyRelease(Binding.select_multiple) && !Core.scene.hasKeyboard()){
-                NormalizeResult result = Placement.normalizeArea(selectX, selectY, cursorX, cursorY, 0, false, 100);
-                selectedEntities.clear();
-                for(int cx = result.x; cx <= result.x2; cx++){
-                    for(int cy = result.y; cy <= result.y2; cy++){
-                        Tile tile = world.ltile(cx, cy);
-                        if (tile != null && tile.entity != null){
-                            selectedEntities.add(tile.entity);
+                if(cursorX == selectX && cursorY == selectY){
+                    selectedEntities.clear();
+                }else{
+                    NormalizeResult result = Placement.normalizeArea(selectX, selectY, cursorX, cursorY, 0, false, 100);
+                    selectedEntities.clear();
+                    for(int cx = result.x; cx <= result.x2; cx++){
+                        for(int cy = result.y; cy <= result.y2; cy++){
+                            Tile tile = world.ltile(cx, cy);
+                            if (tile != null && tile.entity != null){
+                                selectedEntities.add(tile.entity);
+                            }
                         }
                     }
                 }
