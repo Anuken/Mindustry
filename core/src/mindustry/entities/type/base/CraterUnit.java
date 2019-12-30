@@ -103,6 +103,15 @@ public class CraterUnit extends GroundUnit{
         return false; // it has its own logic
     }
 
+    public static CraterUnit on(Tile tile){ // summons a crater on said tile
+        CraterUnit crater = (CraterUnit)UnitTypes.crater.create(tile.getTeam());
+        crater.set(tile.drawx(), tile.drawy());
+        crater.rotation = tile.rotation() * 90;
+        crater.add();
+        Events.fire(new UnitCreateEvent(crater));
+        return crater;
+    }
+
     public boolean on(Track track){
         return track.check.get(on());
     }

@@ -71,11 +71,7 @@ public class CompressedConveyor extends ArmoredConveyor{
         if(entity.crater == null || entity.crater.dead || !entity.crater.loading() || entity.crater.on() != tile){
             if(entity.reload > 0) return false;
             entity.reload = cooldown;
-            entity.crater = (CraterUnit)UnitTypes.crater.create(tile.getTeam());
-            entity.crater.set(tile.drawx(), tile.drawy());
-            entity.crater.rotation = tile.rotation() * 90;
-            entity.crater.add();
-            Events.fire(new UnitCreateEvent(entity.crater));
+            entity.crater = CraterUnit.on(tile);
         }
 
         return entity.crater.acceptItem(item);
