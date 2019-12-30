@@ -225,7 +225,7 @@ public class BlockIndexer{
                         TileEntity e = other.entity;
 
                         float ndst = Mathf.dst(x, y, e.x, e.y);
-                        if(ndst < range && (closest == null || ndst < dst || (usePriority && closest.block.priority.ordinal() < e.block.priority.ordinal()))){
+                        if(ndst < range && (closest == null || ndst < dst || (usePriority && closest.block.priority.ordinal() <= e.block.priority.ordinal()))){
                             dst = ndst;
                             closest = e;
                         }
