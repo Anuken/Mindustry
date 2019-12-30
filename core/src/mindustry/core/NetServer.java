@@ -443,7 +443,7 @@ public class NetServer implements ApplicationListener{
         if(!player.con.hasDisconnected){
             if(player.con.hasConnected){
                 Events.fire(new PlayerLeave(player));
-                Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
+                if(Config.showConnectMessages.bool()) Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
                 Call.onPlayerDisconnect(player.id);
             }
 
@@ -581,7 +581,7 @@ public class NetServer implements ApplicationListener{
 
         player.add();
         player.con.hasConnected = true;
-        Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
+        if(Config.showConnectMessages.bool()) Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
         Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
 
         Events.fire(new PlayerJoin(player));
