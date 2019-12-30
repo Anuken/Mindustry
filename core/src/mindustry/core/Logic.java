@@ -261,7 +261,7 @@ public class Logic implements ApplicationListener{
                 }
             }
 
-            if(!net.client() && !world.isInvalidMap() && !state.isEditor() && !state.rules.canGameOver){
+            if(!net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver){
                 checkGameOver();
             }
         }
