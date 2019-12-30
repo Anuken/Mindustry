@@ -1,19 +1,20 @@
 package mindustry.world.blocks.distribution;
 
 import arc.*;
+import arc.func.*;
+import mindustry.type.*;
+import mindustry.world.*;
 import arc.graphics.g2d.*;
 import mindustry.content.*;
 import mindustry.entities.type.*;
-import mindustry.entities.type.base.*;
 import mindustry.game.EventType.*;
-import mindustry.type.*;
-import mindustry.world.*;
+import mindustry.entities.type.base.*;
 
 public class CompressedConveyor extends ArmoredConveyor{
     protected TextureRegion start;
     public TextureRegion end;
 
-    protected static int cooldown = 10;
+    protected static int cooldown = 4; // ticks it needs to wait with spawning when a ground unit has walked on it
 
     public CompressedConveyor(String name){
         super(name);
@@ -38,36 +39,21 @@ public class CompressedConveyor extends ArmoredConveyor{
     public void draw(Tile tile){
         super.draw(tile);
 
-        if(start(tile) && end(tile)) return;
-        if(start(tile)) Draw.rect(start, tile.drawx(), tile.drawy(), tile.rotation() * 90);
-        if(  end(tile)) Draw.rect(  end, tile.drawx(), tile.drawy(), tile.rotation() * 90);
-    }
-
-    protected boolean start(Tile tile){
-        Tile[] inputs = new Tile[]{tile.back(), tile.left(), tile.right()};
-        for(Tile input : inputs){
-            if(input != null && input.getTeam() == tile.getTeam() && input.block().compressable && input.front() == tile) return false;
-        }
-
-        return true;
-    }
-
-    public boolean end(Tile tile){
-        Tile next = tile.front();
-        if(next == null) return true;
-        if(next.getTeam() != tile.getTeam()) return true;
-        return !next.block().compressable;
+        // draws the markings over either end of the track
+        if(Track.start.check.get(tile) && Track.end.check.get(tile)) return;
+        if(Track.start.check.get(tile))  Draw.rect(start, tile.drawx(), tile.drawy(), tile.rotation() * 90);
+        if(Track.end.check.get(tile))      Draw.rect(end, tile.drawx(), tile.drawy(), tile.rotation() * 90);
     }
 
     @Override
-    public void unitOn(Tile tile, Unit unit){
+    public void unitOn(Tile tile, Unit unit){ // resets the spawner cooldown, as well as adopting stray roomba's
         CompressedConveyorEntity entity = tile.ent();
-        entity.reload = cooldown;
         if(unit instanceof CraterUnit) entity.crater = (CraterUnit)unit;
+        entity.reload = cooldown;
     }
 
     @Override
-    public void update(Tile tile){
+    public void update(Tile tile){ // tick away the cooldown
         CompressedConveyorEntity entity = tile.ent();
         if(entity.reload > 0) entity.reload--;
     }
@@ -78,10 +64,10 @@ public class CompressedConveyor extends ArmoredConveyor{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
+    public boolean acceptItem(Item item, Tile tile, Tile source){ // summon craters into existence to be loaded
         CompressedConveyorEntity entity = tile.ent();
 
-        if(!start(tile)) return false;
+        if(!Track.start.check.get(tile)) return false;
         if(entity.crater == null || entity.crater.dead || !entity.crater.loading() || entity.crater.on() != tile){
             if(entity.reload > 0) return false;
             entity.reload = cooldown;
@@ -111,7 +97,32 @@ public class CompressedConveyor extends ArmoredConveyor{
     }
 
     @Override
-    public boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+    public boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){ // only connect to compressable blocks
         return super.blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock.compressable;
+    }
+
+    public enum Track{
+        // tile is considered the end of the line
+        end(tile -> {
+            if(tile.front() == null) return true;
+            if(tile.getTeam() != tile.front().getTeam()) return true; // comment out to trade
+            return !tile.front().block().compressable;
+        }),
+
+        // tile is considered the start of the line
+        start(tile -> {
+            Tile[] inputs = new Tile[]{tile.back(), tile.left(), tile.right()};
+            for(Tile input : inputs){
+                if(input != null && input.getTeam() == tile.getTeam() && input.block().compressable && input.front() == tile) return false;
+            }
+
+            return true;
+        });
+
+        public final Boolf<Tile> check;
+
+        Track(Boolf<Tile> check){
+            this.check = check;
+        }
     }
 }

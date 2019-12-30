@@ -1,21 +1,20 @@
 package mindustry.entities.type.base;
 
 import arc.*;
-import arc.func.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.ui.*;
+import mindustry.type.*;
+import mindustry.world.*;
+import arc.graphics.g2d.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
+import mindustry.graphics.*;
+import arc.scene.ui.layout.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
-import mindustry.graphics.*;
-import mindustry.type.*;
-import mindustry.ui.*;
-import mindustry.world.*;
-import mindustry.world.blocks.distribution.*;
+import mindustry.entities.Effects.*;
+import mindustry.world.blocks.distribution.CompressedConveyor.*;
 
 import static mindustry.Vars.*;
 
@@ -101,7 +100,7 @@ public class CraterUnit extends GroundUnit{
 
     @Override
     public boolean isCommanded(){
-        return false;
+        return false; // it has its own logic
     }
 
     public boolean on(Track track){
@@ -161,15 +160,5 @@ public class CraterUnit extends GroundUnit{
         if(on() == null || on().entity == null) return type.itemCapacity;
 
         return Mathf.round(type.itemCapacity * on().entity.timeScale);
-    }
-
-    enum Track{
-        end(tile -> tile.block() instanceof CompressedConveyor && ((CompressedConveyor) tile.block()).end(tile));
-
-        public final Boolf<Tile> check;
-
-        Track(Boolf<Tile> check){
-            this.check = check;
-        }
     }
 }
