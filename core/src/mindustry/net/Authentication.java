@@ -1,29 +1,31 @@
-package io.anuke.mindustry.net;
+package mindustry.net;
 
-import io.anuke.annotations.Annotations.*;
-import io.anuke.arc.Core;
-import io.anuke.arc.Net.HttpMethod;
-import io.anuke.arc.Net.HttpRequest;
-import io.anuke.arc.func.Cons;
-import io.anuke.arc.math.RandomXS128;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.NetJavaImpl;
-import io.anuke.arc.util.serialization.*;
-import io.anuke.arc.util.serialization.JsonValue.ValueType;
-import io.anuke.arc.util.serialization.JsonWriter.OutputType;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.net.Packets.KickReason;
+import arc.struct.ObjectMap;
+import mindustry.annotations.Annotations.*;
+import arc.Core;
+import arc.Net.HttpMethod;
+import arc.Net.HttpRequest;
+import arc.func.Cons;
+import arc.math.RandomXS128;
+import arc.util.Log;
+import arc.util.NetJavaImpl;
+import arc.util.serialization.*;
+import arc.util.serialization.JsonValue.ValueType;
+import arc.util.serialization.JsonWriter.OutputType;
+import mindustry.entities.type.Player;
+import mindustry.gen.Call;
+import mindustry.net.Administration.Config;
+import mindustry.net.Packets.KickReason;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import static io.anuke.mindustry.Vars.*;
+import static mindustry.Vars.*;
 
 public class Authentication{
     public static final char[] HEX_DIGITS = "0123456789ABCDEF".toCharArray();
     /** Represents a response from the api */
-    public class ApiResponse<T>{
+    public static class ApiResponse<T>{
         /** Whether or not the request is done */
         public boolean finished;
         /** Was the request successful? */
@@ -100,13 +102,8 @@ public class Authentication{
         }
     }
 
-    public class LoginResponse{
-        public String token;
-        public String username;
-    }
-
     /** Represents information used when asking user for credentials */
-    public class LoginInfo{
+    public static class LoginInfo{
         // values provided by server
         public String authServer;
         public boolean showRegister;
@@ -119,8 +116,27 @@ public class Authentication{
         public Runnable successCallback;
     }
 
+    @Serialize
+    public static class Session{
+        public String username;
+        public String token;
+        public long expires;
+
+        public Session(){}
+        public Session(String username, String token, long expires){
+            this.username = username;
+            this.token = token;
+            this.expires = expires;
+        }
+    }
+
     public NetJavaImpl netImpl = new NetJavaImpl();
     public LoginInfo loginInfo;
+    public ObjectMap<String, Session> sessions = new ObjectMap<>();
+
+    public Authentication(){
+        load();
+    }
 
     @Remote(targets = Loc.server, priority = PacketPriority.high, variants = Variant.one)
     public static void authenticationRequired(String authServer, String serverIdHash){
@@ -144,7 +160,8 @@ public class Authentication{
                     netClient.disconnectQuietly();
                 });
                 netClient.authenticating = false;
-                Call.sendAuthenticationResponse(auth.getUsernameForServer(authServer), response.result);
+                // doConnect will check if the session exists, NPE shouldn't happen here
+                Call.sendAuthenticationResponse(auth.sessions.get(authServer).username, response.result);
                 return;
             }
             if("INVALID_SESSION".equals(response.errorCode)){
@@ -156,7 +173,7 @@ public class Authentication{
                             netClient.disconnectQuietly();
                         });
                         netClient.authenticating = false;
-                        Call.sendAuthenticationResponse(auth.getUsernameForServer(authServer), response2.result);
+                        Call.sendAuthenticationResponse(auth.sessions.get(authServer).username, response2.result);
                         return;
                     }
                     disconnectAndShowApiError(response2);
@@ -178,7 +195,7 @@ public class Authentication{
             return;
         }
 
-        String address = auth.getVerifyIp() ? player.con.address : null;
+        String address = Config.authVerifyIP.bool() ? player.con.address : null;
         auth.verifyConnect(username, token, address).done(response -> {
             if(response.success) {
                 player.con.authenticated = true;
@@ -232,27 +249,7 @@ public class Authentication{
     }
 
     public boolean enabled(){
-        return Core.settings.getBool("authentication-enabled", false);
-    }
-
-    public void setEnabled(boolean enabled){
-        Core.settings.putSave("authentication-enabled", enabled);
-    }
-
-    public String getAuthenticationServer(){
-        return Core.settings.getString("authentication-server", defaultAuthServer);
-    }
-
-    public void setAuthenticationServer(String server){
-        Core.settings.putSave("authentication-server", server);
-    }
-
-    public boolean getVerifyIp(){
-        return Core.settings.getBool("authentication-verify-ip", true);
-    }
-
-    public void setVerifyIp(boolean enable){
-        Core.settings.put("authentication-verify-ip", enable);
+        return Config.authEnabled.bool();
     }
 
     public String getServerId(){
@@ -281,8 +278,18 @@ public class Authentication{
         return hashed;
     }
 
+    public void save(){
+        Core.settings.putObject("authentication-sessions", sessions);
+        Core.settings.save();
+    }
+
+    @SuppressWarnings("unchecked")
+    public void load(){
+        sessions = Core.settings.getObject("authentication-sessions", ObjectMap.class, ObjectMap::new);
+    }
+
     public void handleConnect(Player player){
-        String authServer = getAuthenticationServer();
+        String authServer = Config.authServer.string();
         if(authServer == null){
             Log.err("Authentication was enabled but no authentication server was specified!");
             player.con.kick(KickReason.authenticationFailed);
@@ -298,14 +305,6 @@ public class Authentication{
             base = base.substring(0, base.length() - 1);
         }
         return base + endpoint;
-    }
-
-    public String getUsernameForServer(String authServer){
-        return Core.settings.getString("authentication-username-" + authServer);
-    }
-
-    public String getSessionForServer(String authServer){
-        return Core.settings.getString("authentication-session-" + authServer);
     }
 
     public ApiResponse<LoginInfo> fetchServerInfo(String authServer){
@@ -330,7 +329,7 @@ public class Authentication{
         return response;
     }
 
-    public ApiResponse<LoginResponse> doLogin(String authServer, String username, String password){
+    public ApiResponse<Session> doLogin(String authServer, String username, String password){
         JsonValue body = new JsonValue(ValueType.object);
         body.addChild("username", new JsonValue(username));
         body.addChild("password", new JsonValue(password));
@@ -339,31 +338,31 @@ public class Authentication{
         request.url(buildUrl(authServer, "/api/login"));
         request.header("Content-Type", "application/json");
         request.content(body.toJson(OutputType.json));
-        ApiResponse<LoginResponse> response = new ApiResponse<>();
+        ApiResponse<Session> response = new ApiResponse<>();
         netImpl.http(request, res -> {
             JsonValue obj = response.tryParseResponse(res.getResultAsString());
             if(obj == null) return;
-            LoginResponse loginResponse = new LoginResponse();
+            Session session = new Session();
             try{
-                loginResponse.username = obj.getString("username");
-                loginResponse.token = obj.getString("token");
+                // case-corrected username
+                session.username = obj.getString("username");
+                session.token = obj.getString("token");
+                session.expires = obj.getLong("expiry");
             }catch(IllegalArgumentException ex){
                 response.setError(new RuntimeException("Invalid response from api"));
                 return;
             }
-            Core.settings.put("authentication-session-" + authServer, loginResponse.token);
-            // case-corrected username
-            Core.settings.put("authentication-username-" + authServer, loginResponse.username);
-            Core.settings.save();
-            response.setResult(loginResponse);
+            sessions.put(authServer, session);
+            save();
+            response.setResult(session);
         }, response::setError);
         return response;
     }
 
     public ApiResponse<String> doConnect(String authServer, String serverHash){
         ApiResponse<String> response = new ApiResponse<>();
-        String token = getSessionForServer(authServer);
-        if(token == null){
+        Session session = sessions.get(authServer);
+        if(session == null){
             response.setError("INVALID_SESSION", "session token not found");
             return response;
         }
@@ -373,7 +372,7 @@ public class Authentication{
         request.method(HttpMethod.POST);
         request.url(buildUrl(authServer, "/api/doconnect"));
         request.header("Content-Type", "application/json");
-        request.header("Session", token);
+        request.header("Session", session.token);
         request.content(body.toJson(OutputType.json));
         netImpl.http(request, res -> {
             JsonValue obj = response.tryParseResponse(res.getResultAsString());
@@ -398,7 +397,7 @@ public class Authentication{
         if(ip != null) body.addChild("ip", new JsonValue(ip));
         HttpRequest request = new HttpRequest();
         request.method(HttpMethod.POST);
-        request.url(buildUrl(getAuthenticationServer(), "/api/verifyconnect"));
+        request.url(buildUrl(Config.authServer.string(), "/api/verifyconnect"));
         request.header("Content-Type", "application/json");
         request.content(body.toJson(OutputType.json));
         ApiResponse<Boolean> response = new ApiResponse<>();

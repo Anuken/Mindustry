@@ -1,17 +1,15 @@
-package io.anuke.mindustry.ui.dialogs;
+package mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.ui.Label;
-import io.anuke.arc.scene.ui.Label.LabelStyle;
-import io.anuke.arc.scene.ui.TextField;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Log;
-import io.anuke.mindustry.net.Authentication;
-import io.anuke.mindustry.net.Authentication.LoginInfo;
+import arc.Core;
+import arc.input.KeyCode;
+import arc.scene.event.Touchable;
+import arc.scene.ui.Label;
+import arc.scene.ui.TextField;
+import arc.util.Align;
+import mindustry.net.Authentication;
+import mindustry.net.Authentication.LoginInfo;
 
-import static io.anuke.mindustry.Vars.*;
+import static mindustry.Vars.*;
 
 public class LoginDialog extends FloatingDialog {
     public LoginDialog() {
