@@ -173,13 +173,17 @@ public class ServerControl implements ApplicationListener{
         });
 
         Events.on(WaveEvent.class, e -> {
-            if(state.is(State.playing) && Config.valueOf("enableAutosave").bool() ){
+            if(state.is(State.playing) && Config.enableAutosave.bool()){
                 Fi file = saveDirectory.child("autosave-" + Strings.capitalize(world.getMap().name()) + "-" + state.wave + "." + saveExtension);
-
+                
                 Core.app.post(() -> {
-                    SaveIO.save(file);
-                    Call.sendMessage("[scarlet][Server]:[] - Autosave Done");
-                    info("&lyServer: &lb{0}", "Autosave Done");
+                    try{
+                        SaveIO.save(file);
+                        info("&lbAutosave completed.");
+                    }catch(Exception ex){
+                        String msg = "Autosave failed with: " + ex.getMessage();
+                        Log.err(msg);
+                    }
                 });
             }
         });
