@@ -2,7 +2,9 @@ package mindustry.entities.type.base;
 
 import arc.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
+import mindustry.entities.type.*;
 import mindustry.ui.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -32,10 +34,39 @@ public class CraterUnit extends GroundUnit{
     },
     move = new UnitState(){
         public void update(){
-            // move in the direction/rotation of the block its currently on
-            velocity.add(vec.trnsExact(angleTo(on().front()), type.speed * Time.delta()));
-            rotation = Mathf.slerpDelta(rotation, baseRotation, type.rotatespeed);
+//            float radScl = 1.5f;
+//            float fsize = getSize() / radScl / 100;
+//            float cx = x - fsize/2f, cy = y - fsize/2f;
 
+//            Log.info(unitGroup.intersect(x, y, 3, 3).size);
+
+//            int size = unitGroup.intersect(cx, cy, fsize, fsize).select(unit -> {
+//                Log.info(lastPosition());
+//                Log.info(lastPosition().trns(45, tilesize));
+
+//                Vec2 front = lastPosition().cpy().add(lastPosition().trns(rotation, 6));
+
+//                return front.dst(unit) < 2;
+
+//                velocity.scl()
+
+//            }).size;
+//            Log.info(player.lastPosition());
+//            Log.info(lastPosition());
+//            Log.info(size);
+//
+//            if(size < 1){
+
+//            if(moveVector.isZero()){
+                // move in the direction/rotation of the block its currently on
+                velocity.add(vec.trnsExact(angleTo(on().front()), type.speed * Time.delta()));
+                rotation = Mathf.slerpDelta(rotation, baseRotation, type.rotatespeed);
+//            }
+//            }
+
+//            velocity.
+
+            Log.info(moveVector);
             // switch to unload when on an end tile
             if(dst(on()) < 2.5f && on(Track.end)){
                 state.set(unload);
