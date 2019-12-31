@@ -3,7 +3,6 @@ package mindustry.entities.type.base;
 import arc.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.entities.type.*;
 import mindustry.ui.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -15,7 +14,6 @@ import arc.scene.ui.layout.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.entities.Effects.*;
-import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.distribution.CompressedConveyor.*;
 
 import static mindustry.Vars.*;
@@ -23,8 +21,6 @@ import static mindustry.Vars.*;
 public class CraterUnit extends GroundUnit{
     private final Effect io = Fx.plasticburn; // effect to play when poofing in and out of existence
     private int inactivity = 0;
-
-    private CraterUnit unit = (CraterUnit)this;
 
     private final UnitState
 
@@ -36,39 +32,14 @@ public class CraterUnit extends GroundUnit{
     },
     move = new UnitState(){
         public void update(){
-
-//            Tile target = on().front();
-
-
-
-//            float f = (Time.time() / 100f) % 1f;/**/
-
-//            Log.info(timer.get(timerTarget, 21));
-//            Log.info(f);
-
-//            Timer.schedule()/**/
-
-//            if(retarget()){
-                // move in the direction/rotation of the block its currently on
-//                velocity.add(vec.trnsExact(angleTo(on().front()), type.speed * Time.delta()));
-//                rotation = Mathf.slerpDelta(rotation, baseRotation, type.rotatespeed);
-//            }
+            // move in the direction/rotation of the block its currently on
+            velocity.add(vec.trnsExact(angleTo(on().front()), type.speed * Time.delta()));
+            rotation = Mathf.slerpDelta(rotation, baseRotation, type.rotatespeed);
 
             // switch to unload when on an end tile
             if(dst(on()) < 2.5f && on(Track.end)){
                 state.set(unload);
-                return;
             }
-
-            Tile target = on().front();
-            CompressedConveyorEntity entity = target.ent();
-
-            if(entity == null) return;
-            if(entity.dibs == null) entity.dibs = unit;
-            if(entity.dibs != null) target = on();
-
-            velocity.add(vec.trnsExact(angleTo(target), type.speed * Time.delta()));
-            rotation = Mathf.slerpDelta(rotation, baseRotation, type.rotatespeed);
         }
     },
     unload = new UnitState(){
