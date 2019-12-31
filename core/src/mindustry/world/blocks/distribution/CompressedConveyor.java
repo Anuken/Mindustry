@@ -122,6 +122,6 @@ public class CompressedConveyor extends ArmoredConveyor{
             this.check = check;
         }
 
-        public static ObjectMap<Tile, CraterUnit> dibs = new ObjectMap<>();
+        public static ObjectMap<Tile, CraterUnit> dibs = new ObjectMap<>(); // fixme: race conditions on world load
     }
 }

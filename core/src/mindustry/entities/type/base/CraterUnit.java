@@ -21,7 +21,6 @@ import static mindustry.Vars.*;
 public class CraterUnit extends GroundUnit{
     private final Effect io = Fx.plasticburn; // effect to play when poofing in and out of existence
     private int inactivity = 0;
-    private CraterUnit crater = this;
 
     private final UnitState
 
@@ -35,26 +34,22 @@ public class CraterUnit extends GroundUnit{
         public void update(){
 
             // switch to unload when on an end tile
-            if(dst(on()) < 2.5f && on(Track.end)){
+            if(dst(on()) < 1.5f && on(Track.end)){
                 state.set(unload);
                 return;
             }
 
+            // compute a destination
             Tile target = on().front();
+            if(!dibs(target)) target = on();
 
-            if(!Track.dibs.containsKey(target)){
-                Track.dibs.put(target, crater);
-                if(Track.dibs.get(on()) == crater) Track.dibs.remove(on());
+            if(dst(target) > 1f){ // move to target...
+                velocity.add(vec.trnsExact(angleTo(target), type.speed * Time.delta()));
+            }else{ // ...but snap on its center
+                set(target.drawx(), target.drawy()); // fixme: make movement more majestically
             }
-            if(Track.dibs.get(target) != crater) target = on();
 
-            // move in the direction/rotation of the block its currently on
-            velocity.add(vec.trnsExact(angleTo(target), type.speed * Time.delta()));
-            rotation = Mathf.slerpDelta(rotation, baseRotation, type.rotatespeed);
-
-//            if(dst(on()) < 0.5f && on() != target){
-//                velocity.snap();
-//            }
+            rotation = Mathf.slerpDelta(rotation, angleTo(on().front()), type.rotatespeed);
         }
     },
     unload = new UnitState(){
@@ -74,6 +69,31 @@ public class CraterUnit extends GroundUnit{
             if(on().block().offloadDir(on(), item.item)) item.amount--;
         }
     };
+
+    // ensures (well, tries to make sure) that each crater has one tile to itself
+    private boolean dibs(Tile tile){
+        if(!tile.block().compressable) return false;
+
+        // invalidate existing dibs
+        if(Track.dibs.containsKey(tile)){
+            if(Track.dibs.get(tile).isDead() || Track.dibs.get(tile).dst(tile) > tilesize) Track.dibs.remove(tile);
+        }
+
+        // instantly claim unclaimed tiles
+        if(!Track.dibs.containsKey(tile)){
+            Track.dibs.remove(on());
+            Track.dibs.put(tile, this);
+            return true;
+        }
+
+        // tile is claimed by current unit
+        if(Track.dibs.get(tile) == this){
+            return true;
+        }
+
+        // various reasons
+        return false;
+    }
 
     @Override
     public UnitState getStartState(){
