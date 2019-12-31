@@ -58,9 +58,10 @@ public class CompressedConveyor extends ArmoredConveyor{
         if(entity.reload > 0) entity.reload--;
     }
 
-    class CompressedConveyorEntity extends ConveyorEntity{
+    public class CompressedConveyorEntity extends ConveyorEntity{
         public int reload = 0;
         public CraterUnit crater = null;
+        public CraterUnit dibs = null;
     }
 
     @Override
