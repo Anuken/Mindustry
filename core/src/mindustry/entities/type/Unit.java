@@ -37,7 +37,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public static final float maxAbsVelocity = 127f / velocityPercision;
     public static final int noSpawner = Pos.get(-1, 1);
 
-    protected static final Vec2 moveVector = new Vec2();
+    private static final Vec2 moveVector = new Vec2();
 
     public float rotation;
 
