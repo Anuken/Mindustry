@@ -321,6 +321,11 @@ public class NetServer implements ApplicationListener{
         VoteSession[] currentlyKicking = {null};
 
         clientCommands.<Player>register("votekick", "[player...]", "Vote to kick a player, with a cooldown.", (args, player) -> {
+            if(!Config.enableVotekick.bool()){
+                player.sendMessage("[scarlet]Vote-kick is disabled on this server.");
+                return;
+            }
+
             if(playerGroup.size() < 3){
                 player.sendMessage("[scarlet]At least 3 players are needed to start a votekick.");
                 return;
@@ -443,7 +448,7 @@ public class NetServer implements ApplicationListener{
         if(!player.con.hasDisconnected){
             if(player.con.hasConnected){
                 Events.fire(new PlayerLeave(player));
-                Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
+                if(Config.showConnectMessages.bool()) Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
                 Call.onPlayerDisconnect(player.id);
             }
 
@@ -581,7 +586,7 @@ public class NetServer implements ApplicationListener{
 
         player.add();
         player.con.hasConnected = true;
-        Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
+        if(Config.showConnectMessages.bool()) Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
         Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
 
         Events.fire(new PlayerJoin(player));
