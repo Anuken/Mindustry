@@ -10,4 +10,11 @@ const extend = function(classType, params){
     return new JavaAdapter(classType, params)
 }
 
-const base = {}
+const run = method => new java.lang.Runnable(){run: method}
+const boolf = method => new Boolf(){get: method}
+const boolp = method => new Boolp(){get: method}
+const cons = method => new Cons(){get: method}
+const prov = method => new Prov(){get: method}
+const newEffect = (lifetime, renderer) => new Effects.Effect(lifetime, new Effects.EffectRenderer({render: renderer}))
+Call = Packages.mindustry.gen.Call
+const Calls = Call //backwards compat
