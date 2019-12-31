@@ -381,8 +381,12 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void drawStats(){
+        drawStats(0f);
+    }
+
+    public void drawStats(float cellTrnsY){
         Draw.color(Color.black, team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
-        Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
+        Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, cellTrnsY, 0f), y + Angles.trnsy(rotation, cellTrnsY, 0f), rotation - 90);
         Draw.color();
 
         drawBackItems(item.amount > 0 ? 1f : 0f, false);

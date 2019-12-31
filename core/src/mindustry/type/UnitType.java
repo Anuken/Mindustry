@@ -21,6 +21,7 @@ public class UnitType extends UnlockableContent{
 
     public float health = 60;
     public float hitsize = 7f;
+    public float cellTrnsY = 0f;
     public float hitsizeTile = 4f;
     public float speed = 0.4f;
     public float range = 0, attackLength = 150f;

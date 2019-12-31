@@ -313,6 +313,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
+    public void drawStats(){
+        drawStats(type.cellTrnsY);
+    }
+
+    @Override
     public float maxVelocity(){
         return type.maxVelocity;
     }
