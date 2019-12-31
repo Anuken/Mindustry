@@ -165,19 +165,26 @@ public class Authentication{
                 return;
             }
             if("INVALID_SESSION".equals(response.errorCode)){
-                auth.tryLogin(authServer, () -> auth.doConnect(authServer, serverIdHash).done(response2 -> {
-                    if(response2.success){
-                        ui.loadfrag.show("$connecting.data");
-                        ui.loadfrag.setButton(() -> {
-                            ui.loadfrag.hide();
-                            netClient.disconnectQuietly();
-                        });
-                        netClient.authenticating = false;
-                        Call.sendAuthenticationResponse(auth.sessions.get(authServer).username, response2.result);
-                        return;
-                    }
-                    disconnectAndShowApiError(response2);
-                }));
+                auth.tryLogin(authServer, () -> {
+                    ui.loadfrag.show("$connecting.auth");
+                    ui.loadfrag.setButton(() -> {
+                        ui.loadfrag.hide();
+                        netClient.disconnectQuietly();
+                    });
+                    auth.doConnect(authServer, serverIdHash).done(response2 -> {
+                        if(response2.success){
+                            ui.loadfrag.show("$connecting.data");
+                            ui.loadfrag.setButton(() -> {
+                                ui.loadfrag.hide();
+                                netClient.disconnectQuietly();
+                            });
+                            netClient.authenticating = false;
+                            Call.sendAuthenticationResponse(auth.sessions.get(authServer).username, response2.result);
+                            return;
+                        }
+                        disconnectAndShowApiError(response2);
+                    });
+                });
             }else{
                 // unexpected error
                 disconnectAndShowApiError(response);
