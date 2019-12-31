@@ -21,6 +21,7 @@ import static mindustry.Vars.*;
 public class CraterUnit extends GroundUnit{
     private final Effect io = Fx.plasticburn; // effect to play when poofing in and out of existence
     private int inactivity = 0;
+    private CraterUnit crater = this;
 
     private final UnitState
 
@@ -32,14 +33,28 @@ public class CraterUnit extends GroundUnit{
     },
     move = new UnitState(){
         public void update(){
-            // move in the direction/rotation of the block its currently on
-            velocity.add(vec.trnsExact(angleTo(on().front()), type.speed * Time.delta()));
-            rotation = Mathf.slerpDelta(rotation, baseRotation, type.rotatespeed);
 
             // switch to unload when on an end tile
             if(dst(on()) < 2.5f && on(Track.end)){
                 state.set(unload);
+                return;
             }
+
+            Tile target = on().front();
+
+            if(!Track.dibs.containsKey(target)){
+                Track.dibs.put(target, crater);
+                if(Track.dibs.get(on()) == crater) Track.dibs.remove(on());
+            }
+            if(Track.dibs.get(target) != crater) target = on();
+
+            // move in the direction/rotation of the block its currently on
+            velocity.add(vec.trnsExact(angleTo(target), type.speed * Time.delta()));
+            rotation = Mathf.slerpDelta(rotation, baseRotation, type.rotatespeed);
+
+//            if(dst(on()) < 0.5f && on() != target){
+//                velocity.snap();
+//            }
         }
     },
     unload = new UnitState(){
