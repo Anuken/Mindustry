@@ -181,8 +181,7 @@ public class ServerControl implements ApplicationListener{
                         SaveIO.save(file);
                         info("&lbAutosave completed.");
                     }catch(Exception ex){
-                        String msg = "Autosave failed with: " + ex.getMessage();
-                        Log.err(msg);
+                        Log.err("Autosave failed.", ex);
                     }
                 });
             }
