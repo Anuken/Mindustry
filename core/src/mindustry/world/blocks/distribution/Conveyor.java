@@ -244,6 +244,27 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         if(minremove != Integer.MAX_VALUE) entity.convey.truncate(minremove);
+
+        float currentTime = Time.time();
+        FloatArray flowItemHistory = entity.flowItemHistory;
+        // Longer window makes the estimation less responsinve, while
+        // shorter window makes it less precise
+        final float flowEstimationWindow = 10.0f;
+        // TODO It seems, the better way is using the real framerate, rather
+        // then simply 60
+        float flowEstimationBegin = currentTime - flowEstimationWindow * 60.0f;
+        int removeUpUntilIndex = -1;
+        for(int index = 0; index < flowItemHistory.size; index ++){
+            if(flowItemHistory.get(index) >= flowEstimationBegin){
+                removeUpUntilIndex = index - 1;
+                break;
+            }
+        }
+        if(removeUpUntilIndex >= 0){
+            flowItemHistory.removeRange(0, removeUpUntilIndex);
+        }
+
+        entity.flow = flowItemHistory.size / flowEstimationWindow;
     }
 
     @Override
@@ -308,6 +329,12 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
+        if(item != null){
+            ConveyorEntity entity = tile.ent();
+            float currentTime = Time.time();
+            FloatArray flowItemHistory = entity.flowItemHistory;
+            flowItemHistory.add(currentTime);
+        }
         int direction = source == null ? 0 : Math.abs(source.relativeTo(tile.x, tile.y) - tile.rotation());
         float minitem = tile.<ConveyorEntity>ent().minitem;
         return (((direction == 0) && minitem > itemSpace) ||
@@ -353,6 +380,8 @@ public class Conveyor extends Block implements Autotiler{
         int blendsclx, blendscly;
 
         float clogHeat = 0f;
+        FloatArray flowItemHistory = new FloatArray();
+        float flow = 0.0f;
 
         @Override
         public void write(DataOutput stream) throws IOException{
