@@ -172,6 +172,18 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        Events.on(WaveEvent.class, e -> {
+            if(state.is(State.playing) && Config.valueOf("enableAutosave").bool() ){
+                Fi file = saveDirectory.child("autosave-" + Strings.capitalize(world.getMap().name()) + "-" + state.wave + "." + saveExtension);
+
+                Core.app.post(() -> {
+                    SaveIO.save(file);
+                    Call.sendMessage("[scarlet][Server]:[] - Autosave Done");
+                    info("&lyServer: &lb{0}", "Autosave Done");
+                });
+            }
+        });
+
         if(!mods.list().isEmpty()){
             info("&lc{0} mods loaded.", mods.list().size);
         }
