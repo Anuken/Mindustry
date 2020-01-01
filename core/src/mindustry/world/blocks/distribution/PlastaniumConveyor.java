@@ -8,6 +8,7 @@ import mindustry.world.*;
 import arc.graphics.g2d.*;
 import mindustry.entities.type.*;
 import mindustry.entities.type.base.*;
+import mindustry.world.meta.*;
 
 public class PlastaniumConveyor extends ArmoredConveyor{
     protected TextureRegion start;
@@ -32,6 +33,16 @@ public class PlastaniumConveyor extends ArmoredConveyor{
 
         start = Core.atlas.find(name + "-5-0");
         end   = Core.atlas.find(name + "-6-0");
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.remove(BlockStat.itemCapacity);
+        stats.remove(BlockStat.itemsMoved);
+
+        stats.add(BlockStat.maxUnits, 1, StatUnit.none);
     }
 
     @Override
