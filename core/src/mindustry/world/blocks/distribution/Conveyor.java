@@ -258,8 +258,9 @@ public class Conveyor extends Block implements Autotiler{
             FloatArray itemHistory = entity.itemHistory.get(item);
             int removeUpUntilIndex = -1;
             for(int index = 0; index < itemHistory.size; index ++){
-                if(itemHistory.get(index) >= flowEstimationBegin){
-                    removeUpUntilIndex = index - 1;
+                if(itemHistory.get(index) < flowEstimationBegin){
+                    removeUpUntilIndex = index;
+                }else{
                     break;
                 }
             }
