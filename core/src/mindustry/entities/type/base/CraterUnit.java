@@ -36,21 +36,7 @@ public class CraterUnit extends GroundUnit{
         public void update(){
 
             // switch to unload when on an end tile
-            if(dst(on()) < 1.5f && on(Track.end)){
-                state.set(unload);
-                return;
-            }
-
-            if(purpose != null){
-                if(dst(purpose) > 1f){ // move to target...
-                    velocity.add(vec.trnsExact(angleTo(purpose), type.speed * Time.delta()));
-                }else{ // ...but snap on its center
-                    x = Mathf.lerp(x, purpose.getX(), 0.01f);
-                    y = Mathf.lerp(y, purpose.getY(), 0.01f);
-                }
-            }
-
-            rotation = Mathf.slerpDelta(rotation, angleTo(on().front()), type.rotatespeed);
+            if(dst(on()) < 1.5f && on(Track.end)) state.set(unload);
         }
     },
     unload = new UnitState(){
@@ -96,6 +82,17 @@ public class CraterUnit extends GroundUnit{
         }
 
         Hivemind.update();
+
+        if(purpose != null){
+            if(dst(purpose) > 1f){ // move to target...
+                velocity.add(vec.trnsExact(angleTo(purpose), type.speed * Time.delta()));
+            }else{ // ...but snap on its center
+                x = Mathf.lerp(x, purpose.getX(), 0.01f);
+                y = Mathf.lerp(y, purpose.getY(), 0.01f);
+            }
+        }
+
+        rotation = Mathf.slerpDelta(rotation, angleTo(on().front()), type.rotatespeed);
     }
 
     @Override
@@ -133,6 +130,7 @@ public class CraterUnit extends GroundUnit{
     }
 
     public Tile aspires(){ // what purpose this crater aspires to
+        if(state.is(load)) return on();
         if(on(Track.end)) return on();
 
         return on().front();
