@@ -3,6 +3,7 @@ package mindustry.world.blocks.distribution;
 import arc.*;
 import arc.struct.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -247,25 +248,29 @@ public class Conveyor extends Block implements Autotiler{
         if(minremove != Integer.MAX_VALUE) entity.convey.truncate(minremove);
 
         float currentTime = Time.time();
-        FloatArray flowItemHistory = entity.flowItemHistory;
         // Longer window makes the estimation less responsinve, while
         // shorter window makes it less precise
-        final float flowEstimationWindow = 10.0f;
+        float flowEstimationWindow = 10.0f;
         // TODO It seems, the better way is using the real framerate, rather
         // then simply 60
         float flowEstimationBegin = currentTime - flowEstimationWindow * 60.0f;
-        int removeUpUntilIndex = -1;
-        for(int index = 0; index < flowItemHistory.size; index ++){
-            if(flowItemHistory.get(index) >= flowEstimationBegin){
-                removeUpUntilIndex = index - 1;
-                break;
+        for(Item item: entity.itemHistory.keys()){
+            FloatArray itemHistory = entity.itemHistory.get(item);
+            int removeUpUntilIndex = -1;
+            for(int index = 0; index < itemHistory.size; index ++){
+                if(itemHistory.get(index) >= flowEstimationBegin){
+                    removeUpUntilIndex = index - 1;
+                    break;
+                }
             }
-        }
-        if(removeUpUntilIndex >= 0){
-            flowItemHistory.removeRange(0, removeUpUntilIndex);
+            if(removeUpUntilIndex >= 0){
+                itemHistory.removeRange(0, removeUpUntilIndex);
+            }
+
+            float flow = itemHistory.size / flowEstimationWindow;
+            entity.flowPerItem.put(item, flow);
         }
 
-        entity.flow = flowItemHistory.size / flowEstimationWindow;
     }
 
     @Override
@@ -340,8 +345,8 @@ public class Conveyor extends Block implements Autotiler{
     public void handleItem(Item item, Tile tile, Tile source){
         ConveyorEntity entity = tile.ent();
         float currentTime = Time.time();
-        FloatArray flowItemHistory = entity.flowItemHistory;
-        flowItemHistory.add(currentTime);
+        FloatArray itemHistory = entity.itemHistory.get(item);
+        itemHistory.add(currentTime);
 
         byte rotation = tile.rotation();
 
@@ -378,8 +383,15 @@ public class Conveyor extends Block implements Autotiler{
             table.row();
             table.table().update(flowTable -> {
                 flowTable.clear();
-                flowTable.add("Flow").left().growX();
-                flowTable.add(entity.flow + "/s");
+                for(Item item: content.items()){
+                    float flow = entity.flowPerItem.get(item, 0.0f);
+                    if(flow > 0.01f){
+                        flowTable.row();
+                        flowTable.addImage(item.icon(Cicon.small)).size(24).fill().left();
+                        flowTable.add(item.localizedName).left().color(Color.lightGray).padLeft(5).expandX();
+                        flowTable.add(flow + "/s").right().padLeft(10);
+                    }
+                }
             }).growX();
         }
     }
@@ -394,8 +406,14 @@ public class Conveyor extends Block implements Autotiler{
         int blendsclx, blendscly;
 
         float clogHeat = 0f;
-        FloatArray flowItemHistory = new FloatArray();
-        float flow = 0.0f;
+        ObjectMap<Item, FloatArray> itemHistory = new ObjectMap<Item, FloatArray>();
+        ObjectFloatMap<Item> flowPerItem = new ObjectFloatMap<Item>();
+
+        ConveyorEntity() {
+            for(Item item: content.items()){
+                itemHistory.put(item, new FloatArray());
+            }
+        }
 
         @Override
         public void write(DataOutput stream) throws IOException{
