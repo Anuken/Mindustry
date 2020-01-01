@@ -316,7 +316,10 @@ public class UI implements ApplicationListener, Loadable{
                 });
                 keyDown(KeyCode.ESCAPE, this::hide);
                 keyDown(KeyCode.BACK, this::hide);
-            }}.show();
+                show();
+                Core.scene.setKeyboardFocus(field);
+                field.setCursorPosition(def.length());
+            }};
         }
     }
 
