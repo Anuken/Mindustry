@@ -28,12 +28,15 @@ public class Hivemind{
             on.put(crater.on(), crater);
         });
 
-        craters.each(crater -> {
-            if(!on.containsKey(crater.aspires())){
-                crater.purpose = crater.aspires();
-                on.put(crater.aspires(), crater);
-                on.remove(crater.on());
-            };
+        craters.each(i -> {
+            craters.each(crater -> {
+                if(!on.containsKey(crater.aspires())){
+                    crater.purpose = crater.aspires();
+                    on.put(crater.aspires(), crater);
+                    on.remove(crater.on());
+                    craters.remove(crater);
+                };
+            });
         });
     }
 }
