@@ -68,6 +68,22 @@ public class Units{
         return boolResult;
     }
 
+    /** Returns whether there are any entities on this tile. */
+    public static void allEntities(Tile tile, Cons<Unit> cons){
+        float size = tile.block().size * tilesize;
+        allEntities(tile.drawx() - size/2f, tile.drawy() - size/2f, size, size, cons);
+    }
+
+    public static void allEntities(float x, float y, float width, float height, Cons<Unit> cons){
+        nearby(x, y, width, height, unit -> {
+            if(!unit.isFlying()){
+                unit.hitbox(hitrect);
+
+                if(hitrect.overlaps(x, y, width, height)) cons.get(unit);
+            }
+        });
+    }
+
     /** Returns the neareset damaged tile. */
     public static TileEntity findDamagedTile(Team team, float x, float y){
         Tile tile = Geometry.findClosest(x, y, indexer.getDamaged(team));

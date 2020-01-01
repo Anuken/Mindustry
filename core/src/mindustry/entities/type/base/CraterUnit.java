@@ -13,7 +13,6 @@ import mindustry.graphics.*;
 import arc.scene.ui.layout.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
-import mindustry.entities.traits.*;
 import mindustry.entities.Effects.*;
 import mindustry.world.blocks.distribution.PlastaniumConveyor.*;
 
@@ -22,7 +21,7 @@ import static mindustry.Vars.*;
 public class CraterUnit extends GroundUnit{
     private final Effect io = Fx.plasticburn; // effect to play when poofing in and out of existence
     private int inactivity = 0;
-    public TargetTrait purpose;
+    public Tile purpose;
 
     private final UnitState
 
