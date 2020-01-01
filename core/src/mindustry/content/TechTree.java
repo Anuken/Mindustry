@@ -52,6 +52,10 @@ public class TechTree implements ContentList{
                             node(armoredConveyor, () -> {
 
                             });
+
+                            node(compressedConveyor, () -> {
+
+                            });
                         });
                     });
                 });
