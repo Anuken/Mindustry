@@ -2,7 +2,6 @@ package mindustry.world.blocks.distribution;
 
 import arc.*;
 import arc.func.*;
-import arc.struct.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import arc.graphics.g2d.*;
@@ -130,7 +129,5 @@ public class PlastaniumConveyor extends ArmoredConveyor{
         Track(Boolf<Tile> check){
             this.check = check;
         }
-
-        public static ObjectMap<Tile, CraterUnit> dibs = new ObjectMap<>(); // fixme: race conditions on world load
     }
 }

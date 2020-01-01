@@ -13,6 +13,7 @@ import mindustry.graphics.*;
 import arc.scene.ui.layout.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
+import mindustry.entities.traits.*;
 import mindustry.entities.Effects.*;
 import mindustry.world.blocks.distribution.PlastaniumConveyor.*;
 
@@ -21,6 +22,7 @@ import static mindustry.Vars.*;
 public class CraterUnit extends GroundUnit{
     private final Effect io = Fx.plasticburn; // effect to play when poofing in and out of existence
     private int inactivity = 0;
+    public TargetTrait purpose;
 
     private final UnitState
 
@@ -39,15 +41,13 @@ public class CraterUnit extends GroundUnit{
                 return;
             }
 
-            // compute a destination
-            Tile target = on().front();
-            if(!dibs(target)) target = on();
-
-            if(dst(target) > 1f){ // move to target...
-                velocity.add(vec.trnsExact(angleTo(target), type.speed * Time.delta()));
-            }else{ // ...but snap on its center
-                x = Mathf.lerp(x, target.drawx(), 0.01f);
-                y = Mathf.lerp(y, target.drawy(), 0.01f);
+            if(purpose != null){
+                if(dst(purpose) > 1f){ // move to target...
+                    velocity.add(vec.trnsExact(angleTo(purpose), type.speed * Time.delta()));
+                }else{ // ...but snap on its center
+                    x = Mathf.lerp(x, purpose.getX(), 0.01f);
+                    y = Mathf.lerp(y, purpose.getY(), 0.01f);
+                }
             }
 
             rotation = Mathf.slerpDelta(rotation, angleTo(on().front()), type.rotatespeed);
@@ -71,31 +71,6 @@ public class CraterUnit extends GroundUnit{
         }
     };
 
-    // ensures (well, tries to make sure) that each crater has one tile to itself
-    private boolean dibs(Tile tile){
-        if(!tile.block().compressable) return false;
-
-        // invalidate existing dibs
-        if(Track.dibs.containsKey(tile)){
-            if(Track.dibs.get(tile).isDead() || Track.dibs.get(tile).dst(tile) > tilesize) Track.dibs.remove(tile);
-        }
-
-        // instantly claim unclaimed tiles
-        if(!Track.dibs.containsKey(tile)){
-            Track.dibs.remove(on());
-            Track.dibs.put(tile, this);
-            return true;
-        }
-
-        // tile is claimed by current unit
-        if(Track.dibs.get(tile) == this){
-            return true;
-        }
-
-        // various reasons
-        return false;
-    }
-
     @Override
     public UnitState getStartState(){
         return load;
@@ -116,6 +91,8 @@ public class CraterUnit extends GroundUnit{
             Effects.effect(io, x, y); // poof out of existence
             kill();
         }
+
+        Hivemind.update();
     }
 
     @Override
@@ -150,6 +127,12 @@ public class CraterUnit extends GroundUnit{
 
     public Tile on(){
         return world.ltileWorld(x, y);
+    }
+
+    public Tile aspires(){ // what purpose this crater aspires to
+        if(on(Track.end)) return on();
+
+        return on().front();
     }
 
     private void drawBackItems(){
@@ -202,5 +185,10 @@ public class CraterUnit extends GroundUnit{
         if(on() == null || on().entity == null) return type.itemCapacity;
 
         return Mathf.round(type.itemCapacity * on().entity.timeScale);
+    }
+
+    @Override
+    public void updateTargeting(){
+        super.updateTargeting();
     }
 }
