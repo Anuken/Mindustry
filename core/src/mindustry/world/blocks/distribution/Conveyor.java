@@ -27,6 +27,9 @@ import static mindustry.Vars.*;
 public class Conveyor extends Block implements Autotiler{
     private static final float itemSpace = 0.4f;
     private static final float minmove = 1f / (Short.MAX_VALUE - 2);
+    // Longer window makes the estimation less responsinve, while shorter
+    // window makes it less precise
+    private static final float flowEstimationWindow = 10.0f; // seconds
     private static ItemPos drawpos = new ItemPos();
     private static ItemPos pos1 = new ItemPos();
     private static ItemPos pos2 = new ItemPos();
@@ -248,9 +251,6 @@ public class Conveyor extends Block implements Autotiler{
         if(minremove != Integer.MAX_VALUE) entity.convey.truncate(minremove);
 
         float currentTime = Time.time();
-        // Longer window makes the estimation less responsinve, while
-        // shorter window makes it less precise
-        float flowEstimationWindow = 10.0f;
         // TODO It seems, the better way is using the real framerate, rather
         // then simply 60
         float flowEstimationBegin = currentTime - flowEstimationWindow * 60.0f;
