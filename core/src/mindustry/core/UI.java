@@ -307,15 +307,15 @@ public class UI implements ApplicationListener, Loadable{
                     hide();
                 }).disabled(b -> field.getText().isEmpty());
                 buttons.addButton("$cancel", this::hide);
-                this.keyDown(KeyCode.ENTER, () -> {
+                keyDown(KeyCode.ENTER, () -> {
                     String text = field.getText();
                     if(!text.isEmpty()){
                         confirmed.get(text);
                         hide();
                     }
                 });
-                this.keyDown(KeyCode.ESCAPE, this::hide);
-                this.keyDown(KeyCode.BACK, this::hide);
+                keyDown(KeyCode.ESCAPE, this::hide);
+                keyDown(KeyCode.BACK, this::hide);
             }}.show();
         }
     }
