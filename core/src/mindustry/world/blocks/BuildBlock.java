@@ -171,7 +171,7 @@ public class BuildBlock extends Block{
             return;
         }
 
-        if(entity.previous == null) return;
+        if(entity.previous == null || entity.cblock == null) return;
 
         if(Core.atlas.isFound(entity.previous.icon(mindustry.ui.Cicon.full))){
             Draw.rect(entity.previous.icon(Cicon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.rotation() * 90 : 0);
@@ -257,7 +257,7 @@ public class BuildBlock extends Block{
             if(cblock != null){
                 ItemStack[] requirements = cblock.requirements;
                 if(requirements.length != accumulator.length || totalAccumulator.length != requirements.length){
-                    setDeconstruct(previous);
+                    setDeconstruct(cblock);
                 }
 
                 //make sure you take into account that you can't deconstruct more than there is deconstructed
@@ -342,12 +342,12 @@ public class BuildBlock extends Block{
             this.progress = 1f;
             if(previous.buildCost >= 0.01f){
                 this.cblock = previous;
-                this.accumulator = new float[previous.requirements.length];
-                this.totalAccumulator = new float[previous.requirements.length];
                 this.buildCost = previous.buildCost * state.rules.buildCostMultiplier;
             }else{
                 this.buildCost = 20f; //default no-requirement build cost is 20
             }
+            this.accumulator = new float[previous.requirements.length];
+            this.totalAccumulator = new float[previous.requirements.length];
         }
 
         @Override

@@ -898,10 +898,11 @@ public class Blocks implements ContentList{
         }};
 
         junction = new Junction("junction"){{
-            requirements(Category.distribution, ItemStack.with(Items.copper, 1), true);
+            requirements(Category.distribution, ItemStack.with(Items.copper, 2), true);
             speed = 26;
             capacity = 12;
             health = 30;
+            buildCostMultiplier = 6f;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
@@ -921,16 +922,18 @@ public class Blocks implements ContentList{
 
         sorter = new Sorter("sorter"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 2));
+            buildCostMultiplier = 3f;
         }};
 
         invertedSorter = new Sorter("inverted-sorter"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 2));
+            buildCostMultiplier = 3f;
             invert = true;
         }};
 
         router = new Router("router"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 3));
-
+            buildCostMultiplier = 2f;
         }};
 
         distributor = new Router("distributor"){{
@@ -940,6 +943,7 @@ public class Blocks implements ContentList{
 
         overflowGate = new OverflowGate("overflow-gate"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 4));
+            buildCostMultiplier = 3f;
         }};
 
         massDriver = new MassDriver("mass-driver"){{

@@ -120,6 +120,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     @Override
+    public boolean offloadImmediately(){
+        return true;
+    }
+
+    @Override
     public TypeID getTypeID(){
         return TypeIDs.player;
     }

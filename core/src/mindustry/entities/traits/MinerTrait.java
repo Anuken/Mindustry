@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.util.Time;
 import mindustry.content.*;
 import mindustry.entities.Effects;
+import mindustry.entities.effect.*;
 import mindustry.entities.type.*;
 import mindustry.gen.Call;
 import mindustry.graphics.*;
@@ -38,10 +39,25 @@ public interface MinerTrait extends Entity{
     /** Returns whether or not this builder can mine a specific item type. */
     boolean canMine(Item item);
 
+    /** @return whether to offload mined items immediately at the core. if false, items are collected and dropped in a burst. */
+    default boolean offloadImmediately(){
+        return false;
+    }
+
     default void updateMining(){
         Unit unit = (Unit)this;
         Tile tile = getMineTile();
         TileEntity core = unit.getClosestCore();
+
+        if(core != null && tile != null && tile.drop() != null && !unit.acceptsItem(tile.drop()) && unit.dst(core) < mineTransferRange){
+            int accepted = core.tile.block().acceptStack(unit.item().item, unit.item().amount, core.tile, unit);
+            if(accepted > 0){
+                Call.transferItemTo(unit.item().item, accepted,
+                    tile.worldx() + Mathf.range(tilesize / 2f),
+                    tile.worldy() + Mathf.range(tilesize / 2f), core.tile);
+                unit.clearItem();
+            }
+        }
 
         if(tile == null || core == null || tile.block() != Blocks.air || dst(tile.worldx(), tile.worldy()) > getMiningRange()
                 || tile.drop() == null || !unit.acceptsItem(tile.drop()) || !canMine(tile.drop())){
@@ -52,12 +68,13 @@ public interface MinerTrait extends Entity{
 
             if(Mathf.chance(Time.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
 
-                if(unit.dst(core) < mineTransferRange && core.tile.block().acceptStack(item, 1, core.tile, unit) == 1){
+                if(unit.dst(core) < mineTransferRange && core.tile.block().acceptStack(item, 1, core.tile, unit) == 1 && offloadImmediately()){
                     Call.transferItemTo(item, 1,
                             tile.worldx() + Mathf.range(tilesize / 2f),
                             tile.worldy() + Mathf.range(tilesize / 2f), core.tile);
                 }else if(unit.acceptsItem(item)){
-                    Call.transferItemToUnit(item,
+                    //this is clientside, since items are synced anyway
+                    ItemTransfer.transferItemToUnit(item,
                             tile.worldx() + Mathf.range(tilesize / 2f),
                             tile.worldy() + Mathf.range(tilesize / 2f),
                             unit);
