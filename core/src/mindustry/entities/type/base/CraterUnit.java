@@ -46,7 +46,8 @@ public class CraterUnit extends GroundUnit{
             if(dst(target) > 1f){ // move to target...
                 velocity.add(vec.trnsExact(angleTo(target), type.speed * Time.delta()));
             }else{ // ...but snap on its center
-                set(target.drawx(), target.drawy()); // fixme: make movement more majestically
+                x = Mathf.lerp(x, target.drawx(), 0.01f);
+                y = Mathf.lerp(y, target.drawy(), 0.01f);
             }
 
             rotation = Mathf.slerpDelta(rotation, angleTo(on().front()), type.rotatespeed);
