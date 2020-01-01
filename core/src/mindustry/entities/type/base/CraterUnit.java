@@ -14,6 +14,7 @@ import arc.scene.ui.layout.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.entities.Effects.*;
+import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.distribution.PlastaniumConveyor.*;
 
 import static mindustry.Vars.*;
@@ -65,8 +66,11 @@ public class CraterUnit extends GroundUnit{
                 return;
             }
 
-            if(item.amount == 0) return; // update will take care of poofing
-            if(on().block().offloadDir(on(), item.item)) item.amount--;
+            // update will take care of poofing
+            while(item.amount > 0 && on().block().offloadDir(on(), item.item)){
+                item.amount--;
+                if(on().getNearby(on().rotation()).block() instanceof Conveyor) break; // conveyors accept all of it :|
+            };
         }
     };
 
