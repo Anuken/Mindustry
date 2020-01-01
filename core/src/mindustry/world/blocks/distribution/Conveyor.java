@@ -6,6 +6,7 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.traits.BuilderTrait.*;
@@ -368,6 +369,21 @@ public class Conveyor extends Block implements Autotiler{
         //this item must be greater than anything there...
         entity.convey.add(result);
         entity.lastInserted = (byte)(entity.convey.size - 1);
+    }
+
+    @Override
+    public void display(Tile tile, Table table){
+        super.display(tile, table);
+
+        ConveyorEntity entity = tile.ent();
+        if(entity != null){
+            table.row();
+            table.table().update(flowTable -> {
+                flowTable.clear();
+                flowTable.add("Flow").left().growX();
+                flowTable.add(entity.flow + "/s");
+            }).growX();
+        }
     }
 
     public static class ConveyorEntity extends TileEntity{
