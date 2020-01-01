@@ -8,6 +8,21 @@ A sandbox tower defense game written in Java.
 _[Trello Board](https://trello.com/b/aE2tcUwF/mindustry-40-plans)_  
 _[Wiki](https://mindustrygame.github.io/wiki)_ 
 
+### Downloads
+
+[<img src="https://static.itch.io/images/badge.svg"
+     alt="Get it on Itch.io"
+     height="60">](https://anuke.itch.io/mindustry)
+
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
+     alt="Get it on Google Play"
+     height="80">](https://play.google.com/store/apps/details?id=io.anuke.mindustry)
+
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/io.anuke.mindustry/)
+
+
 ### Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md).
@@ -52,18 +67,3 @@ After building, the output .JAR file should be in `/desktop/build/libs/Mindustry
 ### Feature Requests
 
 [![Feature Requests](https://feathub.com/Anuken/Mindustry?format=svg)](https://feathub.com/Anuken/Mindustry)
-
-
-### Downloads
-
-[<img src="https://static.itch.io/images/badge.svg"
-     alt="Get it on Itch.io"
-     height="60">](https://anuke.itch.io/mindustry)
-
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
-     alt="Get it on Google Play"
-     height="80">](https://play.google.com/store/apps/details?id=io.anuke.mindustry)
-
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="Get it on F-Droid"
-     height="80">](https://f-droid.org/packages/io.anuke.mindustry/)
