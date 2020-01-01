@@ -272,6 +272,10 @@ public class Conveyor extends Block implements Autotiler{
 
                 float flow = itemHistory.size / flowEstimationWindow;
                 entity.flowPerItem.put(item, flow);
+
+                // Reset sleep timer, otherwise the flow estimation won't
+                // converge to zero before the tile turned to sleep
+                entity.noSleep();
             }else{
                 entity.flowPerItem.put(item, 0.0f);
             }
