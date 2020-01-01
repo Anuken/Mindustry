@@ -30,6 +30,7 @@ public class Hivemind{
 
         craters.each(i -> {
             craters.each(crater -> {
+                if(crater == null || crater.aspires() == null) return;
                 if(!on.containsKey(crater.aspires())){
                     crater.purpose = crater.aspires();
                     on.put(crater.aspires(), crater);
