@@ -254,22 +254,27 @@ public class Conveyor extends Block implements Autotiler{
         // TODO It seems, the better way is using the real framerate, rather
         // then simply 60
         float flowEstimationBegin = currentTime - flowEstimationWindow * 60.0f;
-        for(Item item: entity.itemHistory.keys()){
-            FloatArray itemHistory = entity.itemHistory.get(item);
-            int removeUpUntilIndex = -1;
-            for(int index = 0; index < itemHistory.size; index ++){
-                if(itemHistory.get(index) < flowEstimationBegin){
-                    removeUpUntilIndex = index;
-                }else{
-                    break;
+        for(ObjectMap.Entry<Item, FloatArray> entry: entity.itemHistory){
+            Item item = entry.key;
+            FloatArray itemHistory = entry.value;
+            if(itemHistory.size > 0){
+                int removeUpUntilIndex = -1;
+                for(int index = 0; index < itemHistory.size; index ++){
+                    if(itemHistory.get(index) < flowEstimationBegin){
+                        removeUpUntilIndex = index;
+                    }else{
+                        break;
+                    }
                 }
-            }
-            if(removeUpUntilIndex >= 0){
-                itemHistory.removeRange(0, removeUpUntilIndex);
-            }
+                if(removeUpUntilIndex >= 0){
+                    itemHistory.removeRange(0, removeUpUntilIndex);
+                }
 
-            float flow = itemHistory.size / flowEstimationWindow;
-            entity.flowPerItem.put(item, flow);
+                float flow = itemHistory.size / flowEstimationWindow;
+                entity.flowPerItem.put(item, flow);
+            }else{
+                entity.flowPerItem.put(item, 0.0f);
+            }
         }
 
     }
