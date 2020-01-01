@@ -32,6 +32,7 @@ public class Hivemind{
             if(!on.containsKey(crater.aspires())){
                 crater.purpose = crater.aspires();
                 on.put(crater.aspires(), crater);
+                on.remove(crater.on());
             };
         });
     }
