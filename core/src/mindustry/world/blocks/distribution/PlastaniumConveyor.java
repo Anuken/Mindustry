@@ -6,21 +6,19 @@ import arc.struct.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import arc.graphics.g2d.*;
-import mindustry.content.*;
 import mindustry.entities.type.*;
-import mindustry.game.EventType.*;
 import mindustry.entities.type.base.*;
 
-public class CompressedConveyor extends ArmoredConveyor{
+public class PlastaniumConveyor extends ArmoredConveyor{
     protected TextureRegion start;
     public TextureRegion end;
 
     protected static int cooldown = 4; // ticks it needs to wait with spawning when a ground unit has walked on it
 
-    public CompressedConveyor(String name){
+    public PlastaniumConveyor(String name){
         super(name);
         compressable = true;
-        entityType = CompressedConveyorEntity::new;
+        entityType = PlastaniumConveyorEntity::new;
     }
 
     @Override
@@ -48,25 +46,25 @@ public class CompressedConveyor extends ArmoredConveyor{
 
     @Override
     public void unitOn(Tile tile, Unit unit){ // resets the spawner cooldown, as well as adopting stray roomba's
-        CompressedConveyorEntity entity = tile.ent();
+        PlastaniumConveyorEntity entity = tile.ent();
         if(unit instanceof CraterUnit) entity.crater = (CraterUnit)unit;
         entity.reload = cooldown;
     }
 
     @Override
     public void update(Tile tile){ // tick away the cooldown
-        CompressedConveyorEntity entity = tile.ent();
+        PlastaniumConveyorEntity entity = tile.ent();
         if(entity.reload > 0) entity.reload--;
     }
 
-    class CompressedConveyorEntity extends ConveyorEntity{
+    class PlastaniumConveyorEntity extends ConveyorEntity{
         public int reload = 0;
         public CraterUnit crater = null;
     }
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){ // summon craters into existence to be loaded
-        CompressedConveyorEntity entity = tile.ent();
+        PlastaniumConveyorEntity entity = tile.ent();
 
         if(!Track.start.check.get(tile)) return false;
         if(entity.crater == null || entity.crater.dead || !entity.crater.loading() || entity.crater.on() != tile){
@@ -80,7 +78,7 @@ public class CompressedConveyor extends ArmoredConveyor{
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        ((CompressedConveyorEntity)tile.ent()).crater.handleItem(item);
+        ((PlastaniumConveyorEntity)tile.ent()).crater.handleItem(item);
     }
 
     @Override

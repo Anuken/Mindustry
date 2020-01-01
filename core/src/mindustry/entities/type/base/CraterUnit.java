@@ -14,7 +14,7 @@ import arc.scene.ui.layout.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.entities.Effects.*;
-import mindustry.world.blocks.distribution.CompressedConveyor.*;
+import mindustry.world.blocks.distribution.PlastaniumConveyor.*;
 
 import static mindustry.Vars.*;
 

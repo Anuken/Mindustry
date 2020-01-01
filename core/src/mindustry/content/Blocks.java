@@ -57,7 +57,7 @@ public class Blocks implements ContentList{
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //transport
-    conveyor, titaniumConveyor, armoredConveyor, compressedConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, massDriver,
+    conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, massDriver,
 
     //liquids
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
@@ -891,16 +891,16 @@ public class Blocks implements ContentList{
             speed = 0.08f;
         }};
 
+        plastaniumConveyor = new PlastaniumConveyor("plastanium-conveyor"){{
+            requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.surgealloy, 1, Items.phasefabric, 1));
+            health = 150;
+            speed = 0f;
+        }};
+
         armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
             health = 180;
             speed = 0.08f;
-        }};
-
-        compressedConveyor = new CompressedConveyor("compressed-conveyor"){{
-            requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.surgealloy, 1, Items.phasefabric, 1));
-            health = 150;
-            speed = 0f;
         }};
 
         junction = new Junction("junction"){{
