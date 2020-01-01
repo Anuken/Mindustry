@@ -330,12 +330,6 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        if(item != null){
-            ConveyorEntity entity = tile.ent();
-            float currentTime = Time.time();
-            FloatArray flowItemHistory = entity.flowItemHistory;
-            flowItemHistory.add(currentTime);
-        }
         int direction = source == null ? 0 : Math.abs(source.relativeTo(tile.x, tile.y) - tile.rotation());
         float minitem = tile.<ConveyorEntity>ent().minitem;
         return (((direction == 0) && minitem > itemSpace) ||
@@ -344,6 +338,11 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
+        ConveyorEntity entity = tile.ent();
+        float currentTime = Time.time();
+        FloatArray flowItemHistory = entity.flowItemHistory;
+        flowItemHistory.add(currentTime);
+
         byte rotation = tile.rotation();
 
         int ch = Math.abs(source.relativeTo(tile.x, tile.y) - rotation);
@@ -352,7 +351,6 @@ public class Conveyor extends Block implements Autotiler{
         float pos = ch == 0 ? 0 : ch % 2 == 1 ? 0.5f : 1f;
         float y = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
 
-        ConveyorEntity entity = tile.ent();
         entity.noSleep();
         long result = ItemPos.packItem(item, y * 0.9f, pos);
 
