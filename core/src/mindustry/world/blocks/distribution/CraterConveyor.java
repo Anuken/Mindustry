@@ -85,7 +85,7 @@ public class CraterConveyor extends BaseConveyor{
             }else{
                 Tile destination = tile.front();
 
-                if(entity.crater.dst(tile) < 0.5f){
+                if(entity.crater.dst(tile) < 1.25f){
                     entity.crater.f = tile.rotation() * 90 - 90;
                     if(!(destination.block() instanceof CraterConveyor)){
                         while(entity.items.total() > 0 && entity.crater.i != null && offloadDir(tile, entity.crater.i)) entity.items.remove(entity.crater.i, 1);
@@ -110,8 +110,8 @@ public class CraterConveyor extends BaseConveyor{
         }
 
         if(entity.crater != null){
-            entity.crater.x = Mathf.lerpDelta(entity.crater.x, tile.drawx(), 0.05f);
-            entity.crater.y = Mathf.lerpDelta(entity.crater.y, tile.drawy(), 0.05f);
+            entity.crater.x = Mathf.lerpDelta(entity.crater.x, tile.drawx(), 0.075f);
+            entity.crater.y = Mathf.lerpDelta(entity.crater.y, tile.drawy(), 0.075f);
             entity.crater.r = Mathf.slerpDelta(entity.crater.r, entity.crater.f, 0.1f);
         }
     }
