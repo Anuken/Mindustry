@@ -2,12 +2,16 @@ package mindustry.world.blocks.distribution;
 
 import arc.*;
 import arc.func.*;
+import arc.util.*;
+import mindustry.ui.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import arc.graphics.g2d.*;
+import mindustry.graphics.*;
+import arc.scene.ui.layout.*;
+import mindustry.world.meta.*;
 import mindustry.entities.type.*;
 import mindustry.entities.type.base.*;
-import mindustry.world.meta.*;
 
 public class PlastaniumConveyor extends ArmoredConveyor{
     protected TextureRegion start;
@@ -55,6 +59,16 @@ public class PlastaniumConveyor extends ArmoredConveyor{
     }
 
     @Override
+    public void drawLayer(Tile tile){
+        PlastaniumConveyorEntity entity = tile.ent();
+
+        Fonts.outline.draw(entity.tree + "",
+        tile.drawx(),
+        tile.drawy() + 2,
+        Pal.accent, 0.25f * 1f / Scl.scl(1f), false, Align.center);
+    }
+
+    @Override
     public void unitOn(Tile tile, Unit unit){ // resets the spawner cooldown, as well as adopting stray roomba's
         PlastaniumConveyorEntity entity = tile.ent();
         if(unit instanceof CraterUnit) entity.crater = (CraterUnit)unit;
@@ -65,11 +79,18 @@ public class PlastaniumConveyor extends ArmoredConveyor{
     public void update(Tile tile){ // tick away the cooldown
         PlastaniumConveyorEntity entity = tile.ent();
         if(entity.reload > 0) entity.reload--;
+
+        if(tile.front() == null || !(tile.front().block() instanceof PlastaniumConveyor)){
+            entity.tree = 0;
+        }else{
+            entity.tree = ((PlastaniumConveyorEntity)tile.front().ent()).tree + 1;
+        }
     }
 
     class PlastaniumConveyorEntity extends ConveyorEntity{
         public int reload = 0;
         public CraterUnit crater = null;
+        public int tree = 0;
     }
 
     @Override
