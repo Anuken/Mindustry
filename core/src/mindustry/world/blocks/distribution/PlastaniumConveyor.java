@@ -3,6 +3,7 @@ package mindustry.world.blocks.distribution;
 import arc.*;
 import arc.func.*;
 import arc.util.*;
+import arc.struct.*;
 import mindustry.ui.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -80,10 +81,13 @@ public class PlastaniumConveyor extends ArmoredConveyor{
         PlastaniumConveyorEntity entity = tile.ent();
         if(entity.reload > 0) entity.reload--;
 
-        if(tile.front() == null || !(tile.front().block() instanceof PlastaniumConveyor)){
-            entity.tree = 0;
-        }else{
-            entity.tree = ((PlastaniumConveyorEntity)tile.front().ent()).tree + 1;
+        Tile cur = tile;
+        ObjectSet<Tile> walked = new ObjectSet<>();
+        entity.tree = 0;
+        while(cur.front() != null && cur.front().block() instanceof PlastaniumConveyor && !walked.contains(cur)){
+            walked.add(cur);
+            cur = cur.front();
+            entity.tree++;
         }
     }
 
