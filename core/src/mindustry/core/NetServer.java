@@ -321,6 +321,11 @@ public class NetServer implements ApplicationListener{
         VoteSession[] currentlyKicking = {null};
 
         clientCommands.<Player>register("votekick", "[player...]", "Vote to kick a player, with a cooldown.", (args, player) -> {
+            if(!Config.enableVotekick.bool()){
+                player.sendMessage("[scarlet]Vote-kick is disabled on this server.");
+                return;
+            }
+
             if(playerGroup.size() < 3){
                 player.sendMessage("[scarlet]At least 3 players are needed to start a votekick.");
                 return;

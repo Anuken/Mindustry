@@ -49,11 +49,6 @@ If the terminal returns `Permission denied` or `Command not found` on Mac/Linux,
 Gradle may take up to several minutes to download files. Be patient. <br>
 After building, the output .JAR file should be in `/desktop/build/libs/Mindustry.jar` for desktop builds, and in `/server/build/libs/server-release.jar` for server builds.
 
-### Feature Requests
-
-[![Feature Requests](https://feathub.com/Anuken/Mindustry?format=svg)](https://feathub.com/Anuken/Mindustry)
-
-
 ### Downloads
 
 [<img src="https://static.itch.io/images/badge.svg"
@@ -67,3 +62,7 @@ After building, the output .JAR file should be in `/desktop/build/libs/Mindustry
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
      alt="Get it on F-Droid"
      height="80">](https://f-droid.org/packages/io.anuke.mindustry/)
+
+### Feature Requests
+
+[![Feature Requests](https://feathub.com/Anuken/Mindustry?format=svg)](https://feathub.com/Anuken/Mindustry)
