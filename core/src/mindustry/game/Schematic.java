@@ -118,13 +118,15 @@ public class Schematic implements Publishable, Comparable<Schematic>{
         public short x, y;
         public int config;
         public byte rotation;
+        public IntArray links;
 
-        public Stile(Block block, int x, int y, int config, byte rotation){
+        public Stile(Block block, int x, int y, int config, byte rotation, IntArray links){
             this.block = block;
             this.x = (short)x;
             this.y = (short)y;
             this.config = config;
             this.rotation = rotation;
+            this.links = links;
         }
     }
 }

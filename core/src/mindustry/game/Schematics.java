@@ -1,31 +1,43 @@
 package mindustry.game;
 
-import arc.*;
-import arc.assets.*;
+import arc.Core;
+import arc.Events;
+import arc.assets.Loadable;
+import arc.files.Fi;
+import arc.graphics.Color;
+import arc.graphics.Pixmap;
+import arc.graphics.Texture;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
+import arc.graphics.gl.FrameBuffer;
 import arc.struct.*;
-import arc.files.*;
-import arc.graphics.*;
-import arc.graphics.g2d.*;
-import arc.graphics.gl.*;
-import arc.util.*;
-import arc.util.ArcAnnotate.*;
-import arc.util.io.Streams.*;
-import arc.util.serialization.*;
-import mindustry.*;
-import mindustry.content.*;
+import arc.util.ArcAnnotate.Nullable;
+import arc.util.Log;
+import arc.util.ScreenUtils;
+import arc.util.Time;
+import arc.util.Tmp;
+import arc.util.io.Streams.OptimizedByteArrayOutputStream;
+import arc.util.serialization.Base64Coder;
+import mindustry.Vars;
+import mindustry.content.Blocks;
 import mindustry.ctype.ContentType;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.game.EventType.*;
-import mindustry.game.Schematic.*;
-import mindustry.input.*;
-import mindustry.input.Placement.*;
-import mindustry.world.*;
-import mindustry.world.blocks.*;
-import mindustry.world.blocks.production.*;
-import mindustry.world.blocks.storage.*;
+import mindustry.entities.traits.BuilderTrait.BuildRequest;
+import mindustry.game.EventType.ContentReloadEvent;
+import mindustry.game.EventType.DisposeEvent;
+import mindustry.game.Schematic.Stile;
+import mindustry.input.Placement;
+import mindustry.input.Placement.NormalizeResult;
+import mindustry.world.Block;
+import mindustry.world.Pos;
+import mindustry.world.Tile;
+import mindustry.world.blocks.BuildBlock;
+import mindustry.world.blocks.power.PowerNode;
+import mindustry.world.blocks.production.Drill;
+import mindustry.world.blocks.storage.CoreBlock;
 
 import java.io.*;
-import java.util.zip.*;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 import static mindustry.Vars.*;
 
@@ -34,7 +46,7 @@ public class Schematics implements Loadable{
     public static final String base64Header = "bXNjaAB";
 
     private static final byte[] header = {'m', 's', 'c', 'h'};
-    private static final byte version = 0;
+    private static final byte version = 1; //Because power node metadata
 
     private static final int padding = 2;
     private static final int maxPreviewsMobile = 32;
@@ -243,8 +255,20 @@ public class Schematics implements Loadable{
 
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
     public Array<BuildRequest> toRequests(Schematic schem, int x, int y){
-        return schem.tiles.map(t -> new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y, schem.width, schem.height).configure(t.config))
-            .removeAll(s -> !s.block.isVisible() || !s.block.unlockedCur());
+        return schem.tiles.map(t -> {
+            BuildRequest br = new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block);
+            br.original(t.x, t.y, schem.width, schem.height);
+            br.configure(t.config);
+            if(t.links != null){
+                IntArray links = new IntArray();
+                for(int i = 0; i < t.links.size; i++){
+                    int link = t.links.get(i);
+                    links.add(link);
+                }
+                br.link(links);
+            }
+            return br;
+        }).removeAll(s -> !s.block.isVisible() || !s.block.unlockedCur());
     }
 
     public void placeLoadout(Schematic schem, int x, int y){
@@ -346,8 +370,20 @@ public class Schematics implements Loadable{
                     if(tile.block().posConfig){
                         config = Pos.get(Pos.x(config) + offsetX, Pos.y(config) + offsetY);
                     }
-
-                    tiles.add(new Stile(tile.block(), tile.x + offsetX, tile.y + offsetY, config, tile.rotation()));
+                    IntArray links = null;
+                    if(tile.block() instanceof PowerNode){
+                        links = new IntArray();
+                        IntArray from = tile.ent().power.links;
+                        for(int i = 0; i < from.size; i++){
+                            int link = from.get(i);
+                            int linkX = Pos.x(link);
+                            int linkY = Pos.y(link);
+                            if(linkX >= x && linkY >= y && linkX <= x2 && linkY <= y2){
+                                links.add(Pos.get(linkX - tile.x, linkY - tile.y));
+                            }
+                        }
+                    }
+                    tiles.add(new Stile(tile.block(), tile.x + offsetX, tile.y + offsetY, config, tile.rotation(), links));
                     counted.add(tile.pos());
                 }
             }
@@ -394,10 +430,11 @@ public class Schematics implements Loadable{
             }
         }
 
-        int ver;
-        if((ver = input.read()) != version){
+        int ver = input.read();
+        if(ver != version && ver != 0){
             throw new IOException("Unknown version: " + ver);
         }
+        boolean hasPowerNodeMetadata = ver >= version;
 
         try(DataInputStream stream = new DataInputStream(new InflaterInputStream(input))){
             short width = stream.readShort(), height = stream.readShort();
@@ -422,8 +459,16 @@ public class Schematics implements Loadable{
                 int position = stream.readInt();
                 int config = stream.readInt();
                 byte rotation = stream.readByte();
+                IntArray links = null;
+                if(hasPowerNodeMetadata && block instanceof PowerNode){
+                    links = new IntArray(); //TODO static int size?
+                    int size = stream.readByte();
+                    for(int j = 0; j < size; j++){
+                        links.add(stream.readInt());
+                    }
+                }
                 if(block != Blocks.air){
-                    tiles.add(new Stile(block, Pos.x(position), Pos.y(position), config, rotation));
+                    tiles.add(new Stile(block, Pos.x(position), Pos.y(position), config, rotation, links));
                 }
             }
 
@@ -466,6 +511,12 @@ public class Schematics implements Loadable{
                 stream.writeInt(Pos.get(tile.x, tile.y));
                 stream.writeInt(tile.config);
                 stream.writeByte(tile.rotation);
+                if(tile.links != null){
+                    stream.writeByte(tile.links.size);
+                    for(int i = 0; i < tile.links.size; i++){
+                        stream.writeInt(tile.links.get(i));
+                    }
+                }
             }
         }
     }

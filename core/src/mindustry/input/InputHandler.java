@@ -260,6 +260,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         int ox = schemOriginX(), oy = schemOriginY();
 
         requests.each(req -> {
+            //rotate node linking
+            if(req.links != null){
+                for(int i = 0; i < req.links.size; i++){
+                    int link = req.links.get(i);
+                    int linkX = Pos.x(link);
+                    int linkY = Pos.y(link);
+                    req.links.set(i, direction >= 0 ? Pos.get(-linkY, linkX) : Pos.get(linkY, -linkX));
+                }
+            }
+
             //rotate config position
             if(req.block.posConfig){
                 int cx = Pos.x(req.config) - req.originalX, cy = Pos.y(req.config) - req.originalY;

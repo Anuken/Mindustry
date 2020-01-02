@@ -1,6 +1,7 @@
 package mindustry.entities.traits;
 
 import arc.*;
+import arc.struct.IntArray;
 import arc.struct.Queue;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -8,6 +9,7 @@ import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.annotations.Annotations;
 import mindustry.content.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
@@ -16,6 +18,7 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.power.PowerNode;
 
 import java.io.*;
 import java.util.*;
@@ -104,12 +107,38 @@ public interface BuilderTrait extends Entity, TeamTrait{
                 if(current.hasConfig){
                     Call.onTileConfig(null, tile, current.config);
                 }
+                if(tile.ent() != null && tile.ent().power != null && current.links != null){
+                    //Call.onNodeConfig(tile, new BuildRequest[]{current});
+                    IntArray links = tile.ent().power.links;
+                    for(int i = 0; i < links.size; i++){
+                        int linkPos = links.get(i);
+                        //Find tile it's currently linked to
+                        Tile link = world.tile(linkPos);
+                        if(link.ent() != null && link.ent().power != null){
+                            //Remove the link
+                            link.ent().power.links.removeValue(tile.pos());
+                        }
+                    }
+                    //Remove all links from self
+                    links.clear();
+                    for(int i = 0; i < current.links.size; i++){
+                        int linkPos = current.links.get(i);
+                        Tile link = world.tile(Pos.x(linkPos) + tile.x, Pos.y(linkPos) + tile.y);
+                        if(((PowerNode) tile.block()).linkValid(tile, link)){
+                            tile.ent().power.links.add(link.pos());
+                            if(link.ent() != null && link.ent().power != null){
+                                link.ent().power.links.add(tile.pos());
+                            }
+                        }
+                    }
+                }
             }
         }
 
         current.stuck = Mathf.equal(current.progress, entity.progress);
         current.progress = entity.progress;
     }
+
 
     /** @return whether this request should be skipped, in favor of the next one. */
     default boolean shouldSkip(BuildRequest request, @Nullable TileEntity core){
@@ -287,6 +316,8 @@ public interface BuilderTrait extends Entity, TeamTrait{
         public int config;
         /** Original position, only used in schematics.*/
         public int originalX, originalY, originalWidth, originalHeight;
+        /** Links, used for power node configuration */
+        public IntArray links;
 
         /** Last progress.*/
         public float progress;
@@ -332,6 +363,12 @@ public interface BuilderTrait extends Entity, TeamTrait{
             copy.progress = progress;
             copy.initialized = initialized;
             copy.animScale = animScale;
+            if(links != null){
+                copy.links = new IntArray();
+                for(int i = 0; i < links.size; i++){
+                    copy.links.add(links.get(i));
+                }
+            }
             return copy;
         }
 
@@ -371,6 +408,11 @@ public interface BuilderTrait extends Entity, TeamTrait{
         public BuildRequest configure(int config){
             this.config = config;
             this.hasConfig = true;
+            return this;
+        }
+
+        public BuildRequest link(IntArray links) {
+            this.links = links;
             return this;
         }
 

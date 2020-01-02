@@ -9,6 +9,8 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.entities.traits.BuilderTrait;
 import mindustry.entities.type.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -74,6 +76,12 @@ public class PowerNode extends PowerBlock{
 
             entity.power.graph.add(other.entity.power.graph);
         }
+    }
+
+    @Remote(targets = Loc.server)
+    public static void onNodeConfig(Tile tile, BuilderTrait.BuildRequest[] brArr){
+        BuilderTrait.BuildRequest br = brArr[0];
+
     }
 
     @Override
