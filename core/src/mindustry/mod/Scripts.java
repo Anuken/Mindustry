@@ -21,7 +21,8 @@ public class Scripts implements Disposable{
         context.setClassShutter(type -> (ClassAccess.allowedClassNames.contains(type) || type.startsWith("$Proxy") ||
             type.startsWith("adapter") || type.contains("PrintStream") ||
             type.startsWith("mindustry")) && !type.equals("mindustry.mod.ClassAccess"));
-
+        context.getWrapFactory().setJavaPrimitiveWrap(false);
+        
         scope = new ImporterTopLevel(context);
         wrapper = Core.files.internal("scripts/wrapper.js").readString();
 
