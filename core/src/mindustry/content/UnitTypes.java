@@ -17,7 +17,6 @@ public class UnitTypes implements ContentList{
 
     @Override
     public void load(){
-
         draug = new UnitType("draug", MinerDrone::new){{
             flying = true;
             drag = 0.01f;
