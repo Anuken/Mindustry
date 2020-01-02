@@ -1,22 +1,20 @@
 package mindustry.world.blocks.distribution;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.util.*;
-import mindustry.content.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
-import mindustry.gen.*;
-import mindustry.graphics.*;
-import mindustry.type.*;
+import arc.struct.*;
 import mindustry.ui.*;
+import arc.math.geom.*;
+import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
+import arc.graphics.g2d.*;
+import mindustry.content.*;
 import mindustry.world.meta.*;
+import mindustry.world.blocks.*;
+import mindustry.entities.type.*;
+import mindustry.entities.traits.BuilderTrait.*;
 
 import java.io.*;
 
@@ -30,24 +28,10 @@ public class ItemConveyor extends BaseConveyor implements Autotiler{
     private static ItemPos pos2 = new ItemPos();
     private final Vec2 tr1 = new Vec2();
     private final Vec2 tr2 = new Vec2();
-    protected TextureRegion[][] regions = new TextureRegion[7][4];
-
-    public float speed = 0f;
 
     protected ItemConveyor(String name){
         super(name);
-        rotate = true;
-        update = true;
-        layer = Layer.overlay;
-        group = BlockGroup.transportation;
-        hasItems = true;
-        itemCapacity = 4;
-        conveyorPlacement = true;
         entityType = ItemConveyorEntity::new;
-
-        idleSound = Sounds.conveyor;
-        idleSoundVolume = 0.004f;
-        unloadable = false;
     }
 
     private static int compareItems(long a, long b){
@@ -71,53 +55,6 @@ public class ItemConveyor extends BaseConveyor implements Autotiler{
                 regions[i][j] = Core.atlas.find(name + "-" + i + "-" + j);
             }
         }
-    }
-
-    @Override
-    public void draw(Tile tile){
-        ItemConveyorEntity entity = tile.ent();
-        byte rotation = tile.rotation();
-
-        int frame = entity.clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * entity.timeScale)) % 4) : 0;
-        Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], tile.drawx(), tile.drawy(),
-        tilesize * entity.blendsclx, tilesize * entity.blendscly, rotation * 90);
-    }
-
-    @Override
-    public boolean shouldIdleSound(Tile tile){
-        ItemConveyorEntity entity = tile.ent();
-        return entity.clogHeat <= 0.5f ;
-    }
-
-    @Override
-    public void onProximityUpdate(Tile tile){
-        super.onProximityUpdate(tile);
-
-        ItemConveyorEntity entity = tile.ent();
-        int[] bits = buildBlending(tile, tile.rotation(), null, true);
-        entity.blendbits = bits[0];
-        entity.blendsclx = bits[1];
-        entity.blendscly = bits[2];
-    }
-
-    @Override
-    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
-        int[] bits = getTiling(req, list);
-
-        if(bits == null) return;
-
-        TextureRegion region = regions[bits[0]][0];
-        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl * req.animScale, region.getHeight() * bits[2] * Draw.scl * req.animScale, req.rotation * 90);
-    }
-
-    @Override
-    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return otherblock.outputsItems() && lookingAt(tile, rotation, otherx, othery, otherrot, otherblock);
-    }
-
-    @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-0-0")};
     }
 
     @Override
@@ -183,7 +120,7 @@ public class ItemConveyor extends BaseConveyor implements Autotiler{
         Tile next = tile.getNearby(tile.rotation());
         if(next != null) next = next.link();
 
-        float nextMax = next != null && next.block() instanceof ItemConveyor && !next.block().compressable && next.block().acceptItem(null, next, tile) ? 1f - Math.max(itemSpace - next.<ItemConveyorEntity>ent().minitem, 0) : 1f;
+        float nextMax = next != null && next.block() instanceof ItemConveyor && next.block().acceptItem(null, next, tile) ? 1f - Math.max(itemSpace - next.<ItemConveyorEntity>ent().minitem, 0) : 1f;
         int minremove = Integer.MAX_VALUE;
 
         for(int i = entity.convey.size - 1; i >= 0; i--){
@@ -210,7 +147,7 @@ public class ItemConveyor extends BaseConveyor implements Autotiler{
             pos.y = Mathf.clamp(pos.y, 0, nextMax);
 
             if(pos.y >= 0.9999f && offloadDir(tile, pos.item)){
-                if(next != null && next.block() instanceof ItemConveyor && !next.block().compressable){
+                if(next != null && next.block() instanceof ItemConveyor){
                     ItemConveyorEntity othere = next.ent();
 
                     ItemPos ni = pos2.set(othere.convey.get(othere.lastInserted), ItemPos.updateShorts);
@@ -244,11 +181,6 @@ public class ItemConveyor extends BaseConveyor implements Autotiler{
         }
 
         if(minremove != Integer.MAX_VALUE) entity.convey.truncate(minremove);
-    }
-
-    @Override
-    public boolean isAccessible(){
-        return true;
     }
 
     @Override
@@ -343,16 +275,11 @@ public class ItemConveyor extends BaseConveyor implements Autotiler{
         entity.lastInserted = (byte)(entity.convey.size - 1);
     }
 
-    public static class ItemConveyorEntity extends TileEntity{
+    public static class ItemConveyorEntity extends BaseConveyorEntity{
 
         LongArray convey = new LongArray();
         byte lastInserted;
         float minitem = 1;
-
-        int blendbits;
-        int blendsclx, blendscly;
-
-        float clogHeat = 0f;
 
         @Override
         public void write(DataOutput stream) throws IOException{

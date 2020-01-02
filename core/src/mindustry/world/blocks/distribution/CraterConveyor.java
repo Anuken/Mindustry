@@ -14,18 +14,18 @@ import mindustry.entities.*;
 import mindustry.graphics.*;
 import arc.scene.ui.layout.*;
 import mindustry.world.meta.*;
-import mindustry.entities.type.*;
+
 
 import static mindustry.Vars.itemSize;
 
-public class CraterConveyor extends ArmoredItemConveyor{
+public class CraterConveyor extends BaseConveyor{
     private TextureRegion start, end, crater;
 
 
     public CraterConveyor(String name){
         super(name);
         compressable = true;
-        entityType = PlastaniumConveyorEntity::new;
+        entityType = CraterConveyorEntity::new;
     }
 
     @Override
@@ -47,7 +47,6 @@ public class CraterConveyor extends ArmoredItemConveyor{
         super.setStats();
 
         stats.remove(BlockStat.itemCapacity);
-        stats.remove(BlockStat.itemsMoved);
 
         stats.add(BlockStat.maxUnits, 1, StatUnit.none);
     }
@@ -64,15 +63,15 @@ public class CraterConveyor extends ArmoredItemConveyor{
 
     @Override
     public void drawLayer(Tile tile){
-        PlastaniumConveyorEntity entity = tile.ent();
+        CraterConveyorEntity entity = tile.ent();
 
         if(entity.crater != null) entity.crater.draw(tile);
     }
 
 
     @Override
-    public void update(Tile tile){ // tick away the cooldown
-        PlastaniumConveyorEntity entity = tile.ent();
+    public void update(Tile tile){
+        CraterConveyorEntity entity = tile.ent();
 
         if(entity.crater == null){
             if(entity.items.total() > 0){
@@ -96,7 +95,7 @@ public class CraterConveyor extends ArmoredItemConveyor{
 
                 if(entity.crater.dst(tile) < 0.1f){
                     if(destination.block() instanceof CraterConveyor){
-                        PlastaniumConveyorEntity e = destination.ent();
+                        CraterConveyorEntity e = destination.ent();
 
                         if(e.crater == null){
                             e.crater = entity.crater;
@@ -117,7 +116,7 @@ public class CraterConveyor extends ArmoredItemConveyor{
         }
     }
 
-    public class PlastaniumConveyorEntity extends ItemConveyorEntity{
+    public class CraterConveyorEntity extends BaseConveyorEntity{
         Crater crater;
     }
 
@@ -162,43 +161,14 @@ public class CraterConveyor extends ArmoredItemConveyor{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){ // summon craters into existence to be loaded
-        PlastaniumConveyorEntity entity = tile.ent();
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        CraterConveyorEntity entity = tile.ent();
 
         if(!Track.start.check.get(tile) && !source.block().compressable) return false;
         if(entity.items.total() > 0 && !entity.items.has(item)) return false;
         if(entity.items.total() >= getMaximumAccepted(tile, item)) return false;
 
         return true;
-    }
-
-    @Override
-    public void handleItem(Item item, Tile tile, Tile source){
-        tile.entity.items.add(item, 1);
-    }
-
-    @Override
-    public int acceptStack(Item item, int amount, Tile tile, Unit source){
-        if(acceptItem(item, tile, tile) && hasItems && (source == null || source.getTeam() == tile.getTeam())){
-            return Math.min(getMaximumAccepted(tile, item) - tile.entity.items.get(item), amount);
-        }else{
-            return 0;
-        }
-    }
-
-    @Override
-    public void handleStack(Item item, int amount, Tile tile, Unit source){
-        tile.entity.noSleep();
-        tile.entity.items.add(item, amount);
-    }
-
-    @Override
-    public int removeStack(Tile tile, Item item, int amount){
-        if(tile.entity == null || tile.entity.items == null) return 0;
-        amount = Math.min(amount, tile.entity.items.get(item));
-        tile.entity.noSleep();
-        tile.entity.items.remove(item, amount);
-        return amount;
     }
 
     @Override
