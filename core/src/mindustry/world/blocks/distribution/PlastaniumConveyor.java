@@ -61,6 +61,7 @@ public class PlastaniumConveyor extends ArmoredConveyor{
 
     @Override
     public void drawLayer(Tile tile){
+        if(true) return; // debug mode
         PlastaniumConveyorEntity entity = tile.ent();
 
         Fonts.outline.draw(entity.tree + "",
@@ -91,7 +92,7 @@ public class PlastaniumConveyor extends ArmoredConveyor{
         }
     }
 
-    class PlastaniumConveyorEntity extends ConveyorEntity{
+    public class PlastaniumConveyorEntity extends ConveyorEntity{
         public int reload = 0;
         public CraterUnit crater = null;
         public int tree = 0;

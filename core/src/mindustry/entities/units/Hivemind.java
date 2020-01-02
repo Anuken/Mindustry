@@ -3,8 +3,10 @@ package mindustry.entities.units;
 import arc.*;
 import arc.util.*;
 import arc.struct.*;
-import mindustry.entities.type.base.*;
 import mindustry.world.*;
+import mindustry.entities.type.base.*;
+import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.distribution.PlastaniumConveyor.*;
 
 import static mindustry.Vars.*;
 
@@ -21,23 +23,29 @@ public class Hivemind{
 
         on.clear();
 
-        ObjectSet<CraterUnit> craters = new ObjectSet<>();
+        Array<CraterUnit> craters = new Array<>();
         unitGroup.all().each(e -> e instanceof CraterUnit, crater -> craters.add((CraterUnit)crater));
+
+        craters.sort(Structs.comparingInt(crater -> sortPriority(crater.on())));
 
         craters.each(crater -> {
             on.put(crater.on(), crater);
         });
 
-        craters.each(i -> {
-            craters.each(crater -> {
-                if(crater == null || crater.aspires() == null) return;
-                if(!on.containsKey(crater.aspires())){
-                    crater.purpose = crater.aspires();
-                    on.put(crater.aspires(), crater);
-                    on.remove(crater.on());
-                    craters.remove(crater);
-                };
-            });
+        craters.each(crater -> {
+            if(crater == null || crater.aspires() == null) return;
+            if(!on.containsKey(crater.aspires())){
+                crater.purpose = crater.aspires();
+                on.put(crater.aspires(), crater);
+                on.remove(crater.on());
+            }
         });
+    }
+
+    private static int sortPriority(Tile tile){
+        if(tile == null) return 0;
+        if(!(tile.block() instanceof PlastaniumConveyor)) return 0;
+        PlastaniumConveyorEntity entity = tile.ent();
+        return entity.tree;
     }
 }
