@@ -22,7 +22,7 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-public class Conveyor extends Block implements Autotiler{
+public class ItemConveyor extends BaseConveyor implements Autotiler{
     private static final float itemSpace = 0.4f;
     private static final float minmove = 1f / (Short.MAX_VALUE - 2);
     private static ItemPos drawpos = new ItemPos();
@@ -34,7 +34,7 @@ public class Conveyor extends Block implements Autotiler{
 
     public float speed = 0f;
 
-    protected Conveyor(String name){
+    protected ItemConveyor(String name){
         super(name);
         rotate = true;
         update = true;
@@ -43,7 +43,7 @@ public class Conveyor extends Block implements Autotiler{
         hasItems = true;
         itemCapacity = 4;
         conveyorPlacement = true;
-        entityType = ConveyorEntity::new;
+        entityType = ItemConveyorEntity::new;
 
         idleSound = Sounds.conveyor;
         idleSoundVolume = 0.004f;
@@ -75,7 +75,7 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public void draw(Tile tile){
-        ConveyorEntity entity = tile.ent();
+        ItemConveyorEntity entity = tile.ent();
         byte rotation = tile.rotation();
 
         int frame = entity.clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * entity.timeScale)) % 4) : 0;
@@ -85,7 +85,7 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public boolean shouldIdleSound(Tile tile){
-        ConveyorEntity entity = tile.ent();
+        ItemConveyorEntity entity = tile.ent();
         return entity.clogHeat <= 0.5f ;
     }
 
@@ -93,7 +93,7 @@ public class Conveyor extends Block implements Autotiler{
     public void onProximityUpdate(Tile tile){
         super.onProximityUpdate(tile);
 
-        ConveyorEntity entity = tile.ent();
+        ItemConveyorEntity entity = tile.ent();
         int[] bits = buildBlending(tile, tile.rotation(), null, true);
         entity.blendbits = bits[0];
         entity.blendsclx = bits[1];
@@ -122,7 +122,7 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public void drawLayer(Tile tile){
-        ConveyorEntity entity = tile.ent();
+        ItemConveyorEntity entity = tile.ent();
 
         byte rotation = tile.rotation();
 
@@ -148,7 +148,7 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public void unitOn(Tile tile, Unit unit){
-        ConveyorEntity entity = tile.ent();
+        ItemConveyorEntity entity = tile.ent();
 
         if(entity.clogHeat > 0.5f){
             return;
@@ -178,12 +178,12 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public void update(Tile tile){
-        ConveyorEntity entity = tile.ent();
+        ItemConveyorEntity entity = tile.ent();
         entity.minitem = 1f;
         Tile next = tile.getNearby(tile.rotation());
         if(next != null) next = next.link();
 
-        float nextMax = next != null && next.block() instanceof Conveyor && !next.block().compressable && next.block().acceptItem(null, next, tile) ? 1f - Math.max(itemSpace - next.<ConveyorEntity>ent().minitem, 0) : 1f;
+        float nextMax = next != null && next.block() instanceof ItemConveyor && !next.block().compressable && next.block().acceptItem(null, next, tile) ? 1f - Math.max(itemSpace - next.<ItemConveyorEntity>ent().minitem, 0) : 1f;
         int minremove = Integer.MAX_VALUE;
 
         for(int i = entity.convey.size - 1; i >= 0; i--){
@@ -210,8 +210,8 @@ public class Conveyor extends Block implements Autotiler{
             pos.y = Mathf.clamp(pos.y, 0, nextMax);
 
             if(pos.y >= 0.9999f && offloadDir(tile, pos.item)){
-                if(next != null && next.block() instanceof Conveyor && !next.block().compressable){
-                    ConveyorEntity othere = next.ent();
+                if(next != null && next.block() instanceof ItemConveyor && !next.block().compressable){
+                    ItemConveyorEntity othere = next.ent();
 
                     ItemPos ni = pos2.set(othere.convey.get(othere.lastInserted), ItemPos.updateShorts);
 
@@ -253,17 +253,17 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
-        Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conveyor || req.block instanceof Junction));
+        Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof ItemConveyor || req.block instanceof Junction));
         return cont.get(Geometry.d4(req.rotation)) &&
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
-            req.tile().block() instanceof Conveyor &&
+            req.tile().block() instanceof ItemConveyor &&
             Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.junction : this;
     }
 
     @Override
     public int removeStack(Tile tile, Item item, int amount){
-        ConveyorEntity entity = tile.ent();
+        ItemConveyorEntity entity = tile.ent();
         entity.noSleep();
         int removed = 0;
 
@@ -289,13 +289,13 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public int acceptStack(Item item, int amount, Tile tile, Unit source){
-        ConveyorEntity entity = tile.ent();
+        ItemConveyorEntity entity = tile.ent();
         return Math.min((int)(entity.minitem / itemSpace), amount);
     }
 
     @Override
     public void handleStack(Item item, int amount, Tile tile, Unit source){
-        ConveyorEntity entity = tile.ent();
+        ItemConveyorEntity entity = tile.ent();
 
         for(int i = amount - 1; i >= 0; i--){
             long result = ItemPos.packItem(item, 0f, i * itemSpace);
@@ -309,7 +309,7 @@ public class Conveyor extends Block implements Autotiler{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         int direction = source == null ? 0 : Math.abs(source.relativeTo(tile.x, tile.y) - tile.rotation());
-        float minitem = tile.<ConveyorEntity>ent().minitem;
+        float minitem = tile.<ItemConveyorEntity>ent().minitem;
         return (((direction == 0) && minitem > itemSpace) ||
         ((direction % 2 == 1) && minitem > 0.52f)) && (source == null || !(source.block().rotate && (source.rotation() + 2) % 4 == tile.rotation()));
     }
@@ -324,7 +324,7 @@ public class Conveyor extends Block implements Autotiler{
         float pos = ch == 0 ? 0 : ch % 2 == 1 ? 0.5f : 1f;
         float y = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
 
-        ConveyorEntity entity = tile.ent();
+        ItemConveyorEntity entity = tile.ent();
         entity.noSleep();
         long result = ItemPos.packItem(item, y * 0.9f, pos);
 
@@ -343,7 +343,7 @@ public class Conveyor extends Block implements Autotiler{
         entity.lastInserted = (byte)(entity.convey.size - 1);
     }
 
-    public static class ConveyorEntity extends TileEntity{
+    public static class ItemConveyorEntity extends TileEntity{
 
         LongArray convey = new LongArray();
         byte lastInserted;

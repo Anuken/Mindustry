@@ -3,15 +3,15 @@ package mindustry.world.blocks.distribution;
 import mindustry.type.*;
 import mindustry.world.*;
 
-public class ArmoredConveyor extends Conveyor{
+public class ArmoredItemConveyor extends ItemConveyor{
 
-    public ArmoredConveyor(String name){
+    public ArmoredItemConveyor(String name){
         super(name);
     }
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return super.acceptItem(item, tile, source) && (source.block() instanceof Conveyor || Edges.getFacingEdge(source, tile).relativeTo(tile) == tile.rotation());
+        return super.acceptItem(item, tile, source) && (source.block() instanceof ItemConveyor || Edges.getFacingEdge(source, tile).relativeTo(tile) == tile.rotation());
     }
 
     @Override

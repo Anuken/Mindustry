@@ -11,29 +11,12 @@ import mindustry.type.*;
 
 public class UnitTypes implements ContentList{
     public static UnitType
-    crater, draug, spirit, phantom,
+    draug, spirit, phantom,
     wraith, ghoul, revenant, lich, reaper,
     dagger, crawler, titan, fortress, eruptor, chaosArray, eradicator;
 
     @Override
     public void load(){
-        crater = new UnitType("crater", CraterUnit::new){{
-            maxVelocity = 0.75f;
-            speed = 0.1f;
-            drag = 0.25f;
-            hitsize = 3.5f;
-            mass = 0.5f;
-            health = 50;
-            rotatespeed = 0.1f;
-            itemCapacity = 8;
-            weapon = new Weapon("hug"){{
-                length = 1.5f;
-                reload = 28f;
-                alternate = true;
-                ejectEffect = Fx.shellEjectSmall;
-                bullet = Bullets.standardCopper;
-            }};
-        }};
 
         draug = new UnitType("draug", MinerDrone::new){{
             flying = true;

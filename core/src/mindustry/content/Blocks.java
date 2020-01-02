@@ -879,25 +879,26 @@ public class Blocks implements ContentList{
         //endregion
         //region distribution
 
-        conveyor = new Conveyor("conveyor"){{
+        conveyor = new ItemConveyor("conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1), true);
             health = 45;
             speed = 0.03f;
         }};
 
-        titaniumConveyor = new Conveyor("titanium-conveyor"){{
+        titaniumConveyor = new ItemConveyor("titanium-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
             health = 65;
             speed = 0.08f;
         }};
 
-        plastaniumConveyor = new PlastaniumConveyor("plastanium-conveyor"){{
-            requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.surgealloy, 1, Items.phasefabric, 1));
-            health = 150;
+        plastaniumConveyor = new CraterConveyor("plastanium-conveyor"){{
+            requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.silicon, 1, Items.graphite, 1));
+            itemCapacity = 8;
+            health = 75;
             speed = 0f;
         }};
 
-        armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
+        armoredConveyor = new ArmoredItemConveyor("armored-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
             health = 180;
             speed = 0.08f;

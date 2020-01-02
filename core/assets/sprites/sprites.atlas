@@ -5716,13 +5716,6 @@ crater
   orig: 24, 24
   offset: 0, 0
   index: -1
-unit-crater-full
-  rotate: false
-  xy: 285, 1379
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
 power-cell
   rotate: false
   xy: 285, 1379
