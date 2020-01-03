@@ -92,8 +92,7 @@ public class CraterConveyor extends BaseConveyor{
         if(entity.lastFrameUpdated == Core.graphics.getFrameId()) return;
         entity.lastFrameUpdated = Core.graphics.getFrameId();
 
-        if(entity.cooldown   > 0) entity.cooldown--;
-        if(entity.inactivity > 0) entity.inactivity--;
+        if(entity.cooldown > 0) entity.cooldown--;
 
         // ensure a crater exists below this block
         if(entity.crater == null){
@@ -157,7 +156,6 @@ public class CraterConveyor extends BaseConveyor{
         Crater crater;
 
         int cooldown;
-        int inactivity;
 
         @Override
         public void write(DataOutput stream) throws IOException{
@@ -167,7 +165,6 @@ public class CraterConveyor extends BaseConveyor{
             if(crater != null) crater.write(stream);
 
             stream.writeInt(cooldown);
-            stream.writeInt(inactivity);
         }
 
         @Override
@@ -177,7 +174,6 @@ public class CraterConveyor extends BaseConveyor{
             if(stream.readBoolean()) crater = new Crater(stream);
 
             cooldown = stream.readInt();
-            inactivity = stream.readInt();
         }
     }
 
@@ -232,18 +228,6 @@ public class CraterConveyor extends BaseConveyor{
     }
 
     @Override
-    public void handleItem(Item item, Tile tile, Tile source){
-        super.handleItem(item, tile, source);
-        ((CraterConveyorEntity)tile.entity).inactivity = 120;
-    }
-
-    @Override
-    public void handleStack(Item item, int amount, Tile tile, Unit source){
-        super.handleStack(item, amount, tile, source);
-        ((CraterConveyorEntity)tile.entity).inactivity = 60;
-    }
-
-    @Override
     public int getMaximumAccepted(Tile tile, Item item){
         return Mathf.round(super.getMaximumAccepted(tile, item) * tile.entity.timeScale);
     }
@@ -256,9 +240,6 @@ public class CraterConveyor extends BaseConveyor{
 
         // its considered full
         if(entity.items.total() >= getMaximumAccepted(tile, entity.crater.item)) return true;
-
-        // has been inactive
-        if(entity.inactivity == 0) return true;
 
         return false;
     }
