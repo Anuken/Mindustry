@@ -43,7 +43,9 @@ public class ItemConveyor extends BaseConveyor implements Autotiler{
     @Override
     public void setStats(){
         super.setStats();
+
         stats.add(BlockStat.itemsMoved, speed * 60 / itemSpace, StatUnit.itemsSecond);
+        stats.add(BlockStat.boostEffect, "$blocks.itemsmoved");
     }
 
     @Override
