@@ -9,6 +9,7 @@ import mindustry.maps.Map;
 import mindustry.net.Administration.*;
 
 import java.io.*;
+import java.net.*;
 import java.nio.*;
 import java.util.*;
 
@@ -61,9 +62,29 @@ public class NetworkIO{
         }
     }
 
-    public static ByteBuffer writeServerData(){
-        String name = (headless ? Config.name.string() : player.name);
-        String map = world.getMap() == null ? "None" : world.getMap().name();
+    public static ByteBuffer writeServerData(InetAddress address){
+
+        String eyecolor = "lightgray";
+        if(netServer.admins.isWhitelistEnabled()){
+            eyecolor = "white";
+        }
+        if(netServer.admins.isIPBanned(address.getHostAddress())){
+            eyecolor = "red";
+        }
+
+        String name = String.format("[goldenrod]Nydus Network [darkgray]//\\([%s]oo[])/\\\\", eyecolor);
+        String map = world.getMap() == null ? "None" : world.getMap().name().replaceAll("(\\[.*?\\])", "");
+
+        String[] greyscale = {"/127.0.0.1", "/192.99.169.18"};
+        Log.info("ping: " + address.toString());
+
+        if (Arrays.asList(greyscale).contains(address.toString())){
+            name = name.replaceAll("(\\[.*?\\])", "");
+            name = "First player to join = admin ❤️";
+            name = ":foot: :snake: :ohno: :scream:";
+        }
+
+        //
 
         ByteBuffer buffer = ByteBuffer.allocate(256);
 

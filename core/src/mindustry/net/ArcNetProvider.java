@@ -69,7 +69,7 @@ public class ArcNetProvider implements NetProvider{
         server = new Server(4096 * 2, 4096, new PacketSerializer());
         server.setMulticast(multicastGroup, multicastPort);
         server.setDiscoveryHandler((address, handler) -> {
-            ByteBuffer buffer = NetworkIO.writeServerData();
+            ByteBuffer buffer = NetworkIO.writeServerData(address);
             buffer.position(0);
             handler.respond(buffer);
         });
