@@ -83,26 +83,29 @@ public class CraterConveyor extends BaseConveyor{
                 Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
                 entity.crater = null;
             }else{
-                Tile destination = tile.front();
 
-                if(entity.crater.dst(tile) < 1.25f){
-                    entity.crater.f = tile.rotation() * 90 - 90;
-                    if(!(destination.block() instanceof CraterConveyor)){
-                        while(entity.items.total() > 0 && entity.crater.i != null && offloadDir(tile, entity.crater.i)) entity.items.remove(entity.crater.i, 1);
+                if(entity.items.total() >= getMaximumAccepted(tile, entity.crater.i) || !Track.start.check.get(tile)){
+                    Tile destination = tile.front();
 
+                    if(entity.crater.dst(tile) < 1.25f){
+                        entity.crater.f = tile.rotation() * 90 - 90;
+                        if(!(destination.block() instanceof CraterConveyor)){
+                            while(entity.items.total() > 0 && entity.crater.i != null && offloadDir(tile, entity.crater.i)) entity.items.remove(entity.crater.i, 1);
+
+                        }
                     }
-                }
 
-                if(entity.crater.dst(tile) < 0.1f){
-                    if(destination.block() instanceof CraterConveyor){
-                        CraterConveyorEntity e = destination.ent();
+                    if(entity.crater.dst(tile) < 0.1f){
+                        if(destination.block() instanceof CraterConveyor){
+                            CraterConveyorEntity e = destination.ent();
 
-                        if(e.crater == null){
-                            e.crater = entity.crater;
-                            entity.crater = null;
+                            if(e.crater == null){
+                                e.crater = entity.crater;
+                                entity.crater = null;
 
-                            e.items.addAll(entity.items);
-                            entity.items.clear();
+                                e.items.addAll(entity.items);
+                                entity.items.clear();
+                            }
                         }
                     }
                 }
@@ -169,6 +172,11 @@ public class CraterConveyor extends BaseConveyor{
         if(entity.items.total() >= getMaximumAccepted(tile, item)) return false;
 
         return true;
+    }
+
+    @Override
+    public int getMaximumAccepted(Tile tile, Item item){
+        return Mathf.round(super.getMaximumAccepted(tile, item) * tile.entity.timeScale);
     }
 
     @Override
