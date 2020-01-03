@@ -15,6 +15,8 @@ import arc.scene.ui.layout.*;
 import mindustry.world.meta.*;
 import mindustry.entities.type.*;
 
+import java.io.*;
+
 import static mindustry.Vars.*;
 
 public class CraterConveyor extends BaseConveyor{
@@ -154,6 +156,21 @@ public class CraterConveyor extends BaseConveyor{
         float lastFrameSpawned = -1;
         float lastFrameChanged = -1;
         Crater crater;
+
+        @Override
+        public void write(DataOutput stream) throws IOException{
+            super.write(stream);
+
+            stream.writeBoolean(crater != null);
+            if(crater != null) crater.write(stream);
+        }
+
+        @Override
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
+
+            if(stream.readBoolean()) crater = new Crater(stream);
+        }
     }
 
     protected class Crater implements Position{
@@ -168,6 +185,20 @@ public class CraterConveyor extends BaseConveyor{
             y = tile.drawy();
             rotation = tile.rotation() * 90 - 90;
             face = rotation;
+        }
+
+        Crater(DataInput stream) throws IOException{
+            rotation = stream.readFloat();
+            face = stream.readFloat();
+            x = stream.readFloat();
+            y = stream.readFloat();
+        }
+
+        public void write(DataOutput stream) throws IOException{
+            stream.writeFloat(rotation);
+            stream.writeFloat(face);
+            stream.writeFloat(x);
+            stream.writeFloat(y);
         }
 
         @Override
