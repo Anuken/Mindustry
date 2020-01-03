@@ -15,8 +15,7 @@ import mindustry.graphics.*;
 import arc.scene.ui.layout.*;
 import mindustry.world.meta.*;
 
-
-import static mindustry.Vars.itemSize;
+import static mindustry.Vars.*;
 
 public class CraterConveyor extends BaseConveyor{
     private TextureRegion start, end, crater;
@@ -118,9 +117,9 @@ public class CraterConveyor extends BaseConveyor{
         }
 
         if(entity.crater != null){
-            entity.crater.x = Mathf.lerpDelta(entity.crater.x, tile.drawx(), 0.075f);
-            entity.crater.y = Mathf.lerpDelta(entity.crater.y, tile.drawy(), 0.075f);
-            entity.crater.rotation = Mathf.slerpDelta(entity.crater.rotation, entity.crater.face, 0.1f);
+            entity.crater.x = Mathf.lerpDelta(entity.crater.x, tile.drawx(), speed);
+            entity.crater.y = Mathf.lerpDelta(entity.crater.y, tile.drawy(), speed);
+            entity.crater.rotation = Mathf.slerpDelta(entity.crater.rotation, entity.crater.face, speed * 2);
         }
     }
 

@@ -894,8 +894,8 @@ public class Blocks implements ContentList{
         plastaniumConveyor = new CraterConveyor("plastanium-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.silicon, 1, Items.graphite, 1));
             itemCapacity = 8;
+            speed = 0.075f;
             health = 75;
-            speed = 0f;
         }};
 
         armoredConveyor = new ArmoredItemConveyor("armored-conveyor"){{
