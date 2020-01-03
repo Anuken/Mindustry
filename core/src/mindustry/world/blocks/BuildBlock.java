@@ -173,7 +173,7 @@ public class BuildBlock extends Block{
 
         if(entity.previous == null || entity.cblock == null) return;
 
-        if(Core.atlas.isFound(entity.previous.icon(mindustry.ui.Cicon.full))){
+        if(Core.atlas.isFound(entity.previous.icon(Cicon.full))){
             Draw.rect(entity.previous.icon(Cicon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.rotation() * 90 : 0);
         }
     }
