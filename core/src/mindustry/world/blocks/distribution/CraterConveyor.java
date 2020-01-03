@@ -14,6 +14,7 @@ import mindustry.entities.*;
 import mindustry.graphics.*;
 import arc.scene.ui.layout.*;
 import mindustry.world.meta.*;
+import mindustry.entities.type.*;
 
 import static mindustry.Vars.*;
 
@@ -127,6 +128,7 @@ public class CraterConveyor extends BaseConveyor{
         Crater crater;
         float lastFrameUpdated = -1;
         float lastFrameSpawned = -1;
+        float lastFrameChanged = -1;
     }
 
     protected class Crater implements Position{
@@ -181,6 +183,18 @@ public class CraterConveyor extends BaseConveyor{
     }
 
     @Override
+    public void handleItem(Item item, Tile tile, Tile source){
+        super.handleItem(item, tile, source);
+        ((CraterConveyorEntity)tile.entity).lastFrameChanged = Core.graphics.getFrameId();
+    }
+
+    @Override
+    public void handleStack(Item item, int amount, Tile tile, Unit source){
+        super.handleStack(item, amount, tile, source);
+        ((CraterConveyorEntity)tile.entity).lastFrameChanged = Core.graphics.getFrameId();
+    }
+
+    @Override
     public int getMaximumAccepted(Tile tile, Item item){
         return Mathf.round(super.getMaximumAccepted(tile, item) * tile.entity.timeScale);
     }
@@ -194,15 +208,9 @@ public class CraterConveyor extends BaseConveyor{
         // its considered full
         if(entity.items.total() >= getMaximumAccepted(tile, entity.crater.item)) return true;
 
-        // if it has no way of getting additional items
-        Tile[] inputs = new Tile[]{tile.back(), tile.left(), tile.right()};
-        boolean headless = true;
-        for(Tile input : inputs){
-            if(input != null && input.getTeam() == tile.getTeam() && input.block().outputsItems()) headless = false;
-        }
-        if(headless) return true;
+        // inactivity tracker
+        if(Core.graphics.getFrameId() > entity.lastFrameChanged + 120) return true;
 
-        // inactive timer tracker?
         return false;
     }
 
