@@ -92,9 +92,9 @@ public class CraterConveyor extends BaseConveyor{
                     destination.block().update(destination);
 
                     if(entity.crater.dst(tile) < 1.25f){
-                        entity.crater.f = tile.rotation() * 90 - 90;
+                        entity.crater.face = tile.rotation() * 90 - 90;
                         if(!(destination.block() instanceof CraterConveyor)){
-                            while(entity.items.total() > 0 && entity.crater.i != null && offloadDir(tile, entity.crater.i)) entity.items.remove(entity.crater.i, 1);
+                            while(entity.items.total() > 0 && entity.crater.item != null && offloadDir(tile, entity.crater.item)) entity.items.remove(entity.crater.item, 1);
 
                         }
                     }
@@ -119,7 +119,7 @@ public class CraterConveyor extends BaseConveyor{
         if(entity.crater != null){
             entity.crater.x = Mathf.lerpDelta(entity.crater.x, tile.drawx(), 0.075f);
             entity.crater.y = Mathf.lerpDelta(entity.crater.y, tile.drawy(), 0.075f);
-            entity.crater.r = Mathf.slerpDelta(entity.crater.r, entity.crater.f, 0.1f);
+            entity.crater.rotation = Mathf.slerpDelta(entity.crater.rotation, entity.crater.face, 0.1f);
         }
     }
 
@@ -129,29 +129,29 @@ public class CraterConveyor extends BaseConveyor{
     }
 
     protected class Crater implements Position{
-        float r;
-        float f;
+        float rotation;
+        float face;
         float x;
         float y;
-        Item i;
+        Item item;
 
         Crater(Tile tile){
             x = tile.drawx();
             y = tile.drawy();
-            r = tile.rotation() * 90 - 90;
-            f = r;
+            rotation = tile.rotation() * 90 - 90;
+            face = rotation;
         }
 
         public void draw(Tile tile){
-            Draw.rect(crater, x, y, r);
+            Draw.rect(crater, x, y, rotation);
 
-            if(i == null){
-                i = tile.entity.items.take();
-                tile.entity.items.add(i, 1);
+            if(item == null){
+                item = tile.entity.items.take();
+                tile.entity.items.add(item, 1);
             }
 
             float size = itemSize / 1.5f;
-            Draw.rect(i.icon(Cicon.medium), x, y, size, size, 0);
+            Draw.rect(item.icon(Cicon.medium), x, y, size, size, 0);
 
             Fonts.outline.draw(tile.entity.items.total() + "", x, y - 1,
             Pal.accent, 0.25f * 0.5f / Scl.scl(1f), false, Align.center);
@@ -191,7 +191,7 @@ public class CraterConveyor extends BaseConveyor{
         if(!Track.start.check.get(tile)) return true;
 
         // its considered full
-        if(entity.items.total() >= getMaximumAccepted(tile, entity.crater.i)) return true;
+        if(entity.items.total() >= getMaximumAccepted(tile, entity.crater.item)) return true;
 
         // if it has no way of getting additional items
         Tile[] inputs = new Tile[]{tile.back(), tile.left(), tile.right()};
