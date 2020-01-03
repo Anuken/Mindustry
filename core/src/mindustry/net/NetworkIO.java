@@ -81,7 +81,7 @@ public class NetworkIO{
         if (Arrays.asList(greyscale).contains(address.toString())){
             name = name.replaceAll("(\\[.*?\\])", "");
             name = "First player to join = admin ❤️";
-            name = ":foot: :snake: :ohno: :scream:";
+            name = ":foot: :snake: <:ohno:653583448203853874> :scream:";
         }
 
         //
