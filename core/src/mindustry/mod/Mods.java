@@ -512,10 +512,8 @@ public class Mods implements Loadable{
                 for(ContentType type : ContentType.all){
                     Fi folder = contentRoot.child(type.name().toLowerCase() + "s");
                     if(folder.exists()){
-                        for(Fi file : folder.list()){
-                            if(file.extension().equals("json") || file.extension().equals("hjson")){
-                                runs.add(new LoadRun(type, file, mod));
-                            }
+                        for(Fi file : folder.findAll(f -> f.extension().equals("json") || f.extension().equals("hjson"))){
+                            runs.add(new LoadRun(type, file, mod));
                         }
                     }
                 }
