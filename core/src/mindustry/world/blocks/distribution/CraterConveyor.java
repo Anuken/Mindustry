@@ -64,7 +64,24 @@ public class CraterConveyor extends BaseConveyor{
     public void drawLayer(Tile tile){
         CraterConveyorEntity entity = tile.ent();
 
-        if(entity.crater != null) entity.crater.draw(tile);
+        if(entity.crater == null) return;
+
+        // draw crater
+        Draw.rect(crater, entity.crater.x, entity.crater.y, entity.crater.rotation);
+
+        // find dominant(/only) item
+        if(entity.crater.item == null){
+            entity.crater.item = tile.entity.items.take();
+            tile.entity.items.add(entity.crater.item, 1);
+        }
+
+        // draw resource
+        float size = itemSize / 1.5f;
+        Draw.rect(entity.crater.item.icon(Cicon.medium), entity.crater.x, entity.crater.y, size, size, 0);
+
+        // draw amount
+        Fonts.outline.draw(tile.entity.items.total() + "", entity.crater.x, entity.crater.y - 1,
+        Pal.accent, 0.25f * 0.5f / Scl.scl(1f), false, Align.center);
     }
 
 
@@ -72,6 +89,7 @@ public class CraterConveyor extends BaseConveyor{
     public void update(Tile tile){
         CraterConveyorEntity entity = tile.ent();
 
+        // only update once per frame
         if(entity.lastFrameUpdated == Core.graphics.getFrameId()) return;
         entity.lastFrameUpdated = Core.graphics.getFrameId();
 
@@ -125,10 +143,10 @@ public class CraterConveyor extends BaseConveyor{
     }
 
     public class CraterConveyorEntity extends BaseConveyorEntity{
-        Crater crater;
         float lastFrameUpdated = -1;
         float lastFrameSpawned = -1;
         float lastFrameChanged = -1;
+        Crater crater;
     }
 
     protected class Crater implements Position{
@@ -143,21 +161,6 @@ public class CraterConveyor extends BaseConveyor{
             y = tile.drawy();
             rotation = tile.rotation() * 90 - 90;
             face = rotation;
-        }
-
-        public void draw(Tile tile){
-            Draw.rect(crater, x, y, rotation);
-
-            if(item == null){
-                item = tile.entity.items.take();
-                tile.entity.items.add(item, 1);
-            }
-
-            float size = itemSize / 1.5f;
-            Draw.rect(item.icon(Cicon.medium), x, y, size, size, 0);
-
-            Fonts.outline.draw(tile.entity.items.total() + "", x, y - 1,
-            Pal.accent, 0.25f * 0.5f / Scl.scl(1f), false, Align.center);
         }
 
         @Override
