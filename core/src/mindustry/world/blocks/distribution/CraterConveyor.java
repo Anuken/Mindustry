@@ -73,6 +73,9 @@ public class CraterConveyor extends BaseConveyor{
     public void update(Tile tile){
         CraterConveyorEntity entity = tile.ent();
 
+        if(entity.lastFrameUpdated == Core.graphics.getFrameId()) return;
+        entity.lastFrameUpdated = Core.graphics.getFrameId();
+
         if(entity.crater == null){
             if(entity.items.total() > 0){
                 entity.crater = new Crater(tile);
@@ -86,6 +89,7 @@ public class CraterConveyor extends BaseConveyor{
 
                 if(shouldLaunch(tile)){
                     Tile destination = tile.front();
+                    destination.block().update(destination);
 
                     if(entity.crater.dst(tile) < 1.25f){
                         entity.crater.f = tile.rotation() * 90 - 90;
@@ -121,6 +125,7 @@ public class CraterConveyor extends BaseConveyor{
 
     public class CraterConveyorEntity extends BaseConveyorEntity{
         Crater crater;
+        float lastFrameUpdated = -1;
     }
 
     protected class Crater implements Position{
