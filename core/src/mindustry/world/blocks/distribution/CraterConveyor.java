@@ -150,7 +150,6 @@ public class CraterConveyor extends BaseConveyor{
                 }
             }
         }
-
     }
 
     class CraterConveyorEntity extends BaseConveyorEntity{
