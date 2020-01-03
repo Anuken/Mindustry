@@ -86,7 +86,22 @@ public class Teams{
     /** Returns whether {@param other} is an enemy of {@param #team}. */
     public boolean areEnemies(Team team, Team other){
         //todo what about derelict?
-        return team != other;
+        return team != other && !areAllies(team, other);
+    }
+
+    public boolean areAllies(Team team, Team other){
+        TeamData data = get(team);
+        return data.allies.contains(other);
+    }
+
+    public void addAllies(Team team, Team other){
+        TeamData data = get(team);
+        if (!areAllies(other) || team != other) data.allies.add(other);
+    }
+
+    public void removeAllies(Team team, Team other){
+        TeamData data = get(team);
+        if (areAllies(other)) data.allies.remove(other);
     }
 
     public boolean canInteract(Team team, Team other){
@@ -142,6 +157,7 @@ public class Teams{
     public class TeamData{
         public final Array<CoreEntity> cores = new Array<>();
         public final Array<Team> enemies = new Array<>();
+        public Array<Team> allies = new Array<>();
         public final Team team;
         public Queue<BrokenBlock> brokenBlocks = new Queue<>();
 

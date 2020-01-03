@@ -81,6 +81,18 @@ public class Team implements Comparable<Team>{
     public boolean isEnemy(Team other){
         return state.teams.areEnemies(this, other);
     }
+    
+    public boolean isAllies(Team other){
+        return state.teams.areAllies(this, other);
+    }
+
+    public void addAllies(Team other){
+        state.teams.addAllies(this, other);
+    }
+
+    public void removeAllies(Team other){
+        state.teams.removeAllies(this, other);
+    }
 
     public Array<CoreEntity> cores(){
         return state.teams.cores(this);
