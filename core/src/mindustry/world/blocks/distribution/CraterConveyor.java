@@ -220,7 +220,7 @@ public class CraterConveyor extends BaseConveyor{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         CraterConveyorEntity entity = tile.ent();
 
-        if(!isStart(tile) && !(tile.front().block() instanceof CraterConveyor)) return false;
+        if(!isStart(tile) && !(source.block() instanceof CraterConveyor)) return false;
         if(entity.items.total() > 0 && !entity.items.has(item)) return false;
         if(entity.items.total() >= getMaximumAccepted(tile, item)) return false;
 
