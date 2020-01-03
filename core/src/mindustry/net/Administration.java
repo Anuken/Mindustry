@@ -330,7 +330,8 @@ public class Administration{
         socketInputPort("The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputAddress("The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
         allowCustomClients("Whether custom clients are allowed to connect.", !headless, "allow-custom"),
-        whitelist("Whether the whitelist is used.", false);
+        whitelist("Whether the whitelist is used.", false),
+        motd("The message displayed to people on connection.", "off");
 
         public static final Config[] all = values();
 
