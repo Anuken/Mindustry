@@ -84,7 +84,7 @@ public class CraterConveyor extends BaseConveyor{
                 entity.crater = null;
             }else{
 
-                if(entity.items.total() >= getMaximumAccepted(tile, entity.crater.i) || !Track.start.check.get(tile)){
+                if(shouldLaunch(tile)){
                     Tile destination = tile.front();
 
                     if(entity.crater.dst(tile) < 1.25f){
@@ -177,6 +177,27 @@ public class CraterConveyor extends BaseConveyor{
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
         return Mathf.round(super.getMaximumAccepted(tile, item) * tile.entity.timeScale);
+    }
+
+    public boolean shouldLaunch(Tile tile){
+        CraterConveyorEntity entity = tile.ent();
+
+        // its not a start tile so it should be moving
+        if(!Track.start.check.get(tile)) return true;
+
+        // its considered full
+        if(entity.items.total() >= getMaximumAccepted(tile, entity.crater.i)) return true;
+
+        // if it has no way of getting additional items
+        Tile[] inputs = new Tile[]{tile.back(), tile.left(), tile.right()};
+        boolean headless = true;
+        for(Tile input : inputs){
+            if(input != null && input.getTeam() == tile.getTeam() && input.block().outputsItems()) headless = false;
+        }
+        if(headless) return true;
+
+        // inactive timer tracker?
+        return false;
     }
 
     @Override
