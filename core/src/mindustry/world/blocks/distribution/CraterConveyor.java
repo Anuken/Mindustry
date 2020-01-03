@@ -92,10 +92,13 @@ public class CraterConveyor extends BaseConveyor{
         if(entity.lastFrameUpdated == Core.graphics.getFrameId()) return;
         entity.lastFrameUpdated = Core.graphics.getFrameId();
 
+        if(entity.cooldown   > 0) entity.cooldown--;
+        if(entity.inactivity > 0) entity.inactivity--;
+
         // ensure a crater exists below this block
         if(entity.crater == null){
             // poof in crater
-            if(entity.items.total() <= 0 || !(Core.graphics.getFrameId() > entity.lastFrameSpawned)) return;
+            if(entity.items.total() <= 0 || entity.cooldown > 0) return;
             entity.crater = new Crater(tile);
             Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
         }else{
@@ -138,7 +141,7 @@ public class CraterConveyor extends BaseConveyor{
                         entity.crater = null;
 
                         // prevent this tile from spawning a new crater to avoid collisions
-                        entity.lastFrameSpawned = Core.graphics.getFrameId() + 10;
+                        entity.cooldown = 10;
 
                         // transfer inventory of conveyor
                         e.items.addAll(entity.items);
@@ -151,11 +154,11 @@ public class CraterConveyor extends BaseConveyor{
     }
 
     class CraterConveyorEntity extends BaseConveyorEntity{
-        // i should probably use timers/counters instead of frames
         float lastFrameUpdated = -1;
-        float lastFrameSpawned = -1;
-        float lastFrameChanged = -1;
         Crater crater;
+
+        int cooldown;
+        int inactivity;
 
         @Override
         public void write(DataOutput stream) throws IOException{
@@ -163,6 +166,9 @@ public class CraterConveyor extends BaseConveyor{
 
             stream.writeBoolean(crater != null);
             if(crater != null) crater.write(stream);
+
+            stream.writeInt(cooldown);
+            stream.writeInt(inactivity);
         }
 
         @Override
@@ -170,6 +176,9 @@ public class CraterConveyor extends BaseConveyor{
             super.read(stream, revision);
 
             if(stream.readBoolean()) crater = new Crater(stream);
+
+            cooldown = stream.readInt();
+            inactivity = stream.readInt();
         }
     }
 
@@ -226,13 +235,13 @@ public class CraterConveyor extends BaseConveyor{
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
         super.handleItem(item, tile, source);
-        ((CraterConveyorEntity)tile.entity).lastFrameChanged = Core.graphics.getFrameId();
+        ((CraterConveyorEntity)tile.entity).inactivity = 120;
     }
 
     @Override
     public void handleStack(Item item, int amount, Tile tile, Unit source){
         super.handleStack(item, amount, tile, source);
-        ((CraterConveyorEntity)tile.entity).lastFrameChanged = Core.graphics.getFrameId();
+        ((CraterConveyorEntity)tile.entity).inactivity = 60;
     }
 
     @Override
@@ -250,7 +259,7 @@ public class CraterConveyor extends BaseConveyor{
         if(entity.items.total() >= getMaximumAccepted(tile, entity.crater.item)) return true;
 
         // has been inactive
-        if(Core.graphics.getFrameId() > entity.lastFrameChanged + 120) return true;
+        if(entity.inactivity == 0) return true;
 
         return false;
     }
