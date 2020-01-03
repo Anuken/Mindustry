@@ -21,7 +21,6 @@ import static mindustry.Vars.*;
 public class CraterConveyor extends BaseConveyor{
     private TextureRegion start, end, crater;
 
-
     public CraterConveyor(String name){
         super(name);
         compressable = true;
@@ -55,9 +54,9 @@ public class CraterConveyor extends BaseConveyor{
         super.draw(tile);
 
         // draws the markings over either end of the track
-        if(Track.start.check.get(tile) && Track.end.check.get(tile)) return;
-        if(Track.start.check.get(tile))  Draw.rect(start, tile.drawx(), tile.drawy(), tile.rotation() * 90);
-        if(Track.end.check.get(tile))      Draw.rect(end, tile.drawx(), tile.drawy(), tile.rotation() * 90);
+        if(isStart(tile) && isEnd(tile)) return;
+        if(isStart(tile))  Draw.rect(start, tile.drawx(), tile.drawy(), tile.rotation() * 90);
+        if(isEnd(tile))      Draw.rect(end, tile.drawx(), tile.drawy(), tile.rotation() * 90);
     }
 
     @Override
@@ -178,7 +177,7 @@ public class CraterConveyor extends BaseConveyor{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         CraterConveyorEntity entity = tile.ent();
 
-        if(!Track.start.check.get(tile) && !source.block().compressable) return false;
+        if(!isStart(tile) && !source.block().compressable) return false;
         if(entity.items.total() > 0 && !entity.items.has(item)) return false;
         if(entity.items.total() >= getMaximumAccepted(tile, item)) return false;
 
@@ -206,7 +205,7 @@ public class CraterConveyor extends BaseConveyor{
         CraterConveyorEntity entity = tile.ent();
 
         // its not a start tile so it should be moving
-        if(!Track.start.check.get(tile)) return true;
+        if(!isStart(tile)) return true;
 
         // its considered full
         if(entity.items.total() >= getMaximumAccepted(tile, entity.crater.item)) return true;
@@ -222,28 +221,26 @@ public class CraterConveyor extends BaseConveyor{
         return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock.compressable;
     }
 
-    public enum Track{
-        // tile is considered the end of the line
-        end(tile -> {
-            if(tile.front() == null) return true;
-            if(tile.getTeam() != tile.front().getTeam()) return true; // comment out to trade
-            return !tile.front().block().compressable;
-        }),
-
-        // tile is considered the start of the line
-        start(tile -> {
-            Tile[] inputs = new Tile[]{tile.back(), tile.left(), tile.right()};
-            for(Tile input : inputs){
-                if(input != null && input.getTeam() == tile.getTeam() && input.block().compressable && input.front() == tile) return false;
-            }
-
-            return true;
-        });
-
-        public final Boolf<Tile> check;
-
-        Track(Boolf<Tile> check){
-            this.check = check;
+    /**
+     * Check if there is no crater conveyor blending with this block
+     * (should probably use blendbits, if only i understood those)
+     */
+    private boolean isStart(Tile tile){
+        Tile[] inputs = new Tile[]{tile.back(), tile.left(), tile.right()};
+        for(Tile input : inputs){
+            if(input != null && input.getTeam() == tile.getTeam() && input.block().compressable && input.front() == tile) return false;
         }
+
+        return true;
     }
+
+    /**
+     * Check if this tile is considered the end of the line
+     */
+    private boolean isEnd(Tile tile){
+        if(tile.front() == null) return true;
+        if(tile.getTeam() != tile.front().getTeam()) return true;
+        return !tile.front().block().compressable;
+    }
+
 }
