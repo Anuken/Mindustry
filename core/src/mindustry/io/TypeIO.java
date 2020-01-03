@@ -1,5 +1,6 @@
 package mindustry.io;
 
+import arc.struct.IntArray;
 import mindustry.annotations.Annotations.ReadClass;
 import mindustry.annotations.Annotations.WriteClass;
 import arc.graphics.Color;
@@ -129,6 +130,10 @@ public class TypeIO{
                 buffer.put((byte)request.rotation);
                 buffer.put(request.hasConfig ? (byte)1 : 0);
                 buffer.putInt(request.config);
+                buffer.put((byte) request.links.size);
+                for(int i = 0; i < request.links.size; i++){
+                    buffer.putInt(request.links.get(i));
+                }
             }
         }
     }
@@ -153,10 +158,19 @@ public class TypeIO{
                 byte rotation = buffer.get();
                 boolean hasConfig = buffer.get() == 1;
                 int config = buffer.getInt();
+                IntArray links = null;
+                int linkSize = buffer.get();
+                if(linkSize > 0){
+                    links = new IntArray();
+                    for(int j = 0; j < linkSize; j++){
+                        links.add(buffer.getInt());
+                    }
+                }
                 currentRequest = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.block(block));
                 if(hasConfig){
                     currentRequest.configure(config);
                 }
+                currentRequest.link(links);
             }
 
             reqs[i] = (currentRequest);

@@ -108,27 +108,20 @@ public interface BuilderTrait extends Entity, TeamTrait{
                     Call.onTileConfig(null, tile, current.config);
                 }
                 if(tile.ent() != null && tile.ent().power != null && current.links != null){
-                    //Call.onNodeConfig(tile, new BuildRequest[]{current});
                     IntArray links = tile.ent().power.links;
                     for(int i = 0; i < links.size; i++){
                         int linkPos = links.get(i);
                         //Find tile it's currently linked to
                         Tile link = world.tile(linkPos);
                         if(link.ent() != null && link.ent().power != null){
-                            //Remove the link
-                            link.ent().power.links.removeValue(tile.pos());
+                            Call.onNodeDisconnect(tile, link);
                         }
                     }
-                    //Remove all links from self
-                    links.clear();
                     for(int i = 0; i < current.links.size; i++){
                         int linkPos = current.links.get(i);
                         Tile link = world.tile(Pos.x(linkPos) + tile.x, Pos.y(linkPos) + tile.y);
                         if(((PowerNode) tile.block()).linkValid(tile, link)){
-                            tile.ent().power.links.add(link.pos());
-                            if(link.ent() != null && link.ent().power != null){
-                                link.ent().power.links.add(tile.pos());
-                            }
+                            Call.onNodeConnect(tile, link);
                         }
                     }
                 }

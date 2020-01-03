@@ -78,10 +78,26 @@ public class PowerNode extends PowerBlock{
         }
     }
 
-    @Remote(targets = Loc.server)
-    public static void onNodeConfig(Tile tile, BuilderTrait.BuildRequest[] brArr){
-        BuilderTrait.BuildRequest br = brArr[0];
+    @Remote(targets = Loc.server, called = Loc.both, forward = true)
+    public static void onNodeConnect(Tile node, Tile other){
+        if(node == null || other == null || node == other) return;
+        if(node.block() instanceof PowerNode){
+            if(((PowerNode) node.block()).linkValid(node, other)){
+                node.ent().power.links.add(other.pos());
+                other.ent().power.links.add(node.pos());
+            }
+        }
+    }
 
+    @Remote(targets = Loc.server, called = Loc.both, forward = true)
+    public static void onNodeDisconnect(Tile node, Tile other){
+        if(node == null || other == null || node == other) return;
+        if(node.block() instanceof PowerNode){
+            if(other.ent() != null && other.ent().power != null){
+                node.ent().power.links.removeValue(other.pos());
+                other.ent().power.links.removeValue(node.pos());
+            }
+        }
     }
 
     @Override
