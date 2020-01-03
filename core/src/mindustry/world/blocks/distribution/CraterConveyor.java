@@ -129,7 +129,7 @@ public class CraterConveyor extends BaseConveyor{
             }
 
             // when basically exactly on the center:
-            if(entity.crater.dst(tile) < 0.25f){
+            if(entity.crater.dst(tile) < 0.1f){
                 if(destination.block() instanceof CraterConveyor){
                     CraterConveyorEntity e = destination.ent();
 
