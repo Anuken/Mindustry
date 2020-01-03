@@ -53,7 +53,7 @@ public class CraterConveyor extends BaseConveyor{
     public void draw(Tile tile){
         super.draw(tile);
 
-        // draws the markings over either end of the track
+        // don't draw if its just one lone tile
         if(isStart(tile) && isEnd(tile)) return;
         if(isStart(tile))  Draw.rect(start, tile.drawx(), tile.drawy(), tile.rotation() * 90);
         if(isEnd(tile))      Draw.rect(end, tile.drawx(), tile.drawy(), tile.rotation() * 90);
