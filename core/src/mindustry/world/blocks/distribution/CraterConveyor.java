@@ -152,6 +152,7 @@ public class CraterConveyor extends BaseConveyor{
     }
 
     class CraterConveyorEntity extends BaseConveyorEntity{
+        // i should probably use timers/counters instead of frames
         float lastFrameUpdated = -1;
         float lastFrameSpawned = -1;
         float lastFrameChanged = -1;
