@@ -24,7 +24,6 @@ public class CraterConveyor extends BaseConveyor{
 
     public CraterConveyor(String name){
         super(name);
-        compressable = true;
         entityType = CraterConveyorEntity::new;
     }
 
@@ -217,7 +216,7 @@ public class CraterConveyor extends BaseConveyor{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         CraterConveyorEntity entity = tile.ent();
 
-        if(!isStart(tile) && !source.block().compressable) return false;
+        if(!isStart(tile) && !(tile.front().block() instanceof CraterConveyor)) return false;
         if(entity.items.total() > 0 && !entity.items.has(item)) return false;
         if(entity.items.total() >= getMaximumAccepted(tile, item)) return false;
 
@@ -258,14 +257,14 @@ public class CraterConveyor extends BaseConveyor{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock) {
-        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock.compressable;
+        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof CraterConveyor;
     }
 
     // has no crater conveyors facing into it
     private boolean isStart(Tile tile){
         Tile[] inputs = new Tile[]{tile.back(), tile.left(), tile.right()};
         for(Tile input : inputs){
-            if(input != null && input.getTeam() == tile.getTeam() && input.block().compressable && input.front() == tile) return false;
+            if(input != null && input.getTeam() == tile.getTeam() && input.block() instanceof CraterConveyor && input.front() == tile) return false;
         }
 
         return true;
@@ -275,7 +274,7 @@ public class CraterConveyor extends BaseConveyor{
     private boolean isEnd(Tile tile){
         if(tile.front() == null) return true;
         if(tile.getTeam() != tile.front().getTeam()) return true;
-        if(!tile.front().block().compressable) return true;
+        if(!(tile.front().block() instanceof CraterConveyor)) return true;
 
         return false;
     }
