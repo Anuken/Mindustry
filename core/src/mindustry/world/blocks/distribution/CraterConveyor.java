@@ -77,7 +77,7 @@ public class CraterConveyor extends BaseConveyor{
         entity.lastFrameUpdated = Core.graphics.getFrameId();
 
         if(entity.crater == null){
-            if(entity.items.total() > 0){
+            if(entity.items.total() > 0 && Core.graphics.getFrameId() > entity.lastFrameSpawned){
                 entity.crater = new Crater(tile);
                 Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
             }
@@ -107,6 +107,8 @@ public class CraterConveyor extends BaseConveyor{
                                 e.crater = entity.crater;
                                 entity.crater = null;
 
+                                entity.lastFrameSpawned = Core.graphics.getFrameId() + 10;
+
                                 e.items.addAll(entity.items);
                                 entity.items.clear();
                             }
@@ -126,6 +128,7 @@ public class CraterConveyor extends BaseConveyor{
     public class CraterConveyorEntity extends BaseConveyorEntity{
         Crater crater;
         float lastFrameUpdated = -1;
+        float lastFrameSpawned = -1;
     }
 
     protected class Crater implements Position{
