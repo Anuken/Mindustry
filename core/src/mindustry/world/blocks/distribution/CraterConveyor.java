@@ -1,7 +1,6 @@
 package mindustry.world.blocks.distribution;
 
 import arc.*;
-import arc.func.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.ui.*;
@@ -92,56 +91,65 @@ public class CraterConveyor extends BaseConveyor{
         if(entity.lastFrameUpdated == Core.graphics.getFrameId()) return;
         entity.lastFrameUpdated = Core.graphics.getFrameId();
 
+        // ensure a crater exists below this block
         if(entity.crater == null){
-            if(entity.items.total() > 0 && Core.graphics.getFrameId() > entity.lastFrameSpawned){
-                entity.crater = new Crater(tile);
-                Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
-            }
+            // poof in crater
+            if(entity.items.total() <= 0 || !(Core.graphics.getFrameId() > entity.lastFrameSpawned)) return;
+            entity.crater = new Crater(tile);
+            Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
         }else{
+            // poof out crater
             if(entity.items.total() == 0){
                 Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
                 entity.crater = null;
-            }else{
+                return;
+            }
+        }
 
-                if(shouldLaunch(tile)){
-                    Tile destination = tile.front();
-                    destination.block().update(destination);
+        // handle crater movement
+        entity.crater.x = Mathf.lerpDelta(entity.crater.x, tile.drawx(), speed);
+        entity.crater.y = Mathf.lerpDelta(entity.crater.y, tile.drawy(), speed);
+        entity.crater.rotation = Mathf.slerpDelta(entity.crater.rotation, entity.crater.face, speed * 2);
 
-                    if(entity.crater.dst(tile) < 1.25f){
-                        entity.crater.face = tile.rotation() * 90 - 90;
-                        if(!(destination.block() instanceof CraterConveyor)){
-                            while(entity.items.total() > 0 && entity.crater.item != null && offloadDir(tile, entity.crater.item)) entity.items.remove(entity.crater.item, 1);
+        if(shouldLaunch(tile)){
+            Tile destination = tile.front();
 
-                        }
-                    }
+            // update the target first to potentially make room
+            destination.block().update(destination);
 
-                    if(entity.crater.dst(tile) < 0.1f){
-                        if(destination.block() instanceof CraterConveyor){
-                            CraterConveyorEntity e = destination.ent();
+            // when near the center of the target tile...
+            if(entity.crater.dst(tile) < 1.25f){
+                entity.crater.face = tile.rotation() * 90 - 90; // ...set the new direction it should face
+                if(!(destination.block() instanceof CraterConveyor)){ // ...and if its not a crater conveyor, start unloading (everything)
+                    while(entity.items.total() > 0 && entity.crater.item != null && offloadDir(tile, entity.crater.item)) entity.items.remove(entity.crater.item, 1);
+                }
+            }
 
-                            if(e.crater == null){
-                                e.crater = entity.crater;
-                                entity.crater = null;
+            // when basically exactly on the center:
+            if(entity.crater.dst(tile) < 0.1f){
+                if(destination.block() instanceof CraterConveyor){
+                    CraterConveyorEntity e = destination.ent();
 
-                                entity.lastFrameSpawned = Core.graphics.getFrameId() + 10;
+                    // check if next crater conveyor is not occupied
+                    if(e.crater == null){
+                        // transfer ownership of crater
+                        e.crater = entity.crater;
+                        entity.crater = null;
 
-                                e.items.addAll(entity.items);
-                                entity.items.clear();
-                            }
-                        }
+                        // prevent this tile from spawning a new crater to avoid collisions
+                        entity.lastFrameSpawned = Core.graphics.getFrameId() + 10;
+
+                        // transfer inventory of conveyor
+                        e.items.addAll(entity.items);
+                        entity.items.clear();
                     }
                 }
             }
         }
 
-        if(entity.crater != null){
-            entity.crater.x = Mathf.lerpDelta(entity.crater.x, tile.drawx(), speed);
-            entity.crater.y = Mathf.lerpDelta(entity.crater.y, tile.drawy(), speed);
-            entity.crater.rotation = Mathf.slerpDelta(entity.crater.rotation, entity.crater.face, speed * 2);
-        }
     }
 
-    public class CraterConveyorEntity extends BaseConveyorEntity{
+    class CraterConveyorEntity extends BaseConveyorEntity{
         float lastFrameUpdated = -1;
         float lastFrameSpawned = -1;
         float lastFrameChanged = -1;
@@ -210,7 +218,7 @@ public class CraterConveyor extends BaseConveyor{
         // its considered full
         if(entity.items.total() >= getMaximumAccepted(tile, entity.crater.item)) return true;
 
-        // inactivity tracker
+        // has been inactive
         if(Core.graphics.getFrameId() > entity.lastFrameChanged + 120) return true;
 
         return false;
@@ -221,10 +229,7 @@ public class CraterConveyor extends BaseConveyor{
         return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock.compressable;
     }
 
-    /**
-     * Check if there is no crater conveyor blending with this block
-     * (should probably use blendbits, if only i understood those)
-     */
+    // has no crater conveyors facing into it
     private boolean isStart(Tile tile){
         Tile[] inputs = new Tile[]{tile.back(), tile.left(), tile.right()};
         for(Tile input : inputs){
@@ -234,13 +239,13 @@ public class CraterConveyor extends BaseConveyor{
         return true;
     }
 
-    /**
-     * Check if this tile is considered the end of the line
-     */
+    // has no crater conveyor in front of it
     private boolean isEnd(Tile tile){
         if(tile.front() == null) return true;
         if(tile.getTeam() != tile.front().getTeam()) return true;
-        return !tile.front().block().compressable;
+        if(!tile.front().block().compressable) return true;
+
+        return false;
     }
 
 }
