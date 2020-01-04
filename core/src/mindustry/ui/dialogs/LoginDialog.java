@@ -89,19 +89,16 @@ public class LoginDialog extends FloatingDialog {
         cont.row();
         cont.table(t -> {
             t.defaults().size(140f, 60f).pad(4f);
+            if(info.showRegister){
+                t.addButton("$login.register", () -> {
+                    if(!Core.net.openURI(info.authServer)){
+                        ui.showErrorMessage("$linkfail");
+                        Core.app.setClipboardText(info.authServer);
+                    }
+                });
+            }
             t.addButton("$cancel", this::cancel);
             t.addButton("$login.submit", this::submit);
-        }).padBottom(20f);
-        if(info.showRegister){
-            cont.row();
-            Label registerLink = cont.add("$login.register").get();
-            registerLink.touchable(Touchable.enabled);
-            registerLink.tapped(() -> {
-                if(!Core.net.openURI(info.authServer)){
-                    ui.showErrorMessage("$linkfail");
-                    Core.app.setClipboardText(info.authServer);
-                }
-            });
-        }
+        });
     }
 }
