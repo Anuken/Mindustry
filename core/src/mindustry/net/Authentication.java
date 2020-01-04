@@ -130,6 +130,15 @@ public class Authentication{
         }
     }
 
+    public enum AuthResult{
+        succeeded, invalidToken, ipMismatch, serverMismatch, usernameMismatch, serverFail;
+
+        @Override
+        public String toString(){
+            return Core.bundle.get("login.fail." + name());
+        }
+    }
+
     public NetJavaImpl netImpl = new NetJavaImpl();
     public LoginInfo loginInfo;
     public ObjectMap<String, Session> sessions = new ObjectMap<>();
@@ -154,11 +163,6 @@ public class Authentication{
         // callback hell and overall very ugly code
         auth.doConnect(authServer, serverIdHash).done(response -> {
             if(response.success){
-                ui.loadfrag.show("$connecting.data");
-                ui.loadfrag.setButton(() -> {
-                    ui.loadfrag.hide();
-                    netClient.disconnectQuietly();
-                });
                 netClient.authenticating = false;
                 // doConnect will check if the session exists, NPE shouldn't happen here
                 Call.sendAuthenticationResponse(auth.sessions.get(authServer).username, response.result);
@@ -173,11 +177,6 @@ public class Authentication{
                     });
                     auth.doConnect(authServer, serverIdHash).done(response2 -> {
                         if(response2.success){
-                            ui.loadfrag.show("$connecting.data");
-                            ui.loadfrag.setButton(() -> {
-                                ui.loadfrag.hide();
-                                netClient.disconnectQuietly();
-                            });
                             netClient.authenticating = false;
                             Call.sendAuthenticationResponse(auth.sessions.get(authServer).username, response2.result);
                             return;
@@ -207,17 +206,49 @@ public class Authentication{
             if(response.success) {
                 player.con.authenticated = true;
                 player.username = username;
+                Call.sendAuthenticationResult(player.con, AuthResult.succeeded);
                 netServer.finalizeConnect(player);
                 Log.info("Authentication succeeded for player &lc{0}&lg (username &lc{1}&lg)", player.name, username);
             }else{
-                player.con.kick(KickReason.authenticationFailed);
                 if(response.exception != null){
                     Log.err("Unexpected error in authentication", response.exception);
+                    Call.sendAuthenticationResult(player.con, AuthResult.serverFail);
                 }else{
                     Log.info("Player &lc{0}&lg failed authentication: {1} ({2})", player.name, response.errorCode, response.errorDescription);
+                    AuthResult result = AuthResult.serverFail;
+                    switch(response.errorCode){
+                        case "NO_SUCH_TOKEN":
+                        case "TOKEN_EXPIRED":
+                            result = AuthResult.invalidToken;
+                            break;
+                        case "USERNAME_MISMATCH":
+                            result = AuthResult.usernameMismatch;
+                            break;
+                        case "IP_MISMATCH":
+                            result = AuthResult.ipMismatch;
+                            break;
+                        case "SERVER_ID_MISMATCH":
+                            result = AuthResult.serverMismatch;
+                            break;
+                    }
+                    Call.sendAuthenticationResult(player.con, result);
                 }
+                player.con.kick(KickReason.authenticationFailed);
             }
         });
+    }
+
+    @Remote(targets = Loc.server, priority = PacketPriority.high, variants = Variant.one)
+    public static void sendAuthenticationResult(AuthResult result){
+        if(result == AuthResult.succeeded){
+            ui.loadfrag.show("$connecting.data");
+            ui.loadfrag.setButton(() -> {
+                ui.loadfrag.hide();
+                netClient.disconnectQuietly();
+            });
+        }else {
+            ui.showText("$login.fail", result.toString());
+        }
     }
 
     public static void disconnectAndShowApiError(ApiResponse<?> response){

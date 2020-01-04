@@ -14,6 +14,7 @@ import mindustry.entities.type.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.net.Administration.TraceInfo;
+import mindustry.net.Authentication.AuthResult;
 import mindustry.net.Packets.AdminAction;
 import mindustry.net.Packets.KickReason;
 import mindustry.type.*;
@@ -173,6 +174,16 @@ public class TypeIO{
     @ReadClass(KickReason.class)
     public static KickReason readKick(ByteBuffer buffer){
         return KickReason.values()[buffer.get()];
+    }
+
+    @WriteClass(AuthResult.class)
+    public static void writeAuthResult(ByteBuffer buffer, AuthResult reason){
+        buffer.put((byte)reason.ordinal());
+    }
+
+    @ReadClass(AuthResult.class)
+    public static AuthResult readAuthResult(ByteBuffer buffer){
+        return AuthResult.values()[buffer.get()];
     }
 
     @WriteClass(Rules.class)

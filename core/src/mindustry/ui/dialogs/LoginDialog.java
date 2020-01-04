@@ -24,14 +24,14 @@ public class LoginDialog extends FloatingDialog {
         shown(this::setup);
     }
 
-    public void cancel(){
+    private void cancel(){
         ui.loadfrag.hide();
         netClient.disconnectQuietly();
         auth.loginInfo = null;
         hide();
     }
 
-    public void submit(){
+    private void submit(){
         LoginInfo info = auth.loginInfo;
         if(info.username == null || info.password == null || info.username.isEmpty() || info.password.isEmpty()){
             ui.showInfo("$login.invalidcredentials");
@@ -60,7 +60,7 @@ public class LoginDialog extends FloatingDialog {
         });
     }
 
-    public void setup(){
+    private void setup(){
         if(auth.loginInfo == null){
             throw new RuntimeException("Login dialog was shown but no login is active!");
         }
