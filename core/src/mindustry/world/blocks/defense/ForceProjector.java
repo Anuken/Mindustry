@@ -32,6 +32,7 @@ public class ForceProjector extends Block{
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
     public float basePowerDraw = 0.2f;
+    private boolean phaseValid;
     public TextureRegion topRegion;
 
     private static Tile paramTile;
@@ -96,7 +97,7 @@ public class ForceProjector extends Block{
             entity.shield.add();
         }
 
-        boolean phaseValid = consumes.get(ConsumeType.item).valid(tile.entity);
+        phaseValid = consumes.get(ConsumeType.item).valid(tile.entity);
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(phaseValid), 0.1f);
 
@@ -147,6 +148,17 @@ public class ForceProjector extends Block{
 
     float realRadius(ForceEntity entity){
         return (radius + entity.phaseHeat * phaseRadiusBoost) * entity.radscl;
+    }
+
+    @Override
+    public void drawSelect(Tile tile){
+        ForceEntity entity = tile.ent();
+        if(entity == null) return;
+        float drawRadius = radius;
+        if(phaseValid){
+            drawRadius += phaseRadiusBoost;
+        }
+        Drawf.dashHexagon(tile.drawx(), tile.drawy(), drawRadius, Pal.accent);
     }
 
     @Override

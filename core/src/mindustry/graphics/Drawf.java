@@ -10,6 +10,30 @@ import static mindustry.Vars.renderer;
 
 public class Drawf{
 
+    public static void dashHexagon(float x, float y, float rad, Color color){
+        Lines.stroke(3f, Pal.gray);
+        dashHexagon(x, y, rad);
+        Lines.stroke(1f, color);
+        dashHexagon(x, y, rad);
+        Draw.reset();
+    }
+
+    private static void dashHexagon(float x, float y, float rad){
+        final float hrad = rad / 2;
+        final int d = (int) (hrad * 0.425f / 2);
+        final float sq3rad = hrad * Mathf.sqrt3;
+        final float endX = x - rad;
+        final float endY = y;
+        float prevX = endX;
+        float prevY = endY;
+        Lines.dashLine(prevX, prevY, prevX = x - hrad, prevY = y - sq3rad, d);
+        Lines.dashLine(prevX, prevY, prevX = x + hrad, prevY = y - sq3rad, d);
+        Lines.dashLine(prevX, prevY, prevX = x + rad, prevY = y, d);
+        Lines.dashLine(prevX, prevY, prevX = x + hrad, prevY = y + sq3rad, d);
+        Lines.dashLine(prevX, prevY, prevX = x - hrad, prevY = y + sq3rad, d);
+        Lines.dashLine(prevX, prevY, endX, endY, d);
+    }
+
     public static void dashCircle(float x, float y, float rad, Color color){
         Lines.stroke(3f, Pal.gray);
         Lines.dashCircle(x, y, rad);
