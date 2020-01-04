@@ -331,8 +331,8 @@ public class Administration{
         socketInputAddress("The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
         allowCustomClients("Whether custom clients are allowed to connect.", !headless, "allow-custom"),
         whitelist("Whether the whitelist is used.", false),
-        motd("The message displayed to people on connection.", "off");
-        enableAutosave("Whether the server autosaves at the beginning of a wave.", false),
+        motd("The message displayed to people on connection.", "off"),
+        enableAutosave("Whether the server autosaves at the beginning of a wave.", false);
 
         public static final Config[] all = values();
 
