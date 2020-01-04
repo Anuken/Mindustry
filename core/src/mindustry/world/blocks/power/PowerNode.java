@@ -284,7 +284,10 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void drawLayer(Tile tile){
-        if(Core.settings.getInt("lasersopacity") == 0) return;
+        int opacityPercentage = Core.settings.getInt("lasersopacity");
+        if(opacityPercentage == 0) return;
+
+        float opacity = opacityPercentage / 100f;
 
         TileEntity entity = tile.ent();
 
@@ -295,7 +298,7 @@ public class PowerNode extends PowerBlock{
 
             if(link.block() instanceof PowerNode && !(link.pos() < tile.pos())) continue;
 
-            drawLaser(tile, link);
+            drawLaser(tile, link, opacity);
         }
 
         Draw.reset();
@@ -334,25 +337,28 @@ public class PowerNode extends PowerBlock{
         return Intersector.overlaps(Tmp.cr1.set(src.worldx() + offset(), src.worldy() + offset(), laserRange * tilesize), Tmp.r1.setSize(size * tilesize).setCenter(other.worldx() + offset(), other.worldy() + offset()));
     }
 
-    protected void drawLaser(Tile tile, Tile target){
-        int opacityPercentage = Core.settings.getInt("lasersopacity");
-        if(opacityPercentage == 0) return;
+    protected void drawLaser(Tile tile, Tile target, float opacity){
+        drawLaser(
+                tile.drawx(),
+                tile.drawy(),
+                tile.block().size,
+                target.drawx(),
+                target.drawy(),
+                target.block().size,
+                opacity,
+                1f - tile.entity.power.graph.getSatisfaction()
+        );
+    }
 
-        float opacity = opacityPercentage / 100f;
-
-        float x1 = tile.drawx(), y1 = tile.drawy(),
-        x2 = target.drawx(), y2 = target.drawy();
-
+    public void drawLaser(float x1, float y1, float size1, float x2, float y2, float size2, float opacity, float fract){
         float angle1 = Angles.angle(x1, y1, x2, y2);
-        t1.trns(angle1, tile.block().size * tilesize / 2f - 1.5f);
-        t2.trns(angle1 + 180f, target.block().size * tilesize / 2f - 1.5f);
+        t1.trns(angle1, size1 * tilesize / 2f - 1.5f);
+        t2.trns(angle1 + 180f, size2 * tilesize / 2f - 1.5f);
 
         x1 += t1.x;
         y1 += t1.y;
         x2 += t2.x;
         y2 += t2.y;
-
-        float fract = 1f - tile.entity.power.graph.getSatisfaction();
 
         Draw.color(Color.white, Pal.powerLight, fract * 0.86f + Mathf.absin(3f, 0.1f));
         Draw.alpha(opacity);

@@ -224,7 +224,7 @@ public class Schematics implements Loadable{
             Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), -buffer.getHeight());
             Draw.color();
 
-            Array<BuildRequest> requests = schematic.tiles.map(t -> new BuildRequest(t.x, t.y, t.rotation, t.block).configure(t.config));
+            Array<BuildRequest> requests = schematic.tiles.map(t -> new BuildRequest(t.x, t.y, t.rotation, t.block).configure(t.config).link(t.links));
 
             Draw.flush();
             //scale each request to fit schematic
@@ -237,7 +237,29 @@ public class Schematics implements Loadable{
                 req.block.drawRequestRegion(req, requests::each);
             });
 
-            requests.each(req -> req.block.drawRequestConfigTop(req, requests::each));
+            requests.each(req -> {
+                req.block.drawRequestConfigTop(req, requests::each);
+                if(req.links != null){
+                    for(int i = 0; i < req.links.size; i++){
+                        int linkPos = req.links.get(i);
+                        int linkX = Pos.x(linkPos) + req.x;
+                        int linkY = Pos.y(linkPos) + req.y;
+                        BuildRequest link = requests.find(r -> r.x == linkX && r.y == linkY);
+                        if(link != null){
+                            ((PowerNode) req.block).drawLaser(
+                                    req.drawx(),
+                                    req.drawy(),
+                                    req.block.size,
+                                    link.drawx(),
+                                    link.drawy(),
+                                    link.block.size,
+                                    0.7f,
+                                    1f
+                            );
+                        }
+                    }
+                }
+            });
 
             Draw.flush();
             Draw.trans().idt();
@@ -259,14 +281,7 @@ public class Schematics implements Loadable{
             BuildRequest br = new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block);
             br.original(t.x, t.y, schem.width, schem.height);
             br.configure(t.config);
-            if(t.links != null){
-                IntArray links = new IntArray();
-                for(int i = 0; i < t.links.size; i++){
-                    int link = t.links.get(i);
-                    links.add(link);
-                }
-                br.link(links);
-            }
+            br.link(t.links);
             return br;
         }).removeAll(s -> !s.block.isVisible() || !s.block.unlockedCur());
     }
