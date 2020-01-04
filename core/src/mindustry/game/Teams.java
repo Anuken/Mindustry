@@ -80,7 +80,7 @@ public class Teams{
     /** Returns whether a team is active, e.g. whether it has any cores remaining. */
     public boolean isActive(Team team){
         //the enemy wave team is always active
-        return team == state.rules.waveTeam || get(team).cores.size > 0;
+        return get(team).active();
     }
 
     /** Returns whether {@param other} is an enemy of {@param #team}. */
@@ -150,7 +150,7 @@ public class Teams{
         }
 
         public boolean active(){
-            return team == state.rules.waveTeam || cores.size > 0;
+            return (team == state.rules.waveTeam && state.rules.waves) || cores.size > 0;
         }
 
         public boolean hasCore(){
