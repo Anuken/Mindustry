@@ -262,6 +262,7 @@ public class MassDriver extends Block{
     }
 
     protected boolean shooterValid(Tile tile, Tile other){
+
         if(other == null) return true;
         if(!(other.block() instanceof MassDriver)) return false;
         MassDriverEntity entity = other.ent();
@@ -274,7 +275,7 @@ public class MassDriver extends Block{
         if(entity == null || entity.link == -1) return false;
         Tile link = world.tile(entity.link);
 
-        return link != null && link.block() instanceof MassDriver && tile.dst(link) <= range;
+        return link != null && link.block() instanceof MassDriver && link.getTeam() == tile.getTeam() && tile.dst(link) <= range;
     }
 
     public static class DriverBulletData implements Poolable{
