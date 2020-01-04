@@ -637,7 +637,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         if(!state.isEditor() && isShooting() && mech.canShoot(this)){
             if(!mech.turnCursor){
                 //shoot forward ignoring cursor
-                mech.weapon.update(this, x + Angles.trnsx(rotation, 1f), y + Angles.trnsy(rotation, 1f));
+                mech.weapon.update(this, x + Angles.trnsx(rotation, mech.weapon.targetDistance), y + Angles.trnsy(rotation, mech.weapon.targetDistance));
             }else{
                 mech.weapon.update(this, pointerX, pointerY);
             }
