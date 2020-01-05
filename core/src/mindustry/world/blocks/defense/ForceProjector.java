@@ -38,7 +38,13 @@ public class ForceProjector extends Block{
     private static ForceProjector paramBlock;
     private static ForceEntity paramEntity;
     private static Cons<AbsorbTrait> shieldConsumer = trait -> {
-        if(trait.canBeAbsorbed() && trait.getTeam() != paramTile.getTeam() && Intersector.isInsideHexagon(trait.getX(), trait.getY(), paramBlock.realRadius(paramEntity) * 2f, paramTile.drawx(), paramTile.drawy())){
+        Tmp.v1.set(trait);
+        if((paramTile.rotation() & 1) > 0){
+            Tmp.v1.sub(paramTile.drawx(), paramTile.drawy());
+            Tmp.v1.rotate90(0);
+            Tmp.v1.add(paramTile.drawx(), paramTile.drawy());
+        }
+        if(trait.canBeAbsorbed() && trait.getTeam() != paramTile.getTeam() && Intersector.isInsideHexagon(Tmp.v1.getX(), Tmp.v1.getY(), paramBlock.realRadius(paramEntity) * 2f, paramTile.drawx(), paramTile.drawy())){
             trait.absorb();
             Effects.effect(Fx.absorb, trait);
             paramEntity.hit = 1f;
@@ -48,6 +54,7 @@ public class ForceProjector extends Block{
 
     public ForceProjector(String name){
         super(name);
+        rotate = true;
         update = true;
         solid = true;
         hasPower = true;
@@ -83,7 +90,7 @@ public class ForceProjector extends Block{
 
         Draw.color(Pal.accent);
         Lines.stroke(1f);
-        Lines.poly(x * tilesize, y * tilesize, 6, radius);
+        Lines.poly(x * tilesize, y * tilesize, 6, radius, rotation * 90f + 90f);
         Draw.color();
     }
 
@@ -216,7 +223,7 @@ public class ForceProjector extends Block{
         @Override
         public void draw(){
             Draw.color(Pal.accent);
-            Fill.poly(x, y, 6, realRadius(entity));
+            Fill.poly(x, y, 6, realRadius(entity), entity.tile.rotation() * 90f);
             Draw.color();
         }
 
@@ -225,7 +232,7 @@ public class ForceProjector extends Block{
 
             Draw.color(Color.white);
             Draw.alpha(entity.hit);
-            Fill.poly(x, y, 6, realRadius(entity));
+            Fill.poly(x, y, 6, realRadius(entity), entity.tile.rotation() * 90f);
             Draw.color();
         }
 
@@ -237,9 +244,10 @@ public class ForceProjector extends Block{
             Draw.color(Pal.accent);
             Lines.stroke(1.5f);
             Draw.alpha(0.09f + 0.08f * entity.hit);
-            Fill.poly(x, y, 6, rad);
+            float rot = entity.tile.rotation() * 90f;
+            Fill.poly(x, y, 6, rad, rot);
             Draw.alpha(1f);
-            Lines.poly(x, y, 6, rad);
+            Lines.poly(x, y, 6, rad, rot);
             Draw.reset();
         }
 
