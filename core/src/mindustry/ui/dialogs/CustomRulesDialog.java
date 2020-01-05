@@ -184,6 +184,10 @@ public class CustomRulesDialog extends FloatingDialog{
             b.add("$rules.ambientlight");
         }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f);
         main.row();
+        
+        check("$rules.bipartisan.all", b -> rules.bipartisan = b ? 2 : 0, () -> rules.bipartisan == 2, () -> rules.bipartisan != 1);
+        main.row();
+        check("$rules.bipartisan.admin", b -> rules.bipartisan = b ? 1 : 0, () -> rules.bipartisan == 1);
     }
 
     void number(String text, Floatc cons, Floatp prov){

@@ -161,8 +161,9 @@ public class HudFragment extends Fragment{
             }
 
             {
-                editorMain.table(Tex.buttonEdge4, t -> {
-                    //t.margin(0f);
+                editorMain.table(Tex.clear, t -> {
+                    t.marginTop(wavesMain.getPrefHeight());
+                    t.marginLeft(10f);
                     t.add("$editor.teams").growX().left();
                     t.row();
                     t.table(teams -> {
@@ -234,7 +235,7 @@ public class HudFragment extends Fragment{
                         });
                     }
                 }).width(dsize * 5 + 4f);
-                editorMain.visible(() -> shown && state.isEditor());
+                editorMain.visible(() -> shown && state.isEditor() || (state.rules.bipartisan == 2 || (state.rules.bipartisan == 1 && player.isAdmin)));
             }
 
             //fps display
@@ -346,7 +347,7 @@ public class HudFragment extends Fragment{
 
     @Remote(targets = Loc.both, forward = true, called = Loc.both)
     public static void setPlayerTeamEditor(Player player, Team team){
-        if(state.isEditor() && player != null){
+        if((state.isEditor() || (state.rules.bipartisan == 2 || (state.rules.bipartisan == 1 && player.isAdmin))) && player != null){
             player.setTeam(team);
         }
     }

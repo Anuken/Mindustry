@@ -88,6 +88,8 @@ public class Rules{
     public Team waveTeam = Team.crux;
     /** special tags for additional info */
     public StringMap tags = new StringMap();
+    /** wether players can switch teams: 0 = not, 1 = admins, 2 = all */
+    public int bipartisan = 0;
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
     public Rules copy(){
