@@ -63,23 +63,31 @@ public class CraterConveyor extends BaseConveyor{
     public void drawLayer(Tile tile){
         CraterConveyorEntity entity = tile.ent();
 
-        if(entity.crater == null) return;
+        if(!entity.crater) return;
+        
+        Tile from = world.tile(entity.link);
+        Tmp.v1.set(from.getX(), from.getY());
+        Tmp.v2.set(tile.drawx(), tile.drawy());
+        Tmp.v1.interpolate(Tmp.v2, 1f - entity.reload, Interpolation.linear);
+
+        // rotating smoothly
+        float a = from.rotation() * 90;
+        float b = tile.rotation() * 90;
+        if(from.rotation() == 3 && tile.rotation() == 0) a = -1 * 90;
+        if(from.rotation() == 0 && tile.rotation() == 3) a = 4 * 90;
+        float rotation = Mathf.lerp(a, b, Interpolation.linear.apply(1f - entity.reload));
 
         // draw crater
-        Draw.rect(crater, entity.crater.x, entity.crater.y, entity.crater.rotation);
+        Draw.rect(crater, Tmp.v1.x, Tmp.v1.y, rotation - 90);
 
-        // find dominant(/only) item
-        if(entity.crater.item == null){
-            entity.crater.item = tile.entity.items.take();
-            tile.entity.items.add(entity.crater.item, 1);
-        }
+        if(entity.dominant() == null) return;
 
         // draw resource
         float size = itemSize / 1.5f;
-        Draw.rect(entity.crater.item.icon(Cicon.medium), entity.crater.x, entity.crater.y, size, size, 0);
+        Draw.rect(entity.dominant().icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
 
         // draw amount
-        Fonts.outline.draw(tile.entity.items.total() + "", entity.crater.x, entity.crater.y - 1,
+        Fonts.outline.draw(tile.entity.items.total() + "", Tmp.v1.x, Tmp.v1.y - 1,
         Pal.accent, 0.25f * 0.5f / Scl.scl(1f), false, Align.center);
     }
 
@@ -92,27 +100,24 @@ public class CraterConveyor extends BaseConveyor{
         if(entity.lastFrameUpdated == Core.graphics.getFrameId()) return;
         entity.lastFrameUpdated = Core.graphics.getFrameId();
 
-        if(entity.cooldown > 0) entity.cooldown--;
+        entity.reload = Mathf.clamp(entity.reload - speed, 0f, 1f);
 
         // ensure a crater exists below this block
-        if(entity.crater == null){
+        if(!entity.crater){
             // poof in crater
-            if(entity.items.total() <= 0 || entity.cooldown > 0) return;
-            entity.crater = new Crater(tile);
+            if(entity.items.total() <= 0 || entity.reload > 0) return;
             Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
+            entity.crater = true;
+            entity.link = tile.back().pos();
         }else{
             // poof out crater
             if(entity.items.total() == 0){
                 Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
-                entity.crater = null;
+                entity.crater = false;
+                entity.link = Pos.invalid;
                 return;
             }
         }
-
-        // handle crater movement
-        entity.crater.x = Mathf.lerpDelta(entity.crater.x, tile.drawx(), speed);
-        entity.crater.y = Mathf.lerpDelta(entity.crater.y, tile.drawy(), speed);
-        entity.crater.rotation = Mathf.slerpDelta(entity.crater.rotation, entity.crater.face, speed * 2);
 
         if(shouldLaunch(tile)){
             Tile destination = tile.front();
@@ -121,30 +126,32 @@ public class CraterConveyor extends BaseConveyor{
             destination.block().update(destination);
 
             // when near the center of the target tile...
-            if(entity.crater.dst(tile) < 1.25f){
-                entity.crater.face = tile.rotation() * 90 - 90; // ...set the new direction it should face
+            if(entity.reload < 0.25f){
                 if(!(destination.block() instanceof CraterConveyor)){ // ...and if its not a crater conveyor, start unloading (everything)
-                    while(entity.items.total() > 0 && entity.crater.item != null && offloadDir(tile, entity.crater.item)) entity.items.remove(entity.crater.item, 1);
+                    while(entity.items.total() > 0 && entity.dominant() != null && offloadDir(tile, entity.dominant())) entity.items.remove(entity.dominant(), 1);
                 }
             }
 
             // when basically exactly on the center:
-            if(entity.crater.dst(tile) < 0.1f){
+            if(entity.reload == 0){
                 if(destination.block() instanceof CraterConveyor){
                     CraterConveyorEntity e = destination.ent();
-
+                    
                     // check if next crater conveyor is not occupied
-                    if(e.crater == null){
+                    if(e.items.total() == 0){
                         // transfer ownership of crater
-                        e.crater = entity.crater;
-                        entity.crater = null;
+                        e.crater = true;
+                        entity.crater = false;
 
                         // prevent this tile from spawning a new crater to avoid collisions
-                        entity.cooldown = 10;
+                        entity.reload = 1;
 
                         // transfer inventory of conveyor
                         e.items.addAll(entity.items);
                         entity.items.clear();
+
+                        e.reload = 1;
+                        e.link = tile.pos();
                     }
                 }
             }
@@ -153,66 +160,34 @@ public class CraterConveyor extends BaseConveyor{
 
     class CraterConveyorEntity extends BaseConveyorEntity{
         float lastFrameUpdated = -1;
-        Crater crater;
 
-        int cooldown;
+        int link = Pos.invalid;
+        float reload;
+        boolean crater;
 
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
 
-            stream.writeBoolean(crater != null);
-            if(crater != null) crater.write(stream);
-
-            stream.writeInt(cooldown);
+            stream.writeInt(link);
+            stream.writeFloat(reload);
+            stream.writeBoolean(crater);
         }
 
         @Override
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
 
-            if(stream.readBoolean()) crater = new Crater(stream);
-
-            cooldown = stream.readInt();
-        }
-    }
-
-    protected class Crater implements Position{
-        float rotation;
-        float face;
-        float x;
-        float y;
-        Item item;
-
-        Crater(Tile tile){
-            x = tile.drawx();
-            y = tile.drawy();
-            rotation = tile.rotation() * 90 - 90;
-            face = rotation;
+            link = stream.readInt();
+            reload = stream.readFloat();
+            crater = stream.readBoolean();
         }
 
-        Crater(DataInput stream) throws IOException{
-            rotation = stream.readFloat();
-            face = stream.readFloat();
-            x = stream.readFloat();
-            y = stream.readFloat();
-        }
-
-        public void write(DataOutput stream) throws IOException{
-            stream.writeFloat(rotation);
-            stream.writeFloat(face);
-            stream.writeFloat(x);
-            stream.writeFloat(y);
-        }
-
-        @Override
-        public float getX(){
-            return x;
-        }
-
-        @Override
-        public float getY(){
-            return y;
+        public Item dominant(){
+            if(tile.entity.items.total() == 0) return null;
+            Item item = tile.entity.items.take();
+            tile.entity.items.add(item, 1);
+            return item;
         }
     }
 
@@ -239,7 +214,7 @@ public class CraterConveyor extends BaseConveyor{
         if(!isStart(tile)) return true;
 
         // its considered full
-        if(entity.items.total() >= getMaximumAccepted(tile, entity.crater.item)) return true;
+        if(entity.items.total() >= getMaximumAccepted(tile, entity.dominant())) return true;
 
         return false;
     }
