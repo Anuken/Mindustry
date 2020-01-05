@@ -63,7 +63,7 @@ public class CraterConveyor extends BaseConveyor{
     public void drawLayer(Tile tile){
         CraterConveyorEntity entity = tile.ent();
 
-        if(!entity.crater) return;
+        if(entity.link == Pos.invalid) return;
         
         Tile from = world.tile(entity.link);
         Tmp.v1.set(from.getX(), from.getY());
@@ -103,17 +103,15 @@ public class CraterConveyor extends BaseConveyor{
         entity.reload = Mathf.clamp(entity.reload - speed, 0f, 1f);
 
         // ensure a crater exists below this block
-        if(!entity.crater){
+        if(entity.link == Pos.invalid){
             // poof in crater
             if(entity.items.total() <= 0 || entity.reload > 0) return;
             Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
-            entity.crater = true;
-            entity.link = tile.back().pos();
+            entity.link = tile.pos();
         }else{
             // poof out crater
             if(entity.items.total() == 0){
                 Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
-                entity.crater = false;
                 entity.link = Pos.invalid;
                 return;
             }
@@ -140,8 +138,8 @@ public class CraterConveyor extends BaseConveyor{
                     // check if next crater conveyor is not occupied
                     if(e.items.total() == 0){
                         // transfer ownership of crater
-                        e.crater = true;
-                        entity.crater = false;
+                        entity.link = Pos.invalid;
+                        e.link = tile.pos();
 
                         // prevent this tile from spawning a new crater to avoid collisions
                         entity.reload = 1;
@@ -151,7 +149,6 @@ public class CraterConveyor extends BaseConveyor{
                         entity.items.clear();
 
                         e.reload = 1;
-                        e.link = tile.pos();
                     }
                 }
             }
@@ -161,9 +158,8 @@ public class CraterConveyor extends BaseConveyor{
     class CraterConveyorEntity extends BaseConveyorEntity{
         float lastFrameUpdated = -1;
 
-        int link = Pos.invalid;
+        int link;
         float reload;
-        boolean crater;
 
         @Override
         public void write(DataOutput stream) throws IOException{
@@ -171,7 +167,6 @@ public class CraterConveyor extends BaseConveyor{
 
             stream.writeInt(link);
             stream.writeFloat(reload);
-            stream.writeBoolean(crater);
         }
 
         @Override
@@ -180,7 +175,6 @@ public class CraterConveyor extends BaseConveyor{
 
             link = stream.readInt();
             reload = stream.readFloat();
-            crater = stream.readBoolean();
         }
 
         public Item dominant(){
