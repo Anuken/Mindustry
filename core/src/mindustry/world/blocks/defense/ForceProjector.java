@@ -80,11 +80,8 @@ public class ForceProjector extends Block{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
-
-        Draw.color(Pal.accent);
-        Lines.stroke(1f);
-        Lines.poly(x * tilesize, y * tilesize, 6, radius);
-        Draw.color();
+        
+        Drawf.dashHexagon(x * tilesize, y * tilesize, radius, Pal.accent);
     }
 
     @Override
