@@ -20,18 +20,17 @@ public class Drawf{
 
     private static void dashHexagon(float x, float y, float rad){
         final float hrad = rad / 2;
-        final int d = (int) (hrad * 0.425f / 2);
+        final int d = (int) (hrad * 0.425f / 2); //Calculated from 17 / 40 / 2
         final float sq3rad = hrad * Mathf.sqrt3;
         final float endX = x - rad;
-        final float endY = y;
-        float prevX = endX;
-        float prevY = endY;
-        Lines.dashLine(prevX, prevY, prevX = x - hrad, prevY = y - sq3rad, d);
+        float prevX;
+        float prevY;
+        Lines.dashLine(endX, y, prevX = x - hrad, prevY = y - sq3rad, d);
         Lines.dashLine(prevX, prevY, prevX = x + hrad, prevY = y - sq3rad, d);
         Lines.dashLine(prevX, prevY, prevX = x + rad, prevY = y, d);
         Lines.dashLine(prevX, prevY, prevX = x + hrad, prevY = y + sq3rad, d);
         Lines.dashLine(prevX, prevY, prevX = x - hrad, prevY = y + sq3rad, d);
-        Lines.dashLine(prevX, prevY, endX, endY, d);
+        Lines.dashLine(prevX, prevY, endX, y, d);
     }
 
     public static void dashCircle(float x, float y, float rad, Color color){

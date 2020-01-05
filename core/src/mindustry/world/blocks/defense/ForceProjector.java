@@ -32,7 +32,6 @@ public class ForceProjector extends Block{
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
     public float basePowerDraw = 0.2f;
-    private boolean phaseValid;
     public TextureRegion topRegion;
 
     private static Tile paramTile;
@@ -97,7 +96,7 @@ public class ForceProjector extends Block{
             entity.shield.add();
         }
 
-        phaseValid = consumes.get(ConsumeType.item).valid(tile.entity);
+        boolean phaseValid = entity.isPhased = consumes.get(ConsumeType.item).valid(tile.entity);
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(phaseValid), 0.1f);
 
@@ -155,7 +154,7 @@ public class ForceProjector extends Block{
         ForceEntity entity = tile.ent();
         if(entity == null) return;
         float drawRadius = radius;
-        if(phaseValid){
+        if(entity.isPhased){
             drawRadius += phaseRadiusBoost;
         }
         Drawf.dashHexagon(tile.drawx(), tile.drawy(), drawRadius, Pal.accent);
@@ -183,6 +182,7 @@ public class ForceProjector extends Block{
         float hit;
         float warmup;
         float phaseHeat;
+        boolean isPhased;
 
         @Override
         public void write(DataOutput stream) throws IOException{
