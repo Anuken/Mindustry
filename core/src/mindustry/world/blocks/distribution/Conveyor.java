@@ -75,11 +75,20 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public void draw(Tile tile){
+        draw(tile, tile);
+    }
+
+    @Override
+    public void drawLawn(Tile tile){
+        draw(tile, tile.getNearby(tile.rotation()));
+    }
+
+    protected void draw(Tile tile, Position on){
         ConveyorEntity entity = tile.ent();
         byte rotation = tile.rotation();
 
         int frame = entity.clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * entity.timeScale)) % 4) : 0;
-        Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], tile.drawx(), tile.drawy(),
+        Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], on.getX(), on.getY(),
         tilesize * entity.blendsclx, tilesize * entity.blendscly, rotation * 90);
     }
 

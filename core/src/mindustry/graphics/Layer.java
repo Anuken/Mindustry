@@ -1,6 +1,8 @@
 package mindustry.graphics;
 
 public enum Layer{
+    /** Drawn under blocks. */
+    lawn,
     /** Base block layer. */
     block,
     /** for placement */

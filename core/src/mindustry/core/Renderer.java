@@ -238,6 +238,7 @@ public class Renderer implements ApplicationListener{
         blocks.floor.drawLayer(CacheLayer.walls);
         blocks.floor.endDraw();
 
+        blocks.drawBlocks(Layer.lawn);
         blocks.drawBlocks(Layer.block);
         blocks.drawFog();
 

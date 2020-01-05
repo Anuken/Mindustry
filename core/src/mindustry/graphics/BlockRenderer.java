@@ -14,6 +14,8 @@ import mindustry.game.Teams.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.liquid.*;
 
 import static arc.Core.camera;
 import static mindustry.Vars.*;
@@ -240,6 +242,10 @@ public class BlockRenderer implements Disposable{
                                 }
                             }
                         }
+
+                        if(block instanceof Conduit || block instanceof Conveyor){
+                            addRequest(tile, Layer.lawn);
+                        }
                     }
                 }
             }
@@ -285,6 +291,8 @@ public class BlockRenderer implements Disposable{
                 block.drawLayer(request.tile);
             }else if(request.layer == block.layer2){
                 block.drawLayer2(request.tile);
+            }else if(request.layer == Layer.lawn){
+                block.drawLawn(request.tile);
             }
         }
     }

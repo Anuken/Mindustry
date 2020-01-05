@@ -247,6 +247,9 @@ public class Block extends BlockStorage{
     public void drawLayer2(Tile tile){
     }
 
+    public void drawLawn(Tile tile){
+    }
+
     public void drawCracks(Tile tile){
         if(!tile.entity.damaged() || size > maxCrackSize) return;
         int id = tile.pos();
