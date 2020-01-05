@@ -157,7 +157,7 @@ public class CraterConveyor extends BaseConveyor{
     class CraterConveyorEntity extends BaseConveyorEntity{
         float lastFrameUpdated = -1;
 
-        int link;
+        int link = Pos.invalid;
         float reload;
 
         @Override
