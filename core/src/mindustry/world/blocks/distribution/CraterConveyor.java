@@ -176,7 +176,7 @@ public class CraterConveyor extends BaseConveyor{
             reload = stream.readFloat();
         }
 
-        public Item dominant(){
+        public Item dominant(){ // fixme: do this better
             if(tile.entity.items.total() == 0) return null;
             Item item = tile.entity.items.take();
             tile.entity.items.add(item, 1);
