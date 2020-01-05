@@ -13,6 +13,7 @@ import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.entities.type.BaseEntity;
 import mindustry.graphics.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -158,7 +159,7 @@ public class ForceProjector extends Block{
 
     @Override
     public void draw(Tile tile){
-        super.draw(tile);
+        Draw.rect(region, tile.drawx(), tile.drawy(), 0);
 
         ForceEntity entity = tile.ent();
 
@@ -168,6 +169,15 @@ public class ForceProjector extends Block{
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
         Draw.blend();
         Draw.reset();
+    }
+
+    @Override
+    public void drawRequestRegion(BuilderTrait.BuildRequest req, Eachable<BuilderTrait.BuildRequest> list) {
+        TextureRegion reg = icon(Cicon.full);
+        Draw.rect(icon(Cicon.full), req.drawx(), req.drawy(),
+        reg.getWidth() * req.animScale * Draw.scl,
+        reg.getHeight() * req.animScale * Draw.scl,
+        0);
     }
 
     class ForceEntity extends TileEntity{
