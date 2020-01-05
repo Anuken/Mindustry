@@ -143,12 +143,11 @@ public class CraterConveyor extends BaseConveyor{
 
                         // prevent this tile from spawning a new crater to avoid collisions
                         entity.reload = 1;
+                        e.reload = 1;
 
                         // transfer inventory of conveyor
                         e.items.addAll(entity.items);
                         entity.items.clear();
-
-                        e.reload = 1;
                     }
                 }
             }
@@ -192,6 +191,7 @@ public class CraterConveyor extends BaseConveyor{
         if(!isStart(tile) && !(source.block() instanceof CraterConveyor)) return false;
         if(entity.items.total() > 0 && !entity.items.has(item)) return false;
         if(entity.items.total() >= getMaximumAccepted(tile, item)) return false;
+        if(tile.front() == source) return false;
 
         return true;
     }
