@@ -126,6 +126,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         this.team = team;
     }
 
+    /** @return whether this unit counts toward the enemy amount in the wave UI. */
+    public boolean countsAsEnemy(){
+        return true;
+    }
+
     public UnitType getType(){
         return type;
     }
@@ -180,23 +185,16 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         }
     }
 
-    public Tile getClosest(BlockFlag flag){
+    public @Nullable Tile getClosest(BlockFlag flag){
         return Geometry.findClosest(x, y, indexer.getAllied(team, flag));
     }
 
-    public Tile getClosestSpawner(){
+    public @Nullable Tile getClosestSpawner(){
         return Geometry.findClosest(x, y, Vars.spawner.getGroundSpawns());
     }
 
-    public TileEntity getClosestEnemyCore(){
-        for(Team enemy : Vars.state.teams.enemiesOf(team)){
-            Tile tile = Geometry.findClosest(x, y, Vars.state.teams.get(enemy).cores);
-            if(tile != null){
-                return tile.entity;
-            }
-        }
-
-        return null;
+    public @Nullable TileEntity getClosestEnemyCore(){
+        return Vars.state.teams.closestEnemyCore(x, y, team);
     }
 
     public UnitState getStartState(){
@@ -354,18 +352,18 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public void hitbox(Rectangle rectangle){
-        rectangle.setSize(type.hitsize).setCenter(x, y);
+    public void hitbox(Rect rect){
+        rect.setSize(type.hitsize).setCenter(x, y);
     }
 
     @Override
-    public void hitboxTile(Rectangle rectangle){
-        rectangle.setSize(type.hitsizeTile).setCenter(x, y);
+    public void hitboxTile(Rect rect){
+        rect.setSize(type.hitsizeTile).setCenter(x, y);
     }
 
     @Override
     public EntityGroup targetGroup(){
-        return unitGroups[team.ordinal()];
+        return unitGroup;
     }
 
     @Override

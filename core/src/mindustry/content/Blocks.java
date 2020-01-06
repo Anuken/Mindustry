@@ -909,10 +909,11 @@ public class Blocks implements ContentList{
         }};
 
         junction = new Junction("junction"){{
-            requirements(Category.distribution, ItemStack.with(Items.copper, 1), true);
+            requirements(Category.distribution, ItemStack.with(Items.copper, 2), true);
             speed = 26;
             capacity = 12;
             health = 30;
+            buildCostMultiplier = 6f;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
@@ -932,16 +933,18 @@ public class Blocks implements ContentList{
 
         sorter = new Sorter("sorter"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 2));
+            buildCostMultiplier = 3f;
         }};
 
         invertedSorter = new Sorter("inverted-sorter"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 2));
+            buildCostMultiplier = 3f;
             invert = true;
         }};
 
         router = new Router("router"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 3));
-
+            buildCostMultiplier = 2f;
         }};
 
         distributor = new Router("distributor"){{
@@ -951,6 +954,7 @@ public class Blocks implements ContentList{
 
         overflowGate = new OverflowGate("overflow-gate"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 4));
+            buildCostMultiplier = 3f;
         }};
 
         massDriver = new MassDriver("mass-driver"){{
@@ -1245,7 +1249,7 @@ public class Blocks implements ContentList{
         //region storage
 
         coreShard = new CoreBlock("core-shard"){{
-            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with(Items.titanium, 4000));
+            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with());
             alwaysUnlocked = true;
 
             health = 1100;
@@ -1254,7 +1258,7 @@ public class Blocks implements ContentList{
         }};
 
         coreFoundation = new CoreBlock("core-foundation"){{
-            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with(Items.titanium, 400, Items.silicon, 3000));
+            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with());
 
             health = 2000;
             itemCapacity = 9000;
@@ -1262,7 +1266,7 @@ public class Blocks implements ContentList{
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
-            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with(Items.titanium, 4000, Items.silicon, 2000, Items.surgealloy, 3000));
+            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with());
 
             health = 4000;
             itemCapacity = 13000;
@@ -1399,15 +1403,6 @@ public class Blocks implements ContentList{
             range = 110f;
             health = 250 * size * size;
             shootSound = Sounds.splash;
-
-            drawer = (tile, entity) -> {
-                Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-
-                Draw.color(entity.liquids.current().color);
-                Draw.alpha(entity.liquids.total() / liquidCapacity);
-                Draw.rect(name + "-liquid", tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-                Draw.color();
-            };
         }};
 
         lancer = new ChargeTurret("lancer"){{

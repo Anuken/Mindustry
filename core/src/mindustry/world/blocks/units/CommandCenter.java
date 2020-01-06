@@ -1,11 +1,11 @@
 package mindustry.world.blocks.units;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -13,7 +13,6 @@ import mindustry.entities.Effects.*;
 import mindustry.entities.type.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
-import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -21,7 +20,7 @@ import mindustry.world.meta.*;
 
 import java.io.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.indexer;
 
 public class CommandCenter extends Block{
     protected TextureRegion[] commandRegions = new TextureRegion[UnitCommand.all.length];
@@ -58,9 +57,7 @@ public class CommandCenter extends Block{
         ObjectSet<Tile> set = indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter);
 
         if(set.size == 1){
-            for(BaseUnit unit : unitGroups[tile.getTeam().ordinal()].all()){
-                unit.onCommand(UnitCommand.all[0]);
-            }
+            Units.each(tile.getTeam(), u -> u.onCommand(UnitCommand.all[0]));
         }
     }
 
@@ -114,12 +111,7 @@ public class CommandCenter extends Block{
             }
         }
 
-        Team team = (player == null ? tile.getTeam() : player.getTeam());
-
-        for(BaseUnit unit : unitGroups[team.ordinal()].all()){
-            unit.onCommand(command);
-        }
-
+        Units.each(tile.getTeam(), u -> u.onCommand(command));
         Events.fire(new CommandIssueEvent(tile, command));
     }
 

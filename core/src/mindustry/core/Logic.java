@@ -1,8 +1,8 @@
 package mindustry.core;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
@@ -47,8 +47,8 @@ public class Logic implements ApplicationListener{
             //blocks that get broken are appended to the team's broken block queue
             Tile tile = event.tile;
             Block block = tile.block();
-            //skip null entities or nukes, for obvious reasons
-            if(tile.entity == null || tile.block() instanceof NuclearReactor) return;
+            //skip null entities or nukes, for obvious reasons; also skip client since they can't modify these requests
+            if(tile.entity == null || tile.block() instanceof NuclearReactor || net.client()) return;
 
             if(block instanceof BuildBlock){
 
@@ -107,9 +107,9 @@ public class Logic implements ApplicationListener{
 
         //add starting items
         if(!world.isZone()){
-            for(Team team : Team.all){
-                if(!state.teams.get(team).cores.isEmpty()){
-                    TileEntity entity = state.teams.get(team).cores.first().entity;
+            for(TeamData team : state.teams.getActive()){
+                if(team.hasCore()){
+                    TileEntity entity = team.core();
                     entity.items.clear();
                     for(ItemStack stack : state.rules.loadout){
                         entity.items.add(stack.item, stack.amount);
@@ -143,23 +143,23 @@ public class Logic implements ApplicationListener{
     }
 
     private void checkGameOver(){
-        if(!state.rules.attackMode && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
+        if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
             state.gameOver = true;
-            Events.fire(new GameOverEvent(waveTeam));
+            Events.fire(new GameOverEvent(state.rules.waveTeam));
         }else if(state.rules.attackMode){
             Team alive = null;
 
-            for(Team team : Team.all){
-                if(state.teams.get(team).cores.size > 0){
+            for(TeamData team : state.teams.getActive()){
+                if(team.hasCore()){
                     if(alive != null){
                         return;
                     }
-                    alive = team;
+                    alive = team.team;
                 }
             }
 
             if(alive != null && !state.gameOver){
-                if(world.isZone() && alive == defaultTeam){
+                if(world.isZone() && alive == state.rules.defaultTeam){
                     //in attack maps, a victorious game over is equivalent to a launch
                     Call.launchZone();
                 }else{
@@ -176,7 +176,7 @@ public class Logic implements ApplicationListener{
             ui.hudfrag.showLaunch();
         }
 
-        for(Tile tile : state.teams.get(defaultTeam).cores){
+        for(TileEntity tile : state.teams.playerCores()){
             Effects.effect(Fx.launch, tile);
         }
 
@@ -185,19 +185,18 @@ public class Logic implements ApplicationListener{
         }
 
         Time.runTask(30f, () -> {
-            for(Tile tile : state.teams.get(defaultTeam).cores){
+            for(TileEntity entity : state.teams.playerCores()){
                 for(Item item : content.items()){
-                    if(tile == null || tile.entity == null || tile.entity.items == null) continue;
-                    data.addItem(item, tile.entity.items.get(item));
-                    Events.fire(new LaunchItemEvent(item, tile.entity.items.get(item)));
+                    data.addItem(item, entity.items.get(item));
+                    Events.fire(new LaunchItemEvent(item, entity.items.get(item)));
                 }
-                world.removeBlock(tile);
+                entity.tile.remove();
             }
             state.launched = true;
             state.gameOver = true;
             Events.fire(new LaunchEvent());
             //manually fire game over event now
-            Events.fire(new GameOverEvent(defaultTeam));
+            Events.fire(new GameOverEvent(state.rules.defaultTeam));
         });
     }
 
@@ -210,14 +209,18 @@ public class Logic implements ApplicationListener{
 
     @Override
     public void update(){
+        Events.fire(Trigger.update);
 
         if(!state.is(State.menu)){
+            if(!net.client()){
+                state.enemies = unitGroup.count(b -> b.getTeam() == state.rules.waveTeam && b.countsAsEnemy());
+            }
 
             if(!state.isPaused()){
                 Time.update();
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
-                    if(!state.rules.waitForWaveToEnd || unitGroups[waveTeam.ordinal()].size() == 0){
+                    if(!state.rules.waitForWaveToEnd || state.enemies == 0){
                         state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
                     }
                 }
@@ -232,10 +235,7 @@ public class Logic implements ApplicationListener{
                 }
 
                 if(!state.isEditor()){
-                    for(EntityGroup group : unitGroups){
-                        group.update();
-                    }
-
+                    unitGroup.update();
                     puddleGroup.update();
                     shieldGroup.update();
                     bulletGroup.update();
@@ -243,10 +243,8 @@ public class Logic implements ApplicationListener{
                     fireGroup.update();
                     weatherGroup.update();
                 }else{
-                    for(EntityGroup<?> group : unitGroups){
-                        group.updateEvents();
-                        collisions.updatePhysics(group);
-                    }
+                    unitGroup.updateEvents();
+                    collisions.updatePhysics(unitGroup);
                 }
 
 
@@ -258,17 +256,13 @@ public class Logic implements ApplicationListener{
                 }
 
                 if(!state.isEditor()){
-
-                    for(EntityGroup group : unitGroups){
-                        if(group.isEmpty()) continue;
-                        collisions.collideGroups(bulletGroup, group);
-                    }
-
+                    //bulletGroup
+                    collisions.collideGroups(bulletGroup, unitGroup);
                     collisions.collideGroups(bulletGroup, playerGroup);
                 }
             }
 
-            if(!net.client() && !world.isInvalidMap() && !state.isEditor()){
+            if(!net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver){
                 checkGameOver();
             }
         }

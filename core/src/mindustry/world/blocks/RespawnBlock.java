@@ -5,6 +5,7 @@ import arc.math.*;
 import mindustry.entities.type.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.net;
@@ -20,7 +21,7 @@ public class RespawnBlock{
 
         Draw.reset();
         if(player != null){
-            TextureRegion region = player.getIconRegion();
+            TextureRegion region = to.icon(Cicon.full);
 
             Draw.color(0f, 0f, 0f, 0.4f * progress);
             Draw.rect("circle-shadow", tile.drawx(), tile.drawy(), region.getWidth() / 3f, region.getWidth() / 3f);

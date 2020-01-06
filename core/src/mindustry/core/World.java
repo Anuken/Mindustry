@@ -1,15 +1,15 @@
 package mindustry.core;
 
 import arc.*;
-import arc.struct.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.content.*;
+import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.maps.filters.*;
@@ -200,7 +200,7 @@ public class World{
     public void loadMap(Map map, Rules checkRules){
         try{
             SaveIO.load(map.file, new FilterContext(map));
-        }catch(Exception e){
+        }catch(Throwable e){
             Log.err(e);
             if(!headless){
                 ui.showErrorMessage("$map.invalid");
@@ -216,33 +216,22 @@ public class World{
         invalidMap = false;
 
         if(!headless){
-            if(state.teams.get(defaultTeam).cores.size == 0 && !checkRules.pvp){
+            if(state.teams.playerCores().size == 0 && !checkRules.pvp){
                 ui.showErrorMessage("$map.nospawn");
                 invalidMap = true;
             }else if(checkRules.pvp){ //pvp maps need two cores to be valid
-                int teams = 0;
-                for(Team team : Team.all){
-                    if(state.teams.get(team).cores.size != 0){
-                        teams ++;
-                    }
-                }
-                if(teams < 2){
+                if(state.teams.getActive().count(TeamData::hasCore) < 2){
                     invalidMap = true;
                     ui.showErrorMessage("$map.nospawn.pvp");
                 }
             }else if(checkRules.attackMode){ //attack maps need two cores to be valid
-                invalidMap = state.teams.get(waveTeam).cores.isEmpty();
+                invalidMap = state.teams.get(state.rules.waveTeam).noCores();
                 if(invalidMap){
                     ui.showErrorMessage("$map.nospawn.attack");
                 }
             }
         }else{
-            invalidMap = true;
-            for(Team team : Team.all){
-                if(state.teams.get(team).cores.size != 0){
-                    invalidMap = false;
-                }
-            }
+            invalidMap = !state.teams.getActive().contains(TeamData::hasCore);
 
             if(invalidMap){
                 throw new MapException(map, "Map has no cores!");
@@ -255,36 +244,6 @@ public class World{
     public void notifyChanged(Tile tile){
         if(!generating){
             Core.app.post(() -> Events.fire(new TileChangeEvent(tile)));
-        }
-    }
-
-    public void removeBlock(Tile tile){
-        if(tile == null) return;
-        tile.link().getLinkedTiles(other -> other.setBlock(Blocks.air));
-    }
-
-    public void setBlock(Tile tile, Block block, Team team){
-        setBlock(tile, block, team, 0);
-    }
-
-    public void setBlock(Tile tile, Block block, Team team, int rotation){
-        tile.setBlock(block, team, rotation);
-        if(block.isMultiblock()){
-            int offsetx = -(block.size - 1) / 2;
-            int offsety = -(block.size - 1) / 2;
-
-            for(int dx = 0; dx < block.size; dx++){
-                for(int dy = 0; dy < block.size; dy++){
-                    int worldx = dx + offsetx + tile.x;
-                    int worldy = dy + offsety + tile.y;
-                    if(!(worldx == tile.x && worldy == tile.y)){
-                        Tile toplace = world.tile(worldx, worldy);
-                        if(toplace != null){
-                            toplace.setBlock(BlockPart.get(dx + offsetx, dy + offsety), team);
-                        }
-                    }
-                }
-            }
         }
     }
 

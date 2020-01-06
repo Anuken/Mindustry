@@ -44,7 +44,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Maximum line length. */
     final static int maxLength = 100;
     final static Vec2 stackTrns = new Vec2();
-    final static Rectangle r1 = new Rectangle(), r2 = new Rectangle();
+    final static Rect r1 = new Rect(), r2 = new Rect();
     /** Distance on the back from where items originate. */
     final static float backTrns = 3f;
 
@@ -92,7 +92,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Tile tile){
-        if(player == null || player.timer == null || !player.timer.get(Player.timerTransfer, 40)) return;
+        if(player == null || player.timer == null) return;
         if(net.server() && (player.item().amount <= 0 || player.isTransferring|| !Units.canInteract(player, tile))){
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
@@ -402,7 +402,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        for(BrokenBlock req : state.teams.get(player.getTeam()).brokenBlocks){
+        for(BrokenBlock req : player.getTeam().data().brokenBlocks){
             Block block = content.block(req.block);
             if(block.bounds(req.x, req.y, Tmp.r2).overlaps(Tmp.r1)){
                 drawSelected(req.x, req.y, content.block(req.block), Pal.remove);
@@ -725,7 +725,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void tryDropItems(Tile tile, float x, float y){
-        if(!droppingItem || player.item().amount <= 0 || canTapPlayer(x, y) || state.isPaused() || !player.timer.check(Player.timerTransfer, 40)){
+        if(!droppingItem || player.item().amount <= 0 || canTapPlayer(x, y) || state.isPaused() ){
             droppingItem = false;
             return;
         }

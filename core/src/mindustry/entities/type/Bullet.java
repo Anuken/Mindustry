@@ -246,13 +246,13 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
     }
 
     @Override
-    public void hitbox(Rectangle rectangle){
-        rectangle.setSize(type.hitSize).setCenter(x, y);
+    public void hitbox(Rect rect){
+        rect.setSize(type.hitSize).setCenter(x, y);
     }
 
     @Override
-    public void hitboxTile(Rectangle rectangle){
-        rectangle.setSize(type.hitSize).setCenter(x, y);
+    public void hitboxTile(Rect rect){
+        rect.setSize(type.hitSize).setCenter(x, y);
     }
 
     @Override

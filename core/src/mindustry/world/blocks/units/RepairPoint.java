@@ -6,7 +6,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Angles;
 import arc.math.Mathf;
-import arc.math.geom.Rectangle;
+import arc.math.geom.Rect;
 import arc.util.Time;
 import mindustry.entities.Units;
 import mindustry.entities.type.TileEntity;
@@ -19,7 +19,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.tilesize;
 
 public class RepairPoint extends Block{
-    private static Rectangle rect = new Rectangle();
+    private static Rect rect = new Rect();
 
     public int timerTarget = timers++;
 

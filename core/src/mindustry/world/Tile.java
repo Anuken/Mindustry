@@ -142,11 +142,11 @@ public class Tile implements Position, TargetTrait{
 
     @Override
     public Team getTeam(){
-        return Team.all[link().team];
+        return Team.get(link().team);
     }
 
     public void setTeam(Team team){
-        this.team = (byte)team.ordinal();
+        this.team = (byte) team.id;
     }
 
     public byte getTeamID(){
@@ -156,7 +156,7 @@ public class Tile implements Position, TargetTrait{
     public void setBlock(@NonNull Block type, Team team, int rotation){
         preChanged();
         this.block = type;
-        this.team = (byte)team.ordinal();
+        this.team = (byte) team.id;
         this.rotation = (byte)Mathf.mod(rotation, 4);
         changed();
     }
@@ -184,6 +184,35 @@ public class Tile implements Position, TargetTrait{
         Block overlay = this.overlay;
         setFloor(floor);
         setOverlay(overlay);
+    }
+
+    public void remove(){
+        link().getLinkedTiles(other -> other.setBlock(Blocks.air));
+    }
+
+    public void set(Block block, Team team){
+        set(block, team, 0);
+    }
+
+    public void set(Block block, Team team, int rotation){
+        setBlock(block, team, rotation);
+        if(block.isMultiblock()){
+            int offsetx = -(block.size - 1) / 2;
+            int offsety = -(block.size - 1) / 2;
+
+            for(int dx = 0; dx < block.size; dx++){
+                for(int dy = 0; dy < block.size; dy++){
+                    int worldx = dx + offsetx + x;
+                    int worldy = dy + offsety + y;
+                    if(!(worldx == x && worldy == y)){
+                        Tile toplace = world.tile(worldx, worldy);
+                        if(toplace != null){
+                            toplace.setBlock(BlockPart.get(dx + offsetx, dy + offsety), team);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public byte rotation(){
@@ -228,7 +257,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean solid(){
-        return block.solid || block.isSolidFor(this) || (isLinked() && link().solid());
+        return block.solid || block.isSolidFor(this) || (isLinked() && link() != this && link().solid());
     }
 
     public boolean breakable(){
@@ -240,7 +269,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean isEnemyCheat(){
-        return getTeam() == waveTeam && state.rules.enemyCheat;
+        return getTeam() == state.rules.waveTeam && state.rules.enemyCheat;
     }
 
     public boolean isLinked(){
@@ -298,7 +327,7 @@ public class Tile implements Position, TargetTrait{
         return tmpArray;
     }
 
-    public Rectangle getHitbox(Rectangle rect){
+    public Rect getHitbox(Rect rect){
         return rect.setSize(block().size * tilesize).setCenter(drawx(), drawy());
     }
 
@@ -344,10 +373,10 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean interactable(Team team){
-        return getTeam() == Team.derelict || team == getTeam();
+        return state.teams.canInteract(team, getTeam());
     }
 
-    public Item drop(){
+    public @Nullable Item drop(){
         return overlay == Blocks.air || overlay.itemDrop == null ? floor.itemDrop : overlay.itemDrop;
     }
 

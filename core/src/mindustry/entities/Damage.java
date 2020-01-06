@@ -22,8 +22,8 @@ import static mindustry.Vars.*;
 
 /** Utility class for damaging in an area. */
 public class Damage{
-    private static Rectangle rect = new Rectangle();
-    private static Rectangle hitrect = new Rectangle();
+    private static Rect rect = new Rect();
+    private static Rect hitrect = new Rect();
     private static Vec2 tr = new Vec2();
     private static GridBits bits = new GridBits(30, 30);
     private static IntQueue propagation = new IntQueue();
@@ -88,7 +88,7 @@ public class Damage{
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {
             Tile tile = world.ltile(cx, cy);
-            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.entity != null && tile.getTeamID() != team.ordinal() && tile.entity.collide(hitter)){
+            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.entity != null && tile.getTeamID() != team.id && tile.entity.collide(hitter)){
                 tile.entity.collision(hitter);
                 collidedBlocks.add(tile.pos());
                 hitter.getBulletType().hit(hitter, tile.worldx(), tile.worldy());
@@ -127,7 +127,7 @@ public class Damage{
 
         Cons<Unit> cons = e -> {
             e.hitbox(hitrect);
-            Rectangle other = hitrect;
+            Rect other = hitrect;
             other.y -= expand;
             other.x -= expand;
             other.width += expand * 2;
@@ -259,7 +259,7 @@ public class Damage{
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
-                if(tile != null && tile.entity != null && (team == null || state.teams.areEnemies(team, tile.getTeam())) && Mathf.dst(dx, dy) <= trad){
+                if(tile != null && tile.entity != null && (team == null ||team.isEnemy(tile.getTeam())) && Mathf.dst(dx, dy) <= trad){
                     tile.entity.damage(damage);
                 }
             }

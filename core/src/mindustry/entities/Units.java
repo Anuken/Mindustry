@@ -1,21 +1,18 @@
 package mindustry.entities;
 
-import arc.struct.EnumSet;
-import arc.func.Cons;
-import arc.func.Boolf;
-import arc.math.Mathf;
-import arc.math.geom.Geometry;
-import arc.math.geom.Rectangle;
-import mindustry.entities.traits.TargetTrait;
+import arc.func.*;
+import arc.math.*;
+import arc.math.geom.*;
+import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
-import mindustry.game.Team;
-import mindustry.world.Tile;
+import mindustry.game.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
 /** Utility class for unit and team interactions.*/
 public class Units{
-    private static Rectangle hitrect = new Rectangle();
+    private static Rect hitrect = new Rect();
     private static Unit result;
     private static float cdist;
     private static boolean boolResult;
@@ -86,13 +83,7 @@ public class Units{
     public static TileEntity findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
         if(team == Team.derelict) return null;
 
-        for(Team enemy : state.teams.enemiesOf(team)){
-            TileEntity entity = indexer.findTile(enemy, x, y, range, pred, true);
-            if(entity != null){
-                return entity;
-            }
-        }
-        return null;
+        return indexer.findEnemyTile(team, x, y, range, pred);
     }
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
@@ -157,7 +148,11 @@ public class Units{
 
     /** Iterates over all units in a rectangle. */
     public static void nearby(Team team, float x, float y, float width, float height, Cons<Unit> cons){
-        unitGroups[team.ordinal()].intersect(x, y, width, height, cons);
+        unitGroup.intersect(x, y, width, height, u -> {
+            if(u.getTeam() == team){
+                cons.get(u);
+            }
+        });
         playerGroup.intersect(x, y, width, height, player -> {
             if(player.getTeam() == team){
                 cons.get(player);
@@ -167,8 +162,8 @@ public class Units{
 
     /** Iterates over all units in a circle around this position. */
     public static void nearby(Team team, float x, float y, float radius, Cons<Unit> cons){
-        unitGroups[team.ordinal()].intersect(x - radius, y - radius, radius*2f, radius*2f, unit -> {
-            if(unit.withinDst(x, y, radius)){
+        unitGroup.intersect(x - radius, y - radius, radius*2f, radius*2f, unit -> {
+            if(unit.getTeam() == team && unit.withinDst(x, y, radius)){
                 cons.get(unit);
             }
         });
@@ -182,45 +177,43 @@ public class Units{
 
     /** Iterates over all units in a rectangle. */
     public static void nearby(float x, float y, float width, float height, Cons<Unit> cons){
-        for(Team team : Team.all){
-            unitGroups[team.ordinal()].intersect(x, y, width, height, cons);
-        }
-
+        unitGroup.intersect(x, y, width, height, cons);
         playerGroup.intersect(x, y, width, height, cons);
     }
 
     /** Iterates over all units in a rectangle. */
-    public static void nearby(Rectangle rect, Cons<Unit> cons){
+    public static void nearby(Rect rect, Cons<Unit> cons){
         nearby(rect.x, rect.y, rect.width, rect.height, cons);
     }
 
     /** Iterates over all units that are enemies of this team. */
     public static void nearbyEnemies(Team team, float x, float y, float width, float height, Cons<Unit> cons){
-        EnumSet<Team> targets = state.teams.enemiesOf(team);
-
-        for(Team other : targets){
-            unitGroups[other.ordinal()].intersect(x, y, width, height, cons);
-        }
+        unitGroup.intersect(x, y, width, height, u -> {
+            if(team.isEnemy(u.getTeam())){
+                cons.get(u);
+            }
+        });
 
         playerGroup.intersect(x, y, width, height, player -> {
-            if(targets.contains(player.getTeam())){
+            if(team.isEnemy(player.getTeam())){
                 cons.get(player);
             }
         });
     }
 
     /** Iterates over all units that are enemies of this team. */
-    public static void nearbyEnemies(Team team, Rectangle rect, Cons<Unit> cons){
+    public static void nearbyEnemies(Team team, Rect rect, Cons<Unit> cons){
         nearbyEnemies(team, rect.x, rect.y, rect.width, rect.height, cons);
     }
 
     /** Iterates over all units. */
     public static void all(Cons<Unit> cons){
-        for(Team team : Team.all){
-            unitGroups[team.ordinal()].all().each(cons);
-        }
-
+        unitGroup.all().each(cons);
         playerGroup.all().each(cons);
+    }
+
+    public static void each(Team team, Cons<BaseUnit> cons){
+        unitGroup.all().each(t -> t.getTeam() == team, cons);
     }
 
 }

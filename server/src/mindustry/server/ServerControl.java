@@ -1,11 +1,11 @@
 package mindustry.server;
 
 import arc.*;
+import arc.files.*;
 import arc.struct.*;
 import arc.struct.Array.*;
-import arc.files.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.Timer;
 import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
@@ -40,7 +40,6 @@ import static mindustry.Vars.*;
 public class ServerControl implements ApplicationListener{
     private static final int roundExtraTime = 12;
     private static final int maxLogLength = 1024 * 512;
-    private static final int commandSocketPort = 6859;
 
     protected static String[] tags = {"&lc&fb[D]", "&lg&fb[I]", "&ly&fb[W]", "&lr&fb[E]", ""};
     protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");
@@ -64,10 +63,6 @@ public class ServerControl implements ApplicationListener{
             "bans", "",
             "admins", "",
             "shufflemode", "custom",
-            "crashreport", false,
-            "port", port,
-            "logging", true,
-            "socket", false,
             "globalrules", "{reactorExplosions: false}"
         );
 
@@ -75,7 +70,7 @@ public class ServerControl implements ApplicationListener{
             String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr", args1);
             System.out.println(result);
 
-            if(Core.settings.getBool("logging")){
+            if(Config.logging.bool()){
                 logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr", false, args1));
             }
 
@@ -95,11 +90,17 @@ public class ServerControl implements ApplicationListener{
         registerCommands();
 
         Core.app.post(() -> {
-            String[] commands = {};
+            Array<String> commands = new Array<>();
 
             if(args.length > 0){
-                commands = Strings.join(" ", args).split(",");
-                info("&lmFound {0} command-line arguments to parse.", commands.length);
+                commands.addAll(Strings.join(" ", args).split(","));
+                info("&lmFound {0} command-line arguments to parse.", commands.size);
+            }
+
+            if(!Config.startCommands.string().isEmpty()){
+                String[] startup = Strings.join(" ", Config.startCommands.string()).split(",");
+                info("&lmFound {0} startup commands.", startup.length);
+                commands.addAll(startup);
             }
 
             for(String s : commands){
@@ -107,7 +108,6 @@ public class ServerControl implements ApplicationListener{
                 if(response.type != ResponseType.valid){
                     err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
                     err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
-                    System.exit(1);
                 }
             }
         });
@@ -135,7 +135,7 @@ public class ServerControl implements ApplicationListener{
             if(state.rules.waves){
                 info("&lcGame over! Reached wave &ly{0}&lc with &ly{1}&lc players online on map &ly{2}&lc.", state.wave, playerGroup.size(), Strings.capitalize(world.getMap().name()));
             }else{
-                info("&lcGame over! Team &ly{0}&lc is victorious with &ly{1}&lc players online on map &ly{2}&lc.", event.winner.name(), playerGroup.size(), Strings.capitalize(world.getMap().name()));
+                info("&lcGame over! Team &ly{0}&lc is victorious with &ly{1}&lc players online on map &ly{2}&lc.", event.winner.name, playerGroup.size(), Strings.capitalize(world.getMap().name()));
             }
 
             //set next map to be played
@@ -143,7 +143,7 @@ public class ServerControl implements ApplicationListener{
             nextMapOverride = null;
             if(map != null){
                 Call.onInfoMessage((state.rules.pvp
-                ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
+                ? "[YELLOW]The " + event.winner.name + " team is victorious![]" : "[SCARLET]Game over![]")
                 + "\nNext selected map:[accent] " + map.name() + "[]"
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
                 "\nNew game begins in " + roundExtraTime + "[] seconds.");
@@ -158,16 +158,27 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        Events.on(Trigger.socketConfigChanged, () -> {
+            toggleSocket(false);
+            toggleSocket(Config.socketInput.bool());
+        });
+
+        Events.on(PlayEvent.class, e -> {
+            try{
+                JsonValue value = JsonIO.json().fromJson(null, Core.settings.getString("globalrules"));
+                JsonIO.json().readFields(state.rules, value);
+            }catch(Throwable t){
+                Log.err("Error applying custom rules, proceeding without them.", t);
+            }
+        });
+
         if(!mods.list().isEmpty()){
             info("&lc{0} mods loaded.", mods.list().size);
         }
 
-        info("&lcServer loaded. Type &ly'help'&lc for help.");
-        System.out.print("> ");
+        toggleSocket(Config.socketInput.bool());
 
-        if(Core.settings.getBool("socket")){
-            toggleSocket(true);
-        }
+        info("&lcServer loaded. Type &ly'help'&lc for help.");
     }
 
     private void registerCommands(){
@@ -179,7 +190,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("version", "Displays server version info.", arg -> {
-            info("&lmVersion: &lyMindustry {0}-{1} {2} / build {3}", Version.number, Version.modifier, Version.type, Version.build);
+            info("&lmVersion: &lyMindustry {0}-{1} {2} / build {3}", Version.number, Version.modifier, Version.type, Version.build + (Version.revision == 0 ? "" : "." + Version.revision));
             info("&lmJava Version: &ly{0}", System.getProperty("java.version"));
         });
 
@@ -236,29 +247,13 @@ public class ServerControl implements ApplicationListener{
             try{
                 world.loadMap(result, result.applyRules(lastMode));
                 state.rules = result.applyRules(preset);
-                applyRules();
                 logic.play();
 
                 info("Map loaded.");
 
-                host();
+                netServer.openServer();
             }catch(MapException e){
                 Log.err(e.map.name() + ": " + e.getMessage());
-            }
-        });
-
-        handler.register("port", "[port]", "Sets or displays the port for hosting the server.", arg -> {
-            if(arg.length == 0){
-                info("&lyPort: &lc{0}", Core.settings.getInt("port"));
-            }else{
-                int port = Strings.parseInt(arg[0]);
-                if(port < 0 || port > 65535){
-                    err("Port must be a number between 0 and 65535.");
-                    return;
-                }
-                info("&lyPort set to {0}.", port);
-                Core.settings.put("port", port);
-                Core.settings.save();
             }
         });
 
@@ -292,12 +287,12 @@ public class ServerControl implements ApplicationListener{
                 info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name()), state.wave);
 
                 if(state.rules.waves){
-                    info("&ly  {0} enemies.", unitGroups[Team.crux.ordinal()].size());
+                    info("&ly  {0} enemies.", state.enemies);
                 }else{
                     info("&ly  {0} seconds until next wave.", (int)(state.wavetime / 60));
                 }
 
-                info("  &ly{0} FPS, {1} MB used.", (int)(60f / Time.delta()), Core.app.getJavaHeap() / 1024 / 1024);
+                info("  &ly{0} FPS, {1} MB used.", Core.graphics.getFramesPerSecond(), Core.app.getJavaHeap() / 1024 / 1024);
 
                 if(playerGroup.size() > 0){
                     info("  &lyPlayers: {0}", playerGroup.size());
@@ -403,7 +398,7 @@ public class ServerControl implements ApplicationListener{
                         base.addChild(arg[1], value);
                         Log.info("Changed rule: &ly{0}", value.toString().replace("\n", " "));
                     }catch(Throwable e){
-                        Log.err("Error parsing rule JSON", e);
+                        Log.err("Error parsing rule JSON: {0}", e.getMessage());
                     }
                 }
 
@@ -418,34 +413,26 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            try{
-                Team team = arg.length == 0 ? Team.sharded : Team.valueOf(arg[0]);
+            Team team = arg.length == 0 ? Team.sharded : Structs.find(Team.all(), t -> t.name.equals(arg[0]));
 
-                if(state.teams.get(team).cores.isEmpty()){
-                    err("That team has no cores.");
-                    return;
-                }
-
-                for(Item item : content.items()){
-                    if(item.type == ItemType.material){
-                        state.teams.get(team).cores.first().entity.items.set(item, state.teams.get(team).cores.first().block().itemCapacity);
-                    }
-                }
-
-                info("Core filled.");
-            }catch(IllegalArgumentException ignored){
-                err("No such team exists.");
-            }
-        });
-
-        handler.register("name", "[name...]", "Change the server display name.", arg -> {
-            if(arg.length == 0){
-                info("Server name is currently &lc'{0}'.", Core.settings.getString("servername"));
+            if(team == null){
+                err("No team with that name found.");
                 return;
             }
-            Core.settings.put("servername", arg[0]);
-            Core.settings.save();
-            info("Server name is now &lc'{0}'.", arg[0]);
+
+            if(state.teams.cores(team).isEmpty()){
+                err("That team has no cores.");
+                return;
+            }
+
+            for(Item item : content.items()){
+                if(item.type == ItemType.material){
+                    state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().block.itemCapacity);
+                }
+            }
+
+            info("Core filled.");
+
         });
 
         handler.register("playerlimit", "[off/somenumber]", "Set the server player limit.", arg -> {
@@ -468,14 +455,40 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("whitelist", "[on/off...]", "Enable/disable whitelisting.", arg -> {
+        handler.register("config", "[name] [value...]", "Configure server settings.", arg -> {
             if(arg.length == 0){
-                info("Whitelist is currently &lc{0}.", netServer.admins.isWhitelistEnabled() ? "on" : "off");
+                info("&lyAll config values:");
+                for(Config c : Config.all){
+                    Log.info("&ly| &lc{0}:&lm {1}", c.name(), c.get());
+                    Log.info("&ly| | {0}", c.description);
+                    Log.info("&ly|");
+                }
                 return;
             }
-            boolean on = arg[0].equalsIgnoreCase("on");
-            netServer.admins.setWhitelist(on);
-            info("Whitelist is now &lc{0}.", on ? "on" : "off");
+
+            try{
+                Config c = Config.valueOf(arg[0]);
+                if(arg.length == 1){
+                    Log.info("&lc'{0}'&lg is currently &lc{1}.", c.name(), c.get());
+                }else{
+                    if(c.isBool()){
+                        c.set(arg[1].equals("on") || arg[1].equals("true"));
+                    }else if(c.isNum()){
+                        try{
+                            c.set(Integer.parseInt(arg[1]));
+                        }catch(NumberFormatException e){
+                            Log.err("Not a valid number: {0}", arg[1]);
+                            return;
+                        }
+                    }else if(c.isString()){
+                        c.set(arg[1]);
+                    }
+
+                    Log.info("&lc{0}&lg set to &lc{1}.", c.name(), c.get());
+                }
+            }catch(IllegalArgumentException e){
+                err("Unknown config: '{0}'. Run the command with no arguments to get a list of valid configs.", arg[0]);
+            }
         });
 
         handler.register("whitelisted", "List the entire whitelist.", arg -> {
@@ -508,67 +521,6 @@ public class ServerControl implements ApplicationListener{
 
             netServer.admins.unwhitelist(arg[0]);
             info("Player &ly'{0}'&lg has been un-whitelisted.", info.lastName);
-        });
-
-        handler.register("sync", "[on/off...]", "Enable/disable block sync. Experimental.", arg -> {
-            if(arg.length == 0){
-                info("Block sync is currently &lc{0}.", Core.settings.getBool("blocksync") ? "enabled" : "disabled");
-                return;
-            }
-            boolean on = arg[0].equalsIgnoreCase("on");
-            Core.settings.putSave("blocksync", on);
-            info("Block syncing is now &lc{0}.", on ? "on" : "off");
-        });
-
-        handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {
-            boolean value = arg[0].equalsIgnoreCase("on");
-            Core.settings.put("crashreport", value);
-            Core.settings.save();
-            info("Crash reporting is now {0}.", value ? "on" : "off");
-        });
-
-        handler.register("logging", "<on/off>", "Disables or enables server logs", arg -> {
-            boolean value = arg[0].equalsIgnoreCase("on");
-            Core.settings.put("logging", value);
-            Core.settings.save();
-            info("Logging is now {0}.", value ? "on" : "off");
-        });
-
-        handler.register("strict", "<on/off>", "Disables or enables strict mode", arg -> {
-            boolean value = arg[0].equalsIgnoreCase("on");
-            netServer.admins.setStrict(value);
-            info("Strict mode is now {0}.", netServer.admins.getStrict() ? "on" : "off");
-        });
-
-        handler.register("socketinput", "[on/off]", "Disables or enables a local TCP socket at port "+commandSocketPort+" to recieve commands from other applications", arg -> {
-            if(arg.length == 0){
-                info("Socket input is currently &lc{0}.", Core.settings.getBool("socket") ? "on" : "off");
-                return;
-            }
-
-            boolean value = arg[0].equalsIgnoreCase("on");
-            toggleSocket(value);
-            Core.settings.put("socket", value);
-            Core.settings.save();
-            info("Socket input is now &lc{0}.", value ? "on" : "off");
-        });
-
-        handler.register("allow-custom-clients", "[on/off]", "Allow or disallow custom clients.", arg -> {
-            if(arg.length == 0){
-                info("Custom clients are currently &lc{0}.", netServer.admins.allowsCustomClients() ? "allowed" : "disallowed");
-                return;
-            }
-
-            String s = arg[0];
-            if(s.equalsIgnoreCase("on")){
-                netServer.admins.setCustomClients(true);
-                info("Custom clients enabled.");
-            }else if(s.equalsIgnoreCase("off")){
-                netServer.admins.setCustomClients(false);
-                info("Custom clients disabled.");
-            }else{
-                err("Incorrect command usage.");
-            }
         });
 
         handler.register("shuffle", "[none/all/custom/builtin]", "Set map shuffling mode.", arg -> {
@@ -759,8 +711,8 @@ public class ServerControl implements ApplicationListener{
                     SaveIO.load(file);
                     state.rules.zone = null;
                     info("Save loaded.");
-                    host();
                     state.set(State.playing);
+                    netServer.openServer();
                 }catch(Throwable t){
                     err("Failed to load save. Outdated or corrupt file.");
                 }
@@ -833,15 +785,6 @@ public class ServerControl implements ApplicationListener{
         mods.eachClass(p -> p.registerClientCommands(netServer.clientCommands));
     }
 
-    private void applyRules(){
-        try{
-            JsonValue value = JsonIO.json().fromJson(null, Core.settings.getString("globalrules"));
-            JsonIO.json().readFields(state.rules, value);
-        }catch(Throwable t){
-            Log.err("Error applying custom rules, proceeding without them.", t);
-        }
-    }
-
     private void readCommands(){
 
         Scanner scan = new Scanner(System.in);
@@ -877,8 +820,6 @@ public class ServerControl implements ApplicationListener{
         }else if(response.type == ResponseType.manyArguments){
             err("Too many command arguments. Usage: " + response.command.text + " " + response.command.paramText);
         }
-
-        System.out.print("> ");
     }
 
     private void play(boolean wait, Runnable run){
@@ -894,9 +835,8 @@ public class ServerControl implements ApplicationListener{
 
             Call.onWorldDataBegin();
             run.run();
-            logic.play();
             state.rules = world.getMap().applyRules(lastMode);
-            applyRules();
+            logic.play();
 
             for(Player p : players){
                 if(p.con == null) continue;
@@ -929,19 +869,6 @@ public class ServerControl implements ApplicationListener{
         }
     }
 
-    private void host(){
-        try{
-            net.host(Core.settings.getInt("port"));
-            info("&lcOpened a server on port {0}.", Core.settings.getInt("port"));
-        }catch(BindException e){
-            Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");
-            state.set(State.menu);
-        }catch(IOException e){
-            err(e);
-            state.set(State.menu);
-        }
-    }
-
     private void logToFile(String text){
         if(currentLogFile != null && currentLogFile.length() > maxLogLength){
             String date = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss").format(LocalDateTime.now());
@@ -966,7 +893,7 @@ public class ServerControl implements ApplicationListener{
             socketThread = new Thread(() -> {
                 try{
                     serverSocket = new ServerSocket();
-                    serverSocket.bind(new InetSocketAddress("localhost", commandSocketPort));
+                    serverSocket.bind(new InetSocketAddress(Config.socketInputAddress.string(), Config.socketInputPort.num()));
                     while(true){
                         Socket client = serverSocket.accept();
                         info("&lmRecieved command socket connection: &lb{0}", serverSocket.getLocalSocketAddress());

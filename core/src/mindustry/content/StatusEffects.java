@@ -6,8 +6,7 @@ import mindustry.entities.Effects;
 import mindustry.ctype.ContentList;
 import mindustry.game.EventType.*;
 import mindustry.type.StatusEffect;
-
-import static mindustry.Vars.waveTeam;
+import static mindustry.Vars.*;
 
 public class StatusEffects implements ContentList{
     public static StatusEffect none, burning, freezing, wet, melting, tarred, overdrive, shielded, shocked, corroded, boss;
@@ -48,7 +47,7 @@ public class StatusEffects implements ContentList{
             init(() -> {
                 trans(shocked, ((unit, time, newTime, result) -> {
                     unit.damage(20f);
-                    if(unit.getTeam() == waveTeam){
+                    if(unit.getTeam() == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
                     result.set(this, time);

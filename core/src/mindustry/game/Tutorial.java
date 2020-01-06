@@ -10,6 +10,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -161,11 +162,11 @@ public class Tutorial{
         },
         withdraw(() -> event("withdraw")){
             void begin(){
-                state.teams.get(defaultTeam).cores.first().entity.items.add(Items.copper, 10);
+                state.teams.playerCores().first().items.add(Items.copper, 10);
             }
         },
         deposit(() -> event("deposit")),
-        waves(() -> state.wave > 2 && state.enemies() <= 0 && !spawner.isSpawning()){
+        waves(() -> state.wave > 2 && state.enemies <= 0 && !spawner.isSpawning()){
             void begin(){
                 state.rules.waveTimer = true;
                 logic.runWave();
@@ -239,18 +240,18 @@ public class Tutorial{
         //utility
 
         static void placeBlocks(){
-            Tile core = state.teams.get(defaultTeam).cores.first();
+            TileEntity core = state.teams.playerCores().first();
             for(int i = 0; i < blocksToBreak; i++){
-                world.removeBlock(world.ltile(core.x + blockOffset, core.y + i));
-                world.tile(core.x + blockOffset, core.y + i).setBlock(Blocks.scrapWall, defaultTeam);
+                world.ltile(core.tile.x + blockOffset, core.tile.y + i).remove();
+                world.tile(core.tile.x + blockOffset, core.tile.y + i).setBlock(Blocks.scrapWall, state.rules.defaultTeam);
             }
         }
 
         static boolean blocksBroken(){
-            Tile core = state.teams.get(defaultTeam).cores.first();
+            TileEntity core = state.teams.playerCores().first();
 
             for(int i = 0; i < blocksToBreak; i++){
-                if(world.tile(core.x + blockOffset, core.y + i).block() == Blocks.scrapWall){
+                if(world.tile(core.tile.x + blockOffset, core.tile.y + i).block() == Blocks.scrapWall){
                     return false;
                 }
             }
@@ -270,7 +271,7 @@ public class Tutorial{
         }
 
         static int item(Item item){
-            return state.teams.get(defaultTeam).cores.isEmpty() ? 0 : state.teams.get(defaultTeam).cores.first().entity.items.get(item);
+            return state.rules.defaultTeam.data().noCores() ? 0 : state.rules.defaultTeam.core().items.get(item);
         }
 
         static boolean toggled(String name){

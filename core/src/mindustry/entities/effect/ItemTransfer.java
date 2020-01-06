@@ -44,7 +44,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
         create(item, x, y, to, () -> to.addItem(item));
     }
 
-    @Remote(called = Loc.server)
+    @Remote(called = Loc.server, unreliable = true)
     public static void transferItemTo(Item item, int amount, float x, float y, Tile tile){
         if(tile == null || tile.entity == null || tile.entity.items == null) return;
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){

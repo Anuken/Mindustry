@@ -4,7 +4,7 @@ import arc.*;
 import arc.func.*;
 import mindustry.maps.*;
 
-import static mindustry.Vars.waveTeam;
+import static mindustry.Vars.*;
 
 /** Defines preset rule sets. */
 public enum Gamemode{
@@ -22,7 +22,7 @@ public enum Gamemode{
     attack(rules -> {
         rules.unitDrops = true;
         rules.attackMode = true;
-    }, map -> map.teams.contains(waveTeam.ordinal())),
+    }, map -> map.teams.contains((int)state.rules.waveTeam.id)),
     pvp(rules -> {
         rules.pvp = true;
         rules.enemyCoreBuildRadius = 600f;

@@ -864,7 +864,7 @@ public class Block extends BlockStorage{
         return ((size + 1) % 2) * tilesize / 2f;
     }
 
-    public Rectangle bounds(int x, int y, Rectangle rect){
+    public Rect bounds(int x, int y, Rect rect){
         return rect.setSize(size * tilesize).setCenter(x * tilesize + offset(), y * tilesize + offset());
     }
 

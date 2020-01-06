@@ -57,7 +57,7 @@ public class BuildBlock extends Block{
     public static void onDeconstructFinish(Tile tile, Block block, int builderID){
         Team team = tile.getTeam();
         Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
-        world.removeBlock(tile);
+        tile.remove();
         Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, true));
         if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
     }
@@ -66,7 +66,7 @@ public class BuildBlock extends Block{
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         if(tile == null) return;
         float healthf = tile.entity == null ? 1f : tile.entity.healthf();
-        world.setBlock(tile, block, team, rotation);
+        tile.set(block, team, rotation);
         if(tile.entity != null){
             tile.entity.health = block.health * healthf;
         }
@@ -171,9 +171,9 @@ public class BuildBlock extends Block{
             return;
         }
 
-        if(entity.previous == null) return;
+        if(entity.previous == null || entity.cblock == null) return;
 
-        if(Core.atlas.isFound(entity.previous.icon(mindustry.ui.Cicon.full))){
+        if(Core.atlas.isFound(entity.previous.icon(Cicon.full))){
             Draw.rect(entity.previous.icon(Cicon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.rotation() * 90 : 0);
         }
     }
@@ -257,7 +257,7 @@ public class BuildBlock extends Block{
             if(cblock != null){
                 ItemStack[] requirements = cblock.requirements;
                 if(requirements.length != accumulator.length || totalAccumulator.length != requirements.length){
-                    setDeconstruct(previous);
+                    setDeconstruct(cblock);
                 }
 
                 //make sure you take into account that you can't deconstruct more than there is deconstructed
@@ -337,16 +337,17 @@ public class BuildBlock extends Block{
         }
 
         public void setDeconstruct(Block previous){
+            if(previous == null) return;
             this.previous = previous;
             this.progress = 1f;
             if(previous.buildCost >= 0.01f){
                 this.cblock = previous;
-                this.accumulator = new float[previous.requirements.length];
-                this.totalAccumulator = new float[previous.requirements.length];
                 this.buildCost = previous.buildCost * state.rules.buildCostMultiplier;
             }else{
                 this.buildCost = 20f; //default no-requirement build cost is 20
             }
+            this.accumulator = new float[previous.requirements.length];
+            this.totalAccumulator = new float[previous.requirements.length];
         }
 
         @Override

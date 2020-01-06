@@ -23,7 +23,7 @@ public class CoreSpawnFilter extends GenerateFilter{
     public void apply(Tiles tiles, GenerateInput in){
         IntArray spawns = new IntArray();
         for(Tile tile : tiles){
-            if(tile.getTeam() == defaultTeam && tile.block() instanceof CoreBlock){
+            if(tile.getTeam() == state.rules.defaultTeam && tile.block() instanceof CoreBlock){
                 spawns.add(tile.pos());
             }
         }
@@ -32,8 +32,7 @@ public class CoreSpawnFilter extends GenerateFilter{
 
         int used = Math.min(spawns.size, amount);
         for(int i = used; i < spawns.size; i++){
-            Tile tile = tiles.getp(spawns.get(i));
-            world.removeBlock(tile);
+            tiles.getp(spawns.get(i)).remove();
         }
     }
 

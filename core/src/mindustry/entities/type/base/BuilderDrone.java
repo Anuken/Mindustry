@@ -1,10 +1,9 @@
 package mindustry.entities.type.base;
 
 import arc.*;
-import arc.struct.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
@@ -114,12 +113,10 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
     public BuilderDrone(){
         if(reset.check()){
             Events.on(BuildSelectEvent.class, event -> {
-                EntityGroup<BaseUnit> group = unitGroups[event.team.ordinal()];
-
                 if(!(event.tile.entity instanceof BuildEntity)) return;
 
-                for(BaseUnit unit : group.all()){
-                    if(unit instanceof BuilderDrone){
+                for(BaseUnit unit : unitGroup.all()){
+                    if(unit instanceof BuilderDrone && unit.getTeam() == getTeam()){
                         BuilderDrone drone = (BuilderDrone)unit;
                         if(drone.isBuilding()){
                             //stop building if opposite building begins.
@@ -189,7 +186,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
             }
 
             if(timer.get(timerTarget, 80) && Units.closestEnemy(getTeam(), x, y, 100f, u -> !(u instanceof BaseDrone)) == null && !isBuilding()){
-                TeamData data = Vars.state.teams.get(team);
+                TeamData data = team.data();
                 if(!data.brokenBlocks.isEmpty()){
                     BrokenBlock block = data.brokenBlocks.removeLast();
                     if(Build.validPlace(getTeam(), block.x, block.y, content.block(block.block), block.rotation)){

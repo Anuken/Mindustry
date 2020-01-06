@@ -240,7 +240,7 @@ task swapColors(){
                         Color.argb8888ToColor(tmpc, c)
                         if(tmpc.a < 0.1f) continue
                         if(map.containsKey(c)){
-                            img.setRGB(x, y, (int) map.get(c))
+                            img.setRGB(x, y, (int)map.get(c))
                         }
                     }
                 }

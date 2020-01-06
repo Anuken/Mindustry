@@ -12,7 +12,7 @@ import arc.util.pooling.*;
 import mindustry.gen.*;
 
 public class Bar extends Element{
-    private static Rectangle scissor = new Rectangle();
+    private static Rect scissor = new Rect();
 
     private Floatp fraction;
     private String name = "";

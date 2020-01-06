@@ -77,7 +77,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Tile tile = world.ltileWorld(x, y);
 
-            if(tile != null && tile.synthetic() && state.teams.areEnemies(player.getTeam(), tile.getTeam())){
+            if(tile != null && tile.synthetic() && player.getTeam().isEnemy(tile.getTeam())){
                 TileEntity entity = tile.entity;
                 player.setMineTile(null);
                 player.target = entity;
@@ -439,9 +439,11 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, KeyCode button){
-        if(state.is(State.menu) || player.isDead()) return false;
+        if(state.is(State.menu)) return false;
 
         down = true;
+
+        if(player.isDead()) return false;
 
         //get tile on cursor
         Tile cursor = tileAt(screenX, screenY);

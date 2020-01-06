@@ -8,6 +8,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
+import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.*;
@@ -65,7 +66,7 @@ public class PlayerListFragment extends Fragment{
 
         float h = 74f;
 
-        playerGroup.all().sort((p1, p2) -> p1.getTeam().compareTo(p2.getTeam()));
+        playerGroup.all().sort(Structs.comparing(Unit::getTeam));
         playerGroup.all().each(user -> {
             NetConnection connection = user.con;
 
@@ -129,7 +130,7 @@ public class PlayerListFragment extends Fragment{
                     t.addImageButton(Icon.zoomSmall, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
-            }else if((!user.isLocal && !user.isAdmin) && net.client() && playerGroup.size() >= 3){ //votekick
+            }else if((!user.isLocal && !user.isAdmin) && net.client() && playerGroup.size() >= 3 && player.getTeam() != user.getTeam()){ //votekick
                 button.add().growY();
 
                 button.addImageButton(Icon.banSmall, Styles.clearPartiali,

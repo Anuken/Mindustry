@@ -163,7 +163,7 @@ public class SchematicsDialog extends FloatingDialog{
                         setup();
                         ui.showInfoFade("$schematic.saved");
                         showInfo(s);
-                    }catch(Exception e){
+                    }catch(Throwable e){
                         ui.showException(e);
                     }
                 }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith(schematicBaseStart));

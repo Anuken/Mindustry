@@ -17,11 +17,11 @@ public class EntityCollisions{
     private static final float seg = 1f;
 
     //tile collisions
-    private Rectangle tmp = new Rectangle();
+    private Rect tmp = new Rect();
     private Vec2 vector = new Vec2();
     private Vec2 l1 = new Vec2();
-    private Rectangle r1 = new Rectangle();
-    private Rectangle r2 = new Rectangle();
+    private Rect r1 = new Rect();
+    private Rect r2 = new Rect();
 
     //entity collisions
     private Array<SolidTrait> arrOut = new Array<>();
@@ -57,7 +57,7 @@ public class EntityCollisions{
 
     public void moveDelta(SolidTrait entity, float deltax, float deltay, boolean x){
 
-        Rectangle rect = r1;
+        Rect rect = r1;
         entity.hitboxTile(rect);
         entity.hitboxTile(r2);
         rect.x += deltax;
@@ -84,7 +84,7 @@ public class EntityCollisions{
         entity.setY(entity.getY() + rect.y - r2.y);
     }
 
-    public boolean overlapsTile(Rectangle rect){
+    public boolean overlapsTile(Rect rect){
         rect.getCenter(vector);
         int r = 1;
 

@@ -18,11 +18,10 @@ import mindustry.entities.effect.*;
 import mindustry.entities.effect.GroundEffectEntity.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
-import mindustry.ui.Cicon;
+import mindustry.ui.*;
 import mindustry.world.blocks.defense.ForceProjector.*;
 
 import static arc.Core.*;
@@ -42,7 +41,7 @@ public class Renderer implements ApplicationListener{
     private float camerascale = targetscale;
     private float landscale = 0f, landTime;
     private float minZoomScl = Scl.scl(0.01f);
-    private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
+    private Rect rect = new Rect(), rect2 = new Rect();
     private float shakeIntensity, shaketime;
 
     public Renderer(){
@@ -57,8 +56,8 @@ public class Renderer implements ApplicationListener{
         Effects.setEffectProvider((effect, color, x, y, rotation, data) -> {
             if(effect == Fx.none) return;
             if(Core.settings.getBool("effects")){
-                Rectangle view = camera.bounds(rect);
-                Rectangle pos = rect2.setSize(effect.size).setCenter(x, y);
+                Rect view = camera.bounds(rect);
+                Rect pos = rect2.setSize(effect.size).setCenter(x, y);
 
                 if(view.overlaps(pos)){
 
@@ -124,12 +123,14 @@ public class Renderer implements ApplicationListener{
 
             if(player.isDead()){
                 TileEntity core = player.getClosestCore();
-                if(core != null && player.spawner == null){
-                    camera.position.lerpDelta(core.x, core.y, 0.08f);
-                }else{
-                    camera.position.lerpDelta(position, 0.08f);
+                if(core != null){
+                    if(player.spawner == null){
+                        camera.position.lerpDelta(core.x, core.y, 0.08f);
+                    }else{
+                        camera.position.lerpDelta(position, 0.08f);
+                    }
                 }
-            }else if(control.input instanceof DesktopInput){
+            }else if(control.input instanceof DesktopInput && !state.isPaused()){
                 camera.position.lerpDelta(position, 0.08f);
             }
 
@@ -344,11 +345,7 @@ public class Renderer implements ApplicationListener{
             Draw.rect("circle-shadow", u.x, u.y, size * rad, size * rad);
         };
 
-        for(EntityGroup<? extends BaseUnit> group : unitGroups){
-            if(!group.isEmpty()){
-                group.draw(unit -> !unit.isDead(), draw::get);
-            }
-        }
+        unitGroup.draw(unit -> !unit.isDead(), draw::get);
 
         if(!playerGroup.isEmpty()){
             playerGroup.draw(unit -> !unit.isDead(), draw::get);
@@ -361,34 +358,21 @@ public class Renderer implements ApplicationListener{
         float trnsX = -12, trnsY = -13;
         Draw.color(0, 0, 0, 0.22f);
 
-        for(EntityGroup<? extends BaseUnit> group : unitGroups){
-            if(!group.isEmpty()){
-                group.draw(unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
-            }
-        }
-
-        if(!playerGroup.isEmpty()){
-            playerGroup.draw(unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
-        }
+        unitGroup.draw(unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
+        playerGroup.draw(unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
 
         Draw.color();
     }
 
     private void drawAllTeams(boolean flying){
-        for(Team team : Team.all){
-            EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
+        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
+        playerGroup.draw(p -> p.isFlying() == flying && !p.isDead(), Unit::drawUnder);
 
-            if(group.count(p -> p.isFlying() == flying) + playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
+        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
+        playerGroup.draw(p -> p.isFlying() == flying, Unit::drawAll);
 
-            unitGroups[team.ordinal()].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
-            playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
-
-            unitGroups[team.ordinal()].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
-            playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
-
-            unitGroups[team.ordinal()].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
-            playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
-        }
+        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
+        playerGroup.draw(p -> p.isFlying() == flying, Unit::drawOver);
     }
 
     public void scaleCamera(float amount){

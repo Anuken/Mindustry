@@ -28,7 +28,7 @@ public class MapView extends Element implements GestureListener{
     private boolean grid = false;
     private GridImage image = new GridImage(0, 0);
     private Vec2 vec = new Vec2();
-    private Rectangle rect = new Rectangle();
+    private Rect rect = new Rect();
     private Vec2[][] brushPolygons = new Vec2[MapEditor.brushSizes.length][0];
 
     private boolean drawing;

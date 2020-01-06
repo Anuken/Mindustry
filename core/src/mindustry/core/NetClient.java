@@ -160,9 +160,17 @@ public class NetClient implements ApplicationListener{
             throw new ValidateException(player, "Player has sent a message above the text limit.");
         }
 
+        String original = message;
+
         //check if it's a command
         CommandResponse response = netServer.clientCommands.handleMessage(message, player);
         if(response.type == ResponseType.noCommand){ //no command to handle
+            message = netServer.admins.filterMessage(player, message);
+            //supress chat message if it's filtered out
+            if(message == null){
+                return;
+            }
+
             //server console logging
             Log.info("&y{0}: &lb{1}", player.name, message);
 
@@ -190,7 +198,7 @@ public class NetClient implements ApplicationListener{
             }
         }
 
-        Events.fire(new PlayerChatEvent(player, message));
+        Events.fire(new PlayerChatEvent(player, message, original));
     }
 
     public static String colorizeName(int id, String name){

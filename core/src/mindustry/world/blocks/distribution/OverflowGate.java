@@ -81,11 +81,11 @@ public class OverflowGate extends Block{
         if(to == null) return null;
         Tile edge = Edges.getFacingEdge(tile, to);
 
-        if(!to.block().acceptItem(item, to, edge) || (to.block() instanceof OverflowGate)){
+        if(!to.block().acceptItem(item, to, edge) || to.getTeam() != tile.getTeam() || (to.block() instanceof OverflowGate)){
             Tile a = tile.getNearby(Mathf.mod(from - 1, 4));
             Tile b = tile.getNearby(Mathf.mod(from + 1, 4));
-            boolean ac = a != null && a.block().acceptItem(item, a, edge) && !(a.block() instanceof OverflowGate);
-            boolean bc = b != null && b.block().acceptItem(item, b, edge) && !(b.block() instanceof OverflowGate);
+            boolean ac = a != null && a.block().acceptItem(item, a, edge) && !(a.block() instanceof OverflowGate) && a.getTeam() == tile.getTeam();
+            boolean bc = b != null && b.block().acceptItem(item, b, edge) && !(b.block() instanceof OverflowGate) && b.getTeam() == tile.getTeam();
 
             if(!ac && !bc){
                 return null;

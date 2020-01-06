@@ -27,6 +27,7 @@ public class PowerTestFixture{
     @BeforeAll
     static void initializeDependencies(){
         Core.graphics = new FakeGraphics();
+        Vars.state = new GameState();
         Vars.content = new ContentLoader(){
             @Override
             public void handleMappableContent(MappableContent content){

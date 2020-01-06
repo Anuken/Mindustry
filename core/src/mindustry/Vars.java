@@ -21,6 +21,7 @@ import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.maps.*;
 import mindustry.mod.*;
+import mindustry.net.*;
 import mindustry.net.Net;
 import mindustry.type.Weather.*;
 import mindustry.world.blocks.defense.ForceProjector.*;
@@ -54,18 +55,16 @@ public class Vars implements Loadable{
     public static final String crashReportURL = "http://192.99.169.18/report";
     /** URL the links to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/";
-    /** URL to the JSON file containing all the global, public servers. */
+    /** URL to the JSON file containing all the global, public servers. Not queried in BE. */
     public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers.json";
+    /** URL to the JSON file containing all the BE servers. Only queried in BE. */
+    public static final String serverJsonBeURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_be.json";
     /** URL the links to the wiki's modding guide.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?template=bug_report.md";
     /** list of built-in servers.*/
     public static final Array<String> defaultServers = Array.with();
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
-    /** team of the player by default */
-    public static final Team defaultTeam = Team.sharded;
-    /** team of the enemy in waves/sectors */
-    public static final Team waveTeam = Team.crux;
     /** whether to enable editing of units in the editor */
     public static final boolean enableUnitEditing = false;
     /** max chat message length */
@@ -129,9 +128,9 @@ public class Vars implements Loadable{
     public static Fi dataDirectory;
     /** data subdirectory used for screenshots */
     public static Fi screenshotDirectory;
-    /** data subdirectory used for custom mmaps */
+    /** data subdirectory used for custom maps */
     public static Fi customMapDirectory;
-    /** data subdirectory used for custom mmaps */
+    /** data subdirectory used for custom map previews */
     public static Fi mapPreviewDirectory;
     /** tmp subdirectory for map conversion */
     public static Fi tmpDirectory;
@@ -141,6 +140,8 @@ public class Vars implements Loadable{
     public static Fi modDirectory;
     /** data subdirectory used for schematics */
     public static Fi schematicDirectory;
+    /** data subdirectory used for bleeding edge build versions */
+    public static Fi bebuildDirectory;
     /** map file extension */
     public static final String mapExtension = "msav";
     /** save file extension */
@@ -162,6 +163,7 @@ public class Vars implements Loadable{
     public static Platform platform = new Platform(){};
     public static Mods mods;
     public static Schematics schematics = new Schematics();
+    public static BeControl becontrol;
 
     public static World world;
     public static Maps maps;
@@ -186,7 +188,7 @@ public class Vars implements Loadable{
     public static EntityGroup<Puddle> puddleGroup;
     public static EntityGroup<Fire> fireGroup;
     public static EntityGroup<WeatherEntity> weatherGroup;
-    public static EntityGroup<BaseUnit>[] unitGroups;
+    public static EntityGroup<BaseUnit> unitGroup;
 
     public static Player player;
 
@@ -226,6 +228,7 @@ public class Vars implements Loadable{
         defaultWaves = new DefaultWaves();
         collisions = new EntityCollisions();
         world = new World();
+        becontrol = new BeControl();
 
         maps = new Maps();
         spawner = new WaveSpawner();
@@ -241,12 +244,8 @@ public class Vars implements Loadable{
         puddleGroup = entities.add(Puddle.class).enableMapping();
         shieldGroup = entities.add(ShieldEntity.class, false);
         fireGroup = entities.add(Fire.class).enableMapping();
+        unitGroup = entities.add(BaseUnit.class).enableMapping();
         weatherGroup = entities.add(WeatherEntity.class);
-        unitGroups = new EntityGroup[Team.all.length];
-
-        for(Team team : Team.all){
-            unitGroups[team.ordinal()] = entities.add(BaseUnit.class).enableMapping();
-        }
 
         for(EntityGroup<?> group : entities.all()){
             group.setRemoveListener(entity -> {
@@ -271,6 +270,7 @@ public class Vars implements Loadable{
         tmpDirectory = dataDirectory.child("tmp/");
         modDirectory = dataDirectory.child("mods/");
         schematicDirectory = dataDirectory.child("schematics/");
+        bebuildDirectory = dataDirectory.child("be_builds/");
 
         modDirectory.mkdirs();
 
