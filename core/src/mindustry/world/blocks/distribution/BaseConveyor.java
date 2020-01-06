@@ -21,16 +21,17 @@ abstract public class BaseConveyor extends Block implements Autotiler{
 
     public BaseConveyor(String name){
         super(name);
+
         rotate = true;
         update = true;
-        layer = Layer.overlay;
-        group = BlockGroup.transportation;
         hasItems = true;
         itemCapacity = 4;
+        unloadable = false;
+        layer = Layer.overlay;
+        idleSoundVolume = 0.004f;
         conveyorPlacement = true;
         idleSound = Sounds.conveyor;
-        idleSoundVolume = 0.004f;
-        unloadable = false;
+        group = BlockGroup.transportation;
     }
 
     @Override

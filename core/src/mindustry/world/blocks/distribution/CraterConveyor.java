@@ -78,6 +78,7 @@ public class CraterConveyor extends BaseConveyor{
         // draw crater
         Draw.rect(crater, Tmp.v1.x, Tmp.v1.y, rotation - 90);
 
+        // failsafe
         if(entity.dominant() == null) return;
 
         // draw resource

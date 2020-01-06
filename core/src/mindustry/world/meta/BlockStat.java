@@ -26,7 +26,6 @@ public enum BlockStat{
 
     input(StatCategory.crafting),
     output(StatCategory.crafting),
-    throughput(StatCategory.crafting),
     productionTime(StatCategory.crafting),
     drillTier(StatCategory.crafting),
     drillSpeed(StatCategory.crafting),
