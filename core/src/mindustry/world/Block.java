@@ -17,6 +17,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
+import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.ctype.ContentType;
 import mindustry.entities.*;
@@ -248,6 +249,14 @@ public class Block extends BlockStorage{
     }
 
     public void drawLawn(Tile tile){
+    }
+
+    public boolean shouldLawn(Tile direction){
+        if(direction == null) return false;
+        if(direction.link().block == Blocks.air) return false;
+        if(direction.link().block().size == 1) return false;
+
+        return true;
     }
 
     public void drawCracks(Tile tile){

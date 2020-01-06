@@ -80,7 +80,8 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public void drawLawn(Tile tile){
-        draw(tile, tile.getNearby(tile.rotation()));
+        if(shouldLawn(tile.getNearby(tile.rotation()))) draw(tile, tile.getNearby(tile.rotation()));
+        if(shouldLawn(tile.getNearby((tile.rotation() + 2) % 4))) draw(tile, tile.getNearby((tile.rotation() + 2) % 4));
     }
 
     protected void draw(Tile tile, Position on){
