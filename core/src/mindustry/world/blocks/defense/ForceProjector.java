@@ -91,7 +91,7 @@ public class ForceProjector extends Block{
 
         Draw.color(Pal.accent);
         Lines.stroke(1f);
-        Lines.poly(x * tilesize, y * tilesize, 6, radius, rotation * 90f + 90f);
+        Lines.poly(x * tilesize, y * tilesize, 6, radius, (rotation + 1) * 90f);
         Draw.color();
     }
 
