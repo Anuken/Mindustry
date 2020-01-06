@@ -176,4 +176,9 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
         }
         targetItem = Structs.findMin(type.toMine, indexer::hasOre, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
     }
+
+    @Override
+    public TileEntity getClosestCore(){
+        return getSpawner().entity;
+    }
 }

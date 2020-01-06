@@ -1627,7 +1627,7 @@ public class Blocks implements ContentList{
         //endregion
         //region units
 
-        draugFactory = new UnitFactory("draug-factory"){{
+        draugFactory = new MinerFactory("draug-factory"){{
             requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
             unitType = UnitTypes.draug;
             produceTime = 2500;
