@@ -162,6 +162,16 @@ public class MassDriver extends Block{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Drawf.dashCircle(x * tilesize, y*tilesize, range, Pal.accent);
+
+        // check if a mass driver is selected while placing this driver
+        if(!control.input.frag.config.isShown()) return;
+        Tile selected = control.input.frag.config.getSelectedTile();
+        if(!(selected.block() instanceof MassDriver) || !(selected.dst(x * tilesize, y * tilesize) <= range)) return;
+
+        // if so, draw a dotted line towards it while it is in range
+        Lines.stroke(2f, Pal.placing);
+        Lines.dashLine(x * tilesize, y * tilesize, selected.drawx(), selected.drawy(), (int)range / tilesize / 4);
+        Draw.reset();
     }
 
     @Override
