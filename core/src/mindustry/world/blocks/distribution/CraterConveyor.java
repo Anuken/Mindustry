@@ -119,6 +119,9 @@ public class CraterConveyor extends BaseConveyor{
         if(shouldLaunch(tile)){
             Tile destination = tile.front();
 
+            // prevent trading
+            if(destination.getTeam() != tile.getTeam()) return;
+
             // update the target first to potentially make room
             destination.block().update(destination);
 
