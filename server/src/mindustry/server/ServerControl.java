@@ -174,12 +174,17 @@ public class ServerControl implements ApplicationListener{
 
         Events.on(WaveEvent.class, e -> {
             if(state.is(State.playing) && Config.enableAutosave.bool()){
-                Fi file = saveDirectory.child("autosave-" + Strings.capitalize(world.getMap().name()) + "-" + state.wave + "." + saveExtension);
+                Fi dir = saveDirectory.child("autosaves");
+                Fi file = dir.child(Strings.capitalize(world.getMap().name()) + "-" + state.wave + "." + saveExtension);
+                Fi oldSave = dir.child(Strings.capitalize(world.getMap().name()) + "-" + (state.wave-5) + "." + saveExtension);
                 
                 Core.app.post(() -> {
                     try{
                         SaveIO.save(file);
-                        info("&lbAutosave completed.");
+                        if(oldSave != null && oldSave.exists()){
+                            oldSave.delete();
+                        }
+                        info("&lbAutosave Wave " + state.wave + " completed.");
                     }catch(Exception ex){
                         Log.err("Autosave failed.", ex);
                     }
@@ -750,9 +755,21 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("saves", "List all saves in the save directory.", arg -> {
             info("Save files: ");
-            for(Fi file : saveDirectory.list()){
+            Fi[] list = saveDirectory.list();
+            Arrays.sort(list, Comparator.comparing(Fi::name));
+            for(Fi file : list){
                 if(file.extension().equals(saveExtension)){
                     info("| &ly{0}", file.nameWithoutExtension());
+                }
+            }
+            if(Config.enableAutosave.bool()){
+                info("Auto Save files: ");
+                list = saveDirectory.child("autosaves").list();
+                Arrays.sort(list, Comparator.comparing(Fi::name));
+                for(Fi file : list){
+                    if(file.extension().equals(saveExtension)){
+                        info("| autosaves/&ly{0}", file.nameWithoutExtension());
+                    }
                 }
             }
         });
