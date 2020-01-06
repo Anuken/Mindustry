@@ -45,7 +45,6 @@ public class CraterConveyor extends BaseConveyor{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.maxUnits, 1, StatUnit.none);
         stats.add(BlockStat.boostEffect, "$blocks.itemcapacity");
         stats.add(BlockStat.throughput, speed * 60, StatUnit.perSecond);
     }
