@@ -126,7 +126,7 @@ public class CraterConveyor extends BaseConveyor{
 
             // when near the center of the target tile...
             if(entity.reload < 0.25f){
-                if(!(destination.block() instanceof CraterConveyor)){ // ...and if its not a crater conveyor, start unloading (everything)
+                if(!(destination.block() instanceof CraterConveyor) && entity.link != tile.pos()){ // ...and if its not a crater conveyor, start unloading (everything)
                     while(entity.items.total() > 0 && entity.dominant() != null && offloadDir(tile, entity.dominant())) entity.items.remove(entity.dominant(), 1);
                 }
             }
