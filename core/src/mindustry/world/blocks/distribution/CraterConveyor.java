@@ -4,7 +4,6 @@ import arc.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.ui.*;
-import arc.math.geom.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import arc.graphics.g2d.*;
@@ -13,7 +12,6 @@ import mindustry.entities.*;
 import mindustry.graphics.*;
 import arc.scene.ui.layout.*;
 import mindustry.world.meta.*;
-import mindustry.entities.type.*;
 
 import java.io.*;
 
@@ -46,7 +44,7 @@ public class CraterConveyor extends BaseConveyor{
         super.setStats();
 
         stats.add(BlockStat.boostEffect, "$blocks.itemcapacity");
-        stats.add(BlockStat.throughput, speed * 60, StatUnit.perSecond);
+        stats.add(BlockStat.itemsMoved, speed * 60, StatUnit.perSecond);
     }
 
     @Override
