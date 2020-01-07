@@ -15,7 +15,7 @@ public class PlanetRenderer{
         Gl.clear(Gl.depthBufferBit);
 
         Tmp.v1.trns(Time.time() *  2f, 30f);
-        cam.position.set(Tmp.v1.x, Tmp.v1.y, 5);
+        cam.position.set(Tmp.v1.x, Tmp.v1.y, 10);
         cam.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         cam.lookAt(0, 0, 0);
         cam.update();
@@ -25,6 +25,12 @@ public class PlanetRenderer{
         rend.vertex(0f, 0f, 0f);
         rend.color(Color.green);
         rend.vertex(0f, 5f, 0f);
+        rend.color(Color.blue);
+        rend.vertex(0f, 5f, 5f);
+        rend.color(Color.red);
+        rend.vertex(0f, 0f, 0f);
+        rend.color(Color.green);
+        rend.vertex(0f, 0f, 5f);
         rend.color(Color.blue);
         rend.vertex(0f, 5f, 5f);
         rend.end();
