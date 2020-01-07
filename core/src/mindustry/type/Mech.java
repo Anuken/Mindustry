@@ -2,9 +2,11 @@ package mindustry.type;
 
 import arc.Core;
 import arc.graphics.Color;
-import arc.graphics.g2d.TextureRegion;
+import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.scene.ui.layout.Table;
 import arc.util.ArcAnnotate.*;
+import arc.util.Time;
 import mindustry.ctype.ContentType;
 import mindustry.entities.type.Player;
 import mindustry.ctype.UnlockableContent;
@@ -32,6 +34,13 @@ public class Mech extends UnlockableContent{
     public boolean canHeal = false;
     public float compoundSpeed, compoundSpeedBoost;
 
+    /** draw the health and team indicator */
+    public boolean drawCell = true;
+    /** draw the items on its back */
+    public boolean drawItems = true;
+    /** draw the engine light if it's flying/boosting */
+    public boolean drawLight = true;
+
     public float weaponOffsetX, weaponOffsetY, engineOffset = 5f, engineSize = 2.5f;
     public @NonNull Weapon weapon;
 
@@ -50,6 +59,24 @@ public class Mech extends UnlockableContent{
     }
 
     public void draw(Player player){
+    }
+
+    public void drawStats(Player player){
+        if(drawCell){
+            float health = player.healthf();
+            Draw.color(Color.black, player.getTeam().color, health + Mathf.absin(Time.time(), health * 5f, 1f - health));
+            Draw.rect(player.getPowerCellRegion(),
+                player.x + Angles.trnsx(player.rotation, cellTrnsY, 0f),
+                player.y + Angles.trnsy(player.rotation, cellTrnsY, 0f),
+                player.rotation - 90);
+            Draw.reset();
+        }
+        if(drawItems){
+            player.drawBackItems();
+        }
+        if(drawLight){
+            player.drawLight();
+        }
     }
 
     public float getExtraArmor(Player player){
