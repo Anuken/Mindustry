@@ -72,7 +72,7 @@ public class Mech extends UnlockableContent{
             Draw.reset();
         }
         if(drawItems){
-            player.drawBackItems(player.getItemtime(), player.isLocal);
+            player.drawBackItems();
         }
         if(drawLight){
             player.drawLight();
