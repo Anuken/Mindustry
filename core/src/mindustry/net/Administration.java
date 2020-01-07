@@ -2,6 +2,7 @@ package mindustry.net;
 
 import arc.*;
 import arc.struct.*;
+import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -19,6 +20,38 @@ public class Administration{
 
     public Administration(){
         load();
+
+        //anti-spam
+        addChatFilter((player, message) -> {
+            long resetTime = Config.messageRateLimit.num() * 1000;
+            if(Config.antiSpam.bool() && !player.isLocal && !player.isAdmin){
+                //prevent people from spamming messages quickly
+                if(resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime){
+                    //supress message
+                    player.sendMessage("[scarlet]You may only send messages every " + Config.messageRateLimit.num() + " seconds.");
+                    player.getInfo().messageInfractions ++;
+                    //kick player for spamming and prevent connection if they've done this several times
+                    if(player.getInfo().messageInfractions >= Config.messageSpamKick.num() && Config.messageSpamKick.num() != 0){
+                        player.con.kick("You have been kicked for spamming.", 1000 * 60 * 2);
+                    }
+                    player.getInfo().lastSentMessage = message;
+                    return null;
+                }else{
+                    player.getInfo().messageInfractions = 0;
+                }
+
+                //prevent players from sending the same message twice in the span of 50 seconds
+                if(message.equals(player.getInfo().lastSentMessage) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 50){
+                    player.sendMessage("[scarlet]You may not send the same message twice.");
+                    return null;
+                }
+
+                player.getInfo().lastSentMessage = message;
+                player.getInfo().lastMessageTime = Time.millis();
+            }
+
+            return message;
+        });
     }
 
     /** Adds a chat filter. This will transform the chat messages of every player.
@@ -326,6 +359,9 @@ public class Administration{
         crashReport("Whether to send crash reports.", false, "crashreport"),
         logging("Whether to log everything to files.", true),
         strict("Whether strict mode is on - corrects positions and prevents duplicate UUIDs.", true),
+        antiSpam("Whether spammers are automatically kicked and rate-limited.", true),
+        messageRateLimit("Message rate limit in seconds. 0 to disable.", 0),
+        messageSpamKick("How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
         socketInput("Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputPort("The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputAddress("The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
@@ -402,7 +438,11 @@ public class Administration{
         public int timesKicked;
         public int timesJoined;
         public boolean banned, admin;
-        public long lastKicked; //last kicked timestamp
+        public long lastKicked; //last kicked time to expiration
+
+        public transient long lastMessageTime, lastSyncTime;
+        public transient String lastSentMessage;
+        public transient int messageInfractions;
 
         PlayerInfo(String id){
             this.id = id;

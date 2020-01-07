@@ -356,7 +356,7 @@ public class Bloom{
             blurShader.dispose();
             bloomShader.dispose();
             tresholdShader.dispose();
-        }catch(Exception ignored){
+        }catch(Throwable ignored){
 
         }
     }
