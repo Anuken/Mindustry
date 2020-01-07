@@ -83,7 +83,7 @@ public class CraterConveyor extends BaseConveyor{
 
         // draw resource
         float size = itemSize / 2f;
-        size += entity.items.total() * 0.1;
+        size += entity.items.total() * 0.1f / (itemCapacity / 8f);
         Draw.rect(entity.dominant().icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
     }
 
