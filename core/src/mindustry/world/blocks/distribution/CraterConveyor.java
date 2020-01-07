@@ -107,7 +107,6 @@ public class CraterConveyor extends BaseConveyor{
         }else{
             // poof out crater
             if(entity.items.total() == 0){
-                Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
                 entity.link = Pos.invalid;
                 return;
             }
@@ -129,6 +128,7 @@ public class CraterConveyor extends BaseConveyor{
             if(entity.reload < 0.25f){
                 if(!(destination.block() instanceof CraterConveyor) && (entity.link != tile.pos() || !isStart(tile))){ // ...and if its not a crater conveyor, start unloading (everything)
                     while(entity.items.total() > 0 && entity.dominant() != null && offloadDir(tile, entity.dominant())) entity.items.remove(entity.dominant(), 1);
+                    if(entity.items.total() == 0) Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
                 }
             }
 
@@ -196,6 +196,13 @@ public class CraterConveyor extends BaseConveyor{
         if(tile.front() == source) return false;
 
         return true;
+    }
+
+    @Override
+    public int removeStack(Tile tile, Item item, int amount){
+        int i = super.removeStack(tile, item, amount);
+        if(tile.entity.items.total() == 0) Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
+        return i;
     }
 
     @Override
