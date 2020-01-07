@@ -413,6 +413,12 @@ public class NetServer implements ApplicationListener{
             if(player.isLocal){
                 player.sendMessage("[scarlet]Re-synchronizing as the host is pointless.");
             }else{
+                if(Time.timeSinceMillis(player.getInfo().lastSyncTime) < 1000 * 5){
+                    player.sendMessage("[scarlet]You may only /sync every 5 seconds.");
+                    return;
+                }
+
+                player.getInfo().lastSyncTime = Time.millis();
                 Call.onWorldDataBegin(player.con);
                 netServer.sendWorldData(player);
             }

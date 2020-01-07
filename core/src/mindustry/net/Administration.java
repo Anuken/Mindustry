@@ -34,19 +34,19 @@ public class Administration{
                     if(player.getInfo().messageInfractions >= Config.messageSpamKick.num() && Config.messageSpamKick.num() != 0){
                         player.con.kick("You have been kicked for spamming.", 1000 * 60 * 2);
                     }
-                    player.lastText = message;
+                    player.getInfo().lastSentMessage = message;
                     return null;
                 }else{
                     player.getInfo().messageInfractions = 0;
                 }
 
                 //prevent players from sending the same message twice in the span of 50 seconds
-                if(message.equals(player.lastText) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 50){
+                if(message.equals(player.getInfo().lastSentMessage) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 50){
                     player.sendMessage("[scarlet]You may not send the same message twice.");
                     return null;
                 }
 
-                player.lastText = message;
+                player.getInfo().lastSentMessage = message;
                 player.getInfo().lastMessageTime = Time.millis();
             }
 
@@ -440,7 +440,7 @@ public class Administration{
         public boolean banned, admin;
         public long lastKicked; //last kicked time to expiration
 
-        public transient long lastMessageTime;
+        public transient long lastMessageTime, lastSyncTime;
         public transient String lastSentMessage;
         public transient int messageInfractions;
 
