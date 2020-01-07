@@ -143,9 +143,7 @@ public class AndroidLauncher extends AndroidApplication{
 
         }, new AndroidApplicationConfiguration(){{
             useImmersiveMode = true;
-            depth = 0;
             hideStatusBar = true;
-            //errorHandler = ModCrashHandler::handle;
         }});
         checkFiles(getIntent());
     }

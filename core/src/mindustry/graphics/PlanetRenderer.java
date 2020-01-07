@@ -12,9 +12,10 @@ public class PlanetRenderer{
 
     public void draw(){
         Draw.flush();
+        Gl.clear(Gl.depthBufferBit);
 
         Tmp.v1.trns(Time.time() *  2f, 30f);
-        cam.position.set(Tmp.v1.x, Tmp.v1.y, 0);
+        cam.position.set(Tmp.v1.x, Tmp.v1.y, 5);
         cam.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         cam.lookAt(0, 0, 0);
         cam.update();
