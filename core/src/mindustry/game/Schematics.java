@@ -142,6 +142,7 @@ public class Schematics implements Loadable{
                 ui.showException(e);
             }
         }
+        all.sort();
     }
 
     public void savePreview(Schematic schematic, Fi file){
@@ -280,6 +281,7 @@ public class Schematics implements Loadable{
             ui.showException(e);
             Log.err(e);
         }
+        all.sort();
     }
 
     public void remove(Schematic s){
@@ -292,6 +294,7 @@ public class Schematics implements Loadable{
             previews.get(s).dispose();
             previews.remove(s);
         }
+        all.sort();
     }
 
     /** Creates a schematic from a world selection. */

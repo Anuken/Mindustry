@@ -333,7 +333,8 @@ public class Administration{
         whitelist("Whether the whitelist is used.", false),
         authEnabled("Whether authentication is enabled.", false, "authentication-enabled"),
         authServer("The server used for authenticating players.", Vars.defaultAuthServer, "authentication-server"),
-        authVerifyIP("Whether IPs of connecting players should be checked with the authentication server.", true, "authentication-verify-ip");
+        authVerifyIP("Whether IPs of connecting players should be checked with the authentication server.", true, "authentication-verify-ip"),
+        motd("The message displayed to people on connection.", "off");
 
         public static final Config[] all = values();
 

@@ -15,7 +15,7 @@ public class BundleLauncher{
         OrderedMap<String, String> base = new OrderedMap<>();
         PropertiesUtils.load(base, new InputStreamReader(new FileInputStream(file)));
         Array<String> removals = new Array<>();
-        Fi.get("").walk(child -> {
+        Fi.get(".").walk(child -> {
             if(child.name().equals("bundle.properties") || child.isDirectory() || child.toString().contains("output"))
                 return;
 

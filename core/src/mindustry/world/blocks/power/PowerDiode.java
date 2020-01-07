@@ -27,7 +27,7 @@ public class PowerDiode extends Block{
     public void update(Tile tile){
         super.update(tile);
 
-        if(tile.front() == null || tile.back() == null || !tile.back().block().hasPower || !tile.front().block().hasPower) return;
+        if(tile.front() == null || tile.back() == null || !tile.back().block().hasPower || !tile.front().block().hasPower || tile.back().getTeam() != tile.front().getTeam()) return;
 
         PowerGraph backGraph = tile.back().entity.power.graph;
         PowerGraph frontGraph = tile.front().entity.power.graph;

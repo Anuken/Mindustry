@@ -333,8 +333,8 @@ public class ContentParser{
     }
 
     private void readBundle(ContentType type, String name, JsonValue value){
-        UnlockableContent cont = Vars.content.getByName(type, name) instanceof UnlockableContent ?
-                                Vars.content.getByName(type, name) : null;
+        UnlockableContent cont = locate(type, name) instanceof UnlockableContent ?
+            locate(type, name) : null;
 
         String entryName = cont == null ? type + "." + currentMod.name + "-" + name + "." : type + "." + cont.name + ".";
         I18NBundle bundle = Core.bundle;
