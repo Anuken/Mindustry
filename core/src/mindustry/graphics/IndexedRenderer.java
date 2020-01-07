@@ -1,15 +1,11 @@
 package mindustry.graphics;
 
-import arc.Core;
 import arc.graphics.*;
-import arc.graphics.VertexAttributes.Usage;
-import arc.graphics.g2d.BatchShader;
-import arc.graphics.g2d.TextureRegion;
-import arc.graphics.gl.Shader;
-import arc.math.Mathf;
-import arc.math.Matrix3;
-import arc.util.Disposable;
-import arc.util.Strings;
+import arc.graphics.VertexAttributes.*;
+import arc.graphics.g2d.*;
+import arc.graphics.gl.*;
+import arc.math.*;
+import arc.util.*;
 
 //TODO this class is a trainwreck, remove it
 public class IndexedRenderer implements Disposable{
@@ -60,7 +56,7 @@ public class IndexedRenderer implements Disposable{
     }
 
     public void render(Texture texture){
-        Core.gl.glEnable(GL20.GL_BLEND);
+        Gl.enable(Gl.blend);
 
         updateMatrix();
 
@@ -71,7 +67,7 @@ public class IndexedRenderer implements Disposable{
         program.setUniformMatrix4("u_projTrans", BatchShader.copyTransform(combined));
         program.setUniformi("u_texture", 0);
 
-        mesh.render(program, GL20.GL_TRIANGLES, 0, vertices.length / vsize);
+        mesh.render(program, Gl.triangles, 0, vertices.length / vsize);
 
         program.end();
     }
