@@ -350,8 +350,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Draw.reset();
     }
 
-    public float drawBackItems(){
-        return drawBackItems(itemtime, isLocal);
+    public void drawBackItems(){
+        drawBackItems(itemtime, isLocal);
     }
 
     @Override
