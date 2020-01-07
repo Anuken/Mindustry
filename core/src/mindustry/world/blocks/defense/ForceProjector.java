@@ -254,10 +254,9 @@ public class ForceProjector extends Block{
             Draw.color(Pal.accent);
             Lines.stroke(1.5f);
             Draw.alpha(0.09f + 0.08f * entity.hit);
-            float rot = entity.tile.rotation() * 90f;
-            Fill.poly(x, y, 6, rad, rot);
+            Fill.poly(x, y, 6, rad, entity.tile.rotation() * 90f);
             Draw.alpha(1f);
-            Lines.poly(x, y, 6, rad, rot);
+            Lines.poly(x, y, 6, rad, (entity.tile.rotation() + 1) * 90f);
             Draw.reset();
         }
 
