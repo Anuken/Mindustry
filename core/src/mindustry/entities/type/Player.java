@@ -273,10 +273,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         this.team = team;
     }
 
-    public float getItemtime(){
-        return itemtime;
-    }
-
     //endregion
 
     //region draw methods
@@ -352,6 +348,10 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         Draw.reset();
+    }
+
+    public float drawBackItems(){
+        return drawBackItems(itemtime, isLocal);
     }
 
     @Override
