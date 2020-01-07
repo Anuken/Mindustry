@@ -73,7 +73,7 @@ public class CraterConveyor extends BaseConveyor{
         float b = tile.rotation() * 90;
         if(from.rotation() == 3 && tile.rotation() == 0) a = -1 * 90;
         if(from.rotation() == 0 && tile.rotation() == 3) a = 4 * 90;
-        float rotation = Mathf.lerp(a, b, Interpolation.linear.apply(1f - entity.reload));
+        float rotation = Mathf.lerp(a, b, Interpolation.linear.apply(1f - Mathf.clamp(entity.reload * 2, 0f, 1f)));
 
         // draw crater
         Draw.rect(crater, Tmp.v1.x, Tmp.v1.y, rotation - 90);
