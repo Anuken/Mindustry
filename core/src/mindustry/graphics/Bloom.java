@@ -364,8 +364,8 @@ public class Bloom{
     private static Mesh createFullScreenQuad(){
         float[] verts = {-1, -1, 0, 0, 1, -1, 1, 0, 1, 1, 1, 1, -1, 1, 0, 1};
         Mesh tmpMesh = new Mesh(true, 4, 0,
-            new VertexAttribute(Usage.Position, 2, "a_position"),
-            new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0")
+            new VertexAttribute(Usage.position, 2, "a_position"),
+            new VertexAttribute(Usage.textureCoordinates, 2, "a_texCoord0")
         );
 
         tmpMesh.setVertices(verts);
