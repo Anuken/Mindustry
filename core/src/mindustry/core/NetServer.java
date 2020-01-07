@@ -35,7 +35,7 @@ import static mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
     private final static int maxSnapshotSize = 430, timerBlockSync = 0;
-    private final static float serverSyncTime = 12, kickDuration = 30 * 1000, blockSyncTime = 60 * 8;
+    private final static float serverSyncTime = 12, blockSyncTime = 60 * 8;
     private final static Vec2 vector = new Vec2();
     private final static Rect viewport = new Rect();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
@@ -115,7 +115,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(Time.millis() - info.lastKicked < kickDuration){
+            if(Time.millis() < info.lastKicked){
                 con.kick(KickReason.recentKick);
                 return;
             }

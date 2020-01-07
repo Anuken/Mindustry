@@ -64,13 +64,10 @@ public class EventType{
     public static class PlayerChatEvent{
         public final Player player;
         public final String message;
-        /** The original, unfiltered message. */
-        public final String originalMessage;
 
-        public PlayerChatEvent(Player player, String message, String originalMessage){
+        public PlayerChatEvent(Player player, String message){
             this.player = player;
             this.message = message;
-            this.originalMessage = originalMessage;
         }
     }
 
