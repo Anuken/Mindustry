@@ -15,8 +15,7 @@ import static mindustry.Vars.netServer;
 public abstract class NetConnection{
     public final String address;
     public boolean mobile, modclient;
-    public @Nullable
-    Player player;
+    public @Nullable Player player;
 
     /** ID of last recieved client snapshot. */
     public int lastRecievedClientSnapshot = -1;
