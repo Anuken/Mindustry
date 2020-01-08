@@ -30,15 +30,21 @@ public class SeamlessSolarGenerator extends SolarGenerator{
     public void draw(Tile tile){
         super.draw(tile);
 
-        if(foreign(tile, 0, 1))  Draw.rect(compass[0], tile.drawx(), tile.drawy());
-        if(foreign(tile, 1, 0))  Draw.rect(compass[2], tile.drawx(), tile.drawy());
-        if(foreign(tile, 0, -1)) Draw.rect(compass[4], tile.drawx(), tile.drawy());
-        if(foreign(tile, -1, 0)) Draw.rect(compass[6], tile.drawx(), tile.drawy());
+        boolean // where it should edge
+        up = foreign(tile, 0, 1),
+        right = foreign(tile, 1, 0),
+        down = foreign(tile, 0, -1),
+        left = foreign(tile, -1, 0);
 
-        if(foreign(tile, 0, 1) && foreign(tile, 1, 0))   Draw.rect(compass[1], tile.drawx(), tile.drawy());
-        if(foreign(tile, 1, 0) && foreign(tile, 0, -1))  Draw.rect(compass[3], tile.drawx(), tile.drawy());
-        if(foreign(tile, 0, -1) && foreign(tile, -1, 0)) Draw.rect(compass[5], tile.drawx(), tile.drawy());
-        if(foreign(tile, -1, 0) && foreign(tile, 0, 1))  Draw.rect(compass[7], tile.drawx(), tile.drawy());
+        if(up)    Draw.rect(compass[0], tile.drawx(), tile.drawy());
+        if(right) Draw.rect(compass[2], tile.drawx(), tile.drawy());
+        if(down)  Draw.rect(compass[4], tile.drawx(), tile.drawy());
+        if(left)  Draw.rect(compass[6], tile.drawx(), tile.drawy());
+
+        if(up && right)   Draw.rect(compass[1], tile.drawx(), tile.drawy());
+        if(right && down) Draw.rect(compass[3], tile.drawx(), tile.drawy());
+        if(down && left)  Draw.rect(compass[5], tile.drawx(), tile.drawy());
+        if(left && up)    Draw.rect(compass[7], tile.drawx(), tile.drawy());
     }
 
     private boolean foreign(Tile tile, int dx, int dy){
