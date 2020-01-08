@@ -1,9 +1,10 @@
 package mindustry.world.blocks.distribution;
 
+import arc.*;
 import arc.graphics.g2d.*;
-import arc.math.Mathf;
-import arc.math.geom.Geometry;
-import mindustry.world.Tile;
+import arc.math.*;
+import arc.math.geom.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
@@ -31,6 +32,10 @@ public class ExtendingItemBridge extends ItemBridge{
         ex *= uptime;
         ey *= uptime;
 
+        float opacity = Core.settings.getInt("bridgeopacity") / 100f;
+        if(Mathf.zero(opacity)) return;
+        Draw.alpha(opacity);
+
         Lines.stroke(8f);
         Lines.line(bridgeRegion,
         tile.worldx() + Geometry.d4[i].x * tilesize / 2f,
@@ -50,7 +55,7 @@ public class ExtendingItemBridge extends ItemBridge{
         Draw.color();
 
         for(int a = 0; a < arrows; a++){
-            Draw.alpha(Mathf.absin(a / (float)arrows - entity.time / 100f, 0.1f, 1f) * uptime);
+            Draw.alpha(Mathf.absin(a / (float)arrows - entity.time / 100f, 0.1f, 1f) * uptime * opacity);
             Draw.rect(arrowRegion,
             tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 6f + 2) * uptime,
             tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 6f + 2) * uptime, i * 90f);
