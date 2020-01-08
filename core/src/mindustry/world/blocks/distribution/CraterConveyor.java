@@ -224,7 +224,7 @@ public class CraterConveyor extends BaseConveyor{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock) {
-        return super.blends(tile, rotation, otherx, othery, otherrot, otherblock) && (otherblock instanceof CraterConveyor || isStart(tile));
+        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof CraterConveyor;
     }
 
     // has no crater conveyors facing into it
