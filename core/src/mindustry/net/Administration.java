@@ -17,6 +17,7 @@ public class Administration{
     private Array<String> bannedIPs = new Array<>();
     private Array<String> whitelist = new Array<>();
     private Array<ChatFilter> chatFilters = new Array<>();
+    private Array<ActionFilter> actionFilters = new Array<>();
 
     public Administration(){
         load();
@@ -69,6 +70,21 @@ public class Administration{
             if(current == null) return null;
         }
         return current;
+    }
+
+    /** Add a filter to actions, preventing things such as breaking or configuring blocks. */
+    public void addActionFilter(ActionFilter filter){
+        actionFilters.add(filter);
+    }
+
+    /** @return whether this action is allowed by the action filters. */
+    public boolean allowAction(Player player, PlayerAction action){
+        for(ActionFilter filter : actionFilters){
+            if(!filter.allow(player, action)){
+                return false;
+            }
+        }
+        return true;
     }
 
     public int getPlayerLimit(){
@@ -452,9 +468,16 @@ public class Administration{
         }
     }
 
+    /** Handles chat messages from players and changes their contents. */
     public interface ChatFilter{
         /** @return the filtered message; a null string signals that the message should not be sent. */
         @Nullable String filter(Player player, String message);
+    }
+
+    /** Allows or disallows player actions. */
+    public interface ActionFilter{
+        /** @return whether this action should be permitted. if applicable, make sure to send this player a message specify why the action was prohibited. */
+        boolean allow(Player player, PlayerAction action);
     }
 
     public static class TraceInfo{
@@ -467,6 +490,11 @@ public class Administration{
             this.modded = modded;
             this.mobile = mobile;
         }
+    }
+
+    //TODO implement
+    public static class PlayerAction{
+
     }
 
 }

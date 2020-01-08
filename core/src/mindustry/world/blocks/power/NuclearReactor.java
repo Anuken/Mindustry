@@ -46,6 +46,7 @@ public class NuclearReactor extends PowerGenerator{
         hasItems = true;
         hasLiquids = true;
         entityType = NuclearReactorEntity::new;
+        rebuildable = false;
     }
 
     @Override
