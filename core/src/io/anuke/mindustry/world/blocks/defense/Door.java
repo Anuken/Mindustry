@@ -28,9 +28,11 @@ public class Door extends Wall{
 
     public Door(String name){
         super(name);
+        update = true;
         solid = false;
         solidifes = true;
         consumesTap = true;
+        controllable = true;
         entityType = DoorEntity::new;
     }
 
@@ -90,8 +92,21 @@ public class Door extends Wall{
         Call.onDoorToggle(null, tile, !entity.open);
     }
 
+    @Override
+    public void update(Tile tile){
+        DoorEntity entity = tile.entity();
+
+        if((entity.lastSignal != tile.entity.enabled()) && tile.entity.timer.get(timerToggle, 30f)){
+            entity.lastSignal = tile.entity.enabled();
+            if(entity.open != tile.entity.enabled()){
+                Call.onDoorToggle(null, tile, !entity.open);
+            }
+        }
+    }
+
     public class DoorEntity extends TileEntity{
         public boolean open = false;
+        public boolean lastSignal = true;
 
         @Override
         public void write(DataOutput stream) throws IOException{
