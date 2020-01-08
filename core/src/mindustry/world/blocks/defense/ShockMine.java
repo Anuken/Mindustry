@@ -26,6 +26,7 @@ public class ShockMine extends Block{
         solid = false;
         targetable = false;
         layer = Layer.overlay;
+        rebuildable = false;
     }
 
     @Override
