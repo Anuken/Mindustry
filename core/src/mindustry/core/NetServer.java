@@ -76,7 +76,7 @@ public class NetServer implements ApplicationListener{
     public NetServer(){
 
         net.handleServer(Connect.class, (con, connect) -> {
-            if(admins.isIPBanned(connect.addressTCP)){
+            if(admins.isIPBanned(connect.addressTCP) || admins.isSubnetBanned(connect.addressTCP)){
                 con.kick(KickReason.banned);
             }
         });
@@ -94,7 +94,7 @@ public class NetServer implements ApplicationListener{
 
             String uuid = packet.uuid;
 
-            if(admins.isIPBanned(con.address)) return;
+            if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address)) return;
 
             if(con.hasBegunConnecting){
                 con.kick(KickReason.idInUse);

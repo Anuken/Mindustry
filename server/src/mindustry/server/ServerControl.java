@@ -491,6 +491,37 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        handler.register("subnet-ban", "[add/remove] [address]", "Ban a subnet. This simply rejects all connections with IPs starting with some string.", arg -> {
+            if(arg.length == 0){
+                Log.info("Subnets banned: &lc{0}", netServer.admins.getSubnetBans().isEmpty() ? "<none>" : "");
+                for(String subnet : netServer.admins.getSubnetBans()){
+                    Log.info("&ly  " + subnet + "");
+                }
+            }else if(arg.length == 1){
+                err("You must provide a subnet to add or remove.");
+            }else{
+                if(arg[0].equals("add")){
+                    if(netServer.admins.getSubnetBans().contains(arg[1])){
+                        err("That subnet is already banned.");
+                        return;
+                    }
+
+                    netServer.admins.addSubnetBan(arg[1]);
+                    Log.info("Banned &ly{0}&lc**", arg[1]);
+                }else if(arg[0].equals("remove")){
+                    if(!netServer.admins.getSubnetBans().contains(arg[1])){
+                        err("That subnet isn't banned.");
+                        return;
+                    }
+
+                    netServer.admins.removeSubnetBan(arg[1]);
+                    Log.info("Unbanned &ly{0}&lc**", arg[1]);
+                }else{
+                    err("Incorrect usage. You must provide add/remove as the second argument.");
+                }
+            }
+        });
+
         handler.register("whitelisted", "List the entire whitelist.", arg -> {
             if(netServer.admins.getWhitelisted().isEmpty()){
                 info("&lyNo whitelisted players found.");

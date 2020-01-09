@@ -18,6 +18,7 @@ public class Administration{
     private Array<String> whitelist = new Array<>();
     private Array<ChatFilter> chatFilters = new Array<>();
     private Array<ActionFilter> actionFilters = new Array<>();
+    private Array<String> subnetBans = new Array<>();
 
     public Administration(){
         load();
@@ -53,6 +54,24 @@ public class Administration{
 
             return message;
         });
+    }
+
+    public Array<String> getSubnetBans(){
+        return subnetBans;
+    }
+
+    public void removeSubnetBan(String ip){
+        subnetBans.remove(ip);
+        save();
+    }
+
+    public void addSubnetBan(String ip){
+        subnetBans.add(ip);
+        save();
+    }
+
+    public boolean isSubnetBanned(String ip){
+        return subnetBans.contains(ip::startsWith);
     }
 
     /** Adds a chat filter. This will transform the chat messages of every player.
@@ -354,6 +373,7 @@ public class Administration{
         Core.settings.putObject("player-info", playerInfo);
         Core.settings.putObject("banned-ips", bannedIPs);
         Core.settings.putObject("whitelisted", whitelist);
+        Core.settings.putObject("subnet-bans", subnetBans);
         Core.settings.save();
     }
 
@@ -362,6 +382,7 @@ public class Administration{
         playerInfo = Core.settings.getObject("player-info", ObjectMap.class, ObjectMap::new);
         bannedIPs = Core.settings.getObject("banned-ips", Array.class, Array::new);
         whitelist = Core.settings.getObject("whitelisted", Array.class, Array::new);
+        subnetBans = Core.settings.getObject("subnet-bans", Array.class, Array::new);
     }
 
     /** Server configuration definition. Each config value can be a string, boolean or number. */
