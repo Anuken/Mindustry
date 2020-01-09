@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Do not make a new issue for feature requests! Instead, post it on FeatHub: https://feathub.com/Anuken/Mindustry
 
 ---
 
