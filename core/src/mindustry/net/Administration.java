@@ -1,12 +1,17 @@
 package mindustry.net;
 
 import arc.*;
+import arc.func.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
+import arc.util.pooling.*;
+import arc.util.pooling.Pool.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.type.*;
+import mindustry.type.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.headless;
 import static mindustry.game.EventType.*;
@@ -97,12 +102,16 @@ public class Administration{
     }
 
     /** @return whether this action is allowed by the action filters. */
-    public boolean allowAction(Player player, PlayerAction action){
+    public boolean allowAction(Player player, ActionType type, Tile tile, Cons<PlayerAction> setter){
+        PlayerAction act = Pools.obtain(PlayerAction.class, PlayerAction::new);
+        setter.get(act.set(player, type, tile));
         for(ActionFilter filter : actionFilters){
-            if(!filter.allow(player, action)){
+            if(!filter.allow(act)){
+                Pools.free(act);
                 return false;
             }
         }
+        Pools.free(act);
         return true;
     }
 
@@ -498,7 +507,7 @@ public class Administration{
     /** Allows or disallows player actions. */
     public interface ActionFilter{
         /** @return whether this action should be permitted. if applicable, make sure to send this player a message specify why the action was prohibited. */
-        boolean allow(Player player, PlayerAction action);
+        boolean allow(PlayerAction action);
     }
 
     public static class TraceInfo{
@@ -513,9 +522,39 @@ public class Administration{
         }
     }
 
-    //TODO implement
-    public static class PlayerAction{
+    /** Defines a (potentially dangerous) action that a player has done in the world.
+     * These objects are pooled; do not cache them! */
+    public static class PlayerAction implements Poolable{
+        public @NonNull Player player;
+        public @NonNull ActionType type;
+        public @NonNull Tile tile;
 
+        /** valid for configure and rotation-type events only. */
+        public int config;
+
+        /** valid for item-type events only. */
+        public @Nullable Item item;
+        public int itemAmount;
+
+        public PlayerAction set(Player player, ActionType type, Tile tile){
+            this.player = player;
+            this.type = type;
+            this.tile = tile;
+            return this;
+        }
+
+        @Override
+        public void reset(){
+            item = null;
+            itemAmount = config = 0;
+            player = null;
+            type = null;
+            tile = null;
+        }
+    }
+
+    public enum ActionType{
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem
     }
 
 }
