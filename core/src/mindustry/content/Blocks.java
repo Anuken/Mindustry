@@ -913,7 +913,7 @@ public class Blocks implements ContentList{
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
-            requirements(Category.distribution, ItemStack.with(Items.phasefabric, 5, Items.silicon, 7, Items.lead, 10, Items.graphite, 10));
+            requirements(Category.distribution, itemBridge.requirements);
             range = 12;
             canOverdrive = false;
             hasPower = true;
@@ -1023,7 +1023,7 @@ public class Blocks implements ContentList{
         }};
 
         phaseConduit = new LiquidBridge("phase-conduit"){{
-            requirements(Category.liquid, ItemStack.with(Items.phasefabric, 5, Items.silicon, 7, Items.metaglass, 20, Items.titanium, 10));
+            requirements(Category.liquid, bridgeConduit.requirements);
             range = 12;
             hasPower = true;
             canOverdrive = false;
