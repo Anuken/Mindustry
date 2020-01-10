@@ -149,12 +149,12 @@ public class Units{
     /** Iterates over all units in a rectangle. */
     public static void nearby(Team team, float x, float y, float width, float height, Cons<Unit> cons){
         unitGroup.intersect(x, y, width, height, u -> {
-            if(u.getTeam() == team){
+            if(u.getTeam() == team || team == null){
                 cons.get(u);
             }
         });
         playerGroup.intersect(x, y, width, height, player -> {
-            if(player.getTeam() == team){
+            if(player.getTeam() == team || team == null){
                 cons.get(player);
             }
         });
@@ -163,13 +163,13 @@ public class Units{
     /** Iterates over all units in a circle around this position. */
     public static void nearby(Team team, float x, float y, float radius, Cons<Unit> cons){
         unitGroup.intersect(x - radius, y - radius, radius*2f, radius*2f, unit -> {
-            if(unit.getTeam() == team && unit.withinDst(x, y, radius)){
+            if((unit.getTeam() == team || team == null) && unit.withinDst(x, y, radius)){
                 cons.get(unit);
             }
         });
 
         playerGroup.intersect(x - radius, y - radius, radius*2f, radius*2f, unit -> {
-            if(unit.getTeam() == team && unit.withinDst(x, y, radius)){
+            if((unit.getTeam() == team || team == null) && unit.withinDst(x, y, radius)){
                 cons.get(unit);
             }
         });

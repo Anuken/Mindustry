@@ -1,6 +1,7 @@
 package mindustry.world.blocks.units;
 
 import arc.Core;
+import arc.func.*;
 import arc.struct.*;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
@@ -17,6 +18,8 @@ import static mindustry.Vars.tilesize;
 
 public class TractorBeam extends RepairPoint{
     protected float trackRadius = 1.2f; // modifier, not a value
+
+    protected Boolf<Unit> targetValid = u -> !u.isDead() && u.isFlying();
 
     public TractorBeam(String name){
         super(name);
@@ -36,7 +39,7 @@ public class TractorBeam extends RepairPoint{
         public void update(Tile tile){
             TractorBeamEntity entity = tile.ent();
             if(!entity.timer.get(timerTarget, 20)) return;
-            Unit target = Units.closest(Team.sharded, tile.drawx(), tile.drawy(), repairRadius * trackRadius, u -> !u.isDead() && u.isFlying()); //fixme: target enemy team, this is just to demo
+            Unit target = Units.closest(null, tile.drawx(), tile.drawy(), repairRadius * trackRadius, targetValid); //fixme: target enemy team, this is just to demo
             if(target == null) return;
             entity.target = target;
             entity.state.set(tile, track);
@@ -116,6 +119,8 @@ public class TractorBeam extends RepairPoint{
     @Override
     public void update(Tile tile){
         TractorBeamEntity entity = tile.ent();
+
+        if(entity.target != null && !targetValid.get(entity.target)) entity.state.set(tile, idle);
 
         if(entity.state.current() == null) entity.state.set(tile, idle);
         entity.state.update(tile);
