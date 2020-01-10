@@ -90,7 +90,7 @@ public interface Platform{
         String uuid = Core.settings.getString("uuid", "");
         if(uuid.isEmpty()){
             byte[] result = new byte[8];
-            new RandomXS128().nextBytes(result);
+            new Rand().nextBytes(result);
             uuid = new String(Base64Coder.encode(result));
             Core.settings.put("uuid", uuid);
             Core.settings.save();

@@ -27,7 +27,7 @@ import static mindustry.Vars.*;
 public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     public static final float lifetime = 10f;
 
-    private static final RandomXS128 random = new RandomXS128();
+    private static final Rand random = new Rand();
     private static final Rect rect = new Rect();
     private static final Array<Unit> entities = new Array<>();
     private static final IntSet hit = new IntSet();

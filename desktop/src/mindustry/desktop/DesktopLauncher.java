@@ -279,7 +279,7 @@ public class DesktopLauncher extends ClientLauncher{
         if(steam){
             try{
                 byte[] result = new byte[8];
-                new RandomXS128(SVars.user.user.getSteamID().getAccountID()).nextBytes(result);
+                new Rand(SVars.user.user.getSteamID().getAccountID()).nextBytes(result);
                 return new String(Base64Coder.encode(result));
             }catch(Exception e){
                 e.printStackTrace();
