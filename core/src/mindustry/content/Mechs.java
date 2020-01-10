@@ -25,14 +25,15 @@ public class Mechs implements ContentList{
     @Override
     public void load(){
 
-        vanguard = new Mech("vanguard-ship", true){
+        vanguard = new UnitDef("vanguard-ship"){
             float healRange = 60f;
             float healReload = 200f;
             float healPercent = 10f;
 
             {
-                drillPower = 1;
-                mineSpeed = 4f;
+                flying = true;
+                drillTier = 1;
+                minePower = 4f;
                 speed = 0.49f;
                 drag = 0.09f;
                 health = 200f;
@@ -82,9 +83,9 @@ public class Mechs implements ContentList{
             }
         };
 
-        alpha = new Mech("alpha-mech", false){
+        alpha = new UnitDef("alpha-mech", false){
             {
-                drillPower = -1;
+                drillTier = -1;
                 speed = 0.5f;
                 boostSpeed = 0.95f;
                 itemCapacity = 15;
@@ -122,7 +123,7 @@ public class Mechs implements ContentList{
 
         };
 
-        delta = new Mech("delta-mech", false){
+        delta = new UnitDef("delta-mech", false){
             {
                 drillPower = 1;
                 mineSpeed = 1.5f;
@@ -152,7 +153,7 @@ public class Mechs implements ContentList{
             }
         };
 
-        tau = new Mech("tau-mech", false){
+        tau = new UnitDef("tau-mech", false){
             float healRange = 60f;
             float healAmount = 10f;
             float healReload = 160f;
@@ -205,7 +206,7 @@ public class Mechs implements ContentList{
             }
         };
 
-        omega = new Mech("omega-mech", false){
+        omega = new UnitDef("omega-mech", false){
             protected TextureRegion armorRegion;
 
             {
@@ -277,12 +278,13 @@ public class Mechs implements ContentList{
             }
         };
 
-        dart = new Mech("dart-ship", true){
+        dart = new UnitDef("dart-ship"){
             float effectRange = 60f;
             float effectReload = 60f * 5;
             float effectDuration = 60f * 10f;
 
             {
+                flying = true;
                 drillPower = 1;
                 mineSpeed = 2f;
                 speed = 0.5f;
@@ -322,12 +324,13 @@ public class Mechs implements ContentList{
             }
         };
 
-        javelin = new Mech("javelin-ship", true){
+        javelin = new UnitDef("javelin-ship"){
             float minV = 3.6f;
             float maxV = 6f;
             TextureRegion shield;
 
             {
+                flying = true;
                 drillPower = -1;
                 speed = 0.11f;
                 drag = 0.01f;
@@ -386,8 +389,9 @@ public class Mechs implements ContentList{
             }
         };
 
-        trident = new Mech("trident-ship", true){
+        trident = new UnitDef("trident-ship"){
             {
+                flying = true;
                 drillPower = 2;
                 speed = 0.15f;
                 drag = 0.034f;
@@ -427,8 +431,9 @@ public class Mechs implements ContentList{
             }
         };
 
-        glaive = new Mech("glaive-ship", true){
+        glaive = new UnitDef("glaive-ship"){
             {
+                flying = true;
                 drillPower = 4;
                 mineSpeed = 1.3f;
                 speed = 0.32f;
