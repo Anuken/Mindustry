@@ -36,9 +36,6 @@ import static mindustry.Vars.*;
 public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public static final int timerSync = 2;
     public static final int timerAbility = 3;
-    public static final int timerTransfer = 4;
-    private static final int timerShootLeft = 0;
-    private static final int timerShootRight = 1;
     private static final float liftoffBoost = 0.2f;
 
     private static final Rect rect = new Rect();
@@ -54,7 +51,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
     public Color color = new Color();
-    public Mech mech = Mechs.starter;
+    public UnitDef mech = Mechs.starter;
     public SpawnerTrait spawner, lastSpawner;
     public int respawns;
 
@@ -119,6 +116,16 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     @Override
+    public UnitDef type(){
+        return mech;
+    }
+
+    @Override
+    public Weapons getWeapons(){
+        return null;
+    }
+
+    @Override
     public void move(float x, float y){
         if(!mech.flying){
             collisions.move(this, x, y);
@@ -172,7 +179,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public boolean canMine(Item item){
-        return item.hardness <= mech.drillPower;
+        return item.hardness <= mech.drillTier;
     }
 
     @Override
@@ -298,18 +305,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Draw.rect(mech.region, x, y, rotation - 90);
 
         mech.draw(this);
-
-        for(int i : Mathf.signs){
-            float tra = rotation - 90, trY = -mech.weapon.getRecoil(this, i > 0) + mech.weaponOffsetY;
-            float w = i > 0 ? -mech.weapon.region.getWidth() : mech.weapon.region.getWidth();
-            Draw.rect(mech.weapon.region,
-            x + Angles.trnsx(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY),
-            y + Angles.trnsy(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY),
-            w * Draw.scl,
-            mech.weapon.region.getHeight() * Draw.scl,
-            rotation - 90);
-        }
-
+        weapons.draw(this);
         Draw.reset();
     }
 
@@ -495,9 +491,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         if(boostHeat <= liftoffBoost + 0.05f && achievedFlight && !mech.flying){
             if(tile != null){
-                if(mech.shake > 1f){
-                    Effects.shake(mech.shake, mech.shake, this);
-                }
                 Effects.effect(Fx.unitLand, tile.floor().color, x, y, tile.floor().isLiquid ? 1f : 0.5f);
             }
             mech.onLand(this);
@@ -585,7 +578,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         if(canMove){
             float baseLerp = mech.getRotationAlpha(this);
-            if(!isShooting() || !mech.turnCursor){
+            if(!isShooting() || !mech.faceTarget){
                 if(!movement.isZero()){
                     rotation = Mathf.slerpDelta(rotation, mech.flying ? velocity.angle() : movement.angle(), 0.13f * baseLerp);
                 }
@@ -598,18 +591,19 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     protected void updateShooting(){
         if(!state.isEditor() && isShooting() && mech.canShoot(this)){
-            if(!mech.turnCursor){
+            weapons.update(this);
+            //if(!mech.turnCursor){
                 //shoot forward ignoring cursor
-                mech.weapon.update(this, x + Angles.trnsx(rotation, mech.weapon.targetDistance), y + Angles.trnsy(rotation, mech.weapon.targetDistance));
-            }else{
-                mech.weapon.update(this, pointerX, pointerY);
-            }
+                //mech.weapon.update(this, x + Angles.trnsx(rotation, mech.weapon.targetDistance), y + Angles.trnsy(rotation, mech.weapon.targetDistance));
+            //}else{
+                //mech.weapon.update(this, pointerX, pointerY);
+            //}
         }
     }
 
     protected void updateTouch(){
         if(Units.invalidateTarget(target, this) &&
-            !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range() && !(((TileEntity)target).block instanceof BuildBlock))){
+            !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && target.getTeam() == team && mech.canHeal && dst(target) < mech.range && !(((TileEntity)target).block instanceof BuildBlock))){
             target = null;
         }
 
@@ -685,11 +679,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             if(target == null){
                 isShooting = false;
                 if(Core.settings.getBool("autotarget")){
-                    target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
+                    target = Units.closestTarget(team, x, y, mech.range, u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
 
                     if(mech.canHeal && target == null){
                         target = Geometry.findClosest(x, y, indexer.getDamaged(Team.sharded));
-                        if(target != null && dst(target) > getWeapon().bullet.range()){
+                        if(target != null && dst(target) > mech.range){
                             target = null;
                         }else if(target != null){
                             target = ((Tile)target).entity;
@@ -700,9 +694,9 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                         setMineTile(null);
                     }
                 }
-            }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range())){
+            }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team && mech.canHeal && dst(target) < mech.range)){
                 //rotate toward and shoot the target
-                if(mech.turnCursor){
+                if(mech.faceTarget){
                     rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
                 }
 

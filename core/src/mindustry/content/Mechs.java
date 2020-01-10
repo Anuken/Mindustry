@@ -18,9 +18,9 @@ import mindustry.type.*;
 import static mindustry.Vars.indexer;
 
 public class Mechs implements ContentList{
-    public static Mech vanguard, alpha, delta, tau, omega, dart, javelin, trident, glaive;
+    public static UnitDef vanguard, alpha, delta, tau, omega, dart, javelin, trident, glaive;
 
-    public static Mech starter;
+    public static UnitDef starter;
 
     @Override
     public void load(){

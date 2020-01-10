@@ -38,7 +38,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected static final int timerTarget2 = timerIndex++;
 
     protected boolean loaded;
-    protected UnitType type;
+    protected UnitDef type;
     protected Interval timer = new Interval(5);
     protected StateMachine state = new StateMachine();
     protected TargetTrait target;
@@ -112,7 +112,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     /** Initialize the type and team of this unit. Only call once! */
-    public void init(UnitType type, Team team){
+    public void init(UnitDef type, Team team){
         if(this.type != null) throw new RuntimeException("This unit is already initialized!");
 
         this.type = type;
@@ -124,16 +124,12 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         return true;
     }
 
-    public UnitType getType(){
-        return type;
-    }
-
     public void setSpawner(Tile tile){
         this.spawner = tile.pos();
     }
 
     public void rotate(float angle){
-        rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
+        rotation = Mathf.slerpDelta(rotation, angle, type.rotateSpeed);
     }
 
     public boolean targetHasFlag(BlockFlag flag){
@@ -172,7 +168,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public void targetClosest(){
-        TargetTrait newTarget = Units.closestTarget(team, x, y, Math.max(getWeapon().bullet.range(), type.range), u -> type.targetAir || !u.isFlying());
+        TargetTrait newTarget = Units.closestTarget(team, x, y, type.range, u -> type.targetAir || !u.isFlying());
         if(newTarget != null){
             target = newTarget;
         }

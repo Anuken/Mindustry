@@ -14,7 +14,6 @@ import arc.util.noise.RidgedPerlin;
 import arc.util.noise.Simplex;
 import mindustry.content.Blocks;
 import mindustry.content.UnitTypes;
-import mindustry.type.UnitType;
 import mindustry.ui.Cicon;
 import mindustry.world.*;
 import mindustry.world.blocks.Floor;

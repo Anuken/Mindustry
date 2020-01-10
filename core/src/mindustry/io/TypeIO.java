@@ -232,13 +232,13 @@ public class TypeIO{
         return Effects.getEffect(buffer.getShort());
     }
 
-    @WriteClass(UnitType.class)
-    public static void writeUnitType(ByteBuffer buffer, UnitType effect){
+    @WriteClass(UnitDef.class)
+    public static void writeUnitType(ByteBuffer buffer, UnitDef effect){
         buffer.putShort(effect.id);
     }
 
-    @ReadClass(UnitType.class)
-    public static UnitType readUnitType(ByteBuffer buffer){
+    @ReadClass(UnitDef.class)
+    public static UnitDef readUnitType(ByteBuffer buffer){
         return content.getByID(ContentType.unit, buffer.getShort());
     }
 
@@ -250,16 +250,6 @@ public class TypeIO{
     @ReadClass(Color.class)
     public static Color readColor(ByteBuffer buffer){
         return new Color(buffer.getInt());
-    }
-
-    @WriteClass(Mech.class)
-    public static void writeMech(ByteBuffer buffer, Mech mech){
-        buffer.put((byte)mech.id);
-    }
-
-    @ReadClass(Mech.class)
-    public static Mech readMech(ByteBuffer buffer){
-        return content.getByID(ContentType.mech, buffer.get());
     }
 
     @WriteClass(Liquid.class)

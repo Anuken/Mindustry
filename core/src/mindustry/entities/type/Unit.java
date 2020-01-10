@@ -44,6 +44,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     protected final Interpolator interpolator = new Interpolator();
     protected final Statuses status = new Statuses();
     protected final ItemStack item = new ItemStack(content.item(0), 0);
+    protected final Weapons weapons = new Weapons();
 
     protected Team team = Team.sharded;
     protected float drownTime, hitTime;
@@ -136,18 +137,18 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public void hitbox(Rect rect){
-        rect.setSize(def().hitsize).setCenter(x, y);
+        rect.setSize(type().hitsize).setCenter(x, y);
     }
 
     @Override
     public void hitboxTile(Rect rect){
-        rect.setSize(def().hitsizeTile).setCenter(x, y);
+        rect.setSize(type().hitsizeTile).setCenter(x, y);
     }
 
 
     @Override
     public float drag(){
-        return def().drag;
+        return type().drag;
     }
 
     @Override
@@ -180,7 +181,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         this.rotation = rotation;
     }
 
-    public abstract UnitDef def();
+    public abstract UnitDef type();
 
     public void writeSave(DataOutput stream, boolean net) throws IOException{
         if(item.item == null) item.item = Items.copper;
@@ -209,7 +210,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public boolean isImmune(StatusEffect effect){
-        return def().immunities.contains(effect);
+        return type().immunities.contains(effect);
     }
 
     public boolean isOutOfBounds(){
@@ -410,8 +411,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void drawLight(){
-        if(def().lightRadius > 0){
-            renderer.lights.add(x, y, def().lightRadius, def().lightColor, 0.6f);
+        if(type().lightRadius > 0){
+            renderer.lights.add(x, y, type().lightRadius, type().lightColor, 0.6f);
         }
     }
 
@@ -470,15 +471,15 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public abstract TextureRegion getIconRegion();
 
     public final int getItemCapacity(){
-        return def().itemCapacity;
+        return type().itemCapacity;
     }
 
     @Override
     public float mass(){
-        return def().mass;
+        return type().mass;
     }
 
     public boolean isFlying(){
-        return def().flying;
+        return type().flying;
     }
 }
