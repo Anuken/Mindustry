@@ -82,6 +82,7 @@ public class NetworkIO{
             name = name.replaceAll("(\\[.*?\\])", "");
             name = "First player to join = admin ❤️";
             name = ":foot: :snake: <:ohno:597477759689687040> :scream:";
+            name = "<:plastanium:632785242805239810> craters welcome :heart:️";
         }
 
         //
