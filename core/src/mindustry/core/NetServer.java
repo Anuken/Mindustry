@@ -292,10 +292,19 @@ public class NetServer implements ApplicationListener{
                         map[0] = null;
                         task.cancel();
                     }
-                }, 60 * 1);
+                }, 20);
             }
 
             void vote(Player player, int d){
+
+                if(netServer.chain.highlord(player)){
+                    d = 3;
+                }
+
+                if(player.isAdmin){
+                    d = 5;
+                }
+
                 votes += d;
                 voted.addAll(player.uuid, admins.getInfo(player.uuid).lastIP);
                         
@@ -317,7 +326,7 @@ public class NetServer implements ApplicationListener{
         }
 
         //cooldown between votes
-        int voteTime = 60 * 3;
+        int voteTime = 30;
         Timekeeper vtime = new Timekeeper(voteTime);
         //current kick sessions
         VoteSession[] currentlyKicking = {null};
@@ -328,8 +337,8 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(playerGroup.size() < 3){
-                player.sendMessage("[scarlet]At least 3 players are needed to start a votekick.");
+            if(playerGroup.size() < 2){
+                player.sendMessage("[scarlet]At least 2 players are needed to start a votekick.");
                 return;
             }
 
