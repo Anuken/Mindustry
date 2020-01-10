@@ -110,7 +110,7 @@ public class BuildBlock extends Block{
         Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false));
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
 
-        Time.run(60f, () -> {
+        Time.run(300f, () -> {
             Block override = null;
             boolean config = true;
 
