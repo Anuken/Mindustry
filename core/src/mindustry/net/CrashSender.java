@@ -27,7 +27,9 @@ public class CrashSender{
             exception.printStackTrace();
 
             //don't create crash logs for custom builds, as it's expected
-            if(Version.build == -1 || (System.getProperty("user.name").equals("anuke") && "release".equals(Version.modifier))) return;
+            if(Version.build == -1 || (System.getProperty("user.name").equals("anuke") && "release".equals(Version.modifier))){
+                ret();
+            }
 
             //attempt to load version regardless
             if(Version.number == 0){
@@ -63,7 +65,7 @@ public class CrashSender{
             try{
                 //check crash report setting
                 if(!Core.settings.getBool("crashreport", true)){
-                    return;
+                    ret();
                 }
             }catch(Throwable ignored){
                 //if there's no settings init we don't know what the user wants but chances are it's an important crash, so send it anyway
@@ -72,14 +74,14 @@ public class CrashSender{
             try{
                 //check any mods - if there are any, don't send reports
                 if(Vars.mods != null && !Vars.mods.list().isEmpty()){
-                    return;
+                    ret();
                 }
             }catch(Throwable ignored){
             }
 
             //do not send exceptions that occur for versions that can't be parsed
             if(Version.number == 0){
-                return;
+                ret();
             }
 
             boolean netActive = false, netServer = false;
@@ -130,12 +132,16 @@ public class CrashSender{
                 while(!sent[0]){
                     Thread.sleep(30);
                 }
-            }catch(InterruptedException ignored){
-            }
+            }catch(InterruptedException ignored){}
         }catch(Throwable death){
             death.printStackTrace();
-            System.exit(1);
         }
+
+        ret();
+    }
+
+    private static void ret(){
+        System.exit(1);
     }
 
     private static void httpPost(String url, String content, Cons<HttpResponse> success, Cons<Throwable> failure){

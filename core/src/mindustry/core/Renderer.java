@@ -123,12 +123,14 @@ public class Renderer implements ApplicationListener{
 
             if(player.isDead()){
                 TileEntity core = player.getClosestCore();
-                if(core != null && player.spawner == null){
-                    camera.position.lerpDelta(core.x, core.y, 0.08f);
-                }else{
-                    camera.position.lerpDelta(position, 0.08f);
+                if(core != null){
+                    if(player.spawner == null){
+                        camera.position.lerpDelta(core.x, core.y, 0.08f);
+                    }else{
+                        camera.position.lerpDelta(position, 0.08f);
+                    }
                 }
-            }else if(control.input instanceof DesktopInput){
+            }else if(control.input instanceof DesktopInput && !state.isPaused()){
                 camera.position.lerpDelta(position, 0.08f);
             }
 

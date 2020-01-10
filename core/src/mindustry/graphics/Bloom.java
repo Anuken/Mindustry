@@ -14,7 +14,6 @@ import arc.graphics.gl.Shader;
  * @author kalle_h
  */
 public class Bloom{
-
     /**
      * To use implement bloom more like a glow. Texture alpha channel can be
      * used as mask which part are glowing and which are not. see more info at:
@@ -61,10 +60,8 @@ public class Bloom{
      */
     public void resume(){
         bloomShader.begin();
-        {
-            bloomShader.setUniformi("u_texture0", 0);
-            bloomShader.setUniformi("u_texture1", 1);
-        }
+        bloomShader.setUniformi("u_texture0", 0);
+        bloomShader.setUniformi("u_texture1", 1);
         bloomShader.end();
 
         setSize(w, h);
@@ -83,13 +80,11 @@ public class Bloom{
      * blending = false 32bits = true
      */
     public Bloom(){
-        initialize(Core.graphics.getWidth() / 4, Core.graphics.getHeight() / 4,
-                null, false, false, true);
+        initialize(Core.graphics.getWidth() / 4, Core.graphics.getHeight() / 4, null, false, false, true);
     }
 
     public Bloom(boolean useBlending){
-        initialize(Core.graphics.getWidth() / 4, Core.graphics.getHeight() / 4,
-        null, false, useBlending, true);
+        initialize(Core.graphics.getWidth() / 4, Core.graphics.getHeight() / 4, null, false, useBlending, true);
     }
 
     /**
@@ -105,8 +100,7 @@ public class Bloom{
      * and only do blooming on certain objects param use32bitFBO does
      * fbo use higher precision than 16bits.
      */
-    public Bloom(int FBO_W, int FBO_H, boolean hasDepth, boolean useBlending,
-                 boolean use32bitFBO){
+    public Bloom(int FBO_W, int FBO_H, boolean hasDepth, boolean useBlending, boolean use32bitFBO){
         initialize(FBO_W, FBO_H, null, hasDepth, useBlending, use32bitFBO);
 
     }
@@ -129,18 +123,14 @@ public class Bloom{
      * and only do blooming on certain objects param use32bitFBO does
      * fbo use higher precision than 16bits.
      */
-    public Bloom(int FBO_W, int FBO_H, FrameBuffer sceneIsCapturedHere,
-                 boolean useBlending, boolean use32bitFBO){
-
-        initialize(FBO_W, FBO_H, sceneIsCapturedHere, false, useBlending,
-                use32bitFBO);
+    public Bloom(int FBO_W, int FBO_H, FrameBuffer sceneIsCapturedHere, boolean useBlending, boolean use32bitFBO){
+        initialize(FBO_W, FBO_H, sceneIsCapturedHere, false, useBlending, use32bitFBO);
         disposeFBO = false;
     }
 
-    private void initialize(int FBO_W, int FBO_H, FrameBuffer fbo,
-                            boolean hasDepth, boolean useBlending, boolean use32bitFBO){
+    private void initialize(int FBO_W, int FBO_H, FrameBuffer fbo, boolean hasDepth, boolean useBlending, boolean use32bitFBO){
         blending = useBlending;
-        Format format = null;
+        Format format;
 
         if(use32bitFBO){
             if(useBlending){
@@ -157,8 +147,7 @@ public class Bloom{
             }
         }
         if(fbo == null){
-            frameBuffer = new FrameBuffer(format, Core.graphics.getWidth(),
-                    Core.graphics.getHeight(), hasDepth);
+            frameBuffer = new FrameBuffer(format, Core.graphics.getWidth(), Core.graphics.getHeight(), hasDepth);
         }else{
             frameBuffer = fbo;
         }
@@ -190,10 +179,8 @@ public class Bloom{
         setThreshold(0.5f);
 
         bloomShader.begin();
-        {
-            bloomShader.setUniformi("u_texture0", 0);
-            bloomShader.setUniformi("u_texture1", 1);
-        }
+        bloomShader.setUniformi("u_texture0", 0);
+        bloomShader.setUniformi("u_texture1", 1);
         bloomShader.end();
     }
 
@@ -219,8 +206,8 @@ public class Bloom{
         if(!capturing){
             capturing = true;
             frameBuffer.begin();
-            Core.gl.glClearColor(r, g, b, a);
-            Core.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            Gl.clearColor(r, g, b, a);
+            Gl.clear(Gl.colorBufferBit);
 
         }
     }
@@ -252,23 +239,22 @@ public class Bloom{
             frameBuffer.end();
         }
 
-        Core.gl.glDisable(GL20.GL_BLEND);
-        Core.gl.glDisable(GL20.GL_DEPTH_TEST);
-        Core.gl.glDepthMask(false);
+        Gl.disable(Gl.blend);
+        Gl.disable(Gl.depthTest);
+        Gl.depthMask(false);
 
         gaussianBlur();
 
         if(blending){
-            Core.gl.glEnable(GL20.GL_BLEND);
-            Core.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            Gl.enable(Gl.blend);
+            Gl.blendFunc(Gl.srcAlpha, Gl.oneMinusSrcAlpha);
         }
 
         pingPongTex1.bind(1);
         original.bind(0);
+
         bloomShader.begin();
-        {
-            fullScreenQuad.render(bloomShader, GL20.GL_TRIANGLE_FAN);
-        }
+        fullScreenQuad.render(bloomShader, Gl.triangleFan);
         bloomShader.end();
 
     }
@@ -279,15 +265,9 @@ public class Bloom{
 
         original.bind(0);
         pingPongBuffer1.begin();
-        {
-            tresholdShader.begin();
-            {
-                // tresholdShader.setUniformi("u_texture0", 0);
-                fullScreenQuad.render(tresholdShader, GL20.GL_TRIANGLE_FAN, 0,
-                        4);
-            }
-            tresholdShader.end();
-        }
+        tresholdShader.begin();
+        fullScreenQuad.render(tresholdShader, Gl.triangleFan, 0, 4);
+        tresholdShader.end();
         pingPongBuffer1.end();
 
         for(int i = 0; i < blurPasses; i++){
@@ -296,30 +276,19 @@ public class Bloom{
 
             // horizontal
             pingPongBuffer2.begin();
-            {
-                blurShader.begin();
-                {
-                    blurShader.setUniformf("dir", 1f, 0f);
-                    fullScreenQuad.render(blurShader, GL20.GL_TRIANGLE_FAN, 0,
-                            4);
-                }
-                blurShader.end();
-            }
+            blurShader.begin();
+            blurShader.setUniformf("dir", 1f, 0f);
+            fullScreenQuad.render(blurShader, Gl.triangleFan, 0, 4);
+            blurShader.end();
             pingPongBuffer2.end();
 
             pingPongTex2.bind(0);
             // vertical
             pingPongBuffer1.begin();
-            {
-                blurShader.begin();
-                {
-                    blurShader.setUniformf("dir", 0f, 1f);
-
-                    fullScreenQuad.render(blurShader, GL20.GL_TRIANGLE_FAN, 0,
-                            4);
-                }
-                blurShader.end();
-            }
+            blurShader.begin();
+            blurShader.setUniformf("dir", 0f, 1f);
+            fullScreenQuad.render(blurShader, Gl.triangleFan, 0, 4);
+            blurShader.end();
             pingPongBuffer1.end();
         }
     }
@@ -334,9 +303,7 @@ public class Bloom{
     public void setBloomIntesity(float intensity){
         bloomIntensity = intensity;
         bloomShader.begin();
-        {
-            bloomShader.setUniformf("BloomIntensity", intensity);
-        }
+        bloomShader.setUniformf("BloomIntensity", intensity);
         bloomShader.end();
     }
 
@@ -350,9 +317,7 @@ public class Bloom{
     public void setOriginalIntesity(float intensity){
         originalIntensity = intensity;
         bloomShader.begin();
-        {
-            bloomShader.setUniformf("OriginalIntensity", intensity);
-        }
+        bloomShader.setUniformf("OriginalIntensity", intensity);
         bloomShader.end();
     }
 
@@ -364,10 +329,7 @@ public class Bloom{
     public void setThreshold(float threshold){
         this.threshold = threshold;
         tresholdShader.begin();
-        {
-            tresholdShader.setUniformf("threshold", threshold,
-                    1f / (1 - threshold));
-        }
+        tresholdShader.setUniformf("threshold", threshold, 1f / (1 - threshold));
         tresholdShader.end();
     }
 
@@ -384,8 +346,7 @@ public class Bloom{
      */
     public void dispose(){
         try{
-            if(disposeFBO)
-                frameBuffer.dispose();
+            if(disposeFBO) frameBuffer.dispose();
 
             fullScreenQuad.dispose();
 
@@ -395,16 +356,17 @@ public class Bloom{
             blurShader.dispose();
             bloomShader.dispose();
             tresholdShader.dispose();
-        }catch(Exception ignored){
+        }catch(Throwable ignored){
 
         }
     }
 
     private static Mesh createFullScreenQuad(){
         float[] verts = {-1, -1, 0, 0, 1, -1, 1, 0, 1, 1, 1, 1, -1, 1, 0, 1};
-        Mesh tmpMesh = new Mesh(true, 4, 0, new VertexAttribute(
-                Usage.Position, 2, "a_position"), new VertexAttribute(
-                Usage.TextureCoordinates, 2, "a_texCoord0"));
+        Mesh tmpMesh = new Mesh(true, 4, 0,
+            new VertexAttribute(Usage.position, 2, "a_position"),
+            new VertexAttribute(Usage.textureCoordinates, 2, "a_texCoord0")
+        );
 
         tmpMesh.setVertices(verts);
         return tmpMesh;

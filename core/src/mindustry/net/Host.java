@@ -1,5 +1,6 @@
 package mindustry.net;
 
+import mindustry.*;
 import mindustry.game.*;
 
 public class Host{
@@ -11,7 +12,7 @@ public class Host{
     public final int version;
     public final String versionType;
     public final Gamemode mode;
-    public int ping;
+    public int ping, port = Vars.port;
 
     public Host(String name, String address, String mapname, int wave, int players, int version, String versionType, Gamemode mode, int playerLimit){
         this.name = name;

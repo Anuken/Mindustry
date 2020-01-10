@@ -55,6 +55,8 @@ public class Weapon{
     public float shotDelay = 0;
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
+    /** if turnCursor is false for a mech, how far away will the weapon target. */
+    public float targetDistance = 1f;
 
     public Sound shootSound = Sounds.pew;
 

@@ -48,8 +48,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public float baseRotation;
     public float pointerX, pointerY;
     public String name = "noname";
-    public @Nullable
-    String uuid, usid;
+    public @Nullable String uuid, usid;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
     public boolean buildWasAutoPaused = false;
     public float boostHeat, shootHeat, destructTime;
@@ -93,16 +92,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     @Override
-    public void hitbox(Rect rect){
-        rect.setSize(mech.hitsize).setCenter(x, y);
-    }
-
-    @Override
-    public void hitboxTile(Rect rect){
-        rect.setSize(mech.hitsize * 2f / 3f).setCenter(x, y);
-    }
-
-    @Override
     public void onRespawn(Tile tile){
         velocity.setZero();
         boostHeat = 1f;
@@ -120,6 +109,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     @Override
+    public boolean offloadImmediately(){
+        return true;
+    }
+
+    @Override
     public TypeID getTypeID(){
         return TypeIDs.player;
     }
@@ -134,38 +128,13 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     @Override
-    public float drag(){
-        return mech.drag;
-    }
-
-    @Override
-    public Interval getTimer(){
-        return timer;
-    }
-
-    @Override
-    public int getShootTimer(boolean left){
-        return left ? timerShootLeft : timerShootRight;
-    }
-
-    @Override
-    public Weapon getWeapon(){
-        return mech.weapon;
-    }
-
-    @Override
     public float getMinePower(){
-        return mech.mineSpeed;
+        return mech.minePower;
     }
 
     @Override
     public TextureRegion getIconRegion(){
         return mech.icon(Cicon.full);
-    }
-
-    @Override
-    public int getItemCapacity(){
-        return mech.itemCapacity;
     }
 
     @Override
@@ -242,11 +211,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void set(float x, float y){
         this.x = x;
         this.y = y;
-    }
-
-    @Override
-    public float maxVelocity(){
-        return mech.maxSpeed;
     }
 
     @Override
@@ -349,13 +313,13 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Draw.reset();
     }
 
+    public void drawBackItems(){
+        drawBackItems(itemtime, isLocal);
+    }
+
     @Override
     public void drawStats(){
-        Draw.color(Color.black, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
-        Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
-        Draw.reset();
-        drawBackItems(itemtime, isLocal);
-        drawLight();
+        mech.drawStats(this);
     }
 
     @Override
@@ -523,7 +487,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         boostHeat = Mathf.lerpDelta(boostHeat, (tile != null && tile.solid()) || (isBoosting && ((!movement.isZero() && moved) || !isLocal)) ? 1f : 0f, 0.08f);
         shootHeat = Mathf.lerpDelta(shootHeat, isShooting() ? 1f : 0f, 0.06f);
-        mech.updateAlt(this); //updated regardless
+        mech.update(this); //updated regardless
 
         if(boostHeat > liftoffBoost + 0.1f){
             achievedFlight = true;
@@ -572,6 +536,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     protected void updateKeyboard(){
         Tile tile = world.tileWorld(x, y);
+        boolean canMove = !Core.scene.hasKeyboard() || ui.minimapfrag.shown();
 
         isBoosting = Core.input.keyDown(Binding.dash) && !mech.flying;
 
@@ -598,8 +563,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         if(Core.input.keyDown(Binding.mouse_move)){
-            movement.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2) * 0.005f, -1, 1) * speed;
-            movement.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2) * 0.005f, -1, 1) * speed;
+            movement.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * speed;
+            movement.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * speed;
         }
 
         Vec2 vec = Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY());
@@ -609,7 +574,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         movement.limit(speed).scl(Time.delta());
 
-        if(!Core.scene.hasKeyboard()){
+        if(canMove){
             velocity.add(movement.x, movement.y);
         }else{
             isShooting = false;
@@ -618,7 +583,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         updateVelocityStatus();
         moved = dst(prex, prey) > 0.001f;
 
-        if(!Core.scene.hasKeyboard()){
+        if(canMove){
             float baseLerp = mech.getRotationAlpha(this);
             if(!isShooting() || !mech.turnCursor){
                 if(!movement.isZero()){
@@ -635,7 +600,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         if(!state.isEditor() && isShooting() && mech.canShoot(this)){
             if(!mech.turnCursor){
                 //shoot forward ignoring cursor
-                mech.weapon.update(this, x + Angles.trnsx(rotation, 1f), y + Angles.trnsy(rotation, 1f));
+                mech.weapon.update(this, x + Angles.trnsx(rotation, mech.weapon.targetDistance), y + Angles.trnsy(rotation, mech.weapon.targetDistance));
             }else{
                 mech.weapon.update(this, pointerX, pointerY);
             }
@@ -735,8 +700,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                         setMineTile(null);
                     }
                 }
-            }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team &&
-            mech.canHeal && dst(target) < getWeapon().bullet.range())){
+            }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range())){
                 //rotate toward and shoot the target
                 if(mech.turnCursor){
                     rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);

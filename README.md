@@ -17,7 +17,7 @@ See [CONTRIBUTING](CONTRIBUTING.md).
 Bleeding-edge live builds are generated automatically for every commit. You can see them [here](https://github.com/Anuken/MindustryBuilds/releases). Old builds might still be on [jenkins](https://jenkins.hellomouse.net/job/mindustry/).
 
 If you'd rather compile on your own, follow these instructions.
-First, make sure you have [Java 8](https://www.java.com/en/download/) and [JDK 8](https://adoptopenjdk.net/) installed. Open a terminal in the root directory, `cd` to the Mindustry folder and run the following commands:
+First, make sure you have [JDK 8](https://adoptopenjdk.net/) installed. Open a terminal in the root directory, `cd` to the Mindustry folder and run the following commands:
 
 #### Windows
 
@@ -49,11 +49,6 @@ If the terminal returns `Permission denied` or `Command not found` on Mac/Linux,
 Gradle may take up to several minutes to download files. Be patient. <br>
 After building, the output .JAR file should be in `/desktop/build/libs/Mindustry.jar` for desktop builds, and in `/server/build/libs/server-release.jar` for server builds.
 
-### Feature Requests
-
-[![Feature Requests](https://feathub.com/Anuken/Mindustry?format=svg)](https://feathub.com/Anuken/Mindustry)
-
-
 ### Downloads
 
 [<img src="https://static.itch.io/images/badge.svg"
@@ -67,3 +62,7 @@ After building, the output .JAR file should be in `/desktop/build/libs/Mindustry
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
      alt="Get it on F-Droid"
      height="80">](https://f-droid.org/packages/io.anuke.mindustry/)
+
+### Feature Requests
+
+[![Feature Requests](https://feathub.com/Anuken/Mindustry?format=svg)](https://feathub.com/Anuken/Mindustry)

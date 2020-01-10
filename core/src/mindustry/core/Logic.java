@@ -47,8 +47,8 @@ public class Logic implements ApplicationListener{
             //blocks that get broken are appended to the team's broken block queue
             Tile tile = event.tile;
             Block block = tile.block();
-            //skip null entities or nukes, for obvious reasons
-            if(tile.entity == null || tile.block() instanceof NuclearReactor) return;
+            //skip null entities or un-rebuildables, for obvious reasons; also skip client since they can't modify these requests
+            if(tile.entity == null || !tile.block().rebuildable || net.client()) return;
 
             if(block instanceof BuildBlock){
 
@@ -209,6 +209,7 @@ public class Logic implements ApplicationListener{
 
     @Override
     public void update(){
+        Events.fire(Trigger.update);
 
         if(!state.is(State.menu)){
             if(!net.client()){
@@ -260,7 +261,7 @@ public class Logic implements ApplicationListener{
                 }
             }
 
-            if(!net.client() && !world.isInvalidMap() && !state.isEditor()){
+            if(!net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver){
                 checkGameOver();
             }
         }

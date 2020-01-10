@@ -1,17 +1,19 @@
 package mindustry.type;
 
-import arc.Core;
-import arc.graphics.Color;
-import arc.graphics.g2d.TextureRegion;
-import arc.scene.ui.layout.Table;
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.ctype.ContentType;
-import mindustry.entities.type.Player;
-import mindustry.ctype.UnlockableContent;
-import mindustry.graphics.Pal;
-import mindustry.ui.ContentDisplay;
+import arc.util.*;
+import mindustry.ctype.*;
+import mindustry.entities.type.*;
+import mindustry.graphics.*;
+import mindustry.ui.*;
 
-public class Mech extends UnlockableContent{
+public class Mech extends UnitDef{
+    /*
     public boolean flying;
     public float speed = 1.1f;
     public float maxSpeed = 10f;
@@ -32,7 +34,14 @@ public class Mech extends UnlockableContent{
     public boolean canHeal = false;
     public float compoundSpeed, compoundSpeedBoost;
 
-    public float weaponOffsetX, weaponOffsetY, engineOffset = 5f, engineSize = 2.5f;
+    /** draw the health and team indicator
+    public boolean drawCell = true;
+    /** draw the items on its back
+    public boolean drawItems = true;
+    /** draw the engine light if it's flying/boosting
+    public boolean drawLight = true;
+
+    public float weaponOffsetX, weaponOffsetY, engineOffset = 5f, engineSize = 2.5f;*/
     public @NonNull Weapon weapon;
 
     public TextureRegion baseRegion, legRegion, region;
@@ -46,10 +55,26 @@ public class Mech extends UnlockableContent{
         this(name, false);
     }
 
-    public void updateAlt(Player player){
+    public void update(Player player){
     }
 
     public void draw(Player player){
+    }
+
+    public void drawStats(Player player){
+        if(drawCell){
+            float health = player.healthf();
+            Draw.color(Color.black, player.getTeam().color, health + Mathf.absin(Time.time(), health * 5f, 1f - health));
+            Draw.rect(player.getPowerCellRegion(),
+                player.x + Angles.trnsx(player.rotation, cellOffsetY, cellOffsetX),
+                player.y + Angles.trnsy(player.rotation, cellOffsetY, cellOffsetX),
+                player.rotation - 90);
+            Draw.reset();
+        }
+
+        if(drawItems){
+            player.drawBackItems();
+        }
     }
 
     public float getExtraArmor(Player player){

@@ -13,7 +13,7 @@ public interface VelocityTrait extends MoveTrait{
     }
 
     default float maxVelocity(){
-        return Float.MAX_VALUE;
+        return 50f;
     }
 
     default float mass(){

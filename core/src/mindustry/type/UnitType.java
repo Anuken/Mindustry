@@ -2,23 +2,23 @@ package mindustry.type;
 
 import arc.*;
 import arc.audio.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
-import mindustry.ctype.ContentType;
-import mindustry.ctype.UnlockableContent;
+import mindustry.ctype.*;
 import mindustry.entities.type.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 
-public class UnitType extends UnlockableContent{
+public class UnitType extends UnitDef{
     public @NonNull TypeID typeID;
     public @NonNull Prov<? extends BaseUnit> constructor;
 
+    /*
     public float health = 60;
     public float hitsize = 7f;
     public float hitsizeTile = 4f;
@@ -40,7 +40,7 @@ public class UnitType extends UnlockableContent{
     public @NonNull Weapon weapon;
     public float weaponOffsetY, engineOffset = 6f, engineSize = 2f;
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
-    public Sound deathSound = Sounds.bang;
+    public Sound deathSound = Sounds.bang;*/
 
     public TextureRegion legRegion, baseRegion, region;
 

@@ -70,7 +70,7 @@ public class Mechs implements ContentList{
             }
 
             @Override
-            public void updateAlt(Player player){
+            public void update(Player player){
                 if(player.timer.get(Player.timerAbility, healReload)){
                     if(indexer.eachBlock(player, healRange, other -> other.entity.damaged(), other -> {
                         other.entity.healBy(other.entity.maxHealth() * healPercent / 100f);
@@ -116,7 +116,7 @@ public class Mechs implements ContentList{
             }
 
             @Override
-            public void updateAlt(Player player){
+            public void update(Player player){
                 player.healBy(Time.delta() * 0.09f);
             }
 
@@ -185,7 +185,7 @@ public class Mechs implements ContentList{
             }
 
             @Override
-            public void updateAlt(Player player){
+            public void update(Player player){
 
                 if(player.timer.get(Player.timerAbility, healReload)){
                     wasHealed = false;
@@ -253,7 +253,7 @@ public class Mechs implements ContentList{
             }
 
             @Override
-            public void updateAlt(Player player){
+            public void update(Player player){
                 float scl = 1f - player.shootHeat / 2f*Time.delta();
                 player.velocity().scl(scl);
             }
@@ -303,8 +303,8 @@ public class Mechs implements ContentList{
             }
 
             @Override
-            public void updateAlt(Player player){
-                super.updateAlt(player);
+            public void update(Player player){
+                super.update(player);
 
                 if(player.timer.get(Player.timerAbility, effectReload)){
 
@@ -361,7 +361,7 @@ public class Mechs implements ContentList{
             }
 
             @Override
-            public void updateAlt(Player player){
+            public void update(Player player){
                 float scl = scld(player);
                 if(Mathf.chance(Time.delta() * (0.15 * scl))){
                     Effects.effect(Fx.hitLancer, Pal.lancerLaser, player.x, player.y);

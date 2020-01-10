@@ -36,8 +36,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     protected static final int timerTarget = timerIndex++;
     protected static final int timerTarget2 = timerIndex++;
-    protected static final int timerShootLeft = timerIndex++;
-    protected static final int timerShootRight = timerIndex++;
 
     protected boolean loaded;
     protected UnitType type;
@@ -74,11 +72,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         //must run afterwards so the unit's group is not null when sending the removal packet
         Core.app.post(unit::remove);
-    }
-
-    @Override
-    public float drag(){
-        return type.drag;
     }
 
     @Override
@@ -211,38 +204,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public boolean isImmune(StatusEffect effect){
-        return type.immunities.contains(effect);
-    }
-
-    @Override
-    public boolean isValid(){
-        return super.isValid() && isAdded();
-    }
-
-    @Override
-    public Interval getTimer(){
-        return timer;
-    }
-
-    @Override
-    public int getShootTimer(boolean left){
-        return left ? timerShootLeft : timerShootRight;
-    }
-
-    @Override
-    public Weapon getWeapon(){
-        return type.weapon;
-    }
-
-    @Override
     public TextureRegion getIconRegion(){
         return type.icon(Cicon.full);
-    }
-
-    @Override
-    public int getItemCapacity(){
-        return type.itemCapacity;
     }
 
     @Override
@@ -257,16 +220,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public float maxHealth(){
         return type.health * Vars.state.rules.unitHealthMultiplier;
-    }
-
-    @Override
-    public float mass(){
-        return type.mass;
-    }
-
-    @Override
-    public boolean isFlying(){
-        return type.flying;
     }
 
     @Override
@@ -313,11 +266,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public float maxVelocity(){
-        return type.maxVelocity;
-    }
-
-    @Override
     public void removed(){
         super.removed();
         Tile tile = world.tile(spawner);
@@ -349,16 +297,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         if(isCommanded()){
             onCommand(getCommand());
         }
-    }
-
-    @Override
-    public void hitbox(Rect rect){
-        rect.setSize(type.hitsize).setCenter(x, y);
-    }
-
-    @Override
-    public void hitboxTile(Rect rect){
-        rect.setSize(type.hitsizeTile).setCenter(x, y);
     }
 
     @Override

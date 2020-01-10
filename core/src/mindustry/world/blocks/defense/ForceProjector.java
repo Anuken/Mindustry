@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -37,7 +38,7 @@ public class ForceProjector extends Block{
     private static ForceProjector paramBlock;
     private static ForceEntity paramEntity;
     private static Cons<AbsorbTrait> shieldConsumer = trait -> {
-        if(trait.canBeAbsorbed() && trait.getTeam() != paramTile.getTeam() && paramBlock.isInsideHexagon(trait.getX(), trait.getY(), paramBlock.realRadius(paramEntity) * 2f, paramTile.drawx(), paramTile.drawy())){
+        if(trait.canBeAbsorbed() && trait.getTeam() != paramTile.getTeam() && Intersector.isInsideHexagon(trait.getX(), trait.getY(), paramBlock.realRadius(paramEntity) * 2f, paramTile.drawx(), paramTile.drawy())){
             trait.absorb();
             Effects.effect(Fx.absorb, trait);
             paramEntity.hit = 1f;
@@ -111,17 +112,6 @@ public class ForceProjector extends Block{
 
         entity.warmup = Mathf.lerpDelta(entity.warmup, entity.efficiency(), 0.1f);
 
-/*
-        if(entity.power.status < relativePowerDraw){
-            entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.15f);
-            entity.power.status = 0f;
-            if(entity.warmup <= 0.09f){
-                entity.broken = true;
-            }
-        }else{
-            entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.1f);
-        }*/
-
         if(entity.buildup > 0){
             float scale = !entity.broken ? cooldownNormal : cooldownBrokenBase;
             ConsumeLiquidFilter cons = consumes.get(ConsumeType.liquid);
@@ -157,13 +147,6 @@ public class ForceProjector extends Block{
 
     float realRadius(ForceEntity entity){
         return (radius + entity.phaseHeat * phaseRadiusBoost) * entity.radscl;
-    }
-
-    boolean isInsideHexagon(float x0, float y0, float d, float x, float y){
-        float dx = Math.abs(x - x0) / d;
-        float dy = Math.abs(y - y0) / d;
-        float a = 0.25f * Mathf.sqrt3;
-        return (dy <= a) && (a * dx + 0.25 * dy <= 0.5 * a);
     }
 
     @Override

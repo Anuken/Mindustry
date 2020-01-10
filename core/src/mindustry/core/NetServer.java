@@ -15,6 +15,7 @@ import mindustry.entities.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
+import mindustry.net.Administration;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -26,14 +27,16 @@ import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
+import java.net.*;
 import java.nio.*;
 import java.util.zip.*;
 
+import static arc.util.Log.*;
 import static mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
     private final static int maxSnapshotSize = 430, timerBlockSync = 0;
-    private final static float serverSyncTime = 12, kickDuration = 30 * 1000, blockSyncTime = 60 * 8;
+    private final static float serverSyncTime = 12, blockSyncTime = 60 * 8;
     private final static Vec2 vector = new Vec2();
     private final static Rect viewport = new Rect();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
@@ -73,7 +76,7 @@ public class NetServer implements ApplicationListener{
     public NetServer(){
 
         net.handleServer(Connect.class, (con, connect) -> {
-            if(admins.isIPBanned(connect.addressTCP)){
+            if(admins.isIPBanned(connect.addressTCP) || admins.isSubnetBanned(connect.addressTCP)){
                 con.kick(KickReason.banned);
             }
         });
@@ -91,7 +94,7 @@ public class NetServer implements ApplicationListener{
 
             String uuid = packet.uuid;
 
-            if(admins.isIPBanned(con.address)) return;
+            if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address)) return;
 
             if(con.hasBegunConnecting){
                 con.kick(KickReason.idInUse);
@@ -113,7 +116,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(Time.millis() - info.lastKicked < kickDuration){
+            if(Time.millis() < info.lastKicked){
                 con.kick(KickReason.recentKick);
                 return;
             }
@@ -217,7 +220,6 @@ public class NetServer implements ApplicationListener{
 
             //playing in pvp mode automatically assigns players to teams
             player.setTeam(assignTeam(player, playerGroup.all()));
-            Log.info("Auto-assigned player {0} to team {1}.", player.name, player.getTeam());
 
             sendWorldData(player);
 
@@ -322,6 +324,11 @@ public class NetServer implements ApplicationListener{
         VoteSession[] currentlyKicking = {null};
 
         clientCommands.<Player>register("votekick", "[player...]", "Vote to kick a player, with a cooldown.", (args, player) -> {
+            if(!Config.enableVotekick.bool()){
+                player.sendMessage("[scarlet]Vote-kick is disabled on this server.");
+                return;
+            }
+
             if(playerGroup.size() < 3){
                 player.sendMessage("[scarlet]At least 3 players are needed to start a votekick.");
                 return;
@@ -409,6 +416,12 @@ public class NetServer implements ApplicationListener{
             if(player.isLocal){
                 player.sendMessage("[scarlet]Re-synchronizing as the host is pointless.");
             }else{
+                if(Time.timeSinceMillis(player.getInfo().lastSyncTime) < 1000 * 5){
+                    player.sendMessage("[scarlet]You may only /sync every 5 seconds.");
+                    return;
+                }
+
+                player.getInfo().lastSyncTime = Time.millis();
                 Call.onWorldDataBegin(player.con);
                 netServer.sendWorldData(player);
             }
@@ -444,7 +457,7 @@ public class NetServer implements ApplicationListener{
         if(!player.con.hasDisconnected){
             if(player.con.hasConnected){
                 Events.fire(new PlayerLeave(player));
-                Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
+                if(Config.showConnectMessages.bool()) Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
                 Call.onPlayerDisconnect(player.id);
             }
 
@@ -582,8 +595,12 @@ public class NetServer implements ApplicationListener{
 
         player.add();
         player.con.hasConnected = true;
-        Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
+        if(Config.showConnectMessages.bool()) Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
         Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
+
+        if(!Config.motd.string().equalsIgnoreCase("off")){
+            player.sendMessage(Config.motd.string());
+        }
 
         Events.fire(new PlayerJoin(player));
     }
@@ -601,6 +618,7 @@ public class NetServer implements ApplicationListener{
         return false;
     }
 
+    @Override
     public void update(){
 
         if(!headless && !closing && net.server() && state.is(State.menu)){
@@ -615,6 +633,20 @@ public class NetServer implements ApplicationListener{
 
         if(!state.is(State.menu) && net.server()){
             sync();
+        }
+    }
+
+    /** Should only be used on the headless backend. */
+    public void openServer(){
+        try{
+            net.host(Config.port.num());
+            info("&lcOpened a server on port {0}.", Config.port.num());
+        }catch(BindException e){
+            Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");
+            state.set(State.menu);
+        }catch(IOException e){
+            err(e);
+            state.set(State.menu);
         }
     }
 

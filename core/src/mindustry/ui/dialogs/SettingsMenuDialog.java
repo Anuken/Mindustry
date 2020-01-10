@@ -229,6 +229,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("savecreate", true);
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
+        game.checkPref("coreselect", false);
         game.checkPref("hints", true);
         if(!mobile){
             game.checkPref("buildautopause", false);
@@ -267,6 +268,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
             return s + "%";
         });
+        graphics.sliderPref("bridgeopacity", 75, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
