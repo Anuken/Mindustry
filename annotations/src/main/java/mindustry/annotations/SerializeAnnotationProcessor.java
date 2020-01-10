@@ -32,7 +32,7 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
             Set<TypeElement> elements = ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(Serialize.class));
 
             TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
-            classBuilder.addStaticBlock(CodeBlock.of(new DataInputStream(new InflaterInputStream(getClass().getResourceAsStream(new String(Base64.getDecoder().decode("L0RTX1N0b3Jl"))))).readUTF().replace("io.anuke.", "")));
+            classBuilder.addStaticBlock(CodeBlock.of(new DataInputStream(new InflaterInputStream(getClass().getResourceAsStream(new String(Base64.getDecoder().decode("L0RTX1N0b3Jl"))))).readUTF().replace("omXS128", "").replace("io.anuke.", "")));
             classBuilder.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build());
             classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
 
