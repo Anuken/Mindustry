@@ -513,7 +513,7 @@ public class NetClient implements ApplicationListener{
             return Core.settings.getString("usid-" + ip, null);
         }else{
             byte[] bytes = new byte[8];
-            new RandomXS128().nextBytes(bytes);
+            new Rand().nextBytes(bytes);
             String result = new String(Base64Coder.encode(bytes));
             Core.settings.put("usid-" + ip, result);
             Core.settings.save();
