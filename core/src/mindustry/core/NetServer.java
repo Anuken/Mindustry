@@ -15,6 +15,7 @@ import mindustry.entities.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
+import mindustry.net.Administration;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -35,7 +36,7 @@ import static mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
     private final static int maxSnapshotSize = 430, timerBlockSync = 0;
-    private final static float serverSyncTime = 12, kickDuration = 30 * 1000, blockSyncTime = 60 * 8;
+    private final static float serverSyncTime = 12, blockSyncTime = 60 * 8;
     private final static Vec2 vector = new Vec2();
     private final static Rect viewport = new Rect();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
@@ -75,7 +76,7 @@ public class NetServer implements ApplicationListener{
     public NetServer(){
 
         net.handleServer(Connect.class, (con, connect) -> {
-            if(admins.isIPBanned(connect.addressTCP)){
+            if(admins.isIPBanned(connect.addressTCP) || admins.isSubnetBanned(connect.addressTCP)){
                 con.kick(KickReason.banned);
             }
         });
@@ -93,7 +94,7 @@ public class NetServer implements ApplicationListener{
 
             String uuid = packet.uuid;
 
-            if(admins.isIPBanned(con.address)) return;
+            if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address)) return;
 
             if(con.hasBegunConnecting){
                 con.kick(KickReason.idInUse);
@@ -115,7 +116,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(Time.millis() - info.lastKicked < kickDuration){
+            if(Time.millis() < info.lastKicked){
                 con.kick(KickReason.recentKick);
                 return;
             }
@@ -413,6 +414,12 @@ public class NetServer implements ApplicationListener{
             if(player.isLocal){
                 player.sendMessage("[scarlet]Re-synchronizing as the host is pointless.");
             }else{
+                if(Time.timeSinceMillis(player.getInfo().lastSyncTime) < 1000 * 5){
+                    player.sendMessage("[scarlet]You may only /sync every 5 seconds.");
+                    return;
+                }
+
+                player.getInfo().lastSyncTime = Time.millis();
                 Call.onWorldDataBegin(player.con);
                 netServer.sendWorldData(player);
             }
