@@ -1,9 +1,6 @@
 package mindustry.world.blocks;
 
-import mindustry.entities.units.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
-import mindustry.world.meta.*;
 
 public class BlockStateMachine{
     private BlockState state;
