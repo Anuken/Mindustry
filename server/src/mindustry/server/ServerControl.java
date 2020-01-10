@@ -702,6 +702,10 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        handler.register("yeet", "<uuid...>", "Removes admin status from an offline player", arg -> {
+            netServer.admins.unAdminPlayer(arg[0]);
+        });
+
         handler.register("admins", "List all admins.", arg -> {
             Array<PlayerInfo> admins = netServer.admins.getAdmins();
 
