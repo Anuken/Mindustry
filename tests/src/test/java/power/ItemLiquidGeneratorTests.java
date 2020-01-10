@@ -1,13 +1,13 @@
 package power;
 
-import io.anuke.arc.util.*;
-import io.anuke.mindustry.*;
-import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.power.*;
+import arc.util.*;
+import mindustry.*;
+import mindustry.content.*;
+import mindustry.core.*;
+import mindustry.game.*;
+import mindustry.type.*;
+import mindustry.world.*;
+import mindustry.world.blocks.power.*;
 import org.junit.jupiter.api.*;
 
 import java.util.*;

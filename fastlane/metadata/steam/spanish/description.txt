@@ -1,0 +1,61 @@
+Crea elaboradas cadenas de suministros para cargar tus torretas, produce materiales para crear estructuras y defiendelas de oleadas de enemigos. Juega con tus amigos en un multijugador cooperativo multiplataforma, o pelea contra ellos en batallas PvP por equipos.
+
+[img]{STEAM_APP_IMAGE}/extras/ezgif-4-0e70c282f775.gif[/img]
+
+[h2]Gameplay[/h2]
+
+[list]
+[*] Crea taladros y cintas transportadoras para enviar recursos a tu núcleo
+[*] Usa bloques de producción para crear materiales avanzados
+[*] Construye drones para minar recursos automaticamente, construir y defender tu base de forma eficiente
+[*] Distribuye liquidos y apaga posibles incendios
+[*] Potencia la producción refrigerando y lubricando tus defensas y bloques de construcción
+[/list]
+
+[h2]Campaña[/h2]
+
+[list]
+[*] Avanza a través de 12 zonas completamente rejugables con puntos de aparición randomizados
+[*] Obtén y lanza recursos para investigar nuevas tecnologías
+[*] Investiga nuevos bloques para facilitar tu progreso
+[*] Configura los recursos iniciales de cada área a tus necesidades
+[*] Gran variedad de misiones y objetivos
+[*] Juega con tus amigos y completa niveles con ellos
+[*] Mas de 120 bloques por investigar y descubrir
+[*] 19 tipos de drones, mecanoides y naves
+[*] Mas de 50 logros para completar
+[/list]
+
+[h2][h2]Modos de juego[/h2][/h2]
+
+[list]
+[*] [b]Supervivencia[/b]: Construye torretas para defenderte de tus enemigos con un estilo de Tower Defense. Sobrevive tanto como puedas, lanzando tu núcleo (opcionalmente) para utilizar los recursos con propósitos de investigación. Prepara tu base para el ataque de intermitentes bosses áereos.
+[*] [b]Invasión[/b]: Construye fábricas de unidades para destruir el núcleo enemigo, mientras resistes oleadas periódicamente. Utiliza distintos tipos de unidades de ataque y soporte para ayudarte en la conquista.
+[*] [b]PvP[/b]: Compite contra otros jugadores en hasta 4 equipos diferentes para destruir el núcleo de los demás. Crea unidades o ataca directamente con mecanoides la base de tus enemigos.
+[*] [b]Sandbox[/b]: Juega libremente con recursos infinitos y sin enemigos molestando. Usa bloques exclusivos de sandbox para facilitar la prueba de diseños. Crea oleadas a gusto.
+[/list]
+
+[h2]Partidas personalizadas y multijugador multiplataforma[/h2]
+
+[list]
+[*] 12 mapas integrados para partidas personalizadas, además de los de la campaña
+[*] Juega en cooperativo, Sandbox o PvP
+[*] Únete a un servidor dedicado, o invita amigos a tu partida privada
+[*] Reglas personalizadas: Cambia costos y tiempos de tus estructuras. Regula la fuerza de tus enemigos y cada cuanto aparecen, entre otras opciones
+[*] Modos de juego combinados: Juega PvP y PvE al mismo tiempo
+[/list]
+
+[h2]Editor de mapas[/h2]
+
+[list]
+[*] Dibuja terreno con una interfaz completa de editor
+[*] Edita y visualiza estructuras in-game
+[*] Configura los modos de las herramientas
+[*] Poderoso algoritmo de generacion, aplica filtros de terreno.
+[*] Aplica distorsión, simetria, suavidad, generación de terreno y más a tus mapas
+[*] Randomiza la generacion de ores y terreno, para que cada partida sea distinta
+[*] Configura las oleadas a tu gusto
+[*] Comparte mapas en la Steam Workshop
+[*] Personaliza las reglas de los mapas
+[*] Usa mas de 75 bloques ambientales, para darle un estilo único a tus mapas
+[/list]

@@ -166,14 +166,13 @@ project(":ios"){
 
     task incrementConfig{
         def vfile = file('robovm.properties')
-
         def props = new Properties()
         if(vfile.exists()){
             props.load(new FileInputStream(vfile))
         }else{
             props['app.id'] = 'io.anuke.mindustry'
             props['app.version'] = '5.0'
-            props['app.mainclass'] = 'io.anuke.mindustry.IOSLauncher'
+            props['app.mainclass'] = 'mindustry.IOSLauncher'
             props['app.executable'] = 'IOSLauncher'
             props['app.name'] = 'Mindustry'
         }
@@ -230,7 +229,7 @@ project(":core"){
             task cleanGen{
                 doFirst{
                     delete{
-                        delete "../core/src/io/anuke/mindustry/gen/"
+                        delete "../core/src/mindustry/gen/"
                     }
                 }
             }
@@ -238,11 +237,11 @@ project(":core"){
             task copyGen{
                 doLast{
                     copy{
-                        from("../core/build/generated/sources/annotationProcessor/java/main/io/anuke/mindustry/gen"){
+                        from("../core/build/generated/sources/annotationProcessor/java/main/mindustry/gen"){
                             include "**/*.java"
                         }
 
-                        into "../core/src/io/anuke/mindustry/gen"
+                        into "../core/src/mindustry/gen"
                     }
                 }
             }

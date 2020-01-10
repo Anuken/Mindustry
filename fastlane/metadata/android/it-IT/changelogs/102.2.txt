@@ -1,0 +1,5 @@
+- Aggiunta una nuova modalità di visualizzazione della mappa con panoramica e scorrimento
+- Aggiunta regola della salute dei blocchi
+- Aggiunte ulteriori squadre interne per modalità di gioco alternative
+- Aggiunte funzionalità per migliorare il server modding
+- Cambiamenti interni: il package ora è "mindustry" invece di "io.anuke.mindustry" (i plugin non funzioneranno)
