@@ -15,8 +15,7 @@ import static mindustry.Vars.netServer;
 public abstract class NetConnection{
     public final String address;
     public boolean mobile, modclient;
-    public @Nullable
-    Player player;
+    public @Nullable Player player;
 
     /** ID of last recieved client snapshot. */
     public int lastRecievedClientSnapshot = -1;
@@ -37,7 +36,7 @@ public abstract class NetConnection{
         if(player != null && (reason == KickReason.kick || reason == KickReason.banned || reason == KickReason.vote) && player.uuid != null){
             PlayerInfo info = netServer.admins.getInfo(player.uuid);
             info.timesKicked++;
-            info.lastKicked = Math.max(Time.millis(), info.lastKicked);
+            info.lastKicked = Math.max(Time.millis() + 30 * 1000, info.lastKicked);
         }
 
         Call.onKick(this, reason);
@@ -49,12 +48,17 @@ public abstract class NetConnection{
 
     /** Kick with an arbitrary reason. */
     public void kick(String reason){
+        kick(reason, 30 * 1000);
+    }
+
+    /** Kick with an arbitrary reason, and a kick duration in milliseconds. */
+    public void kick(String reason, int kickDuration){
         Log.info("Kicking connection {0}; Reason: {1}", address, reason.replace("\n", " "));
 
         if(player != null  && player.uuid != null){
             PlayerInfo info = netServer.admins.getInfo(player.uuid);
             info.timesKicked++;
-            info.lastKicked = Math.max(Time.millis(), info.lastKicked);
+            info.lastKicked = Math.max(Time.millis() + kickDuration, info.lastKicked);
         }
 
         Call.onKick(this, reason);

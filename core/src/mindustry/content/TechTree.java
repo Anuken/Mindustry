@@ -1,9 +1,10 @@
 package mindustry.content;
 
-import arc.struct.Array;
-import mindustry.ctype.ContentList;
-import mindustry.type.ItemStack;
-import mindustry.world.Block;
+import arc.math.*;
+import arc.struct.*;
+import mindustry.ctype.*;
+import mindustry.type.*;
+import mindustry.world.*;
 
 import static mindustry.content.Blocks.*;
 
@@ -322,7 +323,7 @@ public class TechTree implements ContentList{
     private static TechNode node(Block block, Runnable children){
         ItemStack[] requirements = new ItemStack[block.requirements.length];
         for(int i = 0; i < requirements.length; i++){
-            requirements[i] = new ItemStack(block.requirements[i].item, 30 + block.requirements[i].amount * 6);
+            requirements[i] = new ItemStack(block.requirements[i].item, 40 + Mathf.round(Mathf.pow(block.requirements[i].amount, 1.25f) * 6, 10));
         }
 
         return new TechNode(block, requirements, children);

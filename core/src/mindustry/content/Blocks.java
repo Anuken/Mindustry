@@ -49,7 +49,7 @@ public class Blocks implements ContentList{
     melter, separator, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
-    powerSource, powerVoid, itemSource, itemVoid, liquidSource, message, illuminator,
+    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, message, illuminator,
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
@@ -1819,6 +1819,11 @@ public class Blocks implements ContentList{
         }};
 
         liquidSource = new LiquidSource("liquid-source"){{
+            requirements(Category.liquid, BuildVisibility.sandboxOnly, ItemStack.with());
+            alwaysUnlocked = true;
+        }};
+
+        liquidVoid = new LiquidVoid("liquid-void"){{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, ItemStack.with());
             alwaysUnlocked = true;
         }};
