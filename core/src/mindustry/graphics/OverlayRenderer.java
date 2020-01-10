@@ -64,7 +64,7 @@ public class OverlayRenderer{
                 for(Tile mechpad : indexer.getAllied(player.getTeam(), BlockFlag.mechPad)){
                     if(!(mechpad.block() instanceof MechPad)) continue;
                     if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
-                            .setCenter(Core.camera.position.x, Core.camera.position.y).contains(mechpad.x, mechpad.y)){
+                            .setCenter(Core.camera.position.x, Core.camera.position.y).contains(mechpad.drawx(), mechpad.drawy())){
 
                         Tmp.v1.set(mechpad.drawx(), mechpad.drawy()).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
 

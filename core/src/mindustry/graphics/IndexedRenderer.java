@@ -46,9 +46,9 @@ public class IndexedRenderer implements Disposable{
     private float[] tmpVerts = new float[vsize * 6];
     private float[] vertices;
 
-    private Matrix3 projMatrix = new Matrix3();
-    private Matrix3 transMatrix = new Matrix3();
-    private Matrix3 combined = new Matrix3();
+    private Mat projMatrix = new Mat();
+    private Mat transMatrix = new Mat();
+    private Mat combined = new Mat();
     private float color = Color.white.toFloatBits();
 
     public IndexedRenderer(int sprites){
@@ -210,11 +210,11 @@ public class IndexedRenderer implements Disposable{
         mesh.updateVertices(index * vsize * 6, vertices);
     }
 
-    public Matrix3 getTransformMatrix(){
+    public Mat getTransformMatrix(){
         return transMatrix;
     }
 
-    public void setProjectionMatrix(Matrix3 matrix){
+    public void setProjectionMatrix(Mat matrix){
         projMatrix = matrix;
     }
 

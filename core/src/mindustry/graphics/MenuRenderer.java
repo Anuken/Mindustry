@@ -28,7 +28,7 @@ public class MenuRenderer implements Disposable{
 
     private int cacheFloor, cacheWall;
     private Camera camera = new Camera();
-    private Matrix3 mat = new Matrix3();
+    private Mat mat = new Mat();
     private FrameBuffer shadows;
     private CacheBatch batch;
     private float time = 0f;
