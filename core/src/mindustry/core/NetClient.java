@@ -133,9 +133,9 @@ public class NetClient implements ApplicationListener{
     }
 
     //called on all clients
-    @Remote(called = Loc.server, targets = Loc.server, variants = Variant.both)
+    @Remote(targets = Loc.server, variants = Variant.both)
     public static void sendMessage(String message, String sender, Player playersender){
-        if(Vars.ui != null && !(playersender != null && net.server() && sender.startsWith("[#" + player.getTeam().color.toString() + "]<T>"))){
+        if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message, sender);
         }
 
