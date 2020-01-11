@@ -77,6 +77,7 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(logic = new Logic());
         Core.app.addListener(netServer = new NetServer());
         Core.app.addListener(new ServerControl(args));
+        Core.app.addListener(new BlockUpscaler());
 
         mods.eachClass(Mod::init);
 

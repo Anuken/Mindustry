@@ -17,6 +17,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
+import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.ctype.ContentType;
 import mindustry.entities.*;
@@ -142,6 +143,8 @@ public class Block extends BlockStorage{
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
     public boolean alwaysUnlocked = false;
+    /** What this block can merge into */
+    public Prov<Block> upscale;
 
     protected TextureRegion[] cacheRegions = {};
     protected Array<String> cacheRegionStrings = new Array<>();

@@ -719,6 +719,9 @@ public class Blocks implements ContentList{
         copperWall = new Wall("copper-wall"){{
             requirements(Category.defense, ItemStack.with(Items.copper, 6));
             health = 80 * wallHealthMultiplier;
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> copperWallLarge;
         }};
 
         copperWallLarge = new Wall("copper-wall-large"){{
@@ -730,6 +733,9 @@ public class Blocks implements ContentList{
         titaniumWall = new Wall("titanium-wall"){{
             requirements(Category.defense, ItemStack.with(Items.titanium, 6));
             health = 110 * wallHealthMultiplier;
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> titaniumWallLarge;
         }};
 
         titaniumWallLarge = new Wall("titanium-wall-large"){{
@@ -742,6 +748,9 @@ public class Blocks implements ContentList{
             requirements(Category.defense, ItemStack.with(Items.plastanium, 5, Items.metaglass, 2));
             health = 190 * wallHealthMultiplier;
             insulated = true;
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> plastaniumWallLarge;
         }};
 
         plastaniumWallLarge = new Wall("plastanium-wall-large"){{
@@ -754,6 +763,9 @@ public class Blocks implements ContentList{
         thoriumWall = new Wall("thorium-wall"){{
             requirements(Category.defense, ItemStack.with(Items.thorium, 6));
             health = 200 * wallHealthMultiplier;
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> thoriumWallLarge;
         }};
 
         thoriumWallLarge = new Wall("thorium-wall-large"){{
@@ -765,6 +777,9 @@ public class Blocks implements ContentList{
         phaseWall = new DeflectorWall("phase-wall"){{
             requirements(Category.defense, ItemStack.with(Items.phasefabric, 6));
             health = 150 * wallHealthMultiplier;
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> phaseWallLarge;
         }};
 
         phaseWallLarge = new DeflectorWall("phase-wall-large"){{
@@ -776,6 +791,9 @@ public class Blocks implements ContentList{
         surgeWall = new SurgeWall("surge-wall"){{
             requirements(Category.defense, ItemStack.with(Items.surgealloy, 6));
             health = 230 * wallHealthMultiplier;
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> surgeWallLarge;
         }};
 
         surgeWallLarge = new SurgeWall("surge-wall-large"){{
@@ -795,6 +813,9 @@ public class Blocks implements ContentList{
             closefx = Fx.doorcloselarge;
             health = 100 * 4 * wallHealthMultiplier;
             size = 2;
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> doorLarge;
         }};
 
         scrapWall = new Wall("scrap-wall"){{
@@ -839,6 +860,9 @@ public class Blocks implements ContentList{
             phaseRangeBoost = 20f;
             health = 80;
             consumes.item(Items.silicon).boost();
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> mendProjector;
         }};
 
         mendProjector = new MendProjector("mend-projector"){{
@@ -934,6 +958,9 @@ public class Blocks implements ContentList{
         router = new Router("router"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 3));
             buildCostMultiplier = 2f;
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> distributor;
         }};
 
         distributor = new Router("distributor"){{
@@ -961,6 +988,9 @@ public class Blocks implements ContentList{
         mechanicalPump = new Pump("mechanical-pump"){{
             requirements(Category.liquid, ItemStack.with(Items.copper, 15, Items.metaglass, 10));
             pumpAmount = 0.1f;
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> rotaryPump;
         }};
 
         rotaryPump = new Pump("rotary-pump"){{
@@ -1003,6 +1033,9 @@ public class Blocks implements ContentList{
         liquidRouter = new LiquidRouter("liquid-router"){{
             requirements(Category.liquid, ItemStack.with(Items.graphite, 4, Items.metaglass, 2));
             liquidCapacity = 20f;
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> liquidTank;
         }};
 
         liquidTank = new LiquidTank("liquid-tank"){{
@@ -1037,6 +1070,9 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.copper, 1, Items.lead, 3));
             maxNodes = 20;
             laserRange = 6;
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> surgeTower;
         }};
 
         powerNodeLarge = new PowerNode("power-node-large"){{
@@ -1060,6 +1096,9 @@ public class Blocks implements ContentList{
         battery = new Battery("battery"){{
             requirements(Category.power, ItemStack.with(Items.copper, 4, Items.lead, 20));
             consumes.powerBuffered(4000f);
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> batteryLarge;
         }};
 
         batteryLarge = new Battery("battery-large"){{
@@ -1112,6 +1151,9 @@ public class Blocks implements ContentList{
         solarPanel = new SolarGenerator("solar-panel"){{
             requirements(Category.power, ItemStack.with(Items.lead, 10, Items.silicon, 15));
             powerProduction = 0.06f;
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> largeSolarPanel;
         }};
 
         largeSolarPanel = new SolarGenerator("solar-panel-large"){{
