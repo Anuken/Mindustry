@@ -10,6 +10,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.graphics.PlanetGrid.*;
 
 public class PlanetRenderer{
     private ImmediateRenderer3D rend = new ImmediateRenderer3D(500000, true, true, 0, new Shader(Core.files.internal("shaders/planet.vertex.glsl").readString(), Core.files.internal("shaders/planet.fragment.glsl").readString()));
@@ -23,18 +24,20 @@ public class PlanetRenderer{
     private Simplex sim = new Simplex();
 
     {
-        int div = 100;
-        ico();
+        //int div = 100;
+        //ico();
         //generate(15, 15, 15, div, div);
+
+        planet();
     }
 
     public void draw(){
         Draw.flush();
-        Gl.clearColor(1, 1, 1, 1);
+        Gl.clearColor(0, 0, 0, 1);
         Gl.clear(Gl.depthBufferBit | Gl.colorBufferBit);
         Gl.enable(Gl.depthTest);
 
-        Tmp.v1.trns(Time.time() * 2f, 20f);
+        Tmp.v1.trns(Time.time() / 20f, 2f);
         cam.position.set(Tmp.v1.x, 0f, Tmp.v1.y);
         cam.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         cam.update();
@@ -45,6 +48,46 @@ public class PlanetRenderer{
         drawTri();
         rend.end();
         Gl.disable(Gl.depthTest);
+    }
+
+    void planet(){
+        PlanetGrid p = new PlanetGrid();
+        Grid grid = p.newGrid(4);
+        vertices.clear();
+        indices.clear();
+
+        for(Tile tile : grid.tiles){
+
+            Vec3 nor = Tmp.v31.cpy();
+            Corner[] c = tile.corners;
+
+            for(Corner corner : c){
+                //corner.v.scl(10f);
+                nor.add(corner.v);
+            }
+            nor.nor();
+
+            verts(c[0].v, c[1].v, c[2].v, nor);
+            verts(c[0].v, c[2].v, c[3].v, nor);
+            verts(c[0].v, c[3].v, c[4].v, nor);
+
+            if(c.length > 5){
+                verts(c[0].v, c[4].v, c[5].v, nor);
+            }
+        }
+    }
+
+    void verts(Vec3 a, Vec3 b, Vec3 c, Vec3 normal){
+        indices.add(vert(a, normal), vert(b, normal), vert(c, normal));
+    }
+
+    int vert(Vec3 a, Vec3 normal){
+        Vertex v = new Vertex();
+        v.pos.set(a);
+        v.normal.set(normal).nor();
+        v.color.set(Color.royal);
+        vertices.add(v);
+        return vertices.size - 1;
     }
 
     void ico(){
