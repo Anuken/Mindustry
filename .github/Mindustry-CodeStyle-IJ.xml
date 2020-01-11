@@ -12,7 +12,7 @@
     <option name="PACKAGES_TO_USE_IMPORT_ON_DEMAND">
       <value>
         <package name="java.awt" withSubpackages="false" static="false" />
-        <package name="io.anuke.mindustry" withSubpackages="false" static="true" />
+        <package name="mindustry" withSubpackages="false" static="true" />
         <package name="javax.swing" withSubpackages="false" static="false" />
       </value>
     </option>
