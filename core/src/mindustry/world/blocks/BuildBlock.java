@@ -110,20 +110,20 @@ public class BuildBlock extends Block{
         Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false));
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
 
-        Time.run(150f, () -> {
-            Block override = null;
-            boolean config = true;
-
-            if(tile.block() == Blocks.junction)      override = Blocks.invertedSorter;
-            if(tile.block() == Blocks.junction)      config = false;
-
-            if(tile.block() == Blocks.itemBridge)    override = Blocks.phaseConveyor;
-            if(tile.block() == Blocks.bridgeConduit) override = Blocks.phaseConduit;
-
-            if(override == null) return;
-
-            Call.onConstructFinish(tile, override, builderID, rotation, team, !config);
-        });
+//        Time.run(150f, () -> {
+//            Block override = null;
+//            boolean config = true;
+//
+//            if(tile.block() == Blocks.junction)      override = Blocks.invertedSorter;
+//            if(tile.block() == Blocks.junction)      config = false;
+//
+//            if(tile.block() == Blocks.itemBridge)    override = Blocks.phaseConveyor;
+//            if(tile.block() == Blocks.bridgeConduit) override = Blocks.phaseConduit;
+//
+//            if(override == null) return;
+//
+//            Call.onConstructFinish(tile, override, builderID, rotation, team, !config);
+//        });
     }
 
     @Override
