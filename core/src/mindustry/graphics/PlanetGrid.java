@@ -57,7 +57,7 @@ public class PlanetGrid{
         //add corners to corners
         for(Corner c : grid.corners){
             for(int k = 0; k < 3; k++){
-                c.corners[k] = c.tiles[k].corners[(position(c.tiles[k], c) + 1) % 5];
+                c.corners[k] = c.tiles[k].corners[(pos(c.tiles[k], c) + 1) % 5];
             }
         }
         //new edges
@@ -107,7 +107,7 @@ public class PlanetGrid{
         //connect corners
         for(Corner c : grid.corners){
             for(int k = 0; k < 3; k++){
-                c.corners[k] = c.tiles[k].corners[(position(c.tiles[k], c) + 1) % (c.tiles[k].edgeCount)];
+                c.corners[k] = c.tiles[k].corners[(pos(c.tiles[k], c) + 1) % (c.tiles[k].edgeCount)];
             }
         }
         //new edges
@@ -129,7 +129,7 @@ public class PlanetGrid{
         Tile[] t = {grid.tiles[t1], grid.tiles[t2], grid.tiles[t3]};
         c.v = Tmp.v31.set(t[0].v).add(t[1].v).add(t[2].v).cpy().nor();
         for(int i = 0; i < 3; i++){
-            t[i].corners[position(t[i], t[(i + 2) % 3])] = c;
+            t[i].corners[pos(t[i], t[(i + 2) % 3])] = c;
             c.tiles[i] = t[i];
         }
     }
@@ -138,38 +138,38 @@ public class PlanetGrid{
         Edge e = grid.edges[id];
         Tile[] t = {grid.tiles[t1], grid.tiles[t2]};
         Corner[] c = {
-        grid.corners[t[0].corners[position(t[0], t[1])].id],
-        grid.corners[t[0].corners[(position(t[0], t[1]) + 1) % t[0].edgeCount].id]};
+        grid.corners[t[0].corners[pos(t[0], t[1])].id],
+        grid.corners[t[0].corners[(pos(t[0], t[1]) + 1) % t[0].edgeCount].id]};
         for(int i = 0; i < 2; i++){
-            t[i].edges[position(t[i], t[(i + 1) % 2])] = e;
+            t[i].edges[pos(t[i], t[(i + 1) % 2])] = e;
             e.tiles[i] = t[i];
-            c[i].edges[position(c[i], c[(i + 1) % 2])] = e;
+            c[i].edges[pos(c[i], c[(i + 1) % 2])] = e;
             e.corners[i] = c[i];
         }
     }
 
-    int position(Tile t, Tile n){
+    int pos(Tile t, Tile n){
         for(int i = 0; i < t.edgeCount; i++)
             if(t.tiles[i] == n)
                 return i;
         return -1;
     }
 
-    int position(Tile t, Corner c){
+    int pos(Tile t, Corner c){
         for(int i = 0; i < t.edgeCount; i++)
             if(t.corners[i] == c)
                 return i;
         return -1;
     }
 
-    int position(Tile t, Edge e){
+    int pos(Tile t, Edge e){
         for(int i = 0; i < t.edgeCount; i++)
             if(t.edges[i] == e)
                 return i;
         return -1;
     }
 
-    int position(Corner c, Corner n){
+    int pos(Corner c, Corner n){
         for(int i = 0; i < 3; i++)
             if(c.corners[i] == n)
                 return i;

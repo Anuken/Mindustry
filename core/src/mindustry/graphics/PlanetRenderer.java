@@ -2,33 +2,41 @@ package mindustry.graphics;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.VertexAttributes.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
-import arc.math.*;
+import arc.input.*;
 import arc.math.geom.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.graphics.PlanetGrid.*;
 
 public class PlanetRenderer{
-    private ImmediateRenderer3D rend = new ImmediateRenderer3D(500000, true, true, 0, new Shader(Core.files.internal("shaders/planet.vertex.glsl").readString(), Core.files.internal("shaders/planet.fragment.glsl").readString()));
     private Camera3D cam = new Camera3D();
+    private Shader shader = new Shader(Core.files.internal("shaders/planet.vertex.glsl").readString(), Core.files.internal("shaders/planet.fragment.glsl").readString());
+    private Mesh mesh;
 
-    private IntArray tmpIndices = new IntArray();
-    private IntArray indices = new IntArray();
-    private Array<Vertex> vertices = new Array<>();
+    private int vcount = 0;
+    private float[] floats = new float[3 + 3 + 1];
 
     private Color[] colors = {Color.royal, Color.tan, Color.forest, Color.olive, Color.lightGray, Color.white};
     private Simplex sim = new Simplex();
+    private float lastX, lastY;
 
-    {
-        //int div = 100;
-        //ico();
-        //generate(15, 15, 15, div, div);
+    public PlanetRenderer(){
+        int size = 500000;
+
+        mesh = new Mesh(true, size, 0,
+            new VertexAttribute(Usage.position, 3, Shader.positionAttribute),
+            new VertexAttribute(Usage.normal, 3, Shader.normalAttribute),
+            new VertexAttribute(Usage.colorPacked, 4, Shader.colorAttribute));
+        mesh.getVerticesBuffer().limit(size);
+        mesh.getVerticesBuffer().position(0);
 
         planet();
+        Tmp.v1.trns(0, 2.5f);
+        cam.position.set(Tmp.v1.x, 0f, Tmp.v1.y);
     }
 
     public void draw(){
@@ -37,24 +45,38 @@ public class PlanetRenderer{
         Gl.clear(Gl.depthBufferBit | Gl.colorBufferBit);
         Gl.enable(Gl.depthTest);
 
-        Tmp.v1.trns(Time.time() / 20f, 2f);
-        cam.position.set(Tmp.v1.x, 0f, Tmp.v1.y);
+        input();
+
         cam.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         cam.update();
         cam.lookAt(0, 0, 0);
         cam.update();
 
-        rend.begin(cam.combined(), Gl.triangleStrip);
-        drawTri();
-        rend.end();
+        shader.begin();
+        shader.setUniformMatrix4("u_projModelView", cam.combined().val);
+        mesh.render(shader, Gl.triangleStrip);
+        shader.end();
+
         Gl.disable(Gl.depthTest);
+    }
+
+    void input(){
+        Vec3 v = cam.unproject(Tmp.v33.set(Core.input.mouseX(), Core.input.mouseY(), 0f));
+
+        if(Core.input.keyDown(KeyCode.MOUSE_LEFT)){
+
+            //dx /= Core.graphics.getWidth();
+            //dy /= Core.graphics.getHeight();
+            cam.position.rotate(Vec3.Y, (v.x - lastX) * 100);
+            //cam.position.rotate(Vec3.Z, dy);
+        }
+        lastX = v.x;
+        lastY = v.y;
     }
 
     void planet(){
         PlanetGrid p = new PlanetGrid();
         Grid grid = p.newGrid(4);
-        vertices.clear();
-        indices.clear();
 
         for(Tile tile : grid.tiles){
 
@@ -62,7 +84,6 @@ public class PlanetRenderer{
             Corner[] c = tile.corners;
 
             for(Corner corner : c){
-                //corner.v.scl(10f);
                 nor.add(corner.v);
             }
             nor.nor();
@@ -73,23 +94,34 @@ public class PlanetRenderer{
 
             if(c.length > 5){
                 verts(c[0].v, c[4].v, c[5].v, nor);
+            }else{
+                verts(c[0].v, c[3].v, c[4].v, nor);
             }
         }
     }
 
     void verts(Vec3 a, Vec3 b, Vec3 c, Vec3 normal){
-        indices.add(vert(a, normal), vert(b, normal), vert(c, normal));
+        vert(a, normal);
+        vert(b, normal);
+        vert(c, normal);
     }
 
     int vert(Vec3 a, Vec3 normal){
-        Vertex v = new Vertex();
-        v.pos.set(a);
-        v.normal.set(normal).nor();
-        v.color.set(Color.royal);
-        vertices.add(v);
-        return vertices.size - 1;
-    }
+        floats[0] = a.x;
+        floats[1] = a.y;
+        floats[2] = a.z;
 
+        floats[3] = normal.x;
+        floats[4] = normal.y;
+        floats[5] = normal.z;
+
+        floats[6] = Color.royal.toFloatBits();
+
+        mesh.getVerticesBuffer().put(floats);
+
+        return vcount++;
+    }
+/*
     void ico(){
         float s = 2f/Mathf.sqrt(5), c = 1f/Mathf.sqrt(5);
 
@@ -116,6 +148,10 @@ public class PlanetRenderer{
             indices.add(i+1,(7-i)%5+7,(8-i)%5+7);
         }
 
+        norm();
+    }
+
+    void norm(){
         Array<Vertex> newVertices = new Array<>();
         IntArray newIndices = new IntArray();
         for(int i = 0; i < indices.size; i += 3){
@@ -170,7 +206,7 @@ public class PlanetRenderer{
 
                 Vertex vert = new Vertex();
                 vert.normal.set(Tmp.v32.set(Tmp.v31).nor());
-                vert.color.set(color(Tmp.v31));//set(vert.normal.x, vert.normal.y, vert.normal.z, 1f);
+                vert.color.set(vert.normal.x, vert.normal.y, vert.normal.z, 1f);
                 vert.uv.set(u, v);
                 vert.pos.set(Tmp.v31);
 
@@ -186,6 +222,8 @@ public class PlanetRenderer{
                 tempOffset = (tempOffset + 1) % tmpIndices.size;
             }
         }
+
+        //norm();
     }
 
     Color color(Vec3 v){
@@ -220,20 +258,13 @@ public class PlanetRenderer{
             v4.d();
             v1.d();
         }
-    }
+    }*/
 
     class Vertex{
         Color color = new Color();
         Vec3 normal = new Vec3();
         Vec2 uv = new Vec2();
         Vec3 pos = new Vec3();
-
-        void d(){
-            rend.color(color);
-            rend.normal(normal);
-            rend.texCoord(uv.x, uv.y);
-            rend.vertex(pos);
-        }
 
         Vertex copy(){
             Vertex v = new Vertex();
