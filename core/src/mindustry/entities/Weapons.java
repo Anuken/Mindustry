@@ -17,12 +17,16 @@ import static mindustry.Vars.net;
 public class Weapons{
     private static final int[] one = {1};
 
-    private WeaponMount[] mounts;
-    private UnitDef lastDef;
+    private WeaponMount[] mounts = {};
+
+    public void init(Unit unit){
+        mounts = new WeaponMount[unit.type().weapons.size];
+        for(int i = 0; i < mounts.length; i++){
+            mounts[i] = new WeaponMount(unit.type().weapons.get(i));
+        }
+    }
 
     public void update(Unit unit){
-        check(unit);
-
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
 
@@ -33,8 +37,6 @@ public class Weapons{
     }
 
     public void draw(Unit unit){
-        check(unit);
-
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
 
@@ -52,17 +54,6 @@ public class Weapons{
                     weapon.region.getHeight() * Draw.scl,
                     rotation - 90);
             }
-        }
-    }
-
-    //check mount validity
-    private void check(Unit unit){
-        if(mounts == null || mounts.length != unit.type().weapons.size || lastDef != unit.type()){
-            mounts = new WeaponMount[unit.type().weapons.size];
-            for(int i = 0; i < mounts.length; i++){
-                mounts[i] = new WeaponMount(unit.type().weapons.get(i));
-            }
-            lastDef = unit.type();
         }
     }
 
@@ -180,6 +171,8 @@ public class Weapons{
         float rotation;
         /** weapon associated with this mount */
         Weapon weapon;
+        /** aiming position in world coordinates */
+        float aimX, aimY;
 
         public WeaponMount(Weapon weapon){
             this.weapon = weapon;

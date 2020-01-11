@@ -42,12 +42,29 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public float rotation;
 
     protected final Interpolator interpolator = new Interpolator();
+    /** status effects */
     protected final Statuses status = new Statuses();
+    /** current item held */
     protected final ItemStack item = new ItemStack(content.item(0), 0);
+    /** holds weapon aiming positions and angles */
     protected final Weapons weapons = new Weapons();
 
+    /** team; can be changed at any time */
     protected Team team = Team.sharded;
+    /** timers for drowning and getting hit */
     protected float drownTime, hitTime;
+    /** this unit's type; do not change internally without calling setType(...) */
+    protected UnitDef type;
+    
+    public void setType(UnitDef type){
+        this.type = type;
+        clampHealth();
+        weapons.init(this);
+    }
+    
+    public UnitDef type(){
+        return type;
+    }
 
     @Override
     public boolean collidesGrid(int x, int y){
@@ -137,18 +154,18 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public void hitbox(Rect rect){
-        rect.setSize(type().hitsize).setCenter(x, y);
+        rect.setSize(type.hitsize).setCenter(x, y);
     }
 
     @Override
     public void hitboxTile(Rect rect){
-        rect.setSize(type().hitsizeTile).setCenter(x, y);
+        rect.setSize(type.hitsizeTile).setCenter(x, y);
     }
 
 
     @Override
     public float drag(){
-        return type().drag;
+        return type.drag;
     }
 
     @Override
@@ -181,8 +198,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         this.rotation = rotation;
     }
 
-    public abstract UnitDef type();
-
     public void writeSave(DataOutput stream, boolean net) throws IOException{
         if(item.item == null) item.item = Items.copper;
 
@@ -210,7 +225,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public boolean isImmune(StatusEffect effect){
-        return type().immunities.contains(effect);
+        return type.immunities.contains(effect);
     }
 
     public boolean isOutOfBounds(){
@@ -411,8 +426,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void drawLight(){
-        if(type().lightRadius > 0){
-            renderer.lights.add(x, y, type().lightRadius, type().lightColor, 0.6f);
+        if(type.lightRadius > 0){
+            renderer.lights.add(x, y, type.lightRadius, type.lightColor, 0.6f);
         }
     }
 
@@ -471,15 +486,15 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public abstract TextureRegion getIconRegion();
 
     public final int getItemCapacity(){
-        return type().itemCapacity;
+        return type.itemCapacity;
     }
 
     @Override
     public float mass(){
-        return type().mass;
+        return type.mass;
     }
 
     public boolean isFlying(){
-        return type().flying;
+        return type.flying;
     }
 }
