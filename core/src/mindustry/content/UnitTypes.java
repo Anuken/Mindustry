@@ -10,14 +10,14 @@ import mindustry.gen.*;
 import mindustry.type.*;
 
 public class UnitTypes implements ContentList{
-    public static UnitType
+    public static UnitDef
     draug, spirit, phantom,
     wraith, ghoul, revenant, lich, reaper,
     dagger, crawler, titan, fortress, eruptor, chaosArray, eradicator;
 
     @Override
     public void load(){
-        draug = new UnitType("draug", MinerDrone::new){{
+        draug = new UnitDef("draug", MinerDrone::new){{
             flying = true;
             drag = 0.01f;
             speed = 0.3f;
@@ -27,12 +27,9 @@ public class UnitTypes implements ContentList{
             minePower = 0.9f;
             engineSize = 1.8f;
             engineOffset = 5.7f;
-            weapon = new Weapon("you have incurred my wrath. prepare to die."){{
-                bullet = Bullets.lancerLaser;
-            }};
         }};
 
-        spirit = new UnitType("spirit", RepairDrone::new){{
+        spirit = new UnitDef("spirit", RepairDrone::new){{
             flying = true;
             drag = 0.01f;
             speed = 0.42f;
@@ -53,7 +50,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        phantom = new UnitType("phantom", BuilderDrone::new){{
+        phantom = new UnitDef("phantom", BuilderDrone::new){{
             flying = true;
             drag = 0.01f;
             mass = 2f;
@@ -76,7 +73,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        dagger = new UnitType("dagger", GroundUnit::new){{
+        dagger = new UnitDef("dagger", GroundUnit::new){{
             maxVelocity = 1.1f;
             speed = 0.2f;
             drag = 0.4f;
@@ -92,7 +89,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        crawler = new UnitType("crawler", GroundUnit::new){{
+        crawler = new UnitDef("crawler", GroundUnit::new){{
             maxVelocity = 1.27f;
             speed = 0.285f;
             drag = 0.4f;
@@ -123,7 +120,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        titan = new UnitType("titan", GroundUnit::new){{
+        titan = new UnitDef("titan", GroundUnit::new){{
             maxVelocity = 0.8f;
             speed = 0.22f;
             drag = 0.4f;
@@ -145,7 +142,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        fortress = new UnitType("fortress", GroundUnit::new){{
+        fortress = new UnitDef("fortress", GroundUnit::new){{
             maxVelocity = 0.78f;
             speed = 0.15f;
             drag = 0.4f;
@@ -167,7 +164,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        eruptor = new UnitType("eruptor", GroundUnit::new){{
+        eruptor = new UnitDef("eruptor", GroundUnit::new){{
             maxVelocity = 0.81f;
             speed = 0.16f;
             drag = 0.4f;
@@ -189,7 +186,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        chaosArray = new UnitType("chaos-array", GroundUnit::new){{
+        chaosArray = new UnitDef("chaos-array", GroundUnit::new){{
             maxVelocity = 0.68f;
             speed = 0.12f;
             drag = 0.4f;
@@ -213,7 +210,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        eradicator = new UnitType("eradicator", GroundUnit::new){{
+        eradicator = new UnitDef("eradicator", GroundUnit::new){{
             maxVelocity = 0.68f;
             speed = 0.12f;
             drag = 0.4f;
@@ -238,7 +235,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        wraith = new UnitType("wraith", FlyingUnit::new){{
+        wraith = new UnitDef("wraith", FlyingUnit::new){{
             speed = 0.3f;
             maxVelocity = 1.9f;
             drag = 0.01f;
@@ -257,7 +254,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        ghoul = new UnitType("ghoul", FlyingUnit::new){{
+        ghoul = new UnitDef("ghoul", FlyingUnit::new){{
             health = 220;
             speed = 0.2f;
             maxVelocity = 1.4f;
@@ -281,7 +278,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        revenant = new UnitType("revenant", HoverUnit::new){{
+        revenant = new UnitDef("revenant", HoverUnit::new){{
             health = 1000;
             mass = 5f;
             hitsize = 20f;
@@ -312,7 +309,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        lich = new UnitType("lich", HoverUnit::new){{
+        lich = new UnitDef("lich", HoverUnit::new){{
             health = 6000;
             mass = 20f;
             hitsize = 40f;
@@ -345,7 +342,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        reaper = new UnitType("reaper", HoverUnit::new){{
+        reaper = new UnitDef("reaper", HoverUnit::new){{
             health = 11000;
             mass = 30f;
             hitsize = 56f;

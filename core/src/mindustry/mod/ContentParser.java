@@ -281,7 +281,7 @@ public class ContentParser{
             UnitType unit;
             if(locate(ContentType.unit, name) == null){
                 Class<BaseUnit> type = resolve(legacyUnitMap.get(Strings.capitalize(getType(value)), getType(value)), "mindustry.entities.type.base");
-                unit = new UnitType(mod + "-" + name, supply(type));
+                unit = new UnitDef(mod + "-" + name, supply(type));
             }else{
                 unit = locate(ContentType.unit, name);
             }

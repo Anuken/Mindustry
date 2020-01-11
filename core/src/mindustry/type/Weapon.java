@@ -20,13 +20,8 @@ import mindustry.gen.*;
 import static mindustry.Vars.net;
 
 public class Weapon{
+    /** displayed weapon region */
     public String name;
-
-    /** minimum cursor distance from player, fixes 'cross-eyed' shooting. */
-    protected static float minPlayerDist = 20f;
-    //temporary only
-    protected static int sequenceNum = 0;
-
     /** bullet shot */
     public @NonNull BulletType bullet;
     /** shell ejection effect */
@@ -39,6 +34,8 @@ public class Weapon{
     public boolean alternate = false;
     /** whether to rotate toward the target independently of unit */
     public boolean rotate = false;
+    /** rotation speed of weapon when rotation is enabled, in degrees/t*/
+    public float rotateSpeed = 2f;
     /** weapon reload in frames */
     public float reload;
     /** amount of shots per fire */
@@ -51,10 +48,10 @@ public class Weapon{
     public float shake = 0f;
     /** visual weapon knockback. */
     public float recoil = 1.5f;
-    /** shoot barrel y offset */
-    public float length = 3f;
-    /** shoot barrel x offset. */
-    public float width = 4f;
+    /** projectile/effect offsets from center of weapon */
+    public float shootX = 0f, shootY = 3f;
+    /** offsets of weapon position on unit */
+    public float x = 5f, y = 0f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
     /** randomization of shot length */
@@ -70,13 +67,16 @@ public class Weapon{
     /** displayed region (autoloaded) */
     public TextureRegion region;
 
-    protected Weapon(String name){
+    public Weapon(String name){
         this.name = name;
     }
 
     public Weapon(){
-        //no region
-        this.name = "";
+        this("");
+    }
+
+    public void load(){
+        region = Core.atlas.find(name + "-equip", Core.atlas.find(name, Core.atlas.find("clear")));
     }
 
 }

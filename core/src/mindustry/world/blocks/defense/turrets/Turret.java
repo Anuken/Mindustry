@@ -25,6 +25,8 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.meta.*;
 
+import java.io.*;
+
 import static mindustry.Vars.tilesize;
 
 public abstract class Turret extends Block{
@@ -320,5 +322,26 @@ public abstract class Turret extends Block{
         public float heat;
         public int shots;
         public TargetTrait target;
+
+        @Override
+        public void write(DataOutput stream) throws IOException{
+            super.write(stream);
+            stream.writeFloat(reload);
+            stream.writeFloat(rotation);
+        }
+
+        @Override
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
+            if(revision == 1){
+                reload = stream.readFloat();
+                rotation = stream.readFloat();
+            }
+        }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
     }
 }

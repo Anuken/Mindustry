@@ -233,12 +233,12 @@ public class TypeIO{
     }
 
     @WriteClass(UnitDef.class)
-    public static void writeUnitType(ByteBuffer buffer, UnitDef effect){
+    public static void writeUnitDef(ByteBuffer buffer, UnitDef effect){
         buffer.putShort(effect.id);
     }
 
     @ReadClass(UnitDef.class)
-    public static UnitDef readUnitType(ByteBuffer buffer){
+    public static UnitDef readUnitDef(ByteBuffer buffer){
         return content.getByID(ContentType.unit, buffer.getShort());
     }
 

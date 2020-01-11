@@ -321,11 +321,12 @@ public class EventType{
 
     }
 
+    //TODO rename
     public static class MechChangeEvent{
         public final Player player;
-        public final Mech mech;
+        public final UnitDef mech;
 
-        public MechChangeEvent(Player player, Mech mech){
+        public MechChangeEvent(Player player, UnitDef mech){
             this.player = player;
             this.mech = mech;
         }

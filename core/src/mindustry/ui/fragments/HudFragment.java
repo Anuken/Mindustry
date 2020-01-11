@@ -352,7 +352,7 @@ public class HudFragment extends Fragment{
     }
 
     @Remote(targets = Loc.both, called = Loc.server)
-    public static void spawnUnitEditor(Player player, UnitType type){
+    public static void spawnUnitEditor(Player player, UnitDef type){
         if(state.isEditor()){
             BaseUnit unit = type.create(player.getTeam());
             unit.set(player.x, player.y);
