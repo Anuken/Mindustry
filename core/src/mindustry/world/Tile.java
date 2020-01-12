@@ -1,10 +1,11 @@
 package mindustry.world;
 
-import arc.struct.*;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
@@ -213,6 +214,16 @@ public class Tile implements Position, TargetTrait{
                 }
             }
         }
+    }
+
+    /** remove()-s this tile, except it's synced across the network */
+    public void removeNet(){
+        Call.removeTile(this);
+    }
+
+    /** set()-s this tile, except it's synced across the network */
+    public void setNet(Block block, Team team, int rotation){
+        Call.setTile(this, block, team, rotation);
     }
 
     public byte rotation(){
@@ -505,5 +516,17 @@ public class Tile implements Position, TargetTrait{
     @Override
     public String toString(){
         return floor.name + ":" + block.name + ":" + overlay + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) + ":" + getTeam();
+    }
+
+    //remote utility methods
+
+    @Remote(called = Loc.server)
+    public static void removeTile(Tile tile){
+        tile.remove();
+    }
+
+    @Remote(called = Loc.server)
+    public static void setTile(Tile tile, Block block, Team team, int rotation){
+        tile.set(block, team, rotation);
     }
 }
