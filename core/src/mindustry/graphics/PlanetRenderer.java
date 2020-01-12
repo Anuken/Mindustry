@@ -7,6 +7,7 @@ import arc.graphics.g3d.*;
 import arc.input.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.graphics.Pgrid.*;
 
 public class PlanetRenderer{
     private Camera3D cam = new Camera3D();
@@ -14,6 +15,7 @@ public class PlanetRenderer{
 
     private PlanetMesh planet = new PlanetMesh(3, 1f, false, Color.royal);
     private PlanetMesh outline = new PlanetMesh(3, 1.01f, true, Pal.accent);
+    private VertexBatch3D batch = new VertexBatch3D(false, true, 0);
 
     public PlanetRenderer(){
         Tmp.v1.trns(0, 2.5f);
@@ -24,8 +26,7 @@ public class PlanetRenderer{
         Draw.flush();
         Gl.clearColor(0, 0, 0, 1);
         Gl.clear(Gl.depthBufferBit | Gl.colorBufferBit);
-
-        Ray ray = cam.getPickRay(Core.input.mouseX(), Core.input.mouseY());
+        Gl.enable(Gl.depthTest);
 
         input();
 
@@ -35,14 +36,27 @@ public class PlanetRenderer{
         cam.update();
 
         planet.render(cam.combined());
-        outline.render(cam.combined());
+        //outline.render(cam.combined());
+
+        //Log.info(cam.position + " " + cam.getPickRay(Core.input.mouseX(), Core.input.mouseY()));
+
+        Ptile tile = outline.getTile(cam.getPickRay(Core.input.mouseX(), Core.input.mouseY()));
+        if(tile != null){
+            for(int i = 0; i < tile.corners.length + 1; i++){
+                batch.color(Pal.accent);
+                batch.vertex(tile.corners[i % tile.corners.length].v);
+            }
+            batch.flush(cam.combined(), Gl.lineStrip);
+        }
+
+        Gl.disable(Gl.depthTest);
     }
 
     void input(){
-        Vec3 v = cam.unproject(Tmp.v33.set(Core.input.mouseX(), Core.input.mouseY(), 0f));
+        Vec3 v = Tmp.v33.set(Core.input.mouseX(), Core.input.mouseY(), 0);
 
         if(Core.input.keyDown(KeyCode.MOUSE_LEFT)){
-            cam.position.rotate(Vec3.Y, (v.x - lastX) * 100);
+            cam.position.rotate(Vec3.Y, (v.x - lastX) / 10);
         }
         lastX = v.x;
         lastY = v.y;
