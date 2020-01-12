@@ -54,7 +54,7 @@ public class PlanetRenderer{
 
         shader.begin();
         shader.setUniformMatrix4("u_projModelView", cam.combined().val);
-        mesh.render(shader, Gl.triangleStrip);
+        mesh.render(shader, Gl.triangles);
         shader.end();
 
         Gl.disable(Gl.depthTest);
@@ -76,7 +76,7 @@ public class PlanetRenderer{
 
     void planet(){
         PlanetGrid p = new PlanetGrid();
-        Grid grid = p.newGrid(4);
+        Grid grid = p.newGrid(2);
 
         for(Tile tile : grid.tiles){
 

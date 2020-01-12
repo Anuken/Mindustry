@@ -33,6 +33,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
     @Override
     public void setup(){
         Vars.loadLogger();
+        Vars.loadFileLogger();
         Vars.platform = this;
         beginTime = Time.millis();
 

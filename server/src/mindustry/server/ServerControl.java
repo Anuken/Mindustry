@@ -66,17 +66,17 @@ public class ServerControl implements ApplicationListener{
             "globalrules", "{reactorExplosions: false}"
         );
 
-        Log.setLogger((level, text, args1) -> {
-            String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr", args1);
+        Log.setLogger((level, text) -> {
+            String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr");
             System.out.println(result);
 
             if(Config.logging.bool()){
-                logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr", false, args1));
+                logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + formatColors(tags[level.ordinal()] + " " + text + "&fr", false));
             }
 
             if(socketOutput != null){
                 try{
-                    socketOutput.println(format(text + "&fr", false, args1));
+                    socketOutput.println(formatColors(text + "&fr", false));
                 }catch(Throwable e){
                     err("Error occurred logging to socket: {0}", e.getClass().getSimpleName());
                 }
