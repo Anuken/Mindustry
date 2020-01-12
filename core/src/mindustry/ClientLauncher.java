@@ -11,7 +11,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.async.*;
 import mindustry.core.*;
-import mindustry.ctype.Content;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -33,6 +33,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
     @Override
     public void setup(){
         Vars.loadLogger();
+        Vars.loadFileLogger();
         Vars.platform = this;
         beginTime = Time.millis();
 
