@@ -25,6 +25,8 @@ public class PlanetRenderer{
         Gl.clearColor(0, 0, 0, 1);
         Gl.clear(Gl.depthBufferBit | Gl.colorBufferBit);
 
+        Ray ray = cam.getPickRay(Core.input.mouseX(), Core.input.mouseY());
+
         input();
 
         cam.resize(Core.graphics.getWidth(), Core.graphics.getHeight());

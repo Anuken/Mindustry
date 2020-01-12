@@ -1,16 +1,16 @@
 package mindustry.graphics;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.VertexAttributes.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.graphics.Pgrid.*;
 
 public class PlanetMesh{
     private float[] floats = new float[3 + 3 + 1];
-    private Shader shader = new Shader(Core.files.internal("shaders/planet.vertex.glsl").readString(), Core.files.internal("shaders/planet.fragment.glsl").readString());
+    private Vec3 center = new Vec3(0, 0, 0);
     private Mesh mesh;
     private Pgrid grid;
 
@@ -40,12 +40,25 @@ public class PlanetMesh{
     public void render(Mat3D mat){
         Gl.enable(Gl.depthTest);
 
-        shader.begin();
-        shader.setUniformMatrix4("u_projModelView", mat.val);
-        mesh.render(shader, lines ? Gl.lines : Gl.triangles);
-        shader.end();
+        Shaders.planet.begin();
+        Shaders.planet.setUniformMatrix4("u_projModelView", mat.val);
+        mesh.render(Shaders.planet, lines ? Gl.lines : Gl.triangles);
+        Shaders.planet.end();
 
         Gl.disable(Gl.depthTest);
+    }
+
+    public @Nullable Ptile getTile(Ray ray){
+        Vec3 vec = intersect(ray);
+        if(vec == null) return null;
+        return Structs.findMin(grid.tiles, t -> t.v.dst(vec));
+    }
+
+    public @Nullable Vec3 intersect(Ray ray){
+        if(Intersector3D.intersectRaySphere(ray, center, length, Tmp.v33)){
+            return Tmp.v33;
+        }
+        return null;
     }
 
     private void generateMesh(){
