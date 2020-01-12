@@ -4,7 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 
-public class PlanetGrid{
+class Pgrid{
     private static final float x = -0.525731112119133606f;
     private static final float z = -0.850650808352039932f;
 
@@ -20,7 +20,31 @@ public class PlanetGrid{
     {5, 3, 10, 1, 4}, {2, 5, 4, 0, 11}, {3, 7, 6, 1, 8}, {7, 2, 9, 0, 6}
     };
 
-    Grid newGrid(int size){
+    int size;
+    Ptile[] tiles;
+    Corner[] corners;
+    Edge[] edges;
+
+    Pgrid(int size){
+        this.size = size;
+
+        tiles = new Ptile[tileCount(size)];
+        for(int i = 0; i < tiles.length; i++){
+            tiles[i] = new Ptile(i, i < 12 ? 5 : 6);
+        }
+
+        corners = new Corner[cornerCount(size)];
+        for(int i = 0; i < corners.length; i++){
+            corners[i] = new Corner(i);
+        }
+
+        edges = new Edge[edgeCount(size)];
+        for(int i = 0; i < edges.length; i++){
+            edges[i] = new Edge(i);
+        }
+    }
+
+    static Pgrid newGrid(int size){
         if(size == 0){
             return initialGrid();
         }else{
@@ -28,10 +52,10 @@ public class PlanetGrid{
         }
     }
 
-    Grid initialGrid(){
-        Grid grid = new Grid(0);
+    static Pgrid initialGrid(){
+        Pgrid grid = new Pgrid(0);
 
-        for(Tile t : grid.tiles){
+        for(Ptile t : grid.tiles){
             t.v = iTiles[t.id];
             for(int k = 0; k < 5; k++){
                 t.tiles[k] = grid.tiles[iTilesP[t.id][k]];
@@ -62,7 +86,7 @@ public class PlanetGrid{
         }
         //new edges
         int nextEdge = 0;
-        for(Tile t : grid.tiles){
+        for(Ptile t : grid.tiles){
             for(int k = 0; k < 5; k++){
                 if(t.edges[k] == null){
                     addEdge(nextEdge, grid, t.id, iTilesP[t.id][k]);
@@ -73,8 +97,8 @@ public class PlanetGrid{
         return grid;
     }
 
-    Grid subdividedGrid(Grid prev){
-        Grid grid = new Grid(prev.size + 1);
+    static Pgrid subdividedGrid(Pgrid prev){
+        Pgrid grid = new Pgrid(prev.size + 1);
 
         int prevTiles = prev.tiles.length;
         int prevCorners = prev.corners.length;
@@ -97,8 +121,8 @@ public class PlanetGrid{
         }
         //new corners
         int nextCorner = 0;
-        for(Tile n : prev.tiles){
-            Tile t = grid.tiles[n.id];
+        for(Ptile n : prev.tiles){
+            Ptile t = grid.tiles[n.id];
             for(int k = 0; k < t.edgeCount; k++){
                 addCorner(nextCorner, grid, t.id, t.tiles[(k + t.edgeCount - 1) % t.edgeCount].id, t.tiles[k].id);
                 nextCorner++;
@@ -112,7 +136,7 @@ public class PlanetGrid{
         }
         //new edges
         int nextEdge = 0;
-        for(Tile t : grid.tiles){
+        for(Ptile t : grid.tiles){
             for(int k = 0; k < t.edgeCount; k++){
                 if(t.edges[k] == null){
                     addEdge(nextEdge, grid, t.id, t.tiles[k].id);
@@ -124,9 +148,9 @@ public class PlanetGrid{
         return grid;
     }
 
-    void addCorner(int id, Grid grid, int t1, int t2, int t3){
+    static void addCorner(int id, Pgrid grid, int t1, int t2, int t3){
         Corner c = grid.corners[id];
-        Tile[] t = {grid.tiles[t1], grid.tiles[t2], grid.tiles[t3]};
+        Ptile[] t = {grid.tiles[t1], grid.tiles[t2], grid.tiles[t3]};
         c.v = Tmp.v31.set(t[0].v).add(t[1].v).add(t[2].v).cpy().nor();
         for(int i = 0; i < 3; i++){
             t[i].corners[pos(t[i], t[(i + 2) % 3])] = c;
@@ -134,9 +158,9 @@ public class PlanetGrid{
         }
     }
 
-    void addEdge(int id, Grid grid, int t1, int t2){
+    static void addEdge(int id, Pgrid grid, int t1, int t2){
         Edge e = grid.edges[id];
-        Tile[] t = {grid.tiles[t1], grid.tiles[t2]};
+        Ptile[] t = {grid.tiles[t1], grid.tiles[t2]};
         Corner[] c = {
         grid.corners[t[0].corners[pos(t[0], t[1])].id],
         grid.corners[t[0].corners[(pos(t[0], t[1]) + 1) % t[0].edgeCount].id]};
@@ -148,28 +172,21 @@ public class PlanetGrid{
         }
     }
 
-    int pos(Tile t, Tile n){
+    static int pos(Ptile t, Ptile n){
         for(int i = 0; i < t.edgeCount; i++)
             if(t.tiles[i] == n)
                 return i;
         return -1;
     }
 
-    int pos(Tile t, Corner c){
+    static int pos(Ptile t, Corner c){
         for(int i = 0; i < t.edgeCount; i++)
             if(t.corners[i] == c)
                 return i;
         return -1;
     }
 
-    int pos(Tile t, Edge e){
-        for(int i = 0; i < t.edgeCount; i++)
-            if(t.edges[i] == e)
-                return i;
-        return -1;
-    }
-
-    int pos(Corner c, Corner n){
+    static int pos(Corner c, Corner n){
         for(int i = 0; i < 3; i++)
             if(c.corners[i] == n)
                 return i;
@@ -188,19 +205,19 @@ public class PlanetGrid{
         return 30 * Mathf.pow(3, size);
     }
 
-    static class Tile{
+    static class Ptile{
         int id;
         int edgeCount;
         Vec3 v = new Vec3();
-        Tile[] tiles;
+        Ptile[] tiles;
         Corner[] corners;
         Edge[] edges;
 
-        public Tile(int id, int edgeCount){
+        public Ptile(int id, int edgeCount){
             this.id = id;
             this.edgeCount = edgeCount;
 
-            tiles = new Tile[edgeCount];
+            tiles = new Ptile[edgeCount];
             corners = new Corner[edgeCount];
             edges = new Edge[edgeCount];
         }
@@ -208,7 +225,7 @@ public class PlanetGrid{
 
     static class Corner{
         int id;
-        Tile[] tiles = new Tile[3];
+        Ptile[] tiles = new Ptile[3];
         Corner[] corners = new Corner[3];
         Edge[] edges = new Edge[3];
         Vec3 v = new Vec3();
@@ -220,37 +237,11 @@ public class PlanetGrid{
 
     static class Edge{
         int id;
-        Tile[] tiles = new Tile[2];
+        Ptile[] tiles = new Ptile[2];
         Corner[] corners = new Corner[2];
 
         public Edge(int id){
             this.id = id;
-        }
-    }
-
-    static class Grid{
-        int size;
-        Tile[] tiles;
-        Corner[] corners;
-        Edge[] edges;
-
-        Grid(int size){
-            this.size = size;
-
-            tiles = new Tile[tileCount(size)];
-            for(int i = 0; i < tiles.length; i++){
-                tiles[i] = new Tile(i, i < 12 ? 5 : 6);
-            }
-
-            corners = new Corner[cornerCount(size)];
-            for(int i = 0; i < corners.length; i++){
-                corners[i] = new Corner(i);
-            }
-
-            edges = new Edge[edgeCount(size)];
-            for(int i = 0; i < edges.length; i++){
-                edges[i] = new Edge(i);
-            }
         }
     }
 }
