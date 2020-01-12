@@ -20,15 +20,8 @@ public class ModsDialog extends FloatingDialog{
         super("$mods");
         addCloseButton();
 
-        buttons.addImageTextButton(mobile ? "$mods.report" : "$mods.openfolder", Icon.link,
-        () -> {
-            if(mobile){
-                Core.net.openURI(reportIssueURL);
-            }else{
-                Core.net.openFolder(modDirectory.absolutePath());
-            }
-        })
-        .size(250f, 64f);
+        buttons.addImageTextButton("$mods.openfolder", Icon.link,
+        () -> Core.app.openFolder(modDirectory.absolutePath())).size(250f, 64f);
 
         buttons.row();
 
