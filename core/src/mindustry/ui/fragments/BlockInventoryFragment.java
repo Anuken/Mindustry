@@ -38,6 +38,7 @@ public class BlockInventoryFragment extends Fragment{
     public static void requestItem(Player player, Tile tile, Item item, int amount){
         if(player == null || tile == null || !tile.interactable(player.getTeam())) return;
         if(!Units.canInteract(player, tile)) return;
+        amount = Mathf.clamp(amount, 0, player.getItemCapacity());
 
         int removed = tile.block().removeStack(tile, item, amount);
 

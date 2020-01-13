@@ -91,7 +91,10 @@ public class PausedDialog extends FloatingDialog{
 
             cont.addRowImageTextButton("$hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
 
-            cont.addRowImageTextButton("$quit", Icon.quit, this::showQuitConfirm).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit"));
+            cont.addRowImageTextButton("$quit", Icon.quit, this::showQuitConfirm).update(s -> {
+                s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit");
+                s.getLabelCell().growX().wrap();
+            });
         }
     }
 
