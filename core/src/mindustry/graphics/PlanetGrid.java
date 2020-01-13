@@ -4,7 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 
-class PlanetGrid{
+public class PlanetGrid{
     private static final float x = -0.525731112119133606f;
     private static final float z = -0.850650808352039932f;
 

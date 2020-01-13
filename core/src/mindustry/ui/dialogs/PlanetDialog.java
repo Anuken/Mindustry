@@ -1,5 +1,6 @@
 package mindustry.ui.dialogs;
 
+import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -23,7 +24,7 @@ public class PlanetDialog extends FloatingDialog{
         titleTable.remove();
 
         cont.addRect((x, y, w, h) -> {
-            renderer.draw();
+            renderer.render(Planets.starter);
         }).grow();
     }
 }
