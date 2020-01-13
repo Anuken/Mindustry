@@ -7,4 +7,9 @@ public class Battery extends PowerDistributor{
         outputsPower = true;
         consumesPower = true;
     }
+    
+    @Override
+    public void load(){
+        super.load();
+    }
 }
