@@ -207,6 +207,7 @@ public class BlockIndexer{
     public TileEntity findTile(Team team, float x, float y, float range, Boolf<Tile> pred, boolean usePriority){
         TileEntity closest = null;
         float dst = 0;
+        float range2 = range*range;
 
         for(int rx = Math.max((int)((x - range) / tilesize / quadrantSize), 0); rx <= (int)((x + range) / tilesize / quadrantSize) && rx < quadWidth(); rx++){
             for(int ry = Math.max((int)((y - range) / tilesize / quadrantSize), 0); ry <= (int)((y + range) / tilesize / quadrantSize) && ry < quadHeight(); ry++){
@@ -224,8 +225,12 @@ public class BlockIndexer{
 
                         TileEntity e = other.entity;
 
-                        float ndst = Mathf.dst(x, y, e.x, e.y);
-                        if(ndst < range && (closest == null || ndst < dst || (usePriority && closest.block.priority.ordinal() <= e.block.priority.ordinal()))){
+                        float ndst = Mathf.dst2(x, y, e.x, e.y);
+                        if(ndst < range2 && (closest == null ||
+                                //this one is closer, and it is at least of equal priority
+                                (ndst < dst && (!usePriority || closest.block.priority.ordinal() <= e.block.priority.ordinal())) ||
+                                //priority is used, and new block has higher priority regardless of range
+                                (usePriority && closest.block.priority.ordinal() < e.block.priority.ordinal()))){
                             dst = ndst;
                             closest = e;
                         }
