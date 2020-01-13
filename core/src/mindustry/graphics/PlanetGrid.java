@@ -244,6 +244,7 @@ class PlanetGrid{
         Corner[] corners = new Corner[3];
         Edge[] edges = new Edge[3];
         Vec3 v = new Vec3();
+        Vec3 bv = new Vec3();
 
         public Corner(int id){
             this.id = id;

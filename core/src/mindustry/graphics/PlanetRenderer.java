@@ -11,14 +11,14 @@ import mindustry.graphics.PlanetGrid.*;
 
 public class PlanetRenderer{
     private Camera3D cam = new Camera3D();
-    private float lastX, lastY;
+    private float lastX, lastY, camLength = 4f;
 
-    private PlanetMesh planet = new PlanetMesh(4, 1f, false, Color.royal);
-    private PlanetMesh outline = new PlanetMesh(3, 1.01f, true, Pal.accent);
+    private PlanetMesh planet = new PlanetMesh(6, 1f, false, Color.royal);
+    private PlanetMesh outline = new PlanetMesh(3, 1.3f, true, Pal.accent);
     private VertexBatch3D batch = new VertexBatch3D(false, true, 0);
 
     public PlanetRenderer(){
-        Tmp.v1.trns(0, 2.5f);
+        Tmp.v1.trns(0, camLength);
         cam.position.set(Tmp.v1.x, 0f, Tmp.v1.y);
     }
 

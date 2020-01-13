@@ -21,7 +21,9 @@ public class PlanetMesh{
     private float radius;
 
     private Simplex sim = new Simplex();
+    private RidgedPerlin rid = new RidgedPerlin(2, 2);
     private Color[] colors = {Color.royal, Color.royal, Color.royal, Color.tan, Color.valueOf("3f9a50"), Color.valueOf("3f9a50"), Color.gray, Color.white, Color.white};
+    private Vec3 normal = new Vec3();
 
     public PlanetMesh(int divisions, float radius, boolean lines, Color color){
         this.radius = radius;
@@ -71,12 +73,22 @@ public class PlanetMesh{
             Corner[] c = tile.corners;
 
             for(Corner corner : c){
-                corner.v.setLength(radius);
+                corner.bv.set(corner.v).setLength(radius);;
+            }
+
+            for(Corner corner : c){
+                corner.v.setLength(radius + elevation(corner.bv));
+            }
+
+            for(Corner corner : c){
                 nor.add(corner.v);
             }
             nor.nor();
 
-            Color color = color(nor);
+            Vec3 realNormal = normal(c[0].v, c[2].v, c[4].v);
+            nor.set(realNormal);
+
+            Color color = color(tile.v);
 
             if(lines){
                 nor.set(1f, 1f, 1f);
@@ -102,9 +114,21 @@ public class PlanetMesh{
         }
     }
 
+    private Vec3 normal(Vec3 v1, Vec3 v2, Vec3 v3){
+        return normal.set(v2).sub(v1).crs(v3.x - v1.x, v3.y - v1.y, v3.z - v1.z).nor();
+    }
+
+    private float elevation(Vec3 v){
+        if(lines) return 0;
+
+        Color c = color(v);
+        if(c == Color.royal) return 0.19f;
+        return ((float)sim.octaveNoise3D(8, 0.7, 1 / 2.0, v.x, v.y, v.z)) / 3f + (rid.getValue(v.x, v.y, v.z, 1f) + 1f) / 12f;
+    }
+
     private Color color(Vec3 v){
-        float f = ((float)sim.octaveNoise3D(6, 0.6, 1 / 2.0, v.x, v.y, v.z));
-        return colors[Mathf.clamp((int)(f * colors.length), 0, colors.length - 1)].cpy().mul(Mathf.round(Mathf.lerp(f*2f, 2f, 0.2f), 0.2f)).a(1f);
+        float f = ((float)sim.octaveNoise3D(6, 0.6, 1 / 2.0, v.x, v.y, v.z)) * 0.5f +  0.5f * ((rid.getValue(v.x, v.y, v.z, 1f) + 1f) / 2f);
+        return colors[Mathf.clamp((int)(f * colors.length), 0, colors.length - 1)];
     }
 
     private void verts(Vec3 a, Vec3 b, Vec3 c, Vec3 normal, Color color){
