@@ -152,10 +152,10 @@ public class ZoneInfoDialog extends FloatingDialog{
             if(!data.isUnlocked(zone)){
                 Sounds.unlock.play();
                 data.unlockContent(zone);
-                ui.deploy.setup();
+                ui.planet.setup();
                 setup(zone);
             }else{
-                ui.deploy.hide();
+                ui.planet.hide();
                 data.removeItems(zone.getLaunchCost());
                 hide();
                 control.playZone(zone);

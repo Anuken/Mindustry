@@ -7,13 +7,13 @@ import arc.graphics.g3d.*;
 import arc.input.*;
 import arc.math.geom.*;
 import arc.util.*;
-import mindustry.graphics.Pgrid.*;
+import mindustry.graphics.PlanetGrid.*;
 
 public class PlanetRenderer{
     private Camera3D cam = new Camera3D();
     private float lastX, lastY;
 
-    private PlanetMesh planet = new PlanetMesh(3, 1f, false, Color.royal);
+    private PlanetMesh planet = new PlanetMesh(4, 1f, false, Color.royal);
     private PlanetMesh outline = new PlanetMesh(3, 1.01f, true, Pal.accent);
     private VertexBatch3D batch = new VertexBatch3D(false, true, 0);
 
@@ -24,8 +24,7 @@ public class PlanetRenderer{
 
     public void draw(){
         Draw.flush();
-        Gl.clearColor(0, 0, 0, 1);
-        Gl.clear(Gl.depthBufferBit | Gl.colorBufferBit);
+        Gl.clear(Gl.depthBufferBit);
         Gl.enable(Gl.depthTest);
 
         input();
@@ -38,15 +37,13 @@ public class PlanetRenderer{
         planet.render(cam.combined());
         //outline.render(cam.combined());
 
-        //Log.info(cam.position + " " + cam.getPickRay(Core.input.mouseX(), Core.input.mouseY()));
-
         Ptile tile = outline.getTile(cam.getPickRay(Core.input.mouseX(), Core.input.mouseY()));
         if(tile != null){
-            for(int i = 0; i < tile.corners.length + 1; i++){
-                batch.color(Pal.accent);
-                batch.vertex(tile.corners[i % tile.corners.length].v);
+            for(int i = 0; i < tile.corners.length; i++){
+                batch.color(1f, 1f, 1f, 0.5f);
+                batch.vertex(tile.corners[i].v);
             }
-            batch.flush(cam.combined(), Gl.lineStrip);
+            batch.flush(cam.combined(), Gl.triangleFan);
         }
 
         Gl.disable(Gl.depthTest);

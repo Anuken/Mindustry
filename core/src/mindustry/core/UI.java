@@ -67,7 +67,7 @@ public class UI implements ApplicationListener, Loadable{
     public TraceDialog traces;
     public DatabaseDialog database;
     public ContentInfoDialog content;
-    public DeployDialog deploy;
+    public PlanetDialog planet;
     public TechTreeDialog tech;
     //public MinimapDialog minimap;
     public SchematicsDialog schematics;
@@ -235,7 +235,7 @@ public class UI implements ApplicationListener, Loadable{
         traces = new TraceDialog();
         maps = new MapsDialog();
         content = new ContentInfoDialog();
-        deploy = new DeployDialog();
+        planet = new PlanetDialog();
         tech = new TechTreeDialog();
         mods = new ModsDialog();
         schematics = new SchematicsDialog();

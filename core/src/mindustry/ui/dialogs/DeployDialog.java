@@ -29,6 +29,7 @@ import mindustry.ui.layout.TreeLayout.*;
 
 import static mindustry.Vars.*;
 
+//TODO remove (legacy, no longer needed)
 public class DeployDialog extends FloatingDialog{
     private final float nodeSize = Scl.scl(230f);
     private ObjectSet<ZoneNode> nodes = new ObjectSet<>();
@@ -105,7 +106,7 @@ public class DeployDialog extends FloatingDialog{
         bounds.y += nodeSize*0.4f;
     }
 
-    public void setup(){
+    void setup(){
         platform.updateRPC();
 
         cont.clear();

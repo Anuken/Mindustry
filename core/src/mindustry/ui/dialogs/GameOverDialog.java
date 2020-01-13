@@ -88,7 +88,7 @@ public class GameOverDialog extends FloatingDialog{
                     hide();
                     state.set(State.menu);
                     logic.reset();
-                    ui.deploy.show();
+                    ui.planet.show();
                 }).size(130f, 60f);
             }else{
                 buttons.addButton("$menu", () -> {

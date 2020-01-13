@@ -8,13 +8,13 @@ import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.noise.*;
-import mindustry.graphics.Pgrid.*;
+import mindustry.graphics.PlanetGrid.*;
 
 public class PlanetMesh{
     private float[] floats = new float[3 + 3 + 1];
     private Vec3 center = new Vec3(0, 0, 0);
     private Mesh mesh;
-    private Pgrid grid;
+    private PlanetGrid grid;
 
     private float color;
     private boolean lines;
@@ -27,7 +27,7 @@ public class PlanetMesh{
         this.radius = radius;
         this.lines = lines;
         this.color = color.toFloatBits();
-        this.grid = Pgrid.newGrid(divisions);
+        this.grid = PlanetGrid.newGrid(divisions);
 
         int vertices = grid.tiles.length * 12 * (3 + 3 + 1);
 

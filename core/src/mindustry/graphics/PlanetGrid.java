@@ -4,7 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 
-class Pgrid{
+class PlanetGrid{
     private static final float x = -0.525731112119133606f;
     private static final float z = -0.850650808352039932f;
 
@@ -14,18 +14,20 @@ class Pgrid{
     new Vec3(z, x, 0), new Vec3(-z, x, 0), new Vec3(z, -x, 0), new Vec3(-z, -x, 0)
     };
 
-    private static final  int[][] iTilesP = {
+    private static final int[][] iTilesP = {
     {9, 4, 1, 6, 11}, {4, 8, 10, 6, 0}, {11, 7, 3, 5, 9}, {2, 7, 10, 8, 5},
     {9, 5, 8, 1, 0}, {2, 3, 8, 4, 9}, {0, 1, 10, 7, 11}, {11, 6, 10, 3, 2},
     {5, 3, 10, 1, 4}, {2, 5, 4, 0, 11}, {3, 7, 6, 1, 8}, {7, 2, 9, 0, 6}
     };
+
+    private static PlanetGrid[] cache = new PlanetGrid[10];
 
     int size;
     Ptile[] tiles;
     Corner[] corners;
     Edge[] edges;
 
-    Pgrid(int size){
+    PlanetGrid(int size){
         this.size = size;
 
         tiles = new Ptile[tileCount(size)];
@@ -44,16 +46,29 @@ class Pgrid{
         }
     }
 
-    static Pgrid newGrid(int size){
-        if(size == 0){
-            return initialGrid();
-        }else{
-            return subdividedGrid(newGrid(size - 1));
+    static PlanetGrid newGrid(int size){
+        //cache grids between calls, since only ~5 different grids total are needed
+        if(size < cache.length && cache[size] != null){
+            return cache[size];
         }
+
+        PlanetGrid result;
+        if(size == 0){
+            result = initialGrid();
+        }else{
+            result = subdividedGrid(newGrid(size - 1));
+        }
+
+        //store grid in cache
+        if(size < cache.length){
+            cache[size] = result;
+        }
+
+        return result;
     }
 
-    static Pgrid initialGrid(){
-        Pgrid grid = new Pgrid(0);
+    static PlanetGrid initialGrid(){
+        PlanetGrid grid = new PlanetGrid(0);
 
         for(Ptile t : grid.tiles){
             t.v = iTiles[t.id];
@@ -97,8 +112,8 @@ class Pgrid{
         return grid;
     }
 
-    static Pgrid subdividedGrid(Pgrid prev){
-        Pgrid grid = new Pgrid(prev.size + 1);
+    static PlanetGrid subdividedGrid(PlanetGrid prev){
+        PlanetGrid grid = new PlanetGrid(prev.size + 1);
 
         int prevTiles = prev.tiles.length;
         int prevCorners = prev.corners.length;
@@ -148,7 +163,7 @@ class Pgrid{
         return grid;
     }
 
-    static void addCorner(int id, Pgrid grid, int t1, int t2, int t3){
+    static void addCorner(int id, PlanetGrid grid, int t1, int t2, int t3){
         Corner c = grid.corners[id];
         Ptile[] t = {grid.tiles[t1], grid.tiles[t2], grid.tiles[t3]};
         c.v = Tmp.v31.set(t[0].v).add(t[1].v).add(t[2].v).cpy().nor();
@@ -158,7 +173,7 @@ class Pgrid{
         }
     }
 
-    static void addEdge(int id, Pgrid grid, int t1, int t2){
+    static void addEdge(int id, PlanetGrid grid, int t1, int t2){
         Edge e = grid.edges[id];
         Ptile[] t = {grid.tiles[t1], grid.tiles[t2]};
         Corner[] c = {

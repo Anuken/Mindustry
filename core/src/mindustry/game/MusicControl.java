@@ -48,7 +48,7 @@ public class MusicControl{
     public void update(){
         if(state.is(State.menu)){
             silenced = false;
-            if(ui.deploy.isShown()){
+            if(ui.planet.isShown()){
                 play(Musics.launch);
             }else if(ui.editor.isShown()){
                 play(Musics.editor);

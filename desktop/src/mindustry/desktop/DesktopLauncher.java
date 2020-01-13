@@ -262,7 +262,7 @@ public class DesktopLauncher extends ClientLauncher{
         }else{
             if(ui.editor != null && ui.editor.isShown()){
                 presence.state = "In Editor";
-            }else if(ui.deploy != null && ui.deploy.isShown()){
+            }else if(ui.planet != null && ui.planet.isShown()){
                 presence.state = "In Launch Selection";
             }else{
                 presence.state = "In Menu";
