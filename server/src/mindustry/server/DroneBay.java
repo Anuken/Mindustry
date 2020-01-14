@@ -24,7 +24,7 @@ public class DroneBay implements ApplicationListener{
         if(!state.is(State.playing)) return;
 
         for(Team team : Team.base()){
-            if(team.core() == null)  continue;
+            if(team.cores().isEmpty()) continue;
 
             for(BrokenBlock broken : team.data().brokenBlocks){
                 if(rebuild.get(broken) == null) rebuild.put(broken, spawn(team));
