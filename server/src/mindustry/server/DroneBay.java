@@ -29,14 +29,6 @@ public class DroneBay implements ApplicationListener{
             for(BrokenBlock broken : team.data().brokenBlocks){
                 if(rebuild.get(broken) == null) rebuild.put(broken, spawn(team));
             }
-
-            if(team.data().brokenBlocks.isEmpty()){
-                rebuild.each((block, drone) -> {
-                    if(drone.getTeam() != team) return;
-                    drone.kill();
-                    rebuild.remove(block);
-                });
-            }
         }
     }
 
