@@ -95,8 +95,6 @@ public class Block extends BlockStorage{
     public boolean consumesTap;
     /** Whether to draw the glow of the liquid for this block, if it has one. */
     public boolean drawLiquidLight = true;
-    /** Whether the config is positional and needs to be shifted. */
-    public boolean posConfig;
     /** Whether to periodically sync this block across the network.*/
     public boolean sync;
     /** Whether this block uses conveyor-type placement mode.*/
@@ -146,6 +144,7 @@ public class Block extends BlockStorage{
     protected TextureRegion[] cacheRegions = {};
     protected Array<String> cacheRegionStrings = new Array<>();
     protected Prov<TileEntity> entityType = TileEntity::new;
+    protected ObjectMap<Class<?>, Cons2<Player, Object>> configurations = new ObjectMap<>();
 
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] generatedIcons;
@@ -473,12 +472,13 @@ public class Block extends BlockStorage{
     }
 
     /** Called when arbitrary int configuration is applied to a tile. */
-    protected void configured_(Tile tile, @Nullable Player player, int value){
+    protected void configuredPos(Tile tile, @Nullable Player player, Point2 point){
 
     }
 
     /** Called when arbitrary configuration is applied to a tile.
      * The default behavior is to treat this as integer configuration. */
+    @CallSuper
     public void configured(Tile tile, @Nullable Player player, @Nullable Object value){
         if(value instanceof Integer){
             configured_(tile, player, (int)value);

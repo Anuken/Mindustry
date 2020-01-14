@@ -1,27 +1,25 @@
 package mindustry.io;
 
+import arc.graphics.*;
+import arc.math.geom.*;
 import arc.struct.*;
-import mindustry.annotations.Annotations.ReadClass;
-import mindustry.annotations.Annotations.WriteClass;
-import arc.graphics.Color;
+import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
-import mindustry.entities.Effects;
-import mindustry.entities.Effects.Effect;
-import mindustry.entities.type.Bullet;
-import mindustry.entities.bullet.BulletType;
-import mindustry.entities.traits.BuilderTrait.BuildRequest;
-import mindustry.entities.traits.ShooterTrait;
+import mindustry.entities.*;
+import mindustry.entities.Effects.*;
+import mindustry.entities.bullet.*;
+import mindustry.entities.traits.BuilderTrait.*;
+import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
-import mindustry.net.Administration.TraceInfo;
-import mindustry.net.Packets.AdminAction;
-import mindustry.net.Packets.KickReason;
+import mindustry.net.Administration.*;
+import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
 import java.io.*;
-import java.nio.ByteBuffer;
+import java.nio.*;
 
 import static mindustry.Vars.*;
 
@@ -57,6 +55,10 @@ public class TypeIO{
             for(int i = 0; i < arr.size; i++){
                 buffer.putInt(arr.items[i]);
             }
+        }else if(object instanceof Point2){
+            buffer.put((byte)7);
+            buffer.putInt(((Point2)object).x);
+            buffer.putInt(((Point2)object).y);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -73,6 +75,7 @@ public class TypeIO{
             case 4: return readString(buffer);
             case 5: return content.getByID(ContentType.all[buffer.get()], buffer.getShort());
             case 6: short length = buffer.getShort(); IntArray arr = new IntArray(); for(int i = 0; i < length; i ++) arr.add(buffer.getInt()); return arr;
+            case 7: return new Point2(buffer.getInt(), buffer.getInt());
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
     }
