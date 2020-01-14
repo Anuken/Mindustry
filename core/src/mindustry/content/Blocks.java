@@ -937,7 +937,7 @@ public class Blocks implements ContentList{
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
-            requirements(Category.distribution, itemBridge.requirements);
+            requirements(Category.distribution, ItemStack.with(Items.phasefabric, 5, Items.silicon, 7, Items.lead, 10, Items.graphite, 10));
             range = 12;
             canOverdrive = false;
             hasPower = true;
