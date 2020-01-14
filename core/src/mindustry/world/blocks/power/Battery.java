@@ -30,7 +30,7 @@ public class Battery extends PowerDistributor{
         PowerModule entity = ent.power;
 
         Draw.color(lightColor);
-        Draw.alpha(entity.power.status);
+        Draw.alpha(entity.status);
         Draw.rect(lightsRegion, tile.drawx(), tile.drawy());
 
         Draw.reset();
