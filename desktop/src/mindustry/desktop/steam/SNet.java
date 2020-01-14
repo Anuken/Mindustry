@@ -76,14 +76,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                                 }
 
                                 net.handleServerReceived(con, output);
-                            }catch(RuntimeException e){
-                                if(e.getCause() instanceof ValidateException){
-                                    ValidateException v = (ValidateException)e.getCause();
-                                    Log.err("Validation failed: {0} ({1})", v.player.name, v.getMessage());
-                                }else{
-                                    Log.err(e);
-                                }
-                            }catch(Exception e){
+                            }catch(Throwable e){
                                 Log.err(e);
                             }
                         }else if(currentServer != null && fromID == currentServer.getAccountID()){

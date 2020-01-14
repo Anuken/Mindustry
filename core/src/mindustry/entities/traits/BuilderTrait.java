@@ -67,9 +67,9 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
         if(!(tile.block() instanceof BuildBlock)){
             if(!current.initialized && canCreateBlocks() && !current.breaking && Build.validPlace(getTeam(), current.x, current.y, current.block, current.rotation)){
-                Call.beginPlace(getTeam(), current.x, current.y, current.block, current.rotation);
+                Build.beginPlace(getTeam(), current.x, current.y, current.block, current.rotation);
             }else if(!current.initialized && canCreateBlocks() && current.breaking && Build.validBreak(getTeam(), current.x, current.y)){
-                Call.beginBreak(getTeam(), current.x, current.y);
+                Build.beginBreak(getTeam(), current.x, current.y);
             }else{
                 buildQueue().removeFirst();
                 return;
@@ -116,6 +116,14 @@ public interface BuilderTrait extends Entity, TeamTrait{
         //requests that you have at least *started* are considered
         if(state.rules.infiniteResources || request.breaking || !request.initialized || core == null) return false;
         return request.stuck && !core.items.has(request.block.requirements);
+    }
+
+    default void removeRequest(int x, int y, boolean breaking){
+        //remove matching request
+        int idx = player.buildQueue().indexOf(req -> req.breaking == breaking && req.x == x && req.y == y);
+        if(idx != -1){
+            player.buildQueue().removeIndex(idx);
+        }
     }
 
     /** Returns the queue for storing build requests. */

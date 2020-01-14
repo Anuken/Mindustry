@@ -114,12 +114,7 @@ public class ArcNetProvider implements NetProvider{
                     try{
                         net.handleServerReceived(k, object);
                     }catch(RuntimeException e){
-                        if(e.getCause() instanceof ValidateException){
-                            ValidateException v = (ValidateException)e.getCause();
-                            Log.err("Validation failed: {0} ({1})", v.player.name, v.getMessage());
-                        }else{
-                            e.printStackTrace();
-                        }
+                        e.printStackTrace();
                     }catch(Exception e){
                         e.printStackTrace();
                     }
