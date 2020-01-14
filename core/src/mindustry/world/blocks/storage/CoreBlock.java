@@ -205,8 +205,6 @@ public class CoreBlock extends StorageBlock{
     public void update(Tile tile){
         CoreEntity entity = tile.ent();
 
-        entity.items.set(Items.scrap, 100);
-
         if(entity.spawnPlayer != null){
             if(!entity.spawnPlayer.isDead() || !entity.spawnPlayer.isAdded()){
                 entity.spawnPlayer = null;
