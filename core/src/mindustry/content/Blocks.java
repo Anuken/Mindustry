@@ -624,10 +624,6 @@ public class Blocks implements ContentList{
             );
             hasPower = true;
             craftTime = 35f;
-            spinnerLength = 1.5f;
-            spinnerRadius = 3.5f;
-            spinnerThickness = 1.5f;
-            spinnerSpeed = 3f;
             size = 2;
 
             consumes.power(1f);
