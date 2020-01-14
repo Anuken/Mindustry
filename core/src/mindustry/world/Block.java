@@ -467,14 +467,24 @@ public class Block extends BlockStorage{
         return cacheRegions[id];
     }
 
-    /** Called when the block is tapped. */
+    /** Called when the block is tapped. This is equivalent to being configured with null. */
     public void tapped(Tile tile, Player player){
 
     }
 
-    /** Called when arbitrary configuration is applied to a tile. */
-    public void configured(Tile tile, @Nullable Player player, int value){
+    /** Called when arbitrary int configuration is applied to a tile. */
+    protected void configured_(Tile tile, @Nullable Player player, int value){
 
+    }
+
+    /** Called when arbitrary configuration is applied to a tile.
+     * The default behavior is to treat this as integer configuration. */
+    public void configured(Tile tile, @Nullable Player player, @Nullable Object value){
+        if(value instanceof Integer){
+            configured_(tile, player, (int)value);
+        }else if(value == null){
+            tapped(tile, player);
+        }
     }
 
     /** Returns whether or not a hand cursor should be shown over this block. */

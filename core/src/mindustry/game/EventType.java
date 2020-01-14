@@ -186,9 +186,9 @@ public class EventType{
     public static class TapConfigEvent{
         public final Tile tile;
         public final Player player;
-        public final int value;
+        public final Object value;
 
-        public TapConfigEvent(Tile tile, Player player, int value){
+        public TapConfigEvent(Tile tile, Player player, Object value){
             this.tile = tile;
             this.player = player;
             this.value = value;

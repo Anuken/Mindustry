@@ -345,7 +345,7 @@ public class Schematics implements Loadable{
 
                 if(tile != null && tile.entity != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
                     && (tile.entity.block.isVisible() || (tile.entity.block instanceof CoreBlock && Core.settings.getBool("coreselect")))){
-                    int config = tile.entity.config();
+                    Object config = tile.entity.config();
                     if(tile.block().posConfig){
                         config = Pos.get(Pos.x(config) + offsetX, Pos.y(config) + offsetY);
                     }

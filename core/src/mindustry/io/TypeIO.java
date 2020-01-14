@@ -1,9 +1,10 @@
 package mindustry.io;
 
+import arc.struct.*;
 import mindustry.annotations.Annotations.ReadClass;
 import mindustry.annotations.Annotations.WriteClass;
 import arc.graphics.Color;
-import mindustry.ctype.ContentType;
+import mindustry.ctype.*;
 import mindustry.entities.Effects;
 import mindustry.entities.Effects.Effect;
 import mindustry.entities.type.Bullet;
@@ -27,6 +28,54 @@ import static mindustry.Vars.*;
 /** Class for specifying read/write methods for code generation. */
 @SuppressWarnings("unused")
 public class TypeIO{
+
+    @WriteClass(Object.class)
+    public static void writeObject(ByteBuffer buffer, Object object){
+        if(object == null){
+            buffer.put((byte)0);
+        }else if(object instanceof Integer){
+            buffer.put((byte)1);
+            buffer.putInt((Integer)object);
+        }else if(object instanceof Long){
+            buffer.put((byte)2);
+            buffer.putLong((Long)object);
+        }else if(object instanceof Float){
+            buffer.put((byte)3);
+            buffer.putFloat((Float)object);
+        }else if(object instanceof String){
+            buffer.put((byte)4);
+            writeString(buffer, (String)object);
+        }else if(object instanceof Content){
+            Content map = (Content)object;
+            buffer.put((byte)5);
+            buffer.put((byte)map.getContentType().ordinal());
+            buffer.putShort(map.id);
+        }else if(object instanceof IntArray){
+            buffer.put((byte)6);
+            IntArray arr = (IntArray)object;
+            buffer.putShort((short)arr.size);
+            for(int i = 0; i < arr.size; i++){
+                buffer.putInt(arr.items[i]);
+            }
+        }else{
+            throw new IllegalArgumentException("Unknown object type: " + object.getClass());
+        }
+    }
+
+    @ReadClass(Object.class)
+    public static Object readObject(ByteBuffer buffer){
+        byte type = buffer.get();
+        switch(type){
+            case 0: return null;
+            case 1: return buffer.getInt();
+            case 2: return buffer.getLong();
+            case 3: return buffer.getFloat();
+            case 4: return readString(buffer);
+            case 5: return content.getByID(ContentType.all[buffer.get()], buffer.getShort());
+            case 6: short length = buffer.getShort(); IntArray arr = new IntArray(); for(int i = 0; i < length; i ++) arr.add(buffer.getInt()); return arr;
+            default: throw new IllegalArgumentException("Unknown object type: " + type);
+        }
+    }
 
     @WriteClass(Player.class)
     public static void writePlayer(ByteBuffer buffer, Player player){

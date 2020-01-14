@@ -534,7 +534,7 @@ public class Administration{
         public int rotation;
 
         /** valid for configure and rotation-type events only. */
-        public int config;
+        public Object config;
 
         /** valid for item-type events only. */
         public @Nullable Item item;
@@ -550,7 +550,8 @@ public class Administration{
         @Override
         public void reset(){
             item = null;
-            itemAmount = config = 0;
+            itemAmount = 0;
+            config = null;
             player = null;
             type = null;
             tile = null;
@@ -558,7 +559,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, tapTile, withdrawItem, depositItem
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem
     }
 
 }

@@ -246,9 +246,9 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return proximity;
     }
 
-    /** Tile configuration. Defaults to 0. Used for block rebuilding. */
-    public int config(){
-        return 0;
+    /** Tile configuration. Defaults to null, which means 'no config'. Used for block rebuilding and schematics. */
+    public Object config(){
+        return null;
     }
 
     @Override

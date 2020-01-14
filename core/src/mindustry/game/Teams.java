@@ -170,9 +170,9 @@ public class Teams{
      * This does not include deconstructed blocks.*/
     public static class BrokenBlock{
         public final short x, y, rotation, block;
-        public final int config;
+        public final Object config;
 
-        public BrokenBlock(short x, short y, short rotation, short block, int config){
+        public BrokenBlock(short x, short y, short rotation, short block, Object config){
             this.x = x;
             this.y = y;
             this.rotation = rotation;
