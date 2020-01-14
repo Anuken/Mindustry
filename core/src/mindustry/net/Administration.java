@@ -529,6 +529,10 @@ public class Administration{
         public @NonNull ActionType type;
         public @NonNull Tile tile;
 
+        /** valid for block placement events only */
+        public @Nullable Block block;
+        public int rotation;
+
         /** valid for configure and rotation-type events only. */
         public int config;
 
@@ -554,7 +558,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem
+        breakBlock, placeBlock, rotate, configure, tapTile, withdrawItem, depositItem
     }
 
 }
