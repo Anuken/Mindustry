@@ -1056,7 +1056,7 @@ public class Blocks implements ContentList{
         }};
 
         phaseConduit = new LiquidBridge("phase-conduit"){{
-            requirements(Category.liquid, bridgeConduit.requirements);
+            requirements(Category.liquid, ItemStack.with(Items.phasefabric, 5, Items.silicon, 7, Items.metaglass, 20, Items.titanium, 10));
             range = 12;
             hasPower = true;
             canOverdrive = false;
