@@ -23,10 +23,15 @@ public class ItemBridge extends Block{
     public final int timerTransport = timers++;
     public int range;
     public float transportTime = 2f;
-    public TextureRegion endRegion, bridgeRegion, arrowRegion;
+    public TextureRegion endRegion, bridgeRegion, arrowRegion, colorBridge, circleRegion;
 
     private static BuildRequest otherReq;
     private static int lastPlaced = Pos.invalid;
+
+    public float count = 0;
+    public Array<Item> itemColors = new Array<>();
+    int i = 0;
+    int r = 0;
 
     public ItemBridge(String name){
         super(name);
@@ -56,6 +61,7 @@ public class ItemBridge extends Block{
         endRegion = Core.atlas.find(name + "-end");
         bridgeRegion = Core.atlas.find(name + "-bridge");
         arrowRegion = Core.atlas.find(name + "-arrow");
+        colorBridge = Core.atlas.find(name + "-color");
     }
 
     @Override
@@ -76,7 +82,7 @@ public class ItemBridge extends Block{
         otherReq.drawx(),
         otherReq.drawy(), CapStyle.none, -tilesize / 2f);
         Draw.rect(arrowRegion, (req.drawx() + otherReq.drawx()) / 2f, (req.drawy() + otherReq.drawy()) / 2f,
-            Angles.angle(req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy()));
+        Angles.angle(req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy()));
     }
 
     @Override
@@ -145,7 +151,6 @@ public class ItemBridge extends Block{
                 }
             }
         }
-
         Draw.reset();
     }
 
@@ -192,7 +197,6 @@ public class ItemBridge extends Block{
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
             }
-
             updateTransport(tile, other);
         }
     }
@@ -205,6 +209,8 @@ public class ItemBridge extends Block{
             if(item != null && other.block().acceptItem(item, other, tile)){
                 other.block().handleItem(item, other, tile);
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
+                entity.itemColor = item.color;
+                entity.itemReceivedAt = Time.time();
             }else{
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 1f, 0.01f);
                 if(item != null) entity.items.add(item, 1);
@@ -222,34 +228,82 @@ public class ItemBridge extends Block{
         float opacity = Core.settings.getInt("bridgeopacity") / 100f;
         if(Mathf.zero(opacity)) return;
 
-        int i = tile.absoluteRelativeTo(other.x, other.y);
+        int direction = tile.absoluteRelativeTo(other.x, other.y);
 
-        Draw.color(Color.white, Color.black, Mathf.absin(Time.time(), 6f, 0.07f));
+        Draw.color(entity.lastColor.lerp(entity.itemColor, 0.05f));
         Draw.alpha(Math.max(entity.uptime, 0.25f) * opacity);
 
-        Draw.rect(endRegion, tile.drawx(), tile.drawy(), i * 90 + 90);
-        Draw.rect(endRegion, other.drawx(), other.drawy(), i * 90 + 270);
+        Draw.rect(colorBridge, tile.drawx(), tile.drawy());
+        Draw.rect(colorBridge, other.drawx(), other.drawy());
+
+        Draw.rect(endRegion, tile.drawx(), tile.drawy(), direction * 90 + 90);
+        Draw.rect(endRegion, other.drawx(), other.drawy(), direction * 90 + 270);
 
         Lines.stroke(8f);
         Lines.line(bridgeRegion,
-        tile.worldx(),
-        tile.worldy(),
-        other.worldx(),
-        other.worldy(), CapStyle.none, -tilesize / 2f);
+                tile.worldx(),
+                tile.worldy(),
+                other.worldx(),
+                other.worldy(), CapStyle.none, -tilesize / 2f);
 
         int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y));
 
         float time = entity.time2 / 1.7f;
         int arrows = (dist) * tilesize / 4 - 2;
 
-        Draw.color();
+        if(tile.ent().block.category == Category.liquid){
+            //Conduit
+            if(entity.liquids.currentAmount() < 1) {
+                entity.itemColor = Color.valueOf("999ca5");
+            }
 
-        for(int a = 0; a < arrows; a++){
-            Draw.alpha(Mathf.absin(a / (float)arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime * opacity);
-            Draw.rect(arrowRegion,
-            tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 4f + time % 4f),
-            tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 4f + time % 4f), i * 90f);
+            //Draw arrows
+            arrows = (dist) * tilesize / 8 - 1;
+
+            for(int a = 0; a < arrows; a++){
+                Draw.alpha(Mathf.absin(a / (float) arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime);
+                Draw.rect(arrowRegion,
+                        tile.worldx() + Geometry.d4[direction].x * (tilesize / 8f + a * 8f + time % 8f),
+                        tile.worldy() + Geometry.d4[direction].y * (tilesize / 8f + a * 8f + time % 8f), direction * 90f);
+            }
+
+        } else if(tile.ent().block.category == Category.distribution){
+
+            //Conveyor
+            if(other.entity.items.total() == 0 && Time.time() - entity.itemReceivedAt > 50){
+                entity.itemColor = Color.valueOf("999ca5");
+            }
+
+            //Stuck item
+            if(Time.time() - entity.itemReceivedAt>50 && other.entity.items.total() == itemCapacity){
+
+                for(Item item : content.items()){
+                    if(other.entity.items.has(item) && !itemColors.contains(item)){
+                        itemColors.add(item);
+                    }
+                    r++;
+
+                    if(Time.time() - count>100 && itemColors.size > 0 && r > content.items().size){
+                        entity.itemColor = itemColors.get(i).color;
+                        count = Time.time();
+                        i++;
+                        if(i == itemColors.size){
+                            itemColors.clear();
+                            i = 0;
+                        }
+                    }
+                }
+            }
+
+            //Draw arrows
+            for(int a = 0; a < arrows; a++){
+                Draw.alpha(Mathf.absin(a / (float) arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime);
+                Draw.rect(arrowRegion,
+                        tile.worldx() + Geometry.d4[direction].x * (tilesize / 2f + a * 4f + time % 4f),
+                        tile.worldy() + Geometry.d4[direction].y * (tilesize / 2f + a * 4f + time % 4f), direction * 90f);
+            }
         }
+        Draw.color();
         Draw.reset();
     }
 
@@ -305,6 +359,8 @@ public class ItemBridge extends Block{
 
         ItemBridgeEntity entity = tile.ent();
         Tile other = world.tile(entity.link);
+
+        entity.itemColor = entity.liquids.current().color;
 
         if(linkValid(tile, other)){
             int rel = tile.absoluteRelativeTo(other.x, other.y);
@@ -368,6 +424,10 @@ public class ItemBridge extends Block{
         public float time;
         public float time2;
         public float cycleSpeed = 1f;
+
+        public float itemReceivedAt;
+        public Color itemColor = Color.valueOf("999ca5");
+        public Color lastColor = itemColor;
 
         @Override
         public int config(){
