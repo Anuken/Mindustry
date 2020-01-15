@@ -40,18 +40,13 @@ public class Sorter extends Block{
     @Override
     public void playerPlaced(Tile tile){
         if(lastItem != null){
-            tile.configure(lastItem.id);
+            tile.configure(lastItem);
         }
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
-        tile.<SorterEntity>ent().sortItem = content.item(value);
-    }
-
-    @Override
     public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
-        drawRequestConfigCenter(req, content.item(req.config), "center");
+        drawRequestConfigCenter(req, (Item)req.config, "center");
     }
 
     @Override
@@ -143,8 +138,13 @@ public class Sorter extends Block{
         @Nullable Item sortItem;
 
         @Override
-        public Object config(){
+        public Item config(){
             return sortItem;
+        }
+
+        @Override
+        public void setConfig(Object config){
+            sortItem = (Item)config;
         }
 
         @Override

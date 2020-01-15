@@ -251,6 +251,9 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return null;
     }
 
+    /** Set configuration. */
+    public void setConfig(Object config){}
+
     @Override
     public void removed(){
         if(sound != null){
