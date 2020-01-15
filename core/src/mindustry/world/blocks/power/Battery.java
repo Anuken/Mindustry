@@ -1,11 +1,9 @@
 package mindustry.world.blocks.power;
 
 import arc.*;
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import mindustry.entities.type.TileEntity;
 import mindustry.world.*;
-import mindustry.world.modules.PowerModule;
 
 public class Battery extends PowerDistributor{
     public TextureRegion lightsRegion;
@@ -26,10 +24,9 @@ public class Battery extends PowerDistributor{
     @Override
     public void draw(Tile tile){
         super.draw(tile);
-        TileEntity ent = tile.ent();
 
         Draw.color(lightColor);
-        Draw.alpha(ent.power.status);
+        Draw.alpha(tile.entity.power.status);
         Draw.rect(lightsRegion, tile.drawx(), tile.drawy());
 
         Draw.reset();
