@@ -144,7 +144,7 @@ public class Block extends BlockStorage{
     protected TextureRegion[] cacheRegions = {};
     protected Array<String> cacheRegionStrings = new Array<>();
     protected Prov<TileEntity> entityType = TileEntity::new;
-    protected ObjectMap<Class<?>, Cons2<Player, Object>> configurations = new ObjectMap<>();
+    protected ObjectMap<Class<?>, ConfigHandler> configurations = new ObjectMap<>();
 
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] generatedIcons;
@@ -471,20 +471,17 @@ public class Block extends BlockStorage{
 
     }
 
-    /** Called when arbitrary int configuration is applied to a tile. */
-    protected void configuredPos(Tile tile, @Nullable Player player, Point2 point){
-
+    /** Called when arbitrary configuration is applied to a tile. */
+    public void configured(Tile tile, @Nullable Player player, @Nullable Object value){
+        if(value == null){
+            tapped(tile, player);
+        }else if(configurations.containsKey(value.getClass())){
+            configurations.get(value.getClass()).configured(tile, player, value);
+        }
     }
 
-    /** Called when arbitrary configuration is applied to a tile.
-     * The default behavior is to treat this as integer configuration. */
-    @CallSuper
-    public void configured(Tile tile, @Nullable Player player, @Nullable Object value){
-        if(value instanceof Integer){
-            configured_(tile, player, (int)value);
-        }else if(value == null){
-            tapped(tile, player);
-        }
+    public <T> void config(Class<T> type, ConfigHandler<T> config){
+        configurations.put(type, config);
     }
 
     /** Returns whether or not a hand cursor should be shown over this block. */
@@ -926,6 +923,10 @@ public class Block extends BlockStorage{
         this.buildVisibility = visible;
 
         Arrays.sort(requirements, Structs.comparingInt(i -> i.item.id));
+    }
+
+    public interface ConfigHandler<T>{
+        void configured(Tile tile, Player player, T value);
     }
 
 }

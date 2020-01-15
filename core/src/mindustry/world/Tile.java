@@ -91,11 +91,11 @@ public class Tile implements Position, TargetTrait{
     }
 
     /** Configure a tile with the current, local player. */
-    public void configure(int value){
+    public void configure(Object value){
         Call.onTileConfig(player, this, value);
     }
 
-    public void configureAny(int value){
+    public void configureAny(Object value){
         Call.onTileConfig(null, this, value);
     }
 

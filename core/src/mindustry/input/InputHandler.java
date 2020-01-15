@@ -266,8 +266,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         requests.each(req -> {
             //rotate config position
-            if(req.block.posConfig){
-                int cx = Pos.x(req.config) - req.originalX, cy = Pos.y(req.config) - req.originalY;
+            if(req.config instanceof Point2){
+                int cx = ((Point2)req.config).x - req.originalX, cy = ((Point2)req.config).y - req.originalY;
                 int lx = cx;
 
                 if(direction >= 0){
@@ -277,7 +277,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     cx = cy;
                     cy = -lx;
                 }
-                req.config = Pos.get(cx + req.originalX, cy + req.originalY);
+                req.config = new Point2(cx + req.originalX, cy + req.originalY);
             }
 
             //rotate actual request, centered on its multiblock position
@@ -308,7 +308,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 req.y = (int)((value - req.block.offset()) / tilesize);
             }
 
-            if(req.block.posConfig){
+            if(req.config instanceof Point2){
                 int corigin = x ? req.originalWidth/2 : req.originalHeight/2;
                 int nvalue = -((x ? Pos.x(req.config) : Pos.y(req.config)) - corigin) + corigin;
                 if(x){

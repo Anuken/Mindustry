@@ -1,10 +1,11 @@
 package mindustry.entities.traits;
 
 import arc.*;
-import arc.struct.Queue;
+import arc.struct.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.Queue;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
@@ -289,10 +290,10 @@ public interface BuilderTrait extends Entity, TeamTrait{
         public @Nullable Block block;
         /** Whether this is a break request.*/
         public boolean breaking;
-        /** Whether this request comes with a config int. If yes, any blocks placed with this request will not call playerPlaced.*/
+        /** Whether this request comes with a config. If yes, any blocks placed with this request will not call playerPlaced.*/
         public boolean hasConfig;
         /** Config int. Not used unless hasConfig is true.*/
-        public int config;
+        public Object config;
         /** Original position, only used in schematics.*/
         public int originalX, originalY, originalWidth, originalHeight;
 
@@ -376,7 +377,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
             return y*tilesize + block.offset();
         }
 
-        public BuildRequest configure(int config){
+        public BuildRequest configure(Object config){
             this.config = config;
             this.hasConfig = true;
             return this;

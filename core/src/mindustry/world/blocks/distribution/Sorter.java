@@ -29,6 +29,7 @@ public class Sorter extends Block{
         configurable = true;
         unloadable = false;
         entityType = SorterEntity::new;
+        config(Item.class, (tile, player, item) -> tile.<SorterEntity>ent().sortItem = item);
     }
 
     @Override
@@ -142,8 +143,8 @@ public class Sorter extends Block{
         @Nullable Item sortItem;
 
         @Override
-        public int config(){
-            return sortItem == null ? -1 : sortItem.id;
+        public Object config(){
+            return sortItem;
         }
 
         @Override
