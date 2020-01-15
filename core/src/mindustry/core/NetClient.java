@@ -272,7 +272,6 @@ public class NetClient implements ApplicationListener{
         netClient.removed.clear();
         logic.reset();
 
-        ui.chatfrag.clearMessages();
         net.setClientLoaded(false);
 
         ui.loadfrag.show("$connecting.data");

@@ -230,7 +230,11 @@ public class NetServer implements ApplicationListener{
 
         net.handleServer(InvokePacket.class, (con, packet) -> {
             if(con.player == null) return;
-            RemoteReadServer.readPacket(packet.writeBuffer, packet.type, con.player);
+            try{
+                RemoteReadServer.readPacket(packet.writeBuffer, packet.type, con.player);
+            }catch(ValidateException e){
+                Log.debug("Validation failed for '{0}': {1}", e.player, e.getMessage());
+            }
         });
 
         registerCommands();
@@ -504,6 +508,7 @@ public class NetServer implements ApplicationListener{
         player.isShooting = shooting;
         player.isBuilding = building;
         player.buildQueue().clear();
+
         for(BuildRequest req : requests){
             if(req == null) continue;
             Tile tile = world.tile(req.x, req.y);
@@ -513,9 +518,22 @@ public class NetServer implements ApplicationListener{
                 continue;
             }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.rotation() == req.rotation)){
                 continue;
+            }else if(connection.rejectedRequests.contains(r -> r.breaking == req.breaking && r.x == req.x && r.y == req.y)){ //check if request was recently rejected, and skip it if so
+                continue;
+            }else if(!netServer.admins.allowAction(player, req.breaking ? ActionType.breakBlock : ActionType.placeBlock, tile, action -> { //make sure request is allowed by the server
+                action.block = req.block;
+                action.rotation = req.rotation;
+                action.config = req.config;
+            })){
+                //force the player to remove this request if that's not the case
+                Call.removeQueueBlock(player.con, req.x, req.y, req.breaking);
+                connection.rejectedRequests.add(req);
+                continue;
             }
             player.buildQueue().addLast(req);
         }
+
+        connection.rejectedRequests.clear();
 
         vector.set(x - player.getInterpolator().target.x, y - player.getInterpolator().target.y);
         vector.limit(maxMove);
