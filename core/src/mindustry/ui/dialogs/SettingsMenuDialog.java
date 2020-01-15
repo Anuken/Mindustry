@@ -295,7 +295,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             if(Core.settings.getBool("borderlesswindow")){
                 Core.app.post(() -> Core.graphics.setUndecorated(true));
             }
-        }else{
+        }else if(!ios){
             graphics.checkPref("landscape", false, b -> {
                 if(b){
                     platform.beginForceLandscape();
