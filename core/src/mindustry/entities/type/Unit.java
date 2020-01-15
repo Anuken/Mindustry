@@ -242,6 +242,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         return tile == null ? (Floor)Blocks.air : tile.floor();
     }
 
+    public @Nullable Tile tileOn(){
+        return world.tileWorld(x, y);
+    }
+
     public void onRespawn(Tile tile){
     }
 
