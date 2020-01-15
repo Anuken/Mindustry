@@ -325,8 +325,22 @@ public class Administration{
         ObjectSet<PlayerInfo> result = new ObjectSet<>();
 
         for(PlayerInfo info : playerInfo.values()){
-            if(info.lastName.toLowerCase().equals(name.toLowerCase()) || (info.names.contains(name, false))
+            if(info.lastName.equalsIgnoreCase(name) || (info.names.contains(name, false))
+            || Strings.stripColors(Strings.stripColors(info.lastName)).equals(name)
             || info.ips.contains(name, false) || info.id.equals(name)){
+                result.add(info);
+            }
+        }
+
+        return result;
+    }
+
+    /** Finds by name, using contains(). */
+    public ObjectSet<PlayerInfo> searchNames(String name){
+        ObjectSet<PlayerInfo> result = new ObjectSet<>();
+
+        for(PlayerInfo info : playerInfo.values()){
+            if(info.names.contains(n -> n.toLowerCase().contains(name.toLowerCase()) || Strings.stripColors(n).trim().toLowerCase().contains(name))){
                 result.add(info);
             }
         }
