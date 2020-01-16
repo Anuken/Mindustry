@@ -1,10 +1,10 @@
 package mindustry.tools;
 
 import arc.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
@@ -18,7 +18,7 @@ public class ImagePacker{
     static ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
     static ObjectMap<TextureRegion, BufferedImage> imageCache = new ObjectMap<>();
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception{
         Vars.headless = true;
 
         Log.setLogger(new NoopLogHandler());

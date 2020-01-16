@@ -8,6 +8,7 @@ import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.ui.*;
 
+//TODO remove
 public class Upscaler{
     public static void main(String[] args){
         new SdlApplication(new ApplicationListener(){
