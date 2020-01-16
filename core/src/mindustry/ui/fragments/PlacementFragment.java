@@ -17,6 +17,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.mod.Mod.LoadedMod;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.Cicon;
@@ -271,9 +272,18 @@ public class PlacementFragment extends Fragment{
                                     }
                                 }
                                 final String keyComboFinal = keyCombo;
+                                String modName = "";
+                                for(LoadedMod mod : mods.list()){
+                                    if(lastDisplay.name.startsWith(mod.meta.name + "-")){ // TODO: Make it foolproof
+                                        modName = "\n[accent]" + mod.meta.displayName;
+                                        break;
+                                    }
+                                }
+
+                                final String modNameFinal = modName;
                                 header.left();
                                 header.add(new Image(lastDisplay.icon(Cicon.medium))).size(8 * 4);
-                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName + keyComboFinal)
+                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName + keyComboFinal + modNameFinal)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(unlocked(lastDisplay)){
