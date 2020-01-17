@@ -55,7 +55,7 @@ public class DatabaseDialog extends FloatingDialog{
                 for(int i = 0; i < array.size; i++){
                     UnlockableContent unlock = (UnlockableContent)array.get(i);
 
-                    Image image = unlocked(unlock) ? new Image(unlock.icon(Cicon.medium)) : new Image(Icon.lockedSmall, Pal.gray);
+                    Image image = unlocked(unlock) ? new Image(unlock.icon(Cicon.medium)) : new Image(Icon.lockOpen, Pal.gray);
                     list.add(image).size(8*4).pad(3);
                     ClickListener listener = new ClickListener();
                     image.addListener(listener);

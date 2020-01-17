@@ -6,5 +6,6 @@ public class Fonts{
     public static BitmapFont def;
     public static BitmapFont outline;
     public static BitmapFont chat;
+    public static BitmapFont icon;
 
 }

@@ -42,6 +42,7 @@ public class FontGenerator{
         ZipFi zip = new ZipFi(folder.child("font.zip"));
         Fi dest = folder.child("font.ttf");
         zip.list()[0].child("font").child("fontello.ttf").copyTo(dest);
+        dest.copyTo(Fi.get("core/assets/fonts/icon.ttf"));
 
         Log.info("Merge...");
 

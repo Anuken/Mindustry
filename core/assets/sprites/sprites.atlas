@@ -4883,7 +4883,7 @@ item-silicon-medium
   orig: 32, 32
   offset: 0, 0
   index: -1
-item-silicon-small
+item-silIcon.
   rotate: false
   xy: 1553, 951
   size: 24, 24
@@ -14702,7 +14702,7 @@ block-silicon-smelter-medium
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-silicon-smelter-small
+block-silIcon.smelter-
   rotate: false
   xy: 491, 403
   size: 24, 24

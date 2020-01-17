@@ -122,7 +122,7 @@ public class JoinDialog extends FloatingDialog{
 
             inner.add(button.getLabel()).growX();
 
-            inner.addImageButton(Icon.arrowUpSmall, Styles.emptyi, () -> {
+            inner.addImageButton(Icon.upOpen, Styles.emptyi, () -> {
                 int index = servers.indexOf(server);
                 if(index > 0){
                     servers.remove(index);
@@ -141,16 +141,16 @@ public class JoinDialog extends FloatingDialog{
 
             }).margin(3f).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.loadingSmall, Styles.emptyi, () -> {
+            inner.addImageButton(Icon.refresh, Styles.emptyi, () -> {
                 refreshServer(server);
             }).margin(3f).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.pencilSmall, Styles.emptyi, () -> {
+            inner.addImageButton(Icon.pencil, Styles.emptyi, () -> {
                 renaming = server;
                 add.show();
             }).margin(3f).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.trash16Small, Styles.emptyi, () -> {
+            inner.addImageButton(Icon.trash, Styles.emptyi, () -> {
                 ui.showConfirm("$confirm", "$server.delete", () -> {
                     servers.removeValue(server, true);
                     saveServers();
@@ -303,7 +303,7 @@ public class JoinDialog extends FloatingDialog{
             local.background(Tex.button);
             local.add("$hosts.none").pad(10f);
             local.add().growX();
-            local.addImageButton(Icon.loading, this::refreshLocal).pad(-12f).padLeft(0).size(70f);
+            local.addImageButton(Icon.refresh, this::refreshLocal).pad(-12f).padLeft(0).size(70f);
         }else{
             local.background(null);
         }

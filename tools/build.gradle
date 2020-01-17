@@ -353,3 +353,10 @@ task updateBundles(dependsOn: classes, type: JavaExec){
     standardInput = System.in
     workingDir = "../core/assets/bundles/"
 }
+
+task fontgen(dependsOn: classes, type: JavaExec){
+    main = "mindustry.tools.FontGenerator"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = "../"
+}

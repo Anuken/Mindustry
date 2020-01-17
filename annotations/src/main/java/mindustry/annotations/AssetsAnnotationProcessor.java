@@ -54,25 +54,30 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
     }
 
     void processUI(Set<? extends Element> elements) throws Exception{
-        String[] iconSizes = {"small", "smaller", "tiny"};
-
         TypeSpec.Builder type = TypeSpec.classBuilder("Tex").addModifiers(Modifier.PUBLIC);
-        TypeSpec.Builder ictype = TypeSpec.classBuilder("Icon").addModifiers(Modifier.PUBLIC); //TODO remove and replace
-        TypeSpec.Builder ictype_ = TypeSpec.classBuilder("Icon_").addModifiers(Modifier.PUBLIC);
+        TypeSpec.Builder ictype = TypeSpec.classBuilder("Icon").addModifiers(Modifier.PUBLIC);
         TypeSpec.Builder ichtype = TypeSpec.classBuilder("Iconc").addModifiers(Modifier.PUBLIC);
         MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder loadStyles = MethodSpec.methodBuilder("loadStyles").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder icload = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        MethodSpec.Builder icload_ = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         String resources = path + "/assets-raw/sprites/ui";
         Jval icons = Jval.read(Fi.get(path + "/assets-raw/fontgen/config.json").readString());
+
+        ictype.addField(FieldSpec.builder(ParameterizedTypeName.get(ObjectMap.class, String.class, TextureRegionDrawable.class),
+                "icons", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("new ObjectMap<>()").build());
 
         for(Jval val : icons.get("glyphs").asArray()){
             String name = capitalize(val.getString("css", ""));
             int code = val.getInt("code", 0);
             ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("(char)" + code).build());
-            ictype_.addField(TextureRegionDrawable.class, name, Modifier.PUBLIC, Modifier.STATIC);
-            icload_.addStatement(name + " = mindustry.Vars.ui.getGlyph(mindustry.ui.Fonts.def, (char)" + code + ")");
+
+            ictype.addField(TextureRegionDrawable.class, name + "Sm", Modifier.PUBLIC, Modifier.STATIC);
+            icload.addStatement(name + "Sm = mindustry.Vars.ui.getGlyph(mindustry.ui.Fonts.def, (char)" + code + ")");
+
+            ictype.addField(TextureRegionDrawable.class, name, Modifier.PUBLIC, Modifier.STATIC);
+            icload.addStatement(name + " = mindustry.Vars.ui.getGlyph(mindustry.ui.Fonts.icon, (char)" + code + ")");
+
+            icload.addStatement("icons.put($S, " + name + ")", name);
         }
 
         Fi.get(resources).walk(p -> {
@@ -81,34 +86,15 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
             String filename = p.name();
             filename = filename.substring(0, filename.indexOf("."));
 
-            ArrayList<String> names = new ArrayList<>();
-            names.add("");
-            if(filename.contains("icon")){
-                names.addAll(Arrays.asList(iconSizes));
-            }
+            String sfilen = filename;
+            String dtype = p.name().endsWith(".9.png") ? "arc.scene.style.NinePatchDrawable" : "arc.scene.style.TextureRegionDrawable";
 
-            for(String suffix : names){
-                suffix = suffix.isEmpty() ? "" : "-" + suffix;
+            String varname = capitalize(sfilen);
 
-                String sfilen = filename + suffix;
-                String dtype = p.name().endsWith(".9.png") ? "arc.scene.style.NinePatchDrawable" : "arc.scene.style.TextureRegionDrawable";
+            if(SourceVersion.isKeyword(varname)) varname += "s";
 
-                String varname = capitalize(sfilen);
-                TypeSpec.Builder ttype = type;
-                MethodSpec.Builder tload = load;
-                if(varname.startsWith("icon")){
-                    varname = varname.substring("icon".length());
-                    varname = Character.toLowerCase(varname.charAt(0)) + varname.substring(1);
-                    ttype = ictype;
-                    tload = icload;
-                    if(SourceVersion.isKeyword(varname)) varname += "i";
-                }
-
-                if(SourceVersion.isKeyword(varname)) varname += "s";
-
-                ttype.addField(ClassName.bestGuess(dtype), varname, Modifier.STATIC, Modifier.PUBLIC);
-                tload.addStatement(varname + " = ("+dtype+")arc.Core.atlas.drawable($S)", sfilen);
-            }
+            type.addField(ClassName.bestGuess(dtype), varname, Modifier.STATIC, Modifier.PUBLIC);
+            load.addStatement(varname + " = ("+dtype+")arc.Core.atlas.drawable($S)", sfilen);
         });
 
         for(Element elem : elements){
@@ -121,10 +107,8 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         }
 
         ictype.addMethod(icload.build());
-        ictype_.addMethod(icload_.build());
-        JavaFile.builder(packageName, ictype.build()).build().writeTo(Utils.filer);
         JavaFile.builder(packageName, ichtype.build()).build().writeTo(Utils.filer);
-        JavaFile.builder(packageName, ictype_.build()).build().writeTo(Utils.filer);
+        JavaFile.builder(packageName, ictype.build()).build().writeTo(Utils.filer);
 
         type.addMethod(load.build());
         type.addMethod(loadStyles.build());

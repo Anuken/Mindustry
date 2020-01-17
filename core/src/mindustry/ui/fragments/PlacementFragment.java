@@ -202,7 +202,7 @@ public class PlacementFragment extends Fragment{
                             blockTable.row();
                         }
 
-                        ImageButton button = blockTable.addImageButton(Icon.lockedSmall, Styles.selecti, () -> {
+                        ImageButton button = blockTable.addImageButton(Icon.lock, Styles.selecti, () -> {
                             if(unlocked(block)){
                                 control.input.block = control.input.block == block ? null : block;
                                 selectedBlocks.put(currentCategory, control.input.block);
@@ -311,7 +311,7 @@ public class PlacementFragment extends Fragment{
                             if(state.rules.bannedBlocks.contains(lastDisplay)){
                                 topTable.row();
                                 topTable.table(b -> {
-                                    b.addImage(Icon.cancelSmall).padRight(2).color(Color.scarlet);
+                                    b.addImage(Icon.cancel).padRight(2).color(Color.scarlet);
                                     b.add("$banned");
                                     b.left();
                                 }).padTop(2).left();
@@ -378,7 +378,7 @@ public class PlacementFragment extends Fragment{
                             continue;
                         }
 
-                        categories.addImageButton(Core.atlas.drawable("icon-" + cat.name() + "-smaller"), Styles.clearToggleTransi, () -> {
+                        categories.addImageButton(ui.getIcon(cat.name()), Styles.clearToggleTransi, () -> {
                             currentCategory = cat;
                             if(control.input.block != null){
                                 control.input.block = getSelectedBlock(currentCategory);

@@ -235,7 +235,7 @@ public class DeployDialog extends FloatingDialog{
             button.labelWrap(zone.localizedName).style(Styles.outlineLabel).width(140).growX().get().setAlignment(Align.center);
         }else{
             Cons<Element> flasher = zone.canUnlock() && !hidden(zone) ? e -> e.update(() -> e.getColor().set(Color.white).lerp(Pal.accent, Mathf.absin(3f, 1f))) : e -> {};
-            flasher.get(button.addImage(Icon.locked).get());
+            flasher.get(button.addImage(Icon.lock).get());
             button.row();
             flasher.get(button.add("$locked").get());
         }

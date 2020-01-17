@@ -120,18 +120,18 @@ public class ModsDialog extends FloatingDialog{
                             title.add("[accent]" + mod.meta.displayName() + "[lightgray] v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + "")).width(200f).wrap();
                             title.add().growX();
 
-                            title.addImageTextButton(mod.enabled() ? "$mod.disable" : "$mod.enable", mod.enabled() ? Icon.arrowDownSmall : Icon.arrowUpSmall, Styles.cleart, () -> {
+                            title.addImageTextButton(mod.enabled() ? "$mod.disable" : "$mod.enable", mod.enabled() ? Icon.downOpen : Icon.upOpen, Styles.cleart, () -> {
                                 mods.setEnabled(mod, !mod.enabled());
                                 setup();
                             }).height(50f).margin(8f).width(130f).disabled(!mod.isSupported());
 
                             if(steam && !mod.hasSteamID()){
-                                title.addImageButton(Icon.loadMapSmall, Styles.cleari, () -> {
+                                title.addImageButton(Icon.download, Styles.cleari, () -> {
                                     platform.publish(mod);
                                 }).size(50f);
                             }
 
-                            title.addImageButton(mod.hasSteamID() ? Icon.linkSmall : Icon.trash16Small, Styles.cleari, () -> {
+                            title.addImageButton(mod.hasSteamID() ? Icon.link : Icon.trash, Styles.cleari, () -> {
                                 if(!mod.hasSteamID()){
                                     ui.showConfirm("$confirm", "$mod.remove.confirm", () -> {
                                         mods.removeMod(mod);

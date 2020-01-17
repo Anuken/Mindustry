@@ -174,6 +174,7 @@ public class Mods implements Loadable{
                 });
             }
 
+            //TODO !!!! fix the UI page here
             Core.atlas = packer.flush(filter, new TextureAtlas());
             Core.atlas.setErrorRegion("error");
             Log.debug("Total pages: {0}", Core.atlas.getTextures().size);
@@ -389,12 +390,12 @@ public class Mods implements Loadable{
                             d.left().marginLeft(15f);
                             for(Content c : m.erroredContent){
                                 d.add(c.minfo.sourceFile.nameWithoutExtension()).left().padRight(10);
-                                d.addImageTextButton("$details", Icon.arrowDownSmall, Styles.transt, () -> {
+                                d.addImageTextButton("$details", Icon.downOpen, Styles.transt, () -> {
                                     new Dialog(""){{
                                         setFillParent(true);
                                         cont.pane(e -> e.add(c.minfo.error)).grow();
                                         cont.row();
-                                        cont.addImageTextButton("$ok", Icon.backSmall, this::hide).size(240f, 60f);
+                                        cont.addImageTextButton("$ok", Icon.left, this::hide).size(240f, 60f);
                                     }}.show();
                                 }).size(190f, 50f).left().marginLeft(6);
                                 d.row();

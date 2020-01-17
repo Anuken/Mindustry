@@ -76,22 +76,22 @@ public class PausedDialog extends FloatingDialog{
 
         }else{
             cont.defaults().size(130f).pad(5);
-            cont.addRowImageTextButton("$back", Icon.play2, this::hide);
-            cont.addRowImageTextButton("$settings", Icon.tools, ui.settings::show);
+            cont.addRowImageTextButton("$back", Icon.play, this::hide);
+            cont.addRowImageTextButton("$settings", Icon.settings, ui.settings::show);
 
             if(!world.isZone() && !state.isEditor()){
                 cont.addRowImageTextButton("$save", Icon.save, save::show);
 
                 cont.row();
 
-                cont.addRowImageTextButton("$load", Icon.load, load::show).disabled(b -> net.active());
+                cont.addRowImageTextButton("$load", Icon.download, load::show).disabled(b -> net.active());
             }else{
                 cont.row();
             }
 
             cont.addRowImageTextButton("$hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
 
-            cont.addRowImageTextButton("$quit", Icon.quit, this::showQuitConfirm).update(s -> {
+            cont.addRowImageTextButton("$quit", Icon.exit, this::showQuitConfirm).update(s -> {
                 s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit");
                 s.getLabelCell().growX().wrap();
             });

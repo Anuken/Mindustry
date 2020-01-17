@@ -20,7 +20,7 @@ public class Scripts implements Disposable{
         Time.mark();
 
         context = Vars.platform.getScriptContext();
-        context.setClassShutter(type -> !blacklist.contains(type.toLowerCase()::contains));
+        context.setClassShutter(type -> !blacklist.contains(type.toLowerCase()::contains) || type.contains("mindustry.net"));
         context.getWrapFactory().setJavaPrimitiveWrap(false);
         
         scope = new ImporterTopLevel(context);

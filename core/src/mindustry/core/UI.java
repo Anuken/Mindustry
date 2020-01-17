@@ -105,7 +105,6 @@ public class UI implements ApplicationListener, Loadable{
 
         Tex.load();
         Icon.load();
-        Icon_.load();
         Styles.load();
         Tex.loadStyles();
 
@@ -156,7 +155,6 @@ public class UI implements ApplicationListener, Loadable{
                 }
                 parameter.fontParameters.magFilter = TextureFilter.Linear;
                 parameter.fontParameters.minFilter = TextureFilter.Linear;
-                parameter.fontParameters.size = fontParameter().size;
                 parameter.fontParameters.packer = packer;
                 return super.loadSync(manager, fileName, file, parameter);
             }
@@ -164,6 +162,7 @@ public class UI implements ApplicationListener, Loadable{
 
         FreeTypeFontParameter param = new FreeTypeFontParameter(){{
             borderColor = Color.darkGray;
+            size = (int)(Scl.scl(18f));
             incremental = true;
         }};
 
@@ -208,16 +207,18 @@ public class UI implements ApplicationListener, Loadable{
     public TextureRegionDrawable getGlyph(BitmapFont font, char glyph){
         Glyph g = font.getData().getGlyph(glyph);
         if(g == null) throw new IllegalArgumentException("No glyph: " + glyph + " (" + (int)glyph + ")");
+
+        float size = Math.max(g.width, g.height);
         float aspect = (float)g.height / g.width;
         TextureRegionDrawable draw = new TextureRegionDrawable(new TextureRegion(font.getRegion().getTexture(), g.u, g.v2, g.u2, g.v)){
             @Override
             public void draw(float x, float y, float width, float height){
-                //enforce even aspect ratio, which will always be incorrect for complicate reasons
-                super.draw(x, y, width, width * aspect);
+                super.draw(x + Math.max(g.height-g.width, 0)/2, y, g.width, g.height);
             }
         };
-        draw.setMinWidth(draw.getRegion().getWidth());
-        draw.setMinHeight(draw.getRegion().getHeight());
+
+        draw.setMinWidth(size);
+        draw.setMinHeight(size);
         return draw;
     }
 
@@ -228,6 +229,17 @@ public class UI implements ApplicationListener, Loadable{
 
         Core.assets.load("default", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.def = (BitmapFont)f;
         Core.assets.load("chat", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.chat = (BitmapFont)f;
+        Core.assets.load("icon", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
+            size = (int)(Scl.scl(28f));
+            incremental = true;
+        }})).loaded = f -> Fonts.icon = (BitmapFont)f;
+    }
+
+    public TextureRegionDrawable getIcon(String name){
+        if(Icon.icons.containsKey(name)){
+            return Icon.icons.get(name);
+        }
+        return Core.atlas.getDrawable("error");
     }
 
     static FreeTypeFontParameter fontParameter(){
