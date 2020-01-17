@@ -1,14 +1,15 @@
 package mindustry.ui.fragments;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
+import arc.input.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.traits.BuilderTrait.*;
@@ -19,7 +20,6 @@ import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -206,6 +206,10 @@ public class PlacementFragment extends Fragment{
                             if(unlocked(block)){
                                 control.input.block = control.input.block == block ? null : block;
                                 selectedBlocks.put(currentCategory, control.input.block);
+
+                                if(Core.input.keyDown(KeyCode.SHIFT_LEFT) && Fonts.getUnicode(block.name) != 0){
+                                    Core.app.setClipboardText((char)Fonts.getUnicode(block.name) + "");
+                                }
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
 

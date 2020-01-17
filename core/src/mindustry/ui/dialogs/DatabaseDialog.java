@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.input.*;
 import arc.struct.*;
 import arc.graphics.*;
 import arc.scene.event.*;
@@ -65,7 +66,12 @@ public class DatabaseDialog extends FloatingDialog{
                     }
 
                     if(unlocked(unlock)){
-                        image.clicked(() -> Vars.ui.content.show(unlock));
+                        image.clicked(() -> {
+                            if(Core.input.keyDown(KeyCode.SHIFT_LEFT) && Fonts.getUnicode(unlock.name) != 0){
+                                Core.app.setClipboardText((char)Fonts.getUnicode(unlock.name) + "");
+                            }
+                            Vars.ui.content.show(unlock);
+                        });
                         image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName)));
                     }
 

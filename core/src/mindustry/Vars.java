@@ -88,7 +88,7 @@ public class Vars implements Loadable{
     public static final Color[] playerColors = {
         Color.valueOf("82759a"),
         Color.valueOf("c0c1c5"),
-        Color.valueOf("fff0e7"),
+        Color.valueOf("ffffff"),
         Color.valueOf("7d2953"),
         Color.valueOf("ff074e"),
         Color.valueOf("ff072a"),

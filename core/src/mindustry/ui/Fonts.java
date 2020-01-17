@@ -26,10 +26,16 @@ import mindustry.core.*;
 import java.util.*;
 
 public class Fonts{
+    private static ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
+
     public static BitmapFont def;
     public static BitmapFont outline;
     public static BitmapFont chat;
     public static BitmapFont icon;
+
+    public static int getUnicode(String content){
+        return unicodeIcons.get(content, 0);
+    }
 
     /** Called from a static context to make the cursor appear immediately upon startup.*/
     public static void loadSystemCursors(){
@@ -62,11 +68,14 @@ public class Fonts{
             while(scan.hasNextLine()){
                 String line = scan.nextLine();
                 String[] split = line.split("=");
-                String character = split[0], texture = split[1].split("\\|")[1];
+                String[] nametex = split[1].split("\\|");
+                String character = split[0], texture = nametex[1];
                 int ch = Integer.parseInt(character);
                 TextureRegion region = Core.atlas.find(texture);
 
                 if(region.getTexture() != uitex) throw new IllegalArgumentException("Font icon '" + texture + "' is not in the UI texture.");
+
+                unicodeIcons.put(nametex[0], ch);
 
                 Glyph glyph = new Glyph();
                 glyph.id = ch;
