@@ -7,24 +7,30 @@ import arc.Input.*;
 import arc.assets.*;
 import arc.assets.loaders.*;
 import arc.assets.loaders.resolvers.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.freetype.*;
 import arc.freetype.FreeTypeFontGenerator.*;
 import arc.freetype.FreetypeFontLoader.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.Pixmap.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
+import arc.graphics.g2d.BitmapFont.*;
+import arc.graphics.g2d.PixmapPacker.*;
+import arc.graphics.g2d.TextureAtlas.*;
 import arc.input.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.TextField.*;
 import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.editor.*;
@@ -39,6 +45,8 @@ import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
 
 public class UI implements ApplicationListener, Loadable{
+    public static PixmapPacker packer;
+
     public MenuFragment menufrag;
     public HudFragment hudfrag;
     public ChatFragment chatfrag;
@@ -97,6 +105,7 @@ public class UI implements ApplicationListener, Loadable{
 
         Tex.load();
         Icon.load();
+        Icon_.load();
         Styles.load();
         Tex.loadStyles();
 
@@ -135,6 +144,7 @@ public class UI implements ApplicationListener, Loadable{
 
     /** Called from a static context for use in the loading screen.*/
     public static void loadDefaultFont(){
+        packer = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
         FileHandleResolver resolver = new InternalFileHandleResolver();
         Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
         Core.assets.setLoader(BitmapFont.class, null, new FreetypeFontLoader(resolver){
@@ -147,6 +157,7 @@ public class UI implements ApplicationListener, Loadable{
                 parameter.fontParameters.magFilter = TextureFilter.Linear;
                 parameter.fontParameters.minFilter = TextureFilter.Linear;
                 parameter.fontParameters.size = fontParameter().size;
+                parameter.fontParameters.packer = packer;
                 return super.loadSync(manager, fileName, file, parameter);
             }
         });
@@ -159,9 +170,55 @@ public class UI implements ApplicationListener, Loadable{
         Core.assets.load("outline", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/font.ttf", param)).loaded = t -> Fonts.outline = (BitmapFont)t;
     }
 
+    public static void cleanAtlas(TextureAtlas atlas){
+        //grab all textures from the ui page, remove all the regions assigned to it, then copy them over to Fonts.packer and replace the texture in this atlas.
+
+        //grab old UI texture and regions...
+        Texture texture = atlas.find("logo").getTexture();
+
+        Page page = packer.getPages().first();
+
+        Array<AtlasRegion> regions = atlas.getRegions().select(t -> t.getTexture() == texture);
+        for(AtlasRegion region : regions){
+            //get new pack rect
+            page.setDirty(false);
+            Rect rect = packer.pack(region.name + (region.splits != null ? ".9" : ""), atlas.getPixmap(region));
+            //set new texture
+            region.setTexture(packer.getPages().first().getTexture());
+            //set its new position
+            region.set((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
+            //add old texture
+            atlas.getTextures().add(region.getTexture());
+        }
+
+        //remove old texture, it will no longer be used
+        atlas.getTextures().remove(texture);
+        texture.dispose();
+        atlas.disposePixmap(texture);
+
+        page.setDirty(true);
+        page.updateTexture(TextureFilter.Linear, TextureFilter.Linear, false);
+    }
+
     void loadExtraCursors(){
         drillCursor = Core.graphics.newCursor("drill");
         unloadCursor = Core.graphics.newCursor("unload");
+    }
+
+    public TextureRegionDrawable getGlyph(BitmapFont font, char glyph){
+        Glyph g = font.getData().getGlyph(glyph);
+        if(g == null) throw new IllegalArgumentException("No glyph: " + glyph + " (" + (int)glyph + ")");
+        float aspect = (float)g.height / g.width;
+        TextureRegionDrawable draw = new TextureRegionDrawable(new TextureRegion(font.getRegion().getTexture(), g.u, g.v2, g.u2, g.v)){
+            @Override
+            public void draw(float x, float y, float width, float height){
+                //enforce even aspect ratio, which will always be incorrect for complicate reasons
+                super.draw(x, y, width, width * aspect);
+            }
+        };
+        draw.setMinWidth(draw.getRegion().getWidth());
+        draw.setMinHeight(draw.getRegion().getHeight());
+        return draw;
     }
 
     public void setupFonts(){
@@ -271,7 +328,10 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void dispose(){
-        //generator.dispose();
+        if(packer != null){
+            packer.dispose();
+            packer = null;
+        }
     }
 
     public void loadAnd(Runnable call){

@@ -2,6 +2,7 @@ package mindustry.mod;
 
 import arc.*;
 import arc.files.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
@@ -9,6 +10,7 @@ import mindustry.mod.Mods.*;
 import org.mozilla.javascript.*;
 
 public class Scripts implements Disposable{
+    private final Array<String> blacklist = Array.with("net", "classaccess", ".io", "io.", "files", "reflect");
     private final Context context;
     private final String wrapper;
     private Scriptable scope;
@@ -18,9 +20,7 @@ public class Scripts implements Disposable{
         Time.mark();
 
         context = Vars.platform.getScriptContext();
-        context.setClassShutter(type -> (ClassAccess.allowedClassNames.contains(type) || type.startsWith("$Proxy") ||
-            type.startsWith("adapter") || type.contains("PrintStream") ||
-            type.startsWith("mindustry")) && !type.equals("mindustry.mod.ClassAccess"));
+        context.setClassShutter(type -> !blacklist.contains(type.toLowerCase()::contains));
         context.getWrapFactory().setJavaPrimitiveWrap(false);
         
         scope = new ImporterTopLevel(context);

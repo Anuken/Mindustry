@@ -299,7 +299,6 @@ project(":tools"){
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
         compile "org.reflections:reflections:0.9.11"
-        compile "org.apache.pdfbox:fontbox:2.0.0"
 
         compile arcModule("backends:backend-sdl")
     }
@@ -310,6 +309,7 @@ project(":annotations"){
 
     dependencies{
         compile 'com.squareup:javapoet:1.11.0'
+        compile "com.github.Anuken.Arc:arc-core:-SNAPSHOT"
         compile files("${System.getProperty('java.home')}/../lib/tools.jar")
     }
 }

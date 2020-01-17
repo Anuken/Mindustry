@@ -15,6 +15,7 @@ import java.io.*;
  */
 public class FontGenerator{
 
+    //E000 to F8FF
     public static void main(String[] args){
         Net net = Core.net = new Net();
         net.setBlock(true);

@@ -62,7 +62,7 @@
     },
     {
       "uid": "6f880cbd94039674f0de065ffb57c250",
-      "css": "icon-distribution-transparent.png",
+      "css": "icon-distribution-transparent",
       "code": 59398,
       "src": "custom_icons",
       "selected": true,
