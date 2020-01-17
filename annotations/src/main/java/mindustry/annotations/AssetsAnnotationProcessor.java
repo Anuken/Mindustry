@@ -72,10 +72,10 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
             ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("(char)" + code).build());
 
             ictype.addField(TextureRegionDrawable.class, name + "Sm", Modifier.PUBLIC, Modifier.STATIC);
-            icload.addStatement(name + "Sm = mindustry.Vars.ui.getGlyph(mindustry.ui.Fonts.def, (char)" + code + ")");
+            icload.addStatement(name + "Sm = mindustry.ui.Fonts.getGlyph(mindustry.ui.Fonts.def, (char)" + code + ")");
 
             ictype.addField(TextureRegionDrawable.class, name, Modifier.PUBLIC, Modifier.STATIC);
-            icload.addStatement(name + " = mindustry.Vars.ui.getGlyph(mindustry.ui.Fonts.icon, (char)" + code + ")");
+            icload.addStatement(name + " = mindustry.ui.Fonts.getGlyph(mindustry.ui.Fonts.icon, (char)" + code + ")");
 
             icload.addStatement("icons.put($S, " + name + ")", name);
         }

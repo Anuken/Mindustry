@@ -2,26 +2,13 @@ package mindustry.core;
 
 import arc.*;
 import arc.Graphics.*;
-import arc.Graphics.Cursor.*;
 import arc.Input.*;
 import arc.assets.*;
-import arc.assets.loaders.*;
-import arc.assets.loaders.resolvers.*;
-import arc.files.*;
-import arc.freetype.*;
-import arc.freetype.FreeTypeFontGenerator.*;
-import arc.freetype.FreetypeFontLoader.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Pixmap.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.BitmapFont.*;
-import arc.graphics.g2d.PixmapPacker.*;
-import arc.graphics.g2d.TextureAtlas.*;
 import arc.input.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
@@ -85,7 +72,7 @@ public class UI implements ApplicationListener, Loadable{
     public Cursor drillCursor, unloadCursor;
 
     public UI(){
-        setupFonts();
+        Fonts.loadFonts();
     }
 
     @Override
@@ -107,6 +94,7 @@ public class UI implements ApplicationListener, Loadable{
         Icon.load();
         Styles.load();
         Tex.loadStyles();
+        Fonts.loadContentIcons();
 
         Dialog.setShowAction(() -> sequence(alpha(0f), fadeIn(0.1f)));
         Dialog.setHideAction(() -> sequence(fadeOut(0.1f)));
@@ -124,140 +112,14 @@ public class UI implements ApplicationListener, Loadable{
         Colors.put("unlaunched", Color.valueOf("8982ed"));
         Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
         Colors.put("stat", Pal.stat);
-        loadExtraCursors();
+
+        drillCursor = Core.graphics.newCursor("drill");
+        unloadCursor = Core.graphics.newCursor("unload");
     }
 
     @Override
     public Array<AssetDescriptor> getDependencies(){
         return Array.with(new AssetDescriptor<>(Control.class), new AssetDescriptor<>("outline", BitmapFont.class), new AssetDescriptor<>("default", BitmapFont.class), new AssetDescriptor<>("chat", BitmapFont.class));
-    }
-
-    /** Called from a static context to make the cursor appear immediately upon startup.*/
-    public static void loadSystemCursors(){
-        SystemCursor.arrow.set(Core.graphics.newCursor("cursor"));
-        SystemCursor.hand.set(Core.graphics.newCursor("hand"));
-        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam"));
-
-        Core.graphics.restoreCursor();
-    }
-
-    /** Called from a static context for use in the loading screen.*/
-    public static void loadDefaultFont(){
-        packer = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
-        FileHandleResolver resolver = new InternalFileHandleResolver();
-        Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
-        Core.assets.setLoader(BitmapFont.class, null, new FreetypeFontLoader(resolver){
-            @Override
-            public BitmapFont loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
-                if(fileName.equals("outline")){
-                    parameter.fontParameters.borderWidth = Scl.scl(2f);
-                    parameter.fontParameters.spaceX -= parameter.fontParameters.borderWidth;
-                }
-                parameter.fontParameters.magFilter = TextureFilter.Linear;
-                parameter.fontParameters.minFilter = TextureFilter.Linear;
-                parameter.fontParameters.packer = packer;
-                return super.loadSync(manager, fileName, file, parameter);
-            }
-        });
-
-        FreeTypeFontParameter param = new FreeTypeFontParameter(){{
-            borderColor = Color.darkGray;
-            size = (int)(Scl.scl(18f));
-            incremental = true;
-        }};
-
-        Core.assets.load("outline", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/font.ttf", param)).loaded = t -> Fonts.outline = (BitmapFont)t;
-    }
-
-    public static void cleanAtlas(TextureAtlas atlas){
-        //grab all textures from the ui page, remove all the regions assigned to it, then copy them over to Fonts.packer and replace the texture in this atlas.
-
-        //grab old UI texture and regions...
-        Texture texture = atlas.find("logo").getTexture();
-
-        Page page = packer.getPages().first();
-
-        Array<AtlasRegion> regions = atlas.getRegions().select(t -> t.getTexture() == texture);
-        for(AtlasRegion region : regions){
-            //get new pack rect
-            page.setDirty(false);
-            Rect rect = packer.pack(region.name + (region.splits != null ? ".9" : ""), atlas.getPixmap(region));
-            //set new texture
-            region.setTexture(packer.getPages().first().getTexture());
-            //set its new position
-            region.set((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
-            //add old texture
-            atlas.getTextures().add(region.getTexture());
-        }
-
-        //remove old texture, it will no longer be used
-        atlas.getTextures().remove(texture);
-        texture.dispose();
-        atlas.disposePixmap(texture);
-
-        page.setDirty(true);
-        page.updateTexture(TextureFilter.Linear, TextureFilter.Linear, false);
-    }
-
-    void loadExtraCursors(){
-        drillCursor = Core.graphics.newCursor("drill");
-        unloadCursor = Core.graphics.newCursor("unload");
-    }
-
-    public TextureRegionDrawable getGlyph(BitmapFont font, char glyph){
-        Glyph g = font.getData().getGlyph(glyph);
-        if(g == null) throw new IllegalArgumentException("No glyph: " + glyph + " (" + (int)glyph + ")");
-
-        float size = Math.max(g.width, g.height);
-        float aspect = (float)g.height / g.width;
-        TextureRegionDrawable draw = new TextureRegionDrawable(new TextureRegion(font.getRegion().getTexture(), g.u, g.v2, g.u2, g.v)){
-            @Override
-            public void draw(float x, float y, float width, float height){
-                Draw.color(Tmp.c1.set(tint).mul(Draw.getColor()).toFloatBits());
-                float cx = x + width/2f - g.width/2f, cy = y + height/2f - g.height/2f;
-                cx = (int)cx;
-                cy = (int)cy;
-                Draw.rect(region, cx + g.width/2f, cy + g.height/2f, g.width, g.height);
-            }
-
-            @Override
-            public float imageSize(){
-                return size;
-            }
-        };
-
-        draw.setMinWidth(size);
-        draw.setMinHeight(size);
-        return draw;
-    }
-
-    public void setupFonts(){
-        String fontName = "fonts/font.ttf";
-
-        FreeTypeFontParameter param = fontParameter();
-
-        Core.assets.load("default", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.def = (BitmapFont)f;
-        Core.assets.load("chat", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.chat = (BitmapFont)f;
-        Core.assets.load("icon", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
-            size = (int)(Scl.scl(30f));
-            incremental = true;
-        }})).loaded = f -> Fonts.icon = (BitmapFont)f;
-    }
-
-    public TextureRegionDrawable getIcon(String name){
-        if(Icon.icons.containsKey(name)){
-            return Icon.icons.get(name);
-        }
-        return Core.atlas.getDrawable("error");
-    }
-
-    static FreeTypeFontParameter fontParameter(){
-        return new FreeTypeFontParameter(){{
-            size = (int)(Scl.scl(18f));
-            shadowColor = Color.darkGray;
-            shadowOffsetY = 2;
-            incremental = true;
-        }};
     }
 
     @Override
@@ -353,6 +215,13 @@ public class UI implements ApplicationListener, Loadable{
             packer.dispose();
             packer = null;
         }
+    }
+
+    public TextureRegionDrawable getIcon(String name){
+        if(Icon.icons.containsKey(name)){
+            return Icon.icons.get(name);
+        }
+        return Core.atlas.getDrawable("error");
     }
 
     public void loadAnd(Runnable call){
