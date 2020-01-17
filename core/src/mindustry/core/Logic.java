@@ -138,8 +138,6 @@ public class Logic implements ApplicationListener{
         spawner.spawnEnemies();
         state.wave++;
         state.wavetime = world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
-        state.rules.dropZoneRadius++;
-        Call.onSetRules(state.rules);
 
         Events.fire(new WaveEvent());
     }
