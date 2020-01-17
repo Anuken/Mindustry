@@ -427,7 +427,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 Cons<EditorTool> addTool = tool -> {
 
-                    ImageButton button = new ImageButton(Core.atlas.drawable("Icon." + tool.name() + "-"), Styles.clearTogglei);
+                    ImageButton button = new ImageButton(ui.getIcon(tool.name()), Styles.clearTogglei);
                     button.clicked(() -> {
                         view.setTool(tool);
                         if(lastTable[0] != null){

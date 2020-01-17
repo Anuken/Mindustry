@@ -213,7 +213,16 @@ public class UI implements ApplicationListener, Loadable{
         TextureRegionDrawable draw = new TextureRegionDrawable(new TextureRegion(font.getRegion().getTexture(), g.u, g.v2, g.u2, g.v)){
             @Override
             public void draw(float x, float y, float width, float height){
-                super.draw(x + Math.max(g.height-g.width, 0)/2, y, g.width, g.height);
+                Draw.color(Tmp.c1.set(tint).mul(Draw.getColor()).toFloatBits());
+                float cx = x + width/2f - g.width/2f, cy = y + height/2f - g.height/2f;
+                cx = (int)cx;
+                cy = (int)cy;
+                Draw.rect(region, cx + g.width/2f, cy + g.height/2f, g.width, g.height);
+            }
+
+            @Override
+            public float imageSize(){
+                return size;
             }
         };
 
@@ -230,7 +239,7 @@ public class UI implements ApplicationListener, Loadable{
         Core.assets.load("default", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.def = (BitmapFont)f;
         Core.assets.load("chat", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.chat = (BitmapFont)f;
         Core.assets.load("icon", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
-            size = (int)(Scl.scl(28f));
+            size = (int)(Scl.scl(30f));
             incremental = true;
         }})).loaded = f -> Fonts.icon = (BitmapFont)f;
     }

@@ -202,14 +202,12 @@ public class PlacementFragment extends Fragment{
                             blockTable.row();
                         }
 
-                        ImageButton button = blockTable.addImageButton(Icon.lock, Styles.selecti, () -> {
+                        ImageButton button = blockTable.addImageButton(new TextureRegionDrawable(block.icon(Cicon.medium)), Styles.selecti, () -> {
                             if(unlocked(block)){
                                 control.input.block = control.input.block == block ? null : block;
                                 selectedBlocks.put(currentCategory, control.input.block);
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
-
-                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Cicon.medium));
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = player.getClosestCore();

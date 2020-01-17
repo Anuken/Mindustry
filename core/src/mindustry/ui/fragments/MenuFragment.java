@@ -106,7 +106,7 @@ public class MenuFragment extends Fragment{
             join = new MobileButton(Icon.add, "$joingame", () -> checkPlay(ui.join::show)),
             editor = new MobileButton(Icon.terrain, "$editor", () -> checkPlay(ui.maps::show)),
             tools = new MobileButton(Icon.settings, "$settings", ui.settings::show),
-            mods = new MobileButton(Icon.box, "$mods", ui.mods::show),
+            mods = new MobileButton(Icon.fileText, "$mods", ui.mods::show),
             donate = new MobileButton(Icon.link, "$website", () -> Core.net.openURI("https://anuke.itch.io/mindustry")),
             exit = new MobileButton(Icon.exit, "$quit", () -> Core.app.exit());
 
@@ -172,7 +172,7 @@ public class MenuFragment extends Fragment{
                     new Buttoni("$tutorial", Icon.info, () -> checkPlay(control::playTutorial))
                 ),
                 new Buttoni("$editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("$workshop", Icon.save, platform::openWorkshop) : null,
-                new Buttoni(Core.bundle.get("mods") + "\n" + Core.bundle.get("mods.alpha"), Icon.box, ui.mods::show),
+                new Buttoni(Core.bundle.get("mods") + "\n" + Core.bundle.get("mods.alpha"), Icon.fileText, ui.mods::show),
                 //not enough space for this button
                 //new Buttoni("$schematics", Icon.paste, ui.schematics::show),
                 new Buttoni("$settings", Icon.settings, ui.settings::show),
