@@ -42,7 +42,7 @@ public class Mods implements Loadable{
 
     private Array<LoadedMod> mods = new Array<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
-    private boolean requiresReload;
+    private boolean requiresReload, createdAtlas;
 
     public Mods(){
         Events.on(ClientLoadEvent.class, e -> Core.app.post(this::checkWarnings));
@@ -152,7 +152,8 @@ public class Mods implements Loadable{
 
         //get textures packed
         if(totalSprites > 0){
-            Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
+            if(!createdAtlas) Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
+            createdAtlas = true;
 
             for(AtlasRegion region : Core.atlas.getRegions()){
                 PageType type = getPage(region);
@@ -176,7 +177,6 @@ public class Mods implements Loadable{
                 });
             }
 
-            //TODO !!!! fix the UI page here
             Core.atlas = packer.flush(filter, new TextureAtlas());
             Core.atlas.setErrorRegion("error");
             Log.debug("Total pages: {0}", Core.atlas.getTextures().size);
@@ -422,6 +422,7 @@ public class Mods implements Loadable{
         //epic memory leak
         //TODO make it less epic
         Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
+        createdAtlas = true;
 
         mods.each(LoadedMod::dispose);
         mods.clear();
