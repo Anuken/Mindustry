@@ -271,8 +271,7 @@ public class PlacementFragment extends Fragment{
                                     }
                                 }
                                 final String keyComboFinal = keyCombo;
-                                final String modNameFinal = lastDisplay.minfo.mod == null ? ""
-                                    : "\n[accent]" + lastDisplay.minfo.mod.meta.displayName;
+                                final String modNameFinal = lastDisplay.localizedName + lastDisplay.getModName();
 
                                 header.left();
                                 header.add(new Image(lastDisplay.icon(Cicon.medium))).size(8 * 4);

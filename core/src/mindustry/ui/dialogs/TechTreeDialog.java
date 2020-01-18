@@ -328,7 +328,7 @@ public class TechTreeDialog extends FloatingDialog{
                 b.add().grow();
                 b.table(desc -> {
                     desc.left().defaults().left();
-                    desc.add(node.block.localizedName);
+                    desc.add(node.block.localizedName + node.block.getModName());
                     desc.row();
                     if(locked(node)){
                         desc.table(t -> {

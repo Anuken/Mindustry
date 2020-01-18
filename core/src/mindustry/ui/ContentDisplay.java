@@ -18,7 +18,7 @@ public class ContentDisplay{
             int size = 8 * 6;
 
             title.addImage(block.icon(Cicon.xlarge)).size(size);
-            title.add("[accent]" + block.localizedName).padLeft(5);
+            title.add("[accent]" + block.localizedName + block.getModName("\n[stat]")).padLeft(5);
         });
 
         table.row();
