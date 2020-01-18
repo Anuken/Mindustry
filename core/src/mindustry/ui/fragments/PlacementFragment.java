@@ -1,14 +1,15 @@
 package mindustry.ui.fragments;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
+import arc.input.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.traits.BuilderTrait.*;
@@ -19,7 +20,6 @@ import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -202,14 +202,18 @@ public class PlacementFragment extends Fragment{
                             blockTable.row();
                         }
 
-                        ImageButton button = blockTable.addImageButton(Icon.lockedSmall, Styles.selecti, () -> {
+                        ImageButton button = blockTable.addImageButton(new TextureRegionDrawable(block.icon(Cicon.medium)), Styles.selecti, () -> {
                             if(unlocked(block)){
-                                control.input.block = control.input.block == block ? null : block;
-                                selectedBlocks.put(currentCategory, control.input.block);
+                                if(Core.input.keyDown(KeyCode.SHIFT_LEFT) && Fonts.getUnicode(block.name) != 0){
+                                    Core.app.setClipboardText((char)Fonts.getUnicode(block.name) + "");
+                                    ui.showInfoFade("$copied");
+                                }else{
+                                    control.input.block = control.input.block == block ? null : block;
+                                    selectedBlocks.put(currentCategory, control.input.block);
+                                }
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
-
-                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Cicon.medium));
+                        button.resizeImage(Cicon.medium.size);
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = player.getClosestCore();
@@ -313,7 +317,7 @@ public class PlacementFragment extends Fragment{
                             if(state.rules.bannedBlocks.contains(lastDisplay)){
                                 topTable.row();
                                 topTable.table(b -> {
-                                    b.addImage(Icon.cancelSmall).padRight(2).color(Color.scarlet);
+                                    b.addImage(Icon.cancel).padRight(2).color(Color.scarlet);
                                     b.add("$banned");
                                     b.left();
                                 }).padTop(2).left();
@@ -380,7 +384,7 @@ public class PlacementFragment extends Fragment{
                             continue;
                         }
 
-                        categories.addImageButton(Core.atlas.drawable("icon-" + cat.name() + "-smaller"), Styles.clearToggleTransi, () -> {
+                        categories.addImageButton(ui.getIcon(cat.name()), Styles.clearToggleTransi, () -> {
                             currentCategory = cat;
                             if(control.input.block != null){
                                 control.input.block = getSelectedBlock(currentCategory);

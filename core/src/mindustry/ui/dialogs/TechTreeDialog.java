@@ -60,7 +60,7 @@ public class TechTreeDialog extends FloatingDialog{
 
         addCloseButton();
 
-        buttons.addImageTextButton("$database", Icon.database, () -> {
+        buttons.addImageTextButton("$database", Icon.book, () -> {
             hide();
             ui.database.show();
         }).size(210f, 64f);
@@ -324,7 +324,7 @@ public class TechTreeDialog extends FloatingDialog{
             infoTable.table(b -> {
                 b.margin(0).left().defaults().left();
 
-                b.addImageButton(Icon.infoSmall, Styles.cleari, () -> ui.content.show(node.block)).growY().width(50f);
+                b.addImageButton(Icon.info, Styles.cleari, () -> ui.content.show(node.block)).growY().width(50f);
                 b.add().grow();
                 b.table(desc -> {
                     desc.left().defaults().left();
@@ -351,7 +351,7 @@ public class TechTreeDialog extends FloatingDialog{
 
                 if(mobile && locked(node)){
                     b.row();
-                    b.addImageTextButton("$research", Icon.checkSmall, Styles.nodet, () -> unlock(node))
+                    b.addImageTextButton("$research", Icon.ok, Styles.nodet, () -> unlock(node))
                     .disabled(i -> !data.hasItems(node.requirements)).growX().height(44f).colspan(3);
                 }
             });

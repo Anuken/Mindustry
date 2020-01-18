@@ -71,7 +71,7 @@ public class LoadDialog extends FloatingDialog{
                 title.table(t -> {
                     t.right();
 
-                    t.addImageButton(Icon.floppy, Styles.emptytogglei, () -> {
+                    t.addImageButton(Icon.save, Styles.emptytogglei, () -> {
                         slot.setAutosave(!slot.isAutosave());
                     }).checked(slot.isAutosave()).right();
 

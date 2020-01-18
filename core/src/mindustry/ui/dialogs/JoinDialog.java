@@ -122,7 +122,7 @@ public class JoinDialog extends FloatingDialog{
 
             inner.add(button.getLabel()).growX();
 
-            inner.addImageButton(Icon.arrowUpSmall, Styles.emptyi, () -> {
+            inner.addImageButton(Icon.upOpen, Styles.emptyi, () -> {
                 int index = servers.indexOf(server);
                 if(index > 0){
                     servers.remove(index);
@@ -139,25 +139,25 @@ public class JoinDialog extends FloatingDialog{
                     }
                 }
 
-            }).margin(3f).padTop(6f).top().right();
+            }).margin(3f).pad(2).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.loadingSmall, Styles.emptyi, () -> {
+            inner.addImageButton(Icon.refresh, Styles.emptyi, () -> {
                 refreshServer(server);
-            }).margin(3f).padTop(6f).top().right();
+            }).margin(3f).pad(2).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.pencilSmall, Styles.emptyi, () -> {
+            inner.addImageButton(Icon.pencil, Styles.emptyi, () -> {
                 renaming = server;
                 add.show();
-            }).margin(3f).padTop(6f).top().right();
+            }).margin(3f).pad(2).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.trash16Small, Styles.emptyi, () -> {
+            inner.addImageButton(Icon.trash, Styles.emptyi, () -> {
                 ui.showConfirm("$confirm", "$server.delete", () -> {
                     servers.removeValue(server, true);
                     saveServers();
                     setupRemote();
                     refreshRemote();
                 });
-            }).margin(3f).pad(6).top().right();
+            }).margin(3f).pad(2).pad(6).top().right();
 
             button.row();
 
@@ -179,7 +179,7 @@ public class JoinDialog extends FloatingDialog{
 
         net.pingHost(server.ip, server.port, host -> setupServer(server, host), e -> {
             server.content.clear();
-            server.content.add("$host.invalid");
+            server.content.add("$host.invalid").padBottom(4);
         });
     }
 
@@ -212,6 +212,10 @@ public class JoinDialog extends FloatingDialog{
         content.table(t -> {
             t.add("[lightgray]" + host.name + "   " + versionString).width(targetWidth() - 10f).left().get().setEllipsis(true);
             t.row();
+            if(!host.description.isEmpty()){
+                t.add("[gray]" + host.description).width(targetWidth() - 10f).left().wrap();
+                t.row();
+            }
             t.add("[lightgray]" + (Core.bundle.format("players" + (host.players == 1 && host.playerLimit <= 0 ? ".single" : ""), (host.players == 0 ? "[lightgray]" : "[accent]") + host.players + (host.playerLimit > 0 ? "[lightgray]/[accent]" + host.playerLimit : "")+ "[lightgray]"))).left();
             t.row();
             t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + host.mode.toString()).width(targetWidth() - 10f).left().get().setEllipsis(true);
@@ -303,7 +307,7 @@ public class JoinDialog extends FloatingDialog{
             local.background(Tex.button);
             local.add("$hosts.none").pad(10f);
             local.add().growX();
-            local.addImageButton(Icon.loading, this::refreshLocal).pad(-12f).padLeft(0).size(70f);
+            local.addImageButton(Icon.refresh, this::refreshLocal).pad(-12f).padLeft(0).size(70f);
         }else{
             local.background(null);
         }

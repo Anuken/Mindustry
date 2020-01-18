@@ -411,6 +411,7 @@ public class Administration{
     /** Server configuration definition. Each config value can be a string, boolean or number. */
     public enum Config{
         name("The server name as displayed on clients.", "Server", "servername"),
+        desc("The server description, displayed under the name. Max 100 characters.", "off"),
         port("The port to host on.", Vars.port),
         autoUpdate("Whether to auto-update and exit when a new bleeding-edge update arrives.", false),
         showConnectMessages("Whether to display connect/disconnect messages.", true),

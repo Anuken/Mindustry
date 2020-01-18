@@ -63,9 +63,10 @@ public class NetworkIO{
 
     public static ByteBuffer writeServerData(){
         String name = (headless ? Config.name.string() : player.name);
+        String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
         String map = world.getMap() == null ? "None" : world.getMap().name();
 
-        ByteBuffer buffer = ByteBuffer.allocate(256);
+        ByteBuffer buffer = ByteBuffer.allocate(512);
 
         writeString(buffer, name, 100);
         writeString(buffer, map);
@@ -77,6 +78,8 @@ public class NetworkIO{
 
         buffer.put((byte)Gamemode.bestFit(state.rules).ordinal());
         buffer.putInt(netServer.admins.getPlayerLimit());
+
+        writeString(buffer, description, 100);
         return buffer;
     }
 
@@ -89,8 +92,9 @@ public class NetworkIO{
         String vertype = readString(buffer);
         Gamemode gamemode = Gamemode.all[buffer.get()];
         int limit = buffer.getInt();
+        String description = readString(buffer);
 
-        return new Host(host, hostAddress, map, wave, players, version, vertype, gamemode, limit);
+        return new Host(host, hostAddress, map, wave, players, version, vertype, gamemode, limit, description);
     }
 
     private static void writeString(ByteBuffer buffer, String string, int maxlen){
