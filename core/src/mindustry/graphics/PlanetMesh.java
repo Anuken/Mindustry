@@ -18,9 +18,10 @@ public class PlanetMesh{
     private boolean lines = false;
     private float radius = 1f, intensity = 0.2f;
 
-    private PlanetGenerator gen = new PlanetGenerator();
+    private final PlanetGenerator gen;
 
-    public PlanetMesh(int divisions){
+    public PlanetMesh(int divisions, PlanetGenerator gen){
+        this.gen = gen;
         this.grid = PlanetGrid.newGrid(divisions);
 
         int vertices = grid.tiles.length * 12 * (3 + 3 + 1);
@@ -115,7 +116,7 @@ public class PlanetMesh{
     }
 
     private Color color(Vec3 v){
-        return gen.getColor(v, elevation(v));
+        return gen.getColor(v);
     }
 
     private void verts(Vec3 a, Vec3 b, Vec3 c, Vec3 normal, Color color){

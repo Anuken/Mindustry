@@ -2,15 +2,21 @@ package mindustry.type;
 
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
-import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.graphics.*;
+import mindustry.maps.planet.*;
 
 public class Planet extends UnlockableContent{
     /** Mesh used for rendering. Created on load(). */
     public PlanetMesh mesh;
     /** Grid used for the sectors on the planet. */
     public @NonNull PlanetGrid grid;
+    /** Generator that will make the planet. */
+    public @NonNull PlanetGenerator generator;
+    /** Detail in divisions. Must be between 1 and 10. 6 is a good number.*/
+    public int detail = 3;
+    /** Size in terms of divisions. This only controls the amount of sectors on the planet, not the visuals. */
+    public int size = 3;
 
     public Planet(String name){
         super(name);
@@ -18,9 +24,7 @@ public class Planet extends UnlockableContent{
 
     @Override
     public void load(){
-        Time.mark();
-        mesh = new PlanetMesh(6);
-        Log.info("Time to generate planet mesh: {0}", Time.elapsed());
+        mesh = new PlanetMesh(detail, generator);
     }
 
     /** Planets cannot be viewed in the database dialog. */
