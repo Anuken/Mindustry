@@ -51,7 +51,7 @@ public abstract class Content implements Comparable<Content>{
     }
 
     public String getModName(String prefix){
-        return minfo.mod == null ? "" : (prefix + minfo.mod.meta.displayName);
+        return minfo.mod == null ? "" : (prefix + minfo.mod.meta.displayName()));
     }
 
     public String getModName(){
