@@ -272,15 +272,9 @@ public class PlacementFragment extends Fragment{
                                     }
                                 }
                                 final String keyComboFinal = keyCombo;
-                                String modName = "";
-                                for(LoadedMod mod : mods.list()){
-                                    if(lastDisplay.name.startsWith(mod.meta.name + "-")){ // TODO: Make it foolproof
-                                        modName = "\n[accent]" + mod.meta.displayName;
-                                        break;
-                                    }
-                                }
+                                final String modNameFinal = lastDisplay.minfo.mod == null ? ""
+                                    : "\n[accent]" + lastDisplay.minfo.mod.meta.displayName;
 
-                                final String modNameFinal = modName;
                                 header.left();
                                 header.add(new Image(lastDisplay.icon(Cicon.medium))).size(8 * 4);
                                 header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName + keyComboFinal + modNameFinal)
