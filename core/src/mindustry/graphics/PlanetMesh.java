@@ -3,12 +3,11 @@ package mindustry.graphics;
 import arc.graphics.*;
 import arc.graphics.VertexAttributes.*;
 import arc.graphics.gl.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import arc.util.noise.*;
 import mindustry.graphics.PlanetGrid.*;
+import mindustry.maps.planet.*;
 
 public class PlanetMesh{
     private float[] floats = new float[3 + 3 + 1];
@@ -16,19 +15,12 @@ public class PlanetMesh{
     private Mesh mesh;
     private PlanetGrid grid;
 
-    private float color;
-    private boolean lines;
-    private float radius;
+    private boolean lines = false;
+    private float radius = 1f, intensity = 0.2f;
 
-    private Simplex sim = new Simplex();
-    private RidgedPerlin rid = new RidgedPerlin(2, 2);
-    private Color[] colors = {Color.royal, Color.royal, Color.royal, Color.tan, Color.valueOf("3f9a50"), Color.valueOf("3f9a50"), Color.gray, Color.white, Color.white};
-    private Vec3 normal = new Vec3();
+    private PlanetGenerator gen = new PlanetGenerator();
 
-    public PlanetMesh(int divisions, float radius, boolean lines, Color color){
-        this.radius = radius;
-        this.lines = lines;
-        this.color = color.toFloatBits();
+    public PlanetMesh(int divisions){
         this.grid = PlanetGrid.newGrid(divisions);
 
         int vertices = grid.tiles.length * 12 * (3 + 3 + 1);
@@ -77,7 +69,7 @@ public class PlanetMesh{
             }
 
             for(Corner corner : c){
-                corner.v.setLength(radius + elevation(corner.bv));
+                corner.v.setLength(radius + elevation(corner.bv)*intensity);
             }
 
             for(Corner corner : c){
@@ -115,20 +107,15 @@ public class PlanetMesh{
     }
 
     private Vec3 normal(Vec3 v1, Vec3 v2, Vec3 v3){
-        return normal.set(v2).sub(v1).crs(v3.x - v1.x, v3.y - v1.y, v3.z - v1.z).nor();
+        return Tmp.v32.set(v2).sub(v1).crs(v3.x - v1.x, v3.y - v1.y, v3.z - v1.z).nor();
     }
 
     private float elevation(Vec3 v){
-        if(lines) return 0;
-
-        Color c = color(v);
-        if(c == Color.royal) return 0.19f;
-        return ((float)sim.octaveNoise3D(8, 0.7, 1 / 2.0, v.x, v.y, v.z)) / 3f + (rid.getValue(v.x, v.y, v.z, 1f) + 1f) / 12f;
+        return gen.getHeight(v);
     }
 
     private Color color(Vec3 v){
-        float f = ((float)sim.octaveNoise3D(6, 0.6, 1 / 2.0, v.x, v.y, v.z)) * 0.5f +  0.5f * ((rid.getValue(v.x, v.y, v.z, 1f) + 1f) / 2f);
-        return colors[Mathf.clamp((int)(f * colors.length), 0, colors.length - 1)];
+        return gen.getColor(v, elevation(v));
     }
 
     private void verts(Vec3 a, Vec3 b, Vec3 c, Vec3 normal, Color color){
