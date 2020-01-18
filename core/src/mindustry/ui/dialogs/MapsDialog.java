@@ -67,7 +67,7 @@ public class MapsDialog extends FloatingDialog{
             });
         }).size(210f, 64f);
 
-        buttons.addImageTextButton("$editor.importmap", Icon.download, () -> {
+        buttons.addImageTextButton("$editor.importmap", Icon.upload, () -> {
             platform.showFileChooser(true, mapExtension, file -> {
                 ui.loadAnd(() -> {
                     maps.tryCatchMapError(() -> {
@@ -192,7 +192,7 @@ public class MapsDialog extends FloatingDialog{
 
         table.row();
 
-        table.addImageTextButton("$editor.openin", Icon.download, () -> {
+        table.addImageTextButton("$editor.openin", Icon.export, () -> {
             try{
                 Vars.ui.editor.beginEditMap(map.file);
                 dialog.hide();
