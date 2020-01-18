@@ -139,16 +139,16 @@ public class JoinDialog extends FloatingDialog{
                     }
                 }
 
-            }).margin(3f).padTop(6f).top().right();
+            }).margin(3f).pad(2).padTop(6f).top().right();
 
             inner.addImageButton(Icon.refresh, Styles.emptyi, () -> {
                 refreshServer(server);
-            }).margin(3f).padTop(6f).top().right();
+            }).margin(3f).pad(2).padTop(6f).top().right();
 
             inner.addImageButton(Icon.pencil, Styles.emptyi, () -> {
                 renaming = server;
                 add.show();
-            }).margin(3f).padTop(6f).top().right();
+            }).margin(3f).pad(2).padTop(6f).top().right();
 
             inner.addImageButton(Icon.trash, Styles.emptyi, () -> {
                 ui.showConfirm("$confirm", "$server.delete", () -> {
@@ -157,7 +157,7 @@ public class JoinDialog extends FloatingDialog{
                     setupRemote();
                     refreshRemote();
                 });
-            }).margin(3f).pad(6).top().right();
+            }).margin(3f).pad(2).pad(6).top().right();
 
             button.row();
 
@@ -179,7 +179,7 @@ public class JoinDialog extends FloatingDialog{
 
         net.pingHost(server.ip, server.port, host -> setupServer(server, host), e -> {
             server.content.clear();
-            server.content.add("$host.invalid");
+            server.content.add("$host.invalid").padBottom(4);
         });
     }
 
@@ -212,6 +212,10 @@ public class JoinDialog extends FloatingDialog{
         content.table(t -> {
             t.add("[lightgray]" + host.name + "   " + versionString).width(targetWidth() - 10f).left().get().setEllipsis(true);
             t.row();
+            if(!host.description.isEmpty()){
+                t.add("[gray]" + host.description).width(targetWidth() - 10f).left().wrap();
+                t.row();
+            }
             t.add("[lightgray]" + (Core.bundle.format("players" + (host.players == 1 && host.playerLimit <= 0 ? ".single" : ""), (host.players == 0 ? "[lightgray]" : "[accent]") + host.players + (host.playerLimit > 0 ? "[lightgray]/[accent]" + host.playerLimit : "")+ "[lightgray]"))).left();
             t.row();
             t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + host.mode.toString()).width(targetWidth() - 10f).left().get().setEllipsis(true);
