@@ -16,6 +16,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
+import static mindustry.Vars.ui;
+
 public class DatabaseDialog extends FloatingDialog{
 
     public DatabaseDialog(){
@@ -69,8 +71,10 @@ public class DatabaseDialog extends FloatingDialog{
                         image.clicked(() -> {
                             if(Core.input.keyDown(KeyCode.SHIFT_LEFT) && Fonts.getUnicode(unlock.name) != 0){
                                 Core.app.setClipboardText((char)Fonts.getUnicode(unlock.name) + "");
+                                ui.showInfoFade("$copied");
+                            }else{
+                                Vars.ui.content.show(unlock);
                             }
-                            Vars.ui.content.show(unlock);
                         });
                         image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName)));
                     }

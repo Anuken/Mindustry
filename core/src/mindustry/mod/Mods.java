@@ -112,13 +112,6 @@ public class Mods implements Loadable{
             totalSprites += sprites.size + overrides.size;
         });
 
-        for(AtlasRegion region : Core.atlas.getRegions()){
-            PageType type = getPage(region);
-            if(!packer.has(type, region.name)){
-                packer.add(type, region.name, Core.atlas.getPixmap(region));
-            }
-        }
-
         Log.debug("Time to pack textures: {0}", Time.elapsed());
     }
 
@@ -159,6 +152,15 @@ public class Mods implements Loadable{
 
         //get textures packed
         if(totalSprites > 0){
+            Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
+
+            for(AtlasRegion region : Core.atlas.getRegions()){
+                PageType type = getPage(region);
+                if(!packer.has(type, region.name)){
+                    packer.add(type, region.name, Core.atlas.getPixmap(region));
+                }
+            }
+
             TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
 
             //flush so generators can use these sprites

@@ -204,14 +204,16 @@ public class PlacementFragment extends Fragment{
 
                         ImageButton button = blockTable.addImageButton(new TextureRegionDrawable(block.icon(Cicon.medium)), Styles.selecti, () -> {
                             if(unlocked(block)){
-                                control.input.block = control.input.block == block ? null : block;
-                                selectedBlocks.put(currentCategory, control.input.block);
-
                                 if(Core.input.keyDown(KeyCode.SHIFT_LEFT) && Fonts.getUnicode(block.name) != 0){
                                     Core.app.setClipboardText((char)Fonts.getUnicode(block.name) + "");
+                                    ui.showInfoFade("$copied");
+                                }else{
+                                    control.input.block = control.input.block == block ? null : block;
+                                    selectedBlocks.put(currentCategory, control.input.block);
                                 }
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
+                        button.resizeImage(Cicon.medium.size);
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = player.getClosestCore();
