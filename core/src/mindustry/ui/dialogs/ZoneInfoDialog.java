@@ -86,7 +86,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                             r.row();
                             for(Unlock blocko : blocks){
                                 r.addImage(blocko.block.icon(Cicon.small)).size(8 * 3).padRight(5);
-                                r.add(blocko.block.localizedName + blocko.block.getModName()e).color(Color.lightGray).left();
+                                r.add(blocko.block.localizedName + blocko.block.getModName()).color(Color.lightGray).left();
                                 r.addImage(blocko.block.unlocked() ? Icon.ok : Icon.cancel, blocko.block.unlocked() ? Color.lightGray : Color.scarlet).padLeft(3);
                                 r.row();
                             }
