@@ -17,7 +17,6 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
-import mindustry.mod.Mods.LoadedMod;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.Cicon;
