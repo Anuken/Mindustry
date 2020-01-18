@@ -671,14 +671,6 @@ public class Block extends BlockStorage{
         return localizedName;
     }
 
-    public String getModName(String prefix){
-        return minfo.mod == null ? "" : (prefix + minfo.mod.meta.displayName);
-    }
-
-    public String getModName(){
-        return getModName("\n[accent]");
-    }
-
     public TextureRegion getDisplayIcon(Tile tile){
         return icon(Cicon.medium);
     }

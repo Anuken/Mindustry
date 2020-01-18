@@ -50,6 +50,14 @@ public abstract class Content implements Comparable<Content>{
         return getContentType().name() + "#" + id;
     }
 
+    public String getModName(String prefix){
+        return minfo.mod == null ? "" : (prefix + minfo.mod.meta.displayName);
+    }
+
+    public String getModName(){
+        return getModName("\n[accent]");
+    }
+
     public static class ModContentInfo{
         /** The mod that loaded this piece of content. */
         public @Nullable LoadedMod mod;
