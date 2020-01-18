@@ -1,6 +1,6 @@
 package mindustry.world.blocks.production;
 
-import arc.graphics.*;
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
@@ -15,15 +15,11 @@ import mindustry.world.meta.values.*;
  * Extracts a random list of items from an input item and an input liquid.
  */
 public class Separator extends Block{
-    protected @NonNull ItemStack[] results;
-    protected float craftTime;
-    protected float spinnerRadius = 2.5f;
-    protected float spinnerLength = 1f;
-    protected float spinnerThickness = 1f;
-    protected float spinnerSpeed = 2f;
+    public @NonNull ItemStack[] results;
+    public float craftTime;
 
-    protected Color color = Color.valueOf("858585");
-    protected int liquidRegion;
+    public int liquidRegion, spinnerRegion;
+    public float spinnerSpeed = 3f;
 
     public Separator(String name){
         super(name);
@@ -33,6 +29,7 @@ public class Separator extends Block{
         hasLiquids = true;
 
         liquidRegion = reg("-liquid");
+        spinnerRegion = reg("-spinner");
         entityType = GenericCrafterEntity::new;
     }
 
@@ -70,10 +67,10 @@ public class Separator extends Block{
         Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
         Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
 
-        Draw.color(color);
-        Lines.stroke(spinnerThickness);
-        Lines.spikes(tile.drawx(), tile.drawy(), spinnerRadius, spinnerLength, 3, entity.totalProgress * spinnerSpeed);
         Draw.reset();
+        if(Core.atlas.isFound(reg(spinnerRegion))){
+            Draw.rect(reg(spinnerRegion), tile.drawx(), tile.drawy(), entity.totalProgress * spinnerSpeed);
+        }
     }
 
     @Override

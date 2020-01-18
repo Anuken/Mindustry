@@ -52,7 +52,7 @@ public class LightBlock extends Block{
     public void buildConfiguration(Tile tile, Table table){
         LightEntity entity = tile.ent();
 
-        table.addImageButton(Icon.pencilSmall, () -> {
+        table.addImageButton(Icon.pencil, () -> {
             ui.picker.show(Tmp.c1.set(entity.color).a(0.5f), false, res -> {
                 entity.color = res.rgba();
                 lastColor = entity.color;

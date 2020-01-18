@@ -24,13 +24,13 @@ public class LiquidDisplay extends Table{
 
             if(amount != 0){
                 Table t = new Table().left().bottom();
-                t.add(Strings.autoFixed(amount, 1));
+                t.add(Strings.autoFixed(amount, 1)).style(Styles.outlineLabel);
                 add(t);
             }
         }}).size(8 * 4).padRight(3  + (amount != 0 && Strings.autoFixed(amount, 1).length() > 2 ? 8 : 0));
 
         if(perSecond){
-            add(StatUnit.perSecond.localized()).padLeft(2).padRight(5).color(Color.lightGray);
+            add(StatUnit.perSecond.localized()).padLeft(2).padRight(5).color(Color.lightGray).style(Styles.outlineLabel);
         }
 
         add(liquid.localizedName);

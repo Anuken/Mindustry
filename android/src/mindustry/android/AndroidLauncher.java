@@ -19,6 +19,7 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.io.*;
+import mindustry.net.*;
 import mindustry.ui.dialogs.*;
 
 import java.io.*;
@@ -144,6 +145,7 @@ public class AndroidLauncher extends AndroidApplication{
         }, new AndroidApplicationConfiguration(){{
             useImmersiveMode = true;
             hideStatusBar = true;
+            errorHandler = CrashSender::log;
         }});
         checkFiles(getIntent());
 

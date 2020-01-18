@@ -66,7 +66,7 @@ public class CommandCenter extends Block{
         super.load();
 
         for(UnitCommand cmd : UnitCommand.all){
-            commandRegions[cmd.ordinal()] = Core.atlas.find("icon-command-" + cmd.name() + "-small");
+            commandRegions[cmd.ordinal()] = Core.atlas.find("Icon.command-" + cmd.name() + "-");
         }
     }
 
@@ -91,7 +91,7 @@ public class CommandCenter extends Block{
         Table buttons = new Table();
 
         for(UnitCommand cmd : UnitCommand.all){
-            buttons.addImageButton(Core.atlas.drawable("icon-command-" + cmd.name() + "-small"), Styles.clearToggleTransi, () -> tile.configure(cmd.ordinal()))
+            buttons.addImageButton(Core.atlas.drawable("Icon.command-" + cmd.name() + "-"), Styles.clearToggleTransi, () -> tile.configure(cmd.ordinal()))
             .size(44).group(group).update(b -> b.setChecked(entity.command == cmd));
         }
         table.add(buttons);
