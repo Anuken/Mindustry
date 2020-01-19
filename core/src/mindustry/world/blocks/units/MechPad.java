@@ -47,11 +47,12 @@ public class MechPad extends Block{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void onMechFactoryTap(Player player, Tile tile){
-        if(player == null || tile == null || !(tile.block() instanceof MechPad) || !checkValidTap(tile, player)) return;
+        if(player == null || tile == null || !(tile.block() instanceof MechPad) || !checkValidTapAnywhere(tile, player)) return;
 
         MechFactoryEntity entity = tile.ent();
+        player.lastSpawner = entity;
 
-        if(!entity.cons.valid()) return;
+        if(!entity.cons.valid() || !checkValidTapNearby(tile, player)) return;
         player.beginRespawning(entity);
         entity.sameMech = false;
     }
@@ -79,15 +80,20 @@ public class MechPad extends Block{
         Events.fire(new MechChangeEvent(player, player.mech));
     }
 
-    protected static boolean checkValidTap(Tile tile, Player player){
+    protected static boolean checkValidTapNearby(Tile tile, Player player){
+        return checkValidTapAnywhere(tile, player)
+        && Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize
+        && Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize;
+    }
+
+    protected static boolean checkValidTapAnywhere(Tile tile, Player player){
         MechFactoryEntity entity = tile.ent();
-        return !player.isDead() && tile.interactable(player.getTeam()) && Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize &&
-        Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize && entity.cons.valid() && entity.player == null;
+        return !player.isDead() && tile.interactable(player.getTeam()) && entity.cons.valid() && entity.player == null;
     }
 
     @Override
     public void drawSelect(Tile tile){
-        Draw.color(Pal.accent);
+        Draw.color(player.lastSpawner == tile.entity ? Pal.power : (tile.entity.cons.valid() ? Pal.accent : Pal.lightishGray));
         for(int i = 0; i < 4; i++){
             float length = tilesize * size / 2f + 3 + Mathf.absin(Time.time(), 5f, 2f);
             Draw.rect("transfer-arrow", tile.drawx() + Geometry.d4[i].x * length, tile.drawy() + Geometry.d4[i].y * length, (i + 2) * 90);
@@ -99,7 +105,7 @@ public class MechPad extends Block{
     public void tapped(Tile tile, Player player){
         MechFactoryEntity entity = tile.ent();
 
-        if(checkValidTap(tile, player)){
+        if(checkValidTapAnywhere(tile, player)){
             Call.onMechFactoryTap(player, tile);
         }else if(player.isLocal && mobile && !player.isDead() && entity.cons.valid() && entity.player == null){
             //deselect on double taps
