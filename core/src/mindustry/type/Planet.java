@@ -13,7 +13,7 @@ public class Planet extends UnlockableContent{
     public @NonNull PlanetGrid grid;
     /** Generator that will make the planet. */
     public @NonNull PlanetGenerator generator;
-    /** Detail in divisions. Must be between 1 and 10. 6 is a good number.*/
+    /** Detail in divisions. Must be between 1 and 10. 6 is a good number for this.*/
     public int detail = 3;
     /** Size in terms of divisions. This only controls the amount of sectors on the planet, not the visuals. */
     public int size = 3;

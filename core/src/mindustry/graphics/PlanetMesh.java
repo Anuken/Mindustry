@@ -12,17 +12,24 @@ import mindustry.maps.planet.*;
 public class PlanetMesh{
     private float[] floats = new float[3 + 3 + 1];
     private Vec3 center = new Vec3(0, 0, 0);
+    private Vec3 vec = new Vec3();
     private Mesh mesh;
     private PlanetGrid grid;
 
-    private boolean lines = false;
-    private float radius = 1f, intensity = 0.2f;
+    private boolean lines;
+    private float radius, intensity = 0.2f;
 
     private final PlanetGenerator gen;
 
     public PlanetMesh(int divisions, PlanetGenerator gen){
+        this(divisions, gen, 1f, false);
+    }
+
+    public PlanetMesh(int divisions, PlanetGenerator gen, float radius, boolean lines){
         this.gen = gen;
+        this.radius = radius;
         this.grid = PlanetGrid.newGrid(divisions);
+        this.lines = lines;
 
         int vertices = grid.tiles.length * 12 * (3 + 3 + 1);
 
@@ -42,6 +49,24 @@ public class PlanetMesh{
         Shaders.planet.setUniformMatrix4("u_projModelView", mat.val);
         mesh.render(Shaders.planet, lines ? Gl.lines : Gl.triangles);
         Shaders.planet.end();
+    }
+
+    public void projectTile(Ptile tile){
+        Tmp.v33.setZero();
+        for(Corner c : tile.corners){
+            Tmp.v33.add(c.v);
+        }
+        //v33 is now the center of this shape
+        Tmp.v33.scl(1f / tile.corners.length);
+        //radius of circle
+        float radius = Tmp.v33.dst(tile.corners[0].v);
+
+        //target 'up' vector
+        Vec3 target = Tmp.v33.cpy().add(0f, 1f, 0f);
+
+        //get plane that these points are on
+        Plane plane = new Plane();
+        plane.set(tile.corners[0].v, tile.corners[2].v, tile.corners[4].v);
     }
 
     public @Nullable Ptile getTile(Ray ray){
@@ -66,7 +91,7 @@ public class PlanetMesh{
             Corner[] c = tile.corners;
 
             for(Corner corner : c){
-                corner.bv.set(corner.v).setLength(radius);;
+                corner.bv.set(corner.v).setLength(radius);
             }
 
             for(Corner corner : c){
@@ -112,11 +137,11 @@ public class PlanetMesh{
     }
 
     private float elevation(Vec3 v){
-        return gen.getHeight(v);
+        return gen.getHeight(vec.set(v).scl(1f / radius));
     }
 
     private Color color(Vec3 v){
-        return gen.getColor(v);
+        return gen.getColor(vec.set(v).scl(1f / radius));
     }
 
     private void verts(Vec3 a, Vec3 b, Vec3 c, Vec3 normal, Color color){
