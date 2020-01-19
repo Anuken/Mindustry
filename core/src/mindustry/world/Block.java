@@ -678,6 +678,8 @@ public class Block extends BlockStorage{
     public void display(Tile tile, Table table){
         TileEntity entity = tile.entity;
 
+        table.label(() -> getModName("[accent]"));
+        table.row();
         if(entity != null){
             table.table(bars -> {
                 bars.defaults().growX().height(18f).pad(4);
