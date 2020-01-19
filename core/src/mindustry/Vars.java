@@ -1,13 +1,14 @@
 package mindustry;
 
-import arc.*;
 import arc.Application.*;
+import arc.*;
 import arc.assets.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
+import arc.util.Log.*;
 import arc.util.io.*;
 import mindustry.ai.*;
 import mindustry.core.*;
@@ -21,10 +22,11 @@ import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.maps.*;
 import mindustry.mod.*;
-import mindustry.net.*;
 import mindustry.net.Net;
+import mindustry.net.*;
 import mindustry.world.blocks.defense.ForceProjector.*;
 
+import java.io.*;
 import java.nio.charset.*;
 import java.util.*;
 
@@ -35,7 +37,7 @@ public class Vars implements Loadable{
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
     /** Whether the logger is loaded. */
-    public static boolean loadedLogger = false;
+    public static boolean loadedLogger = false, loadedFileLogger = false;
     /** Maximum schematic size.*/
     public static final int maxSchematicSize = 32;
     /** All schematic base64 starts with this string.*/
@@ -86,7 +88,7 @@ public class Vars implements Loadable{
     public static final Color[] playerColors = {
         Color.valueOf("82759a"),
         Color.valueOf("c0c1c5"),
-        Color.valueOf("fff0e7"),
+        Color.valueOf("ffffff"),
         Color.valueOf("7d2953"),
         Color.valueOf("ff074e"),
         Color.valueOf("ff072a"),
@@ -282,9 +284,10 @@ public class Vars implements Loadable{
         String[] stags = {"&lc&fb[D]", "&lg&fb[I]", "&ly&fb[W]", "&lr&fb[E]", ""};
 
         Array<String> logBuffer = new Array<>();
-        Log.setLogger((level, text, args) -> {
-            String result = Log.format(text, args);
-            System.out.println(Log.format(stags[level.ordinal()] + "&fr " + text, args));
+        Log.setLogger((level, text) -> {
+            String result = text;
+            String rawText = Log.format(stags[level.ordinal()] + "&fr " + text);
+            System.out.println(rawText);
 
             result = tags[level.ordinal()] + " " + result;
 
@@ -298,6 +301,28 @@ public class Vars implements Loadable{
         Events.on(ClientLoadEvent.class, e -> logBuffer.each(ui.scriptfrag::addMessage));
 
         loadedLogger = true;
+    }
+
+    public static void loadFileLogger(){
+        if(loadedFileLogger) return;
+
+        Core.settings.setAppName(appName);
+
+        Writer writer = settings.getDataDirectory().child("last_log.txt").writer(false);
+        LogHandler log = Log.getLogger();
+        Log.setLogger(((level, text) -> {
+            log.log(level, text);
+
+            try{
+                writer.write("[" + Character.toUpperCase(level.name().charAt(0)) +"] " + Log.removeCodes(text) + "\n");
+                writer.flush();
+            }catch(IOException e){
+                e.printStackTrace();
+                //ignore it
+            }
+        }));
+
+        loadedFileLogger = true;
     }
 
     public static void loadSettings(){

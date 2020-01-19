@@ -66,17 +66,17 @@ public class ServerControl implements ApplicationListener{
             "globalrules", "{reactorExplosions: false}"
         );
 
-        Log.setLogger((level, text, args1) -> {
-            String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr", args1);
+        Log.setLogger((level, text) -> {
+            String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr");
             System.out.println(result);
 
             if(Config.logging.bool()){
-                logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr", false, args1));
+                logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + formatColors(tags[level.ordinal()] + " " + text + "&fr", false));
             }
 
             if(socketOutput != null){
                 try{
-                    socketOutput.println(format(text + "&fr", false, args1));
+                    socketOutput.println(formatColors(text + "&fr", false));
                 }catch(Throwable e){
                     err("Error occurred logging to socket: {0}", e.getClass().getSimpleName());
                 }
@@ -799,6 +799,22 @@ public class ServerControl implements ApplicationListener{
                     info("  &lyall IPs used: {0}", info.ips);
                     info("  &lytimes joined: {0}", info.timesJoined);
                     info("  &lytimes kicked: {0}", info.timesKicked);
+                }
+            }else{
+                info("Nobody with that name could be found.");
+            }
+        });
+
+        handler.register("search", "<name...>", "Search players who have used part of a name.", arg -> {
+
+            ObjectSet<PlayerInfo> infos = netServer.admins.searchNames(arg[0]);
+
+            if(infos.size > 0){
+                info("&lgPlayers found: {0}", infos.size);
+
+                int i = 0;
+                for(PlayerInfo info : infos){
+                    info("- &lc[{0}] &ly'{1}'&lc / &lm{2}", i++, info.lastName, info.id);
                 }
             }else{
                 info("Nobody with that name could be found.");

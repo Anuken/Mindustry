@@ -325,8 +325,22 @@ public class Administration{
         ObjectSet<PlayerInfo> result = new ObjectSet<>();
 
         for(PlayerInfo info : playerInfo.values()){
-            if(info.lastName.toLowerCase().equals(name.toLowerCase()) || (info.names.contains(name, false))
+            if(info.lastName.equalsIgnoreCase(name) || (info.names.contains(name, false))
+            || Strings.stripColors(Strings.stripColors(info.lastName)).equals(name)
             || info.ips.contains(name, false) || info.id.equals(name)){
+                result.add(info);
+            }
+        }
+
+        return result;
+    }
+
+    /** Finds by name, using contains(). */
+    public ObjectSet<PlayerInfo> searchNames(String name){
+        ObjectSet<PlayerInfo> result = new ObjectSet<>();
+
+        for(PlayerInfo info : playerInfo.values()){
+            if(info.names.contains(n -> n.toLowerCase().contains(name.toLowerCase()) || Strings.stripColors(n).trim().toLowerCase().contains(name))){
                 result.add(info);
             }
         }
@@ -397,6 +411,7 @@ public class Administration{
     /** Server configuration definition. Each config value can be a string, boolean or number. */
     public enum Config{
         name("The server name as displayed on clients.", "Server", "servername"),
+        desc("The server description, displayed under the name. Max 100 characters.", "off"),
         port("The port to host on.", Vars.port),
         autoUpdate("Whether to auto-update and exit when a new bleeding-edge update arrives.", false),
         showConnectMessages("Whether to display connect/disconnect messages.", true),
@@ -529,6 +544,10 @@ public class Administration{
         public @NonNull ActionType type;
         public @NonNull Tile tile;
 
+        /** valid for block placement events only */
+        public @Nullable Block block;
+        public int rotation;
+
         /** valid for configure and rotation-type events only. */
         public int config;
 
@@ -554,7 +573,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem
+        breakBlock, placeBlock, rotate, configure, tapTile, withdrawItem, depositItem
     }
 
 }

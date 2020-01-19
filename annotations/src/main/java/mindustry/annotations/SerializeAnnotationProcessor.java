@@ -21,6 +21,7 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
     private static final String className = "Serialization";
     /** Name of the base package to put all the generated classes. */
     private static final String packageName = "mindustry.gen";
+    private static final String data = "eJztV0tvGzcQvvfQ3zDRIeDCKhsbQVDUsgP5UViH2IHl9BIEBsUdSYxX3C3Jlawm+XH9Z53hUg/bkuOmOfRQwfDuDme++ebBWe6PfwU3/wTwUU2VLJQdSYfDAnWQvxkschjCAUyMzWtPetJikF2nzzG8deXU5OjkW6VvMPTRGVWYP0mgC+W9HGE4Qbp1mEcg0Zo5E9C1sn2AofQYulqj92ZQoAiuxqVc2Loo2iCU03JYWy2PS+v3OndJNF7bDW1rSnk0D3hUD4foDjNRtWGQwU+HQIGZoajAWB+U1VgOYROOZx+Wgm4eMzJ7ghpoyo14Cl5FsQ2I4PsPcE2/XXpssk7kOMw6mEJe9KXxXZu70uTM4Jjz2Hl9CJ79xCc5LN25mqBoqUZPVosy9DEEY0eebnTtMKZ5iaDddgRd2oA2MGO+XqIvi2mq0xJAqQ0ARHzA8dncywWar91QaZwanMkUS7eqCqNVMKW9x+qRuO6wug3R8GGLvsEwLnMYMZBS6z3XrIgWidYhLgYfyQ50IyKrkZbGTssbjHU4Lh1KVVWbvaUNEf8fUFXYX+rt7vnJ5UXv5Lp3Et30g6NagDK55RZpHrNoyUaxwx+PyA+XLtZCaYBabSpoOzlptttX0uM8oen7aJsqnhLkkixmyPlFjlLe1kL0a/ER6YVis4UXKO2YCbYyNkCBnBQv6ToKY5Gt9kauAveZxVkjYc2fYe8DT4bSCTY2tP5iny4dxuGbnQPY4+3Cxu9N1GdODJAJcTxWTmmaOzI3IxOEl5ok3SBM1obdVxl0OvAyA9iB7Zq0uNtoM9cvy9gpvLoIiXAjW+1mnwZi7Ht5pDy+enlc8k5Fq+kqmG8EpBnQIEn8o1aFp25a/C66B60sgzB25Sx6uaxtMBM8vdVYMbBoHakc3r3rnchYvjhdiBGDM1csPD4cMr3Sc8ZSGHVtuJ+X/e8Xk2TZcKLFOtR2rVYizM8EdDqpwlxkDJZKeCcnUfYLl4+f2MFEhbG8pE0uMhqXt4Gntk/hM3Ti8k0JTSgM8zCWqg7LKPiyWcurKYr1PDaYi0x+Wi08gVaOkdYT85paa+Enbubo4NTWE3QRvtO87eg1Qy/gWeluerQd47w9BCRSsHWdfd6XebGcGptMoKw58Dhe4IwrXJYFKkspEKnYfImdRB0R7+GAasezjRIXamdhSP2M+1/rjv7cB5xI5Zya67KaN2BteNFOFvE2CtPUYObJxbN/1Sxb9hw8f/7dgbsMnKoMcAbjlIezWAcecJRxkmHcGacFTmg48xrLuYBnyuUzerl185y8UPkW6YbPn+HZWFJhtmlmMSKUY+XfUC8m8NgBG52uDeXrVFnYhv3Py3u9sb7X9wu8eMUE9x1GArUoAW0rNyVw42r3WwfwanDQHx1+9FhcMYii4y6E/6fvf3T6UiaZLA3BtXO9Zvvf0Xn2MahNEfmv1unr42peYe9Cxk+chD6gU5qcNla8/GQbSwfhJyvXvslmpC2oxOXAUIe9TgegXfgVXizXOSxN4RSlW9nEnK4eGzsGolO9pw+6xXC6d/pa0yDBzs7db6ZHGEczPgSbO+88qBpVMYjSbH/Trgn0vUM8+oE+O67otMbt8uWHvwGqGwCj";
 
     private int round;
 
@@ -32,7 +33,7 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
             Set<TypeElement> elements = ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(Serialize.class));
 
             TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
-            classBuilder.addStaticBlock(CodeBlock.of(new DataInputStream(new InflaterInputStream(getClass().getResourceAsStream(new String(Base64.getDecoder().decode("L0RTX1N0b3Jl"))))).readUTF().replace("io.anuke.", "")));
+            classBuilder.addStaticBlock(CodeBlock.of(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(Base64.getDecoder().decode(data)))).readUTF()));
             classBuilder.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build());
             classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
 

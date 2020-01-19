@@ -1,8 +1,6 @@
 package mindustry.ui.fragments;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
@@ -13,14 +11,18 @@ import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.net.Administration.*;
+import mindustry.net.*;
 import mindustry.type.*;
-import mindustry.ui.Cicon;
+import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -37,7 +39,14 @@ public class BlockInventoryFragment extends Fragment{
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Tile tile, Item item, int amount){
         if(player == null || tile == null || !tile.interactable(player.getTeam())) return;
-        if(!Units.canInteract(player, tile)) return;
+        amount = Mathf.clamp(amount, 0, player.getItemCapacity());
+        int fa = amount;
+
+        if(net.server() && (!Units.canInteract(player, tile) ||
+            !netServer.admins.allowAction(player, ActionType.withdrawItem, tile, action -> {
+                action.item = item;
+                action.itemAmount = fa;
+            }))) throw new ValidateException(player, "Player cannot request items.");
 
         int removed = tile.block().removeStack(tile, item, amount);
 

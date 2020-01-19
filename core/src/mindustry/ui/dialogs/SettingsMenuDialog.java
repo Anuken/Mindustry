@@ -81,10 +81,10 @@ public class SettingsMenuDialog extends SettingsDialog{
         dataDialog.addCloseButton();
 
         dataDialog.cont.table(Tex.button, t -> {
-            t.defaults().size(240f, 60f).left();
+            t.defaults().size(270f, 60f).left();
             TextButtonStyle style = Styles.cleart;
 
-            t.addButton("$settings.cleardata", style, () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
+            t.addImageTextButton("$settings.cleardata", Icon.trash, style, () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
                 ObjectMap<String, Object> map = new ObjectMap<>();
                 for(String value : Core.settings.keys()){
                     if(value.contains("usid") || value.contains("uuid")){
@@ -104,7 +104,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.row();
 
-            t.addButton("$data.export", style, () -> {
+            t.addImageTextButton("$data.export", Icon.download, style, () -> {
                 if(ios){
                     Fi file = Core.files.local("mindustry-data-export.zip");
                     try{
@@ -128,7 +128,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.row();
 
-            t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
+            t.addImageTextButton("$data.import", Icon.download, style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
                 try{
                     data.importData(file);
                     Core.app.exit();
@@ -143,6 +143,11 @@ public class SettingsMenuDialog extends SettingsDialog{
                     }
                 }
             })));
+
+            if(!ios){
+                t.row();
+                t.addImageTextButton("$data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath()));
+            }
         });
 
         ScrollPane pane = new ScrollPane(prefs);
@@ -290,7 +295,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             if(Core.settings.getBool("borderlesswindow")){
                 Core.app.post(() -> Core.graphics.setUndecorated(true));
             }
-        }else{
+        }else if(!ios){
             graphics.checkPref("landscape", false, b -> {
                 if(b){
                     platform.beginForceLandscape();
@@ -357,7 +362,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     @Override
     public void addCloseButton(){
-        buttons.addImageTextButton("$back", Icon.arrowLeftSmaller, () -> {
+        buttons.addImageTextButton("$back", Icon.leftOpen, () -> {
             if(prefs.getChildren().first() != menu){
                 back();
             }else{

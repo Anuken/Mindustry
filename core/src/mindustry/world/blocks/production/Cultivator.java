@@ -4,7 +4,7 @@ import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
-import arc.math.RandomXS128;
+import arc.math.Rand;
 import arc.util.Time;
 import mindustry.content.Fx;
 import mindustry.entities.type.TileEntity;
@@ -21,7 +21,7 @@ public class Cultivator extends GenericCrafter{
     public Color bottomColor = Color.valueOf("474747");
 
     public TextureRegion middleRegion, topRegion;
-    public RandomXS128 random = new RandomXS128(0);
+    public Rand random = new Rand(0);
     public float recurrence = 6f;
     public Attribute attribute = Attribute.spores;
 

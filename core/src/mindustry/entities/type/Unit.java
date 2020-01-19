@@ -224,11 +224,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         y = Mathf.clamp(y, 0, world.height() * tilesize - tilesize);
     }
 
-    public void kill(){
-        health = -1;
-        damage(1);
-    }
-
     public boolean isImmune(StatusEffect effect){
         return type.immunities.contains(effect);
     }
@@ -279,6 +274,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public Floor getFloorOn(){
         Tile tile = world.tileWorld(x, y);
         return tile == null ? (Floor)Blocks.air : tile.floor();
+    }
+
+    public @Nullable Tile tileOn(){
+        return world.tileWorld(x, y);
     }
 
     public void onRespawn(Tile tile){
