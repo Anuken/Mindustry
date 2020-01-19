@@ -81,7 +81,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         }
 
         Fi.get(resources).walk(p -> {
-            if(p.nameWithoutExtension().equals(".DS_Store")) return;
+            if(!p.extEquals("png")) return;
 
             String filename = p.name();
             filename = filename.substring(0, filename.indexOf("."));

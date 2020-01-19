@@ -246,7 +246,7 @@ public class Mods implements Loadable{
             try{
                 LoadedMod mod = loadMod(file);
                 mods.add(mod);
-            }catch(Exception e){
+            }catch(Throwable e){
                 Log.err("Failed to load mod file {0}. Skipping.", file);
                 Log.err(e);
             }
@@ -258,7 +258,7 @@ public class Mods implements Loadable{
                 LoadedMod mod = loadMod(file);
                 mods.add(mod);
                 mod.addSteamID(file.name());
-            }catch(Exception e){
+            }catch(Throwable e){
                 Log.err("Failed to load mod workshop file {0}. Skipping.", file);
                 Log.err(e);
             }
@@ -354,7 +354,7 @@ public class Mods implements Loadable{
             for(Fi file : bundles.getOr(locale, Array::new)){
                 try{
                     PropertiesUtils.load(bundle.getProperties(), file.reader());
-                }catch(Exception e){
+                }catch(Throwable e){
                     Log.err("Error loading bundle: " + file + "/" + locale, e);
                 }
             }
