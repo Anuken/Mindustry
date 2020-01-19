@@ -3,8 +3,8 @@ package mindustry.world.blocks.distribution;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.type.*;
 import mindustry.type.*;
@@ -85,7 +85,8 @@ public class Sorter extends Block{
     }
 
     boolean isSame(Tile tile, Tile other){
-        return other != null && other.block() instanceof Sorter;
+        //uncomment comment below to prevent sorter/gate chaining (hacky)
+        return other != null && (other.block() instanceof Sorter/* || other.block() instanceof OverflowGate */);
     }
 
     Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
