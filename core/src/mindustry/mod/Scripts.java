@@ -10,7 +10,9 @@ import mindustry.mod.Mods.*;
 import org.mozilla.javascript.*;
 
 public class Scripts implements Disposable{
-    private final Array<String> blacklist = Array.with("net", "classaccess", ".io", "io.", "files", "reflect");
+    private final Array<String> blacklist = Array.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
+        "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system");
+    private final Array<String> whitelist = Array.with("mindustry.net");
     private final Context context;
     private final String wrapper;
     private Scriptable scope;
@@ -20,7 +22,7 @@ public class Scripts implements Disposable{
         Time.mark();
 
         context = Vars.platform.getScriptContext();
-        context.setClassShutter(type -> !blacklist.contains(type.toLowerCase()::contains) || type.contains("mindustry.net"));
+        context.setClassShutter(type -> !blacklist.contains(type.toLowerCase()::contains) || whitelist.contains(type.toLowerCase()::contains));
         context.getWrapFactory().setJavaPrimitiveWrap(false);
         
         scope = new ImporterTopLevel(context);
