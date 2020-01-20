@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class PlanetRenderer implements PlanetGenerator{
     private final Color outlineColor = Pal.accent.cpy().a(0.7f);
-    private final float camLength = 4f, outlineRad = 1.2f;
+    private final float camLength = 4f, outlineRad = 1.15f;
     private final boolean drawnRect = true;
 
     private final PlanetMesh[] outlines = new PlanetMesh[10];
