@@ -185,11 +185,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         y = Mathf.clamp(y, 0, world.height() * tilesize - tilesize);
     }
 
-    public void kill(){
-        health = -1;
-        damage(1);
-    }
-
     public boolean isImmune(StatusEffect effect){
         return false;
     }

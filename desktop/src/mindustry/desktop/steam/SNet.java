@@ -315,7 +315,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                         Strings.parseInt(smat.getLobbyData(lobby, "version"), -1),
                         smat.getLobbyData(lobby, "versionType"),
                         Gamemode.valueOf(smat.getLobbyData(lobby, "gamemode")),
-                        smat.getLobbyMemberLimit(lobby)
+                        smat.getLobbyMemberLimit(lobby),
+                        ""
                     );
                     hosts.add(out);
                 }catch(Exception e){

@@ -55,7 +55,7 @@ public class AboutDialog extends FloatingDialog{
 
             table.table(i -> {
                 i.background(Tex.buttonEdge3);
-                i.addImage(Core.atlas.drawable("icon-" + link.name));
+                i.addImage(link.icon);
             }).size(h - 5, h);
 
             table.table(inset -> {

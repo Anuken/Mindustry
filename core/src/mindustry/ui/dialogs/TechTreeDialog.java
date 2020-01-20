@@ -60,7 +60,7 @@ public class TechTreeDialog extends FloatingDialog{
 
         addCloseButton();
 
-        buttons.addImageTextButton("$database", Icon.database, () -> {
+        buttons.addImageTextButton("$database", Icon.book, () -> {
             hide();
             ui.database.show();
         }).size(210f, 64f);
@@ -252,7 +252,7 @@ public class TechTreeDialog extends FloatingDialog{
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
                     button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !data.hasItems(node.node.requirements) ? Tex.buttonRed : Tex.button;
                     ((TextureRegionDrawable)button.getStyle().imageUp)
-                    .setRegion(node.visible ? node.node.block.icon(Cicon.medium) : Core.atlas.find("icon-locked"));
+                    .setRegion(node.visible ? node.node.block.icon(Cicon.medium) : Icon.lock.getRegion());
                     button.getImage().setColor(!locked(node.node) ? Color.white : Color.gray);
                 });
                 addChild(button);
@@ -324,7 +324,7 @@ public class TechTreeDialog extends FloatingDialog{
             infoTable.table(b -> {
                 b.margin(0).left().defaults().left();
 
-                b.addImageButton(Icon.infoSmall, Styles.cleari, () -> ui.content.show(node.block)).growY().width(50f);
+                b.addImageButton(Icon.info, Styles.cleari, () -> ui.content.show(node.block)).growY().width(50f);
                 b.add().grow();
                 b.table(desc -> {
                     desc.left().defaults().left();
@@ -351,7 +351,7 @@ public class TechTreeDialog extends FloatingDialog{
 
                 if(mobile && locked(node)){
                     b.row();
-                    b.addImageTextButton("$research", Icon.checkSmall, Styles.nodet, () -> unlock(node))
+                    b.addImageTextButton("$research", Icon.ok, Styles.nodet, () -> unlock(node))
                     .disabled(i -> !data.hasItems(node.requirements)).growX().height(44f).colspan(3);
                 }
             });

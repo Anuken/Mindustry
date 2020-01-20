@@ -171,6 +171,11 @@ public class NetClient implements ApplicationListener{
                 return;
             }
 
+            //special case; graphical server needs to see its message
+            if(!headless && player == Vars.player){
+                Vars.ui.chatfrag.addMessage(message, colorizeName(player.id, player.name));
+            }
+
             //server console logging
             Log.info("&y{0}: &lb{1}", player.name, message);
 
@@ -272,7 +277,6 @@ public class NetClient implements ApplicationListener{
         netClient.removed.clear();
         logic.reset();
 
-        ui.chatfrag.clearMessages();
         net.setClientLoaded(false);
 
         ui.loadfrag.show("$connecting.data");

@@ -100,7 +100,7 @@ public class MinimapFragment extends Fragment{
             t.row();
             t.add().growY();
             t.row();
-            t.addImageTextButton("$back", Icon.backSmall, () -> shown = false).size(220f, 60f).pad(10f);
+            t.addImageTextButton("$back", Icon.leftOpen, () -> shown = false).size(220f, 60f).pad(10f);
         });
     }
 

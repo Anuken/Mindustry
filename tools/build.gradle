@@ -303,19 +303,6 @@ task pack(dependsOn: classes){
             workingDir = genFolder
         }
 
-        //upscale icon sprites using different method, which requires an OpenGL context
-        javaexec{
-            if(System.getProperty("os.name").toLowerCase().contains("mac")){
-                jvmArgs "-XstartOnFirstThread"
-            }
-
-            jvmArgs("-Djava.awt.headless=true")
-            main = "mindustry.tools.Upscaler"
-            classpath = sourceSets.main.runtimeClasspath
-            standardInput = System.in
-            workingDir = "../core/assets-raw/sprites_out/ui/icons"
-        }
-
         copy{
             from "../core/assets-raw/sprites_out/ui/icons"
             into "../core/assets-raw/sprites_out/ui/"
@@ -365,4 +352,11 @@ task updateBundles(dependsOn: classes, type: JavaExec){
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = "../core/assets/bundles/"
+}
+
+task fontgen(dependsOn: classes, type: JavaExec){
+    main = "mindustry.tools.FontGenerator"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = "../"
 }

@@ -176,6 +176,10 @@ public class Generators{
                     Image image = new Image(icon.size, icon.size);
                     image.drawScaled(base);
                     image.save(item.getContentType().name() + "-" + item.name + "-" + icon.name(), false);
+
+                    if(icon == Cicon.medium){
+                        image.save("../ui/" + item.getContentType() + "-" + item.name + "-icon");
+                    }
                 }
             }
         });
@@ -254,12 +258,11 @@ public class Generators{
                     image.save("../blocks/environment/ore-" + item.name + (i + 1));
                     image.save("../editor/editor-ore-" + item.name + (i + 1));
 
-                    //save icons
                     image.save("block-" + ore.name + "-full");
                     for(Cicon icon : Cicon.scaled){
                         Image scaled = new Image(icon.size, icon.size);
                         scaled.drawScaled(image);
-                        scaled.save("block-" + ore.name + "-" + icon.name());
+                        scaled.save("../ui/block-" + ore.name + "-" + icon.name());
                     }
                 }
             });
