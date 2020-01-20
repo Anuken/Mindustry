@@ -16,7 +16,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
-import mindustry.world.blocks.power.*;
 
 import java.util.*;
 
@@ -100,6 +99,7 @@ public class Logic implements ApplicationListener{
         }
     }
 
+    /** Adds starting items, resets wave time, and sets state to playing. */
     public void play(){
         state.set(State.playing);
         state.wavetime = state.rules.waveSpacing * 2; //grace period of 2x wave time before game starts

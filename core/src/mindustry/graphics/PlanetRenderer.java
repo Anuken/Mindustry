@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 public class PlanetRenderer implements PlanetGenerator{
     private final Color outlineColor = Pal.accent.cpy().a(0.7f);
     private final float camLength = 4f, outlineRad = 1.15f;
-    private final boolean drawnRect = true;
+    private final boolean drawRect = false;
 
     private final PlanetMesh[] outlines = new PlanetMesh[10];
     private final Camera3D cam = new Camera3D();
@@ -58,8 +58,7 @@ public class PlanetRenderer implements PlanetGenerator{
             }
             batch.flush(cam.combined(), Gl.triangleFan);
 
-            if(drawnRect){
-                //TODO hack.
+            if(drawRect){
                 SectorRect rect = sector.rect;
                 rect.center.scl(outlineRad);
                 rect.right.scl(outlineRad);
@@ -78,12 +77,13 @@ public class PlanetRenderer implements PlanetGenerator{
                 rect.center.scl(1f / outlineRad);
                 rect.right.scl(1f / outlineRad);
                 rect.top.scl(1f / outlineRad);
-
-                if(Core.input.keyTap(KeyCode.SPACE)){
-                    control.playSector(sector);
-                    ui.planet.hide();
-                }
             }
+
+            if(Core.input.keyTap(KeyCode.SPACE)){
+                control.playSector(sector);
+                ui.planet.hide();
+            }
+
         }
 
         Gl.disable(Gl.depthTest);

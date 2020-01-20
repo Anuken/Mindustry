@@ -249,35 +249,15 @@ public class Control implements ApplicationListener, Loadable{
         });
     }
 
-    //TODO remove, make it viable on a server
-    /*public void playZone(Zone zone){
-
-        ui.loadAnd(() -> {
-            logic.reset();
-            net.reset();
-            world.loadGenerator(zone.generator);
-            zone.rules.get(state.rules);
-            state.rules.zone = zone;
-            for(TileEntity core : state.teams.playerCores()){
-                for(ItemStack stack : zone.getStartingItems()){
-                    core.items.add(stack.item, stack.amount);
-                }
-            }
-            state.set(State.playing);
-            state.wavetime = state.rules.waveSpacing;
-            control.saves.zoneSave();
-            logic.play();
-            Events.fire(Trigger.newGame);
-        });
-    }*/
-
     public void playSector(Sector sector){
         ui.loadAnd(() -> {
+            net.reset();
             logic.reset();
             world.loadSector(sector);
-            state.set(State.playing);
             logic.play();
+            control.saves.zoneSave();
             ui.planet.hide();
+            Events.fire(Trigger.newGame);
         });
     }
 

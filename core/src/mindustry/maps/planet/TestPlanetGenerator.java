@@ -15,14 +15,14 @@ public class TestPlanetGenerator implements PlanetGenerator{
     int waterLevel = 5;
     float water;
     float scl = 5f;
-    Array<Block> blocks = Array.with(Blocks.sporeMoss, Blocks.moss, Blocks.ice, Blocks.snow, Blocks.sand, Blocks.darksand, Blocks.darksandWater, Blocks.darksandTaintedWater);
+    Array<Block> blocks = Array.with(Blocks.sporeMoss, Blocks.moss, Blocks.ice, Blocks.snow, Blocks.sand, Blocks.darksand, Blocks.darksandWater, Blocks.darksandTaintedWater, Blocks.iceSnow);
 
     public TestPlanetGenerator(){
         try{
             pix = new Pixmap("planets/colors.png");
             water = waterLevel / (float)(pix.getHeight());
         }catch(Exception ignored){
-
+            //ignored during headless loading for now
         }
     }
 
@@ -39,6 +39,15 @@ public class TestPlanetGenerator implements PlanetGenerator{
 
     @Override
     public Color getColor(Vec3 position){
+        return getBlock(position).color;
+    }
+
+    @Override
+    public void generate(Vec3 position, TileGen tile){
+        tile.floor = getBlock(position);
+    }
+
+    Block getBlock(Vec3 position){
         float height = getHeight(position);
         position = Tmp.v33.set(position).scl(scl);
         float rad = scl;
@@ -49,12 +58,7 @@ public class TestPlanetGenerator implements PlanetGenerator{
         height = Mathf.clamp(height);
 
         Color color = Tmp.c1.set(pix.getPixel((int)(temp * (pix.getWidth()-1)), (int)((1f-height) * (pix.getHeight()-1))));
-        return blocks.min(c -> color.diff(c.color)).color;
-    }
 
-    @Override
-    public void generate(Vec3 position, TileGen tile){
-        Color color = getColor(position);
-        tile.floor = blocks.min(c -> color.diff(c.color));
+        return blocks.min(c -> color.diff(c.color));
     }
 }
