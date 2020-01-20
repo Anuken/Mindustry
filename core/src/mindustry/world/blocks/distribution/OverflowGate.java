@@ -72,6 +72,8 @@ public class OverflowGate extends Block{
         entity.lastItem = item;
         entity.time = 0f;
         entity.lastInput = source;
+
+        update(tile);
     }
 
     Tile getTileTarget(Tile tile, Item item, Tile src, boolean flip){
