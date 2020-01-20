@@ -8,12 +8,14 @@ import arc.input.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.graphics.PlanetGrid.*;
+import mindustry.graphics.PlanetMesh.*;
 import mindustry.maps.planet.*;
 import mindustry.type.*;
 
 public class PlanetRenderer implements PlanetGenerator{
     private final Color outlineColor = Pal.accent.cpy().a(0.7f);
     private final float camLength = 4f, outlineRad = 1.2f;
+    private final boolean drawnRect = true;
 
     private final PlanetMesh[] outlines = new PlanetMesh[10];
     private final Camera3D cam = new Camera3D();
@@ -50,6 +52,20 @@ public class PlanetRenderer implements PlanetGenerator{
                 batch.vertex(tile.corners[i].v);
             }
             batch.flush(cam.combined(), Gl.triangleFan);
+
+            if(drawnRect){
+                SectorRect rect = outline.projectTile(tile);
+
+                batch.color(Pal.place);
+                batch.vertex(rect.project(0, 0));
+                batch.color(Pal.place);
+                batch.vertex(rect.project(1, 0));
+                batch.color(Pal.place);
+                batch.vertex(rect.project(1, 1));
+                batch.color(Pal.place);
+                batch.vertex(rect.project(0, 1));
+                batch.flush(cam.combined(), Gl.lineLoop);
+            }
         }
 
         Gl.disable(Gl.depthTest);

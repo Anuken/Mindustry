@@ -3,6 +3,7 @@ package mindustry.graphics;
 import arc.graphics.*;
 import arc.graphics.VertexAttributes.*;
 import arc.graphics.gl.*;
+import arc.graphics.g3d.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -13,6 +14,7 @@ public class PlanetMesh{
     private float[] floats = new float[3 + 3 + 1];
     private Vec3 center = new Vec3(0, 0, 0);
     private Vec3 vec = new Vec3();
+    private Plane plane = new Plane();
     private Mesh mesh;
     private PlanetGrid grid;
 
@@ -51,22 +53,25 @@ public class PlanetMesh{
         Shaders.planet.end();
     }
 
-    public void projectTile(Ptile tile){
+    /** Projects a tile onto a 4-corner square for use in map gen.
+     * Allocates a new object. Do not call in the main loop. */
+    public SectorRect projectTile(Ptile tile){
         Tmp.v33.setZero();
         for(Corner c : tile.corners){
             Tmp.v33.add(c.v);
         }
         //v33 is now the center of this shape
-        Tmp.v33.scl(1f / tile.corners.length);
+        Vec3 center = Tmp.v33.scl(1f / tile.corners.length).cpy(vec);
         //radius of circle
-        float radius = Tmp.v33.dst(tile.corners[0].v);
-
-        //target 'up' vector
-        Vec3 target = Tmp.v33.cpy().add(0f, 1f, 0f);
+        float radius = Tmp.v33.dst(tile.corners[0].v) * 0.9f;
 
         //get plane that these points are on
-        Plane plane = new Plane();
         plane.set(tile.corners[0].v, tile.corners[2].v, tile.corners[4].v);
+
+        Vec3 planeTop = plane.project(center.cpy().add(0f, 1f, 0f)).sub(center).setLength(radius).add(center);
+        Vec3 planeRight = plane.project(center.cpy().rotate(Vec3.Y, 4f)).sub(center).setLength(radius).add(center);
+
+        return new SectorRect(center, planeTop.sub(center), planeRight.sub(center));
     }
 
     public @Nullable Ptile getTile(Ray ray){
@@ -161,5 +166,23 @@ public class PlanetMesh{
 
         floats[6] = color.toFloatBits();
         mesh.getVerticesBuffer().put(floats);
+    }
+
+    public static class SectorRect{
+        public final Vec3 center, top, right;
+        public final Vec3 result = new Vec3();
+
+        public SectorRect(Vec3 center, Vec3 top, Vec3 right){
+            this.center = center;
+            this.top = top;
+            this.right = right;
+        }
+
+        /** Project a coordinate into 3D space.
+         * Both coordinates should be normalized to floats of the value 0..1 */
+        public Vec3 project(float x, float y){
+            float nx = (x - 0.5f) * 2f, ny = (y - 0.5f) * 2f;
+            return result.set(center).add(right, nx).add(top, ny);
+        }
     }
 }
