@@ -1,11 +1,13 @@
 package mindustry.core;
 
 import arc.*;
+import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -14,7 +16,6 @@ import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.maps.filters.*;
 import mindustry.maps.filters.GenerateFilter.*;
-import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -184,13 +185,30 @@ public class World{
         return state.rules.zone;
     }
 
-    public void loadGenerator(Generator generator){
+    public void loadGenerator(int width, int height, Cons<Tiles> generator){
         beginMapLoad();
 
-        resize(generator.width, generator.height);
-        generator.generate(tiles);
+        resize(width, height);
+        generator.get(tiles);
 
         endMapLoad();
+    }
+
+    public void loadSector(Sector sector){
+        int size = (int)(sector.rect.radius * 2500);
+
+        loadGenerator(size, size, tiles -> {
+            TileGen gen = new TileGen();
+            tiles.each((x, y) -> {
+                gen.reset();
+                Vec3 position = sector.rect.project(x / (float)size, y / (float)size);
+
+                sector.planet.generator.generate(position, gen);
+                tiles.set(x, y, new Tile(x, y, gen.floor, gen.overlay, gen.block));
+            });
+
+            tiles.get(size/2, size/2).setBlock(Blocks.coreShard, Team.sharded);
+        });
     }
 
     public void loadMap(Map map){

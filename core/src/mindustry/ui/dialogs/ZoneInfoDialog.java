@@ -14,6 +14,7 @@ import mindustry.ui.Cicon;
 
 import static mindustry.Vars.*;
 
+//TODO remove
 public class ZoneInfoDialog extends FloatingDialog{
     private LoadoutDialog loadout = new LoadoutDialog();
 
@@ -158,7 +159,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                 ui.planet.hide();
                 data.removeItems(zone.getLaunchCost());
                 hide();
-                control.playZone(zone);
+                //control.playZone(zone);
             }
         }).minWidth(200f).margin(13f).padTop(5).disabled(b -> zone.locked() ? !zone.canUnlock() : !data.hasItems(zone.getLaunchCost())).uniformY().get();
 

@@ -1,14 +1,12 @@
 package mindustry.type;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
-import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
-import mindustry.ctype.ContentType;
-import mindustry.ctype.UnlockableContent;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
@@ -29,7 +27,6 @@ public class Zone extends UnlockableContent{
     public int conditionWave = Integer.MAX_VALUE;
     public int launchPeriod = 10;
     public Schematic loadout = Loadouts.basicShard;
-    public TextureRegion preview;
 
     protected Array<ItemStack> baseLaunchCost = new Array<>();
     protected Array<ItemStack> startingItems = new Array<>();
@@ -45,11 +42,6 @@ public class Zone extends UnlockableContent{
 
     public Zone(String name){
         this(name, Planets.starter, new MapGenerator(name));
-    }
-
-    @Override
-    public void load(){
-        preview = Core.atlas.find("zone-" + name, Core.atlas.find(name + "-zone"));
     }
 
     public Rules getRules(){

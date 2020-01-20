@@ -7,15 +7,10 @@ import arc.graphics.g3d.*;
 import arc.input.*;
 import arc.math.geom.*;
 import arc.util.*;
-import mindustry.*;
-import mindustry.content.*;
-import mindustry.core.GameState.*;
-import mindustry.game.*;
 import mindustry.graphics.PlanetGrid.*;
-import mindustry.graphics.PlanetMesh.*;
-import mindustry.maps.generators.*;
 import mindustry.maps.planet.*;
 import mindustry.type.*;
+import mindustry.type.Sector.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -55,14 +50,17 @@ public class PlanetRenderer implements PlanetGenerator{
 
         Ptile tile = outline.getTile(cam.getPickRay(Core.input.mouseX(), Core.input.mouseY()));
         if(tile != null){
-            for(int i = 0; i < tile.corners.length; i++){
+
+            Sector sector = planet.getSector(tile);
+            for(int i = 0; i < sector.tile.corners.length; i++){
                 batch.color(outlineColor);
-                batch.vertex(tile.corners[i].v);
+                batch.vertex(sector.tile.corners[i].v);
             }
             batch.flush(cam.combined(), Gl.triangleFan);
 
             if(drawnRect){
-                SectorRect rect = planet.mesh.projectTile(tile);
+                //TODO hack.
+                SectorRect rect = sector.rect;
                 rect.center.scl(outlineRad);
                 rect.right.scl(outlineRad);
                 rect.top.scl(outlineRad);
@@ -77,27 +75,12 @@ public class PlanetRenderer implements PlanetGenerator{
                 batch.vertex(rect.project(0, 1));
                 batch.flush(cam.combined(), Gl.lineLoop);
 
-                SectorRect coords = planet.mesh.projectTile(tile);
+                rect.center.scl(1f / outlineRad);
+                rect.right.scl(1f / outlineRad);
+                rect.top.scl(1f / outlineRad);
 
                 if(Core.input.keyTap(KeyCode.SPACE)){
-                    logic.reset();
-                    Vars.world.loadGenerator(new Generator(250, 250){
-                        @Override
-                        public void generate(Tiles tiles){
-                            TileGen gen = new TileGen();
-                            tiles.each((x, y) -> {
-                                gen.reset();
-                                Vec3 position = coords.project(x / (float)width, y / (float)height);
-
-                                planet.generator.generate(position, gen);
-                                tiles.set(x, y, new Tile(x, y, gen.floor, gen.overlay, gen.block));
-                            });
-
-                            tiles.get(width/2, height/2).setBlock(Blocks.coreShard, Team.sharded);
-                        }
-                    });
-                    state.set(State.playing);
-                    logic.play();
+                    control.playSector(sector);
                     ui.planet.hide();
                 }
             }

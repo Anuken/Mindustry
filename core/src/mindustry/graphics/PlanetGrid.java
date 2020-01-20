@@ -4,7 +4,10 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 
+//TODO clean this up somehow
 public class PlanetGrid{
+    private static final PlanetGrid[] cache = new PlanetGrid[10];
+
     private static final float x = -0.525731112119133606f;
     private static final float z = -0.850650808352039932f;
 
@@ -20,12 +23,10 @@ public class PlanetGrid{
     {5, 3, 10, 1, 4}, {2, 5, 4, 0, 11}, {3, 7, 6, 1, 8}, {7, 2, 9, 0, 6}
     };
 
-    private static PlanetGrid[] cache = new PlanetGrid[10];
-
-    int size;
-    Ptile[] tiles;
-    Corner[] corners;
-    Edge[] edges;
+    public final int size;
+    public final Ptile[] tiles;
+    public final Corner[] corners;
+    public final Edge[] edges;
 
     PlanetGrid(int size){
         this.size = size;
@@ -46,7 +47,7 @@ public class PlanetGrid{
         }
     }
 
-    static PlanetGrid newGrid(int size){
+    public static PlanetGrid newGrid(int size){
         //cache grids between calls, since only ~5 different grids total are needed
         if(size < cache.length && cache[size] != null){
             return cache[size];
@@ -104,8 +105,7 @@ public class PlanetGrid{
         for(Ptile t : grid.tiles){
             for(int k = 0; k < 5; k++){
                 if(t.edges[k] == null){
-                    addEdge(nextEdge, grid, t.id, iTilesP[t.id][k]);
-                    nextEdge++;
+                    addEdge(nextEdge++, grid, t.id, iTilesP[t.id][k]);
                 }
             }
         }
@@ -220,13 +220,15 @@ public class PlanetGrid{
         return 30 * Mathf.pow(3, size);
     }
 
-    static class Ptile{
-        int id;
-        int edgeCount;
-        Vec3 v = new Vec3();
-        Ptile[] tiles;
-        Corner[] corners;
-        Edge[] edges;
+    public static class Ptile{
+        public final int id;
+        public final int edgeCount;
+
+        public final Ptile[] tiles;
+        public final Corner[] corners;
+        public final Edge[] edges;
+
+        public Vec3 v = new Vec3();
 
         public Ptile(int id, int edgeCount){
             this.id = id;
@@ -238,23 +240,24 @@ public class PlanetGrid{
         }
     }
 
-    static class Corner{
-        int id;
-        Ptile[] tiles = new Ptile[3];
-        Corner[] corners = new Corner[3];
-        Edge[] edges = new Edge[3];
-        Vec3 v = new Vec3();
-        Vec3 bv = new Vec3();
+    public static class Corner{
+        public final int id;
+        public final Ptile[] tiles = new Ptile[3];
+        public final Corner[] corners = new Corner[3];
+        public final Edge[] edges = new Edge[3];
+
+        public Vec3 v = new Vec3();
+        public Vec3 bv = new Vec3();
 
         public Corner(int id){
             this.id = id;
         }
     }
 
-    static class Edge{
-        int id;
-        Ptile[] tiles = new Ptile[2];
-        Corner[] corners = new Corner[2];
+    public static class Edge{
+        public final int id;
+        public final Ptile[] tiles = new Ptile[2];
+        public final Corner[] corners = new Corner[2];
 
         public Edge(int id){
             this.id = id;

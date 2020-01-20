@@ -3,7 +3,6 @@ package mindustry.graphics;
 import arc.graphics.*;
 import arc.graphics.VertexAttributes.*;
 import arc.graphics.gl.*;
-import arc.graphics.g3d.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -12,11 +11,10 @@ import mindustry.maps.planet.*;
 
 public class PlanetMesh{
     private float[] floats = new float[3 + 3 + 1];
-    private Vec3 center = new Vec3(0, 0, 0);
     private Vec3 vec = new Vec3();
-    private Plane plane = new Plane();
     private Mesh mesh;
     private PlanetGrid grid;
+    private Vec3 center = new Vec3();
 
     private boolean lines;
     private float radius, intensity = 0.2f;
@@ -46,51 +44,18 @@ public class PlanetMesh{
         generateMesh();
     }
 
+    /** @return the sector that is hit by this ray, or null if nothing intersects it. */
+    public @Nullable Ptile getTile(Ray ray){
+        boolean found = Intersector3D.intersectRaySphere(ray, center, radius, Tmp.v33);
+        if(!found) return null;
+        return Structs.findMin(grid.tiles, t -> t.v.dst(Tmp.v33));
+    }
+
     public void render(Mat3D mat){
         Shaders.planet.begin();
         Shaders.planet.setUniformMatrix4("u_projModelView", mat.val);
         mesh.render(Shaders.planet, lines ? Gl.lines : Gl.triangles);
         Shaders.planet.end();
-    }
-
-    /** Projects a tile onto a 4-corner square for use in map gen.
-     * Allocates a new object. Do not call in the main loop. */
-    public SectorRect projectTile(Ptile base){
-        Vec3[] corners = new Vec3[base.corners.length];
-        for(int i = 0; i < corners.length; i++){
-            corners[i] = base.corners[i].v.cpy().setLength(radius);
-        }
-
-        Tmp.v33.setZero();
-        for(Vec3 c : corners){
-            Tmp.v33.add(c);
-        }
-        //v33 is now the center of this shape
-        Vec3 center = Tmp.v33.scl(1f / corners.length).cpy(vec);
-        //radius of circle
-        float radius = Tmp.v33.dst(corners[0]) * 0.9f;
-
-        //get plane that these points are on
-        plane.set(corners[0], corners[2], corners[4]);
-
-        Vec3 planeTop = plane.project(center.cpy().add(0f, 1f, 0f)).sub(center).setLength(radius).add(center);
-        Vec3 planeRight = plane.project(center.cpy().rotate(Vec3.Y, -4f)).sub(center).setLength(radius).add(center);
-
-        return new SectorRect(center, planeTop.sub(center), planeRight.sub(center));
-    }
-
-    public @Nullable Ptile getTile(Ray ray){
-        Vec3 vec = intersect(ray);
-        if(vec == null) return null;
-        //TODO fix O(N) search
-        return Structs.findMin(grid.tiles, t -> t.v.dst(vec));
-    }
-
-    public @Nullable Vec3 intersect(Ray ray){
-        if(Intersector3D.intersectRaySphere(ray, center, radius, Tmp.v33)){
-            return Tmp.v33;
-        }
-        return null;
     }
 
     private void generateMesh(){
@@ -171,23 +136,5 @@ public class PlanetMesh{
 
         floats[6] = color.toFloatBits();
         mesh.getVerticesBuffer().put(floats);
-    }
-
-    public static class SectorRect{
-        public final Vec3 center, top, right;
-        public final Vec3 result = new Vec3();
-
-        public SectorRect(Vec3 center, Vec3 top, Vec3 right){
-            this.center = center;
-            this.top = top;
-            this.right = right;
-        }
-
-        /** Project a coordinate into 3D space.
-         * Both coordinates should be normalized to floats of the value 0..1 */
-        public Vec3 project(float x, float y){
-            float nx = (x - 0.5f) * 2f, ny = (y - 0.5f) * 2f;
-            return result.set(center).add(right, nx).add(top, ny);
-        }
     }
 }

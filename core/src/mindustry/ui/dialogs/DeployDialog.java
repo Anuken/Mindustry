@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -10,10 +9,10 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
-import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.scene.utils.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -143,17 +142,17 @@ public class DeployDialog extends FloatingDialog{
                 if(slot.getZone() != null){
                     sub.add(new Table(f -> f.margin(4f).add(new Image()).color(Color.gray(0.1f)).grow()));
 
-                    sub.add(new Table(f -> f.margin(4f).add(new Image(slot.getZone().preview).setScaling(Scaling.fit)).update(img -> {
-                        TextureRegionDrawable draw = (TextureRegionDrawable)img.getDrawable();
-                        if(draw.getRegion().getTexture().isDisposed()){
-                            draw.setRegion(slot.getZone().preview);
-                        }
+                    //sub.add(new Table(f -> f.margin(4f).add(new Image(slot.getZone().preview).setScaling(Scaling.fit)).update(img -> {
+                        //TextureRegionDrawable draw = (TextureRegionDrawable)img.getDrawable();
+                        //if(draw.getRegion().getTexture().isDisposed()){
+                        //    draw.setRegion(slot.getZone().preview);
+                       // }
 
                         Texture text = slot.previewTexture();
-                        if(draw.getRegion() == slot.getZone().preview && text != null){
-                            draw.setRegion(new TextureRegion(text));
-                        }
-                    }).color(Color.darkGray).grow()));
+                        //if(draw.getRegion() == slot.getZone().preview && text != null){
+                        //    draw.setRegion(new TextureRegion(text));
+                        //}
+                   // }).color(Color.darkGray).grow()));
                 }
 
                 TextButton button = Elements.newButton(Core.bundle.format("resume", slot.getZone().localizedName), Styles.squaret, () -> {
@@ -250,12 +249,12 @@ public class DeployDialog extends FloatingDialog{
             for(ZoneNode node : nodes){
                 Stack stack = new Stack();
                 Tmp.v1.set(node.width, node.height);
-                if(node.zone.preview != null){
-                    Tmp.v1.set(Scaling.fit.apply(node.zone.preview.getWidth(), node.zone.preview.getHeight(), node.width, node.height));
-                }
+                //if(node.zone.preview != null){
+                //    Tmp.v1.set(Scaling.fit.apply(node.zone.preview.getWidth(), node.zone.preview.getHeight(), node.width, node.height));
+                //}
 
-                stack.setSize(Tmp.v1.x, Tmp.v1.y);
-                stack.add(new Table(t -> t.margin(4f).add(new Image(node.zone.preview).setScaling(Scaling.stretch)).color(node.zone.unlocked() ? Color.darkGray : Color.gray(0.2f)).grow()));
+               // stack.setSize(Tmp.v1.x, Tmp.v1.y);
+               // stack.add(new Table(t -> t.margin(4f).add(new Image(node.zone.preview).setScaling(Scaling.stretch)).color(node.zone.unlocked() ? Color.darkGray : Color.gray(0.2f)).grow()));
                 stack.update(() -> stack.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f, Align.center));
 
                 Button button = new Button(Styles.squaret);

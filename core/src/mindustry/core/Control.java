@@ -249,7 +249,9 @@ public class Control implements ApplicationListener, Loadable{
         });
     }
 
-    public void playZone(Zone zone){
+    //TODO remove, make it viable on a server
+    /*public void playZone(Zone zone){
+
         ui.loadAnd(() -> {
             logic.reset();
             net.reset();
@@ -266,6 +268,16 @@ public class Control implements ApplicationListener, Loadable{
             control.saves.zoneSave();
             logic.play();
             Events.fire(Trigger.newGame);
+        });
+    }*/
+
+    public void playSector(Sector sector){
+        ui.loadAnd(() -> {
+            logic.reset();
+            world.loadSector(sector);
+            state.set(State.playing);
+            logic.play();
+            ui.planet.hide();
         });
     }
 
