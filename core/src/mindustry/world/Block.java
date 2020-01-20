@@ -679,7 +679,7 @@ public class Block extends BlockStorage{
         TileEntity entity = tile.entity;
 
         if(minfo.mod != null){
-            table.label(() -> getModName("[accent]"));
+            table.add(getModName("[accent]"));
             table.row();
         }
         if(entity != null){
