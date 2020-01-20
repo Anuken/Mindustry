@@ -34,7 +34,9 @@ public class TechTree implements ContentList{
                         node(sorter, () -> {
                             node(invertedSorter);
                             node(message);
-                            node(overflowGate);
+                            node(overflowGate, () -> {
+                                node(underflowGate);
+                            });
                         });
                         node(container, () -> {
                             node(unloader);
