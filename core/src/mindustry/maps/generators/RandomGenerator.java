@@ -24,7 +24,7 @@ public abstract class RandomGenerator extends Generator{
                 block = Blocks.air;
                 ore = Blocks.air;
                 generate(x, y);
-                tiles.set(x, y, new Tile(x, y, floor.id, ore.id, block.id));
+                tiles.set(x, y, new Tile(x, y, floor, ore, block));
             }
         }
 

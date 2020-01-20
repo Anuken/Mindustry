@@ -340,7 +340,7 @@ public class ApplicationTests{
         world.beginMapLoad();
         for(int x = 0; x < tiles.width(); x++){
             for(int y = 0; y < tiles.height(); y++){
-                tiles.set(x, y, new Tile(x, y, Blocks.stone.id, (byte)0, (byte)0));
+                tiles.set(x, y, new Tile(x, y, Blocks.stone, Blocks.air, Blocks.air));
             }
         }
         int i = 0;
@@ -385,7 +385,7 @@ public class ApplicationTests{
 
     void depositTest(Block block, Item item){
         BaseUnit unit = UnitTypes.spirit.create(Team.derelict);
-        Tile tile = new Tile(0, 0, Blocks.air.id, (byte)0, block.id);
+        Tile tile = new Tile(0, 0, Blocks.air, Blocks.air, block);
         int capacity = tile.block().itemCapacity;
 
         assertNotNull(tile.entity, "Tile should have an entity, but does not: " + tile);

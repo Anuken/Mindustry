@@ -1,5 +1,6 @@
 package mindustry.world;
 
+import arc.func.*;
 import arc.util.ArcAnnotate.*;
 
 import java.util.*;
@@ -14,6 +15,14 @@ public class Tiles implements Iterable<Tile>{
         this.array = new Tile[width * height];
         this.width = width;
         this.height = height;
+    }
+
+    public void each(Intc2 cons){
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                cons.get(x, y);
+            }
+        }
     }
 
     /** fills this tile set with empty air tiles. */

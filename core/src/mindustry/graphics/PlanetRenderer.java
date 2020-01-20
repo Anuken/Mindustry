@@ -7,10 +7,18 @@ import arc.graphics.g3d.*;
 import arc.input.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.*;
+import mindustry.content.*;
+import mindustry.core.GameState.*;
+import mindustry.game.*;
 import mindustry.graphics.PlanetGrid.*;
 import mindustry.graphics.PlanetMesh.*;
+import mindustry.maps.generators.*;
 import mindustry.maps.planet.*;
 import mindustry.type.*;
+import mindustry.world.*;
+
+import static mindustry.Vars.*;
 
 public class PlanetRenderer implements PlanetGenerator{
     private final Color outlineColor = Pal.accent.cpy().a(0.7f);
@@ -54,7 +62,10 @@ public class PlanetRenderer implements PlanetGenerator{
             batch.flush(cam.combined(), Gl.triangleFan);
 
             if(drawnRect){
-                SectorRect rect = outline.projectTile(tile);
+                SectorRect rect = planet.mesh.projectTile(tile);
+                rect.center.scl(outlineRad);
+                rect.right.scl(outlineRad);
+                rect.top.scl(outlineRad);
 
                 batch.color(Pal.place);
                 batch.vertex(rect.project(0, 0));
@@ -65,6 +76,30 @@ public class PlanetRenderer implements PlanetGenerator{
                 batch.color(Pal.place);
                 batch.vertex(rect.project(0, 1));
                 batch.flush(cam.combined(), Gl.lineLoop);
+
+                SectorRect coords = planet.mesh.projectTile(tile);
+
+                if(Core.input.keyTap(KeyCode.SPACE)){
+                    logic.reset();
+                    Vars.world.loadGenerator(new Generator(250, 250){
+                        @Override
+                        public void generate(Tiles tiles){
+                            TileGen gen = new TileGen();
+                            tiles.each((x, y) -> {
+                                gen.reset();
+                                Vec3 position = coords.project(x / (float)width, y / (float)height);
+
+                                planet.generator.generate(position, gen);
+                                tiles.set(x, y, new Tile(x, y, gen.floor, gen.overlay, gen.block));
+                            });
+
+                            tiles.get(width/2, height/2).setBlock(Blocks.coreShard, Team.sharded);
+                        }
+                    });
+                    state.set(State.playing);
+                    logic.play();
+                    ui.planet.hide();
+                }
             }
         }
 
@@ -96,5 +131,10 @@ public class PlanetRenderer implements PlanetGenerator{
     @Override
     public Color getColor(Vec3 position){
         return outlineColor;
+    }
+
+    @Override
+    public void generate(Vec3 position, TileGen tile){
+
     }
 }

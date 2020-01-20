@@ -3,15 +3,28 @@ package mindustry.maps.planet;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.content.*;
+import mindustry.world.*;
 
 public class TestPlanetGenerator implements PlanetGenerator{
-    Pixmap pix = new Pixmap("planets/colors.png");
+    Pixmap pix;
     Simplex noise = new Simplex();
     int waterLevel = 5;
-    float water = waterLevel / (float)(pix.getHeight());
+    float water;
     float scl = 5f;
+    Array<Block> blocks = Array.with(Blocks.sporeMoss, Blocks.moss, Blocks.ice, Blocks.snow, Blocks.sand, Blocks.darksand, Blocks.darksandWater, Blocks.darksandTaintedWater);
+
+    public TestPlanetGenerator(){
+        try{
+            pix = new Pixmap("planets/colors.png");
+            water = waterLevel / (float)(pix.getHeight());
+        }catch(Exception ignored){
+
+        }
+    }
 
     @Override
     public float getHeight(Vec3 position){
@@ -35,6 +48,13 @@ public class TestPlanetGenerator implements PlanetGenerator{
         height *= 1.2f;
         height = Mathf.clamp(height);
 
-        return Tmp.c1.set(pix.getPixel((int)(temp * (pix.getWidth()-1)), (int)((1f-height) * (pix.getHeight()-1))));
+        Color color = Tmp.c1.set(pix.getPixel((int)(temp * (pix.getWidth()-1)), (int)((1f-height) * (pix.getHeight()-1))));
+        return blocks.min(c -> color.diff(c.color)).color;
+    }
+
+    @Override
+    public void generate(Vec3 position, TileGen tile){
+        Color color = getColor(position);
+        tile.floor = blocks.min(c -> color.diff(c.color));
     }
 }

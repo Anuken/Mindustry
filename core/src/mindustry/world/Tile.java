@@ -37,15 +37,19 @@ public class Tile implements Position, TargetTrait{
         block = floor = overlay = (Floor)Blocks.air;
     }
 
-    public Tile(int x, int y, int floor, int overlay, int wall){
+    public Tile(int x, int y, Block floor, Block overlay, Block wall){
         this.x = (short)x;
         this.y = (short)y;
-        this.floor = (Floor)content.block(floor);
-        this.overlay = (Floor)content.block(overlay);
-        this.block = content.block(wall);
+        this.floor = (Floor)floor;
+        this.overlay = (Floor)overlay;
+        this.block = wall;
 
         //update entity and create it if needed
         changed();
+    }
+
+    public Tile(int x, int y, int floor, int overlay, int wall){
+        this(x, y, content.block(floor), content.block(overlay), content.block(wall));
     }
 
     /** Returns this tile's position as a {@link Pos}. */

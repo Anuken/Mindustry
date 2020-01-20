@@ -55,21 +55,26 @@ public class PlanetMesh{
 
     /** Projects a tile onto a 4-corner square for use in map gen.
      * Allocates a new object. Do not call in the main loop. */
-    public SectorRect projectTile(Ptile tile){
+    public SectorRect projectTile(Ptile base){
+        Vec3[] corners = new Vec3[base.corners.length];
+        for(int i = 0; i < corners.length; i++){
+            corners[i] = base.corners[i].v.cpy().setLength(radius);
+        }
+
         Tmp.v33.setZero();
-        for(Corner c : tile.corners){
-            Tmp.v33.add(c.v);
+        for(Vec3 c : corners){
+            Tmp.v33.add(c);
         }
         //v33 is now the center of this shape
-        Vec3 center = Tmp.v33.scl(1f / tile.corners.length).cpy(vec);
+        Vec3 center = Tmp.v33.scl(1f / corners.length).cpy(vec);
         //radius of circle
-        float radius = Tmp.v33.dst(tile.corners[0].v) * 0.9f;
+        float radius = Tmp.v33.dst(corners[0]) * 0.9f;
 
         //get plane that these points are on
-        plane.set(tile.corners[0].v, tile.corners[2].v, tile.corners[4].v);
+        plane.set(corners[0], corners[2], corners[4]);
 
         Vec3 planeTop = plane.project(center.cpy().add(0f, 1f, 0f)).sub(center).setLength(radius).add(center);
-        Vec3 planeRight = plane.project(center.cpy().rotate(Vec3.Y, 4f)).sub(center).setLength(radius).add(center);
+        Vec3 planeRight = plane.project(center.cpy().rotate(Vec3.Y, -4f)).sub(center).setLength(radius).add(center);
 
         return new SectorRect(center, planeTop.sub(center), planeRight.sub(center));
     }
