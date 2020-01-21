@@ -121,6 +121,7 @@ public class TechTreeDialog extends FloatingDialog{
         node.children = leftHalf;
         new BranchTreeLayout(){{
             gapBetweenLevels = gapBetweenNodes = spacing;
+            rootLocation = TreeLocation.top;
         }}.layout(node);
         node.children = rightHalf;
 
