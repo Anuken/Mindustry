@@ -110,7 +110,7 @@ public class TechTreeDialog extends FloatingDialog{
     }
 
     void treeLayout(){
-        RadialTreeLayout layout = new RadialTreeLayout();
+        TreeLayout layout = new RadialTreeLayout();
         LayoutNode node = new LayoutNode(root, null);
         layout.layout(node);
         float minx = 0f, miny = 0f, maxx = 0f, maxy = 0f;
