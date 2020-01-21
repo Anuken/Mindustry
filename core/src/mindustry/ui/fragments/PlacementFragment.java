@@ -31,11 +31,13 @@ public class PlacementFragment extends Fragment{
     Array<Block> returnArray = new Array<>();
     Array<Category> returnCatArray = new Array<>();
     boolean[] categoryEmpty = new boolean[Category.all.length];
-    ObjectMap<Category,Block> selectedBlocks = new ObjectMap<Category,Block>();
+    ObjectMap<Category,Block> selectedBlocks = new ObjectMap<>();
+    ObjectFloatMap<Category> scrollPositions = new ObjectFloatMap<>();
     Block hovered, lastDisplay;
     Tile lastHover;
     Tile hoverTile;
     Table blockTable, toggler, topTable;
+    ScrollPane blockPane;
     boolean lastGround;
     boolean blockSelectEnd;
     int blockSelectSeq;
@@ -86,6 +88,8 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean gridUpdate(InputHandler input){
+        scrollPositions.put(currentCategory, blockPane.getScrollY());
+
         if(Core.input.keyDown(Binding.pick)){ //mouse eyedropper select
             Tile tile = world.ltileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             Block tryRecipe = tile == null ? null : tile.block();
@@ -240,6 +244,9 @@ public class PlacementFragment extends Fragment{
                         }
                     }
                     blockTable.act(0f);
+                    blockPane.act(0f);
+                    blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0));
+                    Core.app.post(() -> blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0)));
                 };
 
                 //top table with hover info
@@ -343,14 +350,15 @@ public class PlacementFragment extends Fragment{
                 frame.row();
                 frame.table(Tex.pane2, blocksSelect -> {
                     blocksSelect.margin(4).marginTop(0);
-                    blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
+                    blockPane = blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
                         if(pane.hasScroll()){
                             Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
                             if(result == null || !result.isDescendantOf(pane)){
                                 Core.scene.setScrollFocus(null);
                             }
                         }
-                    }).grow().get().setStyle(Styles.smallPane);
+                    }).grow().get();
+                    blockPane.setStyle(Styles.smallPane);
                     blocksSelect.row();
                     blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
                 }).fillY().bottom().touchable(Touchable.enabled);
