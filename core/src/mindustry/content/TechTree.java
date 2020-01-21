@@ -22,7 +22,6 @@ public class TechTree implements ContentList{
             node(conveyor, () -> {
 
                 node(junction, () -> {
-                    node(itemBridge);
                     node(router, () -> {
                         node(launchPad, () -> {
                             node(launchPadLarge, () -> {
@@ -45,15 +44,17 @@ public class TechTree implements ContentList{
                             });
                         });
 
-                        node(titaniumConveyor, () -> {
-                            node(phaseConveyor, () -> {
-                                node(massDriver, () -> {
+                        node(itemBridge, () -> {
+                            node(titaniumConveyor, () -> {
+                                node(phaseConveyor, () -> {
+                                    node(massDriver, () -> {
+
+                                    });
+                                });
+
+                                node(armoredConveyor, () -> {
 
                                 });
-                            });
-
-                            node(armoredConveyor, () -> {
-
                             });
                         });
                     });
@@ -102,23 +103,25 @@ public class TechTree implements ContentList{
 
 
                 node(copperWall, () -> {
-                    node(copperWallLarge);
-                    node(titaniumWall, () -> {
-                        node(door, () -> {
-                            node(doorLarge);
-                        });
-                        node(plastaniumWall, () -> {
-                            node(plastaniumWallLarge, () -> {
+                    node(copperWallLarge, () -> {
+                        node(titaniumWall, () -> {
+                            node(titaniumWallLarge);
 
+                            node(door, () -> {
+                                node(doorLarge);
                             });
-                        });
-                        node(titaniumWallLarge);
-                        node(thoriumWall, () -> {
-                            node(thoriumWallLarge);
-                            node(surgeWall, () -> {
-                                node(surgeWallLarge);
-                                node(phaseWall, () -> {
-                                    node(phaseWallLarge);
+                            node(plastaniumWall, () -> {
+                                node(plastaniumWallLarge, () -> {
+
+                                });
+                            });
+                            node(thoriumWall, () -> {
+                                node(thoriumWallLarge);
+                                node(surgeWall, () -> {
+                                    node(surgeWallLarge);
+                                    node(phaseWall, () -> {
+                                        node(phaseWallLarge);
+                                    });
                                 });
                             });
                         });

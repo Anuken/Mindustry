@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.scene.ui.layout.Stack;
 import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -24,6 +25,8 @@ import mindustry.ui.*;
 import mindustry.ui.Cicon;
 import mindustry.ui.layout.*;
 import mindustry.ui.layout.TreeLayout.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -110,9 +113,24 @@ public class TechTreeDialog extends FloatingDialog{
     }
 
     void treeLayout(){
-        TreeLayout layout = new RadialTreeLayout();
+        float spacing = 20f;
         LayoutNode node = new LayoutNode(root, null);
-        layout.layout(node);
+        LayoutNode[] children = node.children;
+        LayoutNode[] leftHalf = Arrays.copyOfRange(node.children, 0, Mathf.ceil(node.children.length/2f));
+        LayoutNode[] rightHalf = Arrays.copyOfRange(node.children, Mathf.ceil(node.children.length/2f), node.children.length);
+        node.children = leftHalf;
+        new BranchTreeLayout(){{
+            gapBetweenLevels = gapBetweenNodes = spacing;
+        }}.layout(node);
+        node.children = rightHalf;
+
+        new BranchTreeLayout(){{
+            gapBetweenLevels = gapBetweenNodes = spacing;
+            rootLocation = TreeLocation.bottom;
+        }}.layout(node);
+
+        node.children = children;
+
         float minx = 0f, miny = 0f, maxx = 0f, maxy = 0f;
         copyInfo(node);
 
@@ -378,7 +396,12 @@ public class TechTreeDialog extends FloatingDialog{
 
                     Lines.stroke(Scl.scl(4f), locked(node.node) || locked(child.node) ? Pal.gray : Pal.accent);
                     Draw.alpha(parentAlpha);
-                    Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
+                    if(Mathf.equal(Math.abs(node.y - child.y), Math.abs(node.x - child.x), 1f) && Mathf.dstm(node.x, node.y, child.x, child.y) <= node.width*3){
+                        Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
+                    }else{
+                        Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, node.y + offsetY);
+                        Lines.line(child.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
+                    }
                 }
             }
 
