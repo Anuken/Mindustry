@@ -234,6 +234,13 @@ public class NetServer implements ApplicationListener{
                 RemoteReadServer.readPacket(packet.writeBuffer, packet.type, con.player);
             }catch(ValidateException e){
                 Log.debug("Validation failed for '{0}': {1}", e.player, e.getMessage());
+            }catch(RuntimeException e){
+                if(e.getCause() instanceof ValidateException){
+                    ValidateException v = (ValidateException)e.getCause();
+                    Log.debug("Validation failed for '{0}': {1}", v.player, v.getMessage());
+                }else{
+                    throw e;
+                }
             }
         });
 
