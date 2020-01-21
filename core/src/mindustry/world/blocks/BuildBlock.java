@@ -65,6 +65,8 @@ public class BuildBlock extends Block{
     @Remote(called = Loc.server)
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         if(tile == null) return;
+        
+        Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false));
         float healthf = tile.entity == null ? 1f : tile.entity.healthf();
         tile.set(block, team, rotation);
         if(tile.entity != null){
@@ -107,7 +109,6 @@ public class BuildBlock extends Block{
         Call.onConstructFinish(tile, block, builderID, rotation, team, skipConfig);
         tile.block().placed(tile);
 
-        Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false));
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
     }
 
