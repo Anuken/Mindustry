@@ -54,8 +54,9 @@ public class Fonts{
         Core.assets.load("default", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.def = (BitmapFont)f;
         Core.assets.load("chat", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.chat = (BitmapFont)f;
         Core.assets.load("icon", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
-            size = (int)(Scl.scl(30f));
+            size = 30;
             incremental = true;
+            characters = "\0";
         }})).loaded = f -> Fonts.icon = (BitmapFont)f;
     }
 
@@ -104,12 +105,19 @@ public class Fonts{
         FileHandleResolver resolver = new InternalFileHandleResolver();
         Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
         Core.assets.setLoader(BitmapFont.class, null, new FreetypeFontLoader(resolver){
+            ObjectSet<FreeTypeFontParameter> scaled = new ObjectSet<>();
+
             @Override
             public BitmapFont loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
                 if(fileName.equals("outline")){
                     parameter.fontParameters.borderWidth = Scl.scl(2f);
                     parameter.fontParameters.spaceX -= parameter.fontParameters.borderWidth;
                 }
+                if(!scaled.contains(parameter.fontParameters)){
+                    parameter.fontParameters.size = (int)(Scl.scl(parameter.fontParameters.size));
+                    scaled.add(parameter.fontParameters);
+                }
+
                 parameter.fontParameters.magFilter = TextureFilter.Linear;
                 parameter.fontParameters.minFilter = TextureFilter.Linear;
                 parameter.fontParameters.packer = UI.packer;
@@ -119,8 +127,8 @@ public class Fonts{
 
         FreeTypeFontParameter param = new FreeTypeFontParameter(){{
             borderColor = Color.darkGray;
-            size = (int)(Scl.scl(18f));
             incremental = true;
+            size = 18;
         }};
 
         Core.assets.load("outline", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/font.ttf", param)).loaded = t -> Fonts.outline = (BitmapFont)t;
@@ -198,7 +206,7 @@ public class Fonts{
 
     static FreeTypeFontParameter fontParameter(){
         return new FreeTypeFontParameter(){{
-            size = (int)(Scl.scl(18f));
+            size = 18;
             shadowColor = Color.darkGray;
             shadowOffsetY = 2;
             incremental = true;
