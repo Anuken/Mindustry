@@ -162,7 +162,6 @@ public class Fonts{
         if(g == null) throw new IllegalArgumentException("No glyph: " + glyph + " (" + (int)glyph + ")");
 
         float size = Math.max(g.width, g.height);
-        float aspect = (float)g.height / g.width;
         TextureRegionDrawable draw = new TextureRegionDrawable(new TextureRegion(font.getRegion().getTexture(), g.u, g.v2, g.u2, g.v)){
             @Override
             public void draw(float x, float y, float width, float height){
@@ -171,6 +170,19 @@ public class Fonts{
                 cx = (int)cx;
                 cy = (int)cy;
                 Draw.rect(region, cx + g.width/2f, cy + g.height/2f, g.width, g.height);
+            }
+
+            @Override
+            public void draw(float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation){
+                width *= scaleX;
+                height *= scaleY;
+                Draw.color(Tmp.c1.set(tint).mul(Draw.getColor()).toFloatBits());
+                float cx = x + width/2f - g.width/2f, cy = y + height/2f - g.height/2f;
+                cx = (int)cx;
+                cy = (int)cy;
+                originX = g.width/2f;
+                originY = g.height/2f;
+                Draw.rect(region, cx + g.width/2f, cy + g.height/2f, g.width, g.height, originX, originY, rotation);
             }
 
             @Override

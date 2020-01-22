@@ -95,11 +95,16 @@ public class JoinDialog extends FloatingDialog{
             }
         });
 
-        onResize(this::setup);
+        onResize(() -> {
+            setup();
+            refreshLocal();
+            refreshRemote();
+        });
     }
 
     void setupRemote(){
         remote.clear();
+
         for(Server server : servers){
             //why are java lambdas this bad
             TextButton[] buttons = {null};
@@ -139,16 +144,16 @@ public class JoinDialog extends FloatingDialog{
                     }
                 }
 
-            }).margin(3f).pad(2).padTop(6f).top().right();
+            }).margin(3f).padTop(6f).top().right();
 
             inner.addImageButton(Icon.refresh, Styles.emptyi, () -> {
                 refreshServer(server);
-            }).margin(3f).pad(2).padTop(6f).top().right();
+            }).margin(3f).padTop(6f).top().right();
 
             inner.addImageButton(Icon.pencil, Styles.emptyi, () -> {
                 renaming = server;
                 add.show();
-            }).margin(3f).pad(2).padTop(6f).top().right();
+            }).margin(3f).padTop(6f).top().right();
 
             inner.addImageButton(Icon.trash, Styles.emptyi, () -> {
                 ui.showConfirm("$confirm", "$server.delete", () -> {
@@ -157,7 +162,7 @@ public class JoinDialog extends FloatingDialog{
                     setupRemote();
                     refreshRemote();
                 });
-            }).margin(3f).pad(2).pad(6).top().right();
+            }).margin(3f).pad(6).top().right();
 
             button.row();
 
@@ -266,7 +271,7 @@ public class JoinDialog extends FloatingDialog{
         cont.addCenteredImageTextButton("$server.add", Icon.add, () -> {
             renaming = null;
             add.show();
-        }).marginLeft(6).width(w).height(80f).update(button -> {
+        }).marginLeft(10).width(w).height(80f).update(button -> {
             float pw = w;
             float pad = 0f;
             if(pane.getChildren().first().getPrefHeight() > pane.getHeight()){
@@ -363,7 +368,7 @@ public class JoinDialog extends FloatingDialog{
     }
 
     float targetWidth(){
-        return Core.graphics.isPortrait() ? 350f : 500f;
+        return Math.min(Core.graphics.getWidth() / Scl.scl() * 0.9f, 500f);//Core.graphics.isPortrait() ? 350f : 500f;
     }
 
     @SuppressWarnings("unchecked")

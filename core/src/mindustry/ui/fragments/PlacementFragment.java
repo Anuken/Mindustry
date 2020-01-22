@@ -244,9 +244,12 @@ public class PlacementFragment extends Fragment{
                         }
                     }
                     blockTable.act(0f);
-                    blockPane.act(0f);
                     blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0));
-                    Core.app.post(() -> blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0)));
+                    Core.app.post(() -> {
+                        blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0));
+                        blockPane.act(0f);
+                        blockPane.layout();
+                    });
                 };
 
                 //top table with hover info
