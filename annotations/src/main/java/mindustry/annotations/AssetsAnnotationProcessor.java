@@ -14,43 +14,20 @@ import javax.tools.Diagnostic.*;
 import javax.tools.*;
 import java.util.*;
 
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes("mindustry.annotations.Annotations.StyleDefaults")
-public class AssetsAnnotationProcessor extends AbstractProcessor{
-    /** Name of the base package to put all the generated classes. */
-    private static final String packageName = "mindustry.gen";
+public class AssetsAnnotationProcessor extends BaseProcessor{
     private String path;
-    private int round;
 
     @Override
-    public synchronized void init(ProcessingEnvironment processingEnv){
-        super.init(processingEnv);
-        //put all relevant utils into utils class
-        Utils.typeUtils = processingEnv.getTypeUtils();
-        Utils.elementUtils = processingEnv.getElementUtils();
-        Utils.filer = processingEnv.getFiler();
-        Utils.messager = processingEnv.getMessager();
-    }
+    public void process(RoundEnvironment env) throws Exception{
+        path = Fi.get(Utils.filer.createResource(StandardLocation.CLASS_OUTPUT, "no", "no")
+        .toUri().toURL().toString().substring(System.getProperty("os.name").contains("Windows") ? 6 : "file:".length()))
+        .parent().parent().parent().parent().parent().parent().toString();
+        path = path.replace("%20", " ");
 
-    @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
-        if(round++ != 0) return false; //only process 1 round
-
-        try{
-            path = Fi.get(Utils.filer.createResource(StandardLocation.CLASS_OUTPUT, "no", "no")
-            .toUri().toURL().toString().substring(System.getProperty("os.name").contains("Windows") ? 6 : "file:".length()))
-            .parent().parent().parent().parent().parent().parent().toString();
-            path = path.replace("%20", " ");
-
-            processSounds("Sounds", path + "/assets/sounds", "arc.audio.Sound");
-            processSounds("Musics", path + "/assets/music", "arc.audio.Music");
-            processUI(roundEnv.getElementsAnnotatedWith(StyleDefaults.class));
-
-            return true;
-        }catch(Exception e){
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        processSounds("Sounds", path + "/assets/sounds", "arc.audio.Sound");
+        processSounds("Musics", path + "/assets/music", "arc.audio.Music");
+        processUI(env.getElementsAnnotatedWith(StyleDefaults.class));
     }
 
     void processUI(Set<? extends Element> elements) throws Exception{

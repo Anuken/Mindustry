@@ -17,148 +17,126 @@ import java.util.Set;
  * Generates ""value types"" classes that are packed into integer primitives of the most aproppriate size.
  * It would be nice if Java didn't make crazy hacks like this necessary.
  */
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes({
 "mindustry.annotations.Annotations.Struct"
 })
-public class StructAnnotationProcessor extends AbstractProcessor{
-    /** Name of the base package to put all the generated classes. */
-    private static final String packageName = "mindustry.gen";
-    private int round;
+public class StructAnnotationProcessor extends BaseProcessor{
 
     @Override
-    public synchronized void init(ProcessingEnvironment processingEnv){
-        super.init(processingEnv);
-        //put all relevant utils into utils class
-        Utils.typeUtils = processingEnv.getTypeUtils();
-        Utils.elementUtils = processingEnv.getElementUtils();
-        Utils.filer = processingEnv.getFiler();
-        Utils.messager = processingEnv.getMessager();
-    }
+    public void process(RoundEnvironment env) throws Exception{
+        Set<TypeElement> elements = ElementFilter.typesIn(env.getElementsAnnotatedWith(Struct.class));
 
-    @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
-        if(round++ != 0) return false; //only process 1 round
+        for(TypeElement elem : elements){
 
-        try{
-            Set<TypeElement> elements = ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(Struct.class));
+            if(!elem.getSimpleName().toString().endsWith("Struct")){
+                Utils.messager.printMessage(Kind.ERROR, "All classes annotated with @Struct must have their class names end in 'Struct'.", elem);
+                continue;
+            }
 
-            for(TypeElement elem : elements){
+            String structName = elem.getSimpleName().toString().substring(0, elem.getSimpleName().toString().length() - "Struct".length());
+            String structParam = structName.toLowerCase();
 
-                if(!elem.getSimpleName().toString().endsWith("Struct")){
-                    Utils.messager.printMessage(Kind.ERROR, "All classes annotated with @Struct must have their class names end in 'Struct'.", elem);
+            TypeSpec.Builder classBuilder = TypeSpec.classBuilder(structName)
+            .addModifiers(Modifier.FINAL, Modifier.PUBLIC);
+
+            try{
+                List<VariableElement> variables = ElementFilter.fieldsIn(elem.getEnclosedElements());
+                int structSize = variables.stream().mapToInt(StructAnnotationProcessor::varSize).sum();
+                int structTotalSize = (structSize <= 8 ? 8 : structSize <= 16 ? 16 : structSize <= 32 ? 32 : 64);
+
+                if(variables.size() == 0){
+                    Utils.messager.printMessage(Kind.ERROR, "making a struct with no fields is utterly pointles.", elem);
                     continue;
                 }
 
-                String structName = elem.getSimpleName().toString().substring(0, elem.getSimpleName().toString().length() - "Struct".length());
-                String structParam = structName.toLowerCase();
+                //obtain type which will be stored
+                Class<?> structType = typeForSize(structSize);
 
-                TypeSpec.Builder classBuilder = TypeSpec.classBuilder(structName)
-                .addModifiers(Modifier.FINAL, Modifier.PUBLIC);
+                //[constructor] get(fields...) : structType
+                MethodSpec.Builder constructor = MethodSpec.methodBuilder("get")
+                .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
+                .returns(structType);
 
-                try{
-                    List<VariableElement> variables = ElementFilter.fieldsIn(elem.getEnclosedElements());
-                    int structSize = variables.stream().mapToInt(StructAnnotationProcessor::varSize).sum();
-                    int structTotalSize = (structSize <= 8 ? 8 : structSize <= 16 ? 16 : structSize <= 32 ? 32 : 64);
+                StringBuilder cons = new StringBuilder();
+                StringBuilder doc = new StringBuilder();
+                doc.append("Bits used: ").append(structSize).append(" / ").append(structTotalSize).append("\n");
 
-                    if(variables.size() == 0){
-                        Utils.messager.printMessage(Kind.ERROR, "making a struct with no fields is utterly pointles.", elem);
-                        continue;
-                    }
+                int offset = 0;
+                for(VariableElement var : variables){
+                    int size = varSize(var);
+                    TypeName varType = TypeName.get(var.asType());
+                    String varName = var.getSimpleName().toString();
 
-                    //obtain type which will be stored
-                    Class<?> structType = typeForSize(structSize);
+                    //add val param to constructor
+                    constructor.addParameter(varType, varName);
 
-                    //[constructor] get(fields...) : structType
-                    MethodSpec.Builder constructor = MethodSpec.methodBuilder("get")
+                    //[get] field(structType) : fieldType
+                    MethodSpec.Builder getter = MethodSpec.methodBuilder(var.getSimpleName().toString())
                     .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
-                    .returns(structType);
+                    .returns(varType)
+                    .addParameter(structType, structParam);
+                    //[set] field(structType, fieldType) : structType
+                    MethodSpec.Builder setter = MethodSpec.methodBuilder(var.getSimpleName().toString())
+                    .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
+                    .returns(structType)
+                    .addParameter(structType, structParam).addParameter(varType, "value");
 
-                    StringBuilder cons = new StringBuilder();
-                    StringBuilder doc = new StringBuilder();
-                    doc.append("Bits used: ").append(structSize).append(" / ").append(structTotalSize).append("\n");
-
-                    int offset = 0;
-                    for(VariableElement var : variables){
-                        int size = varSize(var);
-                        TypeName varType = TypeName.get(var.asType());
-                        String varName = var.getSimpleName().toString();
-
-                        //add val param to constructor
-                        constructor.addParameter(varType, varName);
-
-                        //[get] field(structType) : fieldType
-                        MethodSpec.Builder getter = MethodSpec.methodBuilder(var.getSimpleName().toString())
-                        .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
-                        .returns(varType)
-                        .addParameter(structType, structParam);
-                        //[set] field(structType, fieldType) : structType
-                        MethodSpec.Builder setter = MethodSpec.methodBuilder(var.getSimpleName().toString())
-                        .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
-                        .returns(structType)
-                        .addParameter(structType, structParam).addParameter(varType, "value");
-
-                        //[getter]
-                        if(varType == TypeName.BOOLEAN){
-                            //bools: single bit, is simplified
-                            getter.addStatement("return ($L & (1L << $L)) != 0", structParam, offset);
-                        }else if(varType == TypeName.FLOAT){
-                            //floats: need conversion
-                            getter.addStatement("return Float.intBitsToFloat((int)(($L >>> $L) & $L))", structParam, offset, bitString(size, structTotalSize));
-                        }else{
-                            //bytes, shorts, chars, ints
-                            getter.addStatement("return ($T)(($L >>> $L) & $L)", varType, structParam, offset, bitString(size, structTotalSize));
-                        }
-
-                        //[setter] + [constructor building]
-                        if(varType == TypeName.BOOLEAN){
-                            cons.append(" | (").append(varName).append(" ? ").append("1L << ").append(offset).append("L : 0)");
-
-                            //bools: single bit, needs special case to clear things
-                            setter.beginControlFlow("if(value)");
-                            setter.addStatement("return ($T)(($L & ~(1L << $LL)))", structType, structParam, offset);
-                            setter.nextControlFlow("else");
-                            setter.addStatement("return ($T)(($L & ~(1L << $LL)) | (1L << $LL))", structType, structParam, offset, offset);
-                            setter.endControlFlow();
-                        }else if(varType == TypeName.FLOAT){
-                            cons.append(" | (").append("(").append(structType).append(")").append("Float.floatToIntBits(").append(varName).append(") << ").append(offset).append("L)");
-
-                            //floats: need conversion
-                            setter.addStatement("return ($T)(($L & $L) | (($T)Float.floatToIntBits(value) << $LL))", structType, structParam, bitString(offset, size, structTotalSize), structType, offset);
-                        }else{
-                            cons.append(" | (((").append(structType).append(")").append(varName).append(" << ").append(offset).append("L)").append(" & ").append(bitString(offset, size, structTotalSize)).append(")");
-
-                            //bytes, shorts, chars, ints
-                            setter.addStatement("return ($T)(($L & $L) | (($T)value << $LL))", structType, structParam, bitString(offset, size, structTotalSize), structType, offset);
-                        }
-
-                        doc.append("<br>  ").append(varName).append(" [").append(offset).append("..").append(size + offset).append("]\n");
-
-                        //add finished methods
-                        classBuilder.addMethod(getter.build());
-                        classBuilder.addMethod(setter.build());
-
-                        offset += size;
+                    //[getter]
+                    if(varType == TypeName.BOOLEAN){
+                        //bools: single bit, is simplified
+                        getter.addStatement("return ($L & (1L << $L)) != 0", structParam, offset);
+                    }else if(varType == TypeName.FLOAT){
+                        //floats: need conversion
+                        getter.addStatement("return Float.intBitsToFloat((int)(($L >>> $L) & $L))", structParam, offset, bitString(size, structTotalSize));
+                    }else{
+                        //bytes, shorts, chars, ints
+                        getter.addStatement("return ($T)(($L >>> $L) & $L)", varType, structParam, offset, bitString(size, structTotalSize));
                     }
 
-                    classBuilder.addJavadoc(doc.toString());
+                    //[setter] + [constructor building]
+                    if(varType == TypeName.BOOLEAN){
+                        cons.append(" | (").append(varName).append(" ? ").append("1L << ").append(offset).append("L : 0)");
 
-                    //add constructor final statement + add to class and build
-                    constructor.addStatement("return ($T)($L)", structType, cons.toString().substring(3));
-                    classBuilder.addMethod(constructor.build());
+                        //bools: single bit, needs special case to clear things
+                        setter.beginControlFlow("if(value)");
+                        setter.addStatement("return ($T)(($L & ~(1L << $LL)))", structType, structParam, offset);
+                        setter.nextControlFlow("else");
+                        setter.addStatement("return ($T)(($L & ~(1L << $LL)) | (1L << $LL))", structType, structParam, offset, offset);
+                        setter.endControlFlow();
+                    }else if(varType == TypeName.FLOAT){
+                        cons.append(" | (").append("(").append(structType).append(")").append("Float.floatToIntBits(").append(varName).append(") << ").append(offset).append("L)");
 
-                    JavaFile.builder(packageName, classBuilder.build()).build().writeTo(Utils.filer);
-                }catch(IllegalArgumentException e){
-                    e.printStackTrace();
-                    Utils.messager.printMessage(Kind.ERROR, e.getMessage(), elem);
+                        //floats: need conversion
+                        setter.addStatement("return ($T)(($L & $L) | (($T)Float.floatToIntBits(value) << $LL))", structType, structParam, bitString(offset, size, structTotalSize), structType, offset);
+                    }else{
+                        cons.append(" | (((").append(structType).append(")").append(varName).append(" << ").append(offset).append("L)").append(" & ").append(bitString(offset, size, structTotalSize)).append(")");
+
+                        //bytes, shorts, chars, ints
+                        setter.addStatement("return ($T)(($L & $L) | (($T)value << $LL))", structType, structParam, bitString(offset, size, structTotalSize), structType, offset);
+                    }
+
+                    doc.append("<br>  ").append(varName).append(" [").append(offset).append("..").append(size + offset).append("]\n");
+
+                    //add finished methods
+                    classBuilder.addMethod(getter.build());
+                    classBuilder.addMethod(setter.build());
+
+                    offset += size;
                 }
-            }
 
-            return true;
-        }catch(Exception e){
-            e.printStackTrace();
-            throw new RuntimeException(e);
+                classBuilder.addJavadoc(doc.toString());
+
+                //add constructor final statement + add to class and build
+                constructor.addStatement("return ($T)($L)", structType, cons.toString().substring(3));
+                classBuilder.addMethod(constructor.build());
+
+                JavaFile.builder(packageName, classBuilder.build()).build().writeTo(Utils.filer);
+            }catch(IllegalArgumentException e){
+                e.printStackTrace();
+                Utils.messager.printMessage(Kind.ERROR, e.getMessage(), elem);
+            }
         }
+
     }
 
     static String bitString(int offset, int size, int totalSize){
