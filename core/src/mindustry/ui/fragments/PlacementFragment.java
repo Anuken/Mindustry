@@ -1,14 +1,15 @@
 package mindustry.ui.fragments;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
+import arc.input.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.traits.BuilderTrait.*;
@@ -19,7 +20,6 @@ import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -31,11 +31,13 @@ public class PlacementFragment extends Fragment{
     Array<Block> returnArray = new Array<>();
     Array<Category> returnCatArray = new Array<>();
     boolean[] categoryEmpty = new boolean[Category.all.length];
-    ObjectMap<Category,Block> selectedBlocks = new ObjectMap<Category,Block>();
+    ObjectMap<Category,Block> selectedBlocks = new ObjectMap<>();
+    ObjectFloatMap<Category> scrollPositions = new ObjectFloatMap<>();
     Block hovered, lastDisplay;
     Tile lastHover;
     Tile hoverTile;
     Table blockTable, toggler, topTable;
+    ScrollPane blockPane;
     boolean lastGround;
     boolean blockSelectEnd;
     int blockSelectSeq;
@@ -86,6 +88,8 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean gridUpdate(InputHandler input){
+        scrollPositions.put(currentCategory, blockPane.getScrollY());
+
         if(Core.input.keyDown(Binding.pick)){ //mouse eyedropper select
             Tile tile = world.ltileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             Block tryRecipe = tile == null ? null : tile.block();
@@ -202,14 +206,18 @@ public class PlacementFragment extends Fragment{
                             blockTable.row();
                         }
 
-                        ImageButton button = blockTable.addImageButton(Icon.lockedSmall, Styles.selecti, () -> {
+                        ImageButton button = blockTable.addImageButton(new TextureRegionDrawable(block.icon(Cicon.medium)), Styles.selecti, () -> {
                             if(unlocked(block)){
-                                control.input.block = control.input.block == block ? null : block;
-                                selectedBlocks.put(currentCategory, control.input.block);
+                                if(Core.input.keyDown(KeyCode.SHIFT_LEFT) && Fonts.getUnicode(block.name) != 0){
+                                    Core.app.setClipboardText((char)Fonts.getUnicode(block.name) + "");
+                                    ui.showInfoFade("$copied");
+                                }else{
+                                    control.input.block = control.input.block == block ? null : block;
+                                    selectedBlocks.put(currentCategory, control.input.block);
+                                }
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
-
-                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Cicon.medium));
+                        button.resizeImage(Cicon.medium.size);
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = player.getClosestCore();
@@ -236,6 +244,12 @@ public class PlacementFragment extends Fragment{
                         }
                     }
                     blockTable.act(0f);
+                    blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0));
+                    Core.app.post(() -> {
+                        blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0));
+                        blockPane.act(0f);
+                        blockPane.layout();
+                    });
                 };
 
                 //top table with hover info
@@ -311,7 +325,7 @@ public class PlacementFragment extends Fragment{
                             if(state.rules.bannedBlocks.contains(lastDisplay)){
                                 topTable.row();
                                 topTable.table(b -> {
-                                    b.addImage(Icon.cancelSmall).padRight(2).color(Color.scarlet);
+                                    b.addImage(Icon.cancel).padRight(2).color(Color.scarlet);
                                     b.add("$banned");
                                     b.left();
                                 }).padTop(2).left();
@@ -339,14 +353,15 @@ public class PlacementFragment extends Fragment{
                 frame.row();
                 frame.table(Tex.pane2, blocksSelect -> {
                     blocksSelect.margin(4).marginTop(0);
-                    blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
+                    blockPane = blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
                         if(pane.hasScroll()){
                             Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
                             if(result == null || !result.isDescendantOf(pane)){
                                 Core.scene.setScrollFocus(null);
                             }
                         }
-                    }).grow().get().setStyle(Styles.smallPane);
+                    }).grow().get();
+                    blockPane.setStyle(Styles.smallPane);
                     blocksSelect.row();
                     blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
                 }).fillY().bottom().touchable(Touchable.enabled);
@@ -378,7 +393,7 @@ public class PlacementFragment extends Fragment{
                             continue;
                         }
 
-                        categories.addImageButton(Core.atlas.drawable("icon-" + cat.name() + "-smaller"), Styles.clearToggleTransi, () -> {
+                        categories.addImageButton(ui.getIcon(cat.name()), Styles.clearToggleTransi, () -> {
                             currentCategory = cat;
                             if(control.input.block != null){
                                 control.input.block = getSelectedBlock(currentCategory);

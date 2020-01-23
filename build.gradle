@@ -1,4 +1,8 @@
 buildscript{
+    ext{
+        arcExtVersion = "e287fdce0449a87fb15599c67b5167ac0273bcb6"
+    }
+    
     repositories{
         mavenLocal()
         mavenCentral()
@@ -10,8 +14,9 @@ buildscript{
 
     dependencies{
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.8'
-        classpath "com.badlogicgames.gdx:gdx-tools:1.9.10"
         classpath "com.github.anuken:packr:-SNAPSHOT"
+        classpath "com.github.Anuken.Arc:packer:$arcExtVersion"
+        classpath "com.github.Anuken.Arc:arc-core:$arcExtVersion"
     }
 }
 
@@ -309,6 +314,7 @@ project(":annotations"){
 
     dependencies{
         compile 'com.squareup:javapoet:1.11.0'
+        compile "com.github.Anuken.Arc:arc-core:$arcExtVersion"
         compile files("${System.getProperty('java.home')}/../lib/tools.jar")
     }
 }

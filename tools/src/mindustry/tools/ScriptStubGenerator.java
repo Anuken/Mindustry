@@ -23,7 +23,7 @@ public class ScriptStubGenerator{
     public static void main(String[] args){
         String base = "mindustry";
         Array<String> blacklist = Array.with("plugin", "mod", "net", "io", "tools");
-        Array<String> nameBlacklist = Array.with("ClientLauncher", "NetClient", "NetServer", "ClassAccess");
+        Array<String> nameBlacklist = Array.with("ClassAccess");
         Array<Class<?>> whitelist = Array.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class,
             AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class, Runnable.class, Object.class, Icon.class, Tex.class,
             Sounds.class, Musics.class, Call.class, Texture.class, TextureData.class, Pixmap.class, I18NBundle.class, Interval.class, DataInput.class, DataOutput.class,

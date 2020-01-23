@@ -118,6 +118,14 @@ public interface BuilderTrait extends Entity, TeamTrait{
         return request.stuck && !core.items.has(request.block.requirements);
     }
 
+    default void removeRequest(int x, int y, boolean breaking){
+        //remove matching request
+        int idx = player.buildQueue().indexOf(req -> req.breaking == breaking && req.x == x && req.y == y);
+        if(idx != -1){
+            player.buildQueue().removeIndex(idx);
+        }
+    }
+
     /** Returns the queue for storing build requests. */
     Queue<BuildRequest> buildQueue();
 

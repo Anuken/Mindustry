@@ -1,7 +1,9 @@
 package mindustry.net;
 
-import arc.util.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
+import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.net.Administration.*;
@@ -21,6 +23,8 @@ public abstract class NetConnection{
     public int lastRecievedClientSnapshot = -1;
     /** Timestamp of last recieved snapshot. */
     public long lastRecievedClientTime;
+    /** Build requests that have been recently rejected. This is cleared every snapshot. */
+    public Array<BuildRequest> rejectedRequests = new Array<>();
 
     public boolean hasConnected, hasBegunConnecting, hasDisconnected;
     public float viewWidth, viewHeight, viewX, viewY;

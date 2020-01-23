@@ -19,6 +19,7 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.io.*;
+import mindustry.net.*;
 import mindustry.ui.dialogs.*;
 
 import java.io.*;
@@ -145,9 +146,33 @@ public class AndroidLauncher extends AndroidApplication{
             useImmersiveMode = true;
             depth = 0;
             hideStatusBar = true;
-            //errorHandler = ModCrashHandler::handle;
+            errorHandler = CrashSender::log;
         }});
         checkFiles(getIntent());
+
+        //new external folder
+        Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
+
+        //moved to internal storage if there's no file indicating that it moved
+        if(!Core.files.local("files_moved").exists()){
+            Log.info("Moving files to external storage...");
+
+            try{
+                //current local storage folder
+                Fi src = Core.files.absolute(Core.files.getLocalStoragePath());
+                for(Fi fi : src.list()){
+                    fi.copyTo(data.child(fi.name()));
+                }
+                //create marker
+                Core.files.local("files_moved").writeString("files moved to " + data);
+                Log.info("Files moved.");
+            }catch(Throwable t){
+                Log.err("Failed to move files!");
+                t.printStackTrace();
+            }
+        }else{
+            Core.settings.setDataDirectory(data);
+        }
     }
 
     @Override

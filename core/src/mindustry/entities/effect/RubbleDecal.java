@@ -38,4 +38,9 @@ public class RubbleDecal extends Decal{
         }
         Draw.rect(region, x, y, Mathf.randomSeed(id, 0, 4) * 90);
     }
+
+    @Override
+    public float drawSize(){
+        return region.getWidth() * 3f;
+    }
 }

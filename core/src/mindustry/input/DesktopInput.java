@@ -67,7 +67,7 @@ public class DesktopInput extends InputHandler{
                 Core.keybinds.get(Binding.schematic_flip_y).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.table(a -> {
-                    a.addImageTextButton("$schematic.add", Icon.saveSmall, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
+                    a.addImageTextButton("$schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
             }).margin(6f);
         });
@@ -256,7 +256,7 @@ public class DesktopInput extends InputHandler{
         table.row();
         table.left().margin(0f).defaults().size(48f).left();
 
-        table.addImageButton(Icon.pasteSmall, Styles.clearPartiali, () -> {
+        table.addImageButton(Icon.paste, Styles.clearPartiali, () -> {
             ui.schematics.show();
         });
     }

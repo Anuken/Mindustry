@@ -35,12 +35,12 @@ public class CustomRulesDialog extends FloatingDialog{
         banDialog.addCloseButton();
 
         banDialog.shown(this::rebuildBanned);
-        banDialog.buttons.addImageTextButton("$addall", Icon.arrow16Small, () -> {
+        banDialog.buttons.addImageTextButton("$addall", Icon.add, () -> {
             rules.bannedBlocks.addAll(content.blocks().select(Block::isBuildable));
             rebuildBanned();
         }).size(180, 64f);
 
-        banDialog.buttons.addImageTextButton("$clear", Icon.trash16Small, () -> {
+        banDialog.buttons.addImageTextButton("$clear", Icon.trash, () -> {
             rules.bannedBlocks.clear();
             rebuildBanned();
         }).size(180, 64f);
@@ -72,7 +72,7 @@ public class CustomRulesDialog extends FloatingDialog{
                     b.addImage(block.icon(Cicon.medium)).size(Cicon.medium.size).padRight(3);
                     b.add(block.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
 
-                    b.addImageButton(Icon.cancelSmall, Styles.clearPartiali, () -> {
+                    b.addImageButton(Icon.cancel, Styles.clearPartiali, () -> {
                        rules.bannedBlocks.remove(block);
                        rebuildBanned();
                     }).size(70f).pad(-4f).padLeft(0f);
@@ -84,7 +84,7 @@ public class CustomRulesDialog extends FloatingDialog{
             }
         }).get().setScrollYForce(previousScroll);
         banDialog.cont.row();
-        banDialog.cont.addImageTextButton("$add", Icon.addSmall, () -> {
+        banDialog.cont.addImageTextButton("$add", Icon.add, () -> {
             FloatingDialog dialog = new FloatingDialog("$add");
             dialog.cont.pane(t -> {
                 t.left().margin(14f);

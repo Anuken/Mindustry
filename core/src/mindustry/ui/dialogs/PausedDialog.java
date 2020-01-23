@@ -35,29 +35,29 @@ public class PausedDialog extends FloatingDialog{
         });
 
         if(!mobile){
-            float dw = 210f;
-            cont.defaults().width(dw).height(50).pad(5f);
+            float dw = 220f;
+            cont.defaults().width(dw).height(55).pad(5f);
 
-            cont.addButton("$back", this::hide).colspan(2).width(dw * 2 + 20f);
+            cont.addImageTextButton("$back", Icon.left, this::hide).colspan(2).width(dw * 2 + 20f);
 
             cont.row();
             if(world.isZone()){
-                cont.addButton("$techtree", ui.tech::show);
+                cont.addImageTextButton("$techtree", Icon.tree, ui.tech::show);
             }else{
-                cont.addButton("$database", ui.database::show);
+                cont.addImageTextButton("$database", Icon.book, ui.database::show);
             }
-            cont.addButton("$settings", ui.settings::show);
+            cont.addImageTextButton("$settings", Icon.settings, ui.settings::show);
 
             if(!state.rules.tutorial){
                 if(!world.isZone() && !state.isEditor()){
                     cont.row();
-                    cont.addButton("$savegame", save::show);
-                    cont.addButton("$loadgame", load::show).disabled(b -> net.active());
+                    cont.addImageTextButton("$savegame", Icon.save, save::show);
+                    cont.addImageTextButton("$loadgame", Icon.upload, load::show).disabled(b -> net.active());
                 }
 
                 cont.row();
 
-                cont.addButton("$hostserver", () -> {
+                cont.addImageTextButton("$hostserver", Icon.host, () -> {
                     if(net.server() && steam){
                         platform.inviteFriends();
                     }else{
@@ -72,26 +72,29 @@ public class PausedDialog extends FloatingDialog{
 
             cont.row();
 
-            cont.addButton("$quit", this::showQuitConfirm).colspan(2).width(dw + 10f).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit"));
+            cont.addImageTextButton("$quit", Icon.exit, this::showQuitConfirm).colspan(2).width(dw + 20f).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit"));
 
         }else{
             cont.defaults().size(130f).pad(5);
-            cont.addRowImageTextButton("$back", Icon.play2, this::hide);
-            cont.addRowImageTextButton("$settings", Icon.tools, ui.settings::show);
+            cont.addRowImageTextButton("$back", Icon.play, this::hide);
+            cont.addRowImageTextButton("$settings", Icon.settings, ui.settings::show);
 
             if(!world.isZone() && !state.isEditor()){
                 cont.addRowImageTextButton("$save", Icon.save, save::show);
 
                 cont.row();
 
-                cont.addRowImageTextButton("$load", Icon.load, load::show).disabled(b -> net.active());
+                cont.addRowImageTextButton("$load", Icon.download, load::show).disabled(b -> net.active());
             }else{
                 cont.row();
             }
 
             cont.addRowImageTextButton("$hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
 
-            cont.addRowImageTextButton("$quit", Icon.quit, this::showQuitConfirm).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit"));
+            cont.addRowImageTextButton("$quit", Icon.exit, this::showQuitConfirm).update(s -> {
+                s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit");
+                s.getLabelCell().growX().wrap();
+            });
         }
     }
 

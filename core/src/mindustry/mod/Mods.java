@@ -42,7 +42,7 @@ public class Mods implements Loadable{
 
     private Array<LoadedMod> mods = new Array<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
-    private boolean requiresReload;
+    private boolean requiresReload, createdAtlas;
 
     public Mods(){
         Events.on(ClientLoadEvent.class, e -> Core.app.post(this::checkWarnings));
@@ -112,13 +112,6 @@ public class Mods implements Loadable{
             totalSprites += sprites.size + overrides.size;
         });
 
-        for(AtlasRegion region : Core.atlas.getRegions()){
-            PageType type = getPage(region);
-            if(!packer.has(type, region.name)){
-                packer.add(type, region.name, Core.atlas.getPixmap(region));
-            }
-        }
-
         Log.debug("Time to pack textures: {0}", Time.elapsed());
     }
 
@@ -159,6 +152,16 @@ public class Mods implements Loadable{
 
         //get textures packed
         if(totalSprites > 0){
+            if(!createdAtlas) Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
+            createdAtlas = true;
+
+            for(AtlasRegion region : Core.atlas.getRegions()){
+                PageType type = getPage(region);
+                if(!packer.has(type, region.name)){
+                    packer.add(type, region.name, Core.atlas.getPixmap(region));
+                }
+            }
+
             TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
 
             //flush so generators can use these sprites
@@ -243,7 +246,7 @@ public class Mods implements Loadable{
             try{
                 LoadedMod mod = loadMod(file);
                 mods.add(mod);
-            }catch(Exception e){
+            }catch(Throwable e){
                 Log.err("Failed to load mod file {0}. Skipping.", file);
                 Log.err(e);
             }
@@ -255,7 +258,7 @@ public class Mods implements Loadable{
                 LoadedMod mod = loadMod(file);
                 mods.add(mod);
                 mod.addSteamID(file.name());
-            }catch(Exception e){
+            }catch(Throwable e){
                 Log.err("Failed to load mod workshop file {0}. Skipping.", file);
                 Log.err(e);
             }
@@ -351,7 +354,7 @@ public class Mods implements Loadable{
             for(Fi file : bundles.getOr(locale, Array::new)){
                 try{
                     PropertiesUtils.load(bundle.getProperties(), file.reader());
-                }catch(Exception e){
+                }catch(Throwable e){
                     Log.err("Error loading bundle: " + file + "/" + locale, e);
                 }
             }
@@ -389,12 +392,12 @@ public class Mods implements Loadable{
                             d.left().marginLeft(15f);
                             for(Content c : m.erroredContent){
                                 d.add(c.minfo.sourceFile.nameWithoutExtension()).left().padRight(10);
-                                d.addImageTextButton("$details", Icon.arrowDownSmall, Styles.transt, () -> {
+                                d.addImageTextButton("$details", Icon.downOpen, Styles.transt, () -> {
                                     new Dialog(""){{
                                         setFillParent(true);
                                         cont.pane(e -> e.add(c.minfo.error)).grow();
                                         cont.row();
-                                        cont.addImageTextButton("$ok", Icon.backSmall, this::hide).size(240f, 60f);
+                                        cont.addImageTextButton("$ok", Icon.left, this::hide).size(240f, 60f);
                                     }}.show();
                                 }).size(190f, 50f).left().marginLeft(6);
                                 d.row();
@@ -419,6 +422,7 @@ public class Mods implements Loadable{
         //epic memory leak
         //TODO make it less epic
         Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
+        createdAtlas = true;
 
         mods.each(LoadedMod::dispose);
         mods.clear();
