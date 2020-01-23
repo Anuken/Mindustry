@@ -1,19 +1,23 @@
-![Logo](core/assets/sprites/logo.png)
+![Logo](core/assets-raw/sprites/ui/logo.png)
 
 [![Build Status](https://travis-ci.org/Anuken/Mindustry.svg?branch=master)](https://travis-ci.org/Anuken/Mindustry) 
-[![Discord](https://img.shields.io/discord/391020510269669376.svg)](https://discord.gg/mindustry)
+[![Discord](https://img.shields.io/discord/391020510269669376.svg)](https://discord.gg/mindustry)  
 
 A sandbox tower defense game written in Java.
 
 _[Trello Board](https://trello.com/b/aE2tcUwF/mindustry-40-plans)_  
 _[Wiki](https://mindustrygame.github.io/wiki)_ 
 
+### Contributing
+
+See [CONTRIBUTING](CONTRIBUTING.md).
+
 ### Building
 
 Bleeding-edge live builds are generated automatically for every commit. You can see them [here](https://github.com/Anuken/MindustryBuilds/releases). Old builds might still be on [jenkins](https://jenkins.hellomouse.net/job/mindustry/).
 
 If you'd rather compile on your own, follow these instructions.
-First, make sure you have (https://www.java.com/en/download/)[Java 8] and (https://adoptopenjdk.net/)[JDK 8]  installed. Open a terminal in the root directory, `cd` to the Mindustry folder and run the following commands:
+First, make sure you have [JDK 8](https://adoptopenjdk.net/) installed. Open a terminal in the root directory, `cd` to the Mindustry folder and run the following commands:
 
 #### Windows
 
@@ -58,3 +62,7 @@ After building, the output .JAR file should be in `/desktop/build/libs/Mindustry
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
      alt="Get it on F-Droid"
      height="80">](https://f-droid.org/packages/io.anuke.mindustry/)
+
+### Feature Requests
+
+[![Feature Requests](https://feathub.com/Anuken/Mindustry?format=svg)](https://feathub.com/Anuken/Mindustry)

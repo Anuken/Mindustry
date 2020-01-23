@@ -32,14 +32,15 @@ steam_appid.txt
 /core/assets/gifexport/
 /core/assets/version.properties
 /core/assets/locales
-/ios/src/io/anuke/mindustry/gen/
-/core/src/io/anuke/mindustry/gen/
+/ios/src/mindustry/gen/
+/core/src/mindustry/gen/
 ios/robovm.properties
 packr-out/
 config/
 changelog
 *.gif
 /core/assets/saves/
+/out/
 
 version.properties
 
@@ -54,15 +55,6 @@ crash-report-*
 
 ## Robovm
 /ios/robovm-build/
-
-## GWT
-/html/war/
-/html/gwt-unitCache/
-.apt_generated/
-.gwt/
-gwt-unitCache/
-www-test/
-.gwt-tmp/
 
 ## Android Studio and Intellij and Android in general
 /android/libs/armeabi/

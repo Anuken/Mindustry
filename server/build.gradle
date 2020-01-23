@@ -3,7 +3,7 @@ apply plugin: "java"
 sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = ["src/"]
 
-project.ext.mainClassName = "io.anuke.mindustry.server.ServerLauncher"
+project.ext.mainClassName = "mindustry.server.ServerLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
 ext.getServerFolder = {
@@ -18,6 +18,9 @@ task run(dependsOn: classes, type: JavaExec){
     ignoreExitValue = true
     if(project.hasProperty("appArgs")){
         args Eval.me(appArgs)
+    }
+    if(project.hasProperty("jvmArgs")){
+        jvmArgs((List<String>)Eval.me(project.getProperties()["jvmArgs"]))
     }
 }
 
@@ -43,6 +46,9 @@ task dist(type: Jar){
     exclude("com/badlogic/gdx/**")
     exclude("icons/**")
     exclude("bundles/**")
+    if(!versionModifier.contains("steam")){
+        exclude("**.dll", "**.so", "**.dylib")
+    }
 
     manifest{
         attributes 'Main-Class': project.mainClassName
@@ -51,8 +57,8 @@ task dist(type: Jar){
 
 task dzip(type: Zip){
     from getServerFolder()
-    archiveName "${generateDeployName('server')}.zip"
-    destinationDir(file("../deploy/"))
+    archiveFileName = "${generateDeployName('server')}.zip"
+    destinationDirectory = file("../deploy/")
 
     finalizedBy 'cleanup'
 }

@@ -1,13 +1,15 @@
-import io.anuke.arc.collection.*;
-import io.anuke.arc.util.*;
-import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.storage.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.core.*;
+import mindustry.core.GameState.*;
+import mindustry.game.*;
+import mindustry.io.SaveIO.*;
+import mindustry.type.*;
+import mindustry.world.*;
+import mindustry.world.blocks.storage.*;
 import org.junit.jupiter.api.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static mindustry.Vars.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
@@ -28,13 +30,19 @@ public class ZoneTests{
     @TestFactory
     DynamicTest[] testZoneValidity(){
         Array<DynamicTest> out = new Array<>();
+        if(world == null) world = new World();
 
         for(Zone zone : content.zones()){
             out.add(dynamicTest(zone.name, () -> {
                 zone.generator.init(zone.loadout);
                 logic.reset();
-                world.loadGenerator(zone.generator);
-                zone.rules.accept(state.rules);
+                try{
+                    world.loadGenerator(zone.generator);
+                }catch(SaveException e){
+                    e.printStackTrace();
+                    return;
+                }
+                zone.rules.get(state.rules);
                 ObjectSet<Item> resources = new ObjectSet<>();
                 boolean hasSpawnPoint = false;
 
@@ -44,7 +52,7 @@ public class ZoneTests{
                         if(tile.drop() != null){
                             resources.add(tile.drop());
                         }
-                        if(tile.block() instanceof CoreBlock && tile.getTeam() == defaultTeam){
+                        if(tile.block() instanceof CoreBlock && tile.getTeam() == state.rules.defaultTeam){
                             hasSpawnPoint = true;
                         }
                     }
@@ -61,7 +69,7 @@ public class ZoneTests{
                 }
 
                 assertTrue(hasSpawnPoint, "Zone \"" + zone.name + "\" has no spawn points.");
-                assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && !state.teams.get(waveTeam).cores.isEmpty()), "Zone \"" + zone.name + "\" has no enemy spawn points: " + spawner.countSpawns());
+                assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && state.teams.get(state.rules.waveTeam).hasCore()), "Zone \"" + zone.name + "\" has no enemy spawn points: " + spawner.countSpawns());
 
                 for(Item item : resources){
                     assertTrue(zone.resources.contains(item), "Zone \"" + zone.name + "\" is missing item in resource list: \"" + item.name + "\"");
