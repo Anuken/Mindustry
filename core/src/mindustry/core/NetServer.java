@@ -227,6 +227,8 @@ public class NetServer implements ApplicationListener{
             platform.updateRPC();
 
             Events.fire(new PlayerConnect(player));
+
+            Call.onPauseToggle(paused);
         });
 
         net.handleServer(InvokePacket.class, (con, packet) -> {
