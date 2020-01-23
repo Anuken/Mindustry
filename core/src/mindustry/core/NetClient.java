@@ -50,6 +50,8 @@ public class NetClient implements ApplicationListener{
     /** Last sent client snapshot ID. */
     private int lastSent;
 
+    public boolean paused = false;
+
     /** List of entities that were removed, and need not be added while syncing. */
     private IntSet removed = new IntSet();
     /** Byte stream for reading in snapshots. */
@@ -61,6 +63,7 @@ public class NetClient implements ApplicationListener{
         net.handleClient(Connect.class, packet -> {
             Log.info("Connecting to server: {0}", packet.addressTCP);
 
+            paused = false;
             player.isAdmin = false;
 
             reset();
@@ -402,6 +405,11 @@ public class NetClient implements ApplicationListener{
         }catch(IOException e){
             throw new RuntimeException(e);
         }
+    }
+
+    @Remote(priority = PacketPriority.high)
+    public static void onPauseToggle(boolean paused){
+        netClient.paused = paused;
     }
 
     @Override

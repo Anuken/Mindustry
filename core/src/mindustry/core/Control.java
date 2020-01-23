@@ -19,6 +19,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.maps.Map;
+import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -453,7 +454,11 @@ public class Control implements ApplicationListener, Loadable{
             }
 
             if(Core.input.keyTap(Binding.pause) && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
-                state.set(state.is(State.playing) ? State.paused : State.playing);
+                if(player.isAdmin){
+                    Call.onAdminRequest(player, AdminAction.pause);
+                }else{
+                    state.set(state.is(State.playing) ? State.paused : State.playing);
+                }
             }
 
             if(Core.input.keyTap(Binding.menu) && !ui.restart.isShown() && !ui.minimapfrag.shown()){

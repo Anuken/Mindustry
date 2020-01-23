@@ -39,7 +39,7 @@ public class GameState{
     }
 
     public boolean isPaused(){
-        return (is(State.paused) && !net.active()) || (gameOver && !net.active());
+        return (is(State.paused) && !net.active()) || (gameOver && !net.active()) || netClient.paused || netServer.paused;
     }
 
     public boolean is(State astate){

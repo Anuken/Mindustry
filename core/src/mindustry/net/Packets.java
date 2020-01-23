@@ -39,7 +39,7 @@ public class Packets{
     }
 
     public enum AdminAction{
-        kick, ban, trace, wave
+        kick, ban, trace, wave, pause
     }
 
     public static class Connect implements Packet{

@@ -62,7 +62,8 @@ public class NetServer implements ApplicationListener{
         return state.rules.defaultTeam;
     };
 
-    private boolean closing = false;
+    private boolean closing;
+    public boolean paused = false;
     private Interval timer = new Interval();
 
     private ByteBuffer writeBuffer = ByteBuffer.allocate(127);
@@ -609,6 +610,11 @@ public class NetServer implements ApplicationListener{
                 NetClient.onTraceInfo(other, info);
             }
             Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
+        }else if(action == AdminAction.pause){
+            Log.info(state.isPaused() ? "&lc{0} has unpaused the game." : "&lc{0} has paused the game.", player.name);
+            netServer.paused = !state.isPaused();
+            state.set(!netServer.paused ? State.playing : State.paused);
+            Call.onPauseToggle(netServer.paused);
         }
     }
 
