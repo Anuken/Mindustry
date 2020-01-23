@@ -284,7 +284,11 @@ public class NetServer implements ApplicationListener{
         });
 
         //duration of a a kick in seconds
-        int kickDuration = 15 * 60;
+        int kickDuration = 20 * 60;
+        //voting round duration in seconds
+        float voteDuration = 0.5f * 60;
+        //cooldown between votes
+        int voteCooldown = 60 * 2;
 
         class VoteSession{
             Player target;
@@ -302,7 +306,7 @@ public class NetServer implements ApplicationListener{
                         map[0] = null;
                         task.cancel();
                     }
-                }, 60 * 1);
+                }, voteDuration);
             }
 
             void vote(Player player, int d){
@@ -326,9 +330,7 @@ public class NetServer implements ApplicationListener{
             }
         }
 
-        //cooldown between votes
-        int voteTime = 60 * 3;
-        Timekeeper vtime = new Timekeeper(voteTime);
+        Timekeeper vtime = new Timekeeper(voteCooldown);
         //current kick sessions
         VoteSession[] currentlyKicking = {null};
 
@@ -375,7 +377,7 @@ public class NetServer implements ApplicationListener{
                         player.sendMessage("[scarlet]Only players on your team can be kicked.");
                     }else{
                         if(!vtime.get()){
-                            player.sendMessage("[scarlet]You must wait " + voteTime/60 + " minutes between votekicks.");
+                            player.sendMessage("[scarlet]You must wait " + voteCooldown/60 + " minutes between votekicks.");
                             return;
                         }
 
