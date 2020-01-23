@@ -201,6 +201,8 @@ public class TechTree implements ContentList{
                             node(liquidRouter, () -> {
                                 node(liquidTank);
 
+                                node(bridgeConduit);
+
                                 node(pulseConduit, () -> {
                                     node(phaseConduit, () -> {
 
@@ -217,7 +219,6 @@ public class TechTree implements ContentList{
                                     });
                                 });
                             });
-                            node(bridgeConduit);
                         });
                     });
                 });
