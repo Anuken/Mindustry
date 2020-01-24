@@ -267,6 +267,11 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.both)
+    public static void onInfoToast(String message, float duration){
+        ui.showInfoToast(message, duration);
+    }
+
+    @Remote(variants = Variant.both)
     public static void onSetRules(Rules rules){
         state.rules = rules;
     }

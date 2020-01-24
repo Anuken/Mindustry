@@ -1,0 +1,5 @@
+- Přidán nový pohled na mapu s rolováním a posouváním
+- Přidáno pravidlo pro zdraví bloku
+- Přidáno více interních týmů pro různé herní režimy
+- Přidána vylepšená podpora pro modifikace
+- Hlavní vnitřní změna: programový balík se teď jmenuje "mindustry" namísto dosavadního "io.anuke.mindustry" (toto rozbije staré pluginy)
