@@ -6,7 +6,7 @@ import arc.Core;
 import arc.Net.HttpMethod;
 import arc.Net.HttpRequest;
 import arc.func.Cons;
-import arc.math.RandomXS128;
+import arc.math.Rand;
 import arc.util.Log;
 import arc.util.NetJavaImpl;
 import arc.util.serialization.*;
@@ -295,7 +295,7 @@ public class Authentication{
         if(id != null) return id;
 
         byte[] bytes = new byte[12];
-        new RandomXS128().nextBytes(bytes);
+        new Rand().nextBytes(bytes);
         String result = new String(Base64Coder.encode(bytes));
         Core.settings.put("authentication-server-id", result);
         String hashed = sha256(bytes);
