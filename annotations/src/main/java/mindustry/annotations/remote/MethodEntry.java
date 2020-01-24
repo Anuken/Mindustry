@@ -1,4 +1,4 @@
-package mindustry.annotations;
+package mindustry.annotations.remote;
 
 import mindustry.annotations.Annotations.*;
 

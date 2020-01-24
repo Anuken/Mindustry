@@ -1,10 +1,11 @@
-package mindustry.annotations;
+package mindustry.annotations.impl;
 
 import arc.files.*;
 import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.serialization.*;
 import com.squareup.javapoet.*;
+import mindustry.annotations.*;
 import mindustry.annotations.Annotations.*;
 
 import javax.annotation.processing.*;
@@ -20,7 +21,7 @@ public class AssetsAnnotationProcessor extends BaseProcessor{
 
     @Override
     public void process(RoundEnvironment env) throws Exception{
-        path = Fi.get(Utils.filer.createResource(StandardLocation.CLASS_OUTPUT, "no", "no")
+        path = Fi.get(BaseProcessor.filer.createResource(StandardLocation.CLASS_OUTPUT, "no", "no")
         .toUri().toURL().toString().substring(System.getProperty("os.name").contains("Windows") ? 6 : "file:".length()))
         .parent().parent().parent().parent().parent().parent().toString();
         path = path.replace("%20", " ");
@@ -85,12 +86,12 @@ public class AssetsAnnotationProcessor extends BaseProcessor{
         }
 
         ictype.addMethod(icload.build());
-        JavaFile.builder(packageName, ichtype.build()).build().writeTo(Utils.filer);
-        JavaFile.builder(packageName, ictype.build()).build().writeTo(Utils.filer);
+        JavaFile.builder(packageName, ichtype.build()).build().writeTo(BaseProcessor.filer);
+        JavaFile.builder(packageName, ictype.build()).build().writeTo(BaseProcessor.filer);
 
         type.addMethod(load.build());
         type.addMethod(loadStyles.build());
-        JavaFile.builder(packageName, type.build()).build().writeTo(Utils.filer);
+        JavaFile.builder(packageName, type.build()).build().writeTo(BaseProcessor.filer);
     }
 
     void processSounds(String classname, String path, String rtype) throws Exception{
@@ -104,7 +105,7 @@ public class AssetsAnnotationProcessor extends BaseProcessor{
             String name = p.nameWithoutExtension();
 
             if(names.contains(name)){
-                Utils.messager.printMessage(Kind.ERROR, "Duplicate file name: " + p.toString() + "!");
+                BaseProcessor.messager.printMessage(Kind.ERROR, "Duplicate file name: " + p.toString() + "!");
             }else{
                 names.add(name);
             }
@@ -130,7 +131,7 @@ public class AssetsAnnotationProcessor extends BaseProcessor{
 
         type.addMethod(loadBegin.build());
         type.addMethod(dispose.build());
-        JavaFile.builder(packageName, type.build()).build().writeTo(Utils.filer);
+        JavaFile.builder(packageName, type.build()).build().writeTo(BaseProcessor.filer);
     }
 
     static String capitalize(String s){
