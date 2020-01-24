@@ -285,12 +285,6 @@
       "src": "typicons"
     },
     {
-      "uid": "e45e9f27ce40ba9837cc984076d98067",
-      "css": "zoom",
-      "code": 59441,
-      "src": "elusive"
-    },
-    {
       "uid": "0e26e70b4aa537cc206f41b21dcf2fcc",
       "css": "lock",
       "code": 59442,
@@ -919,6 +913,12 @@
       "search": [
         "chat"
       ]
+    },
+    {
+      "uid": "9dd9e835aebe1060ba7190ad2b2ed951",
+      "css": "zoom",
+      "code": 59415,
+      "src": "fontawesome"
     }
   ]
 }
