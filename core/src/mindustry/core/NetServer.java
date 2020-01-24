@@ -231,7 +231,18 @@ public class NetServer implements ApplicationListener{
 
         net.handleServer(InvokePacket.class, (con, packet) -> {
             if(con.player == null) return;
-            RemoteReadServer.readPacket(packet.writeBuffer, packet.type, con.player);
+            try{
+                RemoteReadServer.readPacket(packet.writeBuffer, packet.type, con.player);
+            }catch(ValidateException e){
+                Log.debug("Validation failed for '{0}': {1}", e.player, e.getMessage());
+            }catch(RuntimeException e){
+                if(e.getCause() instanceof ValidateException){
+                    ValidateException v = (ValidateException)e.getCause();
+                    Log.debug("Validation failed for '{0}': {1}", v.player, v.getMessage());
+                }else{
+                    throw e;
+                }
+            }
         });
 
         registerCommands();
@@ -274,7 +285,11 @@ public class NetServer implements ApplicationListener{
         });
 
         //duration of a a kick in seconds
-        int kickDuration = 15 * 60;
+        int kickDuration = 20 * 60;
+        //voting round duration in seconds
+        float voteDuration = 0.5f * 60;
+        //cooldown between votes
+        int voteCooldown = 60 * 2;
 
         class VoteSession{
             Player target;
@@ -374,7 +389,7 @@ public class NetServer implements ApplicationListener{
                         player.sendMessage("[scarlet]Only players on your team can be kicked.");
                     }else{
                         if(!vtime.get()){
-                            player.sendMessage("[scarlet]You must wait " + voteTime/60 + " minutes between votekicks.");
+                            player.sendMessage("[scarlet]You must wait " + voteCooldown/60 + " minutes between votekicks.");
                             return;
                         }
 
@@ -514,6 +529,7 @@ public class NetServer implements ApplicationListener{
         player.isShooting = shooting;
         player.isBuilding = building;
         player.buildQueue().clear();
+
         for(BuildRequest req : requests){
             if(req == null) continue;
             Tile tile = world.tile(req.x, req.y);
@@ -523,9 +539,22 @@ public class NetServer implements ApplicationListener{
                 continue;
             }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.rotation() == req.rotation)){
                 continue;
+            }else if(connection.rejectedRequests.contains(r -> r.breaking == req.breaking && r.x == req.x && r.y == req.y)){ //check if request was recently rejected, and skip it if so
+                continue;
+            }else if(!netServer.admins.allowAction(player, req.breaking ? ActionType.breakBlock : ActionType.placeBlock, tile, action -> { //make sure request is allowed by the server
+                action.block = req.block;
+                action.rotation = req.rotation;
+                action.config = req.config;
+            })){
+                //force the player to remove this request if that's not the case
+                Call.removeQueueBlock(player.con, req.x, req.y, req.breaking);
+                connection.rejectedRequests.add(req);
+                continue;
             }
             player.buildQueue().addLast(req);
         }
+
+        connection.rejectedRequests.clear();
 
         vector.set(x - player.getInterpolator().target.x, y - player.getInterpolator().target.y);
         vector.limit(maxMove);

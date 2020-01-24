@@ -104,14 +104,14 @@ public class PlayerListFragment extends Fragment{
                 button.table(t -> {
                     t.defaults().size(bs);
 
-                    t.addImageButton(Icon.banSmall, Styles.clearPartiali,
+                    t.addImageButton(Icon.hammer, Styles.clearPartiali,
                     () -> ui.showConfirm("$confirm", "$confirmban", () -> Call.onAdminRequest(user, AdminAction.ban)));
-                    t.addImageButton(Icon.cancelSmall, Styles.clearPartiali,
+                    t.addImageButton(Icon.cancel, Styles.clearPartiali,
                     () -> ui.showConfirm("$confirm", "$confirmkick", () -> Call.onAdminRequest(user, AdminAction.kick)));
 
                     t.row();
 
-                    t.addImageButton(Icon.adminSmall, Styles.clearTogglePartiali, () -> {
+                    t.addImageButton(Icon.admin, Styles.clearTogglePartiali, () -> {
                         if(net.client()) return;
 
                         String id = user.uuid;
@@ -127,13 +127,13 @@ public class PlayerListFragment extends Fragment{
                     .touchable(() -> net.client() ? Touchable.disabled : Touchable.enabled)
                     .checked(user.isAdmin);
 
-                    t.addImageButton(Icon.zoomSmall, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
+                    t.addImageButton(Icon.zoom, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
-            }else if((!user.isLocal && !user.isAdmin) && net.client() && playerGroup.size() >= 3 && player.getTeam() != user.getTeam()){ //votekick
+            }else if(!user.isLocal && !user.isAdmin && net.client() && playerGroup.size() >= 3 && player.getTeam() == user.getTeam()){ //votekick
                 button.add().growY();
 
-                button.addImageButton(Icon.banSmall, Styles.clearPartiali,
+                button.addImageButton(Icon.hammer, Styles.clearPartiali,
                 () -> ui.showConfirm("$confirm", "$confirmvotekick", () -> Call.sendChatMessage("/votekick " + user.name))).size(h);
             }
 

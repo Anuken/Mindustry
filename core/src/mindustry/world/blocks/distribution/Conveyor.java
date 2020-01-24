@@ -33,6 +33,7 @@ public class Conveyor extends Block implements Autotiler{
     private TextureRegion[][] regions = new TextureRegion[7][4];
 
     public float speed = 0f;
+    public float displayedSpeed = 0f;
 
     protected Conveyor(String name){
         super(name);
@@ -59,7 +60,8 @@ public class Conveyor extends Block implements Autotiler{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.itemsMoved, speed * 60 / itemSpace, StatUnit.itemsSecond);
+        //have to add a custom calculated speed, since the actual movement speed is apparently not linear
+        stats.add(BlockStat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
     }
 
     @Override

@@ -63,7 +63,6 @@ public class NetworkIO{
     }
 
     public static ByteBuffer writeServerData(InetAddress address){
-
         String eyecolor = "lightgray";
         if(netServer.admins.isWhitelistEnabled()){
             eyecolor = "white";
@@ -74,6 +73,7 @@ public class NetworkIO{
 
         String name = String.format("[goldenrod]Nydus Network [darkgray]//\\([%s]oo[])/\\\\", eyecolor);
         String map = world.getMap() == null ? "None" : world.getMap().name().replaceAll("(\\[.*?\\])", "");
+        String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
 
         String[] greyscale = {"/127.0.0.1", "/192.99.169.18"};
         Log.info("ping: " + address.toString());
@@ -85,9 +85,8 @@ public class NetworkIO{
             name = "<:plastanium:632785242805239810> craters welcome you️";
         }
 
-        //
 
-        ByteBuffer buffer = ByteBuffer.allocate(256);
+        ByteBuffer buffer = ByteBuffer.allocate(512);
 
         writeString(buffer, name, 100);
         writeString(buffer, map);
@@ -99,6 +98,8 @@ public class NetworkIO{
 
         buffer.put((byte)Gamemode.bestFit(state.rules).ordinal());
         buffer.putInt(netServer.admins.getPlayerLimit());
+
+        writeString(buffer, description, 100);
         return buffer;
     }
 
@@ -111,8 +112,9 @@ public class NetworkIO{
         String vertype = readString(buffer);
         Gamemode gamemode = Gamemode.all[buffer.get()];
         int limit = buffer.getInt();
+        String description = readString(buffer);
 
-        return new Host(host, hostAddress, map, wave, players, version, vertype, gamemode, limit);
+        return new Host(host, hostAddress, map, wave, players, version, vertype, gamemode, limit, description);
     }
 
     private static void writeString(ByteBuffer buffer, String string, int maxlen){

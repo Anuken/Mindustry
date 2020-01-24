@@ -1,17 +1,15 @@
 package mindustry.world;
 
-import mindustry.annotations.Annotations.Loc;
-import mindustry.annotations.Annotations.Remote;
-import arc.Core;
-import arc.Events;
-import arc.math.Mathf;
+import arc.*;
+import arc.math.*;
 import arc.math.geom.*;
-import mindustry.content.Blocks;
-import mindustry.entities.Units;
-import mindustry.game.EventType.BlockBuildBeginEvent;
-import mindustry.game.Team;
-import mindustry.world.blocks.BuildBlock;
-import mindustry.world.blocks.BuildBlock.BuildEntity;
+import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.game.EventType.*;
+import mindustry.game.*;
+import mindustry.world.blocks.*;
+import mindustry.world.blocks.BuildBlock.*;
 
 import static mindustry.Vars.*;
 

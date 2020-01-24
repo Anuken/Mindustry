@@ -122,7 +122,7 @@ public class DeployDialog extends FloatingDialog{
             setFilter(TextureFilter.Linear);
         }}){{
             float[] time = {0};
-            setColor(Color.fromGray(0.3f));
+            setColor(Color.grays(0.3f));
             setScale(1.5f);
             update(() -> {
                 setOrigin(Align.center);
@@ -140,7 +140,7 @@ public class DeployDialog extends FloatingDialog{
                 Stack sub = new Stack();
 
                 if(slot.getZone() != null){
-                    sub.add(new Table(f -> f.margin(4f).add(new Image()).color(Color.fromGray(0.1f)).grow()));
+                    sub.add(new Table(f -> f.margin(4f).add(new Image()).color(Color.grays(0.1f)).grow()));
 
                     sub.add(new Table(f -> f.margin(4f).add(new Image(slot.getZone().preview).setScaling(Scaling.fit)).update(img -> {
                         TextureRegionDrawable draw = (TextureRegionDrawable)img.getDrawable();
@@ -235,7 +235,7 @@ public class DeployDialog extends FloatingDialog{
             button.labelWrap(zone.localizedName).style(Styles.outlineLabel).width(140).growX().get().setAlignment(Align.center);
         }else{
             Cons<Element> flasher = zone.canUnlock() && !hidden(zone) ? e -> e.update(() -> e.getColor().set(Color.white).lerp(Pal.accent, Mathf.absin(3f, 1f))) : e -> {};
-            flasher.get(button.addImage(Icon.locked).get());
+            flasher.get(button.addImage(Icon.lock).get());
             button.row();
             flasher.get(button.add("$locked").get());
         }
@@ -254,7 +254,7 @@ public class DeployDialog extends FloatingDialog{
                 }
 
                 stack.setSize(Tmp.v1.x, Tmp.v1.y);
-                stack.add(new Table(t -> t.margin(4f).add(new Image(node.zone.preview).setScaling(Scaling.stretch)).color(node.zone.unlocked() ? Color.darkGray : Color.fromGray(0.2f)).grow()));
+                stack.add(new Table(t -> t.margin(4f).add(new Image(node.zone.preview).setScaling(Scaling.stretch)).color(node.zone.unlocked() ? Color.darkGray : Color.grays(0.2f)).grow()));
                 stack.update(() -> stack.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f, Align.center));
 
                 Button button = new Button(Styles.squaret);
