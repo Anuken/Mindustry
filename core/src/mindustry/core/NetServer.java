@@ -264,7 +264,7 @@ public class NetServer implements ApplicationListener{
 
             page --;
 
-            if(page > pages || page < 0){
+            if(page >= pages || page < 0){
                 player.sendMessage("[scarlet]'page' must be a number between[orange] 1[] and[orange] " + pages + "[scarlet].");
                 return;
             }
