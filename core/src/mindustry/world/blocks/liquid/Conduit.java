@@ -1,11 +1,11 @@
 package mindustry.world.blocks.liquid;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.traits.BuilderTrait.*;
@@ -13,7 +13,6 @@ import mindustry.entities.type.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.modules.*;
 
 public class Conduit extends LiquidBlock implements Autotiler{
     public final int timerFlow = timers++;
@@ -92,13 +91,12 @@ public class Conduit extends LiquidBlock implements Autotiler{
     @Override
     public void draw(Tile tile){
         ConduitEntity entity = tile.ent();
-        LiquidModule mod = tile.entity.liquids;
         int rotation = tile.rotation() * 90;
 
         Draw.colorl(0.34f);
         Draw.rect(botRegions[entity.blendbits], tile.drawx(), tile.drawy(), rotation);
 
-        Draw.color(mod.current().color);
+        Draw.color(tile.entity.liquids.current().color);
         Draw.alpha(entity.smoothLiquid);
         Draw.rect(botRegions[entity.blendbits], tile.drawx(), tile.drawy(), rotation);
         Draw.color();
@@ -109,7 +107,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     @Override
     public void update(Tile tile){
         ConduitEntity entity = tile.ent();
-        entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.liquids.total() / liquidCapacity, 0.05f);
+        entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.liquids.currentAmount() / liquidCapacity, 0.05f);
 
         if(tile.entity.liquids.total() > 0.001f && tile.entity.timer.get(timerFlow, 1)){
             tryMoveLiquid(tile, tile.getNearby(tile.rotation()), leakResistance, tile.entity.liquids.current());

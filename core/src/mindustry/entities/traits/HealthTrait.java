@@ -14,6 +14,11 @@ public interface HealthTrait{
 
     void setDead(boolean dead);
 
+    default void kill(){
+        health(-1);
+        damage(1);
+    }
+
     default void onHit(SolidTrait entity){
     }
 

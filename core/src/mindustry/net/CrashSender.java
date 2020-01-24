@@ -21,6 +21,18 @@ import static mindustry.Vars.net;
 
 public class CrashSender{
 
+    public static void log(Throwable exception){
+        try{
+            Core.settings.getDataDirectory().child("crashes").child("crash_" + System.currentTimeMillis() + ".txt").writeString(Strings.parseException(exception, true));
+        }catch(Throwable ignored){
+        }
+
+        if(exception instanceof RuntimeException){
+            throw (RuntimeException)exception;
+        }
+        throw new RuntimeException(exception);
+    }
+
     public static void send(Throwable exception, Cons<File> writeListener){
 
         try{

@@ -40,6 +40,7 @@ config/
 changelog
 *.gif
 /core/assets/saves/
+/out/
 
 version.properties
 

@@ -66,30 +66,30 @@ public class MapEditorDialog extends Dialog implements Disposable{
         menu.cont.table(t -> {
             t.defaults().size(swidth, 60f).padBottom(5).padRight(5).padLeft(5);
 
-            t.addImageTextButton("$editor.savemap", Icon.floppy16Small, this::save);
+            t.addImageTextButton("$editor.savemap", Icon.save, this::save);
 
-            t.addImageTextButton("$editor.mapinfo", Icon.pencilSmall, () -> {
+            t.addImageTextButton("$editor.mapinfo", Icon.pencil, () -> {
                 infoDialog.show();
                 menu.hide();
             });
 
             t.row();
 
-            t.addImageTextButton("$editor.generate", Icon.editorSmall, () -> {
+            t.addImageTextButton("$editor.generate", Icon.terrain, () -> {
                 generateDialog.show(generateDialog::applyToEditor);
                 menu.hide();
             });
 
-            t.addImageTextButton("$editor.resize", Icon.resizeSmall, () -> {
+            t.addImageTextButton("$editor.resize", Icon.resize, () -> {
                 resizeDialog.show();
                 menu.hide();
             });
 
             t.row();
 
-            t.addImageTextButton("$editor.import", Icon.loadMapSmall, () ->
+            t.addImageTextButton("$editor.import", Icon.download, () ->
             createDialog("$editor.import",
-            "$editor.importmap", "$editor.importmap.description", Icon.loadMap, (Runnable)loadDialog::show,
+            "$editor.importmap", "$editor.importmap.description", Icon.download, (Runnable)loadDialog::show,
             "$editor.importfile", "$editor.importfile.description", Icon.file, (Runnable)() ->
             platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
                 maps.tryCatchMapError(() -> {
@@ -115,7 +115,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             })))
             );
 
-            t.addImageTextButton("$editor.export", Icon.saveMapSmall, () -> {
+            t.addImageTextButton("$editor.export", Icon.upload, () -> {
                 if(!ios){
                     platform.showFileChooser(false, mapExtension, file -> {
                         ui.loadAnd(() -> {
@@ -148,7 +148,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         menu.cont.row();
 
         if(steam){
-            menu.cont.addImageTextButton("$editor.publish.workshop", Icon.linkSmall, () -> {
+            menu.cont.addImageTextButton("$editor.publish.workshop", Icon.link, () -> {
                 Map builtin = maps.all().find(m -> m.name().equals(editor.getTags().get("name", "").trim()));
 
                 if(editor.getTags().containsKey("steamid") && builtin != null && !builtin.custom){
@@ -181,11 +181,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
             menu.cont.row();
         }
 
-        menu.cont.addImageTextButton("$editor.ingame", Icon.arrowSmall, this::playtest).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
+        menu.cont.addImageTextButton("$editor.ingame", Icon.right, this::playtest).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
 
         menu.cont.row();
 
-        menu.cont.addImageTextButton("$quit", Icon.backSmall, () -> {
+        menu.cont.addImageTextButton("$quit", Icon.exit, () -> {
             tryExit();
             menu.hide();
         }).size(swidth * 2f + 10, 60f);
@@ -427,7 +427,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 Cons<EditorTool> addTool = tool -> {
 
-                    ImageButton button = new ImageButton(Core.atlas.drawable("icon-" + tool.name() + "-small"), Styles.clearTogglei);
+                    ImageButton button = new ImageButton(ui.getIcon(tool.name()), Styles.clearTogglei);
                     button.clicked(() -> {
                         view.setTool(tool);
                         if(lastTable[0] != null){
@@ -503,16 +503,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.defaults().size(size, size);
 
-                tools.addImageButton(Icon.menuLargeSmall, Styles.cleari, menu::show);
+                tools.addImageButton(Icon.menu, Styles.cleari, menu::show);
 
-                ImageButton grid = tools.addImageButton(Icon.gridSmall, Styles.clearTogglei, () -> view.setGrid(!view.isGrid())).get();
+                ImageButton grid = tools.addImageButton(Icon.grid, Styles.clearTogglei, () -> view.setGrid(!view.isGrid())).get();
 
                 addTool.get(EditorTool.zoom);
 
                 tools.row();
 
-                ImageButton undo = tools.addImageButton(Icon.undoSmall, Styles.cleari, editor::undo).get();
-                ImageButton redo = tools.addImageButton(Icon.redoSmall, Styles.cleari, editor::redo).get();
+                ImageButton undo = tools.addImageButton(Icon.undo, Styles.cleari, editor::undo).get();
+                ImageButton redo = tools.addImageButton(Icon.redo, Styles.cleari, editor::redo).get();
 
                 addTool.get(EditorTool.pick);
 
@@ -534,7 +534,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 addTool.get(EditorTool.fill);
                 addTool.get(EditorTool.spray);
 
-                ImageButton rotate = tools.addImageButton(Icon.arrow16Small, Styles.cleari, () -> editor.rotation = (editor.rotation + 1) % 4).get();
+                ImageButton rotate = tools.addImageButton(Icon.right, Styles.cleari, () -> editor.rotation = (editor.rotation + 1) % 4).get();
                 rotate.getImage().update(() -> {
                     rotate.getImage().setRotation(editor.rotation * 90);
                     rotate.getImage().setOrigin(Align.center);

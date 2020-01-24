@@ -338,11 +338,11 @@ public class Maps{
     }
 
     public void addDefaultOres(Array<GenerateFilter> filters){
-        int index = 0;
-        for(Block block : new Block[]{Blocks.oreCopper, Blocks.oreLead, Blocks.oreCoal, Blocks.oreTitanium, Blocks.oreThorium}){
+        Array<Block> ores = content.blocks().select(b -> b.isOverlay() && b.asFloor().oreDefault);
+        for(Block block : ores){
             OreFilter filter = new OreFilter();
-            filter.threshold += index ++ * 0.018f;
-            filter.scl += index/2.1f;
+            filter.threshold = block.asFloor().oreThreshold;
+            filter.scl = block.asFloor().oreScale;
             filter.ore = block;
             filters.add(filter);
         }

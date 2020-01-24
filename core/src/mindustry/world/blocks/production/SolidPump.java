@@ -64,6 +64,7 @@ public class SolidPump extends Pump{
 
         stats.remove(BlockStat.output);
         stats.add(BlockStat.output, result, 60f * pumpAmount, true);
+        stats.add(BlockStat.affinities, attribute);
     }
 
     @Override

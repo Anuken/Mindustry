@@ -1,5 +1,9 @@
 package mindustry.annotations;
 
+import arc.files.*;
+import arc.scene.style.*;
+import arc.struct.*;
+import arc.util.serialization.*;
 import com.squareup.javapoet.*;
 import mindustry.annotations.Annotations.*;
 
@@ -8,96 +12,71 @@ import javax.lang.model.*;
 import javax.lang.model.element.*;
 import javax.tools.Diagnostic.*;
 import javax.tools.*;
-import java.nio.file.*;
 import java.util.*;
 
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes("mindustry.annotations.Annotations.StyleDefaults")
-public class AssetsAnnotationProcessor extends AbstractProcessor{
-    /** Name of the base package to put all the generated classes. */
-    private static final String packageName = "mindustry.gen";
+public class AssetsAnnotationProcessor extends BaseProcessor{
     private String path;
-    private int round;
 
     @Override
-    public synchronized void init(ProcessingEnvironment processingEnv){
-        super.init(processingEnv);
-        //put all relevant utils into utils class
-        Utils.typeUtils = processingEnv.getTypeUtils();
-        Utils.elementUtils = processingEnv.getElementUtils();
-        Utils.filer = processingEnv.getFiler();
-        Utils.messager = processingEnv.getMessager();
-    }
+    public void process(RoundEnvironment env) throws Exception{
+        path = Fi.get(Utils.filer.createResource(StandardLocation.CLASS_OUTPUT, "no", "no")
+        .toUri().toURL().toString().substring(System.getProperty("os.name").contains("Windows") ? 6 : "file:".length()))
+        .parent().parent().parent().parent().parent().parent().toString();
+        path = path.replace("%20", " ");
 
-    @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
-        if(round++ != 0) return false; //only process 1 round
-
-        try{
-            path = Paths.get(Utils.filer.createResource(StandardLocation.CLASS_OUTPUT, "no", "no")
-            .toUri().toURL().toString().substring(System.getProperty("os.name").contains("Windows") ? 6 : "file:".length()))
-            .getParent().getParent().getParent().getParent().getParent().getParent().toString();
-            path = path.replace("%20", " ");
-
-            processSounds("Sounds", path + "/assets/sounds", "arc.audio.Sound");
-            processSounds("Musics", path + "/assets/music", "arc.audio.Music");
-            processUI(roundEnv.getElementsAnnotatedWith(StyleDefaults.class));
-
-            return true;
-        }catch(Exception e){
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        processSounds("Sounds", path + "/assets/sounds", "arc.audio.Sound");
+        processSounds("Musics", path + "/assets/music", "arc.audio.Music");
+        processUI(env.getElementsAnnotatedWith(StyleDefaults.class));
     }
 
     void processUI(Set<? extends Element> elements) throws Exception{
-        String[] iconSizes = {"small", "smaller", "tiny"};
-
         TypeSpec.Builder type = TypeSpec.classBuilder("Tex").addModifiers(Modifier.PUBLIC);
         TypeSpec.Builder ictype = TypeSpec.classBuilder("Icon").addModifiers(Modifier.PUBLIC);
+        TypeSpec.Builder ichtype = TypeSpec.classBuilder("Iconc").addModifiers(Modifier.PUBLIC);
         MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder loadStyles = MethodSpec.methodBuilder("loadStyles").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder icload = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         String resources = path + "/assets-raw/sprites/ui";
-        Files.walk(Paths.get(resources)).forEach(p -> {
-            if(Files.isDirectory(p) || p.getFileName().toString().equals(".DS_Store")) return;
+        Jval icons = Jval.read(Fi.get(path + "/assets-raw/fontgen/config.json").readString());
 
-            String filename = p.getFileName().toString();
+        ictype.addField(FieldSpec.builder(ParameterizedTypeName.get(ObjectMap.class, String.class, TextureRegionDrawable.class),
+                "icons", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("new ObjectMap<>()").build());
+
+        for(Jval val : icons.get("glyphs").asArray()){
+            String name = capitalize(val.getString("css", ""));
+            int code = val.getInt("code", 0);
+            ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("(char)" + code).build());
+
+            ictype.addField(TextureRegionDrawable.class, name + "Small", Modifier.PUBLIC, Modifier.STATIC);
+            icload.addStatement(name + "Small = mindustry.ui.Fonts.getGlyph(mindustry.ui.Fonts.def, (char)" + code + ")");
+
+            ictype.addField(TextureRegionDrawable.class, name, Modifier.PUBLIC, Modifier.STATIC);
+            icload.addStatement(name + " = mindustry.ui.Fonts.getGlyph(mindustry.ui.Fonts.icon, (char)" + code + ")");
+
+            icload.addStatement("icons.put($S, " + name + ")", name);
+            icload.addStatement("icons.put($S, " + name + "Small)", name + "Small");
+        }
+
+        Fi.get(resources).walk(p -> {
+            if(!p.extEquals("png")) return;
+
+            String filename = p.name();
             filename = filename.substring(0, filename.indexOf("."));
 
-            ArrayList<String> names = new ArrayList<>();
-            names.add("");
-            if(filename.contains("icon")){
-                names.addAll(Arrays.asList(iconSizes));
-            }
+            String sfilen = filename;
+            String dtype = p.name().endsWith(".9.png") ? "arc.scene.style.NinePatchDrawable" : "arc.scene.style.TextureRegionDrawable";
 
-            for(String suffix : names){
-                suffix = suffix.isEmpty() ? "" : "-" + suffix;
+            String varname = capitalize(sfilen);
 
-                String sfilen = filename + suffix;
-                String dtype = p.getFileName().toString().endsWith(".9.png") ? "arc.scene.style.NinePatchDrawable" : "arc.scene.style.TextureRegionDrawable";
+            if(SourceVersion.isKeyword(varname)) varname += "s";
 
-                String varname = capitalize(sfilen);
-                TypeSpec.Builder ttype = type;
-                MethodSpec.Builder tload = load;
-                if(varname.startsWith("icon")){
-                    varname = varname.substring("icon".length());
-                    varname = Character.toLowerCase(varname.charAt(0)) + varname.substring(1);
-                    ttype = ictype;
-                    tload = icload;
-                    if(SourceVersion.isKeyword(varname)) varname += "i";
-                }
-
-                if(SourceVersion.isKeyword(varname)) varname += "s";
-
-                ttype.addField(ClassName.bestGuess(dtype), varname, Modifier.STATIC, Modifier.PUBLIC);
-                tload.addStatement(varname + " = ("+dtype+")arc.Core.atlas.drawable($S)", sfilen);
-            }
+            type.addField(ClassName.bestGuess(dtype), varname, Modifier.STATIC, Modifier.PUBLIC);
+            load.addStatement(varname + " = ("+dtype+")arc.Core.atlas.drawable($S)", sfilen);
         });
 
         for(Element elem : elements){
-            TypeElement t = (TypeElement)elem;
-            t.getEnclosedElements().stream().filter(e -> e.getKind() == ElementKind.FIELD).forEach(field -> {
+            Array.with(((TypeElement)elem).getEnclosedElements()).each(e -> e.getKind() == ElementKind.FIELD, field -> {
                 String fname = field.getSimpleName().toString();
                 if(fname.startsWith("default")){
                     loadStyles.addStatement("arc.Core.scene.addStyle(" + field.asType().toString() + ".class, mindustry.ui.Styles." + fname + ")");
@@ -106,6 +85,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         }
 
         ictype.addMethod(icload.build());
+        JavaFile.builder(packageName, ichtype.build()).build().writeTo(Utils.filer);
         JavaFile.builder(packageName, ictype.build()).build().writeTo(Utils.filer);
 
         type.addMethod(load.build());
@@ -119,10 +99,9 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         MethodSpec.Builder loadBegin = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
         HashSet<String> names = new HashSet<>();
-        Files.list(Paths.get(path)).forEach(p -> {
-            String fname = p.getFileName().toString();
-            String name = p.getFileName().toString();
-            name = name.substring(0, name.indexOf("."));
+        Fi.get(path).walk(p -> {
+            String fname = p.name();
+            String name = p.nameWithoutExtension();
 
             if(names.contains(name)){
                 Utils.messager.printMessage(Kind.ERROR, "Duplicate file name: " + p.toString() + "!");

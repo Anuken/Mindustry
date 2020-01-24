@@ -48,8 +48,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public float baseRotation;
     public float pointerX, pointerY;
     public String name = "noname";
-    public @Nullable
-    String uuid, usid;
+    public @Nullable String uuid, usid;
     /** Player username, if authenticated */
     public String username;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
@@ -352,13 +351,13 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Draw.reset();
     }
 
+    public void drawBackItems(){
+        drawBackItems(itemtime, isLocal);
+    }
+
     @Override
     public void drawStats(){
-        Draw.color(Color.black, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
-        Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
-        Draw.reset();
-        drawBackItems(itemtime, isLocal);
-        drawLight();
+        mech.drawStats(this);
     }
 
     @Override
@@ -410,9 +409,9 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             if(isAdmin){
                 float s = 3f;
                 Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
-                Draw.rect(Core.atlas.find("icon-admin-badge"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1.5f, s, s);
+                Draw.rect(Icon.adminSmall.getRegion(), x + layout.width / 2f + 2 + 1, y + nameHeight - 1.5f, s, s);
                 Draw.color(color);
-                Draw.rect(Core.atlas.find("icon-admin-badge"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1f, s, s);
+                Draw.rect(Icon.adminSmall.getRegion(), x + layout.width / 2f + 2 + 1, y + nameHeight - 1f, s, s);
             }
         }
 
@@ -765,7 +764,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void sendMessage(String text){
         if(isLocal){
             if(Vars.ui != null){
-                Log.info("add " + text);
                 Vars.ui.chatfrag.addMessage(text, null);
             }
         }else{

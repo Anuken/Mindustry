@@ -52,6 +52,10 @@ public class Floor extends Block{
     public Effect updateEffect = Fx.none;
     /** Array of affinities to certain things. */
     public Attributes attributes = new Attributes();
+    /** Whether this ore generates in maps by default. */
+    public boolean oreDefault = false;
+    /** Ore generation params. */
+    public float oreScale = 24f, oreThreshold = 0.828f;
 
     protected TextureRegion[][] edges;
     protected byte eq = 0;

@@ -39,6 +39,8 @@ public abstract class BulletType extends Content{
     public float reloadMultiplier = 1f;
     /** Recoil from shooter entities. */
     public float recoil;
+    /** Whether to kill the shooter when this is shot. For suicide bombers. */
+    public boolean killShooter;
 
     public float splashDamage = 0f;
     /** Knockback in velocity. */
@@ -146,6 +148,9 @@ public abstract class BulletType extends Content{
     }
 
     public void init(Bullet b){
+        if(killShooter && b.getOwner() instanceof HealthTrait){
+            ((HealthTrait)b.getOwner()).kill();
+        }
     }
 
     public void update(Bullet b){

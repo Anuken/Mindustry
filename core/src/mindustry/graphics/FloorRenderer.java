@@ -1,22 +1,19 @@
 package mindustry.graphics;
 
-import arc.Core;
-import arc.Events;
-import arc.struct.*;
-import arc.struct.IntSet.IntSetIterator;
-import arc.graphics.Camera;
-import arc.graphics.GL20;
+import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.Mathf;
+import arc.math.*;
+import arc.struct.*;
+import arc.struct.IntSet.*;
 import arc.util.*;
-import mindustry.game.EventType.WorldLoadEvent;
-import mindustry.world.Tile;
-import mindustry.world.blocks.Floor;
+import mindustry.game.EventType.*;
+import mindustry.world.*;
+import mindustry.world.blocks.*;
 
-import java.util.Arrays;
+import java.util.*;
 
-import static mindustry.Vars.tilesize;
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class FloorRenderer implements Disposable{
     private final static int chunksize = 64;
@@ -104,7 +101,7 @@ public class FloorRenderer implements Disposable{
         cbatch.setProjection(Core.camera.projection());
         cbatch.beginDraw();
 
-        Core.gl.glEnable(GL20.GL_BLEND);
+        Gl.enable(Gl.blend);
     }
 
     public void endDraw(){
@@ -204,7 +201,7 @@ public class FloorRenderer implements Disposable{
         int chunksx = Mathf.ceil((float)(world.width()) / chunksize),
         chunksy = Mathf.ceil((float)(world.height()) / chunksize);
         cache = new Chunk[chunksx][chunksy];
-        cbatch = new MultiCacheBatch(chunksize * chunksize * 4);
+        cbatch = new MultiCacheBatch(chunksize * chunksize * 5);
 
         Time.mark();
 
