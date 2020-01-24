@@ -289,6 +289,14 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.add(table);
     }
 
+    public void showInfoFadeBg(String info, float duration){
+        Table table = new Table();
+        table.setFillParent(true);
+        table.actions(Actions.delay(duration * 0.9f), Actions.fadeOut(duration * 0.1f, Interpolation.fade), Actions.remove());
+        table.top().table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).padTop(10);
+        Core.scene.add(table);
+    }
+
     public void showInfo(String info){
         new Dialog(""){{
             getCell(cont).growX();
