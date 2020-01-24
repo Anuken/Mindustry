@@ -3,12 +3,9 @@ apply plugin: "java"
 sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = ["src/"]
 
-
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.tools.texturepacker.TexturePacker
-import com.badlogic.gdx.utils.IntArray
-import com.badlogic.gdx.utils.IntIntMap
-import com.badlogic.gdx.utils.IntMap
+import arc.struct.*
+import arc.graphics.*
+import arc.packer.*
 
 import javax.imageio.ImageIO
 import java.awt.*
@@ -16,7 +13,7 @@ import java.awt.image.BufferedImage
 import java.util.List
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit 
 
 def genFolder = "../core/assets-raw/sprites_out/generated/"
 def doAntialias = !project.hasProperty("disableAntialias")
@@ -87,7 +84,8 @@ def antialias = { File file ->
                 suma.a += color.a
             }
 
-            suma.mul(suma.a <= 0.001f ? 0f : (float) (1f / suma.a))
+            float fm = suma.a <= 0.001f ? 0f : (float) (1f / suma.a)
+            suma.mul(fm, fm, fm, fm)
 
             float total = 0
             sum.set(0)
@@ -103,7 +101,8 @@ def antialias = { File file ->
                 total += 1f
             }
 
-            sum.mul((float) (1f / total))
+            fm = (float)(1f / total)
+            sum.mul(fm, fm, fm, fm)
             int result = Color.argb8888(sum)
             out.setRGB(x, y, result)
             sum.set(0)
@@ -303,19 +302,6 @@ task pack(dependsOn: classes){
             workingDir = genFolder
         }
 
-        //upscale icon sprites using different method, which requires an OpenGL context
-        javaexec{
-            if(System.getProperty("os.name").toLowerCase().contains("mac")){
-                jvmArgs "-XstartOnFirstThread"
-            }
-
-            jvmArgs("-Djava.awt.headless=true")
-            main = "mindustry.tools.Upscaler"
-            classpath = sourceSets.main.runtimeClasspath
-            standardInput = System.in
-            workingDir = "../core/assets-raw/sprites_out/ui/icons"
-        }
-
         copy{
             from "../core/assets-raw/sprites_out/ui/icons"
             into "../core/assets-raw/sprites_out/ui/"
@@ -365,4 +351,11 @@ task updateBundles(dependsOn: classes, type: JavaExec){
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = "../core/assets/bundles/"
+}
+
+task fontgen(dependsOn: classes, type: JavaExec){
+    main = "mindustry.tools.FontGenerator"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = "../"
 }

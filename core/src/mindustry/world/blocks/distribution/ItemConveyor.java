@@ -28,6 +28,10 @@ public class ItemConveyor extends BaseConveyor implements Autotiler{
     private static ItemPos pos2 = new ItemPos();
     private final Vec2 tr1 = new Vec2();
     private final Vec2 tr2 = new Vec2();
+    private TextureRegion[][] regions = new TextureRegion[7][4];
+
+    public float speed = 0f;
+    public float displayedSpeed = 0f;
 
     protected ItemConveyor(String name){
         super(name);
@@ -44,7 +48,8 @@ public class ItemConveyor extends BaseConveyor implements Autotiler{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.itemsMoved, speed * 60 / itemSpace, StatUnit.itemsSecond);
+        //have to add a custom calculated speed, since the actual movement speed is apparently not linear
+        stats.add(BlockStat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
         stats.add(BlockStat.boostEffect, "$blocks.itemsmoved");
     }
 

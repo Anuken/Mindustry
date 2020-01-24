@@ -62,12 +62,12 @@ public class HudFragment extends Fragment{
 
                     ImageButtonStyle style = Styles.clearTransi;
 
-                    select.addImageButton(Icon.menuLargeSmall, style, ui.paused::show);
-                    flip = select.addImageButton(Icon.arrowUpSmall, style, this::toggleMenus).get();
+                    select.addImageButton(Icon.menu, style, ui.paused::show);
+                    flip = select.addImageButton(Icon.upOpen, style, this::toggleMenus).get();
 
-                    select.addImageButton(Icon.pasteSmall, style, ui.schematics::show);
+                    select.addImageButton(Icon.paste, style, ui.schematics::show);
 
-                    select.addImageButton(Icon.pauseSmall, style, () -> {
+                    select.addImageButton(Icon.pause, style, () -> {
                         if(net.active()){
                             ui.listfrag.toggle();
                         }else{
@@ -75,14 +75,14 @@ public class HudFragment extends Fragment{
                         }
                     }).name("pause").update(i -> {
                         if(net.active()){
-                            i.getStyle().imageUp = Icon.playersSmall;
+                            i.getStyle().imageUp = Icon.players;
                         }else{
                             i.setDisabled(false);
-                            i.getStyle().imageUp = state.is(State.paused) ? Icon.playSmall : Icon.pauseSmall;
+                            i.getStyle().imageUp = state.is(State.paused) ? Icon.play : Icon.pause;
                         }
                     });
 
-                    select.addImageButton(Icon.chatSmall, style,() -> {
+                    select.addImageButton(Icon.chat, style,() -> {
                         if(net.active() && mobile){
                             if(ui.chatfrag.shown()){
                                 ui.chatfrag.hide();
@@ -96,9 +96,9 @@ public class HudFragment extends Fragment{
                         }
                     }).update(i -> {
                         if(net.active() && mobile){
-                            i.getStyle().imageUp = Icon.chatSmall;
+                            i.getStyle().imageUp = Icon.chat;
                         }else{
-                            i.getStyle().imageUp = Icon.databaseSmall;
+                            i.getStyle().imageUp = Icon.book;
                         }
                     });
 
@@ -203,7 +203,7 @@ public class HudFragment extends Fragment{
                         float[] position = {0, 0};
 
                         t.row();
-                        t.addImageTextButton("$editor.removeunit", Icon.quit, Styles.togglet, () -> {}).fillX().update(b -> {
+                        t.addImageTextButton("$editor.removeunit", Icon.cancel, Styles.togglet, () -> {}).fillX().update(b -> {
                             boolean[] found = {false};
                             if(b.isChecked()){
                                 Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
@@ -319,7 +319,7 @@ public class HudFragment extends Fragment{
                     setDisabled(() -> !control.tutorial.canNext());
                 }},
                 new Table(f -> {
-                    f.left().addImageButton(Icon.arrowLeftSmall, Styles.emptyi, () -> {
+                    f.left().addImageButton(Icon.left, Styles.emptyi, () -> {
                         control.tutorial.prevSentence();
                     }).width(44f).growY().visible(() -> control.tutorial.canPrev());
                 }));
@@ -393,7 +393,7 @@ public class HudFragment extends Fragment{
                 }
             });
             table.margin(12);
-            table.addImage(Icon.check).pad(3);
+            table.addImage(Icon.ok).pad(3);
             table.add(text).wrap().width(280f).get().setAlignment(Align.center, Align.center);
             table.pack();
 
@@ -562,7 +562,7 @@ public class HudFragment extends Fragment{
 
     private void toggleMenus(){
         if(flip != null){
-            flip.getStyle().imageUp = shown ? Icon.arrowDownSmall : Icon.arrowUpSmall;
+            flip.getStyle().imageUp = shown ? Icon.downOpen : Icon.upOpen;
         }
 
         shown = !shown;
@@ -650,7 +650,7 @@ public class HudFragment extends Fragment{
     }
 
     private void addPlayButton(Table table){
-        table.right().addImageButton(Icon.playSmaller, Styles.righti, 30f, () -> {
+        table.right().addImageButton(Icon.play, Styles.righti, 30f, () -> {
             if(net.client() && player.isAdmin){
                 Call.onAdminRequest(player, AdminAction.wave);
             }else if(inLaunchWave()){

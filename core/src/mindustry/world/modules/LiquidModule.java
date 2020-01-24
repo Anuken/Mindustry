@@ -102,6 +102,7 @@ public class LiquidModule extends BlockModule{
     @Override
     public void read(DataInput stream) throws IOException{
         Arrays.fill(liquids, 0);
+        total = 0f;
         byte count = stream.readByte();
 
         for(int j = 0; j < count; j++){

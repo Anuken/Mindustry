@@ -1,9 +1,11 @@
 package mindustry.world.meta;
 
-import arc.struct.Array;
-import arc.struct.ObjectMap.Entry;
-import arc.struct.OrderedMap;
+import arc.math.*;
+import arc.struct.*;
+import arc.struct.ObjectMap.*;
+import mindustry.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.meta.values.*;
 
 /** Hold and organizes a list of block stats. */
@@ -34,6 +36,13 @@ public class BlockStats{
     /** Adds an item value. */
     public void add(BlockStat stat, Liquid liquid, float amount, boolean perSecond){
         add(stat, new LiquidValue(liquid, amount, perSecond));
+    }
+
+    public void add(BlockStat stat, Attribute attr){
+        for(Block block : Vars.content.blocks()){
+            if(!block.isFloor() || Mathf.zero(block.asFloor().attributes.get(attr))) continue;
+            add(stat, new FloorValue(block.asFloor()));
+        }
     }
 
     /** Adds a single string value with this stat. */

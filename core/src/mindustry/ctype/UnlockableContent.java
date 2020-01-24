@@ -1,6 +1,7 @@
 package mindustry.ctype;
 
 import arc.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
@@ -13,7 +14,7 @@ public abstract class UnlockableContent extends MappableContent{
     /** Localized, formal name. Never null. Set to block name if not found in bundle. */
     public String localizedName;
     /** Localized description. May be null. */
-    public String description;
+    public @Nullable String description;
     /** Icons by Cicon ID.*/
     protected TextureRegion[] cicons = new TextureRegion[mindustry.ui.Cicon.all.length];
 
@@ -22,6 +23,10 @@ public abstract class UnlockableContent extends MappableContent{
 
         this.localizedName = Core.bundle.get(getContentType() + "." + this.name + ".name", this.name);
         this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
+    }
+
+    public String displayDescription(){
+        return minfo.mod == null ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName());
     }
 
     /** Generate any special icons for this content. Called asynchronously.*/

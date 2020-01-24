@@ -134,8 +134,6 @@ public class GenericCrafter extends Block{
         return outputItem != null;
     }
 
-
-
     @Override
     public boolean shouldConsume(Tile tile){
         if(outputItem != null && tile.entity.items.get(outputItem.item) >= itemCapacity){

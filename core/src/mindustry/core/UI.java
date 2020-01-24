@@ -2,29 +2,22 @@ package mindustry.core;
 
 import arc.*;
 import arc.Graphics.*;
-import arc.Graphics.Cursor.*;
 import arc.Input.*;
 import arc.assets.*;
-import arc.assets.loaders.*;
-import arc.assets.loaders.resolvers.*;
-import arc.struct.*;
-import arc.files.*;
-import arc.freetype.*;
-import arc.freetype.FreeTypeFontGenerator.*;
-import arc.freetype.FreetypeFontLoader.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.TextField.*;
 import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.editor.*;
@@ -39,6 +32,8 @@ import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
 
 public class UI implements ApplicationListener, Loadable{
+    public static PixmapPacker packer;
+
     public MenuFragment menufrag;
     public HudFragment hudfrag;
     public ChatFragment chatfrag;
@@ -77,7 +72,7 @@ public class UI implements ApplicationListener, Loadable{
     public Cursor drillCursor, unloadCursor;
 
     public UI(){
-        setupFonts();
+        Fonts.loadFonts();
     }
 
     @Override
@@ -99,6 +94,7 @@ public class UI implements ApplicationListener, Loadable{
         Icon.load();
         Styles.load();
         Tex.loadStyles();
+        Fonts.loadContentIcons();
 
         Dialog.setShowAction(() -> sequence(alpha(0f), fadeIn(0.1f)));
         Dialog.setHideAction(() -> sequence(fadeOut(0.1f)));
@@ -116,70 +112,14 @@ public class UI implements ApplicationListener, Loadable{
         Colors.put("unlaunched", Color.valueOf("8982ed"));
         Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
         Colors.put("stat", Pal.stat);
-        loadExtraCursors();
+
+        drillCursor = Core.graphics.newCursor("drill");
+        unloadCursor = Core.graphics.newCursor("unload");
     }
 
     @Override
     public Array<AssetDescriptor> getDependencies(){
         return Array.with(new AssetDescriptor<>(Control.class), new AssetDescriptor<>("outline", BitmapFont.class), new AssetDescriptor<>("default", BitmapFont.class), new AssetDescriptor<>("chat", BitmapFont.class));
-    }
-
-    /** Called from a static context to make the cursor appear immediately upon startup.*/
-    public static void loadSystemCursors(){
-        SystemCursor.arrow.set(Core.graphics.newCursor("cursor"));
-        SystemCursor.hand.set(Core.graphics.newCursor("hand"));
-        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam"));
-
-        Core.graphics.restoreCursor();
-    }
-
-    /** Called from a static context for use in the loading screen.*/
-    public static void loadDefaultFont(){
-        FileHandleResolver resolver = new InternalFileHandleResolver();
-        Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
-        Core.assets.setLoader(BitmapFont.class, null, new FreetypeFontLoader(resolver){
-            @Override
-            public BitmapFont loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
-                if(fileName.equals("outline")){
-                    parameter.fontParameters.borderWidth = Scl.scl(2f);
-                    parameter.fontParameters.spaceX -= parameter.fontParameters.borderWidth;
-                }
-                parameter.fontParameters.magFilter = TextureFilter.Linear;
-                parameter.fontParameters.minFilter = TextureFilter.Linear;
-                parameter.fontParameters.size = fontParameter().size;
-                return super.loadSync(manager, fileName, file, parameter);
-            }
-        });
-
-        FreeTypeFontParameter param = new FreeTypeFontParameter(){{
-            borderColor = Color.darkGray;
-            incremental = true;
-        }};
-
-        Core.assets.load("outline", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/font.ttf", param)).loaded = t -> Fonts.outline = (BitmapFont)t;
-    }
-
-    void loadExtraCursors(){
-        drillCursor = Core.graphics.newCursor("drill");
-        unloadCursor = Core.graphics.newCursor("unload");
-    }
-
-    public void setupFonts(){
-        String fontName = "fonts/font.ttf";
-
-        FreeTypeFontParameter param = fontParameter();
-
-        Core.assets.load("default", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.def = (BitmapFont)f;
-        Core.assets.load("chat", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.chat = (BitmapFont)f;
-    }
-
-    static FreeTypeFontParameter fontParameter(){
-        return new FreeTypeFontParameter(){{
-            size = (int)(Scl.scl(18f));
-            shadowColor = Color.darkGray;
-            shadowOffsetY = 2;
-            incremental = true;
-        }};
     }
 
     @Override
@@ -271,7 +211,17 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void dispose(){
-        //generator.dispose();
+        if(packer != null){
+            packer.dispose();
+            packer = null;
+        }
+    }
+
+    public TextureRegionDrawable getIcon(String name){
+        if(Icon.icons.containsKey(name)){
+            return Icon.icons.get(name);
+        }
+        return Core.atlas.getDrawable("error");
     }
 
     public void loadAnd(Runnable call){
@@ -336,6 +286,19 @@ public class UI implements ApplicationListener, Loadable{
         table.setFillParent(true);
         table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.remove());
         table.top().add(info).style(Styles.outlineLabel).padTop(10);
+        Core.scene.add(table);
+    }
+
+    public void showInfoToast(String info, float duration){
+        Table table = new Table();
+        table.setFillParent(true);
+        table.update(() -> {
+            if(state.is(State.menu)){
+                table.remove();
+            }
+        });
+        table.actions(Actions.delay(duration * 0.9f), Actions.fadeOut(duration * 0.1f, Interpolation.fade), Actions.remove());
+        table.top().table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).padTop(10);
         Core.scene.add(table);
     }
 

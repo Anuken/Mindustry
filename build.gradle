@@ -1,4 +1,12 @@
 buildscript{
+    ext{
+        getArcHash = {
+            return new Properties().with{ p -> p.load(file('gradle.properties').newReader()); return p }["archash"]
+        }
+
+        arcHash = getArcHash()
+    }
+    
     repositories{
         mavenLocal()
         mavenCentral()
@@ -10,8 +18,9 @@ buildscript{
 
     dependencies{
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.8'
-        classpath "com.badlogicgames.gdx:gdx-tools:1.9.10"
         classpath "com.github.anuken:packr:-SNAPSHOT"
+        classpath "com.github.Anuken.Arc:packer:$arcHash"
+        classpath "com.github.Anuken.Arc:arc-core:$arcHash"
     }
 }
 
@@ -28,7 +37,6 @@ allprojects{
         gdxVersion = '1.9.10'
         roboVMVersion = '2.3.8'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
-        arcHash = null
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -40,10 +48,6 @@ allprojects{
 
         localArc = {
             return !project.hasProperty("release") && new File(projectDir.parent, '../Arc').exists()
-        }
-
-        getArcHash = {
-            return new Properties().with{ p -> p.load(file('gradle.properties').newReader()); return p }["archash"]
         }
 
         arcModule = { String name ->
@@ -298,7 +302,7 @@ project(":tools"){
 
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-        compile "org.reflections:reflections:0.9.11"
+        compile "org.reflections:reflections:0.9.12"
 
         compile arcModule("backends:backend-sdl")
     }
@@ -308,7 +312,8 @@ project(":annotations"){
     apply plugin: "java"
 
     dependencies{
-        compile 'com.squareup:javapoet:1.11.0'
+        compile 'com.squareup:javapoet:1.12.1'
+        compile "com.github.Anuken.Arc:arc-core:$arcHash"
         compile files("${System.getProperty('java.home')}/../lib/tools.jar")
     }
 }

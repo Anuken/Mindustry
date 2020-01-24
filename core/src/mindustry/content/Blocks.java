@@ -57,7 +57,7 @@ public class Blocks implements ContentList{
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //transport
-    conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, massDriver,
+    conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, underflowGate, massDriver,
 
     //liquids
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
@@ -398,12 +398,37 @@ public class Blocks implements ContentList{
         //endregion
         //region ore
 
-        oreCopper = new OreBlock(Items.copper);
-        oreLead = new OreBlock(Items.lead);
+        oreCopper = new OreBlock(Items.copper){{
+            oreDefault = true;
+            oreThreshold = 0.81f;
+            oreScale = 23.47619f;
+        }};
+
+        oreLead = new OreBlock(Items.lead){{
+            oreDefault = true;
+            oreThreshold = 0.828f;
+            oreScale = 23.952381f;
+        }};
+
         oreScrap = new OreBlock(Items.scrap);
-        oreCoal = new OreBlock(Items.coal);
-        oreTitanium = new OreBlock(Items.titanium);
-        oreThorium = new OreBlock(Items.thorium);
+
+        oreCoal = new OreBlock(Items.coal){{
+            oreDefault = true;
+            oreThreshold = 0.846f;
+            oreScale = 24.428572f;
+        }};
+
+        oreTitanium = new OreBlock(Items.titanium){{
+            oreDefault = true;
+            oreThreshold = 0.864f;
+            oreScale = 24.904762f;
+        }};
+
+        oreThorium = new OreBlock(Items.thorium){{
+            oreDefault = true;
+            oreThreshold = 0.882f;
+            oreScale = 25.380953f;
+        }};
 
         //endregion
         //region crafting
@@ -624,10 +649,6 @@ public class Blocks implements ContentList{
             );
             hasPower = true;
             craftTime = 35f;
-            spinnerLength = 1.5f;
-            spinnerRadius = 3.5f;
-            spinnerThickness = 1.5f;
-            spinnerSpeed = 3f;
             size = 2;
 
             consumes.power(1f);
@@ -883,12 +904,14 @@ public class Blocks implements ContentList{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1), true);
             health = 45;
             speed = 0.03f;
+            displayedSpeed = 4.2f;
         }};
 
         titaniumConveyor = new ItemConveyor("titanium-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
             health = 65;
             speed = 0.08f;
+            displayedSpeed = 10f;
         }};
 
         plastaniumConveyor = new CraterConveyor("plastanium-conveyor"){{
@@ -902,6 +925,7 @@ public class Blocks implements ContentList{
             requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
             health = 180;
             speed = 0.08f;
+            displayedSpeed = 10f;
         }};
 
         junction = new Junction("junction"){{
@@ -951,6 +975,12 @@ public class Blocks implements ContentList{
         overflowGate = new OverflowGate("overflow-gate"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 4));
             buildCostMultiplier = 3f;
+        }};
+
+        underflowGate = new OverflowGate("underflow-gate"){{
+            requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 4));
+            buildCostMultiplier = 3f;
+            invert = true;
         }};
 
         massDriver = new MassDriver("mass-driver"){{

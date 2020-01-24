@@ -99,7 +99,7 @@ public class CoreBlock extends StorageBlock{
 
         for(TileEntity other : state.teams.cores(tile.getTeam())){
             if(other.tile == tile) continue;
-            entity.storageCapacity += other.block.itemCapacity + entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
+            entity.storageCapacity += other.block.itemCapacity + other.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         }
 
         if(!world.isGenerating()){

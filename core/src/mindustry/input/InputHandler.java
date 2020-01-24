@@ -1,8 +1,6 @@
 package mindustry.input;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -13,8 +11,10 @@ import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.effect.*;
@@ -27,12 +27,13 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.Placement.*;
 import mindustry.net.*;
+import mindustry.net.Administration.*;
 import mindustry.type.*;
 import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
-import mindustry.world.blocks.power.PowerNode;
+import mindustry.world.blocks.power.*;
 
 import java.util.*;
 
@@ -66,6 +67,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     //methods to override
 
+    @Remote(variants = Variant.one)
+    public static void removeQueueBlock(int x, int y, boolean breaking){
+        player.removeRequest(x, y, breaking);
+    }
+
     @Remote(targets = Loc.client, called = Loc.server)
     public static void dropItem(Player player, float angle){
         if(net.server() && player.item().amount <= 0){
@@ -78,8 +84,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
     public static void rotateBlock(Player player, Tile tile, boolean direction){
-        if(net.server() && !Units.canInteract(player, tile)){
-            throw new ValidateException(player, "Player cannot drop an item.");
+        if(net.server() && (!Units.canInteract(player, tile) ||
+            !netServer.admins.allowAction(player, ActionType.rotate, tile, action -> action.rotation = Mathf.mod(tile.rotation() + Mathf.sign(direction), 4)))){
+            throw new ValidateException(player, "Player cannot rotate a block.");
         }
 
         tile.rotation(Mathf.mod(tile.rotation() + Mathf.sign(direction), 4));
@@ -93,7 +100,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Tile tile){
         if(player == null || player.timer == null) return;
-        if(net.server() && (player.item().amount <= 0 || player.isTransferring|| !Units.canInteract(player, tile))){
+        if(net.server() && (player.item().amount <= 0 || player.isTransferring|| !Units.canInteract(player, tile) ||
+            !netServer.admins.allowAction(player, ActionType.depositItem, tile, action -> {
+                action.itemAmount = player.item().amount;
+                action.item = player.item().item;
+            }))){
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
 
@@ -143,14 +154,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void onTileTapped(Player player, Tile tile){
         if(tile == null || player == null) return;
-        if(!Units.canInteract(player, tile)) return;
+        if(net.server() && (!Units.canInteract(player, tile) ||
+            !netServer.admins.allowAction(player, ActionType.tapTile, tile, action -> {}))) throw new ValidateException(player, "Player cannot tap a tile.");
         tile.block().tapped(tile, player);
         Core.app.post(() -> Events.fire(new TapEvent(tile, player)));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void onTileConfig(Player player, Tile tile, int value){
-        if(tile == null || !Units.canInteract(player, tile)) return;
+        if(tile == null) return;
+
+        if(net.server() && (!Units.canInteract(player, tile) ||
+            !netServer.admins.allowAction(player, ActionType.configure, tile, action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
         tile.block().configured(tile, player, value);
         Core.app.post(() -> Events.fire(new TapConfigEvent(tile, player, value)));
     }
@@ -689,7 +704,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void add(){
-        Core.input.addProcessor(detector = new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
+        Core.input.getInputProcessors().remove(i -> i instanceof InputHandler || (i instanceof GestureDetector && ((GestureDetector)i).getListener() instanceof InputHandler));
+        Core.input.addProcessor(detector = new GestureDetector(20, 0.5f, 0.3f, 0.15f, this));
         Core.input.addProcessor(this);
         if(Core.scene != null){
             Table table = (Table)Core.scene.find("inputTable");
