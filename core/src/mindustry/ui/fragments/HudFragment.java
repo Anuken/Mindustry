@@ -75,7 +75,7 @@ public class HudFragment extends Fragment{
                         }
                     }).name("pause").update(i -> {
                         if(net.active()){
-                            i.getStyle().imageUp = Icon.user;
+                            i.getStyle().imageUp = Icon.players;
                         }else{
                             i.setDisabled(false);
                             i.getStyle().imageUp = state.is(State.paused) ? Icon.play : Icon.pause;
