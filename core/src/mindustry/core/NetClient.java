@@ -268,7 +268,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.both)
     public static void onInfoToast(String message, float duration){
-        ui.showInfoFadeBg(message, duration);
+        ui.showInfoToast(message, duration);
     }
 
     @Remote(variants = Variant.both)
