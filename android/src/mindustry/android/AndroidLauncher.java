@@ -152,6 +152,7 @@ public class AndroidLauncher extends AndroidApplication{
 
         //new external folder
         Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
+        Core.settings.setDataDirectory(data);
 
         //moved to internal storage if there's no file indicating that it moved
         if(!Core.files.local("files_moved").exists()){
@@ -170,8 +171,6 @@ public class AndroidLauncher extends AndroidApplication{
                 Log.err("Failed to move files!");
                 t.printStackTrace();
             }
-        }else{
-            Core.settings.setDataDirectory(data);
         }
     }
 
