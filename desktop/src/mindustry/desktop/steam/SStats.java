@@ -283,7 +283,7 @@ public class SStats implements SteamUserStatsCallback{
         if(result != SteamResult.OK){
             Log.err("Failed to recieve steam stats: {0}", result);
         }else{
-            Log.err("Recieved steam stats.");
+            Log.info("Recieved steam stats.");
         }
     }
 
