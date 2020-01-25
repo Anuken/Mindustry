@@ -3,6 +3,7 @@ package mindustry.annotations;
 import javax.annotation.processing.*;
 import javax.lang.model.*;
 import javax.lang.model.element.*;
+import javax.lang.model.util.*;
 import java.util.*;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -10,20 +11,34 @@ public abstract class BaseProcessor extends AbstractProcessor{
     /** Name of the base package to put all the generated classes. */
     public static final String packageName = "mindustry.gen";
 
-    private int round;
+    public static Types typeu;
+    public static Elements elementu;
+    public static Filer filer;
+    public static Messager messager;
+
+    protected int round;
+
+    public static String getMethodName(Element element){
+        return ((TypeElement)element.getEnclosingElement()).getQualifiedName().toString() + "." + element.getSimpleName();
+    }
+
+    public static boolean isPrimitive(String type){
+        return type.equals("boolean") || type.equals("byte") || type.equals("short") || type.equals("int")
+        || type.equals("long") || type.equals("float") || type.equals("double") || type.equals("char");
+    }
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv){
         super.init(processingEnv);
-        //put all relevant utils into utils class
-        Utils.typeUtils = processingEnv.getTypeUtils();
-        Utils.elementUtils = processingEnv.getElementUtils();
-        Utils.filer = processingEnv.getFiler();
-        Utils.messager = processingEnv.getMessager();
+
+        typeu = processingEnv.getTypeUtils();
+        elementu = processingEnv.getElementUtils();
+        filer = processingEnv.getFiler();
+        messager = processingEnv.getMessager();
     }
 
     @Override
-    public final boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
+    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
         if(round++ != 0) return false; //only process 1 round
         try{
             process(roundEnv);
@@ -39,5 +54,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return SourceVersion.RELEASE_8;
     }
 
-    public abstract void process(RoundEnvironment env) throws Exception;
+    public void process(RoundEnvironment env) throws Exception{
+
+    }
 }

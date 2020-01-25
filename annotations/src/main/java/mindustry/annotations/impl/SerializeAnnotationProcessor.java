@@ -1,14 +1,14 @@
-package mindustry.annotations;
+package mindustry.annotations.impl;
 
 import com.squareup.javapoet.*;
+import mindustry.annotations.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.annotations.remote.*;
 
 import javax.annotation.processing.*;
-import javax.lang.model.*;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.*;
 import javax.lang.model.util.*;
-import javax.tools.Diagnostic.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
@@ -55,13 +55,13 @@ public class SerializeAnnotationProcessor extends BaseProcessor{
 
             readMethod.addStatement("$L object = new $L()", type, type);
 
-            List<VariableElement> fields = ElementFilter.fieldsIn(Utils.elementUtils.getAllMembers(elem));
+            List<VariableElement> fields = ElementFilter.fieldsIn(BaseProcessor.elementu.getAllMembers(elem));
             for(VariableElement field : fields){
                 if(field.getModifiers().contains(Modifier.STATIC) || field.getModifiers().contains(Modifier.TRANSIENT) || field.getModifiers().contains(Modifier.PRIVATE))
                     continue;
 
                 String name = field.getSimpleName().toString();
-                String typeName = Utils.typeUtils.erasure(field.asType()).toString().replace('$', '.');
+                String typeName = BaseProcessor.typeu.erasure(field.asType()).toString().replace('$', '.');
                 String capName = Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
 
                 if(field.asType().getKind().isPrimitive()){
@@ -78,7 +78,7 @@ public class SerializeAnnotationProcessor extends BaseProcessor{
             serializer.addMethod(writeMethod.build());
             serializer.addMethod(readMethod.build());
 
-            method.addStatement("arc.Core.settings.setSerializer($N, $L)", Utils.elementUtils.getBinaryName(elem).toString().replace('$', '.') + ".class", serializer.build());
+            method.addStatement("arc.Core.settings.setSerializer($N, $L)", BaseProcessor.elementu.getBinaryName(elem).toString().replace('$', '.') + ".class", serializer.build());
 
             name(writeMethod, "write" + simpleTypeName);
             name(readMethod, "read" + simpleTypeName);
@@ -93,7 +93,7 @@ public class SerializeAnnotationProcessor extends BaseProcessor{
         classBuilder.addMethod(method.build());
 
         //write result
-        JavaFile.builder(packageName, classBuilder.build()).build().writeTo(Utils.filer);
+        JavaFile.builder(packageName, classBuilder.build()).build().writeTo(BaseProcessor.filer);
     }
 
     static void name(MethodSpec.Builder builder, String name){

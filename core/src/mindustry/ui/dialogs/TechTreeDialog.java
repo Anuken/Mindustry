@@ -377,7 +377,7 @@ public class TechTreeDialog extends FloatingDialog{
 
             infoTable.row();
             if(node.block.description != null){
-                infoTable.table(t -> t.margin(3f).left().labelWrap(node.block.description).color(Color.lightGray).growX()).fillX();
+                infoTable.table(t -> t.margin(3f).left().labelWrap(node.block.displayDescription()).color(Color.lightGray).growX()).fillX();
             }
 
             addChild(infoTable);
