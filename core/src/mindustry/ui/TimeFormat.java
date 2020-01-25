@@ -4,12 +4,16 @@ public class TimeFormat{
     private final StringBuilder ibuild = new StringBuilder();
     private final IntFormat iformat;
 
+    public TimeFormat(){
+        iformat = null;
+    }
+
     public TimeFormat(String text){
         this.iformat = new IntFormat(text, this::converter);
     }
 
     public CharSequence get(int value){
-        return iformat.get(value);
+        return iformat == null ? converter(value) : iformat.get(value);
     }
 
     private String converter(int seconds){

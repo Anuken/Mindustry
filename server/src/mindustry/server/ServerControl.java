@@ -27,6 +27,7 @@ import mindustry.mod.Mods.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 
 import java.io.*;
 import java.net.*;
@@ -46,6 +47,7 @@ public class ServerControl implements ApplicationListener{
 
     private final CommandHandler handler = new CommandHandler("");
     private final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
+    private final TimeFormat timeFormat = new TimeFormat();
 
     private Fi currentLogFile;
     private boolean inExtraRound;
@@ -131,6 +133,8 @@ public class ServerControl implements ApplicationListener{
         }
 
         Events.on(GameOverEvent.class, event -> {
+            state.stats.timeLasted = (int)(state.gametime / 60 * 1000);
+
             if(inExtraRound) return;
             if(state.rules.waves){
                 info("&lcGame over! Reached wave &ly{0}&lc with &ly{1}&lc players online on map &ly{2}&lc.", state.wave, playerGroup.size(), Strings.capitalize(world.getMap().name()));
@@ -144,6 +148,7 @@ public class ServerControl implements ApplicationListener{
             if(map != null){
                 Call.onInfoMessage((state.rules.pvp
                 ? "[YELLOW]The " + event.winner.name + " team is victorious![]" : "[SCARLET]Game over![]")
+                + "\n" + (state.rules.pvp ? "Match Duration:[accent] " : "Time Played:[accent] ") + timeFormat.get((int)(state.stats.timeLasted / 1000L))
                 + "\nNext selected map:[accent] " + map.name() + "[]"
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
                 "\nNew game begins in " + roundExtraTime + "[] seconds.");
