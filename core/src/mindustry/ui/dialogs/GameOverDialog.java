@@ -6,11 +6,13 @@ import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Stats.*;
 import mindustry.type.*;
-import mindustry.ui.Cicon;
+import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
 public class GameOverDialog extends FloatingDialog{
+    private final TimeFormat timePlayedPvpFormat = new TimeFormat("gameover.pvp.duration");
+    private final TimeFormat timePlayedFormat = new TimeFormat("stat.timePlayed");
     private Team winner;
 
     public GameOverDialog(){
@@ -38,6 +40,10 @@ public class GameOverDialog extends FloatingDialog{
 
         if(state.rules.pvp){
             cont.add(Core.bundle.format("gameover.pvp", winner.localized())).pad(6);
+            cont.pane(t -> {
+                t.row();
+                t.add(timePlayedPvpFormat.get((int)(state.stats.timeLasted / 1000L)));
+            });
             buttons.addButton("$menu", () -> {
                 hide();
                 state.set(State.menu);
@@ -53,6 +59,8 @@ public class GameOverDialog extends FloatingDialog{
                 t.margin(13f);
                 t.left().defaults().left();
                 t.add(Core.bundle.format("stat.wave", state.stats.wavesLasted));
+                t.row();
+                t.add(timePlayedFormat.get((int)(state.stats.timeLasted / 1000L)));
                 t.row();
                 t.add(Core.bundle.format("stat.enemiesDestroyed", state.stats.enemyUnitsDestroyed));
                 t.row();

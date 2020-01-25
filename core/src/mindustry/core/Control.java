@@ -102,6 +102,7 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(GameOverEvent.class, event -> {
             state.stats.wavesLasted = state.wave;
+            state.stats.timeLasted = (int)(state.gametime / 60 * 1000);
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.onGameOver(event.winner);

@@ -12,6 +12,8 @@ public class GameState{
     public int wave = 1;
     /** Wave countdown in ticks. */
     public float wavetime;
+    /** Game runtime in ticks */
+    public float gametime;
     /** Whether the game is in game over state. */
     public boolean gameOver = false, launched = false;
     /** The current game rules. */

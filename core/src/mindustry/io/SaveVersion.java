@@ -67,6 +67,7 @@ public abstract class SaveVersion extends SaveFileReader{
             "build", Version.build,
             "mapname", world.getMap() == null ? "unknown" : world.getMap().name(),
             "wave", state.wave,
+            "gametime", state.gametime,
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
             "rules", JsonIO.write(state.rules),
@@ -80,6 +81,7 @@ public abstract class SaveVersion extends SaveFileReader{
         StringMap map = readStringMap(stream);
 
         state.wave = map.getInt("wave");
+        state.gametime = map.getFloat("gametime", 0f);
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
         state.stats = JsonIO.read(Stats.class, map.get("stats", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));

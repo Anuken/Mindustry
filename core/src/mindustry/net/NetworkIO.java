@@ -23,6 +23,7 @@ public class NetworkIO{
             SaveIO.getSaveWriter().writeStringMap(stream, world.getMap().tags);
 
             stream.writeInt(state.wave);
+            stream.writeFloat(state.gametime);
             stream.writeFloat(state.wavetime);
 
             stream.writeInt(player.id);
@@ -43,6 +44,7 @@ public class NetworkIO{
             world.setMap(new Map(SaveIO.getSaveWriter().readStringMap(stream)));
 
             state.wave = stream.readInt();
+            state.gametime = stream.readFloat();
             state.wavetime = stream.readFloat();
 
             entities.clear();
