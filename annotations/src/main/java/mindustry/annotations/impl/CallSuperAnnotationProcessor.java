@@ -2,8 +2,8 @@ package mindustry.annotations.impl;
 
 import com.sun.source.tree.*;
 import com.sun.source.util.*;
-import com.sun.tools.javac.code.*;
 import com.sun.tools.javac.code.Scope;
+import com.sun.tools.javac.code.*;
 import com.sun.tools.javac.code.Symbol.*;
 import com.sun.tools.javac.code.Type.*;
 import com.sun.tools.javac.tree.*;
@@ -33,16 +33,16 @@ public class CallSuperAnnotationProcessor extends AbstractProcessor{
             if(e.getAnnotation(OverrideCallSuper.class) != null) return false;
 
             CodeAnalyzerTreeScanner codeScanner = new CodeAnalyzerTreeScanner();
-            codeScanner.setMethodName(e.getSimpleName().toString());
+            codeScanner.methodName = e.getSimpleName().toString();
 
             TreePath tp = trees.getPath(e.getEnclosingElement());
             codeScanner.scan(tp, trees);
 
-            if(codeScanner.isCallSuperUsed()){
-                List list = codeScanner.getMethod().getBody().getStatements();
+            if(codeScanner.callSuperUsed){
+                List list = codeScanner.method.getBody().getStatements();
 
-                if(!doesCallSuper(list, codeScanner.getMethodName())){
-                    processingEnv.getMessager().printMessage(Kind.ERROR, "Overriding method '" + codeScanner.getMethodName() + "' must explicitly call super method from its parent class.", e);
+                if(!doesCallSuper(list, codeScanner.methodName)){
+                    processingEnv.getMessager().printMessage(Kind.ERROR, "Overriding method '" + codeScanner.methodName + "' must explicitly call super method from its parent class.", e);
                 }
             }
         }
@@ -67,28 +67,28 @@ public class CallSuperAnnotationProcessor extends AbstractProcessor{
         return SourceVersion.RELEASE_8;
     }
 
-    static class CodeAnalyzerTreeScanner extends TreePathScanner<Object, Trees> {
+    static class CodeAnalyzerTreeScanner extends TreePathScanner<Object, Trees>{
         private String methodName;
         private MethodTree method;
         private boolean callSuperUsed;
 
         @Override
-        public Object visitClass (ClassTree classTree, Trees trees) {
+        public Object visitClass(ClassTree classTree, Trees trees){
             Tree extendTree = classTree.getExtendsClause();
 
-            if (extendTree instanceof JCTypeApply) { //generic classes case
-                JCTypeApply generic = (JCTypeApply) extendTree;
+            if(extendTree instanceof JCTypeApply){ //generic classes case
+                JCTypeApply generic = (JCTypeApply)extendTree;
                 extendTree = generic.clazz;
             }
 
-            if (extendTree instanceof JCIdent) {
-                JCIdent tree = (JCIdent) extendTree;
+            if(extendTree instanceof JCIdent){
+                JCIdent tree = (JCIdent)extendTree;
                 com.sun.tools.javac.code.Scope members = tree.sym.members();
 
-                if (checkScope(members))
+                if(checkScope(members))
                     return super.visitClass(classTree, trees);
 
-                if (checkSuperTypes((ClassType) tree.type))
+                if(checkSuperTypes((ClassType)tree.type))
                     return super.visitClass(classTree, trees);
 
             }
@@ -97,19 +97,19 @@ public class CallSuperAnnotationProcessor extends AbstractProcessor{
             return super.visitClass(classTree, trees);
         }
 
-        public boolean checkSuperTypes (ClassType type) {
-            if (type.supertype_field != null && type.supertype_field.tsym != null) {
-                if (checkScope(type.supertype_field.tsym.members()))
+        public boolean checkSuperTypes(ClassType type){
+            if(type.supertype_field != null && type.supertype_field.tsym != null){
+                if(checkScope(type.supertype_field.tsym.members()))
                     return true;
                 else
-                    return checkSuperTypes((ClassType) type.supertype_field);
+                    return checkSuperTypes((ClassType)type.supertype_field);
             }
 
             return false;
         }
 
         @SuppressWarnings("unchecked")
-        public boolean checkScope (Scope members) {
+        public boolean checkScope(Scope members){
             Iterable<Symbol> it;
             try{
                 it = (Iterable<Symbol>)members.getClass().getMethod("getElements").invoke(members);
@@ -121,13 +121,13 @@ public class CallSuperAnnotationProcessor extends AbstractProcessor{
                 }
             }
 
-            for (Symbol s : it) {
-                if (s instanceof MethodSymbol) {
-                    MethodSymbol ms = (MethodSymbol) s;
+            for(Symbol s : it){
+                if(s instanceof MethodSymbol){
+                    MethodSymbol ms = (MethodSymbol)s;
 
-                    if (ms.getSimpleName().toString().equals(methodName)) {
+                    if(ms.getSimpleName().toString().equals(methodName)){
                         Annotation annotation = ms.getAnnotation(CallSuper.class);
-                        if (annotation != null) {
+                        if(annotation != null){
                             callSuperUsed = true;
                             return true;
                         }
@@ -139,27 +139,12 @@ public class CallSuperAnnotationProcessor extends AbstractProcessor{
         }
 
         @Override
-        public Object visitMethod (MethodTree methodTree, Trees trees) {
-            if (methodTree.getName().toString().equals(methodName))
+        public Object visitMethod(MethodTree methodTree, Trees trees){
+            if(methodTree.getName().toString().equals(methodName))
                 method = methodTree;
 
             return super.visitMethod(methodTree, trees);
         }
 
-        public void setMethodName (String methodName) {
-            this.methodName = methodName;
-        }
-
-        public String getMethodName () {
-            return methodName;
-        }
-
-        public MethodTree getMethod () {
-            return method;
-        }
-
-        public boolean isCallSuperUsed () {
-            return callSuperUsed;
-        }
     }
 }
