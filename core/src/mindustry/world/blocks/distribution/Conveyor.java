@@ -96,7 +96,7 @@ public class Conveyor extends Block implements Autotiler{
 
         if(tile.front() != null && tile.front().entity != null){
             entity.next = tile.front().entity;
-            entity.nextc = entity.next instanceof ConveyorEntity ? (ConveyorEntity)entity.next : null;
+            entity.nextc = entity.next instanceof ConveyorEntity && entity.next.getTeam() == tile.getTeam() ? (ConveyorEntity)entity.next : null;
             entity.aligned = entity.nextc != null && tile.rotation() == entity.next.tile.rotation();
         }
     }
@@ -174,7 +174,7 @@ public class Conveyor extends Block implements Autotiler{
         e.mid = 0;
 
         //skip updates if possible
-        if(e.items.total() == 0){
+        if(e.len == 0){
             e.clogHeat = 0f;
             e.sleep();
             return;
@@ -192,7 +192,7 @@ public class Conveyor extends Block implements Autotiler{
             if(e.ys[i] > 0.5 && i > 0) e.mid = i - 1;
             e.xs[i] = Mathf.approachDelta(e.xs[i], 0, 0.1f);
 
-            if(e.ys[i] >= 0.9999f && offloadDir(tile, e.ids[i])){
+            if(e.ys[i] >= 1f && offloadDir(tile, e.ids[i])){
                 //align X position if passing forwards
                 if(e.nextc != null && e.aligned){
                     e.nextc.xs[e.nextc.lastInserted] = e.xs[i];
@@ -205,7 +205,7 @@ public class Conveyor extends Block implements Autotiler{
             }
         }
 
-        if(e.minitem < itemSpace){
+        if(e.minitem < itemSpace + (e.blendbits == 1 ? 0.5f : 0f)){
             e.clogHeat = Mathf.lerpDelta(e.clogHeat, 1f, 0.02f);
         }else{
             e.clogHeat = 0f;
@@ -239,12 +239,13 @@ public class Conveyor extends Block implements Autotiler{
             for(int i = 0; i < e.len; i++){
                 if(e.ids[i] == item){
                     e.remove(i);
-                    e.items.remove(item, 1);
                     removed ++;
                     break;
                 }
             }
         }
+
+        e.items.remove(item, removed);
 
         return removed;
     }

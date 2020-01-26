@@ -125,7 +125,7 @@ public class Teams{
     }
 
     private void updateEnemies(){
-        if(!active.contains(get(state.rules.waveTeam))){
+        if(state.rules.waves && !active.contains(get(state.rules.waveTeam))){
             active.add(get(state.rules.waveTeam));
         }
 
