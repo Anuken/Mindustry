@@ -678,7 +678,6 @@ public class Blocks implements ContentList{
             int topRegion = reg("-top");
 
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top")};
-
             drawer = tile -> {
                 GenericCrafterEntity entity = tile.ent();
 
