@@ -220,7 +220,7 @@ public class ApplicationTests{
 
         world.loadMap(testMap);
         state.set(State.playing);
-        int length = 10;
+        int length = 128;
         world.tile(0, 0).setBlock(Blocks.itemSource);
         world.tile(0, 0).configureAny(Items.copper.id);
 
