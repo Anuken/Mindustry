@@ -184,7 +184,7 @@ public class Conveyor extends Block implements Autotiler{
 
         for(int i = e.len - 1; i >= 0; i--){
             float nextpos = (i == e.len - 1 ? 100f : e.ys[i + 1]) - itemSpace;
-            float maxmove = Math.min(nextpos - e.ys[i], speed * e.delta());
+            float maxmove = Mathf.clamp(nextpos - e.ys[i], 0, speed * e.delta());
 
             e.ys[i] += maxmove;
 
@@ -362,16 +362,18 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
-            len = Math.min(stream.readInt(), capacity);
+            len = stream.readInt();
 
             for(int i = 0; i < len; i++){
                 int val = stream.readInt();
                 byte id = (byte)(val >> 24);
                 float x = (float)((byte)(val >> 16)) / 127f;
                 float y = ((float)((byte)(val >> 8)) + 128f) / 255f;
-                ids[i] = content.item(id);
-                xs[i] = x;
-                ys[i] = i;
+                if(i < capacity){
+                    ids[i] = content.item(id);
+                    xs[i] = x;
+                    ys[i] = y;
+                }
             }
         }
     }
