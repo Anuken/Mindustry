@@ -267,6 +267,11 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.both)
+    public static void onInfoPopup(String message, float duration, int align, int top, int left, int bottom, int right){
+        ui.showInfoPopup(message, duration, align, top, left, bottom, right);
+    }
+
+    @Remote(variants = Variant.both)
     public static void onInfoToast(String message, float duration){
         ui.showInfoToast(message, duration);
     }
