@@ -302,6 +302,15 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.add(table);
     }
 
+    public void showInfoPopup(String info, float duration, int align, int top, int left, int bottom, int right){
+        Table table = new Table();
+        table.setFillParent(true);
+        table.update(() -> { if(state.is(State.menu)) table.remove(); });
+        table.actions(Actions.delay(duration), Actions.remove());
+        table.align(align).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).pad(top,left,bottom,right);
+        Core.scene.add(table);
+    }
+
     public void showInfo(String info){
         new Dialog(""){{
             getCell(cont).growX();
