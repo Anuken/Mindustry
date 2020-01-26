@@ -80,6 +80,23 @@
                     <string>icon-72.png</string>
                 </array>
                 <key>CFBundleTypeName</key>
+                <string>Mindustry Schematic File</string>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>LSHandlerRank</key>
+                <string>Owner</string>
+                <key>LSItemContentTypes</key>
+                <array>
+                    <string>io.anuke.mindustry.schematicfile</string>
+                </array>
+            </dict>
+
+            <dict>
+                <key>CFBundleTypeIconFiles</key>
+                <array>
+                    <string>icon-72.png</string>
+                </array>
+                <key>CFBundleTypeName</key>
                 <string>Zip Game Data</string>
                 <key>CFBundleTypeRole</key>
                 <string>Editor</string>
@@ -109,6 +126,24 @@
                     <string>msav</string>
                     <key>public.mime-type</key>
                     <string>mindustry/msav</string>
+                </dict>
+            </dict>
+
+            <dict>
+                <key>UTTypeConformsTo</key>
+                <array>
+                    <string>public.data</string>
+                </array>
+                <key>UTTypeDescription</key>
+                <string>Mindustry Schematic File</string>
+                <key>UTTypeIdentifier</key>
+                <string>io.anuke.mindustry.schematicfile</string>
+                <key>UTTypeTagSpecification</key>
+                <dict>
+                    <key>public.filename-extension</key>
+                    <string>msch</string>
+                    <key>public.mime-type</key>
+                    <string>mindustry/msch</string>
                 </dict>
             </dict>
         </array>

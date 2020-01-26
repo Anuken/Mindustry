@@ -1,18 +1,18 @@
 package power;
 
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.power.ItemLiquidGenerator;
+import arc.util.*;
+import mindustry.*;
+import mindustry.content.*;
+import mindustry.core.*;
+import mindustry.game.*;
+import mindustry.type.*;
+import mindustry.world.*;
+import mindustry.world.blocks.power.*;
 import org.junit.jupiter.api.*;
 
-import java.util.ArrayList;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 /**
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
  * All tests are run with a fixed delta of 0.5 so delta considerations can be tested as well.
  * Additionally, each PowerGraph::update() call will have its own thread frame, i.e. the method will never be called twice within the same frame.
  * Both of these constraints are handled by FakeThreadHandler within PowerTestFixture.
- * Any expected power amount (produced, consumed, buffered) should be affected by FakeThreadHandler.fakeDelta but satisfaction should not!
+ * Any expected power amount (produced, consumed, buffered) should be affected by FakeThreadHandler.fakeDelta but status should not!
  */
 public class ItemLiquidGeneratorTests extends PowerTestFixture{
 
@@ -31,6 +31,8 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
     private final float maximumLiquidUsage = 0.5f;
 
     public void createGenerator(InputType inputType){
+        Vars.state = new GameState();
+        Vars.state.rules = new Rules();
         generator = new ItemLiquidGenerator(inputType != InputType.liquids, inputType != InputType.items, "fakegen"){
             {
                 powerProduction = 0.1f;
@@ -50,7 +52,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         };
 
         tile = createFakeTile(0, 0, generator);
-        entity = tile.entity();
+        entity = tile.ent();
     }
 
     /** Tests the consumption and efficiency when being supplied with liquids. */

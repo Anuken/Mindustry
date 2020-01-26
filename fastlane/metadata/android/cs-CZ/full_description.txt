@@ -1,0 +1,43 @@
+Vytvoř propracovaný výrobní řetězec dopravníků, abys naládoval munici do věží, vyrobil materiály pro stavění a ubránil své stavby před vlnami nepřátel. Hraj s Tvými přáteli kooperačně napříč platformami, nebo je vyzvi v týmové hře hráčů proti sobě.
+
+Hra:
+- Vytvoř vrty a dopravníky pro přesun zdrojů do Tvého jádra. 
+- Použij výrobní bloky pro vytvoření pokročilých materiálů.
+- Postav drony pro automatické těžení zdrojů, pomoc se stavěním a vybudování a ochraně své základny.
+- Rozváděj kapaliny a bojuj s požárem.
+- Posilni výrobu dodatečným chlazením a promaž obranné i výrobní bloky.
+
+Kampaň:
+- Projdi skrz 12 znovuhratelných předpřipravených zón s náhodným místem startu.
+- Sesbírej a vyšli zpět ze zón materiál.
+- Vynalezni nové bloky, abys rozjel výrobu.
+- Konfiguruj předměty, se kterými se vyšleš do zóny, abys byl lépe připraven.
+- V jednotlivých zónách plň rozdílné cíle mise.
+- Pozvi kamarády pro společné dokončení mise.
+- 120+ technologických bloků, dokážeš je všechny využít?
+- 19 různých typů dronů, mechů and lodí!
+
+Herní módy:
+- Přežití: Postav věže k obraně Tvého jádra před nepřátelskými jednotkami. Přežij tak dlouho, jak jen dokážeš, a ideálně ještě odešli své jádro zpět se sesbíranými surovinami pro zaplacení výzkumu. Připrav svou základnu pro střídavý útok vzdušného Záporáka.
+- Útok: Postav továrny na jednotky pro zničení nepřátelského jádra, zatímco zároveň ochraňuj svoji základnu před vlnami nepřátelských jednotek. Vytvoř různé typy podpůrných a obranných jednotek pro dosažení tohoto cíle.
+- Hráči proti sobě: Soupeř s jinými hráči v až 4 různých týmech, s cílem zničit ostatní jádra. Vytvoř jednotky nebo útoč na cizí jádro rovnou ve svém mechu.
+- Pískoviště: Vyzkoušej si hru s nekonečnými zdroji surovin a bez nepřátelských hrozeb. Použij bloky dostupné pouze v pískovišti aby sis otestoval svůj nový nápad a pokud budeš chtít, můžeš si na vyžádání nechat seslat nepřátelské jednotky.
+
+Vlastní hra a podpora napříč herními platformami:
+- 12 vestavěných map pro vlastní hry, navíc ke kampani
+- Hraj kooperativně, proti sobě nebo na pískovišti
+- Připoj se k  veřejnému serveru nebo pozvi přátele do svého vlastního soukromého sezení
+- Nastavitelná herní pravidla: Změn cenu bloků, nepřátelské statistiky, počáteční předměty, časování vln atd.
+- Mix herních režimů: Smíchej dohromady hru hráčů proti sobě (PvP) a hráčů proti prostředí (PvE)
+
+Editor map:
+- Nakresli si novou mapu s vestavěným editorem 
+- Upravuj a dej si náhled staveb přímo ve hře
+- Konfigurovatelné nástroje: Změň, jak se každý nástroj chová
+- Silný systém pro generování map, s mnoha různými typy filtrů pro procedurální manipulaci s terénem - vytvoř úžasnou mapu za 5 minut!
+- Přidej zašumění, zkreslení, vyhlazení, prolnutí, zrcadlení, rozptýlení, generování rud a náhodného terénu do svých map
+- Konfiguruj náhodné generování rudy, řek a surovin
+- Konfiguruj rozestavění nepřátelských vln
+- Sdílej vyexportované mapy v dílně Steamu
+- Nastav pravidla pro základní mapy
+- Použij 75+ různých bloků
