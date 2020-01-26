@@ -62,8 +62,6 @@ public class DesktopLauncher extends ClientLauncher{
         boolean useSteam = Version.modifier.contains("steam");
         testMobile = Array.with(args).contains("-testMobile");
 
-        if(!useSteam){System.exit(0);}
-
         if(useDiscord){
             try{
                 DiscordEventHandlers handlers = new DiscordEventHandlers();
