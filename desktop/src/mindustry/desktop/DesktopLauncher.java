@@ -254,14 +254,14 @@ public class DesktopLauncher extends ClientLauncher{
         String uiState = "";
 
         if(inGame){
-            if (world.getMap() != null){
+            if(world.getMap() != null){
                 gameMapWithWave = world.isZone() ? world.getZone().localizedName : Strings.capitalize(world.getMap().name());
             }
             if(state.rules.waves){
                 gameMapWithWave += " | Wave " + state.wave;
             }
             gameMode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : "Survival";
-            if (net.active() && playerGroup.size() > 1){
+            if(net.active() && playerGroup.size() > 1){
                 gamePlayersSuffix = " | " + playerGroup.size() + " Players";
             }
         }else{
