@@ -312,7 +312,7 @@ public class Conveyor extends Block implements Autotiler{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         int direction = source == null ? 0 : Math.abs(source.relativeTo(tile.x, tile.y) - tile.rotation());
         float minitem = tile.<ConveyorEntity>ent().minitem;
-        return (((direction == 0) && minitem > itemSpace) ||
+        return (((direction == 0) && minitem >= itemSpace) ||
         ((direction % 2 == 1) && minitem > 0.52f)) && (source == null || !(source.block().rotate && (source.rotation() + 2) % 4 == tile.rotation()));
     }
 

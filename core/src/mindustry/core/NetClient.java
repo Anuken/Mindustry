@@ -172,8 +172,8 @@ public class NetClient implements ApplicationListener{
             }
 
             //special case; graphical server needs to see its message
-            if(!headless && player == Vars.player){
-                Vars.ui.chatfrag.addMessage(message, colorizeName(player.id, player.name));
+            if(!headless){
+                sendMessage(message, colorizeName(player.id, player.name), player);
             }
 
             //server console logging
