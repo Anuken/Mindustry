@@ -363,9 +363,10 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
-            len = stream.readInt();
+            int amount = stream.readInt();
+            len = Math.min(amount, capacity);
 
-            for(int i = 0; i < len; i++){
+            for(int i = 0; i < amount; i++){
                 int val = stream.readInt();
                 byte id = (byte)(val >> 24);
                 float x = (float)((byte)(val >> 16)) / 127f;
