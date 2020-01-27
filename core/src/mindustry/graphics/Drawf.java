@@ -43,6 +43,10 @@ public class Drawf{
     }
 
     public static void arrow(float x, float y, float x2, float y2, float length, float radius){
+        arrow(x, y, x2, y2, length, radius, Pal.accent);
+    }
+
+    public static void arrow(float x, float y, float x2, float y2, float length, float radius, Color color){
         float angle = Angles.angle(x, y, x2, y2);
         float space = 2f;
         Tmp.v1.set(x2, y2).sub(x, y).limit(length);
@@ -50,7 +54,7 @@ public class Drawf{
 
         Draw.color(Pal.gray);
         Fill.poly(vx, vy, 3, radius + space, angle);
-        Draw.color(Pal.accent);
+        Draw.color(color);
         Fill.poly(vx, vy, 3, radius, angle);
         Draw.color();
     }

@@ -95,11 +95,16 @@ public class JoinDialog extends FloatingDialog{
             }
         });
 
-        onResize(this::setup);
+        onResize(() -> {
+            setup();
+            refreshLocal();
+            refreshRemote();
+        });
     }
 
     void setupRemote(){
         remote.clear();
+
         for(Server server : servers){
             //why are java lambdas this bad
             TextButton[] buttons = {null};
@@ -266,7 +271,7 @@ public class JoinDialog extends FloatingDialog{
         cont.addCenteredImageTextButton("$server.add", Icon.add, () -> {
             renaming = null;
             add.show();
-        }).marginLeft(6).width(w).height(80f).update(button -> {
+        }).marginLeft(10).width(w).height(80f).update(button -> {
             float pw = w;
             float pad = 0f;
             if(pane.getChildren().first().getPrefHeight() > pane.getHeight()){
@@ -363,7 +368,7 @@ public class JoinDialog extends FloatingDialog{
     }
 
     float targetWidth(){
-        return Core.graphics.isPortrait() ? 350f : 500f;
+        return Math.min(Core.graphics.getWidth() / Scl.scl() * 0.9f, 500f);//Core.graphics.isPortrait() ? 350f : 500f;
     }
 
     @SuppressWarnings("unchecked")

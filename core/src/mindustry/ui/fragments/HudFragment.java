@@ -75,7 +75,7 @@ public class HudFragment extends Fragment{
                         }
                     }).name("pause").update(i -> {
                         if(net.active()){
-                            i.getStyle().imageUp = Icon.user;
+                            i.getStyle().imageUp = Icon.players;
                         }else{
                             i.setDisabled(false);
                             i.getStyle().imageUp = state.is(State.paused) ? Icon.play : Icon.pause;
@@ -256,7 +256,7 @@ public class HudFragment extends Fragment{
             t.add(new Minimap());
             t.row();
             //position
-            t.label(() -> world.toTile(player.x) + "," + world.toTile(player.y)).style(Styles.outlineLabel)
+            t.label(() -> world.toTile(player.x) + "," + world.toTile(player.y))
                 .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial);
             t.top().right();
         });
@@ -352,7 +352,7 @@ public class HudFragment extends Fragment{
     }
 
     @Remote(targets = Loc.both, called = Loc.server)
-    public static void spawnUnitEditor(Player player, UnitDef type){
+    public static void spawnUnitEditor(Player player, UnitType type){
         if(state.isEditor()){
             BaseUnit unit = type.create(player.getTeam());
             unit.set(player.x, player.y);

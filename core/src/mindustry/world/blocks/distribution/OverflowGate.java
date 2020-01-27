@@ -11,6 +11,7 @@ import java.io.*;
 
 public class OverflowGate extends Block{
     public float speed = 1f;
+    public boolean invert = false;
 
     public OverflowGate(String name){
         super(name);
@@ -72,23 +73,26 @@ public class OverflowGate extends Block{
         entity.lastItem = item;
         entity.time = 0f;
         entity.lastInput = source;
+
+        update(tile);
     }
 
-    Tile getTileTarget(Tile tile, Item item, Tile src, boolean flip){
+    public Tile getTileTarget(Tile tile, Item item, Tile src, boolean flip){
         int from = tile.relativeTo(src.x, src.y);
         if(from == -1) return null;
         Tile to = tile.getNearby((from + 2) % 4);
         if(to == null) return null;
         Tile edge = Edges.getFacingEdge(tile, to);
+        boolean canForward = to.block().acceptItem(item, to, edge) && to.getTeam() == tile.getTeam() && !(to.block() instanceof OverflowGate);
 
-        if(!to.block().acceptItem(item, to, edge) || to.getTeam() != tile.getTeam() || (to.block() instanceof OverflowGate)){
+        if(!canForward || invert){
             Tile a = tile.getNearby(Mathf.mod(from - 1, 4));
             Tile b = tile.getNearby(Mathf.mod(from + 1, 4));
             boolean ac = a != null && a.block().acceptItem(item, a, edge) && !(a.block() instanceof OverflowGate) && a.getTeam() == tile.getTeam();
             boolean bc = b != null && b.block().acceptItem(item, b, edge) && !(b.block() instanceof OverflowGate) && b.getTeam() == tile.getTeam();
 
             if(!ac && !bc){
-                return null;
+                return invert && canForward ? to : null;
             }
 
             if(ac && !bc){

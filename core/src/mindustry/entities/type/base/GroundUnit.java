@@ -42,7 +42,6 @@ public class GroundUnit extends BaseUnit{
                     moveToCore(PathTarget.enemyCores);
                 }
             }else{
-
                 float dst = dst(core);
 
                 if(dst < getWeapon().bullet.range() / 1.1f){
@@ -165,6 +164,7 @@ public class GroundUnit extends BaseUnit{
 
         if(!Units.invalidateTarget(target, this)){
             if(dst(target) < getWeapon().bullet.range()){
+
                 rotate(angleTo(target));
 
                 if(Angles.near(angleTo(target), rotation, 13f)){

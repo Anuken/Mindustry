@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
@@ -12,6 +11,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.SettingsDialog.SettingsTable.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
@@ -240,10 +240,17 @@ public class SettingsMenuDialog extends SettingsDialog{
             game.checkPref("buildautopause", false);
         }
 
-        if(steam && !Version.modifier.contains("beta")){
-            game.checkPref("publichost", false, i -> {
+        if(steam){
+            game.sliderPref("playerlimit", 16, 2, 32, i -> {
                 platform.updateLobby();
+                return i + "";
             });
+
+            if(!Version.modifier.contains("beta")){
+                game.checkPref("publichost", false, i -> {
+                    platform.updateLobby();
+                });
+            }
         }
 
         game.pref(new Setting(){

@@ -13,9 +13,17 @@ import static mindustry.Vars.renderer;
 
 public class ThermalGenerator extends PowerGenerator{
     public Effect generateEffect = Fx.none;
+    public Attribute attribute = Attribute.heat;
 
     public ThermalGenerator(String name){
         super(name);
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.tiles, attribute);
     }
 
     @Override
@@ -29,7 +37,7 @@ public class ThermalGenerator extends PowerGenerator{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        drawPlaceText(Core.bundle.formatFloat("bar.efficiency", sumAttribute(Attribute.heat, x, y) * 100, 1), x, y, valid);
+        drawPlaceText(Core.bundle.formatFloat("bar.efficiency", sumAttribute(attribute, x, y) * 100, 1), x, y, valid);
     }
 
     @Override
@@ -43,7 +51,7 @@ public class ThermalGenerator extends PowerGenerator{
         super.onProximityAdded(tile);
 
         GeneratorEntity entity = tile.ent();
-        entity.productionEfficiency = sumAttribute(Attribute.heat, tile.x, tile.y);
+        entity.productionEfficiency = sumAttribute(attribute, tile.x, tile.y);
     }
 
     @Override
@@ -56,6 +64,6 @@ public class ThermalGenerator extends PowerGenerator{
     @Override
     public boolean canPlaceOn(Tile tile){
         //make sure there's heat at this location
-        return tile.getLinkedTilesAs(this, tempTiles).sumf(other -> other.floor().attributes.get(Attribute.heat)) > 0.01f;
+        return tile.getLinkedTilesAs(this, tempTiles).sumf(other -> other.floor().attributes.get(attribute)) > 0.01f;
     }
 }

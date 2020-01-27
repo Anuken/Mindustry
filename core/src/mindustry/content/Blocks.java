@@ -57,7 +57,7 @@ public class Blocks implements ContentList{
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //transport
-    conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, massDriver,
+    conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, underflowGate, massDriver,
 
     //liquids
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
@@ -396,12 +396,37 @@ public class Blocks implements ContentList{
         //endregion
         //region ore
 
-        oreCopper = new OreBlock(Items.copper);
-        oreLead = new OreBlock(Items.lead);
+        oreCopper = new OreBlock(Items.copper){{
+            oreDefault = true;
+            oreThreshold = 0.81f;
+            oreScale = 23.47619f;
+        }};
+
+        oreLead = new OreBlock(Items.lead){{
+            oreDefault = true;
+            oreThreshold = 0.828f;
+            oreScale = 23.952381f;
+        }};
+
         oreScrap = new OreBlock(Items.scrap);
-        oreCoal = new OreBlock(Items.coal);
-        oreTitanium = new OreBlock(Items.titanium);
-        oreThorium = new OreBlock(Items.thorium);
+
+        oreCoal = new OreBlock(Items.coal){{
+            oreDefault = true;
+            oreThreshold = 0.846f;
+            oreScale = 24.428572f;
+        }};
+
+        oreTitanium = new OreBlock(Items.titanium){{
+            oreDefault = true;
+            oreThreshold = 0.864f;
+            oreScale = 24.904762f;
+        }};
+
+        oreThorium = new OreBlock(Items.thorium){{
+            oreDefault = true;
+            oreThreshold = 0.882f;
+            oreScale = 25.380953f;
+        }};
 
         //endregion
         //region crafting
@@ -651,7 +676,6 @@ public class Blocks implements ContentList{
             int topRegion = reg("-top");
 
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top")};
-
             drawer = tile -> {
                 GenericCrafterEntity entity = tile.ent();
 
@@ -941,6 +965,12 @@ public class Blocks implements ContentList{
         overflowGate = new OverflowGate("overflow-gate"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 4));
             buildCostMultiplier = 3f;
+        }};
+
+        underflowGate = new OverflowGate("underflow-gate"){{
+            requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 4));
+            buildCostMultiplier = 3f;
+            invert = true;
         }};
 
         massDriver = new MassDriver("mass-driver"){{

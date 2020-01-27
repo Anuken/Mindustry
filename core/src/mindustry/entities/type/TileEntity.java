@@ -9,12 +9,11 @@ import arc.math.geom.Point2;
 import arc.math.geom.Vec2;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import arc.util.*;
-import mindustry.annotations.Annotations.*;
-import mindustry.entities.*;
-import mindustry.entities.traits.*;
-import mindustry.game.EventType.*;
+import mindustry.entities.EntityGroup;
+import mindustry.entities.traits.HealthTrait;
+import mindustry.entities.traits.TargetTrait;
 import mindustry.game.*;
+import mindustry.game.EventType.BlockDestroyEvent;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -24,8 +23,8 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait, TeamTrait{
-    public static final float timeToSleep = 60f * 4; //4 seconds to fall asleep
+public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
+    public static final float timeToSleep = 60f * 1; //1 second to fall asleep
     private static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
     /** This value is only used for debugging. */
     public static int sleepingEntities = 0;
@@ -83,11 +82,6 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait, 
         }
 
         return this;
-    }
-
-    public void applyBoost(float intensity, float duration){
-        timeScaleDuration = Math.max(timeScaleDuration, duration);
-        timeScale = Math.max(timeScale, intensity);
     }
 
     /** Scaled delta. */
