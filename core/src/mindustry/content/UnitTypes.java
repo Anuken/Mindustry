@@ -103,9 +103,10 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.explosion;
                 bullet = new BombBulletType(2f, 3f, "clear"){{
                     hitEffect = Fx.pulverize;
-                    lifetime = 2f;
+                    lifetime = 30f;
                     speed = 1.1f;
                     splashDamageRadius = 55f;
+                    instantDisappear = true;
                     splashDamage = 30f;
                     killShooter = true;
                 }};
@@ -126,7 +127,6 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.flame;
                 length = 1f;
                 reload = 14f;
-                range = 30f;
                 alternate = true;
                 recoil = 1f;
                 ejectEffect = Fx.none;
