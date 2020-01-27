@@ -198,8 +198,8 @@ public class Conveyor extends Block implements Autotiler{
                     e.nextc.xs[e.nextc.lastInserted] = e.xs[i];
                 }
                 //remove last item
+                e.items.remove(e.ids[i], e.len - i);
                 e.len = Math.min(i, e.len);
-                e.items.remove(e.ids[i], 1);
             }else if(e.ys[i] < e.minitem){
                 e.minitem = e.ys[i];
             }
