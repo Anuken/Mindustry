@@ -3,8 +3,7 @@ package mindustry.entities.bullet;
 import arc.audio.*;
 import arc.math.*;
 import mindustry.content.*;
-import mindustry.ctype.Content;
-import mindustry.ctype.ContentType;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.Effects.*;
 import mindustry.entities.effect.*;
@@ -41,7 +40,9 @@ public abstract class BulletType extends Content{
     public float recoil;
     /** Whether to kill the shooter when this is shot. For suicide bombers. */
     public boolean killShooter;
-
+    /** Whether to instantly make the bullet disappear. */
+    public boolean instantDisappear;
+    /** Damage dealt in splash. 0 to disable.*/
     public float splashDamage = 0f;
     /** Knockback in velocity. */
     public float knockback;
@@ -150,6 +151,10 @@ public abstract class BulletType extends Content{
     public void init(Bullet b){
         if(killShooter && b.getOwner() instanceof HealthTrait){
             ((HealthTrait)b.getOwner()).kill();
+        }
+
+        if(instantDisappear){
+            b.time(lifetime);
         }
     }
 

@@ -9,6 +9,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
@@ -289,17 +290,47 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.add(table);
     }
 
+    /** Shows a fading label at the top of the screen. */
     public void showInfoToast(String info, float duration){
         Table table = new Table();
         table.setFillParent(true);
+        table.touchable(Touchable.disabled);
         table.update(() -> {
-            if(state.is(State.menu)){
-                table.remove();
-            }
+            if(state.is(State.menu)) table.remove();
         });
         table.actions(Actions.delay(duration * 0.9f), Actions.fadeOut(duration * 0.1f, Interpolation.fade), Actions.remove());
         table.top().table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).padTop(10);
         Core.scene.add(table);
+    }
+
+    /** Shows a label at some position on the screen. Does not fade. */
+    public void showInfoPopup(String info, float duration, int align, int top, int left, int bottom, int right){
+        Table table = new Table();
+        table.setFillParent(true);
+        table.touchable(Touchable.disabled);
+        table.update(() -> {
+            if(state.is(State.menu)) table.remove();
+        });
+        table.actions(Actions.delay(duration), Actions.remove());
+        table.align(align).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).pad(top, left, bottom, right);
+        Core.scene.add(table);
+    }
+
+    /** Shows a label in the world. This label is behind everything. Does not fade. */
+    public void showLabel(String info, float duration, float worldx, float worldy){
+        Table table = new Table();
+        table.setFillParent(true);
+        table.touchable(Touchable.disabled);
+        table.update(() -> {
+            if(state.is(State.menu)) table.remove();
+        });
+        table.actions(Actions.delay(duration), Actions.remove());
+        table.align(Align.center).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).update(t -> {
+            Vec2 v = Core.camera.project(worldx, worldy);
+            t.setPosition(v.x, v.y, Align.center);
+        });
+        //make sure it's at the back
+        Core.scene.root.addChildAt(0, table);
     }
 
     public void showInfo(String info){
@@ -439,7 +470,6 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
-
     public void showCustomConfirm(String title, String text, String yes, String no, Runnable confirmed, Runnable denied){
         FloatingDialog dialog = new FloatingDialog(title);
         dialog.cont.add(text).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
@@ -472,11 +502,11 @@ public class UI implements ApplicationListener, Loadable{
 
     public String formatAmount(int number){
         if(number >= 1000000){
-            return Strings.fixed(number / 1000000f, 1) + "[gray]" + Core.bundle.getOrNull("unit.millions") + "[]";
+            return Strings.fixed(number / 1000000f, 1) + "[gray]" + Core.bundle.get("unit.millions") + "[]";
         }else if(number >= 10000){
-            return number / 1000 + "[gray]k[]";
+            return number / 1000 + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
         }else if(number >= 1000){
-            return Strings.fixed(number / 1000f, 1) + "[gray]" + Core.bundle.getOrNull("unit.thousands") + "[]";
+            return Strings.fixed(number / 1000f, 1) + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
         }else{
             return number + "";
         }

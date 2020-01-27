@@ -484,7 +484,7 @@ public class NetServer implements ApplicationListener{
                 Call.onPlayerDisconnect(player.id);
             }
 
-            Log.info("&lm[{1}] &lc{0} has disconnected. &lg&fi({2})", player.name, player.uuid, reason);
+            if(Config.showConnectMessages.bool()) Log.info("&lm[{1}] &lc{0} has disconnected. &lg&fi({2})", player.name, player.uuid, reason);
         }
 
         player.remove();
@@ -644,8 +644,10 @@ public class NetServer implements ApplicationListener{
 
         player.add();
         player.con.hasConnected = true;
-        if(Config.showConnectMessages.bool()) Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
-        Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
+        if(Config.showConnectMessages.bool()){
+            Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
+            Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
+        }
 
         if(!Config.motd.string().equalsIgnoreCase("off")){
             player.sendMessage(Config.motd.string());
