@@ -284,11 +284,11 @@ public class NetServer implements ApplicationListener{
         });
 
         //duration of a a kick in seconds
-        int kickDuration = 20 * 60;
+        int kickDuration = 60 * 60;
         //voting round duration in seconds
         float voteDuration = 0.5f * 60;
         //cooldown between votes
-        int voteCooldown = 60 * 2;
+        int voteCooldown = 60 * 1;
 
         class VoteSession{
             Player target;
