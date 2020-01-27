@@ -36,7 +36,7 @@ public class CraterConveyor extends BaseConveyor{
 
         start  = Core.atlas.find(name + "-5-0");
         end    = Core.atlas.find(name + "-6-0");
-        crater = Core.atlas.find("crater");
+        crater = Core.atlas.find("item-crater");
     }
 
     @Override

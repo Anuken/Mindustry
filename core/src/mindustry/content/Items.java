@@ -7,7 +7,7 @@ import mindustry.type.ItemType;
 
 public class Items implements ContentList{
     public static Item scrap, copper, lead, graphite, coal, titanium, thorium, silicon, plastanium, phasefabric, surgealloy,
-    sporePod, sand, blastCompound, pyratite, metaglass;
+    sporePod, sand, blastCompound, pyratite, metaglass, crater;
 
     @Override
     public void load(){
@@ -97,5 +97,10 @@ public class Items implements ContentList{
             flammability = 1.4f;
             explosiveness = 0.4f;
         }};
+
+        // this is just to add the crater emoji, can't live without <3
+        crater = new Item("crater", Color.valueOf("989aa3")){
+            public boolean isHidden(){return true;}
+        };
     }
 }
