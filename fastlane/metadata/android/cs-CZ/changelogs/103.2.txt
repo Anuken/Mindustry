@@ -5,5 +5,5 @@
 - Přidány emotikony do kanálu zpráv, pro většinu bloků a předmětů
 - Přidán nový strom technologií, s lepší podporou pro modifikace
 - Přidán soubor s logem hry, uložený v adresáři s daty
-- Přidán nová oddělovat pro sprity a animace (ocená modéři)
+- Přidán nový oddělovač pro sprity a animace (ocení modéři)
 - Přidán seznam synergetických dlaždic do statistik některých bloků (viz například vrt na vodu)
