@@ -715,6 +715,18 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        handler.register("players", "List all players currently in game.", arg -> {
+            if(playerGroup.size() == 0){
+                info("No players are currently in the server.");
+            }else{
+                info("&lyPlayers: {0}", playerGroup.size());
+                for(Player user : playerGroup){
+                    PlayerInfo userInfo = user.getInfo();
+                    info(" &lm {0} /  ID: '{1}' / IP: '{2}' / Admin: '{3}'", userInfo.lastName, userInfo.id, userInfo.lastIP, userInfo.admin);
+                }
+            }
+        });
+
         handler.register("runwave", "Trigger the next wave.", arg -> {
             if(!state.is(State.playing)){
                 err("Not hosting. Host a game first.");
