@@ -20,12 +20,12 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-public class Track extends Block implements Autotiler{
+public class CraterConveyor extends Block implements Autotiler{
     private TextureRegion[] regions = new TextureRegion[8];
 
     public float speed = 0f;
 
-    public Track(String name){
+    public CraterConveyor(String name){
         super(name);
 
         rotate = true;
@@ -204,7 +204,7 @@ public class Track extends Block implements Autotiler{
 
             // when near the center of the target tile...
             if(entity.reload < 0.25f){
-                if(!(destination.block() instanceof Track) && (entity.from != tile.pos() || !isStart(tile))){ // ...and if its not a crater conveyor, start unloading (everything)
+                if(!(destination.block() instanceof CraterConveyor) && (entity.from != tile.pos() || !isStart(tile))){ // ...and if its not a crater conveyor, start unloading (everything)
                     while(entity.items.total() > 0 && entity.items.first() != null && offloadDir(tile, entity.items.first())) entity.items.remove(entity.items.first(), 1);
                     if(entity.items.total() == 0) Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
                 }
@@ -212,7 +212,7 @@ public class Track extends Block implements Autotiler{
 
             // when basically exactly on the center:
             if(entity.reload == 0){
-                if(destination.block() instanceof Track){
+                if(destination.block() instanceof CraterConveyor){
                     TrackEntity e = destination.ent();
 
                     // check if next crater conveyor is not occupied
@@ -238,7 +238,7 @@ public class Track extends Block implements Autotiler{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         TrackEntity entity = tile.ent();
 
-        if(!isStart(tile) && !(source.block() instanceof Track)) return false;
+        if(!isStart(tile) && !(source.block() instanceof CraterConveyor)) return false;
         if(entity.items.total() > 0 && !entity.items.has(item)) return false;
         if(entity.items.total() >= getMaximumAccepted(tile, item)) return false;
         if(tile.front() == source) return false;
@@ -272,14 +272,14 @@ public class Track extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock) {
-        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof Track;
+        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof CraterConveyor;
     }
 
     // has no crater conveyors facing into it
     private boolean isStart(Tile tile){
         Tile[] inputs = new Tile[]{tile.back(), tile.left(), tile.right()};
         for(Tile input : inputs){
-            if(input != null && input.getTeam() == tile.getTeam() && input.block() instanceof Track && input.front() == tile) return false;
+            if(input != null && input.getTeam() == tile.getTeam() && input.block() instanceof CraterConveyor && input.front() == tile) return false;
         }
 
         return true;
@@ -289,7 +289,7 @@ public class Track extends Block implements Autotiler{
     private boolean isEnd(Tile tile){
         if(tile.front() == null) return true;
         if(tile.getTeam() != tile.front().getTeam()) return true;
-        if(!(tile.front().block() instanceof Track)) return true;
+        if(!(tile.front().block() instanceof CraterConveyor)) return true;
 
         return false;
     }

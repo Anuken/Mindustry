@@ -913,7 +913,7 @@ public class Blocks implements ContentList{
             displayedSpeed = 10f;
         }};
 
-        plastaniumConveyor = new Track("plastanium-conveyor"){{
+        plastaniumConveyor = new CraterConveyor("plastanium-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.silicon, 1, Items.graphite, 1));
             itemCapacity = 8;
             speed = 0.04f;
