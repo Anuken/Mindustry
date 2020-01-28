@@ -24,14 +24,16 @@ abstract public class BaseConveyor extends Block implements Autotiler{
 
         rotate = true;
         update = true;
+        layer = Layer.overlay;
+        group = BlockGroup.transportation;
         hasItems = true;
         itemCapacity = 4;
-        unloadable = false;
-        layer = Layer.overlay;
-        idleSoundVolume = 0.004f;
         conveyorPlacement = true;
+        entityType = BaseConveyorEntity::new;
+
         idleSound = Sounds.conveyor;
-        group = BlockGroup.transportation;
+        idleSoundVolume = 0.004f;
+        unloadable = false;
     }
 
     @Override
@@ -86,7 +88,7 @@ abstract public class BaseConveyor extends Block implements Autotiler{
         return true;
     }
 
-    static abstract class BaseConveyorEntity extends TileEntity{
+    static class BaseConveyorEntity extends TileEntity{
         int blendbits;
         int blendsclx, blendscly;
 

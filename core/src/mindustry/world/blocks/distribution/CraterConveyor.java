@@ -22,6 +22,7 @@ public class CraterConveyor extends BaseConveyor{
 
     public CraterConveyor(String name){
         super(name);
+
         entityType = CraterConveyorEntity::new;
     }
 
@@ -43,8 +44,8 @@ public class CraterConveyor extends BaseConveyor{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.boostEffect, "$blocks.itemcapacity");
         stats.add(BlockStat.itemsMoved, speed * 60, StatUnit.perSecond);
+        stats.add(BlockStat.boostEffect, "$blocks.itemcapacity");
     }
 
     @Override

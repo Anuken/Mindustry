@@ -32,12 +32,14 @@ public class ItemConveyor extends BaseConveyor implements Autotiler{
 
     protected ItemConveyor(String name){
         super(name);
+        
         entityType = ItemConveyorEntity::new;
     }
 
     @Override
     public void setStats(){
         super.setStats();
+
         //have to add a custom calculated speed, since the actual movement speed is apparently not linear
         stats.add(BlockStat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
         stats.add(BlockStat.boostEffect, "$blocks.itemsmoved");
@@ -164,10 +166,10 @@ public class ItemConveyor extends BaseConveyor implements Autotiler{
     public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
         Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof ItemConveyor || req.block instanceof Junction));
         return cont.get(Geometry.d4(req.rotation)) &&
-        cont.get(Geometry.d4(req.rotation - 2)) &&
-        req.tile() != null &&
-        req.tile().block() instanceof ItemConveyor &&
-        Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.junction : this;
+            cont.get(Geometry.d4(req.rotation - 2)) &&
+            req.tile() != null &&
+            req.tile().block() instanceof ItemConveyor &&
+            Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.junction : this;
     }
 
     @Override
@@ -265,11 +267,6 @@ public class ItemConveyor extends BaseConveyor implements Autotiler{
 
         int lastInserted, mid;
         float minitem = 1;
-
-        int blendbits;
-        int blendsclx, blendscly;
-
-        float clogHeat = 0f;
 
         final void add(int o){
             for(int i = Math.max(o + 1, len); i > o; i--){
