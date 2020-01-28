@@ -13,8 +13,9 @@ You'll need to either hire some moderators, or make use of (currently non-existe
   Since new players may be exposed to the server list early on, put in a phrase like "Co-op survival" or "PvP" so players know what they're getting into. Yes, this is also displayed in the server mode info text, but having extra info in the name doesn't hurt.
   - Make sure players know where to refer to for server support. It should be fairly clear that the server owner is not me, but you.
   - Try to be professional in your text; use common sense.
-3. **Get some good maps** *(optional, but highly recommended)*. Add some maps to your server and set the map rotation to custom-only. You can get maps from the Steam workshop by subscribing and exporting them; using the `#maps` channel on Discord is also an option.
-4. Finally, **submit a pull request** to add your server's IP to the list. 
+3. **Get some good maps.** *(optional, but highly recommended)*. Add some maps to your server and set the map rotation to custom-only. You can get maps from the Steam workshop by subscribing and exporting them; using the `#maps` channel on Discord is also an option.
+4. **Check your server configuration.** *(optional)* I would recommend adding a message rate limit of 1 second (`config messageRateLimit 1`), and disabling connect/disconnect messages to reduce spam (`config showConnectMessages false`).
+5. Finally, **submit a pull request** to add your server's IP to the list. 
 This should be fairly straightforward: Press the edit button on the [server file](https://github.com/Anuken/Mindustry/blob/master/servers.json), then add a JSON object with a single key, indicating your server address.
 For example, if your server address is `google.com`, you would add a comma after the last entry and insert:
 ```json
