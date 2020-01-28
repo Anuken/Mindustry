@@ -66,6 +66,13 @@ public class ItemModule extends BlockModule{
         return total;
     }
 
+    public Item first(){
+        for(int i = 0; i < items.length; i++){
+            if(items[i] > 0) return content.item(i);
+        }
+        return null;
+    }
+
     public Item take(){
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
