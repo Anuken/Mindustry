@@ -22,7 +22,7 @@ public class Battery extends PowerDistributor{
     public void load(){
         super.load();
         bottomRegion = Core.atlas.find(name + "-bottom");
-        bottomIconRegion = Core.atlas.find(name + "-bottom-icon");
+        bottomIconRegion = Core.atlas.find(name + "-icon-lights");
     }
 
     @Override
@@ -36,7 +36,7 @@ public class Battery extends PowerDistributor{
 
     @Override
     public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-bottom-icon"), Core.atlas.find(name)};
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-icon-lights")};
     }
 
 }
