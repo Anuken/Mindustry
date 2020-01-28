@@ -74,14 +74,13 @@ public class ItemModule extends BlockModule{
     }
 
     public Item take(){
-        Item took = first();
+        if(first() == null) return null;
 
-        if(took != null){
-            items[first().id]--;
-            total--;
-        }
+        int id = first().id;
+        items[id]--;
+        total--;
 
-        return took;
+        return content.item(id);
     }
 
     public int get(Item item){
