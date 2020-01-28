@@ -21,8 +21,7 @@ import java.io.*;
 import static mindustry.Vars.*;
 
 public class Track extends Block implements Autotiler{
-    private TextureRegion[] regions = new TextureRegion[7];
-    private TextureRegion crater;
+    private TextureRegion[] regions = new TextureRegion[8];
 
     public float speed = 0f;
 
@@ -48,8 +47,6 @@ public class Track extends Block implements Autotiler{
         for(int i = 0; i < regions.length; i++){
             regions[i] = Core.atlas.find(name + "-" + i + "-" + 0);
         }
-
-        crater = Core.atlas.find("crater");
     }
 
     @Override
@@ -83,7 +80,7 @@ public class Track extends Block implements Autotiler{
 
     @Override
     public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-0-0")};
+        return new TextureRegion[]{Core.atlas.find(name + "-0-0"), Core.atlas.find(name + "-7-0")};
     }
 
     @Override
@@ -157,7 +154,7 @@ public class Track extends Block implements Autotiler{
         float rotation = Mathf.lerp(a, b, Interpolation.linear.apply(1f - Mathf.clamp(entity.reload * 2, 0f, 1f)));
 
         // draw crater
-        Draw.rect(crater, Tmp.v1.x, Tmp.v1.y, rotation - 90);
+        Draw.rect(regions[7], Tmp.v1.x, Tmp.v1.y, rotation);
 
         // failsafe
         if(entity.items.first() == null) return;
