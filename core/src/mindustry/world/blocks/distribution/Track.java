@@ -80,7 +80,7 @@ public class Track extends Block implements Autotiler{
 
     @Override
     public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-0-0"), Core.atlas.find(name + "-7-0")};
+        return new TextureRegion[]{Core.atlas.find(name + "-0-0")};
     }
 
     @Override
