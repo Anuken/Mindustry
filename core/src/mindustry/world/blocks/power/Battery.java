@@ -6,7 +6,9 @@ import arc.graphics.g2d.*;
 import mindustry.world.*;
 
 public class Battery extends PowerDistributor{
-    public TextureRegion lightsRegion;
+    public TextureRegion bottomRegion;
+    public TextureRegion bottomIconRegion;
+    
     public Color emptyLightColor = Color.valueOf("6e7080");
     public Color fullLightColor = Color.valueOf("fb9567");
 
@@ -19,17 +21,22 @@ public class Battery extends PowerDistributor{
     @Override
     public void load(){
         super.load();
-        lightsRegion = Core.atlas.find(name + "-lights");
+        bottomRegion = Core.atlas.find(name + "-bottom");
+        bottomIconRegion = Core.atlas.find(name + "-bottom-icon");
     }
 
     @Override
     public void draw(Tile tile){
-        super.draw(tile);
-
         Draw.color(emptyLightColor, fullLightColor, tile.entity.power.status);
-        Draw.rect(lightsRegion, tile.drawx(), tile.drawy());
-
+        Draw.rect(bottomRegion, tile.drawx(), tile.drawy());
         Draw.reset();
+        
+        super.draw(tile);
+    }
+
+    @Override
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name + "-bottom-icon"), Core.atlas.find(name)};
     }
 
 }
