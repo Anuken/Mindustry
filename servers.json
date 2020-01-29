@@ -1,14 +1,7 @@
 [
-  {
-    "address": "mindustry.us.to"
-  },
-  {
-    "address": "mindustry.ecansol.com:6597"
-  },
-  {
-    "address": "mindustry.ecansol.com:6499"
-  },
-  {
-    "address": "mindustry.kr"
-  }
+  {"address": "mindustry.us.to"},
+  {"address": "mindustry.ecansol.com:6597"},
+  {"address": "mindustry.ecansol.com:6499"},
+  {"address": "mindustry.ru"},
+  {"address": "mindustry.kr"}
 ]
