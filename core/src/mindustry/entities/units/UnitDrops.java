@@ -25,7 +25,7 @@ public class UnitDrops{
         }
 
         if(dropTable == null){
-            dropTable = new Item[]{Items.titanium, Items.silicon, Items.lead, Items.copper};
+            dropTable = new Item[]{Items.titanium};
         }
 
         for(int i = 0; i < 3; i++){
