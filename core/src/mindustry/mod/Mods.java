@@ -460,10 +460,26 @@ public class Mods implements Loadable{
             eachEnabled(mod -> {
                 if(mod.root.child("scripts").exists()){
                     content.setCurrentMod(mod);
-                    mod.scripts = mod.root.child("scripts").findAll(f -> f.extension().equals("js"));
-                    Log.debug("[{0}] Found {1} scripts.", mod.meta.name, mod.scripts.size);
+                    if(mod.meta.mainScript == null){
+                        mod.scripts = mod.root.child("scripts").findAll(f -> f.extension().equals("js"));
+                        Log.debug("[{0}] Found {1} scripts.", mod.meta.name, mod.scripts.size);
 
-                    for(Fi file : mod.scripts){
+                        for(Fi file : mod.scripts){
+                            try{
+                                if(scripts == null){
+                                    scripts = platform.createScripts();
+                                }
+                                scripts.run(mod, file);
+                            }catch(Throwable e){
+                                Core.app.post(() -> {
+                                    Log.err("Error loading script {0} for mod {1}.", file.name(), mod.meta.name);
+                                    e.printStackTrace();
+                                });
+                                break;
+                            }
+                        }
+                    }else{
+                        Fi file = new Fi(mod.meta.mainscript + ".js");
                         try{
                             if(scripts == null){
                                 scripts = platform.createScripts();
@@ -471,10 +487,9 @@ public class Mods implements Loadable{
                             scripts.run(mod, file);
                         }catch(Throwable e){
                             Core.app.post(() -> {
-                                Log.err("Error loading script {0} for mod {1}.", file.name(), mod.meta.name);
-                                e.printStackTrace();
+                                Log.err("Error loading main script {0} for mod {1}.", file.name(), mod.meta.name);
+                                e.printStacktrace();
                             });
-                            break;
                         }
                     }
                 }
@@ -794,7 +809,7 @@ public class Mods implements Loadable{
 
     /** Plugin metadata information.*/
     public static class ModMeta{
-        public String name, displayName, author, description, version, main, minGameVersion;
+        public String name, displayName, author, description, version, main, minGameVersion, mainScript;
         public Array<String> dependencies = Array.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
