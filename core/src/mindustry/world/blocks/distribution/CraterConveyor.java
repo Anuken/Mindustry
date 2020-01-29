@@ -226,7 +226,7 @@ public class CraterConveyor extends Block implements Autotiler{
 
             // when near the center of the target tile...
             if(entity.reload < 0.25f){
-                if(!(destination.block() instanceof CraterConveyor) && (entity.from != tile.pos() || !((entity.snekbit & head) == head))){ // ...and if its not a crater conveyor, start unloading (everything)
+                if((entity.snekbit & tail) == tail && (entity.from != tile.pos() || !((entity.snekbit & head) == head))){ // ...and if its not a crater conveyor, start unloading (everything)
                     while(entity.items.total() > 0 && entity.items.first() != null && offloadDir(tile, entity.items.first())) entity.items.remove(entity.items.first(), 1);
                     if(entity.items.total() == 0) Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
                     if(entity.items.total() == 0) bump(tile);
