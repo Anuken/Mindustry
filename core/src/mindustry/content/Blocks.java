@@ -880,9 +880,6 @@ public class Blocks implements ContentList{
             phaseRangeBoost = 20f;
             health = 80;
             consumes.item(Items.silicon).boost();
-
-            flags = EnumSet.of(BlockFlag.scalable);
-            upscale = () -> mendProjector;
         }};
 
         mendProjector = new MendProjector("mend-projector"){{
@@ -1023,9 +1020,6 @@ public class Blocks implements ContentList{
         mechanicalPump = new Pump("mechanical-pump"){{
             requirements(Category.liquid, ItemStack.with(Items.copper, 15, Items.metaglass, 10));
             pumpAmount = 0.1f;
-
-            flags = EnumSet.of(BlockFlag.scalable);
-            upscale = () -> rotaryPump;
         }};
 
         rotaryPump = new Pump("rotary-pump"){{
@@ -1068,9 +1062,6 @@ public class Blocks implements ContentList{
         liquidRouter = new LiquidRouter("liquid-router"){{
             requirements(Category.liquid, ItemStack.with(Items.graphite, 4, Items.metaglass, 2));
             liquidCapacity = 20f;
-
-            flags = EnumSet.of(BlockFlag.scalable);
-            upscale = () -> liquidTank;
         }};
 
         liquidTank = new LiquidTank("liquid-tank"){{
@@ -1105,9 +1096,6 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.copper, 1, Items.lead, 3));
             maxNodes = 20;
             laserRange = 6;
-
-            flags = EnumSet.of(BlockFlag.scalable);
-            upscale = () -> surgeTower;
         }};
 
         powerNodeLarge = new PowerNode("power-node-large"){{
@@ -1131,9 +1119,6 @@ public class Blocks implements ContentList{
         battery = new Battery("battery"){{
             requirements(Category.power, ItemStack.with(Items.copper, 4, Items.lead, 20));
             consumes.powerBuffered(4000f);
-
-            flags = EnumSet.of(BlockFlag.scalable);
-            upscale = () -> batteryLarge;
         }};
 
         batteryLarge = new Battery("battery-large"){{
