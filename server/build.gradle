@@ -44,7 +44,7 @@ task dist(type: Jar){
     exclude("fonts/**")
     exclude("zones/**")
     exclude("com/badlogic/gdx/**")
-    exclude("icons/**")
+//    exclude("icons/**")
     exclude("bundles/**")
     if(!versionModifier.contains("steam")){
         exclude("**.dll", "**.so", "**.dylib")
