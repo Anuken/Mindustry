@@ -151,7 +151,7 @@ public class CraterConveyor extends Block implements Autotiler{
     public void drawLayer(Tile tile){
         CraterConveyorEntity entity = tile.ent();
 
-        // fixme: use this for debugging
+        // fixme: someday remove these 3 debugging lines
         Lines.stroke(1f, entity.isSleeping() ? Color.red : Color.green);
         Lines.circle(tile.drawx() + (tilesize/3f), tile.drawy() - (tilesize/3f), 0.5f);
         Draw.reset();
