@@ -287,6 +287,10 @@ public class CraterConveyor extends Block implements Autotiler{
 
     // has no crater conveyor in front of it
     private boolean isEnd(Tile tile){
+        if(tile.back() == null) return false;
+        if(tile.getTeam() != tile.back().getTeam()) return false;
+        if(!(tile.back().block() instanceof CraterConveyor)) return false;
+
         if(tile.front() == null) return true;
         if(tile.getTeam() != tile.front().getTeam()) return true;
         if(!(tile.front().block() instanceof CraterConveyor)) return true;
