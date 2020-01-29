@@ -23,6 +23,9 @@ import static mindustry.Vars.*;
 public class CraterConveyor extends Block implements Autotiler{
     private TextureRegion[] regions = new TextureRegion[8];
 
+    private static final byte head = 1;
+    private static final byte tail = 2;
+
     public float speed = 0f;
 
     public CraterConveyor(String name){
@@ -76,6 +79,10 @@ public class CraterConveyor extends Block implements Autotiler{
         entity.blendbits = bits[0];
         entity.blendsclx = bits[1];
         entity.blendscly = bits[2];
+
+        entity.snekbit = 0;
+        if(isStart(tile)) entity.snekbit = (byte)(entity.snekbit | head);
+        if(isEnd(tile))   entity.snekbit = (byte)(entity.snekbit | tail);
     }
 
     @Override
@@ -96,6 +103,8 @@ public class CraterConveyor extends Block implements Autotiler{
     class TrackEntity extends TileEntity{
         int blendbits;
         int blendsclx, blendscly;
+
+        byte snekbit;
 
         int from = Pos.invalid;
         float reload;
@@ -129,9 +138,9 @@ public class CraterConveyor extends Block implements Autotiler{
         Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)], tile.drawx(), tile.drawy(), tilesize * entity.blendsclx, tilesize * entity.blendscly, rotation * 90);
 
         // don't draw if its just one lone tile
-        if(isStart(tile) && isEnd(tile)) return;
-        if(isStart(tile))  Draw.rect(regions[5], tile.drawx(), tile.drawy(), tile.rotation() * 90);
-        if(isEnd(tile))      Draw.rect(regions[6], tile.drawx(), tile.drawy(), tile.rotation() * 90);
+        if((entity.snekbit & (head | tail)) == (head | tail)) return;
+        if((entity.snekbit & head) == head) Draw.rect(regions[5], tile.drawx(), tile.drawy(), tile.rotation() * 90);
+        if((entity.snekbit & tail) == tail) Draw.rect(regions[6], tile.drawx(), tile.drawy(), tile.rotation() * 90);
     }
 
     @Override
@@ -204,7 +213,7 @@ public class CraterConveyor extends Block implements Autotiler{
 
             // when near the center of the target tile...
             if(entity.reload < 0.25f){
-                if(!(destination.block() instanceof CraterConveyor) && (entity.from != tile.pos() || !isStart(tile))){ // ...and if its not a crater conveyor, start unloading (everything)
+                if(!(destination.block() instanceof CraterConveyor) && (entity.from != tile.pos() || !((entity.snekbit & head) == head))){ // ...and if its not a crater conveyor, start unloading (everything)
                     while(entity.items.total() > 0 && entity.items.first() != null && offloadDir(tile, entity.items.first())) entity.items.remove(entity.items.first(), 1);
                     if(entity.items.total() == 0) Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
                 }
@@ -238,7 +247,7 @@ public class CraterConveyor extends Block implements Autotiler{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         TrackEntity entity = tile.ent();
 
-        if(!isStart(tile) && !(source.block() instanceof CraterConveyor)) return false;
+        if(!((entity.snekbit & head) == head) && !(source.block() instanceof CraterConveyor)) return false;
         if(entity.items.total() > 0 && !entity.items.has(item)) return false;
         if(entity.items.total() >= getMaximumAccepted(tile, item)) return false;
         if(tile.front() == source) return false;
@@ -262,7 +271,7 @@ public class CraterConveyor extends Block implements Autotiler{
         TrackEntity entity = tile.ent();
 
         // its not a start tile so it should be moving
-        if(!isStart(tile)) return true;
+        if(!((entity.snekbit & head) == head)) return true;
 
         // its considered full
         if(entity.items.total() >= getMaximumAccepted(tile, entity.items.first())) return true;
