@@ -8,12 +8,14 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -133,7 +135,12 @@ public class NuclearReactor extends PowerGenerator{
             Time.run(Mathf.random(40), () -> Effects.effect(Fx.nuclearcloud, tile.worldx(), tile.worldy()));
         }
 
-        Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
+        Geometry.circle(tile.x, tile.y, explosionRadius / 2, (x, y) -> {
+            Tile tmp = world.tile(x, y);
+            if(tmp != null && tmp.block() instanceof StaticWall) Timer.schedule(() -> {
+                Call.onDeconstructFinish(tmp, Blocks.air, -1);
+            }, tile.dst(tmp) / tilesize * 0.1f);
+        });
 
         for(int i = 0; i < 20; i++){
             Time.run(Mathf.random(50), () -> {
@@ -148,6 +155,13 @@ public class NuclearReactor extends PowerGenerator{
                 Effects.effect(Fx.nuclearsmoke, tr.x + tile.worldx(), tr.y + tile.worldy());
             });
         }
+
+        Timer.schedule(() -> {
+            for(Player p : playerGroup){
+                Call.onWorldDataBegin(p.con);
+                netServer.sendWorldData(p);
+            }
+        }, 2.5f);
     }
 
     @Override
