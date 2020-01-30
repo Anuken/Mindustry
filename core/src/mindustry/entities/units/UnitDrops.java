@@ -25,7 +25,7 @@ public class UnitDrops{
         }
 
         if(dropTable == null){
-            dropTable = new Item[]{Items.titanium};
+            dropTable = new Item[]{Items.titanium, Items.silicon};
         }
 
         for(int i = 0; i < 3; i++){
@@ -35,12 +35,10 @@ public class UnitDrops{
                     continue;
                 }
 
-                if(Mathf.chance(0.03)){
-                    int amount = Mathf.random(20, 40);
-                    amount = core.tile.block().acceptStack(item, amount, core.tile, null);
-                    if(amount > 0){
-                        Call.transferItemTo(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), core.tile);
-                    }
+                int amount = Mathf.random(10, 20);
+                amount = core.tile.block().acceptStack(item, amount, core.tile, null);
+                if(amount > 0){
+                    Call.transferItemTo(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), core.tile);
                 }
             }
         }
