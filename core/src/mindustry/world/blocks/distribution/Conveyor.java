@@ -190,7 +190,7 @@ public class Conveyor extends Block implements Autotiler{
 
             if(e.ys[i] > nextMax) e.ys[i] = nextMax;
             if(e.ys[i] > 0.5 && i > 0) e.mid = i - 1;
-            e.xs[i] = Mathf.approachDelta(e.xs[i], 0, 0.1f);
+            e.xs[i] = Mathf.approachDelta(e.xs[i], 0, speed*2);
 
             if(e.ys[i] >= 1f && offloadDir(tile, e.ids[i])){
                 //align X position if passing forwards
@@ -198,14 +198,14 @@ public class Conveyor extends Block implements Autotiler{
                     e.nextc.xs[e.nextc.lastInserted] = e.xs[i];
                 }
                 //remove last item
+                e.items.remove(e.ids[i], e.len - i);
                 e.len = Math.min(i, e.len);
-                e.items.remove(e.ids[i], 1);
             }else if(e.ys[i] < e.minitem){
                 e.minitem = e.ys[i];
             }
         }
 
-        if(e.minitem < itemSpace + (e.blendbits == 1 ? 0.5f : 0f)){
+        if(e.minitem < itemSpace + (e.blendbits == 1 ? 0.3f : 0f)){
             e.clogHeat = Mathf.lerpDelta(e.clogHeat, 1f, 0.02f);
         }else{
             e.clogHeat = 0f;
@@ -281,7 +281,7 @@ public class Conveyor extends Block implements Autotiler{
         ConveyorEntity e = tile.ent();
         if(e.len >= capacity) return false;
         int direction = source == null ? 0 : Math.abs(source.relativeTo(tile.x, tile.y) - tile.rotation());
-        return (((direction == 0) && e.minitem >= itemSpace) || ((direction % 2 == 1) && e.minitem > 0.5f + itemSpace)) && (source == null || !(source.block().rotate && (source.rotation() + 2) % 4 == tile.rotation()));
+        return (((direction == 0) && e.minitem >= itemSpace) || ((direction % 2 == 1) && e.minitem > 0.7f)) && (source == null || !(source.block().rotate && (source.rotation() + 2) % 4 == tile.rotation()));
     }
 
     @Override
