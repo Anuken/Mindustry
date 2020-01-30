@@ -915,6 +915,7 @@ public class Blocks implements ContentList{
             tileDamage = 7f;
             length = 10;
             tendrils = 5;
+            buildCostMultiplier = 0.1f;
         }};
 
         //endregion

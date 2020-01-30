@@ -3,6 +3,7 @@ package mindustry.world.blocks.defense;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.effect.Lightning;
 import mindustry.entities.type.Unit;
@@ -22,7 +23,7 @@ public class ShockMine extends Block{
 
     public ShockMine(String name){
         super(name);
-        update = false;
+        update = true;
         destructible = true;
         solid = false;
         targetable = false;
@@ -57,11 +58,16 @@ public class ShockMine extends Block{
             }
             tile.entity.damage(tileDamage);
         }
+    }
 
-        if(tile.entity.health >= tile.entity.maxHealth() / 2) return;
+    @Override
+    public void update(Tile tile){
+        if(tile.entity.health != tile.entity.maxHealth()) return;
         Tile infect = tile.getNearby(Mathf.random(0, 3));
         if(infect == null || infect.block() != Blocks.air) return;
         if(!Build.validPlace(tile.getTeam(), infect.x, infect.y, this, tile.rotation())) return;
         Call.onConstructFinish(infect, this, -1, tile.rotation(), tile.getTeam(), true);
+        tile.entity.damage(tile.entity.maxHealth() / 2);
+        infect.entity.damage(tile.entity.maxHealth() / 2);
     }
 }
