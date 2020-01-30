@@ -27,7 +27,7 @@ public class Vault extends StorageBlock{
 
         for(Tile tmp : tmptiles){
             if(tmp == null) continue;
-            if(tmp.link().block() != Blocks.air && tmp.link().block() != tile.block()) return;
+            if(tmp.link().block() != Blocks.air && tmp.link() != tile) return;
         }
 
         Block block = tile.block();
