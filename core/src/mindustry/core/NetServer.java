@@ -311,19 +311,20 @@ public class NetServer implements ApplicationListener{
             }
 
             void vote(Player player, int d){
+                int b = d;
 
                 if(netServer.chain.highlord(player)){
-                    d = 3;
+                    b = d*3;
                 }
 
                 if(player.isAdmin){
-                    d = 5;
+                    b = d*5;
                 }
 
-                votes += d;
+                votes += b;
                 voted.addAll(player.uuid, admins.getInfo(player.uuid).lastIP);
                         
-                Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted to kick[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
+                Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted on kicking[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
                             player.name, target.name, votes, votesRequired()));
             }
 
