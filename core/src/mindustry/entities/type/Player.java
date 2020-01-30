@@ -470,8 +470,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public void update(){
-        color = (team == null ? Color.white : team.color);
-
         hitTime -= Time.delta();
         textFadeTime -= Time.delta() / (60 * 5);
         itemtime = Mathf.lerpDelta(itemtime, Mathf.num(item.amount > 0), 0.1f);

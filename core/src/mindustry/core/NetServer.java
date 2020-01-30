@@ -205,7 +205,7 @@ public class NetServer implements ApplicationListener{
             player.isMobile = packet.mobile;
             player.dead = true;
             player.setNet(player.x, player.y);
-            player.color.set(Color.white);
+            player.color.set(packet.color);
             player.color.a = 1f;
 
             try{
@@ -797,7 +797,6 @@ public class NetServer implements ApplicationListener{
 
     String fixName(String name){
         name = name.trim();
-        name = name.replaceAll("(\\[.*?])", "");
         if(name.equals("[") || name.equals("]")){
             return "";
         }
