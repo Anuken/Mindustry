@@ -1063,6 +1063,9 @@ public class Blocks implements ContentList{
         liquidRouter = new LiquidRouter("liquid-router"){{
             requirements(Category.liquid, ItemStack.with(Items.graphite, 4, Items.metaglass, 2));
             liquidCapacity = 20f;
+
+            flags = EnumSet.of(BlockFlag.scalable);
+            upscale = () -> liquidTank;
         }};
 
         liquidTank = new LiquidTank("liquid-tank"){{
