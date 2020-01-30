@@ -153,3 +153,5 @@ gradle-app.setting
 .DS_Store
 Thumbs.db
 android/libs/
+mods/
+*.bat
