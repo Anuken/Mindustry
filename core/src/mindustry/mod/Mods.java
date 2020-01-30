@@ -479,7 +479,7 @@ public class Mods implements Loadable{
                             }
                         }
                     }else{
-                        Fi file = new Fi(mod.meta.mainScript + ".js");
+                        Fi file = mod.root.child("scripts").child(mod.meta.mainScript + ".js");
                         try{
                             if(scripts == null){
                                 scripts = platform.createScripts();
