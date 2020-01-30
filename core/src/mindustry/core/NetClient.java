@@ -1,29 +1,29 @@
 package mindustry.core;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.math.*;
-import arc.util.CommandHandler.*;
+import arc.struct.*;
 import arc.util.*;
+import arc.util.CommandHandler.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
-import mindustry.ctype.ContentType;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Net.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
-import mindustry.type.TypeID;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.modules.*;
 
@@ -265,6 +265,29 @@ public class NetClient implements ApplicationListener{
     public static void onInfoMessage(String message){
         ui.showText("", message);
     }
+
+    //TODO these are commented out to enforce compatibility with 103! uncomment before 104 release
+    /*
+
+    @Remote(variants = Variant.both)
+    public static void onInfoPopup(String message, float duration, int align, int top, int left, int bottom, int right){
+        ui.showInfoPopup(message, duration, align, top, left, bottom, right);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void onLabel(String info, float duration, float worldx, float worldy){
+        ui.showLabel(info, duration, worldx, worldy);
+    }
+
+    @Remote(variants = Variant.both, unreliable = true)
+    public static void onEffect(Effect effect, float x, float y, float rotation, Color color){
+        Effects.effect(effect, color, x, y, rotation);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void onEffectReliable(Effect effect, float x, float y, float rotation, Color color){
+        Effects.effect(effect, color, x, y, rotation);
+    }*/
 
     @Remote(variants = Variant.both)
     public static void onInfoToast(String message, float duration){
