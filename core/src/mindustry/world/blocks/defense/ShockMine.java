@@ -3,6 +3,7 @@ package mindustry.world.blocks.defense;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.effect.Lightning;
@@ -65,6 +66,10 @@ public class ShockMine extends Block{
         super.onProximityUpdate(tile);
 
         tile.entity.noSleep();
+
+        if(tile.entity.proximity().count(t -> t.block() == Blocks.siliconSmelter) == 0) return;
+
+        Timer.schedule(() -> cascade(tile), 1f);
     }
 
     @Override
@@ -80,5 +85,12 @@ public class ShockMine extends Block{
         Call.onConstructFinish(infect, this, -1, tile.rotation(), tile.getTeam(), true);
         tile.entity.damage(1);
         infect.entity.damage(1);
+    }
+
+    private void cascade(Tile tile){
+        if(tile == null || tile.entity == null || tile.block() == Blocks.air) return;
+        Array<Tile> prox = tile.entity.proximity().select(t -> t != null && t.block() == this);
+        Call.onDeconstructFinish(tile, this, -1);
+        Timer.schedule(() -> prox.each(this::cascade), 0.1f);
     }
 }
