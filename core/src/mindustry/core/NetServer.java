@@ -307,7 +307,7 @@ public class NetServer implements ApplicationListener{
                         map[0] = null;
                         task.cancel();
                     }
-                }, 20);
+                }, voteDuration);
             }
 
             void vote(Player player, int d){
@@ -341,9 +341,7 @@ public class NetServer implements ApplicationListener{
             }
         }
 
-        //cooldown between votes
-        int voteTime = 30;
-        Timekeeper vtime = new Timekeeper(voteTime);
+        Timekeeper vtime = new Timekeeper(voteCooldown);
         //current kick sessions
         VoteSession[] currentlyKicking = {null};
 
