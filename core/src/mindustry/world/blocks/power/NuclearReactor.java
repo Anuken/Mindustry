@@ -135,10 +135,12 @@ public class NuclearReactor extends PowerGenerator{
             Time.run(Mathf.random(40), () -> Effects.effect(Fx.nuclearcloud, tile.worldx(), tile.worldy()));
         }
 
+        final int[] destroyed = {0};
         Geometry.circle(tile.x, tile.y, explosionRadius / 2, (x, y) -> {
             Tile tmp = world.tile(x, y);
             if(tmp != null && tmp.block() instanceof StaticWall) Timer.schedule(() -> {
                 Call.onDeconstructFinish(tmp, Blocks.air, -1);
+                destroyed[0]++;
             }, tile.dst(tmp) / tilesize * 0.1f);
         });
 
@@ -157,6 +159,7 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         Timer.schedule(() -> {
+            if(destroyed[0] == 0) return;
             for(Player p : playerGroup){
                 Call.onWorldDataBegin(p.con);
                 netServer.sendWorldData(p);
