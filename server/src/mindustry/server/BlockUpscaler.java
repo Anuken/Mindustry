@@ -25,7 +25,7 @@ public class BlockUpscaler implements ApplicationListener{
     public void update(){
         if(!state.is(State.playing)) return;
 
-        if(!timer.get(0, 100)) return;
+        if(!timer.get(0, 20)) return;
 
         for(Team team : Team.base()){
             indexer.getAllied(team, BlockFlag.scalable).each(tile -> {
