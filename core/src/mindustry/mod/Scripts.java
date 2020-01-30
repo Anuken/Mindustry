@@ -5,9 +5,13 @@ import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
+import java.net.URI;
+import java.util.Arrays;
 import mindustry.*;
 import mindustry.mod.Mods.*;
 import org.mozilla.javascript.*;
+import org.mozilla.javascript.commonjs.module.*;
+import org.mozilla.javascript.commonjs.module.provider.*;
 
 public class Scripts implements Disposable{
     private final Array<String> blacklist = Array.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
