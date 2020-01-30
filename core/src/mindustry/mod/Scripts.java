@@ -68,6 +68,10 @@ public class Scripts implements Disposable{
     }
 
     public void run(LoadedMod mod, Fi file){
+        new RequireBuilder()
+            .setModuleScriptProvider(new SoftCachingModuleScriptProvider(
+                new UrlModuleSourceProvider(Arrays.asList(new URI[] {file.child("scripts").file().toURI()}), null)))
+            .setSandboxed(true).createRequire(context, scope).install(scope);
         run(wrapper.replace("$SCRIPT_NAME$", mod.name + "/" + file.nameWithoutExtension()).replace("$CODE$", file.readString()).replace("$MOD_NAME$", mod.name), file.name());
     }
 
