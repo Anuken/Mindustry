@@ -43,14 +43,6 @@ public class BlockUpscaler implements ApplicationListener{
 
     @Override
     public void init(){
-        Events.on(BlockBuildEndEvent.class, event -> {
-            if(event.breaking) return;
-            if(!(event.tile.block() instanceof Vault)) return;
-            if(event.tile.entity.proximity().count(tile -> tile.block() instanceof Vault) == 0) return;
-
-            event.tile.setNet(scrap(event.tile.block()), event.tile.getTeam(), 0);
-        });
-
         try(Scanner scan = new Scanner(Core.files.internal("icons/icons.properties").read(512))){
             while(scan.hasNextLine()){
                 String line = scan.nextLine();
@@ -60,9 +52,6 @@ public class BlockUpscaler implements ApplicationListener{
                 int ch = Integer.parseInt(character);
 
                 Fonts.unicodeIcons.put(nametex[0], ch);
-//                Fonts.unicodeIcons.put(nametex[0].split("-")[0], ch);
-//                Log.info(nametex[0].split("-")[0]);
-
             }
         }
 
@@ -75,14 +64,5 @@ public class BlockUpscaler implements ApplicationListener{
 
             return text;
         });
-    }
-
-    private Block scrap(Block block){
-        if(block.size == 1) return Blocks.scrapWall;
-        if(block.size == 2) return Blocks.scrapWallLarge;
-        if(block.size == 3) return Blocks.scrapWallHuge;
-        if(block.size == 4) return Blocks.scrapWallGigantic;
-
-        return Blocks.coreNucleus; // fallback
     }
 }
