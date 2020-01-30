@@ -61,13 +61,24 @@ public class ShockMine extends Block{
     }
 
     @Override
+    public void onProximityUpdate(Tile tile){
+        super.onProximityUpdate(tile);
+
+        tile.entity.noSleep();
+    }
+
+    @Override
     public void update(Tile tile){
+        if(!tile.entity.timer.get(60)) return;
         if(tile.entity.health != tile.entity.maxHealth()) return;
         Tile infect = tile.getNearby(Mathf.random(0, 3));
-        if(infect == null || infect.block() != Blocks.air) return;
+        if(infect == null || infect.block() != Blocks.air){
+            tile.entity.sleep();
+            return;
+        }
         if(!Build.validPlace(tile.getTeam(), infect.x, infect.y, this, tile.rotation())) return;
         Call.onConstructFinish(infect, this, -1, tile.rotation(), tile.getTeam(), true);
-        tile.entity.damage(tile.entity.maxHealth() / 2);
-        infect.entity.damage(tile.entity.maxHealth() / 2);
+        tile.entity.damage(1);
+        infect.entity.damage(1);
     }
 }

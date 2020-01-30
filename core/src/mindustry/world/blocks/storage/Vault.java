@@ -21,6 +21,8 @@ public class Vault extends StorageBlock{
     public void update(Tile tile){
         super.update(tile);
 
+        if(!tile.entity.timer.get(60)) return;
+
         if(tile.entity.proximity().count(t -> t.block() instanceof CoreBlock) == 0) return;
         Tile center = tile.getNearby(Mathf.random(0, 3));
         center.getLinkedTilesAs(tile.block(), tmptiles);
