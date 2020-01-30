@@ -58,6 +58,7 @@ public class ShockMine extends Block{
             tile.entity.damage(tileDamage);
         }
 
+        if(tile.entity.health >= tile.entity.maxHealth() / 2) return;
         Tile infect = tile.getNearby(Mathf.random(0, 3));
         if(infect == null || infect.block() != Blocks.air) return;
         if(!Build.validPlace(tile.getTeam(), infect.x, infect.y, this, tile.rotation())) return;
