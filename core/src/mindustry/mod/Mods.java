@@ -479,7 +479,7 @@ public class Mods implements Loadable{
                             }
                         }
                     }else{
-                        Fi file = new Fi(mod.meta.mainscript + ".js");
+                        Fi file = new Fi(mod.meta.mainScript + ".js");
                         try{
                             if(scripts == null){
                                 scripts = platform.createScripts();
@@ -488,7 +488,7 @@ public class Mods implements Loadable{
                         }catch(Throwable e){
                             Core.app.post(() -> {
                                 Log.err("Error loading main script {0} for mod {1}.", file.name(), mod.meta.name);
-                                e.printStacktrace();
+                                e.printStackTrace();
                             });
                         }
                     }
