@@ -166,6 +166,13 @@ public class Renderer implements ApplicationListener{
         }
     }
 
+    @Override
+    public void resume(){
+        if(settings.getBool("bloom") && bloom != null){
+            bloom.resume();
+        }
+    }
+
     void setupBloom(){
         try{
             if(bloom != null){
