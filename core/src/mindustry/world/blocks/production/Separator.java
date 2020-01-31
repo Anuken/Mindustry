@@ -31,6 +31,7 @@ public class Separator extends Block{
         liquidRegion = reg("-liquid");
         spinnerRegion = reg("-spinner");
         entityType = GenericCrafterEntity::new;
+        sync = true;
     }
 
     @Override

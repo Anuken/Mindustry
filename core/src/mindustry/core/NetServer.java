@@ -24,6 +24,7 @@ import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.world.*;
+import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -714,6 +715,10 @@ public class NetServer implements ApplicationListener{
         for(TileEntity entity : tileGroup.all()){
             if(!entity.block.sync) continue;
             sent ++;
+
+            if(entity.block instanceof Separator){
+                entity.liquids.reset(Liquids.slag, 100f); // just over 50f gets used when max boosted
+            }
 
             dataStream.writeInt(entity.tile.pos());
             entity.write(dataStream);
