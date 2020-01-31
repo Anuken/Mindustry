@@ -3,16 +3,11 @@ package mindustry.world.blocks.defense;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
-import arc.struct.*;
-import arc.util.*;
-import mindustry.content.*;
 import mindustry.entities.effect.Lightning;
 import mindustry.entities.type.*;
-import mindustry.gen.*;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.world.*;
-import mindustry.world.meta.*;
 
 public class ShockMine extends Block{
     public final int timerDamage = timers++;
@@ -60,14 +55,5 @@ public class ShockMine extends Block{
             }
             tile.entity.damage(tileDamage);
         }
-    }
-
-    public void spread(Tile tile){
-        if(tile.entity.health != tile.entity.maxHealth()) return;
-        if(!tile.entity.timer.get(60)) return;
-        Tile infect = tile.getNearby(Mathf.random(0, 3));
-        if(infect == null || infect.block() != Blocks.air) return;
-        if(!Build.validPlace(tile.getTeam(), infect.x, infect.y, this, tile.rotation())) return;
-        Call.onConstructFinish(infect, this, -1, tile.rotation(), tile.getTeam(), true);
     }
 }

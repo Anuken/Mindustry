@@ -94,8 +94,6 @@ public class MendProjector extends Block{
                         Effects.effect(Fx.healBlockFull, Tmp.c1.set(baseColor).lerp(phaseColor, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
                         healed.add(other.pos());
                     }
-
-                    if(other.block() instanceof ShockMine) ((ShockMine)other.block()).spread(other);
                 }
             }
         }
