@@ -1,6 +1,5 @@
 package mindustry.world.blocks.defense;
 
-import arc.*;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
@@ -8,16 +7,11 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.effect.Lightning;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
-import mindustry.game.EventType.*;
+import mindustry.entities.type.Unit;
 import mindustry.gen.*;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.world.*;
-import mindustry.world.blocks.units.UnitFactory.*;
-
-import static mindustry.Vars.net;
 
 public class ShockMine extends Block{
     public final int timerDamage = timers++;
@@ -91,14 +85,6 @@ public class ShockMine extends Block{
         Call.onConstructFinish(infect, this, -1, tile.rotation(), tile.getTeam(), true);
         tile.entity.damage(1);
         infect.entity.damage(1);
-
-        if(!net.client() && Mathf.chance(0.05)){
-            BaseUnit unit = UnitTypes.spirit.create(tile.getTeam());
-            unit.setSpawner(tile);
-            unit.set(tile.drawx(), tile.drawy());
-            unit.add();
-            Events.fire(new UnitCreateEvent(unit));
-        }
     }
 
     private void cascade(Tile tile){
