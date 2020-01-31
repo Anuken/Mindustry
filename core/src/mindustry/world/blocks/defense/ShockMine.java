@@ -69,6 +69,5 @@ public class ShockMine extends Block{
         if(infect == null || infect.block() != Blocks.air) return;
         if(!Build.validPlace(tile.getTeam(), infect.x, infect.y, this, tile.rotation())) return;
         Call.onConstructFinish(infect, this, -1, tile.rotation(), tile.getTeam(), true);
-        infect.entity.damage(1);
     }
 }
