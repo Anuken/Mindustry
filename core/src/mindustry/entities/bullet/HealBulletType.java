@@ -58,7 +58,7 @@ public class HealBulletType extends BulletType{
 
                 RepairDrone owner = (RepairDrone)b.getOwner();
 
-                if(owner.item().amount >= owner.getItemCapacity()){
+                if(owner.item().amount >= owner.getItemCapacity() && owner.getClosestCore() != null){
                     Call.transferItemTo(Items.silicon, owner.item().amount, owner.x, owner.y, owner.getClosestCore().tile);
                     owner.clearItem();
                 }
