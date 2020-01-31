@@ -5,9 +5,12 @@ import arc.graphics.g2d.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.type.*;
+import mindustry.entities.type.base.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.defense.*;
 
 public class HealBulletType extends BulletType{
     protected float healPercent = 3f;
@@ -48,7 +51,23 @@ public class HealBulletType extends BulletType{
 
         if(tile.entity != null && tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
             Effects.effect(Fx.healBlockFull, Pal.heal, tile.drawx(), tile.drawy(), tile.block().size);
-            tile.entity.healBy(healPercent / 100f * tile.entity.maxHealth());
+            float heal = healPercent / 100f * tile.entity.maxHealth();
+            tile.entity.healBy(heal);
+
+            if(b.getOwner() instanceof RepairDrone && tile.block() instanceof ShockMine){
+
+                RepairDrone owner = (RepairDrone)b.getOwner();
+
+                if(owner.item().amount >= owner.getItemCapacity()){
+                    Call.transferItemTo(Items.silicon, owner.item().amount, owner.x, owner.y, owner.getClosestCore().tile);
+                    owner.clearItem();
+                }
+
+                owner.item().item = Items.silicon;
+                owner.item().amount++;
+
+                tile.entity.damage(heal * 2);
+            }
         }
     }
 }

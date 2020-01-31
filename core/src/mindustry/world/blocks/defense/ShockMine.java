@@ -7,11 +7,12 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.effect.Lightning;
-import mindustry.entities.type.Unit;
+import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 public class ShockMine extends Block{
     public final int timerDamage = timers++;
@@ -30,6 +31,7 @@ public class ShockMine extends Block{
         targetable = false;
         layer = Layer.overlay;
         rebuildable = false;
+        flags = EnumSet.of(BlockFlag.shockMine);
     }
 
     @Override
