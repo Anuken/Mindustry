@@ -14,15 +14,22 @@ public class Stalemate implements ApplicationListener{
 
     @Override
     public void update(){
-        if(Core.graphics.getFramesPerSecond() > 1){
+        if(Core.graphics.getFramesPerSecond() > 10){
             frozen = 0;
             return;
         }
 
         if(frozen++ > 10){
-            frozen = 0;
+            frozen = -10;
             info("&lmstalemate!");
             Events.fire(new GameOverEvent(Team.crux));
         }
+    }
+
+    @Override
+    public void init(){
+        Events.on(PlayEvent.class, event -> {
+            frozen = 0;
+        });
     }
 }
