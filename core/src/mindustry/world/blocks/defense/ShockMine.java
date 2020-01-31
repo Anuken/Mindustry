@@ -83,7 +83,6 @@ public class ShockMine extends Block{
         }
         if(!Build.validPlace(tile.getTeam(), infect.x, infect.y, this, tile.rotation())) return;
         Call.onConstructFinish(infect, this, -1, tile.rotation(), tile.getTeam(), true);
-        tile.entity.damage(1);
         infect.entity.damage(1);
     }
 
