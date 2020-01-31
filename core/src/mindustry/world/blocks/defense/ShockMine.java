@@ -25,7 +25,7 @@ public class ShockMine extends Block{
 
     public ShockMine(String name){
         super(name);
-        update = true;
+        update = false;
         destructible = true;
         solid = false;
         targetable = false;
@@ -63,35 +63,13 @@ public class ShockMine extends Block{
         }
     }
 
-    @Override
-    public void onProximityUpdate(Tile tile){
-        super.onProximityUpdate(tile);
-
-        tile.entity.noSleep();
-
-        if(tile.entity.proximity().count(t -> t.block() == Blocks.siliconSmelter) == 0) return;
-
-        Timer.schedule(() -> cascade(tile), 1f);
-    }
-
-    @Override
-    public void update(Tile tile){
-        if(!tile.entity.timer.get(60)) return;
+    public void spread(Tile tile){
         if(tile.entity.health != tile.entity.maxHealth()) return;
+        if(!tile.entity.timer.get(60)) return;
         Tile infect = tile.getNearby(Mathf.random(0, 3));
-        if(infect == null || infect.block() != Blocks.air){
-            tile.entity.sleep();
-            return;
-        }
+        if(infect == null || infect.block() != Blocks.air) return;
         if(!Build.validPlace(tile.getTeam(), infect.x, infect.y, this, tile.rotation())) return;
         Call.onConstructFinish(infect, this, -1, tile.rotation(), tile.getTeam(), true);
         infect.entity.damage(1);
-    }
-
-    private void cascade(Tile tile){
-        if(tile == null || tile.entity == null || tile.block() == Blocks.air) return;
-        Array<Tile> prox = tile.entity.proximity().select(t -> t != null && t.block() == this);
-        Call.onDeconstructFinish(tile, this, -1);
-        Timer.schedule(() -> prox.each(this::cascade), 0.1f);
     }
 }
