@@ -17,6 +17,8 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import java.io.*;
+
 import static mindustry.Vars.*;
 
 public class Drill extends Block{
@@ -287,6 +289,18 @@ public class Drill extends Block{
 
             Effects.effect(drillEffect, entity.dominantItem.color,
             entity.x + Mathf.range(size), entity.y + Mathf.range(size));
+
+            if((entity.index % 5) == 0){
+                if(tryOffloadNear(tile, Items.scrap)){
+                    try{
+                        netServer.writeBlockSnapshots(entity.proximity());
+                    }catch(IOException e){
+                        e.printStackTrace();
+                    }
+                }else{
+                    tile.entity.damage(50);
+                }
+            }
         }
     }
 

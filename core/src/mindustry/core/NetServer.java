@@ -734,6 +734,32 @@ public class NetServer implements ApplicationListener{
         }
     }
 
+    public void writeBlockSnapshots(Array<Tile> tiles) throws IOException{
+        syncStream.reset();
+
+        short sent = 0;
+        for(Tile tile : tiles){
+            sent ++;
+
+            dataStream.writeInt(tile.entity.tile.pos());
+            tile.entity.write(dataStream);
+
+            if(syncStream.size() > maxSnapshotSize){
+                dataStream.close();
+                byte[] stateBytes = syncStream.toByteArray();
+                Call.onBlockSnapshot(sent, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+                sent = 0;
+                syncStream.reset();
+            }
+        }
+
+        if(sent > 0){
+            dataStream.close();
+            byte[] stateBytes = syncStream.toByteArray();
+            Call.onBlockSnapshot(sent, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+        }
+    }
+
     public void writeEntitySnapshot(Player player) throws IOException{
         syncStream.reset();
         Array<CoreEntity> cores = state.teams.cores(player.getTeam());
