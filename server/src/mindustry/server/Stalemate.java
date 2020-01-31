@@ -2,6 +2,7 @@ package mindustry.server;
 
 import arc.*;
 import arc.util.*;
+import mindustry.core.GameState.*;
 import mindustry.game.*;
 import mindustry.game.EventType.*;
 
@@ -14,6 +15,8 @@ public class Stalemate implements ApplicationListener{
 
     @Override
     public void update(){
+        if(!state.is(State.playing)) return;
+
         if(Core.graphics.getFramesPerSecond() > 10){
             frozen = 0;
             return;
