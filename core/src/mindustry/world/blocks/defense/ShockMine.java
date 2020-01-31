@@ -30,6 +30,8 @@ public class ShockMine extends Block{
         targetable = false;
         layer = Layer.overlay;
         rebuildable = false;
+
+        entityType = UnitFactoryEntity::new;
     }
 
     @Override
