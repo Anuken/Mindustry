@@ -5,8 +5,9 @@ import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
+import java.io.IOException;
 import java.net.URI;
-import java.util.Arrays;
+import java.net.URISyntaxException;
 import mindustry.*;
 import mindustry.mod.Mods.*;
 import org.mozilla.javascript.*;
@@ -22,6 +23,7 @@ public class Scripts implements Disposable{
     private final String wrapper;
     private Scriptable scope;
     private boolean errored;
+    public static LoadedMod loadedMod = null;
 
     public Scripts(){
         Time.mark();
@@ -29,8 +31,12 @@ public class Scripts implements Disposable{
         context = Vars.platform.getScriptContext();
         context.setClassShutter(type -> !blacklist.contains(type.toLowerCase()::contains) || whitelist.contains(type.toLowerCase()::contains));
         context.getWrapFactory().setJavaPrimitiveWrap(false);
-        
+
         scope = new ImporterTopLevel(context);
+
+        new RequireBuilder()
+            .setModuleScriptProvider(new SoftCachingModuleScriptProvider(new ScriptModuleProvider()))
+            .setSandboxed(true).createRequire(context, scope).install(scope);
         wrapper = Core.files.internal("scripts/wrapper.js").readString();
 
         if(!run(Core.files.internal("scripts/global.js").readString(), "global.js")){
@@ -72,10 +78,7 @@ public class Scripts implements Disposable{
     }
 
     public void run(LoadedMod mod, Fi file){
-        new RequireBuilder()
-            .setModuleScriptProvider(new SoftCachingModuleScriptProvider(
-                new UrlModuleSourceProvider(Arrays.asList(new URI[] {file.child("scripts").file().toURI()}), null)))
-            .setSandboxed(true).createRequire(context, scope).install(scope);
+        loadedMod = mod;
         run(wrapper.replace("$SCRIPT_NAME$", mod.name + "/" + file.nameWithoutExtension()).replace("$CODE$", file.readString()).replace("$MOD_NAME$", mod.name), file.name());
     }
 
@@ -92,5 +95,19 @@ public class Scripts implements Disposable{
     @Override
     public void dispose(){
         Context.exit();
+    }
+
+    private class ScriptModuleProvider extends UrlModuleSourceProvider{
+        public ScriptModuleProvider(){
+            super(null, null);
+        }
+
+        @Override
+        public ModuleSource loadSource(String moduleId, Scriptable paths, Object validator) throws IOException, URISyntaxException{
+            if(loadedMod == null) return null;
+            Fi module = Scripts.loadedMod.root.child("scripts").child(moduleId + ".js");
+            if(!module.exists() || module.isDirectory()) return null;
+            return new ModuleSource(module.reader(), null, module.file().toURI(), null, validator);
+        }
     }
 }
