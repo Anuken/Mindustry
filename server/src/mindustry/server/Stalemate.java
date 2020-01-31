@@ -19,7 +19,7 @@ public class Stalemate implements ApplicationListener{
             return;
         }
 
-        if(frozen++ > 10){
+        if(frozen++ > 60){
             frozen = -10;
             info("&lmstalemate!");
             Events.fire(new GameOverEvent(Team.crux));
