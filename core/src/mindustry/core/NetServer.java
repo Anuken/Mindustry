@@ -24,8 +24,6 @@ import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.world.*;
-import mindustry.world.blocks.distribution.*;
-import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -714,19 +712,7 @@ public class NetServer implements ApplicationListener{
 
         short sent = 0;
         for(TileEntity entity : tileGroup.all()){
-
-            final boolean[] skip = {!entity.block.sync};
-
-            if(entity.block instanceof Conveyor){
-                entity.proximity().select(t -> t.block() instanceof Drill).each(t -> {
-                    if(entity.block.acceptItem(Items.scrap, entity.tile, t)){
-                        entity.block.handleItem(Items.scrap, entity.tile, t);
-                        skip[0] = false;
-                    }
-                });
-            }
-
-            if(skip[0]) continue;
+            if(!entity.block.sync) continue;
             sent ++;
 
             dataStream.writeInt(entity.tile.pos());
