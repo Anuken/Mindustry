@@ -78,6 +78,7 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(netServer = new NetServer());
         Core.app.addListener(new ServerControl(args));
         Core.app.addListener(new BlockUpscaler());
+        Core.app.addListener(new EmojiFilter());
 
         mods.eachClass(Mod::init);
 
