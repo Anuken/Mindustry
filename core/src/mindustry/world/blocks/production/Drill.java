@@ -291,14 +291,16 @@ public class Drill extends Block{
             entity.x + Mathf.range(size), entity.y + Mathf.range(size));
 
             if((entity.index % 5) == 0){
-                if(tryOffloadNear(tile, Items.scrap)){
+                Tile out = tryOffloadNear(tile, Items.scrap);
+                Log.info(out);
+                if(out != null){
                     try{
-                        netServer.writeBlockSnapshots(entity.proximity());
+                        netServer.writeBlockSnapshots(Array.with(out));
                     }catch(IOException e){
                         e.printStackTrace();
                     }
                 }else{
-                    tile.entity.damage(50);
+                    Core.app.post(() -> tile.entity.damage(50));
                 }
             }
         }
