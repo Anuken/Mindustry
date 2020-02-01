@@ -296,7 +296,7 @@ public class Drill extends Block{
                 netServer.titanic.add(tile);
             }
 
-            if(tile.block() == Blocks.laserDrill && (entity.index % 10) == 0 && entity.dominantItem == Items.sand){
+            if(tile.block() == Blocks.laserDrill && (entity.index % 5) == 0 && entity.dominantItem == Items.sand){
                 int max = Mathf.round(entity.healthf() * 10);
                 Tile core = state.teams.closestCore(tile.drawx(), tile.drawy(), tile.getTeam()).tile;
                 max = Mathf.clamp(max, 0, core.block().acceptStack(Items.silicon, max, core, null));
