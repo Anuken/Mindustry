@@ -15,7 +15,6 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -289,32 +288,11 @@ public class Drill extends Block{
             Effects.effect(drillEffect, entity.dominantItem.color,
             entity.x + Mathf.range(size), entity.y + Mathf.range(size));
 
-            if(tile.block() == Blocks.blastDrill){
-                for(int i = 0; i < Mathf.round(entity.healthf() * 5); i++){
-                    if(entity.block.itemCapacity > entity.items.total()){
-                        entity.block.handleItem(entity.dominantItem, tile, tile);
-                        entity.damage(1f);
-                    }
-                }
+            if(tile.block() == Blocks.blastDrill && (entity.progress % 10) == 0){
+                int max = Mathf.clamp(Mathf.round(entity.healthf() * 10), 0, entity.block.itemCapacity - entity.items.total());
+                entity.damage(max * 10f);
                 netServer.titanic.add(tile);
             }
-        }
-    }
-
-    @Override
-    public void onProximityUpdate(Tile tile){
-        super.onProximityUpdate(tile);
-
-        if(tile.block() == Blocks.blastDrill){
-            tile.entity.proximity().each(t -> {
-                if (t.block() instanceof Conveyor){
-                    if(t.block() instanceof ArmoredConveyor){
-                        if(t.back() == tile) Core.app.post(() -> Call.setTile(t, Blocks.unloader, t.getTeam(), 0));
-                    }else{
-                        if(t.front() != tile) Core.app.post(() -> Call.setTile(t, Blocks.unloader, t.getTeam(), 0));
-                    }
-                }
-            });
         }
     }
 
