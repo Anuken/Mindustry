@@ -16,6 +16,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
 
@@ -312,7 +313,7 @@ public class Drill extends Block{
 
         if(tile.block() == Blocks.blastDrill || tile.block() == Blocks.laserDrill){
             tile.entity.proximity().each(t -> {
-                if(t.block().category == Category.distribution && t.block().size == 1) Core.app.post(() -> Call.setTile(t, Blocks.unloader, t.getTeam(), 0));
+                if(t.block().category == Category.distribution && t.block().size == 1 && !(t.block() instanceof BuildBlock)) Core.app.post(() -> Call.setTile(t, Blocks.unloader, tile.getTeam(), 0));
             });
         }
     }
