@@ -288,8 +288,9 @@ public class Drill extends Block{
             Effects.effect(drillEffect, entity.dominantItem.color,
             entity.x + Mathf.range(size), entity.y + Mathf.range(size));
 
-            if(tile.block() == Blocks.blastDrill && (entity.progress % 10) == 0){
+            if(tile.block() == Blocks.blastDrill && (entity.index % 10) == 0){
                 int max = Mathf.clamp(Mathf.round(entity.healthf() * 10), 0, entity.block.itemCapacity - entity.items.total());
+                entity.items.add(entity.dominantItem, max);
                 entity.damage(max * 10f);
                 netServer.titanic.add(tile);
             }
