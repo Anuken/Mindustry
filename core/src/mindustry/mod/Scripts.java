@@ -5,7 +5,8 @@ import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
-import java.io.IOException;
+
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import mindustry.*;
@@ -23,7 +24,7 @@ public class Scripts implements Disposable{
     private final String wrapper;
     private Scriptable scope;
     private boolean errored;
-    public static LoadedMod loadedMod = null;
+    private LoadedMod loadedMod = null;
 
     public Scripts(){
         Time.mark();
@@ -79,7 +80,7 @@ public class Scripts implements Disposable{
 
     public void run(LoadedMod mod, Fi file){
         loadedMod = mod;
-        run(wrapper.replace("$SCRIPT_NAME$", mod.name + "/" + file.nameWithoutExtension()).replace("$CODE$", file.readString()).replace("$MOD_NAME$", mod.name), file.name());
+        run(fillWrapper(file), file.name());
     }
 
     private boolean run(String script, String file){
@@ -90,6 +91,12 @@ public class Scripts implements Disposable{
             log(LogLevel.err, file, "" + getError(t));
             return false;
         }
+    }
+
+    private String fillWrapper(Fi file){
+        return wrapper.replace("$SCRIPT_NAME$", loadedMod.name + "/" + file.nameWithoutExtension())
+            .replace("$CODE$", file.readString())
+            .replace("$MOD_NAME$", loadedMod.name);
     }
 
     @Override
@@ -105,9 +112,11 @@ public class Scripts implements Disposable{
         @Override
         public ModuleSource loadSource(String moduleId, Scriptable paths, Object validator) throws IOException, URISyntaxException{
             if(loadedMod == null) return null;
-            Fi module = Scripts.loadedMod.root.child("scripts").child(moduleId + ".js");
+            Fi module = loadedMod.root.child("scripts").child(moduleId + ".js");
             if(!module.exists() || module.isDirectory()) return null;
-            return new ModuleSource(module.reader(), null, module.file().toURI(), null, validator);
+            return new ModuleSource(
+                new InputStreamReader(new ByteArrayInputStream((fillWrapper(module)).getBytes())),
+                null, module.file().toURI(), null, validator);
         }
     }
 }
