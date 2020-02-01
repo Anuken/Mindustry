@@ -73,9 +73,9 @@ public class Incinerator extends Block{
             if(net.server()){
                 Tile out = tryOffloadNear(tile, Items.pyratite);
                 if(out != null) {
-                        Call.rotateBlock(null, out, true);
-                        Call.rotateBlock(null, out, false);
-                        netServer.titanic.add(out);
+                    Call.rotateBlock(null, out, true);
+                    Call.rotateBlock(null, out, false);
+                    netServer.titanic.add(out);
                 }
             }
         }
