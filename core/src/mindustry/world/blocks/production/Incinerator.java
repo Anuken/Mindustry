@@ -5,18 +5,15 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.Effects;
 import mindustry.entities.Effects.Effect;
-import mindustry.entities.effect.*;
 import mindustry.entities.type.TileEntity;
 import mindustry.gen.*;
 import mindustry.type.Item;
 import mindustry.type.Liquid;
 import mindustry.world.Block;
 import mindustry.world.Tile;
-import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
 import static mindustry.Vars.netServer;
@@ -79,14 +76,6 @@ public class Incinerator extends Block{
                         Call.rotateBlock(null, out, true);
                         Call.rotateBlock(null, out, false);
                         netServer.titanic.add(out);
-
-//                    Call.transferItemTo(Items.pyratite, 1, tile.drawx(), tile.drawy(), out);
-//                    Time.run(7, () -> {
-//                        Call.rotateBlock(null, out, true);
-//                        Call.rotateBlock(null, out, false);
-//                        out.entity.items.remove(Items.pyratite, 1);
-//                        netServer.titanic.add(out);
-//                    });
                 }
             }
         }
