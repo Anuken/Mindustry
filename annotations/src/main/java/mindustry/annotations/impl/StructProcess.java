@@ -20,7 +20,7 @@ import java.util.Set;
 @SupportedAnnotationTypes({
 "mindustry.annotations.Annotations.Struct"
 })
-public class StructAnnotationProcessor extends BaseProcessor{
+public class StructProcess extends BaseProcessor{
 
     @Override
     public void process(RoundEnvironment env) throws Exception{
@@ -41,7 +41,7 @@ public class StructAnnotationProcessor extends BaseProcessor{
 
             try{
                 List<VariableElement> variables = ElementFilter.fieldsIn(elem.getEnclosedElements());
-                int structSize = variables.stream().mapToInt(StructAnnotationProcessor::varSize).sum();
+                int structSize = variables.stream().mapToInt(StructProcess::varSize).sum();
                 int structTotalSize = (structSize <= 8 ? 8 : structSize <= 16 ? 16 : structSize <= 32 ? 32 : 64);
 
                 if(variables.size() == 0){
