@@ -72,6 +72,8 @@ public class NetServer implements ApplicationListener{
 
     /** Stream for writing player sync data to. */
     private ReusableByteOutStream syncStream = new ReusableByteOutStream();
+    /** Array to hold the tiles that need sinking. */
+    public Array<Tile> titanic = new Array<>();
     /** Data stream for writing player sync data to. */
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
 
@@ -707,43 +709,28 @@ public class NetServer implements ApplicationListener{
         }
     }
 
-    /** Sends a block snapshot to all players. */
-    public void writeBlockSnapshots() throws IOException{
-        syncStream.reset();
+    /** Writes a block snapshot to all players. */
+    public void writeBlockSnapshots(){
 
-        short sent = 0;
         for(TileEntity entity : tileGroup.all()){
             if(!entity.block.sync) continue;
-            sent ++;
 
             if(entity.block instanceof Separator){
                 entity.liquids.reset(Liquids.slag, 100f); // just over 50f gets used when max boosted
             }
 
-            dataStream.writeInt(entity.tile.pos());
-            entity.write(dataStream);
-
-            if(syncStream.size() > maxSnapshotSize){
-                dataStream.close();
-                byte[] stateBytes = syncStream.toByteArray();
-                Call.onBlockSnapshot(sent, (short)stateBytes.length, net.compressSnapshot(stateBytes));
-                sent = 0;
-                syncStream.reset();
-            }
-        }
-
-        if(sent > 0){
-            dataStream.close();
-            byte[] stateBytes = syncStream.toByteArray();
-            Call.onBlockSnapshot(sent, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+            titanic.add(entity.tile);
         }
     }
 
-    public void writeBlockSnapshots(Array<Tile> tiles) throws IOException{
+    /** Sends a block snapshot to all players. */
+    public void sendBlockSnapshots() throws IOException{
+        if(titanic.isEmpty()) return;
+
         syncStream.reset();
 
         short sent = 0;
-        for(Tile tile : tiles){
+        for(Tile tile : titanic){
             sent ++;
 
             dataStream.writeInt(tile.entity.tile.pos());
@@ -763,6 +750,8 @@ public class NetServer implements ApplicationListener{
             byte[] stateBytes = syncStream.toByteArray();
             Call.onBlockSnapshot(sent, (short)stateBytes.length, net.compressSnapshot(stateBytes));
         }
+
+        titanic.clear();
     }
 
     public void writeEntitySnapshot(Player player) throws IOException{
@@ -899,6 +888,8 @@ public class NetServer implements ApplicationListener{
             if(playerGroup.size() > 0 && Core.settings.getBool("blocksync") && timer.get(timerBlockSync, blockSyncTime)){
                 writeBlockSnapshots();
             }
+
+            sendBlockSnapshots();
 
         }catch(IOException e){
             e.printStackTrace();

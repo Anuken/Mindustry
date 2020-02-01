@@ -293,11 +293,7 @@ public class Drill extends Block{
             if((entity.index % 5) == 0){
                 Tile out = tryOffloadNear(tile, Items.scrap);
                 if(out != null){
-                    try{
-                        netServer.writeBlockSnapshots(Array.with(out));
-                    }catch(IOException e){
-                        e.printStackTrace();
-                    }
+                    netServer.titanic.add(out);
                 }else{
                     Core.app.post(() -> tile.entity.damage(10));
                 }
