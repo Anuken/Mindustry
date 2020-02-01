@@ -161,7 +161,6 @@ public class NuclearReactor extends PowerGenerator{
         Timer.schedule(() -> {
             if(destroyed[0] == 0) return;
             for(Player p : playerGroup){
-                Call.onWorldDataBegin(p.con);
                 netServer.sendWorldData(p);
             }
         }, 2.5f);
