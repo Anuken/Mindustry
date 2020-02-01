@@ -81,6 +81,7 @@ public class Scripts implements Disposable{
     public void run(LoadedMod mod, Fi file){
         loadedMod = mod;
         run(fillWrapper(file), file.name());
+        loadedMod = null;
     }
 
     private boolean run(String script, String file){
