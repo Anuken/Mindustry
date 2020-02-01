@@ -310,7 +310,7 @@ public class Drill extends Block{
     public void onProximityUpdate(Tile tile){
         super.onProximityUpdate(tile);
 
-        if(tile.block() == Blocks.blastDrill){
+        if(tile.block() == Blocks.blastDrill || tile.block() == Blocks.laserDrill){
             tile.entity.proximity().each(t -> {
                 if(t.block().category == Category.distribution && t.block().size == 1) Core.app.post(() -> Call.setTile(t, Blocks.unloader, t.getTeam(), 0));
             });
