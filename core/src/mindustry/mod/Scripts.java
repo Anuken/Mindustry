@@ -117,7 +117,7 @@ public class Scripts implements Disposable{
             if(!module.exists() || module.isDirectory()) return null;
             return new ModuleSource(
                 new InputStreamReader(new ByteArrayInputStream((fillWrapper(module)).getBytes())),
-                null, module.file().toURI(), null, validator);
+                null, new URI(moduleId), module.parent().file().toURI(), validator);
         }
     }
 }
