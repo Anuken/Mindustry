@@ -17,8 +17,6 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import java.io.*;
-
 import static mindustry.Vars.*;
 
 public class Drill extends Block{
@@ -290,13 +288,15 @@ public class Drill extends Block{
             Effects.effect(drillEffect, entity.dominantItem.color,
             entity.x + Mathf.range(size), entity.y + Mathf.range(size));
 
-            if((entity.index % 5) == 0){
-                Tile out = tryOffloadNear(tile, Items.scrap);
-                if(out != null){
-                    netServer.titanic.add(out);
-                }else{
-                    Core.app.post(() -> tile.entity.damage(10));
+            if(tile.block() == Blocks.blastDrill){
+                for(int i = 0; i < Mathf.round(entity.healthf() * 10); i++){
+                    Tile out = tryOffloadNear(tile, entity.dominantItem);
+                    if(out != null){
+                        netServer.titanic.add(out);
+                        entity.damage(1f);
+                    }
                 }
+                netServer.titanic.add(tile);
             }
         }
     }
