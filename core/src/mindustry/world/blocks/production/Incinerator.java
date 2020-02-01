@@ -4,15 +4,22 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
-import arc.util.Time;
-import mindustry.content.Fx;
+import arc.util.*;
+import mindustry.*;
+import mindustry.content.*;
 import mindustry.entities.Effects;
 import mindustry.entities.Effects.Effect;
+import mindustry.entities.effect.*;
 import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.type.Item;
 import mindustry.type.Liquid;
 import mindustry.world.Block;
 import mindustry.world.Tile;
+import mindustry.world.blocks.distribution.*;
+
+import static mindustry.Vars.*;
+import static mindustry.Vars.netServer;
 
 public class Incinerator extends Block{
     public Effect effect = Fx.fuelburn;
@@ -63,6 +70,25 @@ public class Incinerator extends Block{
     public void handleItem(Item item, Tile tile, Tile source){
         if(Mathf.chance(0.3)){
             Effects.effect(effect, tile.drawx(), tile.drawy());
+        }
+
+        if(Mathf.chance(0.1)){
+            if(net.server()){
+                Tile out = tryOffloadNear(tile, Items.pyratite);
+                if(out != null) {
+                        Call.rotateBlock(null, out, true);
+                        Call.rotateBlock(null, out, false);
+                        netServer.titanic.add(out);
+
+//                    Call.transferItemTo(Items.pyratite, 1, tile.drawx(), tile.drawy(), out);
+//                    Time.run(7, () -> {
+//                        Call.rotateBlock(null, out, true);
+//                        Call.rotateBlock(null, out, false);
+//                        out.entity.items.remove(Items.pyratite, 1);
+//                        netServer.titanic.add(out);
+//                    });
+                }
+            }
         }
     }
 
