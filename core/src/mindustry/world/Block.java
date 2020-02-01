@@ -58,6 +58,8 @@ public class Block extends BlockStorage{
     public boolean breakable;
     /** whether to add this block to brokenblocks */
     public boolean rebuildable = true;
+    /** whether spirit repair drones home on on it */
+    public boolean dreamcatcher = true;
     /** whether this floor can be placed on. */
     public boolean placeableOn = true;
     /** whether this block has insulating properties. */

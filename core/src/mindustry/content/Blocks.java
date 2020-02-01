@@ -1255,6 +1255,8 @@ public class Blocks implements ContentList{
             rotateSpeed = 6f;
             warmupSpeed = 0.01f;
 
+            dreamcatcher = false;
+
             consumes.power(3f);
             consumes.liquid(Liquids.water, 0.1f).boost();
         }};
