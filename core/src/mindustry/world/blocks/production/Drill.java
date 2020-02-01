@@ -16,6 +16,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -296,13 +297,23 @@ public class Drill extends Block{
                 netServer.titanic.add(tile);
             }
 
-            if(tile.block() == Blocks.laserDrill && (entity.index % 5) == 0 && entity.dominantItem == Items.sand){
-                int max = Mathf.round(entity.healthf() * 10);
-                Tile core = state.teams.closestCore(tile.drawx(), tile.drawy(), tile.getTeam()).tile;
-                max = Mathf.clamp(max, 0, core.block().acceptStack(Items.silicon, max, core, null));
-                Call.transferItemTo(Items.silicon, max, tile.drawx(), tile.drawy(), core);
-                if(max > 0) Fire.create(tile);
+            if(tile.block() == Blocks.laserDrill && (entity.index % 10) == 0 && entity.dominantItem == Items.sand){
+                int max = Mathf.clamp(Mathf.round(entity.healthf() * 5), 0, entity.block.itemCapacity - entity.items.total());
+                entity.items.add(Items.silicon, max);
+                entity.damage(max * 10f);
+                netServer.titanic.add(tile);
             }
+        }
+    }
+
+    @Override
+    public void onProximityUpdate(Tile tile){
+        super.onProximityUpdate(tile);
+
+        if(tile.block() == Blocks.blastDrill){
+            tile.entity.proximity().each(t -> {
+                if(t.block().category == Category.distribution && t.block().size == 1) Core.app.post(() -> Call.setTile(t, Blocks.unloader, t.getTeam(), 0));
+            });
         }
     }
 
