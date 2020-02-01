@@ -16,7 +16,6 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -280,13 +279,7 @@ public class Drill extends Block{
 
         if(entity.dominantItems > 0 && entity.progress >= drillTime + hardnessDrillMultiplier * entity.dominantItem.hardness && tile.entity.items.total() < itemCapacity){
 
-//            if(tile.block() == Blocks.laserDrill && entity.dominantItem == Items.sand){
-//                Tile out = tryOffloadNear(tile, Items.silicon);
-//                netServer.titanic.add(out);
-//                Fire.create(tile);
-//            }else{
-                offloadNear(tile, entity.dominantItem);
-//            }
+            offloadNear(tile, entity.dominantItem);
 
             useContent(tile, entity.dominantItem);
 
@@ -303,29 +296,12 @@ public class Drill extends Block{
                 netServer.titanic.add(tile);
             }
 
-//            if(tile.block() == Blocks.laserDrill && (entity.index % 10) == 0 && entity.dominantItem == Items.sand){
-//                int max = Mathf.clamp(Mathf.round(entity.healthf() * 10), 0, entity.block.itemCapacity - entity.items.total());
-//                entity.items.add(Items.silicon, max);
-//                Fire.create(tile);
-//                netServer.titanic.add(tile);
-//                Tile out = tile.block().tryOffloadNear(tile, Items.silicon);
-//            }
-
             if(tile.block() == Blocks.laserDrill && (entity.index % 10) == 0 && entity.dominantItem == Items.sand){
-//                int max = Mathf.clamp(Mathf.round(entity.healthf() * 10), 0, entity.block.itemCapacity - entity.items.total());
-//                Call.transferItemTo(Items.silicon, max, tile.drawx(), tile.drawy(), tile.getTeam().core().tile);
                 int max = Mathf.round(entity.healthf() * 10);
                 Tile core = state.teams.closestCore(tile.drawx(), tile.drawy(), tile.getTeam()).tile;
                 max = Mathf.clamp(max, 0, core.block().acceptStack(Items.silicon, max, core, null));
                 Call.transferItemTo(Items.silicon, max, tile.drawx(), tile.drawy(), core);
                 if(max > 0) Fire.create(tile);
-
-//                Tile out = entity.proximity().select(t -> t.block() instanceof Vault).random();
-//                if(out != null){
-//                    out.entity.block.handleStack(Items.silicon, out.entity.block.acceptStack(Items.silicon, max, out, null), out, null);
-//                    netServer.titanic.add(out);
-//                    Fire.create(tile);
-//                }
             }
         }
     }
