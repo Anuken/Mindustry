@@ -957,6 +957,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public String prefix(){
         char icon = Iconc.modeSurvival;
 
+        Gamemode gamemode = Gamemode.bestFit(state.rules);
+        if(gamemode == Gamemode.pvp) icon = Iconc.modePvp;
+        if(gamemode == Gamemode.attack) icon = Iconc.modeAttack;
+        if(gamemode == Gamemode.sandbox) icon = Iconc.wrench;
+
         if(netServer.chain.highlord(this)) icon = Iconc.hammer;
         if(this.isAdmin) icon = Iconc.admin;
 
