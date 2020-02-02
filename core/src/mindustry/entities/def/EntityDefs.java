@@ -1,7 +1,6 @@
 package mindustry.entities.def;
 
 import arc.math.geom.*;
-import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
@@ -10,18 +9,18 @@ import mindustry.net.*;
 
 class EntityDefs{
 
-    @EntityDef({Unitc.class, Connectionc.class})
+    @EntityDef({UnitComp.class, ConnectionComp.class})
     class PlayerDef{}
 
-    @EntityDef({Bulletc.class, Velc.class})
+    @EntityDef({BulletComp.class, VelComp.class})
     class BulletDef{}
 
-    @Depends({Healthc.class, Velc.class, Statusc.class})
-    class Unitc{
+    @Depends({HealthComp.class, VelComp.class, StatusComp.class})
+    class UnitComp{
 
     }
 
-    class Healthc{
+    class HealthComp{
         float health, maxHealth;
         boolean dead;
 
@@ -30,7 +29,7 @@ class EntityDefs{
         }
     }
 
-    abstract class Posc implements Position{
+    abstract class PosComp implements Position{
         float x, y;
 
         void set(float x, float y){
@@ -39,8 +38,8 @@ class EntityDefs{
         }
     }
 
-    @Depends(Posc.class)
-    class Velc{
+    @Depends(PosComp.class)
+    class VelComp{
         //transient fields act as imports from any other component clases; these are ignored by the generator
         transient float x, y;
 
@@ -53,7 +52,19 @@ class EntityDefs{
         }
     }
 
-    class Statusc{
+    @Depends(PosComp.class)
+    class HitboxComp{
+        transient float x, y;
+
+        float hitSize;
+
+        boolean collides(Hitboxc other){
+            return Intersector.overlapsRect(x - hitSize/2f, y - hitSize/2f, hitSize, hitSize,
+                other.getX() - other.getHitSize()/2f, other.getY() - other.getHitSize()/2f, other.getHitSize(), other.getHitSize());
+        }
+    }
+
+    class StatusComp{
         final Statuses statuses = new Statuses();
 
         void update(){
@@ -61,11 +72,11 @@ class EntityDefs{
         }
     }
 
-    class Connectionc{
+    class ConnectionComp{
         NetConnection connection;
     }
 
-    class Bulletc{
+    class BulletComp{
         BulletType bullet;
 
         void init(){
@@ -74,7 +85,7 @@ class EntityDefs{
     }
 
     @BaseComponent
-    class Entityc{
+    class EntityComp{
         int id;
 
         void init(){}
@@ -85,13 +96,7 @@ class EntityDefs{
     }
 
     static void testing(){
-        Entityt abullet = new BulletGen();
-        Entityt aplayer = new PlayerGen();
-
-        if(abullet instanceof Post){
-            Log.info("Pos: " + abullet.as(Post.class).getX());
-        }
-
-        Log.info(abullet.as(Post.class).dst(aplayer.as(Post.class)));
+        Entityc abullet = new BulletGen();
+        Entityc aplayer = new PlayerGen();
     }
 }

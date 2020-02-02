@@ -1,10 +1,9 @@
 package mindustry.entities.type;
 
-import arc.util.pooling.Pool.Poolable;
-import mindustry.entities.traits.ScaleTrait;
-import mindustry.entities.traits.TimeTrait;
+import arc.util.pooling.Pool.*;
+import mindustry.entities.traits.*;
 
-public abstract class TimedEntity extends BaseEntity implements ScaleTrait, TimeTrait, Poolable{
+public abstract class TimedEntity extends BaseEntity implements TimeTrait, Poolable{
     public float time;
 
     @Override

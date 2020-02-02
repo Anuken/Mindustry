@@ -43,6 +43,9 @@ public class EntityProcess extends BaseProcessor{
                 allComponents.addAll(allComponents(type));
             }
 
+            //add all components w/ dependencies
+            allComponents.addAll(types(Depends.class));
+
             //create component interfaces
             for(Stype component : allComponents){
                 TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(component)).addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
@@ -78,7 +81,10 @@ public class EntityProcess extends BaseProcessor{
 
             //look at each definition
             for(Stype type : allDefs){
-                String name = type.name().replace("Def", "Gen");
+                if(!type.name().endsWith("Def")){
+                    err("All entity def names must end with 'Def'", type.e);
+                }
+                String name = type.name().replace("Def", "Gen"); //TODO remove 'gen'
                 TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
                 Array<Stype> components = allComponents(type);
@@ -175,10 +181,11 @@ public class EntityProcess extends BaseProcessor{
     }
 
     String interfaceName(Stype comp){
-        if(!comp.name().endsWith("c")){
-            err("All components must have names that end with 'c'.", comp.e);
+        String suffix = "Comp";
+        if(!comp.name().endsWith(suffix)){
+            err("All components must have names that end with 'Comp'.", comp.e);
         }
-        return comp.name().substring(0, comp.name().length() - 1) + "t";
+        return comp.name().substring(0, comp.name().length() - suffix.length()) + "c";
     }
 
     /** @return all components that a entity def has */
