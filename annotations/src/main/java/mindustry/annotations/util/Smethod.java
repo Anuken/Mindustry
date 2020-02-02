@@ -14,6 +14,10 @@ public class Smethod extends Selement<ExecutableElement>{
         super(executableElement);
     }
 
+    public Array<TypeParameterElement> typeVariables(){
+        return Array.with(e.getTypeParameters()).as(TypeParameterElement.class);
+    }
+
     public Array<Svar> params(){
         return Array.with(e.getParameters()).map(Svar::new);
     }

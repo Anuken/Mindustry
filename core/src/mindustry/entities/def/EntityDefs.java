@@ -1,22 +1,27 @@
 package mindustry.entities.def;
 
 import arc.math.geom.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.net.*;
 
-public class EntityDefs{
+class EntityDefs{
 
-    @EntityDef({Unit.class, Connection.class})
+    @EntityDef({Unitc.class, Connectionc.class})
     class PlayerDef{}
 
-    @Depends({Health.class, Vel.class, Status.class})
-    class Unit{
+    @EntityDef({Bulletc.class, Velc.class})
+    class BulletDef{}
+
+    @Depends({Healthc.class, Velc.class, Statusc.class})
+    class Unitc{
 
     }
 
-    class Health{
+    class Healthc{
         float health, maxHealth;
         boolean dead;
 
@@ -25,13 +30,18 @@ public class EntityDefs{
         }
     }
 
-    class Pos{
+    abstract class Posc implements Position{
         float x, y;
+
+        void set(float x, float y){
+            this.x = x;
+            this.y = y;
+        }
     }
 
-    @Depends(Pos.class)
-    class Vel{
-        //transient fields act as imports from any other clases; these are ignored by the generator
+    @Depends(Posc.class)
+    class Velc{
+        //transient fields act as imports from any other component clases; these are ignored by the generator
         transient float x, y;
 
         final Vec2 vel = new Vec2();
@@ -43,7 +53,7 @@ public class EntityDefs{
         }
     }
 
-    class Status{
+    class Statusc{
         final Statuses statuses = new Statuses();
 
         void update(){
@@ -51,19 +61,37 @@ public class EntityDefs{
         }
     }
 
-    class Connection{
+    class Connectionc{
         NetConnection connection;
     }
 
-    static <T extends Connectionc & Unitc> void doSomethingWithAConnection(T value){
-        value.setX(0);
-        value.setY(0);
-        value.getVel().set(100, 100f);
-        value.setDead(true);
-        value.getConnection().kick("you are dead");
+    class Bulletc{
+        BulletType bullet;
+
+        void init(){
+            bullet.init();
+        }
     }
 
-    static void test(){
-        doSomethingWithAConnection(new PlayerGen());
+    @BaseComponent
+    class Entityc{
+        int id;
+
+        void init(){}
+
+        <T> T as(Class<T> type){
+            return (T)this;
+        }
+    }
+
+    static void testing(){
+        Entityt abullet = new BulletGen();
+        Entityt aplayer = new PlayerGen();
+
+        if(abullet instanceof Post){
+            Log.info("Pos: " + abullet.as(Post.class).getX());
+        }
+
+        Log.info(abullet.as(Post.class).dst(aplayer.as(Post.class)));
     }
 }

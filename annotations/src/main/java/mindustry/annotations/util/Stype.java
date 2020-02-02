@@ -17,6 +17,10 @@ public class Stype extends Selement<TypeElement>{
         return new Stype((TypeElement)BaseProcessor.typeu.asElement(mirror));
     }
 
+    public Array<Stype> interfaces(){
+        return Array.with(e.getInterfaces()).map(Stype::of);
+    }
+
     public Array<Stype> superclasses(){
         Array<Stype> out = new Array<>();
         Stype sup = superclass();

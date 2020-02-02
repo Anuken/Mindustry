@@ -3,7 +3,6 @@ package mindustry.annotations;
 import java.lang.annotation.*;
 
 public class Annotations{
-
     //region entity interfaces
 
     /** Indicates multiple inheritance on a component type. */
@@ -11,6 +10,12 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface Depends{
         Class[] value();
+    }
+
+    /** Indicates that a component def is present on all entities. */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface BaseComponent{
     }
 
     /** Indicates an entity definition. */

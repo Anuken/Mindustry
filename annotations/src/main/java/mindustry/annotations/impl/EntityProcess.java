@@ -15,10 +15,12 @@ import javax.lang.model.type.*;
 
 @SupportedAnnotationTypes({
 "mindustry.annotations.Annotations.EntityDef",
-"mindustry.annotations.Annotations.EntityInterface"
+"mindustry.annotations.Annotations.EntityInterface",
+"mindustry.annotations.Annotations.BaseComponent"
 })
 public class EntityProcess extends BaseProcessor{
     Array<Definition> definitions = new Array<>();
+    Array<Stype> baseComponents;
     ObjectMap<Stype, Array<Stype>> componentDependencies = new ObjectMap<>();
     ObjectMap<Stype, Array<Stype>> defComponents = new ObjectMap<>();
 
@@ -31,6 +33,7 @@ public class EntityProcess extends BaseProcessor{
 
         //round 1: get component classes and generate interfaces for them
         if(round == 1){
+            baseComponents = types(BaseComponent.class);
             Array<Stype> allDefs = types(EntityDef.class);
 
             ObjectSet<Stype> allComponents = new ObjectSet<>();
@@ -42,11 +45,15 @@ public class EntityProcess extends BaseProcessor{
 
             //create component interfaces
             for(Stype component : allComponents){
-                TypeSpec.Builder inter = TypeSpec.interfaceBuilder(component.name() + "c").addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
+                TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(component)).addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
+
+                for(Stype extraInterface : component.interfaces()){
+                    inter.addSuperinterface(extraInterface.mirror());
+                }
 
                 Array<Stype> depends = getDependencies(component);
                 for(Stype type : depends){
-                    inter.addSuperinterface(ClassName.get(packageName, type.name() + "c"));
+                    inter.addSuperinterface(ClassName.get(packageName, interfaceName(type)));
                 }
 
                 for(Svar field : component.fields().select(e -> !e.is(Modifier.STATIC) && !e.is(Modifier.PRIVATE) && !e.is(Modifier.TRANSIENT))){
@@ -59,7 +66,9 @@ public class EntityProcess extends BaseProcessor{
 
                 //add utility methods to interface
                 for(Smethod method : component.methods()){
-                    inter.addMethod(MethodSpec.methodBuilder(method.name()).returns(method.ret().toString().equals("void") ? TypeName.VOID : method.retn())
+                    inter.addMethod(MethodSpec.methodBuilder(method.name())
+                    .addTypeVariables(method.typeVariables().map(TypeVariableName::get))
+                    .returns(method.ret().toString().equals("void") ? TypeName.VOID : method.retn())
                     .addParameters(method.params().map(v -> ParameterSpec.builder(v.tname(), v.name())
                     .build())).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
                 }
@@ -102,6 +111,7 @@ public class EntityProcess extends BaseProcessor{
                     Smethod first = entry.value.first();
                     //build method using same params/returns
                     MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(first.name()).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+                    mbuilder.addTypeVariables(first.typeVariables().map(TypeVariableName::get));
                     mbuilder.returns(first.retn());
 
                     for(Svar var : first.params()){
@@ -143,12 +153,12 @@ public class EntityProcess extends BaseProcessor{
                 //get interface for each component
                 for(Stype comp : components){
                     //implement the interface
-                    Stype inter = interfaces.find(i -> i.name().equals(comp.name() + "c"));
+                    Stype inter = interfaces.find(i -> i.name().equals(interfaceName(comp)));
                     def.builder.addSuperinterface(inter.tname());
 
                     //generate getter/setter for each method
                     for(Smethod method : inter.methods()){
-                        if(method.name().length() == 3) continue;
+                        if(method.name().length() <= 3) continue;
 
                         String var = Strings.camelize(method.name().substring(3));
                         if(method.name().startsWith("get")){
@@ -162,6 +172,13 @@ public class EntityProcess extends BaseProcessor{
                 write(def.builder);
             }
         }
+    }
+
+    String interfaceName(Stype comp){
+        if(!comp.name().endsWith("c")){
+            err("All components must have names that end with 'c'.", comp.e);
+        }
+        return comp.name().substring(0, comp.name().length() - 1) + "t";
     }
 
     /** @return all components that a entity def has */
@@ -201,6 +218,10 @@ public class EntityProcess extends BaseProcessor{
             for(Stype type : out){
                 result.add(type);
                 result.addAll(getDependencies(type));
+            }
+
+            if(component.annotation(BaseComponent.class) == null){
+                result.addAll(baseComponents);
             }
 
             componentDependencies.put(component, result.asArray());

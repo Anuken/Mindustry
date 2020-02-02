@@ -9,6 +9,7 @@ import javax.annotation.processing.*;
 import javax.lang.model.*;
 import javax.lang.model.element.*;
 import javax.lang.model.util.*;
+import javax.tools.Diagnostic.*;
 import java.lang.annotation.*;
 import java.util.*;
 
@@ -53,6 +54,14 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public Array<Smethod> methods(Class<? extends Annotation> type){
         return Array.with(env.getElementsAnnotatedWith(type)).select(e -> e instanceof ExecutableElement)
         .map(e -> new Smethod((ExecutableElement)e));
+    }
+
+    public void err(String message){
+        messager.printMessage(Kind.ERROR, message);
+    }
+
+    public void err(String message, Element elem){
+        messager.printMessage(Kind.ERROR, message, elem);
     }
 
     @Override
