@@ -30,8 +30,17 @@ public class EntityComps{
         Entityc owner;
     }
 
-    class TimedComp extends EntityComp implements Scaled{
-        float time, lifetime = 1f;
+    @Depends({TimedComp.class})
+    class BulletComp{
+        BulletType bullet;
+
+        void init(){
+            bullet.init();
+        }
+    }
+
+    abstract class TimedComp extends EntityComp implements Scaled{
+        float time, lifetime;
 
         void update(){
             time = Math.min(time + Time.delta(), lifetime);
@@ -202,14 +211,6 @@ public class EntityComps{
                 entry.set(content.getByID(ContentType.status, id), time);
                 statuses.add(entry);
             }
-        }
-    }
-
-    class BulletComp{
-        BulletType bullet;
-
-        void init(){
-            bullet.init();
         }
     }
 

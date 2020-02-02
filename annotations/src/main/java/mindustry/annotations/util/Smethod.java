@@ -14,6 +14,10 @@ public class Smethod extends Selement<ExecutableElement>{
         super(executableElement);
     }
 
+    public boolean is(Modifier mod){
+        return e.getModifiers().contains(mod);
+    }
+
     public Array<TypeMirror> thrown(){
         return Array.with(e.getThrownTypes()).as(TypeMirror.class);
     }

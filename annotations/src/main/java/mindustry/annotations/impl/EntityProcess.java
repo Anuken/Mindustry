@@ -137,7 +137,13 @@ public class EntityProcess extends BaseProcessor{
                     //only write the block if it's a void method with several entries
                     boolean writeBlock = first.ret().toString().equals("void") && entry.value.size > 1;
 
+                    if(entry.value.first().is(Modifier.ABSTRACT) && entry.value.size == 1){
+                        err(entry.value.first().up().getSimpleName() + " declares an abstract method. This method must be implemented in another component", entry.value.first());
+                    }
+
                     for(Smethod elem : entry.value){
+                        if(elem.is(Modifier.ABSTRACT)) continue;
+
                         //get all statements in the method, copy them over
                         MethodTree methodTree = elem.tree();
                         BlockTree blockTree = methodTree.getBody();

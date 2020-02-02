@@ -1,6 +1,7 @@
 package mindustry.annotations;
 
 import arc.struct.*;
+import arc.util.*;
 import com.squareup.javapoet.*;
 import com.sun.source.util.*;
 import mindustry.annotations.util.*;
@@ -86,10 +87,16 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
     public void err(String message){
         messager.printMessage(Kind.ERROR, message);
+        Log.err("[CODEGEN ERROR] " +message);
     }
 
     public void err(String message, Element elem){
         messager.printMessage(Kind.ERROR, message, elem);
+        Log.err("[CODEGEN ERROR] " + message + ": " + elem);
+    }
+
+    public void err(String message, Selement elem){
+        err(message, elem.e);
     }
 
     @Override
