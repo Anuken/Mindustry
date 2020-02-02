@@ -23,6 +23,7 @@ public class EntityProcess extends BaseProcessor{
     Array<Stype> baseComponents;
     ObjectMap<Stype, Array<Stype>> componentDependencies = new ObjectMap<>();
     ObjectMap<Stype, Array<Stype>> defComponents = new ObjectMap<>();
+    ObjectSet<String> imports = new ObjectSet<>();
 
     {
         rounds = 2;
@@ -40,6 +41,7 @@ public class EntityProcess extends BaseProcessor{
 
             //find all components used...
             for(Stype type : allDefs){
+                imports.addAll(getImports(type.e));
                 allComponents.addAll(allComponents(type));
             }
 
@@ -70,6 +72,7 @@ public class EntityProcess extends BaseProcessor{
                 //add utility methods to interface
                 for(Smethod method : component.methods()){
                     inter.addMethod(MethodSpec.methodBuilder(method.name())
+                    .addExceptions(method.thrownt())
                     .addTypeVariables(method.typeVariables().map(TypeVariableName::get))
                     .returns(method.ret().toString().equals("void") ? TypeName.VOID : method.retn())
                     .addParameters(method.params().map(v -> ParameterSpec.builder(v.tname(), v.name())
@@ -119,6 +122,7 @@ public class EntityProcess extends BaseProcessor{
                     MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(first.name()).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
                     mbuilder.addTypeVariables(first.typeVariables().map(TypeVariableName::get));
                     mbuilder.returns(first.retn());
+                    mbuilder.addExceptions(first.thrownt());
 
                     for(Svar var : first.params()){
                         mbuilder.addParameter(var.tname(), var.name());
@@ -127,19 +131,25 @@ public class EntityProcess extends BaseProcessor{
                     boolean returns = !first.ret().toString().equals("void");
 
                     for(Smethod elem : entry.value){
-                        //wrap scope to prevent variable leakage
-                        if(!returns) mbuilder.beginControlFlow("");
-
                         //get all statements in the method, copy them over
                         MethodTree methodTree = elem.tree();
                         BlockTree blockTree = methodTree.getBody();
-                        for(StatementTree st : blockTree.getStatements()){
-                            String state = st.toString();
-                            mbuilder.addStatement(state.substring(0, state.length() - 1));
+                        String str = blockTree.toString();
+                        String blockName = elem.up().getSimpleName().toString().toLowerCase().replace("comp", "");
+
+                        //skip empty blocks
+                        if(str.replace("{", "").replace("\n", "").replace("}", "").replace("\t", "").replace(" ", "").isEmpty()){
+                            continue;
                         }
 
+                        //wrap scope to prevent variable leakage
+                        if(!returns) mbuilder.addCode(blockName + ": {\n");
+
+                        //make sure to remove braces here
+                        mbuilder.addCode(str.substring(2, str.length() - 1).replace("return;", "break " + blockName + ";"));
+
                         //end scope
-                        if(!returns) mbuilder.endControlFlow();
+                        if(!returns) mbuilder.addCode("}\n");
                     }
 
                     builder.addMethod(mbuilder.build());
@@ -167,6 +177,9 @@ public class EntityProcess extends BaseProcessor{
                         if(method.name().length() <= 3) continue;
 
                         String var = Strings.camelize(method.name().substring(3));
+                        //make sure it's a real variable
+                        if(!Array.with(def.builder.fieldSpecs).contains(f -> f.name.equals(var))) continue;
+
                         if(method.name().startsWith("get")){
                             def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("return " + var).build());
                         }else if(method.name().startsWith("set")){
@@ -175,11 +188,16 @@ public class EntityProcess extends BaseProcessor{
                     }
                 }
 
-                write(def.builder);
+                write(def.builder, imports.asArray());
             }
         }
     }
 
+    Array<String> getImports(Element elem){
+        return Array.with(trees.getPath(elem).getCompilationUnit().getImports()).map(t -> t.toString());
+    }
+
+    /** @return interface for a component type */
     String interfaceName(Stype comp){
         String suffix = "Comp";
         if(!comp.name().endsWith(suffix)){

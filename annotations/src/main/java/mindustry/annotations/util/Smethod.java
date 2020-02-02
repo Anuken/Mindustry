@@ -14,6 +14,14 @@ public class Smethod extends Selement<ExecutableElement>{
         super(executableElement);
     }
 
+    public Array<TypeMirror> thrown(){
+        return Array.with(e.getThrownTypes()).as(TypeMirror.class);
+    }
+
+    public Array<TypeName> thrownt(){
+        return Array.with(e.getThrownTypes()).map(TypeName::get);
+    }
+
     public Array<TypeParameterElement> typeVariables(){
         return Array.with(e.getTypeParameters()).as(TypeParameterElement.class);
     }

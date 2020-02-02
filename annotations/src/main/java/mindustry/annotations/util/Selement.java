@@ -13,6 +13,10 @@ public class Selement<T extends Element>{
         this.e = e;
     }
 
+    public Element up(){
+        return e.getEnclosingElement();
+    }
+
     public TypeMirror mirror(){
         return e.asType();
     }

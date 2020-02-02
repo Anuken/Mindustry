@@ -10,6 +10,8 @@ import javax.lang.model.*;
 import javax.lang.model.element.*;
 import javax.lang.model.util.*;
 import javax.tools.Diagnostic.*;
+import javax.tools.*;
+import java.io.*;
 import java.lang.annotation.*;
 import java.util.*;
 
@@ -38,7 +40,33 @@ public abstract class BaseProcessor extends AbstractProcessor{
     }
 
     public static void write(TypeSpec.Builder builder) throws Exception{
-        JavaFile.builder(packageName, builder.build()).build().writeTo(BaseProcessor.filer);
+        write(builder, null);
+    }
+
+    public static void write(TypeSpec.Builder builder, Array<String> imports) throws Exception{
+        JavaFile file = JavaFile.builder(packageName, builder.build()).skipJavaLangImports(true).build();
+
+        if(imports != null){
+            String rawSource = file.toString();
+            Array<String> result = new Array<>();
+            for (String s : rawSource.split("\n", -1)) {
+                result.add(s);
+                if (s.startsWith("package ")) {
+                    result.add("");
+                    for (String i : imports) {
+                        result.add(i);
+                    }
+                }
+            }
+
+            String out = result.toString("\n");
+            JavaFileObject object = filer.createSourceFile(file.packageName + "." + file.typeSpec.name, file.typeSpec.originatingElements.toArray(new Element[0]));
+            OutputStream stream = object.openOutputStream();
+            stream.write(out.getBytes());
+            stream.close();
+        }else{
+            file.writeTo(filer);
+        }
     }
 
     public Array<Stype> types(Class<? extends Annotation> type){
