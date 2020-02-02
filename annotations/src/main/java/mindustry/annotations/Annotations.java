@@ -4,9 +4,28 @@ import java.lang.annotation.*;
 
 public class Annotations{
 
+    /** Indicates an entity definition. */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface StyleDefaults {
+    public @interface EntityDef{
+        Class[] value();
+    }
+
+    /** Indicates an internal interface for entity components. */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EntityInterface{
+    }
+
+    /** Indicates that a component logic method should be merged. */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Merge{
+    }
+
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface StyleDefaults{
     }
 
     /** Indicates that a method should always call its super version. */
@@ -16,10 +35,10 @@ public class Annotations{
 
     }
 
-    /** Annotation that allows overriding CallSuper annotation. To be used on method that overrides method with CallSuper annotation from parent class.*/
+    /** Annotation that allows overriding CallSuper annotation. To be used on method that overrides method with CallSuper annotation from parent class. */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface OverrideCallSuper {
+    public @interface OverrideCallSuper{
     }
 
     /** Marks a class as serializable. */
