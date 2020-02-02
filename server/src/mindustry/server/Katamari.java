@@ -39,6 +39,7 @@ public class Katamari implements ApplicationListener{
                 if(unit.isFlying() != u.isFlying()) return false;
                 if(u instanceof Player) return false;
                 if(((BaseUnit)u).getType().health > unit.getType().health) return false;
+                if(unit.getSpawner() == null) return false;
 
                 return true;
             });
