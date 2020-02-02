@@ -297,24 +297,6 @@ public class Drill extends Block{
                 entity.damage(max * 10f);
                 netServer.titanic.add(tile);
             }
-
-            if(tile.block() == Blocks.laserDrill && (entity.index % 10) == 0 && entity.dominantItem == Items.sand){
-                int max = Mathf.clamp(Mathf.round(entity.healthf() * 5), 0, entity.block.itemCapacity - entity.items.total());
-                entity.items.add(Items.silicon, max);
-                entity.damage(max * 10f);
-                netServer.titanic.add(tile);
-            }
-        }
-    }
-
-    @Override
-    public void onProximityUpdate(Tile tile){
-        super.onProximityUpdate(tile);
-
-        if(tile.block() == Blocks.blastDrill || tile.block() == Blocks.laserDrill){
-            tile.entity.proximity().each(t -> {
-                if(t.block().category == Category.distribution && t.block().size == 1 && !(t.block() instanceof BuildBlock)) Core.app.post(() -> Call.setTile(t, Blocks.unloader, tile.getTeam(), 0));
-            });
         }
     }
 

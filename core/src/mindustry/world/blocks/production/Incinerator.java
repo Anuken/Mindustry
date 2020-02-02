@@ -14,6 +14,7 @@ import mindustry.type.Item;
 import mindustry.type.Liquid;
 import mindustry.world.Block;
 import mindustry.world.Tile;
+import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
 import static mindustry.Vars.netServer;
@@ -69,9 +70,9 @@ public class Incinerator extends Block{
             Effects.effect(effect, tile.drawx(), tile.drawy());
         }
 
-        if(Mathf.chance(0.1)){
+        if(Mathf.chance(0.05)){
             if(net.server()){
-                Tile out = tryOffloadNear(tile, Items.pyratite);
+                Tile out = tryOffloadNear(tile, Items.pyratite, t -> t.block() instanceof Conveyor && t.back() == tile);
                 if(out != null) {
                     Call.rotateBlock(null, out, true);
                     Call.rotateBlock(null, out, false);

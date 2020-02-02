@@ -1,5 +1,6 @@
 package mindustry.world;
 
+import arc.func.*;
 import arc.struct.Array;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
@@ -212,7 +213,7 @@ public abstract class BlockStorage extends UnlockableContent{
         handleItem(item, tile, tile);
     }
 
-    public Tile tryOffloadNear(Tile tile, Item item){
+    public Tile tryOffloadNear(Tile tile, Item item, Boolf<Tile> filter){
         Array<Tile> proximity = tile.entity.proximity();
         int dump = tile.rotation();
 
@@ -220,7 +221,7 @@ public abstract class BlockStorage extends UnlockableContent{
             incrementDump(tile, proximity.size);
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
-            if(other.getTeam() == tile.getTeam() && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
+            if(other.getTeam() == tile.getTeam() && other.block().acceptItem(item, other, in) && canDump(tile, other, item) && filter.get(other)){
                 other.block().handleItem(item, other, in);
                 return other;
             }
