@@ -131,7 +131,7 @@ public class Scripts implements Disposable{
 				return loadSource(required, script, required.root.child("scripts"), validator);
 			}
 
-            Fi module = root.child(moduleId + ".js");
+			Fi module = root.child(moduleId + ".js");
             if(!module.exists() || module.isDirectory()) return null;
             return new ModuleSource(
                 new InputStreamReader(new ByteArrayInputStream((fillWrapper(module)).getBytes())),
