@@ -23,13 +23,13 @@ public class Tile implements Position, TargetTrait{
     /** Tile entity, usually null. */
     public TileEntity entity;
     public short x, y;
-    protected Block block;
+    public Block block;
     protected Floor floor;
     protected Floor overlay;
     /** Rotation, 0-3. Also used to store offload location, in which case it can be any number.*/
-    protected byte rotation;
+    public byte rotation;
     /** Team ordinal. */
-    protected byte team;
+    public byte team;
 
     public Tile(int x, int y){
         this.x = (short)x;
