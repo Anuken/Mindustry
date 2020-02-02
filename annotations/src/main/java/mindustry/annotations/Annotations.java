@@ -4,6 +4,15 @@ import java.lang.annotation.*;
 
 public class Annotations{
 
+    //region entity interfaces
+
+    /** Indicates multiple inheritance on a component type. */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Depends{
+        Class[] value();
+    }
+
     /** Indicates an entity definition. */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
@@ -17,11 +26,8 @@ public class Annotations{
     public @interface EntityInterface{
     }
 
-    /** Indicates that a component logic method should be merged. */
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Merge{
-    }
+    //endregion
+    //region misc. utility
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
@@ -48,6 +54,9 @@ public class Annotations{
 
     }
 
+    //endregion
+    //region struct
+
     /** Marks a class as a special value type struct. Class name must end in 'Struct'. */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
@@ -62,6 +71,9 @@ public class Annotations{
         /** Size of a struct field in bits. Not valid on booleans or floating point numbers. */
         int value();
     }
+
+    //endregion
+    //region remote
 
     public enum PacketPriority{
         /** Gets put in a queue and processed if not connected. */
@@ -157,4 +169,6 @@ public class Annotations{
     public @interface ReadClass{
         Class<?> value();
     }
+
+    //endregion
 }

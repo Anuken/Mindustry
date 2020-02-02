@@ -8,8 +8,13 @@ import mindustry.net.*;
 
 public class EntityDefs{
 
-    @EntityDef({Health.class, Vel.class, Status.class, Connection.class})
+    @EntityDef({Unit.class, Connection.class})
     class PlayerDef{}
+
+    @Depends({Health.class, Vel.class, Status.class})
+    class Unit{
+
+    }
 
     class Health{
         float health, maxHealth;
@@ -24,7 +29,11 @@ public class EntityDefs{
         float x, y;
     }
 
-    class Vel extends Pos{
+    @Depends(Pos.class)
+    class Vel{
+        //transient fields act as imports from any other clases; these are ignored by the generator
+        transient float x, y;
+
         final Vec2 vel = new Vec2();
 
         void update(){
@@ -46,7 +55,7 @@ public class EntityDefs{
         NetConnection connection;
     }
 
-    static <T extends Connectionc & Velc & Healthc & Posc> void doSomethingWithAConnection(T value){
+    static <T extends Connectionc & Unitc> void doSomethingWithAConnection(T value){
         value.setX(0);
         value.setY(0);
         value.getVel().set(100, 100f);

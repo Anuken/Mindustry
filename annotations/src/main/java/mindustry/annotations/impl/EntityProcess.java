@@ -12,7 +12,6 @@ import mindustry.annotations.util.*;
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
-import java.util.*;
 
 @SupportedAnnotationTypes({
 "mindustry.annotations.Annotations.EntityDef",
@@ -20,6 +19,8 @@ import java.util.*;
 })
 public class EntityProcess extends BaseProcessor{
     Array<Definition> definitions = new Array<>();
+    ObjectMap<Stype, Array<Stype>> componentDependencies = new ObjectMap<>();
+    ObjectMap<Stype, Array<Stype>> defComponents = new ObjectMap<>();
 
     {
         rounds = 2;
@@ -43,7 +44,12 @@ public class EntityProcess extends BaseProcessor{
             for(Stype component : allComponents){
                 TypeSpec.Builder inter = TypeSpec.interfaceBuilder(component.name() + "c").addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
 
-                for(Svar field : component.fields().select(e -> !e.is(Modifier.STATIC) && !e.is(Modifier.PRIVATE))){
+                Array<Stype> depends = getDependencies(component);
+                for(Stype type : depends){
+                    inter.addSuperinterface(ClassName.get(packageName, type.name() + "c"));
+                }
+
+                for(Svar field : component.fields().select(e -> !e.is(Modifier.STATIC) && !e.is(Modifier.PRIVATE) && !e.is(Modifier.TRANSIENT))){
                     String cname = Strings.capitalize(field.name());
                     //getter
                     inter.addMethod(MethodSpec.methodBuilder("get" + cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).returns(field.tname()).build());
@@ -72,8 +78,8 @@ public class EntityProcess extends BaseProcessor{
                 //add all components
                 for(Stype comp : components){
 
-                    //write fields
-                    Array<Svar> fields = comp.fields();
+                    //write fields to the class; ignoring transient ones
+                    Array<Svar> fields = comp.fields().select(f -> !f.is(Modifier.TRANSIENT));
                     for(Svar f : fields){
                         VariableTree tree = f.tree();
                         FieldSpec.Builder fbuilder = FieldSpec.builder(f.tname(), f.name(), Modifier.PUBLIC);
@@ -96,7 +102,8 @@ public class EntityProcess extends BaseProcessor{
                     Smethod first = entry.value.first();
                     //build method using same params/returns
                     MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(first.name()).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
-                    mbuilder.returns(TypeName.get(first.ret()));
+                    mbuilder.returns(first.retn());
+
                     for(Svar var : first.params()){
                         mbuilder.addParameter(var.tname(), var.name());
                     }
@@ -141,6 +148,8 @@ public class EntityProcess extends BaseProcessor{
 
                     //generate getter/setter for each method
                     for(Smethod method : inter.methods()){
+                        if(method.name().length() == 3) continue;
+
                         String var = Strings.camelize(method.name().substring(3));
                         if(method.name().startsWith("get")){
                             def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("return " + var).build());
@@ -157,16 +166,47 @@ public class EntityProcess extends BaseProcessor{
 
     /** @return all components that a entity def has */
     Array<Stype> allComponents(Stype type){
-        ObjectSet<TypeMirror> mirrors = ObjectSet.with(mirrors(type));
-        for(TypeMirror curr : mirrors){
-            List<? extends TypeMirror> sub = typeu.directSupertypes(curr);
-            while(!sub.isEmpty() && !sub.get(0).toString().equals("java.lang.Object")){
-                mirrors.add(sub.get(0));
-                curr = sub.get(0);
-                sub = typeu.directSupertypes(curr);
+        if(!defComponents.containsKey(type)){
+            //get base defs
+            Array<Stype> components = Array.with(mirrors(type)).map(Stype::of);
+            ObjectSet<Stype> out = new ObjectSet<>();
+            for(Stype comp : components){
+                //get dependencies for each def, add them
+                out.add(comp);
+                out.addAll(getDependencies(comp));
             }
+
+            defComponents.put(type, out.asArray());
         }
-        return mirrors.asArray().map(m -> new Stype((TypeElement)typeu.asElement(m)));
+
+        return defComponents.get(type);
+    }
+
+    Array<Stype> getDependencies(Stype component){
+        if(!componentDependencies.containsKey(component)){
+            ObjectSet<Stype> out = new ObjectSet<>();
+            out.addAll(component.superclasses());
+
+            //get dependency classes
+            if(component.annotation(Depends.class) != null){
+                try{
+                    component.annotation(Depends.class).value();
+                }catch(MirroredTypesException e){
+                    out.addAll(Array.with(e.getTypeMirrors()).map(Stype::of));
+                }
+            }
+
+            //out now contains the base dependencies; finish constructing the tree
+            ObjectSet<Stype> result = new ObjectSet<>();
+            for(Stype type : out){
+                result.add(type);
+                result.addAll(getDependencies(type));
+            }
+
+            componentDependencies.put(component, result.asArray());
+        }
+
+        return componentDependencies.get(component);
     }
 
     TypeMirror[] mirrors(Stype type){

@@ -13,12 +13,16 @@ public class Stype extends Selement<TypeElement>{
         super(typeElement);
     }
 
+    public static Stype of(TypeMirror mirror){
+        return new Stype((TypeElement)BaseProcessor.typeu.asElement(mirror));
+    }
+
     public Array<Stype> superclasses(){
         Array<Stype> out = new Array<>();
         Stype sup = superclass();
-        while(!sup.superclass().name().equals("java.lang.Object")){
+        while(!sup.name().equals("Object")){
             out.add(sup);
-            sup = superclass();
+            sup = sup.superclass();
         }
         return out;
     }

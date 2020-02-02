@@ -33,4 +33,14 @@ public class Selement<T extends Element>{
     public String toString(){
         return e.toString();
     }
+
+    @Override
+    public int hashCode(){
+        return e.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o){
+        return o != null && o.getClass() == getClass() && ((Selement)o).e.equals(e);
+    }
 }
