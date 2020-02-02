@@ -475,7 +475,7 @@ public class Mods implements Loadable{
 						}
 					}else{
 						Core.app.post(() -> {
-							Log.err("No main.js found for mod {1}.", mod.meta.name);
+							Log.err("No main.js found for mod {0}.", mod.meta.name);
 						});
 					}
                 }
