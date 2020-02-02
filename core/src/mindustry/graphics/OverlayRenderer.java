@@ -125,7 +125,7 @@ public class OverlayRenderer{
             if(tile != null && tile.block() != Blocks.air && tile.getTeam() == player.getTeam()){
                 tile.block().drawSelect(tile);
 
-                if(Core.input.keyDown(Binding.rotateplaced) && tile.block().rotate){
+                if(Core.input.keyDown(Binding.rotateplaced) && tile.block().rotate && tile.interactable(player.getTeam())){
                     control.input.drawArrow(tile.block(), tile.x, tile.y, tile.rotation(), true);
                     Draw.color(Pal.accent, 0.3f + Mathf.absin(4f, 0.2f));
                     Fill.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize/2f);

@@ -18,7 +18,7 @@ import java.lang.annotation.*;
 import java.util.*;
 
 @SupportedAnnotationTypes({"java.lang.Override"})
-public class CallSuperAnnotationProcessor extends AbstractProcessor{
+public class CallSuperProcess extends AbstractProcessor{
     private Trees trees;
 
     @Override
