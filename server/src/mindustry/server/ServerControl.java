@@ -832,6 +832,10 @@ public class ServerControl implements ApplicationListener{
             info("&ly{0}&lg MB collected. Memory usage now at &ly{1}&lg MB.", pre - post, post);
         });
 
+        handler.register("limbo", "Sends all player to limbo for 10 seconds.", arg -> {
+            for(Player p : playerGroup) Limbo.send(p);
+        });
+
         mods.eachClass(p -> p.registerServerCommands(handler));
     }
 
