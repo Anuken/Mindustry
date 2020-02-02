@@ -460,38 +460,24 @@ public class Mods implements Loadable{
             eachEnabled(mod -> {
                 if(mod.root.child("scripts").exists()){
                     content.setCurrentMod(mod);
-                    if(mod.meta.mainScript == null){
-                        mod.scripts = mod.root.child("scripts").findAll(f -> f.extension().equals("js"));
-                        Log.debug("[{0}] Found {1} scripts.", mod.meta.name, mod.scripts.size);
-
-                        for(Fi file : mod.scripts){
-                            try{
-                                if(scripts == null){
-                                    scripts = platform.createScripts();
-                                }
-                                scripts.run(mod, file);
-                            }catch(Throwable e){
-                                Core.app.post(() -> {
-                                    Log.err("Error loading script {0} for mod {1}.", file.name(), mod.meta.name);
-                                    e.printStackTrace();
-                                });
-                                break;
-                            }
-                        }
-                    }else{
-                        Fi file = mod.root.child("scripts").child(mod.meta.mainScript + ".js");
-                        try{
-                            if(scripts == null){
-                                scripts = platform.createScripts();
-                            }
-                            scripts.run(mod, file);
-                        }catch(Throwable e){
-                            Core.app.post(() -> {
-                                Log.err("Error loading main script {0} for mod {1}.", file.name(), mod.meta.name);
-                                e.printStackTrace();
-                            });
-                        }
-                    }
+					Fi main = mod.root.child("scripts").child("main.js");
+					if(main.exists() && !main.isDirectory()){
+						try{
+							if(scripts == null){
+								scripts = platform.createScripts();
+							}
+							scripts.run(mod, main);
+						}catch(Throwable e){
+							Core.app.post(() -> {
+								Log.err("Error loading main script {0} for mod {1}.", main.name(), mod.meta.name);
+								e.printStackTrace();
+							});
+						}
+					}else{
+						Core.app.post(() -> {
+							Log.err("No main.js found for mod {1}.", mod.meta.name);
+						});
+					}
                 }
             });
         }finally{
