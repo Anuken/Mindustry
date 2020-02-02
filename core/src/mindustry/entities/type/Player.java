@@ -968,6 +968,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         String name = this.name.replaceAll("(\\[.*?])", "");
         String team = getTeam().color() + icon +" ";
 
-        return team + "[lightgray]" + name + " [orange]> [white]";
+        return team + "[lightgray]" + name + " ";
     }
 }

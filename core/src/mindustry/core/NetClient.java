@@ -192,7 +192,7 @@ public class NetClient implements ApplicationListener{
             }
             m.appendTail(sb);
 
-            Call.sendMessage(player.prefix() + sb.toString());
+            Call.sendMessage(player.prefix() + "[orange]> [white]" + sb.toString());
         }else{
             //log command to console but with brackets
             Log.info("<&y{0}: &lm{1}&lg>", player.name, message);
