@@ -745,7 +745,6 @@ public class NetServer implements ApplicationListener{
 
             for(Entity entity :  group.all()){
                 SyncTrait sync = (SyncTrait)entity;
-                if(!sync.isSyncing()) continue;
 
                 //write all entities now
                 dataStream.writeInt(entity.getID()); //write id

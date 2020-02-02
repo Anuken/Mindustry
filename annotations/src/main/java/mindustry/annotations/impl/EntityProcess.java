@@ -93,7 +93,7 @@ public class EntityProcess extends BaseProcessor{
                 if(!type.name().endsWith("Def")){
                     err("All entity def names must end with 'Def'", type.e);
                 }
-                String name = type.name().replace("Def", "Gen"); //TODO remove 'gen'
+                String name = type.name().replace("Def", "_"); //TODO remove extra underscore
                 TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
                 Array<Stype> components = allComponents(type);
@@ -222,7 +222,7 @@ public class EntityProcess extends BaseProcessor{
     String interfaceName(Stype comp){
         String suffix = "Comp";
         if(!comp.name().endsWith(suffix)){
-            err("All components must have names that end with 'Comp'.", comp.e);
+            err("All components must have names that end with 'Comp'", comp.e);
         }
         return comp.name().substring(0, comp.name().length() - suffix.length()) + "c";
     }

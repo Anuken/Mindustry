@@ -12,7 +12,9 @@ import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.net.*;
 import mindustry.type.*;
 
 import java.io.*;
@@ -21,9 +23,9 @@ import static mindustry.Vars.content;
 
 public class EntityComps{
 
-    @Depends({HealthComp.class, VelComp.class, StatusComp.class})
+    @Depends({HealthComp.class, VelComp.class, StatusComp.class, TeamComp.class, ItemsComp.class})
     class UnitComp{
-
+        //UnitDef type;
     }
 
     class OwnerComp{
@@ -35,7 +37,13 @@ public class EntityComps{
         BulletType bullet;
 
         void init(){
-            bullet.init();
+            //TODO
+            bullet.init(null);
+        }
+
+        void remove(){
+            //TODO
+            bullet.despawned(null);
         }
     }
 
@@ -65,6 +73,27 @@ public class EntityComps{
         }
     }
 
+    class FlyingComp{
+        boolean flying;
+    }
+
+    class LegsComp{
+
+    }
+
+    class RotComp{
+        float rotation;
+    }
+
+    class TeamComp{
+        Team team = Team.sharded;
+    }
+
+    @Depends(PosComp.class)
+    class SyncComp{
+        Interpolator interpolator;
+    }
+
     abstract class PosComp implements Position{
         float x, y;
 
@@ -74,9 +103,24 @@ public class EntityComps{
         }
     }
 
+    abstract class DamageComp{
+        abstract float getDamage();
+    }
+
+    class MinerComp{
+
+    }
+
+    class BuilderComp{
+
+    }
+
+    class ItemsComp{
+        ItemStack item = new ItemStack();
+    }
+
     @Depends(PosComp.class)
     class VelComp{
-        //transient fields act as imports from any other component clases; these are ignored by the generator
         transient float x, y;
 
         final Vec2 vel = new Vec2();
