@@ -13,6 +13,7 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
@@ -25,6 +26,7 @@ public class JoinDialog extends FloatingDialog{
     Server renaming;
     Table local = new Table();
     Table remote = new Table();
+    Table global = new Table();
     Table hosts = new Table();
     int totalHosts;
 
@@ -83,12 +85,14 @@ public class JoinDialog extends FloatingDialog{
         keyDown(KeyCode.F5, () -> {
             refreshLocal();
             refreshRemote();
+            refreshGlobal();
         });
 
         shown(() -> {
             setup();
             refreshLocal();
             refreshRemote();
+            refreshGlobal();
 
             if(!steam){
                 Core.app.post(() -> Core.settings.getBoolOnce("joininfo", () -> ui.showInfo("$join.info")));
@@ -99,6 +103,7 @@ public class JoinDialog extends FloatingDialog{
             setup();
             refreshLocal();
             refreshRemote();
+            refreshGlobal();
         });
     }
 
@@ -232,9 +237,25 @@ public class JoinDialog extends FloatingDialog{
 
         hosts.clear();
 
-        hosts.add(remote).growX();
+        hosts.add("local servers").pad(10).growX().left().color(Pal.accent);
+        hosts.row();
+        hosts.addImage().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
         hosts.row();
         hosts.add(local).width(w);
+        hosts.row();
+
+        hosts.add("remote servers").pad(10).growX().left().color(Pal.accent);
+        hosts.row();
+        hosts.addImage().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
+        hosts.row();
+        hosts.add(remote).growX();
+        hosts.row();
+
+        hosts.add("global servers").pad(10).growX().left().color(Pal.accent);
+        hosts.row();
+        hosts.addImage().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
+        hosts.row();
+        hosts.add(global).width(w);
 
         ScrollPane pane = new ScrollPane(hosts);
         pane.setFadeScrollBars(false);
@@ -296,12 +317,17 @@ public class JoinDialog extends FloatingDialog{
         local.background(null);
         local.table(Tex.button, t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering.any") + Strings.animated(Time.time(), 4, 10f, ".")).pad(10f)).growX();
         net.discoverServers(this::addLocalHost, this::finishLocalHosts);
+    }
+
+    void refreshGlobal(){
+        global.clear();
+        global.background(null);
         for(String host : defaultServers){
             String resaddress = host.contains(":") ? host.split(":")[0] : host;
             int resport = host.contains(":") ? Strings.parseInt(host.split(":")[1]) : port;
             net.pingHost(resaddress, resport, res -> {
                 res.port = resport;
-                addLocalHost(res);
+                addGlobalHost(res);
             }, e -> {});
         }
     }
@@ -329,6 +355,18 @@ public class JoinDialog extends FloatingDialog{
         local.row();
 
         TextButton button = local.addButton("", Styles.cleart, () -> safeConnect(host.address, host.port, host.version))
+        .width(w).pad(5f).get();
+        button.clearChildren();
+        buildServer(host, button);
+    }
+
+    void addGlobalHost(Host host){
+        global.background(null);
+        float w = targetWidth();
+
+        global.row();
+
+        TextButton button = global.addButton("", Styles.cleart, () -> safeConnect(host.address, host.port, host.version))
         .width(w).pad(5f).get();
         button.clearChildren();
         buildServer(host, button);
