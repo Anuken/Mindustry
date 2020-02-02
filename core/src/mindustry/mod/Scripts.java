@@ -9,6 +9,7 @@ import arc.util.Log.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.regex.*;
 import mindustry.*;
 import mindustry.mod.Mods.*;
 import org.mozilla.javascript.*;
@@ -106,6 +107,7 @@ public class Scripts implements Disposable{
     }
 
     private class ScriptModuleProvider extends UrlModuleSourceProvider{
+		private Pattern directory = Pattern.compile("^(.+?)/(.+)");
         public ScriptModuleProvider(){
             super(null, null);
         }
@@ -113,11 +115,27 @@ public class Scripts implements Disposable{
         @Override
         public ModuleSource loadSource(String moduleId, Scriptable paths, Object validator) throws IOException, URISyntaxException{
             if(loadedMod == null) return null;
-            Fi module = loadedMod.root.child("scripts").child(moduleId + ".js");
+            return loadSource(loadedMod, moduleId, loadedMod.root.child("scripts"), validator);
+        }
+
+        private ModuleSource loadSource(LoadedMod mod, String moduleId, Fi root, Object validator) throws IOException, URISyntaxException{
+			Matcher matched = directory.matcher(moduleId);
+			if(matched.find()){
+				LoadedMod required = Vars.mods.locateMod(matched.group(1));
+				String script = matched.group(2);
+				if(required == null || root == required.root.child("scripts")){ // Mod not found, or already using a mod
+					Fi dir = root.child(matched.group(1));
+					if(dir == null) return null; // Mod and folder not found
+					return loadSource(mod, script, dir, validator);
+				}
+				return loadSource(required, script, required.root.child("scripts"), validator);
+			}
+
+            Fi module = root.child(moduleId + ".js");
             if(!module.exists() || module.isDirectory()) return null;
             return new ModuleSource(
                 new InputStreamReader(new ByteArrayInputStream((fillWrapper(module)).getBytes())),
-                null, new URI(moduleId), module.parent().file().toURI(), validator);
+                null, new URI(moduleId), root.file().toURI(), validator);
         }
     }
 }

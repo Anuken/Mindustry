@@ -317,7 +317,7 @@ public class Mods implements Loadable{
         return result;
     }
 
-    private LoadedMod locateMod(String name){
+    public LoadedMod locateMod(String name){
         return mods.find(mod -> mod.enabled() && mod.name.equals(name));
     }
 
