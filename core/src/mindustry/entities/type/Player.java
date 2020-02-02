@@ -72,6 +72,9 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     private Vec2 movement = new Vec2();
     private boolean moved;
 
+    public int idle = 0;
+    public boolean syncWhenIdle = false;
+
     //endregion
 
     //region unit and event overrides, utility methods
@@ -969,5 +972,10 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         String team = getTeam().color() + icon +" ";
 
         return team + "[lightgray]" + name + " ";
+    }
+
+    // define when a player is doing nothing (useful)
+    public boolean idle(){
+        return velocity.isZero(0.1f) && placeQueue.isEmpty() && !isShooting;
     }
 }
