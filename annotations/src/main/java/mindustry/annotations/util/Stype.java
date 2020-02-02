@@ -1,6 +1,7 @@
 package mindustry.annotations.util;
 
 import arc.struct.*;
+import mindustry.annotations.*;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
@@ -10,6 +11,20 @@ public class Stype extends Selement<TypeElement>{
 
     public Stype(TypeElement typeElement){
         super(typeElement);
+    }
+
+    public Array<Stype> superclasses(){
+        Array<Stype> out = new Array<>();
+        Stype sup = superclass();
+        while(!sup.superclass().name().equals("java.lang.Object")){
+            out.add(sup);
+            sup = superclass();
+        }
+        return out;
+    }
+
+    public Stype superclass(){
+        return new Stype((TypeElement)BaseProcessor.typeu.asElement(BaseProcessor.typeu.directSupertypes(mirror()).get(0)));
     }
 
     public <A extends Annotation> A annotation(Class<A> annotation){

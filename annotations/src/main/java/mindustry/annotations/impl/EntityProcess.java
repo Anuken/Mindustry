@@ -48,7 +48,14 @@ public class EntityProcess extends BaseProcessor{
                     //getter
                     inter.addMethod(MethodSpec.methodBuilder("get" + cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).returns(field.tname()).build());
                     //setter
-                    inter.addMethod(MethodSpec.methodBuilder("set" + cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).addParameter(field.tname(), field.name()).build());
+                    if(!field.is(Modifier.FINAL)) inter.addMethod(MethodSpec.methodBuilder("set" + cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).addParameter(field.tname(), field.name()).build());
+                }
+
+                //add utility methods to interface
+                for(Smethod method : component.methods()){
+                    inter.addMethod(MethodSpec.methodBuilder(method.name()).returns(method.ret().toString().equals("void") ? TypeName.VOID : method.retn())
+                    .addParameters(method.params().map(v -> ParameterSpec.builder(v.tname(), v.name())
+                    .build())).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
                 }
 
                 write(inter);

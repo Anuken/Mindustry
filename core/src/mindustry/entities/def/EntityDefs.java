@@ -3,6 +3,7 @@ package mindustry.entities.def;
 import arc.math.geom.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.net.*;
 
 public class EntityDefs{
@@ -24,7 +25,7 @@ public class EntityDefs{
     }
 
     class Vel extends Pos{
-        Vec2 vel = new Vec2();
+        final Vec2 vel = new Vec2();
 
         void update(){
             x += vel.x;
@@ -34,7 +35,7 @@ public class EntityDefs{
     }
 
     class Status{
-        Statuses statuses = new Statuses();
+        final Statuses statuses = new Statuses();
 
         void update(){
             statuses.update(null);
@@ -45,4 +46,15 @@ public class EntityDefs{
         NetConnection connection;
     }
 
+    static <T extends Connectionc & Velc & Healthc & Posc> void doSomethingWithAConnection(T value){
+        value.setX(0);
+        value.setY(0);
+        value.getVel().set(100, 100f);
+        value.setDead(true);
+        value.getConnection().kick("you are dead");
+    }
+
+    static void test(){
+        doSomethingWithAConnection(new PlayerGen());
+    }
 }

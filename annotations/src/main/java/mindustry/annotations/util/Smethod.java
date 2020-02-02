@@ -1,6 +1,7 @@
 package mindustry.annotations.util;
 
 import arc.struct.*;
+import com.squareup.javapoet.*;
 import com.sun.source.tree.*;
 import mindustry.annotations.*;
 
@@ -19,6 +20,10 @@ public class Smethod extends Selement<ExecutableElement>{
 
     public TypeMirror ret(){
         return e.getReturnType();
+    }
+
+    public TypeName retn(){
+        return TypeName.get(ret());
     }
 
     public MethodTree tree(){
