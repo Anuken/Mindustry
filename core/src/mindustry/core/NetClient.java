@@ -182,21 +182,7 @@ public class NetClient implements ApplicationListener{
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
 
-            char icon = Iconc.modeSurvival;
-
-//            Gamemode gamemode = Gamemode.bestFit(state.rules);
-//            if(gamemode == Gamemode.pvp) icon = Iconc.modePvp;
-//            if(gamemode == Gamemode.attack) icon = Iconc.modeAttack;
-//            if(gamemode == Gamemode.sandbox) icon = Iconc.filter;
-
-            if(netServer.chain.highlord(player)) icon = Iconc.hammer;
-            if(player.isAdmin) icon = Iconc.admin;
-
-            String name = player.name.replaceAll("(\\[.*?])", "");
-            message = message.replaceAll("(\\[.*?])", "");
-            String team = "[#" + player.getTeam().color + "]"+ icon +" ";
-
-            Call.sendMessage(team + "[lightgray]" + name + " [orange]> [white]" + message);
+            Call.sendMessage(player.prefix() + message.replaceAll("(\\[.*?])", ""));
         }else{
             //log command to console but with brackets
             Log.info("<&y{0}: &lm{1}&lg>", player.name, message);

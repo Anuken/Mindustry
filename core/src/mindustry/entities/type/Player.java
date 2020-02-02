@@ -953,4 +953,16 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     //endregion
+
+    public String prefix(){
+        char icon = Iconc.modeSurvival;
+
+        if(netServer.chain.highlord(this)) icon = Iconc.hammer;
+        if(this.isAdmin) icon = Iconc.admin;
+
+        String name = this.name.replaceAll("(\\[.*?])", "");
+        String team = "[#" + this.getTeam().color + "]"+ icon +" ";
+
+        return team + "[lightgray]" + name + " [orange]> [white]";
+    }
 }
