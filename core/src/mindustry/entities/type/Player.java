@@ -961,7 +961,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         if(this.isAdmin) icon = Iconc.admin;
 
         String name = this.name.replaceAll("(\\[.*?])", "");
-        String team = "[#" + this.getTeam().color + "]"+ icon +" ";
+        String team = getTeam().color() + icon +" ";
 
         return team + "[lightgray]" + name + " [orange]> [white]";
     }

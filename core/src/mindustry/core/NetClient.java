@@ -28,6 +28,7 @@ import mindustry.world.*;
 import mindustry.world.modules.*;
 
 import java.io.*;
+import java.util.regex.*;
 import java.util.zip.*;
 
 import static mindustry.Vars.*;
@@ -182,7 +183,16 @@ public class NetClient implements ApplicationListener{
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
 
-            Call.sendMessage(player.prefix() + message.replaceAll("(\\[.*?])", ""));
+            message = message.replaceAll("(\\[.*?])", "");
+            Pattern p = Pattern.compile("[A-Z]+");
+            Matcher m = p.matcher(message);
+            StringBuffer sb = new StringBuffer();
+            while (m.find()) {
+                m.appendReplacement(sb, player.getTeam().color() + m.group().toLowerCase() + "[]");
+            }
+            m.appendTail(sb);
+
+            Call.sendMessage(player.prefix() + sb.toString());
         }else{
             //log command to console but with brackets
             Log.info("<&y{0}: &lm{1}&lg>", player.name, message);

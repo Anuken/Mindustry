@@ -99,4 +99,8 @@ public class Team implements Comparable<Team>{
     public String toString(){
         return name;
     }
+
+    public String color(){
+        return "[#" + color + "]";
+    }
 }
