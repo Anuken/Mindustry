@@ -72,7 +72,7 @@ public class Incinerator extends Block{
 
         if(Mathf.chance(0.05)){
             if(net.server()){
-                Tile out = tryOffloadNear(tile, Items.pyratite, t -> t.block() instanceof Conveyor && t.back() == tile);
+                Tile out = tryOffloadNear(tile, Items.pyratite, t -> t.block() instanceof Conveyor);
                 if(out != null) {
                     Call.rotateBlock(null, out, true);
                     Call.rotateBlock(null, out, false);
