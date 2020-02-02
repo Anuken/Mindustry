@@ -41,21 +41,27 @@ public class EntityProcess extends BaseProcessor{
 
             //find all components used...
             for(Stype type : allDefs){
-                imports.addAll(getImports(type.e));
                 allComponents.addAll(allComponents(type));
             }
 
             //add all components w/ dependencies
-            allComponents.addAll(types(Depends.class));
+            allComponents.addAll(types(Depends.class).map(s -> Array.withArrays(getDependencies(s), s)).flatten());
+
+            //add component imports
+            for(Stype comp : allComponents){
+                imports.addAll(getImports(comp.e));
+            }
 
             //create component interfaces
             for(Stype component : allComponents){
                 TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(component)).addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
 
+                //implement extra interfaces these components may have, e.g. position
                 for(Stype extraInterface : component.interfaces()){
                     inter.addSuperinterface(extraInterface.mirror());
                 }
 
+                //implement super interfaces
                 Array<Stype> depends = getDependencies(component);
                 for(Stype type : depends){
                     inter.addSuperinterface(ClassName.get(packageName, interfaceName(type)));
@@ -100,7 +106,7 @@ public class EntityProcess extends BaseProcessor{
                     Array<Svar> fields = comp.fields().select(f -> !f.is(Modifier.TRANSIENT));
                     for(Svar f : fields){
                         VariableTree tree = f.tree();
-                        FieldSpec.Builder fbuilder = FieldSpec.builder(f.tname(), f.name(), Modifier.PUBLIC);
+                        FieldSpec.Builder fbuilder = FieldSpec.builder(f.tname(), f.name());
                         //add initializer if it exists
                         if(tree.getInitializer() != null){
                             fbuilder.initializer(tree.getInitializer().toString());
@@ -128,13 +134,15 @@ public class EntityProcess extends BaseProcessor{
                         mbuilder.addParameter(var.tname(), var.name());
                     }
 
-                    boolean returns = !first.ret().toString().equals("void");
+                    //only write the block if it's a void method with several entries
+                    boolean writeBlock = first.ret().toString().equals("void") && entry.value.size > 1;
 
                     for(Smethod elem : entry.value){
                         //get all statements in the method, copy them over
                         MethodTree methodTree = elem.tree();
                         BlockTree blockTree = methodTree.getBody();
                         String str = blockTree.toString();
+                        //name for code blocks in the methods
                         String blockName = elem.up().getSimpleName().toString().toLowerCase().replace("comp", "");
 
                         //skip empty blocks
@@ -143,13 +151,20 @@ public class EntityProcess extends BaseProcessor{
                         }
 
                         //wrap scope to prevent variable leakage
-                        if(!returns) mbuilder.addCode(blockName + ": {\n");
+                        if(writeBlock){
+                            //replace return; with block break
+                            str = str.replace("return;", "break " + blockName + ";");
+                            mbuilder.addCode(blockName + ": {\n");
+                        }
+
+                        //trim block
+                        str = str.substring(2, str.length() - 1);
 
                         //make sure to remove braces here
-                        mbuilder.addCode(str.substring(2, str.length() - 1).replace("return;", "break " + blockName + ";"));
+                        mbuilder.addCode(str);
 
                         //end scope
-                        if(!returns) mbuilder.addCode("}\n");
+                        if(writeBlock) mbuilder.addCode("}\n");
                     }
 
                     builder.addMethod(mbuilder.build());
@@ -194,7 +209,7 @@ public class EntityProcess extends BaseProcessor{
     }
 
     Array<String> getImports(Element elem){
-        return Array.with(trees.getPath(elem).getCompilationUnit().getImports()).map(t -> t.toString());
+        return Array.with(trees.getPath(elem).getCompilationUnit().getImports()).map(Object::toString);
     }
 
     /** @return interface for a component type */
