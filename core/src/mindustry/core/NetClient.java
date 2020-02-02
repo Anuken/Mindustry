@@ -188,7 +188,7 @@ public class NetClient implements ApplicationListener{
             Matcher m = p.matcher(message);
             StringBuffer sb = new StringBuffer();
             while (m.find()) {
-                m.appendReplacement(sb, player.getTeam().color() + m.group().toLowerCase() + "[]");
+                m.appendReplacement(sb, player.getTeam().color() + m.group() + "[]");
             }
             m.appendTail(sb);
 
