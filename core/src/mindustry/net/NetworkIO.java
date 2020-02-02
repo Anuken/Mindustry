@@ -83,6 +83,8 @@ public class NetworkIO{
             name = "First player to join = admin ❤️";
             name = ":foot: :snake: <:ohno:597477759689687040> :scream:";
             name = "<:plastanium:632785242805239810> craters welcome you️";
+            name = "<:slag:632785242968686632> join us, we have :cookie:";
+            name = "<:slag:632785242968686632> we would be honored if you would join us";
         }
 
 

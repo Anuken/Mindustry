@@ -1,1 +1,2 @@
-[scarlet][[Server]:[] our discord: https://discord.[accent]gg[]/[royal]uQWecPM[]
+config desc [darkgray]https:[goldenrod]//[]discord.[lightgray]gg[goldenrod]/[darkgray]uQWecPM
+config motd off
