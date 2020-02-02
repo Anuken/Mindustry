@@ -733,6 +733,8 @@ public class NetServer implements ApplicationListener{
         for(Tile tile : titanic){
             sent ++;
 
+            if(tile == null || tile.entity == null) continue;
+
             dataStream.writeInt(tile.entity.tile.pos());
             tile.entity.write(dataStream);
 
