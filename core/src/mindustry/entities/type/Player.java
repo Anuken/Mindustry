@@ -968,7 +968,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         if(netServer.chain.highlord(this)) icon = Iconc.hammer;
         if(this.isAdmin) icon = Iconc.admin;
 
-        String name = this.name;
+        String name = "[#" + color.toString().toUpperCase() + "]" + this.name;
         String team = getTeam().color() + icon +" ";
 
         return team + "[lightgray]" + name + " ";
