@@ -192,7 +192,7 @@ public class UnitFactory extends Block{
         float buildTime;
         float time;
         float speedScl;
-        int spawned;
+        public int spawned;
 
         @Override
         public void write(DataOutput stream) throws IOException{
