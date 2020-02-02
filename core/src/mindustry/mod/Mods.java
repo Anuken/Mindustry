@@ -460,24 +460,24 @@ public class Mods implements Loadable{
             eachEnabled(mod -> {
                 if(mod.root.child("scripts").exists()){
                     content.setCurrentMod(mod);
-					Fi main = mod.root.child("scripts").child("main.js");
-					if(main.exists() && !main.isDirectory()){
-						try{
-							if(scripts == null){
-								scripts = platform.createScripts();
-							}
-							scripts.run(mod, main);
-						}catch(Throwable e){
-							Core.app.post(() -> {
-								Log.err("Error loading main script {0} for mod {1}.", main.name(), mod.meta.name);
-								e.printStackTrace();
-							});
-						}
-					}else{
-						Core.app.post(() -> {
-							Log.err("No main.js found for mod {0}.", mod.meta.name);
-						});
-					}
+                    Fi main = mod.root.child("scripts").child("main.js");
+                    if(main.exists() && !main.isDirectory()){
+                        try{
+                            if(scripts == null){
+                                scripts = platform.createScripts();
+                            }
+                            scripts.run(mod, main);
+                        }catch(Throwable e){
+                            Core.app.post(() -> {
+                                Log.err("Error loading main script {0} for mod {1}.", main.name(), mod.meta.name);
+                                e.printStackTrace();
+                            });
+                        }
+                    }else{
+                        Core.app.post(() -> {
+                            Log.err("No main.js found for mod {0}.", mod.meta.name);
+                        });
+                    }
                 }
             });
         }finally{
