@@ -371,16 +371,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     @Override
     public void drawUnder(){
         if(dead) return;
-
-        float size = mech.engineSize * (mech.flying ? 1f : boostHeat);
-        Draw.color(mech.engineColor);
-        Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset), y + Angles.trnsy(rotation + 180, mech.engineOffset),
-        size + Mathf.absin(Time.time(), 2f, size / 4f));
-
-        Draw.color(Color.white);
-        Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset - 1f), y + Angles.trnsy(rotation + 180, mech.engineOffset - 1f),
-        (size + Mathf.absin(Time.time(), 2f, size / 4f)) / 2f);
-        Draw.color();
+        mech.drawEngine(this);
     }
 
     public void drawName(){
