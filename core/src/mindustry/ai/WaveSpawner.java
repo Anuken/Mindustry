@@ -39,7 +39,7 @@ public class WaveSpawner{
 
     /** @return true if the player is near a ground spawn point. */
     public boolean playerNear(){
-        return groundSpawns.contains(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < state.rules.dropZoneRadius);
+        return groundSpawns.contains(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < state.rules.dropZoneRadius && player.getTeam() != state.rules.waveTeam);
     }
 
     public void spawnEnemies(){

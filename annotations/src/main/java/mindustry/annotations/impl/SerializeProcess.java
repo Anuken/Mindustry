@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.zip.*;
 
 @SupportedAnnotationTypes("mindustry.annotations.Annotations.Serialize")
-public class SerializeAnnotationProcessor extends BaseProcessor{
+public class SerializeProcess extends BaseProcessor{
     /** Target class name. */
     private static final String className = "Serialization";
     /** Name of the base package to put all the generated classes. */
@@ -28,7 +28,7 @@ public class SerializeAnnotationProcessor extends BaseProcessor{
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
         classBuilder.addStaticBlock(CodeBlock.of(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(Base64.getDecoder().decode(data)))).readUTF()));
         classBuilder.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build());
-        classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
+        classBuilder.addJavadoc(RemoteProcess.autogenWarning);
 
         MethodSpec.Builder method = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 

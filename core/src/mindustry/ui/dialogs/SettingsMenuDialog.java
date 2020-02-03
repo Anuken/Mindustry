@@ -144,7 +144,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                 }
             })));
 
-            if(!ios){
+            if(!mobile){
                 t.row();
                 t.addImageTextButton("$data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath()));
             }
