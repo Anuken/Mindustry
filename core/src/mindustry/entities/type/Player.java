@@ -282,9 +282,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public void drawShadow(float offsetX, float offsetY){
-        float scl = mech.flying ? 1f : boostHeat / 2f;
-
-        Draw.rect(getIconRegion(), x + offsetX * scl, y + offsetY * scl, rotation - 90);
+        mech.drawShadow(this, offsetX, offsetY);
     }
 
     @Override
