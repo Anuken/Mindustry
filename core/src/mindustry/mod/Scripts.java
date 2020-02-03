@@ -108,6 +108,7 @@ public class Scripts implements Disposable{
 
     private class ScriptModuleProvider extends UrlModuleSourceProvider{
         private Pattern directory = Pattern.compile("^(.+?)/(.+)");
+
         public ScriptModuleProvider(){
             super(null, null);
         }
@@ -125,7 +126,7 @@ public class Scripts implements Disposable{
                 String script = matched.group(2);
                 if(required == null || root == required.root.child("scripts")){ // Mod not found, or already using a mod
                     Fi dir = root.child(matched.group(1));
-                    if(dir == null) return null; // Mod and folder not found
+                    if(!dir.exists()) return null; // Mod and folder not found
                     return loadSource(mod, script, dir, validator);
                 }
                 return loadSource(required, script, required.root.child("scripts"), validator);
