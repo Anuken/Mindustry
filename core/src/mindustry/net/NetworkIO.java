@@ -73,7 +73,7 @@ public class NetworkIO{
 
         String name = String.format("[goldenrod]Nydus Network [darkgray]//\\([%s]oo[])/\\\\", eyecolor);
         String map = world.getMap() == null ? "None" : world.getMap().name().replaceAll("(\\[.*?\\])", "");
-        String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
+        String description = headless && !Config.desc.string().equals("off") ? Config.desc.string().replaceAll("(\\[.*?\\])", "") : "";
 
         String[] greyscale = {"/127.0.0.1", "/192.99.169.18"};
         Log.info("ping: " + address.toString());
