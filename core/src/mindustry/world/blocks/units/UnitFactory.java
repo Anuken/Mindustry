@@ -109,7 +109,7 @@ public class UnitFactory extends Block{
     }
 
     @Override
-    public void unitRemoved(Tile tile, Unit unit){
+    public void unitRemoved(Tile tile, Unitc unit){
         UnitFactoryEntity entity = tile.ent();
         entity.spawned--;
         entity.spawned = Math.max(entity.spawned, 0);

@@ -13,8 +13,6 @@ import mindustry.content.Bullets;
 import mindustry.entities.EntityGroup;
 import mindustry.entities.Units;
 import mindustry.entities.type.Bullet;
-import mindustry.entities.type.TimedEntity;
-import mindustry.entities.type.Unit;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.graphics.Pal;
@@ -27,7 +25,7 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
 
     private static final Rand random = new Rand();
     private static final Rect rect = new Rect();
-    private static final Array<Unit> entities = new Array<>();
+    private static final Array<Unitc> entities = new Array<>();
     private static final IntSet hit = new IntSet();
     private static final int maxChain = 8;
     private static final float hitRange = 30f;
@@ -98,7 +96,7 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
                 });
             }
 
-            Unit furthest = Geometry.findFurthest(x, y, entities);
+            Unitc furthest = Geometry.findFurthest(x, y, entities);
 
             if(furthest != null){
                 hit.add(furthest.getID());

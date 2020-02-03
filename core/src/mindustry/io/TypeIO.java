@@ -42,8 +42,8 @@ public class TypeIO{
         return id == -1 ? null : playerGroup.getByID(id);
     }
 
-    @WriteClass(Unit.class)
-    public static void writeUnit(ByteBuffer buffer, Unit unit){
+    @WriteClass(Unitc.class)
+    public static void writeUnit(ByteBuffer buffer, Unitc unit){
         if(unit.getGroup() == null){
             buffer.put((byte)-1);
             return;
@@ -52,12 +52,12 @@ public class TypeIO{
         buffer.putInt(unit.getID());
     }
 
-    @ReadClass(Unit.class)
-    public static Unit readUnit(ByteBuffer buffer){
+    @ReadClass(Unitc.class)
+    public static Unitc readUnit(ByteBuffer buffer){
         byte gid = buffer.get();
         if(gid == -1) return null;
         int id = buffer.getInt();
-        return (Unit)entities.get(gid).getByID(id);
+        return (Unitc)entities.get(gid).getByID(id);
     }
 
     @WriteClass(ShooterTrait.class)

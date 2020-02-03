@@ -86,7 +86,7 @@ public class ItemTurret extends CooledTurret{
     }
 
     @Override
-    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+    public int acceptStack(Item item, int amount, Tile tile, Unitc source){
         TurretEntity entity = tile.ent();
 
         BulletType type = ammo.get(item);
@@ -97,7 +97,7 @@ public class ItemTurret extends CooledTurret{
     }
 
     @Override
-    public void handleStack(Item item, int amount, Tile tile, Unit source){
+    public void handleStack(Item item, int amount, Tile tile, Unitc source){
         for(int i = 0; i < amount; i++){
             handleItem(item, tile, null);
         }

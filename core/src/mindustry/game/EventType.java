@@ -1,13 +1,13 @@
 package mindustry.game;
 
 import arc.util.ArcAnnotate.*;
-import mindustry.core.GameState.State;
-import mindustry.ctype.UnlockableContent;
-import mindustry.entities.traits.BuilderTrait;
+import mindustry.core.GameState.*;
+import mindustry.ctype.*;
 import mindustry.entities.type.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.Tile;
+import mindustry.world.*;
 
 public class EventType{
 
@@ -280,10 +280,10 @@ public class EventType{
     public static class BuildSelectEvent{
         public final Tile tile;
         public final Team team;
-        public final BuilderTrait builder;
+        public final Builderc builder;
         public final boolean breaking;
 
-        public BuildSelectEvent(Tile tile, Team team, BuilderTrait builder, boolean breaking){
+        public BuildSelectEvent(Tile tile, Team team, Builderc builder, boolean breaking){
             this.tile = tile;
             this.team = team;
             this.builder = builder;
@@ -302,17 +302,17 @@ public class EventType{
     }
 
     public static class UnitDestroyEvent{
-        public final Unit unit;
+        public final Unitc unit;
 
-        public UnitDestroyEvent(Unit unit){
+        public UnitDestroyEvent(Unitc unit){
             this.unit = unit;
         }
     }
 
     public static class UnitCreateEvent{
-        public final BaseUnit unit;
+        public final Unitc unit;
 
-        public UnitCreateEvent(BaseUnit unit){
+        public UnitCreateEvent(Unitc unit){
             this.unit = unit;
         }
     }

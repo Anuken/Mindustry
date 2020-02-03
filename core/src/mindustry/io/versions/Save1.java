@@ -1,7 +1,7 @@
 package mindustry.io.versions;
 
 import arc.func.*;
-import mindustry.entities.traits.*;
+import mindustry.entities.*;
 
 import java.io.*;
 

@@ -1,14 +1,14 @@
 package mindustry.world.blocks;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import mindustry.content.*;
-import mindustry.entities.Effects.*;
+import mindustry.entities.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;

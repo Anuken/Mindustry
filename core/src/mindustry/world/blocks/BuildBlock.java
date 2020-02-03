@@ -217,7 +217,7 @@ public class BuildBlock extends Block{
         private float[] accumulator;
         private float[] totalAccumulator;
 
-        public boolean construct(Unit builder, @Nullable TileEntity core, float amount, boolean configured){
+        public boolean construct(Unitc builder, @Nullable TileEntity core, float amount, boolean configured){
             if(cblock == null){
                 kill();
                 return false;
@@ -238,10 +238,7 @@ public class BuildBlock extends Block{
             maxProgress = core == null ? maxProgress : checkRequired(core.items, maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
-
-            if(builder instanceof Player){
-                builderID = builder.getID();
-            }
+            builderID = builder.getId();
 
             if(progress >= 1f || state.rules.infiniteResources){
                 constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
@@ -250,7 +247,7 @@ public class BuildBlock extends Block{
             return false;
         }
 
-        public void deconstruct(Unit builder, @Nullable TileEntity core, float amount){
+        public void deconstruct(Unitc builder, @Nullable TileEntity core, float amount){
             float deconstructMultiplier = 0.5f;
 
             if(cblock != null){

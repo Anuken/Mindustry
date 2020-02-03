@@ -16,7 +16,6 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
-import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -69,7 +68,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     /** Check and assign targets for a specific position. */
     void checkTargets(float x, float y){
-        Unit unit = Units.closestEnemy(player.getTeam(), x, y, 20f, u -> !u.isDead());
+        Unitc unit = Units.closestEnemy(player.getTeam(), x, y, 20f, u -> !u.isDead());
 
         if(unit != null){
             player.setMineTile(null);

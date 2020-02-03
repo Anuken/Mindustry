@@ -21,6 +21,7 @@ import javax.lang.model.type.*;
 public class EntityProcess extends BaseProcessor{
     Array<Definition> definitions = new Array<>();
     Array<Stype> baseComponents;
+    ObjectMap<String, Stype> componentNames = new ObjectMap<>();
     ObjectMap<Stype, Array<Stype>> componentDependencies = new ObjectMap<>();
     ObjectMap<Stype, Array<Stype>> defComponents = new ObjectMap<>();
     ObjectSet<String> imports = new ObjectSet<>();
@@ -36,16 +37,11 @@ public class EntityProcess extends BaseProcessor{
         if(round == 1){
             baseComponents = types(BaseComponent.class);
             Array<Stype> allDefs = types(EntityDef.class);
+            Array<Stype> allComponents = types(Component.class);
 
-            ObjectSet<Stype> allComponents = new ObjectSet<>();
-
-            //find all components used...
-            for(Stype type : allDefs){
-                allComponents.addAll(allComponents(type));
+            for(Stype type : allComponents){
+                componentNames.put(type.name(), type);
             }
-
-            //add all components w/ dependencies
-            allComponents.addAll(types(Component.class).map(s -> Array.withArrays(getDependencies(s), s)).flatten());
 
             //add component imports
             for(Stype comp : allComponents){
@@ -57,7 +53,7 @@ public class EntityProcess extends BaseProcessor{
                 TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(component)).addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
 
                 //implement extra interfaces these components may have, e.g. position
-                for(Stype extraInterface : component.interfaces()){
+                for(Stype extraInterface : component.interfaces().select(i -> !isCompInterface(i))){
                     inter.addSuperinterface(extraInterface.mirror());
                 }
 
@@ -130,6 +126,8 @@ public class EntityProcess extends BaseProcessor{
 
                 //add all methods from components
                 for(ObjectMap.Entry<String, Array<Smethod>> entry : methods){
+                    entry.value.sort(m -> m.has(MethodPriority.class) ? m.annotation(MethodPriority.class).value() : 0);
+
                     //representative method
                     Smethod first = entry.value.first();
                     //build method using same params/returns
@@ -261,18 +259,8 @@ public class EntityProcess extends BaseProcessor{
     Array<Stype> getDependencies(Stype component){
         if(!componentDependencies.containsKey(component)){
             ObjectSet<Stype> out = new ObjectSet<>();
-            out.addAll(component.superclasses());
-            //TODO extreme confusion
-            //out.addAll(component.interfaces().select(this::isComponent));
-
-            //get dependency classes
-            if(component.annotation(Component.class) != null){
-                try{
-                    component.annotation(Component.class).value();
-                }catch(MirroredTypesException e){
-                    out.addAll(Array.with(e.getTypeMirrors()).map(Stype::of));
-                }
-            }
+            //add base component interfaces
+            out.addAll(component.interfaces().select(this::isCompInterface).map(this::interfaceToComp));
 
             //out now contains the base dependencies; finish constructing the tree
             ObjectSet<Stype> result = new ObjectSet<>();
@@ -289,6 +277,15 @@ public class EntityProcess extends BaseProcessor{
         }
 
         return componentDependencies.get(component);
+    }
+
+    boolean isCompInterface(Stype type){
+        return interfaceToComp(type) != null;
+    }
+
+    Stype interfaceToComp(Stype type){
+        String name = type.name().substring(0, type.name().length() - 1) + "Comp";
+        return componentNames.get(name);
     }
 
     boolean isComponent(Stype type){

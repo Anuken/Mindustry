@@ -12,7 +12,6 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
-import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
@@ -306,7 +305,7 @@ public class Renderer implements ApplicationListener{
         Draw.color(0, 0, 0, 0.4f);
         float rad = 1.6f;
 
-        Cons<Unit> draw = u -> {
+        Cons<Unitc> draw = u -> {
             float size = Math.max(u.getIconRegion().getWidth(), u.getIconRegion().getHeight()) * Draw.scl;
             Draw.rect("circle-shadow", u.x, u.y, size * rad, size * rad);
         };
@@ -331,14 +330,14 @@ public class Renderer implements ApplicationListener{
     }
 
     private void drawAllTeams(boolean flying){
-        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
-        playerGroup.draw(p -> p.isFlying() == flying && !p.isDead(), Unit::drawUnder);
+        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unitc::drawUnder);
+        playerGroup.draw(p -> p.isFlying() == flying && !p.isDead(), Unitc::drawUnder);
 
-        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
-        playerGroup.draw(p -> p.isFlying() == flying, Unit::drawAll);
+        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unitc::drawAll);
+        playerGroup.draw(p -> p.isFlying() == flying, Unitc::drawAll);
 
-        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
-        playerGroup.draw(p -> p.isFlying() == flying, Unit::drawOver);
+        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unitc::drawOver);
+        playerGroup.draw(p -> p.isFlying() == flying, Unitc::drawOver);
     }
 
     public void scaleCamera(float amount){

@@ -138,7 +138,7 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public void unitOn(Tile tile, Unit unit){
+    public void unitOn(Tile tile, Unitc unit){
         ConveyorEntity entity = tile.ent();
 
         if(entity.clogHeat > 0.5f){
@@ -256,13 +256,13 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+    public int acceptStack(Item item, int amount, Tile tile, Unitc source){
         ConveyorEntity entity = tile.ent();
         return Math.min((int)(entity.minitem / itemSpace), amount);
     }
 
     @Override
-    public void handleStack(Item item, int amount, Tile tile, Unit source){
+    public void handleStack(Item item, int amount, Tile tile, Unitc source){
         ConveyorEntity e = tile.ent();
 
         for(int i = amount - 1; i >= 0; i--){

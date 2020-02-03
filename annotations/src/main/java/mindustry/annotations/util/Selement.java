@@ -5,12 +5,21 @@ import mindustry.annotations.*;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
+import java.lang.annotation.*;
 
 public class Selement<T extends Element>{
     public final T e;
 
     public Selement(T e){
         this.e = e;
+    }
+
+    public <A extends Annotation> A annotation(Class<A> annotation){
+        return e.getAnnotation(annotation);
+    }
+
+    public <A extends Annotation> boolean has(Class<A> annotation){
+        return e.getAnnotation(annotation) != null;
     }
 
     public Element up(){

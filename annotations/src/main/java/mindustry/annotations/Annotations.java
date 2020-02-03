@@ -10,7 +10,14 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface Component{
         /** Dependencies. */
-        Class[] value() default {};
+        //Class[] value() default {};
+    }
+
+    /** Indicates priority of a method in an entity. Methods with higher priority are done last. */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface MethodPriority{
+        float value();
     }
 
     /** Indicates that a component def is present on all entities. */

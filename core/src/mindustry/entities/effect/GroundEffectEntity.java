@@ -6,7 +6,6 @@ import mindustry.Vars;
 import mindustry.entities.Effects;
 import mindustry.entities.Effects.Effect;
 import mindustry.entities.Effects.EffectRenderer;
-import mindustry.entities.type.EffectEntity;
 import mindustry.world.Tile;
 
 /**

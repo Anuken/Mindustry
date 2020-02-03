@@ -9,7 +9,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.Effects.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
@@ -125,7 +124,7 @@ public class Damage{
         rect.width += expand * 2;
         rect.height += expand * 2;
 
-        Cons<Unit> cons = e -> {
+        Cons<Unitc> cons = e -> {
             e.hitbox(hitrect);
             Rect other = hitrect;
             other.y -= expand;
@@ -146,8 +145,8 @@ public class Damage{
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
-    public static void damageUnits(Team team, float x, float y, float size, float damage, Boolf<Unit> predicate, Cons<Unit> acceptor){
-        Cons<Unit> cons = entity -> {
+    public static void damageUnits(Team team, float x, float y, float size, float damage, Boolf<Unitc> predicate, Cons<Unitc> acceptor){
+        Cons<Unitc> cons = entity -> {
             if(!predicate.get(entity)) return;
 
             entity.hitbox(hitrect);
@@ -178,7 +177,7 @@ public class Damage{
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete){
-        Cons<Unit> cons = entity -> {
+        Cons<Unitc> cons = entity -> {
             if(entity.getTeam() == team || entity.dst(x, y) > radius){
                 return;
             }

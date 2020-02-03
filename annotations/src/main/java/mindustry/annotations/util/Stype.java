@@ -5,7 +5,6 @@ import mindustry.annotations.*;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
-import java.lang.annotation.*;
 
 public class Stype extends Selement<TypeElement>{
 
@@ -33,10 +32,6 @@ public class Stype extends Selement<TypeElement>{
 
     public Stype superclass(){
         return new Stype((TypeElement)BaseProcessor.typeu.asElement(BaseProcessor.typeu.directSupertypes(mirror()).get(0)));
-    }
-
-    public <A extends Annotation> A annotation(Class<A> annotation){
-        return e.getAnnotation(annotation);
     }
 
     public Array<Svar> fields(){

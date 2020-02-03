@@ -7,8 +7,7 @@ import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.content.*;
 import mindustry.ctype.ContentType;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
+import mindustry.entities.*;
 import mindustry.type.*;
 
 import java.io.*;
@@ -27,7 +26,7 @@ public class Statuses implements Saveable{
     private float damageMultiplier;
     private float armorMultiplier;
 
-    public void handleApply(Unit unit, StatusEffect effect, float duration){
+    public void handleApply(Unitc unit, StatusEffect effect, float duration){
         if(effect == StatusEffects.none || effect == null || unit.isImmune(effect)) return; //don't apply empty or immune effects
 
         if(statuses.size > 0){
@@ -76,7 +75,7 @@ public class Statuses implements Saveable{
         statuses.clear();
     }
 
-    public void update(Unit unit){
+    public void update(Unitc unit){
         applied.clear();
         speedMultiplier = damageMultiplier = armorMultiplier = 1f;
 

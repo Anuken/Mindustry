@@ -1,4 +1,4 @@
-package mindustry.entities.traits;
+package mindustry.entities;
 
 import java.io.*;
 

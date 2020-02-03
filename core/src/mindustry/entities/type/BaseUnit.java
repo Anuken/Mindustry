@@ -11,7 +11,6 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.ContentType;
 import mindustry.entities.*;
-import mindustry.entities.traits.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -31,7 +30,7 @@ import java.io.*;
 import static mindustry.Vars.*;
 
 /** Base class for AI units. */
-public abstract class BaseUnit extends Unit implements ShooterTrait{
+public abstract class BaseUnit extends Unitc implements ShooterTrait{
     protected static int timerIndex = 0;
 
     protected static final int timerTarget = timerIndex++;
@@ -151,7 +150,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public void updateTargeting(){
-        if(target == null || (target instanceof Unit && (target.isDead() || target.getTeam() == team))
+        if(target == null || (target instanceof Unitc && (target.isDead() || target.getTeam() == team))
         || (target instanceof TileEntity && ((TileEntity)target).tile.entity == null)){
             target = null;
         }

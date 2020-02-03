@@ -1,7 +1,7 @@
 package mindustry.io.versions;
 
 import mindustry.ctype.ContentType;
-import mindustry.entities.traits.*;
+import mindustry.entities.*;
 import mindustry.io.*;
 import mindustry.type.TypeID;
 

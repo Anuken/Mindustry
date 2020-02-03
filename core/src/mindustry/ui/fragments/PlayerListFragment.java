@@ -8,7 +8,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
-import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.*;
@@ -66,7 +65,7 @@ public class PlayerListFragment extends Fragment{
 
         float h = 74f;
 
-        playerGroup.all().sort(Structs.comparing(Unit::getTeam));
+        playerGroup.all().sort(Structs.comparing(Unitc::getTeam));
         playerGroup.all().each(user -> {
             NetConnection connection = user.con;
 

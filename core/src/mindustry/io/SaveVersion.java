@@ -8,7 +8,6 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.ctype.ContentType;
 import mindustry.entities.*;
-import mindustry.entities.traits.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.maps.*;

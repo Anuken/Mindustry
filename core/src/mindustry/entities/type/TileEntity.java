@@ -21,7 +21,7 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
+public class TileEntity{
     public static final float timeToSleep = 60f * 1; //1 second to fall asleep
     private static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
     /** This value is only used for debugging. */
@@ -110,10 +110,6 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             sleeping = false;
             sleepingEntities--;
         }
-    }
-
-    public boolean isSleeping(){
-        return sleeping;
     }
 
     public boolean isDead(){
@@ -257,26 +253,6 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     }
 
     @Override
-    public void health(float health){
-        this.health = health;
-    }
-
-    @Override
-    public float health(){
-        return health;
-    }
-
-    @Override
-    public float maxHealth(){
-        return block.health;
-    }
-
-    @Override
-    public void setDead(boolean dead){
-        this.dead = dead;
-    }
-
-    @Override
     public void onDeath(){
         if(!dead){
             dead = true;
@@ -287,16 +263,6 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             tile.remove();
             remove();
         }
-    }
-
-    @Override
-    public Team getTeam(){
-        return tile.getTeam();
-    }
-
-    @Override
-    public Vec2 velocity(){
-        return Vec2.ZERO;
     }
 
     @Override
@@ -337,11 +303,6 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     @Override
     public boolean isValid(){
         return !isDead() && tile.entity == this;
-    }
-
-    @Override
-    public EntityGroup targetGroup(){
-        return tileGroup;
     }
 
     @Override

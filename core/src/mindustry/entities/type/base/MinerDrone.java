@@ -3,7 +3,6 @@ package mindustry.entities.type.base;
 import arc.math.Mathf;
 import arc.util.Structs;
 import mindustry.content.Blocks;
-import mindustry.entities.traits.MinerTrait;
 import mindustry.entities.type.TileEntity;
 import mindustry.entities.units.UnitState;
 import mindustry.gen.Call;

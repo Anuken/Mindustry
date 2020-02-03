@@ -11,8 +11,6 @@ import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;

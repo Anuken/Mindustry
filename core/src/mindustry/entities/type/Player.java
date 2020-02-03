@@ -34,7 +34,7 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
+public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
     public static final int timerSync = 2;
     public static final int timerAbility = 3;
     private static final float liftoffBoost = 0.2f;

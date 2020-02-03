@@ -10,7 +10,6 @@ import arc.math.geom.Rect;
 import arc.util.Time;
 import mindustry.entities.Units;
 import mindustry.entities.type.TileEntity;
-import mindustry.entities.type.Unit;
 import mindustry.graphics.*;
 import mindustry.world.Block;
 import mindustry.world.Tile;
@@ -141,7 +140,7 @@ public class RepairPoint extends Block{
     }
 
     public class RepairPointEntity extends TileEntity{
-        public Unit target;
+        public Unitc target;
         public float strength, rotation = 90;
     }
 }

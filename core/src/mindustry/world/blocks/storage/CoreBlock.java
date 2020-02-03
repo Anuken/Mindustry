@@ -8,7 +8,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
@@ -239,7 +238,7 @@ public class CoreBlock extends StorageBlock{
         protected int storageCapacity;
 
         @Override
-        public boolean hasUnit(Unit unit){
+        public boolean hasUnit(Unitc unit){
             return unit == spawnPlayer;
         }
 

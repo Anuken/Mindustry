@@ -3,7 +3,6 @@ package mindustry.entities;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
-import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.*;
 import mindustry.world.*;
@@ -13,7 +12,7 @@ import static mindustry.Vars.*;
 /** Utility class for unit and team interactions.*/
 public class Units{
     private static Rect hitrect = new Rect();
-    private static Unit result;
+    private static Unitc result;
     private static float cdist;
     private static boolean boolResult;
 
@@ -41,7 +40,7 @@ public class Units{
     }
 
     /** See {@link #invalidateTarget(TargetTrait, Team, float, float, float)} */
-    public static boolean invalidateTarget(TargetTrait target, Unit targeter){
+    public static boolean invalidateTarget(TargetTrait target, Unitc targeter){
         return invalidateTarget(target, targeter.getTeam(), targeter.x, targeter.y, targeter.getWeapon().bullet.range());
     }
 
@@ -88,19 +87,19 @@ public class Units{
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
     public static TargetTrait closestTarget(Team team, float x, float y, float range){
-        return closestTarget(team, x, y, range, Unit::isValid);
+        return closestTarget(team, x, y, range, Unitc::isValid);
     }
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
-    public static TargetTrait closestTarget(Team team, float x, float y, float range, Boolf<Unit> unitPred){
+    public static TargetTrait closestTarget(Team team, float x, float y, float range, Boolf<Unitc> unitPred){
         return closestTarget(team, x, y, range, unitPred, t -> true);
     }
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
-    public static TargetTrait closestTarget(Team team, float x, float y, float range, Boolf<Unit> unitPred, Boolf<Tile> tilePred){
+    public static TargetTrait closestTarget(Team team, float x, float y, float range, Boolf<Unitc> unitPred, Boolf<Tile> tilePred){
         if(team == Team.derelict) return null;
 
-        Unit unit = closestEnemy(team, x, y, range, unitPred);
+        Unitc unit = closestEnemy(team, x, y, range, unitPred);
         if(unit != null){
             return unit;
         }else{
@@ -109,7 +108,7 @@ public class Units{
     }
 
     /** Returns the closest enemy of this team. Filter by predicate. */
-    public static Unit closestEnemy(Team team, float x, float y, float range, Boolf<Unit> predicate){
+    public static Unitc closestEnemy(Team team, float x, float y, float range, Boolf<Unitc> predicate){
         if(team == Team.derelict) return null;
 
         result = null;
@@ -129,7 +128,7 @@ public class Units{
     }
 
     /** Returns the closest ally of this team. Filter by predicate. */
-    public static Unit closest(Team team, float x, float y, float range, Boolf<Unit> predicate){
+    public static Unitc closest(Team team, float x, float y, float range, Boolf<Unitc> predicate){
         result = null;
         cdist = 0f;
 
@@ -147,7 +146,7 @@ public class Units{
     }
 
     /** Iterates over all units in a rectangle. */
-    public static void nearby(Team team, float x, float y, float width, float height, Cons<Unit> cons){
+    public static void nearby(Team team, float x, float y, float width, float height, Cons<Unitc> cons){
         unitGroup.intersect(x, y, width, height, u -> {
             if(u.getTeam() == team){
                 cons.get(u);
@@ -161,7 +160,7 @@ public class Units{
     }
 
     /** Iterates over all units in a circle around this position. */
-    public static void nearby(Team team, float x, float y, float radius, Cons<Unit> cons){
+    public static void nearby(Team team, float x, float y, float radius, Cons<Unitc> cons){
         unitGroup.intersect(x - radius, y - radius, radius*2f, radius*2f, unit -> {
             if(unit.getTeam() == team && unit.withinDst(x, y, radius)){
                 cons.get(unit);
@@ -176,18 +175,18 @@ public class Units{
     }
 
     /** Iterates over all units in a rectangle. */
-    public static void nearby(float x, float y, float width, float height, Cons<Unit> cons){
+    public static void nearby(float x, float y, float width, float height, Cons<Unitc> cons){
         unitGroup.intersect(x, y, width, height, cons);
         playerGroup.intersect(x, y, width, height, cons);
     }
 
     /** Iterates over all units in a rectangle. */
-    public static void nearby(Rect rect, Cons<Unit> cons){
+    public static void nearby(Rect rect, Cons<Unitc> cons){
         nearby(rect.x, rect.y, rect.width, rect.height, cons);
     }
 
     /** Iterates over all units that are enemies of this team. */
-    public static void nearbyEnemies(Team team, float x, float y, float width, float height, Cons<Unit> cons){
+    public static void nearbyEnemies(Team team, float x, float y, float width, float height, Cons<Unitc> cons){
         unitGroup.intersect(x, y, width, height, u -> {
             if(team.isEnemy(u.getTeam())){
                 cons.get(u);
@@ -202,12 +201,12 @@ public class Units{
     }
 
     /** Iterates over all units that are enemies of this team. */
-    public static void nearbyEnemies(Team team, Rect rect, Cons<Unit> cons){
+    public static void nearbyEnemies(Team team, Rect rect, Cons<Unitc> cons){
         nearbyEnemies(team, rect.x, rect.y, rect.width, rect.height, cons);
     }
 
     /** Iterates over all units. */
-    public static void all(Cons<Unit> cons){
+    public static void all(Cons<Unitc> cons){
         unitGroup.all().each(cons);
         playerGroup.all().each(cons);
     }

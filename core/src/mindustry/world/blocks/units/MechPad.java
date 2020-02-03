@@ -9,13 +9,11 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
@@ -143,7 +141,7 @@ public class MechPad extends Block{
         float heat;
 
         @Override
-        public boolean hasUnit(Unit unit){
+        public boolean hasUnit(Unitc unit){
             return unit == player;
         }
 

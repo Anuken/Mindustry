@@ -49,7 +49,7 @@ public class UnitDef extends UnlockableContent{
     public Sound deathSound = Sounds.bang;
 
     public Array<Weapon> weapons = new Array<>();
-    public TextureRegion baseRegion, legRegion, region;
+    public TextureRegion baseRegion, legRegion, region, cellRegion;
 
     public UnitDef(String name){
         super(name);
@@ -87,6 +87,7 @@ public class UnitDef extends UnlockableContent{
         region = Core.atlas.find(name);
         legRegion = Core.atlas.find(name + "-leg");
         baseRegion = Core.atlas.find(name + "-base");
+        cellRegion = Core.atlas.find(name + "-cell", Core.atlas.find("power-cell"));
     }
 
     @Override
@@ -96,13 +97,13 @@ public class UnitDef extends UnlockableContent{
 
     //TODO remove methods below!
 
-    public void update(Unit player){
+    public void update(Unitc player){
     }
 
-    public void draw(Unit player){
+    public void draw(Unitc player){
     }
 
-    public void drawStats(Unit player){
+    public void drawStats(Unitc player){
         if(drawCell){
             float health = player.healthf();
             Draw.color(Color.black, player.getTeam().color, health + Mathf.absin(Time.time(), health * 5f, 1f - health));
@@ -118,25 +119,25 @@ public class UnitDef extends UnlockableContent{
         }
     }
 
-    public float getExtraArmor(Unit player){
+    public float getExtraArmor(Unitc player){
         return 0f;
     }
 
     //TODO remove
-    public float spreadX(Unit player){
+    public float spreadX(Unitc player){
         return 0f;
     }
 
     //TODO remove
-    public float getRotationAlpha(Unit player){
+    public float getRotationAlpha(Unitc player){
         return 1f;
     }
 
-    public boolean canShoot(Unit player){
+    public boolean canShoot(Unitc player){
         return true;
     }
 
-    public void onLand(Unit player){
+    public void onLand(Unitc player){
     }
 
 }

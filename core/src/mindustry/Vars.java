@@ -189,7 +189,7 @@ public class Vars implements Loadable{
     public static EntityGroup<Fire> fireGroup;
     public static EntityGroup<BaseUnit> unitGroup;
 
-    public static Player player;
+    public static Unitc player;
 
     @Override
     public void loadAsync(){

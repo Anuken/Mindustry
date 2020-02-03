@@ -13,7 +13,6 @@ import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -365,8 +364,8 @@ public class NetClient implements ApplicationListener{
                 if(created && entity.getInterpolator() != null && entity.getInterpolator().target != null){
                     //set initial starting position
                     entity.setNet(entity.getInterpolator().target.x, entity.getInterpolator().target.y);
-                    if(entity instanceof Unit && entity.getInterpolator().targets.length > 0){
-                        ((Unit)entity).rotation = entity.getInterpolator().targets[0];
+                    if(entity instanceof Unitc && entity.getInterpolator().targets.length > 0){
+                        ((Unitc)entity).rotation = entity.getInterpolator().targets[0];
                     }
                 }
 

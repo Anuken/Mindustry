@@ -9,7 +9,6 @@ import arc.util.pooling.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.traits.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -122,8 +121,8 @@ public class Bullet extends SolidEntity implements DamageTrait, Scaled, Poolable
     }
 
     public float damageMultiplier(){
-        if(owner instanceof Unit){
-            return ((Unit)owner).getDamageMultipler();
+        if(owner instanceof Unitc){
+            return ((Unitc)owner).getDamageMultipler();
         }
         return 1f;
     }
@@ -166,7 +165,7 @@ public class Bullet extends SolidEntity implements DamageTrait, Scaled, Poolable
 
     @Override
     public boolean collides(SolidTrait other){
-        return type.collides && (other != owner && !(other instanceof DamageTrait)) && !supressCollision && !(other instanceof Unit && ((Unit)other).isFlying() && !type.collidesAir);
+        return type.collides && (other != owner && !(other instanceof DamageTrait)) && !supressCollision && !(other instanceof Unitc && ((Unitc)other).isFlying() && !type.collidesAir);
     }
 
     @Override
@@ -174,8 +173,8 @@ public class Bullet extends SolidEntity implements DamageTrait, Scaled, Poolable
         if(!type.pierce) remove();
         type.hit(this, x, y);
 
-        if(other instanceof Unit){
-            Unit unit = (Unit)other;
+        if(other instanceof Unitc){
+            Unitc unit = (Unitc)other;
             unit.velocity().add(Tmp.v3.set(other.getX(), other.getY()).sub(x, y).setLength(type.knockback / unit.mass()));
             unit.applyEffect(type.status, type.statusDuration);
         }

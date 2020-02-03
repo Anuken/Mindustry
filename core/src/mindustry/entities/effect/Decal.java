@@ -3,7 +3,6 @@ package mindustry.entities.effect;
 import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
 import mindustry.entities.EntityGroup;
-import mindustry.entities.type.TimedEntity;
 import mindustry.graphics.Pal;
 
 import static mindustry.Vars.groundEffectGroup;

@@ -1,22 +1,19 @@
 package mindustry.entities.effect;
 
-import mindustry.annotations.Annotations.Loc;
-import mindustry.annotations.Annotations.Remote;
 import arc.graphics.g2d.*;
-import arc.math.Interpolation;
-import arc.math.Mathf;
-import arc.math.geom.Position;
-import arc.math.geom.Vec2;
-import arc.util.Time;
-import arc.util.pooling.Pools;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.util.*;
+import arc.util.pooling.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
-import mindustry.entities.type.TimedEntity;
-import mindustry.entities.type.Unit;
-import mindustry.graphics.Pal;
-import mindustry.type.Item;
-import mindustry.world.Tile;
+import mindustry.entities.type.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.type.*;
+import mindustry.world.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.effectGroup;
 
 public class ItemTransfer extends TimedEntity implements DrawTrait{
     private Vec2 from = new Vec2();
@@ -31,14 +28,14 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void transferItemEffect(Item item, float x, float y, Unit to){
+    public static void transferItemEffect(Item item, float x, float y, Itemsc to){
         if(to == null) return;
         create(item, x, y, to, () -> {
         });
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void transferItemToUnit(Item item, float x, float y, Unit to){
+    public static void transferItemToUnit(Item item, float x, float y, Itemsc to){
         if(to == null) return;
         create(item, x, y, to, () -> to.addItem(item));
     }

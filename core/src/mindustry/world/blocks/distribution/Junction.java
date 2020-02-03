@@ -2,7 +2,6 @@ package mindustry.world.blocks.distribution;
 
 import arc.util.Time;
 import mindustry.entities.type.TileEntity;
-import mindustry.entities.type.Unit;
 import mindustry.gen.BufferItem;
 import mindustry.type.Item;
 import mindustry.world.Block;
@@ -31,7 +30,7 @@ public class Junction extends Block{
     }
 
     @Override
-    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+    public int acceptStack(Item item, int amount, Tile tile, Unitc source){
         return 0;
     }
 

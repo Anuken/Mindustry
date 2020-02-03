@@ -1,13 +1,16 @@
 package mindustry.entities.def;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.struct.Bits;
+import arc.struct.Queue;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -15,64 +18,154 @@ import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.def.EntityComps.MinerComp.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.net.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
 
 import java.io.*;
+import java.util.*;
 
-import static arc.math.Mathf.dst;
 import static mindustry.Vars.*;
+import static mindustry.entities.traits.BuilderTrait.BuildDataStatic.tmptr;
 
 @SuppressWarnings("unused")
 public class EntityComps{
 
-    @Component({HealthComp.class, VelComp.class, StatusComp.class, TeamComp.class, ItemsComp.class})
-    class UnitComp{
+    @Component
+    abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc{
         UnitDef type;
+        UnitController controller;
+
+        float getBounds(){
+            return getHitSize() *  2f;
+        }
+
+        public void update(){
+            //apply knockback based on spawns
+            //TODO move elsewhere
+            if(getTeam() != state.rules.waveTeam){
+                float relativeSize = state.rules.dropZoneRadius + getBounds()/2f + 1f;
+                for(Tile spawn : spawner.getGroundSpawns()){
+                    if(withinDst(spawn.worldx(), spawn.worldy(), relativeSize)){
+                        getVel().add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta()));
+                    }
+                }
+            }
+
+            Tile tile = tileOn();
+            Floor floor = floorOn();
+
+            if(tile != null){
+                //unit block update
+                tile.block().unitOn(tile, (mindustry.gen.Unitc)this);
+
+                //apply damage
+                if(floor.damageTaken > 0f){
+                    damageContinuous(floor.damageTaken);
+                }
+            }
+        }
+
+        public void drawLight(){
+            //TODO move
+            if(type.lightRadius > 0){
+                renderer.lights.add(getX(), getY(), type.lightRadius, type.lightColor, 0.6f);
+            }
+        }
+
+        public void draw(){
+            //draw power cell - TODO move
+            Draw.color(Color.black, getTeam().color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
+            Draw.rect(type.cellRegion, getX(), getY(), getRotation() - 90);
+            Draw.color();
+        }
+
+        public void killed(){
+            float explosiveness = 2f + item().explosiveness * getStack().amount;
+            float flammability = item().flammability * getStack().amount;
+            Damage.dynamicExplosion(getX(), getY(), flammability, explosiveness, 0f, getBounds() / 2f, Pal.darkFlame);
+
+            //TODO cleanup
+            ScorchDecal.create(getX(), getY());
+            Fx.explosion.at(this);
+            Effects.shake(2f, 2f, this);
+
+            Sounds.bang.at(this);
+            Events.fire(new UnitDestroyEvent((mindustry.gen.Unitc)this));
+
+            //TODO implement suicide bomb trigger
+            //if(explosiveness > 7f && this == player){
+            //    Events.fire(Trigger.suicideBomb);
+            //}
+        }
     }
 
+    @Component
     class OwnerComp{
         Entityc owner;
     }
 
-    @Component({TimedComp.class, DamageComp.class, HitboxComp.class})
-    class BulletComp{
+    @Component
+    abstract class ChildComp implements Posc{
+        transient float x, y;
+
+        private @Nullable Posc parent;
+        private float offsetX, offsetY;
+
+        public void add(){
+            if(parent != null){
+                offsetX = x - parent.getX();
+                offsetY = y - parent.getY();
+            }
+        }
+
+        public void update(){
+            if(parent != null){
+                x = parent.getX() + offsetX;
+                y = parent.getY() + offsetY;
+            }
+        }
+    }
+
+    @Component
+    abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc{
         BulletType bullet;
 
-        float getDamage(){
+        public float getDamage(){
             return bullet.damage;
         }
 
-        void init(){
+        public void init(){
             //TODO
             bullet.init(null);
         }
 
-        void remove(){
+        public void remove(){
             //TODO
             bullet.despawned(null);
         }
     }
 
     @Component
-    class DamageComp{
-        native float getDamage();
+    abstract class DamageComp{
+        abstract float getDamage();
     }
 
     @Component
-    abstract class TimedComp extends EntityComp implements Scaled{
+    abstract class TimedComp implements Entityc, Scaled{
         float time, lifetime;
 
-        void update(){
+        public void update(){
             time = Math.min(time + Time.delta(), lifetime);
 
             if(time >= lifetime){
@@ -87,16 +180,22 @@ public class EntityComps{
     }
 
     @Component
-    class HealthComp{
+    abstract class HealthComp implements Entityc{
+        static final float hitDuration = 9f;
+
         float health, maxHealth, hitTime;
         boolean dead;
+
+        boolean isValid(){
+            return !dead && isAdded();
+        }
 
         float healthf(){
             return health / maxHealth;
         }
 
-        void update(){
-            hitTime -= Time.delta() / 9f;
+        public void update(){
+            hitTime -= Time.delta() / hitDuration;
         }
 
         void killed(){
@@ -125,6 +224,20 @@ public class EntityComps{
             }
         }
 
+        void damage(float amount, boolean withEffect){
+            float pre = hitTime;
+
+            damage(amount);
+
+            if(!withEffect){
+                hitTime = pre;
+            }
+        }
+
+        void damageContinuous(float amount){
+            damage(amount * Time.delta(), hitTime <= -20 + hitDuration);
+        }
+
         void clampHealth(){
             health = Mathf.clamp(health, 0, maxHealth);
         }
@@ -136,23 +249,67 @@ public class EntityComps{
     }
 
     @Component
-    class FlyingComp{
-        boolean flying;
+    abstract class FlyingComp implements Posc, Velc, Healthc{
+        transient float x, y;
+        transient Vec2 vel;
+
+        float elevation;
+        float drownTime;
+
+        boolean isGrounded(){
+            return elevation < 0.001f;
+        }
+
+        public void update(){
+            Floor floor = floorOn();
+
+            if(isGrounded() && floor.isLiquid && vel.len2() > 0.4f*0.4f && Mathf.chance((vel.len2() * floor.speedMultiplier) * 0.03f * Time.delta())){
+                floor.walkEffect.at(x, y, 0, floor.color);
+            }
+
+            if(isGrounded() && floor.isLiquid && floor.drownTime > 0){
+                drownTime += Time.delta() * 1f / floor.drownTime;
+                drownTime = Mathf.clamp(drownTime);
+                if(Mathf.chance(Time.delta() * 0.05f)){
+                    floor.drownUpdateEffect.at(getX(), getY(), 0f, floor.color);
+                }
+
+                //TODO is the netClient check necessary?
+                if(drownTime >= 0.999f && !net.client()){
+                    kill();
+                    //TODO drown event!
+                }
+            }else{
+                drownTime = Mathf.lerpDelta(drownTime, 0f, 0.03f);
+            }
+        }
     }
 
     @Component
-    class LegsComp{
+    abstract class LegsComp implements Posc, Flyingc{
         float baseRotation;
-        float drownTime;
     }
 
     @Component
     class RotComp{
         float rotation;
+
+        void interpolate(){
+            Syncc sync = (Syncc)this;
+
+            if(sync.getInterpolator().values.length > 0){
+                rotation = sync.getInterpolator().values[0];
+            }
+        }
+    }
+    
+    @Component
+    abstract class TileComp implements Posc, Teamc{
+        Tile tile;
     }
 
     @Component
-    abstract class TeamComp{
+    abstract class TeamComp implements Posc{
         transient float x, y;
 
         Team team = Team.sharded;
@@ -162,8 +319,8 @@ public class EntityComps{
         }
     }
 
-    @Component({RotComp.class, PosComp.class})
-    abstract static class WeaponsComp implements Teamc{
+    @Component
+    abstract static class WeaponsComp implements Teamc, Posc, Rotc{
         transient float x, y, rotation;
 
         /** 1 */
@@ -184,7 +341,7 @@ public class EntityComps{
         }
 
         /** Aim at something. This will make all mounts point at it. */
-        void aim(Unit unit, float x, float y){
+        void aim(Unitc unit, float x, float y){
             Tmp.v1.set(x, y).sub(this.x, this.y);
             if(Tmp.v1.len() < minAimDst) Tmp.v1.setLength(minAimDst);
 
@@ -198,12 +355,12 @@ public class EntityComps{
         }
 
         /** Update shooting and rotation for this unit. */
-        void update(Unit unit){
+        public void update(){
             for(WeaponMount mount : mounts){
                 Weapon weapon = mount.weapon;
                 mount.reload -= Time.delta();
 
-                float rotation = unit.rotation - 90;
+                float rotation = this.rotation - 90;
 
                 //rotate if applicable
                 if(weapon.rotate){
@@ -294,39 +451,115 @@ public class EntityComps{
 
         private void bullet(Weapon weapon, float x, float y, float angle){
             Tmp.v1.trns(angle, 3f);
-            Bullet.create(weapon.bullet, this, getTeam(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd));
+            //TODO create the bullet
+            //Bullet.create(weapon.bullet, this, getTeam(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd));
         }
     }
 
     @Component
-    class DrawComp{
-        //TODO ponder.
+    abstract static class DrawShadowComp implements Drawc, Rotc, Flyingc{
+        static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
 
-        native float drawSize();
+        transient float x, y, rotation;
+
+        abstract TextureRegion getShadowRegion();
+
+        void drawShadow(){
+            if(!isGrounded()){
+                Draw.color(shadowColor);
+                Draw.rect(getShadowRegion(), x + shadowTX * getElevation(), y + shadowTY * getElevation(), rotation - 90);
+                Draw.color();
+            }
+        }
+    }
+
+    @Component
+    abstract class DrawItemsComp implements Drawc, Itemsc, Posc, Rotc{
+        transient float x, y, rotation;
+
+        float itemTime;
+
+        //drawn after base
+        @MethodPriority(3)
+        public void draw(){
+            boolean number = isLocal();
+            itemTime = Mathf.lerpDelta(itemTime, Mathf.num(hasItem()), 0.05f);
+
+            //draw back items
+            if(itemTime > 0.01f){
+                float backTrns = 5f;
+                float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * itemTime;
+
+                Draw.mixcol(Pal.accent, Mathf.absin(Time.time(), 5f, 0.5f));
+                Draw.rect(item().icon(Cicon.medium),
+                x + Angles.trnsx(rotation + 180f, backTrns),
+                y + Angles.trnsy(rotation + 180f, backTrns),
+                size, size, rotation);
+
+                Draw.mixcol();
+
+                Lines.stroke(1f, Pal.accent);
+                Lines.circle(
+                x + Angles.trnsx(rotation + 180f, backTrns),
+                y + Angles.trnsy(rotation + 180f, backTrns),
+                (3f + Mathf.absin(Time.time(), 5f, 1f)) * itemTime);
+
+                if(isLocal()){
+                    Fonts.outline.draw(getStack().amount + "",
+                    x + Angles.trnsx(rotation + 180f, backTrns),
+                    y + Angles.trnsy(rotation + 180f, backTrns) - 3,
+                    Pal.accent, 0.25f * itemTime / Scl.scl(1f), false, Align.center
+                    );
+                }
+
+                Draw.reset();
+            }
+        }
+    }
+
+    @Component
+    abstract class DrawLightComp implements Drawc{
+        void drawLight(){}
+    }
+
+    @Component
+    abstract class DrawOverComp implements Drawc{
+        void drawOver(){}
+    }
+
+    @Component
+    abstract class DrawUnderComp implements Drawc{
+        void drawUnder(){}
+    }
+
+    @Component
+    abstract class DrawComp{
+
+        abstract float clipSize();
 
         void draw(){
 
         }
     }
 
-    @Component(PosComp.class)
-    abstract class SyncComp extends PosComp{
+    @Component
+    abstract class SyncComp implements Posc{
+        transient float x, y;
+
         Interpolator interpolator = new Interpolator();
 
         void setNet(float x, float y){
             set(x, y);
 
             //TODO change interpolator API
-            if(interpolator != null){
-                interpolator.target.set(x, y);
-                interpolator.last.set(x, y);
-                interpolator.pos.set(0, 0);
-                interpolator.updateSpacing = 16;
-                interpolator.lastUpdated = 0;
-            }
+            interpolator.target.set(x, y);
+            interpolator.last.set(x, y);
+            interpolator.pos.set(0, 0);
+            interpolator.updateSpacing = 16;
+            interpolator.lastUpdated = 0;
         }
 
-        void update(){
+        public void update(){
             if(Vars.net.client() && !isLocal()){
                 interpolate();
             }
@@ -340,7 +573,35 @@ public class EntityComps{
     }
 
     @Component
-    abstract class PosComp extends EntityComp implements Position{
+    abstract class BoundedComp implements Velc, Posc, Healthc, Flyingc{
+        static final float warpDst = 180f;
+
+        transient float x, y;
+        transient Vec2 vel;
+
+        @Override
+        public void update(){
+            //repel unit out of bounds
+            if(x < 0) vel.x += (-x/warpDst);
+            if(y < 0) vel.y += (-y/warpDst);
+            if(x > world.unitWidth()) vel.x -= (x - world.unitWidth())/warpDst;
+            if(y > world.unitHeight()) vel.y -= (y - world.unitHeight())/warpDst;
+
+            //clamp position if not flying
+            if(isGrounded()){
+                x = Mathf.clamp(x, 0, world.width() * tilesize - tilesize);
+                y = Mathf.clamp(y, 0, world.height() * tilesize - tilesize);
+            }
+
+            //kill when out of bounds
+            if(x < -finalWorldBounds || y < -finalWorldBounds || x >= world.width() * tilesize + finalWorldBounds || y >= world.height() * tilesize + finalWorldBounds){
+                kill();
+            }
+        }
+    }
+
+    @Component
+    abstract class PosComp implements Position{
         float x, y;
 
         void set(float x, float y){
@@ -359,19 +620,31 @@ public class EntityComps{
         int tileY(){
             return Vars.world.toTile(getY());
         }
+
+        /** Returns air if this unit is on a non-air top block. */
+        public Floor floorOn(){
+            Tile tile = tileOn();
+            return tile == null || tile.block() != Blocks.air ? (Floor)Blocks.air : tile.floor();
+        }
+
+        public @Nullable Tile tileOn(){
+            return world.tileWorld(x, y);
+        }
     }
 
-    @Component({ItemsComp.class, TeamComp.class, RotComp.class})
+    @Component
     static abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc{
         static float miningRange = 70f;
 
+        transient float x, y, rotation;
+
         @Nullable Tile mineTile;
 
-        native boolean canMine(Item item);
+        abstract boolean canMine(Item item);
 
-        native float getMiningSpeed();
+        abstract float getMiningSpeed();
 
-        native boolean offloadImmediately();
+        abstract boolean offloadImmediately();
 
         boolean isMining(){
             return mineTile != null;
@@ -381,7 +654,7 @@ public class EntityComps{
             TileEntity core = getClosestCore();
 
             if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && dst(core) < mineTransferRange){
-                int accepted = core.tile.block().acceptStack(item(), getStack().amount, core.tile, unit);
+                int accepted = core.tile.block().acceptStack(item(), getStack().amount, core.tile, this);
                 if(accepted > 0){
                     Call.transferItemTo(item(), accepted,
                     mineTile.worldx() + Mathf.range(tilesize / 2f),
@@ -399,7 +672,7 @@ public class EntityComps{
 
                 if(Mathf.chance(Time.delta() * (0.06 - item.hardness * 0.01) * getMiningSpeed())){
 
-                    if(dst(core) < mineTransferRange && core.tile.block().acceptStack(item, 1, core.tile, unit) == 1 && offloadImmediately()){
+                    if(dst(core) < mineTransferRange && core.tile.block().acceptStack(item, 1, core.tile, this) == 1 && offloadImmediately()){
                         Call.transferItemTo(item, 1,
                         mineTile.worldx() + Mathf.range(tilesize / 2f),
                         mineTile.worldy() + Mathf.range(tilesize / 2f), core.tile);
@@ -408,7 +681,7 @@ public class EntityComps{
                         ItemTransfer.transferItemToUnit(item,
                         mineTile.worldx() + Mathf.range(tilesize / 2f),
                         mineTile.worldy() + Mathf.range(tilesize / 2f),
-                        unit);
+                        this);
                     }
                 }
 
@@ -417,19 +690,136 @@ public class EntityComps{
                 }
             }
         }
+
+        void drawOver(){
+            if(!isMining()) return;
+            float focusLen = 4f + Mathf.absin(Time.time(), 1.1f, 0.5f);
+            float swingScl = 12f, swingMag = tilesize / 8f;
+            float flashScl = 0.3f;
+
+            float px = x + Angles.trnsx(rotation, focusLen);
+            float py = y + Angles.trnsy(rotation, focusLen);
+
+            float ex = mineTile.worldx() + Mathf.sin(Time.time() + 48, swingScl, swingMag);
+            float ey = mineTile.worldy() + Mathf.sin(Time.time() + 48, swingScl + 2f, swingMag);
+
+            Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
+
+            Drawf.laser(Core.atlas.find("minelaser"), Core.atlas.find("minelaser-end"), px, py, ex, ey, 0.75f);
+
+            //TODO hack?
+            if(isLocal()){
+                Lines.stroke(1f, Pal.accent);
+                Lines.poly(mineTile.worldx(), mineTile.worldy(), 4, tilesize / 2f * Mathf.sqrt2, Time.time());
+            }
+
+            Draw.color();
+        }
     }
 
     @Component
-    class BuilderComp{
+    abstract static class BuilderComp implements mindustry.gen.Unitc{
+        static final float placeDistance = 220f;
+        static final Vec2[] tmptr = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
+
+        transient float x, y, rotation;
+        
         Queue<BuildRequest> requests = new Queue<>();
         float buildSpeed = 1f;
         //boolean building;
 
+        void updateBuilding(){
+            float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : placeDistance;
+
+            Iterator<BuildRequest> it = requests.iterator();
+            while(it.hasNext()){
+                BuildRequest req = it.next();
+                Tile tile = world.tile(req.x, req.y);
+                if(tile == null || (req.breaking && tile.block() == Blocks.air) || (!req.breaking && (tile.rotation() == req.rotation || !req.block.rotate) && tile.block() == req.block)){
+                    it.remove();
+                }
+            }
+
+            TileEntity core = getClosestCore();
+
+            //nothing to build.
+            if(buildRequest() == null) return;
+
+            //find the next build request
+            if(requests.size > 1){
+                int total = 0;
+                BuildRequest req;
+                while((dst((req = buildRequest()).tile()) > finalPlaceDst || shouldSkip(req, core)) && total < requests.size){
+                    requests.removeFirst();
+                    requests.addLast(req);
+                    total++;
+                }
+            }
+
+            BuildRequest current = buildRequest();
+
+            if(dst(current.tile()) > finalPlaceDst) return;
+
+            Tile tile = world.tile(current.x, current.y);
+
+            if(!(tile.block() instanceof BuildBlock)){
+                if(!current.initialized && !current.breaking && Build.validPlace(getTeam(), current.x, current.y, current.block, current.rotation)){
+                    Build.beginPlace(getTeam(), current.x, current.y, current.block, current.rotation);
+                }else if(!current.initialized && current.breaking && Build.validBreak(getTeam(), current.x, current.y)){
+                    Build.beginBreak(getTeam(), current.x, current.y);
+                }else{
+                    requests.removeFirst();
+                    return;
+                }
+            }
+
+            if(tile.entity instanceof BuildEntity && !current.initialized){
+                Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, getTeam(), (Builderc)this, current.breaking)));
+                current.initialized = true;
+            }
+
+            //if there is no core to build with or no build entity, stop building!
+            if((core == null && !state.rules.infiniteResources) || !(tile.entity instanceof BuildEntity)){
+                return;
+            }
+
+            //otherwise, update it.
+            BuildEntity entity = tile.ent();
+
+            if(entity == null){
+                return;
+            }
+
+            if(dst(tile) <= finalPlaceDst){
+                rotation = Mathf.slerpDelta(rotation, angleTo(entity), 0.4f);
+            }
+
+            if(current.breaking){
+                entity.deconstruct(this, core, 1f / entity.buildCost * Time.delta() * buildSpeed * state.rules.buildSpeedMultiplier);
+            }else{
+                if(entity.construct(this, core, 1f / entity.buildCost * Time.delta() * buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
+                    if(current.hasConfig){
+                        Call.onTileConfig(null, tile, current.config);
+                    }
+                }
+            }
+
+            current.stuck = Mathf.equal(current.progress, entity.progress);
+            current.progress = entity.progress;
+        }
+
+        /** @return whether this request should be skipped, in favor of the next one. */
+        boolean shouldSkip(BuildRequest request, @Nullable TileEntity core){
+            //requests that you have at least *started* are considered
+            if(state.rules.infiniteResources || request.breaking || !request.initialized || core == null) return false;
+            return request.stuck && !core.items.has(request.block.requirements);
+        }
+
         void removeBuild(int x, int y, boolean breaking){
             //remove matching request
-            int idx = player.buildQueue().indexOf(req -> req.breaking == breaking && req.x == x && req.y == y);
+            int idx = requests.indexOf(req -> req.breaking == breaking && req.x == x && req.y == y);
             if(idx != -1){
-                player.buildQueue().removeIndex(idx);
+                requests.removeIndex(idx);
             }
         }
 
@@ -475,10 +865,47 @@ public class EntityComps{
         @Nullable BuildRequest buildRequest(){
             return requests.size == 0 ? null : requests.first();
         }
+
+        void drawOver(){
+            if(!isBuilding()) return;
+            BuildRequest request = buildRequest();
+            Tile tile = world.tile(request.x, request.y);
+
+            if(dst(tile) > placeDistance && !state.isEditor()){
+                return;
+            }
+
+            Lines.stroke(1f, Pal.accent);
+            float focusLen = 3.8f + Mathf.absin(Time.time(), 1.1f, 0.6f);
+            float px = x + Angles.trnsx(rotation, focusLen);
+            float py = y + Angles.trnsy(rotation, focusLen);
+
+            float sz = Vars.tilesize * tile.block().size / 2f;
+            float ang = angleTo(tile);
+
+            tmptr[0].set(tile.drawx() - sz, tile.drawy() - sz);
+            tmptr[1].set(tile.drawx() + sz, tile.drawy() - sz);
+            tmptr[2].set(tile.drawx() - sz, tile.drawy() + sz);
+            tmptr[3].set(tile.drawx() + sz, tile.drawy() + sz);
+
+            Arrays.sort(tmptr, Structs.comparingFloat(vec -> Angles.angleDist(angleTo(vec), ang)));
+
+            float x1 = tmptr[0].x, y1 = tmptr[0].y,
+            x3 = tmptr[1].x, y3 = tmptr[1].y;
+
+            Draw.alpha(1f);
+
+            Lines.line(px, py, x1, y1);
+            Lines.line(px, py, x3, y3);
+
+            Fill.circle(px, py, 1.6f + Mathf.absin(Time.time(), 0.8f, 1.5f));
+
+            Draw.color();
+        }
     }
 
-    @Component(DamageComp.class)
-    class ShielderComp{
+    @Component
+    abstract class ShielderComp implements Damagec{
 
         void absorb(){
 
@@ -486,12 +913,16 @@ public class EntityComps{
     }
 
     @Component
-    class ItemsComp{
+    abstract class ItemsComp{
         ItemStack stack = new ItemStack();
 
-        native int getItemCapacity();
+        abstract int getItemCapacity();
 
-        public Item item(){
+        void update(){
+            stack.amount = Mathf.clamp(stack.amount, 0, getItemCapacity());
+        }
+
+        Item item(){
             return stack.item;
         }
 
@@ -508,47 +939,50 @@ public class EntityComps{
         }
     }
 
-    @Component(VelComp.class)
-    class MassComp{
+    @Component
+    abstract class MassComp implements Velc{
         float mass;
     }
 
-    @Component({PosComp.class, DrawComp.class, TimedComp.class})
-    class EffectComp extends EntityComp{
+    @Component
+    abstract class EffectComp implements Posc, Drawc, Timedc{
         Effect effect;
         Color color = new Color(Color.white);
         Object data;
         float rotation = 0f;
 
-        void draw(){
+        public void draw(){
 
         }
 
-        void update(){
+        public void update(){
             //TODO fix effects, make everything poolable
         }
     }
 
     @Component
-    abstract class VelComp extends PosComp{
+    abstract class VelComp implements Posc{
+        transient float x, y;
+
         final Vec2 vel = new Vec2();
         float drag = 0f;
 
-        void update(){
+        public void update(){
+            //TODO handle solidity
             x += vel.x;
             y += vel.y;
             vel.scl(1f - drag * Time.delta());
         }
     }
 
-    @Component(PosComp.class)
-    class HitboxComp{
+    @Component
+    abstract class HitboxComp implements Posc{
         transient float x, y;
 
         float hitSize;
         float lastX, lastY;
 
-        void update(){
+        public void update(){
 
         }
 
@@ -575,14 +1009,19 @@ public class EntityComps{
         }
     }
 
-    @Component(PosComp.class)
-    class StatusComp{
+    @Component
+    abstract class StatusComp implements Posc{
         private Array<StatusEntry> statuses = new Array<>();
         private Bits applied = new Bits(content.getBy(ContentType.status).size);
 
         private float speedMultiplier;
         private float damageMultiplier;
         private float armorMultiplier;
+
+        /** @return damage taken based on status armor multipliers */
+        float getDamage(float amount){
+            return amount * Mathf.clamp(1f - armorMultiplier / 100f);
+        }
 
         void apply(StatusEffect effect, float duration){
             if(effect == StatusEffects.none || effect == null || isImmune(effect)) return; //don't apply empty or immune effects
@@ -597,7 +1036,7 @@ public class EntityComps{
                     }else if(entry.effect.reactsWith(effect)){ //find opposite
                         StatusEntry.tmp.effect = entry.effect;
                         //TODO unit cannot be null here
-                        entry.effect.getTransition(null, effect, entry.time, duration, StatusEntry.tmp);
+                        entry.effect.getTransition((mindustry.gen.Unitc)this, effect, entry.time, duration, StatusEntry.tmp);
                         entry.time = StatusEntry.tmp.time;
 
                         if(StatusEntry.tmp.effect != entry.effect){
@@ -634,7 +1073,18 @@ public class EntityComps{
             return Tmp.c1.set(r / statuses.size, g / statuses.size, b / statuses.size, 1f);
         }
 
-        void update(){
+        public void update(){
+            Floor floor = floorOn();
+            Tile tile = tileOn();
+            boolean flying = false;
+            //TODO conditionally apply status effects on floor, if not flying
+            if(!flying && tile != null){
+                //apply effect
+                if(floor.status != null){
+                    apply(floor.status, floor.statusDuration);
+                }
+            }
+
             applied.clear();
             speedMultiplier = damageMultiplier = armorMultiplier = 1f;
 
@@ -651,8 +1101,8 @@ public class EntityComps{
                     speedMultiplier *= entry.effect.speedMultiplier;
                     armorMultiplier *= entry.effect.armorMultiplier;
                     damageMultiplier *= entry.effect.damageMultiplier;
-                    //TODO unit can't be null
-                    entry.effect.update(null, entry.time);
+                    //TODO ugly casting
+                    entry.effect.update((mindustry.gen.Unitc)this, entry.time);
                 }
 
                 return false;
@@ -694,6 +1144,10 @@ public class EntityComps{
     class EntityComp{
         int id;
 
+        boolean isAdded(){
+            return true;
+        }
+
         void init(){}
 
         void update(){}
@@ -707,8 +1161,7 @@ public class EntityComps{
         }
 
         boolean isLocal(){
-            //TODO fix
-            return this == (Object)Vars.player;
+            return this == Vars.player;
         }
 
         <T> T as(Class<T> type){
