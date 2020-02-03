@@ -25,14 +25,13 @@ public class Katamari implements ApplicationListener{
     @Override
     public void update(){
         if(!state.is(State.playing)) return;
-        if(!timer.get(160f)) return;
+        if(!timer.get(60f)) return;
 
         for(BaseUnit unit : unitGroup){
             nearby.clear();
             Units.nearby(unit.getTeam(), unit.x, unit.y, tilesize * 5, nearby::add);
 
             nearby = nearby.select(u -> {
-//                if(unit == u) return false;
                 if(unit instanceof BaseDrone) return false;
                 if(unit.isFlying() != u.isFlying()) return false;
                 if(u instanceof Player) return false;
