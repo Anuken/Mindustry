@@ -211,7 +211,7 @@ public class CoreBlock extends StorageBlock{
             if(tile.entity.items.has(Items.titanium)){
                 Tile conveyor = Geometry.findClosest(tile.drawx(), tile.drawy(), indexer.getAllied(tile.getTeam(), BlockFlag.upgradable));
                 if(conveyor != null){
-                    Core.app.post(() -> tile.entity.items.remove(Items.titanium, 1););
+                    Core.app.post(() -> tile.entity.items.remove(Items.titanium, 1));
                     Call.transferItemTo(Items.titanium, 1, tile.drawx(), tile.drawy(), conveyor);
                     Timer.schedule(() -> Call.onConstructFinish(conveyor, Blocks.titaniumConveyor, -1, conveyor.rotation, conveyor.getTeam(), true), 0.95f);
                 }
