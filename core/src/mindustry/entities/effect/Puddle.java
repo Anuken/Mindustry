@@ -70,7 +70,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
             Puddle p = map.get(tile.pos());
 
             if(generation == 0 && p != null && p.lastRipple <= Time.time() - 40f){
-                Effects.effect(Fx.ripple, tile.floor().liquidDrop.color,
+                Fx.ripple.at(tile.floor().liquidDrop.color,
                 (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
                 p.lastRipple = Time.time();
             }
@@ -93,7 +93,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
             p.accepting = Math.max(amount, p.accepting);
 
             if(generation == 0 && p.lastRipple <= Time.time() - 40f && p.amount >= maxLiquid / 2f){
-                Effects.effect(Fx.ripple, p.liquid.color, (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
+                Fx.ripple.at(p.liquid.color, (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
                 p.lastRipple = Time.time();
             }
         }else{
@@ -119,12 +119,12 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
             }
         }else if(dest.temperature > 0.7f && liquid.temperature < 0.55f){ //cold liquid poured onto hot puddle
             if(Mathf.chance(0.5f * amount)){
-                Effects.effect(Fx.steam, x, y);
+                Fx.steam.at(x, y);
             }
             return -0.1f * amount;
         }else if(liquid.temperature > 0.7f && dest.temperature < 0.55f){ //hot liquid poured onto cold puddle
             if(Mathf.chance(0.8f * amount)){
-                Effects.effect(Fx.steam, x, y);
+                Fx.steam.at(x, y);
             }
             return -0.4f * amount;
         }
@@ -204,7 +204,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
                 unit.applyEffect(liquid.effect, 60 * 2);
 
                 if(unit.velocity().len() > 0.1){
-                    Effects.effect(Fx.ripple, liquid.color, unit.x, unit.y);
+                    Fx.ripple.at(liquid.color, unit.x, unit.y);
                 }
             });
 

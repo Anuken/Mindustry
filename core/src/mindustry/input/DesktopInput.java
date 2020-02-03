@@ -13,7 +13,7 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
-import mindustry.entities.traits.BuilderTrait.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;

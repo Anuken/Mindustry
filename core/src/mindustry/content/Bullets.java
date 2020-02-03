@@ -431,11 +431,11 @@ public class Bullets implements ContentList{
                 }
 
                 if(Mathf.chance(0.1 * Time.delta())){
-                    Effects.effect(Fx.fireballsmoke, b.x, b.y);
+                    Fx.fireballsmoke.at(b.x, b.y);
                 }
 
                 if(Mathf.chance(0.1 * Time.delta())){
-                    Effects.effect(Fx.ballfire, b.x, b.y);
+                    Fx.ballfire.at(b.x, b.y);
                 }
             }
         };
@@ -519,7 +519,7 @@ public class Bullets implements ContentList{
 
             @Override
             public void hit(Bullet b, float hitx, float hity){
-                Effects.effect(hitEffect, colors[2], hitx, hity);
+                hitEffect.at(colors[2], hitx, hity);
                 if(Mathf.chance(0.4)){
                     Fire.create(world.tileWorld(hitx + Mathf.range(5f), hity + Mathf.range(5f)));
                 }

@@ -40,7 +40,7 @@ public class ForceProjector extends Block{
     private static Cons<AbsorbTrait> shieldConsumer = trait -> {
         if(trait.canBeAbsorbed() && trait.getTeam() != paramTile.getTeam() && Intersector.isInsideHexagon(trait.getX(), trait.getY(), paramBlock.realRadius(paramEntity) * 2f, paramTile.drawx(), paramTile.drawy())){
             trait.absorb();
-            Effects.effect(Fx.absorb, trait);
+            Fx.absorb.at(trait);
             paramEntity.hit = 1f;
             paramEntity.buildup += trait.getShieldDamage() * paramEntity.warmup;
         }
@@ -107,7 +107,7 @@ public class ForceProjector extends Block{
         entity.radscl = Mathf.lerpDelta(entity.radscl, entity.broken ? 0f : entity.warmup, 0.05f);
 
         if(Mathf.chance(Time.delta() * entity.buildup / breakage * 0.1f)){
-            Effects.effect(Fx.reactorsmoke, tile.drawx() + Mathf.range(tilesize / 2f), tile.drawy() + Mathf.range(tilesize / 2f));
+            Fx.reactorsmoke.at(tile.drawx() + Mathf.range(tilesize / 2f), tile.drawy() + Mathf.range(tilesize / 2f));
         }
 
         entity.warmup = Mathf.lerpDelta(entity.warmup, entity.efficiency(), 0.1f);
@@ -130,7 +130,7 @@ public class ForceProjector extends Block{
         if(entity.buildup >= breakage && !entity.broken){
             entity.broken = true;
             entity.buildup = breakage;
-            Effects.effect(Fx.shieldBreak, tile.drawx(), tile.drawy(), radius);
+            Fx.shieldBreak.at(tile.drawx(), tile.drawy(), radius);
         }
 
         if(entity.hit > 0f){

@@ -62,7 +62,7 @@ public class Incinerator extends Block{
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
         if(Mathf.chance(0.3)){
-            Effects.effect(effect, tile.drawx(), tile.drawy());
+            effect.at(tile.drawx(), tile.drawy());
         }
     }
 
@@ -75,7 +75,7 @@ public class Incinerator extends Block{
     @Override
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         if(Mathf.chance(0.02)){
-            Effects.effect(effect, tile.drawx(), tile.drawy());
+            effect.at(tile.drawx(), tile.drawy());
         }
     }
 

@@ -2,6 +2,7 @@ package mindustry.world.blocks.power;
 
 import arc.Core;
 import arc.math.Mathf;
+import mindustry.entities.units.*;
 import mindustry.ui.Bar;
 import arc.util.Eachable;
 import mindustry.ui.Cicon;
@@ -10,7 +11,6 @@ import mindustry.world.Block;
 import arc.graphics.g2d.Draw;
 import mindustry.graphics.Pal;
 import arc.graphics.g2d.TextureRegion;
-import mindustry.entities.traits.BuilderTrait;
 
 public class PowerDiode extends Block{
     public TextureRegion arrow;
@@ -75,7 +75,7 @@ public class PowerDiode extends Block{
     }
 
     @Override
-    public void drawRequestRegion(BuilderTrait.BuildRequest req, Eachable<BuilderTrait.BuildRequest> list) {
+    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list) {
         TextureRegion reg = icon(Cicon.full);
         Draw.rect(icon(Cicon.full), req.drawx(), req.drawy(),
                 reg.getWidth() * req.animScale * Draw.scl,

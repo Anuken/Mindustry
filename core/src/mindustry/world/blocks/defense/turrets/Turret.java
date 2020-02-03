@@ -279,8 +279,8 @@ public abstract class Turret extends Block{
 
         TurretEntity entity = tile.ent();
 
-        Effects.effect(shootEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
-        Effects.effect(smokeEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+        shootEffect.at(tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+        smokeEffect.at(tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
         shootSound.at(tile, Mathf.random(0.9f, 1.1f));
 
         if(shootShake > 0){
@@ -294,7 +294,7 @@ public abstract class Turret extends Block{
         if(!isTurret(tile)) return;
         TurretEntity entity = tile.ent();
 
-        Effects.effect(ammoUseEffect, tile.drawx() - Angles.trnsx(entity.rotation, ammoEjectBack),
+        ammoUseEffect.at(tile.drawx() - Angles.trnsx(entity.rotation, ammoEjectBack),
         tile.drawy() - Angles.trnsy(entity.rotation, ammoEjectBack), entity.rotation);
     }
 

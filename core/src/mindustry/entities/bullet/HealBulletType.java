@@ -3,7 +3,6 @@ package mindustry.entities.bullet;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.entities.type.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -49,7 +48,7 @@ public class HealBulletType extends BulletType{
         tile = tile.link();
 
         if(tile.entity != null && tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
-            Effects.effect(Fx.healBlockFull, Pal.heal, tile.drawx(), tile.drawy(), tile.block().size);
+            Fx.healBlockFull.at(tile.drawx(), tile.drawy(), tile.block().size, Pal.heal);
             tile.entity.healBy(healPercent / 100f * tile.entity.maxHealth());
         }
     }

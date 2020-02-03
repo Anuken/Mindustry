@@ -3,7 +3,6 @@ package mindustry.entities.bullet;
 import arc.graphics.g2d.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
 import mindustry.entities.type.Bullet;
 import mindustry.gen.*;
 
@@ -29,7 +28,7 @@ public class ArtilleryBulletType extends BasicBulletType{
         super.update(b);
 
         if(b.timer.get(0, 3 + b.fslope() * 2f)){
-            Effects.effect(trailEffect, backColor, b.x, b.y, b.fslope() * 4f);
+            trailEffect.at(b.x, b.y, b.fslope() * 4f, backColor);
         }
     }
 

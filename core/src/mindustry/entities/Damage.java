@@ -47,21 +47,21 @@ public class Damage{
             int f = i;
             Time.run(i * 2f, () -> {
                 Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f);
-                Effects.effect(Fx.blockExplosionSmoke, x + Mathf.range(radius), y + Mathf.range(radius));
+                Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
             });
         }
 
         if(explosiveness > 15f){
-            Effects.effect(Fx.shockwave, x, y);
+            Fx.shockwave.at(x, y);
         }
 
         if(explosiveness > 30f){
-            Effects.effect(Fx.bigShockwave, x, y);
+            Fx.bigShockwave.at(x, y);
         }
 
         float shake = Math.min(explosiveness / 4f + 3f, 9f);
         Effects.shake(shake, shake, x, y);
-        Effects.effect(Fx.dynamicExplosion, x, y, radius / 8f);
+        Fx.dynamicExplosion.at(x, y, radius / 8f);
     }
 
     public static void createIncend(float x, float y, float range, int amount){
@@ -136,7 +136,7 @@ public class Damage{
             Vec2 vec = Geometry.raycastRect(x, y, x2, y2, other);
 
             if(vec != null){
-                Effects.effect(effect, vec.x, vec.y);
+                effect.at(vec.x, vec.y);
                 e.collision(hitter, vec.x, vec.y);
                 hitter.collision(e, vec.x, vec.y);
             }

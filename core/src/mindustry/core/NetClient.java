@@ -13,9 +13,9 @@ import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -281,12 +281,12 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.both, unreliable = true)
     public static void onEffect(Effect effect, float x, float y, float rotation, Color color){
-        Effects.effect(effect, color, x, y, rotation);
+        effect.at(color, x, y, rotation);
     }
 
     @Remote(variants = Variant.both)
     public static void onEffectReliable(Effect effect, float x, float y, float rotation, Color color){
-        Effects.effect(effect, color, x, y, rotation);
+        effect.at(color, x, y, rotation);
     }*/
 
     @Remote(variants = Variant.both)

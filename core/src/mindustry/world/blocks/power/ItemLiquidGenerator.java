@@ -124,12 +124,12 @@ public class ItemLiquidGenerator extends PowerGenerator{
             entity.productionEfficiency = baseLiquidEfficiency * used / maximumPossible;
 
             if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
-                Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
+                generateEffect.at(tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
             }
         }else if(hasItems){
             // No liquids accepted or none supplied, try using items if accepted
             if(entity.generateTime <= 0f && entity.items.total() > 0){
-                Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
+                generateEffect.at(tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
                 Item item = entity.items.take();
                 entity.productionEfficiency = getItemEfficiency(item);
                 entity.explosiveness = item.explosiveness;
@@ -143,7 +143,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
                     //this block is run last so that in the event of a block destruction, no code relies on the block type
                     Core.app.post(() -> {
                         entity.damage(Mathf.random(11f));
-                        Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));
+                        explodeEffect.at(tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));
                     });
                 }
             }else{

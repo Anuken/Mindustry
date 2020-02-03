@@ -43,9 +43,9 @@ public class Door extends Wall{
 
             pathfinder.updateTile(tile);
             if(!entity.open){
-                Effects.effect(door.openfx, tile.drawx(), tile.drawy());
+                door.openfx.at(tile.drawx(), tile.drawy());
             }else{
-                Effects.effect(door.closefx, tile.drawx(), tile.drawy());
+                door.closefx.at(tile.drawx(), tile.drawy());
             }
             Sounds.door.at(tile);
         }

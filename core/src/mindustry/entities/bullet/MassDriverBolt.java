@@ -5,7 +5,6 @@ import arc.graphics.g2d.Draw;
 import arc.math.Angles;
 import arc.math.Mathf;
 import mindustry.content.Fx;
-import mindustry.entities.Effects;
 import mindustry.entities.type.Bullet;
 import mindustry.graphics.Pal;
 import mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
@@ -94,7 +93,7 @@ public class MassDriverBolt extends BulletType{
             int amountDropped = Mathf.random(0, data.items[i]);
             if(amountDropped > 0){
                 float angle = b.rot() + Mathf.range(100f);
-                Effects.effect(Fx.dropItem, Color.white, b.x, b.y, angle, content.item(i));
+                Fx.dropItem.at(b.x, b.y, angle, Color.white, content.item(i));
             }
         }
     }

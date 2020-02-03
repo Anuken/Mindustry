@@ -44,7 +44,7 @@ public class CoreBlock extends StorageBlock{
         if(player == null || tile.entity == null) return;
 
         CoreEntity entity = tile.ent();
-        Effects.effect(Fx.spawn, entity);
+        Fx.spawn.at(entity);
         entity.progress = 0;
         entity.spawnPlayer = player;
         entity.spawnPlayer.onRespawn(tile);

@@ -6,7 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.ctype.ContentList;
-import mindustry.entities.Effects.*;
+import mindustry.entities.*;
 import mindustry.entities.effect.GroundEffectEntity.*;
 import mindustry.entities.type.*;
 import mindustry.graphics.*;

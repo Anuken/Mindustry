@@ -145,12 +145,12 @@ public class EntityProcess extends BaseProcessor{
                     //only write the block if it's a void method with several entries
                     boolean writeBlock = first.ret().toString().equals("void") && entry.value.size > 1;
 
-                    if(entry.value.first().is(Modifier.ABSTRACT) && entry.value.size == 1){
+                    if((entry.value.first().is(Modifier.ABSTRACT) || entry.value.first().is(Modifier.NATIVE)) && entry.value.size == 1){
                         err(entry.value.first().up().getSimpleName() + " declares an abstract method. This method must be implemented in another component", entry.value.first());
                     }
 
                     for(Smethod elem : entry.value){
-                        if(elem.is(Modifier.ABSTRACT)) continue;
+                        if(elem.is(Modifier.ABSTRACT) || elem.is(Modifier.NATIVE)) continue;
 
                         //get all statements in the method, copy them over
                         MethodTree methodTree = elem.tree();
@@ -262,6 +262,8 @@ public class EntityProcess extends BaseProcessor{
         if(!componentDependencies.containsKey(component)){
             ObjectSet<Stype> out = new ObjectSet<>();
             out.addAll(component.superclasses());
+            //TODO extreme confusion
+            //out.addAll(component.interfaces().select(this::isComponent));
 
             //get dependency classes
             if(component.annotation(Component.class) != null){
@@ -287,6 +289,10 @@ public class EntityProcess extends BaseProcessor{
         }
 
         return componentDependencies.get(component);
+    }
+
+    boolean isComponent(Stype type){
+        return type.annotation(Component.class) != null;
     }
 
     TypeMirror[] mirrors(Stype type){

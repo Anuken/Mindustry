@@ -4,7 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.entities.traits.BuilderTrait.*;
+import mindustry.entities.units.*;
 import mindustry.world.*;
 
 import java.util.*;

@@ -24,7 +24,7 @@ public class StatusEffects implements ContentList{
                 opposite(wet,freezing);
                 trans(tarred, ((unit, time, newTime, result) -> {
                     unit.damage(1f);
-                    Effects.effect(Fx.burning, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
+                    Fx.burning.at(unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                     result.set(this, Math.min(time + newTime, 300f));
                 }));
             });

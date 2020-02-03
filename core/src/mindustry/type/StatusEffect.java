@@ -52,7 +52,7 @@ public class StatusEffect extends MappableContent{
         }
 
         if(effect != Fx.none && Mathf.chance(Time.delta() * 0.15f)){
-            Effects.effect(effect, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
+            effect.at(unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
         }
     }
 

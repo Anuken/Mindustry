@@ -105,7 +105,7 @@ public class CommandCenter extends Block{
     @Override
     public void configured(Tile tile, Player player, int value){
         UnitCommand command = UnitCommand.all[value];
-        Effects.effect(((CommandCenter)tile.block()).effect, tile);
+        ((CommandCenter)tile.block()).effect.at(tile);
 
         for(Tile center : indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter)){
             if(center.block() instanceof CommandCenter){

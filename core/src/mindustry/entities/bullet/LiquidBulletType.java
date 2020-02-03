@@ -67,7 +67,7 @@ public class LiquidBulletType extends BulletType{
 
     @Override
     public void hit(Bullet b, float hitx, float hity){
-        Effects.effect(hitEffect, liquid.color, hitx, hity);
+        hitEffect.at(liquid.color, hitx, hity);
         Puddle.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
 
         if(liquid.temperature <= 0.5f && liquid.flammability < 0.3f){

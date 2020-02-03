@@ -97,11 +97,11 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait{
     @Override
     public void update(){
         if(Mathf.chance(0.1 * Time.delta())){
-            Effects.effect(Fx.fire, x + Mathf.range(4f), y + Mathf.range(4f));
+            Fx.fire.at(x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
         if(Mathf.chance(0.05 * Time.delta())){
-            Effects.effect(Fx.fireSmoke, x + Mathf.range(4f), y + Mathf.range(4f));
+            Fx.fireSmoke.at(x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
         if(Mathf.chance(0.001 * Time.delta())){

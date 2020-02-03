@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.Bits;
 import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.*;
@@ -13,8 +14,9 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.def.EntityComps.MinerComp.*;
+import mindustry.entities.effect.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.entities.units.*;
@@ -22,11 +24,15 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.type.*;
+import mindustry.world.*;
+import mindustry.world.blocks.BuildBlock.*;
 
 import java.io.*;
 
-import static mindustry.Vars.content;
+import static arc.math.Mathf.dst;
+import static mindustry.Vars.*;
 
+@SuppressWarnings("unused")
 public class EntityComps{
 
     @Component({HealthComp.class, VelComp.class, StatusComp.class, TeamComp.class, ItemsComp.class})
@@ -38,7 +44,7 @@ public class EntityComps{
         Entityc owner;
     }
 
-    @Component({TimedComp.class, DamageComp.class, Hitboxc.class})
+    @Component({TimedComp.class, DamageComp.class, HitboxComp.class})
     class BulletComp{
         BulletType bullet;
 
@@ -58,8 +64,8 @@ public class EntityComps{
     }
 
     @Component
-    abstract class DamageComp{
-        abstract float getDamage();
+    class DamageComp{
+        native float getDamage();
     }
 
     @Component
@@ -146,12 +152,18 @@ public class EntityComps{
     }
 
     @Component
-    class TeamComp{
+    abstract class TeamComp{
+        transient float x, y;
+
         Team team = Team.sharded;
+
+        public @Nullable TileEntity getClosestCore(){
+            return state.teams.closestCore(x, y, team);
+        }
     }
 
     @Component({RotComp.class, PosComp.class})
-    static class WeaponsComp{
+    abstract static class WeaponsComp implements Teamc{
         transient float x, y, rotation;
 
         /** 1 */
@@ -164,7 +176,7 @@ public class EntityComps{
         /** weapon mount array, never null */
         WeaponMount[] mounts = {};
 
-        public void init(UnitDef def){
+        void init(UnitDef def){
             mounts = new WeaponMount[def.weapons.size];
             for(int i = 0; i < mounts.length; i++){
                 mounts[i] = new WeaponMount(def.weapons.get(i));
@@ -172,12 +184,12 @@ public class EntityComps{
         }
 
         /** Aim at something. This will make all mounts point at it. */
-        public void aim(Unit unit, float x, float y){
-            Tmp.v1.set(x, y).sub(unit.x, unit.y);
+        void aim(Unit unit, float x, float y){
+            Tmp.v1.set(x, y).sub(this.x, this.y);
             if(Tmp.v1.len() < minAimDst) Tmp.v1.setLength(minAimDst);
 
-            x = Tmp.v1.x + unit.x;
-            y = Tmp.v1.y + unit.y;
+            x = Tmp.v1.x + this.x;
+            y = Tmp.v1.y + this.y;
 
             for(WeaponMount mount : mounts){
                 mount.aimX = x;
@@ -186,7 +198,7 @@ public class EntityComps{
         }
 
         /** Update shooting and rotation for this unit. */
-        public void update(Unit unit){
+        void update(Unit unit){
             for(WeaponMount mount : mounts){
                 Weapon weapon = mount.weapon;
                 mount.reload -= Time.delta();
@@ -196,8 +208,8 @@ public class EntityComps{
                 //rotate if applicable
                 if(weapon.rotate){
                     float axisXOffset = weapon.mirror ? 0f : weapon.x;
-                    float axisX = unit.x + Angles.trnsx(rotation, axisXOffset, weapon.y),
-                    axisY = unit.y + Angles.trnsy(rotation, axisXOffset, weapon.y);
+                    float axisX = this.x + Angles.trnsx(rotation, axisXOffset, weapon.y),
+                    axisY = this.y + Angles.trnsy(rotation, axisXOffset, weapon.y);
 
                     mount.rotation = Angles.moveToward(mount.rotation, Angles.angle(axisX, axisY, mount.aimX, mount.aimY), weapon.rotateSpeed);
                 }
@@ -210,13 +222,13 @@ public class EntityComps{
 
                         //m a t h
                         float weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0);
-                        float mountX = unit.x + Angles.trnsx(rotation, weapon.x * i, weapon.y),
-                        mountY = unit.y + Angles.trnsy(rotation, weapon.x * i, weapon.y);
+                        float mountX = this.x + Angles.trnsx(rotation, weapon.x * i, weapon.y),
+                        mountY = this.y + Angles.trnsy(rotation, weapon.x * i, weapon.y);
                         float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX * i, weapon.shootY),
                         shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX * i, weapon.shootY);
                         float shootAngle = weapon.rotate ? weaponRotation : Angles.angle(shootX, shootY, mount.aimX, mount.aimY);
 
-                        shoot(unit, weapon, shootX, shootY, shootAngle);
+                        shoot(weapon, shootX, shootY, shootAngle);
                     }
 
                     mount.side = !mount.side;
@@ -247,47 +259,50 @@ public class EntityComps{
             }
         }
 
-        private void shoot(ShooterTrait shooter, Weapon weapon, float x, float y, float rotation){
-            float baseX = shooter.getX(), baseY = shooter.getY();
+        private void shoot(Weapon weapon, float x, float y, float rotation){
+            float baseX = this.x, baseY = this.y;
 
             weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
 
             sequenceNum = 0;
             if(weapon.shotDelay > 0.01f){
                 Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
-                    Time.run(sequenceNum * weapon.shotDelay, () -> bullet(shooter, weapon, x + shooter.getX() - baseX, y + shooter.getY() - baseY, f + Mathf.range(weapon.inaccuracy)));
+                    Time.run(sequenceNum * weapon.shotDelay, () -> bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy)));
                     sequenceNum++;
                 });
             }else{
-                Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> bullet(shooter, weapon, x, y, f + Mathf.range(weapon.inaccuracy)));
+                Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy)));
             }
 
             BulletType ammo = weapon.bullet;
 
             Tmp.v1.trns(rotation + 180f, ammo.recoil);
 
-            shooter.velocity().add(Tmp.v1);
+            if(this instanceof Velc){
+                //TODO apply force?
+                ((Velc)this).getVel().add(Tmp.v1);
+            }
 
             Tmp.v1.trns(rotation, 3f);
             boolean parentize = ammo.keepVelocity;
 
             Effects.shake(weapon.shake, weapon.shake, x, y);
-            Effects.effect(weapon.ejectEffect, x, y, rotation);
-            Effects.effect(ammo.shootEffect, x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? shooter : null);
-            Effects.effect(ammo.smokeEffect, x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? shooter : null);
+            weapon.ejectEffect.at(x, y, rotation);
+            ammo.shootEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? this : null);
+            ammo.smokeEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? this : null);
         }
 
-        private void bullet(ShooterTrait owner, Weapon weapon, float x, float y, float angle){
+        private void bullet(Weapon weapon, float x, float y, float angle){
             Tmp.v1.trns(angle, 3f);
-            Bullet.create(weapon.bullet, owner, owner.getTeam(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd));
+            Bullet.create(weapon.bullet, this, getTeam(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd));
         }
     }
 
     @Component
-    abstract class DrawComp{
+    class DrawComp{
         //TODO ponder.
 
-        abstract float drawSize();
+        native float drawSize();
 
         void draw(){
 
@@ -336,21 +351,161 @@ public class EntityComps{
         void trns(float x, float y){
             set(this.x + x, this.y + y);
         }
+
+        int tileX(){
+            return Vars.world.toTile(getX());
+        }
+
+        int tileY(){
+            return Vars.world.toTile(getY());
+        }
     }
 
-    @Component
-    class MinerComp{
+    @Component({ItemsComp.class, TeamComp.class, RotComp.class})
+    static abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc{
+        static float miningRange = 70f;
 
+        @Nullable Tile mineTile;
+
+        native boolean canMine(Item item);
+
+        native float getMiningSpeed();
+
+        native boolean offloadImmediately();
+
+        boolean isMining(){
+            return mineTile != null;
+        }
+
+        void updateMining(){
+            TileEntity core = getClosestCore();
+
+            if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && dst(core) < mineTransferRange){
+                int accepted = core.tile.block().acceptStack(item(), getStack().amount, core.tile, unit);
+                if(accepted > 0){
+                    Call.transferItemTo(item(), accepted,
+                    mineTile.worldx() + Mathf.range(tilesize / 2f),
+                    mineTile.worldy() + Mathf.range(tilesize / 2f), core.tile);
+                    clearItem();
+                }
+            }
+
+            if(mineTile == null || core == null || mineTile.block() != Blocks.air || dst(mineTile.worldx(), mineTile.worldy()) > miningRange
+            || mineTile.drop() == null || !acceptsItem(mineTile.drop()) || !canMine(mineTile.drop())){
+                mineTile = null;
+            }else{
+                Item item = mineTile.drop();
+                setRotation(Mathf.slerpDelta(getRotation(), angleTo(mineTile.worldx(), mineTile.worldy()), 0.4f));
+
+                if(Mathf.chance(Time.delta() * (0.06 - item.hardness * 0.01) * getMiningSpeed())){
+
+                    if(dst(core) < mineTransferRange && core.tile.block().acceptStack(item, 1, core.tile, unit) == 1 && offloadImmediately()){
+                        Call.transferItemTo(item, 1,
+                        mineTile.worldx() + Mathf.range(tilesize / 2f),
+                        mineTile.worldy() + Mathf.range(tilesize / 2f), core.tile);
+                    }else if(acceptsItem(item)){
+                        //this is clientside, since items are synced anyway
+                        ItemTransfer.transferItemToUnit(item,
+                        mineTile.worldx() + Mathf.range(tilesize / 2f),
+                        mineTile.worldy() + Mathf.range(tilesize / 2f),
+                        unit);
+                    }
+                }
+
+                if(Mathf.chance(0.06 * Time.delta())){
+                    Fx.pulverizeSmall.at(mineTile.worldx() + Mathf.range(tilesize / 2f), mineTile.worldy() + Mathf.range(tilesize / 2f), 0f, item.color);
+                }
+            }
+        }
     }
 
     @Component
     class BuilderComp{
+        Queue<BuildRequest> requests = new Queue<>();
+        float buildSpeed = 1f;
+        //boolean building;
 
+        void removeBuild(int x, int y, boolean breaking){
+            //remove matching request
+            int idx = player.buildQueue().indexOf(req -> req.breaking == breaking && req.x == x && req.y == y);
+            if(idx != -1){
+                player.buildQueue().removeIndex(idx);
+            }
+        }
+
+        /** Return whether this builder's place queue contains items. */
+        boolean isBuilding(){
+            return requests.size != 0;
+        }
+
+        /** Clears the placement queue. */
+        void clearBuilding(){
+            requests.clear();
+        }
+
+        /** Add another build requests to the tail of the queue, if it doesn't exist there yet. */
+        void addBuild(BuildRequest place){
+            addBuild(place, true);
+        }
+
+        /** Add another build requests to the queue, if it doesn't exist there yet. */
+        void addBuild(BuildRequest place, boolean tail){
+            BuildRequest replace = null;
+            for(BuildRequest request : requests){
+                if(request.x == place.x && request.y == place.y){
+                    replace = request;
+                    break;
+                }
+            }
+            if(replace != null){
+                requests.remove(replace);
+            }
+            Tile tile = world.tile(place.x, place.y);
+            if(tile != null && tile.entity instanceof BuildEntity){
+                place.progress = tile.<BuildEntity>ent().progress;
+            }
+            if(tail){
+                requests.addLast(place);
+            }else{
+                requests.addFirst(place);
+            }
+        }
+
+        /** Return the build requests currently active, or the one at the top of the queue.*/
+        @Nullable BuildRequest buildRequest(){
+            return requests.size == 0 ? null : requests.first();
+        }
+    }
+
+    @Component(DamageComp.class)
+    class ShielderComp{
+
+        void absorb(){
+
+        }
     }
 
     @Component
     class ItemsComp{
-        ItemStack item = new ItemStack();
+        ItemStack stack = new ItemStack();
+
+        native int getItemCapacity();
+
+        public Item item(){
+            return stack.item;
+        }
+
+        void clearItem(){
+            stack.amount = 0;
+        }
+
+        boolean acceptsItem(Item item){
+            return !hasItem() || item == stack.item && stack.amount + 1 <= getItemCapacity();
+        }
+
+        boolean hasItem(){
+            return stack.amount > 0;
+        }
     }
 
     @Component(VelComp.class)
@@ -543,7 +698,13 @@ public class EntityComps{
 
         void update(){}
 
-        void remove(){}
+        void remove(){
+
+        }
+
+        void add(){
+
+        }
 
         boolean isLocal(){
             //TODO fix

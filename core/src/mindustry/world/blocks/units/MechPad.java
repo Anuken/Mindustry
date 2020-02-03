@@ -62,7 +62,7 @@ public class MechPad extends Block{
 
         MechFactoryEntity entity = tile.ent();
 
-        Effects.effect(Fx.spawn, entity);
+        Fx.spawn.at(entity);
 
         if(entity.player == null) return;
         Mech mech = ((MechPad)tile.block()).mech;

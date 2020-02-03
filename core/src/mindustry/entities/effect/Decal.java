@@ -4,7 +4,6 @@ import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
 import mindustry.entities.EntityGroup;
 import mindustry.entities.type.TimedEntity;
-import mindustry.entities.traits.BelowLiquidTrait;
 import mindustry.graphics.Pal;
 
 import static mindustry.Vars.groundEffectGroup;
@@ -12,7 +11,7 @@ import static mindustry.Vars.groundEffectGroup;
 /**
  * Class for creating block rubble on the ground.
  */
-public abstract class Decal extends TimedEntity implements BelowLiquidTrait, DrawTrait{
+public abstract class Decal extends TimedEntity implements DrawTrait{
 
     @Override
     public float lifetime(){

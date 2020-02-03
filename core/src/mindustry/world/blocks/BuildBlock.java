@@ -9,10 +9,9 @@ import arc.math.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.type.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -56,7 +55,7 @@ public class BuildBlock extends Block{
     @Remote(called = Loc.server)
     public static void onDeconstructFinish(Tile tile, Block block, int builderID){
         Team team = tile.getTeam();
-        Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
+        Fx.breakBlock.at(tile.drawx(), tile.drawy(), block.size);
         Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, true));
         tile.remove();
         if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
@@ -76,7 +75,7 @@ public class BuildBlock extends Block{
                 tile.block().playerPlaced(tile);
             }
         }
-        Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
+        Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
     }
 
     static boolean shouldPlay(){
@@ -155,7 +154,7 @@ public class BuildBlock extends Block{
 
     @Override
     public void onDestroyed(Tile tile){
-        Effects.effect(Fx.blockExplosionSmoke, tile);
+        Fx.blockExplosionSmoke.at(tile);
 
         if(!tile.floor().solid && !tile.floor().isLiquid){
             RubbleDecal.create(tile.drawx(), tile.drawy(), size);

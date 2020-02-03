@@ -1,8 +1,6 @@
 package mindustry.entities.type;
 
-import mindustry.*;
 import mindustry.entities.EntityGroup;
-import mindustry.entities.traits.Entity;
 
 public abstract class BaseEntity implements Entity{
     private static int lastid;

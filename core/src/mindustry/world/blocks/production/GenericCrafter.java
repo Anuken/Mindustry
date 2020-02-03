@@ -95,7 +95,7 @@ public class GenericCrafter extends Block{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
 
             if(Mathf.chance(Time.delta() * updateEffectChance)){
-                Effects.effect(updateEffect, entity.x + Mathf.range(size * 4f), entity.y + Mathf.range(size * 4));
+                updateEffect.at(entity.x + Mathf.range(size * 4f), entity.y + Mathf.range(size * 4));
             }
         }else{
             entity.warmup = Mathf.lerp(entity.warmup, 0f, 0.02f);
@@ -116,7 +116,7 @@ public class GenericCrafter extends Block{
                 handleLiquid(tile, tile, outputLiquid.liquid, outputLiquid.amount);
             }
 
-            Effects.effect(craftEffect, tile.drawx(), tile.drawy());
+            craftEffect.at(tile.drawx(), tile.drawy());
             entity.progress = 0f;
         }
 

@@ -110,7 +110,7 @@ public abstract class BulletType extends Content{
     }
 
     public void hit(Bullet b, float x, float y){
-        Effects.effect(hitEffect, x, y, b.rot());
+        hitEffect.at(x, y, b.rot());
         hitSound.at(b);
 
         Effects.shake(hitShake, hitShake, b);
@@ -133,7 +133,7 @@ public abstract class BulletType extends Content{
     }
 
     public void despawned(Bullet b){
-        Effects.effect(despawnEffect, b.x, b.y, b.rot());
+        despawnEffect.at(b.x, b.y, b.rot());
         hitSound.at(b);
 
         if(fragBullet != null || splashDamageRadius > 0){

@@ -75,9 +75,9 @@ public class Mechs implements ContentList{
                 if(player.timer.get(Player.timerAbility, healReload)){
                     if(indexer.eachBlock(player, healRange, other -> other.entity.damaged(), other -> {
                         other.entity.healBy(other.entity.maxHealth() * healPercent / 100f);
-                        Effects.effect(Fx.healBlockFull, Pal.heal, other.drawx(), other.drawy(), other.block().size);
+                        Fx.healBlockFull.at(other.drawx(), other.drawy(), other.block().size, Pal.heal);
                     })){
-                        Effects.effect(Fx.healWave, player);
+                        Fx.healWave.at(player);
                     }
                 }
             }
@@ -193,14 +193,14 @@ public class Mechs implements ContentList{
 
                     Units.nearby(player.getTeam(), player.x, player.y, healRange, unit -> {
                         if(unit.health < unit.maxHealth()){
-                            Effects.effect(Fx.heal, unit);
+                            Fx.heal.at(unit);
                             wasHealed = true;
                         }
                         unit.healBy(healAmount);
                     });
 
                     if(wasHealed){
-                        Effects.effect(Fx.healWave, player);
+                        Fx.healWave.at(player);
                     }
                 }
             }
@@ -316,10 +316,10 @@ public class Mechs implements ContentList{
 
                     indexer.eachBlock(player, effectRange, other -> other.entity.damaged(), other -> {
                         other.entity.applyBoost(1.5f, effectDuration);
-                        Effects.effect(Fx.healBlockFull, Pal.heal, other.drawx(), other.drawy(), other.block().size);
+                        Fx.healBlockFull.at(other.drawx(), other.drawy(), other.block().size, Pal.heal);
                     });
 
-                    Effects.effect(Fx.overdriveWave, player);
+                    Fx.overdriveWave.at(player);
                 }
             }
         };
@@ -367,7 +367,7 @@ public class Mechs implements ContentList{
             public void update(Player player){
                 float scl = scld(player);
                 if(Mathf.chance(Time.delta() * (0.15 * scl))){
-                    Effects.effect(Fx.hitLancer, Pal.lancerLaser, player.x, player.y);
+                    Fx.hitLancer.at(Pal.lancerLaser, player.x, player.y);
                     Lightning.create(player.getTeam(), Pal.lancerLaser, 10f * Vars.state.rules.playerDamageMultiplier,
                     player.x + player.velocity().x, player.y + player.velocity().y, player.rotation, 14);
                 }

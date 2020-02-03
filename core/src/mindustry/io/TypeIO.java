@@ -8,7 +8,7 @@ import mindustry.entities.Effects;
 import mindustry.entities.Effects.Effect;
 import mindustry.entities.type.Bullet;
 import mindustry.entities.bullet.BulletType;
-import mindustry.entities.traits.BuilderTrait.BuildRequest;
+import mindustry.entities.units.BuildRequest;
 import mindustry.entities.type.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;

@@ -76,7 +76,7 @@ public class LaunchPad extends StorageBlock{
         if(world.isZone() && entity.cons.valid() && entity.items.total() >= itemCapacity && entity.timer.get(timerLaunch, launchTime / entity.timeScale)){
             for(Item item : Vars.content.items()){
                 Events.fire(Trigger.itemLaunch);
-                Effects.effect(Fx.padlaunch, tile);
+                Fx.padlaunch.at(tile);
                 int used = Math.min(entity.items.get(item), itemCapacity);
                 data.addItem(item, used);
                 entity.items.remove(item, used);

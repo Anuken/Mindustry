@@ -102,7 +102,7 @@ public class NuclearReactor extends PowerGenerator{
         if(entity.heat > smokeThreshold){
             float smoke = 1.0f + (entity.heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
             if(Mathf.chance(smoke / 20.0 * entity.delta())){
-                Effects.effect(Fx.reactorsmoke, tile.worldx() + Mathf.range(size * tilesize / 2f),
+                Fx.reactorsmoke.at(tile.worldx() + Mathf.range(size * tilesize / 2f),
                 tile.worldy() + Mathf.random(size * tilesize / 2f));
             }
         }
@@ -128,9 +128,9 @@ public class NuclearReactor extends PowerGenerator{
         if((fuel < 5 && entity.heat < 0.5f) || !state.rules.reactorExplosions) return;
 
         Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
-        Effects.effect(Fx.nuclearShockwave, tile.worldx(), tile.worldy());
+        Fx.nuclearShockwave.at(tile.worldx(), tile.worldy());
         for(int i = 0; i < 6; i++){
-            Time.run(Mathf.random(40), () -> Effects.effect(Fx.nuclearcloud, tile.worldx(), tile.worldy()));
+            Time.run(Mathf.random(40), () -> Fx.nuclearcloud.at(tile.worldx(), tile.worldy()));
         }
 
         Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
@@ -138,14 +138,14 @@ public class NuclearReactor extends PowerGenerator{
         for(int i = 0; i < 20; i++){
             Time.run(Mathf.random(50), () -> {
                 tr.rnd(Mathf.random(40f));
-                Effects.effect(Fx.explosion, tr.x + tile.worldx(), tr.y + tile.worldy());
+                Fx.explosion.at(tr.x + tile.worldx(), tr.y + tile.worldy());
             });
         }
 
         for(int i = 0; i < 70; i++){
             Time.run(Mathf.random(80), () -> {
                 tr.rnd(Mathf.random(120f));
-                Effects.effect(Fx.nuclearsmoke, tr.x + tile.worldx(), tr.y + tile.worldy());
+                Fx.nuclearsmoke.at(tr.x + tile.worldx(), tr.y + tile.worldy());
             });
         }
     }

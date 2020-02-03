@@ -4,7 +4,6 @@ import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.util.Time;
 import mindustry.content.Fx;
-import mindustry.entities.Effects;
 import mindustry.entities.type.Bullet;
 import mindustry.gen.*;
 import mindustry.graphics.Pal;
@@ -32,7 +31,7 @@ public class MissileBulletType extends BasicBulletType{
         super.update(b);
 
         if(Mathf.chance(Time.delta() * 0.2)){
-            Effects.effect(Fx.missileTrail, trailColor, b.x, b.y, 2f);
+            Fx.missileTrail.at(b.x, b.y, 2f, trailColor);
         }
 
         if(weaveMag > 0){

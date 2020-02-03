@@ -10,12 +10,8 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.pooling.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
-import mindustry.entities.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.effect.GroundEffectEntity.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
@@ -48,49 +44,12 @@ public class Renderer implements ApplicationListener{
         camera = new Camera();
         Shaders.init();
 
-        Effects.setScreenShakeProvider((intensity, duration) -> {
-            shakeIntensity = Math.max(intensity, shakeIntensity);
-            shaketime = Math.max(shaketime, duration);
-        });
-
-        Effects.setEffectProvider((effect, color, x, y, rotation, data) -> {
-            if(effect == Fx.none) return;
-            if(Core.settings.getBool("effects")){
-                Rect view = camera.bounds(rect);
-                Rect pos = rect2.setSize(effect.size).setCenter(x, y);
-
-                if(view.overlaps(pos)){
-
-                    if(!(effect instanceof GroundEffect)){
-                        EffectEntity entity = Pools.obtain(EffectEntity.class, EffectEntity::new);
-                        entity.effect = effect;
-                        entity.color.set(color);
-                        entity.rotation = rotation;
-                        entity.data = data;
-                        entity.id++;
-                        entity.set(x, y);
-                        if(data instanceof Entity){
-                            entity.setParent((Entity)data);
-                        }
-                        effectGroup.add(entity);
-                    }else{
-                        GroundEffectEntity entity = Pools.obtain(GroundEffectEntity.class, GroundEffectEntity::new);
-                        entity.effect = effect;
-                        entity.color.set(color);
-                        entity.rotation = rotation;
-                        entity.id++;
-                        entity.data = data;
-                        entity.set(x, y);
-                        if(data instanceof Entity){
-                            entity.setParent((Entity)data);
-                        }
-                        groundEffectGroup.add(entity);
-                    }
-                }
-            }
-        });
-
         clearColor = new Color(0f, 0f, 0f, 1f);
+    }
+
+    public void shake(float intensity, float duration){
+        shakeIntensity = Math.max(shakeIntensity, intensity);
+        shaketime = Math.max(shaketime, duration);
     }
 
     @Override

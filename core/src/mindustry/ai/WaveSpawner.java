@@ -1,20 +1,16 @@
 package mindustry.ai;
 
-import arc.Events;
-import arc.struct.Array;
-import arc.func.Floatc2;
-import arc.math.Angles;
-import arc.math.Mathf;
-import arc.util.Time;
-import arc.util.Tmp;
-import mindustry.content.Blocks;
-import mindustry.content.Fx;
-import mindustry.entities.Damage;
-import mindustry.entities.Effects;
+import arc.*;
+import arc.func.*;
+import arc.math.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.type.*;
-import mindustry.game.EventType.WorldLoadEvent;
-import mindustry.game.SpawnGroup;
-import mindustry.world.Tile;
+import mindustry.game.EventType.*;
+import mindustry.game.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
@@ -77,7 +73,7 @@ public class WaveSpawner{
 
         eachGroundSpawn((spawnX, spawnY, doShockwave) -> {
             if(doShockwave){
-                Time.run(20f, () -> Effects.effect(Fx.spawnShockwave, spawnX, spawnY, state.rules.dropZoneRadius));
+                Time.run(20f, () -> Fx.spawnShockwave.at(spawnX, spawnY, state.rules.dropZoneRadius));
                 Time.run(40f, () -> Damage.damage(state.rules.waveTeam, spawnX, spawnY, state.rules.dropZoneRadius, 99999999f, true));
             }
         });
@@ -142,10 +138,10 @@ public class WaveSpawner{
     }
 
     private void spawnEffect(BaseUnit unit){
-        Effects.effect(Fx.unitSpawn, unit.x, unit.y, 0f, unit);
+        Fx.unitSpawn.at(unit.x, unit.y, 0f, unit);
         Time.run(30f, () -> {
             unit.add();
-            Effects.effect(Fx.spawn, unit);
+            Fx.spawn.at(unit);
         });
     }
 

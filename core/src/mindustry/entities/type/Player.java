@@ -18,6 +18,7 @@ import mindustry.core.*;
 import mindustry.ctype.ContentType;
 import mindustry.entities.*;
 import mindustry.entities.traits.*;
+import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.input.*;
@@ -491,7 +492,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         if(boostHeat <= liftoffBoost + 0.05f && achievedFlight && !mech.flying){
             if(tile != null){
-                Effects.effect(Fx.unitLand, tile.floor().color, x, y, tile.floor().isLiquid ? 1f : 0.5f);
+                Fx.unitLand.at(x, y, tile.floor().isLiquid ? 1f : 0.5f, tile.floor().color);
             }
             mech.onLand(this);
             achievedFlight = false;

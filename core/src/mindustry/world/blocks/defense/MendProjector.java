@@ -7,7 +7,6 @@ import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.util.*;
 import mindustry.content.Fx;
-import mindustry.entities.Effects;
 import mindustry.entities.type.TileEntity;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -80,7 +79,7 @@ public class MendProjector extends Block{
 
             indexer.eachBlock(entity, realRange, other -> other.entity.damaged(), other -> {
                 other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.efficiency());
-                Effects.effect(Fx.healBlockFull, Tmp.c1.set(baseColor).lerp(phaseColor, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
+                Fx.healBlockFull.at(other.drawx(), other.drawy(), other.block().size, Tmp.c1.set(baseColor).lerp(phaseColor, entity.phaseHeat));
             });
         }
     }

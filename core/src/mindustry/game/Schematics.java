@@ -14,7 +14,7 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.ContentType;
-import mindustry.entities.traits.BuilderTrait.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Schematic.*;
 import mindustry.input.*;

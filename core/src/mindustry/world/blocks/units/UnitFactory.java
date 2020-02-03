@@ -55,7 +55,7 @@ public class UnitFactory extends Block{
         entity.spawned = spawns;
 
         Effects.shake(2f, 3f, entity);
-        Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
+        Fx.producesmoke.at(tile.drawx(), tile.drawy());
 
         if(!net.client()){
             BaseUnit unit = factory.unitType.create(tile.getTeam());

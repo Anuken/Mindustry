@@ -177,7 +177,7 @@ public class Logic implements ApplicationListener{
         }
 
         for(TileEntity tile : state.teams.playerCores()){
-            Effects.effect(Fx.launch, tile);
+            Fx.launch.at(tile);
         }
 
         if(world.getZone() != null){

@@ -138,9 +138,9 @@ public class ImpactReactor extends PowerGenerator{
         Sounds.explosionbig.at(tile);
 
         Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
-        Effects.effect(Fx.impactShockwave, tile.worldx(), tile.worldy());
+        Fx.impactShockwave.at(tile.worldx(), tile.worldy());
         for(int i = 0; i < 6; i++){
-            Time.run(Mathf.random(80), () -> Effects.effect(Fx.impactcloud, tile.worldx(), tile.worldy()));
+            Time.run(Mathf.random(80), () -> Fx.impactcloud.at(tile.worldx(), tile.worldy()));
         }
 
         Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
@@ -149,14 +149,14 @@ public class ImpactReactor extends PowerGenerator{
         for(int i = 0; i < 20; i++){
             Time.run(Mathf.random(80), () -> {
                 Tmp.v1.rnd(Mathf.random(40f));
-                Effects.effect(Fx.explosion, Tmp.v1.x + tile.worldx(), Tmp.v1.y + tile.worldy());
+                Fx.explosion.at(Tmp.v1.x + tile.worldx(), Tmp.v1.y + tile.worldy());
             });
         }
 
         for(int i = 0; i < 70; i++){
             Time.run(Mathf.random(90), () -> {
                 Tmp.v1.rnd(Mathf.random(120f));
-                Effects.effect(Fx.impactsmoke, Tmp.v1.x + tile.worldx(), Tmp.v1.y + tile.worldy());
+                Fx.impactsmoke.at(Tmp.v1.x + tile.worldx(), Tmp.v1.y + tile.worldy());
             });
         }
     }

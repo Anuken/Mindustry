@@ -18,8 +18,8 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.type.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -78,7 +78,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
-        Effects.effect(Fx.dropItem, Color.white, player.x, player.y, angle, player.item().item);
+        Fx.dropItem.at(player.x, player.y, angle, Color.white, player.item().item);
         player.clearItem();
     }
 

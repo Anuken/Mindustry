@@ -169,9 +169,9 @@ public class Control implements ApplicationListener, Loadable{
 
             app.post(() -> ui.hudfrag.showLand());
             renderer.zoomIn(Fx.coreLand.lifetime);
-            app.post(() -> Effects.effect(Fx.coreLand, core.x, core.y, 0, core.block));
+            app.post(() -> Fx.coreLand.at(core.x, core.y, 0, core.block));
             Time.run(Fx.coreLand.lifetime, () -> {
-                Effects.effect(Fx.launch, core);
+                Fx.launch.at(core);
                 Effects.shake(5f, 5f, core);
             });
         });

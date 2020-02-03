@@ -269,7 +269,7 @@ public class Drill extends Block{
             * entity.dominantItems * speed * entity.warmup;
 
             if(Mathf.chance(Time.delta() * updateEffectChance * entity.warmup))
-                Effects.effect(updateEffect, entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
+                updateEffect.at(entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
         }else{
             entity.lastDrillSpeed = 0f;
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, warmupSpeed);
@@ -285,7 +285,7 @@ public class Drill extends Block{
             entity.index++;
             entity.progress = 0f;
 
-            Effects.effect(drillEffect, entity.dominantItem.color,
+            drillEffect.at(entity.dominantItem.color,
             entity.x + Mathf.range(size), entity.y + Mathf.range(size));
         }
     }
