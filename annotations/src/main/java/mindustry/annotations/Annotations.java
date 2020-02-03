@@ -9,8 +9,6 @@ public class Annotations{
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
     public @interface Component{
-        /** Dependencies. */
-        //Class[] value() default {};
     }
 
     /** Indicates priority of a method in an entity. Methods with higher priority are done last. */

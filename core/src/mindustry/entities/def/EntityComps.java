@@ -139,20 +139,207 @@ public class EntityComps{
 
     @Component
     abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc{
-        BulletType bullet;
+        private boolean supressCollision, supressOnce, deflected;
+
+        Object data;
+        BulletType type;
 
         public float getDamage(){
-            return bullet.damage;
+            return type.damage;
         }
 
         public void init(){
             //TODO
-            bullet.init(null);
+            type.init((Bulletc)this);
         }
 
         public void remove(){
             //TODO
-            bullet.despawned(null);
+            type.despawned((Bulletc)this);
+        }
+
+        public float getLifetime(){
+            return type.lifetime;
+        }
+
+        void deflect(){
+            supressCollision = true;
+            supressOnce = true;
+            deflected = true;
+        }
+
+        public boolean isDeflected(){
+            return deflected;
+        }
+
+        public float damageMultiplier(){
+            if(owner instanceof Unitc){
+                return ((Unitc)owner).getDamageMultipler();
+            }
+            return 1f;
+        }
+
+        @Override
+        public void killed(Entity other){
+            if(owner instanceof KillerTrait){
+                ((KillerTrait)owner).killed(other);
+            }
+        }
+
+        @Override
+        public void absorb(){
+            supressCollision = true;
+            remove();
+        }
+
+        @Override
+        public float drawSize(){
+            return type.drawSize;
+        }
+
+        @Override
+        public float damage(){
+            if(owner instanceof Lightning && data instanceof Float){
+                return (Float)data;
+            }
+            return type.damage * damageMultiplier();
+        }
+
+        @Override
+        public Team getTeam(){
+            return team;
+        }
+
+        @Override
+        public float getShieldDamage(){
+            return Math.max(damage(), type.splashDamage);
+        }
+
+        @Override
+        public boolean collides(SolidTrait other){
+            return type.collides && (other != owner && !(other instanceof DamageTrait)) && !supressCollision && !(other instanceof Unitc && ((Unitc)other).isFlying() && !type.collidesAir);
+        }
+
+        @Override
+        public void collision(SolidTrait other, float x, float y){
+            if(!type.pierce) remove();
+            type.hit(this, x, y);
+
+            if(other instanceof Unitc){
+                Unitc unit = (Unitc)other;
+                unit.velocity().add(Tmp.v3.set(other.getX(), other.getY()).sub(x, y).setLength(type.knockback / unit.mass()));
+                unit.applyEffect(type.status, type.statusDuration);
+            }
+        }
+
+        @Override
+        public void update(){
+            type.update(this);
+
+            x += velocity.x * Time.delta();
+            y += velocity.y * Time.delta();
+
+            velocity.scl(Mathf.clamp(1f - type.drag * Time.delta()));
+
+            time += Time.delta() * 1f / (lifeScl);
+            time = Mathf.clamp(time, 0, type.lifetime);
+
+            if(time >= type.lifetime){
+                if(!supressCollision) type.despawned(this);
+                remove();
+            }
+
+            if(type.hitTiles && collidesTiles() && !supressCollision && initialized){
+                world.raycastEach(world.toTile(lastPosition().x), world.toTile(lastPosition().y), world.toTile(x), world.toTile(y), (x, y) -> {
+
+                    Tile tile = world.ltile(x, y);
+                    if(tile == null) return false;
+
+                    if(tile.entity != null && tile.entity.collide(this) && type.collides(this, tile) && !tile.entity.isDead() && (type.collidesTeam || tile.getTeam() != team)){
+                        if(tile.getTeam() != team){
+                            tile.entity.collision(this);
+                        }
+
+                        if(!supressCollision){
+                            type.hitTile(this, tile);
+                            remove();
+                        }
+
+                        return true;
+                    }
+
+                    return false;
+                });
+            }
+
+            if(supressOnce){
+                supressCollision = false;
+                supressOnce = false;
+            }
+
+            initialized = true;
+        }
+
+        @Override
+        public void reset(){
+            type = null;
+            owner = null;
+            velocity.setZero();
+            time = 0f;
+            timer.clear();
+            lifeScl = 1f;
+            team = null;
+            data = null;
+            supressCollision = false;
+            supressOnce = false;
+            deflected = false;
+            initialized = false;
+        }
+
+        @Override
+        public void hitbox(Rect rect){
+            rect.setSize(type.hitSize).setCenter(x, y);
+        }
+
+        @Override
+        public void hitboxTile(Rect rect){
+            rect.setSize(type.hitSize).setCenter(x, y);
+        }
+
+        @Override
+        public void draw(){
+            type.draw(this);
+            renderer.lights.add(x, y, 16f, Pal.powerLight, 0.3f);
+        }
+
+        @Override
+        public float fin(){
+            return time / type.lifetime;
+        }
+
+        @Override
+        public Vec2 velocity(){
+            return velocity;
+        }
+
+        public void velocity(float speed, float angle){
+            velocity.set(0, speed).setAngle(angle);
+        }
+
+        public void limit(float f){
+            velocity.limit(f);
+        }
+
+        /** Sets the bullet's rotation in degrees. */
+        public void rot(float angle){
+            velocity.setAngle(angle);
+        }
+
+        /** @return the bullet's rotation. */
+        public float rot(){
+            float angle = Mathf.atan2(velocity.x, velocity.y) * Mathf.radiansToDegrees;
+            if(angle < 0) angle += 360;
+            return angle;
         }
     }
 
