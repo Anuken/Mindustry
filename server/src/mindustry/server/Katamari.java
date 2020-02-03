@@ -3,14 +3,12 @@ package mindustry.server;
 import arc.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.entities.type.base.*;
 import mindustry.type.*;
-import mindustry.world.*;
 import mindustry.world.blocks.units.UnitFactory.*;
 
 import static mindustry.Vars.*;
@@ -20,7 +18,7 @@ public class Katamari implements ApplicationListener{
 
     private Array<Unit> nearby = new Array<>();
     private Array<UnitType> tiers = new Array<UnitType>(){{
-        addAll(content.units());
+        addAll(content.units().select(u ->  !(u.constructor.get() instanceof BaseDrone) ));
         sort(u -> -u.health);
     }};
 
