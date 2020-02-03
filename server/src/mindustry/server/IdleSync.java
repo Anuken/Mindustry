@@ -17,7 +17,7 @@ public class IdleSync implements ApplicationListener{
                 p.idle = 0;
             }
 
-            if(p.idle > 120 && p.syncWhenIdle){
+            if(p.idle > 60 * 5 && p.syncWhenIdle){
                 p.syncWhenIdle = false;
                 Call.onWorldDataBegin(p.con);
                 netServer.sendWorldData(p);
