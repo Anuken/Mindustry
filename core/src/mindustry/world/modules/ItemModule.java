@@ -66,11 +66,28 @@ public class ItemModule extends BlockModule{
         return total;
     }
 
+    // Making the take() loop persistent so it does not return the same item twice in a row unless there is nothing else to return.
+    protected int takeRotation;
+
     public Item take(){
-        for(int i = 0; i < items.length; i++){
+    	// 0-to-length loop broken in two parts. First resume the loop where it previously left off.
+        for(int i = takeRotation; i < items.length; i++){
             if(items[i] > 0){
                 items[i]--;
                 total--;
+    			// save the next position so the next call to take() can resume from there.
+                takeRotation = (i + 1) % items.length;
+                return content.item(i);
+            }
+        }
+
+        // Then start a new lap which ends where the call started from if empty.
+        for(int i = 0; i < takeRotation; i++){
+            if(items[i] > 0){
+                items[i]--;
+                total--;
+    			// save the next position so the next call to take() can resume from there.
+                takeRotation = (i + 1) % items.length;
                 return content.item(i);
             }
         }
