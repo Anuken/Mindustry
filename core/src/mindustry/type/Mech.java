@@ -97,7 +97,7 @@ public class Mech extends UnlockableContent{
         (size + Mathf.absin(Time.time(), 2f, size / 4f)) * engineRadius);
 
         Draw.color(engineInnerColor);
-        Fill.circle(player.x + Angles.trnsx(player.rotation + 180, engineOffset - 1f), player.y + Angles.trnsy(player.rotation + 180, \\\\\\\engineOffset - 1f),
+        Fill.circle(player.x + Angles.trnsx(player.rotation + 180, engineOffset - 1f), player.y + Angles.trnsy(player.rotation + 180, engineOffset - 1f),
         (size + Mathf.absin(Time.time(), 2f, size / 4f)) * engineInnerRadius);
         Draw.color();
     }
