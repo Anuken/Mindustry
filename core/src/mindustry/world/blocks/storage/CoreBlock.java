@@ -1,7 +1,6 @@
 package mindustry.world.blocks.storage;
 
 import arc.*;
-import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import arc.struct.*;
 import arc.func.*;
@@ -10,7 +9,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.effect.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
@@ -206,14 +204,6 @@ public class CoreBlock extends StorageBlock{
     @Override
     public void update(Tile tile){
         CoreEntity entity = tile.ent();
-
-        if(entity.timer.get(60 * 2.5f)){
-            Core.app.post(() -> {
-                indexer.getAllied(tile.getTeam(), BlockFlag.upgradable).each(t -> {
-                    Call.transferItemTo(Items.titanium, 1, tile.drawx(), tile.drawy(), t);
-                });
-            });
-        }
 
         if(entity.spawnPlayer != null){
             if(!entity.spawnPlayer.isDead() || !entity.spawnPlayer.isAdded()){

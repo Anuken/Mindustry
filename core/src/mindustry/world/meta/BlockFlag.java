@@ -17,9 +17,7 @@ public enum BlockFlag{
     /** Upgrade pad. */
     mechPad,
     /** Scalables. */
-    scalable,
-    /** Upgradables. */
-    upgradable;
+    scalable;
 
     public final static BlockFlag[] all = values();
 }
