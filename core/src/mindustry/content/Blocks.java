@@ -926,6 +926,7 @@ public class Blocks implements ContentList{
             health = 45;
             speed = 0.03f;
             displayedSpeed = 4.2f;
+            flags = EnumSet.of(BlockFlag.upgradable);
         }};
 
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
