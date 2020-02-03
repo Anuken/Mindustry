@@ -1,5 +1,6 @@
 package mindustry.world.blocks.production;
 
+import arc.*;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -72,12 +73,14 @@ public class Incinerator extends Block{
 
         if(Mathf.chance(0.05)){
             if(net.server()){
-                Tile out = tryOffloadNear(tile, Items.pyratite, t -> t.block() instanceof Conveyor);
-                if(out != null) {
-                    Call.rotateBlock(null, out, true);
-                    Call.rotateBlock(null, out, false);
-                    netServer.titanic.add(out);
-                }
+                Core.app.post(() -> {
+                    Tile out = tryOffloadNear(tile, Items.pyratite, t -> t.block() instanceof Conveyor);
+                    if(out != null) {
+                        Call.rotateBlock(null, out, true);
+                        Call.rotateBlock(null, out, false);
+                        netServer.titanic.add(out);
+                    }
+                });
             }
         }
     }
