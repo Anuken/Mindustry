@@ -16,7 +16,7 @@ import javax.tools.*;
 import java.util.*;
 
 @SupportedAnnotationTypes("mindustry.annotations.Annotations.StyleDefaults")
-public class AssetsAnnotationProcessor extends BaseProcessor{
+public class AssetsProcess extends BaseProcessor{
     private String path;
 
     @Override
