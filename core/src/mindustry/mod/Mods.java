@@ -795,7 +795,7 @@ public class Mods implements Loadable{
 
     /** Plugin metadata information.*/
     public static class ModMeta{
-        public String name, displayName, author, description, version, main, minGameVersion, mainScript;
+        public String name, displayName, author, description, version, main, minGameVersion;
         public Array<String> dependencies = Array.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
