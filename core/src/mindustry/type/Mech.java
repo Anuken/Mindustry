@@ -28,7 +28,6 @@ public class Mech extends UnlockableContent{
     public float mineSpeed = 1f;
     public int drillPower = -1;
     public float buildPower = 1f;
-    public Color engineColor = Pal.boostTo;
     public int itemCapacity = 30;
     public boolean turnCursor = true;
     public boolean canHeal = false;
@@ -38,8 +37,14 @@ public class Mech extends UnlockableContent{
     public boolean drawCell = true;
     /** draw the items on its back */
     public boolean drawItems = true;
-    /** draw the engine light if it's flying/boosting */
+    /** draw the engine if it's flying/boosting */
+    public boolean drawEngine = true;
     public boolean drawLight = true;
+
+    public Color engineColor = Pal.boostTo;
+    public Color engineInnerColor = Color.white;
+    public float engineRadius = 1f;
+    public float engineInnerRadius = 0.5f;
 
     public float weaponOffsetX, weaponOffsetY, engineOffset = 5f, engineSize = 2.5f;
     public @NonNull Weapon weapon;
@@ -83,6 +88,18 @@ public class Mech extends UnlockableContent{
         float scl = flying ? 1f : player.boostHeat / 2f;
 
         Draw.rect(icon(Cicon.full), player.x + offsetX * scl, player.y + offsetY * scl, player.rotation - 90);
+    }
+    
+    public void drawEngine(Player player){
+        float size = engineSize * (flying ? 1f : player.boostHeat);
+        Draw.color(engineColor);
+        Fill.circle(player.x + Angles.trnsx(player.rotation + 180, engineOffset), player.y + Angles.trnsy(player.rotation + 180, engineOffset),
+        (size + Mathf.absin(Time.time(), 2f, size / 4f)) * engineRadius);
+
+        Draw.color(engineInnerColor);
+        Fill.circle(player.x + Angles.trnsx(player.rotation + 180, engineOffset - 1f), player.y + Angles.trnsy(player.rotation + 180, \\\\\\\engineOffset - 1f),
+        (size + Mathf.absin(Time.time(), 2f, size / 4f)) * engineInnerRadius);
+        Draw.color();
     }
 
     public float getExtraArmor(Player player){
