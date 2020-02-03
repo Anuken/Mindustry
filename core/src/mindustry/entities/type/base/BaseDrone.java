@@ -32,6 +32,7 @@ public abstract class BaseDrone extends FlyingUnit{
         }
     };
 
+    @Override
     public boolean countsAsEnemy(){
         return false;
     }

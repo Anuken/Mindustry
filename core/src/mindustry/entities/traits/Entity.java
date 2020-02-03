@@ -1,6 +1,7 @@
 package mindustry.entities.traits;
 
-import mindustry.entities.EntityGroup;
+import mindustry.*;
+import mindustry.entities.*;
 
 public interface Entity extends MoveTrait{
 
@@ -13,6 +14,14 @@ public interface Entity extends MoveTrait{
     default void removed(){}
 
     default void added(){}
+
+    default int tileX(){
+        return Vars.world.toTile(getX());
+    }
+
+    default int tileY(){
+        return Vars.world.toTile(getY());
+    }
 
     EntityGroup targetGroup();
 

@@ -8,8 +8,9 @@ public class Annotations{
     /** Indicates multiple inheritance on a component type. */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Depends{
-        Class[] value();
+    public @interface Component{
+        /** Dependencies. */
+        Class[] value() default {};
     }
 
     /** Indicates that a component def is present on all entities. */

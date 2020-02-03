@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -25,6 +26,7 @@ public class BlockIndexer{
 
     /** Set of all ores that are being scanned. */
     private final ObjectSet<Item> scanOres = new ObjectSet<>();
+    private final IntSet intSet = new IntSet();
     private final ObjectSet<Item> itemSet = new ObjectSet<>();
     /** Stores all ore quadtrants on the map. */
     private ObjectMap<Item, ObjectSet<Tile>> ores = new ObjectMap<>();
@@ -160,6 +162,39 @@ public class BlockIndexer{
     /** Get all allied blocks with a flag. */
     public ObjectSet<Tile> getAllied(Team team, BlockFlag type){
         return flagMap[team.id][type.ordinal()];
+    }
+
+    public boolean eachBlock(TeamTrait trait, float range, Boolf<Tile> pred, Cons<Tile> cons){
+        return eachBlock(trait.getTeam(), trait.getX(), trait.getY(), range, pred, cons);
+    }
+
+    public boolean eachBlock(Team team, float wx, float wy, float range, Boolf<Tile> pred, Cons<Tile> cons){
+        intSet.clear();
+
+        int tx = world.toTile(wx);
+        int ty = world.toTile(wy);
+
+        int tileRange = (int)(range / tilesize + 1);
+        intSet.clear();
+        boolean any = false;
+
+        for(int x = -tileRange + tx; x <= tileRange + tx; x++){
+            for(int y = -tileRange + ty; y <= tileRange + ty; y++){
+                if(!Mathf.within(x * tilesize, y * tilesize, wx, wy, range)) continue;
+
+                Tile other = world.ltile(x, y);
+
+                if(other == null) continue;
+
+                if(other.getTeam() == team && !intSet.contains(other.pos()) && other.entity != null && pred.get(other)){
+                    cons.get(other);
+                    any = true;
+                    intSet.add(other.pos());
+                }
+            }
+        }
+
+        return any;
     }
 
     /** Get all enemy blocks with a flag. */

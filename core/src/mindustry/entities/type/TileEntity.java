@@ -10,8 +10,6 @@ import arc.math.geom.Vec2;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.entities.EntityGroup;
-import mindustry.entities.traits.HealthTrait;
-import mindustry.entities.traits.TargetTrait;
 import mindustry.game.*;
 import mindustry.game.EventType.BlockDestroyEvent;
 import mindustry.gen.*;

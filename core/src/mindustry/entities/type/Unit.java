@@ -28,7 +28,7 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait{
+public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait, ShooterTrait{
     /** Total duration of hit flash effect */
     public static final float hitDuration = 9f;
     /** Percision divisor of velocity, used when writing. For example a value of '2' would mean the percision is 1/2 = 0.5-size chunks. */
@@ -42,11 +42,29 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public float rotation;
 
     protected final Interpolator interpolator = new Interpolator();
+    /** status effects */
     protected final Statuses status = new Statuses();
+    /** current item held */
     protected final ItemStack item = new ItemStack(content.item(0), 0);
+    /** holds weapon aiming positions and angles */
+    protected final Weapons weapons = new Weapons();
 
+    /** team; can be changed at any time */
     protected Team team = Team.sharded;
+    /** timers for drowning and getting hit */
     protected float drownTime, hitTime;
+    /** this unit's type; do not change internally without calling setType(...) */
+    protected UnitDef type;
+    
+    public void setType(UnitDef type){
+        this.type = type;
+        clampHealth();
+        weapons.init(this);
+    }
+    
+    public UnitDef type(){
+        return type;
+    }
 
     @Override
     public boolean collidesGrid(int x, int y){
@@ -56,6 +74,11 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     @Override
     public Team getTeam(){
         return team;
+    }
+
+    @Override
+    public Weapons getWeapons(){
+        return weapons;
     }
 
     @Override
@@ -135,6 +158,22 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     @Override
+    public void hitbox(Rect rect){
+        rect.setSize(type.hitsize).setCenter(x, y);
+    }
+
+    @Override
+    public void hitboxTile(Rect rect){
+        rect.setSize(type.hitsizeTile).setCenter(x, y);
+    }
+
+
+    @Override
+    public float drag(){
+        return type.drag;
+    }
+
+    @Override
     public void writeSave(DataOutput stream) throws IOException{
         writeSave(stream, false);
     }
@@ -186,7 +225,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public boolean isImmune(StatusEffect effect){
-        return false;
+        return type.immunities.contains(effect);
     }
 
     public boolean isOutOfBounds(){
@@ -253,7 +292,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         status.update(this);
         item.amount = Mathf.clamp(this.item.amount, 0, getItemCapacity());
 
-        velocity.limit(maxVelocity()).scl(1f + (status.getSpeedMultiplier() - 1f) * Time.delta());
+        //velocity.limit(maxVelocity()).scl(1f + (status.getSpeedMultiplier() - 1f) * Time.delta());
 
         if(x < -finalWorldBounds || y < -finalWorldBounds || x >= world.width() * tilesize + finalWorldBounds || y >= world.height() * tilesize + finalWorldBounds){
             kill();
@@ -276,7 +315,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         if(y < 0) velocity.y += (-y/warpDst);
         if(x > world.unitWidth()) velocity.x -= (x - world.unitWidth())/warpDst;
         if(y > world.unitHeight()) velocity.y -= (y - world.unitHeight())/warpDst;
-
 
         if(isFlying()){
             drownTime = 0f;
@@ -327,7 +365,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             if(Math.abs(py - y) <= 0.0001f) velocity.y = 0f;
         }
 
-        velocity.scl(Mathf.clamp(1f - drag() * (isFlying() ? 1f : floor.dragMultiplier) * Time.delta()));
+        //velocity.scl(Mathf.clamp(1f - drag() * (isFlying() ? 1f : floor.dragMultiplier) * Time.delta()));
     }
 
     public boolean acceptsItem(Item item){
@@ -392,7 +430,9 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void drawLight(){
-        renderer.lights.add(x, y, 50f, Pal.powerLight, 0.6f);
+        if(type.lightRadius > 0){
+            renderer.lights.add(x, y, type.lightRadius, type.lightColor, 0.6f);
+        }
     }
 
     public void drawBackItems(float itemtime, boolean number){
@@ -449,11 +489,16 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public abstract TextureRegion getIconRegion();
 
-    public abstract Weapon getWeapon();
+    public final int getItemCapacity(){
+        return type.itemCapacity;
+    }
 
-    public abstract int getItemCapacity();
+    @Override
+    public float mass(){
+        return type.mass;
+    }
 
-    public abstract float mass();
-
-    public abstract boolean isFlying();
+    public boolean isFlying(){
+        return type.flying;
+    }
 }

@@ -11,7 +11,6 @@ import arc.util.Time;
 import arc.util.pooling.Pools;
 import mindustry.entities.*;
 import mindustry.entities.type.TimedEntity;
-import mindustry.entities.traits.DrawTrait;
 import mindustry.entities.type.Unit;
 import mindustry.graphics.Pal;
 import mindustry.type.Item;

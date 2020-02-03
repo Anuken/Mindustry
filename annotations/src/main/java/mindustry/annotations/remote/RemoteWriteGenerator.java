@@ -146,8 +146,12 @@ public class RemoteWriteGenerator{
 
             VariableElement var = elem.getParameters().get(i);
 
-            //add parameter to method
-            method.addParameter(TypeName.get(var.asType()), var.getSimpleName().toString());
+            try{
+                //add parameter to method
+                method.addParameter(TypeName.get(var.asType()), var.getSimpleName().toString());
+            }catch(Throwable t){
+                throw new RuntimeException("Error parsing method " + methodEntry.targetMethod);
+            }
 
             //name of parameter
             String varName = var.getSimpleName().toString();

@@ -6,7 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ctype.ContentList;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
@@ -15,15 +15,115 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 
-public class Mechs implements ContentList{
-    public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive;
+import static mindustry.Vars.indexer;
 
-    public static Mech starter;
+public class Mechs implements ContentList{
+    public static UnitDef vanguard, alpha, delta, tau, omega, dart, javelin, trident, glaive;
+
+    public static UnitDef starter;
 
     @Override
     public void load(){
 
-        alpha = new Mech("alpha-mech", false){
+        vanguard = new UnitDef("vanguard-ship"){
+            float healRange = 60f;
+            float healReload = 200f;
+            float healPercent = 10f;
+
+            {
+                flying = true;
+                drillTier = 1;
+                minePower = 4f;
+                speed = 0.49f;
+                drag = 0.09f;
+                health = 200f;
+                weaponOffsetX = -1;
+                engineSize = 2.3f;
+                weaponOffsetY = -1;
+                engineColor = Pal.lightTrail;
+                cellTrnsY = 1f;
+                buildPower = 1.2f;
+                weapon = new Weapon("vanguard-blaster"){{
+                    length = 1.5f;
+                    reload = 30f;
+                    alternate = true;
+                    inaccuracy = 6f;
+                    velocityRnd = 0.1f;
+                    ejectEffect = Fx.none;
+                    bullet = new HealBulletType(){{
+                        healPercent = 3f;
+                        backColor = engineColor;
+                        homingPower = 20f;
+                        bulletHeight = 4f;
+                        bulletWidth = 1.5f;
+                        damage = 3f;
+                        speed = 4f;
+                        lifetime = 40f;
+                        shootEffect = Fx.shootHealYellow;
+                        smokeEffect = hitEffect = despawnEffect = Fx.hitYellowLaser;
+                    }};
+                }};
+            }
+
+            @Override
+            public boolean alwaysUnlocked(){
+                return true;
+            }
+
+            @Override
+            public void update(Player player){
+                if(player.timer.get(Player.timerAbility, healReload)){
+                    if(indexer.eachBlock(player, healRange, other -> other.entity.damaged(), other -> {
+                        other.entity.healBy(other.entity.maxHealth() * healPercent / 100f);
+                        Effects.effect(Fx.healBlockFull, Pal.heal, other.drawx(), other.drawy(), other.block().size);
+                    })){
+                        Effects.effect(Fx.healWave, player);
+                    }
+                }
+            }
+        };
+
+        alpha = new UnitDef("alpha-mech", false){
+            {
+                drillTier = -1;
+                speed = 0.5f;
+                boostSpeed = 0.95f;
+                itemCapacity = 15;
+                mass = 0.9f;
+                health = 150f;
+                buildPower = 0.9f;
+                weaponOffsetX = 1;
+                weaponOffsetY = -1;
+                engineColor = Pal.heal;
+
+                weapon = new Weapon("shockgun"){{
+                    shake = 2f;
+                    length = 0.5f;
+                    reload = 70f;
+                    alternate = true;
+                    recoil = 4f;
+                    width = 5f;
+                    shootSound = Sounds.laser;
+
+                    bullet = new LaserBulletType(){{
+                        damage = 20f;
+                        recoil = 1f;
+                        sideAngle = 45f;
+                        sideWidth = 1f;
+                        sideLength = 70f;
+                        colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
+                    }};
+                }};
+            }
+
+            @Override
+            public void update(Player player){
+                player.healBy(Time.delta() * 0.09f);
+            }
+
+        };
+
+        delta = new UnitDef("delta-mech", false){
             {
                 drillPower = 1;
                 mineSpeed = 1.5f;
@@ -34,65 +134,26 @@ public class Mechs implements ContentList{
                 buildPower = 1.2f;
                 engineColor = Color.valueOf("ffd37f");
                 health = 250f;
+                weaponOffsetX = 4f;
 
-                weapon = new Weapon("blaster"){{
+                weapon = new Weapon("flamethrower"){{
                     length = 1.5f;
-                    reload = 14f;
+                    reload = 30f;
+                    width = 4f;
                     alternate = true;
-                    ejectEffect = Fx.shellEjectSmall;
-                    bullet = Bullets.standardMechSmall;
-                }};
-            }
-
-            @Override
-            public void updateAlt(Player player){
-                player.healBy(Time.delta() * 0.09f);
-            }
-
-        };
-
-        delta = new Mech("delta-mech", false){
-            float cooldown = 120;
-
-            {
-                drillPower = -1;
-                speed = 0.75f;
-                boostSpeed = 0.95f;
-                itemCapacity = 15;
-                mass = 0.9f;
-                health = 150f;
-                buildPower = 0.9f;
-                weaponOffsetX = -1;
-                weaponOffsetY = -1;
-                engineColor = Color.valueOf("d3ddff");
-
-                weapon = new Weapon("shockgun"){{
-                    shake = 2f;
-                    length = 1f;
-                    reload = 55f;
-                    shotDelay = 3f;
-                    alternate = true;
-                    shots = 2;
-                    inaccuracy = 0f;
-                    ejectEffect = Fx.none;
-                    bullet = Bullets.lightning;
+                    shots = 3;
+                    inaccuracy = 40f;
                     shootSound = Sounds.spark;
+                    bullet = new LightningBulletType(){{
+                        damage = 5;
+                        lightningLength = 10;
+                        lightningColor = Pal.lightFlame;
+                    }};
                 }};
-            }
-
-            @Override
-            public void onLand(Player player){
-                if(player.timer.get(Player.timerAbility, cooldown)){
-                    Effects.shake(1f, 1f, player);
-                    Effects.effect(Fx.landShock, player);
-                    for(int i = 0; i < 8; i++){
-                        Time.run(Mathf.random(8f), () -> Lightning.create(player.getTeam(), Pal.lancerLaser, 17f * Vars.state.rules.playerDamageMultiplier, player.x, player.y, Mathf.random(360f), 14));
-                    }
-                }
             }
         };
 
-        tau = new Mech("tau-mech", false){
+        tau = new UnitDef("tau-mech", false){
             float healRange = 60f;
             float healAmount = 10f;
             float healReload = 160f;
@@ -125,7 +186,7 @@ public class Mechs implements ContentList{
             }
 
             @Override
-            public void updateAlt(Player player){
+            public void update(Player player){
 
                 if(player.timer.get(Player.timerAbility, healReload)){
                     wasHealed = false;
@@ -145,7 +206,7 @@ public class Mechs implements ContentList{
             }
         };
 
-        omega = new Mech("omega-mech", false){
+        omega = new UnitDef("omega-mech", false){
             protected TextureRegion armorRegion;
 
             {
@@ -193,7 +254,7 @@ public class Mechs implements ContentList{
             }
 
             @Override
-            public void updateAlt(Player player){
+            public void update(Player player){
                 float scl = 1f - player.shootHeat / 2f*Time.delta();
                 player.velocity().scl(scl);
             }
@@ -217,10 +278,15 @@ public class Mechs implements ContentList{
             }
         };
 
-        dart = new Mech("dart-ship", true){
+        dart = new UnitDef("dart-ship"){
+            float effectRange = 60f;
+            float effectReload = 60f * 5;
+            float effectDuration = 60f * 10f;
+
             {
+                flying = true;
                 drillPower = 1;
-                mineSpeed = 3f;
+                mineSpeed = 2f;
                 speed = 0.5f;
                 drag = 0.09f;
                 health = 200f;
@@ -239,17 +305,32 @@ public class Mechs implements ContentList{
             }
 
             @Override
-            public boolean alwaysUnlocked(){
-                return true;
+            public void update(Player player){
+                super.update(player);
+
+                if(player.timer.get(Player.timerAbility, effectReload)){
+
+                    Units.nearby(player.getTeam(), player.x, player.y, effectRange, unit -> {
+                        //unit.applyEffect(StatusEffects.overdrive, effectDuration);
+                    });
+
+                    indexer.eachBlock(player, effectRange, other -> other.entity.damaged(), other -> {
+                        other.entity.applyBoost(1.5f, effectDuration);
+                        Effects.effect(Fx.healBlockFull, Pal.heal, other.drawx(), other.drawy(), other.block().size);
+                    });
+
+                    Effects.effect(Fx.overdriveWave, player);
+                }
             }
         };
 
-        javelin = new Mech("javelin-ship", true){
+        javelin = new UnitDef("javelin-ship"){
             float minV = 3.6f;
             float maxV = 6f;
             TextureRegion shield;
 
             {
+                flying = true;
                 drillPower = -1;
                 speed = 0.11f;
                 drag = 0.01f;
@@ -283,7 +364,7 @@ public class Mechs implements ContentList{
             }
 
             @Override
-            public void updateAlt(Player player){
+            public void update(Player player){
                 float scl = scld(player);
                 if(Mathf.chance(Time.delta() * (0.15 * scl))){
                     Effects.effect(Fx.hitLancer, Pal.lancerLaser, player.x, player.y);
@@ -308,8 +389,9 @@ public class Mechs implements ContentList{
             }
         };
 
-        trident = new Mech("trident-ship", true){
+        trident = new UnitDef("trident-ship"){
             {
+                flying = true;
                 drillPower = 2;
                 speed = 0.15f;
                 drag = 0.034f;
@@ -349,8 +431,9 @@ public class Mechs implements ContentList{
             }
         };
 
-        glaive = new Mech("glaive-ship", true){
+        glaive = new UnitDef("glaive-ship"){
             {
+                flying = true;
                 drillPower = 4;
                 mineSpeed = 1.3f;
                 speed = 0.32f;
@@ -373,6 +456,6 @@ public class Mechs implements ContentList{
             }
         };
 
-        starter = dart;
+        starter = vanguard;
     }
 }

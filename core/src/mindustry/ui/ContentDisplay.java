@@ -131,6 +131,8 @@ public class ContentDisplay{
         table.row();
     }
 
+    //TODO implement later
+    /*
     public static void displayMech(Table table, Mech mech){
         table.table(title -> {
             title.addImage(mech.icon(Cicon.xlarge)).size(8 * 6);
@@ -177,9 +179,9 @@ public class ContentDisplay{
             table.add(Core.bundle.format("mech.minepower", mech.drillPower));
             table.row();
         }
-    }
+    }*/
 
-    public static void displayUnit(Table table, UnitType unit){
+    public static void displayUnit(Table table, UnitDef unit){
         table.table(title -> {
             title.addImage(unit.icon(Cicon.xlarge)).size(8 * 6);
             title.add("[accent]" + unit.localizedName).padLeft(5);

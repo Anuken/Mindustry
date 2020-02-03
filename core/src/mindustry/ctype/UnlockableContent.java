@@ -11,7 +11,7 @@ import mindustry.ui.Cicon;
 
 /** Base interface for an unlockable content type. */
 public abstract class UnlockableContent extends MappableContent{
-    /** Localized, formal name. Never null. Set to block name if not found in bundle. */
+    /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
     /** Localized description. May be null. */
     public @Nullable String description;

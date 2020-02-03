@@ -5,7 +5,6 @@ import arc.math.Mathf;
 import mindustry.entities.EntityGroup;
 import mindustry.entities.type.TimedEntity;
 import mindustry.entities.traits.BelowLiquidTrait;
-import mindustry.entities.traits.DrawTrait;
 import mindustry.graphics.Pal;
 
 import static mindustry.Vars.groundEffectGroup;

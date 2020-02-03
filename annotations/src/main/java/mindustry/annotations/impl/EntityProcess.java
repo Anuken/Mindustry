@@ -45,7 +45,7 @@ public class EntityProcess extends BaseProcessor{
             }
 
             //add all components w/ dependencies
-            allComponents.addAll(types(Depends.class).map(s -> Array.withArrays(getDependencies(s), s)).flatten());
+            allComponents.addAll(types(Component.class).map(s -> Array.withArrays(getDependencies(s), s)).flatten());
 
             //add component imports
             for(Stype comp : allComponents){
@@ -77,6 +77,9 @@ public class EntityProcess extends BaseProcessor{
 
                 //add utility methods to interface
                 for(Smethod method : component.methods()){
+                    //skip private methods, those are for internal use.
+                    if(method.is(Modifier.PRIVATE)) continue;
+
                     inter.addMethod(MethodSpec.methodBuilder(method.name())
                     .addExceptions(method.thrownt())
                     .addTypeVariables(method.typeVariables().map(TypeVariableName::get))
@@ -107,6 +110,11 @@ public class EntityProcess extends BaseProcessor{
                     for(Svar f : fields){
                         VariableTree tree = f.tree();
                         FieldSpec.Builder fbuilder = FieldSpec.builder(f.tname(), f.name());
+                        //keep statics/finals
+                        if(f.is(Modifier.STATIC)){
+                            fbuilder.addModifiers(Modifier.STATIC);
+                            if(f.is(Modifier.FINAL)) fbuilder.addModifiers(Modifier.FINAL);
+                        }
                         //add initializer if it exists
                         if(tree.getInitializer() != null){
                             fbuilder.initializer(tree.getInitializer().toString());
@@ -125,7 +133,7 @@ public class EntityProcess extends BaseProcessor{
                     //representative method
                     Smethod first = entry.value.first();
                     //build method using same params/returns
-                    MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(first.name()).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+                    MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(first.name()).addModifiers(first.is(Modifier.PRIVATE) ? Modifier.PRIVATE : Modifier.PUBLIC, Modifier.FINAL);
                     mbuilder.addTypeVariables(first.typeVariables().map(TypeVariableName::get));
                     mbuilder.returns(first.retn());
                     mbuilder.addExceptions(first.thrownt());
@@ -191,6 +199,11 @@ public class EntityProcess extends BaseProcessor{
                 for(Stype comp : components){
                     //implement the interface
                     Stype inter = interfaces.find(i -> i.name().equals(interfaceName(comp)));
+                    if(inter == null){
+                        err("Failed to generate interface for component. Interfaces are " + interfaces + "\nComponent", comp);
+                        return;
+                    }
+
                     def.builder.addSuperinterface(inter.tname());
 
                     //generate getter/setter for each method
@@ -251,9 +264,9 @@ public class EntityProcess extends BaseProcessor{
             out.addAll(component.superclasses());
 
             //get dependency classes
-            if(component.annotation(Depends.class) != null){
+            if(component.annotation(Component.class) != null){
                 try{
-                    component.annotation(Depends.class).value();
+                    component.annotation(Component.class).value();
                 }catch(MirroredTypesException e){
                     out.addAll(Array.with(e.getTypeMirrors()).map(Stype::of));
                 }

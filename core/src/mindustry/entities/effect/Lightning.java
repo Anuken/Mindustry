@@ -14,8 +14,6 @@ import mindustry.entities.EntityGroup;
 import mindustry.entities.Units;
 import mindustry.entities.type.Bullet;
 import mindustry.entities.type.TimedEntity;
-import mindustry.entities.traits.DrawTrait;
-import mindustry.entities.traits.TimeTrait;
 import mindustry.entities.type.Unit;
 import mindustry.game.Team;
 import mindustry.gen.Call;

@@ -15,14 +15,6 @@ public abstract class BaseEntity implements Entity{
         id = lastid++;
     }
 
-    public int tileX(){
-        return Vars.world.toTile(x);
-    }
-
-    public int tileY(){
-        return Vars.world.toTile(y);
-    }
-
     @Override
     public int getID(){
         return id;

@@ -24,10 +24,10 @@ public class Fx implements ContentList{
     producesmoke, smeltsmoke, formsmoke, blastsmoke, lava, doorclose, dooropen, dooropenlarge, doorcloselarge, purify, purifyoil, purifystone, generate,
     mine, mineBig, mineHuge, smelt, teleportActivate, teleport, teleportOut, ripple, bubble, launch,
     healBlock, healBlockFull, healWaveMend, overdriveWave, overdriveBlockFull, shieldBreak, hitBulletSmall, hitFuse,
-    hitBulletBig, hitFlameSmall, hitLiquid, hitLaser, hitLancer, hitMeltdown, despawn, flakExplosion, blastExplosion,
+    hitBulletBig, hitFlameSmall, hitLiquid, hitLaser, hitYellowLaser, hitLancer, hitMeltdown, despawn, flakExplosion, blastExplosion,
     plasticExplosion, artilleryTrail, incendTrail, missileTrail, absorb, flakExplosionBig, plasticExplosionFlak, burning, fire,
     fireSmoke, steam, fireballsmoke, ballfire, freezing, melting, wet, oily, overdriven, dropItem, shockwave,
-    bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke, shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke,
+    bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke, shootSmall, shootHeal, shootHealYellow, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke,
     shootBigSmoke2, shootSmallFlame, shootPyraFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
     shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot,
     unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke, dynamicExplosion, padlaunch, commandSend, coreLand;
@@ -158,7 +158,6 @@ public class Fx implements ContentList{
             Lines.circle(e.x, e.y, 2f + e.finpow() * 7f);
         });
 
-
         hitBulletSmall = new Effect(14, e -> {
             Draw.color(Color.white, Pal.lightOrange, e.fin());
 
@@ -252,6 +251,13 @@ public class Fx implements ContentList{
             Draw.color(Color.white, Pal.heal, e.fin());
             Lines.stroke(0.5f + e.fout());
             Lines.circle(e.x, e.y, e.fin() * 5f);
+        });
+
+        hitYellowLaser = new Effect(8, e -> {
+            Draw.color(Color.white, Pal.lightTrail, e.fin());
+            Lines.stroke(0.5f + e.fout());
+            Lines.circle(e.x, e.y, e.fin() * 5f);
+            Draw.reset();
         });
 
         despawn = new Effect(12, e -> {
@@ -635,6 +641,14 @@ public class Fx implements ContentList{
             Drawf.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
         });
 
+        shootHealYellow = new Effect(8, e -> {
+            Draw.color(Pal.lightTrail);
+            float w = 1f + 5 * e.fout();
+            Drawf.tri(e.x, e.y, w, 17f * e.fout(), e.rotation);
+            Drawf.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
+            Draw.reset();
+        });
+
         shootSmallSmoke = new Effect(20f, e -> {
             Draw.color(Pal.lighterOrange, Color.lightGray, Color.gray, e.fin());
 
@@ -774,9 +788,9 @@ public class Fx implements ContentList{
         });
 
         lancerLaserShootSmoke = new Effect(26f, e -> {
-            Draw.color(Pal.lancerLaser);
+            Draw.color(Color.white);
 
-            Angles.randLenVectors(e.id, 7, 80f, e.rotation, 0f, (x, y) -> {
+            Angles.randLenVectors(e.id, 7, 70f, e.rotation, 0f, (x, y) -> {
                 Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 9f);
             });
 
@@ -791,7 +805,7 @@ public class Fx implements ContentList{
 
         });
 
-        lancerLaserChargeBegin = new Effect(71f, e -> {
+        lancerLaserChargeBegin = new Effect(60f, e -> {
             Draw.color(Pal.lancerLaser);
             Fill.circle(e.x, e.y, e.fin() * 3f);
 

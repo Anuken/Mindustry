@@ -120,11 +120,6 @@ public class GroundUnit extends BaseUnit{
     }
 
     @Override
-    public Weapon getWeapon(){
-        return type.weapon;
-    }
-
-    @Override
     public void draw(){
         Draw.mixcol(Color.white, hitTime / hitDuration);
 

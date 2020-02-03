@@ -80,7 +80,7 @@ public class Blocks implements ContentList{
     fortressFactory, repairPoint,
 
     //upgrades
-    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    dartPad, alphaPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
 
     @Override
     public void load(){
@@ -258,9 +258,7 @@ public class Blocks implements ContentList{
         }};
 
         ice = new Floor("ice"){{
-            //TODO fix drag/speed
-            dragMultiplier = 1f;
-            speedMultiplier = 1f;
+            dragMultiplier = 0.6f;
             attributes.set(Attribute.water, 0.4f);
         }};
 
@@ -1273,6 +1271,7 @@ public class Blocks implements ContentList{
             health = 1100;
             itemCapacity = 4000;
             size = 3;
+            mech = Mechs.vanguard;
         }};
 
         coreFoundation = new CoreBlock("core-foundation"){{
@@ -1281,6 +1280,7 @@ public class Blocks implements ContentList{
             health = 2000;
             itemCapacity = 9000;
             size = 4;
+            mech = Mechs.vanguard;
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
@@ -1289,6 +1289,7 @@ public class Blocks implements ContentList{
             health = 4000;
             itemCapacity = 13000;
             size = 5;
+            mech = Mechs.vanguard;
         }};
 
         vault = new Vault("vault"){{
@@ -1707,6 +1708,7 @@ public class Blocks implements ContentList{
             unitType = UnitTypes.ghoul;
             produceTime = 1150;
             size = 3;
+            maxSpawn = 2;
             consumes.power(1.2f);
             consumes.items(new ItemStack(Items.silicon, 15), new ItemStack(Items.titanium, 10));
         }};
@@ -1716,6 +1718,7 @@ public class Blocks implements ContentList{
             unitType = UnitTypes.revenant;
             produceTime = 2000;
             size = 4;
+            maxSpawn = 2;
             consumes.power(3f);
             consumes.items(new ItemStack(Items.silicon, 40), new ItemStack(Items.titanium, 30));
         }};
@@ -1768,7 +1771,14 @@ public class Blocks implements ContentList{
         //endregion
         //region upgrades
 
-        dartPad = new MechPad("dart-mech-pad"){{
+        dartPad = new MechPad("dart-ship-pad"){{
+            requirements(Category.upgrade, ItemStack.with(Items.lead, 100, Items.graphite, 50, Items.copper, 75));
+            mech = Mechs.dart;
+            size = 2;
+            consumes.power(0.5f);
+        }};
+
+        alphaPad = new MechPad("alpha-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 100, Items.graphite, 50, Items.copper, 75));
             mech = Mechs.alpha;
             size = 2;

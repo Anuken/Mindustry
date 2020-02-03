@@ -1,16 +1,22 @@
 package mindustry.entities.def;
 
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.Bits;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
+import mindustry.entities.Effects.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.traits.*;
+import mindustry.entities.type.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -23,18 +29,22 @@ import static mindustry.Vars.content;
 
 public class EntityComps{
 
-    @Depends({HealthComp.class, VelComp.class, StatusComp.class, TeamComp.class, ItemsComp.class})
+    @Component({HealthComp.class, VelComp.class, StatusComp.class, TeamComp.class, ItemsComp.class})
     class UnitComp{
-        //UnitDef type;
+        UnitDef type;
     }
 
     class OwnerComp{
         Entityc owner;
     }
 
-    @Depends({TimedComp.class})
+    @Component({TimedComp.class, DamageComp.class, Hitboxc.class})
     class BulletComp{
         BulletType bullet;
+
+        float getDamage(){
+            return bullet.damage;
+        }
 
         void init(){
             //TODO
@@ -47,6 +57,12 @@ public class EntityComps{
         }
     }
 
+    @Component
+    abstract class DamageComp{
+        abstract float getDamage();
+    }
+
+    @Component
     abstract class TimedComp extends EntityComp implements Scaled{
         float time, lifetime;
 
@@ -64,79 +80,339 @@ public class EntityComps{
         }
     }
 
+    @Component
     class HealthComp{
-        float health, maxHealth;
+        float health, maxHealth, hitTime;
         boolean dead;
 
         float healthf(){
             return health / maxHealth;
         }
+
+        void update(){
+            hitTime -= Time.delta() / 9f;
+        }
+
+        void killed(){
+            //implement by other components
+        }
+
+        void kill(){
+            health = 0;
+            dead = true;
+        }
+
+        void heal(){
+            dead = false;
+            health = maxHealth;
+        }
+
+        boolean damaged(){
+            return health <= maxHealth - 0.0001f;
+        }
+
+        void damage(float amount){
+            health -= amount;
+            if(health <= 0 && !dead){
+                dead = true;
+                killed();
+            }
+        }
+
+        void clampHealth(){
+            health = Mathf.clamp(health, 0, maxHealth);
+        }
+
+        void heal(float amount){
+            health += amount;
+            clampHealth();
+        }
     }
 
+    @Component
     class FlyingComp{
         boolean flying;
     }
 
+    @Component
     class LegsComp{
-
+        float baseRotation;
+        float drownTime;
     }
 
+    @Component
     class RotComp{
         float rotation;
     }
 
+    @Component
     class TeamComp{
         Team team = Team.sharded;
     }
 
-    @Depends(PosComp.class)
-    class SyncComp{
-        Interpolator interpolator;
+    @Component({RotComp.class, PosComp.class})
+    static class WeaponsComp{
+        transient float x, y, rotation;
+
+        /** 1 */
+        static final int[] one = {1};
+        /** minimum cursor distance from player, fixes 'cross-eyed' shooting */
+        static final float minAimDst = 20f;
+        /** temporary weapon sequence number */
+        static int sequenceNum = 0;
+
+        /** weapon mount array, never null */
+        WeaponMount[] mounts = {};
+
+        public void init(UnitDef def){
+            mounts = new WeaponMount[def.weapons.size];
+            for(int i = 0; i < mounts.length; i++){
+                mounts[i] = new WeaponMount(def.weapons.get(i));
+            }
+        }
+
+        /** Aim at something. This will make all mounts point at it. */
+        public void aim(Unit unit, float x, float y){
+            Tmp.v1.set(x, y).sub(unit.x, unit.y);
+            if(Tmp.v1.len() < minAimDst) Tmp.v1.setLength(minAimDst);
+
+            x = Tmp.v1.x + unit.x;
+            y = Tmp.v1.y + unit.y;
+
+            for(WeaponMount mount : mounts){
+                mount.aimX = x;
+                mount.aimY = y;
+            }
+        }
+
+        /** Update shooting and rotation for this unit. */
+        public void update(Unit unit){
+            for(WeaponMount mount : mounts){
+                Weapon weapon = mount.weapon;
+                mount.reload -= Time.delta();
+
+                float rotation = unit.rotation - 90;
+
+                //rotate if applicable
+                if(weapon.rotate){
+                    float axisXOffset = weapon.mirror ? 0f : weapon.x;
+                    float axisX = unit.x + Angles.trnsx(rotation, axisXOffset, weapon.y),
+                    axisY = unit.y + Angles.trnsy(rotation, axisXOffset, weapon.y);
+
+                    mount.rotation = Angles.moveToward(mount.rotation, Angles.angle(axisX, axisY, mount.aimX, mount.aimY), weapon.rotateSpeed);
+                }
+
+                //shoot if applicable
+                //TODO only shoot if angle is reached, don't shoot inaccurately
+                if(mount.reload <= 0){
+                    for(int i : (weapon.mirror && !weapon.alternate ? Mathf.signs : one)){
+                        i *= Mathf.sign(weapon.flipped) * Mathf.sign(mount.side);
+
+                        //m a t h
+                        float weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0);
+                        float mountX = unit.x + Angles.trnsx(rotation, weapon.x * i, weapon.y),
+                        mountY = unit.y + Angles.trnsy(rotation, weapon.x * i, weapon.y);
+                        float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX * i, weapon.shootY),
+                        shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX * i, weapon.shootY);
+                        float shootAngle = weapon.rotate ? weaponRotation : Angles.angle(shootX, shootY, mount.aimX, mount.aimY);
+
+                        shoot(unit, weapon, shootX, shootY, shootAngle);
+                    }
+
+                    mount.side = !mount.side;
+                    mount.reload = weapon.reload;
+                }
+            }
+        }
+
+        /** Draw weapon mounts. */
+        void draw(){
+            for(WeaponMount mount : mounts){
+                Weapon weapon = mount.weapon;
+
+                for(int i : (weapon.mirror ? Mathf.signs : one)){
+                    i *= Mathf.sign(weapon.flipped);
+
+                    float rotation = this.rotation - 90 + (weapon.rotate ? mount.rotation : 0);
+                    float trY = weapon.y - (mount.reload / weapon.reload * weapon.recoil) * (weapon.alternate ? Mathf.num(i == Mathf.sign(mount.side)) : 1);
+                    float width = i > 0 ? -weapon.region.getWidth() : weapon.region.getWidth();
+
+                    Draw.rect(weapon.region,
+                    x + Angles.trnsx(rotation, weapon.x * i, trY),
+                    y + Angles.trnsy(rotation, weapon.x * i, trY),
+                    width * Draw.scl,
+                    weapon.region.getHeight() * Draw.scl,
+                    rotation - 90);
+                }
+            }
+        }
+
+        private void shoot(ShooterTrait shooter, Weapon weapon, float x, float y, float rotation){
+            float baseX = shooter.getX(), baseY = shooter.getY();
+
+            weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
+
+            sequenceNum = 0;
+            if(weapon.shotDelay > 0.01f){
+                Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
+                    Time.run(sequenceNum * weapon.shotDelay, () -> bullet(shooter, weapon, x + shooter.getX() - baseX, y + shooter.getY() - baseY, f + Mathf.range(weapon.inaccuracy)));
+                    sequenceNum++;
+                });
+            }else{
+                Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> bullet(shooter, weapon, x, y, f + Mathf.range(weapon.inaccuracy)));
+            }
+
+            BulletType ammo = weapon.bullet;
+
+            Tmp.v1.trns(rotation + 180f, ammo.recoil);
+
+            shooter.velocity().add(Tmp.v1);
+
+            Tmp.v1.trns(rotation, 3f);
+            boolean parentize = ammo.keepVelocity;
+
+            Effects.shake(weapon.shake, weapon.shake, x, y);
+            Effects.effect(weapon.ejectEffect, x, y, rotation);
+            Effects.effect(ammo.shootEffect, x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? shooter : null);
+            Effects.effect(ammo.smokeEffect, x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? shooter : null);
+        }
+
+        private void bullet(ShooterTrait owner, Weapon weapon, float x, float y, float angle){
+            Tmp.v1.trns(angle, 3f);
+            Bullet.create(weapon.bullet, owner, owner.getTeam(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd));
+        }
     }
 
-    abstract class PosComp implements Position{
+    @Component
+    abstract class DrawComp{
+        //TODO ponder.
+
+        abstract float drawSize();
+
+        void draw(){
+
+        }
+    }
+
+    @Component(PosComp.class)
+    abstract class SyncComp extends PosComp{
+        Interpolator interpolator = new Interpolator();
+
+        void setNet(float x, float y){
+            set(x, y);
+
+            //TODO change interpolator API
+            if(interpolator != null){
+                interpolator.target.set(x, y);
+                interpolator.last.set(x, y);
+                interpolator.pos.set(0, 0);
+                interpolator.updateSpacing = 16;
+                interpolator.lastUpdated = 0;
+            }
+        }
+
+        void update(){
+            if(Vars.net.client() && !isLocal()){
+                interpolate();
+            }
+        }
+
+        void interpolate(){
+            interpolator.update();
+            x = interpolator.pos.x;
+            y = interpolator.pos.y;
+        }
+    }
+
+    @Component
+    abstract class PosComp extends EntityComp implements Position{
         float x, y;
 
         void set(float x, float y){
             this.x = x;
             this.y = y;
         }
+
+        void trns(float x, float y){
+            set(this.x + x, this.y + y);
+        }
     }
 
-    abstract class DamageComp{
-        abstract float getDamage();
-    }
-
+    @Component
     class MinerComp{
 
     }
 
+    @Component
     class BuilderComp{
 
     }
 
+    @Component
     class ItemsComp{
         ItemStack item = new ItemStack();
     }
 
-    @Depends(PosComp.class)
-    class VelComp{
-        transient float x, y;
+    @Component(VelComp.class)
+    class MassComp{
+        float mass;
+    }
 
+    @Component({PosComp.class, DrawComp.class, TimedComp.class})
+    class EffectComp extends EntityComp{
+        Effect effect;
+        Color color = new Color(Color.white);
+        Object data;
+        float rotation = 0f;
+
+        void draw(){
+
+        }
+
+        void update(){
+            //TODO fix effects, make everything poolable
+        }
+    }
+
+    @Component
+    abstract class VelComp extends PosComp{
         final Vec2 vel = new Vec2();
+        float drag = 0f;
 
         void update(){
             x += vel.x;
             y += vel.y;
-            vel.scl(0.9f);
+            vel.scl(1f - drag * Time.delta());
         }
     }
 
-    @Depends(PosComp.class)
+    @Component(PosComp.class)
     class HitboxComp{
         transient float x, y;
 
         float hitSize;
+        float lastX, lastY;
+
+        void update(){
+
+        }
+
+        void updateLastPosition(){
+            lastX = x;
+            lastY = y;
+        }
+
+        void collision(Hitboxc other){
+
+        }
+
+        float getDeltaX(){
+            return x - lastX;
+        }
+
+        float getDeltaY(){
+            return y - lastY;
+        }
 
         boolean collides(Hitboxc other){
             return Intersector.overlapsRect(x - hitSize/2f, y - hitSize/2f, hitSize, hitSize,
@@ -144,7 +420,7 @@ public class EntityComps{
         }
     }
 
-    @Depends(PosComp.class)
+    @Component(PosComp.class)
     class StatusComp{
         private Array<StatusEntry> statuses = new Array<>();
         private Bits applied = new Bits(content.getBy(ContentType.status).size);
@@ -258,6 +534,7 @@ public class EntityComps{
         }
     }
 
+    @Component
     @BaseComponent
     class EntityComp{
         int id;
@@ -267,6 +544,11 @@ public class EntityComps{
         void update(){}
 
         void remove(){}
+
+        boolean isLocal(){
+            //TODO fix
+            return this == (Object)Vars.player;
+        }
 
         <T> T as(Class<T> type){
             return (T)this;

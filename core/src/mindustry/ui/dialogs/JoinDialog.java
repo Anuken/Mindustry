@@ -144,16 +144,16 @@ public class JoinDialog extends FloatingDialog{
                     }
                 }
 
-            }).margin(3f).padTop(6f).top().right();
+            }).margin(3f).pad(2).padTop(6f).top().right();
 
             inner.addImageButton(Icon.refresh, Styles.emptyi, () -> {
                 refreshServer(server);
-            }).margin(3f).padTop(6f).top().right();
+            }).margin(3f).pad(2).padTop(6f).top().right();
 
             inner.addImageButton(Icon.pencil, Styles.emptyi, () -> {
                 renaming = server;
                 add.show();
-            }).margin(3f).padTop(6f).top().right();
+            }).margin(3f).pad(2).padTop(6f).top().right();
 
             inner.addImageButton(Icon.trash, Styles.emptyi, () -> {
                 ui.showConfirm("$confirm", "$server.delete", () -> {
@@ -162,7 +162,7 @@ public class JoinDialog extends FloatingDialog{
                     setupRemote();
                     refreshRemote();
                 });
-            }).margin(3f).pad(6).top().right();
+            }).margin(3f).pad(2).pad(6).top().right();
 
             button.row();
 

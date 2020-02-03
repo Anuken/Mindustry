@@ -36,11 +36,9 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     protected static final int timerTarget = timerIndex++;
     protected static final int timerTarget2 = timerIndex++;
-    protected static final int timerShootLeft = timerIndex++;
-    protected static final int timerShootRight = timerIndex++;
 
     protected boolean loaded;
-    protected UnitType type;
+    protected UnitDef type;
     protected Interval timer = new Interval(5);
     protected StateMachine state = new StateMachine();
     protected TargetTrait target;
@@ -74,11 +72,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         //must run afterwards so the unit's group is not null when sending the removal packet
         Core.app.post(unit::remove);
-    }
-
-    @Override
-    public float drag(){
-        return type.drag;
     }
 
     @Override
@@ -119,7 +112,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     /** Initialize the type and team of this unit. Only call once! */
-    public void init(UnitType type, Team team){
+    public void init(UnitDef type, Team team){
         if(this.type != null) throw new RuntimeException("This unit is already initialized!");
 
         this.type = type;
@@ -131,16 +124,12 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         return true;
     }
 
-    public UnitType getType(){
-        return type;
-    }
-
     public void setSpawner(Tile tile){
         this.spawner = tile.pos();
     }
 
     public void rotate(float angle){
-        rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
+        rotation = Mathf.slerpDelta(rotation, angle, type.rotateSpeed);
     }
 
     public boolean targetHasFlag(BlockFlag flag){
@@ -179,7 +168,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public void targetClosest(){
-        TargetTrait newTarget = Units.closestTarget(team, x, y, Math.max(getWeapon().bullet.range(), type.range), u -> type.targetAir || !u.isFlying());
+        TargetTrait newTarget = Units.closestTarget(team, x, y, type.range, u -> type.targetAir || !u.isFlying());
         if(newTarget != null){
             target = newTarget;
         }
@@ -211,38 +200,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public boolean isImmune(StatusEffect effect){
-        return type.immunities.contains(effect);
-    }
-
-    @Override
-    public boolean isValid(){
-        return super.isValid() && isAdded();
-    }
-
-    @Override
-    public Interval getTimer(){
-        return timer;
-    }
-
-    @Override
-    public int getShootTimer(boolean left){
-        return left ? timerShootLeft : timerShootRight;
-    }
-
-    @Override
-    public Weapon getWeapon(){
-        return type.weapon;
-    }
-
-    @Override
     public TextureRegion getIconRegion(){
         return type.icon(Cicon.full);
-    }
-
-    @Override
-    public int getItemCapacity(){
-        return type.itemCapacity;
     }
 
     @Override
@@ -257,16 +216,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public float maxHealth(){
         return type.health * Vars.state.rules.unitHealthMultiplier;
-    }
-
-    @Override
-    public float mass(){
-        return type.mass;
-    }
-
-    @Override
-    public boolean isFlying(){
-        return type.flying;
     }
 
     @Override
@@ -313,11 +262,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public float maxVelocity(){
-        return type.maxVelocity;
-    }
-
-    @Override
     public void removed(){
         super.removed();
         Tile tile = world.tile(spawner);
@@ -349,16 +293,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         if(isCommanded()){
             onCommand(getCommand());
         }
-    }
-
-    @Override
-    public void hitbox(Rect rect){
-        rect.setSize(type.hitsize).setCenter(x, y);
-    }
-
-    @Override
-    public void hitboxTile(Rect rect){
-        rect.setSize(type.hitsizeTile).setCenter(x, y);
     }
 
     @Override
