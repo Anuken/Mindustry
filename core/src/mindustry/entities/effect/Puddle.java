@@ -17,7 +17,6 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 
 import java.io.*;
 
@@ -188,13 +187,6 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
             }
 
             amount = Mathf.clamp(amount, 0, maxLiquid);
-            
-            if(amount == maxLiquid){
-                tile.setFloor((Floor)Blocks.tar);
-                for(Player p : playerGroup){
-                    p.syncWhenIdle = true;
-                }
-            }
 
             if(amount <= 0f){
                 Call.onPuddleRemoved(getID());
