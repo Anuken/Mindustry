@@ -86,7 +86,7 @@ public class ItemModule extends BlockModule{
             if(items[i] > 0){
                 items[i]--;
                 total--;
-    			// save the next position so the next call to take() can resume from there.
+    		// save the next position so the next call to take() can resume from there.
                 takeRotation = (i + 1) % items.length;
                 return content.item(i);
             }
