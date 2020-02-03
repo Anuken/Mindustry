@@ -11,7 +11,7 @@ import mindustry.ctype.ContentType;
 import mindustry.entities.type.Player;
 import mindustry.ctype.UnlockableContent;
 import mindustry.graphics.Pal;
-import mindustry.ui.ContentDisplay;
+import mindustry.ui.*;
 
 public class Mech extends UnlockableContent{
     public boolean flying;
@@ -77,6 +77,12 @@ public class Mech extends UnlockableContent{
         if(drawLight){
             player.drawLight();
         }
+    }
+
+    public void drawShadow(Player player, float offsetX, float offsetY){
+        float scl = flying ? 1f : player.boostHeat / 2f;
+
+        Draw.rect(icon(Cicon.full), player.x + offsetX * scl, player.y + offsetY * scl, player.rotation - 90);
     }
 
     public float getExtraArmor(Player player){
