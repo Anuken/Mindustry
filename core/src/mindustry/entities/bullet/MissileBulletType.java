@@ -4,7 +4,6 @@ import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.util.Time;
 import mindustry.content.Fx;
-import mindustry.entities.type.Bullet;
 import mindustry.gen.*;
 import mindustry.graphics.Pal;
 
@@ -27,7 +26,7 @@ public class MissileBulletType extends BasicBulletType{
     }
 
     @Override
-    public void update(Bullet b){
+    public void update(Bulletc b){
         super.update(b);
 
         if(Mathf.chance(Time.delta() * 0.2)){

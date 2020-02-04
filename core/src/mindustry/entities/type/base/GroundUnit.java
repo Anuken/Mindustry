@@ -12,7 +12,6 @@ import mindustry.entities.bullet.*;
 import mindustry.entities.type.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
-import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
@@ -34,7 +33,7 @@ public class GroundUnit extends BaseUnit{
         }
 
         public void update(){
-            TileEntity core = getClosestEnemyCore();
+            Tilec core = getClosestEnemyCore();
 
             if(core == null){
                 Tile closestSpawn = getClosestSpawner();
@@ -251,7 +250,7 @@ public class GroundUnit extends BaseUnit{
         Tile tile = world.tileWorld(x, y);
         if(tile == null) return;
         Tile targetTile = pathfinder.getTargetTile(tile, enemy, PathTarget.enemyCores);
-        TileEntity core = getClosestCore();
+        Tilec core = getClosestCore();
 
         if(tile == targetTile || core == null || dst(core) < 120f) return;
 

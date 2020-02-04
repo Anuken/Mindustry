@@ -7,10 +7,9 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -164,8 +163,8 @@ public class BlockIndexer{
         return flagMap[team.id][type.ordinal()];
     }
 
-    public boolean eachBlock(TeamTrait trait, float range, Boolf<Tile> pred, Cons<Tile> cons){
-        return eachBlock(trait.getTeam(), trait.getX(), trait.getY(), range, pred, cons);
+    public boolean eachBlock(Teamc team, float range, Boolf<Tile> pred, Cons<Tile> cons){
+        return eachBlock(team.getTeam(), team.getX(), team.getY(), range, pred, cons);
     }
 
     public boolean eachBlock(Team team, float wx, float wy, float range, Boolf<Tile> pred, Cons<Tile> cons){
@@ -213,20 +212,20 @@ public class BlockIndexer{
         return returnArray;
     }
 
-    public void notifyTileDamaged(TileEntity entity){
+    public void notifyTileDamaged(Tilec entity){
         if(damagedTiles[(int)entity.getTeam().id] == null){
             damagedTiles[(int)entity.getTeam().id] = new ObjectSet<>();
         }
 
         ObjectSet<Tile> set = damagedTiles[(int)entity.getTeam().id];
-        set.add(entity.tile);
+        set.add(entity.getTile());
     }
 
-    public TileEntity findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
+    public Tilec findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
         for(Team enemy : activeTeams){
             if(!team.isEnemy(enemy)) continue;
 
-            TileEntity entity = indexer.findTile(enemy, x, y, range, pred, true);
+            Tilec entity = indexer.findTile(enemy, x, y, range, pred, true);
             if(entity != null){
                 return entity;
             }
@@ -235,12 +234,12 @@ public class BlockIndexer{
         return null;
     }
 
-    public TileEntity findTile(Team team, float x, float y, float range, Boolf<Tile> pred){
+    public Tilec findTile(Team team, float x, float y, float range, Boolf<Tile> pred){
         return findTile(team, x, y, range, pred, false);
     }
 
-    public TileEntity findTile(Team team, float x, float y, float range, Boolf<Tile> pred, boolean usePriority){
-        TileEntity closest = null;
+    public Tilec findTile(Team team, float x, float y, float range, Boolf<Tile> pred, boolean usePriority){
+        Tilec closest = null;
         float dst = 0;
         float range2 = range*range;
 
@@ -258,14 +257,14 @@ public class BlockIndexer{
                         if(other.entity == null || other.getTeam() != team || !pred.get(other) || !other.block().targetable)
                             continue;
 
-                        TileEntity e = other.entity;
+                        Tilec e = other.entity;
 
-                        float ndst = Mathf.dst2(x, y, e.x, e.y);
+                        float ndst = e.dst2(x, y);
                         if(ndst < range2 && (closest == null ||
                                 //this one is closer, and it is at least of equal priority
-                                (ndst < dst && (!usePriority || closest.block.priority.ordinal() <= e.block.priority.ordinal())) ||
+                                (ndst < dst && (!usePriority || closest.getBlock().priority.ordinal() <= e.getBlock().priority.ordinal())) ||
                                 //priority is used, and new block has higher priority regardless of range
-                                (usePriority && closest.block.priority.ordinal() < e.block.priority.ordinal()))){
+                                (usePriority && closest.getBlock().priority.ordinal() < e.getBlock().priority.ordinal()))){
                             dst = ndst;
                             closest = e;
                         }

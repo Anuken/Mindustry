@@ -1,7 +1,7 @@
 package mindustry.entities.type.base;
 
 import mindustry.entities.Units;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.entities.units.UnitState;
 import mindustry.world.Pos;
 import mindustry.world.Tile;
@@ -24,7 +24,7 @@ public class RepairDrone extends BaseDrone{
                 target = Units.findDamagedTile(team, x, y);
             }
 
-            if(target instanceof TileEntity && ((TileEntity)target).block instanceof BuildBlock){
+            if(target instanceof Tilec && ((Tilec)target).block instanceof BuildBlock){
                 target = null;
             }
 
@@ -58,7 +58,7 @@ public class RepairDrone extends BaseDrone{
     @Override
     public void write(DataOutput data) throws IOException{
         super.write(data);
-        data.writeInt(state.is(repair) && target instanceof TileEntity ? ((TileEntity)target).tile.pos() : Pos.invalid);
+        data.writeInt(state.is(repair) && target instanceof Tilec ? ((Tilec)target).tile.pos() : Pos.invalid);
     }
 
     @Override

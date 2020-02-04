@@ -50,6 +50,7 @@ public class EntityProcess extends BaseProcessor{
 
             //create component interfaces
             for(Stype component : allComponents){
+                Log.info("&yGenerating interface for " + component);
                 TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(component)).addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
 
                 //implement extra interfaces these components may have, e.g. position
@@ -66,7 +67,7 @@ public class EntityProcess extends BaseProcessor{
                 for(Svar field : component.fields().select(e -> !e.is(Modifier.STATIC) && !e.is(Modifier.PRIVATE) && !e.is(Modifier.TRANSIENT))){
                     String cname = Strings.capitalize(field.name());
                     //getter
-                    inter.addMethod(MethodSpec.methodBuilder("get" + cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).returns(field.tname()).build());
+                    inter.addMethod(MethodSpec.methodBuilder((field.mirror().toString().equals("boolean") ? "is" : "get") + cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).returns(field.tname()).build());
                     //setter
                     if(!field.is(Modifier.FINAL)) inter.addMethod(MethodSpec.methodBuilder("set" + cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).addParameter(field.tname(), field.name()).build());
                 }
@@ -144,7 +145,7 @@ public class EntityProcess extends BaseProcessor{
                     boolean writeBlock = first.ret().toString().equals("void") && entry.value.size > 1;
 
                     if((entry.value.first().is(Modifier.ABSTRACT) || entry.value.first().is(Modifier.NATIVE)) && entry.value.size == 1){
-                        err(entry.value.first().up().getSimpleName() + " declares an abstract method. This method must be implemented in another component", entry.value.first());
+                        err(entry.value.first().up().getSimpleName() + "#" + entry.value.first() + " is an abstract method and must be implemented in some component", type);
                     }
 
                     for(Smethod elem : entry.value){
@@ -208,11 +209,11 @@ public class EntityProcess extends BaseProcessor{
                     for(Smethod method : inter.methods()){
                         if(method.name().length() <= 3) continue;
 
-                        String var = Strings.camelize(method.name().substring(3));
+                        String var = Strings.camelize(method.name().substring(method.name().startsWith("is") ? 2 : 3));
                         //make sure it's a real variable
                         if(!Array.with(def.builder.fieldSpecs).contains(f -> f.name.equals(var))) continue;
 
-                        if(method.name().startsWith("get")){
+                        if(method.name().startsWith("get") || method.name().startsWith("is")){
                             def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("return " + var).build());
                         }else if(method.name().startsWith("set")){
                             def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("this." + var + " = " + var).build());
@@ -261,6 +262,8 @@ public class EntityProcess extends BaseProcessor{
             ObjectSet<Stype> out = new ObjectSet<>();
             //add base component interfaces
             out.addAll(component.interfaces().select(this::isCompInterface).map(this::interfaceToComp));
+            //remove self interface
+            out.remove(component);
 
             //out now contains the base dependencies; finish constructing the tree
             ObjectSet<Stype> result = new ObjectSet<>();
@@ -273,6 +276,8 @@ public class EntityProcess extends BaseProcessor{
                 result.addAll(baseComponents);
             }
 
+            //remove it again just in case
+            out.remove(component);
             componentDependencies.put(component, result.asArray());
         }
 

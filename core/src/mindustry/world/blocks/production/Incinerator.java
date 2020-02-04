@@ -6,9 +6,8 @@ import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
 import arc.util.Time;
 import mindustry.content.Fx;
-import mindustry.entities.Effects;
-import mindustry.entities.Effects.Effect;
-import mindustry.entities.type.TileEntity;
+import mindustry.entities.*;
+import mindustry.gen.*;
 import mindustry.type.Item;
 import mindustry.type.Liquid;
 import mindustry.world.Block;
@@ -31,7 +30,7 @@ public class Incinerator extends Block{
     public void update(Tile tile){
         IncineratorEntity entity = tile.ent();
 
-        if(entity.cons.valid()){
+        if(entity.consValid()){
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.04f);
         }else{
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.02f);
@@ -85,7 +84,7 @@ public class Incinerator extends Block{
         return entity.heat > 0.5f;
     }
 
-    public static class IncineratorEntity extends TileEntity{
+    public static class IncineratorEntity extends Tilec{
         public float heat;
     }
 }

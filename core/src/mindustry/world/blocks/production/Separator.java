@@ -54,7 +54,7 @@ public class Separator extends Block{
 
     @Override
     public boolean shouldConsume(Tile tile){
-        return tile.entity.items.total() < itemCapacity;
+        return tile.entity.getItems().total() < itemCapacity;
     }
 
     @Override
@@ -63,8 +63,8 @@ public class Separator extends Block{
 
         GenericCrafterEntity entity = tile.ent();
 
-        Draw.color(tile.entity.liquids.current().color);
-        Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
+        Draw.color(tile.entity.getLiquids().current().color);
+        Draw.alpha(tile.entity.getLiquids().total() / liquidCapacity);
         Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
 
         Draw.reset();
@@ -79,7 +79,7 @@ public class Separator extends Block{
 
         entity.totalProgress += entity.warmup * entity.delta();
 
-        if(entity.cons.valid()){
+        if(entity.consValid()){
             entity.progress += getProgressIncrease(entity, craftTime);
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
         }else{
@@ -104,14 +104,14 @@ public class Separator extends Block{
                 count += stack.amount;
             }
 
-            entity.cons.trigger();
+            entity.consume();
 
-            if(item != null && entity.items.get(item) < itemCapacity){
+            if(item != null && entity.getItems().get(item) < itemCapacity){
                 offloadNear(tile, item);
             }
         }
 
-        if(entity.timer.get(timerDump, dumpTime)){
+        if(entity.timer(timerDump, dumpTime)){
             tryDump(tile);
         }
     }

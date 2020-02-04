@@ -29,8 +29,8 @@ public class PowerDiode extends Block{
 
         if(tile.front() == null || tile.back() == null || !tile.back().block().hasPower || !tile.front().block().hasPower || tile.back().getTeam() != tile.front().getTeam()) return;
 
-        PowerGraph backGraph = tile.back().entity.power.graph;
-        PowerGraph frontGraph = tile.front().entity.power.graph;
+        PowerGraph backGraph = tile.back().entity.getPower().graph;
+        PowerGraph frontGraph = tile.front().entity.getPower().graph;
         if(backGraph == frontGraph) return;
 
         // 0f - 1f of battery capacity in use
@@ -51,7 +51,7 @@ public class PowerDiode extends Block{
 
     // battery % of the graph on either side, defaults to zero
     public float bar(Tile tile){
-        return (tile != null && tile.block().hasPower) ? tile.entity.power.graph.getBatteryStored() / tile.entity.power.graph.getTotalBatteryCapacity() : 0f;
+        return (tile != null && tile.block().hasPower) ? tile.entity.getPower().graph.getBatteryStored() / tile.entity.getPower().graph.getTotalBatteryCapacity() : 0f;
     }
 
     @Override

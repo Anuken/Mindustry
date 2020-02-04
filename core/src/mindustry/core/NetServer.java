@@ -14,6 +14,7 @@ import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.net.Administration;
 import mindustry.game.EventType.*;
@@ -688,7 +689,7 @@ public class NetServer implements ApplicationListener{
         syncStream.reset();
 
         short sent = 0;
-        for(TileEntity entity : tileGroup.all()){
+        for(Tilec entity : tileGroup.all()){
             if(!entity.block.sync) continue;
             sent ++;
 
@@ -719,7 +720,7 @@ public class NetServer implements ApplicationListener{
 
         for(CoreEntity entity : cores){
             dataStream.writeInt(entity.tile.pos());
-            entity.items.write(dataStream);
+            entity.getItems().write(dataStream);
         }
 
         dataStream.close();

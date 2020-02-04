@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import mindustry.entities.type.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -30,17 +31,17 @@ public class Units{
      * @param range The maximum distance from the target X/Y the targeter can be for it to be valid
      * @return whether the target is invalid
      */
-    public static boolean invalidateTarget(TargetTrait target, Team team, float x, float y, float range){
+    public static boolean invalidateTarget(Teamc target, Team team, float x, float y, float range){
         return target == null || (range != Float.MAX_VALUE && !target.withinDst(x, y, range)) || target.getTeam() == team || !target.isValid();
     }
 
-    /** See {@link #invalidateTarget(TargetTrait, Team, float, float, float)} */
-    public static boolean invalidateTarget(TargetTrait target, Team team, float x, float y){
+    /** See {@link #invalidateTarget(Teamc, Team, float, float, float)} */
+    public static boolean invalidateTarget(Teamc target, Team team, float x, float y){
         return invalidateTarget(target, team, x, y, Float.MAX_VALUE);
     }
 
-    /** See {@link #invalidateTarget(TargetTrait, Team, float, float, float)} */
-    public static boolean invalidateTarget(TargetTrait target, Unitc targeter){
+    /** See {@link #invalidateTarget(Teamc, Team, float, float, float)} */
+    public static boolean invalidateTarget(Teamc target, Unitc targeter){
         return invalidateTarget(target, targeter.getTeam(), targeter.x, targeter.y, targeter.getWeapon().bullet.range());
     }
 
@@ -68,35 +69,35 @@ public class Units{
     }
 
     /** Returns the neareset damaged tile. */
-    public static TileEntity findDamagedTile(Team team, float x, float y){
+    public static Tilec findDamagedTile(Team team, float x, float y){
         Tile tile = Geometry.findClosest(x, y, indexer.getDamaged(team));
         return tile == null ? null : tile.entity;
     }
 
     /** Returns the neareset ally tile in a range. */
-    public static TileEntity findAllyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
+    public static Tilec findAllyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
         return indexer.findTile(team, x, y, range, pred);
     }
 
     /** Returns the neareset enemy tile in a range. */
-    public static TileEntity findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
+    public static Tilec findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
         if(team == Team.derelict) return null;
 
         return indexer.findEnemyTile(team, x, y, range, pred);
     }
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
-    public static TargetTrait closestTarget(Team team, float x, float y, float range){
+    public static Teamc closestTarget(Team team, float x, float y, float range){
         return closestTarget(team, x, y, range, Unitc::isValid);
     }
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
-    public static TargetTrait closestTarget(Team team, float x, float y, float range, Boolf<Unitc> unitPred){
+    public static Teamc closestTarget(Team team, float x, float y, float range, Boolf<Unitc> unitPred){
         return closestTarget(team, x, y, range, unitPred, t -> true);
     }
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
-    public static TargetTrait closestTarget(Team team, float x, float y, float range, Boolf<Unitc> unitPred, Boolf<Tile> tilePred){
+    public static Teamc closestTarget(Team team, float x, float y, float range, Boolf<Unitc> unitPred, Boolf<Tile> tilePred){
         if(team == Team.derelict) return null;
 
         Unitc unit = closestEnemy(team, x, y, range, unitPred);
@@ -152,11 +153,6 @@ public class Units{
                 cons.get(u);
             }
         });
-        playerGroup.intersect(x, y, width, height, player -> {
-            if(player.getTeam() == team){
-                cons.get(player);
-            }
-        });
     }
 
     /** Iterates over all units in a circle around this position. */
@@ -166,18 +162,11 @@ public class Units{
                 cons.get(unit);
             }
         });
-
-        playerGroup.intersect(x - radius, y - radius, radius*2f, radius*2f, unit -> {
-            if(unit.getTeam() == team && unit.withinDst(x, y, radius)){
-                cons.get(unit);
-            }
-        });
     }
 
     /** Iterates over all units in a rectangle. */
     public static void nearby(float x, float y, float width, float height, Cons<Unitc> cons){
         unitGroup.intersect(x, y, width, height, cons);
-        playerGroup.intersect(x, y, width, height, cons);
     }
 
     /** Iterates over all units in a rectangle. */
@@ -192,12 +181,6 @@ public class Units{
                 cons.get(u);
             }
         });
-
-        playerGroup.intersect(x, y, width, height, player -> {
-            if(team.isEnemy(player.getTeam())){
-                cons.get(player);
-            }
-        });
     }
 
     /** Iterates over all units that are enemies of this team. */
@@ -208,7 +191,6 @@ public class Units{
     /** Iterates over all units. */
     public static void all(Cons<Unitc> cons){
         unitGroup.all().each(cons);
-        playerGroup.all().each(cons);
     }
 
     public static void each(Team team, Cons<BaseUnit> cons){

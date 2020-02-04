@@ -13,9 +13,6 @@ import arc.util.io.*;
 import mindustry.ai.*;
 import mindustry.core.*;
 import mindustry.entities.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
 import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -24,7 +21,6 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.Net;
 import mindustry.net.*;
-import mindustry.world.blocks.defense.ForceProjector.*;
 
 import java.io.*;
 import java.nio.charset.*;
@@ -178,17 +174,6 @@ public class Vars implements Loadable{
     public static NetServer netServer;
     public static NetClient netClient;
 
-    public static Entities entities;
-    public static EntityGroup<Player> playerGroup;
-    public static EntityGroup<TileEntity> tileGroup;
-    public static EntityGroup<Bullet> bulletGroup;
-    public static EntityGroup<EffectEntity> effectGroup;
-    public static EntityGroup<DrawTrait> groundEffectGroup;
-    public static EntityGroup<ShieldEntity> shieldGroup;
-    public static EntityGroup<Puddle> puddleGroup;
-    public static EntityGroup<Fire> fireGroup;
-    public static EntityGroup<BaseUnit> unitGroup;
-
     public static Unitc player;
 
     @Override
@@ -233,25 +218,6 @@ public class Vars implements Loadable{
         spawner = new WaveSpawner();
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
-
-        entities = new Entities();
-        playerGroup = entities.add(Player.class).enableMapping();
-        tileGroup = entities.add(TileEntity.class, false);
-        bulletGroup = entities.add(Bullet.class).enableMapping();
-        effectGroup = entities.add(EffectEntity.class, false);
-        groundEffectGroup = entities.add(DrawTrait.class, false);
-        puddleGroup = entities.add(Puddle.class).enableMapping();
-        shieldGroup = entities.add(ShieldEntity.class, false);
-        fireGroup = entities.add(Fire.class).enableMapping();
-        unitGroup = entities.add(BaseUnit.class).enableMapping();
-
-        for(EntityGroup<?> group : entities.all()){
-            group.setRemoveListener(entity -> {
-                if(entity instanceof SyncTrait && net.client()){
-                    netClient.addRemovedEntity((entity).getID());
-                }
-            });
-        }
 
         state = new GameState();
         data = new GlobalData();

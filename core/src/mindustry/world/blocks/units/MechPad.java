@@ -11,6 +11,7 @@ import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -49,7 +50,7 @@ public class MechPad extends Block{
 
         MechFactoryEntity entity = tile.ent();
 
-        if(!entity.cons.valid()) return;
+        if(!entity.consValid()) return;
         player.beginRespawning(entity);
         entity.sameMech = false;
     }
@@ -80,7 +81,7 @@ public class MechPad extends Block{
     protected static boolean checkValidTap(Tile tile, Player player){
         MechFactoryEntity entity = tile.ent();
         return !player.isDead() && tile.interactable(player.getTeam()) && Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize &&
-        Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize && entity.cons.valid() && entity.player == null;
+        Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize && entity.consValid() && entity.player == null;
     }
 
     @Override
@@ -99,7 +100,7 @@ public class MechPad extends Block{
 
         if(checkValidTap(tile, player)){
             Call.onMechFactoryTap(player, tile);
-        }else if(player.isLocal && mobile && !player.isDead() && entity.cons.valid() && entity.player == null){
+        }else if(player.isLocal && mobile && !player.isDead() && entity.consValid() && entity.player == null){
             //deselect on double taps
             player.moveTarget = player.moveTarget == tile.entity ? null : tile.entity;
         }
@@ -133,7 +134,7 @@ public class MechPad extends Block{
         }
     }
 
-    public class MechFactoryEntity extends TileEntity implements SpawnerTrait{
+    public class MechFactoryEntity extends Tilec implements SpawnerTrait{
         Player player;
         boolean sameMech;
         float progress;

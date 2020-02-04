@@ -187,7 +187,7 @@ public class ItemBridge extends Block{
         }else{
             ((ItemBridgeEntity)world.tile(entity.link).entity).incoming.add(tile.pos());
 
-            if(entity.cons.valid() && Mathf.zero(1f - entity.efficiency())){
+            if(entity.consValid() && Mathf.zero(1f - entity.efficiency())){
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
@@ -200,14 +200,14 @@ public class ItemBridge extends Block{
     public void updateTransport(Tile tile, Tile other){
         ItemBridgeEntity entity = tile.ent();
 
-        if(entity.uptime >= 0.5f && entity.timer.get(timerTransport, transportTime)){
-            Item item = entity.items.take();
+        if(entity.uptime >= 0.5f && entity.timer(timerTransport, transportTime)){
+            Item item = entity.getItems().take();
             if(item != null && other.block().acceptItem(item, other, tile)){
                 other.block().handleItem(item, other, tile);
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
             }else{
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 1f, 0.01f);
-                if(item != null) entity.items.add(item, 1);
+                if(item != null) entity.getItems().add(item, 1);
             }
         }
     }
@@ -266,10 +266,10 @@ public class ItemBridge extends Block{
 
             if(rel == rel2) return false;
         }else{
-            return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>ent().link == tile.pos() && tile.entity.items.total() < itemCapacity;
+            return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>ent().link == tile.pos() && tile.entity.getItems().total() < itemCapacity;
         }
 
-        return tile.entity.items.total() < itemCapacity;
+        return tile.entity.getItems().total() < itemCapacity;
     }
 
 
@@ -315,7 +315,7 @@ public class ItemBridge extends Block{
             return false;
         }
 
-        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f);
+        return tile.entity.getLiquids().get(liquid) + amount < liquidCapacity && (tile.entity.getLiquids().current() == liquid || tile.entity.getLiquids().get(tile.entity.getLiquids().current()) < 0.2f);
     }
 
     @Override
@@ -361,7 +361,7 @@ public class ItemBridge extends Block{
         return other.block() == this && (!checkDouble || other.<ItemBridgeEntity>ent().link != tile.pos());
     }
 
-    public static class ItemBridgeEntity extends TileEntity{
+    public static class ItemBridgeEntity extends Tilec{
         public int link = Pos.invalid;
         public IntSet incoming = new IntSet();
         public float uptime;

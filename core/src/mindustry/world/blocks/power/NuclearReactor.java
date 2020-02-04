@@ -79,24 +79,24 @@ public class NuclearReactor extends PowerGenerator{
         ConsumeLiquid cliquid = consumes.get(ConsumeType.liquid);
         Item item = consumes.<ConsumeItems>get(ConsumeType.item).items[0].item;
 
-        int fuel = entity.items.get(item);
+        int fuel = entity.getItems().get(item);
         float fullness = (float)fuel / itemCapacity;
         entity.productionEfficiency = fullness;
 
         if(fuel > 0){
             entity.heat += fullness * heating * Math.min(entity.delta(), 4f);
 
-            if(entity.timer.get(timerFuel, itemDuration / entity.timeScale)){
-                entity.cons.trigger();
+            if(entity.timer(timerFuel, itemDuration / entity.timeScale)){
+                entity.consume();
             }
         }
 
         Liquid liquid = cliquid.liquid;
 
         if(entity.heat > 0){
-            float maxUsed = Math.min(entity.liquids.get(liquid), entity.heat / coolantPower);
+            float maxUsed = Math.min(entity.getLiquids().get(liquid), entity.heat / coolantPower);
             entity.heat -= maxUsed * coolantPower;
-            entity.liquids.remove(liquid, maxUsed);
+            entity.getLiquids().remove(liquid, maxUsed);
         }
 
         if(entity.heat > smokeThreshold){
@@ -123,7 +123,7 @@ public class NuclearReactor extends PowerGenerator{
 
         NuclearReactorEntity entity = tile.ent();
 
-        int fuel = entity.items.get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
+        int fuel = entity.getItems().get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
 
         if((fuel < 5 && entity.heat < 0.5f) || !state.rules.reactorExplosions) return;
 
@@ -166,8 +166,8 @@ public class NuclearReactor extends PowerGenerator{
         Draw.color(coolColor, hotColor, entity.heat);
         Fill.rect(tile.drawx(), tile.drawy(), size * tilesize, size * tilesize);
 
-        Draw.color(entity.liquids.current().color);
-        Draw.alpha(entity.liquids.currentAmount() / liquidCapacity);
+        Draw.color(entity.getLiquids().current().color);
+        Draw.alpha(entity.getLiquids().currentAmount() / liquidCapacity);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
 
         if(entity.heat > flashThreshold){

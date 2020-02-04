@@ -80,7 +80,7 @@ public class Renderer implements ApplicationListener{
             Vec2 position = Tmp.v3.set(player);
 
             if(player.isDead()){
-                TileEntity core = player.getClosestCore();
+                Tilec core = player.getClosestCore();
                 if(core != null){
                     if(player.spawner == null){
                         camera.position.lerpDelta(core.x, core.y, 0.08f);
@@ -279,23 +279,23 @@ public class Renderer implements ApplicationListener{
     private void drawLanding(){
         if(landTime > 0 && player.getClosestCore() != null){
             float fract = landTime / Fx.coreLand.lifetime;
-            TileEntity entity = player.getClosestCore();
+            Tilec entity = player.getClosestCore();
 
             TextureRegion reg = entity.block.icon(Cicon.full);
             float scl = Scl.scl(4f) / camerascale;
             float s = reg.getWidth() * Draw.scl * scl * 4f * fract;
 
             Draw.color(Pal.lightTrail);
-            Draw.rect("circle-shadow", entity.x, entity.y, s, s);
+            Draw.rect("circle-shadow", entity.getX(), entity.getY(), s, s);
 
             Angles.randLenVectors(1, (1f- fract), 100, 1000f * scl * (1f-fract), (x, y, fin, fout) -> {
                 Lines.stroke(scl * fin);
-                Lines.lineAngle(entity.x + x, entity.y + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
+                Lines.lineAngle(entity.getX() + x, entity.getY() + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
             });
 
             Draw.color();
             Draw.mixcol(Color.white, fract);
-            Draw.rect(reg, entity.x, entity.y, reg.getWidth() * Draw.scl * scl, reg.getHeight() * Draw.scl * scl, fract * 135f);
+            Draw.rect(reg, entity.getX(), entity.getY(), reg.getWidth() * Draw.scl * scl, reg.getHeight() * Draw.scl * scl, fract * 135f);
 
             Draw.reset();
         }

@@ -16,11 +16,10 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -45,7 +44,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     private float lineScale;
     /** Animation data for crosshair. */
     private float crosshairScale;
-    private TargetTrait lastTarget;
+    private Teamc lastTarget;
     /** Used for shifting build requests. */
     private float shiftDeltaX, shiftDeltaY;
 
@@ -77,7 +76,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             Tile tile = world.ltileWorld(x, y);
 
             if(tile != null && tile.synthetic() && player.getTeam().isEnemy(tile.getTeam())){
-                TileEntity entity = tile.entity;
+                Tilec entity = tile.entity;
                 player.setMineTile(null);
                 player.target = entity;
             }else if(tile != null && player.mech.canHeal && tile.entity != null && tile.getTeam() == player.getTeam() && tile.entity.damaged()){
@@ -155,7 +154,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     void removeRequest(BuildRequest request){
-        selectRequests.removeValue(request, true);
+        selectRequests.remove(request, true);
         if(!request.breaking){
             removals.add(request);
         }
@@ -376,7 +375,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        TargetTrait target = player.target;
+        Teamc target = player.target;
 
         //draw targeting crosshair
         if(target != null && !state.isEditor()){

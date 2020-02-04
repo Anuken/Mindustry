@@ -7,8 +7,6 @@ import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -17,11 +15,11 @@ import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
-public class Tile implements Position, TargetTrait{
+public class Tile implements Position{
     /** Tile traversal cost. */
     public byte cost = 1;
     /** Tile entity, usually null. */
-    public TileEntity entity;
+    public Tilec entity;
     public short x, y;
     protected Block block;
     protected Floor floor;
@@ -100,7 +98,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends TileEntity> T ent(){
+    public <T extends Tilec> T ent(){
         return (T)entity;
     }
 
@@ -141,7 +139,6 @@ public class Tile implements Position, TargetTrait{
         return (T)block;
     }
 
-    @Override
     public Team getTeam(){
         return Team.get(link().team);
     }
@@ -456,13 +453,14 @@ public class Tile implements Position, TargetTrait{
         Block block = block();
 
         if(block.hasEntity()){
+            //TODO assign data and don't use new entity
             entity = block.newEntity().init(this, block.update);
-            entity.cons = new ConsumeModule(entity);
-            if(block.hasItems) entity.items = new ItemModule();
-            if(block.hasLiquids) entity.liquids = new LiquidModule();
+            entity.setCons(new ConsumeModule(entity));
+            if(block.hasItems) entity.setItems(new ItemModule());
+            if(block.hasLiquids) entity.setLiquids(new LiquidModule());
             if(block.hasPower){
-                entity.power = new PowerModule();
-                entity.power.graph.add(this);
+                entity.setPower(new PowerModule());
+                entity.getPower().graph.add(this);
             }
 
             if(!world.isGenerating()){
@@ -484,33 +482,13 @@ public class Tile implements Position, TargetTrait{
     }
 
     @Override
-    public boolean isDead(){
-        return entity == null;
-    }
-
-    @Override
-    public Vec2 velocity(){
-        return Vec2.ZERO;
-    }
-
-    @Override
     public float getX(){
         return drawx();
     }
 
     @Override
-    public void setX(float x){
-        throw new IllegalArgumentException("Tile position cannot change.");
-    }
-
-    @Override
     public float getY(){
         return drawy();
-    }
-
-    @Override
-    public void setY(float y){
-        throw new IllegalArgumentException("Tile position cannot change.");
     }
 
     @Override

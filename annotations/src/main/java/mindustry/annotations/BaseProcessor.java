@@ -116,7 +116,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         this.env = roundEnv;
         try{
             process(roundEnv);
-        }catch(Exception e){
+        }catch(Throwable e){
             e.printStackTrace();
             throw new RuntimeException(e);
         }

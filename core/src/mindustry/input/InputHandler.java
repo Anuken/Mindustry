@@ -132,7 +132,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 ItemTransfer.create(item,
                 player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
                 new Vec2(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
-                    if(tile.block() != block || tile.entity == null || tile.entity.items == null) return;
+                    if(tile.block() != block || tile.entity == null || tile.entity.getItems() == null) return;
 
                     tile.block().handleStack(item, removed, tile, player);
                     remaining[1] -= removed;
@@ -595,7 +595,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(tile.interactable(player.getTeam()) && tile.block().consumesTap){
             consumed = true;
         }else if(tile.interactable(player.getTeam()) && tile.block().synthetic() && !consumed){
-            if(tile.block().hasItems && tile.entity.items.total() > 0){
+            if(tile.block().hasItems && tile.entity.getItems().total() > 0){
                 frag.inv.showFor(tile);
                 consumed = true;
                 showedInventory = true;

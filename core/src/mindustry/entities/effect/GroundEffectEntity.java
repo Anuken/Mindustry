@@ -4,7 +4,7 @@ import arc.math.Mathf;
 import arc.util.Time;
 import mindustry.Vars;
 import mindustry.entities.Effects;
-import mindustry.entities.Effects.Effect;
+import mindustry.entities.*;
 import mindustry.entities.Effects.EffectRenderer;
 import mindustry.world.Tile;
 

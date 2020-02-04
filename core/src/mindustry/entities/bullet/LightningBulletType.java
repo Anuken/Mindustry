@@ -3,7 +3,7 @@ package mindustry.entities.bullet;
 import arc.graphics.*;
 import mindustry.content.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 
 public class LightningBulletType extends BulletType{
@@ -20,11 +20,11 @@ public class LightningBulletType extends BulletType{
     }
 
     @Override
-    public void draw(Bullet b){
+    public void draw(Bulletc b){
     }
 
     @Override
-    public void init(Bullet b){
+    public void init(Bulletc b){
         Lightning.create(b.getTeam(), lightningColor, damage, b.x, b.y, b.rot(), lightningLength);
     }
 }

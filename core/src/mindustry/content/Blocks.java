@@ -10,7 +10,6 @@ import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -585,7 +584,7 @@ public class Blocks implements ContentList{
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name + "-top")};
 
             drawer = tile -> {
-                LiquidModule mod = tile.entity.liquids;
+                LiquidModule mod = tile.entity.getLiquids();
 
                 int rotation = rotate ? tile.rotation() * 90 : 0;
 
@@ -681,7 +680,7 @@ public class Blocks implements ContentList{
 
                 Draw.rect(region, tile.drawx(), tile.drawy());
                 Draw.rect(reg(frameRegions[(int)Mathf.absin(entity.totalProgress, 5f, 2.999f)]), tile.drawx(), tile.drawy());
-                Draw.color(Color.clear, tile.entity.liquids.current().color, tile.entity.liquids.total() / liquidCapacity);
+                Draw.color(Color.clear, tile.entity.getLiquids().current().color, tile.entity.getLiquids().total() / liquidCapacity);
                 Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
                 Draw.color();
                 Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
@@ -1536,14 +1535,14 @@ public class Blocks implements ContentList{
                 }
 
                 @Override
-                public void init(mindustry.entities.type.Bullet b){
+                public void init(Bulletc b){
                     for(int i = 0; i < rays; i++){
                         Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), rayLength - Math.abs(i - (rays / 2)) * 20f);
                     }
                 }
 
                 @Override
-                public void draw(Bullet b){
+                public void draw(Bulletc b){
                     super.draw(b);
                     Draw.color(Color.white, Pal.lancerLaser, b.fin());
                     //Draw.alpha(b.fout());

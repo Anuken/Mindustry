@@ -59,8 +59,8 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
     public @Nullable NetConnection con;
     public boolean isLocal = false;
     public Interval timer = new Interval(6);
-    public TargetTrait target;
-    public TargetTrait moveTarget;
+    public Teamc target;
+    public Teamc moveTarget;
 
     public @Nullable String lastText;
     public float textFadeTime;
@@ -604,7 +604,7 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
 
     protected void updateTouch(){
         if(Units.invalidateTarget(target, this) &&
-            !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && target.getTeam() == team && mech.canHeal && dst(target) < mech.range && !(((TileEntity)target).block instanceof BuildBlock))){
+            !(target instanceof Tilec && ((Tilec)target).damaged() && target.isValid() && target.getTeam() == team && mech.canHeal && dst(target) < mech.range && !(((Tilec)target).block instanceof BuildBlock))){
             target = null;
         }
 
@@ -619,7 +619,7 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
         if(moveTarget != null && !moveTarget.isDead()){
             targetX = moveTarget.getX();
             targetY = moveTarget.getY();
-            boolean tapping = moveTarget instanceof TileEntity && moveTarget.getTeam() == team;
+            boolean tapping = moveTarget instanceof Tilec && moveTarget.getTeam() == team;
             attractDst = 0f;
 
             if(tapping){
@@ -628,7 +628,7 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
 
             if(dst(moveTarget) <= 2f * Time.delta()){
                 if(tapping && !isDead()){
-                    Tile tile = ((TileEntity)moveTarget).tile;
+                    Tile tile = ((Tilec)moveTarget).tile;
                     tile.block().tapped(tile, this);
                 }
 
@@ -695,7 +695,7 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
                         setMineTile(null);
                     }
                 }
-            }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team && mech.canHeal && dst(target) < mech.range)){
+            }else if(target.isValid() || (target instanceof Tilec && ((Tilec)target).damaged() && target.getTeam() == team && mech.canHeal && dst(target) < mech.range)){
                 //rotate toward and shoot the target
                 if(mech.faceTarget){
                     rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);

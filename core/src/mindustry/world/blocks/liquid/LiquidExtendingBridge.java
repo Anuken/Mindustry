@@ -28,11 +28,11 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)){
-            tryDumpLiquid(tile, entity.liquids.current());
+            tryDumpLiquid(tile, entity.getLiquids().current());
         }else{
             ((ItemBridgeEntity)world.tile(entity.link).entity).incoming.add(tile.pos());
 
-            if(entity.cons.valid()){
+            if(entity.consValid()){
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
@@ -40,7 +40,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
 
             if(entity.uptime >= 0.5f){
 
-                if(tryMoveLiquid(tile, other, false, entity.liquids.current()) > 0.1f){
+                if(tryMoveLiquid(tile, other, false, entity.getLiquids().current()) > 0.1f){
                     entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
                 }else{
                     entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 1f, 0.01f);

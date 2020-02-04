@@ -65,19 +65,19 @@ public class LaserTurret extends PowerTurret{
             return;
         }
 
-        if(entity.reload >= reload && (entity.cons.valid() || tile.isEnemyCheat())){
+        if(entity.reload >= reload && (entity.consValid() || tile.isEnemyCheat())){
             BulletType type = peekAmmo(tile);
 
             shoot(tile, type);
 
             entity.reload = 0f;
         }else{
-            Liquid liquid = entity.liquids.current();
+            Liquid liquid = entity.getLiquids().current();
             float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-            float used = baseReloadSpeed(tile) * (tile.isEnemyCheat() ? maxUsed : Math.min(entity.liquids.get(liquid), maxUsed * Time.delta())) * liquid.heatCapacity * coolantMultiplier;
+            float used = baseReloadSpeed(tile) * (tile.isEnemyCheat() ? maxUsed : Math.min(entity.getLiquids().get(liquid), maxUsed * Time.delta())) * liquid.heatCapacity * coolantMultiplier;
             entity.reload += used;
-            entity.liquids.remove(liquid, used);
+            entity.getLiquids().remove(liquid, used);
 
             if(Mathf.chance(0.06 * used)){
                 coolEffect.at(tile.drawx() + Mathf.range(size * tilesize / 2f), tile.drawy() + Mathf.range(size * tilesize / 2f));

@@ -12,7 +12,6 @@ import arc.util.pooling.Pools;
 import mindustry.content.Bullets;
 import mindustry.entities.EntityGroup;
 import mindustry.entities.Units;
-import mindustry.entities.type.Bullet;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.graphics.Pal;

@@ -1,15 +1,15 @@
 package mindustry.world.modules;
 
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.world.consumers.Consume;
 
 import java.io.*;
 
 public class ConsumeModule extends BlockModule{
     private boolean valid, optionalValid;
-    private final TileEntity entity;
+    private final Tilec entity;
 
-    public ConsumeModule(TileEntity entity){
+    public ConsumeModule(Tilec entity){
         this.entity = entity;
     }
 

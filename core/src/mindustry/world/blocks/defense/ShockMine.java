@@ -49,7 +49,7 @@ public class ShockMine extends Block{
 
     @Override
     public void unitOn(Tile tile, Unitc unit){
-        if(unit.getTeam() != tile.getTeam() && tile.entity.timer.get(timerDamage, cooldown)){
+        if(unit.getTeam() != tile.getTeam() && tile.entity.timer(timerDamage, cooldown)){
             for(int i = 0; i < tendrils; i++){
                 Lightning.create(tile.getTeam(), Pal.lancerLaser, damage, tile.drawx(), tile.drawy(), Mathf.random(360f), length);
             }

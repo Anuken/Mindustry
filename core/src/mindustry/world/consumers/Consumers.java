@@ -4,7 +4,7 @@ import arc.struct.*;
 import arc.func.Boolf;
 import arc.util.Structs;
 import mindustry.Vars;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.power.ConditionalConsumePower;
 import mindustry.world.meta.BlockStats;
@@ -48,7 +48,7 @@ public class Consumers{
     }
 
     /** Creates a consumer which only consumes power when the condition is met. */
-    public ConsumePower powerCond(float usage, Boolf<TileEntity> cons){
+    public ConsumePower powerCond(float usage, Boolf<Tilec> cons){
         return add(new ConditionalConsumePower(usage, cons));
     }
 

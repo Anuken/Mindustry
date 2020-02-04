@@ -8,8 +8,8 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
 import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
@@ -83,14 +83,14 @@ public class Door extends Wall{
     public void tapped(Tile tile, Player player){
         DoorEntity entity = tile.ent();
 
-        if((Units.anyEntities(tile) && entity.open) || !tile.entity.timer.get(timerToggle, 30f)){
+        if((Units.anyEntities(tile) && entity.open) || !tile.entity.timer(timerToggle, 30f)){
             return;
         }
 
         Call.onDoorToggle(null, tile, !entity.open);
     }
 
-    public class DoorEntity extends TileEntity{
+    public class DoorEntity extends Tilec{
         public boolean open = false;
 
         @Override

@@ -13,6 +13,7 @@ import arc.util.pooling.*;
 import mindustry.entities.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
+import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -146,7 +147,7 @@ public class MessageBlock extends Block{
         table.setPosition(pos.x, pos.y, Align.bottom);
     }
 
-    public class MessageBlockEntity extends TileEntity{
+    public class MessageBlockEntity extends Tilec{
         public String message = "";
         public String[] lines = {""};
 

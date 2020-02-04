@@ -38,7 +38,7 @@ public class ConsumeItems extends Consume{
     @Override
     public void build(Tile tile, Table table){
         for(ItemStack stack : items){
-            table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(stack.item, stack.amount))).size(8 * 4).padRight(5);
+            table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount), () -> tile.entity != null && tile.entity.getItems() != null && tile.entity.getItems().has(stack.item, stack.amount))).size(8 * 4).padRight(5);
         }
     }
 
@@ -48,20 +48,20 @@ public class ConsumeItems extends Consume{
     }
 
     @Override
-    public void update(TileEntity entity){
+    public void update(Tilec entity){
 
     }
 
     @Override
-    public void trigger(TileEntity entity){
+    public void trigger(Tilec entity){
         for(ItemStack stack : items){
-            entity.items.remove(stack);
+            entity.getItems().remove(stack);
         }
     }
 
     @Override
-    public boolean valid(TileEntity entity){
-        return entity.items != null && entity.items.has(items);
+    public boolean valid(Tilec entity){
+        return entity.getItems() != null && entity.getItems().has(items);
     }
 
     @Override

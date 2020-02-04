@@ -43,7 +43,7 @@ public class Cultivator extends GenericCrafter{
         super.update(tile);
 
         CultivatorEntity entity = tile.ent();
-        entity.warmup = Mathf.lerpDelta(entity.warmup, entity.cons.valid() ? 1f : 0f, 0.015f);
+        entity.warmup = Mathf.lerpDelta(entity.warmup, entity.consValid() ? 1f : 0f, 0.015f);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class Cultivator extends GenericCrafter{
     }
 
     @Override
-    protected float getProgressIncrease(TileEntity entity, float baseTime){
+    protected float getProgressIncrease(Tilec entity, float baseTime){
         CultivatorEntity c = (CultivatorEntity)entity;
         return super.getProgressIncrease(entity, baseTime) * (1f + c.boost);
     }

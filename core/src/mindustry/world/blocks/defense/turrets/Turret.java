@@ -14,10 +14,9 @@ import arc.math.geom.Vec2;
 import arc.util.Time;
 import mindustry.content.Fx;
 import mindustry.entities.*;
-import mindustry.entities.Effects.Effect;
-import mindustry.entities.type.Bullet;
+import mindustry.entities.*;
 import mindustry.entities.bullet.BulletType;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.Block;
@@ -153,7 +152,7 @@ public abstract class Turret extends Block{
 
         if(hasAmmo(tile)){
 
-            if(entity.timer.get(timerTarget, targetInterval)){
+            if(entity.timer(timerTarget, targetInterval)){
                 findTarget(tile);
             }
 
@@ -312,7 +311,7 @@ public abstract class Turret extends Block{
         public abstract BulletType type();
     }
 
-    public static class TurretEntity extends TileEntity{
+    public static class TurretEntity extends Tilec{
         public Array<AmmoEntry> ammo = new Array<>();
         public int totalAmmo;
         public float reload;
@@ -320,7 +319,7 @@ public abstract class Turret extends Block{
         public float recoil = 0f;
         public float heat;
         public int shots;
-        public TargetTrait target;
+        public Teamc target;
 
         @Override
         public void write(DataOutput stream) throws IOException{

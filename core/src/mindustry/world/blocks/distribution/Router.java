@@ -3,7 +3,7 @@ package mindustry.world.blocks.distribution;
 import arc.struct.Array;
 import arc.util.Time;
 import mindustry.content.*;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.type.Item;
 import mindustry.world.*;
 import mindustry.world.meta.BlockGroup;
@@ -26,8 +26,8 @@ public class Router extends Block{
     public void update(Tile tile){
         RouterEntity entity = tile.ent();
 
-        if(entity.lastItem == null && entity.items.total() > 0){
-            entity.items.clear();
+        if(entity.lastItem == null && entity.getItems().total() > 0){
+            entity.getItems().clear();
         }
 
         if(entity.lastItem != null){
@@ -37,7 +37,7 @@ public class Router extends Block{
             if(target != null && (entity.time >= 1f || !(target.block() instanceof Router))){
                 getTileTarget(tile, entity.lastItem, entity.lastInput, true);
                 target.block().handleItem(entity.lastItem, target, Edges.getFacingEdge(tile, target));
-                entity.items.remove(entity.lastItem, 1);
+                entity.getItems().remove(entity.lastItem, 1);
                 entity.lastItem = null;
             }
         }
@@ -47,13 +47,13 @@ public class Router extends Block{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         RouterEntity entity = tile.ent();
 
-        return tile.getTeam() == source.getTeam() && entity.lastItem == null && entity.items.total() == 0;
+        return tile.getTeam() == source.getTeam() && entity.lastItem == null && entity.getItems().total() == 0;
     }
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
         RouterEntity entity = tile.ent();
-        entity.items.add(item, 1);
+        entity.getItems().add(item, 1);
         entity.lastItem = item;
         entity.time = 0f;
         entity.lastInput = source;
@@ -83,7 +83,7 @@ public class Router extends Block{
         return result;
     }
 
-    public class RouterEntity extends TileEntity{
+    public class RouterEntity extends Tilec{
         Item lastItem;
         Tile lastInput;
         float time;

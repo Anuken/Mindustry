@@ -10,7 +10,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
 import mindustry.entities.type.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -118,7 +117,7 @@ public class CommandCenter extends Block{
         Events.fire(new CommandIssueEvent(tile, command));
     }
 
-    public class CommandCenterEntity extends TileEntity{
+    public class CommandCenterEntity extends Tilec{
         public UnitCommand command = UnitCommand.attack;
 
         @Override

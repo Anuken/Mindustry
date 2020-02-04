@@ -9,7 +9,7 @@ import arc.math.Mathf;
 import arc.math.geom.Rect;
 import arc.util.Time;
 import mindustry.entities.Units;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.Block;
 import mindustry.world.Tile;
@@ -112,7 +112,7 @@ public class RepairPoint extends Block{
         boolean targetIsBeingRepaired = false;
         if(entity.target != null && (entity.target.isDead() || entity.target.dst(tile) > repairRadius || entity.target.health >= entity.target.maxHealth())){
             entity.target = null;
-        }else if(entity.target != null && entity.cons.valid()){
+        }else if(entity.target != null && entity.consValid()){
             entity.target.health += repairSpeed * Time.delta() * entity.strength * entity.efficiency();
             entity.target.clampHealth();
             entity.rotation = Mathf.slerpDelta(entity.rotation, entity.angleTo(entity.target), 0.5f);
@@ -125,7 +125,7 @@ public class RepairPoint extends Block{
             entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.07f * Time.delta());
         }
 
-        if(entity.timer.get(timerTarget, 20)){
+        if(entity.timer(timerTarget, 20)){
             rect.setSize(repairRadius * 2).setCenter(tile.drawx(), tile.drawy());
             entity.target = Units.closest(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius,
             unit -> unit.health < unit.maxHealth());
@@ -139,7 +139,7 @@ public class RepairPoint extends Block{
         return entity.target != null;
     }
 
-    public class RepairPointEntity extends TileEntity{
+    public class RepairPointEntity extends Tilec{
         public Unitc target;
         public float strength, rotation = 90;
     }

@@ -24,6 +24,13 @@ public class Annotations{
     public @interface BaseComponent{
     }
 
+    /** Creates a group that only examines entities that have all the components listed. */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface GroupDef{
+        Class[] value();
+    }
+
     /** Indicates an entity definition. */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)

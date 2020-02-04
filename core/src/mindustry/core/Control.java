@@ -14,6 +14,7 @@ import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -163,7 +164,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(Trigger.newGame, () -> {
-            TileEntity core = player.getClosestCore();
+            Tilec core = player.getClosestCore();
 
             if(core == null) return;
 
@@ -256,7 +257,7 @@ public class Control implements ApplicationListener, Loadable{
             world.loadGenerator(zone.generator);
             zone.rules.get(state.rules);
             state.rules.zone = zone;
-            for(TileEntity core : state.teams.playerCores()){
+            for(Tilec core : state.teams.playerCores()){
                 for(ItemStack stack : zone.getStartingItems()){
                     core.items.add(stack.item, stack.amount);
                 }
@@ -305,12 +306,12 @@ public class Control implements ApplicationListener, Loadable{
 
             zone.rules.get(state.rules);
             state.rules.zone = zone;
-            for(TileEntity core : state.teams.playerCores()){
+            for(Tilec core : state.teams.playerCores()){
                 for(ItemStack stack : zone.getStartingItems()){
                     core.items.add(stack.item, stack.amount);
                 }
             }
-            TileEntity core = state.teams.playerCores().first();
+            Tilec core = state.teams.playerCores().first();
             core.items.clear();
 
             logic.play();
@@ -434,7 +435,7 @@ public class Control implements ApplicationListener, Loadable{
             input.update();
 
             if(world.isZone()){
-                for(TileEntity tile : state.teams.cores(player.getTeam())){
+                for(Tilec tile : state.teams.cores(player.getTeam())){
                     for(Item item : content.items()){
                         if(tile.items.has(item)){
                             data.unlockContent(item);

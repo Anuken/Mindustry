@@ -2,13 +2,16 @@ package mindustry.entities.bullet;
 
 import arc.audio.*;
 import arc.math.*;
+import arc.math.geom.*;
+import arc.util.*;
+import arc.util.pooling.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -97,20 +100,20 @@ public abstract class BulletType extends Content{
         return speed * lifetime * (1f - drag);
     }
 
-    public boolean collides(Bullet bullet, Tile tile){
+    public boolean collides(Bulletc bullet, Tile tile){
         return true;
     }
 
-    public void hitTile(Bullet b, Tile tile){
+    public void hitTile(Bulletc b, Tile tile){
         hit(b);
     }
 
-    public void hit(Bullet b){
-        hit(b, b.x, b.y);
+    public void hit(Bulletc b){
+        hit(b, b.getX(), b.getY());
     }
 
-    public void hit(Bullet b, float x, float y){
-        hitEffect.at(x, y, b.rot());
+    public void hit(Bulletc b, float x, float y){
+        hitEffect.at(x, y, b.getRotation());
         hitSound.at(b);
 
         Effects.shake(hitShake, hitShake, b);
@@ -119,7 +122,7 @@ public abstract class BulletType extends Content{
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
                 float a = Mathf.random(360f);
-                Bullet.create(fragBullet, b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax));
+                fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax));
             }
         }
 
@@ -132,8 +135,8 @@ public abstract class BulletType extends Content{
         }
     }
 
-    public void despawned(Bullet b){
-        despawnEffect.at(b.x, b.y, b.rot());
+    public void despawned(Bulletc b){
+        despawnEffect.at(b.getX(), b.getY(), b.getRotation());
         hitSound.at(b);
 
         if(fragBullet != null || splashDamageRadius > 0){
@@ -145,23 +148,23 @@ public abstract class BulletType extends Content{
         }
     }
 
-    public void draw(Bullet b){
+    public void draw(Bulletc b){
     }
 
-    public void init(Bullet b){
-        if(killShooter && b.getOwner() instanceof HealthTrait){
-            ((HealthTrait)b.getOwner()).kill();
+    public void init(Bulletc b){
+        if(killShooter && b.getOwner() instanceof Healthc){
+            ((Healthc)b.getOwner()).kill();
         }
 
         if(instantDisappear){
-            b.time(lifetime);
+            b.setTime(lifetime);
         }
     }
 
-    public void update(Bullet b){
+    public void update(Bulletc b){
 
         if(homingPower > 0.0001f){
-            TargetTrait target = Units.closestTarget(b.getTeam(), b.x, b.y, homingRange, e -> !e.isFlying() || collidesAir);
+            Teamc target = Units.closestTarget(b.getTeam(), b.x, b.y, homingRange, e -> !e.isFlying() || collidesAir);
             if(target != null){
                 b.velocity().setAngle(Mathf.slerpDelta(b.velocity().angle(), b.angleTo(target), 0.08f));
             }
@@ -171,5 +174,62 @@ public abstract class BulletType extends Content{
     @Override
     public ContentType getContentType(){
         return ContentType.bullet;
+    }
+
+    //TODO change 'create' to 'at'
+
+    public Bulletc create(Teamc owner, float x, float y, float angle){
+        return create(owner, owner.getTeam(), x, y, angle);
+    }
+
+    public Bulletc create(Entityc owner, Team team, float x, float y, float angle){
+        return create(owner, team, x, y, angle, 1f);
+    }
+
+    public Bulletc create(Entityc owner, Team team, float x, float y, float angle, float velocityScl){
+        return create(owner, team, x, y, angle, velocityScl, 1f, null);
+    }
+
+    public Bulletc create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
+        return create(owner, team, x, y, angle, velocityScl, lifetimeScl, null);
+    }
+
+    public Bulletc create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl, Object data){
+
+
+        //TODO implement
+        return null;
+        /*
+        Bullet bullet = Pools.obtain(Bullet.class, Bullet::new);
+        bullet.type = type;
+        bullet.owner = owner;
+        bullet.data = data;
+
+        bullet.velocity.set(0, type.speed).setAngle(angle).scl(velocityScl);
+        if(type.keepVelocity){
+            bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait)owner).velocity() : Vec2.ZERO);
+        }
+
+        bullet.team = team;
+        bullet.type = type;
+        bullet.lifeScl = lifetimeScl;
+
+        bullet.set(x - bullet.velocity.x * Time.delta(), y - bullet.velocity.y * Time.delta());
+        bullet.add();
+
+        return bullet;*/
+    }
+
+    public Bulletc create(Bulletc parent, float x, float y, float angle){
+        return create(parent.getOwner(), parent.getTeam(), x, y, angle);
+    }
+
+    public Bulletc create(Bulletc parent, float x, float y, float angle, float velocityScl){
+        return create(parent.getOwner(), parent.getTeam(), x, y, angle, velocityScl);
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void createBullet(BulletType type, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
+        type.create(null, team, x, y, angle, velocityScl, lifetimeScl, null);
     }
 }

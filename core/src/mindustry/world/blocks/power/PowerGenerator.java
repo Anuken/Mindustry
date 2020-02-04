@@ -3,7 +3,7 @@ package mindustry.world.blocks.power;
 import arc.Core;
 import arc.struct.EnumSet;
 import arc.util.Strings;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.ui.Bar;
 import mindustry.world.Tile;
@@ -53,7 +53,7 @@ public class PowerGenerator extends PowerDistributor{
         return false;
     }
 
-    public static class GeneratorEntity extends TileEntity{
+    public static class GeneratorEntity extends Tilec{
         public float generateTime;
         /** The efficiency of the producer. An efficiency of 1.0 means 100% */
         public float productionEfficiency = 0.0f;

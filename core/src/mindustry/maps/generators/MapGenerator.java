@@ -111,7 +111,7 @@ public class MapGenerator extends Generator{
                 if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && world.getZone() != null){
                     for(Item item : world.getZone().resources){
                         if(Mathf.chance(0.3)){
-                            tile.entity.items.add(item, Math.min(Mathf.random(500), tile.block().itemCapacity));
+                            tile.entity.getItems().add(item, Math.min(Mathf.random(500), tile.block().itemCapacity));
                         }
                     }
                 }

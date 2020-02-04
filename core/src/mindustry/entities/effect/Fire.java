@@ -8,7 +8,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -119,7 +119,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait{
             return;
         }
 
-        TileEntity entity = tile.link().entity;
+        Tilec entity = tile.link().entity;
         boolean damage = entity != null;
 
         float flammability = baseFlammability + puddleFlammability;

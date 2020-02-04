@@ -3,7 +3,7 @@ package mindustry.entities.type.base;
 import arc.math.Mathf;
 import arc.util.Structs;
 import mindustry.content.Blocks;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.entities.units.UnitState;
 import mindustry.gen.Call;
 import mindustry.type.Item;
@@ -28,7 +28,7 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
         }
 
         public void update(){
-            TileEntity entity = getClosestCore();
+            Tilec entity = getClosestCore();
 
             if(entity == null) return;
 
@@ -90,7 +90,7 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
 
             if(target == null) return;
 
-            TileEntity tile = (TileEntity)target;
+            Tilec tile = (Tilec)target;
 
             if(dst(target) < type.range){
                 if(tile.tile.block().acceptStack(item.item, item.amount, tile.tile, MinerDrone.this) > 0){
@@ -169,10 +169,10 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
     }
 
     protected void findItem(){
-        TileEntity entity = getClosestCore();
+        Tilec entity = getClosestCore();
         if(entity == null){
             return;
         }
-        targetItem = Structs.findMin(type.toMine, indexer::hasOre, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
+        targetItem = Structs.findMin(type.toMine, indexer::hasOre, (a, b) -> -Integer.compare(entity.getItems().get(a), entity.getItems().get(b)));
     }
 }

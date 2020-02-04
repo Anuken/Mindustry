@@ -98,8 +98,8 @@ public class ForceProjector extends Block{
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(phaseValid), 0.1f);
 
-        if(phaseValid && !entity.broken && entity.timer.get(timerUse, phaseUseTime) && entity.efficiency() > 0){
-            entity.cons.trigger();
+        if(phaseValid && !entity.broken && entity.timer(timerUse, phaseUseTime) && entity.efficiency() > 0){
+            entity.consume();
         }
 
         entity.radscl = Mathf.lerpDelta(entity.radscl, entity.broken ? 0f : entity.warmup, 0.05f);
@@ -115,7 +115,7 @@ public class ForceProjector extends Block{
             ConsumeLiquidFilter cons = consumes.get(ConsumeType.liquid);
             if(cons.valid(entity)){
                 cons.update(entity);
-                scale *= (cooldownLiquid * (1f + (entity.liquids.current().heatCapacity - 0.4f) * 0.9f));
+                scale *= (cooldownLiquid * (1f + (entity.getLiquids().current().heatCapacity - 0.4f) * 0.9f));
             }
 
             entity.buildup -= Time.delta() * scale;
@@ -161,7 +161,7 @@ public class ForceProjector extends Block{
         Draw.reset();
     }
 
-    class ForceEntity extends TileEntity{
+    class ForceEntity extends Tilec{
         ShieldEntity shield;
         boolean broken = true;
         float buildup = 0f;

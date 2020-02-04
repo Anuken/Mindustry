@@ -12,7 +12,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -220,7 +220,7 @@ public class PlacementFragment extends Fragment{
                         button.resizeImage(Cicon.medium.size);
 
                         button.update(() -> { //color unplacable things gray
-                            TileEntity core = player.getClosestCore();
+                            Tilec core = player.getClosestCore();
                             Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
@@ -308,7 +308,7 @@ public class PlacementFragment extends Fragment{
                                         line.addImage(stack.item.icon(Cicon.small)).size(8 * 2);
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
                                         line.labelWrap(() -> {
-                                            TileEntity core = player.getClosestCore();
+                                            Tilec core = player.getClosestCore();
                                             if(core == null || state.rules.infiniteResources) return "*/*";
 
                                             int amount = core.items.get(stack.item);

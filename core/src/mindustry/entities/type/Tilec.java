@@ -6,10 +6,8 @@ import arc.Events;
 import arc.struct.Array;
 import arc.struct.ObjectSet;
 import arc.math.geom.Point2;
-import arc.math.geom.Vec2;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.entities.EntityGroup;
 import mindustry.game.*;
 import mindustry.game.EventType.BlockDestroyEvent;
 import mindustry.gen.*;
@@ -21,7 +19,7 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-public class TileEntity{
+public class Tilec__{
     public static final float timeToSleep = 60f * 1; //1 second to fall asleep
     private static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
     /** This value is only used for debugging. */
@@ -63,7 +61,7 @@ public class TileEntity{
     }
 
     /** Sets this tile entity data to this tile, and adds it if necessary. */
-    public TileEntity init(Tile tile, boolean shouldAdd){
+    public Tilec init(Tile tile, boolean shouldAdd){
         this.tile = tile;
         x = tile.drawx();
         y = tile.drawy();
@@ -148,11 +146,11 @@ public class TileEntity{
         return 0;
     }
 
-    public boolean collide(Bullet other){
+    public boolean collide(Bulletc other){
         return true;
     }
 
-    public void collision(Bullet other){
+    public void collision(Bulletc other){
         block.handleBulletHit(this, other);
     }
 

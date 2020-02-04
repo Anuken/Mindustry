@@ -6,8 +6,8 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
-import mindustry.entities.*;
 import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -16,7 +16,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
-import mindustry.world.blocks.power.*;
 
 import java.util.*;
 
@@ -109,10 +108,10 @@ public class Logic implements ApplicationListener{
         if(!world.isZone()){
             for(TeamData team : state.teams.getActive()){
                 if(team.hasCore()){
-                    TileEntity entity = team.core();
-                    entity.items.clear();
+                    Tilec entity = team.core();
+                    entity.getItems().clear();
                     for(ItemStack stack : state.rules.loadout){
-                        entity.items.add(stack.item, stack.amount);
+                        entity.getItems().add(stack.item, stack.amount);
                     }
                 }
             }
@@ -129,8 +128,6 @@ public class Logic implements ApplicationListener{
 
         entities.clear();
         Time.clear();
-        TileEntity.sleepingEntities = 0;
-
         Events.fire(new ResetEvent());
     }
 
@@ -176,7 +173,7 @@ public class Logic implements ApplicationListener{
             ui.hudfrag.showLaunch();
         }
 
-        for(TileEntity tile : state.teams.playerCores()){
+        for(Tilec tile : state.teams.playerCores()){
             Fx.launch.at(tile);
         }
 
@@ -185,12 +182,12 @@ public class Logic implements ApplicationListener{
         }
 
         Time.runTask(30f, () -> {
-            for(TileEntity entity : state.teams.playerCores()){
+            for(Tilec entity : state.teams.playerCores()){
                 for(Item item : content.items()){
-                    data.addItem(item, entity.items.get(item));
-                    Events.fire(new LaunchItemEvent(item, entity.items.get(item)));
+                    data.addItem(item, entity.getItems().get(item));
+                    Events.fire(new LaunchItemEvent(item, entity.getItems().get(item)));
                 }
-                entity.tile.remove();
+                entity.getTile().remove();
             }
             state.launched = true;
             state.gameOver = true;
@@ -257,7 +254,6 @@ public class Logic implements ApplicationListener{
                 if(!state.isEditor()){
                     //bulletGroup
                     collisions.collideGroups(bulletGroup, unitGroup);
-                    collisions.collideGroups(bulletGroup, playerGroup);
                 }
             }
 

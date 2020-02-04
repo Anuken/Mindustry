@@ -139,7 +139,7 @@ public class Sorter extends Block{
         });
     }
 
-    public class SorterEntity extends TileEntity{
+    public class SorterEntity extends Tilec{
         @Nullable Item sortItem;
 
         @Override

@@ -47,6 +47,10 @@ public class Effect{
         Effects.createEffect(this, x, y, rotation, color, null);
     }
 
+    public void at(float x, float y, Color color){
+        Effects.createEffect(this, x, y, 0, color, null);
+    }
+
     public void at(float x, float y, float rotation, Color color, Object data){
         Effects.createEffect(this, x, y, rotation, color, data);
     }

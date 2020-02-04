@@ -5,7 +5,6 @@ import arc.util.serialization.Json.Serializable;
 import arc.util.serialization.JsonValue;
 import mindustry.content.*;
 import mindustry.ctype.ContentType;
-import mindustry.entities.type.BaseUnit;
 import mindustry.type.*;
 
 import static mindustry.Vars.content;

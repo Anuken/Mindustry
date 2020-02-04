@@ -44,7 +44,7 @@ public class Fracker extends SolidPump{
 
     @Override
     public boolean shouldConsume(Tile tile){
-        return tile.entity.liquids.get(result) < liquidCapacity - 0.01f;
+        return tile.entity.getLiquids().get(result) < liquidCapacity - 0.01f;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class Fracker extends SolidPump{
         super.drawCracks(tile);
 
         Draw.color(result.color);
-        Draw.alpha(tile.entity.liquids.get(result) / liquidCapacity);
+        Draw.alpha(tile.entity.getLiquids().get(result) / liquidCapacity);
         Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
         Draw.color();
 
@@ -72,9 +72,9 @@ public class Fracker extends SolidPump{
     public void update(Tile tile){
         FrackerEntity entity = tile.ent();
 
-        if(entity.cons.valid()){
+        if(entity.consValid()){
             if(entity.accumulator >= itemUseTime){
-                entity.cons.trigger();
+                entity.consume();
                 entity.accumulator -= itemUseTime;
             }
 
@@ -87,7 +87,7 @@ public class Fracker extends SolidPump{
 
     @Override
     public float typeLiquid(Tile tile){
-        return tile.entity.liquids.get(result);
+        return tile.entity.getLiquids().get(result);
     }
 
     public static class FrackerEntity extends SolidPumpEntity{

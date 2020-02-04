@@ -73,9 +73,9 @@ public class ItemSource extends Block{
         ItemSourceEntity entity = tile.ent();
         if(entity.outputItem == null) return;
 
-        entity.items.set(entity.outputItem, 1);
+        entity.getItems().set(entity.outputItem, 1);
         tryDump(tile, entity.outputItem);
-        entity.items.set(entity.outputItem, 0);
+        entity.getItems().set(entity.outputItem, 0);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ItemSource extends Block{
         return false;
     }
 
-    public class ItemSourceEntity extends TileEntity{
+    public class ItemSourceEntity extends Tilec{
         Item outputItem;
 
         @Override

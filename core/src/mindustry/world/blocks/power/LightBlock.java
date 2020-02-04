@@ -6,6 +6,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
@@ -72,7 +73,7 @@ public class LightBlock extends Block{
         renderer.lights.add(tile.drawx(), tile.drawy(), radius, Tmp.c1.set(entity.color), brightness * tile.entity.efficiency());
     }
 
-    public class LightEntity extends TileEntity{
+    public class LightEntity extends Tilec{
         public int color = Pal.accent.rgba();
 
         @Override

@@ -6,7 +6,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 
 public class LaserBulletType extends BulletType{
@@ -40,12 +40,12 @@ public class LaserBulletType extends BulletType{
     }
 
     @Override
-    public void init(Bullet b){
+    public void init(Bulletc b){
         Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), length);
     }
 
     @Override
-    public void draw(Bullet b){
+    public void draw(Bulletc b){
         float f = Mathf.curve(b.fin(), 0f, 0.2f);
         float baseLen = length * f;
         float cwidth = width;

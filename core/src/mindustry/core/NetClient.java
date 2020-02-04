@@ -420,7 +420,7 @@ public class NetClient implements ApplicationListener{
                 Tile tile = world.tile(pos);
 
                 if(tile != null && tile.entity != null){
-                    tile.entity.items.read(input);
+                    tile.entity.getItems().read(input);
                 }else{
                     new ItemModule().read(input);
                 }

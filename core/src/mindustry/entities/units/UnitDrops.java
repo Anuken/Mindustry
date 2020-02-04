@@ -3,8 +3,7 @@ package mindustry.entities.units;
 import arc.math.Mathf;
 import mindustry.Vars;
 import mindustry.content.Items;
-import mindustry.entities.type.BaseUnit;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.gen.Call;
 import mindustry.type.Item;
 import static mindustry.Vars.*;
@@ -18,7 +17,7 @@ public class UnitDrops{
             return;
         }
 
-        TileEntity core = unit.getClosestEnemyCore();
+        Tilec core = unit.getClosestEnemyCore();
 
         if(core == null || core.dst(unit) > Vars.mineTransferRange){
             return;

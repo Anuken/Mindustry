@@ -53,7 +53,7 @@ public class ItemTurret extends CooledTurret{
             }
 
             @Override
-            public boolean valid(TileEntity entity){
+            public boolean valid(Tilec entity){
                 //valid when there's any ammo in the turret
                 return !((ItemTurretEntity)entity).ammo.isEmpty();
             }

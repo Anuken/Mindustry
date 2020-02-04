@@ -1,23 +1,14 @@
 package mindustry.type;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.audio.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
-import mindustry.entities.type.Bullet;
 import mindustry.gen.*;
-
-import static mindustry.Vars.net;
 
 public class Weapon{
     /** displayed weapon region */

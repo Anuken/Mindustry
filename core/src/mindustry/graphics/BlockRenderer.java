@@ -233,7 +233,7 @@ public class BlockRenderer implements Disposable{
                             addRequest(tile, block.layer2);
                         }
 
-                        if(tile.entity != null && tile.entity.power != null && tile.entity.power.links.size > 0){
+                        if(tile.entity != null && tile.entity.getPower() != null && tile.entity.getPower().links.size > 0){
                             for(Tile other : block.getPowerConnections(tile, outArray)){
                                 if(other.block().layer == Layer.power){
                                     addRequest(other, Layer.power);

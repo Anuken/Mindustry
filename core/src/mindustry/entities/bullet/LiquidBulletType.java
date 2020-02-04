@@ -5,9 +5,8 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.type.Bullet;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -45,7 +44,7 @@ public class LiquidBulletType extends BulletType{
     }
 
     @Override
-    public void update(Bullet b){
+    public void update(Bulletc b){
         super.update(b);
 
         if(liquid.canExtinguish()){
@@ -59,14 +58,14 @@ public class LiquidBulletType extends BulletType{
     }
 
     @Override
-    public void draw(Bullet b){
+    public void draw(Bulletc b){
         Draw.color(liquid.color, Color.white, b.fout() / 100f);
 
         Fill.circle(b.x, b.y, 0.5f + b.fout() * 2.5f);
     }
 
     @Override
-    public void hit(Bullet b, float hitx, float hity){
+    public void hit(Bulletc b, float hitx, float hity){
         hitEffect.at(liquid.color, hitx, hity);
         Puddle.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
 

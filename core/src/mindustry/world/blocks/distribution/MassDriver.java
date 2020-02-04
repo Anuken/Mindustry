@@ -9,7 +9,6 @@ import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
 import mindustry.entities.type.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -81,7 +80,7 @@ public class MassDriver extends Block{
         //switch states
         if(entity.state == DriverState.idle){
             //start accepting when idle and there's space
-            if(!entity.waitingShooters.isEmpty() && (itemCapacity - entity.items.total() >= minDistribute)){
+            if(!entity.waitingShooters.isEmpty() && (itemCapacity - entity.getItems().total() >= minDistribute)){
                 entity.state = DriverState.accepting;
             }else if(hasLink){ //switch to shooting if there's a valid link.
                 entity.state = DriverState.shooting;
@@ -94,13 +93,13 @@ public class MassDriver extends Block{
         }
 
         //skip when there's no power
-        if(!entity.cons.valid()){
+        if(!entity.consValid()){
             return;
         }
 
         if(entity.state == DriverState.accepting){
             //if there's nothing shooting at this, bail - OR, items full
-            if(entity.currentShooter() == null || (itemCapacity - entity.items.total() < minDistribute)){
+            if(entity.currentShooter() == null || (itemCapacity - entity.getItems().total() < minDistribute)){
                 entity.state = DriverState.idle;
                 return;
             }
@@ -109,7 +108,7 @@ public class MassDriver extends Block{
             entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(entity.currentShooter()), rotateSpeed * entity.efficiency());
         }else if(entity.state == DriverState.shooting){
             //if there's nothing to shoot at OR someone wants to shoot at this thing, bail
-            if(!hasLink || (!entity.waitingShooters.isEmpty() && (itemCapacity - entity.items.total() >= minDistribute))){
+            if(!hasLink || (!entity.waitingShooters.isEmpty() && (itemCapacity - entity.getItems().total() >= minDistribute))){
                 entity.state = DriverState.idle;
                 return;
             }
@@ -117,8 +116,8 @@ public class MassDriver extends Block{
             float targetRotation = tile.angleTo(link);
 
             if(
-                tile.entity.items.total() >= minDistribute && //must shoot minimum amount of items
-                link.block().itemCapacity - link.entity.items.total() >= minDistribute //must have minimum amount of space
+                tile.entity.getItems().total() >= minDistribute && //must shoot minimum amount of items
+                link.block().itemCapacity - link.entity.getItems().total() >= minDistribute //must have minimum amount of space
             ){
                 MassDriverEntity other = link.ent();
                 other.waitingShooters.add(tile);
@@ -226,7 +225,7 @@ public class MassDriver extends Block{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         //mass drivers that ouput only cannot accept items
-        return tile.entity.items.total() < itemCapacity && linkValid(tile);
+        return tile.entity.getItems().total() < itemCapacity && linkValid(tile);
     }
 
     protected void fire(Tile tile, Tile target){
@@ -241,10 +240,10 @@ public class MassDriver extends Block{
         data.to = other;
         int totalUsed = 0;
         for(int i = 0; i < content.items().size; i++){
-            int maxTransfer = Math.min(entity.items.get(content.item(i)), ((MassDriver)tile.block()).itemCapacity - totalUsed);
+            int maxTransfer = Math.min(entity.getItems().get(content.item(i)), ((MassDriver)tile.block()).itemCapacity - totalUsed);
             data.items[i] = maxTransfer;
             totalUsed += maxTransfer;
-            entity.items.remove(content.item(i), maxTransfer);
+            entity.getItems().remove(content.item(i), maxTransfer);
         }
 
         float angle = tile.angleTo(target);
@@ -263,12 +262,12 @@ public class MassDriver extends Block{
     }
 
     protected void handlePayload(MassDriverEntity entity, Bullet bullet, DriverBulletData data){
-        int totalItems = entity.items.total();
+        int totalItems = entity.getItems().total();
 
         //add all the items possible
         for(int i = 0; i < data.items.length; i++){
             int maxAdd = Math.min(data.items[i], itemCapacity * 2 - totalItems);
-            entity.items.add(content.item(i), maxAdd);
+            entity.getItems().add(content.item(i), maxAdd);
             data.items[i] -= maxAdd;
             totalItems += maxAdd;
 
@@ -312,7 +311,7 @@ public class MassDriver extends Block{
         }
     }
 
-    public class MassDriverEntity extends TileEntity{
+    public class MassDriverEntity extends Tilec{
         int link = -1;
         float rotation = 90;
         float reload = 0f;

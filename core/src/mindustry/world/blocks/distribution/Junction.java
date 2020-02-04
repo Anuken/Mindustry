@@ -1,7 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import arc.util.Time;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.gen.BufferItem;
 import mindustry.type.Item;
 import mindustry.world.Block;
@@ -86,7 +86,7 @@ public class Junction extends Block{
         return to != null && to.link().entity != null && to.getTeam() == tile.getTeam();
     }
 
-    class JunctionEntity extends TileEntity{
+    class JunctionEntity extends Tilec{
         DirectionalItemBuffer buffer = new DirectionalItemBuffer(capacity, speed);
 
         @Override

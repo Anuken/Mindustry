@@ -39,7 +39,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
 
         public void update(){
             BuildEntity entity = (BuildEntity)target;
-            TileEntity core = getClosestCore();
+            Tilec core = getClosestCore();
 
             if(isBuilding() && entity == null && canRebuild()){
                 target = world.tile(buildRequest().x, buildRequest().y);
@@ -97,7 +97,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                     }
                 }else{
                     incDrones(playerTarget);
-                    TargetTrait prev = target;
+                    Teamc prev = target;
                     target = playerTarget;
                     float dst = 90f + (id % 10)*3;
                     float tdst = dst(target);

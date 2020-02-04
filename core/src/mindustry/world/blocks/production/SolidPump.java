@@ -8,9 +8,8 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.Fx;
 import mindustry.content.Liquids;
-import mindustry.entities.Effects;
-import mindustry.entities.Effects.Effect;
-import mindustry.entities.type.TileEntity;
+import mindustry.entities.*;
+import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.type.Liquid;
 import mindustry.ui.Bar;
@@ -75,8 +74,8 @@ public class SolidPump extends Pump{
         SolidPumpEntity entity = tile.ent();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
-        Draw.color(tile.entity.liquids.current().color);
-        Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
+        Draw.color(tile.entity.getLiquids().current().color);
+        Draw.alpha(tile.entity.getLiquids().total() / liquidCapacity);
         Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
         Draw.color();
         Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), entity.pumpTime * rotateSpeed);
@@ -106,13 +105,13 @@ public class SolidPump extends Pump{
 
         fraction += entity.boost;
 
-        if(tile.entity.cons.valid() && typeLiquid(tile) < liquidCapacity - 0.001f){
+        if(tile.entity.getCons().valid() && typeLiquid(tile) < liquidCapacity - 0.001f){
             float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction * entity.efficiency());
-            tile.entity.liquids.add(result, maxPump);
+            tile.entity.getLiquids().add(result, maxPump);
             entity.lastPump = maxPump;
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
             if(Mathf.chance(entity.delta() * updateEffectChance))
-                updateEffect.at(entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
+                updateEffect.at(entity.getX() + Mathf.range(size * 2f), entity.getY() + Mathf.range(size * 2f));
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
             entity.lastPump = 0f;
@@ -153,10 +152,10 @@ public class SolidPump extends Pump{
     }
 
     public float typeLiquid(Tile tile){
-        return tile.entity.liquids.total();
+        return tile.entity.getLiquids().total();
     }
 
-    public static class SolidPumpEntity extends TileEntity{
+    public static class SolidPumpEntity extends Tilec{
         public float warmup;
         public float pumpTime;
         public float boost;

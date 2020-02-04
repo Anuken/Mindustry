@@ -181,10 +181,10 @@ public class Damage{
             if(entity.getTeam() == team || entity.dst(x, y) > radius){
                 return;
             }
-            float amount = calculateDamage(x, y, entity.x, entity.y, radius, damage);
+            float amount = calculateDamage(x, y, entity.getX(), entity.getY(), radius, damage);
             entity.damage(amount);
             //TODO better velocity displacement
-            float dst = tr.set(entity.x - x, entity.y - y).len();
+            float dst = tr.set(entity.getX() - x, entity.getY() - y).len();
             entity.velocity().add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
 
             if(complete && damage >= 9999999f && entity == player){

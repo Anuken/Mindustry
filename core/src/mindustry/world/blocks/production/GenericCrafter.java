@@ -6,8 +6,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -61,7 +60,7 @@ public class GenericCrafter extends Block{
 
     @Override
     public boolean shouldIdleSound(Tile tile){
-        return tile.entity.cons.valid();
+        return tile.entity.getCons().valid();
     }
 
     @Override
@@ -88,21 +87,21 @@ public class GenericCrafter extends Block{
     public void update(Tile tile){
         GenericCrafterEntity entity = tile.ent();
 
-        if(entity.cons.valid()){
+        if(entity.consValid()){
 
             entity.progress += getProgressIncrease(entity, craftTime);
             entity.totalProgress += entity.delta();
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
 
             if(Mathf.chance(Time.delta() * updateEffectChance)){
-                updateEffect.at(entity.x + Mathf.range(size * 4f), entity.y + Mathf.range(size * 4));
+                updateEffect.at(entity.getX() + Mathf.range(size * 4f), entity.getY() + Mathf.range(size * 4));
             }
         }else{
             entity.warmup = Mathf.lerp(entity.warmup, 0f, 0.02f);
         }
 
         if(entity.progress >= 1f){
-            entity.cons.trigger();
+            entity.consume();
 
             if(outputItem != null){
                 useContent(tile, outputItem.item);
@@ -120,7 +119,7 @@ public class GenericCrafter extends Block{
             entity.progress = 0f;
         }
 
-        if(outputItem != null && tile.entity.timer.get(timerDump, dumpTime)){
+        if(outputItem != null && tile.entity.timer(timerDump, dumpTime)){
             tryDump(tile, outputItem.item);
         }
 
@@ -136,10 +135,10 @@ public class GenericCrafter extends Block{
 
     @Override
     public boolean shouldConsume(Tile tile){
-        if(outputItem != null && tile.entity.items.get(outputItem.item) >= itemCapacity){
+        if(outputItem != null && tile.entity.getItems().get(outputItem.item) >= itemCapacity){
             return false;
         }
-        return outputLiquid == null || !(tile.entity.liquids.get(outputLiquid.liquid) >= liquidCapacity);
+        return outputLiquid == null || !(tile.entity.getLiquids().get(outputLiquid.liquid) >= liquidCapacity);
     }
 
     @Override
@@ -147,7 +146,7 @@ public class GenericCrafter extends Block{
         return itemCapacity;
     }
 
-    public static class GenericCrafterEntity extends TileEntity{
+    public static class GenericCrafterEntity extends Tilec{
         public float progress;
         public float totalProgress;
         public float warmup;

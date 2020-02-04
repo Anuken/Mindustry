@@ -143,12 +143,12 @@ public class ApplicationTests{
     void blockInventories(){
         multiblock();
         Tile tile = world.tile(4, 4);
-        tile.entity.items.add(Items.coal, 5);
-        tile.entity.items.add(Items.titanium, 50);
-        assertEquals(tile.entity.items.total(), 55);
-        tile.entity.items.remove(Items.phasefabric, 10);
-        tile.entity.items.remove(Items.titanium, 10);
-        assertEquals(tile.entity.items.total(), 45);
+        tile.entity.getItems().add(Items.coal, 5);
+        tile.entity.getItems().add(Items.titanium, 50);
+        assertEquals(tile.entity.getItems().total(), 55);
+        tile.entity.getItems().remove(Items.phasefabric, 10);
+        tile.entity.getItems().remove(Items.titanium, 10);
+        assertEquals(tile.entity.getItems().total(), 45);
     }
 
     @Test
@@ -224,7 +224,7 @@ public class ApplicationTests{
         world.tile(0, 0).setBlock(Blocks.itemSource);
         world.tile(0, 0).configureAny(Items.copper.id);
 
-        Array<TileEntity> entities = Array.with(world.tile(0, 0).entity);
+        Array<Tilec> entities = Array.with(world.tile(0, 0).entity);
 
         for(int i = 0; i < length; i++){
             world.tile(i + 1, 0).setBlock(Blocks.conveyor);
@@ -246,12 +246,12 @@ public class ApplicationTests{
 
         //warmup
         for(int i = 0; i < 100000; i++){
-            entities.each(TileEntity::update);
+            entities.each(Tilec::update);
         }
 
         Time.mark();
         for(int i = 0; i < 200000; i++){
-            entities.each(TileEntity::update);
+            entities.each(Tilec::update);
         }
         Log.info(Time.elapsed() + "ms to process " + items[0] + " items");
         assertTrue(items[0] > 0);
@@ -422,7 +422,7 @@ public class ApplicationTests{
         Tile core = world.tile(5, 5);
         core.set(Blocks.coreShard, Team.sharded);
         for(Item item : content.items()){
-            core.entity.items.set(item, 3000);
+            core.entity.getItems().set(item, 3000);
         }
 
         assertEquals(core.entity, state.teams.get(Team.sharded).core());
@@ -439,12 +439,12 @@ public class ApplicationTests{
         assertEquals(capacity - 1, deposited);
 
         tile.block().handleStack(item, capacity - 1, tile, unit);
-        assertEquals(tile.entity.items.get(item), capacity - 1);
+        assertEquals(tile.entity.getItems().get(item), capacity - 1);
 
         int overflow = tile.block().acceptStack(item, 10, tile, unit);
         assertEquals(1, overflow);
 
         tile.block().handleStack(item, 1, tile, unit);
-        assertEquals(capacity, tile.entity.items.get(item));
+        assertEquals(capacity, tile.entity.getItems().get(item));
     }
 }

@@ -3,7 +3,6 @@ package mindustry.world.blocks.defense.turrets;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import mindustry.entities.Predict;
-import mindustry.entities.type.Bullet;
 import mindustry.entities.bullet.BulletType;
 import mindustry.world.Tile;
 

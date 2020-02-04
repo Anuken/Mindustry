@@ -5,7 +5,7 @@ import arc.graphics.g2d.Draw;
 import arc.math.Angles;
 import arc.math.Mathf;
 import mindustry.content.Fx;
-import mindustry.entities.type.Bullet;
+import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
 
@@ -23,7 +23,7 @@ public class MassDriverBolt extends BulletType{
     }
 
     @Override
-    public void draw(mindustry.entities.type.Bullet b){
+    public void draw(Bulletc b){
         float w = 11f, h = 13f;
 
         Draw.color(Pal.bulletYellowBack);
@@ -36,7 +36,7 @@ public class MassDriverBolt extends BulletType{
     }
 
     @Override
-    public void update(mindustry.entities.type.Bullet b){
+    public void update(Bulletc b){
         //data MUST be an instance of DriverBulletData
         if(!(b.getData() instanceof DriverBulletData)){
             hit(b);
@@ -82,7 +82,7 @@ public class MassDriverBolt extends BulletType{
     }
 
     @Override
-    public void despawned(mindustry.entities.type.Bullet b){
+    public void despawned(Bulletc b){
         super.despawned(b);
 
         if(!(b.getData() instanceof DriverBulletData)) return;
@@ -99,7 +99,7 @@ public class MassDriverBolt extends BulletType{
     }
 
     @Override
-    public void hit(Bullet b, float hitx, float hity){
+    public void hit(Bulletc b, float hitx, float hity){
         super.hit(b, hitx, hity);
         despawned(b);
     }

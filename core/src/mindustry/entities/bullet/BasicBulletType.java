@@ -4,7 +4,7 @@ import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
-import mindustry.entities.type.Bullet;
+import mindustry.gen.*;
 import mindustry.graphics.Pal;
 
 /** An extended BulletType for most ammo-based bullets shot from turrets and units. */
@@ -34,7 +34,7 @@ public class BasicBulletType extends BulletType{
     }
 
     @Override
-    public void draw(Bullet b){
+    public void draw(Bulletc b){
         float height = bulletHeight * ((1f - bulletShrink) + bulletShrink * b.fout());
 
         Draw.color(backColor);

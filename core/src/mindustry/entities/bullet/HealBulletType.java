@@ -3,7 +3,7 @@ package mindustry.entities.bullet;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.content.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -28,12 +28,12 @@ public class HealBulletType extends BulletType{
     }
 
     @Override
-    public boolean collides(Bullet b, Tile tile){
+    public boolean collides(Bulletc b, Tile tile){
         return tile.getTeam() != b.getTeam() || tile.entity.healthf() < 1f;
     }
 
     @Override
-    public void draw(Bullet b){
+    public void draw(Bulletc b){
         Draw.color(backColor);
         Lines.stroke(bulletWidth);
         Lines.lineAngleCenter(b.x, b.y, b.rot(), bulletHeight);
@@ -43,7 +43,7 @@ public class HealBulletType extends BulletType{
     }
 
     @Override
-    public void hitTile(Bullet b, Tile tile){
+    public void hitTile(Bulletc b, Tile tile){
         super.hit(b);
         tile = tile.link();
 

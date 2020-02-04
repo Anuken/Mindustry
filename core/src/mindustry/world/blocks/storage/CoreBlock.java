@@ -10,6 +10,7 @@ import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -70,7 +71,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return tile.entity.items.get(item) < getMaximumAccepted(tile, item);
+        return tile.entity.getItems().get(item) < getMaximumAccepted(tile, item);
     }
 
     @Override
@@ -83,27 +84,27 @@ public class CoreBlock extends StorageBlock{
     public void onProximityUpdate(Tile tile){
         CoreEntity entity = tile.ent();
 
-        for(TileEntity other : state.teams.cores(tile.getTeam())){
+        for(Tilec other : state.teams.cores(tile.getTeam())){
             if(other.tile != tile){
-                entity.items = other.items;
+                entity.getItems() = other.items;
             }
         }
         state.teams.registerCore(entity);
 
         entity.storageCapacity = itemCapacity + entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         entity.proximity().each(this::isContainer, t -> {
-            t.entity.items = entity.items;
+            t.entity.getItems() = entity.getItems();
             t.<StorageBlockEntity>ent().linkedCore = tile;
         });
 
-        for(TileEntity other : state.teams.cores(tile.getTeam())){
+        for(Tilec other : state.teams.cores(tile.getTeam())){
             if(other.tile == tile) continue;
             entity.storageCapacity += other.block.itemCapacity + other.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         }
 
         if(!world.isGenerating()){
             for(Item item : content.items()){
-                entity.items.set(item, Math.min(entity.items.get(item), entity.storageCapacity));
+                entity.getItems().set(item, Math.min(entity.getItems().get(item), entity.storageCapacity));
             }
         }
 
@@ -122,10 +123,10 @@ public class CoreBlock extends StorageBlock{
                 Draw.rect("block-select", t.drawx() + offset * p.x, t.drawy() + offset * p.y, i * 90);
             }
         };
-        if(tile.entity.proximity().contains(e -> isContainer(e) && e.entity.items == tile.entity.items)){
+        if(tile.entity.proximity().contains(e -> isContainer(e) && e.entity.getItems() == tile.entity.getItems())){
             outline.get(tile);
         }
-        tile.entity.proximity().each(e -> isContainer(e) && e.entity.items == tile.entity.items, outline);
+        tile.entity.proximity().each(e -> isContainer(e) && e.entity.getItems() == tile.entity.getItems(), outline);
         Draw.reset();
     }
 
@@ -150,15 +151,15 @@ public class CoreBlock extends StorageBlock{
     @Override
     public void removed(Tile tile){
         CoreEntity entity = tile.ent();
-        int total = tile.entity.proximity().count(e -> e.entity != null && e.entity.items != null && e.entity.items == tile.entity.items);
+        int total = tile.entity.proximity().count(e -> e.entity != null && e.entity.getItems() != null && e.entity.getItems() == tile.entity.getItems());
         float fract = 1f / total / state.teams.cores(tile.getTeam()).size;
 
-        tile.entity.proximity().each(e -> isContainer(e) && e.entity.items == tile.entity.items, t -> {
+        tile.entity.proximity().each(e -> isContainer(e) && e.entity.getItems() == tile.entity.getItems(), t -> {
             StorageBlockEntity ent = (StorageBlockEntity)t.entity;
             ent.linkedCore = null;
             ent.items = new ItemModule();
             for(Item item : content.items()){
-                ent.items.set(item, (int)(fract * tile.entity.items.get(item)));
+                ent.items.set(item, (int)(fract * tile.entity.getItems().get(item)));
             }
         });
 
@@ -166,7 +167,7 @@ public class CoreBlock extends StorageBlock{
 
         int max = itemCapacity * state.teams.cores(tile.getTeam()).size;
         for(Item item : content.items()){
-            tile.entity.items.set(item, Math.min(tile.entity.items.get(item), max));
+            tile.entity.getItems().set(item, Math.min(tile.entity.getItems().get(item), max));
         }
 
         for(CoreEntity other : state.teams.cores(tile.getTeam())){
@@ -230,7 +231,7 @@ public class CoreBlock extends StorageBlock{
         return entity.spawnPlayer != null;
     }
 
-    public class CoreEntity extends TileEntity implements SpawnerTrait{
+    public class CoreEntity extends Tilec implements SpawnerTrait{
         protected Player spawnPlayer;
         protected float progress;
         protected float time;

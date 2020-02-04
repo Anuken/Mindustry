@@ -11,6 +11,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -197,7 +198,7 @@ public class BuildBlock extends Block{
         }
     }
 
-    public class BuildEntity extends TileEntity{
+    public class BuildEntity extends Tilec{
         /**
          * The recipe of the block that is being constructed.
          * If there is no recipe for this block, as is the case with rocks, 'previous' is used.
@@ -217,7 +218,7 @@ public class BuildBlock extends Block{
         private float[] accumulator;
         private float[] totalAccumulator;
 
-        public boolean construct(Unitc builder, @Nullable TileEntity core, float amount, boolean configured){
+        public boolean construct(Unitc builder, @Nullable Tilec core, float amount, boolean configured){
             if(cblock == null){
                 kill();
                 return false;
@@ -247,7 +248,7 @@ public class BuildBlock extends Block{
             return false;
         }
 
-        public void deconstruct(Unitc builder, @Nullable TileEntity core, float amount){
+        public void deconstruct(Unitc builder, @Nullable Tilec core, float amount){
             float deconstructMultiplier = 0.5f;
 
             if(cblock != null){

@@ -13,13 +13,13 @@ public class LiquidRouter extends LiquidBlock{
     @Override
     public void update(Tile tile){
 
-        if(tile.entity.liquids.total() > 0.01f){
-            tryDumpLiquid(tile, tile.entity.liquids.current());
+        if(tile.entity.getLiquids().total() > 0.01f){
+            tryDumpLiquid(tile, tile.entity.getLiquids().current());
         }
     }
 
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f);
+        return tile.entity.getLiquids().get(liquid) + amount < liquidCapacity && (tile.entity.getLiquids().current() == liquid || tile.entity.getLiquids().get(tile.entity.getLiquids().current()) < 0.2f);
     }
 }

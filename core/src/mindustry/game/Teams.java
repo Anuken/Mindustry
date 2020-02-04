@@ -54,10 +54,10 @@ public class Teams{
         return false;
     }
 
-    public void eachEnemyCore(Team team, Cons<TileEntity> ret){
+    public void eachEnemyCore(Team team, Cons<Tilec> ret){
         for(TeamData data : active){
             if(areEnemies(team, data.team)){
-                for(TileEntity tile : data.cores){
+                for(Tilec tile : data.cores){
                     ret.get(tile);
                 }
             }

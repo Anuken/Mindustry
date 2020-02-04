@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.math.geom.QuadTree.*;
 import arc.scene.ui.layout.*;
 import arc.struct.Bits;
 import arc.struct.Queue;
@@ -19,7 +20,6 @@ import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.type.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -31,18 +31,19 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.consumers.*;
+import mindustry.world.modules.*;
 
 import java.io.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
-import static mindustry.entities.traits.BuilderTrait.BuildDataStatic.tmptr;
 
 @SuppressWarnings("unused")
 public class EntityComps{
 
     @Component
-    abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc{
+    abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc{
         UnitDef type;
         UnitController controller;
 
@@ -138,8 +139,8 @@ public class EntityComps{
     }
 
     @Component
-    abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc{
-        private boolean supressCollision, supressOnce, deflected;
+    abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc{
+        private float lifeScl;
 
         Object data;
         BulletType type;
@@ -148,196 +149,91 @@ public class EntityComps{
             return type.damage;
         }
 
-        public void init(){
-            //TODO
-            type.init((Bulletc)this);
+        public void add(){
+            type.init(this);
+
+            setDrag(type.drag);
+            setHitSize(type.hitSize);
+            setLifetime(lifeScl * type.lifetime);
         }
 
         public void remove(){
-            //TODO
-            type.despawned((Bulletc)this);
+            type.despawned(this);
         }
 
         public float getLifetime(){
             return type.lifetime;
         }
 
-        void deflect(){
-            supressCollision = true;
-            supressOnce = true;
-            deflected = true;
-        }
-
-        public boolean isDeflected(){
-            return deflected;
-        }
-
         public float damageMultiplier(){
-            if(owner instanceof Unitc){
-                return ((Unitc)owner).getDamageMultipler();
+            if(getOwner() instanceof Unitc){
+                return ((Unitc)getOwner()).getDamageMultiplier();
             }
             return 1f;
         }
 
-        @Override
-        public void killed(Entity other){
-            if(owner instanceof KillerTrait){
-                ((KillerTrait)owner).killed(other);
-            }
-        }
-
-        @Override
         public void absorb(){
-            supressCollision = true;
+            //TODO
             remove();
         }
 
-        @Override
-        public float drawSize(){
+        public float clipSize(){
             return type.drawSize;
         }
 
-        @Override
         public float damage(){
-            if(owner instanceof Lightning && data instanceof Float){
-                return (Float)data;
-            }
             return type.damage * damageMultiplier();
         }
 
-        @Override
-        public Team getTeam(){
-            return team;
-        }
-
-        @Override
-        public float getShieldDamage(){
-            return Math.max(damage(), type.splashDamage);
-        }
-
-        @Override
-        public boolean collides(SolidTrait other){
-            return type.collides && (other != owner && !(other instanceof DamageTrait)) && !supressCollision && !(other instanceof Unitc && ((Unitc)other).isFlying() && !type.collidesAir);
-        }
-
-        @Override
-        public void collision(SolidTrait other, float x, float y){
+        public void collision(Hitboxc other, float x, float y){
             if(!type.pierce) remove();
             type.hit(this, x, y);
 
             if(other instanceof Unitc){
                 Unitc unit = (Unitc)other;
-                unit.velocity().add(Tmp.v3.set(other.getX(), other.getY()).sub(x, y).setLength(type.knockback / unit.mass()));
-                unit.applyEffect(type.status, type.statusDuration);
+                unit.getVel().add(Tmp.v3.set(other.getX(), other.getY()).sub(x, y).setLength(type.knockback / unit.getMass()));
+                unit.apply(type.status, type.statusDuration);
             }
         }
 
-        @Override
         public void update(){
             type.update(this);
 
-            x += velocity.x * Time.delta();
-            y += velocity.y * Time.delta();
-
-            velocity.scl(Mathf.clamp(1f - type.drag * Time.delta()));
-
-            time += Time.delta() * 1f / (lifeScl);
-            time = Mathf.clamp(time, 0, type.lifetime);
-
-            if(time >= type.lifetime){
-                if(!supressCollision) type.despawned(this);
-                remove();
-            }
-
-            if(type.hitTiles && collidesTiles() && !supressCollision && initialized){
-                world.raycastEach(world.toTile(lastPosition().x), world.toTile(lastPosition().y), world.toTile(x), world.toTile(y), (x, y) -> {
+            if(type.hitTiles){
+                world.raycastEach(world.toTile(getLastX()), world.toTile(getLastY()), tileX(), tileY(), (x, y) -> {
 
                     Tile tile = world.ltile(x, y);
                     if(tile == null) return false;
 
-                    if(tile.entity != null && tile.entity.collide(this) && type.collides(this, tile) && !tile.entity.isDead() && (type.collidesTeam || tile.getTeam() != team)){
-                        if(tile.getTeam() != team){
+                    if(tile.entity != null && tile.entity.collide(this) && type.collides(this, tile) && !tile.entity.isDead() && (type.collidesTeam || tile.getTeam() != getTeam())){
+                        if(tile.getTeam() != getTeam()){
                             tile.entity.collision(this);
                         }
 
-                        if(!supressCollision){
-                            type.hitTile(this, tile);
-                            remove();
-                        }
-
+                        type.hitTile(this, tile);
+                        remove();
                         return true;
                     }
 
                     return false;
                 });
             }
-
-            if(supressOnce){
-                supressCollision = false;
-                supressOnce = false;
-            }
-
-            initialized = true;
         }
 
-        @Override
-        public void reset(){
-            type = null;
-            owner = null;
-            velocity.setZero();
-            time = 0f;
-            timer.clear();
-            lifeScl = 1f;
-            team = null;
-            data = null;
-            supressCollision = false;
-            supressOnce = false;
-            deflected = false;
-            initialized = false;
-        }
-
-        @Override
-        public void hitbox(Rect rect){
-            rect.setSize(type.hitSize).setCenter(x, y);
-        }
-
-        @Override
-        public void hitboxTile(Rect rect){
-            rect.setSize(type.hitSize).setCenter(x, y);
-        }
-
-        @Override
         public void draw(){
             type.draw(this);
-            renderer.lights.add(x, y, 16f, Pal.powerLight, 0.3f);
-        }
-
-        @Override
-        public float fin(){
-            return time / type.lifetime;
-        }
-
-        @Override
-        public Vec2 velocity(){
-            return velocity;
-        }
-
-        public void velocity(float speed, float angle){
-            velocity.set(0, speed).setAngle(angle);
-        }
-
-        public void limit(float f){
-            velocity.limit(f);
+            //TODO refactor
+            renderer.lights.add(getX(), getY(), 16f, Pal.powerLight, 0.3f);
         }
 
         /** Sets the bullet's rotation in degrees. */
-        public void rot(float angle){
-            velocity.setAngle(angle);
+        public void setRotation(float angle){
+            getVel().setAngle(angle);
         }
 
         /** @return the bullet's rotation. */
-        public float rot(){
-            float angle = Mathf.atan2(velocity.x, velocity.y) * Mathf.radiansToDegrees;
+        public float getRotation(){
+            float angle = Mathf.atan2(getVel().x, getVel().y) * Mathf.radiansToDegrees;
             if(angle < 0) angle += 360;
             return angle;
         }
@@ -491,17 +387,218 @@ public class EntityComps{
     }
     
     @Component
-    abstract class TileComp implements Posc, Teamc{
+    static abstract class TileComp implements Posc, Teamc, Healthc, Tilec{
+        static final float timeToSleep = 60f * 1;
+        static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
+        static int sleepingEntities = 0;
+
         Tile tile;
+        Block block;
+        Array<Tile> proximity = new Array<>(8);
+
+        PowerModule power;
+        ItemModule items;
+        LiquidModule liquids;
+        ConsumeModule cons;
+
+        private Interval timer;
+        private float timeScale = 1f, timeScaleDuration;
+
+        private @Nullable SoundLoop sound;
+
+        private boolean sleeping;
+        private float sleepTime;
+
+        /** Sets this tile entity data to this tile, and adds it if necessary. */
+        public Tilec init(Tile tile, boolean shouldAdd){
+            this.tile = tile;
+            this.block = tile.block();
+
+            set(tile.drawx(), tile.drawy());
+            if(block.activeSound != Sounds.none){
+                sound = new SoundLoop(block.activeSound, block.activeSoundVolume);
+            }
+
+            setHealth(block.health);
+            setMaxHealth(block.health);
+            timer = new Interval(block.timers);
+
+            if(shouldAdd){
+                add();
+            }
+
+            return this;
+        }
+
+        public float getTimeScale(){
+            return timeScale;
+        }
+
+        public boolean consValid(){
+            return cons.valid();
+        }
+
+        public void consume(){
+            cons.trigger();
+        }
+
+        public boolean timer(int id, float time){
+            return timer.get(id, time);
+        }
+
+        /** Scaled delta. */
+        public float delta(){
+            return Time.delta() * timeScale;
+        }
+
+        /** Base efficiency. If this entity has non-buffered power, returns the power %, otherwise returns 1. */
+        public float efficiency(){
+            return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
+        }
+
+        /** Call when nothing is happening to the entity. This increments the internal sleep timer. */
+        public void sleep(){
+            sleepTime += Time.delta();
+            if(!sleeping && sleepTime >= timeToSleep){
+                remove();
+                sleeping = true;
+                sleepingEntities++;
+            }
+        }
+
+        /** Call when this entity is updating. This wakes it up. */
+        public void noSleep(){
+            sleepTime = 0f;
+            if(sleeping){
+                add();
+                sleeping = false;
+                sleepingEntities--;
+            }
+        }
+
+        /** Returns the version of this TileEntity IO code.*/
+        public byte version(){
+            return 0;
+        }
+
+        public boolean collide(Bulletc other){
+            return true;
+        }
+
+        public void collision(Bulletc other){
+            block.handleBulletHit(this, other);
+        }
+
+        //TODO Implement damage!
+
+        public void removeFromProximity(){
+            block.onProximityRemoved(tile);
+
+            Point2[] nearby = Edges.getEdges(block.size);
+            for(Point2 point : nearby){
+                Tile other = world.ltile(tile.x + point.x, tile.y + point.y);
+                //remove this tile from all nearby tile's proximities
+                if(other != null){
+                    other.block().onProximityUpdate(other);
+
+                    if(other.entity != null){
+                        other.entity.getProximity().remove(tile, true);
+                    }
+                }
+            }
+        }
+
+        public void updateProximity(){
+            tmpTiles.clear();
+            proximity.clear();
+
+            Point2[] nearby = Edges.getEdges(block.size);
+            for(Point2 point : nearby){
+                Tile other = world.ltile(tile.x + point.x, tile.y + point.y);
+
+                if(other == null) continue;
+                if(other.entity == null || !(other.interactable(tile.getTeam()))) continue;
+
+                //add this tile to proximity of nearby tiles
+                if(!other.entity.getProximity().contains(tile, true)){
+                    other.entity.getProximity().add(tile);
+                }
+
+                tmpTiles.add(other);
+            }
+
+            //using a set to prevent duplicates
+            for(Tile tile : tmpTiles){
+                proximity.add(tile);
+            }
+
+            block.onProximityAdded(tile);
+            block.onProximityUpdate(tile);
+
+            for(Tile other : tmpTiles){
+                other.block().onProximityUpdate(other);
+            }
+        }
+
+        public Array<Tile> proximity(){
+            return proximity;
+        }
+
+        /** Tile configuration. Defaults to 0. Used for block rebuilding. */
+        public int config(){
+            return 0;
+        }
+
+        public void remove(){
+            if(sound != null){
+                sound.stop();
+            }
+        }
+
+        public void killed(){
+            Events.fire(new BlockDestroyEvent(tile));
+            block.breakSound.at(tile);
+            block.onDestroyed(tile);
+            tile.remove();
+        }
+
+        public void update(){
+            timeScaleDuration -= Time.delta();
+            if(timeScaleDuration <= 0f || !block.canOverdrive){
+                timeScale = 1f;
+            }
+
+            if(sound != null){
+                sound.update(getX(), getY(), block.shouldActiveSound(tile));
+            }
+
+            if(block.idleSound != Sounds.none && block.shouldIdleSound(tile)){
+                loops.play(block.idleSound, this, block.idleSoundVolume);
+            }
+
+            block.update(tile);
+
+            if(liquids != null){
+                liquids.update();
+            }
+
+            if(cons != null){
+                cons.update();
+            }
+
+            if(power != null){
+                power.graph.update();
+            }
+        }
     }
 
     @Component
-    abstract class TeamComp implements Posc{
+    abstract class TeamComp implements Posc, Healthc{
         transient float x, y;
 
         Team team = Team.sharded;
 
-        public @Nullable TileEntity getClosestCore(){
+        public @Nullable Tilec getClosestCore(){
             return state.teams.closestCore(x, y, team);
         }
     }
@@ -838,14 +935,14 @@ public class EntityComps{
         }
 
         void updateMining(){
-            TileEntity core = getClosestCore();
+            Tilec core = getClosestCore();
 
             if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && dst(core) < mineTransferRange){
-                int accepted = core.tile.block().acceptStack(item(), getStack().amount, core.tile, this);
+                int accepted = core.getTile().block().acceptStack(item(), getStack().amount, core.getTile(), this);
                 if(accepted > 0){
                     Call.transferItemTo(item(), accepted,
                     mineTile.worldx() + Mathf.range(tilesize / 2f),
-                    mineTile.worldy() + Mathf.range(tilesize / 2f), core.tile);
+                    mineTile.worldy() + Mathf.range(tilesize / 2f), core.getTile());
                     clearItem();
                 }
             }
@@ -859,10 +956,10 @@ public class EntityComps{
 
                 if(Mathf.chance(Time.delta() * (0.06 - item.hardness * 0.01) * getMiningSpeed())){
 
-                    if(dst(core) < mineTransferRange && core.tile.block().acceptStack(item, 1, core.tile, this) == 1 && offloadImmediately()){
+                    if(dst(core) < mineTransferRange && core.getTile().block().acceptStack(item, 1, core.getTile(), this) == 1 && offloadImmediately()){
                         Call.transferItemTo(item, 1,
                         mineTile.worldx() + Mathf.range(tilesize / 2f),
-                        mineTile.worldy() + Mathf.range(tilesize / 2f), core.tile);
+                        mineTile.worldy() + Mathf.range(tilesize / 2f), core.getTile());
                     }else if(acceptsItem(item)){
                         //this is clientside, since items are synced anyway
                         ItemTransfer.transferItemToUnit(item,
@@ -927,7 +1024,7 @@ public class EntityComps{
                 }
             }
 
-            TileEntity core = getClosestCore();
+            Tilec core = getClosestCore();
 
             //nothing to build.
             if(buildRequest() == null) return;
@@ -996,10 +1093,10 @@ public class EntityComps{
         }
 
         /** @return whether this request should be skipped, in favor of the next one. */
-        boolean shouldSkip(BuildRequest request, @Nullable TileEntity core){
+        boolean shouldSkip(BuildRequest request, @Nullable Tilec core){
             //requests that you have at least *started* are considered
             if(state.rules.infiniteResources || request.breaking || !request.initialized || core == null) return false;
-            return request.stuck && !core.items.has(request.block.requirements);
+            return request.stuck && !core.getItems().has(request.block.requirements);
         }
 
         void removeBuild(int x, int y, boolean breaking){
@@ -1163,7 +1260,7 @@ public class EntityComps{
     }
 
     @Component
-    abstract class HitboxComp implements Posc{
+    abstract class HitboxComp implements Posc, QuadTreeObject{
         transient float x, y;
 
         float hitSize;
@@ -1178,7 +1275,7 @@ public class EntityComps{
             lastY = y;
         }
 
-        void collision(Hitboxc other){
+        void collision(Hitboxc other, float x, float y){
 
         }
 
@@ -1194,6 +1291,15 @@ public class EntityComps{
             return Intersector.overlapsRect(x - hitSize/2f, y - hitSize/2f, hitSize, hitSize,
             other.getX() - other.getHitSize()/2f, other.getY() - other.getHitSize()/2f, other.getHitSize(), other.getHitSize());
         }
+
+        public void hitbox(Rect rect){
+            rect.setCentered(x, y, hitSize, hitSize);
+        }
+
+        public void hitboxTile(Rect rect){
+            float scale = 0.6f;
+            rect.setCentered(x, y, hitSize * scale, hitSize * scale);
+        }
     }
 
     @Component
@@ -1201,9 +1307,9 @@ public class EntityComps{
         private Array<StatusEntry> statuses = new Array<>();
         private Bits applied = new Bits(content.getBy(ContentType.status).size);
 
-        private float speedMultiplier;
-        private float damageMultiplier;
-        private float armorMultiplier;
+        float speedMultiplier;
+        float damageMultiplier;
+        float armorMultiplier;
 
         /** @return damage taken based on status armor multipliers */
         float getDamage(float amount){
@@ -1329,10 +1435,11 @@ public class EntityComps{
     @Component
     @BaseComponent
     class EntityComp{
+        private boolean added;
         int id;
 
         boolean isAdded(){
-            return true;
+            return added;
         }
 
         void init(){}
@@ -1340,11 +1447,11 @@ public class EntityComps{
         void update(){}
 
         void remove(){
-
+            added = false;
         }
 
         void add(){
-
+            added = true;
         }
 
         boolean isLocal(){

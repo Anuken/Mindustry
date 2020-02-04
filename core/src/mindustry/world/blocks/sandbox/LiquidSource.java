@@ -9,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -53,9 +54,9 @@ public class LiquidSource extends Block{
         LiquidSourceEntity entity = tile.ent();
 
         if(entity.source == null){
-            tile.entity.liquids.clear();
+            tile.entity.getLiquids().clear();
         }else{
-            tile.entity.liquids.add(entity.source, liquidCapacity);
+            tile.entity.getLiquids().add(entity.source, liquidCapacity);
             tryDumpLiquid(tile, entity.source);
         }
     }
@@ -112,7 +113,7 @@ public class LiquidSource extends Block{
         tile.<LiquidSourceEntity>ent().source = value == -1 ? null : content.liquid(value);
     }
 
-    class LiquidSourceEntity extends TileEntity{
+    class LiquidSourceEntity extends Tilec{
         public @Nullable Liquid source = null;
 
         @Override

@@ -4,7 +4,7 @@ import arc.math.geom.Rect;
 import arc.util.Time;
 import mindustry.content.Fx;
 import mindustry.entities.Units;
-import mindustry.entities.type.Bullet;
+import mindustry.gen.*;
 
 public class FlakBulletType extends BasicBulletType{
     protected static Rect rect = new Rect();
@@ -24,7 +24,7 @@ public class FlakBulletType extends BasicBulletType{
     }
 
     @Override
-    public void update(Bullet b){
+    public void update(Bulletc b){
         super.update(b);
         if(b.getData() instanceof Integer) return;
 
