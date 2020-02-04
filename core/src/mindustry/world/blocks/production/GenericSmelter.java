@@ -13,6 +13,7 @@ import static mindustry.Vars.renderer;
 public class GenericSmelter extends GenericCrafter{
     public Color flameColor = Color.valueOf("ffc999");
     public TextureRegion topRegion;
+    public bool doFlame = true;
 
     public GenericSmelter(String name){
         super(name);
@@ -31,7 +32,7 @@ public class GenericSmelter extends GenericCrafter{
         GenericCrafterEntity entity = tile.ent();
 
         //draw glowing center
-        if(entity.warmup > 0f && flameColor.a > 0.001f){
+        if(entity.warmup > 0f && flameColor.a > 0.001f && doFlame == true){
             float g = 0.3f;
             float r = 0.06f;
             float cr = Mathf.random(0.1f);
