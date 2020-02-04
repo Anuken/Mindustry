@@ -80,8 +80,8 @@ public class Mech extends UnlockableContent{
         if(drawItems){
             player.drawBackItems();
         }
-        if(lightEmission > 0f){
-            player.drawLight(lightEmission);
+        if(lightEmitted > 0f){
+            player.drawLight(lightEmitted);
         }
     }
 
