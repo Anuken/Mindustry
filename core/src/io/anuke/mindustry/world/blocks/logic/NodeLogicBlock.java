@@ -157,6 +157,11 @@ public class NodeLogicBlock extends AcceptorLogicBlock{
 
     public class NodeLogicEntity extends LogicEntity{
         public int link = Pos.invalid;
+        
+        @Override
+        public int config(){
+            return link;
+        }
 
         @Override
         public void write(DataOutput stream) throws IOException{
