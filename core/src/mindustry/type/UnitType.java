@@ -92,7 +92,7 @@ public class UnitType extends UnlockableContent{
 
     public void drawStats(Unit unit){
         if(drawCell){
-            const health = unit.healthf();
+            float health = unit.healthf();
             Draw.color(Color.black, unit.getTeam().color, health + Mathf.absin(Time.time(), Math.max(health * 5f, 1f), 1f - health));
             Draw.rect(unit.getPowerCellRegion(), unit.x, unit.y, unit.rotation - 90);
             Draw.color();
