@@ -2,6 +2,7 @@ package mindustry.entities.type;
 
 import arc.*;
 import mindustry.annotations.Annotations.*;
+import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
