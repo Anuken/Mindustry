@@ -383,7 +383,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public void drawStats();
 
-    public void drawLight(lightEmitted){
+    public void drawLight(float lightEmitted){
         renderer.lights.add(x, y, lightEmitted, Pal.powerLight, 0.6f);
     }
 
