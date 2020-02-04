@@ -69,25 +69,23 @@ public class MapEditor{
     }
 
     //adds missing blockparts
+    //TODO remove, may not be necessary with blockpart refactor later
     public void checkLinkedTiles(){
-        Tile[][] tiles = world.getTiles();
+        Tiles tiles = world.tiles;
 
-        //clear block parts first
-        for(int x = 0; x < width(); x++){
-            for(int y = 0; y < height(); y++){
-                if(tiles[x][y].block() instanceof BlockPart){
-                    tiles[x][y].setBlock(Blocks.air);
-                }
+        //clear old parts
+        for(Tile tile : tiles){
+            if(tile.block() instanceof BlockPart){
+                tile.setBlock(Blocks.air);
             }
         }
 
-        //set up missing blockparts
-        for(int x = 0; x < width(); x++){
-            for(int y = 0; y < height(); y++){
-                if(tiles[x][y].block().isMultiblock()){
-                    tiles[x][y].set(tiles[x][y].block(), tiles[x][y].getTeam());
-                }
+        //re-add them
+        for(Tile tile : tiles){
+            if(tile.block().isMultiblock()){
+                tile.set(tile.block(), tile.getTeam());
             }
+
         }
     }
 
@@ -99,11 +97,11 @@ public class MapEditor{
 
     /** Creates a 2-D array of EditorTiles with stone as the floor block. */
     private void createTiles(int width, int height){
-        Tile[][] tiles = world.createTiles(width, height);
+        Tiles tiles = world.resize(width, height);
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                tiles[x][y] = new EditorTile(x, y, Blocks.stone.id, (short)0, (short)0);
+                tiles.set(x, y, new EditorTile(x, y, Blocks.stone.id, (short)0, (short)0));
             }
         }
     }
@@ -119,8 +117,8 @@ public class MapEditor{
         tags = new StringMap();
     }
 
-    public Tile[][] tiles(){
-        return world.getTiles();
+    public Tiles tiles(){
+        return world.tiles;
     }
 
     public Tile tile(int x, int y){
@@ -245,20 +243,20 @@ public class MapEditor{
     public void resize(int width, int height){
         clearOp();
 
-        Tile[][] previous = world.getTiles();
+        Tiles previous = world.tiles;
         int offsetX = -(width - width()) / 2, offsetY = -(height - height()) / 2;
         loading = true;
 
-        Tile[][] tiles = world.createTiles(width, height);
+        Tiles tiles = world.resize(width, height);
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
                 int px = offsetX + x, py = offsetY + y;
-                if(Structs.inBounds(px, py, previous.length, previous[0].length)){
-                    tiles[x][y] = previous[px][py];
-                    tiles[x][y].x = (short)x;
-                    tiles[x][y].y = (short)y;
+                if(previous.in(px, py)){
+                    tiles.set(x, y, previous.getn(px, py));
+                    tiles.getn(x, y).x = (short)x;
+                    tiles.getn(x, y).y = (short)y;
                 }else{
-                    tiles[x][y] = new EditorTile(x, y, Blocks.stone.id, (short)0, (short)0);
+                    tiles.set(x, y, new EditorTile(x, y, Blocks.stone.id, (short)0, (short)0));
                 }
             }
         }
@@ -314,12 +312,14 @@ public class MapEditor{
 
         @Override
         public void resize(int width, int height){
-            world.createTiles(width, height);
+            world.resize(width, height);
         }
 
         @Override
         public Tile create(int x, int y, int floorID, int overlayID, int wallID){
-            return (tiles()[x][y] = new EditorTile(x, y, floorID, overlayID, wallID));
+            Tile tile = new EditorTile(x, y, floorID, overlayID, wallID);
+            tiles().set(x, y, tile);
+            return tile;
         }
 
         @Override

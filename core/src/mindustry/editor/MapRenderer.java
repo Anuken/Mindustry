@@ -109,7 +109,7 @@ public class MapRenderer implements Disposable{
     private void render(int wx, int wy){
         int x = wx / chunkSize, y = wy / chunkSize;
         IndexedRenderer mesh = chunks[x][y];
-        Tile tile = editor.tiles()[wx][wy];
+        Tile tile = editor.tiles().getn(wx, wy);
 
         Team team = tile.getTeam();
         Block floor = tile.floor();

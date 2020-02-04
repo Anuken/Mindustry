@@ -30,7 +30,7 @@ public class MapGenerateDialog extends FloatingDialog{
     private final Prov<GenerateFilter>[] filterTypes = new Prov[]{
         NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
         RiverNoiseFilter::new, OreFilter::new, OreMedianFilter::new, MedianFilter::new,
-        BlendFilter::new, MirrorFilter::new, ClearFilter::new
+        BlendFilter::new, MirrorFilter::new, ClearFilter::new, CoreSpawnFilter::new, EnemySpawnFilter::new
     };
     private final MapEditor editor;
     private final boolean applied;
@@ -263,7 +263,7 @@ public class MapGenerateDialog extends FloatingDialog{
                 //all the options
                 c.table(f -> {
                     f.left().top();
-                    for(FilterOption option : filter.options){
+                    for(FilterOption option : filter.options()){
                         option.changed = this::update;
 
                         f.table(t -> {
@@ -292,7 +292,7 @@ public class MapGenerateDialog extends FloatingDialog{
         for(Prov<GenerateFilter> gen : filterTypes){
             GenerateFilter filter = gen.get();
 
-            if(!applied && filter.buffered) continue;
+            if((!applied && filter.isBuffered()) || (filter.isPost() && applied)) continue;
 
             selection.cont.addButton(filter.name(), () -> {
                 filters.add(filter);
@@ -360,21 +360,17 @@ public class MapGenerateDialog extends FloatingDialog{
 
                 for(GenerateFilter filter : copy){
                     input.begin(filter, editor.width(), editor.height(), (x, y) -> buffer1[Mathf.clamp(x / scaling, 0, pixmap.getWidth()-1)][Mathf.clamp(y / scaling, 0, pixmap.getHeight()-1)].tile());
+
                     //read from buffer1 and write to buffer2
-                    for(int px = 0; px < pixmap.getWidth(); px++){
-                        for(int py = 0; py < pixmap.getHeight(); py++){
-                            int x = px * scaling, y = py * scaling;
-                            GenTile tile = buffer1[px][py];
-                            input.apply(x, y, content.block(tile.floor), content.block(tile.block), content.block(tile.ore));
-                            filter.apply(input);
-                            buffer2[px][py].set(input.floor, input.block, input.ore, Team.get(tile.team), tile.rotation);
-                        }
-                    }
-                    for(int px = 0; px < pixmap.getWidth(); px++){
-                        for(int py = 0; py < pixmap.getHeight(); py++){
-                            buffer1[px][py].set(buffer2[px][py]);
-                        }
-                    }
+                    pixmap.each((px, py) -> {
+                        int x = px * scaling, y = py * scaling;
+                        GenTile tile = buffer1[px][py];
+                        input.apply(x, y, content.block(tile.floor), content.block(tile.block), content.block(tile.ore));
+                        filter.apply(input);
+                        buffer2[px][py].set(input.floor, input.block, input.ore, Team.get(tile.team), tile.rotation);
+                    });
+
+                    pixmap.each((px, py) -> buffer1[px][py].set(buffer2[px][py]));
                 }
 
                 for(int px = 0; px < pixmap.getWidth(); px++){

@@ -100,7 +100,7 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-            play = new MobileButton(Icon.play, "$campaign", () -> checkPlay(ui.deploy::show)),
+            play = new MobileButton(Icon.play, "$campaign", () -> checkPlay(ui.planet::show)),
             custom = new MobileButton(Icon.rightOpenOut, "$customgame", () -> checkPlay(ui.custom::show)),
             maps = new MobileButton(Icon.download, "$loadgame", () -> checkPlay(ui.load::show)),
             join = new MobileButton(Icon.add, "$joingame", () -> checkPlay(ui.join::show)),
@@ -165,7 +165,7 @@ public class MenuFragment extends Fragment{
 
             buttons(t,
                 new Buttoni("$play", Icon.play,
-                    new Buttoni("$campaign", Icon.play, () -> checkPlay(ui.deploy::show)),
+                    new Buttoni("$campaign", Icon.play, () -> checkPlay(ui.planet::show)),
                     new Buttoni("$joingame", Icon.add, () -> checkPlay(ui.join::show)),
                     new Buttoni("$customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
                     new Buttoni("$loadgame", Icon.download, () -> checkPlay(ui.load::show)),

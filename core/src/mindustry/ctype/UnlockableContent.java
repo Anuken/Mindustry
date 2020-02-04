@@ -54,7 +54,7 @@ public abstract class UnlockableContent extends MappableContent{
     public void onUnlock(){
     }
 
-    /** Whether this content is always hidden in the content info dialog. */
+    /** Whether this content is always hidden in the content database dialog. */
     public boolean isHidden(){
         return false;
     }

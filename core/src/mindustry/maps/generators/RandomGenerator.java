@@ -1,10 +1,9 @@
 package mindustry.maps.generators;
 
-import arc.struct.StringMap;
-import mindustry.content.Blocks;
-import mindustry.maps.Map;
-import mindustry.world.Block;
-import mindustry.world.Tile;
+import arc.struct.*;
+import mindustry.content.*;
+import mindustry.maps.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.world;
 
@@ -18,14 +17,14 @@ public abstract class RandomGenerator extends Generator{
     }
 
     @Override
-    public void generate(Tile[][] tiles){
+    public void generate(Tiles tiles){
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
                 floor = Blocks.air;
                 block = Blocks.air;
                 ore = Blocks.air;
                 generate(x, y);
-                tiles[x][y] = new Tile(x, y, floor.id, ore.id, block.id);
+                tiles.set(x, y, new Tile(x, y, floor, ore, block));
             }
         }
 
@@ -34,7 +33,7 @@ public abstract class RandomGenerator extends Generator{
         world.setMap(new Map(new StringMap()));
     }
 
-    public abstract void decorate(Tile[][] tiles);
+    public abstract void decorate(Tiles tiles);
 
     /**
      * Sets {@link #floor} and {@link #block} to the correct values as output.

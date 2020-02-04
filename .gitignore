@@ -42,6 +42,7 @@ changelog
 *.gif
 /core/assets/saves/
 /out/
+/core/assets-raw/fontgen/out/
 
 version.properties
 

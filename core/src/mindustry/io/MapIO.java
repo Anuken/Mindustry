@@ -133,11 +133,11 @@ public class MapIO{
         }
     }
 
-    public static Pixmap generatePreview(Tile[][] tiles){
-        Pixmap pixmap = new Pixmap(tiles.length, tiles[0].length, Format.RGBA8888);
+    public static Pixmap generatePreview(Tiles tiles){
+        Pixmap pixmap = new Pixmap(tiles.width(), tiles.height(), Format.RGBA8888);
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
-                Tile tile = tiles[x][y];
+                Tile tile = tiles.getn(x, y);
                 pixmap.draw(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.overlay(), tile.getTeam()));
             }
         }
@@ -152,12 +152,12 @@ public class MapIO{
     }
 
     /** Reads a pixmap in the 3.5 pixmap format. */
-    public static void readPixmap(Pixmap pixmap, Tile[][] tiles){
+    public static void readPixmap(Pixmap pixmap, Tiles tiles){
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
                 int color = pixmap.getPixel(x, pixmap.getHeight() - 1 - y);
                 LegacyBlock block = LegacyColorMapper.get(color);
-                Tile tile = tiles[x][y];
+                Tile tile = tiles.getn(x, y);
 
                 tile.setFloor(block.floor);
                 tile.setBlock(block.wall);

@@ -1,11 +1,13 @@
 package mindustry.core;
 
 import arc.*;
+import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -14,7 +16,6 @@ import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.maps.filters.*;
 import mindustry.maps.filters.GenerateFilter.*;
-import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -25,7 +26,7 @@ public class World{
     public final Context context = new Context();
 
     private Map currentMap;
-    private Tile[][] tiles;
+    public @NonNull Tiles tiles = new Tiles(0, 0);
 
     private boolean generating, invalidMap;
 
@@ -67,11 +68,11 @@ public class World{
     }
 
     public int width(){
-        return tiles == null ? 0 : tiles.length;
+        return tiles.width();
     }
 
     public int height(){
-        return tiles == null ? 0 : tiles[0].length;
+        return tiles.height();
     }
 
     public int unitWidth(){
@@ -88,11 +89,7 @@ public class World{
     }
 
     public @Nullable Tile tile(int x, int y){
-        if(tiles == null){
-            return null;
-        }
-        if(!Structs.inBounds(x, y, tiles)) return null;
-        return tiles[x][y];
+        return tiles.get(x, y);
     }
 
     public @Nullable Tile ltile(int x, int y){
@@ -102,7 +99,7 @@ public class World{
     }
 
     public Tile rawTile(int x, int y){
-        return tiles[x][y];
+        return tiles.getn(x, y);
     }
 
     public @Nullable Tile tileWorld(float x, float y){
@@ -117,16 +114,10 @@ public class World{
         return Math.round(coord / tilesize);
     }
 
-    public Tile[][] getTiles(){
-        return tiles;
-    }
-
     private void clearTileEntities(){
-        for(int x = 0; x < tiles.length; x++){
-            for(int y = 0; y < tiles[0].length; y++){
-                if(tiles[x][y] != null && tiles[x][y].entity != null){
-                    tiles[x][y].entity.remove();
-                }
+        for(Tile tile : tiles){
+            if(tile != null && tile.entity != null){
+                tile.entity.remove();
             }
         }
     }
@@ -135,15 +126,11 @@ public class World{
      * Resizes the tile array to the specified size and returns the resulting tile array.
      * Only use for loading saves!
      */
-    public Tile[][] createTiles(int width, int height){
-        if(tiles != null){
-            clearTileEntities();
+    public Tiles resize(int width, int height){
+        clearTileEntities();
 
-            if(tiles.length != width || tiles[0].length != height){
-                tiles = new Tile[width][height];
-            }
-        }else{
-            tiles = new Tile[width][height];
+        if(tiles.width() != width || tiles.height() != height){
+            tiles = new Tiles(width, height);
         }
 
         return tiles;
@@ -164,14 +151,11 @@ public class World{
     public void endMapLoad(){
         prepareTiles(tiles);
 
-        for(int x = 0; x < tiles.length; x++){
-            for(int y = 0; y < tiles[0].length; y++){
-                Tile tile = tiles[x][y];
-                tile.updateOcclusion();
+        for(Tile tile : tiles){
+            tile.updateOcclusion();
 
-                if(tile.entity != null){
-                    tile.entity.updateProximity();
-                }
+            if(tile.entity != null){
+                tile.entity.updateProximity();
             }
         }
 
@@ -179,7 +163,7 @@ public class World{
             addDarkness(tiles);
         }
 
-        entities.all().each(group -> group.resize(-finalWorldBounds, -finalWorldBounds, tiles.length * tilesize + finalWorldBounds * 2, tiles[0].length * tilesize + finalWorldBounds * 2));
+        entities.all().each(group -> group.resize(-finalWorldBounds, -finalWorldBounds, tiles.width() * tilesize + finalWorldBounds * 2, tiles.height() * tilesize + finalWorldBounds * 2));
 
         generating = false;
         Events.fire(new WorldLoadEvent());
@@ -201,13 +185,30 @@ public class World{
         return state.rules.zone;
     }
 
-    public void loadGenerator(Generator generator){
+    public void loadGenerator(int width, int height, Cons<Tiles> generator){
         beginMapLoad();
 
-        createTiles(generator.width, generator.height);
-        generator.generate(tiles);
+        resize(width, height);
+        generator.get(tiles);
 
         endMapLoad();
+    }
+
+    public void loadSector(Sector sector){
+        int size = (int)(sector.rect.radius * 2500);
+
+        loadGenerator(size, size, tiles -> {
+            TileGen gen = new TileGen();
+            tiles.each((x, y) -> {
+                gen.reset();
+                Vec3 position = sector.rect.project(x / (float)size, y / (float)size);
+
+                sector.planet.generator.generate(position, gen);
+                tiles.set(x, y, new Tile(x, y, gen.floor, gen.overlay, gen.block));
+            });
+
+            tiles.get(size/2, size/2).setBlock(Blocks.coreShard, Team.sharded);
+        });
     }
 
     public void loadMap(Map map){
@@ -297,58 +298,56 @@ public class World{
         }
     }
 
-    public void addDarkness(Tile[][] tiles){
-        byte[][] dark = new byte[tiles.length][tiles[0].length];
-        byte[][] writeBuffer = new byte[tiles.length][tiles[0].length];
+    public void addDarkness(Tiles tiles){
+        byte[] dark = new byte[tiles.width() * tiles.height()];
+        byte[] writeBuffer = new byte[tiles.width() * tiles.height()];
 
         byte darkIterations = 4;
-        for(int x = 0; x < tiles.length; x++){
-            for(int y = 0; y < tiles[0].length; y++){
-                Tile tile = tiles[x][y];
-                if(tile.isDarkened()){
-                    dark[x][y] = darkIterations;
-                }
+
+        for(int i = 0; i < dark.length; i++){
+            Tile tile = tiles.geti(i);
+            if(tile.isDarkened()){
+                dark[i] = darkIterations;
             }
         }
 
         for(int i = 0; i < darkIterations; i++){
-            for(int x = 0; x < tiles.length; x++){
-                for(int y = 0; y < tiles[0].length; y++){
-                    boolean min = false;
-                    for(Point2 point : Geometry.d4){
-                        int newX = x + point.x, newY = y + point.y;
-                        if(Structs.inBounds(newX, newY, tiles) && dark[newX][newY] < dark[x][y]){
-                            min = true;
-                            break;
-                        }
+            for(Tile tile : tiles){
+                int idx = tile.y * tiles.width() + tile.x;
+                boolean min = false;
+                for(Point2 point : Geometry.d4){
+                    int newX = tile.x + point.x, newY = tile.y + point.y;
+                    int nidx = newY * tiles.width() + newX;
+                    if(tiles.in(newX, newY) && dark[nidx] < dark[idx]){
+                        min = true;
+                        break;
                     }
-                    writeBuffer[x][y] = (byte)Math.max(0, dark[x][y] - Mathf.num(min));
                 }
+                writeBuffer[idx] = (byte)Math.max(0, dark[idx] - Mathf.num(min));
             }
 
-            for(int x = 0; x < tiles.length; x++){
-                System.arraycopy(writeBuffer[x], 0, dark[x], 0, tiles[0].length);
-            }
+            System.arraycopy(writeBuffer, 0, dark, 0, writeBuffer.length);
         }
 
-        for(int x = 0; x < tiles.length; x++){
-            for(int y = 0; y < tiles[0].length; y++){
-                Tile tile = tiles[x][y];
-                if(tile.isDarkened()){
-                    tiles[x][y].rotation(dark[x][y]);
-                }
-                if(dark[x][y] == 4){
-                    boolean full = true;
-                    for(Point2 p : Geometry.d4){
-                        int px = p.x + x, py = p.y + y;
-                        if(Structs.inBounds(px, py, tiles) && !(tiles[px][py].isDarkened() && dark[px][py] == 4)){
-                            full = false;
-                            break;
-                        }
-                    }
+        for(Tile tile : tiles){
+            int idx = tile.y * tiles.width() + tile.x;
 
-                    if(full) tiles[x][y].rotation(5);
+            if(tile.isDarkened()){
+                tile.rotation(dark[idx]);
+            }
+
+            if(dark[idx] == 4){
+                boolean full = true;
+                for(Point2 p : Geometry.d4){
+                    int px = p.x + tile.x, py = p.y + tile.y;
+                    int nidx = py * tiles.width() + px;
+                    if(tiles.in(px, py) && !(tile.isDarkened() && dark[nidx] == 4)){
+                        full = false;
+                        break;
+                    }
                 }
+
+                if(full) tile.rotation(5);
             }
         }
     }
@@ -359,18 +358,13 @@ public class World{
      * - updating occlusion<br>
      * Usually used before placing structures on a tile array.
      */
-    public void prepareTiles(Tile[][] tiles){
+    public void prepareTiles(Tiles tiles){
 
         //find multiblocks
         IntArray multiblocks = new IntArray();
-
-        for(int x = 0; x < tiles.length; x++){
-            for(int y = 0; y < tiles[0].length; y++){
-                Tile tile = tiles[x][y];
-
-                if(tile.block().isMultiblock()){
-                    multiblocks.add(tile.pos());
-                }
+        for(Tile tile : tiles){
+            if(tile.block().isMultiblock()){
+                multiblocks.add(tile.pos());
             }
         }
 
@@ -380,9 +374,10 @@ public class World{
 
             int x = Pos.x(pos);
             int y = Pos.y(pos);
+            Tile tile = tiles.getn(x, y);
 
-            Block result = tiles[x][y].block();
-            Team team = tiles[x][y].getTeam();
+            Block result = tile.block();
+            Team team = tile.getTeam();
 
             int offsetx = -(result.size - 1) / 2;
             int offsety = -(result.size - 1) / 2;
@@ -409,17 +404,19 @@ public class World{
     private class Context implements WorldContext{
         @Override
         public Tile tile(int x, int y){
-            return tiles[x][y];
+            return tiles.get(x, y);
         }
 
         @Override
         public void resize(int width, int height){
-            createTiles(width, height);
+            World.this.resize(width, height);
         }
 
         @Override
         public Tile create(int x, int y, int floorID, int overlayID, int wallID){
-            return (tiles[x][y] = new Tile(x, y, floorID, overlayID, wallID));
+            Tile tile = new Tile(x, y, floorID, overlayID, wallID);
+            tiles.set(x, y, tile);
+            return tile;
         }
 
         @Override
@@ -454,23 +451,8 @@ public class World{
                 GenerateInput input = new GenerateInput();
 
                 for(GenerateFilter filter : filters){
-                    input.begin(filter, width(), height(), (x, y) -> tiles[x][y]);
-
-                    //actually apply the filter
-                    for(int x = 0; x < width(); x++){
-                        for(int y = 0; y < height(); y++){
-                            Tile tile = rawTile(x, y);
-                            input.apply(x, y, tile.floor(), tile.block(), tile.overlay());
-                            filter.apply(input);
-
-                            tile.setFloor((Floor)input.floor);
-                            tile.setOverlay(input.ore);
-
-                            if(!tile.block().synthetic() && !input.block.synthetic()){
-                                tile.setBlock(input.block);
-                            }
-                        }
-                    }
+                    input.begin(filter, width(), height(), (x, y) -> tiles.getn(x, y));
+                    filter.apply(tiles, input);
                 }
             }
 

@@ -14,7 +14,8 @@ public enum ContentType{
     zone,
     loadout,
     typeid,
-    error;
+    error,
+    planet;
 
     public static final ContentType[] all = values();
 }

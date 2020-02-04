@@ -59,7 +59,7 @@ public class TechTreeDialog extends FloatingDialog{
             treeLayout();
         });
 
-        hidden(ui.deploy::setup);
+        hidden(ui.planet::setup);
 
         addCloseButton();
 

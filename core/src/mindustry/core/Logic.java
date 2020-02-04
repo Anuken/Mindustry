@@ -236,6 +236,7 @@ public class Logic implements ApplicationListener{
                     bulletGroup.update();
                     tileGroup.update();
                     fireGroup.update();
+                    weatherGroup.update();
                 }else{
                     unitGroup.updateEvents();
                     collisions.updatePhysics(unitGroup);

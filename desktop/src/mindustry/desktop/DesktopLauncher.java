@@ -46,7 +46,6 @@ public class DesktopLauncher extends ClientLauncher{
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
                 title = "Mindustry";
                 maximized = true;
-                depth = 0;
                 stencil = 0;
                 width = 900;
                 height = 700;
@@ -267,7 +266,7 @@ public class DesktopLauncher extends ClientLauncher{
         }else{
             if(ui.editor != null && ui.editor.isShown()){
                 uiState = "In Editor";
-            }else if(ui.deploy != null && ui.deploy.isShown()){
+            }else if(ui.planet != null && ui.planet.isShown()){
                 uiState = "In Launch Selection";
             }else{
                 uiState = "In Menu";

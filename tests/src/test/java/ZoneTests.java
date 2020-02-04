@@ -32,12 +32,14 @@ public class ZoneTests{
         Array<DynamicTest> out = new Array<>();
         if(world == null) world = new World();
 
+        fail("Zone validity tests need to be refactored!");
+
         for(Zone zone : content.zones()){
             out.add(dynamicTest(zone.name, () -> {
                 zone.generator.init(zone.loadout);
                 logic.reset();
                 try{
-                    world.loadGenerator(zone.generator);
+                    //world.loadGenerator(zone.generator);
                 }catch(SaveException e){
                     e.printStackTrace();
                     return;

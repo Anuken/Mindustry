@@ -1,9 +1,9 @@
 package mindustry.maps.zonegen;
 
-import arc.math.Mathf;
-import mindustry.content.Blocks;
-import mindustry.maps.generators.BasicGenerator;
-import mindustry.world.Tile;
+import arc.math.*;
+import mindustry.content.*;
+import mindustry.maps.generators.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.schematics;
 
@@ -19,7 +19,7 @@ public class OvergrowthGenerator extends BasicGenerator{
     }
 
     @Override
-    public void decorate(Tile[][] tiles){
+    public void decorate(Tiles tiles){
         ores(tiles);
         terrain(tiles, Blocks.sporePine, 70f, 1.4f, 1f);
 
@@ -34,12 +34,12 @@ public class OvergrowthGenerator extends BasicGenerator{
         erase(tiles, endX, endY, 10);
         erase(tiles, spawnX, spawnY, 20);
         distort(tiles, 20f, 4f);
-        inverseFloodFill(tiles, tiles[spawnX][spawnY], Blocks.sporerocks);
+        inverseFloodFill(tiles, tiles.getn(spawnX, spawnY), Blocks.sporerocks);
 
         noise(tiles, Blocks.darksandTaintedWater, Blocks.duneRocks, 4, 0.7f, 120f, 0.64f);
         //scatter(tiles, Blocks.sporePine, Blocks.whiteTreeDead, 1f);
 
-        tiles[endX][endY].setOverlay(Blocks.spawn);
+        tiles.getn(endX, endY).setOverlay(Blocks.spawn);
         schematics.placeLoadout(loadout, spawnX, spawnY);
     }
 }

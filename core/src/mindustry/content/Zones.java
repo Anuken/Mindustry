@@ -1,15 +1,15 @@
 package mindustry.content;
 
-import mindustry.ctype.ContentList;
-import mindustry.game.*;
+import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
+import mindustry.game.*;
 import mindustry.maps.generators.*;
-import mindustry.maps.generators.MapGenerator.*;
 import mindustry.maps.zonegen.*;
 import mindustry.type.*;
 
 import static arc.struct.Array.with;
 import static mindustry.content.Items.*;
+import static mindustry.content.Planets.starter;
 import static mindustry.type.ItemStack.list;
 
 public class Zones implements ContentList{
@@ -22,7 +22,7 @@ public class Zones implements ContentList{
     @Override
     public void load(){
 
-        groundZero = new Zone("groundZero", new MapGenerator("groundZero", 1)){{
+        groundZero = new Zone("groundZero", starter, new MapGenerator("groundZero")){{
             baseLaunchCost = list(copper, -60);
             startingItems = list(copper, 60);
             alwaysUnlocked = true;
@@ -31,7 +31,7 @@ public class Zones implements ContentList{
             resources = with(copper, scrap, lead);
         }};
 
-        desertWastes = new Zone("desertWastes", new DesertWastesGenerator(260, 260)){{
+        desertWastes = new Zone("desertWastes", starter, new DesertWastesGenerator(260, 260)){{
             startingItems = list(copper, 120);
             conditionWave = 20;
             launchPeriod = 10;
@@ -82,7 +82,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        saltFlats = new Zone("saltFlats", new MapGenerator("saltFlats")){{
+        saltFlats = new Zone("saltFlats", starter, new MapGenerator("saltFlats")){{
             startingItems = list(copper, 200, Items.silicon, 200, lead, 200);
             loadout = Loadouts.basicFoundation;
             conditionWave = 10;
@@ -98,8 +98,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 1)
-        .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
+        frozenForest = new Zone("frozenForest", starter, new MapGenerator("frozenForest")){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 250);
             conditionWave = 10;
@@ -111,7 +110,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        craters = new Zone("craters", new MapGenerator("craters", 1).decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.004))){{
+        craters = new Zone("craters", starter, new MapGenerator("craters")){{
             startingItems = list(copper, 100);
             conditionWave = 10;
             resources = with(copper, lead, coal, sand, scrap);
@@ -122,7 +121,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores", 1)){{
+        ruinousShores = new Zone("ruinousShores", starter, new MapGenerator("ruinousShores")){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 140, lead, 50);
             conditionWave = 20;
@@ -138,8 +137,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        stainedMountains = new Zone("stainedMountains", new MapGenerator("stainedMountains", 2)
-        .decor(new Decoration(Blocks.shale, Blocks.shaleBoulder, 0.02))){{
+        stainedMountains = new Zone("stainedMountains", starter, new MapGenerator("stainedMountains")){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 200, lead, 50);
             conditionWave = 10;
@@ -153,7 +151,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        fungalPass = new Zone("fungalPass", new MapGenerator("fungalPass")){{
+        fungalPass = new Zone("fungalPass", starter, new MapGenerator("fungalPass")){{
             startingItems = list(copper, 250, lead, 250, Items.metaglass, 100, Items.graphite, 100);
             resources = with(copper, lead, coal, titanium, sand);
             configureObjective = new Launched(this);
@@ -166,7 +164,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        overgrowth = new Zone("overgrowth", new MapGenerator("overgrowth")){{
+        overgrowth = new Zone("overgrowth", starter, new MapGenerator("overgrowth")){{
             startingItems = list(copper, 1500, lead, 1000, Items.silicon, 500, Items.metaglass, 250);
             conditionWave = 12;
             launchPeriod = 4;
@@ -183,8 +181,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        tarFields = new Zone("tarFields", new MapGenerator("tarFields")
-        .decor(new Decoration(Blocks.shale, Blocks.shaleBoulder, 0.02))){{
+        tarFields = new Zone("tarFields", starter, new MapGenerator("tarFields")){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 250, lead, 100);
             conditionWave = 15;
@@ -198,7 +195,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift")){{
+        desolateRift = new Zone("desolateRift", starter, new MapGenerator("desolateRift")){{
             loadout = Loadouts.basicNucleus;
             startingItems = list(copper, 1000, lead, 1000, Items.graphite, 250, titanium, 250, Items.silicon, 250);
             conditionWave = 3;
@@ -223,8 +220,7 @@ public class Zones implements ContentList{
             resources = Array.with(Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
         }};*/
 
-        nuclearComplex = new Zone("nuclearComplex", new MapGenerator("nuclearProductionComplex", 1)
-        .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
+        nuclearComplex = new Zone("nuclearComplex", starter, new MapGenerator("nuclearProductionComplex")){{
             loadout = Loadouts.basicNucleus;
             startingItems = list(copper, 1250, lead, 1500, Items.silicon, 400, Items.metaglass, 250);
             conditionWave = 30;

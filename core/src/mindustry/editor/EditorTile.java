@@ -13,7 +13,6 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.state;
 import static mindustry.Vars.ui;
 
-//TODO somehow remove or replace this class with a more flexible solution
 public class EditorTile extends Tile{
 
     public EditorTile(int x, int y, int floor, int overlay, int wall){
