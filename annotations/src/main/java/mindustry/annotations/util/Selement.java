@@ -1,5 +1,6 @@
 package mindustry.annotations.util;
 
+import arc.struct.*;
 import com.squareup.javapoet.*;
 import mindustry.annotations.*;
 
@@ -12,6 +13,10 @@ public class Selement<T extends Element>{
 
     public Selement(T e){
         this.e = e;
+    }
+
+    public Array<? extends AnnotationMirror> annotations(){
+        return Array.with(e.getAnnotationMirrors());
     }
 
     public <A extends Annotation> A annotation(Class<A> annotation){

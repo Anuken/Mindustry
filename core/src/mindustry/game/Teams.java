@@ -5,7 +5,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import mindustry.entities.type.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
@@ -102,7 +101,7 @@ public class Teams{
     }
 
     public void registerCore(CoreEntity core){
-        TeamData data = get(core.getTeam());
+        TeamData data = get(core.team());
         //add core if not present
         if(!data.cores.contains(core)){
             data.cores.add(core);
@@ -117,7 +116,7 @@ public class Teams{
     }
 
     public void unregisterCore(CoreEntity entity){
-        TeamData data = get(entity.getTeam());
+        TeamData data = get(entity.team());
         //remove core
         data.cores.remove(entity);
         //unregister in active list

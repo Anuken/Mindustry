@@ -14,6 +14,7 @@ import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.ui.*;
@@ -79,8 +80,8 @@ public class Renderer implements ApplicationListener{
         }else{
             Vec2 position = Tmp.v3.set(player);
 
-            if(player.isDead()){
-                Tilec core = player.getClosestCore();
+            if(player.dead()){
+                Tilec core = player.closestCore();
                 if(core != null){
                     if(player.spawner == null){
                         camera.position.lerpDelta(core.x, core.y, 0.08f);
@@ -277,9 +278,9 @@ public class Renderer implements ApplicationListener{
     }
 
     private void drawLanding(){
-        if(landTime > 0 && player.getClosestCore() != null){
+        if(landTime > 0 && player.closestCore() != null){
             float fract = landTime / Fx.coreLand.lifetime;
-            Tilec entity = player.getClosestCore();
+            Tilec entity = player.closestCore();
 
             TextureRegion reg = entity.block.icon(Cicon.full);
             float scl = Scl.scl(4f) / camerascale;

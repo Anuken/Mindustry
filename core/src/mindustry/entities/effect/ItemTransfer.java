@@ -7,7 +7,6 @@ import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -42,11 +41,11 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemTo(Item item, int amount, float x, float y, Tile tile){
-        if(tile == null || tile.entity == null || tile.entity.getItems() == null) return;
+        if(tile == null || tile.entity == null || tile.entity.items() == null) return;
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
             Time.run(i * 3, () -> create(item, x, y, tile, () -> {}));
         }
-        tile.entity.getItems().add(item, amount);
+        tile.entity.items().add(item, amount);
     }
 
     public static void create(Item item, float fromx, float fromy, Position to, Runnable done){

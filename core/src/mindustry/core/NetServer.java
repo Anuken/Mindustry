@@ -20,7 +20,6 @@ import mindustry.net.Administration;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
-import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
@@ -51,7 +50,7 @@ public class NetServer implements ApplicationListener{
             TeamData re = state.teams.getActive().min(data -> {
                 int count = 0;
                 for(Player other : players){
-                    if(other.getTeam() == data.team && other != player){
+                    if(other.team() == data.team && other != player){
                         count++;
                     }
                 }
@@ -220,7 +219,7 @@ public class NetServer implements ApplicationListener{
             con.player = player;
 
             //playing in pvp mode automatically assigns players to teams
-            player.setTeam(assignTeam(player, playerGroup.all()));
+            player.team(assignTeam(player, playerGroup.all()));
 
             sendWorldData(player);
 
@@ -281,7 +280,7 @@ public class NetServer implements ApplicationListener{
         });
 
         clientCommands.<Player>register("t", "<message...>", "Send a message only to your teammates.", (args, player) -> {
-            playerGroup.all().each(p -> p.getTeam() == player.getTeam(), o -> o.sendMessage(args[0], player, "[#" + player.getTeam().color.toString() + "]<T>" + NetClient.colorizeName(player.id, player.name)));
+            playerGroup.all().each(p -> p.getTeam() == player.team(), o -> o.sendMessage(args[0], player, "[#" + player.team().color.toString() + "]<T>" + NetClient.colorizeName(player.id, player.name)));
         });
 
         //duration of a a kick in seconds
@@ -374,7 +373,7 @@ public class NetServer implements ApplicationListener{
                         player.sendMessage("[scarlet]Did you really expect to be able to kick an admin?");
                     }else if(found.isLocal){
                         player.sendMessage("[scarlet]Local players cannot be kicked.");
-                    }else if(found.getTeam() != player.getTeam()){
+                    }else if(found.team() != player.team()){
                         player.sendMessage("[scarlet]Only players on your team can be kicked.");
                     }else{
                         if(!vtime.get()){
@@ -496,7 +495,7 @@ public class NetServer implements ApplicationListener{
         NetConnection connection = player.con;
         if(connection == null || snapshotID < connection.lastRecievedClientSnapshot) return;
 
-        boolean verifyPosition = !player.isDead() && netServer.admins.getStrict() && headless;
+        boolean verifyPosition = !player.dead() && netServer.admins.getStrict() && headless;
 
         if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = Time.millis() - 16;
 
@@ -714,13 +713,13 @@ public class NetServer implements ApplicationListener{
 
     public void writeEntitySnapshot(Player player) throws IOException{
         syncStream.reset();
-        Array<CoreEntity> cores = state.teams.cores(player.getTeam());
+        Array<CoreEntity> cores = state.teams.cores(player.team());
 
         dataStream.writeByte(cores.size);
 
         for(CoreEntity entity : cores){
             dataStream.writeInt(entity.tile.pos());
-            entity.getItems().write(dataStream);
+            entity.items().write(dataStream);
         }
 
         dataStream.close();

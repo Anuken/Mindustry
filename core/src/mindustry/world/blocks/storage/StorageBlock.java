@@ -17,7 +17,7 @@ public abstract class StorageBlock extends Block{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         StorageBlockEntity entity = tile.ent();
-        return entity.linkedCore != null ? entity.linkedCore.block().acceptItem(item, entity.linkedCore, source) : tile.entity.getItems().get(item) < getMaximumAccepted(tile, item);
+        return entity.linkedCore != null ? entity.linkedCore.block().acceptItem(item, entity.linkedCore, source) : tile.entity.items().get(item) < getMaximumAccepted(tile, item);
     }
 
     @Override
@@ -46,10 +46,10 @@ public abstract class StorageBlock extends Block{
         Tilec entity = tile.entity;
 
         if(item == null){
-            return entity.getItems().take();
+            return entity.items().take();
         }else{
-            if(entity.getItems().has(item)){
-                entity.getItems().remove(item, 1);
+            if(entity.items().has(item)){
+                entity.items().remove(item, 1);
                 return item;
             }
 
@@ -64,9 +64,9 @@ public abstract class StorageBlock extends Block{
     public boolean hasItem(Tile tile, Item item){
         Tilec entity = tile.entity;
         if(item == null){
-            return entity.getItems().total() > 0;
+            return entity.items().total() > 0;
         }else{
-            return entity.getItems().has(item);
+            return entity.items().has(item);
         }
     }
 

@@ -12,7 +12,6 @@ import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.game.EventType.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -71,7 +70,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return tile.entity.getItems().get(item) < getMaximumAccepted(tile, item);
+        return tile.entity.items().get(item) < getMaximumAccepted(tile, item);
     }
 
     @Override
@@ -86,14 +85,14 @@ public class CoreBlock extends StorageBlock{
 
         for(Tilec other : state.teams.cores(tile.getTeam())){
             if(other.tile != tile){
-                entity.getItems() = other.items;
+                entity.items() = other.items;
             }
         }
         state.teams.registerCore(entity);
 
         entity.storageCapacity = itemCapacity + entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         entity.proximity().each(this::isContainer, t -> {
-            t.entity.getItems() = entity.getItems();
+            t.entity.items() = entity.items();
             t.<StorageBlockEntity>ent().linkedCore = tile;
         });
 
@@ -104,7 +103,7 @@ public class CoreBlock extends StorageBlock{
 
         if(!world.isGenerating()){
             for(Item item : content.items()){
-                entity.getItems().set(item, Math.min(entity.getItems().get(item), entity.storageCapacity));
+                entity.items().set(item, Math.min(entity.items().get(item), entity.storageCapacity));
             }
         }
 
@@ -123,10 +122,10 @@ public class CoreBlock extends StorageBlock{
                 Draw.rect("block-select", t.drawx() + offset * p.x, t.drawy() + offset * p.y, i * 90);
             }
         };
-        if(tile.entity.proximity().contains(e -> isContainer(e) && e.entity.getItems() == tile.entity.getItems())){
+        if(tile.entity.proximity().contains(e -> isContainer(e) && e.entity.items() == tile.entity.items())){
             outline.get(tile);
         }
-        tile.entity.proximity().each(e -> isContainer(e) && e.entity.getItems() == tile.entity.getItems(), outline);
+        tile.entity.proximity().each(e -> isContainer(e) && e.entity.items() == tile.entity.items(), outline);
         Draw.reset();
     }
 
@@ -137,7 +136,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public float handleDamage(Tile tile, float amount){
-        if(player != null && tile.getTeam() == player.getTeam()){
+        if(player != null && tile.getTeam() == player.team()){
             Events.fire(Trigger.teamCoreDamage);
         }
         return amount;
@@ -151,15 +150,15 @@ public class CoreBlock extends StorageBlock{
     @Override
     public void removed(Tile tile){
         CoreEntity entity = tile.ent();
-        int total = tile.entity.proximity().count(e -> e.entity != null && e.entity.getItems() != null && e.entity.getItems() == tile.entity.getItems());
+        int total = tile.entity.proximity().count(e -> e.entity != null && e.entity.items() != null && e.entity.items() == tile.entity.items());
         float fract = 1f / total / state.teams.cores(tile.getTeam()).size;
 
-        tile.entity.proximity().each(e -> isContainer(e) && e.entity.getItems() == tile.entity.getItems(), t -> {
+        tile.entity.proximity().each(e -> isContainer(e) && e.entity.items() == tile.entity.items(), t -> {
             StorageBlockEntity ent = (StorageBlockEntity)t.entity;
             ent.linkedCore = null;
             ent.items = new ItemModule();
             for(Item item : content.items()){
-                ent.items.set(item, (int)(fract * tile.entity.getItems().get(item)));
+                ent.items.set(item, (int)(fract * tile.entity.items().get(item)));
             }
         });
 
@@ -167,7 +166,7 @@ public class CoreBlock extends StorageBlock{
 
         int max = itemCapacity * state.teams.cores(tile.getTeam()).size;
         for(Item item : content.items()){
-            tile.entity.getItems().set(item, Math.min(tile.entity.getItems().get(item), max));
+            tile.entity.items().set(item, Math.min(tile.entity.items().get(item), max));
         }
 
         for(CoreEntity other : state.teams.cores(tile.getTeam())){
@@ -206,7 +205,7 @@ public class CoreBlock extends StorageBlock{
         CoreEntity entity = tile.ent();
 
         if(entity.spawnPlayer != null){
-            if(!entity.spawnPlayer.isDead() || !entity.spawnPlayer.isAdded()){
+            if(!entity.spawnPlayer.dead() || !entity.spawnPlayer.isAdded()){
                 entity.spawnPlayer = null;
                 return;
             }

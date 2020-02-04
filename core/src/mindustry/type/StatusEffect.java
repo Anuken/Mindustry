@@ -50,7 +50,7 @@ public class StatusEffect extends MappableContent{
         }
 
         if(effect != Fx.none && Mathf.chance(Time.delta() * 0.15f)){
-            effect.at(unit.getX() + Mathf.range(unit.getBounds() / 2f), unit.getY() + Mathf.range(unit.getBounds() / 2f));
+            effect.at(unit.getX() + Mathf.range(unit.bounds() / 2f), unit.getY() + Mathf.range(unit.bounds() / 2f));
         }
     }
 

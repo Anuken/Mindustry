@@ -8,7 +8,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.type.*;
 import mindustry.entities.units.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -96,7 +95,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         Draw.colorl(0.34f);
         Draw.rect(botRegions[entity.blendbits], tile.drawx(), tile.drawy(), rotation);
 
-        Draw.color(tile.entity.getLiquids().current().color);
+        Draw.color(tile.entity.liquids().current().color);
         Draw.alpha(entity.smoothLiquid);
         Draw.rect(botRegions[entity.blendbits], tile.drawx(), tile.drawy(), rotation);
         Draw.color();
@@ -109,8 +108,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
         ConduitEntity entity = tile.ent();
         entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.getLiquids().currentAmount() / liquidCapacity, 0.05f);
 
-        if(tile.entity.getLiquids().total() > 0.001f && tile.entity.timer(timerFlow, 1)){
-            tryMoveLiquid(tile, tile.getNearby(tile.rotation()), leakResistance, tile.entity.getLiquids().current());
+        if(tile.entity.liquids().total() > 0.001f && tile.entity.timer(timerFlow, 1)){
+            tryMoveLiquid(tile, tile.getNearby(tile.rotation()), leakResistance, tile.entity.liquids().current());
             entity.noSleep();
         }else{
             entity.sleep();
@@ -125,7 +124,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         tile.entity.noSleep();
-        return tile.entity.getLiquids().get(liquid) + amount < liquidCapacity && (tile.entity.getLiquids().current() == liquid || tile.entity.getLiquids().get(tile.entity.getLiquids().current()) < 0.2f)
+        return tile.entity.liquids().get(liquid) + amount < liquidCapacity && (tile.entity.liquids().current() == liquid || tile.entity.liquids().get(tile.entity.liquids().current()) < 0.2f)
             && ((source.absoluteRelativeTo(tile.x, tile.y) + 2) % 4 != tile.rotation());
     }
 

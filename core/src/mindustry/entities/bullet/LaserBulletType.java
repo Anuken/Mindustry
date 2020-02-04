@@ -41,7 +41,7 @@ public class LaserBulletType extends BulletType{
 
     @Override
     public void init(Bulletc b){
-        Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), length);
+        Damage.collideLine(b, b.team(), hitEffect, b.x, b.y, b.rot(), length);
     }
 
     @Override

@@ -54,7 +54,7 @@ public class Separator extends Block{
 
     @Override
     public boolean shouldConsume(Tile tile){
-        return tile.entity.getItems().total() < itemCapacity;
+        return tile.entity.items().total() < itemCapacity;
     }
 
     @Override
@@ -63,8 +63,8 @@ public class Separator extends Block{
 
         GenericCrafterEntity entity = tile.ent();
 
-        Draw.color(tile.entity.getLiquids().current().color);
-        Draw.alpha(tile.entity.getLiquids().total() / liquidCapacity);
+        Draw.color(tile.entity.liquids().current().color);
+        Draw.alpha(tile.entity.liquids().total() / liquidCapacity);
         Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
 
         Draw.reset();
@@ -106,7 +106,7 @@ public class Separator extends Block{
 
             entity.consume();
 
-            if(item != null && entity.getItems().get(item) < itemCapacity){
+            if(item != null && entity.items().get(item) < itemCapacity){
                 offloadNear(tile, item);
             }
         }

@@ -29,7 +29,7 @@ public class HealBulletType extends BulletType{
 
     @Override
     public boolean collides(Bulletc b, Tile tile){
-        return tile.getTeam() != b.getTeam() || tile.entity.healthf() < 1f;
+        return tile.getTeam() != b.team() || tile.entity.healthf() < 1f;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class HealBulletType extends BulletType{
         super.hit(b);
         tile = tile.link();
 
-        if(tile.entity != null && tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
+        if(tile.entity != null && tile.getTeam() == b.team() && !(tile.block() instanceof BuildBlock)){
             Fx.healBlockFull.at(tile.drawx(), tile.drawy(), tile.block().size, Pal.heal);
             tile.entity.healBy(healPercent / 100f * tile.entity.maxHealth());
         }

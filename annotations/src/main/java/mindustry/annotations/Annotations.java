@@ -5,6 +5,12 @@ import java.lang.annotation.*;
 public class Annotations{
     //region entity interfaces
 
+    /** Indicates that a component field is read-only. */
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ReadOnly{
+    }
+
     /** Indicates multiple inheritance on a component type. */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)

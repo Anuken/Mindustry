@@ -14,9 +14,7 @@ import arc.math.geom.Vec2;
 import arc.util.Time;
 import mindustry.content.Fx;
 import mindustry.entities.*;
-import mindustry.entities.*;
 import mindustry.entities.bullet.BulletType;
-import mindustry.gen.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.Block;
@@ -193,9 +191,9 @@ public abstract class Turret extends Block{
         TurretEntity entity = tile.ent();
 
         if(targetAir && !targetGround){
-            entity.target = Units.closestEnemy(tile.getTeam(), tile.drawx(), tile.drawy(), range, e -> !e.isDead() && e.isFlying());
+            entity.target = Units.closestEnemy(tile.getTeam(), tile.drawx(), tile.drawy(), range, e -> !e.dead() && e.isFlying());
         }else{
-            entity.target = Units.closestTarget(tile.getTeam(), tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir) && (e.isFlying() || targetGround));
+            entity.target = Units.closestTarget(tile.getTeam(), tile.drawx(), tile.drawy(), range, e -> !e.dead() && (!e.isFlying() || targetAir) && (e.isFlying() || targetGround));
         }
     }
 

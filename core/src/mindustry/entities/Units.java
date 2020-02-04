@@ -19,7 +19,7 @@ public class Units{
 
     /** @return whether this player can interact with a specific tile. if either of these are null, returns true.*/
     public static boolean canInteract(Player player, Tile tile){
-        return player == null || tile == null || tile.interactable(player.getTeam());
+        return player == null || tile == null || tile.interactable(player.team());
     }
 
     /**
@@ -32,7 +32,7 @@ public class Units{
      * @return whether the target is invalid
      */
     public static boolean invalidateTarget(Teamc target, Team team, float x, float y, float range){
-        return target == null || (range != Float.MAX_VALUE && !target.withinDst(x, y, range)) || target.getTeam() == team || !target.isValid();
+        return target == null || (range != Float.MAX_VALUE && !target.withinDst(x, y, range)) || target.team() == team || !target.isValid();
     }
 
     /** See {@link #invalidateTarget(Teamc, Team, float, float, float)} */
@@ -42,7 +42,7 @@ public class Units{
 
     /** See {@link #invalidateTarget(Teamc, Team, float, float, float)} */
     public static boolean invalidateTarget(Teamc target, Unitc targeter){
-        return invalidateTarget(target, targeter.getTeam(), targeter.x, targeter.y, targeter.getWeapon().bullet.range());
+        return invalidateTarget(target, targeter.team(), targeter.x, targeter.y, targeter.getWeapon().bullet.range());
     }
 
     /** Returns whether there are any entities on this tile. */
@@ -116,7 +116,7 @@ public class Units{
         cdist = 0f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.isDead() || !predicate.get(e)) return;
+            if(e.dead() || !predicate.get(e)) return;
 
             float dst2 = Mathf.dst2(e.x, e.y, x, y);
             if(dst2 < range*range && (result == null || dst2 < cdist)){

@@ -87,19 +87,19 @@ public class PowerTestFixture{
 
             // Simulate the "changed" method. Calling it through reflections would require half the game to be initialized.
             tile.entity = block.newEntity().init(tile, false);
-            tile.entity.getCons() = new ConsumeModule(tile.entity);
-            if(block.hasItems) tile.entity.getItems() = new ItemModule();
-            if(block.hasLiquids) tile.entity.getLiquids() = new LiquidModule();
+            tile.entity.cons() = new ConsumeModule(tile.entity);
+            if(block.hasItems) tile.entity.items() = new ItemModule();
+            if(block.hasLiquids) tile.entity.liquids() = new LiquidModule();
             if(block.hasPower){
-                tile.entity.getPower() = new PowerModule();
-                tile.entity.getPower().graph = new PowerGraph(){
+                tile.entity.power() = new PowerModule();
+                tile.entity.power().graph = new PowerGraph(){
                     //assume there's always something consuming power
                     @Override
                     public float getUsageFraction(){
                         return 1f;
                     }
                 };
-                tile.entity.getPower().graph.add(tile);
+                tile.entity.power().graph.add(tile);
             }
 
             // Assign incredibly high health so the block does not get destroyed on e.g. burning Blast Compound

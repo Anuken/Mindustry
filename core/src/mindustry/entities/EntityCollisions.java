@@ -78,8 +78,8 @@ public class EntityCollisions{
             }
         }
 
-        entity.setX(entity.getX() + rect.x - r2.x);
-        entity.setY(entity.getY() + rect.y - r2.y);
+        entity.x(entity.getX() + rect.x - r2.x);
+        entity.y(entity.getY() + rect.y - r2.y);
     }
 
     public boolean overlapsTile(Rect rect){
@@ -112,8 +112,8 @@ public class EntityCollisions{
         tree.clear();
 
         group.each(s -> {
-            s.setLastX(s.getX());
-            s.setLastY(s.getY());
+            s.lastX(s.getX());
+            s.lastY(s.getY());
             tree.insert(s);
         });
     }
@@ -128,15 +128,15 @@ public class EntityCollisions{
         a.hitbox(this.r1);
         b.hitbox(this.r2);
 
-        r1.x += (a.getLastX() - a.getX());
-        r1.y += (a.getLastY() - a.getY());
-        r2.x += (b.getLastX() - b.getX());
-        r2.y += (b.getLastY() - b.getY());
+        r1.x += (a.lastX() - a.getX());
+        r1.y += (a.lastY() - a.getY());
+        r2.x += (b.lastX() - b.getX());
+        r2.y += (b.lastY() - b.getY());
 
-        float vax = a.getX() - a.getLastX();
-        float vay = a.getY() - a.getLastY();
-        float vbx = b.getX() - b.getLastX();
-        float vby = b.getY() - b.getLastY();
+        float vax = a.getX() - a.lastX();
+        float vay = a.getY() - a.lastY();
+        float vbx = b.getX() - b.lastX();
+        float vby = b.getY() - b.lastY();
 
         if(a != b && a.collides(b)){
             l1.set(a.getX(), a.getY());
@@ -204,8 +204,8 @@ public class EntityCollisions{
 
         groupa.each(solid -> {
             solid.hitbox(r1);
-            r1.x += (solid.getLastX() - solid.getX());
-            r1.y += (solid.getLastY() - solid.getY());
+            r1.x += (solid.lastX() - solid.getX());
+            r1.y += (solid.lastY() - solid.getY());
 
             solid.hitbox(r2);
             r2.merge(r1);

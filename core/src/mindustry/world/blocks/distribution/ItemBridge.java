@@ -266,10 +266,10 @@ public class ItemBridge extends Block{
 
             if(rel == rel2) return false;
         }else{
-            return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>ent().link == tile.pos() && tile.entity.getItems().total() < itemCapacity;
+            return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>ent().link == tile.pos() && tile.entity.items().total() < itemCapacity;
         }
 
-        return tile.entity.getItems().total() < itemCapacity;
+        return tile.entity.items().total() < itemCapacity;
     }
 
 
@@ -315,7 +315,7 @@ public class ItemBridge extends Block{
             return false;
         }
 
-        return tile.entity.getLiquids().get(liquid) + amount < liquidCapacity && (tile.entity.getLiquids().current() == liquid || tile.entity.getLiquids().get(tile.entity.getLiquids().current()) < 0.2f);
+        return tile.entity.liquids().get(liquid) + amount < liquidCapacity && (tile.entity.liquids().current() == liquid || tile.entity.liquids().get(tile.entity.liquids().current()) < 0.2f);
     }
 
     @Override

@@ -9,13 +9,11 @@ import arc.math.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.effect.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -228,7 +226,7 @@ public class BuildBlock extends Block{
                 setConstruct(previous, cblock);
             }
 
-            float maxProgress = core == null ? amount : checkRequired(core.getItems(), amount, false);
+            float maxProgress = core == null ? amount : checkRequired(core.items(), amount, false);
 
             for(int i = 0; i < cblock.requirements.length; i++){
                 int reqamount = Math.round(state.rules.buildCostMultiplier * cblock.requirements[i].amount);
@@ -236,13 +234,13 @@ public class BuildBlock extends Block{
                 totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * maxProgress, reqamount);
             }
 
-            maxProgress = core == null ? maxProgress : checkRequired(core.getItems(), maxProgress, true);
+            maxProgress = core == null ? maxProgress : checkRequired(core.items(), maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
             builderID = builder.getId();
 
             if(progress >= 1f || state.rules.infiniteResources){
-                constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
+                constructed(tile, cblock, builderID, tile.rotation(), builder.team(), configured);
                 return true;
             }
             return false;

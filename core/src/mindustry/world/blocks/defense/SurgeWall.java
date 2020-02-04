@@ -18,7 +18,7 @@ public class SurgeWall extends Wall{
     public void handleBulletHit(Tilec entity, Bullet bullet){
         super.handleBulletHit(entity, bullet);
         if(Mathf.chance(lightningChance)){
-            Lightning.create(entity.getTeam(), Pal.surge, lightningDamage, bullet.x, bullet.y, bullet.rot() + 180f, lightningLength);
+            Lightning.create(entity.team(), Pal.surge, lightningDamage, bullet.x, bullet.y, bullet.rot() + 180f, lightningLength);
         }
     }
 }

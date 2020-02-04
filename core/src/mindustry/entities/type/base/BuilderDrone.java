@@ -68,7 +68,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
             }else{ //else, building isn't valid, follow a player
                 target = null;
 
-                if(playerTarget == null || playerTarget.getTeam() != team || !playerTarget.isValid()){
+                if(playerTarget == null || playerTarget.team() != team || !playerTarget.isValid()){
                     playerTarget = null;
 
                     if(retarget()){
@@ -77,7 +77,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
 
                         //find player with min amount of drones
                         for(Player player : playerGroup.all()){
-                            if(player.getTeam() == team){
+                            if(player.team() == team){
                                 int drones = getDrones(player);
                                 float dst = dst2(player);
 
@@ -168,7 +168,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
 
         if(!isBuilding() && timer.get(timerTarget2, 15)){
             for(Player player : playerGroup.all()){
-                if(player.getTeam() == team && player.buildRequest() != null){
+                if(player.team() == team && player.buildRequest() != null){
                     BuildRequest req = player.buildRequest();
                     Tile tile = world.tile(req.x, req.y);
                     if(tile != null && tile.entity instanceof BuildEntity){

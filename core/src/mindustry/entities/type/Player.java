@@ -236,7 +236,7 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
         return playerGroup;
     }
 
-    public void setTeam(Team team){
+    public void team(Team team){
         this.team = team;
     }
 
@@ -406,7 +406,7 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
                 control.input.drawBreaking(request);
             }else{
                 request.block.drawRequest(request, control.input.allRequests(),
-                    Build.validPlace(getTeam(), request.x, request.y, request.block, request.rotation) || control.input.requestMatches(request));
+                    Build.validPlace(team(), request.x, request.y, request.block, request.rotation) || control.input.requestMatches(request));
             }
         }
 
@@ -439,14 +439,14 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
             velocity.set(0f, 0f);
             x = 0;
             y = 0;
-            setDead(true);
+            dead(true);
         }
 
         if(netServer.isWaitingForPlayers()){
-            setDead(true);
+            dead(true);
         }
 
-        if(!isDead() && isOutOfBounds()){
+        if(!dead() && isOutOfBounds()){
             destructTime += Time.delta();
 
             if(destructTime >= boundsCountdown){
@@ -456,7 +456,7 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
             destructTime = 0f;
         }
 
-        if(!isDead() && isFlying()){
+        if(!dead() && isFlying()){
             loops.play(Sounds.thruster, this, Mathf.clamp(velocity.len() * 2f) * 0.3f);
         }
 
@@ -465,7 +465,7 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
             loops.play(Sounds.build, request.tile(), 0.75f);
         }
 
-        if(isDead()){
+        if(dead()){
             isBoosting = false;
             boostHeat = 0f;
             if(respawns > 0 || !state.rules.limitedRespawns){
@@ -604,7 +604,7 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
 
     protected void updateTouch(){
         if(Units.invalidateTarget(target, this) &&
-            !(target instanceof Tilec && ((Tilec)target).damaged() && target.isValid() && target.getTeam() == team && mech.canHeal && dst(target) < mech.range && !(((Tilec)target).block instanceof BuildBlock))){
+            !(target instanceof Tilec && ((Tilec)target).damaged() && target.isValid() && target.team() == team && mech.canHeal && dst(target) < mech.range && !(((Tilec)target).block instanceof BuildBlock))){
             target = null;
         }
 
@@ -616,10 +616,10 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
         float attractDst = 15f;
         float speed = isBoosting && !mech.flying ? mech.boostSpeed : mech.speed;
 
-        if(moveTarget != null && !moveTarget.isDead()){
+        if(moveTarget != null && !moveTarget.dead()){
             targetX = moveTarget.getX();
             targetY = moveTarget.getY();
-            boolean tapping = moveTarget instanceof Tilec && moveTarget.getTeam() == team;
+            boolean tapping = moveTarget instanceof Tilec && moveTarget.team() == team;
             attractDst = 0f;
 
             if(tapping){
@@ -627,7 +627,7 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
             }
 
             if(dst(moveTarget) <= 2f * Time.delta()){
-                if(tapping && !isDead()){
+                if(tapping && !dead()){
                     Tile tile = ((Tilec)moveTarget).tile;
                     tile.block().tapped(tile, this);
                 }
@@ -680,7 +680,7 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
             if(target == null){
                 isShooting = false;
                 if(Core.settings.getBool("autotarget")){
-                    target = Units.closestTarget(team, x, y, mech.range, u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
+                    target = Units.closestTarget(team, x, y, mech.range, u -> u.team() != Team.derelict, u -> u.getTeam() != Team.derelict);
 
                     if(mech.canHeal && target == null){
                         target = Geometry.findClosest(x, y, indexer.getDamaged(Team.sharded));
@@ -695,7 +695,7 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
                         setMineTile(null);
                     }
                 }
-            }else if(target.isValid() || (target instanceof Tilec && ((Tilec)target).damaged() && target.getTeam() == team && mech.canHeal && dst(target) < mech.range)){
+            }else if(target.isValid() || (target instanceof Tilec && ((Tilec)target).damaged() && target.team() == team && mech.canHeal && dst(target) < mech.range)){
                 //rotate toward and shoot the target
                 if(mech.faceTarget){
                     rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
@@ -786,19 +786,19 @@ public class Player extends Unitc implements BuilderMinerTrait, ShooterTrait{
         if(state.isEditor()){
             //instant respawn at center of map.
             set(world.width() * tilesize/2f, world.height() * tilesize/2f);
-            setDead(false);
+            dead(false);
         }else if(spawner != null && spawner.isValid()){
             spawner.updateSpawning(this);
         }else if(!netServer.isWaitingForPlayers()){
             if(!net.client()){
                 if(lastSpawner != null && lastSpawner.isValid()){
                     this.spawner = lastSpawner;
-                }else if(getClosestCore() != null){
-                    this.spawner = (SpawnerTrait)getClosestCore();
+                }else if(closestCore() != null){
+                    this.spawner = (SpawnerTrait)closestCore();
                 }
             }
-        }else if(getClosestCore() != null){
-            set(getClosestCore().getX(), getClosestCore().getY());
+        }else if(closestCore() != null){
+            set(closestCore().getX(), closestCore().getY());
         }
     }
 

@@ -191,7 +191,7 @@ public class Mechs implements ContentList{
                 if(player.timer.get(Player.timerAbility, healReload)){
                     wasHealed = false;
 
-                    Units.nearby(player.getTeam(), player.x, player.y, healRange, unit -> {
+                    Units.nearby(player.team(), player.x, player.y, healRange, unit -> {
                         if(unit.health < unit.maxHealth()){
                             Fx.heal.at(unit);
                             wasHealed = true;
@@ -310,7 +310,7 @@ public class Mechs implements ContentList{
 
                 if(player.timer.get(Player.timerAbility, effectReload)){
 
-                    Units.nearby(player.getTeam(), player.x, player.y, effectRange, unit -> {
+                    Units.nearby(player.team(), player.x, player.y, effectRange, unit -> {
                         //unit.applyEffect(StatusEffects.overdrive, effectDuration);
                     });
 
@@ -368,7 +368,7 @@ public class Mechs implements ContentList{
                 float scl = scld(player);
                 if(Mathf.chance(Time.delta() * (0.15 * scl))){
                     Fx.hitLancer.at(Pal.lancerLaser, player.x, player.y);
-                    Lightning.create(player.getTeam(), Pal.lancerLaser, 10f * Vars.state.rules.playerDamageMultiplier,
+                    Lightning.create(player.team(), Pal.lancerLaser, 10f * Vars.state.rules.playerDamageMultiplier,
                     player.x + player.velocity().x, player.y + player.velocity().y, player.rotation, 14);
                 }
             }

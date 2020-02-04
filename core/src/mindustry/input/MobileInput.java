@@ -67,7 +67,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     /** Check and assign targets for a specific position. */
     void checkTargets(float x, float y){
-        Unitc unit = Units.closestEnemy(player.getTeam(), x, y, 20f, u -> !u.isDead());
+        Unitc unit = Units.closestEnemy(player.team(), x, y, 20f, u -> !u.dead());
 
         if(unit != null){
             player.setMineTile(null);
@@ -75,11 +75,11 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Tile tile = world.ltileWorld(x, y);
 
-            if(tile != null && tile.synthetic() && player.getTeam().isEnemy(tile.getTeam())){
+            if(tile != null && tile.synthetic() && player.team().isEnemy(tile.getTeam())){
                 Tilec entity = tile.entity;
                 player.setMineTile(null);
                 player.target = entity;
-            }else if(tile != null && player.mech.canHeal && tile.entity != null && tile.getTeam() == player.getTeam() && tile.entity.damaged()){
+            }else if(tile != null && player.mech.canHeal && tile.entity != null && tile.getTeam() == player.team() && tile.entity.damaged()){
                 player.setMineTile(null);
                 player.target = tile.entity;
             }
@@ -441,7 +441,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         down = true;
 
-        if(player.isDead()) return false;
+        if(player.dead()) return false;
 
         //get tile on cursor
         Tile cursor = tileAt(screenX, screenY);
@@ -518,7 +518,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean longPress(float x, float y){
-        if(state.is(State.menu) || mode == none || player.isDead()) return false;
+        if(state.is(State.menu) || mode == none || player.dead()) return false;
 
         //get tile on cursor
         Tile cursor = tileAt(x, y);
@@ -583,7 +583,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             mode = none;
         }
 
-        if(player.isDead()){
+        if(player.dead()){
             mode = none;
         }
 

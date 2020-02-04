@@ -132,7 +132,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 ItemTransfer.create(item,
                 player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
                 new Vec2(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
-                    if(tile.block() != block || tile.entity == null || tile.entity.getItems() == null) return;
+                    if(tile.block() != block || tile.entity == null || tile.entity.items() == null) return;
 
                     tile.block().handleStack(item, removed, tile, player);
                     remaining[1] -= removed;
@@ -417,7 +417,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        for(BrokenBlock req : player.getTeam().data().brokenBlocks){
+        for(BrokenBlock req : player.team().data().brokenBlocks){
             Block block = content.block(req.block);
             if(block.bounds(req.x, req.y, Tmp.r2).overlaps(Tmp.r1)){
                 drawSelected(req.x, req.y, content.block(req.block), Pal.remove);
@@ -525,7 +525,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         //remove blocks to rebuild
-        Iterator<BrokenBlock> broken = state.teams.get(player.getTeam()).brokenBlocks.iterator();
+        Iterator<BrokenBlock> broken = state.teams.get(player.team()).brokenBlocks.iterator();
         while(broken.hasNext()){
             BrokenBlock req = broken.next();
             Block block = content.block(req.block);
@@ -565,7 +565,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         boolean consumed = false, showedInventory = false;
 
         //check if tapped block is configurable
-        if(tile.block().configurable && tile.interactable(player.getTeam())){
+        if(tile.block().configurable && tile.interactable(player.team())){
             consumed = true;
             if(((!frag.config.isShown() && tile.block().shouldShowConfigure(tile, player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
@@ -587,15 +587,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         //call tapped event
-        if(!consumed && tile.interactable(player.getTeam())){
+        if(!consumed && tile.interactable(player.team())){
             Call.onTileTapped(player, tile);
         }
 
         //consume tap event if necessary
-        if(tile.interactable(player.getTeam()) && tile.block().consumesTap){
+        if(tile.interactable(player.team()) && tile.block().consumesTap){
             consumed = true;
-        }else if(tile.interactable(player.getTeam()) && tile.block().synthetic() && !consumed){
-            if(tile.block().hasItems && tile.entity.getItems().total() > 0){
+        }else if(tile.interactable(player.team()) && tile.block().synthetic() && !consumed){
+            if(tile.block().hasItems && tile.entity.items().total() > 0){
                 frag.inv.showFor(tile);
                 consumed = true;
                 showedInventory = true;
@@ -750,7 +750,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         ItemStack stack = player.item();
 
-        if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.interactable(player.getTeam()) && tile.block().hasItems && player.item().amount > 0 && !player.isTransferring && tile.interactable(player.getTeam())){
+        if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.interactable(player.team()) && tile.block().hasItems && player.item().amount > 0 && !player.isTransferring && tile.interactable(player.team())){
             Call.transferInventory(player, tile);
         }else{
             Call.dropItem(player.angleTo(x, y));
@@ -782,11 +782,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 return false;
             }
         }
-        return Build.validPlace(player.getTeam(), x, y, type, rotation);
+        return Build.validPlace(player.team(), x, y, type, rotation);
     }
 
     public boolean validBreak(int x, int y){
-        return Build.validBreak(player.getTeam(), x, y);
+        return Build.validBreak(player.team(), x, y);
     }
 
     public void placeBlock(int x, int y, Block block, int rotation){

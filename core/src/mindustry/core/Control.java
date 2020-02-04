@@ -17,7 +17,6 @@ import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
-import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.maps.Map;
 import mindustry.type.*;
@@ -64,8 +63,8 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(PlayEvent.class, event -> {
-            player.setTeam(netServer.assignTeam(player, playerGroup.all()));
-            player.setDead(true);
+            player.team(netServer.assignTeam(player, playerGroup.all()));
+            player.dead(true);
             player.add();
 
             state.set(State.playing);
@@ -73,9 +72,9 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(WorldLoadEvent.class, event -> {
             Core.app.post(() -> Core.app.post(() -> {
-                if(net.active() && player.getClosestCore() != null){
+                if(net.active() && player.closestCore() != null){
                     //set to closest core since that's where the player will probably respawn; prevents camera jumps
-                    Core.camera.position.set(player.isDead() ? player.getClosestCore() : player);
+                    Core.camera.position.set(player.dead() ? player.closestCore() : player);
                 }else{
                     //locally, set to player position since respawning occurs immediately
                     Core.camera.position.set(player);
@@ -130,7 +129,7 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
 
         Events.on(BlockBuildEndEvent.class, e -> {
-            if(e.team == player.getTeam()){
+            if(e.team == player.team()){
                 if(e.breaking){
                     state.stats.buildingsDeconstructed++;
                 }else{
@@ -140,13 +139,13 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(BlockDestroyEvent.class, e -> {
-            if(e.tile.getTeam() == player.getTeam()){
+            if(e.tile.getTeam() == player.team()){
                 state.stats.buildingsDestroyed++;
             }
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
-            if(e.unit.getTeam() != player.getTeam()){
+            if(e.unit.team() != player.team()){
                 state.stats.enemyUnitsDestroyed++;
             }
         });
@@ -164,13 +163,13 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(Trigger.newGame, () -> {
-            Tilec core = player.getClosestCore();
+            Tilec core = player.closestCore();
 
             if(core == null) return;
 
             app.post(() -> ui.hudfrag.showLand());
             renderer.zoomIn(Fx.coreLand.lifetime);
-            app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.getBlock()));
+            app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block()));
             Time.run(Fx.coreLand.lifetime, () -> {
                 Fx.launch.at(core);
                 Effects.shake(5f, 5f, core);
@@ -259,7 +258,7 @@ public class Control implements ApplicationListener, Loadable{
             state.rules.zone = zone;
             for(Tilec core : state.teams.playerCores()){
                 for(ItemStack stack : zone.getStartingItems()){
-                    core.getItems().add(stack.item, stack.amount);
+                    core.items().add(stack.item, stack.amount);
                 }
             }
             state.set(State.playing);
@@ -308,11 +307,11 @@ public class Control implements ApplicationListener, Loadable{
             state.rules.zone = zone;
             for(Tilec core : state.teams.playerCores()){
                 for(ItemStack stack : zone.getStartingItems()){
-                    core.getItems().add(stack.item, stack.amount);
+                    core.items().add(stack.item, stack.amount);
                 }
             }
             Tilec core = state.teams.playerCores().first();
-            core.getItems().clear();
+            core.items().clear();
 
             logic.play();
             state.rules.waveTimer = false;
@@ -435,9 +434,9 @@ public class Control implements ApplicationListener, Loadable{
             input.update();
 
             if(world.isZone()){
-                for(Tilec tile : state.teams.cores(player.getTeam())){
+                for(Tilec tile : state.teams.cores(player.team())){
                     for(Item item : content.items()){
-                        if(tile.getItems().has(item)){
+                        if(tile.items().has(item)){
                             data.unlockContent(item);
                         }
                     }

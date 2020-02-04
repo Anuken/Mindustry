@@ -2,16 +2,11 @@ package mindustry.entities.bullet;
 
 import arc.audio.*;
 import arc.math.*;
-import arc.math.geom.*;
-import arc.struct.*;
-import arc.util.*;
-import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.type.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -132,7 +127,7 @@ public abstract class BulletType extends Content{
         }
 
         if(splashDamageRadius > 0){
-            Damage.damage(b.getTeam(), x, y, splashDamageRadius, splashDamage * b.damageMultiplier());
+            Damage.damage(b.team(), x, y, splashDamageRadius, splashDamage * b.damageMultiplier());
         }
     }
 
@@ -145,7 +140,7 @@ public abstract class BulletType extends Content{
         }
 
         for(int i = 0; i < lightining; i++){
-            Lightning.createLighting(Lightning.nextSeed(), b.getTeam(), Pal.surge, damage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
+            Lightning.createLighting(Lightning.nextSeed(), b.team(), Pal.surge, damage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
         }
     }
 
@@ -164,9 +159,9 @@ public abstract class BulletType extends Content{
 
     public void update(Bulletc b){
         if(homingPower > 0.0001f){
-            Teamc target = Units.closestTarget(b.getTeam(), b.getX(), b.getY(), homingRange, e -> !e.isFlying() || collidesAir);
+            Teamc target = Units.closestTarget(b.team(), b.getX(), b.getY(), homingRange, e -> !e.isFlying() || collidesAir);
             if(target != null){
-                b.getVel().setAngle(Mathf.slerpDelta(b.getRotation(), b.angleTo(target), 0.08f));
+                b.vel().setAngle(Mathf.slerpDelta(b.getRotation(), b.angleTo(target), 0.08f));
             }
         }
     }
@@ -179,7 +174,7 @@ public abstract class BulletType extends Content{
     //TODO change 'create' to 'at'
 
     public Bulletc create(Teamc owner, float x, float y, float angle){
-        return create(owner, owner.getTeam(), x, y, angle);
+        return create(owner, owner.team(), x, y, angle);
     }
 
     public Bulletc create(Entityc owner, Team team, float x, float y, float angle){
@@ -195,11 +190,11 @@ public abstract class BulletType extends Content{
     }
 
     public Bulletc create(Bulletc parent, float x, float y, float angle){
-        return create(parent.getOwner(), parent.getTeam(), x, y, angle);
+        return create(parent.getOwner(), parent.team(), x, y, angle);
     }
 
     public Bulletc create(Bulletc parent, float x, float y, float angle, float velocityScl){
-        return create(parent.getOwner(), parent.getTeam(), x, y, angle, velocityScl);
+        return create(parent.getOwner(), parent.team(), x, y, angle, velocityScl);
     }
 
     public Bulletc create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl, Object data){

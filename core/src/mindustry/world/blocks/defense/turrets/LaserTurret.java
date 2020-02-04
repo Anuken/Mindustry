@@ -2,9 +2,7 @@ package mindustry.world.blocks.defense.turrets;
 
 import arc.math.*;
 import arc.util.*;
-import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.type.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -72,12 +70,12 @@ public class LaserTurret extends PowerTurret{
 
             entity.reload = 0f;
         }else{
-            Liquid liquid = entity.getLiquids().current();
+            Liquid liquid = entity.liquids().current();
             float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-            float used = baseReloadSpeed(tile) * (tile.isEnemyCheat() ? maxUsed : Math.min(entity.getLiquids().get(liquid), maxUsed * Time.delta())) * liquid.heatCapacity * coolantMultiplier;
+            float used = baseReloadSpeed(tile) * (tile.isEnemyCheat() ? maxUsed : Math.min(entity.liquids().get(liquid), maxUsed * Time.delta())) * liquid.heatCapacity * coolantMultiplier;
             entity.reload += used;
-            entity.getLiquids().remove(liquid, used);
+            entity.liquids().remove(liquid, used);
 
             if(Mathf.chance(0.06 * used)){
                 coolEffect.at(tile.drawx() + Mathf.range(size * tilesize / 2f), tile.drawy() + Mathf.range(size * tilesize / 2f));

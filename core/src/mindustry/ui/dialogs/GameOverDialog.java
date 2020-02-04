@@ -22,7 +22,7 @@ public class GameOverDialog extends FloatingDialog{
     public void show(Team winner){
         this.winner = winner;
         show();
-        if(winner == player.getTeam()){
+        if(winner == player.team()){
             Events.fire(new WinEvent());
         }else{
             Events.fire(new LoseEvent());

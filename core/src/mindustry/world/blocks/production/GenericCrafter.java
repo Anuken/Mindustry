@@ -7,7 +7,6 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
-import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -60,7 +59,7 @@ public class GenericCrafter extends Block{
 
     @Override
     public boolean shouldIdleSound(Tile tile){
-        return tile.entity.getCons().valid();
+        return tile.entity.cons().valid();
     }
 
     @Override
@@ -135,10 +134,10 @@ public class GenericCrafter extends Block{
 
     @Override
     public boolean shouldConsume(Tile tile){
-        if(outputItem != null && tile.entity.getItems().get(outputItem.item) >= itemCapacity){
+        if(outputItem != null && tile.entity.items().get(outputItem.item) >= itemCapacity){
             return false;
         }
-        return outputLiquid == null || !(tile.entity.getLiquids().get(outputLiquid.liquid) >= liquidCapacity);
+        return outputLiquid == null || !(tile.entity.liquids().get(outputLiquid.liquid) >= liquidCapacity);
     }
 
     @Override

@@ -34,6 +34,10 @@ public class Smethod extends Selement<ExecutableElement>{
         return Array.with(e.getParameters()).map(Svar::new);
     }
 
+    public boolean isVoid(){
+        return ret().toString().equals("void");
+    }
+
     public TypeMirror ret(){
         return e.getReturnType();
     }

@@ -318,8 +318,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.one)
     public static void onPositionSet(float x, float y){
-        player.x = x;
-        player.y = y;
+        player.set(x, y);
     }
 
     @Remote
@@ -420,7 +419,7 @@ public class NetClient implements ApplicationListener{
                 Tile tile = world.tile(pos);
 
                 if(tile != null && tile.entity != null){
-                    tile.entity.getItems().read(input);
+                    tile.entity.items().read(input);
                 }else{
                     new ItemModule().read(input);
                 }

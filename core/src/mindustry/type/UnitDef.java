@@ -12,7 +12,6 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
-import mindustry.entities.type.*;
 import mindustry.entities.type.base.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -106,7 +105,7 @@ public class UnitDef extends UnlockableContent{
     public void drawStats(Unitc player){
         if(drawCell){
             float health = player.healthf();
-            Draw.color(Color.black, player.getTeam().color, health + Mathf.absin(Time.time(), health * 5f, 1f - health));
+            Draw.color(Color.black, player.team().color, health + Mathf.absin(Time.time(), health * 5f, 1f - health));
             Draw.rect(player.getPowerCellRegion(),
             player.x + Angles.trnsx(player.rotation, cellOffsetY, cellOffsetX),
             player.y + Angles.trnsy(player.rotation, cellOffsetY, cellOffsetX),

@@ -39,7 +39,7 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "unused"})
 public class EntityComps{
 
     @Component
@@ -47,41 +47,48 @@ public class EntityComps{
         private UnitController controller;
         private UnitDef type;
 
-        public float getBounds(){
-            return getHitSize() *  2f;
+        @Override
+        public float bounds(){
+            return hitSize() *  2f;
         }
 
-        public void setController(UnitController controller){
+        @Override
+        public void controller(UnitController controller){
             this.controller = controller;
             controller.set(this);
         }
 
-        public UnitController getController(){
+        @Override
+        public UnitController controller(){
             return controller;
         }
 
+        @Override
         public void set(UnitDef def, UnitController controller){
-            setType(type);
-            setController(controller);
+            type(type);
+            controller(controller);
         }
 
-        public void setType(UnitDef type){
+        @Override
+        public void type(UnitDef type){
             this.type = type;
             setupWeapons(type);
         }
 
-        public UnitDef getType(){
+        @Override
+        public UnitDef type(){
             return type;
         }
 
+        @Override
         public void update(){
             //apply knockback based on spawns
             //TODO move elsewhere
-            if(getTeam() != state.rules.waveTeam){
-                float relativeSize = state.rules.dropZoneRadius + getBounds()/2f + 1f;
+            if(team() != state.rules.waveTeam){
+                float relativeSize = state.rules.dropZoneRadius + bounds()/2f + 1f;
                 for(Tile spawn : spawner.getGroundSpawns()){
                     if(withinDst(spawn.worldx(), spawn.worldy(), relativeSize)){
-                        getVel().add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta()));
+                        vel().add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta()));
                     }
                 }
             }
@@ -91,7 +98,7 @@ public class EntityComps{
 
             if(tile != null){
                 //unit block update
-                tile.block().unitOn(tile, (mindustry.gen.Unitc)this);
+                tile.block().unitOn(tile, this);
 
                 //apply damage
                 if(floor.damageTaken > 0f){
@@ -100,6 +107,7 @@ public class EntityComps{
             }
         }
 
+        @Override
         public void drawLight(){
             //TODO move
             if(type.lightRadius > 0){
@@ -107,17 +115,19 @@ public class EntityComps{
             }
         }
 
+        @Override
         public void draw(){
             //draw power cell - TODO move
-            Draw.color(Color.black, getTeam().color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
-            Draw.rect(type.cellRegion, getX(), getY(), getRotation() - 90);
+            Draw.color(Color.black, team().color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
+            Draw.rect(type.cellRegion, getX(), getY(), rotation() - 90);
             Draw.color();
         }
 
+        @Override
         public void killed(){
-            float explosiveness = 2f + item().explosiveness * getStack().amount;
-            float flammability = item().flammability * getStack().amount;
-            Damage.dynamicExplosion(getX(), getY(), flammability, explosiveness, 0f, getBounds() / 2f, Pal.darkFlame);
+            float explosiveness = 2f + item().explosiveness * stack().amount;
+            float flammability = item().flammability * stack().amount;
+            Damage.dynamicExplosion(getX(), getY(), flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame);
 
             //TODO cleanup
             //ScorchDecal.create(getX(), getY());
@@ -125,7 +135,7 @@ public class EntityComps{
             Effects.shake(2f, 2f, this);
 
             Sounds.bang.at(this);
-            Events.fire(new UnitDestroyEvent((mindustry.gen.Unitc)this));
+            Events.fire(new UnitDestroyEvent(this));
 
             //TODO implement suicide bomb trigger
             //if(explosiveness > 7f && this == player){
@@ -146,6 +156,7 @@ public class EntityComps{
         private @Nullable Posc parent;
         private float offsetX, offsetY;
 
+        @Override
         public void add(){
             if(parent != null){
                 offsetX = x - parent.getX();
@@ -153,6 +164,7 @@ public class EntityComps{
             }
         }
 
+        @Override
         public void update(){
             if(parent != null){
                 x = parent.getX() + offsetX;
@@ -168,68 +180,78 @@ public class EntityComps{
         Object data;
         BulletType type;
 
+        @Override
         public float getDamage(){
             return type.damage;
         }
 
+        @Override
         public void add(){
             type.init(this);
 
-            setDrag(type.drag);
-            setHitSize(type.hitSize);
-            setLifetime(lifeScl * type.lifetime);
+            drag(type.drag);
+            hitSize(type.hitSize);
+            lifetime(lifeScl * type.lifetime);
         }
 
+        @Override
         public void remove(){
             type.despawned(this);
         }
 
+        @Override
         public float getLifetime(){
             return type.lifetime;
         }
 
+        @Override
         public float damageMultiplier(){
-            if(getOwner() instanceof Unitc){
-                return ((Unitc)getOwner()).getDamageMultiplier();
+            if(owner() instanceof Unitc){
+                return ((Unitc)owner()).damageMultiplier();
             }
             return 1f;
         }
 
+        @Override
         public void absorb(){
             //TODO
             remove();
         }
 
+        @Override
         public float clipSize(){
             return type.drawSize;
         }
 
+        @Override
         public float damage(){
             return type.damage * damageMultiplier();
         }
 
+        @Override
         public void collision(Hitboxc other, float x, float y){
             if(!type.pierce) remove();
             type.hit(this, x, y);
 
             if(other instanceof Unitc){
                 Unitc unit = (Unitc)other;
-                unit.getVel().add(Tmp.v3.set(other.getX(), other.getY()).sub(x, y).setLength(type.knockback / unit.getMass()));
+                unit.vel().add(Tmp.v3.set(other.x(), other.y()).sub(x, y).setLength(type.knockback / unit.mass()));
                 unit.apply(type.status, type.statusDuration);
             }
         }
 
+        @Override
         public void update(){
             type.update(this);
 
             if(type.hitTiles){
-                world.raycastEach(world.toTile(getLastX()), world.toTile(getLastY()), tileX(), tileY(), (x, y) -> {
+                world.raycastEach(world.toTile(lastX()), world.toTile(lastY()), tileX(), tileY(), (x, y) -> {
 
                     Tile tile = world.ltile(x, y);
                     if(tile == null) return false;
 
-                    if(tile.entity != null && tile.entity.collide(this) && type.collides(this, tile) && !tile.entity.isDead() && (type.collidesTeam || tile.getTeam() != getTeam())){
-                        if(tile.getTeam() != getTeam()){
+                    if(tile.entity != null && tile.entity.collide(this) && type.collides(this, tile) && !tile.entity.dead() && (type.collidesTeam || tile.getTeam() != team())){
+                        if(tile.getTeam() != team()){
                             tile.entity.collision(this);
                         }
 
@@ -243,20 +265,23 @@ public class EntityComps{
             }
         }
 
+        @Override
         public void draw(){
             type.draw(this);
             //TODO refactor
-            renderer.lights.add(getX(), getY(), 16f, Pal.powerLight, 0.3f);
+            renderer.lights.add(x(), y(), 16f, Pal.powerLight, 0.3f);
         }
 
         /** Sets the bullet's rotation in degrees. */
-        public void setRotation(float angle){
-            getVel().setAngle(angle);
+        @Override
+        public void rotation(float angle){
+            vel().setAngle(angle);
         }
 
         /** @return the bullet's rotation. */
-        public float getRotation(){
-            float angle = Mathf.atan2(getVel().x, getVel().y) * Mathf.radiansToDegrees;
+        @Override
+        public float rotation(){
+            float angle = Mathf.atan2(vel().x, vel().y) * Mathf.radiansToDegrees;
             if(angle < 0) angle += 360;
             return angle;
         }
@@ -264,13 +289,14 @@ public class EntityComps{
 
     @Component
     abstract class DamageComp{
-        abstract float getDamage();
+        abstract float damage();
     }
 
     @Component
     abstract class TimedComp implements Entityc, Scaled{
         float time, lifetime;
 
+        @Override
         public void update(){
             time = Math.min(time + Time.delta(), lifetime);
 
@@ -300,6 +326,7 @@ public class EntityComps{
             return health / maxHealth;
         }
 
+        @Override
         public void update(){
             hitTime -= Time.delta() / hitDuration;
         }
@@ -366,6 +393,7 @@ public class EntityComps{
             return elevation < 0.001f;
         }
 
+        @Override
         public void update(){
             Floor floor = floorOn();
 
@@ -377,7 +405,7 @@ public class EntityComps{
                 drownTime += Time.delta() * 1f / floor.drownTime;
                 drownTime = Mathf.clamp(drownTime);
                 if(Mathf.chance(Time.delta() * 0.05f)){
-                    floor.drownUpdateEffect.at(getX(), getY(), 0f, floor.color);
+                    floor.drownUpdateEffect.at(x, y, 0f, floor.color);
                 }
 
                 //TODO is the netClient check necessary?
@@ -403,8 +431,8 @@ public class EntityComps{
         void interpolate(){
             Syncc sync = (Syncc)this;
 
-            if(sync.getInterpolator().values.length > 0){
-                rotation = sync.getInterpolator().values[0];
+            if(sync.interpolator().values.length > 0){
+                rotation = sync.interpolator().values[0];
             }
         }
     }
@@ -433,6 +461,7 @@ public class EntityComps{
         private float sleepTime;
 
         /** Sets this tile entity data to this tile, and adds it if necessary. */
+        @Override
         public Tilec init(Tile tile, boolean shouldAdd){
             this.tile = tile;
             this.block = tile.block();
@@ -442,8 +471,8 @@ public class EntityComps{
                 sound = new SoundLoop(block.activeSound, block.activeSoundVolume);
             }
 
-            setHealth(block.health);
-            setMaxHealth(block.health);
+            health(block.health);
+            maxHealth(block.health);
             timer = new Interval(block.timers);
 
             if(shouldAdd){
@@ -453,33 +482,40 @@ public class EntityComps{
             return this;
         }
 
-        public float getTimeScale(){
+        @Override
+        public float timeScale(){
             return timeScale;
         }
 
+        @Override
         public boolean consValid(){
             return cons.valid();
         }
 
+        @Override
         public void consume(){
             cons.trigger();
         }
 
+        @Override
         public boolean timer(int id, float time){
             return timer.get(id, time);
         }
 
         /** Scaled delta. */
+        @Override
         public float delta(){
             return Time.delta() * timeScale;
         }
 
         /** Base efficiency. If this entity has non-buffered power, returns the power %, otherwise returns 1. */
+        @Override
         public float efficiency(){
             return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
         }
 
         /** Call when nothing is happening to the entity. This increments the internal sleep timer. */
+        @Override
         public void sleep(){
             sleepTime += Time.delta();
             if(!sleeping && sleepTime >= timeToSleep){
@@ -490,6 +526,7 @@ public class EntityComps{
         }
 
         /** Call when this entity is updating. This wakes it up. */
+        @Override
         public void noSleep(){
             sleepTime = 0f;
             if(sleeping){
@@ -500,20 +537,24 @@ public class EntityComps{
         }
 
         /** Returns the version of this TileEntity IO code.*/
+        @Override
         public byte version(){
             return 0;
         }
 
+        @Override
         public boolean collide(Bulletc other){
             return true;
         }
 
+        @Override
         public void collision(Bulletc other){
             block.handleBulletHit(this, other);
         }
 
         //TODO Implement damage!
 
+        @Override
         public void removeFromProximity(){
             block.onProximityRemoved(tile);
 
@@ -525,12 +566,13 @@ public class EntityComps{
                     other.block().onProximityUpdate(other);
 
                     if(other.entity != null){
-                        other.entity.getProximity().remove(tile, true);
+                        other.entity.proximity().remove(tile, true);
                     }
                 }
             }
         }
 
+        @Override
         public void updateProximity(){
             tmpTiles.clear();
             proximity.clear();
@@ -543,8 +585,8 @@ public class EntityComps{
                 if(other.entity == null || !(other.interactable(tile.getTeam()))) continue;
 
                 //add this tile to proximity of nearby tiles
-                if(!other.entity.getProximity().contains(tile, true)){
-                    other.entity.getProximity().add(tile);
+                if(!other.entity.proximity().contains(tile, true)){
+                    other.entity.proximity().add(tile);
                 }
 
                 tmpTiles.add(other);
@@ -563,21 +605,25 @@ public class EntityComps{
             }
         }
 
+        @Override
         public Array<Tile> proximity(){
             return proximity;
         }
 
         /** Tile configuration. Defaults to 0. Used for block rebuilding. */
+        @Override
         public int config(){
             return 0;
         }
 
+        @Override
         public void remove(){
             if(sound != null){
                 sound.stop();
             }
         }
 
+        @Override
         public void killed(){
             Events.fire(new BlockDestroyEvent(tile));
             block.breakSound.at(tile);
@@ -585,6 +631,7 @@ public class EntityComps{
             tile.remove();
         }
 
+        @Override
         public void update(){
             timeScaleDuration -= Time.delta();
             if(timeScaleDuration <= 0f || !block.canOverdrive){
@@ -592,7 +639,7 @@ public class EntityComps{
             }
 
             if(sound != null){
-                sound.update(getX(), getY(), block.shouldActiveSound(tile));
+                sound.update(x(), y(), block.shouldActiveSound(tile));
             }
 
             if(block.idleSound != Sounds.none && block.shouldIdleSound(tile)){
@@ -621,7 +668,7 @@ public class EntityComps{
 
         Team team = Team.sharded;
 
-        public @Nullable Tilec getClosestCore(){
+        public @Nullable Tilec closestCore(){
             return state.teams.closestCore(x, y, team);
         }
     }
@@ -638,7 +685,7 @@ public class EntityComps{
         static int sequenceNum = 0;
 
         /** weapon mount array, never null */
-        WeaponMount[] mounts = {};
+        @ReadOnly WeaponMount[] mounts = {};
 
         void setupWeapons(UnitDef def){
             mounts = new WeaponMount[def.weapons.size];
@@ -662,6 +709,7 @@ public class EntityComps{
         }
 
         /** Update shooting and rotation for this unit. */
+        @Override
         public void update(){
             for(WeaponMount mount : mounts){
                 Weapon weapon = mount.weapon;
@@ -744,7 +792,7 @@ public class EntityComps{
 
             if(this instanceof Velc){
                 //TODO apply force?
-                ((Velc)this).getVel().add(Tmp.v1);
+                ((Velc)this).vel().add(Tmp.v1);
             }
 
             Tmp.v1.trns(rotation, 3f);
@@ -774,7 +822,7 @@ public class EntityComps{
         void drawShadow(){
             if(!isGrounded()){
                 Draw.color(shadowColor);
-                Draw.rect(getShadowRegion(), x + shadowTX * getElevation(), y + shadowTY * getElevation(), rotation - 90);
+                Draw.rect(getShadowRegion(), x + shadowTX * elevation(), y + shadowTY * elevation(), rotation - 90);
                 Draw.color();
             }
         }
@@ -787,6 +835,7 @@ public class EntityComps{
         float itemTime;
 
         //drawn after base
+        @Override
         @MethodPriority(3)
         public void draw(){
             boolean number = isLocal();
@@ -812,7 +861,7 @@ public class EntityComps{
                 (3f + Mathf.absin(Time.time(), 5f, 1f)) * itemTime);
 
                 if(isLocal()){
-                    Fonts.outline.draw(getStack().amount + "",
+                    Fonts.outline.draw(stack().amount + "",
                     x + Angles.trnsx(rotation + 180f, backTrns),
                     y + Angles.trnsy(rotation + 180f, backTrns) - 3,
                     Pal.accent, 0.25f * itemTime / Scl.scl(1f), false, Align.center
@@ -829,12 +878,14 @@ public class EntityComps{
         Color color = new Color(1, 1, 1, 1);
         TextureRegion region;
 
+        @Override
         public void draw(){
             Draw.color(color);
-            Draw.rect(region, getX(), getY(), getRotation());
+            Draw.rect(region, x(), y(), rotation());
             Draw.color();
         }
 
+        @Override
         public float clipSize(){
             return region.getWidth()*2;
         }
@@ -883,6 +934,7 @@ public class EntityComps{
             interpolator.lastUpdated = 0;
         }
 
+        @Override
         public void update(){
             if(Vars.net.client() && !isLocal()){
                 interpolate();
@@ -938,11 +990,11 @@ public class EntityComps{
         }
 
         int tileX(){
-            return Vars.world.toTile(getX());
+            return Vars.world.toTile(x);
         }
 
         int tileY(){
-            return Vars.world.toTile(getY());
+            return Vars.world.toTile(y);
         }
 
         /** Returns air if this unit is on a non-air top block. */
@@ -953,6 +1005,16 @@ public class EntityComps{
 
         public @Nullable Tile tileOn(){
             return world.tileWorld(x, y);
+        }
+
+        @Override
+        public float getX(){
+            return x;
+        }
+
+        @Override
+        public float getY(){
+            return y;
         }
     }
 
@@ -966,23 +1028,23 @@ public class EntityComps{
 
         abstract boolean canMine(Item item);
 
-        abstract float getMiningSpeed();
+        abstract float miningSpeed();
 
         abstract boolean offloadImmediately();
 
-        boolean isMining(){
+        boolean mining(){
             return mineTile != null;
         }
 
         void updateMining(){
-            Tilec core = getClosestCore();
+            Tilec core = closestCore();
 
             if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && dst(core) < mineTransferRange){
-                int accepted = core.getTile().block().acceptStack(item(), getStack().amount, core.getTile(), this);
+                int accepted = core.tile().block().acceptStack(item(), stack().amount, core.tile(), this);
                 if(accepted > 0){
                     Call.transferItemTo(item(), accepted,
                     mineTile.worldx() + Mathf.range(tilesize / 2f),
-                    mineTile.worldy() + Mathf.range(tilesize / 2f), core.getTile());
+                    mineTile.worldy() + Mathf.range(tilesize / 2f), core.tile());
                     clearItem();
                 }
             }
@@ -992,14 +1054,14 @@ public class EntityComps{
                 mineTile = null;
             }else{
                 Item item = mineTile.drop();
-                setRotation(Mathf.slerpDelta(getRotation(), angleTo(mineTile.worldx(), mineTile.worldy()), 0.4f));
+                rotation(Mathf.slerpDelta(rotation(), angleTo(mineTile.worldx(), mineTile.worldy()), 0.4f));
 
-                if(Mathf.chance(Time.delta() * (0.06 - item.hardness * 0.01) * getMiningSpeed())){
+                if(Mathf.chance(Time.delta() * (0.06 - item.hardness * 0.01) * miningSpeed())){
 
-                    if(dst(core) < mineTransferRange && core.getTile().block().acceptStack(item, 1, core.getTile(), this) == 1 && offloadImmediately()){
+                    if(dst(core) < mineTransferRange && core.tile().block().acceptStack(item, 1, core.tile(), this) == 1 && offloadImmediately()){
                         Call.transferItemTo(item, 1,
                         mineTile.worldx() + Mathf.range(tilesize / 2f),
-                        mineTile.worldy() + Mathf.range(tilesize / 2f), core.getTile());
+                        mineTile.worldy() + Mathf.range(tilesize / 2f), core.tile());
                     }else if(acceptsItem(item)){
                         //this is clientside, since items are synced anyway
                         ItemTransfer.transferItemToUnit(item,
@@ -1016,7 +1078,7 @@ public class EntityComps{
         }
 
         void drawOver(){
-            if(!isMining()) return;
+            if(!mining()) return;
             float focusLen = 4f + Mathf.absin(Time.time(), 1.1f, 0.5f);
             float swingScl = 12f, swingMag = tilesize / 8f;
             float flashScl = 0.3f;
@@ -1042,13 +1104,13 @@ public class EntityComps{
     }
 
     @Component
-    abstract static class BuilderComp implements mindustry.gen.Unitc{
+    abstract static class BuilderComp implements Unitc{
         static final float placeDistance = 220f;
         static final Vec2[] tmptr = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
         transient float x, y, rotation;
-        
-        Queue<BuildRequest> requests = new Queue<>();
+
+        @ReadOnly Queue<BuildRequest> requests = new Queue<>();
         float buildSpeed = 1f;
         //boolean building;
 
@@ -1064,7 +1126,7 @@ public class EntityComps{
                 }
             }
 
-            Tilec core = getClosestCore();
+            Tilec core = closestCore();
 
             //nothing to build.
             if(buildRequest() == null) return;
@@ -1087,10 +1149,10 @@ public class EntityComps{
             Tile tile = world.tile(current.x, current.y);
 
             if(!(tile.block() instanceof BuildBlock)){
-                if(!current.initialized && !current.breaking && Build.validPlace(getTeam(), current.x, current.y, current.block, current.rotation)){
-                    Build.beginPlace(getTeam(), current.x, current.y, current.block, current.rotation);
-                }else if(!current.initialized && current.breaking && Build.validBreak(getTeam(), current.x, current.y)){
-                    Build.beginBreak(getTeam(), current.x, current.y);
+                if(!current.initialized && !current.breaking && Build.validPlace(team(), current.x, current.y, current.block, current.rotation)){
+                    Build.beginPlace(team(), current.x, current.y, current.block, current.rotation);
+                }else if(!current.initialized && current.breaking && Build.validBreak(team(), current.x, current.y)){
+                    Build.beginBreak(team(), current.x, current.y);
                 }else{
                     requests.removeFirst();
                     return;
@@ -1098,7 +1160,7 @@ public class EntityComps{
             }
 
             if(tile.entity instanceof BuildEntity && !current.initialized){
-                Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, getTeam(), (Builderc)this, current.breaking)));
+                Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, team(), (Builderc)this, current.breaking)));
                 current.initialized = true;
             }
 
@@ -1136,7 +1198,7 @@ public class EntityComps{
         boolean shouldSkip(BuildRequest request, @Nullable Tilec core){
             //requests that you have at least *started* are considered
             if(state.rules.infiniteResources || request.breaking || !request.initialized || core == null) return false;
-            return request.stuck && !core.getItems().has(request.block.requirements);
+            return request.stuck && !core.items().has(request.block.requirements);
         }
 
         void removeBuild(int x, int y, boolean breaking){
@@ -1238,12 +1300,12 @@ public class EntityComps{
 
     @Component
     abstract class ItemsComp{
-        ItemStack stack = new ItemStack();
+        @ReadOnly ItemStack stack = new ItemStack();
 
-        abstract int getItemCapacity();
+        abstract int itemCapacity();
 
         void update(){
-            stack.amount = Mathf.clamp(stack.amount, 0, getItemCapacity());
+            stack.amount = Mathf.clamp(stack.amount, 0, itemCapacity());
         }
 
         Item item(){
@@ -1255,7 +1317,7 @@ public class EntityComps{
         }
 
         boolean acceptsItem(Item item){
-            return !hasItem() || item == stack.item && stack.amount + 1 <= getItemCapacity();
+            return !hasItem() || item == stack.item && stack.amount + 1 <= itemCapacity();
         }
 
         boolean hasItem(){
@@ -1275,14 +1337,17 @@ public class EntityComps{
         Object data;
         float rotation = 0f;
 
+        @Override
         public void draw(){
 
         }
 
+        @Override
         public void update(){
             //TODO fix effects, make everything poolable
         }
 
+        @Override
         public float clipSize(){
             return effect.size;
         }
@@ -1295,6 +1360,7 @@ public class EntityComps{
         final Vec2 vel = new Vec2();
         float drag = 0f;
 
+        @Override
         public void update(){
             //TODO handle solidity
             x += vel.x;
@@ -1310,6 +1376,7 @@ public class EntityComps{
         float hitSize;
         float lastX, lastY;
 
+        @Override
         public void update(){
 
         }
@@ -1323,19 +1390,20 @@ public class EntityComps{
 
         }
 
-        float getDeltaX(){
+        float deltaX(){
             return x - lastX;
         }
 
-        float getDeltaY(){
+        float deltaY(){
             return y - lastY;
         }
 
         boolean collides(Hitboxc other){
             return Intersector.overlapsRect(x - hitSize/2f, y - hitSize/2f, hitSize, hitSize,
-            other.getX() - other.getHitSize()/2f, other.getY() - other.getHitSize()/2f, other.getHitSize(), other.getHitSize());
+            other.x() - other.hitSize()/2f, other.y() - other.hitSize()/2f, other.hitSize(), other.hitSize());
         }
 
+        @Override
         public void hitbox(Rect rect){
             rect.setCentered(x, y, hitSize, hitSize);
         }
@@ -1347,16 +1415,16 @@ public class EntityComps{
     }
 
     @Component
-    abstract class StatusComp implements Posc{
+    abstract class StatusComp implements Posc, Flyingc{
         private Array<StatusEntry> statuses = new Array<>();
         private Bits applied = new Bits(content.getBy(ContentType.status).size);
 
-        float speedMultiplier;
-        float damageMultiplier;
-        float armorMultiplier;
+        @ReadOnly float speedMultiplier;
+        @ReadOnly float damageMultiplier;
+        @ReadOnly float armorMultiplier;
 
         /** @return damage taken based on status armor multipliers */
-        float getDamage(float amount){
+        float getShieldDamage(float amount){
             return amount * Mathf.clamp(1f - armorMultiplier / 100f);
         }
 
@@ -1396,7 +1464,7 @@ public class EntityComps{
             return false;
         }
 
-        Color getStatusColor(){
+        Color statusColor(){
             if(statuses.size == 0){
                 return Tmp.c1.set(Color.white);
             }
@@ -1410,16 +1478,12 @@ public class EntityComps{
             return Tmp.c1.set(r / statuses.size, g / statuses.size, b / statuses.size, 1f);
         }
 
+        @Override
         public void update(){
             Floor floor = floorOn();
-            Tile tile = tileOn();
-            boolean flying = false;
-            //TODO conditionally apply status effects on floor, if not flying
-            if(!flying && tile != null){
+            if(isGrounded() && floor.status != null){
                 //apply effect
-                if(floor.status != null){
-                    apply(floor.status, floor.statusDuration);
-                }
+                apply(floor.status, floor.statusDuration);
             }
 
             applied.clear();

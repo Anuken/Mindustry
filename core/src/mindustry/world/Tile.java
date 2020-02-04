@@ -455,12 +455,12 @@ public class Tile implements Position{
         if(block.hasEntity()){
             //TODO assign data and don't use new entity
             entity = block.newEntity().init(this, block.update);
-            entity.setCons(new ConsumeModule(entity));
-            if(block.hasItems) entity.setItems(new ItemModule());
-            if(block.hasLiquids) entity.setLiquids(new LiquidModule());
+            entity.cons(new ConsumeModule(entity));
+            if(block.hasItems) entity.items(new ItemModule());
+            if(block.hasLiquids) entity.liquids(new LiquidModule());
             if(block.hasPower){
-                entity.setPower(new PowerModule());
-                entity.getPower().graph.add(this);
+                entity.power(new PowerModule());
+                entity.power().graph.add(this);
             }
 
             if(!world.isGenerating()){
@@ -511,7 +511,7 @@ public class Tile implements Position{
     @Remote(called = Loc.server, unreliable = true)
     public static void onTileDamage(Tile tile, float health){
         if(tile.entity != null){
-            tile.entity.setHealth(health);
+            tile.entity.health(health);
 
             if(tile.entity.damaged()){
                 indexer.notifyTileDamaged(tile.entity);

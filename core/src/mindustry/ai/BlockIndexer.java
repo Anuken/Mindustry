@@ -146,7 +146,7 @@ public class BlockIndexer{
 
         ObjectSet<Tile> set = damagedTiles[team.id];
         for(Tile tile : set){
-            if((tile.entity == null || tile.entity.getTeam() != team || !tile.entity.damaged()) || tile.block() instanceof BuildBlock){
+            if((tile.entity == null || tile.entity.team() != team || !tile.entity.damaged()) || tile.block() instanceof BuildBlock){
                 returnArray.add(tile);
             }
         }
@@ -164,7 +164,7 @@ public class BlockIndexer{
     }
 
     public boolean eachBlock(Teamc team, float range, Boolf<Tile> pred, Cons<Tile> cons){
-        return eachBlock(team.getTeam(), team.getX(), team.getY(), range, pred, cons);
+        return eachBlock(team.team(), team.getX(), team.getY(), range, pred, cons);
     }
 
     public boolean eachBlock(Team team, float wx, float wy, float range, Boolf<Tile> pred, Cons<Tile> cons){
@@ -213,12 +213,12 @@ public class BlockIndexer{
     }
 
     public void notifyTileDamaged(Tilec entity){
-        if(damagedTiles[(int)entity.getTeam().id] == null){
-            damagedTiles[(int)entity.getTeam().id] = new ObjectSet<>();
+        if(damagedTiles[(int)entity.team().id] == null){
+            damagedTiles[(int)entity.team().id] = new ObjectSet<>();
         }
 
-        ObjectSet<Tile> set = damagedTiles[(int)entity.getTeam().id];
-        set.add(entity.getTile());
+        ObjectSet<Tile> set = damagedTiles[(int)entity.team().id];
+        set.add(entity.tile());
     }
 
     public Tilec findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
@@ -262,9 +262,9 @@ public class BlockIndexer{
                         float ndst = e.dst2(x, y);
                         if(ndst < range2 && (closest == null ||
                                 //this one is closer, and it is at least of equal priority
-                                (ndst < dst && (!usePriority || closest.getBlock().priority.ordinal() <= e.getBlock().priority.ordinal())) ||
+                                (ndst < dst && (!usePriority || closest.block().priority.ordinal() <= e.block().priority.ordinal())) ||
                                 //priority is used, and new block has higher priority regardless of range
-                                (usePriority && closest.getBlock().priority.ordinal() < e.getBlock().priority.ordinal()))){
+                                (usePriority && closest.block().priority.ordinal() < e.block().priority.ordinal()))){
                             dst = ndst;
                             closest = e;
                         }

@@ -6,7 +6,6 @@ import arc.util.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.entities.type.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Stats.*;
@@ -54,17 +53,17 @@ public class SStats implements SteamUserStatsCallback{
 
     private void checkUpdate(){
         if(campaign()){
-            SStat.maxUnitActive.max(unitGroup.count(t -> t.getTeam() == player.getTeam()));
+            SStat.maxUnitActive.max(unitGroup.count(t -> t.getTeam() == player.team()));
 
-            if(unitGroup.count(u -> u.getType() == UnitTypes.phantom && u.getTeam() == player.getTeam()) >= 10){
+            if(unitGroup.count(u -> u.getType() == UnitTypes.phantom && u.getTeam() == player.team()) >= 10){
                 active10Phantoms.complete();
             }
 
-            if(unitGroup.count(u -> u.getType() == UnitTypes.crawler && u.getTeam() == player.getTeam()) >= 50){
+            if(unitGroup.count(u -> u.getType() == UnitTypes.crawler && u.getTeam() == player.team()) >= 50){
                 active50Crawlers.complete();
             }
 
-            for(Tilec entity : player.getTeam().cores()){
+            for(Tilec entity : player.team().cores()){
                 if(!content.items().contains(i -> i.type == ItemType.material && entity.getItems().get(i) < entity.block.itemCapacity)){
                     fillCoreAllCampaign.complete();
                     break;
@@ -76,7 +75,7 @@ public class SStats implements SteamUserStatsCallback{
     private void registerEvents(){
         Events.on(UnitDestroyEvent.class, e -> {
             if(ncustom()){
-                if(e.unit.getTeam() != Vars.player.getTeam()){
+                if(e.unit.team() != Vars.player.team()){
                     SStat.unitsDestroyed.add();
 
                     if(e.unit instanceof BaseUnit && ((BaseUnit)e.unit).isBoss()){
@@ -93,7 +92,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(Trigger.newGame, () -> Core.app.post(() -> {
-            if(campaign() && player.getClosestCore() != null && player.getClosestCore().items.total() >= 10 * 1000){
+            if(campaign() && player.closestCore() != null && player.closestCore().items.total() >= 10 * 1000){
                 drop10kitems.complete();
             }
         }));
@@ -133,7 +132,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(BlockDestroyEvent.class, e -> {
-            if(campaign() && e.tile.getTeam() != player.getTeam()){
+            if(campaign() && e.tile.getTeam() != player.team()){
                 SStat.blocksDestroyed.add();
             }
         });
@@ -180,7 +179,7 @@ public class SStats implements SteamUserStatsCallback{
         trigger(Trigger.itemLaunch, launchItemPad);
 
         Events.on(UnitCreateEvent.class, e -> {
-            if(campaign() && e.unit.getTeam() == player.getTeam()){
+            if(campaign() && e.unit.team() == player.team()){
                 SStat.unitsBuilt.add();
             }
         });

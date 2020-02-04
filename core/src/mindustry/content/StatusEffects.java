@@ -2,7 +2,6 @@ package mindustry.content;
 
 import arc.*;
 import arc.math.Mathf;
-import mindustry.entities.Effects;
 import mindustry.ctype.ContentList;
 import mindustry.game.EventType.*;
 import mindustry.type.StatusEffect;
@@ -47,7 +46,7 @@ public class StatusEffects implements ContentList{
             init(() -> {
                 trans(shocked, ((unit, time, newTime, result) -> {
                     unit.damage(20f);
-                    if(unit.getTeam() == state.rules.waveTeam){
+                    if(unit.team() == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
                     result.set(this, time);

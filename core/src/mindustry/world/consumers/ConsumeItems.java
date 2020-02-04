@@ -3,7 +3,6 @@ package mindustry.world.consumers;
 import arc.struct.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.entities.type.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.Cicon;
@@ -38,7 +37,7 @@ public class ConsumeItems extends Consume{
     @Override
     public void build(Tile tile, Table table){
         for(ItemStack stack : items){
-            table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount), () -> tile.entity != null && tile.entity.getItems() != null && tile.entity.getItems().has(stack.item, stack.amount))).size(8 * 4).padRight(5);
+            table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount), () -> tile.entity != null && tile.entity.items() != null && tile.entity.items().has(stack.item, stack.amount))).size(8 * 4).padRight(5);
         }
     }
 

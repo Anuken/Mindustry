@@ -40,14 +40,14 @@ public class LaunchPad extends StorageBlock{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return item.type == ItemType.material && tile.entity.getItems().total() < itemCapacity;
+        return item.type == ItemType.material && tile.entity.items().total() < itemCapacity;
     }
 
     @Override
     public void draw(Tile tile){
         super.draw(tile);
 
-        float progress = Mathf.clamp(Mathf.clamp((tile.entity.getItems().total() / (float)itemCapacity)) * ((tile.entity.timerTime(timerLaunch) / (launchTime / tile.entity.timeScale))));
+        float progress = Mathf.clamp(Mathf.clamp((tile.entity.items().total() / (float)itemCapacity)) * ((tile.entity.timerTime(timerLaunch) / (launchTime / tile.entity.timeScale))));
         float scale = size / 3f;
 
         Lines.stroke(2f);
@@ -56,7 +56,7 @@ public class LaunchPad extends StorageBlock{
 
         Draw.color(Pal.accent);
 
-        if(tile.entity.getCons().valid()){
+        if(tile.entity.cons().valid()){
             for(int i = 0; i < 3; i++){
                 float f = (Time.time() / 200f + i * 0.5f) % 1f;
 
@@ -72,13 +72,13 @@ public class LaunchPad extends StorageBlock{
     public void update(Tile tile){
         Tilec entity = tile.entity;
 
-        if(world.isZone() && entity.consValid() && entity.getItems().total() >= itemCapacity && entity.timer(timerLaunch, launchTime / entity.timeScale)){
+        if(world.isZone() && entity.consValid() && entity.items().total() >= itemCapacity && entity.timer(timerLaunch, launchTime / entity.timeScale)){
             for(Item item : Vars.content.items()){
                 Events.fire(Trigger.itemLaunch);
                 Fx.padlaunch.at(tile);
-                int used = Math.min(entity.getItems().get(item), itemCapacity);
+                int used = Math.min(entity.items().get(item), itemCapacity);
                 data.addItem(item, used);
-                entity.getItems().remove(item, used);
+                entity.items().remove(item, used);
                 Events.fire(new LaunchItemEvent(item, used));
             }
         }

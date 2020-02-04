@@ -116,8 +116,8 @@ public class MassDriver extends Block{
             float targetRotation = tile.angleTo(link);
 
             if(
-                tile.entity.getItems().total() >= minDistribute && //must shoot minimum amount of items
-                link.block().itemCapacity - link.entity.getItems().total() >= minDistribute //must have minimum amount of space
+                tile.entity.items().total() >= minDistribute && //must shoot minimum amount of items
+                link.block().itemCapacity - link.entity.items().total() >= minDistribute //must have minimum amount of space
             ){
                 MassDriverEntity other = link.ent();
                 other.waitingShooters.add(tile);
@@ -225,7 +225,7 @@ public class MassDriver extends Block{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         //mass drivers that ouput only cannot accept items
-        return tile.entity.getItems().total() < itemCapacity && linkValid(tile);
+        return tile.entity.items().total() < itemCapacity && linkValid(tile);
     }
 
     protected void fire(Tile tile, Tile target){

@@ -866,7 +866,7 @@ public class ServerControl implements ApplicationListener{
             Array<Player> players = new Array<>();
             for(Player p : playerGroup.all()){
                 players.add(p);
-                p.setDead(true);
+                p.dead(true);
             }
             
             logic.reset();
@@ -881,7 +881,7 @@ public class ServerControl implements ApplicationListener{
 
                 p.reset();
                 if(state.rules.pvp){
-                    p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
+                    p.team(netServer.assignTeam(p, new ArrayIterable<>(players)));
                 }
                 netServer.sendWorldData(p);
             }

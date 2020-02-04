@@ -83,7 +83,7 @@ public class MusicControl{
 
     /** Whether to play dark music.*/
     private boolean isDark(){
-        if(state.teams.get(player.getTeam()).hasCore() && state.teams.get(player.getTeam()).core().healthf() < 0.85f){
+        if(state.teams.get(player.team()).hasCore() && state.teams.get(player.team()).core().healthf() < 0.85f){
             //core damaged -> dark
             return true;
         }

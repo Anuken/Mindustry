@@ -136,7 +136,7 @@ public class DesktopInput extends InputHandler{
             ui.listfrag.toggle();
         }
 
-        if(((player.getClosestCore() == null && player.isDead()) || state.isPaused()) && !ui.chatfrag.shown()){
+        if(((player.closestCore() == null && player.dead()) || state.isPaused()) && !ui.chatfrag.shown()){
             //move camera around
             float camSpeed = !Core.input.keyDown(Binding.dash) ? 3f : 8f;
             Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta() * camSpeed));
@@ -162,7 +162,7 @@ public class DesktopInput extends InputHandler{
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
-        if(player.isDead()){
+        if(player.dead()){
             cursorType = SystemCursor.arrow;
             return;
         }
@@ -222,7 +222,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = ui.unloadCursor;
             }
 
-            if(cursor.interactable(player.getTeam()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate){
+            if(cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate){
                 Call.rotateBlock(player, cursor, Core.input.axisTap(Binding.rotate) > 0);
             }
         }

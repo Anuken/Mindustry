@@ -110,7 +110,7 @@ public class RepairPoint extends Block{
         RepairPointEntity entity = tile.ent();
 
         boolean targetIsBeingRepaired = false;
-        if(entity.target != null && (entity.target.isDead() || entity.target.dst(tile) > repairRadius || entity.target.health >= entity.target.maxHealth())){
+        if(entity.target != null && (entity.target.dead() || entity.target.dst(tile) > repairRadius || entity.target.health >= entity.target.maxHealth())){
             entity.target = null;
         }else if(entity.target != null && entity.consValid()){
             entity.target.health += repairSpeed * Time.delta() * entity.strength * entity.efficiency();

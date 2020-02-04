@@ -513,7 +513,7 @@ public class Bullets implements ContentList{
             @Override
             public void update(Bulletc b){
                 if(b.timer.get(1, 5f)){
-                    Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), length, true);
+                    Damage.collideLine(b, b.team(), hitEffect, b.x, b.y, b.rot(), length, true);
                 }
                 Effects.shake(1f, 1f, b.x, b.y);
             }
@@ -587,7 +587,7 @@ public class Bullets implements ContentList{
 
             @Override
             public void init(Bulletc b){
-                Lightning.create(b.getTeam(), Pal.lancerLaser, damage * (b.getOwner() instanceof Player ? state.rules.playerDamageMultiplier : 1f), b.x, b.y, b.rot(), 30);
+                Lightning.create(b.team(), Pal.lancerLaser, damage * (b.getOwner() instanceof Player ? state.rules.playerDamageMultiplier : 1f), b.x, b.y, b.rot(), 30);
             }
         };
 

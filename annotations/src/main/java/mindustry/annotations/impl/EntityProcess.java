@@ -76,11 +76,14 @@ public class EntityProcess extends BaseProcessor{
                 }
 
                 for(Svar field : component.fields().select(e -> !e.is(Modifier.STATIC) && !e.is(Modifier.PRIVATE) && !e.is(Modifier.TRANSIENT))){
-                    String cname = Strings.capitalize(field.name());
+                    String cname = field.name();
                     //getter
-                    inter.addMethod(MethodSpec.methodBuilder((field.mirror().toString().equals("boolean") ? "is" : "get") + cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).returns(field.tname()).build());
+                    inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).returns(field.tname()).build());
+
                     //setter
-                    if(!field.is(Modifier.FINAL)) inter.addMethod(MethodSpec.methodBuilder("set" + cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).addParameter(field.tname(), field.name()).build());
+                    if(!field.is(Modifier.FINAL) && !field.annotations().contains(f -> f.toString().equals("@mindustry.annotations.Annotations.ReadOnly"))){
+                        inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).addParameter(field.tname(), field.name()).build());
+                    }
                 }
 
                 //add utility methods to interface
@@ -128,6 +131,8 @@ public class EntityProcess extends BaseProcessor{
                         if(tree.getInitializer() != null){
                             fbuilder.initializer(tree.getInitializer().toString());
                         }
+
+                        builder.addAnnotations(f.annotations().map(AnnotationSpec::get));
                         builder.addField(fbuilder.build());
                     }
 
@@ -245,15 +250,18 @@ public class EntityProcess extends BaseProcessor{
 
                     //generate getter/setter for each method
                     for(Smethod method : inter.methods()){
-                        if(method.name().length() <= 3) continue;
-
-                        String var = Strings.camelize(method.name().substring(method.name().startsWith("is") ? 2 : 3));
+                        String var = method.name();
+                        FieldSpec field = Array.with(def.builder.fieldSpecs).find(f -> f.name.equals(var));
                         //make sure it's a real variable AND that the component doesn't already implement it with custom logic
-                        if(!Array.with(def.builder.fieldSpecs).contains(f -> f.name.equals(var)) || comp.methods().contains(m -> m.name().equals(method.name()))) continue;
+                        if(field == null || comp.methods().contains(m -> m.name().equals(method.name()))) continue;
 
-                        if(method.name().startsWith("get") || method.name().startsWith("is")){
+                        //getter
+                        if(!method.isVoid()){
                             def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("return " + var).build());
-                        }else if(method.name().startsWith("set")){
+                        }
+
+                        //setter
+                        if(method.isVoid() && !Array.with(field.annotations).contains(f -> f.type.toString().equals("@mindustry.annotations.Annotations.ReadOnly"))){
                             def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("this." + var + " = " + var).build());
                         }
                     }

@@ -11,7 +11,6 @@ import arc.util.ArcAnnotate.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.entities.units.*;
-import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.Cicon;
@@ -54,9 +53,9 @@ public class LiquidSource extends Block{
         LiquidSourceEntity entity = tile.ent();
 
         if(entity.source == null){
-            tile.entity.getLiquids().clear();
+            tile.entity.liquids().clear();
         }else{
-            tile.entity.getLiquids().add(entity.source, liquidCapacity);
+            tile.entity.liquids().add(entity.source, liquidCapacity);
             tryDumpLiquid(tile, entity.source);
         }
     }

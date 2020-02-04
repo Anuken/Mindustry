@@ -15,7 +15,6 @@ import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
@@ -220,8 +219,8 @@ public class PlacementFragment extends Fragment{
                         button.resizeImage(Cicon.medium.size);
 
                         button.update(() -> { //color unplacable things gray
-                            Tilec core = player.getClosestCore();
-                            Color color = state.rules.infiniteResources || (core != null && (core.getItems().has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
+                            Tilec core = player.closestCore();
+                            Color color = state.rules.infiniteResources || (core != null && (core.items().has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
 
@@ -308,10 +307,10 @@ public class PlacementFragment extends Fragment{
                                         line.addImage(stack.item.icon(Cicon.small)).size(8 * 2);
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
                                         line.labelWrap(() -> {
-                                            Tilec core = player.getClosestCore();
+                                            Tilec core = player.closestCore();
                                             if(core == null || state.rules.infiniteResources) return "*/*";
 
-                                            int amount = core.getItems().get(stack.item);
+                                            int amount = core.items().get(stack.item);
                                             int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
                                             String color = (amount < stackamount / 2f ? "[red]" : amount < stackamount ? "[accent]" : "[white]");
 
@@ -338,7 +337,7 @@ public class PlacementFragment extends Fragment{
                                 t.add(new Image(lastDisplay.getDisplayIcon(hoverTile))).size(8 * 4);
                                 t.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(190f).padLeft(5);
                             }).growX().left();
-                            if(hoverTile.getTeam() == player.getTeam()){
+                            if(hoverTile.getTeam() == player.team()){
                                 topTable.row();
                                 topTable.table(t -> {
                                     t.left().defaults().left();

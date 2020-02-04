@@ -5,7 +5,6 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
 import mindustry.game.EventType.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -37,7 +36,7 @@ public class CooledTurret extends Turret{
 
     @Override
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        if(tile.entity.getLiquids().currentAmount() <= 0.001f){
+        if(tile.entity.liquids().currentAmount() <= 0.001f){
             Events.fire(Trigger.turretCool);
         }
 
@@ -51,11 +50,11 @@ public class CooledTurret extends Turret{
         float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
         TurretEntity entity = tile.ent();
-        Liquid liquid = entity.getLiquids().current();
+        Liquid liquid = entity.liquids().current();
 
-        float used = Math.min(Math.min(entity.getLiquids().get(liquid), maxUsed * Time.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed(tile);
+        float used = Math.min(Math.min(entity.liquids().get(liquid), maxUsed * Time.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed(tile);
         entity.reload += used * liquid.heatCapacity * coolantMultiplier;
-        entity.getLiquids().remove(liquid, used);
+        entity.liquids().remove(liquid, used);
 
         if(Mathf.chance(0.06 * used)){
             coolEffect.at(tile.drawx() + Mathf.range(size * tilesize / 2f), tile.drawy() + Mathf.range(size * tilesize / 2f));

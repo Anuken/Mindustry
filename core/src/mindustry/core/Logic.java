@@ -11,7 +11,6 @@ import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
-import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -109,9 +108,9 @@ public class Logic implements ApplicationListener{
             for(TeamData team : state.teams.getActive()){
                 if(team.hasCore()){
                     Tilec entity = team.core();
-                    entity.getItems().clear();
+                    entity.items().clear();
                     for(ItemStack stack : state.rules.loadout){
-                        entity.getItems().add(stack.item, stack.amount);
+                        entity.items().add(stack.item, stack.amount);
                     }
                 }
             }
@@ -184,10 +183,10 @@ public class Logic implements ApplicationListener{
         Time.runTask(30f, () -> {
             for(Tilec entity : state.teams.playerCores()){
                 for(Item item : content.items()){
-                    data.addItem(item, entity.getItems().get(item));
-                    Events.fire(new LaunchItemEvent(item, entity.getItems().get(item)));
+                    data.addItem(item, entity.items().get(item));
+                    Events.fire(new LaunchItemEvent(item, entity.items().get(item)));
                 }
-                entity.getTile().remove();
+                entity.tile().remove();
             }
             state.launched = true;
             state.gameOver = true;

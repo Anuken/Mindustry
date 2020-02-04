@@ -27,7 +27,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.net.Packets.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.Cicon;
 import mindustry.ui.dialogs.*;
@@ -173,7 +172,7 @@ public class HudFragment extends Fragment{
                                 .size(50f).margin(6f).get();
                             button.getImageCell().grow();
                             button.getStyle().imageUpColor = team.color;
-                            button.update(() -> button.setChecked(player.getTeam() == team));
+                            button.update(() -> button.setChecked(player.team() == team));
 
                             if(++i % 3 == 0){
                                 teams.row();
@@ -287,7 +286,7 @@ public class HudFragment extends Fragment{
             });
 
             t.top().visible(() -> {
-                if(state.is(State.menu) || !state.teams.get(player.getTeam()).hasCore()){
+                if(state.is(State.menu) || !state.teams.get(player.team()).hasCore()){
                     coreAttackTime[0] = 0f;
                     return false;
                 }
@@ -347,14 +346,14 @@ public class HudFragment extends Fragment{
     @Remote(targets = Loc.both, forward = true, called = Loc.both)
     public static void setPlayerTeamEditor(Player player, Team team){
         if(state.isEditor() && player != null){
-            player.setTeam(team);
+            player.team(team);
         }
     }
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void spawnUnitEditor(Player player, UnitType type){
         if(state.isEditor()){
-            BaseUnit unit = type.create(player.getTeam());
+            BaseUnit unit = type.create(player.team());
             unit.set(player.x, player.y);
             unit.rotation = player.rotation;
             unit.add();

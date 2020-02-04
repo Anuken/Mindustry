@@ -55,7 +55,7 @@ public class Unloader extends Block{
 
     @Override
     public void configured(Tile tile, Player player, int value){
-        tile.entity.getItems().clear();
+        tile.entity.items().clear();
         tile.<UnloaderEntity>ent().sortItem = content.item(value);
     }
 
@@ -63,10 +63,10 @@ public class Unloader extends Block{
     public void update(Tile tile){
         UnloaderEntity entity = tile.ent();
 
-        if(tile.entity.timer(timerUnload, speed / entity.timeScale) && tile.entity.getItems().total() == 0){
+        if(tile.entity.timer(timerUnload, speed / entity.timeScale) && tile.entity.items().total() == 0){
             for(Tile other : tile.entity.proximity()){
                 if(other.interactable(tile.getTeam()) && other.block().unloadable && other.block().hasItems && entity.getItems().total() == 0 &&
-                ((entity.sortItem == null && other.entity.getItems().total() > 0) || hasItem(other, entity.sortItem))){
+                ((entity.sortItem == null && other.entity.items().total() > 0) || hasItem(other, entity.sortItem))){
                     offloadNear(tile, removeItem(other, entity.sortItem));
                 }
             }

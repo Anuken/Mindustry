@@ -13,7 +13,6 @@ import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.game.EventType.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -80,7 +79,7 @@ public class MechPad extends Block{
 
     protected static boolean checkValidTap(Tile tile, Player player){
         MechFactoryEntity entity = tile.ent();
-        return !player.isDead() && tile.interactable(player.getTeam()) && Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize &&
+        return !player.dead() && tile.interactable(player.team()) && Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize &&
         Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize && entity.consValid() && entity.player == null;
     }
 
@@ -100,7 +99,7 @@ public class MechPad extends Block{
 
         if(checkValidTap(tile, player)){
             Call.onMechFactoryTap(player, tile);
-        }else if(player.isLocal && mobile && !player.isDead() && entity.consValid() && entity.player == null){
+        }else if(player.isLocal && mobile && !player.dead() && entity.consValid() && entity.player == null){
             //deselect on double taps
             player.moveTarget = player.moveTarget == tile.entity ? null : tile.entity;
         }

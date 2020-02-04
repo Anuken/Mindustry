@@ -9,7 +9,6 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -76,7 +75,7 @@ public class Drill extends Block{
         bars.add("drillspeed", e -> {
             DrillEntity entity = (DrillEntity)e;
 
-            return new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(entity.lastDrillSpeed * 60 * entity.getTimeScale(), 2)), () -> Pal.ammo, () -> entity.warmup);
+            return new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(entity.lastDrillSpeed * 60 * entity.timeScale(), 2)), () -> Pal.ammo, () -> entity.warmup);
         });
     }
 
@@ -128,7 +127,7 @@ public class Drill extends Block{
 
     @Override
     public boolean shouldConsume(Tile tile){
-        return tile.entity.getItems().total() < itemCapacity;
+        return tile.entity.items().total() < itemCapacity;
     }
 
     @Override
@@ -252,11 +251,11 @@ public class Drill extends Block{
 
         entity.drillTime += entity.warmup * entity.delta();
 
-        if(entity.getItems().total() < itemCapacity && entity.dominantItems > 0 && entity.consValid()){
+        if(entity.items().total() < itemCapacity && entity.dominantItems > 0 && entity.consValid()){
 
             float speed = 1f;
 
-            if(entity.getCons().optionalValid()){
+            if(entity.cons().optionalValid()){
                 speed = liquidBoostIntensity;
             }
 
@@ -275,7 +274,7 @@ public class Drill extends Block{
             return;
         }
 
-        if(entity.dominantItems > 0 && entity.progress >= drillTime + hardnessDrillMultiplier * entity.dominantItem.hardness && tile.entity.getItems().total() < itemCapacity){
+        if(entity.dominantItems > 0 && entity.progress >= drillTime + hardnessDrillMultiplier * entity.dominantItem.hardness && tile.entity.items().total() < itemCapacity){
 
             offloadNear(tile, entity.dominantItem);
 

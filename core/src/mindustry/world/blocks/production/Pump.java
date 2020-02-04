@@ -48,8 +48,8 @@ public class Pump extends LiquidBlock{
     public void draw(Tile tile){
         Draw.rect(name, tile.drawx(), tile.drawy());
 
-        Draw.color(tile.entity.getLiquids().current().color);
-        Draw.alpha(tile.entity.getLiquids().total() / liquidCapacity);
+        Draw.color(tile.entity.liquids().current().color);
+        Draw.alpha(tile.entity.liquids().total() / liquidCapacity);
         Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
         Draw.color();
     }
@@ -118,16 +118,16 @@ public class Pump extends LiquidBlock{
             liquidDrop = tile.floor().liquidDrop;
         }
 
-        if(tile.entity.getCons().valid() && liquidDrop != null){
-            float maxPump = Math.min(liquidCapacity - tile.entity.getLiquids().total(), tiles * pumpAmount * tile.entity.delta() / size / size) * tile.entity.efficiency();
-            tile.entity.getLiquids().add(liquidDrop, maxPump);
+        if(tile.entity.cons().valid() && liquidDrop != null){
+            float maxPump = Math.min(liquidCapacity - tile.entity.liquids().total(), tiles * pumpAmount * tile.entity.delta() / size / size) * tile.entity.efficiency();
+            tile.entity.liquids().add(liquidDrop, maxPump);
         }
 
-        if(tile.entity.getLiquids().currentAmount() > 0f && tile.entity.timer(timerContentCheck, 10)){
-            useContent(tile, tile.entity.getLiquids().current());
+        if(tile.entity.liquids().currentAmount() > 0f && tile.entity.timer(timerContentCheck, 10)){
+            useContent(tile, tile.entity.liquids().current());
         }
 
-        tryDumpLiquid(tile, tile.entity.getLiquids().current());
+        tryDumpLiquid(tile, tile.entity.liquids().current());
     }
 
     protected boolean isValid(Tile tile){
