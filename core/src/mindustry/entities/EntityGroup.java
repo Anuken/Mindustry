@@ -125,7 +125,7 @@ public class EntityGroup<T extends Entity> implements Iterable<T>{
         entitiesToAdd.clear();
 
         for(T e : entitiesToRemove){
-            entityArray.removeValue(e, true);
+            entityArray.remove(e, true);
             if(map != null){
                 map.remove(e.getID());
             }
@@ -148,7 +148,7 @@ public class EntityGroup<T extends Entity> implements Iterable<T>{
         }else{ //maybe it's being queued?
             for(T check : entitiesToAdd){
                 if(check.getID() == id){ //if it is indeed queued, remove it
-                    entitiesToAdd.removeValue(check, true);
+                    entitiesToAdd.remove(check, true);
                     if(removeListener != null){
                         removeListener.get(check);
                     }

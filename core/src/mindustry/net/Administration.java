@@ -190,7 +190,7 @@ public class Administration{
             }
         }
 
-        bannedIPs.removeValue(ip, false);
+        bannedIPs.remove(ip, false);
 
         if(found){
             save();
