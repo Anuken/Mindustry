@@ -1242,6 +1242,10 @@ public class EntityComps{
         public void update(){
             //TODO fix effects, make everything poolable
         }
+
+        public float clipSize(){
+            return effect.size;
+        }
     }
 
     @Component

@@ -1,5 +1,6 @@
 package mindustry.annotations.impl;
 
+import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import com.squareup.javapoet.*;
@@ -12,6 +13,7 @@ import mindustry.annotations.util.*;
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
+import java.lang.annotation.*;
 
 @SupportedAnnotationTypes({
 "mindustry.annotations.Annotations.EntityDef",
@@ -20,6 +22,7 @@ import javax.lang.model.type.*;
 })
 public class EntityProcess extends BaseProcessor{
     Array<Definition> definitions = new Array<>();
+    Array<GroupDefinition> groupDefs = new Array<>();
     Array<Stype> baseComponents;
     ObjectMap<String, Stype> componentNames = new ObjectMap<>();
     ObjectMap<Stype, Array<Stype>> componentDependencies = new ObjectMap<>();
@@ -36,9 +39,11 @@ public class EntityProcess extends BaseProcessor{
         //round 1: get component classes and generate interfaces for them
         if(round == 1){
             baseComponents = types(BaseComponent.class);
+            Array<Smethod> allGroups = methods(GroupDef.class);
             Array<Stype> allDefs = types(EntityDef.class);
             Array<Stype> allComponents = types(Component.class);
 
+            //store components
             for(Stype type : allComponents){
                 componentNames.put(type.name(), type);
             }
@@ -46,6 +51,12 @@ public class EntityProcess extends BaseProcessor{
             //add component imports
             for(Stype comp : allComponents){
                 imports.addAll(getImports(comp.e));
+            }
+
+            //parse groups
+            for(Smethod group : allGroups){
+                GroupDef an = group.annotation(GroupDef.class);
+                groupDefs.add(new GroupDefinition(group.name(), types(an, GroupDef::value), an));
             }
 
             //create component interfaces
@@ -97,6 +108,7 @@ public class EntityProcess extends BaseProcessor{
                 TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
                 Array<Stype> components = allComponents(type);
+                Array<GroupDefinition> groups = groupDefs.select(g -> !g.components.contains(s -> !components.contains(s)));
                 ObjectMap<String, Array<Smethod>> methods = new ObjectMap<>();
 
                 //add all components
@@ -173,6 +185,14 @@ public class EntityProcess extends BaseProcessor{
                         //trim block
                         str = str.substring(2, str.length() - 1);
 
+                        //SPECIAL CASE: inject group add/remove code
+                        if(elem.name().equals("add") || elem.name().equals("remove")){
+                            for(GroupDefinition def : groups){
+                                //remove/add from each group, assume imported
+                                mbuilder.addStatement("Groups.$L.$L(this)", def.name, elem.name());
+                            }
+                        }
+
                         //make sure to remove braces here
                         mbuilder.addCode(str);
 
@@ -183,19 +203,37 @@ public class EntityProcess extends BaseProcessor{
                     builder.addMethod(mbuilder.build());
                 }
 
-                definitions.add(new Definition(builder, type));
-
+                definitions.add(new Definition(builder, type, components, groups));
             }
+
+            //generate groups
+            TypeSpec.Builder groupsBuilder = TypeSpec.classBuilder("Groups").addModifiers(Modifier.PUBLIC);
+            MethodSpec.Builder groupInit = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+            for(GroupDefinition group : groupDefs){
+                Stype ctype = group.components.first();
+                ClassName itype =  ClassName.bestGuess("mindustry.gen." + interfaceName(ctype));
+                ClassName groupc = ClassName.bestGuess("mindustry.entities.EntityGroup");
+
+                //add field...
+                groupsBuilder.addField(ParameterizedTypeName.get(
+                    ClassName.bestGuess("mindustry.entities.EntityGroup"), itype), group.name, Modifier.PUBLIC, Modifier.STATIC);
+
+                groupInit.addStatement("$L = new $T<>($L, $L)", group.name, groupc, group.def.spatial(), group.def.mapping());
+            }
+
+            groupsBuilder.addMethod(groupInit.build());
+
+            write(groupsBuilder);
+
         }else{
             //round 2: generate actual classes and implement interfaces
             Array<Stype> interfaces = types(EntityInterface.class);
 
             //implement each definition
             for(Definition def : definitions){
-                Array<Stype> components = allComponents(def.base);
 
                 //get interface for each component
-                for(Stype comp : components){
+                for(Stype comp : def.components){
                     //implement the interface
                     Stype inter = interfaces.find(i -> i.name().equals(interfaceName(comp)));
                     if(inter == null){
@@ -243,7 +281,7 @@ public class EntityProcess extends BaseProcessor{
     Array<Stype> allComponents(Stype type){
         if(!defComponents.containsKey(type)){
             //get base defs
-            Array<Stype> components = Array.with(mirrors(type)).map(Stype::of);
+            Array<Stype> components = types(type.annotation(EntityDef.class), EntityDef::value);
             ObjectSet<Stype> out = new ObjectSet<>();
             for(Stype comp : components){
                 //get dependencies for each def, add them
@@ -297,22 +335,52 @@ public class EntityProcess extends BaseProcessor{
         return type.annotation(Component.class) != null;
     }
 
-    TypeMirror[] mirrors(Stype type){
+    <T extends Annotation> Array<Stype> types(T t, Cons<T> consumer){
         try{
-            type.annotation(EntityDef.class).value();
+            consumer.get(t);
         }catch(MirroredTypesException e){
-            return e.getTypeMirrors().toArray(new TypeMirror[0]);
+            return Array.with(e.getTypeMirrors()).map(Stype::of);
         }
-        throw new IllegalArgumentException("Missing components: " + type);
+        throw new IllegalArgumentException("Missing types.");
+    }
+
+    class GroupDefinition{
+        final String name;
+        final Array<Stype> components;
+        final GroupDef def;
+
+        public GroupDefinition(String name, Array<Stype> components, GroupDef def){
+            this.components = components;
+            this.name = name;
+            this.def = def;
+        }
+
+        @Override
+        public String toString(){
+            return name;
+        }
     }
 
     class Definition{
+        final Array<GroupDefinition> groups;
+        final Array<Stype> components;
         final TypeSpec.Builder builder;
         final Stype base;
 
-        public Definition(Builder builder, Stype base){
+        public Definition(Builder builder, Stype base, Array<Stype> components, Array<GroupDefinition> groups){
             this.builder = builder;
             this.base = base;
+            this.groups = groups;
+            this.components = components;
+        }
+
+        @Override
+        public String toString(){
+            return "Definition{" +
+            "groups=" + groups +
+            "components=" + components +
+            ", base=" + base +
+            '}';
         }
     }
 }

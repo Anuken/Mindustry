@@ -29,6 +29,8 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface GroupDef{
         Class[] value();
+        boolean spatial() default false;
+        boolean mapping() default false;
     }
 
     /** Indicates an entity definition. */

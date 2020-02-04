@@ -10,4 +10,7 @@ class EntityDefs{
 
     @EntityDef({TileComp.class})
     class TileDef{}
+
+    @EntityDef({EffectComp.class})
+    class EffectDef{}
 }

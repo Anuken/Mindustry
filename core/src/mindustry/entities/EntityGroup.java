@@ -10,7 +10,6 @@ import static mindustry.Vars.*;
 /** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")
 public class EntityGroup<T extends Entityc>{
-    private final boolean useTree;
     private final Array<T> array = new Array<>(false, 32);
     private final Array<T> intersectArray = new Array<>();
     private final Rect intersectRect = new Rect();
@@ -19,11 +18,13 @@ public class EntityGroup<T extends Entityc>{
 
     private int index;
 
-    public EntityGroup(boolean useTree){
-        this.useTree = useTree;
-
-        if(useTree){
+    public EntityGroup(boolean spatial, boolean mapping){
+        if(spatial){
             tree = new QuadTree<>(new Rect(0, 0, 0, 0));
+        }
+
+        if(mapping){
+            map = new IntMap<>();
         }
     }
 
@@ -44,12 +45,7 @@ public class EntityGroup<T extends Entityc>{
     }
 
     public boolean useTree(){
-        return useTree;
-    }
-
-    public EntityGroup<T> enableMapping(){
-        map = new IntMap<>();
-        return this;
+        return map != null;
     }
 
     public boolean mappingEnabled(){
@@ -86,13 +82,13 @@ public class EntityGroup<T extends Entityc>{
     }
 
     public QuadTree tree(){
-        if(!useTree) throw new RuntimeException("This group does not support quadtrees! Enable quadtrees when creating it.");
+        if(tree == null) throw new RuntimeException("This group does not support quadtrees! Enable quadtrees when creating it.");
         return tree;
     }
 
     /** Resizes the internal quadtree, if it is enabled.*/
     public void resize(float x, float y, float w, float h){
-        if(useTree){
+        if(tree != null){
             tree = new QuadTree<>(new Rect(x, y, w, h));
         }
     }

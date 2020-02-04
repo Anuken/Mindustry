@@ -1,24 +1,24 @@
 package mindustry.entities.effect;
 
-import mindustry.annotations.Annotations.Loc;
-import mindustry.annotations.Annotations.Remote;
-import arc.struct.Array;
-import arc.struct.IntSet;
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.pooling.Pools;
-import mindustry.content.Bullets;
-import mindustry.entities.EntityGroup;
-import mindustry.entities.Units;
-import mindustry.game.Team;
-import mindustry.gen.Call;
-import mindustry.graphics.Pal;
-import mindustry.world.Tile;
+import arc.struct.*;
+import arc.util.pooling.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.entities.traits.*;
+import mindustry.entities.type.*;
+import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
+//TODO lightning should be an effect with custom logic + bullet with custom init logic
 public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     public static final float lifetime = 10f;
 

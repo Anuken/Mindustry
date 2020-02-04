@@ -507,4 +507,21 @@ public class Tile implements Position{
     public static void setTile(Tile tile, Block block, Team team, int rotation){
         tile.set(block, team, rotation);
     }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void onTileDamage(Tile tile, float health){
+        if(tile.entity != null){
+            tile.entity.setHealth(health);
+
+            if(tile.entity.damaged()){
+                indexer.notifyTileDamaged(tile.entity);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server)
+    public static void onTileDestroyed(Tile tile){
+        if(tile.entity == null) return;
+        tile.entity.killed();
+    }
 }

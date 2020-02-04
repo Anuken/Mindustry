@@ -3,6 +3,7 @@ package mindustry.entities.bullet;
 import arc.audio.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
@@ -144,7 +145,7 @@ public abstract class BulletType extends Content{
         }
 
         for(int i = 0; i < lightining; i++){
-            Lightning.createLighting(Lightning.nextSeed(), b.getTeam(), Pal.surge, damage, b.x, b.y, Mathf.random(360f), lightningLength);
+            Lightning.createLighting(Lightning.nextSeed(), b.getTeam(), Pal.surge, damage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
         }
     }
 
@@ -162,11 +163,10 @@ public abstract class BulletType extends Content{
     }
 
     public void update(Bulletc b){
-
         if(homingPower > 0.0001f){
-            Teamc target = Units.closestTarget(b.getTeam(), b.x, b.y, homingRange, e -> !e.isFlying() || collidesAir);
+            Teamc target = Units.closestTarget(b.getTeam(), b.getX(), b.getY(), homingRange, e -> !e.isFlying() || collidesAir);
             if(target != null){
-                b.velocity().setAngle(Mathf.slerpDelta(b.velocity().angle(), b.angleTo(target), 0.08f));
+                b.getVel().setAngle(Mathf.slerpDelta(b.getRotation(), b.angleTo(target), 0.08f));
             }
         }
     }
@@ -192,6 +192,14 @@ public abstract class BulletType extends Content{
 
     public Bulletc create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
         return create(owner, team, x, y, angle, velocityScl, lifetimeScl, null);
+    }
+
+    public Bulletc create(Bulletc parent, float x, float y, float angle){
+        return create(parent.getOwner(), parent.getTeam(), x, y, angle);
+    }
+
+    public Bulletc create(Bulletc parent, float x, float y, float angle, float velocityScl){
+        return create(parent.getOwner(), parent.getTeam(), x, y, angle, velocityScl);
     }
 
     public Bulletc create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl, Object data){
@@ -220,12 +228,8 @@ public abstract class BulletType extends Content{
         return bullet;*/
     }
 
-    public Bulletc create(Bulletc parent, float x, float y, float angle){
-        return create(parent.getOwner(), parent.getTeam(), x, y, angle);
-    }
-
-    public Bulletc create(Bulletc parent, float x, float y, float angle, float velocityScl){
-        return create(parent.getOwner(), parent.getTeam(), x, y, angle, velocityScl);
+    public void createNet(Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
+        Call.createBullet(this, team, x, y, angle, velocityScl, lifetimeScl);
     }
 
     @Remote(called = Loc.server, unreliable = true)
