@@ -30,7 +30,15 @@ public class GenericSmelter extends GenericCrafter{
 
         GenericCrafterEntity entity = tile.ent();
 
-        //draw glowing center
+        //draw topRegion
+        if(topRegion != NULL && entity.warmup > 0f){
+            Draw.color(1f, 1f, 1f, entity.warmup);
+            Draw.rect(topRegion, tile.drawx(), tile.drawy());
+            Draw.color();
+        };
+        
+        
+        //draw "flame" in center
         if(entity.warmup > 0f && flameColor.a > 0.001f){
             float g = 0.3f;
             float r = 0.06f;
@@ -41,7 +49,7 @@ public class GenericSmelter extends GenericCrafter{
             Draw.tint(flameColor);
             Fill.circle(tile.drawx(), tile.drawy(), 3f + Mathf.absin(Time.time(), 5f, 2f) + cr);
             Draw.color(1f, 1f, 1f, entity.warmup);
-            Draw.rect(topRegion, tile.drawx(), tile.drawy());
+            
             Fill.circle(tile.drawx(), tile.drawy(), 1.9f + Mathf.absin(Time.time(), 5f, 1f) + cr);
 
             Draw.color();
