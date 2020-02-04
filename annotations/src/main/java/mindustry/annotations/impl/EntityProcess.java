@@ -248,8 +248,8 @@ public class EntityProcess extends BaseProcessor{
                         if(method.name().length() <= 3) continue;
 
                         String var = Strings.camelize(method.name().substring(method.name().startsWith("is") ? 2 : 3));
-                        //make sure it's a real variable
-                        if(!Array.with(def.builder.fieldSpecs).contains(f -> f.name.equals(var))) continue;
+                        //make sure it's a real variable AND that the component doesn't already implement it with custom logic
+                        if(!Array.with(def.builder.fieldSpecs).contains(f -> f.name.equals(var)) || comp.methods().contains(m -> m.name().equals(method.name()))) continue;
 
                         if(method.name().startsWith("get") || method.name().startsWith("is")){
                             def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("return " + var).build());

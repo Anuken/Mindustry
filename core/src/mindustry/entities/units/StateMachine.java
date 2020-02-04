@@ -21,4 +21,15 @@ public class StateMachine{
     public boolean is(UnitState state){
         return this.state == state;
     }
+
+    public interface UnitState{
+        default void entered(){
+        }
+
+        default void exited(){
+        }
+
+        default void update(){
+        }
+    }
 }

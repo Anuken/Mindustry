@@ -27,9 +27,9 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
     protected boolean isBreaking;
     protected Player playerTarget;
 
-    public final UnitState
+    public final StateMachine.UnitState
 
-    build = new UnitState(){
+    build = new StateMachine.UnitState(){
 
         public void entered(){
             if(!(target instanceof BuildEntity)){
@@ -206,7 +206,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
     }
 
     @Override
-    public UnitState getStartState(){
+    public StateMachine.UnitState getStartState(){
         return build;
     }
 

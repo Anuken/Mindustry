@@ -4,7 +4,7 @@ import arc.math.Mathf;
 import arc.util.Structs;
 import mindustry.content.Blocks;
 import mindustry.gen.*;
-import mindustry.entities.units.UnitState;
+import mindustry.entities.units.StateMachine.UnitState;
 import mindustry.gen.Call;
 import mindustry.type.Item;
 import mindustry.type.ItemType;

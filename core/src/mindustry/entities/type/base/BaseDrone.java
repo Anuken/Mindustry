@@ -9,7 +9,7 @@ import mindustry.world.meta.BlockFlag;
 import static mindustry.Vars.*;
 
 public abstract class BaseDrone extends FlyingUnit{
-    public final UnitState retreat = new UnitState(){
+    public final StateMachine.UnitState retreat = new StateMachine.UnitState(){
         public void entered(){
             target = null;
         }
@@ -63,6 +63,6 @@ public abstract class BaseDrone extends FlyingUnit{
     }
 
     @Override
-    public abstract UnitState getStartState();
+    public abstract StateMachine.UnitState getStartState();
 
 }

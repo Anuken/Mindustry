@@ -43,12 +43,35 @@ import static mindustry.Vars.*;
 public class EntityComps{
 
     @Component
-    abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc{
-        UnitDef type;
-        UnitController controller;
+    abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc{
+        private UnitController controller;
+        private UnitDef type;
 
-        float getBounds(){
+        public float getBounds(){
             return getHitSize() *  2f;
+        }
+
+        public void setController(UnitController controller){
+            this.controller = controller;
+            controller.set(this);
+        }
+
+        public UnitController getController(){
+            return controller;
+        }
+
+        public void set(UnitDef def, UnitController controller){
+            setType(type);
+            setController(controller);
+        }
+
+        public void setType(UnitDef type){
+            this.type = type;
+            setupWeapons(type);
+        }
+
+        public UnitDef getType(){
+            return type;
         }
 
         public void update(){
@@ -97,7 +120,7 @@ public class EntityComps{
             Damage.dynamicExplosion(getX(), getY(), flammability, explosiveness, 0f, getBounds() / 2f, Pal.darkFlame);
 
             //TODO cleanup
-            ScorchDecal.create(getX(), getY());
+            //ScorchDecal.create(getX(), getY());
             Fx.explosion.at(this);
             Effects.shake(2f, 2f, this);
 
@@ -617,7 +640,7 @@ public class EntityComps{
         /** weapon mount array, never null */
         WeaponMount[] mounts = {};
 
-        void init(UnitDef def){
+        void setupWeapons(UnitDef def){
             mounts = new WeaponMount[def.weapons.size];
             for(int i = 0; i < mounts.length; i++){
                 mounts[i] = new WeaponMount(def.weapons.get(i));
@@ -811,6 +834,11 @@ public class EntityComps{
             Draw.rect(region, getX(), getY(), getRotation());
             Draw.color();
         }
+
+        public float clipSize(){
+            return region.getWidth()*2;
+        }
+
     }
 
     @Component

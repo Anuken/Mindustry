@@ -2,7 +2,7 @@ package mindustry.entities.type.base;
 
 import mindustry.entities.Units;
 import mindustry.gen.*;
-import mindustry.entities.units.UnitState;
+import mindustry.entities.units.StateMachine.UnitState;
 import mindustry.world.Pos;
 import mindustry.world.Tile;
 import mindustry.world.blocks.*;
