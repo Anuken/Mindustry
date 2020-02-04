@@ -317,8 +317,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public void drawShadow(){
-        type.drawShadow(this);
+    public void drawShadow(float offsetX, float offsetY){
+        type.drawShadow(this, offsetX, offsetY);
     }
 
     @Override
