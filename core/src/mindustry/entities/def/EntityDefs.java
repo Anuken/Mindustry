@@ -13,4 +13,7 @@ class EntityDefs{
 
     @EntityDef({EffectComp.class})
     class EffectDef{}
+
+    @EntityDef({DecalComp.class})
+    class DecalDef{}
 }

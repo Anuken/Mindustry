@@ -802,6 +802,18 @@ public class EntityComps{
     }
 
     @Component
+    abstract class DecalComp implements Drawc, Timedc, Rotc, Posc{
+        Color color = new Color(1, 1, 1, 1);
+        TextureRegion region;
+
+        public void draw(){
+            Draw.color(color);
+            Draw.rect(region, getX(), getY(), getRotation());
+            Draw.color();
+        }
+    }
+
+    @Component
     abstract class DrawLightComp implements Drawc{
         void drawLight(){}
     }

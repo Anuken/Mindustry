@@ -221,7 +221,7 @@ public class PlacementFragment extends Fragment{
 
                         button.update(() -> { //color unplacable things gray
                             Tilec core = player.getClosestCore();
-                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
+                            Color color = state.rules.infiniteResources || (core != null && (core.getItems().has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
 
@@ -311,7 +311,7 @@ public class PlacementFragment extends Fragment{
                                             Tilec core = player.getClosestCore();
                                             if(core == null || state.rules.infiniteResources) return "*/*";
 
-                                            int amount = core.items.get(stack.item);
+                                            int amount = core.getItems().get(stack.item);
                                             int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
                                             String color = (amount < stackamount / 2f ? "[red]" : amount < stackamount ? "[accent]" : "[white]");
 

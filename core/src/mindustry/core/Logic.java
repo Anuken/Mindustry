@@ -210,7 +210,8 @@ public class Logic implements ApplicationListener{
 
         if(!state.is(State.menu)){
             if(!net.client()){
-                state.enemies = unitGroup.count(b -> b.getTeam() == state.rules.waveTeam && b.countsAsEnemy());
+                //TODO
+                //state.enemies = unitGroup.count(b -> b.getTeam() == state.rules.waveTeam && b.countsAsEnemy());
             }
 
             if(!state.isPaused()){
@@ -226,6 +227,8 @@ public class Logic implements ApplicationListener{
                     runWave();
                 }
 
+                //TODO update groups
+                /*
                 if(!headless){
                     effectGroup.update();
                     groundEffectGroup.update();
@@ -254,7 +257,7 @@ public class Logic implements ApplicationListener{
                 if(!state.isEditor()){
                     //bulletGroup
                     collisions.collideGroups(bulletGroup, unitGroup);
-                }
+                }*/
             }
 
             if(!net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver){

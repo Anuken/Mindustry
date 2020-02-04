@@ -170,7 +170,7 @@ public class Control implements ApplicationListener, Loadable{
 
             app.post(() -> ui.hudfrag.showLand());
             renderer.zoomIn(Fx.coreLand.lifetime);
-            app.post(() -> Fx.coreLand.at(core.x, core.y, 0, core.block));
+            app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.getBlock()));
             Time.run(Fx.coreLand.lifetime, () -> {
                 Fx.launch.at(core);
                 Effects.shake(5f, 5f, core);
@@ -178,8 +178,8 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
-            if(e.unit instanceof BaseUnit && world.isZone()){
-                data.unlockContent(((BaseUnit)e.unit).getType());
+            if(world.isZone()){
+                data.unlockContent(e.unit.getType());
             }
         });
     }
@@ -259,7 +259,7 @@ public class Control implements ApplicationListener, Loadable{
             state.rules.zone = zone;
             for(Tilec core : state.teams.playerCores()){
                 for(ItemStack stack : zone.getStartingItems()){
-                    core.items.add(stack.item, stack.amount);
+                    core.getItems().add(stack.item, stack.amount);
                 }
             }
             state.set(State.playing);
@@ -308,11 +308,11 @@ public class Control implements ApplicationListener, Loadable{
             state.rules.zone = zone;
             for(Tilec core : state.teams.playerCores()){
                 for(ItemStack stack : zone.getStartingItems()){
-                    core.items.add(stack.item, stack.amount);
+                    core.getItems().add(stack.item, stack.amount);
                 }
             }
             Tilec core = state.teams.playerCores().first();
-            core.items.clear();
+            core.getItems().clear();
 
             logic.play();
             state.rules.waveTimer = false;
@@ -437,7 +437,7 @@ public class Control implements ApplicationListener, Loadable{
             if(world.isZone()){
                 for(Tilec tile : state.teams.cores(player.getTeam())){
                     for(Item item : content.items()){
-                        if(tile.items.has(item)){
+                        if(tile.getItems().has(item)){
                             data.unlockContent(item);
                         }
                     }
