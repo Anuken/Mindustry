@@ -13,7 +13,7 @@ import static mindustry.Vars.renderer;
 public class GenericSmelter extends GenericCrafter{
     public Color flameColor = Color.valueOf("ffc999");
     public TextureRegion topRegion;
-    public bool doFlame = true;
+    public boolean doFlame = true;
 
     public GenericSmelter(String name){
         super(name);
