@@ -133,21 +133,12 @@ public class JoinDialog extends FloatingDialog{
             inner.add(button.getLabel()).growX();
 
             inner.addImageButton(Icon.upOpen, Styles.emptyi, () -> {
-                int index = servers.indexOf(server);
-                if(index > 0){
-                    servers.remove(index);
-                    servers.insert(0, server);
+                moveRemote(server, -1);
 
-                    saveServers();
-                    setupRemote();
-                    for(Server other : servers){
-                        if(other.lastHost != null){
-                            setupServer(other, other.lastHost);
-                        }else{
-                            refreshServer(other);
-                        }
-                    }
-                }
+            }).margin(3f).padTop(6f).top().right();
+
+            inner.addImageButton(Icon.downOpen, Styles.emptyi, () -> {
+                moveRemote(server, +1);
 
             }).margin(3f).padTop(6f).top().right();
 
@@ -174,6 +165,26 @@ public class JoinDialog extends FloatingDialog{
             server.content = button.table(t -> {}).grow().get();
 
             remote.row();
+        }
+    }
+
+    void moveRemote(Server server, int sign){
+        int index = servers.indexOf(server);
+
+        if(index + sign < 0) return;
+        if(index + sign > servers.size - 1) return;
+
+        servers.remove(index);
+        servers.insert(index + sign, server);
+
+        saveServers();
+        setupRemote();
+        for(Server other : servers){
+            if(other.lastHost != null){
+                setupServer(other, other.lastHost);
+            }else{
+                refreshServer(other);
+            }
         }
     }
 
