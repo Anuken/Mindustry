@@ -310,6 +310,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public void draw(){
+        type.draw(this);
     }
 
     @Override

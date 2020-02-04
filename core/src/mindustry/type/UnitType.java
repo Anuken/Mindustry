@@ -110,6 +110,9 @@ public class UnitType extends UnlockableContent{
         }
     }
 
+    public void draw(Unit unit){
+    }
+
     public void drawShadow(Unit unit, float offsetX, float offsetY){
         Draw.rect(unit.getIconRegion(), unit.x + offsetX, unit.y + offsetY, unit.rotation - 90);
     }
