@@ -73,7 +73,7 @@ public class Damage{
         }
     }
 
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length){
+    public static void collideLine(Bulletc hitter, Team team, Effect effect, float x, float y, float angle, float length){
         collideLine(hitter, team, effect, x, y, angle, length, false);
     }
 
@@ -81,7 +81,7 @@ public class Damage{
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
+    public static void collideLine(Bulletc hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
         collidedBlocks.clear();
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {
@@ -89,7 +89,7 @@ public class Damage{
             if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.entity != null && tile.getTeamID() != team.id && tile.entity.collide(hitter)){
                 tile.entity.collision(hitter);
                 collidedBlocks.add(tile.pos());
-                hitter.getBulletType().hit(hitter, tile.worldx(), tile.worldy());
+                hitter.type().hit(hitter, tile.worldx(), tile.worldy());
             }
         };
 
@@ -184,7 +184,7 @@ public class Damage{
             entity.damage(amount);
             //TODO better velocity displacement
             float dst = tr.set(entity.getX() - x, entity.getY() - y).len();
-            entity.velocity().add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
+            entity.vel().add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
 
             if(complete && damage >= 9999999f && entity == player){
                 Events.fire(Trigger.exclusionDeath);
@@ -235,8 +235,8 @@ public class Damage{
 
             //apply damage to entity if needed
             if(tile.entity != null && tile.getTeam() != team){
-                int health = (int)tile.entity.health;
-                if(tile.entity.health > 0){
+                int health = (int)tile.entity.health();
+                if(tile.entity.health() > 0){
                     tile.entity.damage(scaledDamage);
                     scaledDamage -= health;
 

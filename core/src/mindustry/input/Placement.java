@@ -97,7 +97,7 @@ public class Placement{
         int nodeLimit = 1000;
         int totalNodes = 0;
 
-        PriorityQueue<Tile> queue = new PriorityQueue<>(10, (a, b) -> Float.compare(costs.get(a.pos(), 0f) + distanceHeuristic(a.x, a.y, end.x, end.y), costs.get(b.pos(), 0f) + distanceHeuristic(b.x, b.y, end.x, end.y)));
+        PriorityQueue<Tile> queue = new PriorityQueue<>(10, (a, b) -> Float.compare(costs.get(a.pos(), 0f) + distanceHeuristic(a.x, a.y, end.x, end.y), costs.get(b.pos(), 0f) + distanceHeuristic(b.x(), b.y(), end.x, end.y)));
         queue.add(start);
         boolean found = false;
         while(!queue.isEmpty() && totalNodes++ < nodeLimit){

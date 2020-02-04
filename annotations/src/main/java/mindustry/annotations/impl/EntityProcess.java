@@ -287,10 +287,11 @@ public class EntityProcess extends BaseProcessor{
 
                 //get interface for each component
                 for(Stype comp : def.components){
+
                     //implement the interface
                     Stype inter = interfaces.find(i -> i.name().equals(interfaceName(comp)));
                     if(inter == null){
-                        err("Failed to generate interface for component. Interfaces are " + interfaces + "\nComponent", comp);
+                        err("Failed to generate interface for", comp);
                         return;
                     }
 

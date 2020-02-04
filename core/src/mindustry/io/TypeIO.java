@@ -1,100 +1,24 @@
 package mindustry.io;
 
-import mindustry.annotations.Annotations.ReadClass;
-import mindustry.annotations.Annotations.WriteClass;
-import arc.graphics.Color;
-import mindustry.ctype.ContentType;
-import mindustry.entities.Effects;
-import mindustry.entities.*;
-import mindustry.entities.bullet.BulletType;
-import mindustry.entities.units.BuildRequest;
-import mindustry.entities.type.*;
+import arc.graphics.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.ctype.*;
+import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
-import mindustry.net.Administration.TraceInfo;
-import mindustry.net.Packets.AdminAction;
-import mindustry.net.Packets.KickReason;
+import mindustry.net.Administration.*;
+import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
 import java.io.*;
-import java.nio.ByteBuffer;
+import java.nio.*;
 
 import static mindustry.Vars.*;
 
 /** Class for specifying read/write methods for code generation. */
 @SuppressWarnings("unused")
 public class TypeIO{
-
-    @WriteClass(Player.class)
-    public static void writePlayer(ByteBuffer buffer, Player player){
-        if(player == null){
-            buffer.putInt(-1);
-        }else{
-            buffer.putInt(player.id);
-        }
-    }
-
-    @ReadClass(Player.class)
-    public static Player readPlayer(ByteBuffer buffer){
-        int id = buffer.getInt();
-        return id == -1 ? null : playerGroup.getByID(id);
-    }
-
-    @WriteClass(Unitc.class)
-    public static void writeUnit(ByteBuffer buffer, Unitc unit){
-        if(unit.getGroup() == null){
-            buffer.put((byte)-1);
-            return;
-        }
-        buffer.put((byte)unit.getGroup().getID());
-        buffer.putInt(unit.getID());
-    }
-
-    @ReadClass(Unitc.class)
-    public static Unitc readUnit(ByteBuffer buffer){
-        byte gid = buffer.get();
-        if(gid == -1) return null;
-        int id = buffer.getInt();
-        return (Unitc)entities.get(gid).getByID(id);
-    }
-
-    @WriteClass(ShooterTrait.class)
-    public static void writeShooter(ByteBuffer buffer, ShooterTrait trait){
-        buffer.put((byte)trait.getGroup().getID());
-        buffer.putInt(trait.getID());
-    }
-
-    @ReadClass(ShooterTrait.class)
-    public static ShooterTrait readShooter(ByteBuffer buffer){
-        byte gid = buffer.get();
-        int id = buffer.getInt();
-        return (ShooterTrait)entities.get(gid).getByID(id);
-    }
-
-    @WriteClass(Bullet.class)
-    public static void writeBullet(ByteBuffer buffer, Bullet bullet){
-        buffer.putInt(bullet.getID());
-    }
-
-    @ReadClass(Bullet.class)
-    public static Bullet readBullet(ByteBuffer buffer){
-        int id = buffer.getInt();
-        return bulletGroup.getByID(id);
-    }
-
-    @WriteClass(BaseUnit.class)
-    public static void writeBaseUnit(ByteBuffer buffer, BaseUnit unit){
-        buffer.put((byte) (int)unit.getTeam().id);
-        buffer.putInt(unit.getID());
-    }
-
-    @ReadClass(BaseUnit.class)
-    public static BaseUnit readBaseUnit(ByteBuffer buffer){
-        byte tid = buffer.get();
-        int id = buffer.getInt();
-        return unitGroup.getByID(id);
-    }
 
     @WriteClass(Tile.class)
     public static void writeTile(ByteBuffer buffer, Tile tile){
@@ -218,16 +142,6 @@ public class TypeIO{
     @ReadClass(AdminAction.class)
     public static AdminAction readAction(ByteBuffer buffer){
         return AdminAction.values()[buffer.get()];
-    }
-
-    @WriteClass(Effect.class)
-    public static void writeEffect(ByteBuffer buffer, Effect effect){
-        buffer.putShort((short)effect.id);
-    }
-
-    @ReadClass(Effect.class)
-    public static Effect readEffect(ByteBuffer buffer){
-        return Effects.getEffect(buffer.getShort());
     }
 
     @WriteClass(UnitDef.class)

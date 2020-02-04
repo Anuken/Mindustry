@@ -263,7 +263,7 @@ public class ContentLoader{
         return getBy(ContentType.zone);
     }
 
-    public Array<UnitType> units(){
+    public Array<UnitDef> units(){
         return getBy(ContentType.unit);
     }
 }

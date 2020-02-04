@@ -577,6 +577,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void update(){
+        super.update();
+
         if(state.is(State.menu) ){
             selectRequests.clear();
             removals.clear();

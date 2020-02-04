@@ -8,7 +8,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -45,7 +45,7 @@ public class ItemBridge extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
+    public void configured(Tile tile, Playerc player, int value){
         tile.<ItemBridgeEntity>ent().link = value;
     }
 
@@ -201,13 +201,13 @@ public class ItemBridge extends Block{
         ItemBridgeEntity entity = tile.ent();
 
         if(entity.uptime >= 0.5f && entity.timer(timerTransport, transportTime)){
-            Item item = entity.getItems().take();
+            Item item = entity.items().take();
             if(item != null && other.block().acceptItem(item, other, tile)){
                 other.block().handleItem(item, other, tile);
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
             }else{
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 1f, 0.01f);
-                if(item != null) entity.getItems().add(item, 1);
+                if(item != null) entity.items().add(item, 1);
             }
         }
     }

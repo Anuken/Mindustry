@@ -10,7 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
@@ -102,7 +102,7 @@ public class CommandCenter extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
+    public void configured(Tile tile, Playerc player, int value){
         UnitCommand command = UnitCommand.all[value];
         ((CommandCenter)tile.block()).effect.at(tile);
 

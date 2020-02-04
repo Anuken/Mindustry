@@ -41,7 +41,7 @@ public class PlayerListFragment extends Fragment{
             });
 
             cont.table(Tex.buttonTrans, pane -> {
-                pane.label(() -> Core.bundle.format(playerGroup.size() == 1 ? "players.single" : "players", playerGroup.size()));
+                pane.label(() -> Core.bundle.format(Groups.player.size() == 1 ? "players.single" : "players", Groups.player.size()));
                 pane.row();
                 pane.pane(content).grow().get().setScrollingDisabled(true, false);
                 pane.row();
@@ -65,8 +65,8 @@ public class PlayerListFragment extends Fragment{
 
         float h = 74f;
 
-        playerGroup.all().sort(Structs.comparing(Unitc::team));
-        playerGroup.all().each(user -> {
+        Groups.player.all().sort(Structs.comparing(Unitc::team));
+        Groups.player.all().each(user -> {
             NetConnection connection = user.con;
 
             if(connection == null && net.server() && !user.isLocal) return;
@@ -129,7 +129,7 @@ public class PlayerListFragment extends Fragment{
                     t.addImageButton(Icon.zoom, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
-            }else if(!user.isLocal && !user.isAdmin && net.client() && playerGroup.size() >= 3 && player.team() == user.getTeam()){ //votekick
+            }else if(!user.isLocal && !user.isAdmin && net.client() && Groups.player.size() >= 3 && player.team() == user.getTeam()){ //votekick
                 button.add().growY();
 
                 button.addImageButton(Icon.hammer, Styles.clearPartiali,

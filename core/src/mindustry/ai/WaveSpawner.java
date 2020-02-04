@@ -9,6 +9,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -34,7 +35,7 @@ public class WaveSpawner{
 
     /** @return true if the player is near a ground spawn point. */
     public boolean playerNear(){
-        return groundSpawns.contains(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < state.rules.dropZoneRadius && player.team() != state.rules.waveTeam);
+        return groundSpawns.contains(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x(), player.y()) < state.rules.dropZoneRadius && player.team() != state.rules.waveTeam);
     }
 
     public void spawnEnemies(){
@@ -48,9 +49,10 @@ public class WaveSpawner{
 
                 eachFlyerSpawn((spawnX, spawnY) -> {
                     for(int i = 0; i < spawned; i++){
-                        BaseUnit unit = group.createUnit(state.rules.waveTeam);
-                        unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
-                        unit.add();
+                        //TODO
+                        //Unitc unit = group.createUnit(state.rules.waveTeam);
+                        //unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
+                        //unit.add();
                     }
                 });
             }else{
@@ -61,10 +63,11 @@ public class WaveSpawner{
                     for(int i = 0; i < spawned; i++){
                         Tmp.v1.rnd(spread);
 
-                        BaseUnit unit = group.createUnit(state.rules.waveTeam);
-                        unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
+                        //TODO
+                        //Unitc unit = group.createUnit(state.rules.waveTeam);
+                        //unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
 
-                        Time.run(Math.min(i * 5, 60 * 2), () -> spawnEffect(unit));
+                        //Time.run(Math.min(i * 5, 60 * 2), () -> spawnEffect(unit));
                     }
                 });
             }
@@ -88,8 +91,8 @@ public class WaveSpawner{
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam) && !state.teams.playerCores().isEmpty()){
             Tilec firstCore = state.teams.playerCores().first();
             for(Tilec core : state.rules.waveTeam.cores()){
-                Tmp.v1.set(firstCore).sub(core.x, core.y).limit(coreMargin + core.block.size*tilesize);
-                cons.accept(core.x + Tmp.v1.x, core.y + Tmp.v1.y, false);
+                Tmp.v1.set(firstCore).sub(core).limit(coreMargin + core.block().size*tilesize);
+                cons.accept(core.x() + Tmp.v1.x, core.y() + Tmp.v1.y, false);
             }
         }
     }
@@ -104,7 +107,7 @@ public class WaveSpawner{
 
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam)){
             for(Tilec core : state.teams.get(state.rules.waveTeam).cores){
-                cons.get(core.x, core.y);
+                cons.get(core.x(), core.y());
             }
         }
     }
@@ -136,8 +139,8 @@ public class WaveSpawner{
         flySpawns.add(fspawn);
     }
 
-    private void spawnEffect(BaseUnit unit){
-        Fx.unitSpawn.at(unit.x, unit.y, 0f, unit);
+    private void spawnEffect(Unitc unit){
+        Fx.unitSpawn.at(unit.x(), unit.y(), 0f, unit);
         Time.run(30f, () -> {
             unit.add();
             Fx.spawn.at(unit);

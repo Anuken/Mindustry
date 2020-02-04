@@ -72,12 +72,12 @@ public class RemoteProcess extends BaseProcessor{
 
                 //check for static
                 if(!element.getModifiers().contains(Modifier.STATIC) || !element.getModifiers().contains(Modifier.PUBLIC)){
-                    BaseProcessor.messager.printMessage(Kind.ERROR, "All @Remote methods must be public and static: ", element);
+                    err("All @Remote methods must be public and static: ", element);
                 }
 
                 //can't generate none methods
                 if(annotation.targets() == Loc.none){
-                    BaseProcessor.messager.printMessage(Kind.ERROR, "A @Remote method's targets() cannot be equal to 'none':", element);
+                    err("A @Remote method's targets() cannot be equal to 'none':", element);
                 }
 
                 //get and create class entry if needed

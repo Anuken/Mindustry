@@ -182,7 +182,7 @@ public abstract class BasicGenerator extends RandomGenerator{
         Tile end = tiles.getn(endX, endY);
         GridBits closed = new GridBits(width, height);
         IntFloatMap costs = new IntFloatMap();
-        PriorityQueue<Tile> queue = new PriorityQueue<>(tiles.width() * tiles.height()/4, (a, b) -> Float.compare(costs.get(a.pos(), 0f) + dh.cost(a.x, a.y, end.x, end.y), costs.get(b.pos(), 0f) + dh.cost(b.x, b.y, end.x, end.y)));
+        PriorityQueue<Tile> queue = new PriorityQueue<>(tiles.width() * tiles.height()/4, (a, b) -> Float.compare(costs.get(a.pos(), 0f) + dh.cost(a.x, a.y, end.x, end.y), costs.get(b.pos(), 0f) + dh.cost(b.x(), b.y(), end.x, end.y)));
         queue.add(start);
         boolean found = false;
         while(!queue.isEmpty()){

@@ -53,8 +53,8 @@ public class ConsumeItemFilter extends Consume{
     public void trigger(Tilec entity){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
-            if(entity.getItems() != null && entity.getItems().has(item) && this.filter.get(item)){
-                entity.getItems().remove(item, 1);
+            if(entity.items() != null && entity.items().has(item) && this.filter.get(item)){
+                entity.items().remove(item, 1);
                 break;
             }
         }
@@ -64,7 +64,7 @@ public class ConsumeItemFilter extends Consume{
     public boolean valid(Tilec entity){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
-            if(entity.getItems() != null && entity.getItems().has(item) && this.filter.get(item)){
+            if(entity.items() != null && entity.items().has(item) && this.filter.get(item)){
                 return true;
             }
         }

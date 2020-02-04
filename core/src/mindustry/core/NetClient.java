@@ -13,7 +13,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -60,7 +60,7 @@ public class NetClient implements ApplicationListener{
         net.handleClient(Connect.class, packet -> {
             Log.info("Connecting to server: {0}", packet.addressTCP);
 
-            player.isAdmin = false;
+            player.admin(false);
 
             reset();
 
@@ -75,11 +75,11 @@ public class NetClient implements ApplicationListener{
             });
 
             ConnectPacket c = new ConnectPacket();
-            c.name = player.name;
+            c.name = player.name();
             c.mods = mods.getModStrings();
             c.mobile = mobile;
             c.versionType = Version.type;
-            c.color = Color.rgba8888(player.color);
+            c.color = Color.rgba8888(player.color());
             c.usid = getUsid(packet.addressTCP);
             c.uuid = platform.getUUID();
 
@@ -133,14 +133,14 @@ public class NetClient implements ApplicationListener{
 
     //called on all clients
     @Remote(targets = Loc.server, variants = Variant.both)
-    public static void sendMessage(String message, String sender, Player playersender){
+    public static void sendMessage(String message, String sender, Playerc playersender){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message, sender);
         }
 
         if(playersender != null){
-            playersender.lastText = message;
-            playersender.textFadeTime = 1f;
+            playersender.lastText(message);
+            playersender.textFadeTime(1f);
         }
     }
 
@@ -154,7 +154,7 @@ public class NetClient implements ApplicationListener{
 
     //called when a server recieves a chat message from a player
     @Remote(called = Loc.server, targets = Loc.client)
-    public static void sendChatMessage(Player player, String message){
+    public static void sendChatMessage(Playerc player, String message){
         if(message.length() > maxTextLength){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
         }
@@ -172,18 +172,18 @@ public class NetClient implements ApplicationListener{
 
             //special case; graphical server needs to see its message
             if(!headless){
-                sendMessage(message, colorizeName(player.id, player.name), player);
+                sendMessage(message, colorizeName(player.id(), player.name()), player);
             }
 
             //server console logging
-            Log.info("&y{0}: &lb{1}", player.name, message);
+            Log.info("&y{0}: &lb{1}", player.name(), message);
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
-            Call.sendMessage(message, colorizeName(player.id, player.name), player);
+            Call.sendMessage(message, colorizeName(player.id(), player.name()), player);
         }else{
             //log command to console but with brackets
-            Log.info("<&y{0}: &lm{1}&lg>", player.name, message);
+            Log.info("<&y{0}: &lm{1}&lg>", player.name(), message);
 
             //a command was sent, now get the output
             if(response.type != ResponseType.valid){
@@ -204,9 +204,9 @@ public class NetClient implements ApplicationListener{
     }
 
     public static String colorizeName(int id, String name){
-        Player player = playerGroup.getByID(id);
+        Playerc player = Groups.player.getByID(id);
         if(name == null || player == null) return null;
-        return "[#" + player.color.toString().toUpperCase() + "]" + name;
+        return "[#" + player.color().toString().toUpperCase() + "]" + name;
     }
 
     @Remote(called = Loc.client, variants = Variant.one)
@@ -219,8 +219,8 @@ public class NetClient implements ApplicationListener{
     }
     
     @Remote(targets = Loc.client)
-    public static void onPing(Player player, long time){
-        Call.onPingResponse(player.con, time);
+    public static void onPing(Playerc player, long time){
+        Call.onPingResponse(player.con(), time);
     }
 
     @Remote(variants = Variant.one)
@@ -229,7 +229,7 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one)
-    public static void onTraceInfo(Player player, TraceInfo info){
+    public static void onTraceInfo(Playerc player, TraceInfo info){
         if(player != null){
             ui.traces.show(player, info);
         }
@@ -265,9 +265,6 @@ public class NetClient implements ApplicationListener{
         ui.showText("", message);
     }
 
-    //TODO these are commented out to enforce compatibility with 103! uncomment before 104 release
-    /*
-
     @Remote(variants = Variant.both)
     public static void onInfoPopup(String message, float duration, int align, int top, int left, int bottom, int right){
         ui.showInfoPopup(message, duration, align, top, left, bottom, right);
@@ -278,14 +275,15 @@ public class NetClient implements ApplicationListener{
         ui.showLabel(info, duration, worldx, worldy);
     }
 
+    /*
     @Remote(variants = Variant.both, unreliable = true)
     public static void onEffect(Effect effect, float x, float y, float rotation, Color color){
-        effect.at(color, x, y, rotation);
+        effect.at(x, y, rotation, color);
     }
 
     @Remote(variants = Variant.both)
     public static void onEffectReliable(Effect effect, float x, float y, float rotation, Color color){
-        effect.at(color, x, y, rotation);
+        effect.at(x, y, rotation, color);
     }*/
 
     @Remote(variants = Variant.both)
@@ -323,35 +321,33 @@ public class NetClient implements ApplicationListener{
 
     @Remote
     public static void onPlayerDisconnect(int playerid){
-        playerGroup.removeByID(playerid);
+        Groups.player.removeByID(playerid);
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void onEntitySnapshot(byte groupID, short amount, short dataLen, byte[] data){
+    public static void onEntitySnapshot(short amount, short dataLen, byte[] data){
         try{
             netClient.byteStream.setBytes(net.decompressSnapshot(data, dataLen));
             DataInputStream input = netClient.dataStream;
-
-            EntityGroup group = entities.get(groupID);
 
             //go through each entity
             for(int j = 0; j < amount; j++){
                 int id = input.readInt();
                 byte typeID = input.readByte();
 
-                SyncTrait entity = group == null ? null : (SyncTrait)group.getByID(id);
+                Syncc entity = Groups.sync.getByID(id);
                 boolean add = false, created = false;
 
-                if(entity == null && id == player.id){
+                if(entity == null && id == player.id()){
                     entity = player;
                     add = true;
                 }
 
                 //entity must not be added yet, so create it
                 if(entity == null){
-                    entity = (SyncTrait)content.<TypeID>getByID(ContentType.typeid, typeID).constructor.get();
-                    entity.resetID(id);
-                    if(!netClient.isEntityUsed(entity.getID())){
+                    entity = (Syncc)ClassMapping.map(typeID).get();
+                    entity.id(id);
+                    if(!netClient.isEntityUsed(entity.id())){
                         add = true;
                     }
                     created = true;
@@ -360,17 +356,14 @@ public class NetClient implements ApplicationListener{
                 //read the entity
                 entity.read(input);
 
-                if(created && entity.getInterpolator() != null && entity.getInterpolator().target != null){
+                if(created && entity.interpolator().target != null){
                     //set initial starting position
-                    entity.setNet(entity.getInterpolator().target.x, entity.getInterpolator().target.y);
-                    if(entity instanceof Unitc && entity.getInterpolator().targets.length > 0){
-                        ((Unitc)entity).rotation = entity.getInterpolator().targets[0];
-                    }
+                    entity.setNet(entity.interpolator().target.x, entity.interpolator().target.y);
                 }
 
                 if(add){
                     entity.add();
-                    netClient.addRemovedEntity(entity.getID());
+                    netClient.addRemovedEntity(entity.id());
                 }
             }
         }catch(IOException e){
@@ -391,7 +384,7 @@ public class NetClient implements ApplicationListener{
                     Log.warn("Missing entity at {0}. Skipping block snapshot.", tile);
                     break;
                 }
-                tile.entity.read(input, tile.entity.version());
+                tile.entity.read(input);
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -525,7 +518,7 @@ public class NetClient implements ApplicationListener{
 
             Call.onClientShapshot(lastSent++, player.x, player.y,
             player.pointerX, player.pointerY, player.rotation, player.baseRotation,
-            player.velocity().x, player.velocity().y,
+            player.vel().x, player.vel().y,
             player.getMineTile(),
             player.isBoosting, player.isShooting, ui.chatfrag.shown(), player.isBuilding,
             requests,

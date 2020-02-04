@@ -41,7 +41,7 @@ public class LaserBulletType extends BulletType{
 
     @Override
     public void init(Bulletc b){
-        Damage.collideLine(b, b.team(), hitEffect, b.x, b.y, b.rot(), length);
+        Damage.collideLine(b, b.team(), hitEffect, b.x(), b.y(), b.rotation(), length);
     }
 
     @Override
@@ -51,18 +51,18 @@ public class LaserBulletType extends BulletType{
         float cwidth = width;
         float compound = 1f;
 
-        Lines.lineAngle(b.x, b.y, b.rot(), baseLen);
+        Lines.lineAngle(b.x(), b.y(), b.rotation(), baseLen);
         Lines.precise(true);
         for(Color color : colors){
             Draw.color(color);
             Lines.stroke((cwidth *= lengthFalloff) * b.fout());
-            Lines.lineAngle(b.x, b.y, b.rot(), baseLen, CapStyle.none);
-            Tmp.v1.trns(b.rot(), baseLen);
-            Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, Lines.getStroke() * 1.22f, cwidth * 2f + width / 2f, b.rot());
+            Lines.lineAngle(b.x(), b.y(), b.rotation(), baseLen, CapStyle.none);
+            Tmp.v1.trns(b.rotation(), baseLen);
+            Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, Lines.getStroke() * 1.22f, cwidth * 2f + width / 2f, b.rotation());
 
-            Fill.circle(b.x, b.y, 1f * cwidth * b.fout());
+            Fill.circle(b.x(), b.y(), 1f * cwidth * b.fout());
             for(int i : Mathf.signs){
-                Drawf.tri(b.x, b.y, sideWidth * b.fout() * cwidth, sideLength * compound, b.rot() + sideAngle * i);
+                Drawf.tri(b.x(), b.y(), sideWidth * b.fout() * cwidth, sideLength * compound, b.rotation() + sideAngle * i);
             }
 
             compound *= lengthFalloff;

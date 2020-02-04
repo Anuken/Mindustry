@@ -37,8 +37,8 @@ public class DirectConsumerTests extends PowerTestFixture{
             consumes.power(requestedPower);
             consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30));
         }});
-        consumertile.entity.getItems().add(Items.silicon, siliconAmount);
-        consumertile.entity.getItems().add(Items.lead, leadAmount);
+        consumertile.entity.items().add(Items.silicon, siliconAmount);
+        consumertile.entity.items().add(Items.lead, leadAmount);
 
         Tile producerTile = createFakeTile(2, 0, createFakeProducerBlock(producedPower));
         producerTile.<PowerGenerator.GeneratorEntity>ent().productionEfficiency = 1f;

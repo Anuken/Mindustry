@@ -13,7 +13,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -63,7 +63,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(PlayEvent.class, event -> {
-            player.team(netServer.assignTeam(player, playerGroup.all()));
+            player.team(netServer.assignTeam(player, Groups.player.all()));
             player.dead(true);
             player.add();
 
@@ -204,10 +204,10 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     void createPlayer(){
-        player = new Player();
+        player = new Playerc();
         player.name = Core.settings.getString("name");
         player.color.set(Core.settings.getInt("color-0"));
-        player.isLocal = true;
+        player.isLocal() = true;
         player.isMobile = mobile;
 
         if(mobile){
@@ -304,14 +304,14 @@ public class Control implements ApplicationListener, Loadable{
                 }
             }
 
-            Geometry.circle(coreb.x, coreb.y, 10, (cx, cy) -> {
+            Geometry.circle(coreb.x(), coreb.y(), 10, (cx, cy) -> {
                 Tile tile = world.ltile(cx, cy);
                 if(tile != null && tile.getTeam() == state.rules.defaultTeam && !(tile.block() instanceof CoreBlock)){
                     tile.remove();
                 }
             });
 
-            Geometry.circle(coreb.x, coreb.y, 5, (cx, cy) -> world.tile(cx, cy).clearOverlay());
+            Geometry.circle(coreb.x(), coreb.y(), 5, (cx, cy) -> world.tile(cx, cy).clearOverlay());
 
             world.endMapLoad();
 

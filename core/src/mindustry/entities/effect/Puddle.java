@@ -201,7 +201,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
 
                 unit.applyEffect(liquid.effect, 60 * 2);
 
-                if(unit.velocity().len() > 0.1){
+                if(unit.vel().len() > 0.1){
                     Fx.ripple.at(liquid.color, unit.x, unit.y);
                 }
             });

@@ -8,7 +8,6 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -35,7 +34,7 @@ public class Door extends Wall{
     }
 
     @Remote(called = Loc.server)
-    public static void onDoorToggle(Player player, Tile tile, boolean open){
+    public static void onDoorToggle(Playerc player, Tile tile, boolean open){
         DoorEntity entity = tile.ent();
         if(entity != null){
             entity.open = open;
@@ -80,7 +79,7 @@ public class Door extends Wall{
     }
 
     @Override
-    public void tapped(Tile tile, Player player){
+    public void tapped(Tile tile, Playerc player){
         DoorEntity entity = tile.ent();
 
         if((Units.anyEntities(tile) && entity.open) || !tile.entity.timer(timerToggle, 30f)){

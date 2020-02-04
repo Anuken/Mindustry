@@ -8,7 +8,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import mindustry.content.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
@@ -22,7 +22,7 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
-    public Mech mech = Mechs.starter;
+    public UnitDef mech = UnitTypes.starter;
 
     public CoreBlock(String name){
         super(name);
@@ -38,15 +38,16 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Remote(called = Loc.server)
-    public static void onUnitRespawn(Tile tile, Player player){
+    public static void onUnitRespawn(Tile tile, Playerc player){
         if(player == null || tile.entity == null) return;
 
         CoreEntity entity = tile.ent();
         Fx.spawn.at(entity);
         entity.progress = 0;
         entity.spawnPlayer = player;
-        entity.spawnPlayer.onRespawn(tile);
-        entity.spawnPlayer.applyImpulse(0, 8f);
+        //TODO fix
+        //entity.spawnPlayer.onRespawn(tile);
+        //entity.spawnPlayer.applyImpulse(0, 8f);
         entity.spawnPlayer = null;
     }
 
@@ -58,7 +59,7 @@ public class CoreBlock extends StorageBlock{
             new Bar(
                 () -> Core.bundle.format("bar.capacity", ui.formatAmount(((CoreEntity)e).storageCapacity)),
                 () -> Pal.items,
-                () -> e.items.total() / (float)(((CoreEntity)e).storageCapacity * content.items().count(i -> i.type == ItemType.material))
+                () -> e.items().total() / (float)(((CoreEntity)e).storageCapacity * content.items().count(i -> i.type == ItemType.material))
             ));
     }
 
@@ -83,21 +84,21 @@ public class CoreBlock extends StorageBlock{
         CoreEntity entity = tile.ent();
 
         for(Tilec other : state.teams.cores(tile.getTeam())){
-            if(other.tile != tile){
-                entity.items() = other.items;
+            if(other.tile() != tile){
+                entity.items(other.items());
             }
         }
         state.teams.registerCore(entity);
 
         entity.storageCapacity = itemCapacity + entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         entity.proximity().each(this::isContainer, t -> {
-            t.entity.items() = entity.items();
+            t.entity.items(entity.items());
             t.<StorageBlockEntity>ent().linkedCore = tile;
         });
 
         for(Tilec other : state.teams.cores(tile.getTeam())){
-            if(other.tile == tile) continue;
-            entity.storageCapacity += other.block.itemCapacity + other.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
+            if(other.tile() == tile) continue;
+            entity.storageCapacity += other.block().itemCapacity + other.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         }
 
         if(!world.isGenerating()){
@@ -135,9 +136,10 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public float handleDamage(Tile tile, float amount){
-        if(player != null && tile.getTeam() == player.team()){
-            Events.fire(Trigger.teamCoreDamage);
-        }
+        //TODO implement
+        //if(player != null && tile.getTeam() == player.team()){
+        //    Events.fire(Trigger.teamCoreDamage);
+        //}
         return amount;
     }
 
@@ -155,9 +157,9 @@ public class CoreBlock extends StorageBlock{
         tile.entity.proximity().each(e -> isContainer(e) && e.entity.items() == tile.entity.items(), t -> {
             StorageBlockEntity ent = (StorageBlockEntity)t.entity;
             ent.linkedCore = null;
-            ent.items = new ItemModule();
+            ent.items(new ItemModule());
             for(Item item : content.items()){
-                ent.items.set(item, (int)(fract * tile.entity.items().get(item)));
+                ent.items().set(item, (int)(fract * tile.entity.items().get(item)));
             }
         });
 
@@ -169,7 +171,7 @@ public class CoreBlock extends StorageBlock{
         }
 
         for(CoreEntity other : state.teams.cores(tile.getTeam())){
-            other.block.onProximityUpdate(other.tile);
+            other.block().onProximityUpdate(other.tile());
         }
     }
 
@@ -185,7 +187,8 @@ public class CoreBlock extends StorageBlock{
         CoreEntity entity = tile.ent();
 
         if(entity.heat > 0.001f){
-            RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.spawnPlayer, mech);
+            //TODO implement
+            //RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.spawnPlayer, mech);
         }
     }
 
@@ -203,6 +206,8 @@ public class CoreBlock extends StorageBlock{
     public void update(Tile tile){
         CoreEntity entity = tile.ent();
 
+        //TODO implement
+        /*
         if(entity.spawnPlayer != null){
             if(!entity.spawnPlayer.dead() || !entity.spawnPlayer.isAdded()){
                 entity.spawnPlayer = null;
@@ -219,7 +224,7 @@ public class CoreBlock extends StorageBlock{
             }
         }else{
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
-        }
+        }*/
     }
 
     @Override
@@ -229,26 +234,11 @@ public class CoreBlock extends StorageBlock{
         return entity.spawnPlayer != null;
     }
 
-    public class CoreEntity extends Tilec implements SpawnerTrait{
-        protected Player spawnPlayer;
+    public class CoreEntity extends Tilec{
+        protected Playerc spawnPlayer;
         protected float progress;
         protected float time;
         protected float heat;
         protected int storageCapacity;
-
-        @Override
-        public boolean hasUnit(Unitc unit){
-            return unit == spawnPlayer;
-        }
-
-        @Override
-        public void updateSpawning(Player player){
-            if(!netServer.isWaitingForPlayers() && spawnPlayer == null){
-                spawnPlayer = player;
-                progress = 0f;
-                player.mech = mech;
-                player.beginRespawning(this);
-            }
-        }
     }
 }

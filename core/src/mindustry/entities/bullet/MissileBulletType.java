@@ -30,11 +30,11 @@ public class MissileBulletType extends BasicBulletType{
         super.update(b);
 
         if(Mathf.chance(Time.delta() * 0.2)){
-            Fx.missileTrail.at(b.x, b.y, 2f, trailColor);
+            Fx.missileTrail.at(b.x(), b.y(), 2f, trailColor);
         }
 
         if(weaveMag > 0){
-            b.velocity().rotate(Mathf.sin(Time.time() + b.id * 4422, weaveScale, weaveMag) * Time.delta());
+            b.vel().rotate(Mathf.sin(Time.time() + b.id * 4422, weaveScale, weaveMag) * Time.delta());
         }
     }
 }

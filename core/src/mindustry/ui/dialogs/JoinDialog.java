@@ -253,7 +253,7 @@ public class JoinDialog extends FloatingDialog{
                     Core.settings.save();
                 }).grow().pad(8).get().setMaxLength(maxNameLength);
             }else{
-                t.add(player.name).update(l -> l.setColor(player.color)).grow().pad(8);
+                t.add(player.name()).update(l -> l.setColor(player.color)).grow().pad(8);
             }
 
             ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {

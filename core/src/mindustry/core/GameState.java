@@ -1,9 +1,9 @@
 package mindustry.core;
 
 import arc.*;
-import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
@@ -25,8 +25,8 @@ public class GameState{
     /** Current game state. */
     private State state = State.menu;
 
-    public BaseUnit boss(){
-        return unitGroup.find(u -> u.isBoss() && u.getTeam() == rules.waveTeam);
+    public Unitc boss(){
+        return Groups.unit.find(u -> u.isBoss() && u.team() == rules.waveTeam);
     }
 
     public void set(State astate){

@@ -1,33 +1,27 @@
 package mindustry.world.blocks.units;
 
 import arc.*;
-import mindustry.annotations.Annotations.Loc;
-import mindustry.annotations.Annotations.Remote;
-import arc.struct.EnumSet;
 import arc.graphics.g2d.*;
-import arc.math.Mathf;
-import mindustry.Vars;
-import mindustry.content.Fx;
-import mindustry.entities.Effects;
-import mindustry.entities.type.*;
-import mindustry.game.EventType.*;
-import mindustry.gen.Call;
-import mindustry.graphics.Pal;
-import mindustry.graphics.Shaders;
+import arc.math.*;
+import arc.struct.*;
+import mindustry.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.ui.Bar;
-import mindustry.ui.Cicon;
-import mindustry.world.Block;
-import mindustry.world.Tile;
-import mindustry.world.consumers.ConsumeItems;
-import mindustry.world.consumers.ConsumeType;
+import mindustry.ui.*;
+import mindustry.world.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import java.io.*;
-import static mindustry.Vars.*;
+
+import static mindustry.Vars.net;
 
 public class UnitFactory extends Block{
-    public UnitType unitType;
+    public UnitDef unitType;
     public float produceTime = 1000f;
     public float launchVelocity = 0f;
     public TextureRegion topRegion;
@@ -58,12 +52,14 @@ public class UnitFactory extends Block{
         Fx.producesmoke.at(tile.drawx(), tile.drawy());
 
         if(!net.client()){
-            BaseUnit unit = factory.unitType.create(tile.getTeam());
+            //TODO create the unit
+            /*
+            Unitc unit = factory.unitType.create(tile.getTeam());
             unit.setSpawner(tile);
             unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
             unit.add();
-            unit.velocity().y = factory.launchVelocity;
-            Events.fire(new UnitCreateEvent(unit));
+            unit.vel().y = factory.launchVelocity;
+            Events.fire(new UnitCreateEvent(unit));*/
         }
     }
 

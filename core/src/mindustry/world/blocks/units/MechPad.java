@@ -9,10 +9,11 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
@@ -22,7 +23,7 @@ import java.io.*;
 import static mindustry.Vars.*;
 
 public class MechPad extends Block{
-    public @NonNull Mech mech;
+    public @NonNull UnitDef mech;
     public float buildTime = 60 * 5;
 
     public MechPad(String name){
@@ -43,7 +44,7 @@ public class MechPad extends Block{
     }
 
     @Remote(targets = Loc.both, called = Loc.server)
-    public static void onMechFactoryTap(Player player, Tile tile){
+    public static void onMechFactoryTap(Playerc player, Tile tile){
         if(player == null || tile == null || !(tile.block() instanceof MechPad) || !checkValidTap(tile, player)) return;
 
         MechFactoryEntity entity = tile.ent();
@@ -64,9 +65,9 @@ public class MechPad extends Block{
         if(entity.player == null) return;
         Mech mech = ((MechPad)tile.block()).mech;
         boolean resetSpawner = !entity.sameMech && entity.player.mech == mech;
-        entity.player.mech = !entity.sameMech && entity.player.mech == mech ? Mechs.starter : mech;
+        entity.player.mech = !entity.sameMech && entity.player.mech == mech ? UnitTypes.starter : mech;
 
-        Player player = entity.player;
+        Playerc player = entity.player;
 
         entity.progress = 0;
         entity.player.onRespawn(tile);
@@ -76,7 +77,7 @@ public class MechPad extends Block{
         Events.fire(new MechChangeEvent(player, player.mech));
     }
 
-    protected static boolean checkValidTap(Tile tile, Player player){
+    protected static boolean checkValidTap(Tile tile, Playerc player){
         MechFactoryEntity entity = tile.ent();
         return !player.dead() && tile.interactable(player.team()) && Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize &&
         Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize && entity.consValid() && entity.player == null;
@@ -93,12 +94,12 @@ public class MechPad extends Block{
     }
 
     @Override
-    public void tapped(Tile tile, Player player){
+    public void tapped(Tile tile, Playerc player){
         MechFactoryEntity entity = tile.ent();
 
         if(checkValidTap(tile, player)){
             Call.onMechFactoryTap(player, tile);
-        }else if(player.isLocal && mobile && !player.dead() && entity.consValid() && entity.player == null){
+        }else if(player.isLocal() && mobile && !player.dead() && entity.consValid() && entity.player == null){
             //deselect on double taps
             player.moveTarget = player.moveTarget == tile.entity ? null : tile.entity;
         }
@@ -109,7 +110,7 @@ public class MechPad extends Block{
         MechFactoryEntity entity = tile.ent();
 
         if(entity.player != null){
-            RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.player, (!entity.sameMech && entity.player.mech == mech ? Mechs.starter : mech));
+            RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.player, (!entity.sameMech && entity.player.mech == mech ? UnitTypes.starter : mech));
         }
     }
 
@@ -133,7 +134,7 @@ public class MechPad extends Block{
     }
 
     public class MechFactoryEntity extends Tilec implements SpawnerTrait{
-        Player player;
+        Playerc player;
         boolean sameMech;
         float progress;
         float time;
@@ -145,7 +146,7 @@ public class MechPad extends Block{
         }
 
         @Override
-        public void updateSpawning(Player unit){
+        public void updateSpawning(Playerc unit){
             if(player == null){
                 progress = 0f;
                 player = unit;

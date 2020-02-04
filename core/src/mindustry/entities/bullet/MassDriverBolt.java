@@ -27,10 +27,10 @@ public class MassDriverBolt extends BulletType{
         float w = 11f, h = 13f;
 
         Draw.color(Pal.bulletYellowBack);
-        Draw.rect("shell-back", b.x, b.y, w, h, b.rot() + 90);
+        Draw.rect("shell-back", b.x(), b.y(), w, h, b.rotation() + 90);
 
         Draw.color(Pal.bulletYellow);
-        Draw.rect("shell", b.x, b.y, w, h, b.rot() + 90);
+        Draw.rect("shell", b.x(), b.y(), w, h, b.rotation() + 90);
 
         Draw.reset();
     }
@@ -92,8 +92,8 @@ public class MassDriverBolt extends BulletType{
         for(int i = 0; i < data.items.length; i++){
             int amountDropped = Mathf.random(0, data.items[i]);
             if(amountDropped > 0){
-                float angle = b.rot() + Mathf.range(100f);
-                Fx.dropItem.at(b.x, b.y, angle, Color.white, content.item(i));
+                float angle = b.rotation() + Mathf.range(100f);
+                Fx.dropItem.at(b.x(), b.y(), angle, Color.white, content.item(i));
             }
         }
     }

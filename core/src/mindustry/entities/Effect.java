@@ -16,6 +16,9 @@ public class Effect{
     /** Clip size. */
     public float size;
 
+    public boolean ground;
+    public float groundDuration;
+
     public Effect(float life, float clipsize, Cons<EffectContainer> renderer){
         this.id = lastid++;
         this.lifetime = life;
@@ -25,6 +28,17 @@ public class Effect{
 
     public Effect(float life, Cons<EffectContainer> renderer){
         this(life, 28f, renderer);
+    }
+
+    public Effect ground(){
+        ground = true;
+        return this;
+    }
+
+    public Effect ground(float duration){
+        ground = true;
+        this.groundDuration = duration;
+        return this;
     }
 
     public void at(Position pos){

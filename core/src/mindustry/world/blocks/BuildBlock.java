@@ -9,7 +9,7 @@ import arc.math.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -55,7 +55,7 @@ public class BuildBlock extends Block{
     public static void onDeconstructFinish(Tile tile, Block block, int builderID){
         Team team = tile.getTeam();
         Fx.breakBlock.at(tile.drawx(), tile.drawy(), block.size);
-        Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, true));
+        Events.fire(new BlockBuildEndEvent(tile, Groups.player.getByID(builderID), team, true));
         tile.remove();
         if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
     }
@@ -105,7 +105,7 @@ public class BuildBlock extends Block{
         Call.onConstructFinish(tile, block, builderID, rotation, team, skipConfig);
         tile.block().placed(tile);
 
-        Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false));
+        Events.fire(new BlockBuildEndEvent(tile, Groups.player.getByID(builderID), team, false));
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
     }
 
@@ -138,7 +138,7 @@ public class BuildBlock extends Block{
     }
 
     @Override
-    public void tapped(Tile tile, Player player){
+    public void tapped(Tile tile, Playerc player){
         BuildEntity entity = tile.ent();
 
         //if the target is constructible, begin constructing
@@ -279,7 +279,7 @@ public class BuildBlock extends Block{
 
             progress = Mathf.clamp(progress - amount);
 
-            if(builder instanceof Player){
+            if(builder instanceof Playerc){
                 builderID = builder.getID();
             }
 

@@ -12,7 +12,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -242,7 +242,7 @@ public class Renderer implements ApplicationListener{
         }
 
         overlays.drawBottom();
-        playerGroup.draw(p -> p.isLocal, Player::drawBuildRequests);
+        Groups.player.draw(p -> p.isLocal, Playerc::drawBuildRequests);
 
         if(shieldGroup.countInBounds() > 0){
             if(settings.getBool("animatedshields") && Shaders.shield != null){
@@ -265,7 +265,7 @@ public class Renderer implements ApplicationListener{
 
         overlays.drawTop();
 
-        playerGroup.draw(p -> !p.isDead(), Player::drawName);
+        Groups.player.draw(p -> !p.isDead(), Playerc::drawName);
 
         if(state.rules.lighting){
             lights.draw();
@@ -311,10 +311,10 @@ public class Renderer implements ApplicationListener{
             Draw.rect("circle-shadow", u.x, u.y, size * rad, size * rad);
         };
 
-        unitGroup.draw(unit -> !unit.isDead(), draw::get);
+        Groups.unit.draw(unit -> !unit.isDead(), draw::get);
 
-        if(!playerGroup.isEmpty()){
-            playerGroup.draw(unit -> !unit.isDead(), draw::get);
+        if(!Groups.player.isEmpty()){
+            Groups.player.draw(unit -> !unit.isDead(), draw::get);
         }
 
         Draw.color();
@@ -324,21 +324,21 @@ public class Renderer implements ApplicationListener{
         float trnsX = -12, trnsY = -13;
         Draw.color(0, 0, 0, 0.22f);
 
-        unitGroup.draw(unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
-        playerGroup.draw(unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
+        Groups.unit.draw(unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
+        Groups.player.draw(unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
 
         Draw.color();
     }
 
     private void drawAllTeams(boolean flying){
-        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unitc::drawUnder);
-        playerGroup.draw(p -> p.isFlying() == flying && !p.isDead(), Unitc::drawUnder);
+        Groups.unit.draw(u -> u.isFlying() == flying && !u.isDead(), Unitc::drawUnder);
+        Groups.player.draw(p -> p.isFlying() == flying && !p.isDead(), Unitc::drawUnder);
 
-        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unitc::drawAll);
-        playerGroup.draw(p -> p.isFlying() == flying, Unitc::drawAll);
+        Groups.unit.draw(u -> u.isFlying() == flying && !u.isDead(), Unitc::drawAll);
+        Groups.player.draw(p -> p.isFlying() == flying, Unitc::drawAll);
 
-        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unitc::drawOver);
-        playerGroup.draw(p -> p.isFlying() == flying, Unitc::drawOver);
+        Groups.unit.draw(u -> u.isFlying() == flying && !u.isDead(), Unitc::drawOver);
+        Groups.player.draw(p -> p.isFlying() == flying, Unitc::drawOver);
     }
 
     public void scaleCamera(float amount){

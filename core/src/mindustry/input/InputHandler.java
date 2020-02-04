@@ -18,7 +18,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -73,7 +73,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
-    public static void dropItem(Player player, float angle){
+    public static void dropItem(Playerc player, float angle){
         if(net.server() && player.item().amount <= 0){
             throw new ValidateException(player, "Player cannot drop an item.");
         }
@@ -83,7 +83,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
-    public static void rotateBlock(Player player, Tile tile, boolean direction){
+    public static void rotateBlock(Playerc player, Tile tile, boolean direction){
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.rotate, tile, action -> action.rotation = Mathf.mod(tile.rotation() + Mathf.sign(direction), 4)))){
             throw new ValidateException(player, "Player cannot rotate a block.");
@@ -98,8 +98,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
-    public static void transferInventory(Player player, Tile tile){
-        if(player == null || player.timer == null) return;
+    public static void transferInventory(Playerc player, Tile tile){
+        if(player == null) return;
         if(net.server() && (player.item().amount <= 0 || player.isTransferring|| !Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.depositItem, tile, action -> {
                 action.itemAmount = player.item().amount;
@@ -152,7 +152,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void onTileTapped(Player player, Tile tile){
+    public static void onTileTapped(Playerc player, Tile tile){
         if(tile == null || player == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.tapTile, tile, action -> {}))) throw new ValidateException(player, "Player cannot tap a tile.");
@@ -161,7 +161,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
-    public static void onTileConfig(Player player, Tile tile, int value){
+    public static void onTileConfig(Playerc player, Tile tile, int value){
         if(tile == null) return;
 
         if(net.server() && (!Units.canInteract(player, tile) ||
@@ -183,7 +183,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void update(){
-
+        player.typing(ui.chatfrag.shown());
     }
 
     public float getMouseX(){
@@ -637,7 +637,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         && tile.drop() != null && tile.drop().hardness <= player.mech.drillPower
         && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
         && player.acceptsItem(tile.drop())
-        && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= Player.mineDistance;
+        && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= Playerc.mineDistance;
     }
 
     /** Returns the tile at the specified MOUSE coordinates. */
@@ -897,4 +897,192 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         public int x, y, rotation;
         public boolean last;
     }
+
+    //TODO implement all of this!
+    /*
+        protected void updateKeyboard(){
+        Tile tile = world.tileWorld(x, y);
+        boolean canMove = !Core.scene.hasKeyboard() || ui.minimapfrag.shown();
+
+        isBoosting = Core.input.keyDown(Binding.dash) && !mech.flying;
+
+        //if player is in solid block
+        if(tile != null && tile.solid()){
+            isBoosting = true;
+        }
+
+        float speed = isBoosting && !mech.flying ? mech.boostSpeed : mech.speed;
+
+        if(mech.flying){
+            //prevent strafing backwards, have a penalty for doing so
+            float penalty = 0.2f; //when going 180 degrees backwards, reduce speed to 0.2x
+            speed *= Mathf.lerp(1f, penalty, Angles.angleDist(rotation, velocity.angle()) / 180f);
+        }
+
+        movement.setZero();
+
+        float xa = Core.input.axis(Binding.move_x);
+        float ya = Core.input.axis(Binding.move_y);
+        if(!(Core.scene.getKeyboardFocus() instanceof TextField)){
+            movement.y += ya * speed;
+            movement.x += xa * speed;
+        }
+
+        if(Core.input.keyDown(Binding.mouse_move)){
+            movement.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * speed;
+            movement.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * speed;
+        }
+
+        Vec2 vec = Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY());
+        pointerX = vec.x;
+        pointerY = vec.y;
+        updateShooting();
+
+        movement.limit(speed).scl(Time.delta());
+
+        if(canMove){
+            velocity.add(movement.x, movement.y);
+        }else{
+            isShooting = false;
+        }
+        float prex = x, prey = y;
+        updateVelocityStatus();
+        moved = dst(prex, prey) > 0.001f;
+
+        if(canMove){
+            float baseLerp = mech.getRotationAlpha(this);
+            if(!isShooting() || !mech.faceTarget){
+                if(!movement.isZero()){
+                    rotation = Mathf.slerpDelta(rotation, mech.flying ? velocity.angle() : movement.angle(), 0.13f * baseLerp);
+                }
+            }else{
+                float angle = control.input.mouseAngle(x, y);
+                this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f * baseLerp);
+            }
+        }
+    }
+
+    protected void updateShooting(){
+        if(!state.isEditor() && isShooting() && mech.canShoot(this)){
+            weapons.update(this);
+            //if(!mech.turnCursor){
+                //shoot forward ignoring cursor
+                //mech.weapon.update(this, x + Angles.trnsx(rotation, mech.weapon.targetDistance), y + Angles.trnsy(rotation, mech.weapon.targetDistance));
+            //}else{
+                //mech.weapon.update(this, pointerX, pointerY);
+            //}
+        }
+    }
+
+    protected void updateTouch(){
+        if(Units.invalidateTarget(target, this) &&
+            !(target instanceof Tilec && ((Tilec)target).damaged() && target.isValid() && target.team() == team && mech.canHeal && dst(target) < mech.range && !(((Tilec)target).block instanceof BuildBlock))){
+            target = null;
+        }
+
+        if(state.isEditor()){
+            target = null;
+        }
+
+        float targetX = Core.camera.position.x, targetY = Core.camera.position.y;
+        float attractDst = 15f;
+        float speed = isBoosting && !mech.flying ? mech.boostSpeed : mech.speed;
+
+        if(moveTarget != null && !moveTarget.dead()){
+            targetX = moveTarget.getX();
+            targetY = moveTarget.getY();
+            boolean tapping = moveTarget instanceof Tilec && moveTarget.team() == team;
+            attractDst = 0f;
+
+            if(tapping){
+                velocity.setAngle(angleTo(moveTarget));
+            }
+
+            if(dst(moveTarget) <= 2f * Time.delta()){
+                if(tapping && !dead()){
+                    Tile tile = ((Tilec)moveTarget).tile;
+                    tile.block().tapped(tile, this);
+                }
+
+                moveTarget = null;
+            }
+        }else{
+            moveTarget = null;
+        }
+
+        movement.set((targetX - x) / Time.delta(), (targetY - y) / Time.delta()).limit(speed);
+        movement.setAngle(Mathf.slerp(movement.angle(), velocity.angle(), 0.05f));
+
+        if(dst(targetX, targetY) < attractDst){
+            movement.setZero();
+        }
+
+        float expansion = 3f;
+
+        hitbox(rect);
+        rect.x -= expansion;
+        rect.y -= expansion;
+        rect.width += expansion * 2f;
+        rect.height += expansion * 2f;
+
+        isBoosting = collisions.overlapsTile(rect) || dst(targetX, targetY) > 85f;
+
+        velocity.add(movement.scl(Time.delta()));
+
+        if(velocity.len() <= 0.2f && mech.flying){
+            rotation += Mathf.sin(Time.time() + id * 99, 10f, 1f);
+        }else if(target == null){
+            rotation = Mathf.slerpDelta(rotation, velocity.angle(), velocity.len() / 10f);
+        }
+
+        float lx = x, ly = y;
+        updateVelocityStatus();
+        moved = dst(lx, ly) > 0.001f;
+
+        if(mech.flying){
+            //hovering effect
+            x += Mathf.sin(Time.time() + id * 999, 25f, 0.08f);
+            y += Mathf.cos(Time.time() + id * 999, 25f, 0.08f);
+        }
+
+        //update shooting if not building, not mining and there's ammo left
+        if(!isBuilding() && getMineTile() == null){
+
+            //autofire
+            if(target == null){
+                isShooting = false;
+                if(Core.settings.getBool("autotarget")){
+                    target = Units.closestTarget(team, x, y, mech.range, u -> u.team() != Team.derelict, u -> u.getTeam() != Team.derelict);
+
+                    if(mech.canHeal && target == null){
+                        target = Geometry.findClosest(x, y, indexer.getDamaged(Team.sharded));
+                        if(target != null && dst(target) > mech.range){
+                            target = null;
+                        }else if(target != null){
+                            target = ((Tile)target).entity;
+                        }
+                    }
+
+                    if(target != null){
+                        setMineTile(null);
+                    }
+                }
+            }else if(target.isValid() || (target instanceof Tilec && ((Tilec)target).damaged() && target.team() == team && mech.canHeal && dst(target) < mech.range)){
+                //rotate toward and shoot the target
+                if(mech.faceTarget){
+                    rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
+                }
+
+                Vec2 intercept = Predict.intercept(this, target, getWeapon().bullet.speed);
+
+                pointerX = intercept.x;
+                pointerY = intercept.y;
+
+                updateShooting();
+                isShooting = true;
+            }
+
+        }
+    }
+     */
 }

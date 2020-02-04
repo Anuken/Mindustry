@@ -12,7 +12,7 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.io.*;
 import mindustry.ui.*;
@@ -97,8 +97,8 @@ public class MinimapRenderer implements Disposable{
             Draw.rect(unit.getIconRegion(), x + rx, y + ry, scale, scale, unit.rotation - 90);
             Draw.reset();
 
-            if(withLabels && unit instanceof Player){
-                Player pl = (Player) unit;
+            if(withLabels && unit instanceof Playerc){
+                Playerc pl = (Playerc) unit;
                 if(!pl.isLocal){
                     // Only display names for other players.
                     drawLabel(x + rx, y + ry, pl.name, unit.getTeam().color);

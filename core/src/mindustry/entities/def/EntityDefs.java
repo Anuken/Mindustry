@@ -16,4 +16,7 @@ class EntityDefs{
 
     @EntityDef({DecalComp.class})
     class DecalDef{}
+
+    @EntityDef({PlayerComp.class})
+    class PlayerDef{}
 }

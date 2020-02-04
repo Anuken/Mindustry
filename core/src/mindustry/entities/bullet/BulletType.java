@@ -210,7 +210,7 @@ public abstract class BulletType extends Content{
 
         bullet.velocity.set(0, type.speed).setAngle(angle).scl(velocityScl);
         if(type.keepVelocity){
-            bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait)owner).velocity() : Vec2.ZERO);
+            bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait)owner).vel() : Vec2.ZERO);
         }
 
         bullet.team = team;

@@ -4,7 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -54,7 +54,7 @@ public class Unloader extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
+    public void configured(Tile tile, Playerc player, int value){
         tile.entity.items().clear();
         tile.<UnloaderEntity>ent().sortItem = content.item(value);
     }
@@ -65,14 +65,14 @@ public class Unloader extends Block{
 
         if(tile.entity.timer(timerUnload, speed / entity.timeScale) && tile.entity.items().total() == 0){
             for(Tile other : tile.entity.proximity()){
-                if(other.interactable(tile.getTeam()) && other.block().unloadable && other.block().hasItems && entity.getItems().total() == 0 &&
+                if(other.interactable(tile.getTeam()) && other.block().unloadable && other.block().hasItems && entity.items().total() == 0 &&
                 ((entity.sortItem == null && other.entity.items().total() > 0) || hasItem(other, entity.sortItem))){
                     offloadNear(tile, removeItem(other, entity.sortItem));
                 }
             }
         }
 
-        if(entity.getItems().total() > 0){
+        if(entity.items().total() > 0){
             tryDump(tile);
         }
     }
@@ -85,10 +85,10 @@ public class Unloader extends Block{
         Tilec entity = tile.entity;
 
         if(item == null){
-            return entity.getItems().take();
+            return entity.items().take();
         }else{
-            if(entity.getItems().has(item)){
-                entity.getItems().remove(item, 1);
+            if(entity.items().has(item)){
+                entity.items().remove(item, 1);
                 return item;
             }
 
@@ -103,9 +103,9 @@ public class Unloader extends Block{
     private boolean hasItem(Tile tile, Item item){
         Tilec entity = tile.entity;
         if(item == null){
-            return entity.getItems().total() > 0;
+            return entity.items().total() > 0;
         }else{
-            return entity.getItems().has(item);
+            return entity.items().has(item);
         }
     }
 

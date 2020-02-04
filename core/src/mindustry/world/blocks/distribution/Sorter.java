@@ -5,7 +5,7 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -44,7 +44,7 @@ public class Sorter extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
+    public void configured(Tile tile, Playerc player, int value){
         tile.<SorterEntity>ent().sortItem = content.item(value);
     }
 

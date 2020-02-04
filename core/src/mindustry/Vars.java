@@ -174,7 +174,7 @@ public class Vars implements Loadable{
     public static NetServer netServer;
     public static NetClient netClient;
 
-    public static Unitc player;
+    public static Playerc player;
 
     @Override
     public void loadAsync(){

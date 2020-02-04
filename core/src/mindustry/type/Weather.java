@@ -4,7 +4,7 @@ import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.type.Weather.*;
 
 import java.io.*;

@@ -36,9 +36,9 @@ public class HealBulletType extends BulletType{
     public void draw(Bulletc b){
         Draw.color(backColor);
         Lines.stroke(bulletWidth);
-        Lines.lineAngleCenter(b.x, b.y, b.rot(), bulletHeight);
+        Lines.lineAngleCenter(b.x(), b.y(), b.rotation(), bulletHeight);
         Draw.color(frontColor);
-        Lines.lineAngleCenter(b.x, b.y, b.rot(), bulletHeight / 2f);
+        Lines.lineAngleCenter(b.x(), b.y(), b.rotation(), bulletHeight / 2f);
         Draw.reset();
     }
 

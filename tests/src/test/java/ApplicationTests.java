@@ -424,7 +424,7 @@ public class ApplicationTests{
     }
 
     void depositTest(Block block, Item item){
-        BaseUnit unit = UnitTypes.spirit.create(Team.derelict);
+        Unitc unit = UnitTypes.spirit.create(Team.derelict);
         Tile tile = new Tile(0, 0, Blocks.air, Blocks.air, block);
         int capacity = tile.block().itemCapacity;
 

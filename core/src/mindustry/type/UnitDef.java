@@ -21,7 +21,7 @@ import mindustry.ui.*;
 //TODO change to UnitType or Shell or something
 public class UnitDef extends UnlockableContent{
     //TODO implement
-    public @NonNull Prov<? extends BaseUnit> constructor = () -> this.flying ? new FlyingUnit() : new GroundUnit();
+    public @NonNull Prov<? extends Unitc> constructor = () -> this.flying ? new FlyingUnit() : new GroundUnit();
     public TypeID typeID;
 
     public boolean flying;
@@ -57,8 +57,8 @@ public class UnitDef extends UnlockableContent{
         typeID = new TypeID(name, constructor);
     }
 
-    public BaseUnit create(Team team){
-        BaseUnit unit = constructor.get();
+    public Unitc create(Team team){
+        Unitc unit = constructor.get();
         unit.init(this, team);
         return unit;
     }

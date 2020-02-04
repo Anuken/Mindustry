@@ -20,7 +20,7 @@ import mindustry.core.GameState.*;
 import mindustry.ctype.ContentType;
 import mindustry.ctype.UnlockableContent;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -209,9 +209,9 @@ public class HudFragment extends Fragment{
                                 if(e == null){
                                     Vec2 world = Core.input.mouseWorld();
                                     Units.nearby(world.x, world.y, 1f, 1f, unit -> {
-                                        if(!found[0] && unit instanceof BaseUnit){
+                                        if(!found[0] && unit instanceof Unitc){
                                             if(Core.input.keyTap(KeyCode.MOUSE_LEFT)){
-                                                Call.removeUnitEditor(player, (BaseUnit)unit);
+                                                Call.removeUnitEditor(player, (Unitc)unit);
                                             }
                                             found[0] = true;
                                             unit.hitbox(Tmp.r1);
@@ -344,16 +344,16 @@ public class HudFragment extends Fragment{
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.both)
-    public static void setPlayerTeamEditor(Player player, Team team){
+    public static void setPlayerTeamEditor(Playerc player, Team team){
         if(state.isEditor() && player != null){
             player.team(team);
         }
     }
 
     @Remote(targets = Loc.both, called = Loc.server)
-    public static void spawnUnitEditor(Player player, UnitType type){
+    public static void spawnUnitEditor(Playerc player, UnitType type){
         if(state.isEditor()){
-            BaseUnit unit = type.create(player.team());
+            Unitc unit = type.create(player.team());
             unit.set(player.x, player.y);
             unit.rotation = player.rotation;
             unit.add();
@@ -361,7 +361,7 @@ public class HudFragment extends Fragment{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void removeUnitEditor(Player player, BaseUnit unit){
+    public static void removeUnitEditor(Playerc player, Unitc unit){
         if(state.isEditor() && unit != null){
             unit.remove();
         }

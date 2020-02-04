@@ -48,7 +48,7 @@ public class LiquidBulletType extends BulletType{
         super.update(b);
 
         if(liquid.canExtinguish()){
-            Tile tile = world.tileWorld(b.x, b.y);
+            Tile tile = world.tileWorld(b.x(), b.y());
             if(tile != null && Fire.has(tile.x, tile.y)){
                 Fire.extinguish(tile, 100f);
                 b.remove();
@@ -61,7 +61,7 @@ public class LiquidBulletType extends BulletType{
     public void draw(Bulletc b){
         Draw.color(liquid.color, Color.white, b.fout() / 100f);
 
-        Fill.circle(b.x, b.y, 0.5f + b.fout() * 2.5f);
+        Fill.circle(b.x(), b.y(), 0.5f + b.fout() * 2.5f);
     }
 
     @Override

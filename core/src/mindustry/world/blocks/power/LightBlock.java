@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -63,7 +62,7 @@ public class LightBlock extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
+    public void configured(Tile tile, Playerc player, int value){
         tile.<LightEntity>ent().color = value;
     }
 

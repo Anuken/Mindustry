@@ -54,13 +54,13 @@ public class ConsumeItems extends Consume{
     @Override
     public void trigger(Tilec entity){
         for(ItemStack stack : items){
-            entity.getItems().remove(stack);
+            entity.items().remove(stack);
         }
     }
 
     @Override
     public boolean valid(Tilec entity){
-        return entity.getItems() != null && entity.getItems().has(items);
+        return entity.items() != null && entity.items().has(items);
     }
 
     @Override

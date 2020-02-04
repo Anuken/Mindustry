@@ -9,7 +9,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -36,7 +36,7 @@ public class OverlayRenderer{
     public void drawTop(){
 
         if(Core.settings.getBool("indicators")){
-            for(Player player : playerGroup.all()){
+            for(Playerc player : Groups.player.all()){
                 if(Vars.player != player && Vars.player.team() == player.team()){
                     if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
                     .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){

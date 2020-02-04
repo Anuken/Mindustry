@@ -1281,7 +1281,6 @@ public class Blocks implements ContentList{
             health = 1100;
             itemCapacity = 4000;
             size = 3;
-            mech = Mechs.vanguard;
         }};
 
         coreFoundation = new CoreBlock("core-foundation"){{
@@ -1290,7 +1289,6 @@ public class Blocks implements ContentList{
             health = 2000;
             itemCapacity = 9000;
             size = 4;
-            mech = Mechs.vanguard;
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
@@ -1299,7 +1297,6 @@ public class Blocks implements ContentList{
             health = 4000;
             itemCapacity = 13000;
             size = 5;
-            mech = Mechs.vanguard;
         }};
 
         vault = new Vault("vault"){{
@@ -1548,7 +1545,7 @@ public class Blocks implements ContentList{
                 @Override
                 public void init(Bulletc b){
                     for(int i = 0; i < rays; i++){
-                        Damage.collideLine(b, b.team(), hitEffect, b.x, b.y, b.rot(), rayLength - Math.abs(i - (rays / 2)) * 20f);
+                        Damage.collideLine(b, b.team(), hitEffect, b.x(), b.y(), b.rotation(), rayLength - Math.abs(i - (rays / 2)) * 20f);
                     }
                 }
 
@@ -1558,13 +1555,13 @@ public class Blocks implements ContentList{
                     Draw.color(Color.white, Pal.lancerLaser, b.fin());
                     //Draw.alpha(b.fout());
                     for(int i = 0; i < 7; i++){
-                        Tmp.v1.trns(b.rot(), i * 8f);
+                        Tmp.v1.trns(b.rotation(), i * 8f);
                         float sl = Mathf.clamp(b.fout() - 0.5f) * (80f - i * 10);
-                        Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() + 90);
-                        Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() - 90);
+                        Drawf.tri(b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 4f, sl, b.rotation() + 90);
+                        Drawf.tri(b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 4f, sl, b.rotation() - 90);
                     }
-                    Drawf.tri(b.x, b.y, 20f * b.fout(), (rayLength + 50), b.rot());
-                    Drawf.tri(b.x, b.y, 20f * b.fout(), 10f, b.rot() + 180f);
+                    Drawf.tri(b.x(), b.y(), 20f * b.fout(), (rayLength + 50), b.rotation());
+                    Drawf.tri(b.x(), b.y(), 20f * b.fout(), 10f, b.rotation() + 180f);
                     Draw.reset();
                 }
             });
@@ -1783,56 +1780,56 @@ public class Blocks implements ContentList{
 
         dartPad = new MechPad("dart-ship-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 100, Items.graphite, 50, Items.copper, 75));
-            mech = Mechs.dart;
+            mech = UnitTypes.dart;
             size = 2;
             consumes.power(0.5f);
         }};
 
         alphaPad = new MechPad("alpha-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 100, Items.graphite, 50, Items.copper, 75));
-            mech = Mechs.alpha;
+            mech = UnitTypes.alpha;
             size = 2;
             consumes.power(0.5f);
         }};
 
         deltaPad = new MechPad("delta-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 175, Items.titanium, 175, Items.copper, 200, Items.silicon, 225, Items.thorium, 150));
-            mech = Mechs.delta;
+            mech = UnitTypes.delta;
             size = 2;
             consumes.power(0.7f);
         }};
 
         tauPad = new MechPad("tau-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 125, Items.titanium, 125, Items.copper, 125, Items.silicon, 125));
-            mech = Mechs.tau;
+            mech = UnitTypes.tau;
             size = 2;
             consumes.power(1f);
         }};
 
         omegaPad = new MechPad("omega-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 225, Items.graphite, 275, Items.silicon, 325, Items.thorium, 300, Items.surgealloy, 120));
-            mech = Mechs.omega;
+            mech = UnitTypes.omega;
             size = 3;
             consumes.power(1.2f);
         }};
 
         javelinPad = new MechPad("javelin-ship-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 175, Items.silicon, 225, Items.titanium, 250, Items.plastanium, 200, Items.phasefabric, 100));
-            mech = Mechs.javelin;
+            mech = UnitTypes.javelin;
             size = 2;
             consumes.power(0.8f);
         }};
 
         tridentPad = new MechPad("trident-ship-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 125, Items.copper, 125, Items.silicon, 125, Items.titanium, 150, Items.plastanium, 100));
-            mech = Mechs.trident;
+            mech = UnitTypes.trident;
             size = 2;
             consumes.power(1f);
         }};
 
         glaivePad = new MechPad("glaive-ship-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 225, Items.silicon, 325, Items.titanium, 350, Items.plastanium, 300, Items.surgealloy, 100));
-            mech = Mechs.glaive;
+            mech = UnitTypes.glaive;
             size = 3;
             consumes.power(1.2f);
         }};

@@ -20,7 +20,7 @@ import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.entities.Effects.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
@@ -280,7 +280,7 @@ public class ContentParser{
 
             UnitType unit;
             if(locate(ContentType.unit, name) == null){
-                Class<BaseUnit> type = resolve(legacyUnitMap.get(Strings.capitalize(getType(value)), getType(value)), "mindustry.entities.type.base");
+                Class<Unitc> type = resolve(legacyUnitMap.get(Strings.capitalize(getType(value)), getType(value)), "mindustry.entities.type.base");
                 unit = new UnitDef(mod + "-" + name, supply(type));
             }else{
                 unit = locate(ContentType.unit, name);

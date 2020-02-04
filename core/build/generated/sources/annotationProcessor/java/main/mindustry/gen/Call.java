@@ -4,11 +4,8 @@ import arc.graphics.Color;
 import java.lang.String;
 import java.nio.ByteBuffer;
 import mindustry.entities.bullet.BulletType;
-import mindustry.entities.type.Player;
-import mindustry.entities.units.BuildRequest;
 import mindustry.game.Rules;
 import mindustry.game.Team;
-import mindustry.net.Administration;
 import mindustry.net.NetConnection;
 import mindustry.net.Packets;
 import mindustry.type.Item;
@@ -54,18 +51,6 @@ public class Call {
       TEMP_BUFFER.putInt(y);
       mindustry.io.TypeIO.writeBlock(TEMP_BUFFER, result);
       TEMP_BUFFER.putInt(rotation);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void connectConfirm() {
-    if(mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)2;
-      TEMP_BUFFER.position(0);
       packet.writeLength = TEMP_BUFFER.position();
       mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
     }
@@ -118,22 +103,6 @@ public class Call {
     }
   }
 
-  public static synchronized void dropItem(float angle) {
-    if(mindustry.Vars.net.server() || !mindustry.Vars.net.active()) {
-      mindustry.input.InputHandler.dropItem(mindustry.Vars.player, angle);
-    }
-    if(mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)5;
-      TEMP_BUFFER.position(0);
-      TEMP_BUFFER.putFloat(angle);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
   public static synchronized void launchZone() {
     mindustry.core.Logic.launchZone();
     if(mindustry.Vars.net.server()) {
@@ -142,23 +111,6 @@ public class Call {
       packet.priority = (byte)0;
       packet.type = (byte)6;
       TEMP_BUFFER.position(0);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void onAdminRequest(Player other, Packets.AdminAction action) {
-    if(mindustry.Vars.net.server() || !mindustry.Vars.net.active()) {
-      mindustry.core.NetServer.onAdminRequest(mindustry.Vars.player, other, action);
-    }
-    if(mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)7;
-      TEMP_BUFFER.position(0);
-      mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, other);
-      mindustry.io.TypeIO.writeAction(TEMP_BUFFER, action);
       packet.writeLength = TEMP_BUFFER.position();
       mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
     }
@@ -192,40 +144,6 @@ public class Call {
       mindustry.io.TypeIO.writeBytes(TEMP_BUFFER, data);
       packet.writeLength = TEMP_BUFFER.position();
       playerConnection.send(packet, mindustry.net.Net.SendMode.udp);
-    }
-  }
-
-  public static synchronized void onClientShapshot(int snapshotID, float x, float y, float pointerX,
-      float pointerY, float rotation, float baseRotation, float xVelocity, float yVelocity,
-      Tile mining, boolean boosting, boolean shooting, boolean chatting, boolean building,
-      BuildRequest[] requests, float viewX, float viewY, float viewWidth, float viewHeight) {
-    if(mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)9;
-      TEMP_BUFFER.position(0);
-      TEMP_BUFFER.putInt(snapshotID);
-      TEMP_BUFFER.putFloat(x);
-      TEMP_BUFFER.putFloat(y);
-      TEMP_BUFFER.putFloat(pointerX);
-      TEMP_BUFFER.putFloat(pointerY);
-      TEMP_BUFFER.putFloat(rotation);
-      TEMP_BUFFER.putFloat(baseRotation);
-      TEMP_BUFFER.putFloat(xVelocity);
-      TEMP_BUFFER.putFloat(yVelocity);
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, mining);
-      TEMP_BUFFER.put(boosting ? (byte)1 : 0);
-      TEMP_BUFFER.put(shooting ? (byte)1 : 0);
-      TEMP_BUFFER.put(chatting ? (byte)1 : 0);
-      TEMP_BUFFER.put(building ? (byte)1 : 0);
-      mindustry.io.TypeIO.writeRequests(TEMP_BUFFER, requests);
-      TEMP_BUFFER.putFloat(viewX);
-      TEMP_BUFFER.putFloat(viewY);
-      TEMP_BUFFER.putFloat(viewWidth);
-      TEMP_BUFFER.putFloat(viewHeight);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.udp);
     }
   }
 
@@ -286,33 +204,14 @@ public class Call {
     }
   }
 
-  public static synchronized void onDoorToggle(Player player, Tile tile, boolean open) {
-    if(mindustry.Vars.net.server() || !mindustry.Vars.net.active()) {
-      mindustry.world.blocks.defense.Door.onDoorToggle(player, tile, open);
-    }
-    if(mindustry.Vars.net.server()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)13;
-      TEMP_BUFFER.position(0);
-      mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      TEMP_BUFFER.put(open ? (byte)1 : 0);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void onEntitySnapshot(NetConnection playerConnection, byte groupID,
-      short amount, short dataLen, byte[] data) {
+  public static synchronized void onEntitySnapshot(NetConnection playerConnection, short amount,
+      short dataLen, byte[] data) {
     if(mindustry.Vars.net.server()) {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)2;
       packet.type = (byte)14;
       TEMP_BUFFER.position(0);
-      TEMP_BUFFER.put(groupID);
       TEMP_BUFFER.putShort(amount);
       TEMP_BUFFER.putShort(dataLen);
       mindustry.io.TypeIO.writeBytes(TEMP_BUFFER, data);
@@ -361,12 +260,52 @@ public class Call {
     }
   }
 
-  public static synchronized void onInfoToast(String message, float duration) {
+  public static synchronized void onInfoPopup(String message, float duration, int align, int top,
+      int left, int bottom, int right) {
     if(mindustry.Vars.net.server()) {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
       packet.type = (byte)17;
+      TEMP_BUFFER.position(0);
+      mindustry.io.TypeIO.writeString(TEMP_BUFFER, message);
+      TEMP_BUFFER.putFloat(duration);
+      TEMP_BUFFER.putInt(align);
+      TEMP_BUFFER.putInt(top);
+      TEMP_BUFFER.putInt(left);
+      TEMP_BUFFER.putInt(bottom);
+      TEMP_BUFFER.putInt(right);
+      packet.writeLength = TEMP_BUFFER.position();
+      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
+    }
+  }
+
+  public static synchronized void onInfoPopup(NetConnection playerConnection, String message,
+      float duration, int align, int top, int left, int bottom, int right) {
+    if(mindustry.Vars.net.server()) {
+      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
+      packet.writeBuffer = TEMP_BUFFER;
+      packet.priority = (byte)0;
+      packet.type = (byte)17;
+      TEMP_BUFFER.position(0);
+      mindustry.io.TypeIO.writeString(TEMP_BUFFER, message);
+      TEMP_BUFFER.putFloat(duration);
+      TEMP_BUFFER.putInt(align);
+      TEMP_BUFFER.putInt(top);
+      TEMP_BUFFER.putInt(left);
+      TEMP_BUFFER.putInt(bottom);
+      TEMP_BUFFER.putInt(right);
+      packet.writeLength = TEMP_BUFFER.position();
+      playerConnection.send(packet, mindustry.net.Net.SendMode.tcp);
+    }
+  }
+
+  public static synchronized void onInfoToast(String message, float duration) {
+    if(mindustry.Vars.net.server()) {
+      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
+      packet.writeBuffer = TEMP_BUFFER;
+      packet.priority = (byte)0;
+      packet.type = (byte)18;
       TEMP_BUFFER.position(0);
       mindustry.io.TypeIO.writeString(TEMP_BUFFER, message);
       TEMP_BUFFER.putFloat(duration);
@@ -381,7 +320,7 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)17;
+      packet.type = (byte)18;
       TEMP_BUFFER.position(0);
       mindustry.io.TypeIO.writeString(TEMP_BUFFER, message);
       TEMP_BUFFER.putFloat(duration);
@@ -395,7 +334,7 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)1;
-      packet.type = (byte)18;
+      packet.type = (byte)19;
       TEMP_BUFFER.position(0);
       mindustry.io.TypeIO.writeString(TEMP_BUFFER, reason);
       packet.writeLength = TEMP_BUFFER.position();
@@ -409,9 +348,42 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)1;
-      packet.type = (byte)19;
+      packet.type = (byte)20;
       TEMP_BUFFER.position(0);
       mindustry.io.TypeIO.writeKick(TEMP_BUFFER, reason);
+      packet.writeLength = TEMP_BUFFER.position();
+      playerConnection.send(packet, mindustry.net.Net.SendMode.tcp);
+    }
+  }
+
+  public static synchronized void onLabel(String info, float duration, float worldx, float worldy) {
+    if(mindustry.Vars.net.server()) {
+      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
+      packet.writeBuffer = TEMP_BUFFER;
+      packet.priority = (byte)0;
+      packet.type = (byte)21;
+      TEMP_BUFFER.position(0);
+      mindustry.io.TypeIO.writeString(TEMP_BUFFER, info);
+      TEMP_BUFFER.putFloat(duration);
+      TEMP_BUFFER.putFloat(worldx);
+      TEMP_BUFFER.putFloat(worldy);
+      packet.writeLength = TEMP_BUFFER.position();
+      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
+    }
+  }
+
+  public static synchronized void onLabel(NetConnection playerConnection, String info,
+      float duration, float worldx, float worldy) {
+    if(mindustry.Vars.net.server()) {
+      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
+      packet.writeBuffer = TEMP_BUFFER;
+      packet.priority = (byte)0;
+      packet.type = (byte)21;
+      TEMP_BUFFER.position(0);
+      mindustry.io.TypeIO.writeString(TEMP_BUFFER, info);
+      TEMP_BUFFER.putFloat(duration);
+      TEMP_BUFFER.putFloat(worldx);
+      TEMP_BUFFER.putFloat(worldy);
       packet.writeLength = TEMP_BUFFER.position();
       playerConnection.send(packet, mindustry.net.Net.SendMode.tcp);
     }
@@ -425,41 +397,9 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)20;
-      TEMP_BUFFER.position(0);
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void onMechFactoryTap(Player player, Tile tile) {
-    if(mindustry.Vars.net.server() || !mindustry.Vars.net.active()) {
-      mindustry.world.blocks.units.MechPad.onMechFactoryTap(player, tile);
-    }
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)21;
-      TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void onPing(long time) {
-    if(mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
       packet.type = (byte)22;
       TEMP_BUFFER.position(0);
-      TEMP_BUFFER.putLong(time);
+      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
       packet.writeLength = TEMP_BUFFER.position();
       mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
     }
@@ -470,27 +410,11 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)23;
+      packet.type = (byte)25;
       TEMP_BUFFER.position(0);
       TEMP_BUFFER.putLong(time);
       packet.writeLength = TEMP_BUFFER.position();
       playerConnection.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void onPlayerDeath(Player player) {
-    if(mindustry.Vars.net.server() || !mindustry.Vars.net.active()) {
-      mindustry.entities.type.Player.onPlayerDeath(player);
-    }
-    if(mindustry.Vars.net.server()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)24;
-      TEMP_BUFFER.position(0);
-      mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
     }
   }
 
@@ -499,7 +423,7 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)25;
+      packet.type = (byte)26;
       TEMP_BUFFER.position(0);
       TEMP_BUFFER.putInt(playerid);
       packet.writeLength = TEMP_BUFFER.position();
@@ -512,7 +436,7 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)26;
+      packet.type = (byte)27;
       TEMP_BUFFER.position(0);
       TEMP_BUFFER.putFloat(x);
       TEMP_BUFFER.putFloat(y);
@@ -529,7 +453,7 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)27;
+      packet.type = (byte)28;
       TEMP_BUFFER.position(0);
       TEMP_BUFFER.putInt(puddleid);
       packet.writeLength = TEMP_BUFFER.position();
@@ -542,7 +466,7 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)28;
+      packet.type = (byte)29;
       TEMP_BUFFER.position(0);
       TEMP_BUFFER.putInt(fid);
       packet.writeLength = TEMP_BUFFER.position();
@@ -555,7 +479,7 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)29;
+      packet.type = (byte)30;
       TEMP_BUFFER.position(0);
       mindustry.io.TypeIO.writeRules(TEMP_BUFFER, rules);
       packet.writeLength = TEMP_BUFFER.position();
@@ -568,7 +492,7 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)29;
+      packet.type = (byte)30;
       TEMP_BUFFER.position(0);
       mindustry.io.TypeIO.writeRules(TEMP_BUFFER, rules);
       packet.writeLength = TEMP_BUFFER.position();
@@ -582,7 +506,7 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)2;
-      packet.type = (byte)30;
+      packet.type = (byte)31;
       TEMP_BUFFER.position(0);
       TEMP_BUFFER.putFloat(waveTime);
       TEMP_BUFFER.putInt(wave);
@@ -594,42 +518,6 @@ public class Call {
     }
   }
 
-  public static synchronized void onTileConfig(Player player, Tile tile, int value) {
-    mindustry.input.InputHandler.onTileConfig(player, tile, value);
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)31;
-      TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      TEMP_BUFFER.putInt(value);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  static synchronized void onTileConfig__forward(NetConnection exceptConnection, Player player,
-      Tile tile, int value) {
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)31;
-      TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      TEMP_BUFFER.putInt(value);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.sendExcept(exceptConnection, packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
   public static synchronized void onTileDamage(Tile tile, float health) {
     if(mindustry.Vars.net.server() || !mindustry.Vars.net.active()) {
       mindustry.world.Tile.onTileDamage(tile, health);
@@ -638,7 +526,7 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)32;
+      packet.type = (byte)33;
       TEMP_BUFFER.position(0);
       mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
       TEMP_BUFFER.putFloat(health);
@@ -655,62 +543,11 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)33;
-      TEMP_BUFFER.position(0);
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void onTileTapped(Player player, Tile tile) {
-    if(mindustry.Vars.net.server() || !mindustry.Vars.net.active()) {
-      mindustry.input.InputHandler.onTileTapped(player, tile);
-    }
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
       packet.type = (byte)34;
       TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
       mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
       packet.writeLength = TEMP_BUFFER.position();
       mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  static synchronized void onTileTapped__forward(NetConnection exceptConnection, Player player,
-      Tile tile) {
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)34;
-      TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void onTraceInfo(NetConnection playerConnection, Player player,
-      Administration.TraceInfo info) {
-    if(mindustry.Vars.net.server()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)35;
-      TEMP_BUFFER.position(0);
-      mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      mindustry.io.TypeIO.writeTraceInfo(TEMP_BUFFER, info);
-      packet.writeLength = TEMP_BUFFER.position();
-      playerConnection.send(packet, mindustry.net.Net.SendMode.tcp);
     }
   }
 
@@ -722,27 +559,10 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)36;
-      TEMP_BUFFER.position(0);
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      TEMP_BUFFER.putInt(spawns);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void onUnitRespawn(Tile tile, Player player) {
-    if(mindustry.Vars.net.server() || !mindustry.Vars.net.active()) {
-      mindustry.world.blocks.storage.CoreBlock.onUnitRespawn(tile, player);
-    }
-    if(mindustry.Vars.net.server()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
       packet.type = (byte)37;
       TEMP_BUFFER.position(0);
       mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
+      TEMP_BUFFER.putInt(spawns);
       packet.writeLength = TEMP_BUFFER.position();
       mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
     }
@@ -753,7 +573,7 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)38;
+      packet.type = (byte)39;
       TEMP_BUFFER.position(0);
       packet.writeLength = TEMP_BUFFER.position();
       mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
@@ -765,7 +585,7 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)38;
+      packet.type = (byte)39;
       TEMP_BUFFER.position(0);
       packet.writeLength = TEMP_BUFFER.position();
       playerConnection.send(packet, mindustry.net.Net.SendMode.tcp);
@@ -778,7 +598,7 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)39;
+      packet.type = (byte)40;
       TEMP_BUFFER.position(0);
       TEMP_BUFFER.putInt(x);
       TEMP_BUFFER.putInt(y);
@@ -796,103 +616,9 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)40;
+      packet.type = (byte)41;
       TEMP_BUFFER.position(0);
       mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void requestItem(Player player, Tile tile, Item item, int amount) {
-    if(mindustry.Vars.net.server() || !mindustry.Vars.net.active()) {
-      mindustry.ui.fragments.BlockInventoryFragment.requestItem(player, tile, item, amount);
-    }
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)42;
-      TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      mindustry.io.TypeIO.writeItem(TEMP_BUFFER, item);
-      TEMP_BUFFER.putInt(amount);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  static synchronized void requestItem__forward(NetConnection exceptConnection, Player player,
-      Tile tile, Item item, int amount) {
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)42;
-      TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      mindustry.io.TypeIO.writeItem(TEMP_BUFFER, item);
-      TEMP_BUFFER.putInt(amount);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void rotateBlock(Player player, Tile tile, boolean direction) {
-    if(mindustry.Vars.net.server() || !mindustry.Vars.net.active()) {
-      mindustry.input.InputHandler.rotateBlock(player, tile, direction);
-    }
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)43;
-      TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      TEMP_BUFFER.put(direction ? (byte)1 : 0);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.udp);
-    }
-  }
-
-  static synchronized void rotateBlock__forward(NetConnection exceptConnection, Player player,
-      Tile tile, boolean direction) {
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)43;
-      TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      TEMP_BUFFER.put(direction ? (byte)1 : 0);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.udp);
-    }
-  }
-
-  public static synchronized void sendChatMessage(String message) {
-    if(mindustry.Vars.net.server() || !mindustry.Vars.net.active()) {
-      mindustry.core.NetClient.sendChatMessage(mindustry.Vars.player, message);
-    }
-    if(mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)44;
-      TEMP_BUFFER.position(0);
-      mindustry.io.TypeIO.writeString(TEMP_BUFFER, message);
       packet.writeLength = TEMP_BUFFER.position();
       mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
     }
@@ -906,112 +632,11 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)45;
-      TEMP_BUFFER.position(0);
-      mindustry.io.TypeIO.writeString(TEMP_BUFFER, message);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void sendMessage(String message, String sender, Player playersender) {
-    if(mindustry.Vars.net.server()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
       packet.type = (byte)46;
       TEMP_BUFFER.position(0);
       mindustry.io.TypeIO.writeString(TEMP_BUFFER, message);
-      mindustry.io.TypeIO.writeString(TEMP_BUFFER, sender);
-      mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, playersender);
       packet.writeLength = TEMP_BUFFER.position();
       mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void sendMessage(NetConnection playerConnection, String message,
-      String sender, Player playersender) {
-    if(mindustry.Vars.net.server()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)46;
-      TEMP_BUFFER.position(0);
-      mindustry.io.TypeIO.writeString(TEMP_BUFFER, message);
-      mindustry.io.TypeIO.writeString(TEMP_BUFFER, sender);
-      mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, playersender);
-      packet.writeLength = TEMP_BUFFER.position();
-      playerConnection.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void setMessageBlockText(Player player, Tile tile, String text) {
-    mindustry.world.blocks.logic.MessageBlock.setMessageBlockText(player, tile, text);
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)47;
-      TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      mindustry.io.TypeIO.writeString(TEMP_BUFFER, text);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  static synchronized void setMessageBlockText__forward(NetConnection exceptConnection,
-      Player player, Tile tile, String text) {
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)47;
-      TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      mindustry.io.TypeIO.writeString(TEMP_BUFFER, text);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.sendExcept(exceptConnection, packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void setPlayerTeamEditor(Player player, Team team) {
-    mindustry.ui.fragments.HudFragment.setPlayerTeamEditor(player, team);
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)48;
-      TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
-      mindustry.io.TypeIO.writeTeam(TEMP_BUFFER, team);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  static synchronized void setPlayerTeamEditor__forward(NetConnection exceptConnection,
-      Player player, Team team) {
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)48;
-      TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
-      mindustry.io.TypeIO.writeTeam(TEMP_BUFFER, team);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.sendExcept(exceptConnection, packet, mindustry.net.Net.SendMode.tcp);
     }
   }
 
@@ -1023,48 +648,12 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)49;
+      packet.type = (byte)50;
       TEMP_BUFFER.position(0);
       mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
       mindustry.io.TypeIO.writeBlock(TEMP_BUFFER, block);
       mindustry.io.TypeIO.writeTeam(TEMP_BUFFER, team);
       TEMP_BUFFER.putInt(rotation);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  public static synchronized void transferInventory(Player player, Tile tile) {
-    if(mindustry.Vars.net.server() || !mindustry.Vars.net.active()) {
-      mindustry.input.InputHandler.transferInventory(player, tile);
-    }
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)51;
-      TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
-      packet.writeLength = TEMP_BUFFER.position();
-      mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
-    }
-  }
-
-  static synchronized void transferInventory__forward(NetConnection exceptConnection, Player player,
-      Tile tile) {
-    if(mindustry.Vars.net.server() || mindustry.Vars.net.client()) {
-      mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
-      packet.writeBuffer = TEMP_BUFFER;
-      packet.priority = (byte)0;
-      packet.type = (byte)51;
-      TEMP_BUFFER.position(0);
-      if(mindustry.Vars.net.server()) {
-        mindustry.io.TypeIO.writePlayer(TEMP_BUFFER, player);
-      }
-      mindustry.io.TypeIO.writeTile(TEMP_BUFFER, tile);
       packet.writeLength = TEMP_BUFFER.position();
       mindustry.Vars.net.send(packet, mindustry.net.Net.SendMode.tcp);
     }
@@ -1079,7 +668,7 @@ public class Call {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
       packet.priority = (byte)0;
-      packet.type = (byte)53;
+      packet.type = (byte)54;
       TEMP_BUFFER.position(0);
       mindustry.io.TypeIO.writeItem(TEMP_BUFFER, item);
       TEMP_BUFFER.putInt(amount);

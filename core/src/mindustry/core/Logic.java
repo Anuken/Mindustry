@@ -6,7 +6,6 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
-import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -79,7 +78,7 @@ public class Logic implements ApplicationListener{
                 while(it.hasNext()){
                     BrokenBlock b = it.next();
                     Block block = content.block(b.block);
-                    if(event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1).overlaps(block.bounds(b.x, b.y, Tmp.r2))){
+                    if(event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1).overlaps(block.bounds(b.x(), b.y(), Tmp.r2))){
                         it.remove();
                     }
                 }
@@ -206,7 +205,7 @@ public class Logic implements ApplicationListener{
         if(!state.is(State.menu)){
             if(!net.client()){
                 //TODO
-                //state.enemies = unitGroup.count(b -> b.getTeam() == state.rules.waveTeam && b.countsAsEnemy());
+                //state.enemies = Groups.unit.count(b -> b.getTeam() == state.rules.waveTeam && b.countsAsEnemy());
             }
 
             if(!state.isPaused()){
@@ -230,7 +229,7 @@ public class Logic implements ApplicationListener{
                 }
 
                 if(!state.isEditor()){
-                    unitGroup.update();
+                    Groups.unit.update();
                     puddleGroup.update();
                     shieldGroup.update();
                     bulletGroup.update();
@@ -238,12 +237,12 @@ public class Logic implements ApplicationListener{
                     fireGroup.update();
                     weatherGroup.update();
                 }else{
-                    unitGroup.updateEvents();
-                    collisions.updatePhysics(unitGroup);
+                    Groups.unit.updateEvents();
+                    collisions.updatePhysics(Groups.unit);
                 }
 
 
-                playerGroup.update();
+                Groups.player.update();
 
                 //effect group only contains item transfers in the headless version, update it!
                 if(headless){
@@ -252,7 +251,7 @@ public class Logic implements ApplicationListener{
 
                 if(!state.isEditor()){
                     //bulletGroup
-                    collisions.collideGroups(bulletGroup, unitGroup);
+                    collisions.collideGroups(bulletGroup, Groups.unit);
                 }*/
             }
 

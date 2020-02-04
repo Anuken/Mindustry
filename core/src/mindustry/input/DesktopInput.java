@@ -132,6 +132,8 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void update(){
+        super.update();
+
         if(net.active() && Core.input.keyTap(Binding.player_list)){
             ui.listfrag.toggle();
         }

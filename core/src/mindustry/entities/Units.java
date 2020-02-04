@@ -3,7 +3,7 @@ package mindustry.entities;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -18,7 +18,7 @@ public class Units{
     private static boolean boolResult;
 
     /** @return whether this player can interact with a specific tile. if either of these are null, returns true.*/
-    public static boolean canInteract(Player player, Tile tile){
+    public static boolean canInteract(Playerc player, Tile tile){
         return player == null || tile == null || tile.interactable(player.team());
     }
 
@@ -148,7 +148,7 @@ public class Units{
 
     /** Iterates over all units in a rectangle. */
     public static void nearby(Team team, float x, float y, float width, float height, Cons<Unitc> cons){
-        unitGroup.intersect(x, y, width, height, u -> {
+        Groups.unit.intersect(x, y, width, height, u -> {
             if(u.getTeam() == team){
                 cons.get(u);
             }
@@ -157,7 +157,7 @@ public class Units{
 
     /** Iterates over all units in a circle around this position. */
     public static void nearby(Team team, float x, float y, float radius, Cons<Unitc> cons){
-        unitGroup.intersect(x - radius, y - radius, radius*2f, radius*2f, unit -> {
+        Groups.unit.intersect(x - radius, y - radius, radius*2f, radius*2f, unit -> {
             if(unit.getTeam() == team && unit.withinDst(x, y, radius)){
                 cons.get(unit);
             }
@@ -166,7 +166,7 @@ public class Units{
 
     /** Iterates over all units in a rectangle. */
     public static void nearby(float x, float y, float width, float height, Cons<Unitc> cons){
-        unitGroup.intersect(x, y, width, height, cons);
+        Groups.unit.intersect(x, y, width, height, cons);
     }
 
     /** Iterates over all units in a rectangle. */
@@ -176,7 +176,7 @@ public class Units{
 
     /** Iterates over all units that are enemies of this team. */
     public static void nearbyEnemies(Team team, float x, float y, float width, float height, Cons<Unitc> cons){
-        unitGroup.intersect(x, y, width, height, u -> {
+        Groups.unit.intersect(x, y, width, height, u -> {
             if(team.isEnemy(u.getTeam())){
                 cons.get(u);
             }
@@ -190,11 +190,11 @@ public class Units{
 
     /** Iterates over all units. */
     public static void all(Cons<Unitc> cons){
-        unitGroup.all().each(cons);
+        Groups.unit.all().each(cons);
     }
 
-    public static void each(Team team, Cons<BaseUnit> cons){
-        unitGroup.all().each(t -> t.getTeam() == team, cons);
+    public static void each(Team team, Cons<Unitc> cons){
+        Groups.unit.all().each(t -> t.getTeam() == team, cons);
     }
 
 }

@@ -16,7 +16,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.net.Administration.*;
@@ -37,7 +37,7 @@ public class BlockInventoryFragment extends Fragment{
     private Item lastItem;
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
-    public static void requestItem(Player player, Tile tile, Item item, int amount){
+    public static void requestItem(Playerc player, Tile tile, Item item, int amount){
         if(player == null || tile == null || !tile.interactable(player.team())) return;
         amount = Mathf.clamp(amount, 0, player.ttemCapacity());
         int fa = amount;

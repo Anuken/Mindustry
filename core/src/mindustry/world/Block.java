@@ -20,7 +20,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -467,12 +467,12 @@ public class Block extends BlockStorage{
     }
 
     /** Called when the block is tapped. */
-    public void tapped(Tile tile, Player player){
+    public void tapped(Tile tile, Playerc player){
 
     }
 
     /** Called when arbitrary configuration is applied to a tile. */
-    public void configured(Tile tile, @Nullable Player player, int value){
+    public void configured(Tile tile, @Nullable Playerc player, int value){
 
     }
 
@@ -503,12 +503,12 @@ public class Block extends BlockStorage{
     }
 
     /** Returns whether this config menu should show when the specified player taps it. */
-    public boolean shouldShowConfigure(Tile tile, Player player){
+    public boolean shouldShowConfigure(Tile tile, Playerc player){
         return true;
     }
 
     /** Whether this configuration should be hidden now. Called every frame the config is open. */
-    public boolean shouldHideConfigure(Tile tile, Player player){
+    public boolean shouldHideConfigure(Tile tile, Playerc player){
         return false;
     }
 

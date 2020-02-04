@@ -50,7 +50,7 @@ public class DeflectorWall extends Wall{
 
         bullet.hitbox(rect2);
 
-        Vec2 position = Geometry.raycastRect(bullet.x - bullet.velocity().x*Time.delta(), bullet.y - bullet.velocity().y*Time.delta(), bullet.x + bullet.velocity().x*Time.delta(), bullet.y + bullet.velocity().y*Time.delta(),
+        Vec2 position = Geometry.raycastRect(bullet.x - bullet.vel().x*Time.delta(), bullet.y - bullet.vel().y*Time.delta(), bullet.x + bullet.vel().x*Time.delta(), bullet.y + bullet.vel().y*Time.delta(),
         rect.setSize(size * tilesize + rect2.width*2 + rect2.height*2).setCenter(entity.getX(), entity.getY()));
 
         if(position != null){
@@ -58,9 +58,9 @@ public class DeflectorWall extends Wall{
         }
 
         if(penX > penY){
-            bullet.velocity().x *= -1;
+            bullet.vel().x *= -1;
         }else{
-            bullet.velocity().y *= -1;
+            bullet.vel().y *= -1;
         }
 
         //bullet.updateVelocity();

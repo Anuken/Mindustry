@@ -2,7 +2,7 @@ package mindustry.io.versions;
 
 import arc.func.Prov;
 import mindustry.entities.effect.*;
-import mindustry.entities.type.Player;
+import mindustry.gen.*;
 import mindustry.entities.type.base.*;
 
 /*
@@ -78,7 +78,7 @@ public class LegacyTypeTable{
 13 = Revenant
      */
     private static final Prov[] build81Table = {
-        Player::new,
+        Playerc::new,
         Fire::new,
         Puddle::new,
         MinerDrone::new,
@@ -95,7 +95,7 @@ public class LegacyTypeTable{
     };
 
     private static final Prov[] build80Table = {
-        Player::new,
+        Playerc::new,
         Fire::new,
         Puddle::new,
         Bullet::new,
@@ -114,7 +114,7 @@ public class LegacyTypeTable{
     };
 
     private static final Prov[] build79Table = {
-        Player::new,
+        Playerc::new,
         Fire::new,
         Puddle::new,
         Bullet::new,

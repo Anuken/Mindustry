@@ -16,6 +16,7 @@ import arc.util.pooling.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -25,7 +26,9 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.net.Administration.*;
 import mindustry.net.*;
+import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -179,6 +182,11 @@ public class EntityComps{
 
         Object data;
         BulletType type;
+        Interval timer = new Interval(6);
+
+        public boolean timer(int index, float time){
+            return timer.get(index, time);
+        }
 
         @Override
         public float getDamage(){
@@ -658,6 +666,136 @@ public class EntityComps{
 
             if(power != null){
                 power.graph.update();
+            }
+        }
+    }
+
+    @Component
+    abstract class PlayerComp implements UnitController, Entityc, Syncc{
+        @Nullable Unitc unit;
+
+        @ReadOnly Team team = Team.sharded;
+        String name = "noname";
+        @Nullable NetConnection con;
+        boolean admin, typing;
+        Color color = new Color();
+        float mouseX, mouseY;
+
+        @Nullable String lastText;
+        float textFadeTime;
+
+        public void update(){
+            if(unit != null){
+                x(unit.x());
+                y(unit.y());
+                unit.team(team);
+            }
+            textFadeTime -= Time.delta() / (60 * 5);
+        }
+
+        public void team(Team team){
+            if(unit != null){
+                unit.team(team);
+            }
+        }
+
+        public void unit(Unitc unit){
+            this.unit = unit;
+            unit.team(team);
+        }
+
+        String uuid(){
+            return con == null ? "AAAAAAAA" : con.uuid;
+        }
+
+        String usid(){
+            return con == null ? "AAAAAAAA" : con.usid;
+        }
+
+        void kick(KickReason reason){
+            con.kick(reason);
+        }
+
+        void kick(String reason){
+            con.kick(reason);
+        }
+
+        void drawName(){
+            BitmapFont font = Fonts.def;
+            GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+            final float nameHeight = 11;
+            final float textHeight = 15;
+
+            boolean ints = font.usesIntegerPositions();
+            font.setUseIntegerPositions(false);
+            font.getData().setScale(0.25f / Scl.scl(1f));
+            layout.setText(font, name);
+
+            if(!isLocal()){
+                Draw.color(0f, 0f, 0f, 0.3f);
+                Fill.rect(unit.x(), unit.y() + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
+                Draw.color();
+                font.setColor(color);
+                font.draw(name, unit.x(), unit.y() + nameHeight, 0, Align.center, false);
+
+                if(admin){
+                    float s = 3f;
+                    Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
+                    Draw.rect(Icon.adminSmall.getRegion(), unit.x() + layout.width / 2f + 2 + 1, unit.y() + nameHeight - 1.5f, s, s);
+                    Draw.color(color);
+                    Draw.rect(Icon.adminSmall.getRegion(), unit.x() + layout.width / 2f + 2 + 1, unit.y() + nameHeight - 1f, s, s);
+                }
+            }
+
+            if(Core.settings.getBool("playerchat") && ((textFadeTime > 0 && lastText != null) || typing)){
+                String text = textFadeTime <= 0 || lastText == null ? "[LIGHT_GRAY]" + Strings.animated(Time.time(), 4, 15f, ".") : lastText;
+                float width = 100f;
+                float visualFadeTime = 1f - Mathf.curve(1f - textFadeTime, 0.9f);
+                font.setColor(1f, 1f, 1f, textFadeTime <= 0 || lastText == null ? 1f : visualFadeTime);
+
+                layout.setText(font, text, Color.white, width, Align.bottom, true);
+
+                Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime <= 0 || lastText == null  ? 1f : visualFadeTime));
+                Fill.rect(unit.x(), unit.y() + textHeight + layout.height - layout.height/2f, layout.width + 2, layout.height + 3);
+                font.draw(text, unit.x() - width/2f, unit.y() + textHeight + layout.height, width, Align.center, true);
+            }
+
+            Draw.reset();
+            Pools.free(layout);
+            font.getData().setScale(1f);
+            font.setColor(Color.white);
+            font.setUseIntegerPositions(ints);
+        }
+
+        void sendMessage(String text){
+            if(isLocal()){
+                if(ui != null){
+                    ui.chatfrag.addMessage(text, null);
+                }
+            }else{
+                Call.sendMessage(con, text, null, null);
+            }
+        }
+
+        void sendMessage(String text, Playerc from){
+            sendMessage(text, from, NetClient.colorizeName(from.id(), from.name()));
+        }
+
+         void sendMessage(String text, Playerc from, String fromName){
+            if(isLocal()){
+                if(ui != null){
+                    ui.chatfrag.addMessage(text, fromName);
+                }
+            }else{
+                Call.sendMessage(con, text, fromName, from);
+            }
+        }
+
+        PlayerInfo getInfo(){
+            if(isLocal()){
+                throw new IllegalArgumentException("Local players cannot be traced and do not have info.");
+            }else{
+                return netServer.admins.getInfo(uuid());
             }
         }
     }
@@ -1194,6 +1332,25 @@ public class EntityComps{
             current.progress = entity.progress;
         }
 
+
+        /** Draw all current build requests. Does not draw the beam effect, only the positions. */
+        void drawBuildRequests(){
+
+            for(BuildRequest request : requests){
+                if(request.progress > 0.01f || (buildRequest() == request && request.initialized && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor()))) continue;
+
+                request.animScale = 1f;
+                if(request.breaking){
+                    control.input.drawBreaking(request);
+                }else{
+                    request.block.drawRequest(request, control.input.allRequests(),
+                    Build.validPlace(team(), request.x, request.y, request.block, request.rotation) || control.input.requestMatches(request));
+                }
+            }
+
+            Draw.reset();
+        }
+
         /** @return whether this request should be skipped, in favor of the next one. */
         boolean shouldSkip(BuildRequest request, @Nullable Tilec core){
             //requests that you have at least *started* are considered
@@ -1557,7 +1714,7 @@ public class EntityComps{
         }
 
         boolean isLocal(){
-            return this == Vars.player;
+            return this instanceof Unitc && ((Unitc)this).controller() == player || this == player;
         }
 
         <T> T as(Class<T> type){
@@ -1566,5 +1723,13 @@ public class EntityComps{
 
         @InternalImpl
         abstract int classId();
+
+        void read(DataInput input) throws IOException{
+            //TODO dynamic io
+        }
+
+        void write(DataOutput output) throws IOException{
+            //TODO dynamic io
+        }
     }
 }

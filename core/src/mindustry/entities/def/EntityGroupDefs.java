@@ -5,6 +5,11 @@ import mindustry.entities.def.EntityComps.*;
 
 public class EntityGroupDefs{
 
+    @GroupDef(PlayerComp.class)
+    void player(){
+
+    }
+
     @GroupDef(UnitComp.class)
     void unit(){
 
@@ -16,7 +21,12 @@ public class EntityGroupDefs{
     }
 
     @GroupDef(DrawComp.class)
-    void drawers(){
+    void drawer(){
+
+    }
+
+    @GroupDef(SyncComp.class)
+    void sync(){
 
     }
 }

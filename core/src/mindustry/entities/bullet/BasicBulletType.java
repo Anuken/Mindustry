@@ -38,9 +38,9 @@ public class BasicBulletType extends BulletType{
         float height = bulletHeight * ((1f - bulletShrink) + bulletShrink * b.fout());
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x, b.y, bulletWidth, height, b.rot() - 90);
+        Draw.rect(backRegion, b.x(), b.y(), bulletWidth, height, b.rotation() - 90);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x, b.y, bulletWidth, height, b.rot() - 90);
+        Draw.rect(frontRegion, b.x(), b.y(), bulletWidth, height, b.rotation() - 90);
         Draw.color();
     }
 }

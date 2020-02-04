@@ -4,11 +4,10 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.ctype.ContentList;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -412,31 +411,31 @@ public class Bullets implements ContentList{
 
             @Override
             public void init(Bulletc b){
-                b.velocity().setLength(0.6f + Mathf.random(2f));
+                b.vel().setLength(0.6f + Mathf.random(2f));
             }
 
             @Override
             public void draw(Bulletc b){
                 Draw.color(Pal.lightFlame, Pal.darkFlame, Color.gray, b.fin());
-                Fill.circle(b.x, b.y, 3f * b.fout());
+                Fill.circle(b.x(), b.y(), 3f * b.fout());
                 Draw.reset();
             }
 
             @Override
             public void update(Bulletc b){
                 if(Mathf.chance(0.04 * Time.delta())){
-                    Tile tile = world.tileWorld(b.x, b.y);
+                    Tile tile = world.tileWorld(b.x(), b.y());
                     if(tile != null){
                         Fire.create(tile);
                     }
                 }
 
                 if(Mathf.chance(0.1 * Time.delta())){
-                    Fx.fireballsmoke.at(b.x, b.y);
+                    Fx.fireballsmoke.at(b.x(), b.y());
                 }
 
                 if(Mathf.chance(0.1 * Time.delta())){
-                    Fx.ballfire.at(b.x, b.y);
+                    Fx.ballfire.at(b.x(), b.y());
                 }
             }
         };
@@ -512,15 +511,15 @@ public class Bullets implements ContentList{
 
             @Override
             public void update(Bulletc b){
-                if(b.timer.get(1, 5f)){
-                    Damage.collideLine(b, b.team(), hitEffect, b.x, b.y, b.rot(), length, true);
+                if(b.timer(1, 5f)){
+                    Damage.collideLine(b, b.team(), hitEffect, b.x(), b.y(), b.rotation(), length, true);
                 }
-                Effects.shake(1f, 1f, b.x, b.y);
+                Effects.shake(1f, 1f, b.x(), b.y());
             }
 
             @Override
             public void hit(Bulletc b, float hitx, float hity){
-                hitEffect.at(colors[2], hitx, hity);
+                hitEffect.at(hitx, hity, colors[2]);
                 if(Mathf.chance(0.4)){
                     Fire.create(world.tileWorld(hitx + Mathf.range(5f), hity + Mathf.range(5f)));
                 }
@@ -530,13 +529,13 @@ public class Bullets implements ContentList{
             public void draw(Bulletc b){
                 float baseLen = (length) * b.fout();
 
-                Lines.lineAngle(b.x, b.y, b.rot(), baseLen);
+                Lines.lineAngle(b.x(), b.y(), b.rotation(), baseLen);
                 for(int s = 0; s < colors.length; s++){
                     Draw.color(tmpColor.set(colors[s]).mul(1f + Mathf.absin(Time.time(), 1f, 0.1f)));
                     for(int i = 0; i < tscales.length; i++){
-                        Tmp.v1.trns(b.rot() + 180f, (lenscales[i] - 1f) * 35f);
+                        Tmp.v1.trns(b.rotation() + 180f, (lenscales[i] - 1f) * 35f);
                         Lines.stroke((9f + Mathf.absin(Time.time(), 0.8f, 1.5f)) * b.fout() * strokes[s] * tscales[i]);
-                        Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rot(), baseLen * lenscales[i], CapStyle.none);
+                        Lines.lineAngle(b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], CapStyle.none);
                     }
                 }
                 Draw.reset();
@@ -587,7 +586,8 @@ public class Bullets implements ContentList{
 
             @Override
             public void init(Bulletc b){
-                Lightning.create(b.team(), Pal.lancerLaser, damage * (b.getOwner() instanceof Player ? state.rules.playerDamageMultiplier : 1f), b.x, b.y, b.rot(), 30);
+                //TODO owners are never players...
+                Lightning.create(b.team(), Pal.lancerLaser, damage * (b.owner() instanceof Playerc ? state.rules.playerDamageMultiplier : 1f), b.x(), b.y(), b.rotation(), 30);
             }
         };
 
