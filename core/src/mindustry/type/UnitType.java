@@ -42,6 +42,13 @@ public class UnitType extends UnlockableContent{
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
 
+    /** draw the health and team indicator */
+    public boolean drawCell = true;
+    /** draw the items on its back */
+    public boolean drawItems = true;
+    /** light emitted with lighting map rule enabled */
+    public float lightEmitted = 50f;
+
     public TextureRegion legRegion, baseRegion, region;
 
     public <T extends BaseUnit> UnitType(String name, Prov<T> mainConstructor){
@@ -81,5 +88,26 @@ public class UnitType extends UnlockableContent{
         BaseUnit unit = constructor.get();
         unit.init(this, team);
         return unit;
+    }
+
+    public void drawStats(Unit unit){
+        if(drawCell){
+            const health = unit.healthf();
+            Draw.color(Color.black, unit.getTeam().color, health + Mathf.absin(Time.time(), Math.max(health * 5f, 1f), 1f - health));
+            Draw.rect(unit.getPowerCellRegion(), unit.x, unit.y, unit.rotation - 90);
+            Draw.color();
+        }
+
+        if(drawItems){
+            unit.drawBackItems();
+        }
+
+        if(lightEmitted > 0f){
+           unit.drawLight(lightEmitted);
+        }
+    }
+
+    public void drawShadow(Unit unit, float offsetX, float offsetY){
+        Draw.rect(unit.getIconRegion(), unit.x + offsetX, unit.y + offsetY, unit.rotation - 90);
     }
 }
