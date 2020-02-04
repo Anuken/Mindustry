@@ -1,15 +1,14 @@
 package mindustry.entities;
 
-import arc.Core;
-import arc.struct.Array;
-import arc.func.Cons;
-import arc.graphics.Color;
+import arc.*;
+import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.Mathf;
-import arc.math.geom.Position;
-import arc.util.pooling.Pools;
-import mindustry.entities.type.EffectEntity;
-import mindustry.entities.traits.ScaleTrait;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.pooling.*;
+import mindustry.entities.type.*;
 
 public class Effects{
     private static final EffectContainer container = new EffectContainer();
@@ -126,7 +125,7 @@ public class Effects{
         }
     }
 
-    public static class EffectContainer implements ScaleTrait{
+    public static class EffectContainer implements Scaled{
         public float x, y, time, lifetime, rotation;
         public Color color;
         public int id;

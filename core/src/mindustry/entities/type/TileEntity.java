@@ -204,7 +204,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
                 other.block().onProximityUpdate(other);
 
                 if(other.entity != null){
-                    other.entity.proximity.removeValue(tile, true);
+                    other.entity.proximity.remove(tile, true);
                 }
             }
         }

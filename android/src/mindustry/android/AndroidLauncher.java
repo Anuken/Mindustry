@@ -177,6 +177,7 @@ public class AndroidLauncher extends AndroidApplication{
                 }
                 //create marker
                 Core.files.local("files_moved").writeString("files moved to " + data);
+                Core.files.local("files_moved_103").writeString("files moved again");
                 Log.info("Files moved.");
             }catch(Throwable t){
                 Log.err("Failed to move files!");

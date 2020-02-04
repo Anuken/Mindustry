@@ -16,7 +16,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Poolable, DrawTrait, VelocityTrait, TimeTrait, TeamTrait, AbsorbTrait{
+public class Bullet extends SolidEntity implements DamageTrait, Scaled, Poolable, DrawTrait, VelocityTrait, TimeTrait, TeamTrait, AbsorbTrait{
     public Interval timer = new Interval(3);
 
     private float lifeScl;

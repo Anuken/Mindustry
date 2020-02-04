@@ -27,11 +27,11 @@ public class RemoteWriteGenerator{
         for(ClassEntry entry : entries){
             //create builder
             TypeSpec.Builder classBuilder = TypeSpec.classBuilder(entry.name).addModifiers(Modifier.PUBLIC);
-            classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
+            classBuilder.addJavadoc(RemoteProcess.autogenWarning);
 
             //add temporary write buffer
             classBuilder.addField(FieldSpec.builder(ByteBuffer.class, "TEMP_BUFFER", Modifier.STATIC, Modifier.PRIVATE, Modifier.FINAL)
-            .initializer("ByteBuffer.allocate($1L)", RemoteMethodAnnotationProcessor.maxPacketSize).build());
+            .initializer("ByteBuffer.allocate($1L)", RemoteProcess.maxPacketSize).build());
 
             //go through each method entry in this class
             for(MethodEntry methodEntry : entry.methods){

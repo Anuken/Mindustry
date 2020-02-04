@@ -311,7 +311,7 @@ public class Saves{
 
         public void delete(){
             file.delete();
-            saves.removeValue(this, true);
+            saves.remove(this, true);
             if(this == current){
                 current = null;
             }
