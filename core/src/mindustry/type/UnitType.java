@@ -7,6 +7,7 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.scene.ui.layout.*;
+import arc.util.Time;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.ctype.ContentType;
