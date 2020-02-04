@@ -381,7 +381,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public void drawOver(){
     }
 
-    public void drawStats();
+    public void drawStats(){
+    }
 
     public void drawLight(float lightEmitted){
         renderer.lights.add(x, y, lightEmitted, Pal.powerLight, 0.6f);
@@ -433,7 +434,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         }
     }
 
-    public void drawShadow(float offsetX, float offsetY);
+    public void drawShadow(float offsetX, float offsetY){
+    }
 
     public float getSize(){
         hitbox(Tmp.r1);
