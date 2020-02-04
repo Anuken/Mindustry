@@ -39,7 +39,7 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-@SuppressWarnings({"unused", "unused"})
+@SuppressWarnings({"unused", "unchecked"})
 public class EntityComps{
 
     @Component
@@ -1331,20 +1331,14 @@ public class EntityComps{
     }
 
     @Component
-    abstract class EffectComp implements Posc, Drawc, Timedc{
+    abstract class EffectComp implements Posc, Drawc, Timedc, Rotc{
         Effect effect;
         Color color = new Color(Color.white);
         Object data;
-        float rotation = 0f;
 
         @Override
         public void draw(){
-
-        }
-
-        @Override
-        public void update(){
-            //TODO fix effects, make everything poolable
+            effect.render(id(), color, time(), rotation(), x(), y(), data);
         }
 
         @Override
