@@ -381,22 +381,13 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public void drawOver(){
     }
 
-    public void drawStats(){
-        Draw.color(Color.black, team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
-        Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
-        Draw.color();
+    public void drawStats();
 
-        drawBackItems(item.amount > 0 ? 1f : 0f, false);
-
-        drawLight();
-    }
-
-    public void drawLight(){
-        renderer.lights.add(x, y, 50f, Pal.powerLight, 0.6f);
+    public void drawLight(lightEmitted){
+        renderer.lights.add(x, y, lightEmitted, Pal.powerLight, 0.6f);
     }
 
     public void drawBackItems(float itemtime, boolean number){
-        //draw back items
         if(itemtime > 0.01f && item.item != null){
             float backTrns = 5f;
             float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * itemtime;
@@ -426,6 +417,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         Draw.reset();
     }
+    
+    public void drawBackItems(){
+        drawBackItems(item.amount > 0 ? 1f : 0f, false);
+    }
 
     public TextureRegion getPowerCellRegion(){
         return Core.atlas.find("power-cell");
@@ -438,9 +433,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         }
     }
 
-    public void drawShadow(float offsetX, float offsetY){
-        Draw.rect(getIconRegion(), x + offsetX, y + offsetY, rotation - 90);
-    }
+    public void drawShadow(float offsetX, float offsetY);
 
     public float getSize(){
         hitbox(Tmp.r1);
