@@ -309,7 +309,16 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public void draw(){
+    }
 
+    @Override
+    public void drawStats(){
+        type.drawStats(this);
+    }
+
+    @Override
+    public void drawShadow(){
+        type.drawShadow(this);
     }
 
     @Override
