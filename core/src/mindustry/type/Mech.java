@@ -39,7 +39,8 @@ public class Mech extends UnlockableContent{
     public boolean drawItems = true;
     /** draw the engine if it's flying/boosting */
     public boolean drawEngine = true;
-    public boolean drawLight = true;
+    /** light emitted with lighting map rule enabled */
+    public float lightEmitted = 50f;
 
     public Color engineColor = Pal.boostTo;
     public Color engineInnerColor = Color.white;
@@ -79,8 +80,8 @@ public class Mech extends UnlockableContent{
         if(drawItems){
             player.drawBackItems();
         }
-        if(drawLight){
-            player.drawLight();
+        if(lightEmission > 0f){
+            player.drawLight(lightEmission);
         }
     }
 
