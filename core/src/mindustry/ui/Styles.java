@@ -169,7 +169,6 @@ public class Styles{
         emptyi = new ImageButtonStyle(){{
             imageDownColor = Pal.accent;
             imageUpColor = Color.white;
-            imageDisabledColor = Color.gray;
         }};
         emptytogglei = new ImageButtonStyle(){{
             imageCheckedColor = Color.white;
