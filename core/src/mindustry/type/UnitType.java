@@ -4,6 +4,7 @@ import arc.*;
 import arc.audio.*;
 import arc.struct.*;
 import arc.func.*;
+import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.scene.ui.layout.*;
