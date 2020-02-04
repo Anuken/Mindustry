@@ -31,7 +31,7 @@ public class GenericSmelter extends GenericCrafter{
         GenericCrafterEntity entity = tile.ent();
 
         //draw topRegion
-        if(topRegion != NULL && entity.warmup > 0f){
+        if(topRegion != None && entity.warmup > 0f){
             Draw.color(1f, 1f, 1f, entity.warmup);
             Draw.rect(topRegion, tile.drawx(), tile.drawy());
             Draw.color();
