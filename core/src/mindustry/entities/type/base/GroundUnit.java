@@ -153,6 +153,7 @@ public class GroundUnit extends BaseUnit{
 
         Draw.rect(type.region, x, y, rotation - 90);
 
+        type.draw(this);
         for(int i : Mathf.signs){
             float tra = rotation - 90, trY = -type.weapon.getRecoil(this, i > 0) + type.weaponOffsetY;
             float w = -i * type.weapon.region.getWidth() * Draw.scl;

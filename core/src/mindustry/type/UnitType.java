@@ -93,7 +93,10 @@ public class UnitType extends UnlockableContent{
         return unit;
     }
 
-    public void drawStats(Unit unit){
+    public void update(BaseUnit unit){
+    }
+
+    public void drawStats(BaseUnit unit){
         if(drawCell){
             float health = unit.healthf();
             Draw.color(Color.black, unit.getTeam().color, health + Mathf.absin(Time.time(), Math.max(health * 5f, 1f), 1f - health));
@@ -110,7 +113,7 @@ public class UnitType extends UnlockableContent{
         }
     }
 
-    public void draw(Unit unit){
+    public void draw(BaseUnit unit){
     }
 
     public void drawShadow(Unit unit, float offsetX, float offsetY){

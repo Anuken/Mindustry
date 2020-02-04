@@ -306,6 +306,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         if(!isFlying()){
             clampPosition();
         }
+        type.update(this);
     }
 
     @Override

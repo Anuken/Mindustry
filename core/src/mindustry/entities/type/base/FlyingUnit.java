@@ -145,6 +145,7 @@ public class FlyingUnit extends BaseUnit{
         Draw.mixcol(Color.white, hitTime / hitDuration);
         Draw.rect(type.region, x, y, rotation - 90);
 
+        super.draw();
         drawWeapons();
 
         Draw.mixcol();
