@@ -12,7 +12,6 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
-import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.entities.units.*;

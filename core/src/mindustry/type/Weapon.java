@@ -7,7 +7,6 @@ import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.traits.*;
 import mindustry.gen.*;
 
 public class Weapon{

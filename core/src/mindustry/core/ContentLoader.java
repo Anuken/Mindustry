@@ -42,7 +42,6 @@ public class ContentLoader{
         new Weathers(),
         new Planets(),
         new Zones(),
-        new TypeIDs(),
 
         //these are not really content classes, but this makes initialization easier
         new LegacyColorMapper(),

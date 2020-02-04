@@ -16,6 +16,10 @@ public class Stype extends Selement<TypeElement>{
         return new Stype((TypeElement)BaseProcessor.typeu.asElement(mirror));
     }
 
+    public String fullName(){
+        return mirror().toString();
+    }
+
     public Array<Stype> interfaces(){
         return Array.with(e.getInterfaces()).map(Stype::of);
     }

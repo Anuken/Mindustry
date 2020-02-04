@@ -3,8 +3,6 @@ package mindustry.entities;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
-import mindustry.entities.traits.*;
-
 /**
  * Class for predicting shoot angles based on velocities of targets.
  */

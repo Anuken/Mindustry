@@ -3,8 +3,6 @@ package mindustry.type;
 import arc.func.*;
 import mindustry.ctype.*;
 import mindustry.ctype.ContentType;
-import mindustry.entities.traits.*;
-
 public class TypeID extends MappableContent{
     public final Prov<? extends TypeTrait> constructor;
 

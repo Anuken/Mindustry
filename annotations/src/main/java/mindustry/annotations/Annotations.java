@@ -17,6 +17,12 @@ public class Annotations{
     public @interface Component{
     }
 
+    /** Indicates that a method is implemented by the annotation processor. */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface InternalImpl{
+    }
+
     /** Indicates priority of a method in an entity. Methods with higher priority are done last. */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)

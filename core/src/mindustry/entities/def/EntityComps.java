@@ -55,7 +55,7 @@ public class EntityComps{
         @Override
         public void controller(UnitController controller){
             this.controller = controller;
-            controller.set(this);
+            controller.unit(this);
         }
 
         @Override
@@ -1291,7 +1291,7 @@ public class EntityComps{
     }
 
     @Component
-    abstract class ShielderComp implements Damagec{
+    abstract class ShielderComp implements Damagec, Teamc, Posc{
 
         void absorb(){
 
@@ -1536,7 +1536,7 @@ public class EntityComps{
 
     @Component
     @BaseComponent
-    class EntityComp{
+    abstract class EntityComp{
         private boolean added;
         int id;
 
@@ -1563,5 +1563,8 @@ public class EntityComps{
         <T> T as(Class<T> type){
             return (T)this;
         }
+
+        @InternalImpl
+        abstract int classId();
     }
 }

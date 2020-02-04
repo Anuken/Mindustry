@@ -9,7 +9,6 @@ import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.*;
 import mindustry.gen.*;

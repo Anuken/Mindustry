@@ -1,5 +1,6 @@
 package mindustry.annotations;
 
+import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
 import com.squareup.javapoet.*;
@@ -30,6 +31,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
     protected int round;
     protected int rounds = 1;
     protected RoundEnvironment env;
+    protected Fi rootDirectory;
 
     public static String getMethodName(Element element){
         return ((TypeElement)element.getEnclosingElement()).getQualifiedName().toString() + "." + element.getSimpleName();
@@ -113,6 +115,17 @@ public abstract class BaseProcessor extends AbstractProcessor{
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
         if(round++ >= rounds) return false; //only process 1 round
+        if(rootDirectory == null){
+            try{
+                String path = Fi.get(filer.getResource(StandardLocation.CLASS_OUTPUT, "no", "no")
+                .toUri().toURL().toString().substring(System.getProperty("os.name").contains("Windows") ? 6 : "file:".length()))
+                .parent().parent().parent().parent().parent().parent().parent().toString().replace("%20", " ");
+                rootDirectory = Fi.get(path);
+            }catch(IOException e){
+                throw new RuntimeException(e);
+            }
+        }
+
         this.env = roundEnv;
         try{
             process(roundEnv);

@@ -4,7 +4,6 @@ import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.type.Weather.*;
 

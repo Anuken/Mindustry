@@ -9,7 +9,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -17,7 +17,7 @@ import mindustry.world.meta.*;
 
 import java.io.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.tilesize;
 
 public class ForceProjector extends Block{
     public final int timerUse = timers++;
@@ -35,12 +35,12 @@ public class ForceProjector extends Block{
     private static Tile paramTile;
     private static ForceProjector paramBlock;
     private static ForceEntity paramEntity;
-    private static Cons<AbsorbTrait> shieldConsumer = trait -> {
-        if(trait.canBeAbsorbed() && trait.getTeam() != paramTile.getTeam() && Intersector.isInsideHexagon(trait.getX(), trait.getY(), paramBlock.realRadius(paramEntity) * 2f, paramTile.drawx(), paramTile.drawy())){
+    private static Cons<Shielderc> shieldConsumer = trait -> {
+        if(trait.team() != paramTile.getTeam() && Intersector.isInsideHexagon(trait.x(), trait.y(), paramBlock.realRadius(paramEntity) * 2f, paramTile.drawx(), paramTile.drawy())){
             trait.absorb();
             Fx.absorb.at(trait);
             paramEntity.hit = 1f;
-            paramEntity.buildup += trait.getShieldDamage() * paramEntity.warmup;
+            paramEntity.buildup += trait.damage() * paramEntity.warmup;
         }
     };
 

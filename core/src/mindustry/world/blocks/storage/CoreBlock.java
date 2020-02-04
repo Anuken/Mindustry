@@ -8,7 +8,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import mindustry.content.*;
-import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.game.EventType.*;
