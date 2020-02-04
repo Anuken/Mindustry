@@ -70,25 +70,14 @@ public class ItemModule extends BlockModule{
     }
 
     public Item take(){
-    	// 0-to-length loop broken in two parts. First resume the loop where it previously left off.
-        for(int i = takeRotation; i < items.length; i++){
-            if(items[i] > 0){
-                items[i]--;
-                total--;
-    		// save the next position so the next call to take() can resume from there.
-                takeRotation = (i + 1) % items.length;
-                return content.item(i);
-            }
-        }
-
-        // Then start a new lap which ends where the call started from if empty.
-        for(int i = 0; i < takeRotation; i++){
-            if(items[i] > 0){
-                items[i]--;
-                total--;
-    		// save the next position so the next call to take() can resume from there.
-                takeRotation = (i + 1) % items.length;
-                return content.item(i);
+        for(int i = 0; i < items.length; i++){
+            int index = (i + takeRotation);
+            if(index >= items.length) index -= items.length; //conditional instead of mod
+            if(items[index] > 0){
+                items[index] --;
+                total --;
+                takeRotation = index + 1;
+                return content.item(index % items.length);
             }
         }
         return null;
