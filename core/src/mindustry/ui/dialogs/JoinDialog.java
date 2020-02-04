@@ -237,25 +237,9 @@ public class JoinDialog extends FloatingDialog{
 
         hosts.clear();
 
-        hosts.add("local servers").pad(10).growX().left().color(Pal.accent);
-        hosts.row();
-        hosts.addImage().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
-        hosts.row();
-        hosts.add(local).width(w);
-        hosts.row();
-
-        hosts.add("remote servers").pad(10).growX().left().color(Pal.accent);
-        hosts.row();
-        hosts.addImage().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
-        hosts.row();
-        hosts.add(remote).growX();
-        hosts.row();
-
-        hosts.add("global servers").pad(10).growX().left().color(Pal.accent);
-        hosts.row();
-        hosts.addImage().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
-        hosts.row();
-        hosts.add(global).width(w);
+        section("$servers.local", local);
+        section("$servers.remote", remote);
+        section("$servers.global", global);
 
         ScrollPane pane = new ScrollPane(hosts);
         pane.setFadeScrollBars(false);
@@ -308,6 +292,15 @@ public class JoinDialog extends FloatingDialog{
                 pane.getParent().invalidateHierarchy();
             }
         });
+    }
+
+    void section(String label, Table servers){
+        hosts.add(label).pad(10).growX().left().color(Pal.accent);
+        hosts.row();
+        hosts.addImage().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
+        hosts.row();
+        hosts.add(servers).width(targetWidth());
+        hosts.row(); // also called for the last one, does not seem to break layout
     }
 
     void refreshLocal(){
