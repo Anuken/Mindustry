@@ -30,7 +30,11 @@ public class BlockUpscaler implements ApplicationListener{
                 tile.getLinkedTilesAs(tile.block().upscale.get(), tmp);
                 if(tmp.select(t -> t.block() != tile.block()).size > 0) return;
 
+                float healthf = tmp.sumf(t -> t.entity.healthf()) / tmp.size;
+
                 Call.onConstructFinish(tile, tile.block().upscale.get(), -1, tile.rotation(), tile.getTeam(), true);
+
+                tile.entity.damage(tile.entity.maxHealth() - (tile.entity.maxHealth() * healthf));
             });
         }
     }
