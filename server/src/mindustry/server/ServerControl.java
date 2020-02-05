@@ -653,18 +653,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("unban", "<ip/ID>", "Completely unban a person by IP or ID.", arg -> {
-            if(arg[0].contains(".")){
-                if(netServer.admins.unbanPlayerIP(arg[0])){
-                    info("Unbanned player by IP: {0}.", arg[0]);
-                }else{
-                    err("That IP is not banned!");
-                }
+            if(netServer.admins.unbanPlayerIP(arg[0]) || netServer.admins.unbanPlayerID(arg[0])){
+                info("Unbanned player.", arg[0]);
             }else{
-                if(netServer.admins.unbanPlayerID(arg[0])){
-                    info("Unbanned player by ID: {0}.", arg[0]);
-                }else{
-                    err("That ID is not banned!");
-                }
+                err("That IP/ID is not banned!");
             }
         });
 

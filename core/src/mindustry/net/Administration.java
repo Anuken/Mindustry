@@ -41,7 +41,6 @@ public class Administration{
                     if(player.getInfo().messageInfractions >= Config.messageSpamKick.num() && Config.messageSpamKick.num() != 0){
                         player.con.kick("You have been kicked for spamming.", 1000 * 60 * 2);
                     }
-                    player.getInfo().lastSentMessage = message;
                     return null;
                 }else{
                     player.getInfo().messageInfractions = 0;
@@ -191,7 +190,7 @@ public class Administration{
             }
         }
 
-        bannedIPs.removeValue(ip, false);
+        bannedIPs.remove(ip, false);
 
         if(found){
             save();

@@ -157,7 +157,7 @@ public class JoinDialog extends FloatingDialog{
 
             inner.addImageButton(Icon.trash, Styles.emptyi, () -> {
                 ui.showConfirm("$confirm", "$server.delete", () -> {
-                    servers.removeValue(server, true);
+                    servers.remove(server, true);
                     saveServers();
                     setupRemote();
                     refreshRemote();

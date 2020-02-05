@@ -12,6 +12,9 @@ public class ItemModule extends BlockModule{
     private int[] items = new int[content.items().size];
     private int total;
 
+    // Make the take() loop persistent so it does not return the same item twice in a row unless there is nothing else to return.
+    protected int takeRotation;
+
     public void forEach(ItemConsumer cons){
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
@@ -66,21 +69,27 @@ public class ItemModule extends BlockModule{
         return total;
     }
 
-    public Item first(){
+    public Item first(){ // fixme: entangle with take()
         for(int i = 0; i < items.length; i++){
-            if(items[i] > 0) return content.item(i);
+            if(items[i] > 0){
+                return content.item(i);
+            }
         }
         return null;
     }
 
     public Item take(){
-        if(first() == null) return null;
-
-        int id = first().id;
-        items[id]--;
-        total--;
-
-        return content.item(id);
+        for(int i = 0; i < items.length; i++){
+            int index = (i + takeRotation);
+            if(index >= items.length) index -= items.length; //conditional instead of mod
+            if(items[index] > 0){
+                items[index] --;
+                total --;
+                takeRotation = index + 1;
+                return content.item(index % items.length);
+            }
+        }
+        return null;
     }
 
     public int get(Item item){

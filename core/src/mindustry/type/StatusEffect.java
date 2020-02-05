@@ -10,7 +10,7 @@ import mindustry.ctype.ContentType;
 import mindustry.entities.*;
 import mindustry.entities.Effects.*;
 import mindustry.entities.type.*;
-import mindustry.entities.units.Statuses.*;
+import mindustry.entities.units.*;
 
 public class StatusEffect extends MappableContent{
     /** Damage dealt by the unit with the effect. */
