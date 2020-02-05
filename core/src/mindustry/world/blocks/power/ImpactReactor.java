@@ -81,10 +81,16 @@ public class ImpactReactor extends PowerGenerator{
                 entity.warmup = 1f;
 
                 Core.app.post(() -> {
-                    BaseUnit unit = UnitTypes.reaper.create(tile.getTeam());
-                    unit.set(tile.drawx(), tile.drawy());
-                    unit.add();
-                    Events.fire(new UnitCreateEvent(unit));
+                    BaseUnit reaper = UnitTypes.reaper.create(tile.getTeam());
+                    reaper.set(tile.drawx(), tile.drawy());
+                    reaper.add();
+                    Events.fire(new UnitCreateEvent(reaper));
+
+                    BaseUnit eradicator = UnitTypes.eradicator.create(tile.getTeam());
+                    eradicator.set(tile.drawx(), tile.drawy());
+                    eradicator.add();
+                    Events.fire(new UnitCreateEvent(eradicator));
+
                     tile.entity.kill();
                 });
             }
