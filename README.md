@@ -21,13 +21,15 @@ First, make sure you have [JDK 8](https://adoptopenjdk.net/) installed. Open a t
 
 #### Windows
 
-_Running:_ `gradlew desktop:run`  
-_Building:_ `gradlew desktop:dist`
+_Running:_ `gradlew desktop:run` 
+_Building:_ `gradlew desktop:dist`  
+_Sprite Packing:_ `gradlew tools:pack`
 
 #### Linux/Mac OS
 
-_Running:_ `./gradlew desktop:run`  
-_Building:_ `./gradlew desktop:dist`
+_Running:_ `./gradlew desktop:run` 
+_Building:_ `./gradlew desktop:dist`  
+_Sprite Packing:_ `./gradlew tools:pack`
 
 #### Server
 
