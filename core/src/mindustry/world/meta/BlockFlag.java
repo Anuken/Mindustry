@@ -19,7 +19,9 @@ public enum BlockFlag{
     /** Scalables. */
     scalable,
     /** Upgradables. */
-    upgradable;
+    upgradable,
+    /** Feedables. */
+    feedable;
 
     public final static BlockFlag[] all = values();
 }

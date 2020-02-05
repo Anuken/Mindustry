@@ -20,6 +20,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
@@ -27,6 +28,8 @@ import static mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
     public Mech mech = Mechs.starter;
+
+    int conveyor = timers++, alloy = timers++;
 
     public CoreBlock(String name){
         super(name);
@@ -207,7 +210,7 @@ public class CoreBlock extends StorageBlock{
     public void update(Tile tile){
         CoreEntity entity = tile.ent();
 
-        if(entity.timer.get(60)){
+        if(entity.timer.get(conveyor, 60)){
             if(tile.entity.items.has(Items.titanium)){
                 Tile conveyor = Geometry.findClosest(tile.drawx(), tile.drawy(), indexer.getAllied(tile.getTeam(), BlockFlag.upgradable));
                 if(conveyor != null){
@@ -216,6 +219,26 @@ public class CoreBlock extends StorageBlock{
                     Timer.schedule(() -> Call.onConstructFinish(conveyor, Blocks.titaniumConveyor, -1, conveyor.rotation, conveyor.getTeam(), true), 0.95f);
                 }
             }
+        }
+
+        if(entity.timer.get(alloy, 30)){
+            indexer.getAllied(tile.getTeam(), BlockFlag.feedable).each(feedable -> {
+                ConsumeItems needs = feedable.block.consumes.get(ConsumeType.item);
+
+                if(!tile.entity.items.has(needs.items)) return;
+
+                for(ItemStack stack : needs.items){
+                    if(feedable.block.acceptStack(stack.item, stack.amount, feedable, null) != stack.amount) return;
+                }
+
+                for(ItemStack stack : needs.items){
+                    entity.items.remove(stack);
+                }
+
+                for(ItemStack stack : needs.items){
+                    Call.transferItemTo(stack.item, stack.amount, tile.getX(), tile.getY(), feedable);
+                }
+            });
         }
 
         if(entity.spawnPlayer != null){
