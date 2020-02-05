@@ -68,7 +68,7 @@ public class MapGenerator extends Generator{
                 });
             }
 
-            if(tile.block() instanceof CoreBlock && tile.getTeam() == state.rules.defaultTeam){
+            if(tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam){
                 schematics.placeLoadout(loadout, tile.x, tile.y);
                 anyCores = true;
             }

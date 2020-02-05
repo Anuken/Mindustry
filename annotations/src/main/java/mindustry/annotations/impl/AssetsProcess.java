@@ -11,7 +11,6 @@ import mindustry.annotations.*;
 import javax.annotation.processing.*;
 import javax.lang.model.*;
 import javax.lang.model.element.*;
-import javax.tools.Diagnostic.*;
 import java.util.*;
 
 @SupportedAnnotationTypes("mindustry.annotations.Annotations.StyleDefaults")
@@ -98,7 +97,7 @@ public class AssetsProcess extends BaseProcessor{
             String name = p.nameWithoutExtension();
 
             if(names.contains(name)){
-                BaseProcessor.messager.printMessage(Kind.ERROR, "Duplicate file name: " + p.toString() + "!");
+                BaseProcessor.err("Duplicate file name: " + p.toString() + "!");
             }else{
                 names.add(name);
             }

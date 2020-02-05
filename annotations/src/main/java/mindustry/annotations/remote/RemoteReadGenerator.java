@@ -2,16 +2,13 @@ package mindustry.annotations.remote;
 
 import com.squareup.javapoet.*;
 import mindustry.annotations.*;
-import mindustry.annotations.remote.IOFinder.ClassSerializer;
+import mindustry.annotations.remote.IOFinder.*;
 
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.*;
-import javax.tools.Diagnostic.Kind;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.List;
+import java.lang.reflect.*;
+import java.nio.*;
+import java.util.*;
 
 /** Generates code for reading remote invoke packets on the client and server. */
 public class RemoteReadGenerator{
@@ -29,8 +26,7 @@ public class RemoteReadGenerator{
      * @param packageName Full target package name.
      * @param needsPlayer Whether this read method requires a reference to the player sender.
      */
-    public void generateFor(List<MethodEntry> entries, String className, String packageName, boolean needsPlayer)
-    throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException, IOException{
+    public void generateFor(List<MethodEntry> entries, String className, String packageName, boolean needsPlayer) throws Exception{
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
         classBuilder.addJavadoc(RemoteProcess.autogenWarning);
@@ -48,7 +44,7 @@ public class RemoteReadGenerator{
             Constructor<TypeName> cons = TypeName.class.getDeclaredConstructor(String.class);
             cons.setAccessible(true);
 
-            TypeName playerType = cons.newInstance("mindustry.entities.type.Player");
+            TypeName playerType = cons.newInstance("mindustry.gen.Playerc");
             //add player parameter
             readMethod.addParameter(playerType, "player");
         }
@@ -91,10 +87,10 @@ public class RemoteReadGenerator{
                         }
                     }else{
                         //else, try and find a serializer
-                        ClassSerializer ser = serializers.get(typeName);
+                        ClassSerializer ser = serializers.getOrDefault(typeName, SerializerResolver.locate(entry.element, var.asType()));
 
                         if(ser == null){ //make sure a serializer exists!
-                            BaseProcessor.messager.printMessage(Kind.ERROR, "No @ReadClass method to read class type: '" + typeName + "'", var);
+                            BaseProcessor.err("No @ReadClass method to read class type '" + typeName + "' in method " + entry.targetMethod, var);
                             return;
                         }
 
@@ -119,7 +115,7 @@ public class RemoteReadGenerator{
             if(entry.forward && entry.where.isServer && needsPlayer){
                 //call forwarded method
                 readBlock.addStatement(packageName + "." + entry.className + "." + entry.element.getSimpleName() +
-                "__forward(player.con" + (varResult.length() == 0 ? "" : ", ") + varResult.toString() + ")");
+                "__forward(player.con()" + (varResult.length() == 0 ? "" : ", ") + varResult.toString() + ")");
             }
 
             readBlock.nextControlFlow("catch (java.lang.Exception e)");

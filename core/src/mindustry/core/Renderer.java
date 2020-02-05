@@ -1,8 +1,6 @@
 package mindustry.core;
 
 import arc.*;
-import arc.files.*;
-import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
@@ -12,13 +10,8 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
-import mindustry.gen.*;
 import mindustry.game.EventType.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.input.*;
-import mindustry.ui.*;
-import mindustry.world.blocks.defense.ForceProjector.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -80,6 +73,8 @@ public class Renderer implements ApplicationListener{
         }else{
             Vec2 position = Tmp.v3.set(player);
 
+            //TODO camera controls should be in input
+            /*
             if(player.dead()){
                 Tilec core = player.closestCore();
                 if(core != null){
@@ -91,7 +86,7 @@ public class Renderer implements ApplicationListener{
                 }
             }else if(control.input instanceof DesktopInput && !state.isPaused()){
                 camera.position.lerpDelta(position, 0.08f);
-            }
+            }*/
 
             updateShake(0.75f);
             if(pixelator.enabled()){
@@ -173,6 +168,10 @@ public class Renderer implements ApplicationListener{
         }
     }
 
+    public void draw(){
+        //TODO do it
+    }
+/*
     public void draw(){
         camera.update();
 
@@ -339,7 +338,7 @@ public class Renderer implements ApplicationListener{
 
         Groups.unit.draw(u -> u.isFlying() == flying && !u.isDead(), Unitc::drawOver);
         Groups.player.draw(p -> p.isFlying() == flying, Unitc::drawOver);
-    }
+    }*/
 
     public void scaleCamera(float amount){
         targetscale += amount;
@@ -366,6 +365,8 @@ public class Renderer implements ApplicationListener{
     }
 
     public void takeMapScreenshot(){
+        //TODO uncomment
+        /*
         drawGroundShadows();
 
         int w = world.width() * tilesize, h = world.height() * tilesize;
@@ -414,7 +415,7 @@ public class Renderer implements ApplicationListener{
         buffer.dispose();
 
         Core.settings.put("animatedwater", hadWater);
-        Core.settings.put("animatedshields", hadShields);
+        Core.settings.put("animatedshields", hadShields);*/
     }
 
 }

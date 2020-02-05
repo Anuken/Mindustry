@@ -76,7 +76,7 @@ public class MinimapRenderer implements Disposable{
             updateUnitArray();
         }else{
             units.clear();
-            Units.all(units::add);
+            Groups.unit.each(units::add);
         }
 
         float sz = baseSize * zoom;
@@ -88,20 +88,19 @@ public class MinimapRenderer implements Disposable{
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
 
         for(Unitc unit : units){
-            if(unit.isDead()) continue;
-            float rx = !withLabels ? (unit.x - rect.x) / rect.width * w : unit.x / (world.width() * tilesize) * w;
-            float ry = !withLabels ? (unit.y - rect.y) / rect.width * h : unit.y / (world.height() * tilesize) * h;
+            float rx = !withLabels ? (unit.x() - rect.x) / rect.width * w : unit.x() / (world.width() * tilesize) * w;
+            float ry = !withLabels ? (unit.y() - rect.y) / rect.width * h : unit.y() / (world.height() * tilesize) * h;
 
-            Draw.mixcol(unit.getTeam().color, 1f);
+            Draw.mixcol(unit.team().color, 1f);
             float scale = Scl.scl(1f) / 2f * scaling * 32f;
-            Draw.rect(unit.getIconRegion(), x + rx, y + ry, scale, scale, unit.rotation - 90);
+            Draw.rect(unit.type().region, x + rx, y + ry, scale, scale, unit.rotation() - 90);
             Draw.reset();
 
             if(withLabels && unit instanceof Playerc){
                 Playerc pl = (Playerc) unit;
-                if(!pl.isLocal){
+                if(!pl.isLocal()){
                     // Only display names for other players.
-                    drawLabel(x + rx, y + ry, pl.name, unit.getTeam().color);
+                    drawLabel(x + rx, y + ry, pl.name(), unit.team().color);
                 }
             }
         }
@@ -162,7 +161,7 @@ public class MinimapRenderer implements Disposable{
         if(bc != 0){
             return bc;
         }
-        return Tmp.c1.set(MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.getTeam())).mul(tile.block().cacheLayer == CacheLayer.walls ? 1f - tile.rotation() / 4f : 1f).rgba();
+        return Tmp.c1.set(MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.team())).mul(tile.block().cacheLayer == CacheLayer.walls ? 1f - tile.rotation() / 4f : 1f).rgba();
     }
 
     @Override

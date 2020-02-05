@@ -63,7 +63,7 @@ public class OverflowGate extends Block{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         OverflowGateEntity entity = tile.ent();
 
-        return tile.getTeam() == source.getTeam() && entity.lastItem == null && entity.items().total() == 0;
+        return tile.team() == source.team() && entity.lastItem == null && entity.items().total() == 0;
     }
 
     @Override
@@ -83,13 +83,13 @@ public class OverflowGate extends Block{
         Tile to = tile.getNearby((from + 2) % 4);
         if(to == null) return null;
         Tile edge = Edges.getFacingEdge(tile, to);
-        boolean canForward = to.block().acceptItem(item, to, edge) && to.getTeam() == tile.getTeam() && !(to.block() instanceof OverflowGate);
+        boolean canForward = to.block().acceptItem(item, to, edge) && to.team() == tile.team() && !(to.block() instanceof OverflowGate);
 
         if(!canForward || invert){
             Tile a = tile.getNearby(Mathf.mod(from - 1, 4));
             Tile b = tile.getNearby(Mathf.mod(from + 1, 4));
-            boolean ac = a != null && a.block().acceptItem(item, a, edge) && !(a.block() instanceof OverflowGate) && a.getTeam() == tile.getTeam();
-            boolean bc = b != null && b.block().acceptItem(item, b, edge) && !(b.block() instanceof OverflowGate) && b.getTeam() == tile.getTeam();
+            boolean ac = a != null && a.block().acceptItem(item, a, edge) && !(a.block() instanceof OverflowGate) && a.team() == tile.team();
+            boolean bc = b != null && b.block().acceptItem(item, b, edge) && !(b.block() instanceof OverflowGate) && b.team() == tile.team();
 
             if(!ac && !bc){
                 return invert && canForward ? to : null;

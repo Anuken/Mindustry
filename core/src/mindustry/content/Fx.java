@@ -4,6 +4,8 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -32,6 +34,38 @@ public class Fx{
         rect(unit.type().region, e.x, e.y,
         unit.type().region.getWidth() * Draw.scl * scl, unit.type().region.getHeight() * Draw.scl * scl, 180f);
 
+    }),
+
+    itemTransfer = new Effect(30f, e -> {
+        if(!(e.data instanceof Position)) return;
+        Position to = e.data();
+        Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interpolation.pow3)
+        .add(Tmp.v2.sub(e.x, e.y).nor().rotate90(1).scl(Mathf.randomSeedRange(e.id, 1f) * e.fslope() * 10f));
+        float x = Tmp.v1.x, y = Tmp.v1.y;
+
+        stroke(e.fslope() * 2f, Pal.accent);
+        Lines.circle(x, y, e.fslope() * 2f);
+
+        color(e.color);
+        Fill.circle(x, y, e.fslope() * 1.5f);
+    }),
+
+    lightning = new Effect(10f, 500f, e -> {
+        if(!(e.data instanceof Array)) return;
+        Array<Vec2> lines = e.data();
+
+        stroke(3f * e.fout());
+        color(e.color, Color.white, e.fin());
+        beginLine();
+
+        linePoint(e.x, e.y);
+        lines.each(Lines::linePoint);
+        endLine();
+
+        int i = 0;
+        for(Vec2 p : lines){
+            Fill.square(p.x, p.y, (5f - (float)i++ / lines.size * 2f) * e.fout(), 45);
+        }
     }),
 
     commandSend = new Effect(28, e -> {

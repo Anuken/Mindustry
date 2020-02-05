@@ -34,7 +34,7 @@ public class MissileBulletType extends BasicBulletType{
         }
 
         if(weaveMag > 0){
-            b.vel().rotate(Mathf.sin(Time.time() + b.id * 4422, weaveScale, weaveMag) * Time.delta());
+            b.vel().rotate(Mathf.sin(Time.time() + b.id() * 442, weaveScale, weaveMag) * Time.delta());
         }
     }
 }

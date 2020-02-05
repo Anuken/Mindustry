@@ -1,9 +1,9 @@
 package mindustry.world.blocks.defense;
 
-import arc.math.Mathf;
-import mindustry.entities.effect.Lightning;
+import arc.math.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
-import mindustry.graphics.Pal;
+import mindustry.graphics.*;
 
 public class SurgeWall extends Wall{
     public float lightningChance = 0.05f;
@@ -15,10 +15,10 @@ public class SurgeWall extends Wall{
     }
 
     @Override
-    public void handleBulletHit(Tilec entity, Bullet bullet){
+    public void handleBulletHit(Tilec entity, Bulletc bullet){
         super.handleBulletHit(entity, bullet);
         if(Mathf.chance(lightningChance)){
-            Lightning.create(entity.team(), Pal.surge, lightningDamage, bullet.x, bullet.y, bullet.rotation() + 180f, lightningLength);
+            Lightning.create(entity.team(), Pal.surge, lightningDamage, bullet.x(), bullet.y(), bullet.rotation() + 180f, lightningLength);
         }
     }
 }

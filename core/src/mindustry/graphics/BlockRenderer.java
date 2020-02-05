@@ -275,7 +275,7 @@ public class BlockRenderer implements Disposable{
                 if(request.tile.entity != null && request.tile.entity.damaged()){
                     block.drawCracks(request.tile);
                 }
-                if(block.synthetic() && request.tile.getTeam() != player.team()){
+                if(block.synthetic() && request.tile.team() != player.team()){
                     block.drawTeam(request.tile);
                 }
 

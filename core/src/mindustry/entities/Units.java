@@ -1,9 +1,7 @@
 package mindustry.entities;
 
 import arc.func.*;
-import arc.math.*;
 import arc.math.geom.*;
-import mindustry.gen.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -41,8 +39,8 @@ public class Units{
     }
 
     /** See {@link #invalidateTarget(Teamc, Team, float, float, float)} */
-    public static boolean invalidateTarget(Teamc target, Unitc targeter){
-        return invalidateTarget(target, targeter.team(), targeter.x, targeter.y, targeter.getWeapon().bullet.range());
+    public static boolean invalidateTarget(Teamc target, Unitc targeter, float range){
+        return invalidateTarget(target, targeter.team(), targeter.x(), targeter.y(), range);
     }
 
     /** Returns whether there are any entities on this tile. */
@@ -56,7 +54,7 @@ public class Units{
 
         nearby(x, y, width, height, unit -> {
             if(boolResult) return;
-            if(!unit.isFlying()){
+            if(unit.isGrounded()){
                 unit.hitbox(hitrect);
 
                 if(hitrect.overlaps(x, y, width, height)){
@@ -118,7 +116,7 @@ public class Units{
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
             if(e.dead() || !predicate.get(e)) return;
 
-            float dst2 = Mathf.dst2(e.x, e.y, x, y);
+            float dst2 = e.dst2(x, y);
             if(dst2 < range*range && (result == null || dst2 < cdist)){
                 result = e;
                 cdist = dst2;
@@ -136,7 +134,7 @@ public class Units{
         nearby(team, x, y, range, e -> {
             if(!predicate.get(e)) return;
 
-            float dist = Mathf.dst2(e.x, e.y, x, y);
+            float dist = e.dst2(x, y);
             if(result == null || dist < cdist){
                 result = e;
                 cdist = dist;
@@ -149,7 +147,7 @@ public class Units{
     /** Iterates over all units in a rectangle. */
     public static void nearby(Team team, float x, float y, float width, float height, Cons<Unitc> cons){
         Groups.unit.intersect(x, y, width, height, u -> {
-            if(u.getTeam() == team){
+            if(u.team() == team){
                 cons.get(u);
             }
         });
@@ -158,7 +156,7 @@ public class Units{
     /** Iterates over all units in a circle around this position. */
     public static void nearby(Team team, float x, float y, float radius, Cons<Unitc> cons){
         Groups.unit.intersect(x - radius, y - radius, radius*2f, radius*2f, unit -> {
-            if(unit.getTeam() == team && unit.withinDst(x, y, radius)){
+            if(unit.team() == team && unit.withinDst(x, y, radius)){
                 cons.get(unit);
             }
         });
@@ -177,7 +175,7 @@ public class Units{
     /** Iterates over all units that are enemies of this team. */
     public static void nearbyEnemies(Team team, float x, float y, float width, float height, Cons<Unitc> cons){
         Groups.unit.intersect(x, y, width, height, u -> {
-            if(team.isEnemy(u.getTeam())){
+            if(team.isEnemy(u.team())){
                 cons.get(u);
             }
         });
@@ -186,15 +184,6 @@ public class Units{
     /** Iterates over all units that are enemies of this team. */
     public static void nearbyEnemies(Team team, Rect rect, Cons<Unitc> cons){
         nearbyEnemies(team, rect.x, rect.y, rect.width, rect.height, cons);
-    }
-
-    /** Iterates over all units. */
-    public static void all(Cons<Unitc> cons){
-        Groups.unit.all().each(cons);
-    }
-
-    public static void each(Team team, Cons<Unitc> cons){
-        Groups.unit.all().each(t -> t.getTeam() == team, cons);
     }
 
 }

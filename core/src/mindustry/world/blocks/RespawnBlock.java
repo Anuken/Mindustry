@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
@@ -11,7 +12,7 @@ import static mindustry.Vars.net;
 
 public class RespawnBlock{
     
-    public static void drawRespawn(Tile tile, float heat, float progress, float time, Playerc player, Mech to){
+    public static void drawRespawn(Tile tile, float heat, float progress, float time, Playerc player, UnitDef to){
         progress = Mathf.clamp(progress);
 
         Draw.color(Pal.darkMetal);

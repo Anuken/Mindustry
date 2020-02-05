@@ -1,19 +1,17 @@
 package mindustry.entities;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.entities.effect.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -31,8 +29,8 @@ public class Damage{
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
         for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
             int branches = 5 + Mathf.clamp((int)(power / 30), 1, 20);
-            Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3,
-            x, y, Mathf.random(360f), branches + Mathf.range(2)));
+            //TODO uncomment
+            //Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2)));
         }
 
         for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
@@ -68,7 +66,8 @@ public class Damage{
             float cy = y + Mathf.range(range);
             Tile tile = world.tileWorld(cx, cy);
             if(tile != null){
-                Fire.create(tile);
+                //TODO uncomment
+                //Fire.create(tile);
             }
         }
     }
@@ -234,7 +233,7 @@ public class Damage{
             if(scaledDamage <= 0 || tile == null) continue;
 
             //apply damage to entity if needed
-            if(tile.entity != null && tile.getTeam() != team){
+            if(tile.entity != null && tile.team() != team){
                 int health = (int)tile.entity.health();
                 if(tile.entity.health() > 0){
                     tile.entity.damage(scaledDamage);
@@ -257,7 +256,7 @@ public class Damage{
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
-                if(tile != null && tile.entity != null && (team == null ||team.isEnemy(tile.getTeam())) && Mathf.dst(dx, dy) <= trad){
+                if(tile != null && tile.entity != null && (team == null ||team.isEnemy(tile.team())) && Mathf.dst(dx, dy) <= trad){
                     tile.entity.damage(damage);
                 }
             }

@@ -1,7 +1,6 @@
 package mindustry.io.versions;
 
 import arc.func.Prov;
-import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.entities.type.base.*;
 

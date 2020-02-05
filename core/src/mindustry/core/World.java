@@ -12,6 +12,7 @@ import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
+import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.maps.filters.*;
@@ -163,7 +164,7 @@ public class World{
             addDarkness(tiles);
         }
 
-        entities.all().each(group -> group.resize(-finalWorldBounds, -finalWorldBounds, tiles.width() * tilesize + finalWorldBounds * 2, tiles.height() * tilesize + finalWorldBounds * 2));
+        Groups.resize(-finalWorldBounds, -finalWorldBounds, tiles.width() * tilesize + finalWorldBounds * 2, tiles.height() * tilesize + finalWorldBounds * 2);
 
         generating = false;
         Events.fire(new WorldLoadEvent());
@@ -377,7 +378,7 @@ public class World{
             Tile tile = tiles.getn(x, y);
 
             Block result = tile.block();
-            Team team = tile.getTeam();
+            Team team = tile.team();
 
             int offsetx = -(result.size - 1) / 2;
             int offsety = -(result.size - 1) / 2;

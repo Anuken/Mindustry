@@ -10,6 +10,7 @@ import mindustry.annotations.util.*;
 import javax.annotation.processing.*;
 import javax.lang.model.*;
 import javax.lang.model.element.*;
+import javax.lang.model.type.*;
 import javax.lang.model.util.*;
 import javax.tools.Diagnostic.*;
 import javax.tools.*;
@@ -40,6 +41,22 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public static boolean isPrimitive(String type){
         return type.equals("boolean") || type.equals("byte") || type.equals("short") || type.equals("int")
         || type.equals("long") || type.equals("float") || type.equals("double") || type.equals("char");
+    }
+
+    public static String simpleName(String str){
+        return str.contains(".") ? str.substring(str.lastIndexOf('.') + 1) : str;
+    }
+
+    public static TypeVariableName getTVN(TypeParameterElement element) {
+        String name = element.getSimpleName().toString();
+        List<? extends TypeMirror> boundsMirrors = element.getBounds();
+
+        List<TypeName> boundsTypeNames = new ArrayList<>();
+        for (TypeMirror typeMirror : boundsMirrors) {
+            boundsTypeNames.add(TypeName.get(typeMirror));
+        }
+
+        return TypeVariableName.get(name, boundsTypeNames.toArray(new TypeName[0]));
     }
 
     public static void write(TypeSpec.Builder builder) throws Exception{
@@ -87,12 +104,12 @@ public abstract class BaseProcessor extends AbstractProcessor{
         .map(e -> new Smethod((ExecutableElement)e));
     }
 
-    public void err(String message){
+    public static void err(String message){
         messager.printMessage(Kind.ERROR, message);
         Log.err("[CODEGEN ERROR] " +message);
     }
 
-    public void err(String message, Element elem){
+    public static void err(String message, Element elem){
         messager.printMessage(Kind.ERROR, message, elem);
         Log.err("[CODEGEN ERROR] " + message + ": " + elem);
     }

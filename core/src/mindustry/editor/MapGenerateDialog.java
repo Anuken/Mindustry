@@ -124,7 +124,7 @@ public class MapGenerateDialog extends FloatingDialog{
                     Tile tile = editor.tile(x, y);
                     input.apply(x, y, tile.floor(), tile.block(), tile.overlay());
                     filter.apply(input);
-                    writeTiles[x][y].set(input.floor, input.block, input.ore, tile.getTeam(), tile.rotation());
+                    writeTiles[x][y].set(input.floor, input.block, input.ore, tile.team(), tile.rotation());
                 }
             }
 
@@ -424,7 +424,7 @@ public class MapGenerateDialog extends FloatingDialog{
         }
 
         public GenTile set(Tile other){
-            set(other.floor(), other.block(), other.overlay(), other.getTeam(), other.rotation());
+            set(other.floor(), other.block(), other.overlay(), other.team(), other.rotation());
             return this;
         }
 

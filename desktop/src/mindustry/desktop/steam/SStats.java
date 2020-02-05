@@ -53,13 +53,13 @@ public class SStats implements SteamUserStatsCallback{
 
     private void checkUpdate(){
         if(campaign()){
-            SStat.maxUnitActive.max(unitGroup.count(t -> t.getTeam() == player.team()));
+            SStat.maxUnitActive.max(unitGroup.count(t -> t.team() == player.team()));
 
-            if(unitGroup.count(u -> u.getType() == UnitTypes.phantom && u.getTeam() == player.team()) >= 10){
+            if(unitGroup.count(u -> u.getType() == UnitTypes.phantom && u.team() == player.team()) >= 10){
                 active10Phantoms.complete();
             }
 
-            if(unitGroup.count(u -> u.getType() == UnitTypes.crawler && u.getTeam() == player.team()) >= 50){
+            if(unitGroup.count(u -> u.getType() == UnitTypes.crawler && u.team() == player.team()) >= 50){
                 active50Crawlers.complete();
             }
 
@@ -132,7 +132,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(BlockDestroyEvent.class, e -> {
-            if(campaign() && e.tile.getTeam() != player.team()){
+            if(campaign() && e.tile.team() != player.team()){
                 SStat.blocksDestroyed.add();
             }
         });

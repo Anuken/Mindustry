@@ -19,7 +19,6 @@ import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -317,7 +316,7 @@ public class Block extends BlockStorage{
     }
 
     public void drawTeam(Tile tile){
-        Draw.color(tile.getTeam().color);
+        Draw.color(tile.team().color);
         Draw.rect("block-border", tile.drawx() - size * tilesize / 2f + 4, tile.drawy() - size * tilesize / 2f + 4);
         Draw.color();
     }
@@ -372,7 +371,7 @@ public class Block extends BlockStorage{
     /** Call when some content is produced. This unlocks the content if it is applicable. */
     public void useContent(Tile tile, UnlockableContent content){
         //only unlocks content in zones
-        if(!headless && tile.getTeam() == player.team() && world.isZone()){
+        if(!headless && tile.team() == player.team() && world.isZone()){
             logic.handleContent(content);
         }
     }

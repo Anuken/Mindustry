@@ -5,16 +5,19 @@ import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.gen.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 /** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")
-public class EntityGroup<T extends Entityc>{
+public class EntityGroup<T extends Entityc> implements Iterable<T>{
     private final Array<T> array = new Array<>(false, 32);
     private final Array<T> intersectArray = new Array<>();
     private final Rect intersectRect = new Rect();
     private IntMap<T> map;
     private QuadTree tree;
+    private boolean clearing;
 
     private int index;
 
@@ -41,6 +44,13 @@ public class EntityGroup<T extends Entityc>{
         T[] items = array.items;
         for(index = 0; index < array.size; index++){
             cons.get(items[index]);
+        }
+    }
+
+    public void each(Boolf<T> filter, Cons<T> cons){
+        T[] items = array.items;
+        for(index = 0; index < array.size; index++){
+            if(filter.get(items[index])) cons.get(items[index]);
         }
     }
 
@@ -101,6 +111,10 @@ public class EntityGroup<T extends Entityc>{
         return array.size;
     }
 
+    public boolean contains(Boolf<T> pred){
+        return array.contains(pred);
+    }
+
     public int count(Boolf<T> pred){
         return array.count(pred);
     }
@@ -110,11 +124,12 @@ public class EntityGroup<T extends Entityc>{
         array.add(type);
 
         if(mappingEnabled()){
-            map.put(type.getId(), type);
+            map.put(type.id(), type);
         }
     }
 
     public void remove(T type){
+        if(clearing) return;
         if(type == null) throw new RuntimeException("Cannot remove a null entity!");
         int idx = array.indexOf(type, true);
         if(idx != -1){
@@ -128,12 +143,22 @@ public class EntityGroup<T extends Entityc>{
     }
 
     public void clear(){
+        clearing = true;
+
+        array.each(Entityc::remove);
         array.clear();
         if(map != null)
             map.clear();
+
+        clearing = false;
     }
 
     public T find(Boolf<T> pred){
         return array.find(pred);
+    }
+
+    @Override
+    public Iterator<T> iterator(){
+        return array.iterator();
     }
 }

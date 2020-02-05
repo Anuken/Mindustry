@@ -6,7 +6,7 @@ public class Annotations{
     //region entity interfaces
 
     /** Indicates that a component field is read-only. */
-    @Target(ElementType.FIELD)
+    @Target({ElementType.FIELD, ElementType.METHOD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ReadOnly{
     }

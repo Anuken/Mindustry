@@ -11,10 +11,6 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
-import mindustry.ctype.*;
-import mindustry.entities.*;
-import mindustry.gen.*;
-import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -22,7 +18,6 @@ import mindustry.net.Administration.*;
 import mindustry.net.Net.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
-import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.modules.*;
 
@@ -127,7 +122,8 @@ public class NetClient implements ApplicationListener{
 
         net.handleClient(InvokePacket.class, packet -> {
             packet.writeBuffer.position(0);
-            RemoteReadClient.readPacket(packet.writeBuffer, packet.type);
+            //TODO fix remote read client
+           // RemoteReadClient.readPacket(packet.writeBuffer, packet.type);
         });
     }
 
@@ -180,7 +176,8 @@ public class NetClient implements ApplicationListener{
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
-            Call.sendMessage(message, colorizeName(player.id(), player.name()), player);
+            //TODO uncomment when it works
+            //Call.sendMessage(message, colorizeName(player.id(), player.name()), player);
         }else{
             //log command to console but with brackets
             Log.info("<&y{0}: &lm{1}&lg>", player.name(), message);
@@ -298,7 +295,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.both)
     public static void onWorldDataBegin(){
-        entities.clear();
+        Groups.all.clear();
         netClient.removed.clear();
         logic.reset();
 
@@ -457,7 +454,8 @@ public class NetClient implements ApplicationListener{
         connecting = false;
         ui.join.hide();
         net.setClientLoaded(true);
-        Core.app.post(Call::connectConfirm);
+        //TODO connect confirm
+        //Core.app.post(Call::connectConfirm);
         Time.runTask(40f, platform::updateRPC);
         Core.app.post(() -> ui.loadfrag.hide());
     }
@@ -471,7 +469,7 @@ public class NetClient implements ApplicationListener{
         quiet = false;
         lastSent = 0;
 
-        entities.clear();
+        Groups.all.clear();
         ui.chatfrag.clearMessages();
     }
 
@@ -505,7 +503,8 @@ public class NetClient implements ApplicationListener{
     }
 
     void sync(){
-
+        //TODO implement
+        /*
         if(timer.get(0, playerSyncTime)){
             BuildRequest[] requests;
             //limit to 10 to prevent buffer overflows
@@ -528,7 +527,7 @@ public class NetClient implements ApplicationListener{
 
         if(timer.get(1, 60)){
             Call.onPing(Time.millis());
-        }
+        }*/
     }
 
     String getUsid(String ip){

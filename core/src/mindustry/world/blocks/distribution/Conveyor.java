@@ -95,7 +95,7 @@ public class Conveyor extends Block implements Autotiler{
 
         if(tile.front() != null && tile.front().entity != null){
             entity.next = tile.front().entity;
-            entity.nextc = entity.next instanceof ConveyorEntity && entity.next.team() == tile.getTeam() ? (ConveyorEntity)entity.next : null;
+            entity.nextc = entity.next instanceof ConveyorEntity && entity.next.team() == tile.team() ? (ConveyorEntity)entity.next : null;
             entity.aligned = entity.nextc != null && tile.rotation() == entity.next.tile.rotation();
         }
     }

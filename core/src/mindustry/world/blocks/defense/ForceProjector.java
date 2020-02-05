@@ -36,7 +36,7 @@ public class ForceProjector extends Block{
     private static ForceProjector paramBlock;
     private static ForceEntity paramEntity;
     private static Cons<Shielderc> shieldConsumer = trait -> {
-        if(trait.team() != paramTile.getTeam() && Intersector.isInsideHexagon(trait.x(), trait.y(), paramBlock.realRadius(paramEntity) * 2f, paramTile.drawx(), paramTile.drawy())){
+        if(trait.team() != paramTile.team() && Intersector.isInsideHexagon(trait.x(), trait.y(), paramBlock.realRadius(paramEntity) * 2f, paramTile.drawx(), paramTile.drawy())){
             trait.absorb();
             Fx.absorb.at(trait);
             paramEntity.hit = 1f;

@@ -3,20 +3,19 @@ package mindustry.core;
 import arc.*;
 import arc.assets.*;
 import arc.audio.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.geom.*;
 import arc.scene.ui.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
-import mindustry.gen.*;
-import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.maps.Map;
 import mindustry.type.*;
@@ -63,21 +62,19 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(PlayEvent.class, event -> {
-            player.team(netServer.assignTeam(player, Groups.player.all()));
-            player.dead(true);
+            player.team(netServer.assignTeam(player));
             player.add();
 
             state.set(State.playing);
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            Core.app.post(() -> Core.app.post(() -> {
-                if(net.active() && player.closestCore() != null){
-                    //set to closest core since that's where the player will probably respawn; prevents camera jumps
-                    Core.camera.position.set(player.dead() ? player.closestCore() : player);
-                }else{
-                    //locally, set to player position since respawning occurs immediately
-                    Core.camera.position.set(player);
+            //TODO test this
+            app.post(() -> app.post(() -> {
+                //TODO 0,0 seems like a bad choice?
+                Tilec core = state.teams.closestCore(0, 0, player.team());
+                if(core != null){
+                    camera.position.set(core);
                 }
             }));
         });
@@ -118,7 +115,7 @@ public class Control implements ApplicationListener, Loadable{
             if(state.rules.pvp && !net.active()){
                 try{
                     net.host(port);
-                    player.isAdmin = true;
+                    player.admin(true);
                 }catch(IOException e){
                     ui.showException("$server.error", e);
                     Core.app.post(() -> state.set(State.menu));
@@ -139,7 +136,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(BlockDestroyEvent.class, e -> {
-            if(e.tile.getTeam() == player.team()){
+            if(e.tile.team() == player.team()){
                 state.stats.buildingsDestroyed++;
             }
         });
@@ -178,7 +175,7 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(UnitDestroyEvent.class, e -> {
             if(world.isZone()){
-                data.unlockContent(e.unit.getType());
+                data.unlockContent(e.unit.type());
             }
         });
     }
@@ -204,11 +201,9 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     void createPlayer(){
-        player = new Playerc();
-        player.name = Core.settings.getString("name");
-        player.color.set(Core.settings.getInt("color-0"));
-        player.isLocal() = true;
-        player.isMobile = mobile;
+        //player = new Playerc();
+        player.name(Core.settings.getString("name"));
+        player.color().set(Core.settings.getInt("color-0"));
 
         if(mobile){
             input = new MobileInput();
@@ -304,14 +299,14 @@ public class Control implements ApplicationListener, Loadable{
                 }
             }
 
-            Geometry.circle(coreb.x(), coreb.y(), 10, (cx, cy) -> {
+            Geometry.circle(coreb.x, coreb.y, 10, (cx, cy) -> {
                 Tile tile = world.ltile(cx, cy);
-                if(tile != null && tile.getTeam() == state.rules.defaultTeam && !(tile.block() instanceof CoreBlock)){
+                if(tile != null && tile.team() == state.rules.defaultTeam && !(tile.block() instanceof CoreBlock)){
                     tile.remove();
                 }
             });
 
-            Geometry.circle(coreb.x(), coreb.y(), 5, (cx, cy) -> world.tile(cx, cy).clearOverlay());
+            Geometry.circle(coreb.x, coreb.y, 5, (cx, cy) -> world.tile(cx, cy).clearOverlay());
 
             world.endMapLoad();
 

@@ -29,12 +29,10 @@ public class ContentLoader{
     private @Nullable Content lastAdded;
     private ObjectSet<Cons<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
-        new Fx(),
         new Items(),
         new StatusEffects(),
         new Liquids(),
         new Bullets(),
-        new Mechs(),
         new UnitTypes(),
         new Blocks(),
         new Loadouts(),

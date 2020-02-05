@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.struct.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;

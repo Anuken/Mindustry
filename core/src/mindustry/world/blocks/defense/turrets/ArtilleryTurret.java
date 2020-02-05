@@ -36,7 +36,7 @@ public class ArtilleryTurret extends ItemTurret{
         float maxTraveled = type.lifetime * type.speed;
 
         for(int i = 0; i < shots; i++){
-            Bullet.create(ammo, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y,
+            Bullet.create(ammo, tile.entity, tile.team(), tile.drawx() + tr.x, tile.drawy() + tr.y,
             entity.rotation + Mathf.range(inaccuracy + type.inaccuracy), 1f + Mathf.range(velocityInaccuracy), (dst / maxTraveled));
         }
 

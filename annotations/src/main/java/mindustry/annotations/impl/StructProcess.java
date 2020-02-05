@@ -29,7 +29,7 @@ public class StructProcess extends BaseProcessor{
         for(TypeElement elem : elements){
 
             if(!elem.getSimpleName().toString().endsWith("Struct")){
-                BaseProcessor.messager.printMessage(Kind.ERROR, "All classes annotated with @Struct must have their class names end in 'Struct'.", elem);
+                BaseProcessor.err("All classes annotated with @Struct must have their class names end in 'Struct'.", elem);
                 continue;
             }
 
@@ -45,7 +45,7 @@ public class StructProcess extends BaseProcessor{
                 int structTotalSize = (structSize <= 8 ? 8 : structSize <= 16 ? 16 : structSize <= 32 ? 32 : 64);
 
                 if(variables.size() == 0){
-                    BaseProcessor.messager.printMessage(Kind.ERROR, "making a struct with no fields is utterly pointles.", elem);
+                    BaseProcessor.err("making a struct with no fields is utterly pointles.", elem);
                     continue;
                 }
 
@@ -133,7 +133,7 @@ public class StructProcess extends BaseProcessor{
                 JavaFile.builder(packageName, classBuilder.build()).build().writeTo(BaseProcessor.filer);
             }catch(IllegalArgumentException e){
                 e.printStackTrace();
-                BaseProcessor.messager.printMessage(Kind.ERROR, e.getMessage(), elem);
+                BaseProcessor.err(e.getMessage(), elem);
             }
         }
 

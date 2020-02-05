@@ -1,15 +1,12 @@
 package mindustry.annotations.remote;
 
+import mindustry.annotations.Annotations.*;
 import mindustry.annotations.*;
-import mindustry.annotations.Annotations.ReadClass;
-import mindustry.annotations.Annotations.WriteClass;
 
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.type.MirroredTypeException;
-import javax.tools.Diagnostic.Kind;
-import java.util.HashMap;
-import java.util.Set;
+import javax.annotation.processing.*;
+import javax.lang.model.element.*;
+import javax.lang.model.type.*;
+import java.util.*;
 
 /**
  * This class finds reader and writer methods annotated by the {@link WriteClass}
@@ -35,15 +32,15 @@ public class IOFinder{
 
             //make sure there's only one read method
             if(readers.stream().filter(elem -> getValue(elem.getAnnotation(ReadClass.class)).equals(typeName)).count() > 1){
-                BaseProcessor.messager.printMessage(Kind.ERROR, "Multiple writer methods for type '" + typeName + "'", writer);
+                BaseProcessor.err("Multiple writer methods for type '" + typeName + "'", writer);
             }
 
             //make sure there's only one write method
             long count = readers.stream().filter(elem -> getValue(elem.getAnnotation(ReadClass.class)).equals(typeName)).count();
             if(count == 0){
-                BaseProcessor.messager.printMessage(Kind.ERROR, "Writer method does not have an accompanying reader: ", writer);
+                BaseProcessor.err("Writer method does not have an accompanying reader: ", writer);
             }else if(count > 1){
-                BaseProcessor.messager.printMessage(Kind.ERROR, "Writer method has multiple reader for type: ", writer);
+                BaseProcessor.err("Writer method has multiple reader for type: ", writer);
             }
 
             Element reader = readers.stream().filter(elem -> getValue(elem.getAnnotation(ReadClass.class)).equals(typeName)).findFirst().get();

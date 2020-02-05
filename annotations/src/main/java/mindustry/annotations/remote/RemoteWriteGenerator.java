@@ -1,16 +1,15 @@
 package mindustry.annotations.remote;
 
+import arc.struct.*;
 import com.squareup.javapoet.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.annotations.*;
-import mindustry.annotations.Annotations.Loc;
-import mindustry.annotations.remote.IOFinder.ClassSerializer;
+import mindustry.annotations.remote.IOFinder.*;
 
 import javax.lang.model.element.*;
-import javax.tools.Diagnostic.Kind;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.List;
+import java.io.*;
+import java.nio.*;
+import java.util.*;
 
 /** Generates code for writing remote invoke packets on the client and server. */
 public class RemoteWriteGenerator{
@@ -74,12 +73,12 @@ public class RemoteWriteGenerator{
         //validate client methods to make sure
         if(methodEntry.where.isClient){
             if(elem.getParameters().isEmpty()){
-                BaseProcessor.messager.printMessage(Kind.ERROR, "Client invoke methods must have a first parameter of type Player.", elem);
+                BaseProcessor.err("Client invoke methods must have a first parameter of type Player", elem);
                 return;
             }
 
-            if(!elem.getParameters().get(0).asType().toString().equals("mindustry.entities.type.Player")){
-                BaseProcessor.messager.printMessage(Kind.ERROR, "Client invoke methods should have a first parameter of type Player.", elem);
+            if(!elem.getParameters().get(0).asType().toString().equals("Playerc")){
+                BaseProcessor.err("Client invoke methods should have a first parameter of type Playerc", elem);
                 return;
             }
         }
@@ -138,6 +137,8 @@ public class RemoteWriteGenerator{
         //rewind buffer
         method.addStatement("TEMP_BUFFER.position(0)");
 
+        method.addTypeVariables(Array.with(elem.getTypeParameters()).map(BaseProcessor::getTVN));
+
         for(int i = 0; i < elem.getParameters().size(); i++){
             //first argument is skipped as it is always the player caller
             if((!methodEntry.where.isServer/* || methodEntry.mode == Loc.both*/) && i == 0){
@@ -176,10 +177,10 @@ public class RemoteWriteGenerator{
                 }
             }else{
                 //else, try and find a serializer
-                ClassSerializer ser = serializers.get(typeName);
+                ClassSerializer ser = serializers.getOrDefault(typeName, SerializerResolver.locate(elem, var.asType()));
 
                 if(ser == null){ //make sure a serializer exists!
-                    BaseProcessor.messager.printMessage(Kind.ERROR, "No @WriteClass method to write class type: '" + typeName + "'", var);
+                    BaseProcessor.err("No @WriteClass method to write class type: '" + typeName + "'", var);
                     return;
                 }
 

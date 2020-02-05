@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
-import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -66,7 +65,7 @@ public class LiquidBulletType extends BulletType{
 
     @Override
     public void hit(Bulletc b, float hitx, float hity){
-        hitEffect.at(liquid.color, hitx, hity);
+        hitEffect.at(hitx, hity, liquid.color);
         Puddle.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
 
         if(liquid.temperature <= 0.5f && liquid.flammability < 0.3f){

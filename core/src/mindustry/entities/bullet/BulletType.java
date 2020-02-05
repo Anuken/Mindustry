@@ -2,11 +2,11 @@ package mindustry.entities.bullet;
 
 import arc.audio.*;
 import arc.math.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.entities.effect.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -109,7 +109,7 @@ public abstract class BulletType extends Content{
     }
 
     public void hit(Bulletc b, float x, float y){
-        hitEffect.at(x, y, b.getRotation());
+        hitEffect.at(x, y, b.rotation());
         hitSound.at(b);
 
         Effects.shake(hitShake, hitShake, b);
@@ -132,7 +132,7 @@ public abstract class BulletType extends Content{
     }
 
     public void despawned(Bulletc b){
-        despawnEffect.at(b.getX(), b.getY(), b.getRotation());
+        despawnEffect.at(b.getX(), b.getY(), b.rotation());
         hitSound.at(b);
 
         if(fragBullet != null || splashDamageRadius > 0){
@@ -140,7 +140,7 @@ public abstract class BulletType extends Content{
         }
 
         for(int i = 0; i < lightining; i++){
-            Lightning.createLighting(Lightning.nextSeed(), b.team(), Pal.surge, damage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
+            Lightning.create(b.team(), Pal.surge, damage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
         }
     }
 
@@ -148,20 +148,20 @@ public abstract class BulletType extends Content{
     }
 
     public void init(Bulletc b){
-        if(killShooter && b.getOwner() instanceof Healthc){
-            ((Healthc)b.getOwner()).kill();
+        if(killShooter && b.owner() instanceof Healthc){
+            ((Healthc)b.owner()).kill();
         }
 
         if(instantDisappear){
-            b.setTime(lifetime);
+            b.time(lifetime);
         }
     }
 
     public void update(Bulletc b){
         if(homingPower > 0.0001f){
-            Teamc target = Units.closestTarget(b.team(), b.getX(), b.getY(), homingRange, e -> !e.isFlying() || collidesAir);
+            Teamc target = Units.closestTarget(b.team(), b.getX(), b.getY(), homingRange, e -> e.isGrounded() || collidesAir);
             if(target != null){
-                b.vel().setAngle(Mathf.slerpDelta(b.getRotation(), b.angleTo(target), 0.08f));
+                b.vel().setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), 0.08f));
             }
         }
     }
@@ -182,23 +182,24 @@ public abstract class BulletType extends Content{
     }
 
     public Bulletc create(Entityc owner, Team team, float x, float y, float angle, float velocityScl){
-        return create(owner, team, x, y, angle, velocityScl, 1f, null);
+        return create(owner, team, x, y, angle, -1, velocityScl, 1f, null);
     }
 
     public Bulletc create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
-        return create(owner, team, x, y, angle, velocityScl, lifetimeScl, null);
+        return create(owner, team, x, y, angle, -1, velocityScl, lifetimeScl, null);
     }
 
     public Bulletc create(Bulletc parent, float x, float y, float angle){
-        return create(parent.getOwner(), parent.team(), x, y, angle);
+        return create(parent.owner(), parent.team(), x, y, angle);
     }
 
     public Bulletc create(Bulletc parent, float x, float y, float angle, float velocityScl){
-        return create(parent.getOwner(), parent.team(), x, y, angle, velocityScl);
+        return create(parent.owner(), parent.team(), x, y, angle, velocityScl);
     }
 
-    public Bulletc create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl, Object data){
+    public Bulletc create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
 
+        //TODO assign type damage is damage <0, else assign provided damage
 
         //TODO implement
         return null;
@@ -223,12 +224,12 @@ public abstract class BulletType extends Content{
         return bullet;*/
     }
 
-    public void createNet(Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
-        Call.createBullet(this, team, x, y, angle, velocityScl, lifetimeScl);
+    public void createNet(Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
+        Call.createBullet(this, team, x, y, damage, angle, velocityScl, lifetimeScl);
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void createBullet(BulletType type, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
-        type.create(null, team, x, y, angle, velocityScl, lifetimeScl, null);
+    public static void createBullet(BulletType type, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
+        type.create(null, team, x, y, angle, damage, velocityScl, lifetimeScl, null);
     }
 }

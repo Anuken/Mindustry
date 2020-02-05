@@ -346,15 +346,6 @@ public class ServerControl implements ApplicationListener{
             info("&lyServer: &lb{0}", arg[0]);
         });
 
-        handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
-            try{
-                state.rules.waveSpacing = Difficulty.valueOf(arg[0]).waveTime * 60 * 60 * 2;
-                info("Difficulty set to '{0}'.", arg[0]);
-            }catch(IllegalArgumentException e){
-                err("No difficulty with name '{0}' found.", arg[0]);
-            }
-        });
-
         handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
             String rules = Core.settings.getString("globalrules");
             JsonValue base = JsonIO.json().fromJson(null, rules);

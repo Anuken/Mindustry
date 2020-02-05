@@ -38,17 +38,17 @@ public class MassDriverBolt extends BulletType{
     @Override
     public void update(Bulletc b){
         //data MUST be an instance of DriverBulletData
-        if(!(b.getData() instanceof DriverBulletData)){
+        if(!(b.data() instanceof DriverBulletData)){
             hit(b);
             return;
         }
 
         float hitDst = 7f;
 
-        DriverBulletData data = (DriverBulletData)b.getData();
+        DriverBulletData data = (DriverBulletData)b.data();
 
         //if the target is dead, just keep flying until the bullet explodes
-        if(data.to.isDead()){
+        if(data.to.dead()){
             return;
         }
 
@@ -67,7 +67,7 @@ public class MassDriverBolt extends BulletType{
             if(Angles.near(angleTo, baseAngle, 2f)){
                 intersect = true;
                 //snap bullet position back; this is used for low-FPS situations
-                b.set(data.to.x + Angles.trnsx(baseAngle, hitDst), data.to.y + Angles.trnsy(baseAngle, hitDst));
+                b.set(data.to.x() + Angles.trnsx(baseAngle, hitDst), data.to.y() + Angles.trnsy(baseAngle, hitDst));
             }
         }
 
@@ -85,9 +85,9 @@ public class MassDriverBolt extends BulletType{
     public void despawned(Bulletc b){
         super.despawned(b);
 
-        if(!(b.getData() instanceof DriverBulletData)) return;
+        if(!(b.data() instanceof DriverBulletData)) return;
 
-        DriverBulletData data = (DriverBulletData)b.getData();
+        DriverBulletData data = (DriverBulletData)b.data();
 
         for(int i = 0; i < data.items.length; i++){
             int amountDropped = Mathf.random(0, data.items[i]);

@@ -6,6 +6,7 @@ import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
@@ -19,6 +20,16 @@ import static mindustry.Vars.*;
 /** Class for specifying read/write methods for code generation. */
 @SuppressWarnings("unused")
 public class TypeIO{
+
+    @WriteClass(Entityc.class)
+    public static void writeEntity(ByteBuffer buffer, Entityc entity){
+        buffer.putInt(entity == null ? -1 : entity.id());
+    }
+
+    @ReadClass(Entityc.class)
+    public static <T extends Entityc> T readEntity(ByteBuffer buffer){
+        return (T)Groups.all.getByID(buffer.getInt());
+    }
 
     @WriteClass(Tile.class)
     public static void writeTile(ByteBuffer buffer, Tile tile){

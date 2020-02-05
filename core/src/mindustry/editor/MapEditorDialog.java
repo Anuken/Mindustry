@@ -283,7 +283,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
             }
             player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
-            player.dead(false);
+            //TODO figure out how to kill player
+            //player.dead(false);
             logic.play();
         });
     }
@@ -295,7 +296,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
         editor.getTags().put("rules", JsonIO.write(state.rules));
         editor.getTags().remove("width");
         editor.getTags().remove("height");
-        player.dead = true;
+        //TODO unkill player
+        //player.dead = true;
 
         Map returned = null;
 

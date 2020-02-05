@@ -65,7 +65,7 @@ public class Unloader extends Block{
 
         if(tile.entity.timer(timerUnload, speed / entity.timeScale) && tile.entity.items().total() == 0){
             for(Tile other : tile.entity.proximity()){
-                if(other.interactable(tile.getTeam()) && other.block().unloadable && other.block().hasItems && entity.items().total() == 0 &&
+                if(other.interactable(tile.team()) && other.block().unloadable && other.block().hasItems && entity.items().total() == 0 &&
                 ((entity.sortItem == null && other.entity.items().total() > 0) || hasItem(other, entity.sortItem))){
                     offloadNear(tile, removeItem(other, entity.sortItem));
                 }

@@ -7,7 +7,6 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
@@ -48,7 +47,7 @@ public abstract class BlockStorage extends UnlockableContent{
 
     /** Returns the amount of items this block can accept. */
     public int acceptStack(Item item, int amount, Tile tile, Teamc source){
-        if(acceptItem(item, tile, tile) && hasItems && (source == null || source.team() == tile.getTeam())){
+        if(acceptItem(item, tile, tile) && hasItems && (source == null || source.team() == tile.team())){
             return Math.min(getMaximumAccepted(tile, item) - tile.entity.items().get(item), amount);
         }else{
             return 0;
@@ -114,7 +113,7 @@ public abstract class BlockStorage extends UnlockableContent{
 
             other = other.block().getLiquidDestination(other, in, liquid);
 
-            if(other != null && other.getTeam() == tile.getTeam() && other.block().hasLiquids && canDumpLiquid(tile, other, liquid) && other.entity.liquids() != null){
+            if(other != null && other.team() == tile.team() && other.block().hasLiquids && canDumpLiquid(tile, other, liquid) && other.entity.liquids() != null){
                 float ofract = other.entity.liquids().get(liquid) / other.block().liquidCapacity;
                 float fract = tile.entity.liquids().get(liquid) / liquidCapacity;
 
@@ -147,7 +146,7 @@ public abstract class BlockStorage extends UnlockableContent{
         next = next.link();
         next = next.block().getLiquidDestination(next, tile, liquid);
 
-        if(next.getTeam() == tile.getTeam() && next.block().hasLiquids && tile.entity.liquids().get(liquid) > 0f){
+        if(next.team() == tile.team() && next.block().hasLiquids && tile.entity.liquids().get(liquid) > 0f){
 
             if(next.block().acceptLiquid(next, tile, liquid, 0f)){
                 float ofract = next.entity.liquids().get(liquid) / next.block().liquidCapacity;
@@ -199,7 +198,7 @@ public abstract class BlockStorage extends UnlockableContent{
             incrementDump(tile, proximity.size);
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
-            if(other.getTeam() == tile.getTeam() && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
+            if(other.team() == tile.team() && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                 other.block().handleItem(item, other, in);
                 return;
             }
@@ -236,7 +235,7 @@ public abstract class BlockStorage extends UnlockableContent{
                 for(int ii = 0; ii < Vars.content.items().size; ii++){
                     Item item = Vars.content.item(ii);
 
-                    if(other.getTeam() == tile.getTeam() && entity.items().has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
+                    if(other.team() == tile.team() && entity.items().has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                         other.block().handleItem(item, other, in);
                         tile.entity.items().remove(item, 1);
                         incrementDump(tile, proximity.size);
@@ -245,7 +244,7 @@ public abstract class BlockStorage extends UnlockableContent{
                 }
             }else{
 
-                if(other.getTeam() == tile.getTeam() && other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)){
+                if(other.team() == tile.team() && other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)){
                     other.block().handleItem(todump, other, in);
                     tile.entity.items().remove(todump, 1);
                     incrementDump(tile, proximity.size);
@@ -271,7 +270,7 @@ public abstract class BlockStorage extends UnlockableContent{
     /** Try offloading an item to a nearby container in its facing direction. Returns true if success. */
     public boolean offloadDir(Tile tile, Item item){
         Tile other = tile.front();
-        if(other != null && other.getTeam() == tile.getTeam() && other.block().acceptItem(item, other, tile)){
+        if(other != null && other.team() == tile.team() && other.block().acceptItem(item, other, tile)){
             other.block().handleItem(item, other, tile);
             return true;
         }

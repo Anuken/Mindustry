@@ -17,7 +17,6 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -66,6 +65,34 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected Array<BuildRequest> selectRequests = new Array<>();
 
     //methods to override
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static <T extends Posc & Itemsc> void transferItemEffect(Item item, float x, float y, T to){
+        if(to == null) return;
+        createItemTransfer(item, x, y, to, null);
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static <T extends Posc & Itemsc> void transferItemToUnit(Item item, float x, float y, T to){
+        if(to == null) return;
+        createItemTransfer(item, x, y, to, () -> to.addItem(item));
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void transferItemTo(Item item, int amount, float x, float y, Tile tile){
+        if(tile == null || tile.entity == null || tile.entity.items() == null) return;
+        for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
+            Time.run(i * 3, () -> createItemTransfer(item, x, y, tile, () -> {}));
+        }
+        tile.entity.items().add(item, amount);
+    }
+
+    public static void createItemTransfer(Item item, float x, float y, Position to, Runnable done){
+        Fx.itemTransfer.at(x, y, 0, item.color, to);
+        if(done != null){
+            Time.run(Fx.itemTransfer.lifetime, done);
+        }
+    }
 
     @Remote(variants = Variant.one)
     public static void removeQueueBlock(int x, int y, boolean breaking){
@@ -1052,7 +1079,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(target == null){
                 isShooting = false;
                 if(Core.settings.getBool("autotarget")){
-                    target = Units.closestTarget(team, x, y, mech.range, u -> u.team() != Team.derelict, u -> u.getTeam() != Team.derelict);
+                    target = Units.closestTarget(team, x, y, mech.range, u -> u.team() != Team.derelict, u -> u.team() != Team.derelict);
 
                     if(mech.canHeal && target == null){
                         target = Geometry.findClosest(x, y, indexer.getDamaged(Team.sharded));

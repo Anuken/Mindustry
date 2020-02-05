@@ -337,7 +337,7 @@ public class PlacementFragment extends Fragment{
                                 t.add(new Image(lastDisplay.getDisplayIcon(hoverTile))).size(8 * 4);
                                 t.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(190f).padLeft(5);
                             }).growX().left();
-                            if(hoverTile.getTeam() == player.team()){
+                            if(hoverTile.team() == player.team()){
                                 topTable.row();
                                 topTable.table(t -> {
                                     t.left().defaults().left();

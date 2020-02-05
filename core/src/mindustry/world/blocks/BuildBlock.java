@@ -53,7 +53,7 @@ public class BuildBlock extends Block{
 
     @Remote(called = Loc.server)
     public static void onDeconstructFinish(Tile tile, Block block, int builderID){
-        Team team = tile.getTeam();
+        Team team = tile.team();
         Fx.breakBlock.at(tile.drawx(), tile.drawy(), block.size);
         Events.fire(new BlockBuildEndEvent(tile, Groups.player.getByID(builderID), team, true));
         tile.remove();

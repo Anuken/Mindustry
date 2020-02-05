@@ -31,7 +31,7 @@ public class ShockMine extends Block{
     @Override
     public void drawLayer(Tile tile){
         super.draw(tile);
-        Draw.color(tile.getTeam().color);
+        Draw.color(tile.team().color);
         Draw.alpha(0.22f);
         Fill.rect(tile.drawx(), tile.drawy(), 2f, 2f);
         Draw.color();
@@ -49,9 +49,9 @@ public class ShockMine extends Block{
 
     @Override
     public void unitOn(Tile tile, Unitc unit){
-        if(unit.getTeam() != tile.getTeam() && tile.entity.timer(timerDamage, cooldown)){
+        if(unit.team() != tile.team() && tile.entity.timer(timerDamage, cooldown)){
             for(int i = 0; i < tendrils; i++){
-                Lightning.create(tile.getTeam(), Pal.lancerLaser, damage, tile.drawx(), tile.drawy(), Mathf.random(360f), length);
+                Lightning.create(tile.team(), Pal.lancerLaser, damage, tile.drawx(), tile.drawy(), Mathf.random(360f), length);
             }
             tile.entity.damage(tileDamage);
         }

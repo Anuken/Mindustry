@@ -41,7 +41,7 @@ public class CommandCenter extends Block{
     @Override
     public void placed(Tile tile){
         super.placed(tile);
-        ObjectSet<Tile> set = indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter);
+        ObjectSet<Tile> set = indexer.getAllied(tile.team(), BlockFlag.comandCenter);
 
         if(set.size > 0){
             CommandCenterEntity entity = tile.ent();
@@ -54,10 +54,10 @@ public class CommandCenter extends Block{
     public void removed(Tile tile){
         super.removed(tile);
 
-        ObjectSet<Tile> set = indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter);
+        ObjectSet<Tile> set = indexer.getAllied(tile.team(), BlockFlag.comandCenter);
 
         if(set.size == 1){
-            Units.each(tile.getTeam(), u -> u.onCommand(UnitCommand.all[0]));
+            Groups.unit.each(t -> t.team() == tile.team(), u -> u.onCommand(UnitCommand.all[0]));
         }
     }
 
@@ -106,14 +106,14 @@ public class CommandCenter extends Block{
         UnitCommand command = UnitCommand.all[value];
         ((CommandCenter)tile.block()).effect.at(tile);
 
-        for(Tile center : indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter)){
+        for(Tile center : indexer.getAllied(tile.team(), BlockFlag.comandCenter)){
             if(center.block() instanceof CommandCenter){
                 CommandCenterEntity entity = center.ent();
                 entity.command = command;
             }
         }
 
-        Units.each(tile.getTeam(), u -> u.onCommand(command));
+        Groups.unit.each(t -> t.team() == tile.team(), u -> u.onCommand(command));
         Events.fire(new CommandIssueEvent(tile, command));
     }
 

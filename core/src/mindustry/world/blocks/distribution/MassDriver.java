@@ -214,7 +214,7 @@ public class MassDriver extends Block{
         if(entity.link == other.pos()){
             tile.configure(-1);
             return false;
-        }else if(other.block() instanceof MassDriver && other.dst(tile) <= range && other.getTeam() == tile.getTeam()){
+        }else if(other.block() instanceof MassDriver && other.dst(tile) <= range && other.team() == tile.team()){
             tile.configure(other.pos());
             return false;
         }
@@ -248,9 +248,9 @@ public class MassDriver extends Block{
 
         float angle = tile.angleTo(target);
 
-        Bullet.create(Bullets.driverBolt, entity, entity.getTeam(),
+        Bullets.driverBolt.create(entity, entity.team(),
         tile.drawx() + Angles.trnsx(angle, translation), tile.drawy() + Angles.trnsy(angle, translation),
-        angle, 1f, 1f, data);
+        angle, -1f, 1f, 1f, data);
 
         shootEffect.at(tile.drawx() + Angles.trnsx(angle, translation),
         tile.drawy() + Angles.trnsy(angle, translation), angle);
@@ -261,7 +261,7 @@ public class MassDriver extends Block{
         Effects.shake(shake, shake, entity);
     }
 
-    protected void handlePayload(MassDriverEntity entity, Bullet bullet, DriverBulletData data){
+    protected void handlePayload(MassDriverEntity entity, Bulletc bullet, DriverBulletData data){
         int totalItems = entity.items().total();
 
         //add all the items possible
@@ -297,7 +297,7 @@ public class MassDriver extends Block{
         if(entity == null || entity.link == -1) return false;
         Tile link = world.tile(entity.link);
 
-        return link != null && link.block() instanceof MassDriver && link.getTeam() == tile.getTeam() && tile.dst(link) <= range;
+        return link != null && link.block() instanceof MassDriver && link.team() == tile.team() && tile.dst(link) <= range;
     }
 
     public static class DriverBulletData implements Poolable{
@@ -322,8 +322,8 @@ public class MassDriver extends Block{
             return waitingShooters.isEmpty() ? null : waitingShooters.first();
         }
 
-        public void handlePayload(Bullet bullet, DriverBulletData data){
-            ((MassDriver)block).handlePayload(this, bullet, data);
+        public void handlePayload(Bulletc bullet, DriverBulletData data){
+            ((MassDriver)block()).handlePayload(this, bullet, data);
         }
 
         @Override

@@ -20,12 +20,12 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.effect.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
@@ -177,21 +177,12 @@ public class EntityComps{
     }
 
     @Component
-    abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc{
+    abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
         private float lifeScl;
 
         Object data;
         BulletType type;
-        Interval timer = new Interval(6);
-
-        public boolean timer(int index, float time){
-            return timer.get(index, time);
-        }
-
-        @Override
-        public float getDamage(){
-            return type.damage;
-        }
+        float damage;
 
         @Override
         public void add(){
@@ -258,8 +249,8 @@ public class EntityComps{
                     Tile tile = world.ltile(x, y);
                     if(tile == null) return false;
 
-                    if(tile.entity != null && tile.entity.collide(this) && type.collides(this, tile) && !tile.entity.dead() && (type.collidesTeam || tile.getTeam() != team())){
-                        if(tile.getTeam() != team()){
+                    if(tile.entity != null && tile.entity.collide(this) && type.collides(this, tile) && !tile.entity.dead() && (type.collidesTeam || tile.team() != team())){
+                        if(tile.team() != team()){
                             tile.entity.collision(this);
                         }
 
@@ -292,6 +283,15 @@ public class EntityComps{
             float angle = Mathf.atan2(vel().x, vel().y) * Mathf.radiansToDegrees;
             if(angle < 0) angle += 360;
             return angle;
+        }
+    }
+
+    @Component
+    abstract class TimerComp{
+        @ReadOnly Interval timer = new Interval(6);
+
+        public boolean timer(int index, float time){
+            return timer.get(index, time);
         }
     }
 
@@ -590,7 +590,7 @@ public class EntityComps{
                 Tile other = world.ltile(tile.x + point.x, tile.y + point.y);
 
                 if(other == null) continue;
-                if(other.entity == null || !(other.interactable(tile.getTeam()))) continue;
+                if(other.entity == null || !(other.interactable(tile.team()))) continue;
 
                 //add this tile to proximity of nearby tiles
                 if(!other.entity.proximity().contains(tile, true)){
@@ -671,7 +671,7 @@ public class EntityComps{
     }
 
     @Component
-    abstract class PlayerComp implements UnitController, Entityc, Syncc{
+    abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
         @Nullable Unitc unit;
 
         @ReadOnly Team team = Team.sharded;
@@ -683,6 +683,19 @@ public class EntityComps{
 
         @Nullable String lastText;
         float textFadeTime;
+
+        public @Nullable Tilec closestCore(){
+            return state.teams.closestCore(x(), y(), team);
+        }
+
+        public void reset(){
+            team = state.rules.defaultTeam;
+            admin = typing = false;
+            lastText = null;
+            textFadeTime = 0f;
+            unit.controller(unit.type().createController());
+            unit = null;
+        }
 
         public void update(){
             if(unit != null){
@@ -704,12 +717,16 @@ public class EntityComps{
             unit.team(team);
         }
 
+        boolean dead(){
+            return unit == null;
+        }
+
         String uuid(){
-            return con == null ? "AAAAAAAA" : con.uuid;
+            return con == null ? "[LOCAL]" : con.uuid;
         }
 
         String usid(){
-            return con == null ? "AAAAAAAA" : con.usid;
+            return con == null ? "[LOCAL]" : con.usid;
         }
 
         void kick(KickReason reason){
@@ -801,7 +818,7 @@ public class EntityComps{
     }
 
     @Component
-    abstract class TeamComp implements Posc, Healthc{
+    abstract class TeamComp implements Posc{
         transient float x, y;
 
         Team team = Team.sharded;
@@ -944,8 +961,7 @@ public class EntityComps{
 
         private void bullet(Weapon weapon, float x, float y, float angle){
             Tmp.v1.trns(angle, 3f);
-            //TODO create the bullet
-            //Bullet.create(weapon.bullet, this, getTeam(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd));
+            weapon.bullet.create(this, team(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd));
         }
     }
 
@@ -1202,7 +1218,7 @@ public class EntityComps{
                         mineTile.worldy() + Mathf.range(tilesize / 2f), core.tile());
                     }else if(acceptsItem(item)){
                         //this is clientside, since items are synced anyway
-                        ItemTransfer.transferItemToUnit(item,
+                        InputHandler.transferItemToUnit(item,
                         mineTile.worldx() + Mathf.range(tilesize / 2f),
                         mineTile.worldy() + Mathf.range(tilesize / 2f),
                         this);
@@ -1480,6 +1496,16 @@ public class EntityComps{
         boolean hasItem(){
             return stack.amount > 0;
         }
+
+        void addItem(Item item){
+            addItem(item, 1);
+        }
+
+        void addItem(Item item, int amount){
+            stack.amount = stack.item == item ? stack.amount + amount : amount;
+            stack.item = item;
+            stack.amount = Mathf.clamp(stack.amount, 0, itemCapacity());
+        }
     }
 
     @Component
@@ -1591,8 +1617,7 @@ public class EntityComps{
                         return;
                     }else if(entry.effect.reactsWith(effect)){ //find opposite
                         StatusEntry.tmp.effect = entry.effect;
-                        //TODO unit cannot be null here
-                        entry.effect.getTransition((mindustry.gen.Unitc)this, effect, entry.time, duration, StatusEntry.tmp);
+                        entry.effect.getTransition((Unitc)this, effect, entry.time, duration, StatusEntry.tmp);
                         entry.time = StatusEntry.tmp.time;
 
                         if(StatusEntry.tmp.effect != entry.effect){
@@ -1609,6 +1634,10 @@ public class EntityComps{
             StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
             entry.set(effect, duration);
             statuses.add(entry);
+        }
+
+        boolean isBoss(){
+            return hasEffect(StatusEffects.boss);
         }
 
         boolean isImmune(StatusEffect effect){
@@ -1714,7 +1743,7 @@ public class EntityComps{
         }
 
         boolean isLocal(){
-            return this instanceof Unitc && ((Unitc)this).controller() == player || this == player;
+            return ((Object)this) == player || ((Object)this) instanceof Unitc && ((Unitc)((Object)this)).controller() == player;
         }
 
         <T> T as(Class<T> type){

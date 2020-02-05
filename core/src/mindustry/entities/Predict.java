@@ -3,6 +3,8 @@ package mindustry.entities;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.gen.*;
+
 /**
  * Class for predicting shoot angles based on velocities of targets.
  */
@@ -52,8 +54,8 @@ public class Predict{
     /**
      * See {@link #intercept(float, float, float, float, float, float, float)}.
      */
-    public static Vec2 intercept(Teamc src, Teamc dst, float v){
-        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dst.getTargetVelocityX() - src.getTargetVelocityX()/(2f*Time.delta()), dst.getTargetVelocityY() - src.getTargetVelocityY()/(2f*Time.delta()), v);
+    public static Vec2 intercept(Hitboxc src, Hitboxc dst, float v){
+        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dst.deltaX() - src.deltaX()/(2f*Time.delta()), dst.deltaY() - src.deltaX()/(2f*Time.delta()), v);
     }
 
     private static Vec2 quad(float a, float b, float c){

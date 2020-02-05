@@ -138,7 +138,7 @@ public enum EditorTool{
 
                 //only fill synthetic blocks, it's meaningless otherwise
                 if(tile.link().synthetic()){
-                    Team dest = tile.getTeam();
+                    Team dest = tile.team();
                     if(dest == editor.drawTeam) return;
                     fill(editor, x, y, false, t -> t.getTeamID() == (int)dest.id && t.link().synthetic(), t -> t.setTeam(editor.drawTeam));
                 }

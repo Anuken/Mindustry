@@ -54,7 +54,7 @@ public class UnitFactory extends Block{
         if(!net.client()){
             //TODO create the unit
             /*
-            Unitc unit = factory.unitType.create(tile.getTeam());
+            Unitc unit = factory.unitType.create(tile.team());
             unit.setSpawner(tile);
             unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
             unit.add();

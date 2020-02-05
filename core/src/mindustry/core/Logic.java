@@ -56,7 +56,7 @@ public class Logic implements ApplicationListener{
                 }
             }
 
-            TeamData data = state.teams.get(tile.getTeam());
+            TeamData data = state.teams.get(tile.team());
 
             //remove existing blocks that have been placed here.
             //painful O(n) iteration + copy
@@ -78,7 +78,7 @@ public class Logic implements ApplicationListener{
                 while(it.hasNext()){
                     BrokenBlock b = it.next();
                     Block block = content.block(b.block);
-                    if(event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1).overlaps(block.bounds(b.x(), b.y(), Tmp.r2))){
+                    if(event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1).overlaps(block.bounds(b.x, b.y, Tmp.r2))){
                         it.remove();
                     }
                 }
@@ -120,7 +120,7 @@ public class Logic implements ApplicationListener{
         state.rules = new Rules();
         state.stats = new Stats();
 
-        entities.clear();
+        Groups.all.clear();
         Time.clear();
         Events.fire(new ResetEvent());
     }
@@ -205,7 +205,7 @@ public class Logic implements ApplicationListener{
         if(!state.is(State.menu)){
             if(!net.client()){
                 //TODO
-                //state.enemies = Groups.unit.count(b -> b.getTeam() == state.rules.waveTeam && b.countsAsEnemy());
+                //state.enemies = Groups.unit.count(b -> b.team() == state.rules.waveTeam && b.countsAsEnemy());
             }
 
             if(!state.isPaused()){

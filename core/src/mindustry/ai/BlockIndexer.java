@@ -122,7 +122,7 @@ public class BlockIndexer{
         for(int x = 0; x < world.width(); x++){
             for(int y = 0; y < world.height(); y++){
                 Tile tile = world.tile(x, y);
-                if(tile.getTeam() == team){
+                if(tile.team() == team){
                     int quadrantX = tile.x / quadrantSize;
                     int quadrantY = tile.y / quadrantSize;
                     structQuadrant(team).set(quadrantX, quadrantY);
@@ -185,7 +185,7 @@ public class BlockIndexer{
 
                 if(other == null) continue;
 
-                if(other.getTeam() == team && !intSet.contains(other.pos()) && other.entity != null && pred.get(other)){
+                if(other.team() == team && !intSet.contains(other.pos()) && other.entity != null && pred.get(other)){
                     cons.get(other);
                     any = true;
                     intSet.add(other.pos());
@@ -254,7 +254,7 @@ public class BlockIndexer{
 
                         if(other == null) continue;
 
-                        if(other.entity == null || other.getTeam() != team || !pred.get(other) || !other.block().targetable)
+                        if(other.entity == null || other.team() != team || !pred.get(other) || !other.block().targetable)
                             continue;
 
                         Tilec e = other.entity;
@@ -305,8 +305,8 @@ public class BlockIndexer{
     }
 
     private void process(Tile tile){
-        if(tile.block().flags.size() > 0 && tile.getTeam() != Team.derelict){
-            ObjectSet<Tile>[] map = getFlagged(tile.getTeam());
+        if(tile.block().flags.size() > 0 && tile.team() != Team.derelict){
+            ObjectSet<Tile>[] map = getFlagged(tile.team());
 
             for(BlockFlag flag : tile.block().flags){
 
@@ -316,9 +316,9 @@ public class BlockIndexer{
 
                 map[flag.ordinal()] = arr;
             }
-            typeMap.put(tile.pos(), new TileIndex(tile.block().flags, tile.getTeam()));
+            typeMap.put(tile.pos(), new TileIndex(tile.block().flags, tile.team()));
         }
-        activeTeams.add(tile.getTeam());
+        activeTeams.add(tile.team());
 
         if(ores == null) return;
 
@@ -362,7 +362,7 @@ public class BlockIndexer{
             GridBits bits = structQuadrant(team);
 
             //fast-set this quadrant to 'occupied' if the tile just placed is already of this team
-            if(tile.getTeam() == team && tile.entity != null && tile.block().targetable){
+            if(tile.team() == team && tile.entity != null && tile.block().targetable){
                 bits.set(quadrantX, quadrantY);
                 continue; //no need to process futher
             }
@@ -374,7 +374,7 @@ public class BlockIndexer{
                 for(int y = quadrantY * quadrantSize; y < world.height() && y < (quadrantY + 1) * quadrantSize; y++){
                     Tile result = world.ltile(x, y);
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
-                    if(result.entity != null && result.getTeam() == team){
+                    if(result.entity != null && result.team() == team){
                         bits.set(quadrantX, quadrantY);
                         break outer;
                     }

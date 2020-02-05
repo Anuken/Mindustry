@@ -9,16 +9,12 @@ import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
 import mindustry.core.GameState.*;
-import mindustry.entities.*;
-import mindustry.gen.*;
-import mindustry.gen.*;
 import mindustry.entities.units.*;
-import mindustry.net.Administration;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
+import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
@@ -161,16 +157,14 @@ public class NetServer implements ApplicationListener{
             boolean preventDuplicates = headless && netServer.admins.getStrict();
 
             if(preventDuplicates){
-                for(Playerc player : Groups.player.all()){
-                    if(player.name.trim().equalsIgnoreCase(packet.name.trim())){
-                        con.kick(KickReason.nameInUse);
-                        return;
-                    }
+                if(Groups.player.contains(p -> p.name().trim().equalsIgnoreCase(packet.name.trim()))){
+                    con.kick(KickReason.nameInUse);
+                    return;
+                }
 
-                    if(player.uuid != null && player.usid != null && (player.uuid.equals(packet.uuid) || player.usid.equals(packet.usid))){
-                        con.kick(KickReason.idInUse);
-                        return;
-                    }
+                if(Groups.player.contains(player -> player.uuid().equals(packet.uuid) || player.usid().equals(packet.usid))){
+                    con.kick(KickReason.idInUse);
+                    return;
                 }
             }
 
@@ -194,17 +188,15 @@ public class NetServer implements ApplicationListener{
                 con.modclient = true;
             }
 
-            Playerc player = new Playerc();
-            player.isAdmin = admins.isAdmin(uuid, packet.usid);
-            player.con = con;
-            player.usid = packet.usid;
-            player.name = packet.name;
-            player.uuid = uuid;
-            player.isMobile = packet.mobile;
-            player.dead = true;
-            player.setNet(player.x, player.y);
-            player.color.set(packet.color);
-            player.color.a = 1f;
+            //TODO place instance of player here
+            Playerc player = null;//new Playerc();
+            player.admin(admins.isAdmin(uuid, packet.usid));
+            player.con(con);
+            player.con().usid = packet.usid;
+            player.con().uuid = uuid;
+            player.con().mobile = packet.mobile;
+            player.name(packet.name);
+            player.color().set(packet.color).a(1f);
 
             try{
                 writeBuffer.position(0);
@@ -218,7 +210,7 @@ public class NetServer implements ApplicationListener{
             con.player = player;
 
             //playing in pvp mode automatically assigns players to teams
-            player.team(assignTeam(player, Groups.player.all()));
+            player.team(assignTeam(player));
 
             sendWorldData(player);
 
@@ -230,7 +222,8 @@ public class NetServer implements ApplicationListener{
         net.handleServer(InvokePacket.class, (con, packet) -> {
             if(con.player == null) return;
             try{
-                RemoteReadServer.readPacket(packet.writeBuffer, packet.type, con.player);
+                //TODO uncomment when compilation works
+                //RemoteReadServer.readPacket(packet.writeBuffer, packet.type, con.player);
             }catch(ValidateException e){
                 Log.debug("Validation failed for '{0}': {1}", e.player, e.getMessage());
             }catch(RuntimeException e){
@@ -279,7 +272,7 @@ public class NetServer implements ApplicationListener{
         });
 
         clientCommands.<Playerc>register("t", "<message...>", "Send a message only to your teammates.", (args, player) -> {
-            Groups.player.all().each(p -> p.getTeam() == player.team(), o -> o.sendMessage(args[0], player, "[#" + player.team().color.toString() + "]<T>" + NetClient.colorizeName(player.id, player.name())));
+            Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(args[0], player, "[#" + player.team().color.toString() + "]<T>" + NetClient.colorizeName(player.id(), player.name())));
         });
 
         //duration of a a kick in seconds
@@ -301,7 +294,7 @@ public class NetServer implements ApplicationListener{
                 this.map = map;
                 this.task = Timer.schedule(() -> {
                     if(!checkPass()){
-                        Call.sendMessage(Strings.format("[lightgray]Vote failed. Not enough votes to kick[orange] {0}[lightgray].", target.name));
+                        Call.sendMessage(Strings.format("[lightgray]Vote failed. Not enough votes to kick[orange] {0}[lightgray].", target.name()));
                         map[0] = null;
                         task.cancel();
                     }
@@ -310,17 +303,17 @@ public class NetServer implements ApplicationListener{
 
             void vote(Playerc player, int d){
                 votes += d;
-                voted.addAll(player.uuid, admins.getInfo(player.uuid).lastIP);
+                voted.addAll(player.uuid(), admins.getInfo(player.uuid()).lastIP);
                         
                 Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted to kick[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
-                            player.name(), target.name, votes, votesRequired()));
+                            player.name(), target.name(), votes, votesRequired()));
             }
 
             boolean checkPass(){
                 if(votes >= votesRequired()){
-                    Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] {0}[orange] will be banned from the server for {1} minutes.", target.name, (kickDuration/60)));
+                    Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] {0}[orange] will be banned from the server for {1} minutes.", target.name(), (kickDuration/60)));
                     target.getInfo().lastKicked = Time.millis() + kickDuration*1000;
-                    Groups.player.all().each(p -> p.uuid != null && p.uuid.equals(target.uuid), p -> p.con.kick(KickReason.vote));
+                    Groups.player.each(p -> p.uuid().equals(target.uuid()), p -> p.kick(KickReason.vote));
                     map[0] = null;
                     task.cancel();
                     return true;
@@ -352,25 +345,24 @@ public class NetServer implements ApplicationListener{
             if(args.length == 0){
                 StringBuilder builder = new StringBuilder();
                 builder.append("[orange]Players to kick: \n");
-                for(Playerc p : Groups.player.all()){
-                    if(p.isAdmin || p.con == null || p == player) continue;
 
-                    builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.id).append(")\n");
-                }
+                Groups.player.each(p -> !p.admin() && p.con() != null && p != player, p -> {
+                    builder.append("[lightgray] ").append(p.name()).append("[accent] (#").append(p.id()).append(")\n");
+                });
                 player.sendMessage(builder.toString());
             }else{
                 Playerc found;
                 if(args[0].length() > 1 && args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))){
                     int id = Strings.parseInt(args[0].substring(1));
-                    found = Groups.player.find(p -> p.id == id);
+                    found = Groups.player.find(p -> p.id() == id);
                 }else{
-                    found = Groups.player.find(p -> p.name.equalsIgnoreCase(args[0]));
+                    found = Groups.player.find(p -> p.name().equalsIgnoreCase(args[0]));
                 }
 
                 if(found != null){
-                    if(found.isAdmin){
+                    if(found.admin()){
                         player.sendMessage("[scarlet]Did you really expect to be able to kick an admin?");
-                    }else if(found.isLocal){
+                    }else if(found.isLocal()){
                         player.sendMessage("[scarlet]Local players cannot be kicked.");
                     }else if(found.team() != player.team()){
                         player.sendMessage("[scarlet]Only players on your team can be kicked.");
@@ -401,7 +393,7 @@ public class NetServer implements ApplicationListener{
                 }
 
                 //hosts can vote all they want
-                if(player.uuid != null && (currentlyKicking[0].voted.contains(player.uuid) || currentlyKicking[0].voted.contains(admins.getInfo(player.uuid).lastIP))){
+                if((currentlyKicking[0].voted.contains(player.uuid()) || currentlyKicking[0].voted.contains(admins.getInfo(player.uuid()).lastIP))){
                     player.sendMessage("[scarlet]You've already voted. Sit down.");
                     return;
                 }
@@ -432,7 +424,7 @@ public class NetServer implements ApplicationListener{
                 }
 
                 player.getInfo().lastSyncTime = Time.millis();
-                Call.onWorldDataBegin(player.con);
+                Call.onWorldDataBegin(player.con());
                 netServer.sendWorldData(player);
             }
         });
@@ -440,6 +432,10 @@ public class NetServer implements ApplicationListener{
 
     public int votesRequired(){
         return 2 + (Groups.player.size() > 4 ? 1 : 0);
+    }
+
+    public Team assignTeam(Playerc current){
+        return assigner.assign(current, Groups.player);
     }
 
     public Team assignTeam(Playerc current, Iterable<Playerc> players){
@@ -452,30 +448,30 @@ public class NetServer implements ApplicationListener{
         NetworkIO.writeWorld(player, def);
         WorldStream data = new WorldStream();
         data.stream = new ByteArrayInputStream(stream.toByteArray());
-        player.con.sendStream(data);
+        player.con().sendStream(data);
 
         Log.debug("Packed {0} compressed bytes of world data.", stream.size());
     }
 
     public static void onDisconnect(Playerc player, String reason){
         //singleplayer multiplayer wierdness
-        if(player.con == null){
+        if(player.con() == null){
             player.remove();
             return;
         }
 
-        if(!player.con.hasDisconnected){
-            if(player.con.hasConnected){
+        if(!player.con().hasDisconnected){
+            if(player.con().hasConnected){
                 Events.fire(new PlayerLeave(player));
-                if(Config.showConnectMessages.bool()) Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
-                Call.onPlayerDisconnect(player.id);
+                if(Config.showConnectMessages.bool()) Call.sendMessage("[accent]" + player.name() + "[accent] has disconnected.");
+                Call.onPlayerDisconnect(player.id());
             }
 
-            if(Config.showConnectMessages.bool()) Log.info("&lm[{1}] &lc{0} has disconnected. &lg&fi({2})", player.name(), player.uuid, reason);
+            if(Config.showConnectMessages.bool()) Log.info("&lm[{1}] &lc{0} has disconnected. &lg&fi({2})", player.name(), player.uuid(), reason);
         }
 
         player.remove();
-        player.con.hasDisconnected = true;
+        player.con().hasDisconnected = true;
     }
 
     @Remote(targets = Loc.client, unreliable = true)
@@ -491,7 +487,9 @@ public class NetServer implements ApplicationListener{
         BuildRequest[] requests,
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
-        NetConnection connection = player.con;
+        //TODO this entire thing needs to be rewritten.
+        /*
+        NetConnection connection = player.con();
         if(connection == null || snapshotID < connection.lastRecievedClientSnapshot) return;
 
         boolean verifyPosition = !player.dead() && netServer.admins.getStrict() && headless;
@@ -534,7 +532,7 @@ public class NetServer implements ApplicationListener{
                 action.config = req.config;
             })){
                 //force the player to remove this request if that's not the case
-                Call.removeQueueBlock(player.con, req.x, req.y, req.breaking);
+                Call.removeQueueBlock(player.con(), req.x, req.y, req.breaking);
                 connection.rejectedRequests.add(req);
                 continue;
             }
@@ -562,7 +560,7 @@ public class NetServer implements ApplicationListener{
             newx = x;
             newy = y;
         }else if(Mathf.dst(x, y, newx, newy) > correctDist){
-            Call.onPositionSet(player.con, newx, newy); //teleport and correct position when necessary
+            Call.onPositionSet(player.con(), newx, newy); //teleport and correct position when necessary
         }
 
         //reset player to previous synced position so it gets interpolated
@@ -574,7 +572,7 @@ public class NetServer implements ApplicationListener{
         player.vel().set(xVelocity, yVelocity); //only for visual calculation purposes, doesn't actually update the player
 
         connection.lastRecievedClientSnapshot = snapshotID;
-        connection.lastRecievedClientTime = Time.millis();
+        connection.lastRecievedClientTime = Time.millis();*/
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
@@ -603,9 +601,10 @@ public class NetServer implements ApplicationListener{
             other.kick(KickReason.kick);
             Log.info("&lc{0} has kicked {1}.", player.name(), other.name());
         }else if(action == AdminAction.trace){
-            TraceInfo info = new TraceInfo(other.con().address, other.uuid(), other.con().modclient, other.con.mobile);
+            TraceInfo info = new TraceInfo(other.con().address, other.uuid(), other.con().modclient, other.con().mobile);
             if(player.con() != null){
-                Call.onTraceInfo(player.con(), other, info);
+                //TODO uncomment
+                //Call.onTraceInfo(player.con(), other, info);
             }else{
                 NetClient.onTraceInfo(other, info);
             }
@@ -635,7 +634,7 @@ public class NetServer implements ApplicationListener{
         if(state.rules.pvp){
             int used = 0;
             for(TeamData t : state.teams.getActive()){
-                if(Groups.player.count(p -> p.getTeam() == t.team) > 0){
+                if(Groups.player.count(p -> p.team() == t.team) > 0){
                     used++;
                 }
             }
@@ -687,11 +686,11 @@ public class NetServer implements ApplicationListener{
         syncStream.reset();
 
         short sent = 0;
-        for(Tilec entity : tileGroup.all()){
-            if(!entity.block.sync) continue;
+        for(Tilec entity : Groups.tile){
+            if(!entity.block().sync) continue;
             sent ++;
 
-            dataStream.writeInt(entity.tile.pos());
+            dataStream.writeInt(entity.tile().pos());
             entity.write(dataStream);
 
             if(syncStream.size() > maxSnapshotSize){
@@ -725,35 +724,26 @@ public class NetServer implements ApplicationListener{
         byte[] stateBytes = syncStream.toByteArray();
 
         //write basic state data.
-        Call.onStateSnapshot(player.con, state.wavetime, state.wave, state.enemies, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+        Call.onStateSnapshot(player.con(), state.wavetime, state.wave, state.enemies, (short)stateBytes.length, net.compressSnapshot(stateBytes));
 
-        viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
-
-        //check for syncable groups
-
-        //make sure mapping is enabled for this group
-        if(!group.mappingEnabled()){
-            throw new RuntimeException("Entity group '" + group.getType() + "' contains SyncTrait entities, yet mapping is not enabled. In order for syncing to work, you must enable mapping for this group.");
-        }
+        viewport.setSize(player.con().viewWidth, player.con().viewHeight).setCenter(player.con().viewX, player.con().viewY);
 
         syncStream.reset();
 
         int sent = 0;
 
-        for(Entity entity :  group.all()){
-            SyncTrait sync = (SyncTrait)entity;
-
+        for(Syncc entity : Groups.sync){
             //write all entities now
-            dataStream.writeInt(entity.getID()); //write id
-            dataStream.writeByte(sync.getTypeID().id); //write type ID
-            sync.write(dataStream); //write entity
+            dataStream.writeInt(entity.id()); //write id
+            dataStream.writeByte(entity.classId()); //write type ID
+            entity.write(dataStream); //write entity
 
             sent++;
 
             if(syncStream.size() > maxSnapshotSize){
                 dataStream.close();
                 byte[] syncBytes = syncStream.toByteArray();
-                Call.onEntitySnapshot(player.con, (byte)group.getID(), (short)sent, (short)syncBytes.length, net.compressSnapshot(syncBytes));
+                Call.onEntitySnapshot(player.con(), (short)sent, (short)syncBytes.length, net.compressSnapshot(syncBytes));
                 sent = 0;
                 syncStream.reset();
             }
@@ -763,7 +753,7 @@ public class NetServer implements ApplicationListener{
             dataStream.close();
 
             byte[] syncBytes = syncStream.toByteArray();
-            Call.onEntitySnapshot(player.con, (byte)group.getID(), (short)sent, (short)syncBytes.length, net.compressSnapshot(syncBytes));
+            Call.onEntitySnapshot(player.con(), (short)sent, (short)syncBytes.length, net.compressSnapshot(syncBytes));
         }
 
     }
@@ -821,22 +811,22 @@ public class NetServer implements ApplicationListener{
     void sync(){
 
         try{
-            //iterate through each player
-            for(int i = 0; i < Groups.player.size(); i++){
-                Playerc player = Groups.player.all().get(i);
-                if(player.isLocal()) continue;
-
-                if(player.con == null || !player.con.isConnected()){
+            Groups.player.each(p -> !p.isLocal(), player -> {
+                if(player.con() == null || !player.con().isConnected()){
                     onDisconnect(player, "disappeared");
-                    continue;
+                    return;
                 }
 
-                NetConnection connection = player.con;
+                NetConnection connection = player.con();
 
-                if(!player.timer.get(Playerc.timerSync, serverSyncTime) || !connection.hasConnected) continue;
+                if(!player.timer(0, serverSyncTime) || !connection.hasConnected) return;
 
-                writeEntitySnapshot(player);
-            }
+                try{
+                    writeEntitySnapshot(player);
+                }catch(IOException e){
+                    e.printStackTrace();
+                }
+            });
 
             if(Groups.player.size() > 0 && Core.settings.getBool("blocksync") && timer.get(timerBlockSync, blockSyncTime)){
                 writeBlockSnapshots();

@@ -8,7 +8,6 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.type.*;
@@ -36,12 +35,12 @@ public class OverlayRenderer{
     public void drawTop(){
 
         if(Core.settings.getBool("indicators")){
-            for(Playerc player : Groups.player.all()){
+            for(Playerc player : Groups.player){
                 if(Vars.player != player && Vars.player.team() == player.team()){
                     if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
-                    .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){
+                    .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x(), player.y())){
 
-                        Tmp.v1.set(player.x, player.y).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
+                        Tmp.v1.set(player.x(), player.y()).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
 
                         Lines.stroke(2f, player.team().color);
                         Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 4f);
@@ -50,15 +49,15 @@ public class OverlayRenderer{
                 }
             }
 
-            Units.all(unit -> {
-                if(unit != player && unit.team() != player.team() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f).setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x, unit.y)){
-                    Tmp.v1.set(unit.x, unit.y).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
+            Groups.unit.each(unit -> {
+                    if(unit != player && unit.team() != player.team() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f).setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x(), unit.y())){
+                        Tmp.v1.set(unit.x(), unit.y()).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
 
-                    Lines.stroke(1f, unit.team().color);
-                    Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 3f);
-                    Draw.reset();
-                }
-            });
+                        Lines.stroke(1f, unit.team().color);
+                        Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 3f);
+                        Draw.reset();
+                    }
+                });
 
             if(ui.hudfrag.blockfrag.currentCategory == Category.upgrade){
                 for(Tile mechpad : indexer.getAllied(player.team(), BlockFlag.mechPad)){
@@ -98,9 +97,9 @@ public class OverlayRenderer{
                 float dst = core.dst(player);
                 if(dst < state.rules.enemyCoreBuildRadius * 2.2f){
                     Draw.color(Color.darkGray);
-                    Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
-                    Draw.color(Pal.accent, core.getTeam().color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
-                    Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
+                    Lines.circle(core.x(), core.y() - 2, state.rules.enemyCoreBuildRadius);
+                    Draw.color(Pal.accent, core.team().color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
+                    Lines.circle(core.x(), core.y(), state.rules.enemyCoreBuildRadius);
                 }
             });
         }
@@ -109,7 +108,7 @@ public class OverlayRenderer{
         Draw.color(Color.gray, Color.lightGray, Mathf.absin(Time.time(), 8f, 1f));
 
         for(Tile tile : spawner.getGroundSpawns()){
-            if(tile.withinDst(player.x, player.y, state.rules.dropZoneRadius + spawnerMargin)){
+            if(tile.withinDst(player.x(), player.y(), state.rules.dropZoneRadius + spawnerMargin)){
                 Draw.alpha(Mathf.clamp(1f - (player.dst(tile) - state.rules.dropZoneRadius) / spawnerMargin));
                 Lines.dashCircle(tile.worldx(), tile.worldy(), state.rules.dropZoneRadius);
             }
@@ -122,7 +121,7 @@ public class OverlayRenderer{
             Vec2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
             Tile tile = world.ltileWorld(vec.x, vec.y);
 
-            if(tile != null && tile.block() != Blocks.air && tile.getTeam() == player.team()){
+            if(tile != null && tile.block() != Blocks.air && tile.team() == player.team()){
                 tile.block().drawSelect(tile);
 
                 if(Core.input.keyDown(Binding.rotateplaced) && tile.block().rotate && tile.interactable(player.team())){
@@ -138,13 +137,13 @@ public class OverlayRenderer{
         if(input.isDroppingItem()){
             Vec2 v = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
             float size = 8;
-            Draw.rect(player.item().item.icon(Cicon.medium), v.x, v.y, size, size);
+            Draw.rect(player.unit().item().icon(Cicon.medium), v.x, v.y, size, size);
             Draw.color(Pal.accent);
             Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time(), 5f, 1f));
             Draw.reset();
 
             Tile tile = world.ltileWorld(v.x, v.y);
-            if(tile != null && tile.interactable(player.team()) && tile.block().acceptStack(player.item().item, player.item().amount, tile, player) > 0){
+            if(tile != null && tile.interactable(player.team()) && tile.block().acceptStack(player.unit().item(), player.unit().stack().amount, tile, player.unit()) > 0){
                 Lines.stroke(3f, Pal.gray);
                 Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 3 + Mathf.absin(Time.time(), 5f, 1f));
                 Lines.stroke(1f, Pal.place);

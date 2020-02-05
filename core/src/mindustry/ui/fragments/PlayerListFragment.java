@@ -129,7 +129,7 @@ public class PlayerListFragment extends Fragment{
                     t.addImageButton(Icon.zoom, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
-            }else if(!user.isLocal && !user.isAdmin && net.client() && Groups.player.size() >= 3 && player.team() == user.getTeam()){ //votekick
+            }else if(!user.isLocal && !user.isAdmin && net.client() && Groups.player.size() >= 3 && player.team() == user.team()){ //votekick
                 button.add().growY();
 
                 button.addImageButton(Icon.hammer, Styles.clearPartiali,
@@ -138,7 +138,7 @@ public class PlayerListFragment extends Fragment{
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
             content.row();
-            content.addImage().height(4f).color(state.rules.pvp ? user.getTeam().color : Pal.gray).growX();
+            content.addImage().height(4f).color(state.rules.pvp ? user.team().color : Pal.gray).growX();
             content.row();
         });
 

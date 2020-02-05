@@ -2,7 +2,7 @@ package mindustry.entities.bullet;
 
 import arc.graphics.*;
 import mindustry.content.*;
-import mindustry.entities.effect.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 

@@ -63,7 +63,6 @@ public class EntityProcess extends BaseProcessor{
 
             //create component interfaces
             for(Stype component : allComponents){
-                Log.info("&yGenerating interface for " + component);
                 TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(component)).addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
 
                 //implement extra interfaces these components may have, e.g. position
@@ -77,21 +76,15 @@ public class EntityProcess extends BaseProcessor{
                     inter.addSuperinterface(ClassName.get(packageName, interfaceName(type)));
                 }
 
-                for(Svar field : component.fields().select(e -> !e.is(Modifier.STATIC) && !e.is(Modifier.PRIVATE) && !e.is(Modifier.TRANSIENT))){
-                    String cname = field.name();
-                    //getter
-                    inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).returns(field.tname()).build());
-
-                    //setter
-                    if(!field.is(Modifier.FINAL) && !field.annotations().contains(f -> f.toString().equals("@mindustry.annotations.Annotations.ReadOnly"))){
-                        inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).addParameter(field.tname(), field.name()).build());
-                    }
-                }
+                ObjectSet<String> signatures = new ObjectSet<>();
 
                 //add utility methods to interface
                 for(Smethod method : component.methods()){
                     //skip private methods, those are for internal use.
                     if(method.is(Modifier.PRIVATE)) continue;
+
+                    //keep track of signatures used to prevent dupes
+                    signatures.add(method.e.toString());
 
                     inter.addMethod(MethodSpec.methodBuilder(method.name())
                     .addExceptions(method.thrownt())
@@ -101,7 +94,42 @@ public class EntityProcess extends BaseProcessor{
                     .build())).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
                 }
 
+                for(Svar field : component.fields().select(e -> !e.is(Modifier.STATIC) && !e.is(Modifier.PRIVATE) && !e.is(Modifier.TRANSIENT))){
+                    String cname = field.name();
+
+                    //getter
+                    if(!signatures.contains(cname + "()")){
+                        inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
+                        .addAnnotations(Array.with(field.annotations()).select(a -> a.toString().contains("Null")).map(AnnotationSpec::get))
+                        .returns(field.tname()).build());
+                    }
+
+                    //setter
+                    if(!field.is(Modifier.FINAL) && !signatures.contains(cname + "(" + field.mirror().toString() + ")") &&
+                        !field.annotations().contains(f -> f.toString().equals("@mindustry.annotations.Annotations.ReadOnly"))){
+                            inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
+                            .addParameter(ParameterSpec.builder(field.tname(), field.name())
+                            .addAnnotations(Array.with(field.annotations())
+                            .select(a -> a.toString().contains("Null")).map(AnnotationSpec::get)).build()).build());
+                    }
+                }
+
                 write(inter);
+
+                //LOGGING
+
+                Log.info("&gGenerating interface for " + component.name());
+
+                for(TypeName tn : inter.superinterfaces){
+                    Log.info("&g> &lbextends {0}", simpleName(tn.toString()));
+                }
+
+                //log methods generated
+                for(MethodSpec spec : inter.methodSpecs){
+                    Log.info("&g> > &c{0} {1}({2})", simpleName(spec.returnType.toString()), spec.name, Array.with(spec.parameters).toString(", ", p -> simpleName(p.type.toString()) + " " + p.name));
+                }
+
+                Log.info("");
             }
 
             //look at each definition
@@ -134,7 +162,7 @@ public class EntityProcess extends BaseProcessor{
                             fbuilder.initializer(tree.getInitializer().toString());
                         }
 
-                        builder.addAnnotations(f.annotations().map(AnnotationSpec::get));
+                        fbuilder.addAnnotations(f.annotations().map(AnnotationSpec::get));
                         builder.addField(fbuilder.build());
                     }
 
@@ -150,6 +178,12 @@ public class EntityProcess extends BaseProcessor{
 
                     //representative method
                     Smethod first = entry.value.first();
+
+                    //skip internal impl
+                    if(first.has(InternalImpl.class)){
+                        continue;
+                    }
+
                     //build method using same params/returns
                     MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(first.name()).addModifiers(first.is(Modifier.PRIVATE) ? Modifier.PRIVATE : Modifier.PUBLIC, Modifier.FINAL);
                     mbuilder.addTypeVariables(first.typeVariables().map(TypeVariableName::get));
@@ -232,6 +266,18 @@ public class EntityProcess extends BaseProcessor{
             //write the groups
             groupsBuilder.addMethod(groupInit.build());
 
+            MethodSpec.Builder groupResize = MethodSpec.methodBuilder("resize")
+                .addParameter(TypeName.FLOAT, "x").addParameter(TypeName.FLOAT, "y").addParameter(TypeName.FLOAT, "w").addParameter(TypeName.FLOAT, "h")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
+            for(GroupDefinition group : groupDefs){
+                if(group.def.spatial()){
+                    groupResize.addStatement("$L.resize(x, y, w, h)", group.name);
+                }
+            }
+
+            groupsBuilder.addMethod(groupResize.build());
+
             write(groupsBuilder);
 
             //load map of sync IDs
@@ -302,16 +348,16 @@ public class EntityProcess extends BaseProcessor{
                         String var = method.name();
                         FieldSpec field = Array.with(def.builder.fieldSpecs).find(f -> f.name.equals(var));
                         //make sure it's a real variable AND that the component doesn't already implement it with custom logic
-                        if(field == null || comp.methods().contains(m -> m.name().equals(method.name()))) continue;
+                        if(field == null || comp.methods().contains(m -> m.simpleString().equals(method.simpleString()))) continue;
 
                         //getter
                         if(!method.isVoid()){
-                            def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("return " + var).build());
+                            def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("return " + var).addModifiers(Modifier.FINAL).build());
                         }
 
                         //setter
                         if(method.isVoid() && !Array.with(field.annotations).contains(f -> f.type.toString().equals("@mindustry.annotations.Annotations.ReadOnly"))){
-                            def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("this." + var + " = " + var).build());
+                            def.builder.addMethod(MethodSpec.overriding(method.e).addModifiers(Modifier.FINAL).addStatement("this." + var + " = " + var).build());
                         }
                     }
                 }

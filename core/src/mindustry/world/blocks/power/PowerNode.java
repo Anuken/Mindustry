@@ -134,7 +134,7 @@ public class PowerNode extends PowerBlock{
     private void getPotentialLinks(Tile tile, Cons<Tile> others){
         Boolf<Tile> valid = other -> other != null && other != tile && other.entity != null && other.entity.power() != null &&
         ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) &&
-        overlaps(tile.x * tilesize + offset(), tile.y * tilesize + offset(), other, laserRange * tilesize) && other.getTeam() == player.team()
+        overlaps(tile.x * tilesize + offset(), tile.y * tilesize + offset(), other, laserRange * tilesize) && other.team() == player.team()
         && !other.entity.proximity().contains(tile) && !graphs.contains(other.entity.power().graph);
 
         tempTiles.clear();
@@ -289,7 +289,7 @@ public class PowerNode extends PowerBlock{
     }
 
     public boolean linkValid(Tile tile, Tile link, boolean checkMaxNodes){
-        if(tile == link || link == null || link.entity == null || tile.entity == null || !link.block().hasPower || tile.getTeam() != link.getTeam()) return false;
+        if(tile == link || link == null || link.entity == null || tile.entity == null || !link.block().hasPower || tile.team() != link.team()) return false;
 
         if(overlaps(tile, link, laserRange * tilesize) || (link.block() instanceof PowerNode && overlaps(link, tile, link.<PowerNode>cblock().laserRange * tilesize))){
             if(checkMaxNodes && link.block() instanceof PowerNode){

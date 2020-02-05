@@ -143,7 +143,7 @@ public class Tile implements Position{
         return (T)block;
     }
 
-    public Team getTeam(){
+    public Team team(){
         return Team.get(link().team);
     }
 
@@ -281,7 +281,7 @@ public class Tile implements Position{
     }
 
     public boolean isEnemyCheat(){
-        return getTeam() == state.rules.waveTeam && state.rules.enemyCheat;
+        return team() == state.rules.waveTeam && state.rules.enemyCheat;
     }
 
     public boolean isLinked(){
@@ -385,7 +385,7 @@ public class Tile implements Position{
     }
 
     public boolean interactable(Team team){
-        return state.teams.canInteract(team, getTeam());
+        return state.teams.canInteract(team, team());
     }
 
     public @Nullable Item drop(){
@@ -497,7 +497,7 @@ public class Tile implements Position{
 
     @Override
     public String toString(){
-        return floor.name + ":" + block.name + ":" + overlay + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) + ":" + getTeam();
+        return floor.name + ":" + block.name + ":" + overlay + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) + ":" + team();
     }
 
     //remote utility methods

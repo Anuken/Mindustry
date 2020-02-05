@@ -49,4 +49,8 @@ public class Smethod extends Selement<ExecutableElement>{
     public MethodTree tree(){
         return BaseProcessor.trees.getTree(e);
     }
+
+    public String simpleString(){
+        return name() + "(" + params().toString(", ", p -> BaseProcessor.simpleName(p.mirror().toString())) + ")";
+    }
 }

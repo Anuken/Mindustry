@@ -131,7 +131,7 @@ public abstract class Turret extends Block{
 
     @Override
     public void drawSelect(Tile tile){
-        Drawf.dashCircle(tile.drawx(), tile.drawy(), range, tile.getTeam().color);
+        Drawf.dashCircle(tile.drawx(), tile.drawy(), range, tile.team().color);
     }
 
     @Override
@@ -184,16 +184,16 @@ public abstract class Turret extends Block{
 
     protected boolean validateTarget(Tile tile){
         TurretEntity entity = tile.ent();
-        return !Units.invalidateTarget(entity.target, tile.getTeam(), tile.drawx(), tile.drawy());
+        return !Units.invalidateTarget(entity.target, tile.team(), tile.drawx(), tile.drawy());
     }
 
     protected void findTarget(Tile tile){
         TurretEntity entity = tile.ent();
 
         if(targetAir && !targetGround){
-            entity.target = Units.closestEnemy(tile.getTeam(), tile.drawx(), tile.drawy(), range, e -> !e.dead() && e.isFlying());
+            entity.target = Units.closestEnemy(tile.team(), tile.drawx(), tile.drawy(), range, e -> !e.dead() && e.isFlying());
         }else{
-            entity.target = Units.closestTarget(tile.getTeam(), tile.drawx(), tile.drawy(), range, e -> !e.dead() && (!e.isFlying() || targetAir) && (e.isFlying() || targetGround));
+            entity.target = Units.closestTarget(tile.team(), tile.drawx(), tile.drawy(), range, e -> !e.dead() && (!e.isFlying() || targetAir) && (e.isFlying() || targetGround));
         }
     }
 
@@ -267,7 +267,7 @@ public abstract class Turret extends Block{
     }
 
     protected void bullet(Tile tile, BulletType type, float angle){
-        Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
+        Bullet.create(type, tile.entity, tile.team(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
     }
 
     protected void effects(Tile tile){

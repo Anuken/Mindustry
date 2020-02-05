@@ -26,16 +26,16 @@ public class FlakBulletType extends BasicBulletType{
     @Override
     public void update(Bulletc b){
         super.update(b);
-        if(b.getData() instanceof Integer) return;
+        if(b.data() instanceof Integer) return;
 
-        if(b.timer.get(2, 6)){
+        if(b.timer(2, 6)){
             Units.nearbyEnemies(b.team(), rect.setSize(explodeRange * 2f).setCenter(b.x(), b.y()), unit -> {
-                if(b.getData() instanceof Float) return;
+                if(b.data() instanceof Float) return;
 
                 if(unit.dst(b) < explodeRange){
-                    b.setData(0);
+                    b.data(0);
                     Time.run(5f, () -> {
-                        if(b.getData() instanceof Integer){
+                        if(b.data() instanceof Integer){
                             b.time(b.lifetime());
                         }
                     });

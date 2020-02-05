@@ -122,7 +122,7 @@ public class ApplicationTests{
         int bx = 4;
         int by = 4;
         world.tile(bx, by).set(Blocks.coreShard, Team.sharded);
-        assertEquals(world.tile(bx, by).getTeam(), Team.sharded);
+        assertEquals(world.tile(bx, by).team(), Team.sharded);
         for(int x = bx - 1; x <= bx + 1; x++){
             for(int y = by - 1; y <= by + 1; y++){
                 if(x == bx && by == y){

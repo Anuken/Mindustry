@@ -97,6 +97,10 @@ public class Effect{
             this.data = data;
         }
 
+        public <T> T data(){
+            return (T)data;
+        }
+
         public void scaled(float lifetime, Cons<EffectContainer> cons){
             if(innerContainer == null) innerContainer = new EffectContainer();
             if(time <= lifetime){

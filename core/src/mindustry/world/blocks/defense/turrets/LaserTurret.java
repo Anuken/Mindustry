@@ -3,6 +3,7 @@ package mindustry.world.blocks.defense.turrets;
 import arc.math.*;
 import arc.util.*;
 import mindustry.entities.bullet.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -94,7 +95,7 @@ public class LaserTurret extends PowerTurret{
     protected void bullet(Tile tile, BulletType type, float angle){
         LaserTurretEntity entity = tile.ent();
 
-        entity.bullet = Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
+        entity.bullet = Bullet.create(type, tile.entity, tile.team(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
         entity.bulletLife = shootDuration;
     }
 
@@ -106,7 +107,7 @@ public class LaserTurret extends PowerTurret{
     }
 
     class LaserTurretEntity extends TurretEntity{
-        Bullet bullet;
+        Bulletc bullet;
         float bulletLife;
     }
 }
