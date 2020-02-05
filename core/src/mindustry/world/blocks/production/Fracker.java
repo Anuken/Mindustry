@@ -2,7 +2,6 @@ package mindustry.world.blocks.production;
 
 import arc.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
 import mindustry.content.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.type.*;
@@ -97,7 +96,6 @@ public class Fracker extends SolidPump{
         super.onDestroyed(tile);
 
         tile.getLinkedTiles(on -> {
-            if(on != tile && Mathf.chance(0.25)) return;
             Core.app.post(() -> on.setFloor((Floor)Blocks.tar));
         });
         Core.app.post(() -> Fire.create(tile));
