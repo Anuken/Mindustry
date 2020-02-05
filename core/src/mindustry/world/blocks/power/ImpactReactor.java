@@ -7,9 +7,11 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -77,6 +79,14 @@ public class ImpactReactor extends PowerGenerator{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
             if(Mathf.equal(entity.warmup, 1f, 0.001f)){
                 entity.warmup = 1f;
+
+                Core.app.post(() -> {
+                    BaseUnit unit = UnitTypes.reaper.create(tile.getTeam());
+                    unit.set(tile.drawx(), tile.drawy());
+                    unit.add();
+                    Events.fire(new UnitCreateEvent(unit));
+                    tile.entity.kill();
+                });
             }
 
             if(!prevOut && (getPowerProduction(tile) > consumes.getPower().requestedPower(entity))){
