@@ -162,8 +162,8 @@ public class ItemTurret extends CooledTurret{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             byte amount = stream.readByte();
             for(int i = 0; i < amount; i++){
                 Item item = Vars.content.item(stream.readByte());

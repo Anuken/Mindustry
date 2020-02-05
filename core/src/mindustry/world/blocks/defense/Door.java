@@ -89,7 +89,7 @@ public class Door extends Wall{
         Call.onDoorToggle(null, tile, !entity.open);
     }
 
-    public class DoorEntity extends Tilec{
+    public class DoorEntity extends TileEntity{
         public boolean open = false;
 
         @Override
@@ -99,8 +99,8 @@ public class Door extends Wall{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             open = stream.readBoolean();
         }
     }

@@ -53,7 +53,7 @@ public class PowerGenerator extends PowerDistributor{
         return false;
     }
 
-    public static class GeneratorEntity extends Tilec{
+    public static class GeneratorEntity extends TileEntity{
         public float generateTime;
         /** The efficiency of the producer. An efficiency of 1.0 means 100% */
         public float productionEfficiency = 0.0f;
@@ -65,8 +65,8 @@ public class PowerGenerator extends PowerDistributor{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             productionEfficiency = stream.readFloat();
         }
     }

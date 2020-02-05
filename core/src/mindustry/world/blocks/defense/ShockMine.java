@@ -1,13 +1,11 @@
 package mindustry.world.blocks.defense;
 
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.math.Mathf;
-import mindustry.entities.effect.Lightning;
-import mindustry.graphics.Layer;
-import mindustry.graphics.Pal;
-import mindustry.world.Block;
-import mindustry.world.Tile;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import mindustry.entities.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.world.*;
 
 public class ShockMine extends Block{
     public final int timerDamage = timers++;

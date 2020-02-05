@@ -83,7 +83,7 @@ public class Router extends Block{
         return result;
     }
 
-    public class RouterEntity extends Tilec{
+    public class RouterEntity extends TileEntity{
         Item lastItem;
         Tile lastInput;
         float time;

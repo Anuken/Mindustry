@@ -8,7 +8,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -90,8 +89,9 @@ public class ForceProjector extends Block{
         ForceEntity entity = tile.ent();
 
         if(entity.shield == null){
-            entity.shield = new ShieldEntity(tile);
-            entity.shield.add();
+            //TODO implement
+            //entity.shield = new ShieldEntity(tile);
+            //entity.shield.add();
         }
 
         boolean phaseValid = consumes.get(ConsumeType.item).valid(tile.entity);
@@ -115,7 +115,7 @@ public class ForceProjector extends Block{
             ConsumeLiquidFilter cons = consumes.get(ConsumeType.liquid);
             if(cons.valid(entity)){
                 cons.update(entity);
-                scale *= (cooldownLiquid * (1f + (entity.getLiquids().current().heatCapacity - 0.4f) * 0.9f));
+                scale *= (cooldownLiquid * (1f + (entity.liquids().current().heatCapacity - 0.4f) * 0.9f));
             }
 
             entity.buildup -= Time.delta() * scale;
@@ -140,7 +140,8 @@ public class ForceProjector extends Block{
         paramTile = tile;
         paramEntity = entity;
         paramBlock = this;
-        bulletGroup.intersect(tile.drawx() - realRadius, tile.drawy() - realRadius, realRadius*2f, realRadius * 2f, shieldConsumer);
+        //TODO fix
+        //bulletGroup.intersect(tile.drawx() - realRadius, tile.drawy() - realRadius, realRadius*2f, realRadius * 2f, shieldConsumer);
     }
 
     float realRadius(ForceEntity entity){
@@ -161,7 +162,7 @@ public class ForceProjector extends Block{
         Draw.reset();
     }
 
-    class ForceEntity extends Tilec{
+    class ForceEntity extends TileEntity{
         ShieldEntity shield;
         boolean broken = true;
         float buildup = 0f;
@@ -181,8 +182,8 @@ public class ForceProjector extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             broken = stream.readBoolean();
             buildup = stream.readFloat();
             radscl = stream.readFloat();
@@ -190,6 +191,14 @@ public class ForceProjector extends Block{
             phaseHeat = stream.readFloat();
         }
     }
+
+    //TODO fix
+    class ShieldEntity{
+
+    }
+    /*
+    //@EntityDef({Drawc.class})
+    //class ShieldDef{}
 
     public class ShieldEntity extends BaseEntity implements DrawTrait{
         final ForceEntity entity;
@@ -245,5 +254,5 @@ public class ForceProjector extends Block{
         public EntityGroup targetGroup(){
             return shieldGroup;
         }
-    }
+    }*/
 }

@@ -133,28 +133,12 @@ public class MechPad extends Block{
         }
     }
 
-    public class MechFactoryEntity extends Tilec implements SpawnerTrait{
+    public class MechFactoryEntity extends TileEntity{
         Playerc player;
         boolean sameMech;
         float progress;
         float time;
         float heat;
-
-        @Override
-        public boolean hasUnit(Unitc unit){
-            return unit == player;
-        }
-
-        @Override
-        public void updateSpawning(Playerc unit){
-            if(player == null){
-                progress = 0f;
-                player = unit;
-                sameMech = true;
-
-                player.beginRespawning(this);
-            }
-        }
 
         @Override
         public void write(DataOutput stream) throws IOException{
@@ -165,8 +149,8 @@ public class MechPad extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             progress = stream.readFloat();
             time = stream.readFloat();
             heat = stream.readFloat();

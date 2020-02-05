@@ -70,7 +70,7 @@ public abstract class StorageBlock extends Block{
         }
     }
 
-    public class StorageBlockEntity extends Tilec{
+    public class StorageBlockEntity extends TileEntity{
         protected @Nullable
         Tile linkedCore;
     }

@@ -309,7 +309,7 @@ public abstract class Turret extends Block{
         public abstract BulletType type();
     }
 
-    public static class TurretEntity extends Tilec{
+    public static class TurretEntity extends TileEntity{
         public Array<AmmoEntry> ammo = new Array<>();
         public int totalAmmo;
         public float reload;
@@ -327,8 +327,8 @@ public abstract class Turret extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             if(revision == 1){
                 reload = stream.readFloat();
                 rotation = stream.readFloat();

@@ -1,7 +1,7 @@
 package mindustry.annotations;
 
 import arc.files.*;
-import arc.struct.*;
+import arc.struct.Array;
 import arc.util.*;
 import com.squareup.javapoet.*;
 import com.sun.source.util.*;
@@ -16,6 +16,7 @@ import javax.tools.Diagnostic.*;
 import javax.tools.*;
 import java.io.*;
 import java.lang.annotation.*;
+import java.lang.reflect.*;
 import java.util.*;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -45,6 +46,12 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
     public static String simpleName(String str){
         return str.contains(".") ? str.substring(str.lastIndexOf('.') + 1) : str;
+    }
+
+    public static TypeName tname(String name) throws Exception{
+        Constructor<TypeName> cons = TypeName.class.getDeclaredConstructor(String.class);
+        cons.setAccessible(true);
+        return cons.newInstance(name);
     }
 
     public static TypeVariableName getTVN(TypeParameterElement element) {

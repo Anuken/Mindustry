@@ -92,7 +92,7 @@ public class ItemSource extends Block{
         return false;
     }
 
-    public class ItemSourceEntity extends Tilec{
+    public class ItemSourceEntity extends TileEntity{
         Item outputItem;
 
         @Override
@@ -107,8 +107,8 @@ public class ItemSource extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             outputItem = content.item(stream.readShort());
         }
     }

@@ -78,7 +78,7 @@ public class OverdriveProjector extends Block{
         entity.heat = Mathf.lerpDelta(entity.heat, entity.consValid() ? 1f : 0f, 0.08f);
         entity.charge += entity.heat * Time.delta();
 
-        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
+        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons().optionalValid()), 0.1f);
 
         if(entity.timer(timerUse, useTime) && entity.efficiency() > 0){
             entity.consume();
@@ -118,7 +118,7 @@ public class OverdriveProjector extends Block{
         Draw.reset();
     }
 
-    class OverdriveEntity extends Tilec{
+    class OverdriveEntity extends TileEntity{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
@@ -131,8 +131,8 @@ public class OverdriveProjector extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             heat = stream.readFloat();
             phaseHeat = stream.readFloat();
         }

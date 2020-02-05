@@ -86,7 +86,7 @@ public class Junction extends Block{
         return to != null && to.link().entity != null && to.team() == tile.team();
     }
 
-    class JunctionEntity extends Tilec{
+    class JunctionEntity extends TileEntity{
         DirectionalItemBuffer buffer = new DirectionalItemBuffer(capacity, speed);
 
         @Override
@@ -96,8 +96,8 @@ public class Junction extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             buffer.read(stream);
         }
     }

@@ -1,9 +1,5 @@
 package mindustry.io.versions;
 
-import arc.func.Prov;
-import mindustry.gen.*;
-import mindustry.entities.type.base.*;
-
 /*
 Latest data: [build 81]
 
@@ -75,7 +71,7 @@ public class LegacyTypeTable{
 11 = Wraith
 12 = Ghoul
 13 = Revenant
-     */
+
     private static final Prov[] build81Table = {
         Playerc::new,
         Fire::new,
@@ -139,5 +135,5 @@ public class LegacyTypeTable{
         }else{
             return build79Table;
         }
-    }
+    }*/
 }

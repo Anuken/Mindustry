@@ -171,8 +171,8 @@ public class ImpactReactor extends PowerGenerator{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             warmup = stream.readFloat();
         }
     }

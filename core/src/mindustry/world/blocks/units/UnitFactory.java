@@ -184,7 +184,7 @@ public class UnitFactory extends Block{
         return entity.spawned < maxSpawn;
     }
 
-    public static class UnitFactoryEntity extends Tilec{
+    public static class UnitFactoryEntity extends TileEntity{
         float buildTime;
         float time;
         float speedScl;
@@ -198,8 +198,8 @@ public class UnitFactory extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             buildTime = stream.readFloat();
             spawned = stream.readInt();
         }

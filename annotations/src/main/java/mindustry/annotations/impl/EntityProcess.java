@@ -134,11 +134,13 @@ public class EntityProcess extends BaseProcessor{
 
             //look at each definition
             for(Stype type : allDefs){
+                boolean isFinal = type.annotation(EntityDef.class).isFinal();
                 if(!type.name().endsWith("Def")){
                     err("All entity def names must end with 'Def'", type.e);
                 }
-                String name = type.name().replace("Def", "_"); //TODO remove extra underscore
-                TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+                String name = type.name().replace("Def", "Entity"); //TODO remove extra underscore
+                TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
+                if(isFinal) builder.addModifiers(Modifier.FINAL);
 
                 Array<Stype> components = allComponents(type);
                 Array<GroupDefinition> groups = groupDefs.select(g -> !g.components.contains(s -> !components.contains(s)));
@@ -185,7 +187,8 @@ public class EntityProcess extends BaseProcessor{
                     }
 
                     //build method using same params/returns
-                    MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(first.name()).addModifiers(first.is(Modifier.PRIVATE) ? Modifier.PRIVATE : Modifier.PUBLIC, Modifier.FINAL);
+                    MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(first.name()).addModifiers(first.is(Modifier.PRIVATE) ? Modifier.PRIVATE : Modifier.PUBLIC);
+                    if(isFinal) mbuilder.addModifiers(Modifier.FINAL);
                     mbuilder.addTypeVariables(first.typeVariables().map(TypeVariableName::get));
                     mbuilder.returns(first.retn());
                     mbuilder.addExceptions(first.thrownt());
@@ -243,6 +246,14 @@ public class EntityProcess extends BaseProcessor{
 
                     builder.addMethod(mbuilder.build());
                 }
+
+                //make constructor private
+                builder.addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PROTECTED).build());
+
+                //add create() method
+                builder.addMethod(MethodSpec.methodBuilder("create").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(tname(packageName + "." + name))
+                .addStatement("return new $L()", name).build());
 
                 definitions.add(new EntityDefinition("mindustry.gen." + name, builder, type, components, groups));
             }

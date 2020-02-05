@@ -361,7 +361,7 @@ public class ItemBridge extends Block{
         return other.block() == this && (!checkDouble || other.<ItemBridgeEntity>ent().link != tile.pos());
     }
 
-    public static class ItemBridgeEntity extends Tilec{
+    public static class ItemBridgeEntity extends TileEntity{
         public int link = Pos.invalid;
         public IntSet incoming = new IntSet();
         public float uptime;
@@ -389,8 +389,8 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             link = stream.readInt();
             uptime = stream.readFloat();
             byte links = stream.readByte();

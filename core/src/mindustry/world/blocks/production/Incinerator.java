@@ -84,7 +84,7 @@ public class Incinerator extends Block{
         return entity.heat > 0.5f;
     }
 
-    public static class IncineratorEntity extends Tilec{
+    public static class IncineratorEntity extends TileEntity{
         public float heat;
     }
 }

@@ -145,7 +145,7 @@ public class GenericCrafter extends Block{
         return itemCapacity;
     }
 
-    public static class GenericCrafterEntity extends Tilec{
+    public static class GenericCrafterEntity extends TileEntity{
         public float progress;
         public float totalProgress;
         public float warmup;
@@ -158,8 +158,8 @@ public class GenericCrafter extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             progress = stream.readFloat();
             warmup = stream.readFloat();
         }

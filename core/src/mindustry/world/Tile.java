@@ -102,7 +102,7 @@ public class Tile implements Position{
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Tilec> T ent(){
+    public <T extends TileEntity> T ent(){
         return (T)entity;
     }
 
@@ -458,7 +458,7 @@ public class Tile implements Position{
 
         if(block.hasEntity()){
             //TODO assign data and don't use new entity
-            //entity = block.newEntity().init(this, block.update);
+            entity = block.newEntity().init(this, block.update);
             entity.cons(new ConsumeModule(entity));
             if(block.hasItems) entity.items(new ItemModule());
             if(block.hasLiquids) entity.liquids(new LiquidModule());

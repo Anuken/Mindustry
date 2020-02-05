@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -128,7 +129,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
             && ((source.absoluteRelativeTo(tile.x, tile.y) + 2) % 4 != tile.rotation());
     }
 
-    public static class ConduitEntity extends Tilec{
+    public static class ConduitEntity extends TileEntity{
         public float smoothLiquid;
 
         int blendbits;

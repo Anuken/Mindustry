@@ -113,7 +113,7 @@ public class OverflowGate extends Block{
         return to;
     }
 
-    public class OverflowGateEntity extends Tilec{
+    public class OverflowGateEntity extends TileEntity{
         Item lastItem;
         Tile lastInput;
         float time;
@@ -129,8 +129,8 @@ public class OverflowGate extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             if(revision == 1){
                 new DirectionalItemBuffer(25, 50f).read(stream);
             }

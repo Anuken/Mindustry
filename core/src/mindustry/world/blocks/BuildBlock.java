@@ -196,7 +196,7 @@ public class BuildBlock extends Block{
         }
     }
 
-    public class BuildEntity extends Tilec{
+    public class BuildEntity extends TileEntity{
         /**
          * The recipe of the block that is being constructed.
          * If there is no recipe for this block, as is the case with rocks, 'previous' is used.
@@ -364,8 +364,8 @@ public class BuildBlock extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             progress = stream.readFloat();
             short pid = stream.readShort();
             short rid = stream.readShort();

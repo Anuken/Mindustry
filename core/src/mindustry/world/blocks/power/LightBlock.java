@@ -72,7 +72,7 @@ public class LightBlock extends Block{
         renderer.lights.add(tile.drawx(), tile.drawy(), radius, Tmp.c1.set(entity.color), brightness * tile.entity.efficiency());
     }
 
-    public class LightEntity extends Tilec{
+    public class LightEntity extends TileEntity{
         public int color = Pal.accent.rgba();
 
         @Override
@@ -87,8 +87,8 @@ public class LightBlock extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             color = stream.readInt();
         }
     }

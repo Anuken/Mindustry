@@ -139,7 +139,7 @@ public class RepairPoint extends Block{
         return entity.target != null;
     }
 
-    public class RepairPointEntity extends Tilec{
+    public class RepairPointEntity extends TileEntity{
         public Unitc target;
         public float strength, rotation = 90;
     }

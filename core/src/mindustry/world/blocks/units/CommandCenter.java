@@ -117,7 +117,7 @@ public class CommandCenter extends Block{
         Events.fire(new CommandIssueEvent(tile, command));
     }
 
-    public class CommandCenterEntity extends Tilec{
+    public class CommandCenterEntity extends TileEntity{
         public UnitCommand command = UnitCommand.attack;
 
         @Override

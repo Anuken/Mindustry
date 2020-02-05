@@ -155,7 +155,7 @@ public class SolidPump extends Pump{
         return tile.entity.liquids().total();
     }
 
-    public static class SolidPumpEntity extends Tilec{
+    public static class SolidPumpEntity extends TileEntity{
         public float warmup;
         public float pumpTime;
         public float boost;

@@ -311,7 +311,7 @@ public class MassDriver extends Block{
         }
     }
 
-    public class MassDriverEntity extends Tilec{
+    public class MassDriverEntity extends TileEntity{
         int link = -1;
         float rotation = 90;
         float reload = 0f;
@@ -340,8 +340,8 @@ public class MassDriver extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             link = stream.readInt();
             rotation = stream.readFloat();
             state = DriverState.values()[stream.readByte()];

@@ -424,7 +424,7 @@ public class UnitTypes implements ContentList{
             public void update(Playerc player){
                 if(player.timer.get(Playerc.timerAbility, healReload)){
                     if(indexer.eachBlock(player, healRange, other -> other.entity.damaged(), other -> {
-                        other.entity.healBy(other.entity.maxHealth() * healPercent / 100f);
+                        other.entity.heal(other.entity.maxHealth() * healPercent / 100f);
                         Fx.healBlockFull.at(other.drawx(), other.drawy(), other.block().size, Pal.heal);
                     })){
                         Fx.healWave.at(player);
@@ -468,7 +468,7 @@ public class UnitTypes implements ContentList{
 
             @Override
             public void update(Playerc player){
-                player.healBy(Time.delta() * 0.09f);
+                player.heal(Time.delta() * 0.09f);
             }
 
         };
@@ -546,7 +546,7 @@ public class UnitTypes implements ContentList{
                             Fx.heal.at(unit);
                             wasHealed = true;
                         }
-                        unit.healBy(healAmount);
+                        unit.heal(healAmount);
                     });
 
                     if(wasHealed){

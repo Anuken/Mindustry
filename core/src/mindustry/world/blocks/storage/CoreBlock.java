@@ -234,7 +234,7 @@ public class CoreBlock extends StorageBlock{
         return entity.spawnPlayer != null;
     }
 
-    public class CoreEntity extends Tilec{
+    public class CoreEntity extends TileEntity{
         protected Playerc spawnPlayer;
         protected float progress;
         protected float time;

@@ -315,7 +315,7 @@ public class Drill extends Block{
         return drops != null && drops.hardness <= tier;
     }
 
-    public static class DrillEntity extends Tilec{
+    public static class DrillEntity extends TileEntity{
         float progress;
         int index;
         float warmup;

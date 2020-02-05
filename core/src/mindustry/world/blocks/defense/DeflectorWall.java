@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.tilesize;
@@ -40,17 +41,18 @@ public class DeflectorWall extends Wall{
     }
 
     @Override
-    public void handleBulletHit(Tilec entity, Bullet bullet){
+    public void handleBulletHit(Tilec entity, Bulletc bullet){
         super.handleBulletHit(entity, bullet);
 
+        //TODO fix and test
         //doesn't reflect powerful bullets
-        if(bullet.damage() > maxDamageDeflect || bullet.isDeflected()) return;
+        if(bullet.damage() > maxDamageDeflect) return;
 
-        float penX = Math.abs(entity.getX() - bullet.x), penY = Math.abs(entity.getY() - bullet.y);
+        float penX = Math.abs(entity.getX() - bullet.x()), penY = Math.abs(entity.getY() - bullet.y());
 
         bullet.hitbox(rect2);
 
-        Vec2 position = Geometry.raycastRect(bullet.x - bullet.vel().x*Time.delta(), bullet.y - bullet.vel().y*Time.delta(), bullet.x + bullet.vel().x*Time.delta(), bullet.y + bullet.vel().y*Time.delta(),
+        Vec2 position = Geometry.raycastRect(bullet.x() - bullet.vel().x*Time.delta(), bullet.y() - bullet.vel().y*Time.delta(), bullet.x() + bullet.vel().x*Time.delta(), bullet.y() + bullet.vel().y*Time.delta(),
         rect.setSize(size * tilesize + rect2.width*2 + rect2.height*2).setCenter(entity.getX(), entity.getY()));
 
         if(position != null){
@@ -64,14 +66,16 @@ public class DeflectorWall extends Wall{
         }
 
         //bullet.updateVelocity();
-        bullet.resetOwner(entity, entity.team());
-        bullet.scaleTime(1f);
-        bullet.deflect();
+        bullet.owner(entity);
+        bullet.team(entity.team());
+        bullet.time(bullet.time() + 1f);
+        //TODO deflect
+        //bullet.deflect();
 
         ((DeflectorEntity)entity).hit = 1f;
     }
 
-    public static class DeflectorEntity extends Tilec{
+    public static class DeflectorEntity extends TileEntity{
         public float hit;
     }
 }

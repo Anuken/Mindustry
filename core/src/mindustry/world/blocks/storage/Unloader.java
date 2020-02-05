@@ -129,7 +129,7 @@ public class Unloader extends Block{
         });
     }
 
-    public static class UnloaderEntity extends Tilec{
+    public static class UnloaderEntity extends TileEntity{
         public Item sortItem = null;
 
         @Override
@@ -144,8 +144,8 @@ public class Unloader extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             byte id = stream.readByte();
             sortItem = id == -1 ? null : content.items().get(id);
         }

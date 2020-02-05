@@ -67,9 +67,9 @@ public class MendProjector extends Block{
         entity.heat = Mathf.lerpDelta(entity.heat, entity.consValid() || tile.isEnemyCheat() ? 1f : 0f, 0.08f);
         entity.charge += entity.heat * entity.delta();
 
-        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
+        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons().optionalValid()), 0.1f);
 
-        if(entity.cons.optionalValid() && entity.timer(timerUse, useTime) && entity.efficiency() > 0){
+        if(entity.cons().optionalValid() && entity.timer(timerUse, useTime) && entity.efficiency() > 0){
             entity.consume();
         }
 
@@ -78,7 +78,7 @@ public class MendProjector extends Block{
             entity.charge = 0f;
 
             indexer.eachBlock(entity, realRange, other -> other.entity.damaged(), other -> {
-                other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.efficiency());
+                other.entity.heal(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.efficiency());
                 Fx.healBlockFull.at(other.drawx(), other.drawy(), other.block().size, Tmp.c1.set(baseColor).lerp(phaseColor, entity.phaseHeat));
             });
         }
@@ -120,7 +120,7 @@ public class MendProjector extends Block{
         renderer.lights.add(tile.drawx(), tile.drawy(), 50f * tile.entity.efficiency(), baseColor, 0.7f * tile.entity.efficiency());
     }
 
-    class MendEntity extends Tilec{
+    class MendEntity extends TileEntity{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
@@ -133,8 +133,8 @@ public class MendProjector extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             heat = stream.readFloat();
             phaseHeat = stream.readFloat();
         }

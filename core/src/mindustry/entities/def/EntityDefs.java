@@ -8,7 +8,7 @@ class EntityDefs{
     @EntityDef({BulletComp.class, VelComp.class, TimedComp.class})
     class BulletDef{}
 
-    @EntityDef({TileComp.class})
+    @EntityDef(value = {TileComp.class}, isFinal = false)
     class TileDef{}
 
     @EntityDef({EffectComp.class})

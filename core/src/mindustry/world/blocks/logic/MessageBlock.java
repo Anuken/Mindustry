@@ -146,7 +146,7 @@ public class MessageBlock extends Block{
         table.setPosition(pos.x, pos.y, Align.bottom);
     }
 
-    public class MessageBlockEntity extends Tilec{
+    public class MessageBlockEntity extends TileEntity{
         public String message = "";
         public String[] lines = {""};
 
@@ -157,8 +157,8 @@ public class MessageBlock extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             message = stream.readUTF();
         }
     }

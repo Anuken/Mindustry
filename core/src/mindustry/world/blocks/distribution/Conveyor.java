@@ -179,7 +179,7 @@ public class Conveyor extends Block implements Autotiler{
             return;
         }
 
-        float nextMax = e.nextc != null && tile.rotation() == e.nextc.tile.rotation() ? 1f - Math.max(itemSpace - e.nextc.minitem, 0) : 1f;
+        float nextMax = e.nextc != null && tile.rotation() == e.nextc.tile().rotation() ? 1f - Math.max(itemSpace - e.nextc.minitem, 0) : 1f;
 
         for(int i = e.len - 1; i >= 0; i--){
             float nextpos = (i == e.len - 1 ? 100f : e.ys[i + 1]) - itemSpace;
@@ -197,7 +197,7 @@ public class Conveyor extends Block implements Autotiler{
                     e.nextc.xs[e.nextc.lastInserted] = e.xs[i];
                 }
                 //remove last item
-                e.items.remove(e.ids[i], e.len - i);
+                e.items().remove(e.ids[i], e.len - i);
                 e.len = Math.min(i, e.len);
             }else if(e.ys[i] < e.minitem){
                 e.minitem = e.ys[i];
@@ -244,7 +244,7 @@ public class Conveyor extends Block implements Autotiler{
             }
         }
 
-        e.items.remove(item, removed);
+        e.items().remove(item, removed);
 
         return removed;
     }
@@ -255,13 +255,13 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public int acceptStack(Item item, int amount, Tile tile, Unitc source){
+    public int acceptStack(Item item, int amount, Tile tile, Teamc source){
         ConveyorEntity entity = tile.ent();
         return Math.min((int)(entity.minitem / itemSpace), amount);
     }
 
     @Override
-    public void handleStack(Item item, int amount, Tile tile, Unitc source){
+    public void handleStack(Item item, int amount, Tile tile, Teamc source){
         ConveyorEntity e = tile.ent();
 
         for(int i = amount - 1; i >= 0; i--){
@@ -269,7 +269,7 @@ public class Conveyor extends Block implements Autotiler{
             e.xs[0] = 0;
             e.ys[0] = i * itemSpace;
             e.ids[0] = item;
-            e.items.add(item, 1);
+            e.items().add(item, 1);
         }
 
         e.noSleep();
@@ -293,7 +293,7 @@ public class Conveyor extends Block implements Autotiler{
         float x = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
 
         e.noSleep();
-        e.items.add(item, 1);
+        e.items().add(item, 1);
 
         if(Math.abs(source.relativeTo(tile.x, tile.y) - r) == 0){ //idx = 0
             e.add(0);
@@ -308,7 +308,7 @@ public class Conveyor extends Block implements Autotiler{
         }
     }
 
-    public static class ConveyorEntity extends Tilec{
+    public static class ConveyorEntity extends TileEntity{
         //parallel array data
         Item[] ids = new Item[capacity];
         float[] xs = new float[capacity];
@@ -360,8 +360,8 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             int amount = stream.readInt();
             len = Math.min(amount, capacity);
 

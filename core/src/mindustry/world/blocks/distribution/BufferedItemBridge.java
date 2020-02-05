@@ -47,8 +47,8 @@ public class BufferedItemBridge extends ExtendingItemBridge{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             buffer.read(stream);
         }
     }

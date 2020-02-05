@@ -112,7 +112,7 @@ public class LiquidSource extends Block{
         tile.<LiquidSourceEntity>ent().source = value == -1 ? null : content.liquid(value);
     }
 
-    class LiquidSourceEntity extends Tilec{
+    class LiquidSourceEntity extends TileEntity{
         public @Nullable Liquid source = null;
 
         @Override
@@ -127,8 +127,8 @@ public class LiquidSource extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             byte id = stream.readByte();
             source = id == -1 ? null : content.liquid(id);
         }

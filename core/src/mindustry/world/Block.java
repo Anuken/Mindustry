@@ -19,7 +19,6 @@ import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -143,7 +142,7 @@ public class Block extends BlockStorage{
 
     protected TextureRegion[] cacheRegions = {};
     protected Array<String> cacheRegionStrings = new Array<>();
-    protected Prov<TileData> entityType = TileData::new;
+    protected Prov<Tilec> entityType = TileEntity::create;
 
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] generatedIcons;
@@ -631,7 +630,8 @@ public class Block extends BlockStorage{
                     Time.run(i / 2f, () -> {
                         Tile other = world.tile(tile.x + Mathf.range(size / 2), tile.y + Mathf.range(size / 2));
                         if(other != null){
-                            Puddle.deposit(other, liquid, splash);
+                            //TODO puddle
+                            //Puddle.deposit(other, liquid, splash);
                         }
                     });
                 }
@@ -640,7 +640,8 @@ public class Block extends BlockStorage{
 
         Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * size / 2f, Pal.darkFlame);
         if(!tile.floor().solid && !tile.floor().isLiquid){
-            RubbleDecal.create(tile.drawx(), tile.drawy(), size);
+            //TODO rubble decal
+            //RubbleDecal.create(tile.drawx(), tile.drawy(), size);
         }
     }
 
@@ -855,7 +856,7 @@ public class Block extends BlockStorage{
         return destructible || update;
     }
 
-    public final TileData newData(){
+    public final Tilec newEntity(){
         return entityType.get();
     }
 

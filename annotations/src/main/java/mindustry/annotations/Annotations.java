@@ -50,6 +50,7 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface EntityDef{
         Class[] value();
+        boolean isFinal() default true;
     }
 
     /** Indicates an internal interface for entity components. */
