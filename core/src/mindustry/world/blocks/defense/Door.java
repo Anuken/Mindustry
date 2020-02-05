@@ -88,7 +88,7 @@ public class Door extends Wall{
             return;
         }
 
-        Time.run(10f, () -> entity.proximity().select(t -> t.block() instanceof Door).each(t -> {
+        Time.run(5f, () -> entity.proximity().select(t -> t.block() instanceof Door).each(t -> {
             t.block().tapped(t, null);
         }));
 
