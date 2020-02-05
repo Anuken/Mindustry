@@ -11,9 +11,13 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.type.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.*;
+
+import static mindustry.Vars.world;
 
 public class Mechs implements ContentList{
     public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive;
@@ -332,7 +336,22 @@ public class Mechs implements ContentList{
                     velocityRnd = 1f;
                     inaccuracy = 20f;
                     ignoreRotation = true;
-                    bullet = new BombBulletType(16f, 25f, "shell"){{
+                    bullet = new BombBulletType(16f, 25f, "shell"){
+
+                        @Override
+                        public void init(Bullet b){
+                            super.init(b);
+
+                            Tile over = world.tile(b.tileX(), b.tileY());
+                            Team team = b.getTeam();
+
+                            Timer.schedule(() -> {
+                                if(over == null || over.block() != Blocks.air) return;
+                                over.setNet(Blocks.shockMine, team, 0);
+                            }, lifetime / 60);
+                        }
+
+                        {
                         bulletWidth = 10f;
                         bulletHeight = 14f;
                         hitEffect = Fx.flakExplosion;
