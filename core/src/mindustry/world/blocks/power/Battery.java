@@ -7,4 +7,5 @@ public class Battery extends PowerDistributor{
         outputsPower = true;
         consumesPower = true;
     }
+    
 }
