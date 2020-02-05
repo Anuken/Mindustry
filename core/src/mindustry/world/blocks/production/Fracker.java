@@ -2,14 +2,8 @@ package mindustry.world.blocks.production;
 
 import arc.*;
 import arc.graphics.g2d.*;
-import mindustry.content.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
-
-import static mindustry.Vars.playerGroup;
 
 public class Fracker extends SolidPump{
     public float itemUseTime = 100f;
@@ -88,20 +82,6 @@ public class Fracker extends SolidPump{
             entity.accumulator += entity.delta() * entity.efficiency();
         }else{
             tryDumpLiquid(tile, result);
-        }
-    }
-
-    @Override
-    public void onDestroyed(Tile tile){
-        super.onDestroyed(tile);
-
-        tile.getLinkedTiles(on -> {
-            Core.app.post(() -> on.setFloor((Floor)Blocks.tar));
-        });
-        Core.app.post(() -> Fire.create(tile));
-
-        for(Player p : playerGroup){
-            p.syncWhenIdle = true;
         }
     }
 
