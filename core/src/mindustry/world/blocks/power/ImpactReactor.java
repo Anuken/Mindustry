@@ -81,6 +81,8 @@ public class ImpactReactor extends PowerGenerator{
                 entity.warmup = 1f;
 
                 Core.app.post(() -> {
+                    if (tile.entity == null) return;
+
                     BaseUnit reaper = UnitTypes.reaper.create(tile.getTeam());
                     reaper.set(tile.drawx(), tile.drawy());
                     reaper.add();
