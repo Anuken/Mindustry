@@ -122,7 +122,7 @@ public class DeployDialog extends FloatingDialog{
             setFilter(TextureFilter.Linear);
         }}){{
             float[] time = {0};
-            setColor(Color.gray(0.3f));
+            setColor(Color.grays(0.3f));
             setScale(1.5f);
             update(() -> {
                 setOrigin(Align.center);
@@ -140,7 +140,7 @@ public class DeployDialog extends FloatingDialog{
                 Stack sub = new Stack();
 
                 if(slot.getZone() != null){
-                    sub.add(new Table(f -> f.margin(4f).add(new Image()).color(Color.gray(0.1f)).grow()));
+                    sub.add(new Table(f -> f.margin(4f).add(new Image()).color(Color.grays(0.1f)).grow()));
 
                     //sub.add(new Table(f -> f.margin(4f).add(new Image(slot.getZone().preview).setScaling(Scaling.fit)).update(img -> {
                         //TextureRegionDrawable draw = (TextureRegionDrawable)img.getDrawable();

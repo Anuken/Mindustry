@@ -191,9 +191,9 @@ public abstract class Turret extends Block{
         TurretEntity entity = tile.ent();
 
         if(targetAir && !targetGround){
-            entity.target = Units.closestEnemy(tile.team(), tile.drawx(), tile.drawy(), range, e -> !e.dead() && e.isFlying());
+            entity.target = Units.closestEnemy(tile.team(), tile.drawx(), tile.drawy(), range, e -> !e.dead() && !e.isGrounded());
         }else{
-            entity.target = Units.closestTarget(tile.team(), tile.drawx(), tile.drawy(), range, e -> !e.dead() && (!e.isFlying() || targetAir) && (e.isFlying() || targetGround));
+            entity.target = Units.closestTarget(tile.team(), tile.drawx(), tile.drawy(), range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround));
         }
     }
 
@@ -267,7 +267,7 @@ public abstract class Turret extends Block{
     }
 
     protected void bullet(Tile tile, BulletType type, float angle){
-        Bullet.create(type, tile.entity, tile.team(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
+        type.create(tile.entity, tile.team(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
     }
 
     protected void effects(Tile tile){
@@ -329,10 +329,8 @@ public abstract class Turret extends Block{
         @Override
         public void read(DataInput stream) throws IOException{
             super.read(stream);
-            if(revision == 1){
-                reload = stream.readFloat();
-                rotation = stream.readFloat();
-            }
+            reload = stream.readFloat();
+            rotation = stream.readFloat();
         }
 
         @Override

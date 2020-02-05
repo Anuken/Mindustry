@@ -162,9 +162,6 @@ public class Sorter extends Block{
         public void read(DataInput stream) throws IOException{
             super.read(stream);
             sortItem = content.item(stream.readShort());
-            if(revision == 1){
-                new DirectionalItemBuffer(20, 45f).read(stream);
-            }
         }
     }
 }

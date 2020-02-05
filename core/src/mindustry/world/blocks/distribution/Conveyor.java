@@ -72,7 +72,7 @@ public class Conveyor extends Block implements Autotiler{
         ConveyorEntity entity = tile.ent();
         byte rotation = tile.rotation();
 
-        int frame = entity.clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * entity.timeScale)) % 4) : 0;
+        int frame = entity.clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * entity.timeScale())) % 4) : 0;
         Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], tile.drawx(), tile.drawy(),
         tilesize * entity.blendsclx, tilesize * entity.blendscly, rotation * 90);
     }
@@ -96,7 +96,7 @@ public class Conveyor extends Block implements Autotiler{
         if(tile.front() != null && tile.front().entity != null){
             entity.next = tile.front().entity;
             entity.nextc = entity.next instanceof ConveyorEntity && entity.next.team() == tile.team() ? (ConveyorEntity)entity.next : null;
-            entity.aligned = entity.nextc != null && tile.rotation() == entity.next.tile.rotation();
+            entity.aligned = entity.nextc != null && tile.rotation() == entity.next.tile().rotation();
         }
     }
 
@@ -154,11 +154,11 @@ public class Conveyor extends Block implements Autotiler{
         float centerx = 0f, centery = 0f;
 
         if(Math.abs(tx) > Math.abs(ty)){
-            centery = Mathf.clamp((tile.worldy() - unit.y) / centerDstScl, -centerSpeed, centerSpeed);
-            if(Math.abs(tile.worldy() - unit.y) < 1f) centery = 0f;
+            centery = Mathf.clamp((tile.worldy() - unit.y()) / centerDstScl, -centerSpeed, centerSpeed);
+            if(Math.abs(tile.worldy() - unit.y()) < 1f) centery = 0f;
         }else{
-            centerx = Mathf.clamp((tile.worldx() - unit.x) / centerDstScl, -centerSpeed, centerSpeed);
-            if(Math.abs(tile.worldx() - unit.x) < 1f) centerx = 0f;
+            centerx = Mathf.clamp((tile.worldx() - unit.x()) / centerDstScl, -centerSpeed, centerSpeed);
+            if(Math.abs(tile.worldx() - unit.x()) < 1f) centerx = 0f;
         }
 
         if(entity.len * itemSpace < 0.9f){
@@ -179,7 +179,7 @@ public class Conveyor extends Block implements Autotiler{
             return;
         }
 
-        float nextMax = e.nextc != null && tile.rotation() == e.nextc.tile().rotation() ? 1f - Math.max(itemSpace - e.nextc.minitem, 0) : 1f;
+        float nextMax = e.aligned ? 1f - Math.max(itemSpace - e.nextc.minitem, 0) : 1f;
 
         for(int i = e.len - 1; i >= 0; i--){
             float nextpos = (i == e.len - 1 ? 100f : e.ys[i + 1]) - itemSpace;

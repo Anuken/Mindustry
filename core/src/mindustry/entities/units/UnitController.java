@@ -6,4 +6,8 @@ import mindustry.gen.*;
 public interface UnitController{
     void unit(Unitc unit);
     Unitc unit();
+
+    default void command(UnitCommand command){
+
+    }
 }

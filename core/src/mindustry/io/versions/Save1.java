@@ -1,8 +1,5 @@
 package mindustry.io.versions;
 
-import arc.func.*;
-import mindustry.entities.*;
-
 import java.io.*;
 
 public class Save1 extends Save2{
@@ -13,7 +10,8 @@ public class Save1 extends Save2{
 
     @Override
     public void readEntities(DataInput stream) throws IOException{
-        Prov[] table = LegacyTypeTable.getTable(lastReadBuild);
+        //TODO implement
+        //Prov[] table = LegacyTypeTable.getTable(lastReadBuild);
 
         byte groups = stream.readByte();
 
@@ -23,8 +21,8 @@ public class Save1 extends Save2{
                 readChunk(stream, true, in -> {
                     byte typeid = in.readByte();
                     byte version = in.readByte();
-                    SaveTrait trait = (SaveTrait)table[typeid].get();
-                    trait.readSave(in, version);
+                    //SaveTrait trait = (SaveTrait)table[typeid].get();
+                    //trait.readSave(in, version);
                 });
             }
         }

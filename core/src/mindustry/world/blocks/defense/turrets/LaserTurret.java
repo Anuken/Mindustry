@@ -44,7 +44,7 @@ public class LaserTurret extends PowerTurret{
 
         if(entity.bulletLife > 0 && entity.bullet != null){
             tr.trns(entity.rotation, size * tilesize / 2f, 0f);
-            entity.bullet.rot(entity.rotation);
+            entity.bullet.rotation(entity.rotation);
             entity.bullet.set(tile.drawx() + tr.x, tile.drawy() + tr.y);
             entity.bullet.time(0f);
             entity.heat = 1f;
@@ -95,7 +95,7 @@ public class LaserTurret extends PowerTurret{
     protected void bullet(Tile tile, BulletType type, float angle){
         LaserTurretEntity entity = tile.ent();
 
-        entity.bullet = Bullet.create(type, tile.entity, tile.team(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
+        entity.bullet = type.create(tile.entity, tile.team(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
         entity.bulletLife = shootDuration;
     }
 

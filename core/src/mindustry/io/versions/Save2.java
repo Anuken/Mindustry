@@ -1,12 +1,8 @@
 package mindustry.io.versions;
 
-import mindustry.ctype.ContentType;
-import mindustry.entities.*;
 import mindustry.io.*;
 
 import java.io.*;
-
-import static mindustry.Vars.content;
 
 public class Save2 extends SaveVersion{
 
@@ -16,6 +12,7 @@ public class Save2 extends SaveVersion{
 
     @Override
     public void readEntities(DataInput stream) throws IOException{
+        //TODO implement
         byte groups = stream.readByte();
 
         for(int i = 0; i < groups; i++){
@@ -25,8 +22,8 @@ public class Save2 extends SaveVersion{
                 readChunk(stream, true, in -> {
                     byte typeid = in.readByte();
                     byte version = in.readByte();
-                    SaveTrait trait = (SaveTrait)content.<TypeID>getByID(ContentType.typeid, typeid).constructor.get();
-                    trait.readSave(in, version);
+                    //SaveTrait trait = (SaveTrait)content.<TypeID>getByID(ContentType.typeid, typeid).constructor.get();
+                    //trait.readSave(in, version);
                 });
             }
         }

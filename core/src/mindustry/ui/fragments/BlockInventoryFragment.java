@@ -16,7 +16,6 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
-import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.net.Administration.*;
@@ -39,7 +38,7 @@ public class BlockInventoryFragment extends Fragment{
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Playerc player, Tile tile, Item item, int amount){
         if(player == null || tile == null || !tile.interactable(player.team())) return;
-        amount = Mathf.clamp(amount, 0, player.ttemCapacity());
+        amount = Mathf.clamp(amount, 0, player.unit().itemCapacity());
         int fa = amount;
 
         if(net.server() && (!Units.canInteract(player, tile) ||
@@ -50,10 +49,10 @@ public class BlockInventoryFragment extends Fragment{
 
         int removed = tile.block().removeStack(tile, item, amount);
 
-        player.addItem(item, removed);
+        player.unit().addItem(item, removed);
         Events.fire(new WithdrawEvent(tile, player, item, amount));
         for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
-            Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.drawx(), tile.drawy(), player));
+            Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.drawx(), tile.drawy(), player.unit()));
         }
     }
 
@@ -105,7 +104,7 @@ public class BlockInventoryFragment extends Fragment{
                     holdTime += Time.delta();
 
                     if(holdTime >= holdWithdraw){
-                        int amount = Math.min(tile.entity.items().get(lastItem), player.maxAccepted(lastItem));
+                        int amount = Math.min(tile.entity.items().get(lastItem), player.unit().maxAccepted(lastItem));
                         Call.requestItem(player, tile, lastItem, amount);
                         holding = false;
                         holdTime = 0f;
@@ -140,7 +139,7 @@ public class BlockInventoryFragment extends Fragment{
 
                 container.add(i);
 
-                Boolp canPick = () -> player.acceptsItem(item) && !state.isPaused();
+                Boolp canPick = () -> player.unit().acceptsItem(item) && !state.isPaused();
 
                 HandCursorListener l = new HandCursorListener();
                 l.setEnabled(canPick);
@@ -157,7 +156,7 @@ public class BlockInventoryFragment extends Fragment{
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                         if(!canPick.get() || tile == null || tile.entity == null || tile.entity.items() == null || !tile.entity.items().has(item)) return false;
-                        int amount = Math.min(1, player.maxAccepted(item));
+                        int amount = Math.min(1, player.unit().maxAccepted(item));
                         if(amount > 0){
                             Call.requestItem(player, tile, item, amount);
                             lastItem = item;

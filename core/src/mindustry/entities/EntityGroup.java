@@ -31,6 +31,10 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         }
     }
 
+    public void sort(Comparator<? super T> comp){
+        array.sort(comp);
+    }
+
     public void update(){
 
         if(useTree()){

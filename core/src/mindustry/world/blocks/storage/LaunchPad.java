@@ -47,7 +47,8 @@ public class LaunchPad extends StorageBlock{
     public void draw(Tile tile){
         super.draw(tile);
 
-        float progress = Mathf.clamp(Mathf.clamp((tile.entity.items().total() / (float)itemCapacity)) * ((tile.entity.timerTime(timerLaunch) / (launchTime / tile.entity.timeScale))));
+        //TODO broken
+        float progress = Mathf.clamp(Mathf.clamp((tile.entity.items().total() / (float)itemCapacity)) * ((tile.entity.timer().getTime(timerLaunch) / (launchTime / tile.entity.timeScale()))));
         float scale = size / 3f;
 
         Lines.stroke(2f);
@@ -72,7 +73,7 @@ public class LaunchPad extends StorageBlock{
     public void update(Tile tile){
         Tilec entity = tile.entity;
 
-        if(world.isZone() && entity.consValid() && entity.items().total() >= itemCapacity && entity.timer(timerLaunch, launchTime / entity.timeScale)){
+        if(world.isZone() && entity.consValid() && entity.items().total() >= itemCapacity && entity.timer(timerLaunch, launchTime / entity.timeScale())){
             for(Item item : Vars.content.items()){
                 Events.fire(Trigger.itemLaunch);
                 Fx.padlaunch.at(tile);

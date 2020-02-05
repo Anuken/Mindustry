@@ -12,6 +12,7 @@ import arc.util.serialization.JsonValue.*;
 import arc.util.serialization.JsonWriter.*;
 import mindustry.*;
 import mindustry.core.*;
+import mindustry.gen.*;
 
 import java.io.*;
 import java.text.*;

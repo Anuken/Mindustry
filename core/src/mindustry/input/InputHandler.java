@@ -67,13 +67,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     //methods to override
 
     @Remote(called = Loc.server, unreliable = true)
-    public static <T extends Posc & Itemsc> void transferItemEffect(Item item, float x, float y, T to){
+    public static void transferItemEffect(Item item, float x, float y, Itemsc to){
         if(to == null) return;
         createItemTransfer(item, x, y, to, null);
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static <T extends Posc & Itemsc> void transferItemToUnit(Item item, float x, float y, T to){
+    public static void transferItemToUnit(Item item, float x, float y, Itemsc to){
         if(to == null) return;
         createItemTransfer(item, x, y, to, () -> to.addItem(item));
     }

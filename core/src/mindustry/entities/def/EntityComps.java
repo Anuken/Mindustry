@@ -51,6 +51,11 @@ public class EntityComps{
         private UnitDef type;
 
         @Override
+        public int itemCapacity(){
+            return type.itemCapacity;
+        }
+
+        @Override
         public float bounds(){
             return hitSize() *  2f;
         }
@@ -288,7 +293,7 @@ public class EntityComps{
 
     @Component
     abstract class TimerComp{
-        @ReadOnly Interval timer = new Interval(6);
+        Interval timer = new Interval(6);
 
         public boolean timer(int index, float time){
             return timer.get(index, time);
@@ -433,11 +438,11 @@ public class EntityComps{
     }
 
     @Component
-    class RotComp{
+    abstract class RotComp implements Entityc{
         float rotation;
 
         void interpolate(){
-            Syncc sync = (Syncc)this;
+            Syncc sync = as(Syncc.class);
 
             if(sync.interpolator().values.length > 0){
                 rotation = sync.interpolator().values[0];
@@ -446,7 +451,7 @@ public class EntityComps{
     }
     
     @Component
-    static abstract class TileComp implements Posc, Teamc, Healthc, Tilec{
+    static abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         static final float timeToSleep = 60f * 1;
         static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
         static int sleepingEntities = 0;
@@ -460,7 +465,6 @@ public class EntityComps{
         LiquidModule liquids;
         ConsumeModule cons;
 
-        private Interval timer;
         private float timeScale = 1f, timeScaleDuration;
 
         private @Nullable SoundLoop sound;
@@ -481,13 +485,19 @@ public class EntityComps{
 
             health(block.health);
             maxHealth(block.health);
-            timer = new Interval(block.timers);
+            timer(new Interval(block.timers));
 
             if(shouldAdd){
                 add();
             }
 
             return this;
+        }
+
+        @Override
+        public void applyBoost(float intensity, float  duration){
+            timeScale = Math.max(timeScale, intensity);
+            timeScaleDuration = Math.max(timeScaleDuration, duration);
         }
 
         @Override
@@ -503,11 +513,6 @@ public class EntityComps{
         @Override
         public void consume(){
             cons.trigger();
-        }
-
-        @Override
-        public boolean timer(int id, float time){
-            return timer.get(id, time);
         }
 
         /** Scaled delta. */
@@ -671,8 +676,10 @@ public class EntityComps{
     }
 
     @Component
-    abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
-        @Nullable Unitc unit;
+    abstract static class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
+        private static final Unitc noUnit = GenericUnitEntity.create();
+
+        @NonNull @ReadOnly Unitc unit = noUnit;
 
         @ReadOnly Team team = Team.sharded;
         String name = "noname";
@@ -698,7 +705,7 @@ public class EntityComps{
         }
 
         public void update(){
-            if(unit != null){
+            if(!dead()){
                 x(unit.x());
                 y(unit.y());
                 unit.team(team);
@@ -712,13 +719,29 @@ public class EntityComps{
             }
         }
 
+        public void clearUnit(){
+            unit(noUnit);
+        }
+
+        public Unitc unit(){
+            if(dead()){
+                //TODO remove
+                Log.err("WARNING: DEAD PLAYER UNIT ACCESSED");
+                new RuntimeException().printStackTrace();
+            }
+            return unit;
+        }
+
         public void unit(Unitc unit){
+            if(unit == null) throw new IllegalArgumentException("Unit cannot be null. Use clearUnit() instead.");
             this.unit = unit;
-            unit.team(team);
+            if(unit != noUnit){
+                unit.team(team);
+            }
         }
 
         boolean dead(){
-            return unit == null;
+            return unit == noUnit;
         }
 
         String uuid(){
@@ -1472,12 +1495,13 @@ public class EntityComps{
     }
 
     @Component
-    abstract class ItemsComp{
+    abstract class ItemsComp implements Posc{
         @ReadOnly ItemStack stack = new ItemStack();
 
         abstract int itemCapacity();
 
-        void update(){
+        @Override
+        public void update(){
             stack.amount = Mathf.clamp(stack.amount, 0, itemCapacity());
         }
 
@@ -1506,11 +1530,19 @@ public class EntityComps{
             stack.item = item;
             stack.amount = Mathf.clamp(stack.amount, 0, itemCapacity());
         }
+
+        int maxAccepted(Item item){
+            return stack.item != item && stack.amount > 0 ? 0 : itemCapacity() - stack.amount;
+        }
     }
 
     @Component
     abstract class MassComp implements Velc{
-        float mass;
+        float mass = 1f;
+
+        public void applyImpulse(float x, float y){
+            vel().add(x / mass, y / mass);
+        }
     }
 
     @Component

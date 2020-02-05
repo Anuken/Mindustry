@@ -47,12 +47,13 @@ public class LiquidBulletType extends BulletType{
         super.update(b);
 
         if(liquid.canExtinguish()){
+            //TODO implement
             Tile tile = world.tileWorld(b.x(), b.y());
-            if(tile != null && Fire.has(tile.x, tile.y)){
-                Fire.extinguish(tile, 100f);
-                b.remove();
-                hit(b);
-            }
+            //if(tile != null && Fire.has(tile.x, tile.y)){
+                //Fire.extinguish(tile, 100f);
+             //   b.remove();
+            //    hit(b);
+            //}
         }
     }
 
@@ -66,13 +67,14 @@ public class LiquidBulletType extends BulletType{
     @Override
     public void hit(Bulletc b, float hitx, float hity){
         hitEffect.at(hitx, hity, liquid.color);
-        Puddle.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
+        //TODO implement
+       // Puddle.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
 
         if(liquid.temperature <= 0.5f && liquid.flammability < 0.3f){
             float intensity = 400f;
-            Fire.extinguish(world.tileWorld(hitx, hity), intensity);
+            //Fire.extinguish(world.tileWorld(hitx, hity), intensity);
             for(Point2 p : Geometry.d4){
-                Fire.extinguish(world.tileWorld(hitx + p.x * tilesize, hity + p.y * tilesize), intensity);
+            //    Fire.extinguish(world.tileWorld(hitx + p.x * tilesize, hity + p.y * tilesize), intensity);
             }
         }
     }

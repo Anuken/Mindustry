@@ -19,4 +19,7 @@ class EntityDefs{
 
     @EntityDef({PlayerComp.class})
     class PlayerDef{}
+
+    @EntityDef({UnitComp.class})
+    class GenericUnitDef{}
 }

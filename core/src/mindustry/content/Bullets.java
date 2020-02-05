@@ -383,7 +383,7 @@ public class Bullets implements ContentList{
         }};
 
         damageLightning = new BulletType(0.0001f, 0f){{
-            lifetime = Lightning.lifetime;
+            lifetime = Fx.lightning.lifetime;
             hitEffect = Fx.hitLancer;
             despawnEffect = Fx.none;
             status = StatusEffects.shocked;
@@ -425,7 +425,8 @@ public class Bullets implements ContentList{
                 if(Mathf.chance(0.04 * Time.delta())){
                     Tile tile = world.tileWorld(b.x(), b.y());
                     if(tile != null){
-                        Fire.create(tile);
+                        //TODO implement
+                        //Fire.create(tile);
                     }
                 }
 
@@ -520,7 +521,8 @@ public class Bullets implements ContentList{
             public void hit(Bulletc b, float hitx, float hity){
                 hitEffect.at(hitx, hity, colors[2]);
                 if(Mathf.chance(0.4)){
-                    Fire.create(world.tileWorld(hitx + Mathf.range(5f), hity + Mathf.range(5f)));
+                    //TODO implement
+                   // Fire.create(world.tileWorld(hitx + Mathf.range(5f), hity + Mathf.range(5f)));
                 }
             }
 
@@ -639,7 +641,8 @@ public class Bullets implements ContentList{
 
                 for(int i = 0; i < 3; i++){
                     Tile tile = world.tileWorld(x + Mathf.range(8f), y + Mathf.range(8f));
-                    Puddle.deposit(tile, Liquids.oil, 5f);
+                    //TODO implement
+                    //Puddle.deposit(tile, Liquids.oil, 5f);
                 }
             }
         };

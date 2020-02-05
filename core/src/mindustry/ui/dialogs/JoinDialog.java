@@ -248,22 +248,22 @@ public class JoinDialog extends FloatingDialog{
             t.add("$name").padRight(10);
             if(!steam){
                 t.addField(Core.settings.getString("name"), text -> {
-                    player.name = text;
+                    player.name(text);
                     Core.settings.put("name", text);
                     Core.settings.save();
                 }).grow().pad(8).get().setMaxLength(maxNameLength);
             }else{
-                t.add(player.name()).update(l -> l.setColor(player.color)).grow().pad(8);
+                t.add(player.name()).update(l -> l.setColor(player.color())).grow().pad(8);
             }
 
             ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new PaletteDialog().show(color -> {
-                    player.color.set(color);
+                    player.color().set(color);
                     Core.settings.put("color-0", Color.rgba8888(color));
                     Core.settings.save();
                 });
             }).size(54f).get();
-            button.update(() -> button.getStyle().imageUpColor = player.color);
+            button.update(() -> button.getStyle().imageUpColor = player.color());
         }).width(w).height(70f).pad(4);
         cont.row();
         cont.add(pane).width(w + 38).pad(0);
@@ -335,7 +335,7 @@ public class JoinDialog extends FloatingDialog{
     }
 
     public void connect(String ip, int port){
-        if(player.name.trim().isEmpty()){
+        if(player.name().trim().isEmpty()){
             ui.showInfo("$noname");
             return;
         }

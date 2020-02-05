@@ -39,12 +39,12 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
 
     @Override
     public void update(Tilec entity){
-        entity.getLiquids().remove(liquid, Math.min(use(entity), entity.getLiquids().get(liquid)));
+        entity.liquids().remove(liquid, Math.min(use(entity), entity.liquids().get(liquid)));
     }
 
     @Override
     public boolean valid(Tilec entity){
-        return entity != null && entity.getLiquids() != null && entity.getLiquids().get(liquid) >= use(entity);
+        return entity != null && entity.liquids() != null && entity.liquids().get(liquid) >= use(entity);
     }
 
     @Override

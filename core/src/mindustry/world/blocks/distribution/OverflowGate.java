@@ -1,13 +1,11 @@
 package mindustry.world.blocks.distribution;
 
-import arc.math.Mathf;
-import arc.util.Time;
+import arc.math.*;
+import arc.util.*;
 import mindustry.gen.*;
-import mindustry.type.Item;
+import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.meta.BlockGroup;
-
-import java.io.*;
+import mindustry.world.meta.*;
 
 public class OverflowGate extends Block{
     public float speed = 1f;
@@ -117,23 +115,5 @@ public class OverflowGate extends Block{
         Item lastItem;
         Tile lastInput;
         float time;
-
-        @Override
-        public byte version(){
-            return 2;
-        }
-
-        @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-        }
-
-        @Override
-        public void read(DataInput stream) throws IOException{
-            super.read(stream);
-            if(revision == 1){
-                new DirectionalItemBuffer(25, 50f).read(stream);
-            }
-        }
     }
 }

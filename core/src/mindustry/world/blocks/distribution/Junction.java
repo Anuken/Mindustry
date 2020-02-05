@@ -30,7 +30,7 @@ public class Junction extends Block{
     }
 
     @Override
-    public int acceptStack(Item item, int amount, Tile tile, Unitc source){
+    public int acceptStack(Item item, int amount, Tile tile, Teamc source){
         return 0;
     }
 

@@ -89,7 +89,7 @@ public class OverdriveProjector extends Block{
             float realBoost = (speedBoost + entity.phaseHeat * speedBoostPhase) * entity.efficiency();
 
             entity.charge = 0f;
-            indexer.eachBlock(entity, realRange, other -> other.entity.timeScale <= realBoost, other -> other.entity.applyBoost(realBoost, reload + 1f));
+            indexer.eachBlock(entity, realRange, other -> other.entity.timeScale() <= realBoost, other -> other.entity.applyBoost(realBoost, reload + 1f));
         }
     }
 

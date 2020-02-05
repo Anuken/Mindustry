@@ -63,7 +63,7 @@ public class Unloader extends Block{
     public void update(Tile tile){
         UnloaderEntity entity = tile.ent();
 
-        if(tile.entity.timer(timerUnload, speed / entity.timeScale) && tile.entity.items().total() == 0){
+        if(tile.entity.timer(timerUnload, speed / entity.timeScale()) && tile.entity.items().total() == 0){
             for(Tile other : tile.entity.proximity()){
                 if(other.interactable(tile.team()) && other.block().unloadable && other.block().hasItems && entity.items().total() == 0 &&
                 ((entity.sortItem == null && other.entity.items().total() > 0) || hasItem(other, entity.sortItem))){

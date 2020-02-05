@@ -33,12 +33,12 @@ public class CachedTile extends Tile{
 
         if(block.hasEntity()){
             Tilec n = block.newEntity();
-            n.cons = new ConsumeModule(entity);
-            n.tile = this;
-            n.block = block;
-            if(block.hasItems) n.items = new ItemModule();
-            if(block.hasLiquids) n.liquids = new LiquidModule();
-            if(block.hasPower) n.power = new PowerModule();
+            n.cons(new ConsumeModule(entity));
+            n.tile(this);
+            n.block(block);
+            if(block.hasItems) n.items(new ItemModule());
+            if(block.hasLiquids) n.liquids(new LiquidModule());
+            if(block.hasPower) n.power(new PowerModule());
             entity = n;
         }
     }

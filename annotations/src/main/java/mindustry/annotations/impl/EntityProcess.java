@@ -164,6 +164,7 @@ public class EntityProcess extends BaseProcessor{
                             fbuilder.initializer(tree.getInitializer().toString());
                         }
 
+                        if(!isFinal) fbuilder.addModifiers(Modifier.PROTECTED);
                         fbuilder.addAnnotations(f.annotations().map(AnnotationSpec::get));
                         builder.addField(fbuilder.build());
                     }

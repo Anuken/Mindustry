@@ -1,19 +1,17 @@
 package mindustry.world.blocks;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.gen.*;
-import mindustry.gen.*;
-import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -66,10 +64,10 @@ public class BuildBlock extends Block{
         float healthf = tile.entity == null ? 1f : tile.entity.healthf();
         tile.set(block, team, rotation);
         if(tile.entity != null){
-            tile.entity.health = block.health * healthf;
+            tile.entity.health(block.health * healthf);
         }
         //last builder was this local client player, call placed()
-        if(!headless && builderID == player.id){
+        if(!headless && builderID == player.id()){
             if(!skipConfig){
                 tile.block().playerPlaced(tile);
             }
@@ -141,6 +139,8 @@ public class BuildBlock extends Block{
     public void tapped(Tile tile, Playerc player){
         BuildEntity entity = tile.ent();
 
+        //TODO building
+        /*
         //if the target is constructible, begin constructing
         if(entity.cblock != null){
             if(player.buildWasAutoPaused && !player.isBuilding){
@@ -148,7 +148,7 @@ public class BuildBlock extends Block{
             }
             //player.clearBuilding();
             player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.rotation(), entity.cblock), false);
-        }
+        }*/
     }
 
     @Override
@@ -156,7 +156,8 @@ public class BuildBlock extends Block{
         Fx.blockExplosionSmoke.at(tile);
 
         if(!tile.floor().solid && !tile.floor().isLiquid){
-            RubbleDecal.create(tile.drawx(), tile.drawy(), size);
+            //TODO implement
+           // RubbleDecal.create(tile.drawx(), tile.drawy(), size);
         }
     }
 
@@ -237,7 +238,7 @@ public class BuildBlock extends Block{
             maxProgress = core == null ? maxProgress : checkRequired(core.items(), maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
-            builderID = builder.getId();
+            builderID = builder.id();
 
             if(progress >= 1f || state.rules.infiniteResources){
                 constructed(tile, cblock, builderID, tile.rotation(), builder.team(), configured);
@@ -267,8 +268,8 @@ public class BuildBlock extends Block{
 
                     if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
                         if(core != null){
-                            int accepting = core.tile.block().acceptStack(requirements[i].item, accumulated, core.tile, builder);
-                            core.tile.block().handleStack(requirements[i].item, accepting, core.tile, builder);
+                            int accepting = core.tile().block().acceptStack(requirements[i].item, accumulated, core.tile(), builder);
+                            core.tile().block().handleStack(requirements[i].item, accepting, core.tile(), builder);
                             accumulator[i] -= accepting;
                         }else{
                             accumulator[i] -= accumulated;
@@ -280,7 +281,7 @@ public class BuildBlock extends Block{
             progress = Mathf.clamp(progress - amount);
 
             if(builder instanceof Playerc){
-                builderID = builder.getID();
+                builderID = builder.id();
             }
 
             if(progress <= 0 || state.rules.infiniteResources){

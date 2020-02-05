@@ -30,7 +30,7 @@ public class Units{
      * @return whether the target is invalid
      */
     public static boolean invalidateTarget(Teamc target, Team team, float x, float y, float range){
-        return target == null || (range != Float.MAX_VALUE && !target.withinDst(x, y, range)) || target.team() == team || !target.isValid();
+        return target == null || (range != Float.MAX_VALUE && !target.withinDst(x, y, range)) || target.team() == team || (target instanceof Healthc && !((Healthc)target).isValid());
     }
 
     /** See {@link #invalidateTarget(Teamc, Team, float, float, float)} */

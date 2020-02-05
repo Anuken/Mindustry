@@ -107,7 +107,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     @Override
     public void update(Tile tile){
         ConduitEntity entity = tile.ent();
-        entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.getLiquids().currentAmount() / liquidCapacity, 0.05f);
+        entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.liquids().currentAmount() / liquidCapacity, 0.05f);
 
         if(tile.entity.liquids().total() > 0.001f && tile.entity.timer(timerFlow, 1)){
             tryMoveLiquid(tile, tile.getNearby(tile.rotation()), leakResistance, tile.entity.liquids().current());

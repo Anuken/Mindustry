@@ -71,7 +71,8 @@ public class LiquidTurret extends Turret{
     protected boolean validateTarget(Tile tile){
         TurretEntity entity = tile.ent();
         if(entity.liquids().current().canExtinguish() && entity.target instanceof Tile){
-            return Fire.has(((Tile)entity.target).x, ((Tile)entity.target).y);
+            //TODO fix
+            //return Fire.has(((Tile)entity.target).x, ((Tile)entity.target).y);
         }
         return super.validateTarget(tile);
     }
@@ -83,10 +84,10 @@ public class LiquidTurret extends Turret{
             int tr = (int)(range / tilesize);
             for(int x = -tr; x <= tr; x++){
                 for(int y = -tr; y <= tr; y++){
-                    if(Fire.has(x + tile.x, y + tile.y)){
-                        entity.target = world.tile(x + tile.x, y + tile.y);
-                        return;
-                    }
+                    //if(Fire.has(x + tile.x, y + tile.y)){
+                    //    entity.target = world.tile(x + tile.x, y + tile.y);
+                    //    return;
+                    //}
                 }
             }
         }

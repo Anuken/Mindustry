@@ -41,11 +41,11 @@ public class PowerNode extends PowerBlock{
     public void configured(Tile tile, Playerc player, int value){
         Tilec entity = tile.entity;
         Tile other = world.tile(value);
-        boolean contains = entity.getPower().links.contains(value), valid = other != null && other.entity != null && other.entity.power() != null;
+        boolean contains = entity.power().links.contains(value), valid = other != null && other.entity != null && other.entity.power() != null;
 
         if(contains){
             //unlink
-            entity.getPower().links.removeValue(value);
+            entity.power().links.removeValue(value);
             if(valid) other.entity.power().links.removeValue(tile.pos());
 
             PowerGraph newgraph = new PowerGraph();
@@ -59,10 +59,10 @@ public class PowerNode extends PowerBlock{
                 //reflow from other end
                 og.reflow(other);
             }
-        }else if(linkValid(tile, other) && valid && entity.getPower().links.size < maxNodes){
+        }else if(linkValid(tile, other) && valid && entity.power().links.size < maxNodes){
 
-            if(!entity.getPower().links.contains(other.pos())){
-                entity.getPower().links.add(other.pos());
+            if(!entity.power().links.contains(other.pos())){
+                entity.power().links.add(other.pos());
             }
 
             if(other.getTeamID() == tile.getTeamID()){
@@ -72,7 +72,7 @@ public class PowerNode extends PowerBlock{
                 }
             }
 
-            entity.getPower().graph.add(other.entity.power().graph);
+            entity.power().graph.add(other.entity.power().graph);
         }
     }
 
@@ -189,8 +189,8 @@ public class PowerNode extends PowerBlock{
                     }
                 });
             }else{
-                while(entity.getPower().links.size > 0){
-                    tile.configure(entity.getPower().links.get(0));
+                while(entity.power().links.size > 0){
+                    tile.configure(entity.power().links.get(0));
                 }
             }
             return false;
@@ -267,8 +267,8 @@ public class PowerNode extends PowerBlock{
 
         Tilec entity = tile.ent();
 
-        for(int i = 0; i < entity.getPower().links.size; i++){
-            Tile link = world.tile(entity.getPower().links.get(i));
+        for(int i = 0; i < entity.power().links.size; i++){
+            Tile link = world.tile(entity.power().links.get(i));
 
             if(!linkValid(tile, link)) continue;
 

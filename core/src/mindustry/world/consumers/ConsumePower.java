@@ -42,7 +42,7 @@ public class ConsumePower extends Consume{
 
     @Override
     public void update(Tilec entity){
-        // Nothing to do since PowerGraph directly updates entity.getPower().status
+        // Nothing to do since PowerGraph directly updates entity.power().status
     }
 
     @Override

@@ -57,7 +57,7 @@ public class CommandCenter extends Block{
         ObjectSet<Tile> set = indexer.getAllied(tile.team(), BlockFlag.comandCenter);
 
         if(set.size == 1){
-            Groups.unit.each(t -> t.team() == tile.team(), u -> u.onCommand(UnitCommand.all[0]));
+            Groups.unit.each(t -> t.team() == tile.team(), u -> u.controller().command(UnitCommand.all[0]));
         }
     }
 
@@ -113,7 +113,7 @@ public class CommandCenter extends Block{
             }
         }
 
-        Groups.unit.each(t -> t.team() == tile.team(), u -> u.onCommand(command));
+        Groups.unit.each(t -> t.team() == tile.team(), u -> u.controller().command(command));
         Events.fire(new CommandIssueEvent(tile, command));
     }
 
@@ -132,8 +132,8 @@ public class CommandCenter extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte version) throws IOException{
-            super.read(stream, version);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             command = UnitCommand.all[stream.readByte()];
         }
     }
