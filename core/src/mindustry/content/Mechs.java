@@ -263,7 +263,7 @@ public class Mechs implements ContentList{
                 cellTrnsY = 1f;
                 weapon = new Weapon("missiles"){{
                     length = 1.5f;
-                    reload = 70f;
+                    reload = 10f;
                     shots = 4;
                     inaccuracy = 2f;
                     alternate = true;
