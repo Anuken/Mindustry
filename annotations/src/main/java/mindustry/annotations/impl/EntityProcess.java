@@ -335,24 +335,6 @@ public class EntityProcess extends BaseProcessor{
 
             idBuilder.addStaticBlock(idStore.build());
 
-            //create mock types of all components
-            for(Stype component : allComponents){
-
-
-                Array<Stype> dependencies = getDependencies(component);
-                Array<Stype> out = new Array<>();
-                out.add(component);
-                out.addAll(component.superclasses());
-                dependencies.each(dep -> {
-                    out.add(dep);
-                    out.addAll(dep.superclasses());
-                });
-
-                out.distinct();
-
-                Log.info("Dependencies of {0}:\n{1}\n\n", component, out.toString("\n", s -> "&lb> " + s));
-            }
-
             write(idBuilder);
         }else{
             //round 2: generate actual classes and implement interfaces
@@ -393,6 +375,43 @@ public class EntityProcess extends BaseProcessor{
                 }
 
                 write(def.builder, imports.asArray());
+            }
+
+            //create mock types of all components
+            for(Stype interf : interfaces){
+                Array<Stype> dependencies = interf.allInterfaces();
+                dependencies.add(interf);
+                Log.info(interf + ": sub  " + interf.allSuperclasses() + " " + interf.allInterfaces());
+
+                Array<Smethod> methods = dependencies.flatMap(Stype::methods);
+                methods.sort(Structs.comparing(Object::toString));
+
+                ObjectSet<String> signatures = new ObjectSet<>();
+
+                TypeSpec.Builder nullBuilder = TypeSpec.classBuilder("Null" + interf.name().substring(0, interf.name().length() - 1))
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+
+                nullBuilder.addSuperinterface(interf.tname());
+
+                for(Smethod method : methods){
+                    String signature = method.toString();
+                    if(signatures.contains(signature)) continue;
+
+                    Stype type = method.type();
+                    MethodSpec.Builder builder = MethodSpec.overriding(method.e).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+
+                    if(!method.isVoid()){
+                        builder.addStatement("return " + getDefault(method.ret().toString()));
+                    }
+
+                    nullBuilder.addMethod(builder.build());
+
+                    signatures.add(signature);
+                }
+
+                //write(nullBuilder);
+
+                Log.info("Methods to override for {0}:\n{1}\n\n", interf, methods.toString("\n", s -> "&lg> &lb" + s));
             }
         }
     }

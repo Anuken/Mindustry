@@ -14,8 +14,19 @@ public class Smethod extends Selement<ExecutableElement>{
         super(executableElement);
     }
 
+    public boolean isAny(Modifier... mod){
+        for(Modifier m : mod){
+            if(is(m)) return true;
+        }
+        return false;
+    }
+
     public boolean is(Modifier mod){
         return e.getModifiers().contains(mod);
+    }
+
+    public Stype type(){
+        return new Stype((TypeElement)up());
     }
 
     public Array<TypeMirror> thrown(){

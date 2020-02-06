@@ -44,6 +44,23 @@ public abstract class BaseProcessor extends AbstractProcessor{
         || type.equals("long") || type.equals("float") || type.equals("double") || type.equals("char");
     }
 
+    public static String getDefault(String value){
+        switch(value){
+            case "float":
+            case "double":
+            case "int":
+            case "long":
+            case "short":
+            case "char":
+            case "byte":
+                return "0";
+            case "boolean":
+                return "false";
+            default:
+                return "null";
+        }
+    }
+
     public static String simpleName(String str){
         return str.contains(".") ? str.substring(str.lastIndexOf('.') + 1) : str;
     }

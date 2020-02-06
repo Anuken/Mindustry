@@ -24,8 +24,17 @@ public class Stype extends Selement<TypeElement>{
         return Array.with(e.getInterfaces()).map(Stype::of);
     }
 
+    public Array<Stype> allInterfaces(){
+        return interfaces().flatMap(Stype::allInterfaces).distinct();
+    }
+
     public Array<Stype> superclasses(){
         return Array.with(BaseProcessor.typeu.directSupertypes(mirror())).map(Stype::of);
+    }
+
+    public Array<Stype> allSuperclasses(){
+        //this is truly PEAK efficiency
+        return superclasses().flatMap(Stype::allSuperclasses).distinct();
     }
 
     public Stype superclass(){
