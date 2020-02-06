@@ -6,6 +6,24 @@ public class Annotations{
     //region entity interfaces
 
     /** Indicates that a component field is read-only. */
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Render{
+        RenderLayer value();
+    }
+
+    public enum RenderLayer{
+        floor,
+        groundShadows,
+        ground,
+        flyingShadows,
+        flying,
+        bullets,
+        effects,
+        names,
+    }
+
+    /** Indicates that a component field is read-only. */
     @Target({ElementType.FIELD, ElementType.METHOD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ReadOnly{

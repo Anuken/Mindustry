@@ -1,0 +1,203 @@
+package mindustry.entities.def;
+
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.scene.ui.layout.*;
+import arc.util.*;
+import arc.util.ArcAnnotate.*;
+import arc.util.pooling.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
+import mindustry.entities.units.*;
+import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.net.*;
+import mindustry.net.Administration.*;
+import mindustry.net.Packets.*;
+import mindustry.ui.*;
+
+import static mindustry.Vars.*;
+
+@Component
+abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
+    @NonNull
+    @ReadOnly Unitc unit = Nulls.unit;
+
+    @ReadOnly Team team = Team.sharded;
+    String name = "noname";
+    @Nullable NetConnection con;
+    boolean admin, typing;
+    Color color = new Color();
+    float mouseX, mouseY;
+
+    @Nullable String lastText;
+    float textFadeTime;
+
+    public boolean isBuilder(){
+        return unit instanceof Builderc;
+    }
+
+    public boolean isMiner(){
+        return unit instanceof Minerc;
+    }
+
+    public @Nullable Tilec closestCore(){
+        return state.teams.closestCore(x(), y(), team);
+    }
+
+    public void reset(){
+        team = state.rules.defaultTeam;
+        admin = typing = false;
+        lastText = null;
+        textFadeTime = 0f;
+        if(!dead()){
+            unit.controller(unit.type().createController());
+            unit = Nulls.unit;
+        }
+    }
+
+    public void update(){
+        if(!dead()){
+            x(unit.x());
+            y(unit.y());
+            unit.team(team);
+        }
+        textFadeTime -= Time.delta() / (60 * 5);
+    }
+
+    public void team(Team team){
+        if(unit != null){
+            unit.team(team);
+        }
+    }
+
+    public void clearUnit(){
+        unit(Nulls.unit);
+    }
+
+    public Unitc unit(){
+        if(dead()){
+            //TODO remove
+            Log.err("WARNING: DEAD PLAYER UNIT ACCESSED");
+            new RuntimeException().printStackTrace();
+        }
+        return unit;
+    }
+
+    public Minerc miner(){
+        return !(unit instanceof Minerc) ? Nulls.miner : (Minerc)unit;
+    }
+
+    public Builderc builder(){
+        return !(unit instanceof Builderc) ? Nulls.builder : (Builderc)unit;
+    }
+
+    public void unit(Unitc unit){
+        if(unit == null) throw new IllegalArgumentException("Unit cannot be null. Use clearUnit() instead.");
+        this.unit = unit;
+        if(unit != Nulls.unit){
+            unit.team(team);
+        }
+    }
+
+    boolean dead(){
+        return unit.isNull();
+    }
+
+    String uuid(){
+        return con == null ? "[LOCAL]" : con.uuid;
+    }
+
+    String usid(){
+        return con == null ? "[LOCAL]" : con.usid;
+    }
+
+    void kick(KickReason reason){
+        con.kick(reason);
+    }
+
+    void kick(String reason){
+        con.kick(reason);
+    }
+
+    void drawName(){
+        BitmapFont font = Fonts.def;
+        GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+        final float nameHeight = 11;
+        final float textHeight = 15;
+
+        boolean ints = font.usesIntegerPositions();
+        font.setUseIntegerPositions(false);
+        font.getData().setScale(0.25f / Scl.scl(1f));
+        layout.setText(font, name);
+
+        if(!isLocal()){
+            Draw.color(0f, 0f, 0f, 0.3f);
+            Fill.rect(unit.x(), unit.y() + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
+            Draw.color();
+            font.setColor(color);
+            font.draw(name, unit.x(), unit.y() + nameHeight, 0, Align.center, false);
+
+            if(admin){
+                float s = 3f;
+                Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
+                Draw.rect(Icon.adminSmall.getRegion(), unit.x() + layout.width / 2f + 2 + 1, unit.y() + nameHeight - 1.5f, s, s);
+                Draw.color(color);
+                Draw.rect(Icon.adminSmall.getRegion(), unit.x() + layout.width / 2f + 2 + 1, unit.y() + nameHeight - 1f, s, s);
+            }
+        }
+
+        if(Core.settings.getBool("playerchat") && ((textFadeTime > 0 && lastText != null) || typing)){
+            String text = textFadeTime <= 0 || lastText == null ? "[LIGHT_GRAY]" + Strings.animated(Time.time(), 4, 15f, ".") : lastText;
+            float width = 100f;
+            float visualFadeTime = 1f - Mathf.curve(1f - textFadeTime, 0.9f);
+            font.setColor(1f, 1f, 1f, textFadeTime <= 0 || lastText == null ? 1f : visualFadeTime);
+
+            layout.setText(font, text, Color.white, width, Align.bottom, true);
+
+            Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime <= 0 || lastText == null  ? 1f : visualFadeTime));
+            Fill.rect(unit.x(), unit.y() + textHeight + layout.height - layout.height/2f, layout.width + 2, layout.height + 3);
+            font.draw(text, unit.x() - width/2f, unit.y() + textHeight + layout.height, width, Align.center, true);
+        }
+
+        Draw.reset();
+        Pools.free(layout);
+        font.getData().setScale(1f);
+        font.setColor(Color.white);
+        font.setUseIntegerPositions(ints);
+    }
+
+    void sendMessage(String text){
+        if(isLocal()){
+            if(ui != null){
+                ui.chatfrag.addMessage(text, null);
+            }
+        }else{
+            Call.sendMessage(con, text, null, null);
+        }
+    }
+
+    void sendMessage(String text, Playerc from){
+        sendMessage(text, from, NetClient.colorizeName(from.id(), from.name()));
+    }
+
+     void sendMessage(String text, Playerc from, String fromName){
+        if(isLocal()){
+            if(ui != null){
+                ui.chatfrag.addMessage(text, fromName);
+            }
+        }else{
+            Call.sendMessage(con, text, fromName, from);
+        }
+    }
+
+    PlayerInfo getInfo(){
+        if(isLocal()){
+            throw new IllegalArgumentException("Local players cannot be traced and do not have info.");
+        }else{
+            return netServer.admins.getInfo(uuid());
+        }
+    }
+}

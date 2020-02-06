@@ -7,5 +7,6 @@ public enum RenderLayer{
     flyingShadows,
     flying,
     bullets,
-    effects
+    effects,
+    names,
 }

@@ -19,6 +19,7 @@ import java.lang.annotation.*;
 
 @SupportedAnnotationTypes({
 "mindustry.annotations.Annotations.EntityDef",
+"mindustry.annotations.Annotations.GroupDef",
 "mindustry.annotations.Annotations.EntityInterface",
 "mindustry.annotations.Annotations.BaseComponent"
 })
@@ -64,7 +65,8 @@ public class EntityProcess extends BaseProcessor{
 
             //create component interfaces
             for(Stype component : allComponents){
-                TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(component)).addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
+                TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(component))
+                .addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
 
                 //implement extra interfaces these components may have, e.g. position
                 for(Stype extraInterface : component.interfaces().select(i -> !isCompInterface(i))){

@@ -3,6 +3,7 @@ package mindustry.annotations;
 import arc.files.*;
 import arc.struct.Array;
 import arc.util.*;
+import arc.util.Log.*;
 import com.squareup.javapoet.*;
 import com.sun.source.util.*;
 import mindustry.annotations.util.*;
@@ -151,6 +152,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
         elementu = env.getElementUtils();
         filer = env.getFiler();
         messager = env.getMessager();
+
+        if(System.getProperty("debug") == null){
+            Log.setLogLevel(LogLevel.err);
+        }
     }
 
     @Override
@@ -159,7 +164,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         if(rootDirectory == null){
             try{
                 String path = Fi.get(filer.getResource(StandardLocation.CLASS_OUTPUT, "no", "no")
-                .toUri().toURL().toString().substring(System.getProperty("os.name").contains("Windows") ? 6 : "file:".length()))
+                .toUri().toURL().toString().substring(OS.isWindows ? 6 : "file:".length()))
                 .parent().parent().parent().parent().parent().parent().parent().toString().replace("%20", " ");
                 rootDirectory = Fi.get(path);
             }catch(IOException e){

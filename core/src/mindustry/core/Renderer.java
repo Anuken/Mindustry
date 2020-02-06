@@ -240,6 +240,7 @@ public class Renderer implements ApplicationListener{
 
         overlays.drawTop();
 
+        render(RenderLayer.names);
         //TODO should use (draw)
         Groups.player.each(p -> !p.dead(), Playerc::drawName);
 

@@ -1,5 +1,6 @@
 package mindustry.entities;
 
+import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -7,13 +8,14 @@ import mindustry.gen.*;
 
 import java.util.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.collisions;
 
 /** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")
 public class EntityGroup<T extends Entityc> implements Iterable<T>{
     private final Array<T> array;
     private final Array<T> intersectArray = new Array<>();
+    private final Rect viewport = new Rect();
     private final Rect intersectRect = new Rect();
     private IntMap<T> map;
     private QuadTree tree;
@@ -58,6 +60,17 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         for(index = 0; index < array.size; index++){
             if(filter.get(items[index])) cons.get(items[index]);
         }
+    }
+
+    public void draw(Cons<T> cons){
+        Core.camera.bounds(viewport);
+
+        each(e -> {
+            Drawc draw = (Drawc)e;
+            if(viewport.overlaps(draw.x() - draw.clipSize()/2f, draw.y() - draw.clipSize()/2f, draw.clipSize(), draw.clipSize())){
+                cons.get(e);
+            }
+        });
     }
 
     public boolean useTree(){
