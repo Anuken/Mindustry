@@ -81,6 +81,7 @@ public class EntityComps{
         @Override
         public void type(UnitDef type){
             this.type = type;
+            controller(type.createController());
             setupWeapons(type);
         }
 
@@ -678,19 +679,7 @@ public class EntityComps{
 
     @Component
     abstract static class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
-        //TODO mock these properly
-        private static final Unitc noUnit = GenericUnitEntity.create();
-        private static final Builderc noBuilder = GenericBuilderEntity.create().with(s -> s.requests(new Queue<BuildRequest>(){
-            @Override
-            public void addLast(BuildRequest object){
-            }
-
-            @Override
-            public void addFirst(BuildRequest object){
-            }
-        }));
-
-        @NonNull @ReadOnly Unitc unit = noUnit;
+        @NonNull @ReadOnly Unitc unit = Nulls.unit;
 
         @ReadOnly Team team = Team.sharded;
         String name = "noname";
@@ -739,7 +728,7 @@ public class EntityComps{
         }
 
         public void clearUnit(){
-            unit(noUnit);
+            unit(Nulls.unit);
         }
 
         public Unitc unit(){
@@ -751,23 +740,24 @@ public class EntityComps{
             return unit;
         }
 
+        public Minerc miner(){
+            return !(unit instanceof Minerc) ? Nulls.miner : (Minerc)unit;
+        }
+
         public Builderc builder(){
-            if(!(unit instanceof Builderc)){
-                return noBuilder;
-            }
-            return (Builderc)unit;
+            return !(unit instanceof Builderc) ? Nulls.builder : (Builderc)unit;
         }
 
         public void unit(Unitc unit){
             if(unit == null) throw new IllegalArgumentException("Unit cannot be null. Use clearUnit() instead.");
             this.unit = unit;
-            if(unit != noUnit){
+            if(unit != Nulls.unit){
                 unit.team(team);
             }
         }
 
         boolean dead(){
-            return unit == noUnit;
+            return unit == Nulls.builder;
         }
 
         String uuid(){
@@ -1223,8 +1213,6 @@ public class EntityComps{
 
     @Component
     static abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc{
-        static float miningRange = 70f;
-
         transient float x, y, rotation;
 
         @Nullable Tile mineTile;
@@ -1308,7 +1296,6 @@ public class EntityComps{
 
     @Component
     abstract static class BuilderComp implements Unitc{
-        static final float placeDistance = 220f;
         static final Vec2[] tmptr = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
         transient float x, y, rotation;
@@ -1318,7 +1305,7 @@ public class EntityComps{
         //boolean building;
 
         void updateBuilding(){
-            float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : placeDistance;
+            float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange;
 
             Iterator<BuildRequest> it = requests.iterator();
             while(it.hasNext()){
@@ -1402,7 +1389,7 @@ public class EntityComps{
         void drawBuildRequests(){
 
             for(BuildRequest request : requests){
-                if(request.progress > 0.01f || (buildRequest() == request && request.initialized && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor()))) continue;
+                if(request.progress > 0.01f || (buildRequest() == request && request.initialized && (dst(request.x * tilesize, request.y * tilesize) <= buildingRange || state.isEditor()))) continue;
 
                 request.animScale = 1f;
                 if(request.breaking){
@@ -1479,7 +1466,7 @@ public class EntityComps{
             BuildRequest request = buildRequest();
             Tile tile = world.tile(request.x, request.y);
 
-            if(dst(tile) > placeDistance && !state.isEditor()){
+            if(dst(tile) > buildingRange && !state.isEditor()){
                 return;
             }
 
@@ -1802,6 +1789,10 @@ public class EntityComps{
 
         boolean isLocal(){
             return ((Object)this) == player || ((Object)this) instanceof Unitc && ((Unitc)((Object)this)).controller() == player;
+        }
+
+        boolean isNull(){
+            return false;
         }
 
         <T> T as(Class<T> type){

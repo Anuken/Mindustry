@@ -11,6 +11,7 @@ import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -19,6 +20,7 @@ import mindustry.ui.*;
 public class UnitDef extends UnlockableContent{
     //TODO implement
     public @NonNull Prov<? extends UnitController> defaultController = AIController::new;
+    public @NonNull Prov<? extends Unitc> constructor;
     public boolean flying;
     public float speed = 1.1f, boostSpeed = 0.75f, rotateSpeed = 0.2f, baseRotateSpeed = 0.1f;
     public float drag = 0.3f, mass = 1f, accel = 0.1f;
@@ -45,12 +47,24 @@ public class UnitDef extends UnlockableContent{
     public Array<Weapon> weapons = new Array<>();
     public TextureRegion baseRegion, legRegion, region, cellRegion;
 
-    public UnitDef(String name){
+    public UnitDef(String name, Prov<Unitc> constructor){
         super(name);
+        this.constructor = constructor;
+    }
+
+    public UnitDef(String name){
+        this(name, () -> Nulls.unit);
     }
 
     public UnitController createController(){
         return defaultController.get();
+    }
+
+    public Unitc create(Team team){
+        Unitc unit = constructor.get();
+        unit.team(team);
+        unit.type(this);
+        return unit;
     }
 
     @Override

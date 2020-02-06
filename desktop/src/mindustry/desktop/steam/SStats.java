@@ -9,6 +9,7 @@ import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Stats.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 
 import static mindustry.Vars.*;
@@ -53,18 +54,18 @@ public class SStats implements SteamUserStatsCallback{
 
     private void checkUpdate(){
         if(campaign()){
-            SStat.maxUnitActive.max(unitGroup.count(t -> t.team() == player.team()));
+            SStat.maxUnitActive.max(Groups.unit.count(t -> t.team() == player.team()));
 
-            if(unitGroup.count(u -> u.getType() == UnitTypes.phantom && u.team() == player.team()) >= 10){
+            if(Groups.unit.count(u -> u.type() == UnitTypes.phantom && u.team() == player.team()) >= 10){
                 active10Phantoms.complete();
             }
 
-            if(unitGroup.count(u -> u.getType() == UnitTypes.crawler && u.team() == player.team()) >= 50){
+            if(Groups.unit.count(u -> u.type() == UnitTypes.crawler && u.team() == player.team()) >= 50){
                 active50Crawlers.complete();
             }
 
             for(Tilec entity : player.team().cores()){
-                if(!content.items().contains(i -> i.type == ItemType.material && entity.items().get(i) < entity.block.itemCapacity)){
+                if(!content.items().contains(i -> i.type == ItemType.material && entity.items().get(i) < entity.block().itemCapacity)){
                     fillCoreAllCampaign.complete();
                     break;
                 }
@@ -92,7 +93,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(Trigger.newGame, () -> Core.app.post(() -> {
-            if(campaign() && player.closestCore() != null && player.closestCore().items.total() >= 10 * 1000){
+            if(campaign() && player.closestCore() != null && player.closestCore().items().total() >= 10 * 1000){
                 drop10kitems.complete();
             }
         }));
@@ -216,7 +217,7 @@ public class SStats implements SteamUserStatsCallback{
 
         Events.on(PlayerJoin.class, e -> {
             if(Vars.net.server()){
-                SStat.maxPlayersServer.max(Vars.playerGroup.size());
+                SStat.maxPlayersServer.max(Groups.player.size());
             }
         });
 

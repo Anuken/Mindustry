@@ -25,7 +25,7 @@ public class Stype extends Selement<TypeElement>{
     }
 
     public Array<Stype> allInterfaces(){
-        return interfaces().flatMap(Stype::allInterfaces).distinct();
+        return interfaces().flatMap(s -> s.allInterfaces().and(s)).distinct();
     }
 
     public Array<Stype> superclasses(){
@@ -33,8 +33,7 @@ public class Stype extends Selement<TypeElement>{
     }
 
     public Array<Stype> allSuperclasses(){
-        //this is truly PEAK efficiency
-        return superclasses().flatMap(Stype::allSuperclasses).distinct();
+        return superclasses().flatMap(s -> s.allSuperclasses().and(s)).distinct();
     }
 
     public Stype superclass(){

@@ -73,6 +73,10 @@ public class Vars implements Loadable{
     public static final float worldBounds = 100f;
     /** units outside of this bound will simply die instantly */
     public static final float finalWorldBounds = worldBounds + 500;
+    /** mining range for manual miners */
+    public static final float miningRange = 70f;
+    /** range for building */
+    public static final float buildingRange = 220f;
     /** ticks spent out of bound until self destruct. */
     public static final float boundsCountdown = 60 * 7;
     /** for map generator dialog */

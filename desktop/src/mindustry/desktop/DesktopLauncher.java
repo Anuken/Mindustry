@@ -17,6 +17,7 @@ import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.desktop.steam.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.type.*;
@@ -136,9 +137,9 @@ public class DesktopLauncher extends ClientLauncher{
         boolean[] isShutdown = {false};
 
         Events.on(ClientLoadEvent.class, event -> {
-            player.name = SVars.net.friends.getPersonaName();
+            player.name(SVars.net.friends.getPersonaName());
             Core.settings.defaults("name", SVars.net.friends.getPersonaName());
-            Core.settings.put("name", player.name);
+            Core.settings.put("name", player.name());
             Core.settings.save();
             //update callbacks
             Core.app.addListener(new ApplicationListener(){
@@ -260,8 +261,8 @@ public class DesktopLauncher extends ClientLauncher{
                 gameMapWithWave += " | Wave " + state.wave;
             }
             gameMode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : "Survival";
-            if(net.active() && playerGroup.size() > 1){
-                gamePlayersSuffix = " | " + playerGroup.size() + " Players";
+            if(net.active() && Groups.player.size() > 1){
+                gamePlayersSuffix = " | " + Groups.player.size() + " Players";
             }
         }else{
             if(ui.editor != null && ui.editor.isShown()){

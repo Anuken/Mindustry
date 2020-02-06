@@ -348,7 +348,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         if(result == SteamResult.OK){
             currentLobby = steamID;
 
-            smat.setLobbyData(steamID, "name", player.name);
+            smat.setLobbyData(steamID, "name", player.name());
             smat.setLobbyData(steamID, "mapname", world.getMap() == null ? "Unknown" : state.rules.zone == null ? world.getMap().name() : state.rules.zone.localizedName);
             smat.setLobbyData(steamID, "version", Version.build + "");
             smat.setLobbyData(steamID, "versionType", Version.type);

@@ -63,6 +63,8 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Down tracking for panning.*/
     private boolean down = false;
 
+    private Teamc target;
+
     //region utility methods
 
     /** Check and assign targets for a specific position. */
@@ -70,19 +72,20 @@ public class MobileInput extends InputHandler implements GestureListener{
         Unitc unit = Units.closestEnemy(player.team(), x, y, 20f, u -> !u.dead());
 
         if(unit != null){
-            player.setMineTile(null);
-            player.target = unit;
+            player.miner().mineTile(null);
+            target = unit;
         }else{
             Tile tile = world.ltileWorld(x, y);
 
             if(tile != null && tile.synthetic() && player.team().isEnemy(tile.team())){
                 Tilec entity = tile.entity;
-                player.setMineTile(null);
-                player.target = entity;
-            }else if(tile != null && player.mech.canHeal && tile.entity != null && tile.team() == player.team() && tile.entity.damaged()){
-                player.setMineTile(null);
-                player.target = tile.entity;
-            }
+                player.miner().mineTile(null);
+                target = entity;
+                //TODO implement healing
+            }//else if(tile != null && player.unit().canHeal && tile.entity != null && tile.team() == player.team() && tile.entity.damaged()){
+             ///   player.miner().mineTile(null);
+            //    target = tile.entity;
+           // }
         }
     }
 
@@ -250,9 +253,9 @@ public class MobileInput extends InputHandler implements GestureListener{
         Boolp schem = () -> lastSchematic != null && !selectRequests.isEmpty();
 
         group.fill(t -> {
-            t.bottom().left().visible(() -> (player.isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
+            t.bottom().left().visible(() -> (player.builder().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
             t.addImageTextButton("$cancel", Icon.cancel, () -> {
-                player.clearBuilding();
+                player.builder().clearBuilding();
                 selectRequests.clear();
                 mode = none;
                 block = null;
@@ -375,8 +378,6 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        Teamc target = player.target;
-
         //draw targeting crosshair
         if(target != null && !state.isEditor()){
             if(target != lastTarget){
@@ -431,7 +432,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     @Override
     public void useSchematic(Schematic schem){
         selectRequests.clear();
-        selectRequests.addAll(schematics.toRequests(schem, world.toTile(player.x), world.toTile(player.y)));
+        selectRequests.addAll(schematics.toRequests(schem, player.tileX(), player.tileY()));
         lastSchematic = schem;
     }
 
@@ -467,7 +468,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 lastLineY = tileY;
             }else if(!tryTapPlayer(worldx, worldy) && Core.settings.getBool("keyboard")){
                 //shoot on touch down when in keyboard mode
-                player.isShooting = true;
+                isShooting = true;
             }
         }
 
@@ -602,11 +603,11 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(Core.settings.getBool("keyboard")){
             if(Core.input.keyRelease(Binding.select)){
-                player.isShooting = false;
+                isShooting = false;
             }
 
-            if(player.isShooting && !canShoot()){
-                player.isShooting = false;
+            if(isShooting && !canShoot()){
+                isShooting = false;
             }
         }
 

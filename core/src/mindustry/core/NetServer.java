@@ -508,7 +508,7 @@ public class NetServer implements ApplicationListener{
 
         player.mouseX(pointerX);
         player.mouseY(pointerY);
-        player.setMineTile(mining);
+        player.miner().mineTile(mining);
         player.isTyping = chatting;
         player.isBoosting = boosting;
         player.isShooting = shooting;

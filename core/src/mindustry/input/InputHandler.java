@@ -17,7 +17,6 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -25,8 +24,8 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.Placement.*;
-import mindustry.net.*;
 import mindustry.net.Administration.*;
+import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.fragments.*;
 import mindustry.world.*;
@@ -55,6 +54,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public int rotation;
     public boolean droppingItem;
     public Group uiGroup;
+    public boolean isShooting, isBuilding = true, buildWasAutoPaused = false;
 
     protected @Nullable Schematic lastSchematic;
     protected GestureDetector detector;
@@ -627,14 +627,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean canTapPlayer(float x, float y){
-        return Mathf.dst(x, y, player.x, player.y) <= playerSelectRange && player.unit().stack().amount > 0;
+        return player.within(x, y, playerSelectRange) && player.unit().stack().amount > 0;
     }
 
     /** Tries to begin mining a tile, returns true if successful. */
     boolean tryBeginMine(Tile tile){
         if(canMine(tile)){
             //if a block is clicked twice, reset it
-            player.setMineTile(player.getMineTile() == tile ? null : tile);
+            player.miner().mineTile(player.miner().mineTile() == tile ? null : tile);
             return true;
         }
         return false;
@@ -642,10 +642,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
-        && tile.drop() != null && tile.drop().hardness <= player.mech.drillPower
+        && tile.drop() != null && player.miner().canMine(tile.drop())
         && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
         && player.unit().acceptsItem(tile.drop())
-        && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= Playerc.mineDistance;
+        && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= miningRange;
     }
 
     /** Returns the tile at the specified MOUSE coordinates. */
@@ -1050,7 +1050,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         //update shooting if not building, not mining and there's ammo left
-        if(!isBuilding() && getMineTile() == null){
+        if(!isBuilding() && mineTile() == null){
 
             //autofire
             if(target == null){
@@ -1068,7 +1068,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     }
 
                     if(target != null){
-                        setMineTile(null);
+                        mineTile(null);
                     }
                 }
             }else if(target.isValid() || (target instanceof Tilec && ((Tilec)target).damaged() && target.team() == team && mech.canHeal && dst(target) < mech.range)){

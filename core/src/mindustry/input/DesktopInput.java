@@ -44,12 +44,12 @@ public class DesktopInput extends InputHandler{
     @Override
     public void buildUI(Group group){
         group.fill(t -> {
-            t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.isBuilding() ? 1f : 0f, 0.15f));
+            t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.builder().isBuilding() ? 1f : 0f, 0.15f));
             t.visible(() -> Core.settings.getBool("hints") && selectRequests.isEmpty());
             t.touchable(() -> t.getColor().a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
             t.table(Styles.black6, b -> {
                 b.defaults().left();
-                b.label(() -> Core.bundle.format(!player.isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
+                b.label(() -> Core.bundle.format(!isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.label(() -> Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
@@ -150,7 +150,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyRelease(Binding.select)){
-            player.isShooting = false;
+            isShooting = false;
         }
 
         if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap) && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
@@ -176,8 +176,8 @@ public class DesktopInput extends InputHandler{
             mode = none;
         }
 
-        if(player.isShooting && !canShoot()){
-            player.isShooting = false;
+        if(isShooting && !canShoot()){
+            isShooting = false;
         }
 
         if(isPlacing()){
@@ -272,9 +272,9 @@ public class DesktopInput extends InputHandler{
         int rawCursorX = world.toTile(Core.input.mouseWorld().x), rawCursorY = world.toTile(Core.input.mouseWorld().y);
 
         // automatically pause building if the current build queue is empty
-        if(Core.settings.getBool("buildautopause") && player.isBuilding && !player.isBuilding()){
-            player.isBuilding = false;
-            player.buildWasAutoPaused = true;
+        if(Core.settings.getBool("buildautopause") && isBuilding && !player.builder().isBuilding()){
+            isBuilding = false;
+            buildWasAutoPaused = true;
         }
 
         if(!selectRequests.isEmpty()){
@@ -290,11 +290,11 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.deselect)){
-            player.setMineTile(null);
+            player.miner().mineTile(null);
         }
 
         if(Core.input.keyTap(Binding.clear_building)){
-            player.clearBuilding();
+            player.builder().clearBuilding();
         }
 
         if(Core.input.keyTap(Binding.schematic_select) && !Core.scene.hasKeyboard()){
@@ -346,8 +346,8 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.pause_building)){
-            player.isBuilding = !player.isBuilding;
-            player.buildWasAutoPaused = false;
+            isBuilding = !isBuilding;
+            buildWasAutoPaused = false;
         }
 
         if((cursorX != lastLineX || cursorY != lastLineY) && isPlacing() && mode == placing){
@@ -376,12 +376,12 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().requests().size == 0 || !player.isBuilding) && !droppingItem &&
-                !tryBeginMine(selected) && player.getMineTile() == null && !Core.scene.hasKeyboard()){
-                    player.isShooting = true;
+                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().requests().size == 0 || !player.builder().isBuilding()) && !droppingItem &&
+                !tryBeginMine(selected) && player.miner().mineTile() == null && !Core.scene.hasKeyboard()){
+                    isShooting = true;
                 }
             }else if(!Core.scene.hasKeyboard()){ //if it's out of bounds, shooting is just fine
-                player.isShooting = true;
+                isShooting = true;
             }
         }else if(Core.input.keyTap(Binding.deselect) && isPlacing()){
             block = null;

@@ -29,6 +29,7 @@ public class EntityProcess extends BaseProcessor{
     ObjectMap<String, Stype> componentNames = new ObjectMap<>();
     ObjectMap<Stype, Array<Stype>> componentDependencies = new ObjectMap<>();
     ObjectMap<Stype, Array<Stype>> defComponents = new ObjectMap<>();
+    ObjectMap<Svar, String> varInitializers = new ObjectMap<>();
     ObjectSet<String> imports = new ObjectSet<>();
 
     {
@@ -161,7 +162,9 @@ public class EntityProcess extends BaseProcessor{
                         }
                         //add initializer if it exists
                         if(tree.getInitializer() != null){
-                            fbuilder.initializer(tree.getInitializer().toString());
+                            String init = tree.getInitializer().toString();
+                            varInitializers.put(f, init);
+                            fbuilder.initializer(init);
                         }
 
                         if(!isFinal) fbuilder.addModifiers(Modifier.PROTECTED);
@@ -377,19 +380,24 @@ public class EntityProcess extends BaseProcessor{
                 write(def.builder, imports.asArray());
             }
 
+            //store nulls
+            TypeSpec.Builder nullsBuilder = TypeSpec.classBuilder("Nulls").addModifiers(Modifier.PUBLIC).addModifiers(Modifier.FINAL);
+
             //create mock types of all components
             for(Stype interf : interfaces){
-                Array<Stype> dependencies = interf.allInterfaces();
-                dependencies.add(interf);
-                Log.info(interf + ": sub  " + interf.allSuperclasses() + " " + interf.allInterfaces());
-
+                //indirect interfaces to implement methods for
+                Array<Stype> dependencies = interf.allInterfaces().and(interf);
                 Array<Smethod> methods = dependencies.flatMap(Stype::methods);
-                methods.sort(Structs.comparing(Object::toString));
+                methods.sortComparing(Object::toString);
 
+                //used method signatures
                 ObjectSet<String> signatures = new ObjectSet<>();
 
-                TypeSpec.Builder nullBuilder = TypeSpec.classBuilder("Null" + interf.name().substring(0, interf.name().length() - 1))
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+                //create null builder
+                String baseName = interf.name().substring(0, interf.name().length() - 1);
+                String className = "Null" + baseName;
+                TypeSpec.Builder nullBuilder = TypeSpec.classBuilder(className)
+                .addModifiers(Modifier.FINAL);
 
                 nullBuilder.addSuperinterface(interf.tname());
 
@@ -397,11 +405,21 @@ public class EntityProcess extends BaseProcessor{
                     String signature = method.toString();
                     if(signatures.contains(signature)) continue;
 
-                    Stype type = method.type();
+                    Stype compType = interfaceToComp(method.type());
                     MethodSpec.Builder builder = MethodSpec.overriding(method.e).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
                     if(!method.isVoid()){
-                        builder.addStatement("return " + getDefault(method.ret().toString()));
+                        if(method.name().equals("isNull")){
+                            builder.addStatement("return true");
+                        }else{
+                            Svar variable = compType == null || method.params().size > 0 ? null : compType.fields().find(v -> v.name().equals(method.name()));
+                            if(variable == null || !varInitializers.containsKey(variable)){
+                                builder.addStatement("return " + getDefault(method.ret().toString()));
+                            }else{
+                                String init = varInitializers.get(variable);
+                                builder.addStatement("return " + (init.equals("{}") ? "new " + variable.mirror().toString() : "") + init);
+                            }
+                        }
                     }
 
                     nullBuilder.addMethod(builder.build());
@@ -409,10 +427,12 @@ public class EntityProcess extends BaseProcessor{
                     signatures.add(signature);
                 }
 
-                //write(nullBuilder);
+                nullsBuilder.addField(FieldSpec.builder(interf.cname(), Strings.camelize(baseName)).initializer("new " + className + "()").addModifiers(Modifier.FINAL, Modifier.STATIC, Modifier.PUBLIC).build());
 
-                Log.info("Methods to override for {0}:\n{1}\n\n", interf, methods.toString("\n", s -> "&lg> &lb" + s));
+                write(nullBuilder);
             }
+
+            write(nullsBuilder);
         }
     }
 

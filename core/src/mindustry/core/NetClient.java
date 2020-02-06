@@ -518,7 +518,7 @@ public class NetClient implements ApplicationListener{
             Call.onClientShapshot(lastSent++, player.x, player.y,
             player.pointerX, player.pointerY, player.rotation, player.baseRotation,
             player.vel().x, player.vel().y,
-            player.getMineTile(),
+            player.miner().mineTile(),
             player.isBoosting, player.isShooting, ui.chatfrag.shown(), player.isBuilding,
             requests,
             Core.camera.position.x, Core.camera.position.y,
