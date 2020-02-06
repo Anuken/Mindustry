@@ -71,6 +71,8 @@ public class CraterConveyor extends Block implements Autotiler{
         CraterConveyorEntity entity = tile.ent();
 
         Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)], tile.drawx(), tile.drawy(), tilesize * entity.blendsclx, tilesize * entity.blendscly, tile.rotation() * 90);
+        if(entity.blendbitz == 0) return;
+        Draw.rect(regions[Mathf.clamp(entity.blendbitz, 0, regions.length - 1)], tile.drawx(), tile.drawy(), tilesize * entity.blendsclx, tilesize * entity.blendscly, tile.rotation() * 90);
     }
 
     @Override
@@ -131,8 +133,9 @@ public class CraterConveyor extends Block implements Autotiler{
         CraterConveyorEntity entity = tile.ent();
         int[] bits = buildBlending(tile, tile.rotation(), null, true);
 
-        if(bits[0] == 0 && blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) bits[0] = 5; // a 0 that faces into a crater conveyor with none behind it
-        if(bits[0] == 0 && !blends(tile, tile.rotation(), 0) && blends(tile, tile.rotation(), 2)) bits[0] = 6; // a 0 that faces into none with a crater conveyor behind it
+        entity.blendbitz = 0;
+        if(bits[0] == 0 && blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) entity.blendbitz = 5; // a 0 that faces into a crater conveyor with none behind it
+        if(bits[0] == 0 && !blends(tile, tile.rotation(), 0) && blends(tile, tile.rotation(), 2)) entity.blendbitz = 6; // a 0 that faces into none with a crater conveyor behind it
 
         entity.blendbits = bits[0];
         entity.blendsclx = bits[1];
@@ -181,7 +184,7 @@ public class CraterConveyor extends Block implements Autotiler{
 
             // when near the center of the target tile...
             if(entity.reload < 0.25f){
-                if(entity.blendbits != 5 && (entity.from != tile.pos() || entity.blendbits == 6)){ // ...and if its not a crater conveyor, start unloading (everything)
+                if(entity.blendbitz != 5 && (entity.from != tile.pos() || entity.blendbitz == 6)){ // ...and if its not a crater conveyor, start unloading (everything)
                     while(entity.items.total() > 0 && entity.items.first() != null && offloadDir(tile, entity.items.first())) entity.items.remove(entity.items.first(), 1);
                     if(entity.items.total() == 0) Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
                     if(entity.items.total() == 0) bump(tile);
@@ -245,7 +248,7 @@ public class CraterConveyor extends Block implements Autotiler{
     class CraterConveyorEntity extends TileEntity{
         float lastFrameUpdated = -1;
 
-        int blendbits;
+        int blendbits, blendbitz;
         int blendsclx, blendscly;
 
         int from = Pos.invalid;
