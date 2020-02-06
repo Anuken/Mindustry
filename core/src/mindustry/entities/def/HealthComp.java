@@ -25,6 +25,10 @@ abstract class HealthComp implements Entityc{
         hitTime -= Time.delta() / hitDuration;
     }
 
+    float hitAlpha(){
+        return hitTime / hitDuration;
+    }
+
     void killed(){
         //implement by other components
     }

@@ -87,7 +87,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     }
 
     /** Draw weapon mounts. */
-    void draw(){
+    void drawWeapons(){
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
 

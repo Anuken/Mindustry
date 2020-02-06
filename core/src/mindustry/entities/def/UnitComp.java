@@ -19,7 +19,9 @@ import mindustry.world.blocks.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, DrawShadowc{
+abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, DrawShadowc, DrawLayerGroundc, DrawLayerFlyingc{
+    transient float x, y, rotation;
+
     private UnitController controller;
     private UnitDef type;
 
@@ -103,15 +105,39 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     public void drawLight(){
         //TODO move
         if(type.lightRadius > 0){
-            renderer.lights.add(getX(), getY(), type.lightRadius, type.lightColor, 0.6f);
+            renderer.lights.add(x, y, type.lightRadius, type.lightColor, 0.6f);
         }
     }
 
     @Override
     public void draw(){
+        drawCell();
+    }
+
+    @Override
+    public void drawBody(){
+        Draw.mixcol(Color.white, hitAlpha());
+
+        Draw.rect(type.region, x, y, rotation - 90);
+
+        Draw.reset();
+    }
+
+    @Override
+    public void drawFlying(){
+        if(isFlying()) draw();
+    }
+
+    @Override
+    public void drawGround(){
+        if(isGrounded()) draw();
+    }
+
+    @Override
+    public void drawCell(){
         //draw power cell - TODO move
         Draw.color(Color.black, team().color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
-        Draw.rect(type.cellRegion, getX(), getY(), rotation() - 90);
+        Draw.rect(type.cellRegion, x, y, rotation() - 90);
         Draw.color();
     }
 
@@ -119,7 +145,7 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     public void killed(){
         float explosiveness = 2f + item().explosiveness * stack().amount;
         float flammability = item().flammability * stack().amount;
-        Damage.dynamicExplosion(getX(), getY(), flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame);
 
         //TODO cleanup
         //ScorchDecal.create(getX(), getY());
