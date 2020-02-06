@@ -70,9 +70,15 @@ public class CraterConveyor extends Block implements Autotiler{
     public void draw(Tile tile){
         CraterConveyorEntity entity = tile.ent();
 
-        Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)], tile.drawx(), tile.drawy(), tilesize * entity.blendsclx, tilesize * entity.blendscly, tile.rotation() * 90);
-        if(entity.blendbitz == 0) return;
-        Draw.rect(regions[Mathf.clamp(entity.blendbitz, 0, regions.length - 1)], tile.drawx(), tile.drawy(), tilesize * entity.blendsclx, tilesize * entity.blendscly, tile.rotation() * 90);
+        draw(tile, entity.blendbit1);
+        if(entity.blendbit2 == 0) return;
+        draw(tile, entity.blendbit2);
+    }
+
+    public void draw(Tile tile, int bit){
+        CraterConveyorEntity entity = tile.ent();
+
+        Draw.rect(regions[Mathf.clamp(bit, 0, regions.length - 1)], tile.drawx(), tile.drawy(), tilesize * entity.blendsclx, tilesize * entity.blendscly, tile.rotation() * 90);
     }
 
     @Override
@@ -133,11 +139,11 @@ public class CraterConveyor extends Block implements Autotiler{
         CraterConveyorEntity entity = tile.ent();
         int[] bits = buildBlending(tile, tile.rotation(), null, true);
 
-        entity.blendbitz = 0;
-        if(bits[0] == 0 && blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) entity.blendbitz = 5; // a 0 that faces into a crater conveyor with none behind it
-        if(bits[0] == 0 && !blends(tile, tile.rotation(), 0) && blends(tile, tile.rotation(), 2)) entity.blendbitz = 6; // a 0 that faces into none with a crater conveyor behind it
+        entity.blendbit2 = 0;
+        if(bits[0] == 0 && blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) entity.blendbit2 = 5; // a 0 that faces into a crater conveyor with none behind it
+        if(bits[0] == 0 && !blends(tile, tile.rotation(), 0) && blends(tile, tile.rotation(), 2)) entity.blendbit2 = 6; // a 0 that faces into none with a crater conveyor behind it
 
-        entity.blendbits = bits[0];
+        entity.blendbit1 = bits[0];
         entity.blendsclx = bits[1];
         entity.blendscly = bits[2];
     }
@@ -184,7 +190,7 @@ public class CraterConveyor extends Block implements Autotiler{
 
             // when near the center of the target tile...
             if(entity.reload < 0.25f){
-                if(entity.blendbitz != 5 && (entity.from != tile.pos() || entity.blendbitz == 6)){ // ...and if its not a crater conveyor, start unloading (everything)
+                if(entity.blendbit2 != 5 && (entity.from != tile.pos() || entity.blendbit2 == 6)){ // ...and if its not a crater conveyor, start unloading (everything)
                     while(entity.items.total() > 0 && entity.items.first() != null && offloadDir(tile, entity.items.first())) entity.items.remove(entity.items.first(), 1);
                     if(entity.items.total() == 0) Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
                     if(entity.items.total() == 0) bump(tile);
@@ -248,7 +254,7 @@ public class CraterConveyor extends Block implements Autotiler{
     class CraterConveyorEntity extends TileEntity{
         float lastFrameUpdated = -1;
 
-        int blendbits, blendbitz;
+        int blendbit1, blendbit2;
         int blendsclx, blendscly;
 
         int from = Pos.invalid;
@@ -295,7 +301,7 @@ public class CraterConveyor extends Block implements Autotiler{
         CraterConveyorEntity entity = tile.ent();
 
         // unless its a loading dock, always move
-        if(entity.blendbits != 5) return true;
+        if(entity.blendbit1 != 5) return true;
 
         // its considered full (enough, at this point in time)
         if(entity.items.total() >= getMaximumAccepted(tile, entity.items.first())) return true;
@@ -308,7 +314,7 @@ public class CraterConveyor extends Block implements Autotiler{
         CraterConveyorEntity entity = tile.ent();
 
         // is a loading dock
-        if(entity.blendbits != 5) return false;
+        if(entity.blendbit1 != 5) return false;
 
         // doesn't yet have a different item
         if(entity.items.total() > 0 && !entity.items.has(item)) return false;
