@@ -60,7 +60,8 @@ public class EntityProcess extends BaseProcessor{
             //parse groups
             for(Smethod group : allGroups){
                 GroupDef an = group.annotation(GroupDef.class);
-                groupDefs.add(new GroupDefinition(group.name(), types(an, GroupDef::value), an));
+                Array<Stype> types = types(an, GroupDef::value);
+                groupDefs.add(new GroupDefinition(group.name(), ClassName.bestGuess(packageName + "." + interfaceName(types.first())), types, an.spatial(), an.mapping()));
             }
 
             //create component interfaces
@@ -70,7 +71,8 @@ public class EntityProcess extends BaseProcessor{
 
                 //implement extra interfaces these components may have, e.g. position
                 for(Stype extraInterface : component.interfaces().select(i -> !isCompInterface(i))){
-                    inter.addSuperinterface(extraInterface.mirror());
+                    //javapoet completely chokes on this if I add `addSuperInterface` or create the type name with TypeName.get
+                    inter.superinterfaces.add(tname(extraInterface.fullName()));
                 }
 
                 //implement super interfaces
@@ -135,18 +137,36 @@ public class EntityProcess extends BaseProcessor{
                 Log.info("");
             }
 
+            //generate special render layer interfaces
+            for(DrawLayer layer : DrawLayer.values()){
+                //create the DrawLayer interface that entities need to implement
+                String name = "DrawLayer" + Strings.capitalize(layer.name()) + "c";
+                TypeSpec.Builder inter = TypeSpec.interfaceBuilder(name)
+                .addSuperinterface(tname(packageName + ".Entityc"))
+                .addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
+                inter.addMethod(MethodSpec.methodBuilder("draw" + Strings.capitalize(layer.name())).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
+                write(inter);
+
+                //create group definition with no components directly
+                GroupDefinition def = new GroupDefinition(layer.name(), ClassName.bestGuess(packageName + "." + name), Array.with(), false, false);
+                //add manual inclusions of entities to be added to this group
+                def.manualInclusions.addAll(allDefs.select(s -> allComponents(s).contains(comp -> comp.interfaces().contains(in -> in.name().equals(name)))));
+
+                groupDefs.add(def);
+            }
+
             //look at each definition
             for(Stype type : allDefs){
                 boolean isFinal = type.annotation(EntityDef.class).isFinal();
                 if(!type.name().endsWith("Def")){
                     err("All entity def names must end with 'Def'", type.e);
                 }
-                String name = type.name().replace("Def", "Entity"); //TODO remove extra underscore
+                String name = type.name().replace("Def", "Entity");
                 TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
                 if(isFinal) builder.addModifiers(Modifier.FINAL);
 
                 Array<Stype> components = allComponents(type);
-                Array<GroupDefinition> groups = groupDefs.select(g -> !g.components.contains(s -> !components.contains(s)));
+                Array<GroupDefinition> groups = groupDefs.select(g -> (!g.components.isEmpty() && !g.components.contains(s -> !components.contains(s))) || g.manualInclusions.contains(type));
                 ObjectMap<String, Array<Smethod>> methods = new ObjectMap<>();
 
                 //add all components
@@ -268,29 +288,38 @@ public class EntityProcess extends BaseProcessor{
             TypeSpec.Builder groupsBuilder = TypeSpec.classBuilder("Groups").addModifiers(Modifier.PUBLIC);
             MethodSpec.Builder groupInit = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
             for(GroupDefinition group : groupDefs){
-                Stype ctype = group.components.first();
+                //Stype ctype = group.components.first();
                 //class names for interface/group
-                ClassName itype =  ClassName.bestGuess("mindustry.gen." + interfaceName(ctype));
+                ClassName itype =  group.baseType;
                 ClassName groupc = ClassName.bestGuess("mindustry.entities.EntityGroup");
 
                 //add field...
                 groupsBuilder.addField(ParameterizedTypeName.get(
                     ClassName.bestGuess("mindustry.entities.EntityGroup"), itype), group.name, Modifier.PUBLIC, Modifier.STATIC);
 
-                groupInit.addStatement("$L = new $T<>($L.class, $L, $L)", group.name, groupc, itype, group.def.spatial(), group.def.mapping());
+                groupInit.addStatement("$L = new $T<>($L.class, $L, $L)", group.name, groupc, itype, group.spatial, group.mapping);
             }
 
             //write the groups
             groupsBuilder.addMethod(groupInit.build());
 
+            //add method for resizing all necessary groups
             MethodSpec.Builder groupResize = MethodSpec.methodBuilder("resize")
                 .addParameter(TypeName.FLOAT, "x").addParameter(TypeName.FLOAT, "y").addParameter(TypeName.FLOAT, "w").addParameter(TypeName.FLOAT, "h")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
+            //method resize
             for(GroupDefinition group : groupDefs){
-                if(group.def.spatial()){
+                if(group.spatial){
                     groupResize.addStatement("$L.resize(x, y, w, h)", group.name);
                 }
+            }
+
+            for(DrawLayer layer : DrawLayer.values()){
+                MethodSpec.Builder groupDraw = MethodSpec.methodBuilder("draw" + Strings.capitalize(layer.name()))
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+                groupDraw.addStatement("$L.draw($L::$L)", layer.name(), "DrawLayer" + Strings.capitalize(layer.name()) + "c", "draw" + Strings.capitalize(layer.name()));
+                groupsBuilder.addMethod(groupDraw.build());
             }
 
             groupsBuilder.addMethod(groupResize.build());
@@ -520,13 +549,17 @@ public class EntityProcess extends BaseProcessor{
 
     class GroupDefinition{
         final String name;
+        final ClassName baseType;
         final Array<Stype> components;
-        final GroupDef def;
+        final boolean spatial, mapping;
+        final ObjectSet<Stype> manualInclusions = new ObjectSet<>();
 
-        public GroupDefinition(String name, Array<Stype> components, GroupDef def){
+        public GroupDefinition(String name, ClassName bestType, Array<Stype> components, boolean spatial, boolean mapping){
+            this.baseType = bestType;
             this.components = components;
             this.name = name;
-            this.def = def;
+            this.spatial = spatial;
+            this.mapping = mapping;
         }
 
         @Override

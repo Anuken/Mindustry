@@ -19,9 +19,19 @@ import mindustry.world.blocks.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc{
+abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, DrawShadowc{
     private UnitController controller;
     private UnitDef type;
+
+    @Override
+    public TextureRegion getShadowRegion(){
+        return type.region;
+    }
+
+    @Override
+    public float clipSize(){
+        return type.region.getWidth() * 2f;
+    }
 
     @Override
     public int itemCapacity(){

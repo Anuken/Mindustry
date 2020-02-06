@@ -3,7 +3,6 @@ package mindustry.annotations;
 import arc.files.*;
 import arc.struct.Array;
 import arc.util.*;
-import arc.util.Log.*;
 import com.squareup.javapoet.*;
 import com.sun.source.util.*;
 import mindustry.annotations.util.*;
@@ -154,7 +153,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         messager = env.getMessager();
 
         if(System.getProperty("debug") == null){
-            Log.setLogLevel(LogLevel.err);
+            //Log.setLogLevel(LogLevel.err);
         }
     }
 

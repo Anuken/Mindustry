@@ -187,7 +187,7 @@ public class Renderer implements ApplicationListener{
 
         blocks.floor.drawFloor();
 
-        render(RenderLayer.floor);
+        Groups.drawFloor();
 
         blocks.processBlocks();
         blocks.drawShadows();
@@ -208,25 +208,25 @@ public class Renderer implements ApplicationListener{
 
         blocks.drawBlocks(Layer.overlay);
 
-        render(RenderLayer.groundShadows);
-        render(RenderLayer.ground);
+        Groups.drawGroundShadows();
+        Groups.drawGround();
 
         blocks.drawBlocks(Layer.turret);
 
-        render(RenderLayer.flyingShadows);
+        Groups.drawFlyingShadows();
 
         blocks.drawBlocks(Layer.power);
         blocks.drawBlocks(Layer.lights);
 
-        render(RenderLayer.flying);
+        Groups.drawFlying();
 
         Draw.flush();
         if(bloom != null && !pixelator.enabled()){
             bloom.capture();
         }
 
-        render(RenderLayer.bullets);
-        render(RenderLayer.effects);
+        Groups.drawBullets();
+        Groups.drawEffects();
 
         Draw.flush();
         if(bloom != null && !pixelator.enabled()){
@@ -240,9 +240,9 @@ public class Renderer implements ApplicationListener{
 
         overlays.drawTop();
 
-        render(RenderLayer.names);
-        //TODO should use (draw)
-        Groups.player.each(p -> !p.dead(), Playerc::drawName);
+        if(!pixelator.enabled()){
+            Groups.drawNames();
+        }
 
         if(state.rules.lighting){
             lights.draw();
@@ -252,10 +252,6 @@ public class Renderer implements ApplicationListener{
 
         Draw.color();
         Draw.flush();
-    }
-
-    private void render(RenderLayer layer){
-
     }
 
     private void drawLanding(){

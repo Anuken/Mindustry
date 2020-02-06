@@ -22,9 +22,6 @@ class AllEntities{
     @EntityDef({UnitComp.class})
     class GenericUnitDef{}
 
-    @EntityDef({BuilderComp.class})
-    class GenericBuilderDef{}
-
     @GroupDef(EntityComp.class)
     void all(){
 
@@ -42,11 +39,6 @@ class AllEntities{
 
     @GroupDef(TileComp.class)
     void tile(){
-
-    }
-
-    @GroupDef(DrawComp.class)
-    void drawer(){
 
     }
 

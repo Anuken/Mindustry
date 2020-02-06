@@ -5,14 +5,14 @@ import java.lang.annotation.*;
 public class Annotations{
     //region entity interfaces
 
-    /** Indicates that a component field is read-only. */
+    /** Indicates that a component field is read-only.
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Render{
         RenderLayer value();
-    }
+    }*/
 
-    public enum RenderLayer{
+    public enum DrawLayer{
         floor,
         groundShadows,
         ground,

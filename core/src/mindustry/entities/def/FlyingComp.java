@@ -21,6 +21,10 @@ abstract class FlyingComp implements Posc, Velc, Healthc{
         return elevation < 0.001f;
     }
 
+    boolean isFlying(){
+        return elevation >= 0.001f;
+    }
+
     @Override
     public void update(){
         Floor floor = floorOn();

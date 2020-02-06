@@ -6,6 +6,7 @@ import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.util.*;
+import mindustry.gen.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.renderer;
@@ -52,8 +53,7 @@ public class Pixelator implements Disposable{
         Draw.rect(Draw.wrap(buffer.getTexture()), Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
         Draw.blend();
 
-        //TODO implement drawing functions, maybe
-        //Groups.player.draw(p -> !p.isDead(), Playerc::drawName);
+        Groups.drawNames();
 
         Core.camera.position.set(px, py);
         Core.settings.put("animatedwater", hadWater);
