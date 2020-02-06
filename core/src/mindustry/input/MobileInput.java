@@ -109,7 +109,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        for(BuildRequest req : player.buildQueue()){
+        for(BuildRequest req : player.builder().requests()){
             Tile other = world.tile(req.x, req.y);
 
             if(other == null || req.breaking) continue;
@@ -224,10 +224,10 @@ public class MobileInput extends InputHandler implements GestureListener{
                             }
 
                             if(other == null){
-                                player.addBuildRequest(copy);
+                                player.builder().addBuild(copy);
                             }else if(!other.breaking && other.x == request.x && other.y == request.y && other.block.size == request.block.size){
-                                player.buildQueue().remove(other);
-                                player.addBuildRequest(copy);
+                                player.builder().requests().remove(other);
+                                player.builder().addBuild(copy);
                             }
                         }
 

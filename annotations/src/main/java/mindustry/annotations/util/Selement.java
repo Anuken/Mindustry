@@ -54,11 +54,11 @@ public class Selement<T extends Element>{
 
     @Override
     public int hashCode(){
-        return e.hashCode();
+        return toString().hashCode();
     }
 
     @Override
     public boolean equals(Object o){
-        return o != null && o.getClass() == getClass() && ((Selement)o).e.equals(e);
+        return o != null && toString().equals(o.toString());
     }
 }

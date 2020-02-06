@@ -25,13 +25,7 @@ public class Stype extends Selement<TypeElement>{
     }
 
     public Array<Stype> superclasses(){
-        Array<Stype> out = new Array<>();
-        Stype sup = superclass();
-        while(!sup.name().equals("Object")){
-            out.add(sup);
-            sup = sup.superclass();
-        }
-        return out;
+        return Array.with(BaseProcessor.typeu.directSupertypes(mirror())).map(Stype::of);
     }
 
     public Stype superclass(){

@@ -22,4 +22,7 @@ class EntityDefs{
 
     @EntityDef({UnitComp.class})
     class GenericUnitDef{}
+
+    @EntityDef({BuilderComp.class})
+    class GenericBuilderDef{}
 }

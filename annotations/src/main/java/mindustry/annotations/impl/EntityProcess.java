@@ -335,6 +335,24 @@ public class EntityProcess extends BaseProcessor{
 
             idBuilder.addStaticBlock(idStore.build());
 
+            //create mock types of all components
+            for(Stype component : allComponents){
+
+
+                Array<Stype> dependencies = getDependencies(component);
+                Array<Stype> out = new Array<>();
+                out.add(component);
+                out.addAll(component.superclasses());
+                dependencies.each(dep -> {
+                    out.add(dep);
+                    out.addAll(dep.superclasses());
+                });
+
+                out.distinct();
+
+                Log.info("Dependencies of {0}:\n{1}\n\n", component, out.toString("\n", s -> "&lb> " + s));
+            }
+
             write(idBuilder);
         }else{
             //round 2: generate actual classes and implement interfaces

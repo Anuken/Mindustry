@@ -1,6 +1,7 @@
 package mindustry.entities.def;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -677,7 +678,17 @@ public class EntityComps{
 
     @Component
     abstract static class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
+        //TODO mock these properly
         private static final Unitc noUnit = GenericUnitEntity.create();
+        private static final Builderc noBuilder = GenericBuilderEntity.create().with(s -> s.requests(new Queue<BuildRequest>(){
+            @Override
+            public void addLast(BuildRequest object){
+            }
+
+            @Override
+            public void addFirst(BuildRequest object){
+            }
+        }));
 
         @NonNull @ReadOnly Unitc unit = noUnit;
 
@@ -690,6 +701,14 @@ public class EntityComps{
 
         @Nullable String lastText;
         float textFadeTime;
+
+        public boolean isBuilder(){
+            return unit instanceof Builderc;
+        }
+
+        public boolean isMiner(){
+            return unit instanceof Minerc;
+        }
 
         public @Nullable Tilec closestCore(){
             return state.teams.closestCore(x(), y(), team);
@@ -730,6 +749,13 @@ public class EntityComps{
                 new RuntimeException().printStackTrace();
             }
             return unit;
+        }
+
+        public Builderc builder(){
+            if(!(unit instanceof Builderc)){
+                return noBuilder;
+            }
+            return (Builderc)unit;
         }
 
         public void unit(Unitc unit){
@@ -1287,7 +1313,7 @@ public class EntityComps{
 
         transient float x, y, rotation;
 
-        @ReadOnly Queue<BuildRequest> requests = new Queue<>();
+        Queue<BuildRequest> requests = new Queue<>();
         float buildSpeed = 1f;
         //boolean building;
 
@@ -1779,6 +1805,11 @@ public class EntityComps{
         }
 
         <T> T as(Class<T> type){
+            return (T)this;
+        }
+
+        <T> T with(Cons<T> cons){
+            cons.get((T)this);
             return (T)this;
         }
 

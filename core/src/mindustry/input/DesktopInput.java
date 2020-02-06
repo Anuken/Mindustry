@@ -376,7 +376,7 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.buildQueue().size == 0 || !player.isBuilding) && !droppingItem &&
+                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().requests().size == 0 || !player.isBuilding) && !droppingItem &&
                 !tryBeginMine(selected) && player.getMineTile() == null && !Core.scene.hasKeyboard()){
                     player.isShooting = true;
                 }
@@ -400,7 +400,7 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyDown(Binding.select) && mode == none && !isPlacing() && deleting){
             BuildRequest req = getRequest(cursorX, cursorY);
             if(req != null && req.breaking){
-                player.buildQueue().remove(req);
+                player.builder().requests().remove(req);
             }
         }else{
             deleting = false;
@@ -431,7 +431,7 @@ public class DesktopInput extends InputHandler{
 
             if(sreq != null){
                 if(getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null){
-                    player.buildQueue().remove(sreq, true);
+                    player.builder().requests().remove(sreq, true);
                 }
                 sreq = null;
             }

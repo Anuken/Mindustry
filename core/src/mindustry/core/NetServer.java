@@ -513,7 +513,7 @@ public class NetServer implements ApplicationListener{
         player.isBoosting = boosting;
         player.isShooting = shooting;
         player.isBuilding = building;
-        player.buildQueue().clear();
+        player.builder().requests().clear();
 
         for(BuildRequest req : requests){
             if(req == null) continue;
@@ -536,7 +536,7 @@ public class NetServer implements ApplicationListener{
                 connection.rejectedRequests.add(req);
                 continue;
             }
-            player.buildQueue().addLast(req);
+            player.builder().requests().addLast(req);
         }
 
         connection.rejectedRequests.clear();
