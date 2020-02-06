@@ -57,82 +57,17 @@ public class CraterConveyor extends Block implements Autotiler{
     }
 
     @Override
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name + "-0-0")};
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
 
         stats.add(BlockStat.itemsMoved, speed * 60, StatUnit.perSecond);
         stats.add(BlockStat.boostEffect, "$blocks.itemcapacity");
     }
-
-    @Override
-    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
-        int[] bits = getTiling(req, list);
-
-        if(bits == null) return;
-
-        TextureRegion region = regions[bits[0]];
-        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl * req.animScale, region.getHeight() * bits[2] * Draw.scl * req.animScale, req.rotation * 90);
-    }
-
-    @Override
-    public void onProximityUpdate(Tile tile){
-        super.onProximityUpdate(tile);
-
-        CraterConveyorEntity entity = tile.ent();
-        int[] bits = buildBlending(tile, tile.rotation(), null, true);
-        entity.blendbits = bits[0];
-        entity.blendsclx = bits[1];
-        entity.blendscly = bits[2];
-
-        entity.snekbit = 0;
-        if(isStart(tile)) entity.snekbit = (byte)(entity.snekbit | head);
-        if(isEnd(tile))   entity.snekbit = (byte)(entity.snekbit | tail);
-    }
-
-    @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-0-0")};
-    }
-
-    @Override
-    public boolean shouldIdleSound(Tile tile){
-        return false;
-    }
-
-    @Override
-    public boolean isAccessible(){
-        return true;
-    }
-
-    class CraterConveyorEntity extends TileEntity{
-        int blendbits;
-        int blendsclx, blendscly;
-
-        byte snekbit;
-
-        int from = Pos.invalid;
-        float reload;
-
-        float lastFrameUpdated = -1;
-
-        @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-
-            stream.writeInt(from);
-            stream.writeFloat(reload);
-        }
-
-        @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-
-            from = stream.readInt();
-            reload = stream.readFloat();
-        }
-    }
-
-    //
 
     @Override
     public void draw(Tile tile){
@@ -183,6 +118,35 @@ public class CraterConveyor extends Block implements Autotiler{
         Draw.rect(entity.items.first().icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
     }
 
+    @Override
+    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+        int[] bits = getTiling(req, list);
+
+        if(bits == null) return;
+
+        TextureRegion region = regions[bits[0]];
+        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl * req.animScale, region.getHeight() * bits[2] * Draw.scl * req.animScale, req.rotation * 90);
+    }
+
+    @Override
+    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock) {
+        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof CraterConveyor; // blend with nothing but crater conveyors
+    }
+
+    @Override
+    public void onProximityUpdate(Tile tile){
+        super.onProximityUpdate(tile);
+
+        CraterConveyorEntity entity = tile.ent();
+        int[] bits = buildBlending(tile, tile.rotation(), null, true);
+        entity.blendbits = bits[0];
+        entity.blendsclx = bits[1];
+        entity.blendscly = bits[2];
+
+        entity.snekbit = 0;
+        if(isStart(tile)) entity.snekbit = (byte)(entity.snekbit | head);
+        if(isEnd(tile))   entity.snekbit = (byte)(entity.snekbit | tail);
+    }
 
     @Override
     public void update(Tile tile){
@@ -263,18 +227,6 @@ public class CraterConveyor extends Block implements Autotiler{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        CraterConveyorEntity entity = tile.ent();
-
-        if(!((entity.snekbit & head) == head) && !(source.block() instanceof CraterConveyor)) return false;
-        if(entity.items.total() > 0 && !entity.items.has(item)) return false;
-        if(entity.items.total() >= getMaximumAccepted(tile, item)) return false;
-        if(tile.front() == source) return false;
-
-        return true;
-    }
-
-    @Override
     public void handleItem(Item item, Tile tile, Tile source){
         super.handleItem(item, tile, source);
 
@@ -291,25 +243,43 @@ public class CraterConveyor extends Block implements Autotiler{
 
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
-        return Mathf.round(super.getMaximumAccepted(tile, item) * tile.entity.timeScale);
-    }
-
-    public boolean shouldLaunch(Tile tile){
-        CraterConveyorEntity entity = tile.ent();
-
-        // its not a start tile so it should be moving
-        if(!((entity.snekbit & head) == head)) return true;
-
-        // its considered full
-        if(entity.items.total() >= getMaximumAccepted(tile, entity.items.first())) return true;
-
-        return false;
+        return Mathf.round(super.getMaximumAccepted(tile, item) * tile.entity.timeScale); // increased item capacity while boosted
     }
 
     @Override
-    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock) {
-        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof CraterConveyor;
+    public boolean shouldIdleSound(Tile tile){
+        return false; // has no moving parts
     }
+
+    class CraterConveyorEntity extends TileEntity{
+        int blendbits;
+        int blendsclx, blendscly;
+
+        byte snekbit;
+
+        int from = Pos.invalid;
+        float reload;
+
+        float lastFrameUpdated = -1;
+
+        @Override
+        public void write(DataOutput stream) throws IOException{
+            super.write(stream);
+
+            stream.writeInt(from);
+            stream.writeFloat(reload);
+        }
+
+        @Override
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
+
+            from = stream.readInt();
+            reload = stream.readFloat();
+        }
+    }
+
+    // ▲ | ▼ fixme: refactor
 
     // has no crater conveyors facing into it
     private boolean isStart(Tile tile){
@@ -346,4 +316,29 @@ public class CraterConveyor extends Block implements Autotiler{
             }
         }
     }
+
+    public boolean shouldLaunch(Tile tile){
+        CraterConveyorEntity entity = tile.ent();
+
+        // its not a start tile so it should be moving
+        if(!((entity.snekbit & head) == head)) return true;
+
+        // its considered full
+        if(entity.items.total() >= getMaximumAccepted(tile, entity.items.first())) return true;
+
+        return false;
+    }
+
+    @Override
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        CraterConveyorEntity entity = tile.ent();
+
+        if(!((entity.snekbit & head) == head) && !(source.block() instanceof CraterConveyor)) return false;
+        if(entity.items.total() > 0 && !entity.items.has(item)) return false;
+        if(entity.items.total() >= getMaximumAccepted(tile, item)) return false;
+        if(tile.front() == source) return false;
+
+        return true;
+    }
+
 }
