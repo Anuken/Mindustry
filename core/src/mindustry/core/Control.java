@@ -201,7 +201,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     void createPlayer(){
-        //player = new Playerc();
+        player = PlayerEntity.create();
         player.name(Core.settings.getString("name"));
         player.color().set(Core.settings.getInt("color-0"));
 
@@ -243,28 +243,6 @@ public class Control implements ApplicationListener, Loadable{
             Events.fire(Trigger.newGame);
         });
     }
-
-    //TODO remove, make it viable on a server
-    /*public void playZone(Zone zone){
-
-        ui.loadAnd(() -> {
-            logic.reset();
-            net.reset();
-            world.loadGenerator(zone.generator);
-            zone.rules.get(state.rules);
-            state.rules.zone = zone;
-            for(Tilec core : state.teams.playerCores()){
-                for(ItemStack stack : zone.getStartingItems()){
-                    core.items().add(stack.item, stack.amount);
-                }
-            }
-            state.set(State.playing);
-            state.wavetime = state.rules.waveSpacing;
-            control.saves.zoneSave();
-            logic.play();
-            Events.fire(Trigger.newGame);
-        });
-    }*/
 
     public void playSector(Sector sector){
         ui.loadAnd(() -> {

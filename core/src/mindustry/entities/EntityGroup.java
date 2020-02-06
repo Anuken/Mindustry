@@ -12,7 +12,7 @@ import static mindustry.Vars.*;
 /** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")
 public class EntityGroup<T extends Entityc> implements Iterable<T>{
-    private final Array<T> array = new Array<>(false, 32);
+    private final Array<T> array;
     private final Array<T> intersectArray = new Array<>();
     private final Rect intersectRect = new Rect();
     private IntMap<T> map;
@@ -21,7 +21,9 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
 
     private int index;
 
-    public EntityGroup(boolean spatial, boolean mapping){
+    public EntityGroup(Class<T> type, boolean spatial, boolean mapping){
+        array = new Array<>(false, 32, type);
+
         if(spatial){
             tree = new QuadTree<>(new Rect(0, 0, 0, 0));
         }

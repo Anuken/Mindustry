@@ -138,8 +138,7 @@ public class EditorTile extends Tile{
         Block block = block();
 
         if(block.hasEntity()){
-            //TODO uncomment once this mess is figure out
-            //entity = block.newEntity().init(this, false);
+            entity = block.newEntity().init(this, false);
             entity.cons(new ConsumeModule(entity));
             if(block.hasItems) entity.items(new ItemModule());
             if(block.hasLiquids) entity.liquids(new LiquidModule());

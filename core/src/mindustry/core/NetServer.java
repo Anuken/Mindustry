@@ -188,8 +188,7 @@ public class NetServer implements ApplicationListener{
                 con.modclient = true;
             }
 
-            //TODO place instance of player here
-            Playerc player = null;//new Playerc();
+            Playerc player = PlayerEntity.create();
             player.admin(admins.isAdmin(uuid, packet.usid));
             player.con(con);
             player.con().usid = packet.usid;
@@ -222,8 +221,7 @@ public class NetServer implements ApplicationListener{
         net.handleServer(InvokePacket.class, (con, packet) -> {
             if(con.player == null) return;
             try{
-                //TODO uncomment when compilation works
-                //RemoteReadServer.readPacket(packet.writeBuffer, packet.type, con.player);
+                RemoteReadServer.readPacket(packet.writeBuffer, packet.type, con.player);
             }catch(ValidateException e){
                 Log.debug("Validation failed for '{0}': {1}", e.player, e.getMessage());
             }catch(RuntimeException e){
@@ -483,7 +481,7 @@ public class NetServer implements ApplicationListener{
         float rotation, float baseRotation,
         float xVelocity, float yVelocity,
         Tile mining,
-        boolean boosting, boolean shooting, boolean chatting, boolean building,
+        boolean boosting, boolean shooting, boolean chatting,
         BuildRequest[] requests,
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
@@ -603,8 +601,7 @@ public class NetServer implements ApplicationListener{
         }else if(action == AdminAction.trace){
             TraceInfo info = new TraceInfo(other.con().address, other.uuid(), other.con().modclient, other.con().mobile);
             if(player.con() != null){
-                //TODO uncomment
-                //Call.onTraceInfo(player.con(), other, info);
+                Call.onTraceInfo(player.con(), other, info);
             }else{
                 NetClient.onTraceInfo(other, info);
             }

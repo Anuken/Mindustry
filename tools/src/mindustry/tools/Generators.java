@@ -184,34 +184,10 @@ public class Generators{
             }
         });
 
-        ImagePacker.generate("mech-icons", () -> {
-            for(Mech mech : content.<Mech>getBy(ContentType.mech)){
-                mech.load();
-                mech.weapon.load();
-
-                Image image = ImagePacker.get(mech.region);
-
-                if(!mech.flying){
-                    image.drawCenter(mech.baseRegion);
-                    image.drawCenter(mech.legRegion);
-                    image.drawCenter(mech.legRegion, true, false);
-                    image.drawCenter(mech.region);
-                }
-
-                int off = image.width / 2 - mech.weapon.region.getWidth() / 2;
-
-                for(int i : Mathf.signs){
-                    image.draw(mech.weapon.region, i * (int)mech.weaponOffsetX*4 + off, -(int)mech.weaponOffsetY*4 + off, i > 0, false);
-                }
-
-                image.save("mech-" + mech.name + "-full");
-            }
-        });
-
         ImagePacker.generate("unit-icons", () -> {
-            content.<UnitType>getBy(ContentType.unit).each(type -> !type.flying, type -> {
+            content.units().each(type -> !type.flying, type -> {
                 type.load();
-                type.weapon.load();
+                type.weapons.each(Weapon::load);
 
                 Image image = ImagePacker.get(type.region);
 
@@ -220,12 +196,14 @@ public class Generators{
                 image.draw(type.legRegion, true, false);
                 image.draw(type.region);
 
+                //TODO draw weapons with proper offsets
+                /*
                 for(boolean b : Mathf.booleans){
                     image.draw(type.weapon.region,
                     (int)(Mathf.sign(b) * type.weapon.width / Draw.scl + image.width / 2 - type.weapon.region.getWidth() / 2),
                     (int)(type.weaponOffsetY / Draw.scl + image.height / 2f - type.weapon.region.getHeight() / 2f),
                     b, false);
-                }
+                }*/
 
                 image.save("unit-" + type.name + "-full");
             });

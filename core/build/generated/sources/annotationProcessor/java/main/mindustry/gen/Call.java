@@ -172,8 +172,8 @@ public class Call {
 
   public static synchronized void onClientShapshot(int snapshotID, float x, float y, float pointerX,
       float pointerY, float rotation, float baseRotation, float xVelocity, float yVelocity,
-      Tile mining, boolean boosting, boolean shooting, boolean chatting, boolean building,
-      BuildRequest[] requests, float viewX, float viewY, float viewWidth, float viewHeight) {
+      Tile mining, boolean boosting, boolean shooting, boolean chatting, BuildRequest[] requests,
+      float viewX, float viewY, float viewWidth, float viewHeight) {
     if(mindustry.Vars.net.client()) {
       mindustry.net.Packets.InvokePacket packet = arc.util.pooling.Pools.obtain(mindustry.net.Packets.InvokePacket.class, mindustry.net.Packets.InvokePacket::new);
       packet.writeBuffer = TEMP_BUFFER;
@@ -193,7 +193,6 @@ public class Call {
       TEMP_BUFFER.put(boosting ? (byte)1 : 0);
       TEMP_BUFFER.put(shooting ? (byte)1 : 0);
       TEMP_BUFFER.put(chatting ? (byte)1 : 0);
-      TEMP_BUFFER.put(building ? (byte)1 : 0);
       mindustry.io.TypeIO.writeRequests(TEMP_BUFFER, requests);
       TEMP_BUFFER.putFloat(viewX);
       TEMP_BUFFER.putFloat(viewY);

@@ -188,6 +188,7 @@ public class Vars implements Loadable{
 
     public static void init(){
         Serialization.init();
+        Groups.init();
         DefaultSerializers.typeMappings.put("mindustry.type.ContentType", "mindustry.ctype.ContentType");
 
         if(loadLocales){

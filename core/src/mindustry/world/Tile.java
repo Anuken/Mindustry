@@ -457,7 +457,6 @@ public class Tile implements Position{
         Block block = block();
 
         if(block.hasEntity()){
-            //TODO assign data and don't use new entity
             entity = block.newEntity().init(this, block.update);
             entity.cons(new ConsumeModule(entity));
             if(block.hasItems) entity.items(new ItemModule());

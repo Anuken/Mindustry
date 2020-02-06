@@ -708,8 +708,10 @@ public class EntityComps{
             admin = typing = false;
             lastText = null;
             textFadeTime = 0f;
-            unit.controller(unit.type().createController());
-            unit = null;
+            if(!dead()){
+                unit.controller(unit.type().createController());
+                unit = Nulls.unit;
+            }
         }
 
         public void update(){
@@ -757,7 +759,7 @@ public class EntityComps{
         }
 
         boolean dead(){
-            return unit == Nulls.builder;
+            return unit.isNull();
         }
 
         String uuid(){

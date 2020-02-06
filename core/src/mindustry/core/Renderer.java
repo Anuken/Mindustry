@@ -11,7 +11,9 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.ui.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -23,7 +25,7 @@ public class Renderer implements ApplicationListener{
     public final LightRenderer lights = new LightRenderer();
     public final Pixelator pixelator = new Pixelator();
 
-    public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
+    public FrameBuffer effectBuffer = new FrameBuffer(2, 2);
     private Bloom bloom;
     private Color clearColor;
     private float targetscale = Scl.scl(4);
@@ -104,7 +106,7 @@ public class Renderer implements ApplicationListener{
     @Override
     public void dispose(){
         minimap.dispose();
-        shieldBuffer.dispose();
+        effectBuffer.dispose();
         blocks.dispose();
         if(bloom != null){
             bloom.dispose();
@@ -169,7 +171,115 @@ public class Renderer implements ApplicationListener{
     }
 
     public void draw(){
-        //TODO do it
+        camera.update();
+
+        if(Float.isNaN(camera.position.x) || Float.isNaN(camera.position.y)){
+            camera.position.set(player);
+        }
+
+        graphics.clear(clearColor);
+
+        if(!graphics.isHidden() && (Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")) && (effectBuffer.getWidth() != graphics.getWidth() || effectBuffer.getHeight() != graphics.getHeight())){
+            effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
+        }
+
+        Draw.proj(camera.projection());
+
+        blocks.floor.drawFloor();
+
+        render(RenderLayer.floor);
+
+        blocks.processBlocks();
+        blocks.drawShadows();
+        Draw.color();
+
+        blocks.floor.beginDraw();
+        blocks.floor.drawLayer(CacheLayer.walls);
+        blocks.floor.endDraw();
+
+        blocks.drawBlocks(Layer.block);
+        blocks.drawFog();
+
+        blocks.drawDestroyed();
+
+        Draw.shader(Shaders.blockbuild, true);
+        blocks.drawBlocks(Layer.placement);
+        Draw.shader();
+
+        blocks.drawBlocks(Layer.overlay);
+
+        render(RenderLayer.groundShadows);
+        render(RenderLayer.ground);
+
+        blocks.drawBlocks(Layer.turret);
+
+        render(RenderLayer.flyingShadows);
+
+        blocks.drawBlocks(Layer.power);
+        blocks.drawBlocks(Layer.lights);
+
+        render(RenderLayer.flying);
+
+        Draw.flush();
+        if(bloom != null && !pixelator.enabled()){
+            bloom.capture();
+        }
+
+        render(RenderLayer.bullets);
+        render(RenderLayer.effects);
+
+        Draw.flush();
+        if(bloom != null && !pixelator.enabled()){
+            bloom.render();
+        }
+
+        overlays.drawBottom();
+        if(player.isBuilder()){
+            player.builder().drawBuildRequests();
+        }
+
+        overlays.drawTop();
+
+        //TODO should use (draw)
+        Groups.player.each(p -> !p.dead(), Playerc::drawName);
+
+        if(state.rules.lighting){
+            lights.draw();
+        }
+
+        drawLanding();
+
+        Draw.color();
+        Draw.flush();
+    }
+
+    private void render(RenderLayer layer){
+
+    }
+
+    private void drawLanding(){
+        if(landTime > 0 && player.closestCore() != null){
+            float fract = landTime / Fx.coreLand.lifetime;
+            Tilec entity = player.closestCore();
+
+            TextureRegion reg = entity.block().icon(Cicon.full);
+            float scl = Scl.scl(4f) / camerascale;
+            float s = reg.getWidth() * Draw.scl * scl * 4f * fract;
+
+            Draw.color(Pal.lightTrail);
+            Draw.rect("circle-shadow", entity.getX(), entity.getY(), s, s);
+
+            Angles.randLenVectors(1, (1f- fract), 100, 1000f * scl * (1f-fract), (x, y, fin, fout) -> {
+                Lines.stroke(scl * fin);
+                Lines.lineAngle(entity.getX() + x, entity.getY() + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
+            });
+
+            Draw.color();
+            Draw.mixcol(Color.white, fract);
+            Draw.rect(reg, entity.getX(), entity.getY(), reg.getWidth() * Draw.scl * scl, reg.getHeight() * Draw.scl * scl, fract * 135f);
+
+            Draw.reset();
+        }
     }
 /*
     public void draw(){
@@ -182,8 +292,8 @@ public class Renderer implements ApplicationListener{
 
         graphics.clear(clearColor);
 
-        if(!graphics.isHidden() && (Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")) && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
-            shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
+        if(!graphics.isHidden() && (Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")) && (effectBuffer.getWidth() != graphics.getWidth() || effectBuffer.getHeight() != graphics.getHeight())){
+            effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
         Draw.proj(camera.projection());
@@ -246,15 +356,15 @@ public class Renderer implements ApplicationListener{
         if(shieldGroup.countInBounds() > 0){
             if(settings.getBool("animatedshields") && Shaders.shield != null){
                 Draw.flush();
-                shieldBuffer.begin();
+                effectBuffer.begin();
                 graphics.clear(Color.clear);
                 shieldGroup.draw();
                 shieldGroup.draw(shield -> true, ShieldEntity::drawOver);
                 Draw.flush();
-                shieldBuffer.end();
+                effectBuffer.end();
                 Draw.shader(Shaders.shield);
                 Draw.color(Pal.accent);
-                Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
+                Draw.rect(Draw.wrap(effectBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
                 Draw.color();
                 Draw.shader();
             }else{

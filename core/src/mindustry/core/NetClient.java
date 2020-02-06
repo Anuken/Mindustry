@@ -122,8 +122,7 @@ public class NetClient implements ApplicationListener{
 
         net.handleClient(InvokePacket.class, packet -> {
             packet.writeBuffer.position(0);
-            //TODO fix remote read client
-           // RemoteReadClient.readPacket(packet.writeBuffer, packet.type);
+            RemoteReadClient.readPacket(packet.writeBuffer, packet.type);
         });
     }
 
@@ -176,8 +175,7 @@ public class NetClient implements ApplicationListener{
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
-            //TODO uncomment when it works
-            //Call.sendMessage(message, colorizeName(player.id(), player.name()), player);
+            Call.sendMessage(message, colorizeName(player.id(), player.name()), player);
         }else{
             //log command to console but with brackets
             Log.info("<&y{0}: &lm{1}&lg>", player.name(), message);

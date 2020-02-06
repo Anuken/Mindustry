@@ -12,6 +12,7 @@ import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -29,8 +30,7 @@ public class Damage{
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
         for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
             int branches = 5 + Mathf.clamp((int)(power / 30), 1, 20);
-            //TODO uncomment
-            //Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2)));
+            Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2)));
         }
 
         for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){

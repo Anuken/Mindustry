@@ -275,7 +275,7 @@ public class EntityProcess extends BaseProcessor{
                 groupsBuilder.addField(ParameterizedTypeName.get(
                     ClassName.bestGuess("mindustry.entities.EntityGroup"), itype), group.name, Modifier.PUBLIC, Modifier.STATIC);
 
-                groupInit.addStatement("$L = new $T<>($L, $L)", group.name, groupc, group.def.spatial(), group.def.mapping());
+                groupInit.addStatement("$L = new $T<>($L.class, $L, $L)", group.name, groupc, itype, group.def.spatial(), group.def.mapping());
             }
 
             //write the groups
