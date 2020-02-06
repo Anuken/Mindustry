@@ -2,6 +2,7 @@ package mindustry.entities.def;
 
 import arc.func.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 
 import java.io.*;
@@ -12,7 +13,7 @@ import static mindustry.Vars.player;
 @BaseComponent
 abstract class EntityComp{
     private boolean added;
-    int id;
+    int id = EntityGroup.nextId();
 
     boolean isAdded(){
         return added;

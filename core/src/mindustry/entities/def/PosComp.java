@@ -19,6 +19,10 @@ abstract class PosComp implements Position{
         this.y = y;
     }
 
+    void set(Position pos){
+        set(pos.getX(), pos.getY());
+    }
+
     void trns(float x, float y){
         set(this.x + x, this.y + y);
     }

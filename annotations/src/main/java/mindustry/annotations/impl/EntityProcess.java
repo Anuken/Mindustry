@@ -442,6 +442,8 @@ public class EntityProcess extends BaseProcessor{
                     if(!method.isVoid()){
                         if(method.name().equals("isNull")){
                             builder.addStatement("return true");
+                        }else if(method.name().equals("id")){
+                                builder.addStatement("return -1");
                         }else{
                             Svar variable = compType == null || method.params().size > 0 ? null : compType.fields().find(v -> v.name().equals(method.name()));
                             if(variable == null || !varInitializers.containsKey(variable)){

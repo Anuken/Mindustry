@@ -1,6 +1,7 @@
 package mindustry.content;
 
 import mindustry.ctype.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 
 public class UnitTypes implements ContentList{
@@ -14,6 +15,20 @@ public class UnitTypes implements ContentList{
 
     @Override
     public void load(){
+        dagger = new UnitDef("dagger", GenericUnitEntity::create){{
+            speed = 0.2f;
+            drag = 0.4f;
+            hitsize = 8f;
+            mass = 1.75f;
+            health = 130;
+            weapons.add(new Weapon("chain-blaster"){{
+                reload = 28f;
+                alternate = true;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.standardCopper;
+            }});
+        }};
+
         /*
         draug = new UnitDef("draug", MinerDrone::new){{
             flying = true;

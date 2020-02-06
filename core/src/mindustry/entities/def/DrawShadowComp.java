@@ -6,7 +6,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 
 @Component
-abstract class DrawShadowComp implements Drawc, Rotc, Flyingc, DrawLayerFlyingShadowsc, DrawLayerGroundShadowsc{
+abstract class DrawShadowComp implements Drawc, Rotc, Flyingc, DrawLayerFlyingShadowsc{
     static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
 
     transient float x, y, rotation;
@@ -16,19 +16,6 @@ abstract class DrawShadowComp implements Drawc, Rotc, Flyingc, DrawLayerFlyingSh
     @Override
     public void drawFlyingShadows(){
         if(isFlying()){
-            drawShadow();
-        }
-    }
-
-    @Override
-    public void drawGroundShadows(){
-        if(isGrounded()){
-            drawShadow();
-        }
-    }
-
-    void drawShadow(){
-        if(!isGrounded()){
             Draw.color(shadowColor);
             Draw.rect(getShadowRegion(), x + shadowTX * elevation(), y + shadowTY * elevation(), rotation - 90);
             Draw.color();

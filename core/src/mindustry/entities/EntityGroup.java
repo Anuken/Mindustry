@@ -13,6 +13,8 @@ import static mindustry.Vars.collisions;
 /** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")
 public class EntityGroup<T extends Entityc> implements Iterable<T>{
+    private static int lastId = 0;
+
     private final Array<T> array;
     private final Array<T> intersectArray = new Array<>();
     private final Rect viewport = new Rect();
@@ -22,6 +24,10 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     private boolean clearing;
 
     private int index;
+
+    public static int nextId(){
+        return lastId++;
+    }
 
     public EntityGroup(Class<T> type, boolean spatial, boolean mapping){
         array = new Array<>(false, 32, type);
