@@ -38,9 +38,10 @@ public class TechTree implements ContentList{
                             });
                         });
                         node(container, () -> {
-                            node(unloader);
+                            node(unloader, () ->{
+                                node(maxUnloader);
+                            });
                             node(vault, () -> {
-
                             });
                         });
 
