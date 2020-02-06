@@ -38,13 +38,26 @@ public class MaxUnloader extends Block{
 
         if(tile.entity.timer.get(timerUnload, speed / entity.timeScale) && tile.entity.items.total() == 0){
             for(Tile other : tile.entity.proximity()){
-                if(other.interactable(tile.getTeam()) && other.block().unloadable && other.block().hasItems && entity.items.total() == 0 &&
-                        (other.entity.items.total() > 0)){
-                    offloadNear(tile, other.entity.items.takeMaxItem());
+                if(other.interactable(tile.getTeam()) && other.block().unloadable && other.block().hasItems && entity.items.total() == 0){
+                    int nThreshold = other.block().getMaximumAccepted(other, null) * 9/16;
+                    // Remain inactive until total items is above threshold to let other unloaders have first dibs at items.
+                    if(other.entity.items.total() > nThreshold){
+                        // If the target is a vault, try to take an item that is above threshold.
+                         if(other.block() instanceof Vault) {
+                             Item iitem = other.entity.items.takeMaxItem(nThreshold);
+                             if(iitem != null)
+                                 offloadNear(tile, iitem);
+                         }
+                         if(other.block() instanceof LaunchPad) {
+                             // If the target is a launcher, take whichever item there is the most of.
+                              offloadNear(tile, other.entity.items.takeMaxItem(0));
+                         }
+                    }
                 }
             }
         }
 
+        // Still got to empty items that got pushed into the block to avoid stalling.
         if(entity.items.total() > 0){
             tryDump(tile);
         }
