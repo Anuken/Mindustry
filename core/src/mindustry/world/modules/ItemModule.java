@@ -77,6 +77,26 @@ public class ItemModule extends BlockModule{
         return null;
     }
 
+    // Takes one of whichever item there is the most of in this block - Added for Max Unloader.
+    // Assumes you checked for empty before calling to avoid wasting time on a futile max search, returns a courtesy null if you didn't.
+    public Item takeMaxItem() {
+        int maxIdx = -1;
+        int max = 0;
+        for(int i = 0; i < items.length; i++) {
+            if (items[i] > max) {
+                max = items[i];
+                maxIdx = i;
+            }
+        }
+
+        if(maxIdx >= 0) {
+            total--;
+            items[maxIdx]--;
+            return content.item(maxIdx);
+        }
+        return null;
+    }
+
     public int get(Item item){
         return items[item.id];
     }
