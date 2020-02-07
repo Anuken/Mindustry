@@ -180,7 +180,7 @@ public class Conveyor extends Block implements Autotiler{
             return;
         }
 
-        float nextMax = e.nextc != null && tile.rotation() == e.nextc.tile.rotation() ? 1f - Math.max(itemSpace - e.nextc.minitem, 0) : 1f;
+        float nextMax = e.aligned ? 1f - Math.max(itemSpace - e.nextc.minitem, 0) : 1f;
 
         for(int i = e.len - 1; i >= 0; i--){
             float nextpos = (i == e.len - 1 ? 100f : e.ys[i + 1]) - itemSpace;
