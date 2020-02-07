@@ -122,6 +122,7 @@ public class CallSuperProcess extends AbstractProcessor{
             }
 
             for(Symbol s : it){
+
                 if(s instanceof MethodSymbol){
                     MethodSymbol ms = (MethodSymbol)s;
 

@@ -42,96 +42,83 @@ public class RemoteProcess extends BaseProcessor{
     //list of all method entries
     private ArrayList<ClassEntry> classes;
 
+    {
+        rounds = 2;
+    }
+
     @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
-        if(round > 1) return false; //only process 2 rounds
+    public void process(RoundEnvironment roundEnv) throws Exception{
+        //round 1: find all annotations, generate *writers*
+        if(round == 1){
+            //get serializers
+            serializers = new IOFinder().findSerializers(roundEnv);
+            //last method ID used
+            int lastMethodID = 0;
+            //find all elements with the Remote annotation
+            elements = roundEnv.getElementsAnnotatedWith(Remote.class);
+            //map of all classes to generate by name
+            classMap = new HashMap<>();
+            //list of all method entries
+            methods = new ArrayList<>();
+            //list of all method entries
+            classes = new ArrayList<>();
 
-        round++;
+            List<Element> orderedElements = new ArrayList<>(elements);
+            orderedElements.sort(Comparator.comparing(Object::toString));
 
-        try{
+            //create methods
+            for(Element element : orderedElements){
+                Remote annotation = element.getAnnotation(Remote.class);
 
-            //round 1: find all annotations, generate *writers*
-            if(round == 1){
-                //get serializers
-                serializers = new IOFinder().findSerializers(roundEnv);
-                //last method ID used
-                int lastMethodID = 0;
-                //find all elements with the Remote annotation
-                elements = roundEnv.getElementsAnnotatedWith(Remote.class);
-                //map of all classes to generate by name
-                classMap = new HashMap<>();
-                //list of all method entries
-                methods = new ArrayList<>();
-                //list of all method entries
-                classes = new ArrayList<>();
-
-                List<Element> orderedElements = new ArrayList<>(elements);
-                orderedElements.sort(Comparator.comparing(Object::toString));
-
-                //create methods
-                for(Element element : orderedElements){
-                    Remote annotation = element.getAnnotation(Remote.class);
-
-                    //check for static
-                    if(!element.getModifiers().contains(Modifier.STATIC) || !element.getModifiers().contains(Modifier.PUBLIC)){
-                        BaseProcessor.messager.printMessage(Kind.ERROR, "All @Remote methods must be public and static: ", element);
-                    }
-
-                    //can't generate none methods
-                    if(annotation.targets() == Loc.none){
-                        BaseProcessor.messager.printMessage(Kind.ERROR, "A @Remote method's targets() cannot be equal to 'none':", element);
-                    }
-
-                    //get and create class entry if needed
-                    if(!classMap.containsKey(callLocation)){
-                        ClassEntry clas = new ClassEntry(callLocation);
-                        classMap.put(callLocation, clas);
-                        classes.add(clas);
-                    }
-
-                    ClassEntry entry = classMap.get(callLocation);
-
-                    //create and add entry
-                    MethodEntry method = new MethodEntry(entry.name, BaseProcessor.getMethodName(element), annotation.targets(), annotation.variants(),
-                    annotation.called(), annotation.unreliable(), annotation.forward(), lastMethodID++, (ExecutableElement)element, annotation.priority());
-
-                    entry.methods.add(method);
-                    methods.add(method);
+                //check for static
+                if(!element.getModifiers().contains(Modifier.STATIC) || !element.getModifiers().contains(Modifier.PUBLIC)){
+                    BaseProcessor.messager.printMessage(Kind.ERROR, "All @Remote methods must be public and static: ", element);
                 }
 
-                //create read/write generators
-                RemoteWriteGenerator writegen = new RemoteWriteGenerator(serializers);
+                //can't generate none methods
+                if(annotation.targets() == Loc.none){
+                    BaseProcessor.messager.printMessage(Kind.ERROR, "A @Remote method's targets() cannot be equal to 'none':", element);
+                }
 
-                //generate the methods to invoke (write)
-                writegen.generateFor(classes, packageName);
+                //get and create class entry if needed
+                if(!classMap.containsKey(callLocation)){
+                    ClassEntry clas = new ClassEntry(callLocation);
+                    classMap.put(callLocation, clas);
+                    classes.add(clas);
+                }
 
-                return true;
-            }else if(round == 2){ //round 2: generate all *readers*
-                RemoteReadGenerator readgen = new RemoteReadGenerator(serializers);
+                ClassEntry entry = classMap.get(callLocation);
 
-                //generate server readers
-                readgen.generateFor(methods.stream().filter(method -> method.where.isClient).collect(Collectors.toList()), readServerName, packageName, true);
-                //generate client readers
-                readgen.generateFor(methods.stream().filter(method -> method.where.isServer).collect(Collectors.toList()), readClientName, packageName, false);
+                //create and add entry
+                MethodEntry method = new MethodEntry(entry.name, BaseProcessor.getMethodName(element), annotation.targets(), annotation.variants(),
+                annotation.called(), annotation.unreliable(), annotation.forward(), lastMethodID++, (ExecutableElement)element, annotation.priority());
 
-                //create class for storing unique method hash
-                TypeSpec.Builder hashBuilder = TypeSpec.classBuilder("MethodHash").addModifiers(Modifier.PUBLIC);
-                hashBuilder.addJavadoc(autogenWarning);
-                hashBuilder.addField(FieldSpec.builder(int.class, "HASH", Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL)
-                .initializer("$1L", Objects.hash(methods)).build());
-
-                //build and write resulting hash class
-                TypeSpec spec = hashBuilder.build();
-                JavaFile.builder(packageName, spec).build().writeTo(BaseProcessor.filer);
-
-                return true;
+                entry.methods.add(method);
+                methods.add(method);
             }
 
-        }catch(Exception e){
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+            //create read/write generators
+            RemoteWriteGenerator writegen = new RemoteWriteGenerator(serializers);
 
-        return false;
+            //generate the methods to invoke (write)
+            writegen.generateFor(classes, packageName);
+        }else if(round == 2){ //round 2: generate all *readers*
+            RemoteReadGenerator readgen = new RemoteReadGenerator(serializers);
+
+            //generate server readers
+            readgen.generateFor(methods.stream().filter(method -> method.where.isClient).collect(Collectors.toList()), readServerName, packageName, true);
+            //generate client readers
+            readgen.generateFor(methods.stream().filter(method -> method.where.isServer).collect(Collectors.toList()), readClientName, packageName, false);
+
+            //create class for storing unique method hash
+            TypeSpec.Builder hashBuilder = TypeSpec.classBuilder("MethodHash").addModifiers(Modifier.PUBLIC);
+            hashBuilder.addJavadoc(autogenWarning);
+            hashBuilder.addField(FieldSpec.builder(int.class, "HASH", Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL)
+            .initializer("$1L", Objects.hash(methods)).build());
+
+            //build and write resulting hash class
+            TypeSpec spec = hashBuilder.build();
+            JavaFile.builder(packageName, spec).build().writeTo(BaseProcessor.filer);
+        }
     }
 }
