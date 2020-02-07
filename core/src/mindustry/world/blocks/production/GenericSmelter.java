@@ -34,7 +34,7 @@ public class GenericSmelter extends GenericCrafter{
         if(entity.warmup > 0f){
             Draw.color(1f, 1f, 1f, entity.warmup);
             Draw.rect(topRegion, tile.drawx(), tile.drawy());
-            Draw.color();
+          
         
         
         
@@ -52,8 +52,10 @@ public class GenericSmelter extends GenericCrafter{
             
             Fill.circle(tile.drawx(), tile.drawy(), 1.9f + Mathf.absin(Time.time(), 5f, 1f) + cr);
 
+            
+        }; 
             Draw.color();
-        }}
+        }
     }
 
     @Override
