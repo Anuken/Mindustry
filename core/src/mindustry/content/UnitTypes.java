@@ -1,6 +1,8 @@
 package mindustry.content;
 
+import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 
 public class UnitTypes implements ContentList{
@@ -9,8 +11,7 @@ public class UnitTypes implements ContentList{
     wraith, ghoul, revenant, lich, reaper,
     crawler, titan, fortress, eruptor, chaosArray, eradicator;
 
-    //TODO can't get comp classes
-    public static UnitDef dagger;
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitDef dagger;
 
     public static UnitDef vanguard, alpha, delta, tau, omega, dart, javelin, trident, glaive;
     public static UnitDef starter;
@@ -18,6 +19,7 @@ public class UnitTypes implements ContentList{
 
     @Override
     public void load(){
+
         dagger = new UnitDef("dagger"){{
             speed = 0.2f;
             drag = 0.4f;

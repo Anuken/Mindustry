@@ -184,6 +184,9 @@ public class EntityProcess extends BaseProcessor{
                 groupDefs.add(def);
             }
 
+            ObjectMap<String, Selement> usedNames = new ObjectMap<>();
+            ObjectMap<Selement, ObjectSet<String>> extraNames = new ObjectMap<>();
+
             //look at each definition
             for(Selement<?> type : allDefs){
                 EntityDef ann = type.annotation(EntityDef.class);
@@ -194,6 +197,19 @@ public class EntityProcess extends BaseProcessor{
                 String name = type.isType() ?
                     type.name().replace("Def", "Entity") :
                     createName(type);
+
+                //skip double classes
+                if(usedNames.containsKey(name)){
+                    extraNames.getOr(usedNames.get(name), ObjectSet::new).add(type.name());
+                    continue;
+                }
+
+                usedNames.put(name, type);
+                extraNames.getOr(type, ObjectSet::new).add(name);
+                if(!type.isType()){
+                    extraNames.getOr(type, ObjectSet::new).add(type.name());
+                }
+
                 TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
                 if(isFinal) builder.addModifiers(Modifier.FINAL);
 
@@ -398,8 +414,9 @@ public class EntityProcess extends BaseProcessor{
             for(EntityDefinition def : definitions){
                 //store mapping
                 idStore.addStatement("idMap[$L] = $L::new", def.classID, def.name);
-                idStore.addStatement("nameMap.put($S, $L::new)", def.name.substring(packageName.length() + 1), def.name);
-                idStore.addStatement("nameMap.put($S, $L::new)", def.base.name(), def.name);
+                extraNames.get(def.base).each(extra -> {
+                    idStore.addStatement("nameMap.put($S, $L::new)", extra, def.name);
+                });
 
                 //return mapping
                 def.builder.addMethod(MethodSpec.methodBuilder("classId").addAnnotation(Override.class)

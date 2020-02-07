@@ -58,7 +58,6 @@ public class Annotations{
     }
 
     /** Indicates an entity definition. */
-    @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
     public @interface EntityDef{
         Class[] value();
