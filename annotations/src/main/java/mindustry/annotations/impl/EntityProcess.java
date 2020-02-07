@@ -157,7 +157,8 @@ public class EntityProcess extends BaseProcessor{
 
             //look at each definition
             for(Stype type : allDefs){
-                boolean isFinal = type.annotation(EntityDef.class).isFinal();
+                EntityDef ann = type.annotation(EntityDef.class);
+                boolean isFinal = ann.isFinal();
                 if(!type.name().endsWith("Def")){
                     err("All entity def names must end with 'Def'", type.e);
                 }
@@ -279,7 +280,7 @@ public class EntityProcess extends BaseProcessor{
                 //add create() method
                 builder.addMethod(MethodSpec.methodBuilder("create").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(tname(packageName + "." + name))
-                .addStatement("return new $L()", name).build());
+                .addStatement(ann.pooled() ? "return " : "return new $L()", name).build());
 
                 definitions.add(new EntityDefinition("mindustry.gen." + name, builder, type, components, groups));
             }

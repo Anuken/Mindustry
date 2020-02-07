@@ -25,6 +25,14 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     private UnitController controller;
     private UnitDef type;
 
+    TextureRegion baseRegion(){
+        return type.baseRegion;
+    }
+
+    TextureRegion legRegion(){
+        return type.legRegion;
+    }
+
     @Override
     public TextureRegion getShadowRegion(){
         return type.region;
@@ -112,6 +120,10 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     @Override
     public void draw(){
         drawCell();
+
+        if(type.lightRadius > 0){
+            renderer.lights.add(x, y, type.lightRadius, type.lightColor, type.lightOpacity);
+        }
     }
 
     @Override

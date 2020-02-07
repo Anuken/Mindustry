@@ -5,16 +5,10 @@ import java.lang.annotation.*;
 public class Annotations{
     //region entity interfaces
 
-    /** Indicates that a component field is read-only.
-    @Target({ElementType.METHOD})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Render{
-        RenderLayer value();
-    }*/
-
     public enum DrawLayer{
         floor,
         groundShadows,
+        groundUnder,
         ground,
         flyingShadows,
         flying,
@@ -69,6 +63,7 @@ public class Annotations{
     public @interface EntityDef{
         Class[] value();
         boolean isFinal() default true;
+        boolean pooled() default false;
     }
 
     /** Indicates an internal interface for entity components. */

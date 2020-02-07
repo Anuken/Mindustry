@@ -4,13 +4,13 @@ import mindustry.annotations.Annotations.*;
 
 class AllEntities{
 
-    @EntityDef({BulletComp.class, VelComp.class, TimedComp.class})
+    @EntityDef(value = {BulletComp.class, VelComp.class, TimedComp.class}, pooled = true)
     class BulletDef{}
 
     @EntityDef(value = {TileComp.class}, isFinal = false)
     class TileDef{}
 
-    @EntityDef({EffectComp.class})
+    @EntityDef(value = {EffectComp.class}, pooled = true)
     class EffectDef{}
 
     @EntityDef({DecalComp.class})

@@ -37,7 +37,7 @@ public class UnitDef extends UnlockableContent{
 
     public float hitsize = 6f, hitsizeTile = 4f;
     public float cellOffsetX = 0f, cellOffsetY = 0f;
-    public float lightRadius = 60f;
+    public float lightRadius = 60f, lightOpacity = 0.6f;
     public Color lightColor = Pal.powerLight;
     public boolean drawCell = true, drawItems = true;
 

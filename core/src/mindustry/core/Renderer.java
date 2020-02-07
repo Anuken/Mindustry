@@ -209,6 +209,7 @@ public class Renderer implements ApplicationListener{
         blocks.drawBlocks(Layer.overlay);
 
         Groups.drawGroundShadows();
+        Groups.drawGroundUnder();
         Groups.drawGround();
 
         blocks.drawBlocks(Layer.turret);
