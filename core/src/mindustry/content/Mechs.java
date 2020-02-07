@@ -348,6 +348,7 @@ public class Mechs implements ContentList{
                             Timer.schedule(() -> {
                                 if(over == null || over.block() != Blocks.air) return;
                                 over.setNet(Blocks.shockMine, team, 0);
+                                over.entity.damage(0.1f);
                             }, lifetime / 60);
                         }
 

@@ -20,7 +20,7 @@ public class ShockMine extends Block{
 
     public ShockMine(String name){
         super(name);
-        update = false;
+        update = true;
         destructible = true;
         solid = false;
         targetable = false;
@@ -55,5 +55,10 @@ public class ShockMine extends Block{
             }
             tile.entity.damage(tileDamage);
         }
+    }
+
+    @Override
+    public void update(Tile tile){
+        if(tile.entity.healthf() < 1f) tile.entity.damage(0.1f);
     }
 }
