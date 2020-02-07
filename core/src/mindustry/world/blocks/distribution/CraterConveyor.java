@@ -26,8 +26,6 @@ import static mindustry.Vars.*;
 public class CraterConveyor extends Block implements Autotiler{
     private TextureRegion[] regions = new TextureRegion[8];
 
-    private Tile upstream;
-
     public float speed = 0f;
 
     public CraterConveyor(String name){
@@ -147,8 +145,6 @@ public class CraterConveyor extends Block implements Autotiler{
         entity.blendbit1 = bits[0];
         entity.blendsclx = bits[1];
         entity.blendscly = bits[2];
-
-        upstream(tile);
     }
 
     @Override
@@ -260,7 +256,6 @@ public class CraterConveyor extends Block implements Autotiler{
         int blendbit1, blendbit2;
         int blendsclx, blendscly;
 
-        int[] upstream = new int[3];
         int from = Pos.invalid;
         float reload;
 
@@ -281,43 +276,37 @@ public class CraterConveyor extends Block implements Autotiler{
         }
     }
 
-    private void upstream(Tile tile){
+    private void upstream(Tile tile, Cons<Tile> cons){
         CraterConveyorEntity entity = tile.ent();
 
         if(    entity.blendbit1 == 0 // 1 input from the back, 0 from the sides
             || entity.blendbit1 == 2 // 1 input from the back, 1 from the sides
             || entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
-        ) entity.upstream[0] = tile.back().pos(); else entity.upstream[0] = Pos.invalid;
+        ) cons.get(tile.back());
 
         if(    entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
             || entity.blendbit1 == 4 // 0 input from the back, 2 from the sides
             ||(entity.blendbit1 == 1 && entity.blendscly == -1) // side is open
             ||(entity.blendbit1 == 2 && entity.blendscly == +1) // side is open
-        ) entity.upstream[1] = tile.right().pos(); else entity.upstream[1] = Pos.invalid;
+        ) cons.get(tile.right());
 
         if(    entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
             || entity.blendbit1 == 4 // 0 input from the back, 2 from the sides
             ||(entity.blendbit1 == 1 && entity.blendscly == +1) // side is open
             ||(entity.blendbit1 == 2 && entity.blendscly == -1) // side is open
-        ) entity.upstream[2] = tile.left().pos(); else entity.upstream[2] = Pos.invalid;
+        ) cons.get(tile.left());
     }
 
     // ▲ | ▼ fixme: refactor
 
     // awaken inputting conveyors
     private void bump(Tile tile){
-        CraterConveyorEntity entity = tile.ent();
-
-        for(int i = 0; i < 3; i++){
-            if(entity.upstream[i] == Pos.invalid) continue;
-
-            upstream = world.tile(entity.upstream[i]);
-
-            if(upstream != null && upstream.entity != null && upstream.entity.isSleeping() && upstream.entity.items.total() > 0){
-                upstream.entity.noSleep();
-                bump(upstream);
+        upstream(tile, t -> {
+            if(t != null && t.entity != null && t.entity.isSleeping() && t.entity.items.total() > 0){
+                t.entity.noSleep();
+                bump(t);
             }
-        }
+        });
     }
 
     public boolean shouldLaunch(Tile tile){
