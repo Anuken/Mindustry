@@ -298,7 +298,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
                 kill();
             }else{
                 float multiplier = 1f - factory.entity.power.status;
-                damage(10 * multiplier);
+                damage(1 * multiplier);
             }
         }
 
