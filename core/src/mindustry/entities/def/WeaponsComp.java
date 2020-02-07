@@ -1,6 +1,5 @@
 package mindustry.entities.def;
 
-import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
@@ -14,8 +13,6 @@ import mindustry.type.*;
 abstract class WeaponsComp implements Teamc, Posc, Rotc{
     transient float x, y, rotation;
 
-    /** 1 */
-    static final int[] one = {1};
     /** minimum cursor distance from player, fixes 'cross-eyed' shooting */
     static final float minAimDst = 20f;
     /** temporary weapon sequence number */
@@ -50,60 +47,40 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     public void update(){
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
-            mount.reload -= Time.delta();
+            mount.reload = Math.max(mount.reload - Time.delta(), 0);
 
-            float rotation = this.rotation - 90;
+            if(mount.shoot){
+                float rotation = this.rotation - 90;
 
-            //rotate if applicable
-            if(weapon.rotate){
-                float axisXOffset = weapon.mirror ? 0f : weapon.x;
-                float axisX = this.x + Angles.trnsx(rotation, axisXOffset, weapon.y),
-                axisY = this.y + Angles.trnsy(rotation, axisXOffset, weapon.y);
+                //rotate if applicable
+                if(weapon.rotate){
+                    float axisXOffset = weapon.mirror ? 0f : weapon.x;
+                    float axisX = this.x + Angles.trnsx(rotation, axisXOffset, weapon.y),
+                    axisY = this.y + Angles.trnsy(rotation, axisXOffset, weapon.y);
 
-                mount.rotation = Angles.moveToward(mount.rotation, Angles.angle(axisX, axisY, mount.aimX, mount.aimY), weapon.rotateSpeed);
-            }
-
-            //shoot if applicable
-            //TODO only shoot if angle is reached, don't shoot inaccurately
-            if(mount.reload <= 0){
-                for(int i : (weapon.mirror && !weapon.alternate ? Mathf.signs : one)){
-                    i *= Mathf.sign(weapon.flipped) * Mathf.sign(mount.side);
-
-                    //m a t h
-                    float weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0);
-                    float mountX = this.x + Angles.trnsx(rotation, weapon.x * i, weapon.y),
-                    mountY = this.y + Angles.trnsy(rotation, weapon.x * i, weapon.y);
-                    float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX * i, weapon.shootY),
-                    shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX * i, weapon.shootY);
-                    float shootAngle = weapon.rotate ? weaponRotation : Angles.angle(shootX, shootY, mount.aimX, mount.aimY);
-
-                    shoot(weapon, shootX, shootY, shootAngle);
+                    mount.rotation = Angles.moveToward(mount.rotation, Angles.angle(axisX, axisY, mount.aimX, mount.aimY), weapon.rotateSpeed);
                 }
 
-                mount.side = !mount.side;
-                mount.reload = weapon.reload;
-            }
-        }
-    }
+                //shoot if applicable
+                //TODO only shoot if angle is reached, don't shoot inaccurately
+                if(mount.reload <= 0.0001f){
+                    for(int i : (weapon.mirror && !weapon.alternate ? Mathf.signs : Mathf.one)){
+                        i *= Mathf.sign(weapon.flipped) * Mathf.sign(mount.side);
 
-    /** Draw weapon mounts. */
-    void drawWeapons(){
-        for(WeaponMount mount : mounts){
-            Weapon weapon = mount.weapon;
+                        //m a t h
+                        float weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0);
+                        float mountX = this.x + Angles.trnsx(rotation, weapon.x * i, weapon.y),
+                        mountY = this.y + Angles.trnsy(rotation, weapon.x * i, weapon.y);
+                        float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX * i, weapon.shootY),
+                        shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX * i, weapon.shootY);
+                        float shootAngle = weapon.rotate ? weaponRotation : Angles.angle(shootX, shootY, mount.aimX, mount.aimY);
 
-            for(int i : (weapon.mirror ? Mathf.signs : one)){
-                i *= Mathf.sign(weapon.flipped);
+                        shoot(weapon, shootX, shootY, shootAngle);
+                    }
 
-                float rotation = this.rotation - 90 + (weapon.rotate ? mount.rotation : 0);
-                float trY = weapon.y - (mount.reload / weapon.reload * weapon.recoil) * (weapon.alternate ? Mathf.num(i == Mathf.sign(mount.side)) : 1);
-                float width = i > 0 ? -weapon.region.getWidth() : weapon.region.getWidth();
-
-                Draw.rect(weapon.region,
-                x + Angles.trnsx(rotation, weapon.x * i, trY),
-                y + Angles.trnsy(rotation, weapon.x * i, trY),
-                width * Draw.scl,
-                weapon.region.getHeight() * Draw.scl,
-                rotation - 90);
+                    mount.side = !mount.side;
+                    mount.reload = weapon.reload;
+                }
             }
         }
     }

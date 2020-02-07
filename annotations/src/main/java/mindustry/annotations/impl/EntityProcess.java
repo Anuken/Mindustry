@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.util.pooling.*;
 import com.squareup.javapoet.*;
 import com.squareup.javapoet.TypeSpec.*;
 import com.sun.source.tree.*;
@@ -271,6 +272,10 @@ public class EntityProcess extends BaseProcessor{
                         if(writeBlock) mbuilder.addCode("}\n");
                     }
 
+                    if(first.name().equals("remove") && ann.pooled()){
+                        mbuilder.addStatement("$T.free(this)", Pools.class);
+                    }
+
                     builder.addMethod(mbuilder.build());
                 }
 
@@ -280,7 +285,7 @@ public class EntityProcess extends BaseProcessor{
                 //add create() method
                 builder.addMethod(MethodSpec.methodBuilder("create").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(tname(packageName + "." + name))
-                .addStatement(ann.pooled() ? "return " : "return new $L()", name).build());
+                .addStatement(ann.pooled() ? "return Pools.obtain($L.class, " +name +"::new)" : "return new $L()", name).build());
 
                 definitions.add(new EntityDefinition("mindustry.gen." + name, builder, type, components, groups));
             }

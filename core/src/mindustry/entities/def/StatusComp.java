@@ -66,9 +66,7 @@ abstract class StatusComp implements Posc, Flyingc{
         return hasEffect(StatusEffects.boss);
     }
 
-    boolean isImmune(StatusEffect effect){
-        return false;
-    }
+    abstract boolean isImmune(StatusEffect effect);
 
     Color statusColor(){
         if(statuses.size == 0){

@@ -8,12 +8,14 @@ import mindustry.type.*;
 @Component
 abstract class ItemsComp implements Posc{
     @ReadOnly ItemStack stack = new ItemStack();
+    float itemTime;
 
     abstract int itemCapacity();
 
     @Override
     public void update(){
         stack.amount = Mathf.clamp(stack.amount, 0, itemCapacity());
+        itemTime = Mathf.lerpDelta(itemTime, Mathf.num(hasItem()), 0.05f);
     }
 
     Item item(){

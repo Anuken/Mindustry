@@ -1,9 +1,6 @@
 package mindustry.entities.def;
 
 import arc.*;
-import arc.graphics.*;
-import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -19,24 +16,12 @@ import mindustry.world.blocks.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, DrawShadowc, DrawLayerGroundc, DrawLayerFlyingc{
+abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, Drawc,
+        DrawLayerGroundc, DrawLayerFlyingc, DrawLayerGroundShadowsc, DrawLayerFlyingShadowsc{
     transient float x, y, rotation;
 
     private UnitController controller;
     private UnitDef type;
-
-    TextureRegion baseRegion(){
-        return type.baseRegion;
-    }
-
-    TextureRegion legRegion(){
-        return type.legRegion;
-    }
-
-    @Override
-    public TextureRegion getShadowRegion(){
-        return type.region;
-    }
 
     @Override
     public float clipSize(){
@@ -110,29 +95,27 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     }
 
     @Override
-    public void drawLight(){
-        //TODO move
-        if(type.lightRadius > 0){
-            renderer.lights.add(x, y, type.lightRadius, type.lightColor, 0.6f);
-        }
+    public boolean isImmune(StatusEffect effect){
+        return type.immunities.contains(effect);
     }
 
     @Override
     public void draw(){
-        drawCell();
-
-        if(type.lightRadius > 0){
-            renderer.lights.add(x, y, type.lightRadius, type.lightColor, type.lightOpacity);
-        }
+        type.drawBody(this);
+        type.drawWeapons(this);
+        if(type.drawCell) type.drawCell(this);
+        if(type.drawItems) type.drawItems(this);
+        type.drawLight(this);
     }
 
     @Override
-    public void drawBody(){
-        Draw.mixcol(Color.white, hitAlpha());
+    public void drawFlyingShadows(){
+        if(isFlying()) type.drawShadow(this);
+    }
 
-        Draw.rect(type.region, x, y, rotation - 90);
-
-        Draw.reset();
+    @Override
+    public void drawGroundShadows(){
+        type.drawOcclusion(this);
     }
 
     @Override
@@ -143,14 +126,6 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     @Override
     public void drawGround(){
         if(isGrounded()) draw();
-    }
-
-    @Override
-    public void drawCell(){
-        //draw power cell - TODO move
-        Draw.color(Color.black, team().color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
-        Draw.rect(type.cellRegion, x, y, rotation() - 90);
-        Draw.color();
     }
 
     @Override

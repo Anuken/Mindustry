@@ -23,6 +23,7 @@ public class UnitTypes implements ContentList{
             health = 130;
             weapons.add(new Weapon("chain-blaster"){{
                 reload = 28f;
+                x = 4f;
                 alternate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;

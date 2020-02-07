@@ -13,6 +13,8 @@ public class WeaponMount{
     public float aimX, aimY;
     /** side that's being shot - only valid for mirrors */
     public boolean side;
+    /** whether to shoot right now */
+    public boolean shoot = false;
 
     public WeaponMount(Weapon weapon){
         this.weapon = weapon;
