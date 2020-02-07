@@ -561,7 +561,6 @@ public class Blocks implements ContentList{
             craftTime = 75f;
             size = 3;
             hasPower = true;
-            flags = EnumSet.of(BlockFlag.feedable);
 
             consumes.power(4f);
             consumes.items(new ItemStack(Items.copper, 3), new ItemStack(Items.lead, 4), new ItemStack(Items.titanium, 2), new ItemStack(Items.silicon, 3));
