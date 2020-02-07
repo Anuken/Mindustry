@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
@@ -77,6 +78,7 @@ public class ImpactReactor extends PowerGenerator{
             boolean prevOut = getPowerProduction(tile) <= consumes.getPower().requestedPower(entity);
 
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
+
             if(Mathf.equal(entity.warmup, 1f, 0.001f)){
                 entity.warmup = 1f;
 
@@ -86,14 +88,11 @@ public class ImpactReactor extends PowerGenerator{
                     BaseUnit reaper = UnitTypes.reaper.create(tile.getTeam());
                     reaper.set(tile.drawx(), tile.drawy());
                     reaper.add();
+                    reaper.applyEffect(StatusEffects.corroded, 999999f);
                     Events.fire(new UnitCreateEvent(reaper));
 
-                    BaseUnit eradicator = UnitTypes.eradicator.create(tile.getTeam());
-                    eradicator.set(tile.drawx(), tile.drawy());
-                    eradicator.add();
-                    Events.fire(new UnitCreateEvent(eradicator));
-
-                    tile.entity.kill();
+                    entity.warmup = 0f;
+                    netServer.titanic.add(tile);
                 });
             }
 
