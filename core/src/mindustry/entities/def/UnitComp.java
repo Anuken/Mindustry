@@ -41,7 +41,7 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     @Override
     public void controller(UnitController controller){
         this.controller = controller;
-        controller.unit(this);
+        if(controller.unit() != this) controller.unit(this);
     }
 
     @Override
@@ -58,6 +58,10 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     @Override
     public void type(UnitDef type){
         this.type = type;
+        maxHealth(type.health);
+        heal();
+        drag(type.drag);
+        hitSize(type.hitsize);
         controller(type.createController());
         setupWeapons(type);
     }

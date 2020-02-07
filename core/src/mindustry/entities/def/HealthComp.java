@@ -9,7 +9,7 @@ import mindustry.gen.*;
 abstract class HealthComp implements Entityc{
     static final float hitDuration = 9f;
 
-    float health, maxHealth, hitTime;
+    float health, maxHealth = 1f, hitTime;
     boolean dead;
 
     boolean isValid(){

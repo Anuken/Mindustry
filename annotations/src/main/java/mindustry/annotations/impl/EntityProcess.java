@@ -355,12 +355,18 @@ public class EntityProcess extends BaseProcessor{
                 .addParameter(TypeName.FLOAT, "x").addParameter(TypeName.FLOAT, "y").addParameter(TypeName.FLOAT, "w").addParameter(TypeName.FLOAT, "h")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
+            MethodSpec.Builder groupUpdate = MethodSpec.methodBuilder("update")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
             //method resize
             for(GroupDefinition group : groupDefs){
                 if(group.spatial){
                     groupResize.addStatement("$L.resize(x, y, w, h)", group.name);
+                    groupUpdate.addStatement("$L.updatePhysics()", group.name);
                 }
             }
+
+            groupUpdate.addStatement("all.update()");
 
             for(DrawLayer layer : DrawLayer.values()){
                 MethodSpec.Builder groupDraw = MethodSpec.methodBuilder("draw" + Strings.capitalize(layer.name()))
@@ -370,6 +376,7 @@ public class EntityProcess extends BaseProcessor{
             }
 
             groupsBuilder.addMethod(groupResize.build());
+            groupsBuilder.addMethod(groupUpdate.build());
 
             write(groupsBuilder);
 

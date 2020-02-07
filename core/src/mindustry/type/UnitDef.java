@@ -184,8 +184,6 @@ public class UnitDef extends UnlockableContent{
     }
 
     public void drawCell(Unitc unit){
-        if(!drawCell) return;
-
         Draw.color(Color.black, unit.team().color, unit.healthf() + Mathf.absin(Time.time(), Math.max(unit.healthf() * 5f, 1f), 1f - unit.healthf()));
         Draw.rect(cellRegion, unit, unit.rotation() - 90);
         Draw.color();

@@ -221,7 +221,7 @@ public class Logic implements ApplicationListener{
                     runWave();
                 }
 
-                Groups.all.update();
+                Groups.update();
 
                 //TODO update groups
                 /*

@@ -45,12 +45,11 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         array.sort(comp);
     }
 
+    public void updatePhysics(){
+        collisions.updatePhysics((EntityGroup<? extends Hitboxc>)this);
+    }
+
     public void update(){
-
-        if(useTree()){
-            collisions.updatePhysics((EntityGroup<? extends Hitboxc>)this);
-        }
-
         each(Entityc::update);
     }
 

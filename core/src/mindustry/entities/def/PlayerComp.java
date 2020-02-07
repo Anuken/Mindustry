@@ -99,6 +99,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
         this.unit = unit;
         if(unit != Nulls.unit){
             unit.team(team);
+            unit.controller(this);
         }
     }
 

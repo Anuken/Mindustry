@@ -13,6 +13,7 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -138,7 +139,7 @@ public class DesktopInput extends InputHandler{
             ui.listfrag.toggle();
         }
 
-        if(((player.dead()) || state.isPaused()) && !ui.chatfrag.shown()){
+        if((player.dead() || state.isPaused()) && !ui.chatfrag.shown()){
             //move camera around
             float camSpeed = !Core.input.keyDown(Binding.dash) ? 3f : 8f;
             Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta() * camSpeed));
@@ -147,6 +148,24 @@ public class DesktopInput extends InputHandler{
                 Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * camSpeed;
                 Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * camSpeed;
             }
+        }else if(!player.dead()){
+            Core.camera.position.lerpDelta(player, 0.08f);
+        }
+
+        //TODO remove: debug unit possession
+        if(player.dead() && Core.input.keyTap(Binding.select)){
+            Unitc unit = Units.closest(state.rules.defaultTeam, Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> true);
+            if(unit != null){
+                unit.hitbox(Tmp.r1);
+                if(Tmp.r1.contains(Core.input.mouseWorld())){
+                    player.unit(unit);
+                }
+            }
+        }
+
+        //TODO implement
+        if(!player.dead()){
+            updateKeyboard(player.unit());
         }
 
         if(Core.input.keyRelease(Binding.select)){
@@ -473,5 +492,76 @@ public class DesktopInput extends InputHandler{
             sreq = null;
             selectRequests.clear();
         }
+    }
+
+    protected void updateKeyboard(Unitc unit){
+        boolean canMove = !(Core.scene.getKeyboardFocus() instanceof TextField);
+
+        float speed = unit.type().speed;
+        float xa = Core.input.axis(Binding.move_x);
+        float ya = Core.input.axis(Binding.move_y);
+
+        unit.vel().add(speed * xa, speed * ya);
+        /*
+        Tile tile = unit.tileOn();
+        boolean canMove = !Core.scene.hasKeyboard() || ui.minimapfrag.shown();
+
+        //TODO implement
+        boolean isBoosting = Core.input.keyDown(Binding.dash) && !mech.flying;
+
+        //if player is in solid block
+        if(tile != null && tile.solid()){
+            isBoosting = true;
+        }
+
+        float speed = isBoosting && unit.type().flying ? mech.boostSpeed : mech.speed;
+
+        if(mech.flying){
+            //prevent strafing backwards, have a penalty for doing so
+            float penalty = 0.2f; //when going 180 degrees backwards, reduce speed to 0.2x
+            speed *= Mathf.lerp(1f, penalty, Angles.angleDist(rotation, velocity.angle()) / 180f);
+        }
+
+        movement.setZero();
+
+        float xa = Core.input.axis(Binding.move_x);
+        float ya = Core.input.axis(Binding.move_y);
+        if(!(Core.scene.getKeyboardFocus() instanceof TextField)){
+            movement.y += ya * speed;
+            movement.x += xa * speed;
+        }
+
+        if(Core.input.keyDown(Binding.mouse_move)){
+            movement.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * speed;
+            movement.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * speed;
+        }
+
+        Vec2 vec = Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY());
+        pointerX = vec.x;
+        pointerY = vec.y;
+        updateShooting();
+
+        movement.limit(speed).scl(Time.delta());
+
+        if(canMove){
+            velocity.add(movement.x, movement.y);
+        }else{
+            isShooting = false;
+        }
+        float prex = x, prey = y;
+        updateVelocityStatus();
+        moved = dst(prex, prey) > 0.001f;
+
+        if(canMove){
+            float baseLerp = mech.getRotationAlpha(this);
+            if(!isShooting() || !mech.faceTarget){
+                if(!movement.isZero()){
+                    rotation = Mathf.slerpDelta(rotation, mech.flying ? velocity.angle() : movement.angle(), 0.13f * baseLerp);
+                }
+            }else{
+                float angle = control.input.mouseAngle(x, y);
+                this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f * baseLerp);
+            }
+        }*/
     }
 }
