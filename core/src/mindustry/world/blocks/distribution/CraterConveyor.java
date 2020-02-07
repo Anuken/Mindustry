@@ -276,6 +276,7 @@ public class CraterConveyor extends Block implements Autotiler{
         }
     }
 
+    // crater conveyor tiles that input into this one
     private void upstream(Tile tile, Cons<Tile> cons){
         CraterConveyorEntity entity = tile.ent();
 
