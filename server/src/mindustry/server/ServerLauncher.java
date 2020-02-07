@@ -80,7 +80,6 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(new BlockUpscaler());
         Core.app.addListener(new EmojiFilter());
         Core.app.addListener(new IdleSync());
-        Core.app.addListener(new Autosave());
         Core.app.addListener(new Limbo());
 //        Core.app.addListener(new Katamari());
 //        Core.app.addListener(new PiertotumLocomotor());
