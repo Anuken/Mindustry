@@ -163,9 +163,8 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        //TODO implement
-        if(!player.dead()){
-            updateKeyboard(player.unit());
+        if(!player.dead() && !state.isPaused()){
+            updateMovement(player.unit());
         }
 
         if(Core.input.keyRelease(Binding.select)){
@@ -179,7 +178,8 @@ public class DesktopInput extends InputHandler{
         if(state.is(State.menu) || Core.scene.hasDialog()) return;
 
         //zoom camera
-        if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonal_placement)) && !ui.chatfrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
+        if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonal_placement)) && !ui.chatfrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0
+            && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
@@ -494,7 +494,7 @@ public class DesktopInput extends InputHandler{
         }
     }
 
-    protected void updateKeyboard(Unitc unit){
+    protected void updateMovement(Unitc unit){
         boolean canMove = !(Core.scene.getKeyboardFocus() instanceof TextField);
 
         float speed = unit.type().speed;

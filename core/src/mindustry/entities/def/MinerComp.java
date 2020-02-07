@@ -20,6 +20,7 @@ import static mindustry.Vars.*;
 abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc{
     transient float x, y, rotation;
 
+    float mineTimer;
     @Nullable Tile mineTile;
 
     abstract boolean canMine(Item item);
@@ -48,11 +49,14 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc{
         if(mineTile == null || core == null || mineTile.block() != Blocks.air || dst(mineTile.worldx(), mineTile.worldy()) > miningRange
         || mineTile.drop() == null || !acceptsItem(mineTile.drop()) || !canMine(mineTile.drop())){
             mineTile = null;
+            mineTimer = 0f;
         }else{
             Item item = mineTile.drop();
             rotation(Mathf.slerpDelta(rotation(), angleTo(mineTile.worldx(), mineTile.worldy()), 0.4f));
+            mineTimer += Time.delta()*miningSpeed();
 
-            if(Mathf.chance(Time.delta() * (0.06 - item.hardness * 0.01) * miningSpeed())){
+            if(mineTimer >= 50f + item.hardness*10f){
+                mineTimer = 0;
 
                 if(dst(core) < mineTransferRange && core.tile().block().acceptStack(item, 1, core.tile(), this) == 1 && offloadImmediately()){
                     Call.transferItemTo(item, 1,

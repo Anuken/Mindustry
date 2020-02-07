@@ -1,5 +1,6 @@
 package mindustry.entities.def;
 
+import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
@@ -13,7 +14,7 @@ abstract class LegsComp implements Posc, Flyingc, Hitboxc, DrawLayerGroundUnderc
     @Override
     public void update(){
         if(vel().len() > 0.5f){
-            baseRotation = vel().angle();
+            baseRotation = Angles.moveToward(baseRotation, vel().angle(), type().baseRotateSpeed);
             walkTime += Time.delta()*vel().len()/1f;
         }
     }
