@@ -284,17 +284,22 @@ public class CraterConveyor extends Block implements Autotiler{
         if(entity.blendbit1 == 0 || entity.blendbit1 == 2 || entity.blendbit1 == 3) cons.get(tile.back());
 
         // fixme: add x/y checks for bits 1 & 2
+        if(entity.blendbit1 == 2 && entity.blendscly == +1) cons.get(tile.right());
+        if(entity.blendbit1 == 2 && entity.blendscly == -1) cons.get(tile.left());
 
-        if(entity.blendbit1 == 4) cons.get(tile.left());
-        if(entity.blendbit1 == 4) cons.get(tile.right());
+        if(entity.blendbit1 == 1 && entity.blendscly == -1) cons.get(tile.right());
+        if(entity.blendbit1 == 1 && entity.blendscly == +1) cons.get(tile.left());
+
+        if(entity.blendbit1 == 4 || entity.blendbit1 == 3){
+            cons.get(tile.right());
+            cons.get(tile.left());
+        }
     }
 
     // awaken inputting conveyors
     private void bump(Tile tile){
         upstream(tile, t -> {
-            Effects.effect(Fx.smeltsmoke, t.drawx(), t.drawy());
-
-            if(t.entity.isSleeping() && t.entity.items.total() > 0){
+            if(t != null && t.entity != null && t.entity.isSleeping() && t.entity.items.total() > 0){
                 t.entity.noSleep();
                 bump(t);
             }
