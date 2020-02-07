@@ -1,6 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -24,8 +25,6 @@ import static mindustry.Vars.*;
 
 public class CraterConveyor extends Block implements Autotiler{
     private TextureRegion[] regions = new TextureRegion[8];
-
-    private Array<Tile> tmptiles = new Array<>();
 
     public float speed = 0f;
 
@@ -279,29 +278,34 @@ public class CraterConveyor extends Block implements Autotiler{
 
     // ▲ | ▼ fixme: refactor
 
-    private Array<Tile> inputs(Tile tile){
-        tmptiles.clear();
-        for(Tile input : new Tile[]{tile.back(), tile.left(), tile.right()}){
-            if(input != null && input.getTeam() == tile.getTeam() && input.block() instanceof CraterConveyor && input.front() == tile) tmptiles.add(input);
-        }
-        return tmptiles;
+    private void upstream(Tile tile, Cons<Tile> cons){
+        CraterConveyorEntity entity = tile.ent();
+
+        if(entity.blendbit1 == 0 || entity.blendbit1 == 2 || entity.blendbit1 == 3) cons.get(tile.back());
+
+        // fixme: add x/y checks for bits 1 & 2
+
+        if(entity.blendbit1 == 4) cons.get(tile.left());
+        if(entity.blendbit1 == 4) cons.get(tile.right());
     }
 
     // awaken inputting conveyors
     private void bump(Tile tile){
-        for(Tile input : inputs(tile)){
-            if(input.entity.isSleeping() && input.entity.items.total() > 0){
-                input.entity.noSleep();
-                bump(input);
+        upstream(tile, t -> {
+            Effects.effect(Fx.smeltsmoke, t.drawx(), t.drawy());
+
+            if(t.entity.isSleeping() && t.entity.items.total() > 0){
+                t.entity.noSleep();
+                bump(t);
             }
-        }
+        });
     }
 
     public boolean shouldLaunch(Tile tile){
         CraterConveyorEntity entity = tile.ent();
 
         // unless its a loading dock, always move
-        if(entity.blendbit1 != 5) return true;
+        if(entity.blendbit2 != 5) return true;
 
         // its considered full (enough, at this point in time)
         if(entity.items.total() >= getMaximumAccepted(tile, entity.items.first())) return true;
@@ -314,7 +318,7 @@ public class CraterConveyor extends Block implements Autotiler{
         CraterConveyorEntity entity = tile.ent();
 
         // is a loading dock
-        if(entity.blendbit1 != 5) return false;
+        if(entity.blendbit2 != 5) return false;
 
         // doesn't yet have a different item
         if(entity.items.total() > 0 && !entity.items.has(item)) return false;
