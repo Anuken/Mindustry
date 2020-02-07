@@ -1,12 +1,15 @@
 package mindustry.annotations.util;
 
-import arc.struct.*;
+import arc.struct.Array;
 import com.squareup.javapoet.*;
+import com.sun.tools.javac.code.Attribute.*;
 import mindustry.annotations.*;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
+import java.lang.Class;
 import java.lang.annotation.*;
+import java.lang.reflect.*;
 
 public class Selement<T extends Element>{
     public final T e;
@@ -48,11 +51,18 @@ public class Selement<T extends Element>{
     }
 
     public <A extends Annotation> A annotation(Class<A> annotation){
-        return e.getAnnotation(annotation);
+        try{
+            Method m = com.sun.tools.javac.code.AnnoConstruct.class.getDeclaredMethod("getAttribute", Class.class);
+            m.setAccessible(true);
+            Compound compound = (Compound)m.invoke(e, annotation);
+            return compound == null ? null : AnnotationProxyMaker.generateAnnotation(compound, annotation);
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
     }
 
     public <A extends Annotation> boolean has(Class<A> annotation){
-        return e.getAnnotation(annotation) != null;
+        return annotation(annotation) != null;
     }
 
     public Element up(){

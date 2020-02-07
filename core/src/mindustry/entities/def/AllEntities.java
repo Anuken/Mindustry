@@ -1,48 +1,49 @@
 package mindustry.entities.def;
 
 import mindustry.annotations.Annotations.*;
+import mindustry.gen.*;
 
 class AllEntities{
 
-    @EntityDef(value = {BulletComp.class, VelComp.class, TimedComp.class}, pooled = true)
+    @EntityDef(value = {Bulletc.class, Velc.class, Timedc.class}, pooled = true)
     class BulletDef{}
 
-    @EntityDef(value = {TileComp.class}, isFinal = false)
+    @EntityDef(value = {Tilec.class}, isFinal = false)
     class TileDef{}
 
-    @EntityDef(value = {EffectComp.class}, pooled = true)
+    @EntityDef(value = {Effectc.class}, pooled = true)
     class EffectDef{}
 
-    @EntityDef({DecalComp.class})
+    @EntityDef({Decalc.class})
     class DecalDef{}
 
-    @EntityDef({PlayerComp.class})
+    @EntityDef({Playerc.class})
     class PlayerDef{}
 
-    @EntityDef({UnitComp.class})
+    @EntityDef({Unitc.class})
     class GenericUnitDef{}
 
-    @GroupDef(EntityComp.class)
+    @GroupDef(Entityc.class)
     void all(){
 
     }
 
-    @GroupDef(PlayerComp.class)
+    @GroupDef(Playerc.class)
     void player(){
 
     }
 
-    @GroupDef(value = UnitComp.class, spatial = true)
+    @GroupDef(value = Unitc.class, spatial = true)
     void unit(){
 
     }
 
-    @GroupDef(TileComp.class)
+    @GroupDef(Tilec.class)
     void tile(){
 
     }
 
-    @GroupDef(SyncComp.class)
+    @GroupDef(Syncc.class)
     void sync(){
 
     }

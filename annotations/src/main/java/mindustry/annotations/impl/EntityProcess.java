@@ -32,21 +32,45 @@ public class EntityProcess extends BaseProcessor{
     ObjectMap<Stype, Array<Stype>> componentDependencies = new ObjectMap<>();
     ObjectMap<Selement, Array<Stype>> defComponents = new ObjectMap<>();
     ObjectMap<Svar, String> varInitializers = new ObjectMap<>();
+    ObjectMap<Smethod, String> methodBlocks = new ObjectMap<>();
     ObjectSet<String> imports = new ObjectSet<>();
+    Array<Smethod> allGroups = new Array<>();
+    Array<Selement> allDefs = new Array<>();
+    Array<Stype> allInterfaces = new Array<>();
 
     {
-        rounds = 2;
+        rounds = 3;
     }
 
     @Override
     public void process(RoundEnvironment env) throws Exception{
+        allGroups.addAll(methods(GroupDef.class));
+        allDefs.addAll(elements(EntityDef.class));
+        allInterfaces.addAll(types(EntityInterface.class));
 
-        //round 1: get component classes and generate interfaces for them
+        //round 1: generate component interfaces
         if(round == 1){
             baseComponents = types(BaseComponent.class);
-            Array<Smethod> allGroups = methods(GroupDef.class);
-            Array<Selement> allDefs = elements(EntityDef.class);
             Array<Stype> allComponents = types(Component.class);
+
+            //store code
+            for(Stype component : allComponents){
+                for(Svar f : component.fields()){
+                    VariableTree tree = f.tree();
+
+                    //add initializer if it exists
+                    if(tree.getInitializer() != null){
+                        String init = tree.getInitializer().toString();
+                        varInitializers.put(f, init);
+                    }
+                }
+
+                for(Smethod elem : component.methods()){
+                    if(elem.is(Modifier.ABSTRACT) || elem.is(Modifier.NATIVE)) continue;
+                    //get all statements in the method, store them
+                    methodBlocks.put(elem, elem.tree().getBody().toString());
+                }
+            }
 
             //store components
             for(Stype type : allComponents){
@@ -56,13 +80,6 @@ public class EntityProcess extends BaseProcessor{
             //add component imports
             for(Stype comp : allComponents){
                 imports.addAll(getImports(comp.e));
-            }
-
-            //parse groups
-            for(Smethod group : allGroups){
-                GroupDef an = group.annotation(GroupDef.class);
-                Array<Stype> types = types(an, GroupDef::value);
-                groupDefs.add(new GroupDefinition(group.name(), ClassName.bestGuess(packageName + "." + interfaceName(types.first())), types, an.spatial(), an.mapping()));
             }
 
             //create component interfaces
@@ -112,11 +129,11 @@ public class EntityProcess extends BaseProcessor{
 
                     //setter
                     if(!field.is(Modifier.FINAL) && !signatures.contains(cname + "(" + field.mirror().toString() + ")") &&
-                        !field.annotations().contains(f -> f.toString().equals("@mindustry.annotations.Annotations.ReadOnly"))){
-                            inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
-                            .addParameter(ParameterSpec.builder(field.tname(), field.name())
-                            .addAnnotations(Array.with(field.annotations())
-                            .select(a -> a.toString().contains("Null")).map(AnnotationSpec::get)).build()).build());
+                    !field.annotations().contains(f -> f.toString().equals("@mindustry.annotations.Annotations.ReadOnly"))){
+                        inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
+                        .addParameter(ParameterSpec.builder(field.tname(), field.name())
+                        .addAnnotations(Array.with(field.annotations())
+                        .select(a -> a.toString().contains("Null")).map(AnnotationSpec::get)).build()).build());
                     }
                 }
 
@@ -147,12 +164,23 @@ public class EntityProcess extends BaseProcessor{
                 .addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
                 inter.addMethod(MethodSpec.methodBuilder("draw" + Strings.capitalize(layer.name())).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
                 write(inter);
+            }
+        }else if(round == 2){ //round 2: get component classes and generate interfaces for them
 
+            //parse groups
+            for(Smethod group : allGroups){
+                GroupDef an = group.annotation(GroupDef.class);
+                Array<Stype> types = types(an, GroupDef::value).map(this::interfaceToComp);;
+                groupDefs.add(new GroupDefinition(group.name(), ClassName.bestGuess(packageName + "." + interfaceName(types.first())), types, an.spatial(), an.mapping()));
+            }
+
+            //add special generated groups
+            for(DrawLayer layer : DrawLayer.values()){
+                String name = "DrawLayer" + Strings.capitalize(layer.name()) + "c";
                 //create group definition with no components directly
                 GroupDefinition def = new GroupDefinition(layer.name(), ClassName.bestGuess(packageName + "." + name), Array.with(), false, false);
                 //add manual inclusions of entities to be added to this group
                 def.manualInclusions.addAll(allDefs.select(s -> allComponents(s).contains(comp -> comp.interfaces().contains(in -> in.name().equals(name)))));
-
                 groupDefs.add(def);
             }
 
@@ -179,7 +207,6 @@ public class EntityProcess extends BaseProcessor{
                     //write fields to the class; ignoring transient ones
                     Array<Svar> fields = comp.fields().select(f -> !f.is(Modifier.TRANSIENT));
                     for(Svar f : fields){
-                        VariableTree tree = f.tree();
                         FieldSpec.Builder fbuilder = FieldSpec.builder(f.tname(), f.name());
                         //keep statics/finals
                         if(f.is(Modifier.STATIC)){
@@ -187,10 +214,8 @@ public class EntityProcess extends BaseProcessor{
                             if(f.is(Modifier.FINAL)) fbuilder.addModifiers(Modifier.FINAL);
                         }
                         //add initializer if it exists
-                        if(tree.getInitializer() != null){
-                            String init = tree.getInitializer().toString();
-                            varInitializers.put(f, init);
-                            fbuilder.initializer(init);
+                        if(varInitializers.containsKey(f)){
+                            fbuilder.initializer(varInitializers.get(f));
                         }
 
                         if(!isFinal) fbuilder.addModifiers(Modifier.PROTECTED);
@@ -235,12 +260,10 @@ public class EntityProcess extends BaseProcessor{
                     }
 
                     for(Smethod elem : entry.value){
-                        if(elem.is(Modifier.ABSTRACT) || elem.is(Modifier.NATIVE)) continue;
+                        if(elem.is(Modifier.ABSTRACT) || elem.is(Modifier.NATIVE) || !methodBlocks.containsKey(elem)) continue;
 
                         //get all statements in the method, copy them over
-                        MethodTree methodTree = elem.tree();
-                        BlockTree blockTree = methodTree.getBody();
-                        String str = blockTree.toString();
+                        String str = methodBlocks.get(elem);
                         //name for code blocks in the methods
                         String blockName = elem.up().getSimpleName().toString().toLowerCase().replace("comp", "");
 
@@ -387,8 +410,7 @@ public class EntityProcess extends BaseProcessor{
 
             write(idBuilder);
         }else{
-            //round 2: generate actual classes and implement interfaces
-            Array<Stype> interfaces = types(EntityInterface.class);
+            //round 3: generate actual classes and implement interfaces
 
             //implement each definition
             for(EntityDefinition def : definitions){
@@ -397,7 +419,7 @@ public class EntityProcess extends BaseProcessor{
                 for(Stype comp : def.components){
 
                     //implement the interface
-                    Stype inter = interfaces.find(i -> i.name().equals(interfaceName(comp)));
+                    Stype inter = allInterfaces.find(i -> i.name().equals(interfaceName(comp)));
                     if(inter == null){
                         err("Failed to generate interface for", comp);
                         return;
@@ -431,7 +453,7 @@ public class EntityProcess extends BaseProcessor{
             TypeSpec.Builder nullsBuilder = TypeSpec.classBuilder("Nulls").addModifiers(Modifier.PUBLIC).addModifiers(Modifier.FINAL);
 
             //create mock types of all components
-            for(Stype interf : interfaces){
+            for(Stype interf : allInterfaces){
                 //indirect interfaces to implement methods for
                 Array<Stype> dependencies = interf.allInterfaces().and(interf);
                 Array<Smethod> methods = dependencies.flatMap(Stype::methods);
@@ -502,7 +524,7 @@ public class EntityProcess extends BaseProcessor{
     Array<Stype> allComponents(Selement<?> type){
         if(!defComponents.containsKey(type)){
             //get base defs
-            Array<Stype> components = types(type.annotation(EntityDef.class), EntityDef::value);
+            Array<Stype> components = types(type.annotation(EntityDef.class), EntityDef::value).map(this::interfaceToComp);
             ObjectSet<Stype> out = new ObjectSet<>();
             for(Stype comp : components){
                 //get dependencies for each def, add them
@@ -553,7 +575,7 @@ public class EntityProcess extends BaseProcessor{
     }
 
     String createName(Selement<?> elem){
-        Array<Stype> comps = types(elem.annotation(EntityDef.class), EntityDef::value);
+        Array<Stype> comps = types(elem.annotation(EntityDef.class), EntityDef::value).map(this::interfaceToComp);;
         comps.sortComparing(Selement::name);
         return comps.toString("", s -> s.name().replace("Comp", "")) + "Entity";
     }

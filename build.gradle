@@ -163,6 +163,9 @@ allprojects{
 project(":desktop"){
     apply plugin: "java"
 
+    compileJava.options.fork = true
+    compileJava.options.compilerArgs += ["-XDignore.symbol.file"]
+
     dependencies{
         compile project(":core")
 
