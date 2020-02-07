@@ -1,10 +1,10 @@
 package mindustry.tools;
 
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.ctype.*;
@@ -187,7 +187,6 @@ public class Generators{
         ImagePacker.generate("unit-icons", () -> {
             content.units().each(type -> !type.flying, type -> {
                 type.load();
-                type.weapons.each(Weapon::load);
 
                 Image image = ImagePacker.get(type.region);
 
@@ -196,14 +195,18 @@ public class Generators{
                 image.draw(type.legRegion, true, false);
                 image.draw(type.region);
 
-                //TODO draw weapons with proper offsets
-                /*
-                for(boolean b : Mathf.booleans){
-                    image.draw(type.weapon.region,
-                    (int)(Mathf.sign(b) * type.weapon.width / Draw.scl + image.width / 2 - type.weapon.region.getWidth() / 2),
-                    (int)(type.weaponOffsetY / Draw.scl + image.height / 2f - type.weapon.region.getHeight() / 2f),
-                    b, false);
-                }*/
+                for(Weapon weapon : type.weapons){
+                    weapon.load();
+
+                    for(int i : (weapon.mirror ? Mathf.signs : Mathf.one)){
+                        i *= Mathf.sign(weapon.flipped);
+
+                        image.draw(weapon.region,
+                        (int)(i * weapon.x / Draw.scl + image.width / 2 - weapon.region.getWidth() / 2),
+                        (int)(weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
+                        i > 0, false);
+                    }
+                }
 
                 image.save("unit-" + type.name + "-full");
             });

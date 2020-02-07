@@ -15,6 +15,34 @@ public class Selement<T extends Element>{
         this.e = e;
     }
 
+    public String fullName(){
+        return e.toString();
+    }
+
+    public Stype asType(){
+        return new Stype((TypeElement)e);
+    }
+
+    public Svar asVar(){
+        return new Svar((VariableElement)e);
+    }
+
+    public Smethod asMethod(){
+        return new Smethod((ExecutableElement)e);
+    }
+
+    public boolean isVar(){
+        return e instanceof VariableElement;
+    }
+
+    public boolean isType(){
+        return e instanceof TypeElement;
+    }
+
+    public boolean isMethod(){
+        return e instanceof ExecutableElement;
+    }
+
     public Array<? extends AnnotationMirror> annotations(){
         return Array.with(e.getAnnotationMirrors());
     }

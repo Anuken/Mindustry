@@ -138,8 +138,8 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
         //ScorchDecal.create(getX(), getY());
         Fx.explosion.at(this);
         Effects.shake(2f, 2f, this);
+        type.deathSound.at(this);
 
-        Sounds.bang.at(this);
         Events.fire(new UnitDestroyEvent(this));
 
         //TODO implement suicide bomb trigger

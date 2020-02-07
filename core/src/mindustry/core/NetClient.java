@@ -340,7 +340,7 @@ public class NetClient implements ApplicationListener{
 
                 //entity must not be added yet, so create it
                 if(entity == null){
-                    entity = (Syncc)ClassMapping.map(typeID).get();
+                    entity = (Syncc)EntityMapping.map(typeID).get();
                     entity.id(id);
                     if(!netClient.isEntityUsed(entity.id())){
                         add = true;

@@ -53,13 +53,14 @@ public class UnitDef extends UnlockableContent{
     public Array<Weapon> weapons = new Array<>();
     public TextureRegion baseRegion, legRegion, region, cellRegion, occlusionRegion;
 
-    public UnitDef(String name, Prov<Unitc> constructor){
-        super(name);
-        this.constructor = constructor;
-    }
-
     public UnitDef(String name){
-        this(name, () -> Nulls.unit);
+        super(name);
+
+        if(EntityMapping.map(name) != null){
+            constructor = EntityMapping.map(name);
+        }else{
+            constructor = () -> Nulls.unit;
+        }
     }
 
     public UnitController createController(){

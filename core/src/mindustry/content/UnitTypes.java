@@ -1,21 +1,24 @@
 package mindustry.content;
 
 import mindustry.ctype.*;
-import mindustry.gen.*;
 import mindustry.type.*;
 
 public class UnitTypes implements ContentList{
     public static UnitDef
     draug, spirit, phantom,
     wraith, ghoul, revenant, lich, reaper,
-    dagger, crawler, titan, fortress, eruptor, chaosArray, eradicator;
+    crawler, titan, fortress, eruptor, chaosArray, eradicator;
+
+    //TODO can't get comp classes
+    public static UnitDef dagger;
 
     public static UnitDef vanguard, alpha, delta, tau, omega, dart, javelin, trident, glaive;
     public static UnitDef starter;
 
+
     @Override
     public void load(){
-        dagger = new UnitDef("dagger", GenericUnitEntity::create){{
+        dagger = new UnitDef("dagger"){{
             speed = 0.2f;
             drag = 0.4f;
             hitsize = 8f;

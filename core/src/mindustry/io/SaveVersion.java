@@ -247,7 +247,7 @@ public abstract class SaveVersion extends SaveFileReader{
         for(int j = 0; j < amount; j++){
             readChunk(stream, true, in -> {
                 byte typeid = in.readByte();
-                Syncc sync = (Syncc)ClassMapping.map(typeid).get();
+                Syncc sync = (Syncc)EntityMapping.map(typeid).get();
                 sync.read(in);
             });
         }

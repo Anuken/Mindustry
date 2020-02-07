@@ -71,6 +71,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return cons.newInstance(name);
     }
 
+    public static TypeName tname(Class<?> c){
+        return ClassName.get(c).box();
+    }
+
     public static TypeVariableName getTVN(TypeParameterElement element) {
         String name = element.getSimpleName().toString();
         List<? extends TypeMirror> boundsMirrors = element.getBounds();
@@ -111,6 +115,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
         }else{
             file.writeTo(filer);
         }
+    }
+
+    public Array<Selement> elements(Class<? extends Annotation> type){
+        return Array.with(env.getElementsAnnotatedWith(type)).map(Selement::new);
     }
 
     public Array<Stype> types(Class<? extends Annotation> type){
