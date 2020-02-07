@@ -969,18 +969,12 @@ public class Blocks implements ContentList{
         sorter = new Sorter("sorter"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 2));
             buildCostMultiplier = 3f;
-
-            flags = EnumSet.of(BlockFlag.scalable);
-            upscale = () -> scrapWallLarge;
         }};
 
         invertedSorter = new Sorter("inverted-sorter"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 2));
             buildCostMultiplier = 3f;
             invert = true;
-
-            flags = EnumSet.of(BlockFlag.scalable);
-            upscale = () -> scrapWallLarge;
         }};
 
         router = new Router("router"){{
