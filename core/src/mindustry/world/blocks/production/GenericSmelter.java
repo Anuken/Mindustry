@@ -35,11 +35,11 @@ public class GenericSmelter extends GenericCrafter{
             Draw.color(1f, 1f, 1f, entity.warmup);
             Draw.rect(topRegion, tile.drawx(), tile.drawy());
             Draw.color();
-        };
+        
         
         
         //draw "flame" in center
-        if(entity.warmup > 0f && flameColor.a > 0.001f){
+        if(flameColor.a > 0.001f){
             float g = 0.3f;
             float r = 0.06f;
             float cr = Mathf.random(0.1f);
@@ -53,7 +53,7 @@ public class GenericSmelter extends GenericCrafter{
             Fill.circle(tile.drawx(), tile.drawy(), 1.9f + Mathf.absin(Time.time(), 5f, 1f) + cr);
 
             Draw.color();
-        }
+        }}
     }
 
     @Override
