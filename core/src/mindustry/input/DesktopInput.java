@@ -153,7 +153,7 @@ public class DesktopInput extends InputHandler{
         }
 
         //TODO remove: debug unit possession
-        if(player.dead() && Core.input.keyTap(Binding.select)){
+        if(Core.input.keyTap(Binding.select)){
             Unitc unit = Units.closest(state.rules.defaultTeam, Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> true);
             if(unit != null){
                 unit.hitbox(Tmp.r1);
@@ -501,7 +501,8 @@ public class DesktopInput extends InputHandler{
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
 
-        unit.vel().add(speed * xa, speed * ya);
+        unit.vel().add(Tmp.v1.set(speed * xa, speed * ya).limit(speed));
+        unit.lookAt(Angles.mouseAngle(unit.x(), unit.y()));
         /*
         Tile tile = unit.tileOn();
         boolean canMove = !Core.scene.hasKeyboard() || ui.minimapfrag.shown();

@@ -96,6 +96,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
 
     public void unit(Unitc unit){
         if(unit == null) throw new IllegalArgumentException("Unit cannot be null. Use clearUnit() instead.");
+        if(this.unit != Nulls.unit){
+            //un-control the old unit
+            this.unit.controller(this.unit.type().createController());
+        }
         this.unit = unit;
         if(unit != Nulls.unit){
             unit.team(team);

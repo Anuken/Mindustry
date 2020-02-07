@@ -1,6 +1,8 @@
 package mindustry.entities.def;
 
 import arc.*;
+import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -69,6 +71,14 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     @Override
     public UnitDef type(){
         return type;
+    }
+
+    public void lookAt(float angle){
+        rotation = Angles.moveToward(rotation, angle, type.rotateSpeed);
+    }
+
+    public void lookAt(Position pos){
+        lookAt(angleTo(pos));
     }
 
     @Override

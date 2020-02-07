@@ -22,7 +22,7 @@ public class UnitTypes implements ContentList{
 
         dagger = new UnitDef("dagger"){{
             speed = 0.2f;
-            drag = 0.4f;
+            drag = 0.2f;
             hitsize = 8f;
             mass = 1.75f;
             health = 130;
