@@ -3931,6 +3931,13 @@ threshunloader
   orig: 32, 32
   offset: 0, 0
   index: -1
+threshunloader-icon-editor
+  rotate: false
+  xy: 1667, 1113
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
 block-threshunloader-tiny-full
   rotate: false
   xy: 1667, 1113
@@ -3945,7 +3952,7 @@ block-threshunloader-small-full
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-threshunloader-medium-full
+block-threshunloader-medium
   rotate: false
   xy: 1667, 1113
   size: 32, 32
@@ -4065,13 +4072,6 @@ block-threshunloader-full
   offset: 0, 0
   index: -1
 block-threshunloader-large-full
-  rotate: false
-  xy: 1699, 1113
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
-block-threshunloader-medium-full
   rotate: false
   xy: 1699, 1113
   size: 32, 32
