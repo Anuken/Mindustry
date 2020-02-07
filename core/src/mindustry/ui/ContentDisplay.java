@@ -96,6 +96,31 @@ public class ContentDisplay{
         table.row();
     }
 
+    public static void displayThreshold(Table table, Threshold threshold){
+
+        table.table(title -> {
+            title.addImage(threshold.icon(Cicon.xlarge)).size(8 * 6);
+            title.add("[accent]" + threshold.localizedName).padLeft(5);
+        });
+
+        table.row();
+
+        table.addImage().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
+
+        table.row();
+
+        if(threshold.description != null){
+            table.add(threshold.displayDescription()).padLeft(5).padRight(5).width(400f).wrap().fillX();
+            table.row();
+
+            table.addImage().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
+            table.row();
+        }
+
+        table.left().defaults().fillX();
+        table.row();
+    }
+
     public static void displayLiquid(Table table, Liquid liquid){
 
         table.table(title -> {

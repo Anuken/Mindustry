@@ -14,6 +14,7 @@ public enum ContentType{
     zone,
     loadout,
     typeid,
+    threshold,
     error;
 
     public static final ContentType[] all = values();

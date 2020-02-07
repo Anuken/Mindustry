@@ -31,6 +31,7 @@ public class ContentLoader{
     private ContentList[] content = {
         new Fx(),
         new Items(),
+        new Thresholds(),
         new StatusEffects(),
         new Liquids(),
         new Bullets(),
@@ -240,6 +241,14 @@ public class ContentLoader{
 
     public Item item(int id){
         return (Item)getByID(ContentType.item, id);
+    }
+
+    public Array<Threshold> thresholds(){
+        return getBy(ContentType.threshold);
+    }
+
+    public Threshold threshold(int id){
+        return (Threshold)getByID(ContentType.threshold, id);
     }
 
     public Array<Liquid> liquids(){

@@ -12,6 +12,9 @@ public class ItemModule extends BlockModule{
     private int[] items = new int[content.items().size];
     private int total;
 
+    // saving next take() index here so it does not return the same thing twice in a row unless there is nothing else.
+    protected int takeRotation;
+
     public void forEach(ItemConsumer cons){
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
@@ -68,14 +71,36 @@ public class ItemModule extends BlockModule{
 
     public Item take(){
         for(int i = 0; i < items.length; i++){
-            if(items[i] > 0){
-                items[i]--;
-                total--;
-                return content.item(i);
+            int index = (i + takeRotation);
+            if(index >= items.length) index -= items.length; //conditional instead of mod
+            if(items[index] > 0){
+                items[index] --;
+                total --;
+                takeRotation = index + 1;
+                return content.item(index % items.length);
             }
         }
         return null;
     }
+
+        // Takes one of whichever item there is the most of provided there are more than nThreshold of them.
+        public Item takeMaxItem(int nThreshold) {
+            int maxIdx = -1;
+            int max = nThreshold;
+            for(int i = 0; i < items.length; i++) {
+                if (items[i] > max) {
+                    max = items[i];
+                    maxIdx = i;
+                }
+            }
+
+            if(maxIdx >= 0) {
+                total--;
+                items[maxIdx]--;
+                return content.item(maxIdx);
+            }
+            return null;
+        }
 
     public int get(Item item){
         return items[item.id];

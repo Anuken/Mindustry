@@ -70,7 +70,7 @@ public class Blocks implements ContentList{
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
 
     //storage
-    coreShard, coreFoundation, coreNucleus, vault, container, unloader, launchPad, launchPadLarge,
+    coreShard, coreFoundation, coreNucleus, vault, container, unloader, threshUnloader, launchPad, launchPadLarge,
 
     //turrets
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
@@ -1306,6 +1306,11 @@ public class Blocks implements ContentList{
         unloader = new Unloader("unloader"){{
             requirements(Category.effect, ItemStack.with(Items.titanium, 25, Items.silicon, 30));
             speed = 7f;
+        }};
+
+        threshUnloader = new ThreshUnloader("threshunloader"){{
+            requirements(Category.effect, ItemStack.with(Items.titanium, 35, Items.silicon, 40, Items.surgealloy, 10));
+            speed = 6f;
         }};
 
         launchPad = new LaunchPad("launch-pad"){{
