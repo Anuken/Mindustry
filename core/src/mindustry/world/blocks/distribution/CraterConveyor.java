@@ -276,25 +276,28 @@ public class CraterConveyor extends Block implements Autotiler{
         }
     }
 
-    // ▲ | ▼ fixme: refactor
-
     private void upstream(Tile tile, Cons<Tile> cons){
         CraterConveyorEntity entity = tile.ent();
 
-        if(entity.blendbit1 == 0 || entity.blendbit1 == 2 || entity.blendbit1 == 3) cons.get(tile.back());
+        if(    entity.blendbit1 == 0 // 1 input from the back, 0 from the sides
+            || entity.blendbit1 == 2 // 1 input from the back, 1 from the sides
+            || entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
+        ) cons.get(tile.back());
 
-        // fixme: add x/y checks for bits 1 & 2
-        if(entity.blendbit1 == 2 && entity.blendscly == +1) cons.get(tile.right());
-        if(entity.blendbit1 == 2 && entity.blendscly == -1) cons.get(tile.left());
+        if(    entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
+            || entity.blendbit1 == 4 // 0 input from the back, 2 from the sides
+            ||(entity.blendbit1 == 1 && entity.blendscly == -1) // side is open
+            ||(entity.blendbit1 == 2 && entity.blendscly == +1) // side is open
+        ) cons.get(tile.right());
 
-        if(entity.blendbit1 == 1 && entity.blendscly == -1) cons.get(tile.right());
-        if(entity.blendbit1 == 1 && entity.blendscly == +1) cons.get(tile.left());
-
-        if(entity.blendbit1 == 4 || entity.blendbit1 == 3){
-            cons.get(tile.right());
-            cons.get(tile.left());
-        }
+        if(    entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
+            || entity.blendbit1 == 4 // 0 input from the back, 2 from the sides
+            ||(entity.blendbit1 == 1 && entity.blendscly == +1) // side is open
+            ||(entity.blendbit1 == 2 && entity.blendscly == -1) // side is open
+        ) cons.get(tile.left());
     }
+
+    // ▲ | ▼ fixme: refactor
 
     // awaken inputting conveyors
     private void bump(Tile tile){
