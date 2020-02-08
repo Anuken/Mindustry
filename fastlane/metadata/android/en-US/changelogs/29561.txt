@@ -1,0 +1,5 @@
+- Added new map view w/ panning and scrolling
+- Added block health rule
+- Added more internal teams for alternative gamemodes
+- Added features for improved server modding
+- Major internal change: package is now "mindustry" instead of "io.anuke.mindustry" (will break plugins)
