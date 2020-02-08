@@ -28,8 +28,7 @@ public enum Category{
     /** Additional Category 3. When mod uses this category, it is activated. Succeeding You, Lich. */
     immortallizion,
     /** Additional Category 4. When mod uses this category, it is activated. Explosion is nature! */
-    naturexplosion
-    ;
+    naturexplosion;
 
     public static final Category[] all = values();
 
