@@ -20,7 +20,16 @@ public enum Category{
     /** Things that upgrade the player such as mech pads. */
     upgrade,
     /** Things for storage or passive effects. */
-    effect;
+    effect,
+    /** Additional Category 1. When mod uses this category, it is activated. Just a magic machine. XD */
+    magichine,
+    /** Additional Category 2. When mod uses this category, it is activated. It is not Bionic magical, it is bionic mechanical */
+    bionical,
+    /** Additional Category 3. When mod uses this category, it is activated. Succeeding You, Lich. */
+    immortallizion,
+    /** Additional Category 4. When mod uses this category, it is activated. Explosion is nature! */
+    naturexplosion
+    ;
 
     public static final Category[] all = values();
 
