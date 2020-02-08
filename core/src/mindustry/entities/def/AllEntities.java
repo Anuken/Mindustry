@@ -11,7 +11,7 @@ class AllEntities{
     @EntityDef(value = {Tilec.class}, isFinal = false)
     class TileDef{}
 
-    @EntityDef(value = {Effectc.class}, pooled = true)
+    @EntityDef(value = {Effectc.class, Childc.class}, pooled = true)
     class EffectDef{}
 
     @EntityDef({Decalc.class})

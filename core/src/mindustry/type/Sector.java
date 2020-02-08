@@ -5,7 +5,6 @@ import arc.util.*;
 import mindustry.graphics.PlanetGrid.*;
 
 /** A small section of a planet. */
-//TODO should this be content?
 public class Sector{
     public final SectorRect rect;
     public final Planet planet;

@@ -8,8 +8,8 @@ import mindustry.gen.*;
 abstract class ChildComp implements Posc{
     transient float x, y;
 
-    private @Nullable Posc parent;
-    private float offsetX, offsetY;
+    @Nullable Posc parent;
+    float offsetX, offsetY;
 
     @Override
     public void add(){

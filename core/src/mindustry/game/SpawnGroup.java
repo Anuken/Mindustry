@@ -58,20 +58,17 @@ public class SpawnGroup implements Serializable{
      * This method does not add() the unit.
      */
     public Unitc createUnit(Team team){
-        //TODO
-        throw new IllegalArgumentException("TODO");
-        /*
         Unitc unit = type.create(team);
 
         if(effect != null){
-            unit.applyEffect(effect, 999999f);
+            unit.apply(effect, 999999f);
         }
 
         if(items != null){
             unit.addItem(items.item, items.amount);
         }
 
-        return unit;*/
+        return unit;
     }
 
     @Override

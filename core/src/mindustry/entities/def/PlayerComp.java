@@ -78,11 +78,6 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
     }
 
     public Unitc unit(){
-        if(dead()){
-            //TODO remove
-            Log.err("WARNING: DEAD PLAYER UNIT ACCESSED");
-            new RuntimeException().printStackTrace();
-        }
         return unit;
     }
 

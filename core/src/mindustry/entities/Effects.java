@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
@@ -38,19 +39,15 @@ public class Effects{
             Rect pos = Tmp.r2.setSize(effect.size).setCenter(x, y);
 
             if(view.overlaps(pos)){
-                //TODO implement create() method here.
-                //EffectEntity entity = Pools.obtain(EffectEntity.class, EffectEntity::new);
-                //entity.effect = effect;
-                //entity.color.set(color);
-                //entity.rotation = rotation;
-                //entity.data = data;
-                //entity.id++;
-                //entity.set(x, y);
-                //if(data instanceof Entity){
-                //    entity.setParent((Entity)data);
-                //}
-                //TODO ground effect
-                //effectGroup.add(entity);
+                EffectEntity entity = EffectEntity.create();
+                entity.effect(effect);
+                entity.rotation(rotation);
+                entity.data(data);
+                entity.id(EntityGroup.nextId());
+                entity.set(x, y);
+                entity.color().set(color);
+                if(data instanceof Posc) entity.parent((Posc)data);
+                entity.add();
             }
         }
     }
