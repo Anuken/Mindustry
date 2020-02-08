@@ -375,7 +375,7 @@ public class Schematics implements Loadable{
     /** Loads a schematic from base64. May throw an exception. */
     public static Schematic readBase64(String schematic){
         try{
-            return read(new ByteArrayInputStream(Base64Coder.decode(schematic)));
+            return read(new ByteArrayInputStream(Base64Coder.decode(schematic.trim())));
         }catch(IOException e){
             throw new RuntimeException(e);
         }
