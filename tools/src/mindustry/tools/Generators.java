@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.ctype.*;
+import mindustry.gen.*;
 import mindustry.tools.ImagePacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -190,9 +191,11 @@ public class Generators{
 
                 Image image = ImagePacker.get(type.region);
 
-                image.draw(type.baseRegion);
-                image.draw(type.legRegion);
-                image.draw(type.legRegion, true, false);
+                if(type.constructor.get() instanceof Legsc){
+                    image.draw(type.baseRegion);
+                    image.draw(type.legRegion);
+                    image.draw(type.legRegion, true, false);
+                }
                 image.draw(type.region);
 
                 for(Weapon weapon : type.weapons){

@@ -15,6 +15,8 @@ public class WeaponMount{
     public boolean side;
     /** whether to shoot right now */
     public boolean shoot = false;
+    /** whether to rotate to face the target right now */
+    public boolean rotate = false;
 
     public WeaponMount(Weapon weapon){
         this.weapon = weapon;

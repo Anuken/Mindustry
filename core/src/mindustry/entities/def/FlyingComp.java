@@ -10,7 +10,7 @@ import mindustry.world.blocks.*;
 import static mindustry.Vars.net;
 
 @Component
-abstract class FlyingComp implements Posc, Velc, Healthc{
+abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     transient float x, y;
     transient Vec2 vel;
 
@@ -34,8 +34,8 @@ abstract class FlyingComp implements Posc, Velc, Healthc{
     public void update(){
         Floor floor = floorOn();
 
-        if(isGrounded() && floor.isLiquid && !vel.isZero(0.01f)){
-            if((splashTimer += vel.len()) >= 7f){
+        if(isGrounded() && floor.isLiquid){
+            if((splashTimer += Mathf.dst(deltaX(), deltaY())) >= 7f){
                 floor.walkEffect.at(x, y, 0, floor.color);
                 splashTimer = 0f;
             }

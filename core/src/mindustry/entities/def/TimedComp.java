@@ -9,6 +9,8 @@ import mindustry.gen.*;
 abstract class TimedComp implements Entityc, Scaled{
     float time, lifetime;
 
+    //called last so pooling and removal happens then.
+    @MethodPriority(100)
     @Override
     public void update(){
         time = Math.min(time + Time.delta(), lifetime);

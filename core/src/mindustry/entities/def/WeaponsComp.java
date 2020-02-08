@@ -1,6 +1,7 @@
 package mindustry.entities.def;
 
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
@@ -28,8 +29,19 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
         }
     }
 
+    void controlWeapons(boolean rotate, boolean shoot){
+        for(WeaponMount mount : mounts){
+            mount.rotate = rotate;
+            mount.shoot = shoot;
+        }
+    }
+
+    void aim(Position pos){
+        aim(pos.getX(), pos.getY());
+    }
+
     /** Aim at something. This will make all mounts point at it. */
-    void aim(Unitc unit, float x, float y){
+    void aim(float x, float y){
         Tmp.v1.set(x, y).sub(this.x, this.y);
         if(Tmp.v1.len() < minAimDst) Tmp.v1.setLength(minAimDst);
 
@@ -49,17 +61,17 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
             Weapon weapon = mount.weapon;
             mount.reload = Math.max(mount.reload - Time.delta(), 0);
 
+            //rotate if applicable
+            if(weapon.rotate && (mount.rotate || mount.shoot)){
+                float axisXOffset = weapon.mirror ? 0f : weapon.x;
+                float axisX = this.x + Angles.trnsx(rotation, axisXOffset, weapon.y),
+                axisY = this.y + Angles.trnsy(rotation, axisXOffset, weapon.y);
+
+                mount.rotation = Angles.moveToward(mount.rotation, Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation(), weapon.rotateSpeed);
+            }
+
             if(mount.shoot){
                 float rotation = this.rotation - 90;
-
-                //rotate if applicable
-                if(weapon.rotate){
-                    float axisXOffset = weapon.mirror ? 0f : weapon.x;
-                    float axisX = this.x + Angles.trnsx(rotation, axisXOffset, weapon.y),
-                    axisY = this.y + Angles.trnsy(rotation, axisXOffset, weapon.y);
-
-                    mount.rotation = Angles.moveToward(mount.rotation, Angles.angle(axisX, axisY, mount.aimX, mount.aimY), weapon.rotateSpeed);
-                }
 
                 //shoot if applicable
                 //TODO only shoot if angle is reached, don't shoot inaccurately
@@ -73,7 +85,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                         mountY = this.y + Angles.trnsy(rotation, weapon.x * i, weapon.y);
                         float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX * i, weapon.shootY),
                         shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX * i, weapon.shootY);
-                        float shootAngle = weapon.rotate ? weaponRotation : Angles.angle(shootX, shootY, mount.aimX, mount.aimY);
+                        float shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY);
 
                         shoot(weapon, shootX, shootY, shootAngle);
                     }

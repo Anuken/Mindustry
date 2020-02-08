@@ -54,16 +54,14 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     }
 
     public void each(Cons<T> cons){
-        T[] items = array.items;
         for(index = 0; index < array.size; index++){
-            cons.get(items[index]);
+            cons.get(array.items[index]);
         }
     }
 
     public void each(Boolf<T> filter, Cons<T> cons){
-        T[] items = array.items;
         for(index = 0; index < array.size; index++){
-            if(filter.get(items[index])) cons.get(items[index]);
+            if(filter.get(array.items[index])) cons.get(array.items[index]);
         }
     }
 

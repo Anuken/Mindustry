@@ -12,8 +12,9 @@ public class UnitTypes implements ContentList{
     crawler, titan, fortress, eruptor, chaosArray, eradicator;
 
     public static @EntityDef({Unitc.class, Legsc.class}) UnitDef dagger;
+    public static @EntityDef({Unitc.class, WaterMovec.class}) UnitDef vanguard;
 
-    public static UnitDef vanguard, alpha, delta, tau, omega, dart, javelin, trident, glaive;
+    public static UnitDef alpha, delta, tau, omega, dart, javelin, trident, glaive;
     public static UnitDef starter;
 
 
@@ -30,6 +31,22 @@ public class UnitTypes implements ContentList{
                 reload = 28f;
                 x = 4f;
                 alternate = true;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.standardCopper;
+            }});
+        }};
+
+        vanguard = new UnitDef("vanguard"){{
+            speed = 0.3f;
+            drag = 0.1f;
+            hitsize = 8f;
+            mass = 1.75f;
+            health = 130;
+            weapons.add(new Weapon("chain-blaster"){{
+                reload = 10f;
+                x = 1.25f;
+                alternate = true;
+                rotate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
             }});

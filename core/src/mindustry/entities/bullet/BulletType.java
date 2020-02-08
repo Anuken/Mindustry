@@ -3,6 +3,7 @@ package mindustry.entities.bullet;
 import arc.audio.*;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
@@ -198,30 +199,22 @@ public abstract class BulletType extends Content{
     }
 
     public Bulletc create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
-
-        //TODO assign type damage is damage <0, else assign provided damage
-
-        //TODO implement
-        return null;
-        /*
-        Bullet bullet = Pools.obtain(Bullet.class, Bullet::new);
-        bullet.type = type;
-        bullet.owner = owner;
-        bullet.data = data;
-
-        bullet.velocity.set(0, type.speed).setAngle(angle).scl(velocityScl);
-        if(type.keepVelocity){
-            bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait)owner).vel() : Vec2.ZERO);
-        }
-
-        bullet.team = team;
-        bullet.type = type;
-        bullet.lifeScl = lifetimeScl;
-
-        bullet.set(x - bullet.velocity.x * Time.delta(), y - bullet.velocity.y * Time.delta());
+        Bulletc bullet = BulletEntity.create();
+        bullet.type(this);
+        bullet.owner(owner);
+        bullet.team(team);
+        bullet.vel().trns(angle, speed * velocityScl);
+        bullet.set(x - bullet.vel().x * Time.delta(), y - bullet.vel().y * Time.delta());
+        bullet.lifetime(lifetime * lifetimeScl);
+        bullet.data(data);
+        bullet.drag(drag);
+        bullet.hitSize(hitSize);
+        bullet.damage(damage < 0 ? this.damage : damage);
         bullet.add();
 
-        return bullet;*/
+        //if(keepVelocity && owner instanceof Velc) bullet.vel().add(((Velc)owner).vel());
+        return bullet;
+
     }
 
     public void createNet(Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){

@@ -25,7 +25,7 @@ public class Weapon{
     /** whether to rotate toward the target independently of unit */
     public boolean rotate = false;
     /** rotation speed of weapon when rotation is enabled, in degrees/t*/
-    public float rotateSpeed = 2f;
+    public float rotateSpeed = 20f;
     /** weapon reload in frames */
     public float reload;
     /** amount of shots per fire */

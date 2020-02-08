@@ -11,30 +11,24 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
-    private float lifeScl;
-
+abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc, DrawLayerBulletsc{
     Object data;
     BulletType type;
     float damage;
 
     @Override
+    public void drawBullets(){
+        type.draw(this);
+    }
+
+    @Override
     public void add(){
         type.init(this);
-
-        drag(type.drag);
-        hitSize(type.hitSize);
-        lifetime(lifeScl * type.lifetime);
     }
 
     @Override
     public void remove(){
         type.despawned(this);
-    }
-
-    @Override
-    public float getLifetime(){
-        return type.lifetime;
     }
 
     @Override
@@ -58,7 +52,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public float damage(){
-        return type.damage * damageMultiplier();
+        return damage * damageMultiplier();
     }
 
     @Override

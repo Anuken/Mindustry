@@ -5,6 +5,7 @@ import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
@@ -163,7 +164,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if(!player.dead() && !state.isPaused()){
+        if(!player.dead() && !state.isPaused() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
             updateMovement(player.unit());
         }
 
@@ -495,14 +496,24 @@ public class DesktopInput extends InputHandler{
     }
 
     protected void updateMovement(Unitc unit){
-        boolean canMove = !(Core.scene.getKeyboardFocus() instanceof TextField);
-
+        boolean omni = !(unit instanceof WaterMovec);
         float speed = unit.type().speed;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
 
-        unit.vel().add(Tmp.v1.set(speed * xa, speed * ya).limit(speed));
-        unit.lookAt(Angles.mouseAngle(unit.x(), unit.y()));
+        Vec2 movement = Tmp.v1.set(speed * xa, speed * ya).limit(speed);
+
+        if(omni){
+            unit.vel().add(movement);
+            unit.lookAt(Angles.mouseAngle(unit.x(), unit.y()));
+        }else{
+            if(!unit.vel().isZero(0.01f)) unit.rotation(unit.vel().angle());
+            unit.vel().add(Tmp.v2.trns(unit.rotation(), movement.len()));
+            if(!movement.isZero()) unit.vel().rotateTo(movement.angle(), unit.type().rotateSpeed * Time.delta());
+        }
+
+        unit.aim(Core.input.mouseWorld());
+        unit.controlWeapons(true, isShooting);
         /*
         Tile tile = unit.tileOn();
         boolean canMove = !Core.scene.hasKeyboard() || ui.minimapfrag.shown();
