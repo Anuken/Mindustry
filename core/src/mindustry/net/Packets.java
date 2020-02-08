@@ -154,7 +154,7 @@ public class Packets{
         public int version;
         public String versionType;
         public Array<String> mods;
-        public String name, uuid, usid;
+        public String name, uuid, usid, legacyUuid;
         public boolean mobile;
         public int color;
 
@@ -166,6 +166,7 @@ public class Packets{
             TypeIO.writeString(buffer, usid);
             buffer.put(mobile ? (byte)1 : 0);
             buffer.put(Base64Coder.decode(uuid));
+            buffer.put(Base64Coder.decode(legacyUuid));
             buffer.put((byte)color);
             buffer.put((byte)mods.size);
             for(int i = 0; i < mods.size; i++){
@@ -179,6 +180,9 @@ public class Packets{
             versionType = TypeIO.readString(buffer);
             name = TypeIO.readString(buffer);
             usid = TypeIO.readString(buffer);
+            byte[] lidbytes = new byte[8];
+            buffer.get(lidbytes);
+            legacyUuid = new String(Base64Coder.encode(lidbytes));
             mobile = buffer.get() == 1;
             color = buffer.getInt();
             byte[] idbytes = new byte[8];
