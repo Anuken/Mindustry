@@ -19,8 +19,6 @@ abstract class EntityComp{
         return added;
     }
 
-    void init(){}
-
     void update(){}
 
     void remove(){

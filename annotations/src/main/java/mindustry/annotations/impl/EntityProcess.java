@@ -272,7 +272,7 @@ public class EntityProcess extends BaseProcessor{
                         err("Type " + type + " has multiple components implementing non-void method " + entry.key + ".");
                     }
 
-                    entry.value.sort(m -> m.has(MethodPriority.class) ? m.annotation(MethodPriority.class).value() : 0);
+                    entry.value.sort(Structs.comps(Structs.comparingFloat(m -> m.has(MethodPriority.class) ? m.annotation(MethodPriority.class).value() : 0), Structs.comparing(Selement::name)));
 
                     //representative method
                     Smethod first = entry.value.first();

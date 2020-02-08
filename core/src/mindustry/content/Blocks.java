@@ -269,6 +269,7 @@ public class Blocks implements ContentList{
 
         ice = new Floor("ice"){{
             dragMultiplier = 0.35f;
+            speedMultiplier = 0.9f;
             attributes.set(Attribute.water, 0.4f);
         }};
 

@@ -12,6 +12,8 @@ abstract class VelComp implements Posc{
     final Vec2 vel = new Vec2();
     float drag = 0f;
 
+    //velocity needs to be called first, as it affects delta and lastPosition
+    @MethodPriority(-1)
     @Override
     public void update(){
         move(vel.x, vel.y);

@@ -32,7 +32,6 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     }
 
     void moveAt(Vec2 vector){
-        Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
         Vec2 t = Tmp.v3.set(vector).scl(floorSpeedMultiplier()); //target vector
         float mag = Tmp.v3.len();
         vel.x = Mathf.approach(vel.x, t.x, mag);

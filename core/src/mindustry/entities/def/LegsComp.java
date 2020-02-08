@@ -13,10 +13,9 @@ abstract class LegsComp implements Posc, Flyingc, Hitboxc, DrawLayerGroundUnderc
 
     @Override
     public void update(){
-        if(vel().len() > 0.5f){
-            baseRotation = Angles.moveToward(baseRotation, vel().angle(), type().baseRotateSpeed);
-            walkTime += Time.delta()*vel().len()/1f;
-        }
+        float len = vel().len();
+        baseRotation = Angles.moveToward(baseRotation, vel().angle(), type().baseRotateSpeed * Mathf.clamp(len / type().speed));
+        walkTime += Time.delta()*len/1f;
     }
 
     @Override
