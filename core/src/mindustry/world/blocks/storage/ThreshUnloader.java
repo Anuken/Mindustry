@@ -62,7 +62,7 @@ public class ThreshUnloader extends Block{
     public void update(Tile tile){
         ThreshUnloaderEntity entity = tile.ent();
 
-        if(tile.entity.timer.get(timerUnload, speed / entity.timeScale) && tile.entity.items.total() == 0){
+        if(tile.entity.timer.get(timerUnload, speed * entity.polladjust / entity.timeScale) && tile.entity.items.total() == 0){
             for(Tile other : tile.entity.proximity()){
                 if(other.interactable(tile.getTeam()) && other.block().unloadable && other.block().hasItems && entity.items.total() == 0){
                     // If the target is a vault, try to take an item that is above threshold.
@@ -70,15 +70,31 @@ public class ThreshUnloader extends Block{
                         int nThreshold = (int)(other.block().getMaximumAccepted(other, null) * entity.threshold.vaultFrac);
                         if(other.entity.items.total() > nThreshold) {
                             Item iitem = other.entity.items.takeMaxItem(nThreshold);
-                            if (iitem != null)
+                            if (iitem != null) {
+                                // Every time an item gets deliverd, cut the polling rate penalty by 15% to quickly bring the rate back to full.
+                                // Also produces a neat ramp-up visual effect as the unloader comes out hibernation.
+                                entity.polladjust = entity.polladjust * 0.85f + 0.15f;
                                 offloadNear(tile, iitem);
+                            } else {
+                                // Since the max search algorithm is mildly CPU-intensive, reduce the polling rate by 3% each time it fails to return anything to pass along.
+                                entity.polladjust *= 1.03;
+                                // Cap the polling rate reduction to 100X
+                                if (entity.polladjust > 100f)
+                                    entity.polladjust = 100f;
+                            }
                         }
                     }
                     // If the target is a launcher loaded above threshold, take whichever item there is the most of.
                     if(other.block() instanceof LaunchPad) {
                         int nThreshold = (int)(other.block().getMaximumAccepted(other, null) * entity.threshold.launcherFrac);
-                        if(other.entity.items.total() > nThreshold)
+                        if(other.entity.items.total() > nThreshold) {
                             offloadNear(tile, other.entity.items.takeMaxItem(0));
+                            entity.polladjust = entity.polladjust * 0.85f + 0.15f;
+                        } else {
+                            entity.polladjust *= 1.03;
+                            if (entity.polladjust > 100f)
+                                entity.polladjust = 100f;
+                        }
                     }
                 }
             }
@@ -140,6 +156,7 @@ public class ThreshUnloader extends Block{
 
     public static class ThreshUnloaderEntity extends TileEntity{
         public Threshold threshold = Thresholds.threshold00;
+        public float polladjust = 10f;
 
         @Override
         public int config(){return threshold.id;}
