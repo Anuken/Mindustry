@@ -3980,30 +3980,23 @@ threshold00
   orig: 32, 32
   offset: 0, 0
   index: -1
-threshold20
+threshold25
   rotate: false
   xy: 1731, 1081
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-threshold40
+threshold50
   rotate: false
   xy: 1763, 1081
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-threshold60
+threshold75
   rotate: false
   xy: 1795, 1081
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
-threshold80
-  rotate: false
-  xy: 1827, 1081
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

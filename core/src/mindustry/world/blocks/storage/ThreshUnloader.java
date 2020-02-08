@@ -124,10 +124,7 @@ public class ThreshUnloader extends Block{
 
     @Override
     public void draw(Tile tile){
-//        super.draw(tile);
-
         ThreshUnloader.ThreshUnloaderEntity entity = tile.ent();
-
         Draw.rect("threshunloader" + entity.threshold.id, tile.worldx(), tile.worldy());
     }
 
@@ -156,6 +153,10 @@ public class ThreshUnloader extends Block{
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
             byte id = stream.readByte();
+
+            if(id>=content.thresholds().size)
+                id = (byte)(content.thresholds().size-1);
+
             threshold = content.thresholds().get(id);
         }
     }

@@ -10,28 +10,27 @@ public class Thresholds implements ContentList{
     @Override
     public void load(){
         threshold00 = new Threshold("threshold00"){{
-            vaultFrac = 0.001f;
-            launcherFrac = 0.001f;
+            description= "0%";
+            vaultFrac = 0.0f;
+            launcherFrac = 0.0f;
         }};
 
-        threshold20 = new Threshold("threshold20"){{
-            vaultFrac = 0.2f;
-            launcherFrac = 0.18f;
+        threshold20 = new Threshold("threshold25"){{
+            description= "25%";
+            vaultFrac = 0.25f;
+            launcherFrac = 0.25f;
         }};
 
-        threshold40 = new Threshold("threshold40"){{
-            vaultFrac = 0.4f;
-            launcherFrac = 0.36f;
+        threshold40 = new Threshold("threshold50"){{
+            description= "50%";
+            vaultFrac = 0.5f;
+            launcherFrac = 0.50f;
         }};
 
-        threshold60 = new Threshold("threshold60"){{
-            vaultFrac = 0.6f;
-            launcherFrac = 0.54f;
-        }};
-
-        threshold80 = new Threshold("threshold80"){{
-            vaultFrac = 0.8f;
-            launcherFrac = 0.72f;
+        threshold60 = new Threshold("threshold75"){{
+            description= "75%";
+            vaultFrac = 0.75f;
+            launcherFrac = 0.70f; // cap launchers threshold a little lower since they have a total item limit instead of per-item limit
         }};
     }
 }
