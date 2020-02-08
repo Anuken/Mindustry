@@ -81,7 +81,7 @@ public class AndroidLauncher extends AndroidApplication{
                 if(VERSION.SDK_INT >= VERSION_CODES.Q){
                     Intent intent = new Intent(open ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType(extension.equals("zip") ? "application/zip" : "*/*");
+                    intent.setType("*/*");
                     addResultListener(i -> startActivityForResult(intent, i), (code, in) -> {
                         if(code == Activity.RESULT_OK && in != null && in.getData() != null){
                             Uri uri = in.getData();
