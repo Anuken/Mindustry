@@ -6,6 +6,7 @@ import mindustry.ctype.UnlockableContent;
 import mindustry.entities.traits.BuilderTrait;
 import mindustry.entities.type.*;
 import mindustry.entities.units.*;
+import mindustry.maps.Map;
 import mindustry.type.*;
 import mindustry.world.Tile;
 
