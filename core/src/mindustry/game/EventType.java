@@ -205,7 +205,11 @@ public class EventType{
 
     /** Called when a game begins and the world is loaded. */
     public static class WorldLoadEvent{
-
+        public final Map map;
+        
+        public WorldLoadEvent(Map map){
+            this.map = map;
+        }
     }
 
     /** Called from the logic thread. Do not access graphics here! */
