@@ -182,7 +182,7 @@ public class World{
         entities.all().each(group -> group.resize(-finalWorldBounds, -finalWorldBounds, tiles.length * tilesize + finalWorldBounds * 2, tiles[0].length * tilesize + finalWorldBounds * 2));
 
         generating = false;
-        Events.fire(new WorldLoadEvent());
+        Events.fire(new WorldLoadEvent(currentMap));
     }
 
     public void setGenerating(boolean gen){
