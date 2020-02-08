@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.*;
 
@@ -28,6 +29,19 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
 
     boolean canDrown(){
         return isGrounded();
+    }
+
+    void moveAt(Vec2 vector){
+        Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
+        Vec2 t = Tmp.v3.set(vector).scl(floorSpeedMultiplier()); //target vector
+        float mag = Tmp.v3.len();
+        vel.x = Mathf.approach(vel.x, t.x, mag);
+        vel.y = Mathf.approach(vel.y, t.y, mag);
+    }
+
+    float floorSpeedMultiplier(){
+        Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
+        return on.speedMultiplier;
     }
 
     @Override

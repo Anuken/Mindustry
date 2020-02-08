@@ -1,8 +1,10 @@
 package mindustry.entities.def;
 
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.collisions;
 
@@ -28,6 +30,12 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc{
     @Override
     public boolean canDrown(){
         return false;
+    }
+
+    @Replace
+    public float floorSpeedMultiplier(){
+        Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
+        return on.isDeep() ? 1.3f : 1f;
     }
 }
 

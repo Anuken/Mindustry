@@ -162,7 +162,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         if(entity.len * itemSpace < 0.9f){
-            unit.applyImpulse((tx * speed + centerx) * entity.delta(), (ty * speed + centery) * entity.delta());
+            unit.impulse((tx * speed + centerx) * entity.delta(), (ty * speed + centery) * entity.delta());
         }
     }
 

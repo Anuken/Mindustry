@@ -22,8 +22,8 @@ public class UnitTypes implements ContentList{
     public void load(){
 
         dagger = new UnitDef("dagger"){{
-            speed = 0.2f;
-            drag = 0.2f;
+            speed = 1f;
+            drag = 0.3f;
             hitsize = 8f;
             mass = 1.75f;
             health = 130;
@@ -37,7 +37,7 @@ public class UnitTypes implements ContentList{
         }};
 
         vanguard = new UnitDef("vanguard"){{
-            speed = 0.3f;
+            speed = 1.3f;
             drag = 0.1f;
             hitsize = 8f;
             mass = 1.75f;

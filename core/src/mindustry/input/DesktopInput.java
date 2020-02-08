@@ -504,11 +504,11 @@ public class DesktopInput extends InputHandler{
         Vec2 movement = Tmp.v1.set(speed * xa, speed * ya).limit(speed);
 
         if(omni){
-            unit.vel().add(movement);
+            unit.moveAt(movement);
             unit.lookAt(Angles.mouseAngle(unit.x(), unit.y()));
         }else{
             if(!unit.vel().isZero(0.01f)) unit.rotation(unit.vel().angle());
-            unit.vel().add(Tmp.v2.trns(unit.rotation(), movement.len()));
+            unit.moveAt(Tmp.v2.trns(unit.rotation(), movement.len()));
             if(!movement.isZero()) unit.vel().rotateTo(movement.angle(), unit.type().rotateSpeed * Time.delta());
         }
 

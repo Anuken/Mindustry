@@ -7,7 +7,7 @@ import mindustry.gen.*;
 abstract class MassComp implements Velc{
     float mass = 1f;
 
-    public void applyImpulse(float x, float y){
+    public void impulse(float x, float y){
         vel().add(x / mass, y / mass);
     }
 }

@@ -268,11 +268,12 @@ public class Blocks implements ContentList{
         }};
 
         ice = new Floor("ice"){{
-            dragMultiplier = 0.6f;
+            dragMultiplier = 0.35f;
             attributes.set(Attribute.water, 0.4f);
         }};
 
         iceSnow = new Floor("ice-snow"){{
+            dragMultiplier = 0.6f;
             variants = 3;
             attributes.set(Attribute.water, 0.3f);
         }};

@@ -83,6 +83,8 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
 
     @Override
     public void update(){
+        drag(type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f));
+
         //apply knockback based on spawns
         //TODO move elsewhere
         if(team() != state.rules.waveTeam){
