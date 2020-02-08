@@ -122,6 +122,7 @@ public class ThreshUnloader extends Block{
         }
     }
 
+    // Reflect configuration status with the associated sprite.
     @Override
     public void draw(Tile tile){
         ThreshUnloader.ThreshUnloaderEntity entity = tile.ent();

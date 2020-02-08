@@ -27,7 +27,7 @@ public class Threshold extends UnlockableContent {
 
     @Override
     public void displayInfo(Table table){
-        ContentDisplay.displayThreshold(table, this);
+//        ContentDisplay.displayThreshold(table, this);
     }
 
     @Override
