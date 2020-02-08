@@ -220,7 +220,7 @@ public class PlacementFragment extends Fragment{
 
                         button.update(() -> { //color unplacable things gray
                             Tilec core = player.closestCore();
-                            Color color = state.rules.infiniteResources || (core != null && (core.items().has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
+                            Color color = (state.rules.infiniteResources || (core != null && (core.items().has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
 
@@ -321,11 +321,11 @@ public class PlacementFragment extends Fragment{
                                 }
                             }).growX().left().margin(3);
 
-                            if(state.rules.bannedBlocks.contains(lastDisplay)){
+                            if(state.rules.bannedBlocks.contains(lastDisplay) || !player.isBuilder()){
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.addImage(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add("$banned");
+                                    b.add(!player.isBuilder() ? "$unit.nobuild" : "$banned");
                                     b.left();
                                 }).padTop(2).left();
                             }
