@@ -1,6 +1,7 @@
 package mindustry.content;
 
 import arc.*;
+import arc.graphics.*;
 import arc.math.Mathf;
 import mindustry.ctype.ContentList;
 import mindustry.game.EventType.*;
@@ -40,6 +41,7 @@ public class StatusEffects implements ContentList{
         }};
 
         wet = new StatusEffect("wet"){{
+            color = Color.royal;
             speedMultiplier = 0.9f;
             effect = Fx.wet;
 

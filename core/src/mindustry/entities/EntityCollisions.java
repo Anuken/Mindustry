@@ -1,13 +1,12 @@
 package mindustry.entities;
 
-import arc.struct.Array;
-import arc.math.Mathf;
+import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import mindustry.gen.*;
-import mindustry.world.Tile;
+import mindustry.world.*;
 
-import static mindustry.Vars.tilesize;
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class EntityCollisions{
     //range for tile collision scanning
@@ -26,12 +25,16 @@ public class EntityCollisions{
     private Array<Hitboxc> arrOut = new Array<>();
 
     public void move(Hitboxc entity, float deltax, float deltay){
+        move(entity, deltax, deltay, EntityCollisions::solid);
+    }
+
+    public void move(Hitboxc entity, float deltax, float deltay, SolidPred solidCheck){
 
         boolean movedx = false;
 
         while(Math.abs(deltax) > 0 || !movedx){
             movedx = true;
-            moveDelta(entity, Math.min(Math.abs(deltax), seg) * Mathf.sign(deltax), 0, true);
+            moveDelta(entity, Math.min(Math.abs(deltax), seg) * Mathf.sign(deltax), 0, true, solidCheck);
 
             if(Math.abs(deltax) >= seg){
                 deltax -= seg * Mathf.sign(deltax);
@@ -44,7 +47,7 @@ public class EntityCollisions{
 
         while(Math.abs(deltay) > 0 || !movedy){
             movedy = true;
-            moveDelta(entity, 0, Math.min(Math.abs(deltay), seg) * Mathf.sign(deltay), false);
+            moveDelta(entity, 0, Math.min(Math.abs(deltay), seg) * Mathf.sign(deltay), false, solidCheck);
 
             if(Math.abs(deltay) >= seg){
                 deltay -= seg * Mathf.sign(deltay);
@@ -54,7 +57,7 @@ public class EntityCollisions{
         }
     }
 
-    public void moveDelta(Hitboxc entity, float deltax, float deltay, boolean x){
+    public void moveDelta(Hitboxc entity, float deltax, float deltay, boolean x, SolidPred solidCheck){
         Rect rect = r1;
         entity.hitboxTile(rect);
         entity.hitboxTile(r2);
@@ -66,7 +69,7 @@ public class EntityCollisions{
         for(int dx = -r; dx <= r; dx++){
             for(int dy = -r; dy <= r; dy++){
                 int wx = dx + tilex, wy = dy + tiley;
-                if(solid(wx, wy)){
+                if(solidCheck.solid(wx, wy)){
                     tmp.setSize(tilesize).setCenter(wx * tilesize, wy * tilesize);
 
                     if(tmp.overlaps(rect)){
@@ -118,7 +121,12 @@ public class EntityCollisions{
         });
     }
 
-    private static boolean solid(int x, int y){
+    public static boolean waterSolid(int x, int y){
+        Tile tile = world.tile(x, y);
+        return tile != null && (tile.solid() || !tile.floor().isLiquid);
+    }
+
+    public static boolean solid(int x, int y){
         Tile tile = world.tile(x, y);
         return tile != null && tile.solid();
     }
@@ -220,5 +228,9 @@ public class EntityCollisions{
                 }
             }
         });
+    }
+
+    public interface SolidPred{
+        boolean solid(int x, int y);
     }
 }

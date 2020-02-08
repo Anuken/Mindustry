@@ -7,6 +7,7 @@ public class Annotations{
 
     public enum DrawLayer{
         floor,
+        floorOver,
         groundShadows,
         groundUnder,
         ground,
@@ -15,6 +16,12 @@ public class Annotations{
         bullets,
         effects,
         names,
+    }
+
+    /** Indicates that a method overrides other methods. */
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Replace{
     }
 
     /** Indicates that a component field is read-only. */

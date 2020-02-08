@@ -1082,7 +1082,7 @@ public class Fx{
 
     //TODO fix false in constructor
     ripple = new Effect(30, e -> {
-        color(Tmp.c1.set(e.color).mul(1.2f));
+        color(Tmp.c1.set(e.color).mul(1.5f));
         stroke(e.fout() + 0.4f);
         Lines.circle(e.x, e.y, 2f + e.fin() * 4f);
     }).ground(),

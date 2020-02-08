@@ -16,6 +16,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc{
 
     float elevation;
     float drownTime;
+    float splashTimer;
 
     boolean isGrounded(){
         return elevation < 0.001f;
@@ -25,15 +26,22 @@ abstract class FlyingComp implements Posc, Velc, Healthc{
         return elevation >= 0.001f;
     }
 
+    boolean canDrown(){
+        return isGrounded();
+    }
+
     @Override
     public void update(){
         Floor floor = floorOn();
 
-        if(isGrounded() && floor.isLiquid && vel.len2() > 0.4f*0.4f && Mathf.chance((vel.len2() * floor.speedMultiplier) * 0.03f * Time.delta())){
-            floor.walkEffect.at(x, y, 0, floor.color);
+        if(isGrounded() && floor.isLiquid && !vel.isZero(0.01f)){
+            if((splashTimer += vel.len()) >= 7f){
+                floor.walkEffect.at(x, y, 0, floor.color);
+                splashTimer = 0f;
+            }
         }
 
-        if(isGrounded() && floor.isLiquid && floor.drownTime > 0){
+        if(canDrown() && floor.isLiquid && floor.drownTime > 0){
             drownTime += Time.delta() * 1f / floor.drownTime;
             drownTime = Mathf.clamp(drownTime);
             if(Mathf.chance(Time.delta() * 0.05f)){

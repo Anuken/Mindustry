@@ -73,13 +73,16 @@ abstract class StatusComp implements Posc, Flyingc{
             return Tmp.c1.set(Color.white);
         }
 
-        float r = 0f, g = 0f, b = 0f;
+        float r = 1f, g = 1f, b = 1f, total = 0f;
         for(StatusEntry entry : statuses){
-            r += entry.effect.color.r;
-            g += entry.effect.color.g;
-            b += entry.effect.color.b;
+            float intensity = entry.time < 10f ? entry.time/10f : 1f;
+            r += entry.effect.color.r * intensity;
+            g += entry.effect.color.g * intensity;
+            b += entry.effect.color.b * intensity;
+            total += intensity;
         }
-        return Tmp.c1.set(r / statuses.size, g / statuses.size, b / statuses.size, 1f);
+        float count = statuses.size + total;
+        return Tmp.c1.set(r / count, g / count, b / count, 1f);
     }
 
     @Override
@@ -117,6 +120,8 @@ abstract class StatusComp implements Posc, Flyingc{
     boolean hasEffect(StatusEffect effect){
         return applied.get(effect.id);
     }
+
+    //TODO autogen io code
 
     void writeSave(DataOutput stream) throws IOException{
         stream.writeByte(statuses.size);

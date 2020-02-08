@@ -6,12 +6,12 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 
 @Component
-abstract class DecalComp implements Drawc, Timedc, Rotc, Posc{
+abstract class DecalComp implements Drawc, Timedc, Rotc, Posc, DrawLayerFloorc{
     Color color = new Color(1, 1, 1, 1);
     TextureRegion region;
 
     @Override
-    public void draw(){
+    public void drawFloor(){
         Draw.color(color);
         Draw.rect(region, x(), y(), rotation());
         Draw.color();

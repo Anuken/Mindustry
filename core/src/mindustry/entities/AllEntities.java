@@ -1,4 +1,4 @@
-package mindustry.entities.def;
+package mindustry.entities;
 
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
@@ -11,8 +11,11 @@ class AllEntities{
     @EntityDef(value = {Tilec.class}, isFinal = false)
     class TileDef{}
 
-    @EntityDef(value = {Effectc.class, Childc.class}, pooled = true)
+    @EntityDef(value = {StandardEffectc.class, Childc.class}, pooled = true)
     class EffectDef{}
+
+    @EntityDef(value = {GroundEffectc.class, Childc.class}, pooled = true)
+    class GroundEffectDef{}
 
     @EntityDef({Decalc.class})
     class DecalDef{}

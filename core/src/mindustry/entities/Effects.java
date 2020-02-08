@@ -39,11 +39,11 @@ public class Effects{
             Rect pos = Tmp.r2.setSize(effect.size).setCenter(x, y);
 
             if(view.overlaps(pos)){
-                EffectEntity entity = EffectEntity.create();
+                Effectc entity = effect.ground ? GroundEffectEntity.create() : EffectEntity.create();
                 entity.effect(effect);
                 entity.rotation(rotation);
                 entity.data(data);
-                entity.id(EntityGroup.nextId());
+                entity.lifetime(effect.lifetime);
                 entity.set(x, y);
                 entity.color().set(color);
                 if(data instanceof Posc) entity.parent((Posc)data);

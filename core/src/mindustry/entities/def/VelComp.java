@@ -14,9 +14,12 @@ abstract class VelComp implements Posc{
 
     @Override
     public void update(){
-        //TODO handle solidity
-        x += vel.x;
-        y += vel.y;
+        move(vel.x, vel.y);
         vel.scl(1f - drag * Time.delta());
+    }
+
+    void move(float cx, float cy){
+        x += cx;
+        y += cy;
     }
 }

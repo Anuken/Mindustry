@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.*;
+import arc.util.pooling.Pool.*;
 import com.squareup.javapoet.*;
 import com.squareup.javapoet.TypeSpec.*;
 import com.sun.source.tree.*;
@@ -216,6 +217,7 @@ public class EntityProcess extends BaseProcessor{
                 Array<Stype> components = allComponents(type);
                 Array<GroupDefinition> groups = groupDefs.select(g -> (!g.components.isEmpty() && !g.components.contains(s -> !components.contains(s))) || g.manualInclusions.contains(type));
                 ObjectMap<String, Array<Smethod>> methods = new ObjectMap<>();
+                ObjectMap<FieldSpec, Svar> specVariables = new ObjectMap<>();
 
                 //add all components
                 for(Stype comp : components){
@@ -237,6 +239,7 @@ public class EntityProcess extends BaseProcessor{
                         if(!isFinal) fbuilder.addModifiers(Modifier.PROTECTED);
                         fbuilder.addAnnotations(f.annotations().map(AnnotationSpec::get));
                         builder.addField(fbuilder.build());
+                        specVariables.put(builder.fieldSpecs.get(builder.fieldSpecs.size() - 1), f);
                     }
 
                     //get all utility methods from components
@@ -245,8 +248,30 @@ public class EntityProcess extends BaseProcessor{
                     }
                 }
 
+                //override toString method
+                builder.addMethod(MethodSpec.methodBuilder("toString")
+                    .addAnnotation(Override.class)
+                    .returns(String.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addStatement("return $S + $L", name + "#", "id").build());
+
                 //add all methods from components
                 for(ObjectMap.Entry<String, Array<Smethod>> entry : methods){
+                    if(entry.value.contains(m -> m.has(Replace.class))){
+                        //check replacements
+                        if(entry.value.count(m -> m.has(Replace.class)) > 1){
+                            err("Type " + type + " has multiple components replacing method " + entry.key + ".");
+                        }
+                        Smethod base = entry.value.find(m -> m.has(Replace.class));
+                        entry.value.clear();
+                        entry.value.add(base);
+                    }
+
+                    //check multi return
+                    if(entry.value.count(m -> !m.isAny(Modifier.NATIVE, Modifier.ABSTRACT) && !m.isVoid()) > 1){
+                        err("Type " + type + " has multiple components implementing non-void method " + entry.key + ".");
+                    }
+
                     entry.value.sort(m -> m.has(MethodPriority.class) ? m.annotation(MethodPriority.class).value() : 0);
 
                     //representative method
@@ -275,6 +300,14 @@ public class EntityProcess extends BaseProcessor{
                         err(entry.value.first().up().getSimpleName() + "#" + entry.value.first() + " is an abstract method and must be implemented in some component", type);
                     }
 
+                    //SPECIAL CASE: inject group add/remove code
+                    if(first.name().equals("add") || first.name().equals("remove")){
+                        for(GroupDefinition def : groups){
+                            //remove/add from each group, assume imported
+                            mbuilder.addStatement("Groups.$L.$L(this)", def.name, first.name());
+                        }
+                    }
+
                     for(Smethod elem : entry.value){
                         if(elem.is(Modifier.ABSTRACT) || elem.is(Modifier.NATIVE) || !methodBlocks.containsKey(elem)) continue;
 
@@ -298,14 +331,6 @@ public class EntityProcess extends BaseProcessor{
                         //trim block
                         str = str.substring(2, str.length() - 1);
 
-                        //SPECIAL CASE: inject group add/remove code
-                        if(elem.name().equals("add") || elem.name().equals("remove")){
-                            for(GroupDefinition def : groups){
-                                //remove/add from each group, assume imported
-                                mbuilder.addStatement("Groups.$L.$L(this)", def.name, elem.name());
-                            }
-                        }
-
                         //make sure to remove braces here
                         mbuilder.addCode(str);
 
@@ -313,11 +338,33 @@ public class EntityProcess extends BaseProcessor{
                         if(writeBlock) mbuilder.addCode("}\n");
                     }
 
+                    //add free code to remove methods
                     if(first.name().equals("remove") && ann.pooled()){
                         mbuilder.addStatement("$T.free(this)", Pools.class);
                     }
 
                     builder.addMethod(mbuilder.build());
+                }
+
+                //add pool reset method and implment Poolable
+                if(ann.pooled()){
+                    builder.addSuperinterface(Poolable.class);
+                    //implement reset()
+                    MethodSpec.Builder resetBuilder = MethodSpec.methodBuilder("reset").addModifiers(Modifier.PUBLIC);
+                    for(FieldSpec spec : builder.fieldSpecs){
+                        Svar variable = specVariables.get(spec);
+                        if(spec.type.isPrimitive()){
+                            //set to primitive default
+                            resetBuilder.addStatement("$L = $L", spec.name, varInitializers.containsKey(variable) ? varInitializers.get(variable) : getDefault(spec.type.toString()));
+                        }else{
+                            //set to default null
+                            if(!varInitializers.containsKey(variable)){
+                                resetBuilder.addStatement("$L = null", spec.name);
+                            } //else... TODO reset if poolable
+                        }
+                    }
+
+                    builder.addMethod(resetBuilder.build());
                 }
 
                 //make constructor private

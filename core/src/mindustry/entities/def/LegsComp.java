@@ -6,7 +6,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 
 @Component
-abstract class LegsComp implements Posc, Flyingc, Hitboxc, DrawLayerGroundUnderc, Unitc, Legsc{
+abstract class LegsComp implements Posc, Flyingc, Hitboxc, DrawLayerGroundUnderc, Unitc, Legsc, ElevationMovec{
     transient float x, y;
 
     float baseRotation, walkTime;

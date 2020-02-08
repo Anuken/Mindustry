@@ -6,13 +6,12 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 
 @Component
-abstract class EffectComp implements Posc, Drawc, Timedc, Rotc{
-    Effect effect;
+abstract class EffectComp implements Posc, Drawc, Timedc, Rotc, Childc{
     Color color = new Color(Color.white);
+    Effect effect;
     Object data;
 
-    @Override
-    public void draw(){
+    void draw(){
         effect.render(id(), color, time(), rotation(), x(), y(), data);
     }
 
