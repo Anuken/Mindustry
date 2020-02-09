@@ -38,7 +38,7 @@ public class Build{
 
         tile.set(sub, team, rotation);
         tile.<BuildEntity>ent().setDeconstruct(previous);
-        tile.entity.health = tile.entity.maxHealth() * prevPercent;
+        tile.entity.health(tile.entity.maxHealth() * prevPercent);
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, true)));
     }
@@ -78,7 +78,7 @@ public class Build{
             return false;
         }
 
-        if(state.teams.eachEnemyCore(team, core -> Mathf.dst(x * tilesize + type.offset(), y * tilesize + type.offset(), core.x, core.y) < state.rules.enemyCoreBuildRadius + type.size * tilesize / 2f)){
+        if(state.teams.eachEnemyCore(team, core -> Mathf.dst(x * tilesize + type.offset(), y * tilesize + type.offset(), core.x(), core.y()) < state.rules.enemyCoreBuildRadius + type.size * tilesize / 2f)){
             return false;
         }
 

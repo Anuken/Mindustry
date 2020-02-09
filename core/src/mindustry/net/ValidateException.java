@@ -1,14 +1,14 @@
 package mindustry.net;
 
-import mindustry.entities.type.Player;
+import mindustry.gen.*;
 
 /**
  * Thrown when a client sends invalid information.
  */
 public class ValidateException extends RuntimeException{
-    public final Player player;
+    public final Playerc player;
 
-    public ValidateException(Player player, String s){
+    public ValidateException(Playerc player, String s){
         super(s);
         this.player = player;
     }

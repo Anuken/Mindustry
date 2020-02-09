@@ -134,7 +134,7 @@ public class BlockRenderer implements Disposable{
         }
 
         if(brokenFade > 0.001f){
-            for(BrokenBlock block : state.teams.get(player.getTeam()).brokenBlocks){
+            for(BrokenBlock block : state.teams.get(player.team()).brokenBlocks){
                 Block b = content.block(block.block);
                 if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset(), block.y * tilesize + b.offset()))) continue;
 
@@ -233,7 +233,7 @@ public class BlockRenderer implements Disposable{
                             addRequest(tile, block.layer2);
                         }
 
-                        if(tile.entity != null && tile.entity.power != null && tile.entity.power.links.size > 0){
+                        if(tile.entity != null && tile.entity.power() != null && tile.entity.power().links.size > 0){
                             for(Tile other : block.getPowerConnections(tile, outArray)){
                                 if(other.block().layer == Layer.power){
                                     addRequest(other, Layer.power);
@@ -275,7 +275,7 @@ public class BlockRenderer implements Disposable{
                 if(request.tile.entity != null && request.tile.entity.damaged()){
                     block.drawCracks(request.tile);
                 }
-                if(block.synthetic() && request.tile.getTeam() != player.getTeam()){
+                if(block.synthetic() && request.tile.team() != player.team()){
                     block.drawTeam(request.tile);
                 }
 

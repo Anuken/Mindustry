@@ -29,12 +29,10 @@ public class ContentLoader{
     private @Nullable Content lastAdded;
     private ObjectSet<Cons<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
-        new Fx(),
         new Items(),
         new StatusEffects(),
         new Liquids(),
         new Bullets(),
-        new Mechs(),
         new UnitTypes(),
         new Blocks(),
         new Loadouts(),
@@ -42,7 +40,6 @@ public class ContentLoader{
         new Weathers(),
         new Planets(),
         new Zones(),
-        new TypeIDs(),
 
         //these are not really content classes, but this makes initialization easier
         new LegacyColorMapper(),
@@ -264,7 +261,7 @@ public class ContentLoader{
         return getBy(ContentType.zone);
     }
 
-    public Array<UnitType> units(){
+    public Array<UnitDef> units(){
         return getBy(ContentType.unit);
     }
 }

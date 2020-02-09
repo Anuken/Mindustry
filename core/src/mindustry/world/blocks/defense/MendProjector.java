@@ -7,8 +7,7 @@ import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.util.*;
 import mindustry.content.Fx;
-import mindustry.entities.Effects;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -65,37 +64,23 @@ public class MendProjector extends Block{
     @Override
     public void update(Tile tile){
         MendEntity entity = tile.ent();
-        entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() || tile.isEnemyCheat() ? 1f : 0f, 0.08f);
+        entity.heat = Mathf.lerpDelta(entity.heat, entity.consValid() || tile.isEnemyCheat() ? 1f : 0f, 0.08f);
         entity.charge += entity.heat * entity.delta();
 
-        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
+        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons().optionalValid()), 0.1f);
 
-        if(entity.cons.optionalValid() && entity.timer.get(timerUse, useTime) && entity.efficiency() > 0){
-            entity.cons.trigger();
+        if(entity.cons().optionalValid() && entity.timer(timerUse, useTime) && entity.efficiency() > 0){
+            entity.consume();
         }
 
         if(entity.charge >= reload){
             float realRange = range + entity.phaseHeat * phaseRangeBoost;
             entity.charge = 0f;
 
-            int tileRange = (int)(realRange / tilesize + 1);
-            healed.clear();
-
-            for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
-                for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    if(!Mathf.within(x * tilesize, y * tilesize, tile.drawx(), tile.drawy(), realRange)) continue;
-
-                    Tile other = world.ltile(x, y);
-
-                    if(other == null) continue;
-
-                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null && other.entity.health < other.entity.maxHealth()){
-                        other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.efficiency());
-                        Effects.effect(Fx.healBlockFull, Tmp.c1.set(baseColor).lerp(phaseColor, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
-                        healed.add(other.pos());
-                    }
-                }
-            }
+            indexer.eachBlock(entity, realRange, other -> other.entity.damaged(), other -> {
+                other.entity.heal(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.efficiency());
+                Fx.healBlockFull.at(other.drawx(), other.drawy(), other.block().size, Tmp.c1.set(baseColor).lerp(phaseColor, entity.phaseHeat));
+            });
         }
     }
 
@@ -121,9 +106,7 @@ public class MendProjector extends Block{
 
         Draw.color(baseColor, phaseColor, entity.phaseHeat);
         Draw.alpha(entity.heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
-        //Draw.blend(Blending.additive);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
-        //Draw.blend();
 
         Draw.alpha(1f);
         Lines.stroke((2f * f + 0.2f) * entity.heat);
@@ -150,8 +133,8 @@ public class MendProjector extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             heat = stream.readFloat();
             phaseHeat = stream.readFloat();
         }

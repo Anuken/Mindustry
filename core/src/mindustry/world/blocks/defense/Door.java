@@ -8,8 +8,7 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
@@ -35,7 +34,7 @@ public class Door extends Wall{
     }
 
     @Remote(called = Loc.server)
-    public static void onDoorToggle(Player player, Tile tile, boolean open){
+    public static void onDoorToggle(Playerc player, Tile tile, boolean open){
         DoorEntity entity = tile.ent();
         if(entity != null){
             entity.open = open;
@@ -43,9 +42,9 @@ public class Door extends Wall{
 
             pathfinder.updateTile(tile);
             if(!entity.open){
-                Effects.effect(door.openfx, tile.drawx(), tile.drawy());
+                door.openfx.at(tile.drawx(), tile.drawy());
             }else{
-                Effects.effect(door.closefx, tile.drawx(), tile.drawy());
+                door.closefx.at(tile.drawx(), tile.drawy());
             }
             Sounds.door.at(tile);
         }
@@ -80,10 +79,10 @@ public class Door extends Wall{
     }
 
     @Override
-    public void tapped(Tile tile, Player player){
+    public void tapped(Tile tile, Playerc player){
         DoorEntity entity = tile.ent();
 
-        if((Units.anyEntities(tile) && entity.open) || !tile.entity.timer.get(timerToggle, 30f)){
+        if((Units.anyEntities(tile) && entity.open) || !tile.entity.timer(timerToggle, 30f)){
             return;
         }
 
@@ -100,8 +99,8 @@ public class Door extends Wall{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             open = stream.readBoolean();
         }
     }

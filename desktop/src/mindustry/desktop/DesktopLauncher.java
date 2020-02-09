@@ -17,6 +17,7 @@ import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.desktop.steam.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.type.*;
@@ -136,9 +137,9 @@ public class DesktopLauncher extends ClientLauncher{
         boolean[] isShutdown = {false};
 
         Events.on(ClientLoadEvent.class, event -> {
-            player.name = SVars.net.friends.getPersonaName();
+            player.name(SVars.net.friends.getPersonaName());
             Core.settings.defaults("name", SVars.net.friends.getPersonaName());
-            Core.settings.put("name", player.name);
+            Core.settings.put("name", player.name());
             Core.settings.save();
             //update callbacks
             Core.app.addListener(new ApplicationListener(){
@@ -242,36 +243,65 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public void updateRPC(){
-        if(!useDiscord) return;
+        //if we're using neither discord nor steam, do no work
+        if(!useDiscord && !steam) return;
 
-        DiscordRichPresence presence = new DiscordRichPresence();
+        //common elements they each share
+        boolean inGame = !state.is(State.menu);
+        String gameMapWithWave = "Unknown Map";
+        String gameMode = "";
+        String gamePlayersSuffix = "";
+        String uiState = "";
 
-        if(!state.is(State.menu)){
-            String map = world.getMap() == null ? "Unknown Map" : world.isZone() ? world.getZone().localizedName : Strings.capitalize(world.getMap().name());
-            String mode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : "Survival";
-            String players =  net.active() && playerGroup.size() > 1 ? " | " + playerGroup.size() + " Players" : "";
-
-            presence.state = mode + players;
-
-            if(!state.rules.waves){
-                presence.details = map;
-            }else{
-                presence.details = map + " | Wave " + state.wave;
-                presence.largeImageText = "Wave " + state.wave;
+        if(inGame){
+            if(world.getMap() != null){
+                gameMapWithWave = world.isZone() ? world.getZone().localizedName : Strings.capitalize(world.getMap().name());
+            }
+            if(state.rules.waves){
+                gameMapWithWave += " | Wave " + state.wave;
+            }
+            gameMode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : "Survival";
+            if(net.active() && Groups.player.size() > 1){
+                gamePlayersSuffix = " | " + Groups.player.size() + " Players";
             }
         }else{
             if(ui.editor != null && ui.editor.isShown()){
-                presence.state = "In Editor";
+                uiState = "In Editor";
             }else if(ui.planet != null && ui.planet.isShown()){
-                presence.state = "In Launch Selection";
+                uiState = "In Launch Selection";
             }else{
-                presence.state = "In Menu";
+                uiState = "In Menu";
             }
         }
 
-        presence.largeImageKey = "logo";
+        if(useDiscord){
+            DiscordRichPresence presence = new DiscordRichPresence();
 
-        DiscordRPC.INSTANCE.Discord_UpdatePresence(presence);
+            if(inGame){
+                presence.state = gameMode + gamePlayersSuffix;
+                presence.details = gameMapWithWave;
+                if(state.rules.waves){
+                    presence.largeImageText = "Wave " + state.wave;
+                }
+            }else{
+                presence.state = uiState;
+            }
+
+            presence.largeImageKey = "logo";
+
+            DiscordRPC.INSTANCE.Discord_UpdatePresence(presence);
+        }
+
+        if(steam){
+            //Steam mostly just expects us to give it a nice string, but it apparently expects "steam_display" to always be a loc token, so I've uploaded this one which just passes through 'steam_status' raw.
+            SVars.net.friends.setRichPresence("steam_display", "#steam_status_raw");
+
+            if(inGame){
+                SVars.net.friends.setRichPresence("steam_status", gameMapWithWave);
+            }else{
+                SVars.net.friends.setRichPresence("steam_status", uiState);
+            }
+        }
     }
 
     @Override

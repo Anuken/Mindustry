@@ -54,7 +54,7 @@ public class ZoneTests{
                         if(tile.drop() != null){
                             resources.add(tile.drop());
                         }
-                        if(tile.block() instanceof CoreBlock && tile.getTeam() == state.rules.defaultTeam){
+                        if(tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam){
                             hasSpawnPoint = true;
                         }
                     }

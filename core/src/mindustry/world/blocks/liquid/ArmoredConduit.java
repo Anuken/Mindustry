@@ -28,7 +28,7 @@ public class ArmoredConduit extends Conduit{
 
         // draw the cap when a conduit would normally leak
         Tile next = tile.front();
-        if(next != null && next.getTeam() == tile.getTeam() && next.block().hasLiquids) return;
+        if(next != null && next.team() == tile.team() && next.block().hasLiquids) return;
 
         Draw.rect(capRegion, tile.drawx(), tile.drawy(), tile.rotation() * 90);
     }

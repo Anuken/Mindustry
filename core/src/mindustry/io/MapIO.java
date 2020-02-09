@@ -19,7 +19,6 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 /** Reads and writes map files. */
-//TODO does this class even need to exist??? move to Maps?
 public class MapIO{
     private static final int[] pngHeader = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
 
@@ -81,7 +80,7 @@ public class MapIO{
                 @Override
                 public void setBlock(Block type){
                     super.setBlock(type);
-                    int c = colorFor(Blocks.air, block(), Blocks.air, getTeam());
+                    int c = colorFor(Blocks.air, block(), Blocks.air, team());
                     if(c != black){
                         walls.draw(x, floors.getHeight() - 1 - y, c);
                         floors.draw(x, floors.getHeight() - 1 - y + 1, shade);
@@ -138,7 +137,7 @@ public class MapIO{
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
                 Tile tile = tiles.getn(x, y);
-                pixmap.draw(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.overlay(), tile.getTeam()));
+                pixmap.draw(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.overlay(), tile.team()));
             }
         }
         return pixmap;

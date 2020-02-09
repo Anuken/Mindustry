@@ -1,15 +1,15 @@
 package mindustry.world.blocks;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
+import arc.struct.*;
 import mindustry.content.*;
-import mindustry.entities.Effects.*;
+import mindustry.entities.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
@@ -53,6 +53,10 @@ public class Floor extends Block{
     public Effect updateEffect = Fx.none;
     /** Array of affinities to certain things. */
     public Attributes attributes = new Attributes();
+    /** Whether this ore generates in maps by default. */
+    public boolean oreDefault = false;
+    /** Ore generation params. */
+    public float oreScale = 24f, oreThreshold = 0.828f;
 
     protected TextureRegion[][] edges;
     protected byte eq = 0;

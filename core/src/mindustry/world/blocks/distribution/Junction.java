@@ -1,8 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import arc.util.Time;
-import mindustry.entities.type.TileEntity;
-import mindustry.entities.type.Unit;
+import mindustry.gen.*;
 import mindustry.gen.BufferItem;
 import mindustry.type.Item;
 import mindustry.world.Block;
@@ -31,7 +30,7 @@ public class Junction extends Block{
     }
 
     @Override
-    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+    public int acceptStack(Item item, int amount, Tile tile, Teamc source){
         return 0;
     }
 
@@ -58,7 +57,7 @@ public class Junction extends Block{
                     if(dest != null) dest = dest.link();
 
                     //skip blocks that don't want the item, keep waiting until they do
-                    if(dest == null || !dest.block().acceptItem(item, dest, tile) || dest.getTeam() != tile.getTeam()){
+                    if(dest == null || !dest.block().acceptItem(item, dest, tile) || dest.team() != tile.team()){
                         continue;
                     }
 
@@ -84,7 +83,7 @@ public class Junction extends Block{
 
         if(entity == null || relative == -1 || !entity.buffer.accepts(relative)) return false;
         Tile to = tile.getNearby(relative);
-        return to != null && to.link().entity != null && to.getTeam() == tile.getTeam();
+        return to != null && to.link().entity != null && to.team() == tile.team();
     }
 
     class JunctionEntity extends TileEntity{
@@ -97,8 +96,8 @@ public class Junction extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             buffer.read(stream);
         }
     }

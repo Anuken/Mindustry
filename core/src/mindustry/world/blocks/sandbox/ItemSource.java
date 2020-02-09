@@ -4,8 +4,8 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
+import mindustry.entities.units.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -29,7 +29,7 @@ public class ItemSource extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
+    public void configured(Tile tile, Playerc player, int value){
         tile.<ItemSourceEntity>ent().outputItem = content.item(value);
     }
 
@@ -73,9 +73,9 @@ public class ItemSource extends Block{
         ItemSourceEntity entity = tile.ent();
         if(entity.outputItem == null) return;
 
-        entity.items.set(entity.outputItem, 1);
+        entity.items().set(entity.outputItem, 1);
         tryDump(tile, entity.outputItem);
-        entity.items.set(entity.outputItem, 0);
+        entity.items().set(entity.outputItem, 0);
     }
 
     @Override
@@ -107,8 +107,8 @@ public class ItemSource extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             outputItem = content.item(stream.readShort());
         }
     }

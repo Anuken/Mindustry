@@ -149,10 +149,22 @@ public class AndroidLauncher extends AndroidApplication{
         }});
         checkFiles(getIntent());
 
+
         //new external folder
         Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
+        Core.settings.setDataDirectory(data);
 
-        //moved to internal storage if there's no file indicating that it moved
+        //delete old external files due to screwup
+        if(Core.files.local("files_moved").exists() && !Core.files.local("files_moved_103").exists()){
+            for(Fi fi : data.list()){
+                fi.deleteDirectory();
+            }
+
+            Core.files.local("files_moved").delete();
+            Core.files.local("files_moved_103").writeString("files moved again");
+        }
+
+        //move to internal storage if there's no file indicating that it moved
         if(!Core.files.local("files_moved").exists()){
             Log.info("Moving files to external storage...");
 
@@ -160,17 +172,16 @@ public class AndroidLauncher extends AndroidApplication{
                 //current local storage folder
                 Fi src = Core.files.absolute(Core.files.getLocalStoragePath());
                 for(Fi fi : src.list()){
-                    fi.copyTo(data.child(fi.name()));
+                    fi.copyTo(data);
                 }
                 //create marker
                 Core.files.local("files_moved").writeString("files moved to " + data);
+                Core.files.local("files_moved_103").writeString("files moved again");
                 Log.info("Files moved.");
             }catch(Throwable t){
                 Log.err("Failed to move files!");
                 t.printStackTrace();
             }
-        }else{
-            Core.settings.setDataDirectory(data);
         }
     }
 

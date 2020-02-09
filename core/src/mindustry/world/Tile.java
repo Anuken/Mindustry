@@ -7,8 +7,6 @@ import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -17,11 +15,11 @@ import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
-public class Tile implements Position, TargetTrait{
+public class Tile implements Position{
     /** Tile traversal cost. */
     public byte cost = 1;
     /** Tile entity, usually null. */
-    public TileEntity entity;
+    public Tilec entity;
     public short x, y;
     protected Block block;
     protected Floor floor;
@@ -145,8 +143,7 @@ public class Tile implements Position, TargetTrait{
         return (T)block;
     }
 
-    @Override
-    public Team getTeam(){
+    public Team team(){
         return Team.get(link().team);
     }
 
@@ -284,7 +281,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean isEnemyCheat(){
-        return getTeam() == state.rules.waveTeam && state.rules.enemyCheat;
+        return team() == state.rules.waveTeam && state.rules.enemyCheat;
     }
 
     public boolean isLinked(){
@@ -388,7 +385,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean interactable(Team team){
-        return state.teams.canInteract(team, getTeam());
+        return state.teams.canInteract(team, team());
     }
 
     public @Nullable Item drop(){
@@ -461,12 +458,12 @@ public class Tile implements Position, TargetTrait{
 
         if(block.hasEntity()){
             entity = block.newEntity().init(this, block.update);
-            entity.cons = new ConsumeModule(entity);
-            if(block.hasItems) entity.items = new ItemModule();
-            if(block.hasLiquids) entity.liquids = new LiquidModule();
+            entity.cons(new ConsumeModule(entity));
+            if(block.hasItems) entity.items(new ItemModule());
+            if(block.hasLiquids) entity.liquids(new LiquidModule());
             if(block.hasPower){
-                entity.power = new PowerModule();
-                entity.power.graph.add(this);
+                entity.power(new PowerModule());
+                entity.power().graph.add(this);
             }
 
             if(!world.isGenerating()){
@@ -488,23 +485,8 @@ public class Tile implements Position, TargetTrait{
     }
 
     @Override
-    public boolean isDead(){
-        return entity == null;
-    }
-
-    @Override
-    public Vec2 velocity(){
-        return Vec2.ZERO;
-    }
-
-    @Override
     public float getX(){
         return drawx();
-    }
-
-    @Override
-    public void setX(float x){
-        throw new IllegalArgumentException("Tile position cannot change.");
     }
 
     @Override
@@ -513,13 +495,8 @@ public class Tile implements Position, TargetTrait{
     }
 
     @Override
-    public void setY(float y){
-        throw new IllegalArgumentException("Tile position cannot change.");
-    }
-
-    @Override
     public String toString(){
-        return floor.name + ":" + block.name + ":" + overlay + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) + ":" + getTeam();
+        return floor.name + ":" + block.name + ":" + overlay + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) + ":" + team();
     }
 
     //remote utility methods
@@ -532,5 +509,22 @@ public class Tile implements Position, TargetTrait{
     @Remote(called = Loc.server)
     public static void setTile(Tile tile, Block block, Team team, int rotation){
         tile.set(block, team, rotation);
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void onTileDamage(Tile tile, float health){
+        if(tile.entity != null){
+            tile.entity.health(health);
+
+            if(tile.entity.damaged()){
+                indexer.notifyTileDamaged(tile.entity);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server)
+    public static void onTileDestroyed(Tile tile){
+        if(tile.entity == null) return;
+        tile.entity.killed();
     }
 }

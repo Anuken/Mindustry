@@ -4,8 +4,8 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
+import mindustry.entities.units.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -54,8 +54,8 @@ public class Unloader extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
-        tile.entity.items.clear();
+    public void configured(Tile tile, Playerc player, int value){
+        tile.entity.items().clear();
         tile.<UnloaderEntity>ent().sortItem = content.item(value);
     }
 
@@ -63,16 +63,16 @@ public class Unloader extends Block{
     public void update(Tile tile){
         UnloaderEntity entity = tile.ent();
 
-        if(tile.entity.timer.get(timerUnload, speed / entity.timeScale) && tile.entity.items.total() == 0){
+        if(tile.entity.timer(timerUnload, speed / entity.timeScale()) && tile.entity.items().total() == 0){
             for(Tile other : tile.entity.proximity()){
-                if(other.interactable(tile.getTeam()) && other.block().unloadable && other.block().hasItems && entity.items.total() == 0 &&
-                ((entity.sortItem == null && other.entity.items.total() > 0) || hasItem(other, entity.sortItem))){
+                if(other.interactable(tile.team()) && other.block().unloadable && other.block().hasItems && entity.items().total() == 0 &&
+                ((entity.sortItem == null && other.entity.items().total() > 0) || hasItem(other, entity.sortItem))){
                     offloadNear(tile, removeItem(other, entity.sortItem));
                 }
             }
         }
 
-        if(entity.items.total() > 0){
+        if(entity.items().total() > 0){
             tryDump(tile);
         }
     }
@@ -82,13 +82,13 @@ public class Unloader extends Block{
      * Returns null if no items are there.
      */
     private Item removeItem(Tile tile, Item item){
-        TileEntity entity = tile.entity;
+        Tilec entity = tile.entity;
 
         if(item == null){
-            return entity.items.take();
+            return entity.items().take();
         }else{
-            if(entity.items.has(item)){
-                entity.items.remove(item, 1);
+            if(entity.items().has(item)){
+                entity.items().remove(item, 1);
                 return item;
             }
 
@@ -101,11 +101,11 @@ public class Unloader extends Block{
      * If the item is null, it should return whether it has ANY items.
      */
     private boolean hasItem(Tile tile, Item item){
-        TileEntity entity = tile.entity;
+        Tilec entity = tile.entity;
         if(item == null){
-            return entity.items.total() > 0;
+            return entity.items().total() > 0;
         }else{
-            return entity.items.has(item);
+            return entity.items().has(item);
         }
     }
 
@@ -144,8 +144,8 @@ public class Unloader extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             byte id = stream.readByte();
             sortItem = id == -1 ? null : content.items().get(id);
         }

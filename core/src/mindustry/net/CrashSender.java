@@ -12,6 +12,7 @@ import arc.util.serialization.JsonValue.*;
 import arc.util.serialization.JsonWriter.*;
 import mindustry.*;
 import mindustry.core.*;
+import mindustry.gen.*;
 
 import java.io.*;
 import java.text.*;
@@ -118,7 +119,7 @@ public class CrashSender{
             ex(() -> value.addChild("revision", new JsonValue(Version.revision)));
             ex(() -> value.addChild("net", new JsonValue(fn)));
             ex(() -> value.addChild("server", new JsonValue(fs)));
-            ex(() -> value.addChild("players", new JsonValue(Vars.playerGroup.size())));
+            ex(() -> value.addChild("players", new JsonValue(Groups.player.size())));
             ex(() -> value.addChild("state", new JsonValue(Vars.state.getState().name())));
             ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name") + "x" + (OS.is64Bit ? "64" : "32"))));
             ex(() -> value.addChild("trace", new JsonValue(parseException(exception))));

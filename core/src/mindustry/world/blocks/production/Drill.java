@@ -8,8 +8,6 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
-import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -77,7 +75,7 @@ public class Drill extends Block{
         bars.add("drillspeed", e -> {
             DrillEntity entity = (DrillEntity)e;
 
-            return new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(entity.lastDrillSpeed * 60 * entity.timeScale, 2)), () -> Pal.ammo, () -> entity.warmup);
+            return new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(entity.lastDrillSpeed * 60 * entity.timeScale(), 2)), () -> Pal.ammo, () -> entity.warmup);
         });
     }
 
@@ -129,7 +127,7 @@ public class Drill extends Block{
 
     @Override
     public boolean shouldConsume(Tile tile){
-        return tile.entity.items.total() < itemCapacity;
+        return tile.entity.items().total() < itemCapacity;
     }
 
     @Override
@@ -247,17 +245,17 @@ public class Drill extends Block{
             entity.dominantItems = returnCount;
         }
 
-        if(entity.timer.get(timerDump, dumpTime)){
+        if(entity.timer(timerDump, dumpTime)){
             tryDump(tile, entity.dominantItem);
         }
 
         entity.drillTime += entity.warmup * entity.delta();
 
-        if(entity.items.total() < itemCapacity && entity.dominantItems > 0 && entity.cons.valid()){
+        if(entity.items().total() < itemCapacity && entity.dominantItems > 0 && entity.consValid()){
 
             float speed = 1f;
 
-            if(entity.cons.optionalValid()){
+            if(entity.cons().optionalValid()){
                 speed = liquidBoostIntensity;
             }
 
@@ -269,14 +267,14 @@ public class Drill extends Block{
             * entity.dominantItems * speed * entity.warmup;
 
             if(Mathf.chance(Time.delta() * updateEffectChance * entity.warmup))
-                Effects.effect(updateEffect, entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
+                updateEffect.at(entity.getX() + Mathf.range(size * 2f), entity.getY() + Mathf.range(size * 2f));
         }else{
             entity.lastDrillSpeed = 0f;
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, warmupSpeed);
             return;
         }
 
-        if(entity.dominantItems > 0 && entity.progress >= drillTime + hardnessDrillMultiplier * entity.dominantItem.hardness && tile.entity.items.total() < itemCapacity){
+        if(entity.dominantItems > 0 && entity.progress >= drillTime + hardnessDrillMultiplier * entity.dominantItem.hardness && tile.entity.items().total() < itemCapacity){
 
             offloadNear(tile, entity.dominantItem);
 
@@ -285,8 +283,7 @@ public class Drill extends Block{
             entity.index++;
             entity.progress = 0f;
 
-            Effects.effect(drillEffect, entity.dominantItem.color,
-            entity.x + Mathf.range(size), entity.y + Mathf.range(size));
+            drillEffect.at(entity.getX() + Mathf.range(size), entity.getY() + Mathf.range(size), entity.dominantItem.color);
         }
     }
 

@@ -3,10 +3,87 @@ package mindustry.annotations;
 import java.lang.annotation.*;
 
 public class Annotations{
+    //region entity interfaces
+
+    public enum DrawLayer{
+        floor,
+        floorOver,
+        groundShadows,
+        groundUnder,
+        ground,
+        flyingShadows,
+        flying,
+        bullets,
+        effects,
+        names,
+    }
+
+    /** Indicates that a method overrides other methods. */
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Replace{
+    }
+
+    /** Indicates that a component field is read-only. */
+    @Target({ElementType.FIELD, ElementType.METHOD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ReadOnly{
+    }
+
+    /** Indicates multiple inheritance on a component type. */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Component{
+    }
+
+    /** Indicates that a method is implemented by the annotation processor. */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface InternalImpl{
+    }
+
+    /** Indicates priority of a method in an entity. Methods with higher priority are done last. */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface MethodPriority{
+        float value();
+    }
+
+    /** Indicates that a component def is present on all entities. */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface BaseComponent{
+    }
+
+    /** Creates a group that only examines entities that have all the components listed. */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface GroupDef{
+        Class[] value();
+        boolean spatial() default false;
+        boolean mapping() default false;
+    }
+
+    /** Indicates an entity definition. */
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EntityDef{
+        Class[] value();
+        boolean isFinal() default true;
+        boolean pooled() default false;
+    }
+
+    /** Indicates an internal interface for entity components. */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EntityInterface{
+    }
+
+    //endregion
+    //region misc. utility
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface StyleDefaults {
+    public @interface StyleDefaults{
     }
 
     /** Indicates that a method should always call its super version. */
@@ -16,10 +93,10 @@ public class Annotations{
 
     }
 
-    /** Annotation that allows overriding CallSuper annotation. To be used on method that overrides method with CallSuper annotation from parent class.*/
+    /** Annotation that allows overriding CallSuper annotation. To be used on method that overrides method with CallSuper annotation from parent class. */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface OverrideCallSuper {
+    public @interface OverrideCallSuper{
     }
 
     /** Marks a class as serializable. */
@@ -28,6 +105,9 @@ public class Annotations{
     public @interface Serialize{
 
     }
+
+    //endregion
+    //region struct
 
     /** Marks a class as a special value type struct. Class name must end in 'Struct'. */
     @Target(ElementType.TYPE)
@@ -43,6 +123,9 @@ public class Annotations{
         /** Size of a struct field in bits. Not valid on booleans or floating point numbers. */
         int value();
     }
+
+    //endregion
+    //region remote
 
     public enum PacketPriority{
         /** Gets put in a queue and processed if not connected. */
@@ -138,4 +221,6 @@ public class Annotations{
     public @interface ReadClass{
         Class<?> value();
     }
+
+    //endregion
 }

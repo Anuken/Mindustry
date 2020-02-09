@@ -15,7 +15,7 @@ import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.entities.type.Playerc;
 import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -296,7 +296,7 @@ public class ServerControl implements ApplicationListener{
 
                 if(playerGroup.size() > 0){
                     info("  &lyPlayers: {0}", playerGroup.size());
-                    for(Player p : playerGroup.all()){
+                    for(Playerc p : playerGroup.all()){
                         info("    &y{0} / {1}", p.name, p.uuid);
                     }
                 }else{
@@ -344,15 +344,6 @@ public class ServerControl implements ApplicationListener{
             Call.sendMessage("[scarlet][[Server]:[] " + arg[0]);
 
             info("&lyServer: &lb{0}", arg[0]);
-        });
-
-        handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
-            try{
-                state.rules.waveSpacing = Difficulty.valueOf(arg[0]).waveTime * 60 * 60 * 2;
-                info("Difficulty set to '{0}'.", arg[0]);
-            }catch(IllegalArgumentException e){
-                err("No difficulty with name '{0}' found.", arg[0]);
-            }
         });
 
         handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
@@ -585,7 +576,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Player target = playerGroup.find(p -> p.name.equals(arg[0]));
+            Playerc target = playerGroup.find(p -> p.name.equals(arg[0]));
 
             if(target != null){
                 Call.sendMessage("[scarlet] " + target.name + "[scarlet] has been kicked by the server.");
@@ -601,7 +592,7 @@ public class ServerControl implements ApplicationListener{
                 netServer.admins.banPlayerID(arg[1]);
                 info("Banned.");
             }else if(arg[0].equals("name")){
-                Player target = playerGroup.find(p -> p.name.equalsIgnoreCase(arg[1]));
+                Playerc target = playerGroup.find(p -> p.name.equalsIgnoreCase(arg[1]));
                 if(target != null){
                     netServer.admins.banPlayer(target.uuid);
                     info("Banned.");
@@ -615,7 +606,7 @@ public class ServerControl implements ApplicationListener{
                 err("Invalid type.");
             }
 
-            for(Player player : playerGroup.all()){
+            for(Playerc player : playerGroup.all()){
                 if(netServer.admins.isIDBanned(player.uuid)){
                     Call.sendMessage("[scarlet] " + player.name + " has been banned.");
                     player.con.kick(KickReason.banned);
@@ -653,18 +644,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("unban", "<ip/ID>", "Completely unban a person by IP or ID.", arg -> {
-            if(arg[0].contains(".")){
-                if(netServer.admins.unbanPlayerIP(arg[0])){
-                    info("Unbanned player by IP: {0}.", arg[0]);
-                }else{
-                    err("That IP is not banned!");
-                }
+            if(netServer.admins.unbanPlayerIP(arg[0]) || netServer.admins.unbanPlayerID(arg[0])){
+                info("Unbanned player.", arg[0]);
             }else{
-                if(netServer.admins.unbanPlayerID(arg[0])){
-                    info("Unbanned player by ID: {0}.", arg[0]);
-                }else{
-                    err("That ID is not banned!");
-                }
+                err("That IP/ID is not banned!");
             }
         });
 
@@ -674,7 +657,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Player target = playerGroup.find(p -> p.name.equals(arg[0]));
+            Playerc target = playerGroup.find(p -> p.name.equals(arg[0]));
 
             if(target != null){
                 netServer.admins.adminPlayer(target.uuid, target.usid);
@@ -691,7 +674,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Player target = playerGroup.find(p -> p.name.equals(arg[0]));
+            Playerc target = playerGroup.find(p -> p.name.equals(arg[0]));
 
             if(target != null){
                 netServer.admins.unAdminPlayer(target.uuid);
@@ -829,7 +812,6 @@ public class ServerControl implements ApplicationListener{
         });
 
         mods.eachClass(p -> p.registerServerCommands(handler));
-        mods.eachClass(p -> p.registerClientCommands(netServer.clientCommands));
     }
 
     private void readCommands(){
@@ -872,10 +854,10 @@ public class ServerControl implements ApplicationListener{
     private void play(boolean wait, Runnable run){
         inExtraRound = true;
         Runnable r = () -> {
-            Array<Player> players = new Array<>();
-            for(Player p : playerGroup.all()){
+            Array<Playerc> players = new Array<>();
+            for(Playerc p : playerGroup.all()){
                 players.add(p);
-                p.setDead(true);
+                p.dead(true);
             }
             
             logic.reset();
@@ -885,12 +867,12 @@ public class ServerControl implements ApplicationListener{
             state.rules = world.getMap().applyRules(lastMode);
             logic.play();
 
-            for(Player p : players){
+            for(Playerc p : players){
                 if(p.con == null) continue;
 
                 p.reset();
                 if(state.rules.pvp){
-                    p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
+                    p.team(netServer.assignTeam(p, new ArrayIterable<>(players)));
                 }
                 netServer.sendWorldData(p);
             }

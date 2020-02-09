@@ -6,7 +6,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.util.Time;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -75,13 +75,13 @@ public class OverdriveProjector extends Block{
     @Override
     public void update(Tile tile){
         OverdriveEntity entity = tile.ent();
-        entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() ? 1f : 0f, 0.08f);
+        entity.heat = Mathf.lerpDelta(entity.heat, entity.consValid() ? 1f : 0f, 0.08f);
         entity.charge += entity.heat * Time.delta();
 
-        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
+        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons().optionalValid()), 0.1f);
 
-        if(entity.timer.get(timerUse, useTime) && entity.efficiency() > 0){
-            entity.cons.trigger();
+        if(entity.timer(timerUse, useTime) && entity.efficiency() > 0){
+            entity.consume();
         }
 
         if(entity.charge >= reload){
@@ -89,27 +89,7 @@ public class OverdriveProjector extends Block{
             float realBoost = (speedBoost + entity.phaseHeat * speedBoostPhase) * entity.efficiency();
 
             entity.charge = 0f;
-
-            int tileRange = (int)(realRange / tilesize + 1);
-            healed.clear();
-
-            for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
-                for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    if(!Mathf.within(x * tilesize, y * tilesize, tile.drawx(), tile.drawy(), realRange)) continue;
-
-                    Tile other = world.ltile(x, y);
-
-                    if(other == null) continue;
-
-                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null){
-                        if(other.entity.timeScale <= realBoost){
-                            other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
-                            other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
-                        }
-                        healed.add(other.pos());
-                    }
-                }
-            }
+            indexer.eachBlock(entity, realRange, other -> other.entity.timeScale() <= realBoost, other -> other.entity.applyBoost(realBoost, reload + 1f));
         }
     }
 
@@ -151,8 +131,8 @@ public class OverdriveProjector extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             heat = stream.readFloat();
             phaseHeat = stream.readFloat();
         }

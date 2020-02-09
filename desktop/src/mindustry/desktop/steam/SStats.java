@@ -6,10 +6,10 @@ import arc.util.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.entities.type.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Stats.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 
 import static mindustry.Vars.*;
@@ -54,18 +54,18 @@ public class SStats implements SteamUserStatsCallback{
 
     private void checkUpdate(){
         if(campaign()){
-            SStat.maxUnitActive.max(unitGroup.count(t -> t.getTeam() == player.getTeam()));
+            SStat.maxUnitActive.max(Groups.unit.count(t -> t.team() == player.team()));
 
-            if(unitGroup.count(u -> u.getType() == UnitTypes.phantom && u.getTeam() == player.getTeam()) >= 10){
+            if(Groups.unit.count(u -> u.type() == UnitTypes.phantom && u.team() == player.team()) >= 10){
                 active10Phantoms.complete();
             }
 
-            if(unitGroup.count(u -> u.getType() == UnitTypes.crawler && u.getTeam() == player.getTeam()) >= 50){
+            if(Groups.unit.count(u -> u.type() == UnitTypes.crawler && u.team() == player.team()) >= 50){
                 active50Crawlers.complete();
             }
 
-            for(TileEntity entity : player.getTeam().cores()){
-                if(!content.items().contains(i -> i.type == ItemType.material && entity.items.get(i) < entity.block.itemCapacity)){
+            for(Tilec entity : player.team().cores()){
+                if(!content.items().contains(i -> i.type == ItemType.material && entity.items().get(i) < entity.block().itemCapacity)){
                     fillCoreAllCampaign.complete();
                     break;
                 }
@@ -76,10 +76,10 @@ public class SStats implements SteamUserStatsCallback{
     private void registerEvents(){
         Events.on(UnitDestroyEvent.class, e -> {
             if(ncustom()){
-                if(e.unit.getTeam() != Vars.player.getTeam()){
+                if(e.unit.team() != Vars.player.team()){
                     SStat.unitsDestroyed.add();
 
-                    if(e.unit instanceof BaseUnit && ((BaseUnit)e.unit).isBoss()){
+                    if(e.unit instanceof Unitc && ((Unitc)e.unit).isBoss()){
                         SStat.bossesDefeated.add();
                     }
                 }
@@ -93,7 +93,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(Trigger.newGame, () -> Core.app.post(() -> {
-            if(campaign() && player.getClosestCore() != null && player.getClosestCore().items.total() >= 10 * 1000){
+            if(campaign() && player.closestCore() != null && player.closestCore().items().total() >= 10 * 1000){
                 drop10kitems.complete();
             }
         }));
@@ -133,7 +133,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(BlockDestroyEvent.class, e -> {
-            if(campaign() && e.tile.getTeam() != player.getTeam()){
+            if(campaign() && e.tile.team() != player.team()){
                 SStat.blocksDestroyed.add();
             }
         });
@@ -180,7 +180,7 @@ public class SStats implements SteamUserStatsCallback{
         trigger(Trigger.itemLaunch, launchItemPad);
 
         Events.on(UnitCreateEvent.class, e -> {
-            if(campaign() && e.unit.getTeam() == player.getTeam()){
+            if(campaign() && e.unit.team() == player.team()){
                 SStat.unitsBuilt.add();
             }
         });
@@ -217,7 +217,7 @@ public class SStats implements SteamUserStatsCallback{
 
         Events.on(PlayerJoin.class, e -> {
             if(Vars.net.server()){
-                SStat.maxPlayersServer.max(Vars.playerGroup.size());
+                SStat.maxPlayersServer.max(Groups.player.size());
             }
         });
 
@@ -283,7 +283,7 @@ public class SStats implements SteamUserStatsCallback{
         if(result != SteamResult.OK){
             Log.err("Failed to recieve steam stats: {0}", result);
         }else{
-            Log.err("Recieved steam stats.");
+            Log.info("Recieved steam stats.");
         }
     }
 

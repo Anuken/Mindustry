@@ -171,7 +171,7 @@ public class MenuFragment extends Fragment{
                     new Buttoni("$loadgame", Icon.download, () -> checkPlay(ui.load::show)),
                     new Buttoni("$tutorial", Icon.info, () -> checkPlay(control::playTutorial))
                 ),
-                new Buttoni("$editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("$workshop", Icon.save, platform::openWorkshop) : null,
+                new Buttoni("$editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("$workshop", Icon.book, platform::openWorkshop) : null,
                 new Buttoni(Core.bundle.get("mods"), Icon.bookOpen, ui.mods::show),
                 //not enough space for this button
                 //new Buttoni("$schematics", Icon.paste, ui.schematics::show),

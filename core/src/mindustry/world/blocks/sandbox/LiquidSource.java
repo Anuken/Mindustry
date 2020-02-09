@@ -8,9 +8,9 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
 import mindustry.gen.*;
+import mindustry.gen.*;
+import mindustry.entities.units.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.Cicon;
@@ -53,9 +53,9 @@ public class LiquidSource extends Block{
         LiquidSourceEntity entity = tile.ent();
 
         if(entity.source == null){
-            tile.entity.liquids.clear();
+            tile.entity.liquids().clear();
         }else{
-            tile.entity.liquids.add(entity.source, liquidCapacity);
+            tile.entity.liquids().add(entity.source, liquidCapacity);
             tryDumpLiquid(tile, entity.source);
         }
     }
@@ -108,7 +108,7 @@ public class LiquidSource extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
+    public void configured(Tile tile, Playerc player, int value){
         tile.<LiquidSourceEntity>ent().source = value == -1 ? null : content.liquid(value);
     }
 
@@ -127,8 +127,8 @@ public class LiquidSource extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             byte id = stream.readByte();
             source = id == -1 ? null : content.liquid(id);
         }

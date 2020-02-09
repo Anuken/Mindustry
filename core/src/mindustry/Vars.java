@@ -13,9 +13,6 @@ import arc.util.io.*;
 import mindustry.ai.*;
 import mindustry.core.*;
 import mindustry.entities.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
 import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -24,8 +21,6 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.Net;
 import mindustry.net.*;
-import mindustry.type.Weather.*;
-import mindustry.world.blocks.defense.ForceProjector.*;
 
 import java.io.*;
 import java.nio.charset.*;
@@ -33,7 +28,6 @@ import java.util.*;
 
 import static arc.Core.settings;
 
-@SuppressWarnings("unchecked")
 public class Vars implements Loadable{
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
@@ -61,7 +55,7 @@ public class Vars implements Loadable{
     public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers.json";
     /** URL to the JSON file containing all the BE servers. Only queried in BE. */
     public static final String serverJsonBeURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_be.json";
-    /** URL the links to the wiki's modding guide.*/
+    /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?template=bug_report.md";
     /** list of built-in servers.*/
     public static final Array<String> defaultServers = Array.with();
@@ -79,6 +73,10 @@ public class Vars implements Loadable{
     public static final float worldBounds = 100f;
     /** units outside of this bound will simply die instantly */
     public static final float finalWorldBounds = worldBounds + 500;
+    /** mining range for manual miners */
+    public static final float miningRange = 70f;
+    /** range for building */
+    public static final float buildingRange = 220f;
     /** ticks spent out of bound until self destruct. */
     public static final float boundsCountdown = 60 * 7;
     /** for map generator dialog */
@@ -180,19 +178,7 @@ public class Vars implements Loadable{
     public static NetServer netServer;
     public static NetClient netClient;
 
-    public static Entities entities;
-    public static EntityGroup<Player> playerGroup;
-    public static EntityGroup<TileEntity> tileGroup;
-    public static EntityGroup<Bullet> bulletGroup;
-    public static EntityGroup<EffectEntity> effectGroup;
-    public static EntityGroup<DrawTrait> groundEffectGroup;
-    public static EntityGroup<ShieldEntity> shieldGroup;
-    public static EntityGroup<Puddle> puddleGroup;
-    public static EntityGroup<Fire> fireGroup;
-    public static EntityGroup<WeatherEntity> weatherGroup;
-    public static EntityGroup<BaseUnit> unitGroup;
-
-    public static Player player;
+    public static Playerc player;
 
     @Override
     public void loadAsync(){
@@ -202,6 +188,7 @@ public class Vars implements Loadable{
 
     public static void init(){
         Serialization.init();
+        Groups.init();
         DefaultSerializers.typeMappings.put("mindustry.type.ContentType", "mindustry.ctype.ContentType");
 
         if(loadLocales){
@@ -236,26 +223,6 @@ public class Vars implements Loadable{
         spawner = new WaveSpawner();
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
-
-        entities = new Entities();
-        playerGroup = entities.add(Player.class).enableMapping();
-        tileGroup = entities.add(TileEntity.class, false);
-        bulletGroup = entities.add(Bullet.class).enableMapping();
-        effectGroup = entities.add(EffectEntity.class, false);
-        groundEffectGroup = entities.add(DrawTrait.class, false);
-        puddleGroup = entities.add(Puddle.class).enableMapping();
-        shieldGroup = entities.add(ShieldEntity.class, false);
-        fireGroup = entities.add(Fire.class).enableMapping();
-        unitGroup = entities.add(BaseUnit.class).enableMapping();
-        weatherGroup = entities.add(WeatherEntity.class);
-
-        for(EntityGroup<?> group : entities.all()){
-            group.setRemoveListener(entity -> {
-                if(entity instanceof SyncTrait && net.client()){
-                    netClient.addRemovedEntity((entity).getID());
-                }
-            });
-        }
 
         state = new GameState();
         data = new GlobalData();

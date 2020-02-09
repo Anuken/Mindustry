@@ -6,12 +6,10 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
-import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
-import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -33,10 +31,6 @@ public class Logic implements ApplicationListener{
 
     public Logic(){
         Events.on(WaveEvent.class, event -> {
-            for(Player p : playerGroup.all()){
-                p.respawns = state.rules.respawns;
-            }
-
             if(world.isZone()){
                 world.getZone().updateWave(state.wave);
             }
@@ -62,7 +56,7 @@ public class Logic implements ApplicationListener{
                 }
             }
 
-            TeamData data = state.teams.get(tile.getTeam());
+            TeamData data = state.teams.get(tile.team());
 
             //remove existing blocks that have been placed here.
             //painful O(n) iteration + copy
@@ -109,10 +103,10 @@ public class Logic implements ApplicationListener{
         if(!world.isZone()){
             for(TeamData team : state.teams.getActive()){
                 if(team.hasCore()){
-                    TileEntity entity = team.core();
-                    entity.items.clear();
+                    Tilec entity = team.core();
+                    entity.items().clear();
                     for(ItemStack stack : state.rules.loadout){
-                        entity.items.add(stack.item, stack.amount);
+                        entity.items().add(stack.item, stack.amount);
                     }
                 }
             }
@@ -127,10 +121,8 @@ public class Logic implements ApplicationListener{
         state.rules = new Rules();
         state.stats = new Stats();
 
-        entities.clear();
+        Groups.all.clear();
         Time.clear();
-        TileEntity.sleepingEntities = 0;
-
         Events.fire(new ResetEvent());
     }
 
@@ -176,8 +168,8 @@ public class Logic implements ApplicationListener{
             ui.hudfrag.showLaunch();
         }
 
-        for(TileEntity tile : state.teams.playerCores()){
-            Effects.effect(Fx.launch, tile);
+        for(Tilec tile : state.teams.playerCores()){
+            Fx.launch.at(tile);
         }
 
         if(world.getZone() != null){
@@ -185,12 +177,12 @@ public class Logic implements ApplicationListener{
         }
 
         Time.runTask(30f, () -> {
-            for(TileEntity entity : state.teams.playerCores()){
+            for(Tilec entity : state.teams.playerCores()){
                 for(Item item : content.items()){
-                    data.addItem(item, entity.items.get(item));
-                    Events.fire(new LaunchItemEvent(item, entity.items.get(item)));
+                    data.addItem(item, entity.items().get(item));
+                    Events.fire(new LaunchItemEvent(item, entity.items().get(item)));
                 }
-                entity.tile.remove();
+                entity.tile().remove();
             }
             state.launched = true;
             state.gameOver = true;
@@ -213,7 +205,8 @@ public class Logic implements ApplicationListener{
 
         if(!state.is(State.menu)){
             if(!net.client()){
-                state.enemies = unitGroup.count(b -> b.getTeam() == state.rules.waveTeam && b.countsAsEnemy());
+                //TODO
+                //state.enemies = Groups.unit.count(b -> b.team() == state.rules.waveTeam && b.countsAsEnemy());
             }
 
             if(!state.isPaused()){
@@ -229,13 +222,17 @@ public class Logic implements ApplicationListener{
                     runWave();
                 }
 
+                Groups.update();
+
+                //TODO update groups
+                /*
                 if(!headless){
                     effectGroup.update();
                     groundEffectGroup.update();
                 }
 
                 if(!state.isEditor()){
-                    unitGroup.update();
+                    Groups.unit.update();
                     puddleGroup.update();
                     shieldGroup.update();
                     bulletGroup.update();
@@ -243,12 +240,12 @@ public class Logic implements ApplicationListener{
                     fireGroup.update();
                     weatherGroup.update();
                 }else{
-                    unitGroup.updateEvents();
-                    collisions.updatePhysics(unitGroup);
+                    Groups.unit.updateEvents();
+                    collisions.updatePhysics(Groups.unit);
                 }
 
 
-                playerGroup.update();
+                Groups.player.update();
 
                 //effect group only contains item transfers in the headless version, update it!
                 if(headless){
@@ -257,9 +254,8 @@ public class Logic implements ApplicationListener{
 
                 if(!state.isEditor()){
                     //bulletGroup
-                    collisions.collideGroups(bulletGroup, unitGroup);
-                    collisions.collideGroups(bulletGroup, playerGroup);
-                }
+                    collisions.collideGroups(bulletGroup, Groups.unit);
+                }*/
             }
 
             if(!net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver){

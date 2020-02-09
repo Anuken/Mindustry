@@ -4,7 +4,7 @@ import arc.math.geom.Rect;
 import arc.util.Time;
 import mindustry.content.Fx;
 import mindustry.entities.Units;
-import mindustry.entities.type.Bullet;
+import mindustry.gen.*;
 
 public class FlakBulletType extends BasicBulletType{
     protected static Rect rect = new Rect();
@@ -24,18 +24,18 @@ public class FlakBulletType extends BasicBulletType{
     }
 
     @Override
-    public void update(Bullet b){
+    public void update(Bulletc b){
         super.update(b);
-        if(b.getData() instanceof Integer) return;
+        if(b.data() instanceof Integer) return;
 
-        if(b.timer.get(2, 6)){
-            Units.nearbyEnemies(b.getTeam(), rect.setSize(explodeRange * 2f).setCenter(b.x, b.y), unit -> {
-                if(b.getData() instanceof Float) return;
+        if(b.timer(2, 6)){
+            Units.nearbyEnemies(b.team(), rect.setSize(explodeRange * 2f).setCenter(b.x(), b.y()), unit -> {
+                if(b.data() instanceof Float) return;
 
                 if(unit.dst(b) < explodeRange){
-                    b.setData(0);
+                    b.data(0);
                     Time.run(5f, () -> {
-                        if(b.getData() instanceof Integer){
+                        if(b.data() instanceof Integer){
                             b.time(b.lifetime());
                         }
                     });

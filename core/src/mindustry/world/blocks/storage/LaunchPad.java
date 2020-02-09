@@ -7,8 +7,7 @@ import arc.math.Mathf;
 import arc.util.Time;
 import mindustry.Vars;
 import mindustry.content.Fx;
-import mindustry.entities.Effects;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.Pal;
 import mindustry.type.Item;
@@ -41,14 +40,15 @@ public class LaunchPad extends StorageBlock{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return item.type == ItemType.material && tile.entity.items.total() < itemCapacity;
+        return item.type == ItemType.material && tile.entity.items().total() < itemCapacity;
     }
 
     @Override
     public void draw(Tile tile){
         super.draw(tile);
 
-        float progress = Mathf.clamp(Mathf.clamp((tile.entity.items.total() / (float)itemCapacity)) * ((tile.entity.timer.getTime(timerLaunch) / (launchTime / tile.entity.timeScale))));
+        //TODO broken
+        float progress = Mathf.clamp(Mathf.clamp((tile.entity.items().total() / (float)itemCapacity)) * ((tile.entity.timer().getTime(timerLaunch) / (launchTime / tile.entity.timeScale()))));
         float scale = size / 3f;
 
         Lines.stroke(2f);
@@ -57,7 +57,7 @@ public class LaunchPad extends StorageBlock{
 
         Draw.color(Pal.accent);
 
-        if(tile.entity.cons.valid()){
+        if(tile.entity.cons().valid()){
             for(int i = 0; i < 3; i++){
                 float f = (Time.time() / 200f + i * 0.5f) % 1f;
 
@@ -71,15 +71,15 @@ public class LaunchPad extends StorageBlock{
 
     @Override
     public void update(Tile tile){
-        TileEntity entity = tile.entity;
+        Tilec entity = tile.entity;
 
-        if(world.isZone() && entity.cons.valid() && entity.items.total() >= itemCapacity && entity.timer.get(timerLaunch, launchTime / entity.timeScale)){
+        if(world.isZone() && entity.consValid() && entity.items().total() >= itemCapacity && entity.timer(timerLaunch, launchTime / entity.timeScale())){
             for(Item item : Vars.content.items()){
                 Events.fire(Trigger.itemLaunch);
-                Effects.effect(Fx.padlaunch, tile);
-                int used = Math.min(entity.items.get(item), itemCapacity);
+                Fx.padlaunch.at(tile);
+                int used = Math.min(entity.items().get(item), itemCapacity);
                 data.addItem(item, used);
-                entity.items.remove(item, used);
+                entity.items().remove(item, used);
                 Events.fire(new LaunchItemEvent(item, used));
             }
         }

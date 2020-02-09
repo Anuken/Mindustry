@@ -3,8 +3,7 @@ package mindustry.net;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Net.*;
@@ -16,8 +15,9 @@ import static mindustry.Vars.netServer;
 
 public abstract class NetConnection{
     public final String address;
+    public String uuid = "AAAAAAAA", usid = uuid;
     public boolean mobile, modclient;
-    public @Nullable Player player;
+    public @Nullable Playerc player;
 
     /** ID of last recieved client snapshot. */
     public int lastRecievedClientSnapshot = -1;
@@ -37,8 +37,8 @@ public abstract class NetConnection{
     public void kick(KickReason reason){
         Log.info("Kicking connection {0}; Reason: {1}", address, reason.name());
 
-        if(player != null && (reason == KickReason.kick || reason == KickReason.banned || reason == KickReason.vote) && player.uuid != null){
-            PlayerInfo info = netServer.admins.getInfo(player.uuid);
+        if((reason == KickReason.kick || reason == KickReason.banned || reason == KickReason.vote)){
+            PlayerInfo info = netServer.admins.getInfo(uuid);
             info.timesKicked++;
             info.lastKicked = Math.max(Time.millis() + 30 * 1000, info.lastKicked);
         }
@@ -59,11 +59,9 @@ public abstract class NetConnection{
     public void kick(String reason, int kickDuration){
         Log.info("Kicking connection {0}; Reason: {1}", address, reason.replace("\n", " "));
 
-        if(player != null  && player.uuid != null){
-            PlayerInfo info = netServer.admins.getInfo(player.uuid);
-            info.timesKicked++;
-            info.lastKicked = Math.max(Time.millis() + kickDuration, info.lastKicked);
-        }
+        PlayerInfo info = netServer.admins.getInfo(uuid);
+        info.timesKicked++;
+        info.lastKicked = Math.max(Time.millis() + kickDuration, info.lastKicked);
 
         Call.onKick(this, reason);
 

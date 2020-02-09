@@ -5,7 +5,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
@@ -16,6 +16,10 @@ public class Teams{
     private TeamData[] map = new TeamData[256];
     /** Active teams. */
     private Array<TeamData> active = new Array<>();
+
+    public Teams(){
+        active.add(get(Team.crux));
+    }
 
     public @Nullable CoreEntity closestEnemyCore(float x, float y, Team team){
         for(TeamData data : active){
@@ -50,10 +54,10 @@ public class Teams{
         return false;
     }
 
-    public void eachEnemyCore(Team team, Cons<TileEntity> ret){
+    public void eachEnemyCore(Team team, Cons<Tilec> ret){
         for(TeamData data : active){
             if(areEnemies(team, data.team)){
-                for(TileEntity tile : data.cores){
+                for(Tilec tile : data.cores){
                     ret.get(tile);
                 }
             }
@@ -85,7 +89,6 @@ public class Teams{
 
     /** Returns whether {@param other} is an enemy of {@param #team}. */
     public boolean areEnemies(Team team, Team other){
-        //todo what about derelict?
         return team != other;
     }
 
@@ -99,7 +102,7 @@ public class Teams{
     }
 
     public void registerCore(CoreEntity core){
-        TeamData data = get(core.getTeam());
+        TeamData data = get(core.team());
         //add core if not present
         if(!data.cores.contains(core)){
             data.cores.add(core);
@@ -114,7 +117,7 @@ public class Teams{
     }
 
     public void unregisterCore(CoreEntity entity){
-        TeamData data = get(entity.getTeam());
+        TeamData data = get(entity.team());
         //remove core
         data.cores.remove(entity);
         //unregister in active list
@@ -125,7 +128,7 @@ public class Teams{
     }
 
     private void updateEnemies(){
-        if(!active.contains(get(state.rules.waveTeam))){
+        if(state.rules.waves && !active.contains(get(state.rules.waveTeam))){
             active.add(get(state.rules.waveTeam));
         }
 

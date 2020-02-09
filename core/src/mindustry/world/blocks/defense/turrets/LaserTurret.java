@@ -2,9 +2,8 @@ package mindustry.world.blocks.defense.turrets;
 
 import arc.math.*;
 import arc.util.*;
-import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -45,7 +44,7 @@ public class LaserTurret extends PowerTurret{
 
         if(entity.bulletLife > 0 && entity.bullet != null){
             tr.trns(entity.rotation, size * tilesize / 2f, 0f);
-            entity.bullet.rot(entity.rotation);
+            entity.bullet.rotation(entity.rotation);
             entity.bullet.set(tile.drawx() + tr.x, tile.drawy() + tr.y);
             entity.bullet.time(0f);
             entity.heat = 1f;
@@ -65,22 +64,22 @@ public class LaserTurret extends PowerTurret{
             return;
         }
 
-        if(entity.reload >= reload && (entity.cons.valid() || tile.isEnemyCheat())){
+        if(entity.reload >= reload && (entity.consValid() || tile.isEnemyCheat())){
             BulletType type = peekAmmo(tile);
 
             shoot(tile, type);
 
             entity.reload = 0f;
         }else{
-            Liquid liquid = entity.liquids.current();
+            Liquid liquid = entity.liquids().current();
             float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-            float used = baseReloadSpeed(tile) * (tile.isEnemyCheat() ? maxUsed : Math.min(entity.liquids.get(liquid), maxUsed * Time.delta())) * liquid.heatCapacity * coolantMultiplier;
+            float used = baseReloadSpeed(tile) * (tile.isEnemyCheat() ? maxUsed : Math.min(entity.liquids().get(liquid), maxUsed * Time.delta())) * liquid.heatCapacity * coolantMultiplier;
             entity.reload += used;
-            entity.liquids.remove(liquid, used);
+            entity.liquids().remove(liquid, used);
 
             if(Mathf.chance(0.06 * used)){
-                Effects.effect(coolEffect, tile.drawx() + Mathf.range(size * tilesize / 2f), tile.drawy() + Mathf.range(size * tilesize / 2f));
+                coolEffect.at(tile.drawx() + Mathf.range(size * tilesize / 2f), tile.drawy() + Mathf.range(size * tilesize / 2f));
             }
         }
     }
@@ -96,7 +95,7 @@ public class LaserTurret extends PowerTurret{
     protected void bullet(Tile tile, BulletType type, float angle){
         LaserTurretEntity entity = tile.ent();
 
-        entity.bullet = Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
+        entity.bullet = type.create(tile.entity, tile.team(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
         entity.bulletLife = shootDuration;
     }
 
@@ -108,7 +107,7 @@ public class LaserTurret extends PowerTurret{
     }
 
     class LaserTurretEntity extends TurretEntity{
-        Bullet bullet;
+        Bulletc bullet;
         float bulletLife;
     }
 }

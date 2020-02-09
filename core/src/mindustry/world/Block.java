@@ -1,12 +1,9 @@
 package mindustry.world;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.audio.*;
-import arc.struct.EnumSet;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -14,15 +11,15 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.EnumSet;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
 import mindustry.entities.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
@@ -145,7 +142,7 @@ public class Block extends BlockStorage{
 
     protected TextureRegion[] cacheRegions = {};
     protected Array<String> cacheRegionStrings = new Array<>();
-    protected Prov<TileEntity> entityType = TileEntity::new;
+    protected Prov<Tilec> entityType = TileEntity::create;
 
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] generatedIcons;
@@ -177,7 +174,7 @@ public class Block extends BlockStorage{
     }
 
     public void onProximityRemoved(Tile tile){
-        if(tile.entity.power != null){
+        if(tile.entity.power() != null){
             tile.block().powerGraphRemoved(tile);
         }
     }
@@ -187,49 +184,49 @@ public class Block extends BlockStorage{
     }
 
     protected void updatePowerGraph(Tile tile){
-        TileEntity entity = tile.ent();
+        Tilec entity = tile.ent();
 
         for(Tile other : getPowerConnections(tile, tempTiles)){
-            if(other.entity.power != null){
-                other.entity.power.graph.add(entity.power.graph);
+            if(other.entity.power() != null){
+                other.entity.power().graph.add(entity.power().graph);
             }
         }
     }
 
     protected void powerGraphRemoved(Tile tile){
-        if(tile.entity == null || tile.entity.power == null){
+        if(tile.entity == null || tile.entity.power() == null){
             return;
         }
 
-        tile.entity.power.graph.remove(tile);
-        for(int i = 0; i < tile.entity.power.links.size; i++){
-            Tile other = world.tile(tile.entity.power.links.get(i));
-            if(other != null && other.entity != null && other.entity.power != null){
-                other.entity.power.links.removeValue(tile.pos());
+        tile.entity.power().graph.remove(tile);
+        for(int i = 0; i < tile.entity.power().links.size; i++){
+            Tile other = world.tile(tile.entity.power().links.get(i));
+            if(other != null && other.entity != null && other.entity.power() != null){
+                other.entity.power().links.removeValue(tile.pos());
             }
         }
     }
 
     public Array<Tile> getPowerConnections(Tile tile, Array<Tile> out){
         out.clear();
-        if(tile == null || tile.entity == null || tile.entity.power == null) return out;
+        if(tile == null || tile.entity == null || tile.entity.power() == null) return out;
 
         for(Tile other : tile.entity.proximity()){
-            if(other != null && other.entity != null && other.entity.power != null
+            if(other != null && other.entity != null && other.entity.power() != null
             && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
-            && !tile.entity.power.links.contains(other.pos())){
+            && !tile.entity.power().links.contains(other.pos())){
                 out.add(other);
             }
         }
 
-        for(int i = 0; i < tile.entity.power.links.size; i++){
-            Tile link = world.tile(tile.entity.power.links.get(i));
-            if(link != null && link.entity != null && link.entity.power != null) out.add(link);
+        for(int i = 0; i < tile.entity.power().links.size; i++){
+            Tile link = world.tile(tile.entity.power().links.get(i));
+            if(link != null && link.entity != null && link.entity.power() != null) out.add(link);
         }
         return out;
     }
 
-    protected float getProgressIncrease(TileEntity entity, float baseTime){
+    protected float getProgressIncrease(Tilec entity, float baseTime){
         return 1f / baseTime * entity.delta() * entity.efficiency();
     }
 
@@ -301,8 +298,8 @@ public class Block extends BlockStorage{
     }
 
     public void drawLight(Tile tile){
-        if(tile.entity != null && hasLiquids && drawLiquidLight && tile.entity.liquids.current().lightColor.a > 0.001f){
-            drawLiquidLight(tile, tile.entity.liquids.current(), tile.entity.liquids.smoothAmount());
+        if(tile.entity != null && hasLiquids && drawLiquidLight && tile.entity.liquids().current().lightColor.a > 0.001f){
+            drawLiquidLight(tile, tile.entity.liquids().current(), tile.entity.liquids().smoothAmount());
         }
     }
 
@@ -318,7 +315,7 @@ public class Block extends BlockStorage{
     }
 
     public void drawTeam(Tile tile){
-        Draw.color(tile.getTeam().color);
+        Draw.color(tile.team().color);
         Draw.rect("block-border", tile.drawx() - size * tilesize / 2f + 4, tile.drawy() - size * tilesize / 2f + 4);
         Draw.color();
     }
@@ -340,14 +337,14 @@ public class Block extends BlockStorage{
             Geometry.circle(tile.x, tile.y, range, (x, y) -> {
                 Tile other = world.ltile(x, y);
                 if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile) && !PowerNode.insulated(other, tile) && !other.entity.proximity().contains(tile) &&
-                !(outputsPower && tile.entity.proximity().contains(p -> p.entity != null && p.entity.power != null && p.entity.power.graph == other.entity.power.graph))){
+                !(outputsPower && tile.entity.proximity().contains(p -> p.entity != null && p.entity.power() != null && p.entity.power().graph == other.entity.power().graph))){
                     tempTiles.add(other);
                 }
             });
             tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
             if(!tempTiles.isEmpty()){
                 Tile toLink = tempTiles.first();
-                if(!toLink.entity.power.links.contains(tile.pos())){
+                if(!toLink.entity.power().links.contains(tile.pos())){
                     toLink.configureAny(tile.pos());
                 }
             }
@@ -358,11 +355,11 @@ public class Block extends BlockStorage{
     }
 
     /** Called every frame a unit is on this tile. */
-    public void unitOn(Tile tile, Unit unit){
+    public void unitOn(Tile tile, Unitc unit){
     }
 
     /** Called when a unit that spawned at this tile is removed. */
-    public void unitRemoved(Tile tile, Unit unit){
+    public void unitRemoved(Tile tile, Unitc unit){
     }
 
     /** Returns whether ot not this block can be place on the specified tile. */
@@ -373,7 +370,7 @@ public class Block extends BlockStorage{
     /** Call when some content is produced. This unlocks the content if it is applicable. */
     public void useContent(Tile tile, UnlockableContent content){
         //only unlocks content in zones
-        if(!headless && tile.getTeam() == player.getTeam() && world.isZone()){
+        if(!headless && tile.team() == player.team() && world.isZone()){
             logic.handleContent(content);
         }
     }
@@ -468,12 +465,12 @@ public class Block extends BlockStorage{
     }
 
     /** Called when the block is tapped. */
-    public void tapped(Tile tile, Player player){
+    public void tapped(Tile tile, Playerc player){
 
     }
 
     /** Called when arbitrary configuration is applied to a tile. */
-    public void configured(Tile tile, @Nullable Player player, int value){
+    public void configured(Tile tile, @Nullable Playerc player, int value){
 
     }
 
@@ -504,12 +501,12 @@ public class Block extends BlockStorage{
     }
 
     /** Returns whether this config menu should show when the specified player taps it. */
-    public boolean shouldShowConfigure(Tile tile, Player player){
+    public boolean shouldShowConfigure(Tile tile, Playerc player){
         return true;
     }
 
     /** Whether this configuration should be hidden now. Called every frame the config is open. */
-    public boolean shouldHideConfigure(Tile tile, Player player){
+    public boolean shouldHideConfigure(Tile tile, Playerc player){
         return false;
     }
 
@@ -543,15 +540,15 @@ public class Block extends BlockStorage{
         bars.add("health", entity -> new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.white));
 
         if(hasLiquids){
-            Func<TileEntity, Liquid> current;
+            Func<Tilec, Liquid> current;
             if(consumes.has(ConsumeType.liquid) && consumes.get(ConsumeType.liquid) instanceof ConsumeLiquid){
                 Liquid liquid = consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
                 current = entity -> liquid;
             }else{
-                current = entity -> entity.liquids.current();
+                current = entity -> entity.liquids().current();
             }
-            bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
-                    () -> current.get(entity).barColor(), () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
+            bars.add("liquid", entity -> new Bar(() -> entity.liquids().get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
+                    () -> current.get(entity).barColor(), () -> entity.liquids().get(current.get(entity)) / liquidCapacity));
         }
 
         if(hasPower && consumes.hasPower()){
@@ -559,12 +556,12 @@ public class Block extends BlockStorage{
             boolean buffered = cons.buffered;
             float capacity = cons.capacity;
 
-            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : (int)(entity.power.status * capacity)) :
-                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status));
+            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power().status * capacity) ? "<ERROR>" : (int)(entity.power().status * capacity)) :
+                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power().graph.getPowerProduced() + entity.power().graph.getBatteryStored() > 0f ? 1f : entity.power().status));
         }
 
         if(hasItems && configurable){
-            bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
+            bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items().total()), () -> Pal.items, () -> (float)entity.items().total() / itemCapacity));
         }
     }
 
@@ -589,7 +586,7 @@ public class Block extends BlockStorage{
         return amount;
     }
 
-    public void handleBulletHit(TileEntity entity, Bullet bullet){
+    public void handleBulletHit(Tilec entity, Bulletc bullet){
         entity.damage(bullet.damage());
     }
 
@@ -609,31 +606,32 @@ public class Block extends BlockStorage{
 
         if(hasItems){
             for(Item item : content.items()){
-                int amount = tile.entity.items.get(item);
+                int amount = tile.entity.items().get(item);
                 explosiveness += item.explosiveness * amount;
                 flammability += item.flammability * amount;
             }
         }
 
         if(hasLiquids){
-            flammability += tile.entity.liquids.sum((liquid, amount) -> liquid.explosiveness * amount / 2f);
-            explosiveness += tile.entity.liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
+            flammability += tile.entity.liquids().sum((liquid, amount) -> liquid.explosiveness * amount / 2f);
+            explosiveness += tile.entity.liquids().sum((liquid, amount) -> liquid.flammability * amount / 2f);
         }
 
         if(consumes.hasPower() && consumes.getPower().buffered){
-            power += tile.entity.power.status * consumes.getPower().capacity;
+            power += tile.entity.power().status * consumes.getPower().capacity;
         }
 
         if(hasLiquids){
 
-            tile.entity.liquids.each((liquid, amount) -> {
+            tile.entity.liquids().each((liquid, amount) -> {
                 float splash = Mathf.clamp(amount / 4f, 0f, 10f);
 
                 for(int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++){
                     Time.run(i / 2f, () -> {
                         Tile other = world.tile(tile.x + Mathf.range(size / 2), tile.y + Mathf.range(size / 2));
                         if(other != null){
-                            Puddle.deposit(other, liquid, splash);
+                            //TODO puddle
+                            //Puddle.deposit(other, liquid, splash);
                         }
                     });
                 }
@@ -642,7 +640,7 @@ public class Block extends BlockStorage{
 
         Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * size / 2f, Pal.darkFlame);
         if(!tile.floor().solid && !tile.floor().isLiquid){
-            RubbleDecal.create(tile.drawx(), tile.drawy(), size);
+            Effects.rubble(tile.drawx(), tile.drawy(), size);
         }
     }
 
@@ -657,10 +655,10 @@ public class Block extends BlockStorage{
             }
             return 0;
         }else{
-            float result = tile.entity.items.sum((item, amount) -> item.flammability * amount);
+            float result = tile.entity.items().sum((item, amount) -> item.flammability * amount);
 
             if(hasLiquids){
-                result += tile.entity.liquids.sum((liquid, amount) -> liquid.flammability * amount / 3f);
+                result += tile.entity.liquids().sum((liquid, amount) -> liquid.flammability * amount / 3f);
             }
 
             return result;
@@ -676,7 +674,7 @@ public class Block extends BlockStorage{
     }
 
     public void display(Tile tile, Table table){
-        TileEntity entity = tile.entity;
+        Tilec entity = tile.entity;
 
         if(entity != null){
             table.table(bars -> {
@@ -702,7 +700,7 @@ public class Block extends BlockStorage{
     }
 
     public void displayBars(Tile tile, Table table){
-        for(Func<TileEntity, Bar> bar : bars.list()){
+        for(Func<Tilec, Bar> bar : bars.list()){
             table.add(bar.get(tile.entity)).growX();
             table.row();
         }
@@ -857,7 +855,7 @@ public class Block extends BlockStorage{
         return destructible || update;
     }
 
-    public final TileEntity newEntity(){
+    public final Tilec newEntity(){
         return entityType.get();
     }
 

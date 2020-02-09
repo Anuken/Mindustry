@@ -3,7 +3,7 @@ package mindustry.world.blocks.power;
 import arc.Core;
 import arc.struct.EnumSet;
 import arc.util.Strings;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.ui.Bar;
 import mindustry.world.Tile;
@@ -37,7 +37,7 @@ public class PowerGenerator extends PowerDistributor{
         if(hasPower && outputsPower && !consumes.hasPower()){
             bars.add("power", entity -> new Bar(() ->
             Core.bundle.format("bar.poweroutput",
-            Strings.fixed(entity.block.getPowerProduction(entity.tile) * 60 * entity.timeScale, 1)),
+            Strings.fixed(entity.block().getPowerProduction(entity.tile()) * 60 * entity.timeScale(), 1)),
             () -> Pal.powerBar,
             () -> ((GeneratorEntity)entity).productionEfficiency));
         }
@@ -65,8 +65,8 @@ public class PowerGenerator extends PowerDistributor{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             productionEfficiency = stream.readFloat();
         }
     }

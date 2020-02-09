@@ -1,21 +1,21 @@
 package mindustry.world.modules;
 
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.world.consumers.Consume;
 
 import java.io.*;
 
 public class ConsumeModule extends BlockModule{
     private boolean valid, optionalValid;
-    private final TileEntity entity;
+    private final Tilec entity;
 
-    public ConsumeModule(TileEntity entity){
+    public ConsumeModule(Tilec entity){
         this.entity = entity;
     }
 
     public void update(){
         //everything is valid here
-        if(entity.tile.isEnemyCheat()){
+        if(entity.tile().isEnemyCheat()){
             valid = optionalValid = true;
             return;
         }
@@ -23,9 +23,9 @@ public class ConsumeModule extends BlockModule{
         boolean prevValid = valid();
         valid = true;
         optionalValid = true;
-        boolean docons = entity.block.shouldConsume(entity.tile) && entity.block.productionValid(entity.tile);
+        boolean docons = entity.block().shouldConsume(entity.tile()) && entity.block().productionValid(entity.tile());
 
-        for(Consume cons : entity.block.consumes.all()){
+        for(Consume cons : entity.block().consumes.all()){
             if(cons.isOptional()) continue;
 
             if(docons && cons.isUpdate() && prevValid && cons.valid(entity)){
@@ -35,7 +35,7 @@ public class ConsumeModule extends BlockModule{
             valid &= cons.valid(entity);
         }
 
-        for(Consume cons : entity.block.consumes.optionals()){
+        for(Consume cons : entity.block().consumes.optionals()){
             if(docons && cons.isUpdate() && prevValid && cons.valid(entity)){
                 cons.update(entity);
             }
@@ -45,13 +45,13 @@ public class ConsumeModule extends BlockModule{
     }
 
     public void trigger(){
-        for(Consume cons : entity.block.consumes.all()){
+        for(Consume cons : entity.block().consumes.all()){
             cons.trigger(entity);
         }
     }
 
     public boolean valid(){
-        return valid && entity.block.shouldConsume(entity.tile);
+        return valid && entity.block().shouldConsume(entity.tile());
     }
 
     public boolean optionalValid(){

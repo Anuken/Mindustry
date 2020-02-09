@@ -14,7 +14,7 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.ContentType;
-import mindustry.entities.traits.BuilderTrait.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Schematic.*;
 import mindustry.input.*;
@@ -315,7 +315,7 @@ public class Schematics implements Loadable{
             for(int cy = y; cy <= y2; cy++){
                 Tile linked = world.ltile(cx, cy);
 
-                if(linked != null && linked.entity != null && linked.entity.block.isVisible() && !(linked.block() instanceof BuildBlock)){
+                if(linked != null && linked.entity != null && linked.entity.block().isVisible() && !(linked.block() instanceof BuildBlock)){
                     int top = linked.block().size/2;
                     int bot = linked.block().size % 2 == 1 ? -linked.block().size/2 : -(linked.block().size - 1)/2;
                     minx = Math.min(linked.x + bot, minx);
@@ -344,7 +344,7 @@ public class Schematics implements Loadable{
                 Tile tile = world.ltile(cx, cy);
 
                 if(tile != null && tile.entity != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
-                    && (tile.entity.block.isVisible() || (tile.entity.block instanceof CoreBlock && Core.settings.getBool("coreselect")))){
+                    && (tile.entity.block().isVisible() || (tile.entity.block() instanceof CoreBlock && Core.settings.getBool("coreselect")))){
                     int config = tile.entity.config();
                     if(tile.block().posConfig){
                         config = Pos.get(Pos.x(config) + offsetX, Pos.y(config) + offsetY);

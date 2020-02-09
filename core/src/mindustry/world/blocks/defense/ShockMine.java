@@ -1,14 +1,11 @@
 package mindustry.world.blocks.defense;
 
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.math.Mathf;
-import mindustry.entities.effect.Lightning;
-import mindustry.entities.type.Unit;
-import mindustry.graphics.Layer;
-import mindustry.graphics.Pal;
-import mindustry.world.Block;
-import mindustry.world.Tile;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import mindustry.entities.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.world.*;
 
 public class ShockMine extends Block{
     public final int timerDamage = timers++;
@@ -32,7 +29,7 @@ public class ShockMine extends Block{
     @Override
     public void drawLayer(Tile tile){
         super.draw(tile);
-        Draw.color(tile.getTeam().color);
+        Draw.color(tile.team().color);
         Draw.alpha(0.22f);
         Fill.rect(tile.drawx(), tile.drawy(), 2f, 2f);
         Draw.color();
@@ -49,10 +46,10 @@ public class ShockMine extends Block{
     }
 
     @Override
-    public void unitOn(Tile tile, Unit unit){
-        if(unit.getTeam() != tile.getTeam() && tile.entity.timer.get(timerDamage, cooldown)){
+    public void unitOn(Tile tile, Unitc unit){
+        if(unit.team() != tile.team() && tile.entity.timer(timerDamage, cooldown)){
             for(int i = 0; i < tendrils; i++){
-                Lightning.create(tile.getTeam(), Pal.lancerLaser, damage, tile.drawx(), tile.drawy(), Mathf.random(360f), length);
+                Lightning.create(tile.team(), Pal.lancerLaser, damage, tile.drawx(), tile.drawy(), Mathf.random(360f), length);
             }
             tile.entity.damage(tileDamage);
         }

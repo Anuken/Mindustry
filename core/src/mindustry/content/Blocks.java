@@ -10,7 +10,6 @@ import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -57,7 +56,7 @@ public class Blocks implements ContentList{
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //transport
-    conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, massDriver,
+    conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, underflowGate, massDriver,
 
     //liquids
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
@@ -80,7 +79,7 @@ public class Blocks implements ContentList{
     fortressFactory, repairPoint,
 
     //upgrades
-    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    dartPad, alphaPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
 
     @Override
     public void load(){
@@ -269,13 +268,13 @@ public class Blocks implements ContentList{
         }};
 
         ice = new Floor("ice"){{
-            //TODO fix drag/speed
-            dragMultiplier = 1f;
-            speedMultiplier = 1f;
+            dragMultiplier = 0.35f;
+            speedMultiplier = 0.9f;
             attributes.set(Attribute.water, 0.4f);
         }};
 
         iceSnow = new Floor("ice-snow"){{
+            dragMultiplier = 0.6f;
             variants = 3;
             attributes.set(Attribute.water, 0.3f);
         }};
@@ -409,12 +408,37 @@ public class Blocks implements ContentList{
         //endregion
         //region ore
 
-        oreCopper = new OreBlock(Items.copper);
-        oreLead = new OreBlock(Items.lead);
+        oreCopper = new OreBlock(Items.copper){{
+            oreDefault = true;
+            oreThreshold = 0.81f;
+            oreScale = 23.47619f;
+        }};
+
+        oreLead = new OreBlock(Items.lead){{
+            oreDefault = true;
+            oreThreshold = 0.828f;
+            oreScale = 23.952381f;
+        }};
+
         oreScrap = new OreBlock(Items.scrap);
-        oreCoal = new OreBlock(Items.coal);
-        oreTitanium = new OreBlock(Items.titanium);
-        oreThorium = new OreBlock(Items.thorium);
+
+        oreCoal = new OreBlock(Items.coal){{
+            oreDefault = true;
+            oreThreshold = 0.846f;
+            oreScale = 24.428572f;
+        }};
+
+        oreTitanium = new OreBlock(Items.titanium){{
+            oreDefault = true;
+            oreThreshold = 0.864f;
+            oreScale = 24.904762f;
+        }};
+
+        oreThorium = new OreBlock(Items.thorium){{
+            oreDefault = true;
+            oreThreshold = 0.882f;
+            oreScale = 25.380953f;
+        }};
 
         //endregion
         //region crafting
@@ -573,7 +597,7 @@ public class Blocks implements ContentList{
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name + "-top")};
 
             drawer = tile -> {
-                LiquidModule mod = tile.entity.liquids;
+                LiquidModule mod = tile.entity.liquids();
 
                 int rotation = rotate ? tile.rotation() * 90 : 0;
 
@@ -664,13 +688,12 @@ public class Blocks implements ContentList{
             int topRegion = reg("-top");
 
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top")};
-
             drawer = tile -> {
                 GenericCrafterEntity entity = tile.ent();
 
                 Draw.rect(region, tile.drawx(), tile.drawy());
                 Draw.rect(reg(frameRegions[(int)Mathf.absin(entity.totalProgress, 5f, 2.999f)]), tile.drawx(), tile.drawy());
-                Draw.color(Color.clear, tile.entity.liquids.current().color, tile.entity.liquids.total() / liquidCapacity);
+                Draw.color(Color.clear, tile.entity.liquids().current().color, tile.entity.liquids().total() / liquidCapacity);
                 Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
                 Draw.color();
                 Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
@@ -954,6 +977,12 @@ public class Blocks implements ContentList{
         overflowGate = new OverflowGate("overflow-gate"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 4));
             buildCostMultiplier = 3f;
+        }};
+
+        underflowGate = new OverflowGate("underflow-gate"){{
+            requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 4));
+            buildCostMultiplier = 3f;
+            invert = true;
         }};
 
         massDriver = new MassDriver("mass-driver"){{
@@ -1516,25 +1545,25 @@ public class Blocks implements ContentList{
                 }
 
                 @Override
-                public void init(mindustry.entities.type.Bullet b){
+                public void init(Bulletc b){
                     for(int i = 0; i < rays; i++){
-                        Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), rayLength - Math.abs(i - (rays / 2)) * 20f);
+                        Damage.collideLine(b, b.team(), hitEffect, b.x(), b.y(), b.rotation(), rayLength - Math.abs(i - (rays / 2)) * 20f);
                     }
                 }
 
                 @Override
-                public void draw(Bullet b){
+                public void draw(Bulletc b){
                     super.draw(b);
                     Draw.color(Color.white, Pal.lancerLaser, b.fin());
                     //Draw.alpha(b.fout());
                     for(int i = 0; i < 7; i++){
-                        Tmp.v1.trns(b.rot(), i * 8f);
+                        Tmp.v1.trns(b.rotation(), i * 8f);
                         float sl = Mathf.clamp(b.fout() - 0.5f) * (80f - i * 10);
-                        Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() + 90);
-                        Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() - 90);
+                        Drawf.tri(b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 4f, sl, b.rotation() + 90);
+                        Drawf.tri(b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 4f, sl, b.rotation() - 90);
                     }
-                    Drawf.tri(b.x, b.y, 20f * b.fout(), (rayLength + 50), b.rot());
-                    Drawf.tri(b.x, b.y, 20f * b.fout(), 10f, b.rot() + 180f);
+                    Drawf.tri(b.x(), b.y(), 20f * b.fout(), (rayLength + 50), b.rotation());
+                    Drawf.tri(b.x(), b.y(), 20f * b.fout(), 10f, b.rotation() + 180f);
                     Draw.reset();
                 }
             });
@@ -1688,6 +1717,7 @@ public class Blocks implements ContentList{
             unitType = UnitTypes.ghoul;
             produceTime = 1150;
             size = 3;
+            maxSpawn = 2;
             consumes.power(1.2f);
             consumes.items(new ItemStack(Items.silicon, 15), new ItemStack(Items.titanium, 10));
         }};
@@ -1697,6 +1727,7 @@ public class Blocks implements ContentList{
             unitType = UnitTypes.revenant;
             produceTime = 2000;
             size = 4;
+            maxSpawn = 2;
             consumes.power(3f);
             consumes.items(new ItemStack(Items.silicon, 40), new ItemStack(Items.titanium, 30));
         }};
@@ -1749,51 +1780,58 @@ public class Blocks implements ContentList{
         //endregion
         //region upgrades
 
-        dartPad = new MechPad("dart-mech-pad"){{
+        dartPad = new MechPad("dart-ship-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 100, Items.graphite, 50, Items.copper, 75));
-            mech = Mechs.alpha;
+            mech = UnitTypes.dart;
+            size = 2;
+            consumes.power(0.5f);
+        }};
+
+        alphaPad = new MechPad("alpha-mech-pad"){{
+            requirements(Category.upgrade, ItemStack.with(Items.lead, 100, Items.graphite, 50, Items.copper, 75));
+            mech = UnitTypes.alpha;
             size = 2;
             consumes.power(0.5f);
         }};
 
         deltaPad = new MechPad("delta-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 175, Items.titanium, 175, Items.copper, 200, Items.silicon, 225, Items.thorium, 150));
-            mech = Mechs.delta;
+            mech = UnitTypes.delta;
             size = 2;
             consumes.power(0.7f);
         }};
 
         tauPad = new MechPad("tau-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 125, Items.titanium, 125, Items.copper, 125, Items.silicon, 125));
-            mech = Mechs.tau;
+            mech = UnitTypes.tau;
             size = 2;
             consumes.power(1f);
         }};
 
         omegaPad = new MechPad("omega-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 225, Items.graphite, 275, Items.silicon, 325, Items.thorium, 300, Items.surgealloy, 120));
-            mech = Mechs.omega;
+            mech = UnitTypes.omega;
             size = 3;
             consumes.power(1.2f);
         }};
 
         javelinPad = new MechPad("javelin-ship-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 175, Items.silicon, 225, Items.titanium, 250, Items.plastanium, 200, Items.phasefabric, 100));
-            mech = Mechs.javelin;
+            mech = UnitTypes.javelin;
             size = 2;
             consumes.power(0.8f);
         }};
 
         tridentPad = new MechPad("trident-ship-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 125, Items.copper, 125, Items.silicon, 125, Items.titanium, 150, Items.plastanium, 100));
-            mech = Mechs.trident;
+            mech = UnitTypes.trident;
             size = 2;
             consumes.power(1f);
         }};
 
         glaivePad = new MechPad("glaive-ship-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 225, Items.silicon, 325, Items.titanium, 350, Items.plastanium, 300, Items.surgealloy, 100));
-            mech = Mechs.glaive;
+            mech = UnitTypes.glaive;
             size = 3;
             consumes.power(1.2f);
         }};

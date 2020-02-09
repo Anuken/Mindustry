@@ -31,7 +31,6 @@ if(!hasProperty("release")){
         use(':Arc:extensions:g3d')
         use(':Arc:backends')
         use(':Arc:backends:backend-sdl')
-        use(':Arc:backends:backend-lwjgl3')
         use(':Arc:backends:backend-android')
         use(':Arc:backends:backend-robovm')
         use(':Arc:backends:backend-headless')

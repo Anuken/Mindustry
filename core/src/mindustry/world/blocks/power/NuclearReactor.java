@@ -79,30 +79,30 @@ public class NuclearReactor extends PowerGenerator{
         ConsumeLiquid cliquid = consumes.get(ConsumeType.liquid);
         Item item = consumes.<ConsumeItems>get(ConsumeType.item).items[0].item;
 
-        int fuel = entity.items.get(item);
+        int fuel = entity.items().get(item);
         float fullness = (float)fuel / itemCapacity;
         entity.productionEfficiency = fullness;
 
         if(fuel > 0){
             entity.heat += fullness * heating * Math.min(entity.delta(), 4f);
 
-            if(entity.timer.get(timerFuel, itemDuration / entity.timeScale)){
-                entity.cons.trigger();
+            if(entity.timer(timerFuel, itemDuration / entity.timeScale())){
+                entity.consume();
             }
         }
 
         Liquid liquid = cliquid.liquid;
 
         if(entity.heat > 0){
-            float maxUsed = Math.min(entity.liquids.get(liquid), entity.heat / coolantPower);
+            float maxUsed = Math.min(entity.liquids().get(liquid), entity.heat / coolantPower);
             entity.heat -= maxUsed * coolantPower;
-            entity.liquids.remove(liquid, maxUsed);
+            entity.liquids().remove(liquid, maxUsed);
         }
 
         if(entity.heat > smokeThreshold){
             float smoke = 1.0f + (entity.heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
             if(Mathf.chance(smoke / 20.0 * entity.delta())){
-                Effects.effect(Fx.reactorsmoke, tile.worldx() + Mathf.range(size * tilesize / 2f),
+                Fx.reactorsmoke.at(tile.worldx() + Mathf.range(size * tilesize / 2f),
                 tile.worldy() + Mathf.random(size * tilesize / 2f));
             }
         }
@@ -123,14 +123,14 @@ public class NuclearReactor extends PowerGenerator{
 
         NuclearReactorEntity entity = tile.ent();
 
-        int fuel = entity.items.get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
+        int fuel = entity.items().get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
 
         if((fuel < 5 && entity.heat < 0.5f) || !state.rules.reactorExplosions) return;
 
         Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
-        Effects.effect(Fx.nuclearShockwave, tile.worldx(), tile.worldy());
+        Fx.nuclearShockwave.at(tile.worldx(), tile.worldy());
         for(int i = 0; i < 6; i++){
-            Time.run(Mathf.random(40), () -> Effects.effect(Fx.nuclearcloud, tile.worldx(), tile.worldy()));
+            Time.run(Mathf.random(40), () -> Fx.nuclearcloud.at(tile.worldx(), tile.worldy()));
         }
 
         Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
@@ -138,14 +138,14 @@ public class NuclearReactor extends PowerGenerator{
         for(int i = 0; i < 20; i++){
             Time.run(Mathf.random(50), () -> {
                 tr.rnd(Mathf.random(40f));
-                Effects.effect(Fx.explosion, tr.x + tile.worldx(), tr.y + tile.worldy());
+                Fx.explosion.at(tr.x + tile.worldx(), tr.y + tile.worldy());
             });
         }
 
         for(int i = 0; i < 70; i++){
             Time.run(Mathf.random(80), () -> {
                 tr.rnd(Mathf.random(120f));
-                Effects.effect(Fx.nuclearsmoke, tr.x + tile.worldx(), tr.y + tile.worldy());
+                Fx.nuclearsmoke.at(tr.x + tile.worldx(), tr.y + tile.worldy());
             });
         }
     }
@@ -166,8 +166,8 @@ public class NuclearReactor extends PowerGenerator{
         Draw.color(coolColor, hotColor, entity.heat);
         Fill.rect(tile.drawx(), tile.drawy(), size * tilesize, size * tilesize);
 
-        Draw.color(entity.liquids.current().color);
-        Draw.alpha(entity.liquids.currentAmount() / liquidCapacity);
+        Draw.color(entity.liquids().current().color);
+        Draw.alpha(entity.liquids().currentAmount() / liquidCapacity);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
 
         if(entity.heat > flashThreshold){
@@ -192,8 +192,8 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             heat = stream.readFloat();
         }
     }

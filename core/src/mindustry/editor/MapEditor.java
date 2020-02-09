@@ -83,7 +83,7 @@ public class MapEditor{
         //re-add them
         for(Tile tile : tiles){
             if(tile.block().isMultiblock()){
-                tile.set(tile.block(), tile.getTeam());
+                tile.set(tile.block(), tile.team());
             }
 
         }

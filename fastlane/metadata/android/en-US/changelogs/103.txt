@@ -1,0 +1,9 @@
+- Added new icons w/ smooth scaling
+- Added liquid void (Contributed by @GioIacca9)
+- Added bridge opacity slider (Contributed by @Quezler)
+- Added "underflow" gate (opposite of overflow gate)
+- Added "emojis" for most blocks and items into the font
+- Added new tech tree layout w/ better mod support
+- Added game log file, stored in data folder
+- Added new separator sprite/animation
+- Added list of affinity tiles to stats of certain blocks

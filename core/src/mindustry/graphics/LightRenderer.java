@@ -24,6 +24,10 @@ public class LightRenderer{
         lights.add(run);
     }
 
+    public void add(Position pos, float radius, Color color, float opacity){
+        add(pos.getX(), pos.getY(), radius, color, opacity);
+    }
+
     public void add(float x, float y, float radius, Color color, float opacity){
         if(!enabled()) return;
 

@@ -5,7 +5,7 @@ import arc.util.serialization.Json.Serializable;
 import arc.util.serialization.JsonValue;
 import mindustry.content.*;
 import mindustry.ctype.ContentType;
-import mindustry.entities.type.BaseUnit;
+import mindustry.gen.*;
 import mindustry.type.*;
 
 import static mindustry.Vars.content;
@@ -19,7 +19,7 @@ public class SpawnGroup implements Serializable{
     public static final int never = Integer.MAX_VALUE;
 
     /** The unit type spawned */
-    public UnitType type;
+    public UnitDef type;
     /** When this spawn should end */
     public int end = never;
     /** When this spawn should start */
@@ -37,7 +37,7 @@ public class SpawnGroup implements Serializable{
     /** Items this unit spawns with. Null to disable. */
     public ItemStack items;
 
-    public SpawnGroup(UnitType type){
+    public SpawnGroup(UnitDef type){
         this.type = type;
     }
 
@@ -57,11 +57,11 @@ public class SpawnGroup implements Serializable{
      * Creates a unit, and assigns correct values based on this group's data.
      * This method does not add() the unit.
      */
-    public BaseUnit createUnit(Team team){
-        BaseUnit unit = type.create(team);
+    public Unitc createUnit(Team team){
+        Unitc unit = type.create(team);
 
         if(effect != null){
-            unit.applyEffect(effect, 999999f);
+            unit.apply(effect, 999999f);
         }
 
         if(items != null){

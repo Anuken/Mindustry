@@ -11,7 +11,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.ui.*;
@@ -35,7 +35,7 @@ public class MessageBlock extends Block{
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
-    public static void setMessageBlockText(Player player, Tile tile, String text){
+    public static void setMessageBlockText(Playerc player, Tile tile, String text){
         if(!Units.canInteract(player, tile)) return;
         if(net.server() && text.length() > maxTextLength){
             throw new ValidateException(player, "Player has gone above text limit.");
@@ -157,8 +157,8 @@ public class MessageBlock extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             message = stream.readUTF();
         }
     }

@@ -5,7 +5,7 @@ Crie correntes de suprimentos elaboradas com correias transportadoras para alime
 [h2]Gameplay[/h2]
 
 [list]
-[*] Crie brocas e correntes transportadoras para mover recursos para o seu Núcleo.
+[*] Crie brocas e esteiras transportadoras para mover recursos para o seu Núcleo.
 [*] Use blocos de produção para criar materiais avançados.
 [*] Construa drones para minerar recursos automaticamente, ajudar na construção e proteger a sua base.
 [*] Distribua líquidos e enfrente surtos de fogo.

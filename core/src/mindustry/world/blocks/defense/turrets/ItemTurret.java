@@ -6,7 +6,7 @@ import arc.scene.ui.layout.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -53,7 +53,7 @@ public class ItemTurret extends CooledTurret{
             }
 
             @Override
-            public boolean valid(TileEntity entity){
+            public boolean valid(Tilec entity){
                 //valid when there's any ammo in the turret
                 return !((ItemTurretEntity)entity).ammo.isEmpty();
             }
@@ -86,7 +86,7 @@ public class ItemTurret extends CooledTurret{
     }
 
     @Override
-    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+    public int acceptStack(Item item, int amount, Tile tile, Teamc source){
         TurretEntity entity = tile.ent();
 
         BulletType type = ammo.get(item);
@@ -97,7 +97,7 @@ public class ItemTurret extends CooledTurret{
     }
 
     @Override
-    public void handleStack(Item item, int amount, Tile tile, Unit source){
+    public void handleStack(Item item, int amount, Tile tile, Teamc source){
         for(int i = 0; i < amount; i++){
             handleItem(item, tile, null);
         }
@@ -162,8 +162,8 @@ public class ItemTurret extends CooledTurret{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             byte amount = stream.readByte();
             for(int i = 0; i < amount; i++){
                 Item item = Vars.content.item(stream.readByte());

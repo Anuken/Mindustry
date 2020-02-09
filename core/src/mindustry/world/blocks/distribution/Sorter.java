@@ -3,10 +3,10 @@ package mindustry.world.blocks.distribution;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import arc.util.*;
+import mindustry.gen.*;
+import mindustry.entities.units.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -44,7 +44,7 @@ public class Sorter extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
+    public void configured(Tile tile, Playerc player, int value){
         tile.<SorterEntity>ent().sortItem = content.item(value);
     }
 
@@ -74,7 +74,7 @@ public class Sorter extends Block{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         Tile to = getTileTarget(item, tile, source, false);
 
-        return to != null && to.block().acceptItem(item, to, tile) && to.getTeam() == tile.getTeam();
+        return to != null && to.block().acceptItem(item, to, tile) && to.team() == tile.team();
     }
 
     @Override
@@ -85,7 +85,8 @@ public class Sorter extends Block{
     }
 
     boolean isSame(Tile tile, Tile other){
-        return other != null && other.block() instanceof Sorter;
+        //uncomment comment below to prevent sorter/gate chaining (hacky)
+        return other != null && (other.block() instanceof Sorter/* || other.block() instanceof OverflowGate */);
     }
 
     Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
@@ -158,12 +159,9 @@ public class Sorter extends Block{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             sortItem = content.item(stream.readShort());
-            if(revision == 1){
-                new DirectionalItemBuffer(20, 45f).read(stream);
-            }
         }
     }
 }

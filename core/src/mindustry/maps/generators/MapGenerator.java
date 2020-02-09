@@ -50,7 +50,7 @@ public class MapGenerator extends Generator{
             if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && world.getZone() != null){
                 for(Item item : world.getZone().resources){
                     if(Mathf.chance(0.3)){
-                        tile.entity.items.add(item, Math.min(Mathf.random(500), tile.block().itemCapacity));
+                        tile.entity.items().add(item, Math.min(Mathf.random(500), tile.block().itemCapacity));
                     }
                 }
             }
@@ -68,7 +68,7 @@ public class MapGenerator extends Generator{
                 });
             }
 
-            if(tile.block() instanceof CoreBlock && tile.getTeam() == state.rules.defaultTeam){
+            if(tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam){
                 schematics.placeLoadout(loadout, tile.x, tile.y);
                 anyCores = true;
             }

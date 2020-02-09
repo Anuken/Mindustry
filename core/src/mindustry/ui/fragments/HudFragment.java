@@ -1,35 +1,27 @@
 package mindustry.ui.fragments;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
-import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
-import mindustry.ctype.ContentType;
-import mindustry.ctype.UnlockableContent;
-import mindustry.entities.*;
-import mindustry.entities.type.*;
-import mindustry.game.*;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.net.Packets.*;
-import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.ui.dialogs.*;
 
 import static mindustry.Vars.*;
@@ -75,7 +67,7 @@ public class HudFragment extends Fragment{
                         }
                     }).name("pause").update(i -> {
                         if(net.active()){
-                            i.getStyle().imageUp = Icon.user;
+                            i.getStyle().imageUp = Icon.players;
                         }else{
                             i.setDisabled(false);
                             i.getStyle().imageUp = state.is(State.paused) ? Icon.play : Icon.pause;
@@ -173,66 +165,13 @@ public class HudFragment extends Fragment{
                                 .size(50f).margin(6f).get();
                             button.getImageCell().grow();
                             button.getStyle().imageUpColor = team.color;
-                            button.update(() -> button.setChecked(player.getTeam() == team));
+                            button.update(() -> button.setChecked(player.team() == team));
 
                             if(++i % 3 == 0){
                                 teams.row();
                             }
                         }
                     }).left();
-
-                    if(enableUnitEditing){
-
-                        t.row();
-                        t.addImageTextButton("$editor.spawn", Icon.add, () -> {
-                            FloatingDialog dialog = new FloatingDialog("$editor.spawn");
-                            int i = 0;
-                            for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
-                                dialog.cont.addImageButton(Tex.whiteui, 8 * 6f, () -> {
-                                    Call.spawnUnitEditor(player, type);
-                                    dialog.hide();
-                                }).get().getStyle().imageUp = new TextureRegionDrawable(type.icon(Cicon.xlarge));
-                                if(++i % 4 == 0) dialog.cont.row();
-                            }
-                            dialog.addCloseButton();
-                            dialog.setFillParent(false);
-                            dialog.show();
-                        }).fillX();
-
-                        float[] size = {0};
-                        float[] position = {0, 0};
-
-                        t.row();
-                        t.addImageTextButton("$editor.removeunit", Icon.cancel, Styles.togglet, () -> {}).fillX().update(b -> {
-                            boolean[] found = {false};
-                            if(b.isChecked()){
-                                Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
-                                if(e == null){
-                                    Vec2 world = Core.input.mouseWorld();
-                                    Units.nearby(world.x, world.y, 1f, 1f, unit -> {
-                                        if(!found[0] && unit instanceof BaseUnit){
-                                            if(Core.input.keyTap(KeyCode.MOUSE_LEFT)){
-                                                Call.removeUnitEditor(player, (BaseUnit)unit);
-                                            }
-                                            found[0] = true;
-                                            unit.hitbox(Tmp.r1);
-                                            size[0] = Mathf.lerpDelta(size[0], Tmp.r1.width * 2f + Mathf.absin(Time.time(), 10f, 5f), 0.1f);
-                                            position[0] = unit.x;
-                                            position[1] = unit.y;
-                                        }
-                                    });
-                                }
-                            }
-
-                            Draw.color(Pal.accent, Color.white, Mathf.absin(Time.time(), 8f, 1f));
-                            Lines.poly(position[0], position[1], 4, size[0] / 2f);
-                            Draw.reset();
-
-                            if(!found[0]){
-                                size[0] = Mathf.lerpDelta(size[0], 0f, 0.2f);
-                            }
-                        });
-                    }
                 }).width(dsize * 5 + 4f);
                 editorMain.visible(() -> shown && state.isEditor());
             }
@@ -256,7 +195,7 @@ public class HudFragment extends Fragment{
             t.add(new Minimap());
             t.row();
             //position
-            t.label(() -> world.toTile(player.x) + "," + world.toTile(player.y))
+            t.label(() -> player.tileX() + "," + player.tileY())
                 .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial);
             t.top().right();
         });
@@ -287,7 +226,7 @@ public class HudFragment extends Fragment{
             });
 
             t.top().visible(() -> {
-                if(state.is(State.menu) || !state.teams.get(player.getTeam()).hasCore()){
+                if(state.is(State.menu) || !state.teams.get(player.team()).hasCore()){
                     coreAttackTime[0] = 0f;
                     return false;
                 }
@@ -345,26 +284,9 @@ public class HudFragment extends Fragment{
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.both)
-    public static void setPlayerTeamEditor(Player player, Team team){
+    public static void setPlayerTeamEditor(Playerc player, Team team){
         if(state.isEditor() && player != null){
-            player.setTeam(team);
-        }
-    }
-
-    @Remote(targets = Loc.both, called = Loc.server)
-    public static void spawnUnitEditor(Player player, UnitType type){
-        if(state.isEditor()){
-            BaseUnit unit = type.create(player.getTeam());
-            unit.set(player.x, player.y);
-            unit.rotation = player.rotation;
-            unit.add();
-        }
-    }
-
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void removeUnitEditor(Player player, BaseUnit unit){
-        if(state.isEditor() && unit != null){
-            unit.remove();
+            player.team(team);
         }
     }
 
@@ -646,12 +568,12 @@ public class HudFragment extends Fragment{
     }
 
     private boolean canSkipWave(){
-        return state.rules.waves && ((net.server() || player.isAdmin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning() && !state.rules.tutorial;
+        return state.rules.waves && ((net.server() || player.admin()) || !net.active()) && state.enemies == 0 && !spawner.isSpawning() && !state.rules.tutorial;
     }
 
     private void addPlayButton(Table table){
         table.right().addImageButton(Icon.play, Styles.righti, 30f, () -> {
-            if(net.client() && player.isAdmin){
+            if(net.client() && player.admin()){
                 Call.onAdminRequest(player, AdminAction.wave);
             }else if(inLaunchWave()){
                 ui.showConfirm("$confirm", "$launch.skip.confirm", () -> !canSkipWave(), () -> state.wavetime = 0f);

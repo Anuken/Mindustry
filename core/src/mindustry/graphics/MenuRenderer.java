@@ -1,24 +1,20 @@
 package mindustry.graphics;
 
-import arc.Core;
-import arc.struct.Array;
-import arc.func.Floatc2;
-import arc.graphics.Camera;
-import arc.graphics.Color;
+import arc.*;
+import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.FrameBuffer;
+import arc.graphics.gl.*;
 import arc.math.*;
-import arc.scene.ui.layout.Scl;
+import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
-import arc.util.noise.RidgedPerlin;
-import arc.util.noise.Simplex;
-import mindustry.content.Blocks;
-import mindustry.content.UnitTypes;
-import mindustry.type.UnitType;
-import mindustry.ui.Cicon;
+import arc.util.noise.*;
+import mindustry.content.*;
+import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.Floor;
-import mindustry.world.blocks.OreBlock;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
@@ -34,7 +30,7 @@ public class MenuRenderer implements Disposable{
     private float time = 0f;
     private float flyerRot = 45f;
     private int flyers = Mathf.chance(0.2) ? Mathf.random(35) : Mathf.random(15);
-    private UnitType flyerType = Structs.select(UnitTypes.wraith, UnitTypes.wraith, UnitTypes.ghoul, UnitTypes.phantom, UnitTypes.phantom, UnitTypes.revenant);
+    private UnitDef flyerType = Structs.select(UnitTypes.wraith, UnitTypes.wraith, UnitTypes.ghoul, UnitTypes.phantom, UnitTypes.phantom, UnitTypes.revenant);
 
     public MenuRenderer(){
         Time.mark();
@@ -251,6 +247,8 @@ public class MenuRenderer implements Disposable{
     }
 
     private void drawFlyers(){
+        //TODO fix
+        if(true) return;
         Draw.color(0f, 0f, 0f, 0.4f);
 
         TextureRegion icon = flyerType.icon(Cicon.full);

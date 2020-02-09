@@ -2,7 +2,7 @@ package mindustry.net;
 
 import arc.util.*;
 import mindustry.core.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.*;
 import mindustry.io.*;
 import mindustry.maps.Map;
@@ -16,7 +16,7 @@ import static mindustry.Vars.*;
 
 public class NetworkIO{
 
-    public static void writeWorld(Player player, OutputStream os){
+    public static void writeWorld(Playerc player, OutputStream os){
 
         try(DataOutputStream stream = new DataOutputStream(os)){
             stream.writeUTF(JsonIO.write(state.rules));
@@ -25,7 +25,7 @@ public class NetworkIO{
             stream.writeInt(state.wave);
             stream.writeFloat(state.wavetime);
 
-            stream.writeInt(player.id);
+            stream.writeInt(player.id());
             player.write(stream);
 
             SaveIO.getSaveWriter().writeContentHeader(stream);
@@ -45,11 +45,11 @@ public class NetworkIO{
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();
 
-            entities.clear();
+            Groups.all.clear();
             int id = stream.readInt();
-            player.resetNoAdd();
+            player.reset();
             player.read(stream);
-            player.resetID(id);
+            player.id(id);
             player.add();
 
             SaveIO.getSaveWriter().readContentHeader(stream);
@@ -62,7 +62,7 @@ public class NetworkIO{
     }
 
     public static ByteBuffer writeServerData(){
-        String name = (headless ? Config.name.string() : player.name);
+        String name = (headless ? Config.name.string() : player.name());
         String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
         String map = world.getMap() == null ? "None" : world.getMap().name();
 
@@ -71,7 +71,7 @@ public class NetworkIO{
         writeString(buffer, name, 100);
         writeString(buffer, map);
 
-        buffer.putInt(playerGroup.size());
+        buffer.putInt(Groups.player.size());
         buffer.putInt(state.wave);
         buffer.putInt(Version.build);
         writeString(buffer, Version.type);

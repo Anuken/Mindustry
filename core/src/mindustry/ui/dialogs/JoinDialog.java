@@ -95,11 +95,16 @@ public class JoinDialog extends FloatingDialog{
             }
         });
 
-        onResize(this::setup);
+        onResize(() -> {
+            setup();
+            refreshLocal();
+            refreshRemote();
+        });
     }
 
     void setupRemote(){
         remote.clear();
+
         for(Server server : servers){
             //why are java lambdas this bad
             TextButton[] buttons = {null};
@@ -152,7 +157,7 @@ public class JoinDialog extends FloatingDialog{
 
             inner.addImageButton(Icon.trash, Styles.emptyi, () -> {
                 ui.showConfirm("$confirm", "$server.delete", () -> {
-                    servers.removeValue(server, true);
+                    servers.remove(server, true);
                     saveServers();
                     setupRemote();
                     refreshRemote();
@@ -243,22 +248,22 @@ public class JoinDialog extends FloatingDialog{
             t.add("$name").padRight(10);
             if(!steam){
                 t.addField(Core.settings.getString("name"), text -> {
-                    player.name = text;
+                    player.name(text);
                     Core.settings.put("name", text);
                     Core.settings.save();
                 }).grow().pad(8).get().setMaxLength(maxNameLength);
             }else{
-                t.add(player.name).update(l -> l.setColor(player.color)).grow().pad(8);
+                t.add(player.name()).update(l -> l.setColor(player.color())).grow().pad(8);
             }
 
             ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new PaletteDialog().show(color -> {
-                    player.color.set(color);
+                    player.color().set(color);
                     Core.settings.put("color-0", Color.rgba8888(color));
                     Core.settings.save();
                 });
             }).size(54f).get();
-            button.update(() -> button.getStyle().imageUpColor = player.color);
+            button.update(() -> button.getStyle().imageUpColor = player.color());
         }).width(w).height(70f).pad(4);
         cont.row();
         cont.add(pane).width(w + 38).pad(0);
@@ -266,7 +271,7 @@ public class JoinDialog extends FloatingDialog{
         cont.addCenteredImageTextButton("$server.add", Icon.add, () -> {
             renaming = null;
             add.show();
-        }).marginLeft(6).width(w).height(80f).update(button -> {
+        }).marginLeft(10).width(w).height(80f).update(button -> {
             float pw = w;
             float pad = 0f;
             if(pane.getChildren().first().getPrefHeight() > pane.getHeight()){
@@ -330,7 +335,7 @@ public class JoinDialog extends FloatingDialog{
     }
 
     public void connect(String ip, int port){
-        if(player.name.trim().isEmpty()){
+        if(player.name().trim().isEmpty()){
             ui.showInfo("$noname");
             return;
         }
@@ -363,7 +368,7 @@ public class JoinDialog extends FloatingDialog{
     }
 
     float targetWidth(){
-        return Core.graphics.isPortrait() ? 350f : 500f;
+        return Math.min(Core.graphics.getWidth() / Scl.scl() * 0.9f, 500f);//Core.graphics.isPortrait() ? 350f : 500f;
     }
 
     @SuppressWarnings("unchecked")

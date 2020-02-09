@@ -30,6 +30,7 @@ steam_appid.txt
 /android/assets/mindustry-maps/
 /android/assets/mindustry-saves/
 /core/assets/gifexport/
+/annotations/src/main/resources/META-INF/services
 /core/assets/version.properties
 /core/assets/locales
 /ios/src/mindustry/gen/

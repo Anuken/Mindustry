@@ -1,17 +1,16 @@
 package mindustry.world.blocks.production;
 
-import arc.Core;
-import arc.graphics.Color;
+import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.Mathf;
-import arc.math.Rand;
-import arc.util.Time;
-import mindustry.content.Fx;
-import mindustry.entities.type.TileEntity;
-import mindustry.graphics.Pal;
-import mindustry.ui.Bar;
-import mindustry.world.Tile;
-import mindustry.world.meta.Attribute;
+import arc.math.*;
+import arc.util.*;
+import mindustry.content.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.ui.*;
+import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 
@@ -44,7 +43,7 @@ public class Cultivator extends GenericCrafter{
         super.update(tile);
 
         CultivatorEntity entity = tile.ent();
-        entity.warmup = Mathf.lerpDelta(entity.warmup, entity.cons.valid() ? 1f : 0f, 0.015f);
+        entity.warmup = Mathf.lerpDelta(entity.warmup, entity.consValid() ? 1f : 0f, 0.015f);
     }
 
     @Override
@@ -55,6 +54,13 @@ public class Cultivator extends GenericCrafter{
         ((((CultivatorEntity)entity).boost + 1f) * ((CultivatorEntity)entity).warmup) * 100f, 1),
         () -> Pal.ammo,
         () -> ((CultivatorEntity)entity).warmup));
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.affinities, attribute);
     }
 
     @Override
@@ -104,7 +110,7 @@ public class Cultivator extends GenericCrafter{
     }
 
     @Override
-    protected float getProgressIncrease(TileEntity entity, float baseTime){
+    protected float getProgressIncrease(Tilec entity, float baseTime){
         CultivatorEntity c = (CultivatorEntity)entity;
         return super.getProgressIncrease(entity, baseTime) * (1f + c.boost);
     }
@@ -120,8 +126,8 @@ public class Cultivator extends GenericCrafter{
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
             warmup = stream.readFloat();
         }
     }

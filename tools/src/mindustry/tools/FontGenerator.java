@@ -46,7 +46,8 @@ public class FontGenerator{
 
         Log.info("Merge...");
 
-        OS.exec("fontforge", "-script", "core/assets-raw/fontgen/merge.pe");
+        //don't merge since it breaks the font
+        //OS.exec("fontforge", "-script", "core/assets-raw/fontgen/merge.pe");
 
         Log.info("Done.");
     }

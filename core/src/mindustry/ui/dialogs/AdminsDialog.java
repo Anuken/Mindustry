@@ -41,9 +41,9 @@ public class AdminsDialog extends FloatingDialog{
             res.addImageButton(Icon.cancel, () -> {
                 ui.showConfirm("$confirm", "$confirmunadmin", () -> {
                     netServer.admins.unAdminPlayer(info.id);
-                    playerGroup.all().each(player -> {
-                        if(player != null && player.uuid != null && player.uuid.equals(info.id)){
-                            player.isAdmin = false;
+                    Groups.player.each(player -> {
+                        if(player != null && !player.isLocal() && player.uuid().equals(info.id)){
+                            player.admin(false);
                         }
                     });
                     setup();

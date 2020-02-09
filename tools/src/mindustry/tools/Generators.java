@@ -1,13 +1,15 @@
 package mindustry.tools;
 
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.ctype.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.tools.ImagePacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -184,47 +186,30 @@ public class Generators{
             }
         });
 
-        ImagePacker.generate("mech-icons", () -> {
-            for(Mech mech : content.<Mech>getBy(ContentType.mech)){
-                mech.load();
-                mech.weapon.load();
-
-                Image image = ImagePacker.get(mech.region);
-
-                if(!mech.flying){
-                    image.drawCenter(mech.baseRegion);
-                    image.drawCenter(mech.legRegion);
-                    image.drawCenter(mech.legRegion, true, false);
-                    image.drawCenter(mech.region);
-                }
-
-                int off = image.width / 2 - mech.weapon.region.getWidth() / 2;
-
-                for(int i : Mathf.signs){
-                    image.draw(mech.weapon.region, i * (int)mech.weaponOffsetX*4 + off, -(int)mech.weaponOffsetY*4 + off, i > 0, false);
-                }
-
-                image.save("mech-" + mech.name + "-full");
-            }
-        });
-
         ImagePacker.generate("unit-icons", () -> {
-            content.<UnitType>getBy(ContentType.unit).each(type -> !type.flying, type -> {
+            content.units().each(type -> !type.flying, type -> {
                 type.load();
-                type.weapon.load();
 
                 Image image = ImagePacker.get(type.region);
 
-                image.draw(type.baseRegion);
-                image.draw(type.legRegion);
-                image.draw(type.legRegion, true, false);
+                if(type.constructor.get() instanceof Legsc){
+                    image.draw(type.baseRegion);
+                    image.draw(type.legRegion);
+                    image.draw(type.legRegion, true, false);
+                }
                 image.draw(type.region);
 
-                for(boolean b : Mathf.booleans){
-                    image.draw(type.weapon.region,
-                    (int)(Mathf.sign(b) * type.weapon.width / Draw.scl + image.width / 2 - type.weapon.region.getWidth() / 2),
-                    (int)(type.weaponOffsetY / Draw.scl + image.height / 2f - type.weapon.region.getHeight() / 2f),
-                    b, false);
+                for(Weapon weapon : type.weapons){
+                    weapon.load();
+
+                    for(int i : (weapon.mirror ? Mathf.signs : Mathf.one)){
+                        i *= Mathf.sign(weapon.flipped);
+
+                        image.draw(weapon.region,
+                        (int)(i * weapon.x / Draw.scl + image.width / 2 - weapon.region.getWidth() / 2),
+                        (int)(weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
+                        i > 0, false);
+                    }
                 }
 
                 image.save("unit-" + type.name + "-full");
@@ -290,6 +275,33 @@ public class Generators{
 
                 }catch(Exception ignored){}
             });
+        });
+
+        ImagePacker.generate("scorches", () -> {
+            for(int size = 0; size < 10; size++){
+                for(int i = 0; i < 3; i++){
+                    ScorchGenerator gen = new ScorchGenerator();
+                    double multiplier = 30;
+                    double ss = size * multiplier / 20.0;
+
+                    gen.seed = Mathf.random(100000);
+                    gen.size += size*multiplier;
+                    gen.scale = gen.size / 80f * 18f;
+                    //gen.nscl -= size * 0.2f;
+                    gen.octaves += ss/3.0;
+                    gen.pers += ss/10.0/5.0;
+
+                    gen.scale += Mathf.range(3f);
+                    gen.scale -= ss*2f;
+                    gen.nscl -= Mathf.random(1f);
+
+                    Pixmap out = gen.generate();
+                    Pixmap median = Pixmaps.median(out, 2, 0.75);
+                    Fi.get("../rubble/scorch-" + size + "-" + i + ".png").writePNG(median);
+                    out.dispose();
+                    median.dispose();
+                }
+            }
         });
     }
 

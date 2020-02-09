@@ -17,17 +17,15 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.Placement.*;
-import mindustry.net.*;
 import mindustry.net.Administration.*;
+import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.fragments.*;
 import mindustry.world.*;
@@ -56,6 +54,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public int rotation;
     public boolean droppingItem;
     public Group uiGroup;
+    public boolean isShooting, isBuilding = true, buildWasAutoPaused = false;
 
     protected @Nullable Schematic lastSchematic;
     protected GestureDetector detector;
@@ -67,23 +66,51 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     //methods to override
 
+    @Remote(called = Loc.server, unreliable = true)
+    public static void transferItemEffect(Item item, float x, float y, Itemsc to){
+        if(to == null) return;
+        createItemTransfer(item, x, y, to, null);
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void transferItemToUnit(Item item, float x, float y, Itemsc to){
+        if(to == null) return;
+        createItemTransfer(item, x, y, to, () -> to.addItem(item));
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void transferItemTo(Item item, int amount, float x, float y, Tile tile){
+        if(tile == null || tile.entity == null || tile.entity.items() == null) return;
+        for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
+            Time.run(i * 3, () -> createItemTransfer(item, x, y, tile, () -> {}));
+        }
+        tile.entity.items().add(item, amount);
+    }
+
+    public static void createItemTransfer(Item item, float x, float y, Position to, Runnable done){
+        Fx.itemTransfer.at(x, y, 0, item.color, to);
+        if(done != null){
+            Time.run(Fx.itemTransfer.lifetime, done);
+        }
+    }
+
     @Remote(variants = Variant.one)
     public static void removeQueueBlock(int x, int y, boolean breaking){
-        player.removeRequest(x, y, breaking);
+        player.builder().removeBuild(x, y, breaking);
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
-    public static void dropItem(Player player, float angle){
-        if(net.server() && player.item().amount <= 0){
+    public static void dropItem(Playerc player, float angle){
+        if(net.server() && player.unit().stack().amount <= 0){
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
-        Effects.effect(Fx.dropItem, Color.white, player.x, player.y, angle, player.item().item);
-        player.clearItem();
+        Fx.dropItem.at(player.x(), player.y(), angle, Color.white, player.unit().item());
+        player.unit().clearItem();
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
-    public static void rotateBlock(Player player, Tile tile, boolean direction){
+    public static void rotateBlock(Playerc player, Tile tile, boolean direction){
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.rotate, tile, action -> action.rotation = Mathf.mod(tile.rotation() + Mathf.sign(direction), 4)))){
             throw new ValidateException(player, "Player cannot rotate a block.");
@@ -98,61 +125,42 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
-    public static void transferInventory(Player player, Tile tile){
-        if(player == null || player.timer == null) return;
-        if(net.server() && (player.item().amount <= 0 || player.isTransferring|| !Units.canInteract(player, tile) ||
+    public static void transferInventory(Playerc player, Tile tile){
+        if(player == null) return;
+        if(net.server() && (player.unit().stack().amount <= 0 || !Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.depositItem, tile, action -> {
-                action.itemAmount = player.item().amount;
-                action.item = player.item().item;
+                action.itemAmount = player.unit().stack().amount;
+                action.item = player.unit().item();
             }))){
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
 
         if(tile.entity == null) return;
 
-        player.isTransferring = true;
-
-        Item item = player.item().item;
-        int amount = player.item().amount;
-        int accepted = tile.block().acceptStack(item, amount, tile, player);
-        player.item().amount -= accepted;
+        Item item = player.unit().item();
+        int amount = player.unit().stack().amount;
+        int accepted = tile.block().acceptStack(item, amount, tile, player.unit());
+        player.unit().stack().amount -= accepted;
 
         int sent = Mathf.clamp(accepted / 4, 1, 8);
-        int removed = accepted / sent;
-        int[] remaining = {accepted, accepted};
         Block block = tile.block();
 
         Core.app.post(() -> Events.fire(new DepositEvent(tile, player, item, accepted)));
 
         for(int i = 0; i < sent; i++){
-            boolean end = i == sent - 1;
-            Time.run(i * 3, () -> {
-                tile.block().getStackOffset(item, tile, stackTrns);
+            tile.block().getStackOffset(item, tile, stackTrns);
 
-                ItemTransfer.create(item,
-                player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
-                new Vec2(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
-                    if(tile.block() != block || tile.entity == null || tile.entity.items == null) return;
+            createItemTransfer(item, player.x() + Angles.trnsx(player.unit().rotation() + 180f, backTrns), player.y() + Angles.trnsy(player.unit().rotation() + 180f, backTrns),
+            new Vec2(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
+                if(tile.block() != block || tile.entity == null || tile.entity.items() == null) return;
 
-                    tile.block().handleStack(item, removed, tile, player);
-                    remaining[1] -= removed;
-
-                    if(end && remaining[1] > 0){
-                        tile.block().handleStack(item, remaining[1], tile, player);
-                    }
-                });
-
-                remaining[0] -= removed;
-
-                if(end){
-                    player.isTransferring = false;
-                }
+                tile.block().handleStack(item, accepted, tile, player.unit());
             });
         }
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void onTileTapped(Player player, Tile tile){
+    public static void onTileTapped(Playerc player, Tile tile){
         if(tile == null || player == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.tapTile, tile, action -> {}))) throw new ValidateException(player, "Player cannot tap a tile.");
@@ -161,7 +169,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
-    public static void onTileConfig(Player player, Tile tile, int value){
+    public static void onTileConfig(Playerc player, Tile tile, int value){
         if(tile == null) return;
 
         if(net.server() && (!Units.canInteract(player, tile) ||
@@ -172,7 +180,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public Eachable<BuildRequest> allRequests(){
         return cons -> {
-            for(BuildRequest request : player.buildQueue()) cons.get(request);
+            for(BuildRequest request : player.builder().requests()) cons.get(request);
             for(BuildRequest request : selectRequests) cons.get(request);
             for(BuildRequest request : lineRequests) cons.get(request);
         };
@@ -183,7 +191,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void update(){
-
+        player.typing(ui.chatfrag.shown());
     }
 
     public float getMouseX(){
@@ -248,7 +256,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void useSchematic(Schematic schem){
-        selectRequests.addAll(schematics.toRequests(schem, world.toTile(player.x), world.toTile(player.y)));
+        selectRequests.addAll(schematics.toRequests(schem, player.tileX(), player.tileY()));
     }
 
     protected void showSchematicSave(){
@@ -374,7 +382,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             return r2.overlaps(r1);
         };
 
-        for(BuildRequest req : player.buildQueue()){
+        for(BuildRequest req : player.builder().requests()){
             if(test.get(req)) return req;
         }
 
@@ -403,7 +411,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.color(Pal.remove);
         Lines.stroke(1f);
 
-        for(BuildRequest req : player.buildQueue()){
+        for(BuildRequest req : player.builder().requests()){
             if(req.breaking) continue;
             if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 drawBreaking(req);
@@ -417,7 +425,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        for(BrokenBlock req : player.getTeam().data().brokenBlocks){
+        for(BrokenBlock req : player.team().data().brokenBlocks){
             Block block = content.block(req.block);
             if(block.bounds(req.x, req.y, Tmp.r2).overlaps(Tmp.r1)){
                 drawSelected(req.x, req.y, content.block(req.block), Pal.remove);
@@ -464,7 +472,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(copy.hasConfig && copy.block.posConfig){
                     copy.config = Pos.get(Pos.x(copy.config) + copy.x - copy.originalX, Pos.y(copy.config) + copy.y - copy.originalY);
                 }
-                player.addBuildRequest(copy);
+                player.builder().addBuild(copy);
             }
         }
     }
@@ -508,7 +516,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //remove build requests
         Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
 
-        Iterator<BuildRequest> it = player.buildQueue().iterator();
+        Iterator<BuildRequest> it = player.builder().requests().iterator();
         while(it.hasNext()){
             BuildRequest req = it.next();
             if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
@@ -525,7 +533,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         //remove blocks to rebuild
-        Iterator<BrokenBlock> broken = state.teams.get(player.getTeam()).brokenBlocks.iterator();
+        Iterator<BrokenBlock> broken = state.teams.get(player.team()).brokenBlocks.iterator();
         while(broken.hasNext()){
             BrokenBlock req = broken.next();
             Block block = content.block(req.block);
@@ -565,7 +573,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         boolean consumed = false, showedInventory = false;
 
         //check if tapped block is configurable
-        if(tile.block().configurable && tile.interactable(player.getTeam())){
+        if(tile.block().configurable && tile.interactable(player.team())){
             consumed = true;
             if(((!frag.config.isShown() && tile.block().shouldShowConfigure(tile, player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
@@ -587,15 +595,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         //call tapped event
-        if(!consumed && tile.interactable(player.getTeam())){
+        if(!consumed && tile.interactable(player.team())){
             Call.onTileTapped(player, tile);
         }
 
         //consume tap event if necessary
-        if(tile.interactable(player.getTeam()) && tile.block().consumesTap){
+        if(tile.interactable(player.team()) && tile.block().consumesTap){
             consumed = true;
-        }else if(tile.interactable(player.getTeam()) && tile.block().synthetic() && !consumed){
-            if(tile.block().hasItems && tile.entity.items.total() > 0){
+        }else if(tile.interactable(player.team()) && tile.block().synthetic() && !consumed){
+            if(tile.block().hasItems && tile.entity.items().total() > 0){
                 frag.inv.showFor(tile);
                 consumed = true;
                 showedInventory = true;
@@ -619,14 +627,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean canTapPlayer(float x, float y){
-        return Mathf.dst(x, y, player.x, player.y) <= playerSelectRange && player.item().amount > 0;
+        return player.within(x, y, playerSelectRange) && player.unit().stack().amount > 0;
     }
 
     /** Tries to begin mining a tile, returns true if successful. */
     boolean tryBeginMine(Tile tile){
         if(canMine(tile)){
             //if a block is clicked twice, reset it
-            player.setMineTile(player.getMineTile() == tile ? null : tile);
+            player.miner().mineTile(player.miner().mineTile() == tile ? null : tile);
             return true;
         }
         return false;
@@ -634,10 +642,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
-        && tile.drop() != null && tile.drop().hardness <= player.mech.drillPower
+        && tile.drop() != null && player.miner().canMine(tile.drop())
         && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
-        && player.acceptsItem(tile.drop())
-        && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= Player.mineDistance;
+        && player.unit().acceptsItem(tile.drop())
+        && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= miningRange;
     }
 
     /** Returns the tile at the specified MOUSE coordinates. */
@@ -704,7 +712,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void add(){
-        Core.input.addProcessor(detector = new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
+        Core.input.getInputProcessors().remove(i -> i instanceof InputHandler || (i instanceof GestureDetector && ((GestureDetector)i).getListener() instanceof InputHandler));
+        Core.input.addProcessor(detector = new GestureDetector(20, 0.5f, 0.3f, 0.15f, this));
         Core.input.addProcessor(this);
         if(Core.scene != null){
             Table table = (Table)Core.scene.find("inputTable");
@@ -721,10 +730,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             frag.add();
         }
-
-        if(player != null){
-            player.isBuilding = true;
-        }
     }
 
     public boolean canShoot(){
@@ -740,16 +745,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void tryDropItems(Tile tile, float x, float y){
-        if(!droppingItem || player.item().amount <= 0 || canTapPlayer(x, y) || state.isPaused() ){
+        if(!droppingItem || player.unit().stack().amount <= 0 || canTapPlayer(x, y) || state.isPaused() ){
             droppingItem = false;
             return;
         }
 
         droppingItem = false;
 
-        ItemStack stack = player.item();
+        ItemStack stack = player.unit().stack();
 
-        if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.interactable(player.getTeam()) && tile.block().hasItems && player.item().amount > 0 && !player.isTransferring && tile.interactable(player.getTeam())){
+        if(tile.block().acceptStack(stack.item, stack.amount, tile, player.unit()) > 0 && tile.interactable(player.team()) && tile.block().hasItems && player.unit().stack().amount > 0 && tile.interactable(player.team())){
             Call.transferInventory(player, tile);
         }else{
             Call.dropItem(player.angleTo(x, y));
@@ -773,7 +778,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean validPlace(int x, int y, Block type, int rotation, BuildRequest ignore){
-        for(BuildRequest req : player.buildQueue()){
+        for(BuildRequest req : player.builder().requests()){
             if(req != ignore
                     && !req.breaking
                     && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
@@ -781,24 +786,24 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 return false;
             }
         }
-        return Build.validPlace(player.getTeam(), x, y, type, rotation);
+        return Build.validPlace(player.team(), x, y, type, rotation);
     }
 
     public boolean validBreak(int x, int y){
-        return Build.validBreak(player.getTeam(), x, y);
+        return Build.validBreak(player.team(), x, y);
     }
 
     public void placeBlock(int x, int y, Block block, int rotation){
         BuildRequest req = getRequest(x, y);
         if(req != null){
-            player.buildQueue().remove(req);
+            player.builder().requests().remove(req);
         }
-        player.addBuildRequest(new BuildRequest(x, y, rotation, block));
+        player.builder().addBuild(new BuildRequest(x, y, rotation, block));
     }
 
     public void breakBlock(int x, int y){
         Tile tile = world.ltile(x, y);
-        player.addBuildRequest(new BuildRequest(tile.x, tile.y));
+        player.builder().addBuild(new BuildRequest(tile.x, tile.y));
     }
 
     public void drawArrow(Block block, int x, int y, int rotation){
@@ -896,4 +901,192 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         public int x, y, rotation;
         public boolean last;
     }
+
+    //TODO implement all of this!
+    /*
+        protected void updateKeyboard(){
+        Tile tile = world.tileWorld(x, y);
+        boolean canMove = !Core.scene.hasKeyboard() || ui.minimapfrag.shown();
+
+        isBoosting = Core.input.keyDown(Binding.dash) && !mech.flying;
+
+        //if player is in solid block
+        if(tile != null && tile.solid()){
+            isBoosting = true;
+        }
+
+        float speed = isBoosting && !mech.flying ? mech.boostSpeed : mech.speed;
+
+        if(mech.flying){
+            //prevent strafing backwards, have a penalty for doing so
+            float penalty = 0.2f; //when going 180 degrees backwards, reduce speed to 0.2x
+            speed *= Mathf.lerp(1f, penalty, Angles.angleDist(rotation, velocity.angle()) / 180f);
+        }
+
+        movement.setZero();
+
+        float xa = Core.input.axis(Binding.move_x);
+        float ya = Core.input.axis(Binding.move_y);
+        if(!(Core.scene.getKeyboardFocus() instanceof TextField)){
+            movement.y += ya * speed;
+            movement.x += xa * speed;
+        }
+
+        if(Core.input.keyDown(Binding.mouse_move)){
+            movement.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * speed;
+            movement.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * speed;
+        }
+
+        Vec2 vec = Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY());
+        pointerX = vec.x;
+        pointerY = vec.y;
+        updateShooting();
+
+        movement.limit(speed).scl(Time.delta());
+
+        if(canMove){
+            velocity.add(movement.x, movement.y);
+        }else{
+            isShooting = false;
+        }
+        float prex = x, prey = y;
+        updateVelocityStatus();
+        moved = dst(prex, prey) > 0.001f;
+
+        if(canMove){
+            float baseLerp = mech.getRotationAlpha(this);
+            if(!isShooting() || !mech.faceTarget){
+                if(!movement.isZero()){
+                    rotation = Mathf.slerpDelta(rotation, mech.flying ? velocity.angle() : movement.angle(), 0.13f * baseLerp);
+                }
+            }else{
+                float angle = control.input.mouseAngle(x, y);
+                this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f * baseLerp);
+            }
+        }
+    }
+
+    protected void updateShooting(){
+        if(!state.isEditor() && isShooting() && mech.canShoot(this)){
+            weapons.update(this);
+            //if(!mech.turnCursor){
+                //shoot forward ignoring cursor
+                //mech.weapon.update(this, x + Angles.trnsx(rotation, mech.weapon.targetDistance), y + Angles.trnsy(rotation, mech.weapon.targetDistance));
+            //}else{
+                //mech.weapon.update(this, pointerX, pointerY);
+            //}
+        }
+    }
+
+    protected void updateTouch(){
+        if(Units.invalidateTarget(target, this) &&
+            !(target instanceof Tilec && ((Tilec)target).damaged() && target.isValid() && target.team() == team && mech.canHeal && dst(target) < mech.range && !(((Tilec)target).block instanceof BuildBlock))){
+            target = null;
+        }
+
+        if(state.isEditor()){
+            target = null;
+        }
+
+        float targetX = Core.camera.position.x, targetY = Core.camera.position.y;
+        float attractDst = 15f;
+        float speed = isBoosting && !mech.flying ? mech.boostSpeed : mech.speed;
+
+        if(moveTarget != null && !moveTarget.dead()){
+            targetX = moveTarget.getX();
+            targetY = moveTarget.getY();
+            boolean tapping = moveTarget instanceof Tilec && moveTarget.team() == team;
+            attractDst = 0f;
+
+            if(tapping){
+                velocity.setAngle(angleTo(moveTarget));
+            }
+
+            if(dst(moveTarget) <= 2f * Time.delta()){
+                if(tapping && !dead()){
+                    Tile tile = ((Tilec)moveTarget).tile;
+                    tile.block().tapped(tile, this);
+                }
+
+                moveTarget = null;
+            }
+        }else{
+            moveTarget = null;
+        }
+
+        movement.set((targetX - x) / Time.delta(), (targetY - y) / Time.delta()).limit(speed);
+        movement.setAngle(Mathf.slerp(movement.angle(), velocity.angle(), 0.05f));
+
+        if(dst(targetX, targetY) < attractDst){
+            movement.setZero();
+        }
+
+        float expansion = 3f;
+
+        hitbox(rect);
+        rect.x -= expansion;
+        rect.y -= expansion;
+        rect.width += expansion * 2f;
+        rect.height += expansion * 2f;
+
+        isBoosting = collisions.overlapsTile(rect) || dst(targetX, targetY) > 85f;
+
+        velocity.add(movement.scl(Time.delta()));
+
+        if(velocity.len() <= 0.2f && mech.flying){
+            rotation += Mathf.sin(Time.time() + id * 99, 10f, 1f);
+        }else if(target == null){
+            rotation = Mathf.slerpDelta(rotation, velocity.angle(), velocity.len() / 10f);
+        }
+
+        float lx = x, ly = y;
+        updateVelocityStatus();
+        moved = dst(lx, ly) > 0.001f;
+
+        if(mech.flying){
+            //hovering effect
+            x += Mathf.sin(Time.time() + id * 999, 25f, 0.08f);
+            y += Mathf.cos(Time.time() + id * 999, 25f, 0.08f);
+        }
+
+        //update shooting if not building, not mining and there's ammo left
+        if(!isBuilding() && mineTile() == null){
+
+            //autofire
+            if(target == null){
+                isShooting = false;
+                if(Core.settings.getBool("autotarget")){
+                    target = Units.closestTarget(team, x, y, mech.range, u -> u.team() != Team.derelict, u -> u.team() != Team.derelict);
+
+                    if(mech.canHeal && target == null){
+                        target = Geometry.findClosest(x, y, indexer.getDamaged(Team.sharded));
+                        if(target != null && dst(target) > mech.range){
+                            target = null;
+                        }else if(target != null){
+                            target = ((Tile)target).entity;
+                        }
+                    }
+
+                    if(target != null){
+                        mineTile(null);
+                    }
+                }
+            }else if(target.isValid() || (target instanceof Tilec && ((Tilec)target).damaged() && target.team() == team && mech.canHeal && dst(target) < mech.range)){
+                //rotate toward and shoot the target
+                if(mech.faceTarget){
+                    rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
+                }
+
+                Vec2 intercept = Predict.intercept(this, target, getWeapon().bullet.speed);
+
+                pointerX = intercept.x;
+                pointerY = intercept.y;
+
+                updateShooting();
+                isShooting = true;
+            }
+
+        }
+    }
+     */
 }

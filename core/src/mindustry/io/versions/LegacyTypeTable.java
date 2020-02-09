@@ -1,11 +1,5 @@
 package mindustry.io.versions;
 
-import arc.func.Prov;
-import mindustry.entities.type.Bullet;
-import mindustry.entities.effect.*;
-import mindustry.entities.type.Player;
-import mindustry.entities.type.base.*;
-
 /*
 Latest data: [build 81]
 
@@ -77,9 +71,9 @@ public class LegacyTypeTable{
 11 = Wraith
 12 = Ghoul
 13 = Revenant
-     */
+
     private static final Prov[] build81Table = {
-        Player::new,
+        Playerc::new,
         Fire::new,
         Puddle::new,
         MinerDrone::new,
@@ -96,7 +90,7 @@ public class LegacyTypeTable{
     };
 
     private static final Prov[] build80Table = {
-        Player::new,
+        Playerc::new,
         Fire::new,
         Puddle::new,
         Bullet::new,
@@ -115,7 +109,7 @@ public class LegacyTypeTable{
     };
 
     private static final Prov[] build79Table = {
-        Player::new,
+        Playerc::new,
         Fire::new,
         Puddle::new,
         Bullet::new,
@@ -141,5 +135,5 @@ public class LegacyTypeTable{
         }else{
             return build79Table;
         }
-    }
+    }*/
 }

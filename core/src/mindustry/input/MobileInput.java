@@ -16,12 +16,10 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -46,7 +44,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     private float lineScale;
     /** Animation data for crosshair. */
     private float crosshairScale;
-    private TargetTrait lastTarget;
+    private Teamc lastTarget;
     /** Used for shifting build requests. */
     private float shiftDeltaX, shiftDeltaY;
 
@@ -65,26 +63,29 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Down tracking for panning.*/
     private boolean down = false;
 
+    private Teamc target;
+
     //region utility methods
 
     /** Check and assign targets for a specific position. */
     void checkTargets(float x, float y){
-        Unit unit = Units.closestEnemy(player.getTeam(), x, y, 20f, u -> !u.isDead());
+        Unitc unit = Units.closestEnemy(player.team(), x, y, 20f, u -> !u.dead());
 
         if(unit != null){
-            player.setMineTile(null);
-            player.target = unit;
+            player.miner().mineTile(null);
+            target = unit;
         }else{
             Tile tile = world.ltileWorld(x, y);
 
-            if(tile != null && tile.synthetic() && player.getTeam().isEnemy(tile.getTeam())){
-                TileEntity entity = tile.entity;
-                player.setMineTile(null);
-                player.target = entity;
-            }else if(tile != null && player.mech.canHeal && tile.entity != null && tile.getTeam() == player.getTeam() && tile.entity.damaged()){
-                player.setMineTile(null);
-                player.target = tile.entity;
-            }
+            if(tile != null && tile.synthetic() && player.team().isEnemy(tile.team())){
+                Tilec entity = tile.entity;
+                player.miner().mineTile(null);
+                target = entity;
+                //TODO implement healing
+            }//else if(tile != null && player.unit().canHeal && tile.entity != null && tile.team() == player.team() && tile.entity.damaged()){
+             ///   player.miner().mineTile(null);
+            //    target = tile.entity;
+           // }
         }
     }
 
@@ -111,7 +112,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        for(BuildRequest req : player.buildQueue()){
+        for(BuildRequest req : player.builder().requests()){
             Tile other = world.tile(req.x, req.y);
 
             if(other == null || req.breaking) continue;
@@ -156,7 +157,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     void removeRequest(BuildRequest request){
-        selectRequests.removeValue(request, true);
+        selectRequests.remove(request, true);
         if(!request.breaking){
             removals.add(request);
         }
@@ -226,10 +227,10 @@ public class MobileInput extends InputHandler implements GestureListener{
                             }
 
                             if(other == null){
-                                player.addBuildRequest(copy);
+                                player.builder().addBuild(copy);
                             }else if(!other.breaking && other.x == request.x && other.y == request.y && other.block.size == request.block.size){
-                                player.buildQueue().remove(other);
-                                player.addBuildRequest(copy);
+                                player.builder().requests().remove(other);
+                                player.builder().addBuild(copy);
                             }
                         }
 
@@ -252,13 +253,13 @@ public class MobileInput extends InputHandler implements GestureListener{
         Boolp schem = () -> lastSchematic != null && !selectRequests.isEmpty();
 
         group.fill(t -> {
-            t.bottom().left().visible(() -> (player.isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
+            t.bottom().left().visible(() -> (player.builder().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
             t.addImageTextButton("$cancel", Icon.cancel, () -> {
-                player.clearBuilding();
+                player.builder().clearBuilding();
                 selectRequests.clear();
                 mode = none;
                 block = null;
-            }).width(155f);
+            }).width(155f).margin(12f);
         });
 
         group.fill(t -> {
@@ -377,8 +378,6 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        TargetTrait target = player.target;
-
         //draw targeting crosshair
         if(target != null && !state.isEditor()){
             if(target != lastTarget){
@@ -433,7 +432,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     @Override
     public void useSchematic(Schematic schem){
         selectRequests.clear();
-        selectRequests.addAll(schematics.toRequests(schem, world.toTile(player.x), world.toTile(player.y)));
+        selectRequests.addAll(schematics.toRequests(schem, player.tileX(), player.tileY()));
         lastSchematic = schem;
     }
 
@@ -443,7 +442,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         down = true;
 
-        if(player.isDead()) return false;
+        if(player.dead()) return false;
 
         //get tile on cursor
         Tile cursor = tileAt(screenX, screenY);
@@ -469,7 +468,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 lastLineY = tileY;
             }else if(!tryTapPlayer(worldx, worldy) && Core.settings.getBool("keyboard")){
                 //shoot on touch down when in keyboard mode
-                player.isShooting = true;
+                isShooting = true;
             }
         }
 
@@ -520,7 +519,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean longPress(float x, float y){
-        if(state.is(State.menu) || mode == none || player.isDead()) return false;
+        if(state.is(State.menu) || mode == none || player.dead()) return false;
 
         //get tile on cursor
         Tile cursor = tileAt(x, y);
@@ -537,10 +536,10 @@ public class MobileInput extends InputHandler implements GestureListener{
         lineMode = true;
 
         if(mode == breaking){
-            Effects.effect(Fx.tapBlock, cursor.worldx(), cursor.worldy(), 1f);
+            Fx.tapBlock.at(cursor.worldx(), cursor.worldy(), 1f);
         }else if(block != null){
             updateLine(lineStartX, lineStartY, cursor.x, cursor.y);
-            Effects.effect(Fx.tapBlock, cursor.worldx() + block.offset(), cursor.worldy() + block.offset(), block.size);
+            Fx.tapBlock.at(cursor.worldx() + block.offset(), cursor.worldy() + block.offset(), block.size);
         }
 
         return false;
@@ -579,13 +578,15 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void update(){
+        super.update();
+
         if(state.is(State.menu) ){
             selectRequests.clear();
             removals.clear();
             mode = none;
         }
 
-        if(player.isDead()){
+        if(player.dead()){
             mode = none;
         }
 
@@ -602,11 +603,11 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(Core.settings.getBool("keyboard")){
             if(Core.input.keyRelease(Binding.select)){
-                player.isShooting = false;
+                isShooting = false;
             }
 
-            if(player.isShooting && !canShoot()){
-                player.isShooting = false;
+            if(isShooting && !canShoot()){
+                isShooting = false;
             }
         }
 
