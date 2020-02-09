@@ -14,10 +14,8 @@ import arc.util.serialization.JsonValue.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
-import mindustry.entities.*;
-import mindustry.entities.type.Playerc;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.maps.Map;
@@ -84,8 +82,6 @@ public class ServerControl implements ApplicationListener{
         });
 
         Time.setDeltaProvider(() -> Core.graphics.getDeltaTime() * 60f);
-        Effects.setScreenShakeProvider((a, b) -> {});
-        Effects.setEffectProvider((a, b, c, d, e, f) -> {});
 
         registerCommands();
 
@@ -133,9 +129,9 @@ public class ServerControl implements ApplicationListener{
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
             if(state.rules.waves){
-                info("&lcGame over! Reached wave &ly{0}&lc with &ly{1}&lc players online on map &ly{2}&lc.", state.wave, playerGroup.size(), Strings.capitalize(world.getMap().name()));
+                info("&lcGame over! Reached wave &ly{0}&lc with &ly{1}&lc players online on map &ly{2}&lc.", state.wave, Groups.player.size(), Strings.capitalize(world.getMap().name()));
             }else{
-                info("&lcGame over! Team &ly{0}&lc is victorious with &ly{1}&lc players online on map &ly{2}&lc.", event.winner.name, playerGroup.size(), Strings.capitalize(world.getMap().name()));
+                info("&lcGame over! Team &ly{0}&lc is victorious with &ly{1}&lc players online on map &ly{2}&lc.", event.winner.name, Groups.player.size(), Strings.capitalize(world.getMap().name()));
             }
 
             //set next map to be played
@@ -294,10 +290,10 @@ public class ServerControl implements ApplicationListener{
 
                 info("  &ly{0} FPS, {1} MB used.", Core.graphics.getFramesPerSecond(), Core.app.getJavaHeap() / 1024 / 1024);
 
-                if(playerGroup.size() > 0){
-                    info("  &lyPlayers: {0}", playerGroup.size());
-                    for(Playerc p : playerGroup.all()){
-                        info("    &y{0} / {1}", p.name, p.uuid);
+                if(Groups.player.size() > 0){
+                    info("  &lyPlayers: {0}", Groups.player.size());
+                    for(Playerc p : Groups.player){
+                        info("    &y{0} / {1}", p.name(), p.uuid());
                     }
                 }else{
                     info("  &lyNo players connected.");
@@ -418,7 +414,7 @@ public class ServerControl implements ApplicationListener{
 
             for(Item item : content.items()){
                 if(item.type == ItemType.material){
-                    state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().block.itemCapacity);
+                    state.teams.cores(team).first().items().set(item, state.teams.cores(team).first().block().itemCapacity);
                 }
             }
 
@@ -576,11 +572,11 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Playerc target = playerGroup.find(p -> p.name.equals(arg[0]));
+            Playerc target = Groups.player.find(p -> p.name().equals(arg[0]));
 
             if(target != null){
-                Call.sendMessage("[scarlet] " + target.name + "[scarlet] has been kicked by the server.");
-                target.con.kick(KickReason.kick);
+                Call.sendMessage("[scarlet] " + target.name() + "[scarlet] has been kicked by the server.");
+                target.kick(KickReason.kick);
                 info("It is done.");
             }else{
                 info("Nobody with that name could be found...");
@@ -592,9 +588,9 @@ public class ServerControl implements ApplicationListener{
                 netServer.admins.banPlayerID(arg[1]);
                 info("Banned.");
             }else if(arg[0].equals("name")){
-                Playerc target = playerGroup.find(p -> p.name.equalsIgnoreCase(arg[1]));
+                Playerc target = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
                 if(target != null){
-                    netServer.admins.banPlayer(target.uuid);
+                    netServer.admins.banPlayer(target.uuid());
                     info("Banned.");
                 }else{
                     err("No matches found.");
@@ -606,10 +602,10 @@ public class ServerControl implements ApplicationListener{
                 err("Invalid type.");
             }
 
-            for(Playerc player : playerGroup.all()){
-                if(netServer.admins.isIDBanned(player.uuid)){
-                    Call.sendMessage("[scarlet] " + player.name + " has been banned.");
-                    player.con.kick(KickReason.banned);
+            for(Playerc player : Groups.player){
+                if(netServer.admins.isIDBanned(player.uuid())){
+                    Call.sendMessage("[scarlet] " + player.name() + " has been banned.");
+                    player.con().kick(KickReason.banned);
                 }
             }
         });
@@ -657,11 +653,11 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Playerc target = playerGroup.find(p -> p.name.equals(arg[0]));
+            Playerc target = Groups.player.find(p -> p.name().equals(arg[0]));
 
             if(target != null){
-                netServer.admins.adminPlayer(target.uuid, target.usid);
-                target.isAdmin = true;
+                netServer.admins.adminPlayer(target.uuid(), target.usid());
+                target.admin(true);
                 info("Admin-ed player: {0}", arg[0]);
             }else{
                 info("Nobody with that name could be found.");
@@ -674,11 +670,11 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Playerc target = playerGroup.find(p -> p.name.equals(arg[0]));
+            Playerc target = Groups.player.find(p -> p.name().equals(arg[0]));
 
             if(target != null){
-                netServer.admins.unAdminPlayer(target.uuid);
-                target.isAdmin = false;
+                netServer.admins.unAdminPlayer(target.uuid());
+                target.admin(false);
                 info("Un-admin-ed player: {0}", arg[0]);
             }else{
                 info("Nobody with that name could be found.");
@@ -855,9 +851,9 @@ public class ServerControl implements ApplicationListener{
         inExtraRound = true;
         Runnable r = () -> {
             Array<Playerc> players = new Array<>();
-            for(Playerc p : playerGroup.all()){
+            for(Playerc p : Groups.player){
                 players.add(p);
-                p.dead(true);
+                p.clearUnit();
             }
             
             logic.reset();
@@ -868,7 +864,7 @@ public class ServerControl implements ApplicationListener{
             logic.play();
 
             for(Playerc p : players){
-                if(p.con == null) continue;
+                if(p.con() == null) continue;
 
                 p.reset();
                 if(state.rules.pvp){

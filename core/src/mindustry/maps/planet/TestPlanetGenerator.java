@@ -18,10 +18,11 @@ public class TestPlanetGenerator implements PlanetGenerator{
     Array<Block> blocks = Array.with(Blocks.sporeMoss, Blocks.moss, Blocks.ice, Blocks.snow, Blocks.sand, Blocks.darksand, Blocks.darksandWater, Blocks.darksandTaintedWater, Blocks.iceSnow);
 
     public TestPlanetGenerator(){
+        //TODO remove planet pixmap
         try{
             pix = new Pixmap("planets/colors.png");
             water = waterLevel / (float)(pix.getHeight());
-        }catch(Exception ignored){
+        }catch(Throwable ignored){
             //ignored during headless loading for now
         }
     }
