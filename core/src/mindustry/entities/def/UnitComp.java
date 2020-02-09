@@ -152,6 +152,7 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
 
         //TODO cleanup
         //ScorchDecal.create(getX(), getY());
+        Effects.scorch(x, y, (int)(hitSize() / 5));
         Fx.explosion.at(this);
         Effects.shake(2f, 2f, this);
         type.deathSound.at(this);

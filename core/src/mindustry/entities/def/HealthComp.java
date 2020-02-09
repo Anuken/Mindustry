@@ -34,8 +34,12 @@ abstract class HealthComp implements Entityc{
     }
 
     void kill(){
+        if(dead) return;
+
         health = 0;
         dead = true;
+        killed();
+        remove();
     }
 
     void heal(){
@@ -50,8 +54,7 @@ abstract class HealthComp implements Entityc{
     void damage(float amount){
         health -= amount;
         if(health <= 0 && !dead){
-            dead = true;
-            killed();
+            kill();
         }
     }
 

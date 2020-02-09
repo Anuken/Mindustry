@@ -25,6 +25,7 @@ public class ImagePacker{
 
     public static void main(String[] args) throws Exception{
         Vars.headless = true;
+        ArcNativesLoader.load();
 
         Log.setLogger(new NoopLogHandler());
         Vars.content = new ContentLoader();

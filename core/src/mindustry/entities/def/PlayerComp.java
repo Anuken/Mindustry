@@ -59,6 +59,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
     }
 
     public void update(){
+        if(unit.dead()){
+            clearUnit();
+        }
+
         if(!dead()){
             x(unit.x());
             y(unit.y());

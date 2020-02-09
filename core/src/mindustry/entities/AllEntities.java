@@ -26,6 +26,9 @@ class AllEntities{
     @EntityDef({Unitc.class})
     class GenericUnitDef{}
 
+    @EntityDef(value = {Firec.class}, pooled = true)
+    class FireDef{}
+
     @GroupDef(Entityc.class)
     void all(){
 
