@@ -252,6 +252,7 @@ public class ServerControl implements ApplicationListener{
                 info("Map loaded.");
 
                 netServer.openServer();
+                Events.fire(new HostEvent());
             }catch(MapException e){
                 Log.err(e.map.name() + ": " + e.getMessage());
             }

@@ -208,6 +208,11 @@ public class EventType{
 
     }
 
+    /** Called when a server host started. */
+    public static class HostEvent{
+
+    }
+
     /** Called from the logic thread. Do not access graphics here! */
     public static class TileChangeEvent{
         public final Tile tile;
