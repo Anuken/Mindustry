@@ -3,6 +3,7 @@ package mindustry.entities;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
@@ -58,13 +59,12 @@ public class EntityCollisions{
     }
 
     public void moveDelta(Hitboxc entity, float deltax, float deltay, boolean x, SolidPred solidCheck){
-        Rect rect = r1;
-        entity.hitboxTile(rect);
+        entity.hitboxTile(r1);
         entity.hitboxTile(r2);
-        rect.x += deltax;
-        rect.y += deltay;
+        r1.x += deltax;
+        r1.y += deltay;
 
-        int tilex = Math.round((rect.x + rect.width / 2) / tilesize), tiley = Math.round((rect.y + rect.height / 2) / tilesize);
+        int tilex = Math.round((r1.x + r1.width / 2) / tilesize), tiley = Math.round((r1.y + r1.height / 2) / tilesize);
 
         for(int dx = -r; dx <= r; dx++){
             for(int dy = -r; dy <= r; dy++){
@@ -72,17 +72,16 @@ public class EntityCollisions{
                 if(solidCheck.solid(wx, wy)){
                     tmp.setSize(tilesize).setCenter(wx * tilesize, wy * tilesize);
 
-                    if(tmp.overlaps(rect)){
-                        Vec2 v = Geometry.overlap(rect, tmp, x);
-                        rect.x += v.x;
-                        rect.y += v.y;
+                    if(tmp.overlaps(r1)){
+                        Vec2 v = Geometry.overlap(r1, tmp, x);
+                        if(x) r1.x += v.x;
+                        if(!x) r1.y += v.y;
                     }
                 }
             }
         }
 
-        entity.x(entity.getX() + rect.x - r2.x);
-        entity.y(entity.getY() + rect.y - r2.y);
+        entity.trns(r1.x - r2.x, r1.y - r2.y);
     }
 
     public boolean overlapsTile(Rect rect){
