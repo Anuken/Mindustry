@@ -71,16 +71,16 @@ public class ThreshUnloader extends Block{
                         if(other.entity.items.total() > nThreshold) {
                             Item iitem = other.entity.items.takeMaxItem(nThreshold);
                             if (iitem != null) {
-                                // Every time an item gets deliverd, cut the polling rate penalty by 15% to quickly bring the rate back to full.
+                                // Every time an item gets deliverd, cut the polling rate penalty to quickly bring the rate back to full.
                                 // Also produces a neat ramp-up visual effect as the unloader comes out hibernation.
-                                entity.polladjust = entity.polladjust * 0.85f + 0.15f;
+                                entity.polladjust = entity.polladjust * 0.90f + 0.10f;
                                 offloadNear(tile, iitem);
                             } else {
-                                // Since the max search algorithm is mildly CPU-intensive, reduce the polling rate by 3% each time it fails to return anything to pass along.
-                                entity.polladjust *= 1.03;
-                                // Cap the polling rate reduction to 25X to keep the idle tick rate reasonable.
-                                if (entity.polladjust > 25f)
-                                    entity.polladjust = 25f;
+                                // Since the max search algorithm is mildly CPU-intensive, reduce the polling rate each time it fails to return anything to pass along.
+                                entity.polladjust *= 1.07;
+                                // Cap the polling rate reduction to 20X to keep the idle tick rate reasonable.
+                                if (entity.polladjust > 20f)
+                                    entity.polladjust = 20f;
                             }
                         }
                     }
@@ -89,11 +89,11 @@ public class ThreshUnloader extends Block{
                         int nThreshold = (int)(other.block().getMaximumAccepted(other, null) * entity.threshold.launcherFrac);
                         if(other.entity.items.total() > nThreshold) {
                             offloadNear(tile, other.entity.items.takeMaxItem(0));
-                            entity.polladjust = entity.polladjust * 0.85f + 0.15f;
+                            entity.polladjust = entity.polladjust * 0.90f + 0.10f;
                         } else {
-                            entity.polladjust *= 1.03;
-                            if (entity.polladjust > 25f)
-                                entity.polladjust = 25f;
+                            entity.polladjust *= 1.07;
+                            if (entity.polladjust > 20f)
+                                entity.polladjust = 20f;
                         }
                     }
                 }
