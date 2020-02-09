@@ -21,7 +21,7 @@ import static mindustry.Vars.content;
 public class ThreshUnloader extends Block{
     public float speed = 1f;
 
-    public final int timerUnload = timers++;
+    public final int timerThreshUnload = timers++;
     private static Threshold lastThreshold;
 
     public ThreshUnloader(String name){
@@ -62,7 +62,7 @@ public class ThreshUnloader extends Block{
     public void update(Tile tile){
         ThreshUnloaderEntity entity = tile.ent();
 
-        if(tile.entity.timer.get(timerUnload, speed * entity.polladjust / entity.timeScale) && tile.entity.items.total() == 0){
+        if(tile.entity.timer.get(timerThreshUnload, speed * entity.polladjust / entity.timeScale) && tile.entity.items.total() == 0){
             for(Tile other : tile.entity.proximity()){
                 if(other.interactable(tile.getTeam()) && other.block().unloadable && other.block().hasItems && entity.items.total() == 0){
                     // If the target is a vault, try to take an item that is above threshold.
@@ -78,9 +78,9 @@ public class ThreshUnloader extends Block{
                             } else {
                                 // Since the max search algorithm is mildly CPU-intensive, reduce the polling rate by 3% each time it fails to return anything to pass along.
                                 entity.polladjust *= 1.03;
-                                // Cap the polling rate reduction to 100X
-                                if (entity.polladjust > 100f)
-                                    entity.polladjust = 100f;
+                                // Cap the polling rate reduction to 25X to keep the idle tick rate reasonable.
+                                if (entity.polladjust > 25f)
+                                    entity.polladjust = 25f;
                             }
                         }
                     }
@@ -92,8 +92,8 @@ public class ThreshUnloader extends Block{
                             entity.polladjust = entity.polladjust * 0.85f + 0.15f;
                         } else {
                             entity.polladjust *= 1.03;
-                            if (entity.polladjust > 100f)
-                                entity.polladjust = 100f;
+                            if (entity.polladjust > 25f)
+                                entity.polladjust = 25f;
                         }
                     }
                 }
