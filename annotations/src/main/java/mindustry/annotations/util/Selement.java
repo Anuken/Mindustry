@@ -18,6 +18,10 @@ public class Selement<T extends Element>{
         this.e = e;
     }
 
+    public Array<Selement<?>> enclosed(){
+        return Array.with(e.getEnclosedElements()).map(Selement::new);
+    }
+
     public String fullName(){
         return e.toString();
     }

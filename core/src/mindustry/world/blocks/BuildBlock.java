@@ -9,6 +9,7 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -156,8 +157,7 @@ public class BuildBlock extends Block{
         Fx.blockExplosionSmoke.at(tile);
 
         if(!tile.floor().solid && !tile.floor().isLiquid){
-            //TODO implement
-           // RubbleDecal.create(tile.drawx(), tile.drawy(), size);
+            Effects.rubble(tile.drawx(), tile.drawy(), size);
         }
     }
 

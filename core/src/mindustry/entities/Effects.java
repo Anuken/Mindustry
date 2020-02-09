@@ -2,11 +2,13 @@ package mindustry.entities;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 
 import static mindustry.Vars.*;
 
@@ -32,7 +34,7 @@ public class Effects{
         shake(intensity, duration, loc.getX(), loc.getY());
     }
 
-    public static void createEffect(Effect effect, float x, float y, float rotation, Color color, Object data){
+    public static void create(Effect effect, float x, float y, float rotation, Color color, Object data){
         if(headless || effect == Fx.none) return;
         if(Core.settings.getBool("effects")){
             Rect view = Core.camera.bounds(Tmp.r1);
@@ -50,5 +52,26 @@ public class Effects{
                 entity.add();
             }
         }
+    }
+
+    public static void decal(TextureRegion region, float x, float y, float rotation, float lifetime, Color color){
+        if(headless || region == null) return;
+
+        Decalc decal = DecalEntity.create();
+        decal.set(x, y);
+        decal.rotation(rotation);
+        decal.lifetime(lifetime);
+        decal.color().set(color);
+        decal.region(region);
+        decal.add();
+    }
+
+    public static void rubble(float x, float y, int blockSize){
+        if(headless) return;
+
+        TextureRegion region = Core.atlas.find("rubble-" + blockSize + "-" + Mathf.random(0, 1));
+        if(!Core.atlas.isFound(region)) return;
+
+        decal(region, x, y, Mathf.random(0, 4) * 90, 3600, Pal.rubble);
     }
 }

@@ -161,10 +161,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
         filer = env.getFiler();
         messager = env.getMessager();
 
-        //System.setProperty("debug", "true");
+        Log.setLogLevel(LogLevel.info);
 
-        if(System.getProperty("debug") == null){
-            Log.setLogLevel(LogLevel.err);
+        if(System.getProperty("debug") != null){
+            Log.setLogLevel(LogLevel.debug);
         }
     }
 

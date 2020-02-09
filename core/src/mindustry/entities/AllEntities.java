@@ -17,7 +17,7 @@ class AllEntities{
     @EntityDef(value = {GroundEffectc.class, Childc.class}, pooled = true)
     class GroundEffectDef{}
 
-    @EntityDef({Decalc.class})
+    @EntityDef(value = {Decalc.class}, pooled = true)
     class DecalDef{}
 
     @EntityDef({Playerc.class})

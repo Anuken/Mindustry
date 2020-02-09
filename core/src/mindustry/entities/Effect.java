@@ -42,35 +42,35 @@ public class Effect{
     }
 
     public void at(Position pos){
-        Effects.createEffect(this, pos.getX(), pos.getY(), 0, Color.white, null);
+        Effects.create(this, pos.getX(), pos.getY(), 0, Color.white, null);
     }
 
     public void at(Position pos, float rotation){
-        Effects.createEffect(this, pos.getX(), pos.getY(), rotation, Color.white, null);
+        Effects.create(this, pos.getX(), pos.getY(), rotation, Color.white, null);
     }
 
     public void at(float x, float y){
-        Effects.createEffect(this, x, y, 0, Color.white, null);
+        Effects.create(this, x, y, 0, Color.white, null);
     }
 
     public void at(float x, float y, float rotation){
-        Effects.createEffect(this, x, y, rotation, Color.white, null);
+        Effects.create(this, x, y, rotation, Color.white, null);
     }
 
     public void at(float x, float y, float rotation, Color color){
-        Effects.createEffect(this, x, y, rotation, color, null);
+        Effects.create(this, x, y, rotation, color, null);
     }
 
     public void at(float x, float y, Color color){
-        Effects.createEffect(this, x, y, 0, color, null);
+        Effects.create(this, x, y, 0, color, null);
     }
 
     public void at(float x, float y, float rotation, Color color, Object data){
-        Effects.createEffect(this, x, y, rotation, color, data);
+        Effects.create(this, x, y, rotation, color, data);
     }
 
     public void at(float x, float y, float rotation, Object data){
-        Effects.createEffect(this, x, y, rotation, Color.white, data);
+        Effects.create(this, x, y, rotation, Color.white, data);
     }
 
     public void render(int id, Color color, float life, float rotation, float x, float y, Object data){

@@ -4,7 +4,7 @@ package mindustry.ctype;
 public enum ContentType{
     item,
     block,
-    mech,
+    mech_UNUSED,
     bullet,
     liquid,
     status,

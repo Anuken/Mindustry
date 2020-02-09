@@ -142,18 +142,18 @@ public class EntityProcess extends BaseProcessor{
 
                 //LOGGING
 
-                Log.info("&gGenerating interface for " + component.name());
+                Log.debug("&gGenerating interface for " + component.name());
 
                 for(TypeName tn : inter.superinterfaces){
-                    Log.info("&g> &lbextends {0}", simpleName(tn.toString()));
+                    Log.debug("&g> &lbextends {0}", simpleName(tn.toString()));
                 }
 
                 //log methods generated
                 for(MethodSpec spec : inter.methodSpecs){
-                    Log.info("&g> > &c{0} {1}({2})", simpleName(spec.returnType.toString()), spec.name, Array.with(spec.parameters).toString(", ", p -> simpleName(p.type.toString()) + " " + p.name));
+                    Log.debug("&g> > &c{0} {1}({2})", simpleName(spec.returnType.toString()), spec.name, Array.with(spec.parameters).toString(", ", p -> simpleName(p.type.toString()) + " " + p.name));
                 }
 
-                Log.info("");
+                Log.debug("");
             }
 
             //generate special render layer interfaces
