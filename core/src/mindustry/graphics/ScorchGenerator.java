@@ -2,6 +2,7 @@ package mindustry.graphics;
 
 import arc.graphics.*;
 import arc.math.*;
+import arc.util.*;
 import arc.util.noise.*;
 
 /** Generates a scorch pixmap based on parameters. Thread safe, unless multiple scorch generators are running in parallel. */
@@ -21,7 +22,7 @@ public class ScorchGenerator{
             scaled -= noise(Angles.angle(x, y, size/2, size/2))*nscl;
             boolean present = scaled < 1.5f;
 
-            if(present) pix.draw(x, y, color);
+            pix.draw(x, y, Tmp.c1.set(Color.white).a(Mathf.clamp(1f + 1.5f - (float)scaled)));
         });
 
         return pix;
