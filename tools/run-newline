@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# add newlines to all files
+git ls-files -z | while IFS= read -rd '' f; do tail -c1 < "$f" | read -r _ || echo >> "$f"; done
+
+# undo the changes in these
+git checkout -- "*.png"
+git checkout -- "*.msav"
+git checkout -- "*.jar"
+git checkout -- "*.ogg"
+git checkout -- "*.ico"
+git checkout -- "*.icns"
+git checkout -- "*.ttf"
+git checkout -- "*.glsl"

@@ -18,6 +18,7 @@ logs/
 /annotations/out/
 /net/build/
 /tools/build/
+/core/build/
 /tests/build/
 /server/build/
 changelog
