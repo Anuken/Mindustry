@@ -11,6 +11,13 @@ public class Svar extends Selement<VariableElement>{
         super(e);
     }
 
+    public boolean isAny(Modifier... mods){
+        for(Modifier m : mods){
+            if(is(m)) return true;
+        }
+        return false;
+    }
+
     public boolean is(Modifier mod){
         return e.getModifiers().contains(mod);
     }

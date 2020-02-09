@@ -105,7 +105,7 @@ public class EntityProcess extends BaseProcessor{
                 //add utility methods to interface
                 for(Smethod method : component.methods()){
                     //skip private methods, those are for internal use.
-                    if(method.is(Modifier.PRIVATE)) continue;
+                    if(method.isAny(Modifier.PRIVATE, Modifier.STATIC)) continue;
 
                     //keep track of signatures used to prevent dupes
                     signatures.add(method.e.toString());
@@ -353,6 +353,8 @@ public class EntityProcess extends BaseProcessor{
                     MethodSpec.Builder resetBuilder = MethodSpec.methodBuilder("reset").addModifiers(Modifier.PUBLIC);
                     for(FieldSpec spec : builder.fieldSpecs){
                         Svar variable = specVariables.get(spec);
+                        if(variable.isAny(Modifier.STATIC, Modifier.FINAL)) continue;
+
                         if(spec.type.isPrimitive()){
                             //set to primitive default
                             resetBuilder.addStatement("$L = $L", spec.name, varInitializers.containsKey(variable) ? varInitializers.get(variable) : getDefault(spec.type.toString()));
