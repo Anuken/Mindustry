@@ -27,7 +27,6 @@ abstract class FireComp implements Timedc, Posc, Firec{
     private Block block;
     private float baseFlammability = -1, puddleFlammability;
 
-    //TODO move these somewhere else.
     /** Start a fire on the tile. If there already is a file there, refreshes its lifetime. */
     public static void create(Tile tile){
         if(net.client() || tile == null) return; //not clientside.
@@ -139,4 +138,10 @@ abstract class FireComp implements Timedc, Posc, Firec{
             unit -> unit.apply(StatusEffects.burning, 60 * 5));
         }
     }
+
+    @Override
+    public void remove(){
+        map.remove(tile.pos());
+    }
+
 }
