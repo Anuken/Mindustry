@@ -205,8 +205,7 @@ public class Logic implements ApplicationListener{
 
         if(!state.is(State.menu)){
             if(!net.client()){
-                //TODO
-                //state.enemies = Groups.unit.count(b -> b.team() == state.rules.waveTeam && b.countsAsEnemy());
+                state.enemies = Groups.unit.count(b -> b.team() == state.rules.waveTeam && b.type().isCounted);
             }
 
             if(!state.isPaused()){
@@ -223,39 +222,6 @@ public class Logic implements ApplicationListener{
                 }
 
                 Groups.update();
-
-                //TODO update groups
-                /*
-                if(!headless){
-                    effectGroup.update();
-                    groundEffectGroup.update();
-                }
-
-                if(!state.isEditor()){
-                    Groups.unit.update();
-                    puddleGroup.update();
-                    shieldGroup.update();
-                    bulletGroup.update();
-                    tileGroup.update();
-                    fireGroup.update();
-                    weatherGroup.update();
-                }else{
-                    Groups.unit.updateEvents();
-                    collisions.updatePhysics(Groups.unit);
-                }
-
-
-                Groups.player.update();
-
-                //effect group only contains item transfers in the headless version, update it!
-                if(headless){
-                    effectGroup.update();
-                }
-
-                if(!state.isEditor()){
-                    //bulletGroup
-                    collisions.collideGroups(bulletGroup, Groups.unit);
-                }*/
             }
 
             if(!net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver){

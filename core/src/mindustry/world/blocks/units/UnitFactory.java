@@ -8,6 +8,7 @@ import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -52,14 +53,11 @@ public class UnitFactory extends Block{
         Fx.producesmoke.at(tile.drawx(), tile.drawy());
 
         if(!net.client()){
-            //TODO create the unit
-            /*
             Unitc unit = factory.unitType.create(tile.team());
-            unit.setSpawner(tile);
             unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
             unit.add();
             unit.vel().y = factory.launchVelocity;
-            Events.fire(new UnitCreateEvent(unit));*/
+            Events.fire(new UnitCreateEvent(unit));
         }
     }
 

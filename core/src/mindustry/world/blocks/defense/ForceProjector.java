@@ -140,8 +140,7 @@ public class ForceProjector extends Block{
         paramTile = tile;
         paramEntity = entity;
         paramBlock = this;
-        //TODO fix
-        //bulletGroup.intersect(tile.drawx() - realRadius, tile.drawy() - realRadius, realRadius*2f, realRadius * 2f, shieldConsumer);
+        Groups.bullet.intersect(tile.drawx() - realRadius, tile.drawy() - realRadius, realRadius*2f, realRadius * 2f, shieldConsumer);
     }
 
     float realRadius(ForceEntity entity){

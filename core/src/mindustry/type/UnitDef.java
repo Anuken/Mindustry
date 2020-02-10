@@ -32,7 +32,7 @@ public class UnitDef extends UnlockableContent{
     public float drag = 0.3f, mass = 1f, accel = 0.1f;
     public float health = 200f, range = -1;
     public boolean targetAir = false, targetGround = false;
-    public boolean faceTarget = true;
+    public boolean faceTarget = true, isCounted = true;
 
     public int itemCapacity = 30;
     public int drillTier = -1;

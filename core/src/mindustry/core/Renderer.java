@@ -1,6 +1,7 @@
 package mindustry.core;
 
 import arc.*;
+import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
@@ -73,23 +74,6 @@ public class Renderer implements ApplicationListener{
             landTime = 0f;
             graphics.clear(Color.black);
         }else{
-            Vec2 position = Tmp.v3.set(player);
-
-            //TODO camera controls should be in input
-            /*
-            if(player.dead()){
-                Tilec core = player.closestCore();
-                if(core != null){
-                    if(player.spawner == null){
-                        camera.position.lerpDelta(core.x, core.y, 0.08f);
-                    }else{
-                        camera.position.lerpDelta(position, 0.08f);
-                    }
-                }
-            }else if(control.input instanceof DesktopInput && !state.isPaused()){
-                camera.position.lerpDelta(position, 0.08f);
-            }*/
-
             updateShake(0.75f);
             if(pixelator.enabled()){
                 pixelator.drawPixelate();
@@ -280,174 +264,6 @@ public class Renderer implements ApplicationListener{
             Draw.reset();
         }
     }
-/*
-    public void draw(){
-        camera.update();
-
-        if(Float.isNaN(camera.position.x) || Float.isNaN(camera.position.y)){
-            camera.position.x = player.x;
-            camera.position.y = player.y;
-        }
-
-        graphics.clear(clearColor);
-
-        if(!graphics.isHidden() && (Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")) && (effectBuffer.getWidth() != graphics.getWidth() || effectBuffer.getHeight() != graphics.getHeight())){
-            effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
-        }
-
-        Draw.proj(camera.projection());
-
-        blocks.floor.drawFloor();
-
-        groundEffectGroup.draw(e -> e instanceof BelowLiquidTrait);
-        puddleGroup.draw();
-        groundEffectGroup.draw(e -> !(e instanceof BelowLiquidTrait));
-
-        blocks.processBlocks();
-
-        blocks.drawShadows();
-        Draw.color();
-
-        blocks.floor.beginDraw();
-        blocks.floor.drawLayer(CacheLayer.walls);
-        blocks.floor.endDraw();
-
-        blocks.drawBlocks(Layer.block);
-        blocks.drawFog();
-
-        blocks.drawDestroyed();
-
-        Draw.shader(Shaders.blockbuild, true);
-        blocks.drawBlocks(Layer.placement);
-        Draw.shader();
-
-        blocks.drawBlocks(Layer.overlay);
-
-        drawGroundShadows();
-
-        drawAllTeams(false);
-
-        blocks.drawBlocks(Layer.turret);
-
-        drawFlyerShadows();
-
-        blocks.drawBlocks(Layer.power);
-        blocks.drawBlocks(Layer.lights);
-
-        drawAllTeams(true);
-
-        Draw.flush();
-        if(bloom != null && !pixelator.enabled()){
-            bloom.capture();
-        }
-
-        bulletGroup.draw();
-        effectGroup.draw();
-
-        Draw.flush();
-        if(bloom != null && !pixelator.enabled()){
-            bloom.render();
-        }
-
-        overlays.drawBottom();
-        Groups.player.draw(p -> p.isLocal, Playerc::drawBuildRequests);
-
-        if(shieldGroup.countInBounds() > 0){
-            if(settings.getBool("animatedshields") && Shaders.shield != null){
-                Draw.flush();
-                effectBuffer.begin();
-                graphics.clear(Color.clear);
-                shieldGroup.draw();
-                shieldGroup.draw(shield -> true, ShieldEntity::drawOver);
-                Draw.flush();
-                effectBuffer.end();
-                Draw.shader(Shaders.shield);
-                Draw.color(Pal.accent);
-                Draw.rect(Draw.wrap(effectBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
-                Draw.color();
-                Draw.shader();
-            }else{
-                shieldGroup.draw(shield -> true, ShieldEntity::drawSimple);
-            }
-        }
-
-        overlays.drawTop();
-
-        Groups.player.draw(p -> !p.isDead(), Playerc::drawName);
-
-        if(state.rules.lighting){
-            lights.draw();
-        }
-
-        drawLanding();
-
-        Draw.color();
-        Draw.flush();
-    }
-
-    private void drawLanding(){
-        if(landTime > 0 && player.closestCore() != null){
-            float fract = landTime / Fx.coreLand.lifetime;
-            Tilec entity = player.closestCore();
-
-            TextureRegion reg = entity.block.icon(Cicon.full);
-            float scl = Scl.scl(4f) / camerascale;
-            float s = reg.getWidth() * Draw.scl * scl * 4f * fract;
-
-            Draw.color(Pal.lightTrail);
-            Draw.rect("circle-shadow", entity.getX(), entity.getY(), s, s);
-
-            Angles.randLenVectors(1, (1f- fract), 100, 1000f * scl * (1f-fract), (x, y, fin, fout) -> {
-                Lines.stroke(scl * fin);
-                Lines.lineAngle(entity.getX() + x, entity.getY() + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
-            });
-
-            Draw.color();
-            Draw.mixcol(Color.white, fract);
-            Draw.rect(reg, entity.getX(), entity.getY(), reg.getWidth() * Draw.scl * scl, reg.getHeight() * Draw.scl * scl, fract * 135f);
-
-            Draw.reset();
-        }
-    }
-
-    private void drawGroundShadows(){
-        Draw.color(0, 0, 0, 0.4f);
-        float rad = 1.6f;
-
-        Cons<Unitc> draw = u -> {
-            float size = Math.max(u.getIconRegion().getWidth(), u.getIconRegion().getHeight()) * Draw.scl;
-            Draw.rect("circle-shadow", u.x, u.y, size * rad, size * rad);
-        };
-
-        Groups.unit.draw(unit -> !unit.isDead(), draw::get);
-
-        if(!Groups.player.isEmpty()){
-            Groups.player.draw(unit -> !unit.isDead(), draw::get);
-        }
-
-        Draw.color();
-    }
-
-    private void drawFlyerShadows(){
-        float trnsX = -12, trnsY = -13;
-        Draw.color(0, 0, 0, 0.22f);
-
-        Groups.unit.draw(unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
-        Groups.player.draw(unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
-
-        Draw.color();
-    }
-
-    private void drawAllTeams(boolean flying){
-        Groups.unit.draw(u -> u.isFlying() == flying && !u.isDead(), Unitc::drawUnder);
-        Groups.player.draw(p -> p.isFlying() == flying && !p.isDead(), Unitc::drawUnder);
-
-        Groups.unit.draw(u -> u.isFlying() == flying && !u.isDead(), Unitc::drawAll);
-        Groups.player.draw(p -> p.isFlying() == flying, Unitc::drawAll);
-
-        Groups.unit.draw(u -> u.isFlying() == flying && !u.isDead(), Unitc::drawOver);
-        Groups.player.draw(p -> p.isFlying() == flying, Unitc::drawOver);
-    }*/
 
     public void scaleCamera(float amount){
         targetscale += amount;
@@ -474,9 +290,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public void takeMapScreenshot(){
-        //TODO uncomment
-        /*
-        drawGroundShadows();
+        Groups.drawGroundShadows();
 
         int w = world.width() * tilesize, h = world.height() * tilesize;
         int memory = w * h * 4 / 1024 / 1024;
@@ -524,7 +338,7 @@ public class Renderer implements ApplicationListener{
         buffer.dispose();
 
         Core.settings.put("animatedwater", hadWater);
-        Core.settings.put("animatedshields", hadShields);*/
+        Core.settings.put("animatedshields", hadShields);
     }
 
 }

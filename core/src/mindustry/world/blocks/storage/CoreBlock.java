@@ -1,21 +1,19 @@
 package mindustry.world.blocks.storage;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.gen.*;
-import mindustry.gen.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
@@ -136,10 +134,9 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public float handleDamage(Tile tile, float amount){
-        //TODO implement
-        //if(player != null && tile.team() == player.team()){
-        //    Events.fire(Trigger.teamCoreDamage);
-        //}
+        if(player != null && tile.team() == player.team()){
+            Events.fire(Trigger.teamCoreDamage);
+        }
         return amount;
     }
 

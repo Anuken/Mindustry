@@ -20,7 +20,7 @@ class AllDefs{
 
     }
 
-    @GroupDef(value = Unitc.class, spatial = true)
+    @GroupDef(value = Unitc.class, spatial = true, collide = {unit.class})
     class unit{
 
     }
