@@ -3,7 +3,6 @@ package mindustry.entities;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
@@ -223,6 +222,8 @@ public class EntityCollisions{
                 sc.hitbox(r1);
                 if(r2.overlaps(r1)){
                     checkCollide(solid, sc);
+                    //break out of loop when this object hits something
+                    if(!solid.isAdded()) return;
                 }
             }
         });

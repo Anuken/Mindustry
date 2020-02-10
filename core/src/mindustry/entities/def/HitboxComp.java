@@ -17,6 +17,12 @@ abstract class HitboxComp implements Posc, QuadTreeObject{
 
     }
 
+    @Override
+    public void add(){
+        lastX = x;
+        lastY = y;
+    }
+
     void updateLastPosition(){
         lastX = x;
         lastY = y;
@@ -35,8 +41,7 @@ abstract class HitboxComp implements Posc, QuadTreeObject{
     }
 
     boolean collides(Hitboxc other){
-        return Intersector.overlapsRect(x - hitSize/2f, y - hitSize/2f, hitSize, hitSize,
-        other.x() - other.hitSize()/2f, other.y() - other.hitSize()/2f, other.hitSize(), other.hitSize());
+        return true;
     }
 
     @Override

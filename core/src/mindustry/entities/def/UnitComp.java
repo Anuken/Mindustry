@@ -150,8 +150,6 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
         float flammability = item().flammability * stack().amount;
         Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame);
 
-        //TODO cleanup
-        //ScorchDecal.create(getX(), getY());
         Effects.scorch(x, y, (int)(hitSize() / 5));
         Fx.explosion.at(this);
         Effects.shake(2f, 2f, this);
@@ -159,9 +157,8 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
 
         Events.fire(new UnitDestroyEvent(this));
 
-        //TODO implement suicide bomb trigger
-        //if(explosiveness > 7f && this == player){
-        //    Events.fire(Trigger.suicideBomb);
-        //}
+        if(explosiveness > 7f && isLocal()){
+            Events.fire(Trigger.suicideBomb);
+        }
     }
 }

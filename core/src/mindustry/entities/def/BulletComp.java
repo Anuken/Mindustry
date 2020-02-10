@@ -56,16 +56,30 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         return damage * damageMultiplier();
     }
 
+    @Replace
+    @Override
+    public boolean collides(Hitboxc other){
+        return type.collides && (other instanceof Teamc && ((Teamc)other).team() != team()) && !(other instanceof Flyingc && ((Flyingc)other).isFlying() && !type.collidesAir);
+    }
+
+    @MethodPriority(100)
     @Override
     public void collision(Hitboxc other, float x, float y){
-        if(!type.pierce) remove();
         type.hit(this, x, y);
+
+        if(other instanceof Healthc){
+            Healthc h = (Healthc)other;
+            h.damage(damage);
+        }
 
         if(other instanceof Unitc){
             Unitc unit = (Unitc)other;
             unit.vel().add(Tmp.v3.set(other.x(), other.y()).sub(x, y).setLength(type.knockback / unit.mass()));
             unit.apply(type.status, type.statusDuration);
         }
+
+        //must be last.
+        if(!type.pierce) remove();
     }
 
     @Override

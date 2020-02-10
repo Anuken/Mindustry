@@ -155,6 +155,8 @@ public class UnitDef extends UnlockableContent{
     }
 
     public void drawWeapons(Unitc unit){
+        Draw.mixcol(Color.white, unit.hitTime());
+
         for(WeaponMount mount : unit.mounts()){
             Weapon weapon = mount.weapon;
 
@@ -173,10 +175,12 @@ public class UnitDef extends UnlockableContent{
                 rotation);
             }
         }
+
+        Draw.reset();
     }
 
     public void drawBody(Unitc unit){
-        Draw.mixcol(Color.white, unit.hitAlpha());
+        Draw.mixcol(Color.white, unit.hitTime());
 
         Draw.rect(region, unit, unit.rotation() - 90);
 
@@ -196,7 +200,7 @@ public class UnitDef extends UnlockableContent{
     }
 
     public void drawLegs(Legsc unit){
-        Draw.mixcol(Color.white, unit.hitAlpha());
+        Draw.mixcol(Color.white, unit.hitTime());
 
         float ft = Mathf.sin(unit.walkTime(), 6f, 2f + unit.hitSize() / 15f);
 
