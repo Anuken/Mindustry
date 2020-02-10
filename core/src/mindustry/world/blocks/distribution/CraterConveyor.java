@@ -26,8 +26,6 @@ import static mindustry.Vars.*;
 public class CraterConveyor extends Block implements Autotiler{
     private TextureRegion[] regions = new TextureRegion[8];
 
-    protected final Array<Tile> upstreamTiles = new Array<>();
-
     public float speed = 0f;
 
     public CraterConveyor(String name){
@@ -142,7 +140,7 @@ public class CraterConveyor extends Block implements Autotiler{
 
         entity.blendbit2 = 0;
         if(bits[0] == 0 && blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) entity.blendbit2 = 5; // a 0 that faces into a crater conveyor with none behind it
-        if(!upstream(tile, upstreamTiles).isEmpty() && !blends(tile, tile.rotation(), 0)) entity.blendbit2 = 6; // a 0 that faces into none with a crater conveyor behind it
+        if(bits[0] == 0 && !blends(tile, tile.rotation(), 0)) entity.blendbit2 = 6; // a 0 that faces into none with a crater conveyor behind it
 
         entity.blendbit1 = bits[0];
         entity.blendsclx = bits[1];
@@ -285,7 +283,7 @@ public class CraterConveyor extends Block implements Autotiler{
         if(    entity.blendbit1 == 0 // 1 input from the back, 0 from the sides
             || entity.blendbit1 == 2 // 1 input from the back, 1 from the sides
             || entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
-        )   if(blends(tile, tile.rotation(), 2)) cons.get(tile.back());
+        ) cons.get(tile.back());
 
         if(    entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
             || entity.blendbit1 == 4 // 0 input from the back, 2 from the sides
@@ -298,12 +296,6 @@ public class CraterConveyor extends Block implements Autotiler{
             ||(entity.blendbit1 == 1 && entity.blendscly == +1) // side is open
             ||(entity.blendbit1 == 2 && entity.blendscly == -1) // side is open
         ) cons.get(tile.left());
-    }
-
-    private Array<Tile> upstream(Tile tile, Array<Tile> upstreamTiles){
-        upstreamTiles.clear();
-        upstream(tile, upstreamTiles::add);
-        return upstreamTiles;
     }
 
     // ▲ | ▼ fixme: refactor
