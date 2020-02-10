@@ -35,7 +35,7 @@ public class EntityProcess extends BaseProcessor{
     ObjectMap<Svar, String> varInitializers = new ObjectMap<>();
     ObjectMap<Smethod, String> methodBlocks = new ObjectMap<>();
     ObjectSet<String> imports = new ObjectSet<>();
-    Array<Smethod> allGroups = new Array<>();
+    Array<Selement> allGroups = new Array<>();
     Array<Selement> allDefs = new Array<>();
     Array<Stype> allInterfaces = new Array<>();
 
@@ -45,7 +45,7 @@ public class EntityProcess extends BaseProcessor{
 
     @Override
     public void process(RoundEnvironment env) throws Exception{
-        allGroups.addAll(methods(GroupDef.class));
+        allGroups.addAll(elements(GroupDef.class));
         allDefs.addAll(elements(EntityDef.class));
         allInterfaces.addAll(types(EntityInterface.class));
 
@@ -169,17 +169,18 @@ public class EntityProcess extends BaseProcessor{
         }else if(round == 2){ //round 2: get component classes and generate interfaces for them
 
             //parse groups
-            for(Smethod group : allGroups){
+            for(Selement<?> group : allGroups){
                 GroupDef an = group.annotation(GroupDef.class);
-                Array<Stype> types = types(an, GroupDef::value).map(this::interfaceToComp);;
-                groupDefs.add(new GroupDefinition(group.name(), ClassName.bestGuess(packageName + "." + interfaceName(types.first())), types, an.spatial(), an.mapping()));
+                Array<Stype> types = types(an, GroupDef::value).map(this::interfaceToComp);
+                Array<Stype> collides = types(an, GroupDef::collide);
+                groupDefs.add(new GroupDefinition(group.name(), ClassName.bestGuess(packageName + "." + interfaceName(types.first())), types, an.spatial(), an.mapping(), collides));
             }
 
             //add special generated groups
             for(DrawLayer layer : DrawLayer.values()){
                 String name = "DrawLayer" + Strings.capitalize(layer.name()) + "c";
                 //create group definition with no components directly
-                GroupDefinition def = new GroupDefinition(layer.name(), ClassName.bestGuess(packageName + "." + name), Array.with(), false, false);
+                GroupDefinition def = new GroupDefinition(layer.name(), ClassName.bestGuess(packageName + "." + name), Array.with(), false, false, new Array<>(0));
                 //add manual inclusions of entities to be added to this group
                 def.manualInclusions.addAll(allDefs.select(s -> allComponents(s).contains(comp -> comp.interfaces().contains(in -> in.name().equals(name)))));
                 groupDefs.add(def);
@@ -419,6 +420,12 @@ public class EntityProcess extends BaseProcessor{
             }
 
             groupUpdate.addStatement("all.update()");
+
+            for(GroupDefinition group : groupDefs){
+                for(Stype collide : group.collides){
+                    groupUpdate.addStatement("$L.collide($L)", group.name, collide.name());
+                }
+            }
 
             for(DrawLayer layer : DrawLayer.values()){
                 MethodSpec.Builder groupDraw = MethodSpec.methodBuilder("draw" + Strings.capitalize(layer.name()))
@@ -673,15 +680,17 @@ public class EntityProcess extends BaseProcessor{
         final String name;
         final ClassName baseType;
         final Array<Stype> components;
+        final Array<Stype> collides;
         final boolean spatial, mapping;
         final ObjectSet<Selement> manualInclusions = new ObjectSet<>();
 
-        public GroupDefinition(String name, ClassName bestType, Array<Stype> components, boolean spatial, boolean mapping){
+        public GroupDefinition(String name, ClassName bestType, Array<Stype> components, boolean spatial, boolean mapping, Array<Stype> collides){
             this.baseType = bestType;
             this.components = components;
             this.name = name;
             this.spatial = spatial;
             this.mapping = mapping;
+            this.collides = collides;
         }
 
         @Override

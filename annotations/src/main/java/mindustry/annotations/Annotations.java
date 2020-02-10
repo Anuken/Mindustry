@@ -56,10 +56,10 @@ public class Annotations{
     }
 
     /** Creates a group that only examines entities that have all the components listed. */
-    @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface GroupDef{
         Class[] value();
+        Class[] collide() default {};
         boolean spatial() default false;
         boolean mapping() default false;
     }

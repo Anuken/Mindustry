@@ -6,27 +6,32 @@ import mindustry.gen.*;
 class AllDefs{
 
     @GroupDef(Entityc.class)
-    void all(){
+    class all{
 
     }
 
     @GroupDef(Playerc.class)
-    void player(){
+    class player{
+
+    }
+
+    @GroupDef(value = Bulletc.class, spatial = true, collide = {unit.class})
+    class bullet{
 
     }
 
     @GroupDef(value = Unitc.class, spatial = true)
-    void unit(){
+    class unit{
 
     }
 
     @GroupDef(Tilec.class)
-    void tile(){
+    class tile{
 
     }
 
     @GroupDef(Syncc.class)
-    void sync(){
+    class sync{
 
     }
 }
