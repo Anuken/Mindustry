@@ -101,19 +101,17 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void intersect(float x, float y, float width, float height, Cons<? super T> out){
         //don't waste time for empty groups
         if(isEmpty()) return;
-        tree().getIntersect(out, x, y, width, height);
+        tree.getIntersect(out, x, y, width, height);
     }
 
-    @SuppressWarnings("unchecked")
     public Array<T> intersect(float x, float y, float width, float height){
         intersectArray.clear();
         //don't waste time for empty groups
         if(isEmpty()) return intersectArray;
-        tree().getIntersect(intersectArray, intersectRect.set(x, y, width, height));
+        tree.getIntersect(intersectArray, intersectRect.set(x, y, width, height));
         return intersectArray;
     }
 

@@ -16,7 +16,7 @@ abstract class VelComp implements Posc{
     @MethodPriority(-1)
     @Override
     public void update(){
-        move(vel.x, vel.y);
+        move(vel.x * Time.delta(), vel.y * Time.delta());
         vel.scl(1f - drag * Time.delta());
     }
 
