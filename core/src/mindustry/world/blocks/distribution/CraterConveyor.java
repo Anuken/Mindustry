@@ -285,7 +285,7 @@ public class CraterConveyor extends Block implements Autotiler{
         if(    entity.blendbit1 == 0 // 1 input from the back, 0 from the sides
             || entity.blendbit1 == 2 // 1 input from the back, 1 from the sides
             || entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
-        ) cons.get(tile.back());
+        )   if(blends(tile, tile.rotation(), 2)) cons.get(tile.back());
 
         if(    entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
             || entity.blendbit1 == 4 // 0 input from the back, 2 from the sides
