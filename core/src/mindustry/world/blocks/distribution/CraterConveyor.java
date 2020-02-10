@@ -138,21 +138,18 @@ public class CraterConveyor extends Block implements Autotiler{
         CraterConveyorEntity entity = tile.ent();
         int[] bits = buildBlending(tile, tile.rotation(), null, true);
 
-        entity.blendbit1 = bits[0];
-        entity.blendbit2 = 0;
-        entity.blendsclx = bits[1];
-        entity.blendscly = bits[2];
-
-        if(bits[0] == 0 && blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) entity.blendbit2 = 5; // a 0 that faces into a crater conveyor with none behind it
-
-        // needs to be in between 5 and 6 due to race condition
         final boolean[] upstream = {false};
         upstream(tile, t -> {
-            Log.info(t);
-            upstream[0] = true;
+            if(t.block() instanceof CraterConveyor) upstream[0] = true;
         });
 
+        entity.blendbit2 = 0;
+        if(bits[0] == 0 && blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) entity.blendbit2 = 5; // a 0 that faces into a crater conveyor with none behind it
         if(upstream[0] && !blends(tile, tile.rotation(), 0)) entity.blendbit2 = 6; // a 0 that faces into none with a crater conveyor behind it
+
+        entity.blendbit1 = bits[0];
+        entity.blendsclx = bits[1];
+        entity.blendscly = bits[2];
     }
 
     @Override
@@ -291,7 +288,7 @@ public class CraterConveyor extends Block implements Autotiler{
         if(    entity.blendbit1 == 0 // 1 input from the back, 0 from the sides
             || entity.blendbit1 == 2 // 1 input from the back, 1 from the sides
             || entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
-        )   if(entity.blendbit2 != 5) cons.get(tile.back()); // unless it loads
+        ) cons.get(tile.back());
 
         if(    entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
             || entity.blendbit1 == 4 // 0 input from the back, 2 from the sides
