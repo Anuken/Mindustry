@@ -66,8 +66,7 @@ public class Damage{
             float cy = y + Mathf.range(range);
             Tile tile = world.tileWorld(cx, cy);
             if(tile != null){
-                //TODO uncomment
-                //Fire.create(tile);
+                Fires.create(tile);
             }
         }
     }

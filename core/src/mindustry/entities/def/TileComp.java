@@ -15,6 +15,7 @@ import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
+@EntityDef(value = {Tilec.class}, isFinal = false)
 @Component
 abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     static final float timeToSleep = 60f * 1;

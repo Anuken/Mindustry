@@ -192,11 +192,13 @@ public class EntityProcess extends BaseProcessor{
             for(Selement<?> type : allDefs){
                 EntityDef ann = type.annotation(EntityDef.class);
                 boolean isFinal = ann.isFinal();
-                if(type.isType() && !type.name().endsWith("Def")){
-                    err("All entity def names must end with 'Def'", type.e);
+
+                if(type.isType() && (!type.name().endsWith("Def") && !type.name().endsWith("Comp"))){
+                    err("All entity def names must end with 'Def'/'Comp'", type.e);
                 }
+
                 String name = type.isType() ?
-                    type.name().replace("Def", "Entity") :
+                    type.name().replace("Def", "Entity").replace("Comp", "Entity") :
                     createName(type);
 
                 //skip double classes

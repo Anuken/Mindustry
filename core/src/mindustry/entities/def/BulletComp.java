@@ -10,6 +10,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
+@EntityDef(value = {Bulletc.class}, pooled = true)
 @Component
 abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc, DrawLayerBulletsc{
     Object data;

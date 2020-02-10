@@ -29,16 +29,16 @@ public class Units{
      * @param range The maximum distance from the target X/Y the targeter can be for it to be valid
      * @return whether the target is invalid
      */
-    public static boolean invalidateTarget(Teamc target, Team team, float x, float y, float range){
-        return target == null || (range != Float.MAX_VALUE && !target.withinDst(x, y, range)) || target.team() == team || (target instanceof Healthc && !((Healthc)target).isValid());
+    public static boolean invalidateTarget(Posc target, Team team, float x, float y, float range){
+        return target == null || !target.isAdded() || (range != Float.MAX_VALUE && !target.withinDst(x, y, range)) || (target instanceof Teamc && ((Teamc)target).team() == team) || (target instanceof Healthc && !((Healthc)target).isValid());
     }
 
-    /** See {@link #invalidateTarget(Teamc, Team, float, float, float)} */
-    public static boolean invalidateTarget(Teamc target, Team team, float x, float y){
+    /** See {@link #invalidateTarget(Posc, Team, float, float, float)} */
+    public static boolean invalidateTarget(Posc target, Team team, float x, float y){
         return invalidateTarget(target, team, x, y, Float.MAX_VALUE);
     }
 
-    /** See {@link #invalidateTarget(Teamc, Team, float, float, float)} */
+    /** See {@link #invalidateTarget(Posc, Team, float, float, float)} */
     public static boolean invalidateTarget(Teamc target, Unitc targeter, float range){
         return invalidateTarget(target, targeter.team(), targeter.x(), targeter.y(), range);
     }

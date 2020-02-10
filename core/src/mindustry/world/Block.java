@@ -630,8 +630,7 @@ public class Block extends BlockStorage{
                     Time.run(i / 2f, () -> {
                         Tile other = world.tile(tile.x + Mathf.range(size / 2), tile.y + Mathf.range(size / 2));
                         if(other != null){
-                            //TODO puddle
-                            //Puddle.deposit(other, liquid, splash);
+                            Puddles.deposit(other, liquid, splash);
                         }
                     });
                 }

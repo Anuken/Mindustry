@@ -68,26 +68,16 @@ public class LiquidTurret extends Turret{
     }
 
     @Override
-    protected boolean validateTarget(Tile tile){
-        TurretEntity entity = tile.ent();
-        if(entity.liquids().current().canExtinguish() && entity.target instanceof Tile){
-            //TODO fix
-            //return Fire.has(((Tile)entity.target).x, ((Tile)entity.target).y);
-        }
-        return super.validateTarget(tile);
-    }
-
-    @Override
     protected void findTarget(Tile tile){
         TurretEntity entity = tile.ent();
         if(entity.liquids().current().canExtinguish()){
             int tr = (int)(range / tilesize);
             for(int x = -tr; x <= tr; x++){
                 for(int y = -tr; y <= tr; y++){
-                    //if(Fire.has(x + tile.x, y + tile.y)){
-                    //    entity.target = world.tile(x + tile.x, y + tile.y);
-                    //    return;
-                    //}
+                    if(Fires.has(x + tile.x, y + tile.y)){
+                        entity.target = Fires.get(x + tile.x, y + tile.y);
+                        return;
+                    }
                 }
             }
         }
@@ -103,7 +93,7 @@ public class LiquidTurret extends Turret{
 
         type.shootEffect.at(tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation, entity.liquids().current().color);
         type.smokeEffect.at(tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation, entity.liquids().current().color);
-        //shootSound.at(tile);
+        shootSound.at(tile);
 
         if(shootShake > 0){
             Effects.shake(shootShake, shootShake, tile.entity);

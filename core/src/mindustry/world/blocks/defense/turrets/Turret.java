@@ -317,7 +317,7 @@ public abstract class Turret extends Block{
         public float recoil = 0f;
         public float heat;
         public int shots;
-        public Teamc target;
+        public Posc target;
 
         @Override
         public void write(DataOutput stream) throws IOException{

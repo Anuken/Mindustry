@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -47,13 +48,12 @@ public class LiquidBulletType extends BulletType{
         super.update(b);
 
         if(liquid.canExtinguish()){
-            //TODO implement
             Tile tile = world.tileWorld(b.x(), b.y());
-            //if(tile != null && Fire.has(tile.x, tile.y)){
-                //Fire.extinguish(tile, 100f);
-             //   b.remove();
-            //    hit(b);
-            //}
+            if(tile != null && Fires.has(tile.x, tile.y)){
+                Fires.extinguish(tile, 100f);
+                b.remove();
+                hit(b);
+            }
         }
     }
 
@@ -67,14 +67,13 @@ public class LiquidBulletType extends BulletType{
     @Override
     public void hit(Bulletc b, float hitx, float hity){
         hitEffect.at(hitx, hity, liquid.color);
-        //TODO implement
-       // Puddle.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
+        Puddles.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
 
         if(liquid.temperature <= 0.5f && liquid.flammability < 0.3f){
             float intensity = 400f;
-            //Fire.extinguish(world.tileWorld(hitx, hity), intensity);
+            Fires.extinguish(world.tileWorld(hitx, hity), intensity);
             for(Point2 p : Geometry.d4){
-            //    Fire.extinguish(world.tileWorld(hitx + p.x * tilesize, hity + p.y * tilesize), intensity);
+                Fires.extinguish(world.tileWorld(hitx + p.x * tilesize, hity + p.y * tilesize), intensity);
             }
         }
     }

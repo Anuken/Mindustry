@@ -425,8 +425,7 @@ public class Bullets implements ContentList{
                 if(Mathf.chance(0.04 * Time.delta())){
                     Tile tile = world.tileWorld(b.x(), b.y());
                     if(tile != null){
-                        //TODO implement
-                        //Fire.create(tile);
+                        Fires.create(tile);
                     }
                 }
 
@@ -521,8 +520,7 @@ public class Bullets implements ContentList{
             public void hit(Bulletc b, float hitx, float hity){
                 hitEffect.at(hitx, hity, colors[2]);
                 if(Mathf.chance(0.4)){
-                    //TODO implement
-                   // Fire.create(world.tileWorld(hitx + Mathf.range(5f), hity + Mathf.range(5f)));
+                    Fires.create(world.tileWorld(hitx + Mathf.range(5f), hity + Mathf.range(5f)));
                 }
             }
 
@@ -641,8 +639,7 @@ public class Bullets implements ContentList{
 
                 for(int i = 0; i < 3; i++){
                     Tile tile = world.tileWorld(x + Mathf.range(8f), y + Mathf.range(8f));
-                    //TODO implement
-                    //Puddle.deposit(tile, Liquids.oil, 5f);
+                    Puddles.deposit(tile, Liquids.oil, 5f);
                 }
             }
         };

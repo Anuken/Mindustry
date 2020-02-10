@@ -6,6 +6,7 @@ import arc.math.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 
+@EntityDef(value = {Decalc.class}, pooled = true)
 @Component
 abstract class DecalComp implements Drawc, Timedc, Rotc, Posc, DrawLayerFloorc{
     transient float x, y, rotation;

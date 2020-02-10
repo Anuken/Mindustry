@@ -7,6 +7,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
@@ -176,8 +177,7 @@ public abstract class BlockStorage extends UnlockableContent{
             }
         }else if(leakResistance != 100f && !next.block().solid && !next.block().hasLiquids){
             float leakAmount = tile.entity.liquids().get(liquid) / leakResistance;
-            //TODO deposit puddle
-            //Puddle.deposit(next, tile, liquid, leakAmount);
+            Puddles.deposit(next, tile, liquid, leakAmount);
             tile.entity.liquids().remove(liquid, leakAmount);
         }
         return 0;
