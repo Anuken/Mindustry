@@ -131,6 +131,10 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         return array.size == 0;
     }
 
+    public T index(int i){
+        return array.get(i);
+    }
+
     public int size(){
         return array.size;
     }
