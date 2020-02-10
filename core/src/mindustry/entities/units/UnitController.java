@@ -10,4 +10,8 @@ public interface UnitController{
     default void command(UnitCommand command){
 
     }
+
+    default void update(){
+
+    }
 }

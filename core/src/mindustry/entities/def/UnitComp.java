@@ -18,7 +18,7 @@ import mindustry.world.blocks.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, Drawc,
+abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, Drawc, Boundedc,
         DrawLayerGroundc, DrawLayerFlyingc, DrawLayerGroundShadowsc, DrawLayerFlyingShadowsc{
     transient float x, y, rotation;
 
@@ -125,6 +125,8 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
                 damageContinuous(floor.damageTaken);
             }
         }
+
+        controller.update();
     }
 
     @Override

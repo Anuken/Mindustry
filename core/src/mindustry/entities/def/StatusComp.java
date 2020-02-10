@@ -36,7 +36,8 @@ abstract class StatusComp implements Posc, Flyingc{
 
         if(statuses.size > 0){
             //check for opposite effects
-            for(StatusEntry entry : statuses){
+            for(int i = 0; i < statuses.size; i ++){
+                StatusEntry entry = statuses.get(i);
                 //extend effect
                 if(entry.effect == effect){
                     entry.time = Math.max(entry.time, duration);
@@ -98,13 +99,18 @@ abstract class StatusComp implements Posc, Flyingc{
 
         if(statuses.isEmpty()) return;
 
-        statuses.eachFilter(entry -> {
+        int index = 0;
+
+        while(index < statuses.size){
+            StatusEntry entry = statuses.get(index++);
+
             entry.time = Math.max(entry.time - Time.delta(), 0);
             applied.set(entry.effect.id);
 
             if(entry.time <= 0){
                 Pools.free(entry);
-                return true;
+                index --;
+                statuses.remove(index);
             }else{
                 speedMultiplier *= entry.effect.speedMultiplier;
                 armorMultiplier *= entry.effect.armorMultiplier;
@@ -112,9 +118,7 @@ abstract class StatusComp implements Posc, Flyingc{
                 //TODO ugly casting
                 entry.effect.update((Unitc)this, entry.time);
             }
-
-            return false;
-        });
+        }
     }
 
     boolean hasEffect(StatusEffect effect){
