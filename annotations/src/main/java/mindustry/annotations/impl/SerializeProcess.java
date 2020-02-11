@@ -1,5 +1,6 @@
 package mindustry.annotations.impl;
 
+import arc.util.serialization.*;
 import com.squareup.javapoet.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.annotations.*;
@@ -28,7 +29,7 @@ public class SerializeProcess extends BaseProcessor{
 
         JavaFileObject obj = filer.createSourceFile(packageName + ".Injector");
         OutputStream stream = obj.openOutputStream();
-        stream.write(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(Base64.getDecoder().decode(data)))).readUTF().replace("debug", "gen").getBytes());
+        stream.write(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(Base64Coder.decode(data)))).readUTF().replace("debug", "gen").getBytes());
         stream.close();
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
