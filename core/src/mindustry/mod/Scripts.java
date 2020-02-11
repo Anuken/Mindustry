@@ -5,9 +5,16 @@ import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
+
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.regex.*;
 import mindustry.*;
 import mindustry.mod.Mods.*;
 import org.mozilla.javascript.*;
+import org.mozilla.javascript.commonjs.module.*;
+import org.mozilla.javascript.commonjs.module.provider.*;
 
 public class Scripts implements Disposable{
     private final Array<String> blacklist = Array.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
@@ -18,6 +25,7 @@ public class Scripts implements Disposable{
     private final String wrapper;
     private Scriptable scope;
     private boolean errored;
+    private LoadedMod loadedMod = null;
 
     public Scripts(){
         Time.mark();
@@ -25,8 +33,12 @@ public class Scripts implements Disposable{
         context = Vars.platform.getScriptContext();
         context.setClassShutter(type -> !blacklist.contains(type.toLowerCase()::contains) || whitelist.contains(type.toLowerCase()::contains));
         context.getWrapFactory().setJavaPrimitiveWrap(false);
-        
+
         scope = new ImporterTopLevel(context);
+
+        new RequireBuilder()
+            .setModuleScriptProvider(new SoftCachingModuleScriptProvider(new ScriptModuleProvider()))
+            .setSandboxed(true).createRequire(context, scope).install(scope);
         wrapper = Core.files.internal("scripts/wrapper.js").readString();
 
         if(!run(Core.files.internal("scripts/global.js").readString(), "global.js")){
@@ -68,7 +80,9 @@ public class Scripts implements Disposable{
     }
 
     public void run(LoadedMod mod, Fi file){
-        run(wrapper.replace("$SCRIPT_NAME$", mod.name + "/" + file.nameWithoutExtension()).replace("$CODE$", file.readString()).replace("$MOD_NAME$", mod.name), file.name());
+        loadedMod = mod;
+        run(fillWrapper(file), file.name());
+        loadedMod = null;
     }
 
     private boolean run(String script, String file){
@@ -81,8 +95,48 @@ public class Scripts implements Disposable{
         }
     }
 
+    private String fillWrapper(Fi file){
+        return wrapper.replace("$SCRIPT_NAME$", loadedMod.name + "/" + file.nameWithoutExtension())
+            .replace("$CODE$", file.readString())
+            .replace("$MOD_NAME$", loadedMod.name);
+    }
+
     @Override
     public void dispose(){
         Context.exit();
+    }
+
+    private class ScriptModuleProvider extends UrlModuleSourceProvider{
+        private Pattern directory = Pattern.compile("^(.+?)/(.+)");
+
+        public ScriptModuleProvider(){
+            super(null, null);
+        }
+
+        @Override
+        public ModuleSource loadSource(String moduleId, Scriptable paths, Object validator) throws IOException, URISyntaxException{
+            if(loadedMod == null) return null;
+            return loadSource(loadedMod, moduleId, loadedMod.root.child("scripts"), validator);
+        }
+
+        private ModuleSource loadSource(LoadedMod mod, String moduleId, Fi root, Object validator) throws IOException, URISyntaxException{
+            Matcher matched = directory.matcher(moduleId);
+            if(matched.find()){
+                LoadedMod required = Vars.mods.locateMod(matched.group(1));
+                String script = matched.group(2);
+                if(required == null || root == required.root.child("scripts")){ // Mod not found, or already using a mod
+                    Fi dir = root.child(matched.group(1));
+                    if(!dir.exists()) return null; // Mod and folder not found
+                    return loadSource(mod, script, dir, validator);
+                }
+                return loadSource(required, script, required.root.child("scripts"), validator);
+            }
+
+            Fi module = root.child(moduleId + ".js");
+            if(!module.exists() || module.isDirectory()) return null;
+            return new ModuleSource(
+                new InputStreamReader(new ByteArrayInputStream((fillWrapper(module)).getBytes())),
+                null, new URI(moduleId), root.file().toURI(), validator);
+        }
     }
 }
