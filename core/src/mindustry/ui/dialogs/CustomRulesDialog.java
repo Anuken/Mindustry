@@ -172,6 +172,7 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
         title("$rules.title.experimental");
+        check("$rules.bytelogic", b -> rules.bytelogic = b, () -> rules.bytelogic);
         check("$rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
 
         main.addButton(b -> {

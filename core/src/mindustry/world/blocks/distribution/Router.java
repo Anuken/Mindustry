@@ -20,6 +20,7 @@ public class Router extends Block{
         group = BlockGroup.transportation;
         unloadable = false;
         entityType = RouterEntity::new;
+        stopOnDisabled = true;
     }
 
     @Override
@@ -46,6 +47,7 @@ public class Router extends Block{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         RouterEntity entity = tile.ent();
+        if(entity.disabled()) return false;
 
         return tile.getTeam() == source.getTeam() && entity.lastItem == null && entity.items.total() == 0;
     }

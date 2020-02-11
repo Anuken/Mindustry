@@ -30,6 +30,7 @@ public class LaunchPad extends StorageBlock{
         update = true;
         hasItems = true;
         solid = true;
+        controllable = true;
     }
 
     @Override
@@ -73,7 +74,7 @@ public class LaunchPad extends StorageBlock{
     public void update(Tile tile){
         TileEntity entity = tile.entity;
 
-        if(world.isZone() && entity.cons.valid() && entity.items.total() >= itemCapacity && entity.timer.get(timerLaunch, launchTime / entity.timeScale)){
+        if(entity.enabled() && world.isZone() && entity.cons.valid() && entity.items.total() >= itemCapacity && entity.timer.get(timerLaunch, launchTime / entity.timeScale)){
             for(Item item : Vars.content.items()){
                 Events.fire(Trigger.itemLaunch);
                 Effects.effect(Fx.padlaunch, tile);

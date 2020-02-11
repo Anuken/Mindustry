@@ -21,6 +21,7 @@ public class OverflowGate extends Block{
         group = BlockGroup.transportation;
         unloadable = false;
         entityType = OverflowGateEntity::new;
+        stopOnDisabled = true;
     }
 
     @Override

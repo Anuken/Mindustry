@@ -88,6 +88,8 @@ public class Rules{
     public Team waveTeam = Team.crux;
     /** special tags for additional info */
     public StringMap tags = new StringMap();
+    /** Whether byte logic blocks can be built. Experimental. */
+    public boolean bytelogic = false;
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
     public Rules copy(){

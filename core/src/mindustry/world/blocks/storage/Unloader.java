@@ -28,6 +28,7 @@ public class Unloader extends Block{
         hasItems = true;
         configurable = true;
         entityType = UnloaderEntity::new;
+        stopOnDisabled = true;
     }
 
     @Override

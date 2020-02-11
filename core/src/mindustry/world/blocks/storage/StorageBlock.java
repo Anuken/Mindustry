@@ -12,6 +12,7 @@ public abstract class StorageBlock extends Block{
         super(name);
         hasItems = true;
         entityType = StorageBlockEntity::new;
+        controllable = false;
     }
 
     @Override

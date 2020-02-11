@@ -150,7 +150,7 @@ public abstract class Turret extends Block{
         entity.recoil = Mathf.lerpDelta(entity.recoil, 0f, restitution);
         entity.heat = Mathf.lerpDelta(entity.heat, 0f, cooldown);
 
-        if(hasAmmo(tile)){
+        if(hasAmmo(tile) && tile.entity.enabled()){
 
             if(entity.timer.get(timerTarget, targetInterval)){
                 findTarget(tile);

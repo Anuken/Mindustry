@@ -27,6 +27,7 @@ public class Junction extends Block{
         group = BlockGroup.transportation;
         unloadable = false;
         entityType = JunctionEntity::new;
+        stopOnDisabled = true;
     }
 
     @Override
@@ -79,6 +80,7 @@ public class Junction extends Block{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         JunctionEntity entity = tile.ent();
+        if(entity.disabled()) return false;
         int relative = source.relativeTo(tile.x, tile.y);
 
         if(entity == null || relative == -1 || !entity.buffer.accepts(relative)) return false;

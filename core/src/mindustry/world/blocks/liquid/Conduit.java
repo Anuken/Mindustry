@@ -29,6 +29,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         floating = true;
         conveyorPlacement = true;
         entityType = ConduitEntity::new;
+        stopOnDisabled = true;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package mindustry.world.blocks.logic;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.Input.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -10,6 +9,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.pooling.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
@@ -98,7 +98,7 @@ public class MessageBlock extends Block{
     public void buildConfiguration(Tile tile, Table table){
         MessageBlockEntity entity = tile.ent();
 
-        table.addImageButton(Icon.pencil, () -> {
+        table.addImageButton(Icon.pencilSmall, () -> {
             if(mobile){
                 Core.input.getTextInput(new TextInput(){{
                     text = entity.message;
@@ -147,8 +147,8 @@ public class MessageBlock extends Block{
     }
 
     public class MessageBlockEntity extends TileEntity{
-        public String message = "";
-        public String[] lines = {""};
+        protected String message = "";
+        protected String[] lines = {""};
 
         @Override
         public void write(DataOutput stream) throws IOException{

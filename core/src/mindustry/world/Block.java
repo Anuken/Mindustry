@@ -110,6 +110,10 @@ public class Block extends BlockStorage{
     public boolean targetable = true;
     /** Whether the overdrive core has any effect on this block. */
     public boolean canOverdrive = true;
+    /** Whether logic blocks can toggle its efficiency between 0 or 1. */
+    public boolean controllable = true;
+    /** Whether this block stops updating completely when 'disabled' by logic. */
+    public boolean stopOnDisabled = false;
     /** Outlined icon color.*/
     public Color outlineColor = Color.valueOf("404049");
     /** Whether the icon region has an outline added. */
@@ -141,6 +145,7 @@ public class Block extends BlockStorage{
     public float buildCostMultiplier = 1f;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
+    /** Whether this tech tree entry is always unlocked. */
     public boolean alwaysUnlocked = false;
 
     protected TextureRegion[] cacheRegions = {};

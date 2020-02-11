@@ -1,8 +1,8 @@
 package mindustry.entities.type;
 
+import arc.*;
 import arc.math.*;
 import mindustry.annotations.Annotations.*;
-import arc.Events;
 import arc.struct.Array;
 import arc.struct.ObjectSet;
 import arc.math.geom.Point2;
@@ -47,6 +47,9 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     private float sleepTime;
     private @Nullable SoundLoop sound;
 
+    private long controlFrame = -1;
+    private boolean controlActive;
+
     @Remote(called = Loc.server, unreliable = true)
     public static void onTileDamage(Tile tile, float health){
         if(tile.entity != null){
@@ -84,6 +87,18 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return this;
     }
 
+    public void control(boolean active){
+        if(active){
+            controlActive = true;
+        }else{
+            if(controlFrame < Core.graphics.getFrameId()){
+                controlActive = false;
+            }
+        }
+
+        controlFrame = Core.graphics.getFrameId();
+    }
+
     /** Scaled delta. */
     public float delta(){
         return Time.delta() * timeScale;
@@ -91,7 +106,17 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     /** Base efficiency. If this entity has non-buffered power, returns the power %, otherwise returns 1. */
     public float efficiency(){
+        if(Core.graphics.getFrameId() <= controlFrame + 1 && !controlActive) return 0f;
         return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
+    }
+
+    /** @return whether this block is functioning at all, e.g. whether efficiency is > 0. */
+    public boolean enabled(){
+        return !Mathf.zero(efficiency());
+    }
+
+    public boolean disabled(){
+        return !enabled();
     }
 
     /** Call when nothing is happening to the entity. This increments the internal sleep timer. */
@@ -321,7 +346,9 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             loops.play(block.idleSound, this, block.idleSoundVolume);
         }
 
-        block.update(tile);
+        if(!block.stopOnDisabled || enabled()){
+            block.update(tile);
+        }
 
         if(liquids != null){
             liquids.update();

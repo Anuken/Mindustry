@@ -37,6 +37,7 @@ public class CommandCenter extends Block{
         solid = true;
         configurable = true;
         entityType = CommandCenterEntity::new;
+        controllable = false;
     }
 
     @Override

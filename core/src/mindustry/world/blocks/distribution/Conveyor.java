@@ -73,7 +73,7 @@ public class Conveyor extends Block implements Autotiler{
         ConveyorEntity entity = tile.ent();
         byte rotation = tile.rotation();
 
-        int frame = entity.clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * entity.timeScale)) % 4) : 0;
+        int frame = entity.clogHeat <= 0.5f && entity.enabled() ? (int)(((Time.time() * speed * 8f * entity.timeScale)) % 4) : 0;
         Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], tile.drawx(), tile.drawy(),
         tilesize * entity.blendsclx, tilesize * entity.blendscly, rotation * 90);
     }
@@ -174,7 +174,7 @@ public class Conveyor extends Block implements Autotiler{
         e.mid = 0;
 
         //skip updates if possible
-        if(e.len == 0){
+        if(e.len == 0 || e.disabled()){
             e.clogHeat = 0f;
             e.sleep();
             return;
@@ -184,7 +184,7 @@ public class Conveyor extends Block implements Autotiler{
 
         for(int i = e.len - 1; i >= 0; i--){
             float nextpos = (i == e.len - 1 ? 100f : e.ys[i + 1]) - itemSpace;
-            float maxmove = Mathf.clamp(nextpos - e.ys[i], 0, speed * e.delta());
+            float maxmove = Mathf.clamp(nextpos - e.ys[i], 0, speed * e.delta() * e.efficiency());
 
             e.ys[i] += maxmove;
 

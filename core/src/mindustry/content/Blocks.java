@@ -80,7 +80,10 @@ public class Blocks implements ContentList{
     fortressFactory, repairPoint,
 
     //upgrades
-    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad,
+
+    //logic
+    switchBlock, signalBlock, signalNode, signalRouter, analyzer, controller, relay, notGate, andGate, orGate, xorGate, adder, subtractor, divider, remainder, multiplier, equalizer, comparator, fontSignal, displayBlock;
 
     @Override
     public void load(){
@@ -1859,6 +1862,118 @@ public class Blocks implements ContentList{
             brightness = 0.67f;
             radius = 120f;
             consumes.power(0.05f);
+        }};
+
+        //endregion
+        //region logic
+
+        switchBlock = new SwitchBlock("switch-block"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+        }};
+
+        signalBlock = new SignalBlock("signal-block"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+        }};
+
+        signalRouter = new AcceptorLogicBlock("signal-router"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+            doOutput = true;
+            rotate = false;
+        }};
+
+        signalNode = new NodeLogicBlock("signal-node"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+            range = 110f;
+        }};
+
+        analyzer = new AnalyzerBlock("analyzer"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+        }};
+
+        controller = new ControllerBlock("controller"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+        }};
+
+        relay = new RelayBlock("relay"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+        }};
+
+        notGate = new UnaryLogicBlock("not-gate"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+
+            processor = input -> input != 0 ? 0 : 1;
+        }};
+
+        andGate = new BinaryLogicBlock("and-gate"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> left & right;
+        }};
+
+        orGate = new BinaryLogicBlock("or-gate"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> left | right;
+        }};
+
+        xorGate = new BinaryLogicBlock("xor-gate"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> left ^ right;
+        }};
+
+        adder = new BinaryLogicBlock("adder"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> {
+                long result = (long)left + right;
+                return (int)Math.min(result, Integer.MAX_VALUE);
+            };
+        }};
+
+        subtractor = new BinaryLogicBlock("subtractor"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> Math.max(left - right, 0);
+        }};
+
+        divider = new BinaryLogicBlock("divider"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> right == 0 ? 0 : left / right;
+        }};
+
+        remainder = new BinaryLogicBlock("remainder"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> right == 0 ? 0 : left % right;
+        }};
+
+        multiplier = new BinaryLogicBlock("multiplier"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> left * right;
+        }};
+
+        equalizer = new BinaryLogicBlock("equalizer"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> left == right ? 1 : 0;
+        }};
+
+        comparator = new BinaryLogicBlock("comparator"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> left > right ? 1 : 0;
+        }};
+
+        fontSignal = new FontSignalBlock("font-signal"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+        }};
+
+        displayBlock = new DisplayBlock("display"){{
+            requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+            size = 2;
         }};
 
         //endregion
