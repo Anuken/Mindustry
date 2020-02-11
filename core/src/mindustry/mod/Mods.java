@@ -460,7 +460,9 @@ public class Mods implements Loadable{
             eachEnabled(mod -> {
                 if(mod.root.child("scripts").exists()){
                     content.setCurrentMod(mod);
-                    Fi main = mod.root.child("scripts").child("main.js");
+                    //if there's only one script file, use it (for backwards compatibility); if there isn't, use "main.js"
+                    Array<Fi> allScripts = mod.root.child("scripts").findAll(f -> f.extEquals("js"));
+                    Fi main = allScripts.size == 1 ? allScripts.first() : mod.root.child("scripts").child("main.js");
                     if(main.exists() && !main.isDirectory()){
                         try{
                             if(scripts == null){
