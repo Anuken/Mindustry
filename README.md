@@ -66,5 +66,4 @@ After building, the output .JAR file should be in `/desktop/build/libs/Mindustry
      height="80">](https://f-droid.org/packages/io.anuke.mindustry/)
 
 ### Feature Requests
-
-[![Feature Requests](https://feathub.com/Anuken/Mindustry?format=svg)](https://feathub.com/Anuken/Mindustry)
+Suggest changes on [this repository](https://github.com/Anuken/Mindustry-Suggestions)
