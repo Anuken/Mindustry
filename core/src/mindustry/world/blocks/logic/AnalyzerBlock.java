@@ -67,17 +67,17 @@ public class AnalyzerBlock extends LogicBlock{
             toggler.get(modeItem, Icon.copySmall);
             toggler.get(modeLiquid, Icon.liquidSmall);
             toggler.get(modePowerBalance, Icon.powerSmall);
-            toggler.get(modePowerBattery, Icon.bookSmall); // fixme
+            toggler.get(modePowerBattery, Icon.bookSmall); // fixme, replace with svg of https://github.com/Anuken/Mindustry/blob/byte-logic/core/assets-raw/sprites/ui/icons/icon-battery.png
             table.row();
             Table next = table.table().colspan(4).get();
 
             int mode = AnalyzeMode.mode(entity.mode);
             if(mode == modeItem){
-                ItemSelection.buildItemTable(next, () -> Vars.content.item(AnalyzeMode.selection(entity.mode)), item -> {
+                ItemSelection.buildTable(next, Vars.content.items(), () -> Vars.content.item(AnalyzeMode.selection(entity.mode)), item -> {
                     tile.configure(AnalyzeMode.get(modeItem, item == null ? Short.MAX_VALUE: item.id));
                 });
             }else if(mode == modeLiquid){
-                LiquidSelection.buildLiquidTable(next, () -> Vars.content.liquid(AnalyzeMode.selection(entity.mode)), item -> {
+                ItemSelection.buildTable(next, Vars.content.liquids(), () -> Vars.content.liquid(AnalyzeMode.selection(entity.mode)), item -> {
                     tile.configure(AnalyzeMode.get(modeLiquid, item == null ? Short.MAX_VALUE: item.id));
                 });
             }
