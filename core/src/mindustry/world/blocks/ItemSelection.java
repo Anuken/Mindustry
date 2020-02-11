@@ -12,6 +12,7 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class ItemSelection{
+    private static float scrollPos = 0f;
 
     public static <T extends UnlockableContent> void buildTable(Table table, Array<T> items, Prov<T> holder, Cons<T> consumer){
 
@@ -35,6 +36,21 @@ public class ItemSelection{
             }
         }
 
-        table.add(cont);
+        //add extra blank spaces so it looks nice
+        if(i % 4 != 0){
+            int remaining = 4 - (i % 4);
+            for(int j = 0; j < remaining; j++){
+                cont.addImage(Styles.black6);
+            }
+        }
+
+        ScrollPane pane = new ScrollPane(cont, Styles.smallPane);
+        pane.setScrollingDisabled(true, false);
+        pane.setScrollYForce(scrollPos);
+        pane.update(() -> {
+            scrollPos = pane.getScrollY();
+        });
+
+        table.add(pane).maxHeight(40 * 5);
     }
 }
