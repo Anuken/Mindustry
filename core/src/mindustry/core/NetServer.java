@@ -112,6 +112,7 @@ public class NetServer implements ApplicationListener{
             }
 
             PlayerInfo info = admins.getInfo(uuid);
+            info.adminUsid = packet.usid;
 
             con.hasBegunConnecting = true;
             con.mobile = packet.mobile;
