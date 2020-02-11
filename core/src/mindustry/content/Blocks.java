@@ -83,7 +83,7 @@ public class Blocks implements ContentList{
     dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad,
 
     //logic
-    switchBlock, signalBlock, signalNode, signalRouter, analyzer, controller, relay, notGate, andGate, orGate, xorGate, adder, subtractor, divider, remainder, multiplier, equalizer, comparator, fontSignal, displayBlock;
+    switchBlock, switchCrater, signalBlock, signalNode, signalRouter, analyzer, controller, relay, notGate, andGate, orGate, xorGate, adder, subtractor, divider, remainder, multiplier, equalizer, comparator, fontSignal, displayBlock;
 
     @Override
     public void load(){
@@ -1869,6 +1869,10 @@ public class Blocks implements ContentList{
 
         switchBlock = new SwitchBlock("switch-block"){{
             requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
+        }};
+
+        switchCrater = new SwitchBlock("switch-crater"){{
+            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with(Items.graphite, 4));
         }};
 
         signalBlock = new SignalBlock("signal-block"){{
