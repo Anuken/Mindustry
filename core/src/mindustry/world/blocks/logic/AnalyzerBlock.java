@@ -64,10 +64,10 @@ public class AnalyzerBlock extends LogicBlock{
                 }).group(group).size(40f).checked(AnalyzeMode.mode(entity.mode) == mode);
             };
 
-//            toggler.get(modeItem, Icon.itemSmall); // fixme
+            toggler.get(modeItem, Icon.copySmall);
             toggler.get(modeLiquid, Icon.liquidSmall);
             toggler.get(modePowerBalance, Icon.powerSmall);
-//            toggler.get(modePowerBattery, Icon.batterySmall); // fixme
+            toggler.get(modePowerBattery, Icon.bookSmall); // fixme
             table.row();
             Table next = table.table().colspan(4).get();
 
