@@ -27,6 +27,7 @@ public class LiquidSource extends Block{
         configurable = true;
         outputsLiquid = true;
         entityType = LiquidSourceEntity::new;
+        stopOnDisabled = true;
     }
 
     @Override

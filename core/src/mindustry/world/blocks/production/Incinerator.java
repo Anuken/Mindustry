@@ -25,6 +25,7 @@ public class Incinerator extends Block{
         update = true;
         solid = true;
         entityType = IncineratorEntity::new;
+        stopOnDisabled = true;
     }
 
     @Override

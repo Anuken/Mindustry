@@ -26,6 +26,7 @@ public class ItemSource extends Block{
         group = BlockGroup.transportation;
         configurable = true;
         entityType = ItemSourceEntity::new;
+        stopOnDisabled = true;
     }
 
     @Override

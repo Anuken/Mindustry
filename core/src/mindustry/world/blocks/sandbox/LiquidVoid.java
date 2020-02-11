@@ -20,7 +20,7 @@ public class LiquidVoid extends Block{
 
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return true;
+        return tile.entity.enabled();
     }
 
     @Override

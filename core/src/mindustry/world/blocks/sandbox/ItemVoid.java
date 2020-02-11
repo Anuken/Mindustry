@@ -17,6 +17,6 @@ public class ItemVoid extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return true;
+        return tile.entity.enabled();
     }
 }
