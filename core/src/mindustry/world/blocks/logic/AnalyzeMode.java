@@ -1,6 +1,6 @@
 package mindustry.world.blocks.logic;
 
-public final class AnalyzeMode{
+public abstract class AnalyzeMode{
     public AnalyzeMode(){
     }
 

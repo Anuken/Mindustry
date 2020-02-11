@@ -115,7 +115,7 @@ public class AnalyzerBlock extends LogicBlock{
         }
     }
 
-//    @Struct // fixme
+//    @Struct // fixme, remove or reimplement
 //    class AnalyzeModeStruct{
 //        /** mode of analysis, e.g. power, liquid, item */
 //        @StructField(16)
