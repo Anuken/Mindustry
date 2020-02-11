@@ -39,7 +39,6 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
             }
 
             if(entity.uptime >= 0.5f){
-
                 if(tryMoveLiquid(tile, other, false, entity.liquids.current()) > 0.1f){
                     entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
                 }else{

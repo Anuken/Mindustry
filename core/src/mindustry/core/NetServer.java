@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
+import arc.util.serialization.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -15,7 +16,6 @@ import mindustry.entities.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
-import mindustry.net.Administration;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -93,6 +93,16 @@ public class NetServer implements ApplicationListener{
             }
 
             String uuid = packet.uuid;
+            byte[] buuid = Base64Coder.decode(uuid);
+            CRC32 crc = new CRC32();
+            crc.update(buuid, 0, 8);
+            ByteBuffer buff = ByteBuffer.allocate(8);
+            buff.put(buuid, 8, 8);
+            buff.position(0);
+            if(crc.getValue() != buff.getLong()){
+                con.kick(KickReason.clientOutdated);
+                return;
+            }
 
             if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address)) return;
 
