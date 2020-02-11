@@ -21,10 +21,9 @@ public class Scripts implements Disposable{
         ".awt", "socket", "classloader", "oracle", "invoke");
     private final Array<String> whitelist = Array.with("mindustry.net");
     private final Context context;
-    private final String wrapper;
     private Scriptable scope;
     private boolean errored;
-    private LoadedMod loadedMod = null;
+    private LoadedMod currentMod = null;
 
     public Scripts(){
         Time.mark();
@@ -38,7 +37,6 @@ public class Scripts implements Disposable{
         new RequireBuilder()
             .setModuleScriptProvider(new SoftCachingModuleScriptProvider(new ScriptModuleProvider()))
             .setSandboxed(true).createRequire(context, scope).install(scope);
-        wrapper = Core.files.internal("scripts/wrapper.js").readString();
 
         if(!run(Core.files.internal("scripts/global.js").readString(), "global.js")){
             errored = true;
@@ -79,25 +77,23 @@ public class Scripts implements Disposable{
     }
 
     public void run(LoadedMod mod, Fi file){
-        loadedMod = mod;
-        run(fillWrapper(file), file.name());
-        loadedMod = null;
+        currentMod = mod;
+        run(file.readString(), file.name());
+        currentMod = null;
     }
 
     private boolean run(String script, String file){
         try{
+            if(currentMod != null){
+                //inject script info into file (TODO maybe rhino handles this?)
+                context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1, null);
+            }
             context.evaluateString(scope, script, file, 1, null);
             return true;
         }catch(Throwable t){
             log(LogLevel.err, file, "" + getError(t));
             return false;
         }
-    }
-
-    private String fillWrapper(Fi file){
-        return wrapper.replace("$SCRIPT_NAME$", loadedMod.name + "/" + file.nameWithoutExtension())
-            .replace("$CODE$", file.readString())
-            .replace("$MOD_NAME$", loadedMod.name);
     }
 
     @Override
@@ -114,8 +110,8 @@ public class Scripts implements Disposable{
 
         @Override
         public ModuleSource loadSource(String moduleId, Scriptable paths, Object validator) throws IOException, URISyntaxException{
-            if(loadedMod == null) return null;
-            return loadSource(moduleId, loadedMod.root.child("scripts"), validator);
+            if(currentMod == null) return null;
+            return loadSource(moduleId, currentMod.root.child("scripts"), validator);
         }
 
         private ModuleSource loadSource(String moduleId, Fi root, Object validator) throws URISyntaxException{
@@ -134,7 +130,7 @@ public class Scripts implements Disposable{
             Fi module = root.child(moduleId + ".js");
             if(!module.exists() || module.isDirectory()) return null;
             return new ModuleSource(
-                new InputStreamReader(new ByteArrayInputStream((fillWrapper(module)).getBytes())),
+                new InputStreamReader(new ByteArrayInputStream((module.readString()).getBytes())),
                 null, new URI(moduleId), root.file().toURI(), validator);
         }
     }
