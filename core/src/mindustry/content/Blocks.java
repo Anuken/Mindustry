@@ -1891,7 +1891,7 @@ public class Blocks implements ContentList{
 
         signalNode = new NodeLogicBlock("signal-node"){{
             requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
-            range = 110f;
+            range = 110f * 33f; // fixme, undo request from legomonster33 @ scidustry
         }};
 
         analyzer = new AnalyzerBlock("analyzer"){{
