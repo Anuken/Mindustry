@@ -1,15 +1,15 @@
 package mindustry.world.blocks.power;
 
-import arc.*;
-import arc.graphics.Color;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.world.*;
 
+import static mindustry.Vars.tilesize;
+
 public class Battery extends PowerDistributor{
+    public int topRegion = reg("-top");
 
-    public TextureRegion baseRegion;
-
-    public Color emptyLightColor = Color.valueOf("6e7080");
+    public Color emptyLightColor = Color.valueOf("f8c266");
     public Color fullLightColor = Color.valueOf("fb9567");
 
     public Battery(String name){
@@ -19,23 +19,11 @@ public class Battery extends PowerDistributor{
     }
 
     @Override
-    public void load(){
-        super.load();
-
-        baseRegion = Core.atlas.find(name + "-base");
-    }
-
-    @Override
     public void draw(Tile tile){
         Draw.color(emptyLightColor, fullLightColor, tile.entity.power.status);
-        Draw.rect(baseRegion, tile.drawx(), tile.drawy());
-        Draw.reset();
+        Fill.square(tile.drawx(), tile.drawy(), tilesize * size / 2f - 1);
+        Draw.color();
 
-        super.draw(tile);
-    }
-
-    @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-icon")};
+        Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
     }
 }
