@@ -112,7 +112,6 @@ public class NetServer implements ApplicationListener{
             }
 
             PlayerInfo info = admins.getInfo(uuid);
-            info.adminUsid = packet.usid;
 
             con.hasBegunConnecting = true;
             con.mobile = packet.mobile;
@@ -217,6 +216,11 @@ public class NetServer implements ApplicationListener{
             player.setNet(player.x, player.y);
             player.color.set(packet.color);
             player.color.a = 1f;
+
+            //save admin ID but don't overwrite it
+            if(!player.isAdmin && !info.admin){
+                info.adminUsid = packet.usid;
+            }
 
             try{
                 writeBuffer.position(0);
