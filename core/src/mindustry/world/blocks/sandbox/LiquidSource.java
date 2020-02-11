@@ -77,6 +77,7 @@ public class LiquidSource extends Block{
     @Override
     public void buildConfiguration(Tile tile, Table table){
         LiquidSourceEntity entity = tile.ent();
+        
         ItemSelection.buildTable(table, content.liquids(), () -> entity.source, liquid -> {
             lastLiquid = liquid;
             tile.configure(liquid == null ? -1 : liquid.id);
