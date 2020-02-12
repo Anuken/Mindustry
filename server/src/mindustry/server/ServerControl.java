@@ -647,37 +647,38 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("admin", "<username...>", "Make an online user admin", arg -> {
+        handler.register("admin", "<add/remove> <username/ID...>", "Make an online user admin", arg -> {
             if(!state.is(State.playing)){
                 err("Open the server first.");
                 return;
             }
 
-            Playerc target = Groups.player.find(p -> p.name().equals(arg[0]));
-
-            if(target != null){
-                netServer.admins.adminPlayer(target.uuid(), target.usid());
-                target.admin(true);
-                info("Admin-ed player: {0}", arg[0]);
-            }else{
-                info("Nobody with that name could be found.");
-            }
-        });
-
-        handler.register("unadmin", "<username...>", "Removes admin status from an online player", arg -> {
-            if(!state.is(State.playing)){
-                err("Open the server first.");
+            if(!(arg[0].equals("add") || arg[0].equals("remove"))){
+                err("Second parameter must be either 'add' or 'remove'.");
                 return;
             }
 
-            Playerc target = Groups.player.find(p -> p.name().equals(arg[0]));
+            boolean add = arg[0].equals("add");
+
+            PlayerInfo target;
+            Playerc playert = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
+            if(playert != null){
+                target = playert.getInfo();
+            }else{
+                target = netServer.admins.getInfoOptional(arg[1]);
+                playert = Groups.player.find(p -> p.getInfo() == target);
+            }
 
             if(target != null){
-                netServer.admins.unAdminPlayer(target.uuid());
-                target.admin(false);
-                info("Un-admin-ed player: {0}", arg[0]);
+                if(add){
+                    netServer.admins.adminPlayer(target.id, target.adminUsid);
+                }else{
+                    netServer.admins.unAdminPlayer(target.id);
+                }
+                if(playert != null) playert.admin(add);
+                info("Changed admin status of player: &ly{0}", target.lastName);
             }else{
-                info("Nobody with that name could be found.");
+                err("Nobody with that name or ID could be found. If adding an admin by name, make sure they're online; otherwise, use their UUID.");
             }
         });
 
@@ -690,6 +691,18 @@ public class ServerControl implements ApplicationListener{
                 info("&lyAdmins:");
                 for(PlayerInfo info : admins){
                     info(" &lm {0} /  ID: '{1}' / IP: '{2}'", info.lastName, info.id, info.lastIP);
+                }
+            }
+        });
+
+        handler.register("players", "List all players currently in game.", arg -> {
+            if(Groups.player.size() == 0){
+                info("No players are currently in the server.");
+            }else{
+                info("&lyPlayers: {0}", Groups.player.size());
+                for(Playerc user : Groups.player){
+                    PlayerInfo userInfo = user.getInfo();
+                    info(" &lm {0} /  ID: '{1}' / IP: '{2}' / Admin: '{3}'", userInfo.lastName, userInfo.id, userInfo.lastIP, userInfo.admin);
                 }
             }
         });

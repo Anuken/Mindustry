@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
+import arc.util.serialization.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.units.*;
@@ -88,6 +89,16 @@ public class NetServer implements ApplicationListener{
             }
 
             String uuid = packet.uuid;
+            byte[] buuid = Base64Coder.decode(uuid);
+            CRC32 crc = new CRC32();
+            crc.update(buuid, 0, 8);
+            ByteBuffer buff = ByteBuffer.allocate(8);
+            buff.put(buuid, 8, 8);
+            buff.position(0);
+            if(crc.getValue() != buff.getLong()){
+                con.kick(KickReason.clientOutdated);
+                return;
+            }
 
             if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address)) return;
 
@@ -116,7 +127,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(admins.getPlayerLimit() > 0 && Groups.player.size() >= admins.getPlayerLimit()){
+            if(admins.getPlayerLimit() > 0 && Groups.player.size() >= admins.getPlayerLimit() && !netServer.admins.isAdmin(uuid, packet.usid)){
                 con.kick(KickReason.playerLimit);
                 return;
             }
@@ -196,6 +207,11 @@ public class NetServer implements ApplicationListener{
             player.con().mobile = packet.mobile;
             player.name(packet.name);
             player.color().set(packet.color).a(1f);
+
+            //save admin ID but don't overwrite it
+            if(!player.admin() && !info.admin){
+                info.adminUsid = packet.usid;
+            }
 
             try{
                 writeBuffer.position(0);

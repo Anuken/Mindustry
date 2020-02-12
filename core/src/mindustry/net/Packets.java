@@ -181,7 +181,7 @@ public class Packets{
             usid = TypeIO.readString(buffer);
             mobile = buffer.get() == 1;
             color = buffer.getInt();
-            byte[] idbytes = new byte[8];
+            byte[] idbytes = new byte[16];
             buffer.get(idbytes);
             uuid = new String(Base64Coder.encode(idbytes));
             int totalMods = buffer.get();

@@ -123,7 +123,7 @@ public class Unloader extends Block{
     @Override
     public void buildConfiguration(Tile tile, Table table){
         UnloaderEntity entity = tile.ent();
-        ItemSelection.buildItemTable(table, () -> entity.sortItem, item -> {
+        ItemSelection.buildTable(table, content.items(), () -> entity.sortItem, item -> {
             lastItem = item;
             tile.configure(item == null ? -1 : item.id);
         });
