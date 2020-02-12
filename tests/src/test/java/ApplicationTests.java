@@ -1,25 +1,23 @@
-import arc.ApplicationCore;
-import arc.Core;
-import arc.backend.headless.HeadlessApplication;
+import arc.*;
+import arc.backend.headless.*;
+import arc.math.geom.*;
 import arc.struct.*;
-import arc.math.geom.Point2;
-import arc.util.Log;
-import arc.util.Time;
-import mindustry.Vars;
+import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
-import mindustry.core.GameState.State;
 import mindustry.core.*;
-import mindustry.entities.traits.BuilderTrait.BuildRequest;
-import mindustry.entities.type.BaseUnit;
+import mindustry.core.GameState.*;
+import mindustry.ctype.*;
+import mindustry.entities.traits.BuilderTrait.*;
+import mindustry.entities.type.*;
 import mindustry.entities.type.base.*;
-import mindustry.game.Team;
-import mindustry.io.SaveIO;
-import mindustry.maps.Map;
-import mindustry.net.*;
-import mindustry.ctype.ContentType;
-import mindustry.type.Item;
+import mindustry.game.*;
+import mindustry.io.*;
+import mindustry.maps.*;
+import mindustry.net.Net;
+import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.BlockPart;
+import mindustry.world.blocks.*;
 import org.junit.jupiter.api.*;
 
 import static mindustry.Vars.*;
@@ -214,6 +212,49 @@ public class ApplicationTests{
         assertEquals(world.width(), map.width);
         assertEquals(world.height(), map.height);
         assertTrue(state.teams.playerCores().size > 0);
+    }
+
+    @Test
+    void conveyorBench(){
+        int[] items = {0};
+
+        world.loadMap(testMap);
+        state.set(State.playing);
+        int length = 128;
+        world.tile(0, 0).setBlock(Blocks.itemSource);
+        world.tile(0, 0).configureAny(Items.copper.id);
+
+        Array<TileEntity> entities = Array.with(world.tile(0, 0).entity);
+
+        for(int i = 0; i < length; i++){
+            world.tile(i + 1, 0).setBlock(Blocks.conveyor);
+            world.tile(i + 1, 0).rotation(0);
+            entities.add(world.tile(i + 1, 0).entity);
+        }
+
+        world.tile(length + 1, 0).setBlock(new Block("___"){
+            @Override
+            public void handleItem(Item item, Tile tile, Tile source){
+                items[0] ++;
+            }
+
+            @Override
+            public boolean acceptItem(Item item, Tile tile, Tile source){
+                return true;
+            }
+        });
+
+        //warmup
+        for(int i = 0; i < 100000; i++){
+            entities.each(TileEntity::update);
+        }
+
+        Time.mark();
+        for(int i = 0; i < 200000; i++){
+            entities.each(TileEntity::update);
+        }
+        Log.info(Time.elapsed() + "ms to process " + items[0] + " items");
+        assertTrue(items[0] > 0);
     }
 
     @Test

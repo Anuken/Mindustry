@@ -1,11 +1,12 @@
 package mindustry.world.blocks.distribution;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.traits.BuilderTrait.*;
@@ -24,10 +25,8 @@ import static mindustry.Vars.*;
 
 public class Conveyor extends Block implements Autotiler{
     private static final float itemSpace = 0.4f;
-    private static final float minmove = 1f / (Short.MAX_VALUE - 2);
-    private static ItemPos drawpos = new ItemPos();
-    private static ItemPos pos1 = new ItemPos();
-    private static ItemPos pos2 = new ItemPos();
+    private static final int capacity = 4;
+
     private final Vec2 tr1 = new Vec2();
     private final Vec2 tr2 = new Vec2();
     private TextureRegion[][] regions = new TextureRegion[7][4];
@@ -49,12 +48,6 @@ public class Conveyor extends Block implements Autotiler{
         idleSound = Sounds.conveyor;
         idleSoundVolume = 0.004f;
         unloadable = false;
-    }
-
-    private static int compareItems(long a, long b){
-        pos1.set(a, ItemPos.packShorts);
-        pos2.set(b, ItemPos.packShorts);
-        return Float.compare(pos1.y, pos2.y);
     }
 
     @Override
@@ -100,6 +93,12 @@ public class Conveyor extends Block implements Autotiler{
         entity.blendbits = bits[0];
         entity.blendsclx = bits[1];
         entity.blendscly = bits[2];
+
+        if(tile.front() != null && tile.front().entity != null){
+            entity.next = tile.front().entity;
+            entity.nextc = entity.next instanceof ConveyorEntity && entity.next.getTeam() == tile.getTeam() ? (ConveyorEntity)entity.next : null;
+            entity.aligned = entity.nextc != null && tile.rotation() == entity.next.tile.rotation();
+        }
     }
 
     @Override
@@ -124,27 +123,17 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public void drawLayer(Tile tile){
-        ConveyorEntity entity = tile.ent();
-
+        ConveyorEntity e = tile.ent();
         byte rotation = tile.rotation();
 
-        try{
+        for(int i = 0; i < e.len; i++){
+            Item item = e.ids[i];
+            tr1.trns(rotation * 90, tilesize, 0);
+            tr2.trns(rotation * 90, -tilesize / 2f, e.xs[i] * tilesize / 2f);
 
-            for(int i = 0; i < entity.convey.size; i++){
-                ItemPos pos = drawpos.set(entity.convey.get(i), ItemPos.drawShorts);
-
-                if(pos.item == null) continue;
-
-                tr1.trns(rotation * 90, tilesize, 0);
-                tr2.trns(rotation * 90, -tilesize / 2f, pos.x * tilesize / 2f);
-
-                Draw.rect(pos.item.icon(Cicon.medium),
-                (tile.x * tilesize + tr1.x * pos.y + tr2.x),
-                (tile.y * tilesize + tr1.y * pos.y + tr2.y), itemSize, itemSize);
-            }
-
-        }catch(IndexOutOfBoundsException e){
-            Log.err(e);
+            Draw.rect(item.icon(Cicon.medium),
+            (tile.x * tilesize + tr1.x * e.ys[i] + tr2.x),
+            (tile.y * tilesize + tr1.y * e.ys[i] + tr2.y), itemSize, itemSize);
         }
     }
 
@@ -173,79 +162,56 @@ public class Conveyor extends Block implements Autotiler{
             if(Math.abs(tile.worldx() - unit.x) < 1f) centerx = 0f;
         }
 
-        if(entity.convey.size * itemSpace < 0.9f){
+        if(entity.len * itemSpace < 0.9f){
             unit.applyImpulse((tx * speed + centerx) * entity.delta(), (ty * speed + centery) * entity.delta());
         }
     }
 
     @Override
     public void update(Tile tile){
-        ConveyorEntity entity = tile.ent();
-        entity.minitem = 1f;
-        Tile next = tile.getNearby(tile.rotation());
-        if(next != null) next = next.link();
+        ConveyorEntity e = tile.ent();
+        e.minitem = 1f;
+        e.mid = 0;
 
-        float nextMax = next != null && next.block() instanceof Conveyor && next.block().acceptItem(null, next, tile) ? 1f - Math.max(itemSpace - next.<ConveyorEntity>ent().minitem, 0) : 1f;
-        int minremove = Integer.MAX_VALUE;
+        //skip updates if possible
+        if(e.len == 0){
+            e.clogHeat = 0f;
+            e.sleep();
+            return;
+        }
 
-        for(int i = entity.convey.size - 1; i >= 0; i--){
-            long value = entity.convey.get(i);
-            ItemPos pos = pos1.set(value, ItemPos.updateShorts);
+        float nextMax = e.aligned ? 1f - Math.max(itemSpace - e.nextc.minitem, 0) : 1f;
 
-            //..this should never happen, but in case it does, remove it and stop here
-            if(pos.item == null){
-                entity.convey.removeValue(value);
-                break;
-            }
+        for(int i = e.len - 1; i >= 0; i--){
+            float nextpos = (i == e.len - 1 ? 100f : e.ys[i + 1]) - itemSpace;
+            float maxmove = Mathf.clamp(nextpos - e.ys[i], 0, speed * e.delta());
 
-            float nextpos = (i == entity.convey.size - 1 ? 100f : pos2.set(entity.convey.get(i + 1), ItemPos.updateShorts).y) - itemSpace;
-            float maxmove = Math.min(nextpos - pos.y, speed * entity.delta());
+            e.ys[i] += maxmove;
 
-            if(maxmove > minmove){
-                pos.y += maxmove;
-                if(Mathf.equal(pos.x, 0, 0.1f)){
-                    pos.x = 0f;
+            if(e.ys[i] > nextMax) e.ys[i] = nextMax;
+            if(e.ys[i] > 0.5 && i > 0) e.mid = i - 1;
+            e.xs[i] = Mathf.approachDelta(e.xs[i], 0, speed*2);
+
+            if(e.ys[i] >= 1f && offloadDir(tile, e.ids[i])){
+                //align X position if passing forwards
+                if(e.aligned){
+                    e.nextc.xs[e.nextc.lastInserted] = e.xs[i];
                 }
-                pos.x = Mathf.lerpDelta(pos.x, 0, 0.1f);
-            }
-
-            pos.y = Mathf.clamp(pos.y, 0, nextMax);
-
-            if(pos.y >= 0.9999f && offloadDir(tile, pos.item)){
-                if(next != null && next.block() instanceof Conveyor){
-                    ConveyorEntity othere = next.ent();
-
-                    ItemPos ni = pos2.set(othere.convey.get(othere.lastInserted), ItemPos.updateShorts);
-
-                    if(next.rotation() == tile.rotation()){
-                        ni.x = pos.x;
-                    }
-                    othere.convey.set(othere.lastInserted, ni.pack());
-                }
-                minremove = Math.min(i, minremove);
-                tile.entity.items.remove(pos.item, 1);
-            }else{
-                value = pos.pack();
-
-                if(pos.y < entity.minitem)
-                    entity.minitem = pos.y;
-                entity.convey.set(i, value);
+                //remove last item
+                e.items.remove(e.ids[i], e.len - i);
+                e.len = Math.min(i, e.len);
+            }else if(e.ys[i] < e.minitem){
+                e.minitem = e.ys[i];
             }
         }
 
-        if(entity.minitem < itemSpace){
-            entity.clogHeat = Mathf.lerpDelta(entity.clogHeat, 1f, 0.02f);
+        if(e.minitem < itemSpace + (e.blendbits == 1 ? 0.3f : 0f)){
+            e.clogHeat = Mathf.lerpDelta(e.clogHeat, 1f, 0.02f);
         }else{
-            entity.clogHeat = Mathf.lerpDelta(entity.clogHeat, 0f, 1f);
+            e.clogHeat = 0f;
         }
 
-        if(entity.items.total() == 0){
-            entity.sleep();
-        }else{
-            entity.noSleep();
-        }
-
-        if(minremove != Integer.MAX_VALUE) entity.convey.truncate(minremove);
+        e.noSleep();
     }
 
     @Override
@@ -265,22 +231,22 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public int removeStack(Tile tile, Item item, int amount){
-        ConveyorEntity entity = tile.ent();
-        entity.noSleep();
+        ConveyorEntity e = tile.ent();
+        e.noSleep();
         int removed = 0;
 
         for(int j = 0; j < amount; j++){
-            for(int i = 0; i < entity.convey.size; i++){
-                long val = entity.convey.get(i);
-                ItemPos pos = pos1.set(val, ItemPos.drawShorts);
-                if(pos.item == item){
-                    entity.convey.removeValue(val);
-                    entity.items.remove(item, 1);
-                    removed++;
+            for(int i = 0; i < e.len; i++){
+                if(e.ids[i] == item){
+                    e.remove(i);
+                    removed ++;
                     break;
                 }
             }
         }
+
+        e.items.remove(item, removed);
+
         return removed;
     }
 
@@ -297,58 +263,66 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public void handleStack(Item item, int amount, Tile tile, Unit source){
-        ConveyorEntity entity = tile.ent();
+        ConveyorEntity e = tile.ent();
 
         for(int i = amount - 1; i >= 0; i--){
-            long result = ItemPos.packItem(item, 0f, i * itemSpace);
-            entity.convey.insert(0, result);
-            entity.items.add(item, 1);
+            e.add(0);
+            e.xs[0] = 0;
+            e.ys[0] = i * itemSpace;
+            e.ids[0] = item;
+            e.items.add(item, 1);
         }
 
-        entity.noSleep();
+        e.noSleep();
     }
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
+        ConveyorEntity e = tile.ent();
+        if(e.len >= capacity) return false;
         int direction = source == null ? 0 : Math.abs(source.relativeTo(tile.x, tile.y) - tile.rotation());
-        float minitem = tile.<ConveyorEntity>ent().minitem;
-        return (((direction == 0) && minitem > itemSpace) ||
-        ((direction % 2 == 1) && minitem > 0.52f)) && (source == null || !(source.block().rotate && (source.rotation() + 2) % 4 == tile.rotation()));
+        return (((direction == 0) && e.minitem >= itemSpace) || ((direction % 2 == 1) && e.minitem > 0.7f)) && (source == null || !(source.block().rotate && (source.rotation() + 2) % 4 == tile.rotation()));
     }
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        byte rotation = tile.rotation();
+        ConveyorEntity e = tile.ent();
+        if(e.len >= capacity) return;
 
-        int ch = Math.abs(source.relativeTo(tile.x, tile.y) - rotation);
-        int ang = ((source.relativeTo(tile.x, tile.y) - rotation));
+        byte r = tile.rotation();
+        int ang = ((source.relativeTo(tile.x, tile.y) - r));
+        float x = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
 
-        float pos = ch == 0 ? 0 : ch % 2 == 1 ? 0.5f : 1f;
-        float y = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
+        e.noSleep();
+        e.items.add(item, 1);
 
-        ConveyorEntity entity = tile.ent();
-        entity.noSleep();
-        long result = ItemPos.packItem(item, y * 0.9f, pos);
-
-        tile.entity.items.add(item, 1);
-
-        for(int i = 0; i < entity.convey.size; i++){
-            if(compareItems(result, entity.convey.get(i)) < 0){
-                entity.convey.insert(i, result);
-                entity.lastInserted = (byte)i;
-                return;
-            }
+        if(Math.abs(source.relativeTo(tile.x, tile.y) - r) == 0){ //idx = 0
+            e.add(0);
+            e.xs[0] = x;
+            e.ys[0] = 0;
+            e.ids[0] = item;
+        }else{ //idx = mid
+            e.add(e.mid);
+            e.xs[e.mid] = x;
+            e.ys[e.mid] = 0.5f;
+            e.ids[e.mid] = item;
         }
-
-        //this item must be greater than anything there...
-        entity.convey.add(result);
-        entity.lastInserted = (byte)(entity.convey.size - 1);
     }
 
     public static class ConveyorEntity extends TileEntity{
+        //parallel array data
+        Item[] ids = new Item[capacity];
+        float[] xs = new float[capacity];
+        float[] ys = new float[capacity];
+        //amount of items, always < capacity
+        int len = 0;
+        //next entity
+        @Nullable TileEntity next;
+        @Nullable ConveyorEntity nextc;
+        //whether the next conveyor's rotation == tile rotation
+        boolean aligned;
 
-        LongArray convey = new LongArray();
-        byte lastInserted;
+        int lastInserted, mid;
         float minitem = 1;
 
         int blendbits;
@@ -356,96 +330,53 @@ public class Conveyor extends Block implements Autotiler{
 
         float clogHeat = 0f;
 
+        final void add(int o){
+            for(int i = Math.max(o + 1, len); i > o; i--){
+                ids[i] = ids[i - 1];
+                xs[i] = xs[i - 1];
+                ys[i] = ys[i - 1];
+            }
+
+            len++;
+        }
+
+        final void remove(int o){
+            for(int i = o; i < len - 1; i++){
+                ids[i] = ids[i + 1];
+                xs[i] = xs[i + 1];
+                ys[i] = ys[i + 1];
+            }
+
+            len--;
+        }
+
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
-            stream.writeInt(convey.size);
+            stream.writeInt(len);
 
-            for(int i = 0; i < convey.size; i++){
-                stream.writeInt(ItemPos.toInt(convey.get(i)));
+            for(int i = 0; i < len; i++){
+                stream.writeInt(Pack.intBytes((byte)ids[i].id, (byte)(xs[i] * 127), (byte)(ys[i] * 255 - 128), (byte)0));
             }
         }
 
         @Override
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
-            convey.clear();
             int amount = stream.readInt();
-            convey.ensureCapacity(Math.min(amount, 10));
+            len = Math.min(amount, capacity);
 
             for(int i = 0; i < amount; i++){
-                convey.add(ItemPos.toLong(stream.readInt()));
+                int val = stream.readInt();
+                byte id = (byte)(val >> 24);
+                float x = (float)((byte)(val >> 16)) / 127f;
+                float y = ((float)((byte)(val >> 8)) + 128f) / 255f;
+                if(i < capacity){
+                    ids[i] = content.item(id);
+                    xs[i] = x;
+                    ys[i] = y;
+                }
             }
-        }
-    }
-
-    //Container class. Do not instantiate.
-    static class ItemPos{
-        private static short[] writeShort = new short[4];
-        private static byte[] writeByte = new byte[4];
-
-        private static short[] packShorts = new short[4];
-        private static short[] drawShorts = new short[4];
-        private static short[] updateShorts = new short[4];
-
-        Item item;
-        float x, y;
-
-        private ItemPos(){
-        }
-
-        static long packItem(Item item, float x, float y){
-            short[] shorts = packShorts;
-            shorts[0] = (short)item.id;
-            shorts[1] = (short)(x * Short.MAX_VALUE);
-            shorts[2] = (short)((y - 1f) * Short.MAX_VALUE);
-            return Pack.longShorts(shorts);
-        }
-
-        static int toInt(long value){
-            short[] values = Pack.shorts(value, writeShort);
-
-            short itemid = values[0];
-            float x = values[1] / (float)Short.MAX_VALUE;
-            float y = ((float)values[2]) / Short.MAX_VALUE + 1f;
-
-            byte[] bytes = writeByte;
-            bytes[0] = (byte)itemid;
-            bytes[1] = (byte)(x * 127);
-            bytes[2] = (byte)(y * 255 - 128);
-
-            return Pack.intBytes(bytes);
-        }
-
-        static long toLong(int value){
-            byte[] values = Pack.bytes(value, writeByte);
-
-            short itemid = content.item(values[0]).id;
-            float x = values[1] / 127f;
-            float y = ((int)values[2] + 128) / 255f;
-
-            short[] shorts = writeShort;
-            shorts[0] = itemid;
-            shorts[1] = (short)(x * Short.MAX_VALUE);
-            shorts[2] = (short)((y - 1f) * Short.MAX_VALUE);
-            return Pack.longShorts(shorts);
-        }
-
-        ItemPos set(long lvalue, short[] values){
-            Pack.shorts(lvalue, values);
-
-            if(values[0] >= content.items().size || values[0] < 0)
-                item = null;
-            else
-                item = content.items().get(values[0]);
-
-            x = values[1] / (float)Short.MAX_VALUE;
-            y = ((float)values[2]) / Short.MAX_VALUE + 1f;
-            return this;
-        }
-
-        long pack(){
-            return packItem(item, x, y);
         }
     }
 }

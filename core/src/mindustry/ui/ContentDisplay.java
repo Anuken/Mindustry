@@ -28,7 +28,7 @@ public class ContentDisplay{
         table.row();
 
         if(block.description != null){
-            table.add(block.description).padLeft(5).padRight(5).width(400f).wrap().fillX();
+            table.add(block.displayDescription()).padLeft(5).padRight(5).width(400f).wrap().fillX();
             table.row();
 
             table.addImage().height(3).color(Color.lightGray).pad(8).padLeft(0).padRight(0).fillX();
@@ -76,7 +76,7 @@ public class ContentDisplay{
         table.row();
 
         if(item.description != null){
-            table.add(item.description).padLeft(5).padRight(5).width(400f).wrap().fillX();
+            table.add(item.displayDescription()).padLeft(5).padRight(5).width(400f).wrap().fillX();
             table.row();
 
             table.addImage().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
@@ -110,7 +110,7 @@ public class ContentDisplay{
         table.row();
 
         if(liquid.description != null){
-            table.add(liquid.description).padLeft(5).padRight(5).width(400f).wrap().fillX();
+            table.add(liquid.displayDescription()).padLeft(5).padRight(5).width(400f).wrap().fillX();
             table.row();
 
             table.addImage().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
@@ -145,7 +145,7 @@ public class ContentDisplay{
         table.row();
 
         if(mech.description != null){
-            table.add(mech.description).padLeft(5).padRight(5).width(400f).wrap().fillX();
+            table.add(mech.displayDescription()).padLeft(5).padRight(5).width(400f).wrap().fillX();
             table.row();
 
             table.addImage().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
@@ -192,7 +192,7 @@ public class ContentDisplay{
         table.row();
 
         if(unit.description != null){
-            table.add(unit.description).padLeft(5).padRight(5).width(400f).wrap().fillX();
+            table.add(unit.displayDescription()).padLeft(5).padRight(5).width(400f).wrap().fillX();
             table.row();
 
             table.addImage().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();

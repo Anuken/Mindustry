@@ -66,8 +66,10 @@ public class CommandCenter extends Block{
     public void load(){
         super.load();
 
-        for(UnitCommand cmd : UnitCommand.all){
-            commandRegions[cmd.ordinal()] = ui.getIcon("command" + Strings.capitalize(cmd.name()));
+        if(ui != null){
+            for(UnitCommand cmd : UnitCommand.all){
+                commandRegions[cmd.ordinal()] = ui.getIcon("command" + Strings.capitalize(cmd.name()));
+            }
         }
     }
 

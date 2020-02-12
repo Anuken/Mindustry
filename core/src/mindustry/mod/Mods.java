@@ -317,7 +317,7 @@ public class Mods implements Loadable{
         return result;
     }
 
-    private LoadedMod locateMod(String name){
+    public LoadedMod locateMod(String name){
         return mods.find(mod -> mod.enabled() && mod.name.equals(name));
     }
 
@@ -460,22 +460,25 @@ public class Mods implements Loadable{
             eachEnabled(mod -> {
                 if(mod.root.child("scripts").exists()){
                     content.setCurrentMod(mod);
-                    mod.scripts = mod.root.child("scripts").findAll(f -> f.extension().equals("js"));
-                    Log.debug("[{0}] Found {1} scripts.", mod.meta.name, mod.scripts.size);
-
-                    for(Fi file : mod.scripts){
+                    //if there's only one script file, use it (for backwards compatibility); if there isn't, use "main.js"
+                    Array<Fi> allScripts = mod.root.child("scripts").findAll(f -> f.extEquals("js"));
+                    Fi main = allScripts.size == 1 ? allScripts.first() : mod.root.child("scripts").child("main.js");
+                    if(main.exists() && !main.isDirectory()){
                         try{
                             if(scripts == null){
                                 scripts = platform.createScripts();
                             }
-                            scripts.run(mod, file);
+                            scripts.run(mod, main);
                         }catch(Throwable e){
                             Core.app.post(() -> {
-                                Log.err("Error loading script {0} for mod {1}.", file.name(), mod.meta.name);
+                                Log.err("Error loading main script {0} for mod {1}.", main.name(), mod.meta.name);
                                 e.printStackTrace();
                             });
-                            break;
                         }
+                    }else{
+                        Core.app.post(() -> {
+                            Log.err("No main.js found for mod {0}.", mod.meta.name);
+                        });
                     }
                 }
             });
@@ -611,7 +614,7 @@ public class Mods implements Loadable{
 
         Fi metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("mod.hjson").exists() ? zip.child("mod.hjson") : zip.child("plugin.json");
         if(!metaf.exists()){
-            Log.warn("Mod {0} doesn't have a 'mod.json'/'plugin.json'/'mod.js' file, skipping.", sourceFile);
+            Log.warn("Mod {0} doesn't have a 'mod.json'/'mod.hjson'/'plugin.json' file, skipping.", sourceFile);
             throw new IllegalArgumentException("No mod.json found.");
         }
 

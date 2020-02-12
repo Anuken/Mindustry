@@ -653,52 +653,45 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("unban", "<ip/ID>", "Completely unban a person by IP or ID.", arg -> {
-            if(arg[0].contains(".")){
-                if(netServer.admins.unbanPlayerIP(arg[0])){
-                    info("Unbanned player by IP: {0}.", arg[0]);
-                }else{
-                    err("That IP is not banned!");
-                }
+            if(netServer.admins.unbanPlayerIP(arg[0]) || netServer.admins.unbanPlayerID(arg[0])){
+                info("Unbanned player.", arg[0]);
             }else{
-                if(netServer.admins.unbanPlayerID(arg[0])){
-                    info("Unbanned player by ID: {0}.", arg[0]);
-                }else{
-                    err("That ID is not banned!");
-                }
+                err("That IP/ID is not banned!");
             }
         });
 
-        handler.register("admin", "<username...>", "Make an online user admin", arg -> {
+        handler.register("admin", "<add/remove> <username/ID...>", "Make an online user admin", arg -> {
             if(!state.is(State.playing)){
                 err("Open the server first.");
                 return;
             }
 
-            Player target = playerGroup.find(p -> p.name.equals(arg[0]));
-
-            if(target != null){
-                netServer.admins.adminPlayer(target.uuid, target.usid);
-                target.isAdmin = true;
-                info("Admin-ed player: {0}", arg[0]);
-            }else{
-                info("Nobody with that name could be found.");
-            }
-        });
-
-        handler.register("unadmin", "<username...>", "Removes admin status from an online player", arg -> {
-            if(!state.is(State.playing)){
-                err("Open the server first.");
+            if(!(arg[0].equals("add") || arg[0].equals("remove"))){
+                err("Second parameter must be either 'add' or 'remove'.");
                 return;
             }
 
-            Player target = playerGroup.find(p -> p.name.equals(arg[0]));
+            boolean add = arg[0].equals("add");
+
+            PlayerInfo target;
+            Player playert = playerGroup.find(p -> p.name.equals(arg[1]));
+            if(playert != null){
+                target = playert.getInfo();
+            }else{
+                target = netServer.admins.getInfoOptional(arg[1]);
+                playert = playerGroup.find(p -> p.getInfo() == target);
+            }
 
             if(target != null){
-                netServer.admins.unAdminPlayer(target.uuid);
-                target.isAdmin = false;
-                info("Un-admin-ed player: {0}", arg[0]);
+                if(add){
+                    netServer.admins.adminPlayer(target.id, target.adminUsid);
+                }else{
+                    netServer.admins.unAdminPlayer(target.id);
+                }
+                if(playert != null) playert.isAdmin = add;
+                info("Changed admin status of player: &ly{0}", target.lastName);
             }else{
-                info("Nobody with that name could be found.");
+                err("Nobody with that name or ID could be found. If adding an admin by name, make sure they're online; otherwise, use their UUID.");
             }
         });
 
@@ -711,6 +704,18 @@ public class ServerControl implements ApplicationListener{
                 info("&lyAdmins:");
                 for(PlayerInfo info : admins){
                     info(" &lm {0} /  ID: '{1}' / IP: '{2}'", info.lastName, info.id, info.lastIP);
+                }
+            }
+        });
+
+        handler.register("players", "List all players currently in game.", arg -> {
+            if(playerGroup.size() == 0){
+                info("No players are currently in the server.");
+            }else{
+                info("&lyPlayers: {0}", playerGroup.size());
+                for(Player user : playerGroup){
+                    PlayerInfo userInfo = user.getInfo();
+                    info(" &lm {0} /  ID: '{1}' / IP: '{2}' / Admin: '{3}'", userInfo.lastName, userInfo.id, userInfo.lastIP, userInfo.admin);
                 }
             }
         });
@@ -829,7 +834,6 @@ public class ServerControl implements ApplicationListener{
         });
 
         mods.eachClass(p -> p.registerServerCommands(handler));
-        mods.eachClass(p -> p.registerClientCommands(netServer.clientCommands));
     }
 
     private void readCommands(){

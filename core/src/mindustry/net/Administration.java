@@ -41,7 +41,6 @@ public class Administration{
                     if(player.getInfo().messageInfractions >= Config.messageSpamKick.num() && Config.messageSpamKick.num() != 0){
                         player.con.kick("You have been kicked for spamming.", 1000 * 60 * 2);
                     }
-                    player.getInfo().lastSentMessage = message;
                     return null;
                 }else{
                     player.getInfo().messageInfractions = 0;
@@ -191,7 +190,7 @@ public class Administration{
             }
         }
 
-        bannedIPs.removeValue(ip, false);
+        bannedIPs.remove(ip, false);
 
         if(found){
             save();
@@ -420,7 +419,7 @@ public class Administration{
         crashReport("Whether to send crash reports.", false, "crashreport"),
         logging("Whether to log everything to files.", true),
         strict("Whether strict mode is on - corrects positions and prevents duplicate UUIDs.", true),
-        antiSpam("Whether spammers are automatically kicked and rate-limited.", true),
+        antiSpam("Whether spammers are automatically kicked and rate-limited.", headless),
         messageRateLimit("Message rate limit in seconds. 0 to disable.", 0),
         messageSpamKick("How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
         socketInput("Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),

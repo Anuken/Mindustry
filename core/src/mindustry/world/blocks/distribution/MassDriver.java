@@ -192,6 +192,11 @@ public class MassDriver extends Block{
 
         MassDriverEntity entity = tile.ent();
 
+        for(Tile shooter : entity.waitingShooters){
+            Drawf.circles(shooter.drawx(), shooter.drawy(), (tile.block().size / 2f + 1) * tilesize + sin - 2f, Pal.place);
+            Drawf.arrow(shooter.drawx(), shooter.drawy(), tile.drawx(), tile.drawy(), size * tilesize + sin, 4f + sin, Pal.place);
+        }
+
         if(linkValid(tile)){
             Tile target = world.tile(entity.link);
             Drawf.circles(target.drawx(), target.drawy(), (target.block().size / 2f + 1) * tilesize + sin - 2f, Pal.place);
