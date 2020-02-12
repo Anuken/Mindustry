@@ -1873,11 +1873,7 @@ public class Blocks implements ContentList{
 
         switchCrater = new SwitchBlock("switch-crater"){{
             requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with(Items.graphite, 4));
-        }   @Override
-            public Block getSchematic(){
-                return switchBlock;
-            }
-        };
+        }};
 
         signalBlock = new SignalBlock("signal-block"){{
             requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));

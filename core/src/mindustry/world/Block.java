@@ -590,11 +590,6 @@ public class Block extends BlockStorage{
         return this;
     }
 
-    /** @return a possible replacement for this block when being selected for a schematic. */
-    public Block getSchematic(){
-        return this;
-    }
-
     public float handleDamage(Tile tile, float amount){
         return amount;
     }
