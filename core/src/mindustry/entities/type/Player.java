@@ -976,6 +976,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     // define when a player is doing nothing (useful)
     public boolean idle(){
-        return velocity.isZero(0.1f) && placeQueue.isEmpty() && !isShooting;
+        return velocity.isZero(0.1f) && placeQueue.isEmpty() && !isShooting && !isTyping;
     }
 }

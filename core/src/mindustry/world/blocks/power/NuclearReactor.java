@@ -135,6 +135,8 @@ public class NuclearReactor extends PowerGenerator{
             Time.run(Mathf.random(40), () -> Effects.effect(Fx.nuclearcloud, tile.worldx(), tile.worldy()));
         }
 
+        if(!net.server()) return;
+
         final int[] destroyed = {0};
         Geometry.circle(tile.x, tile.y, explosionRadius / 2, (x, y) -> {
             Tile tmp = world.tile(x, y);
@@ -164,6 +166,7 @@ public class NuclearReactor extends PowerGenerator{
             if(destroyed[0] == 0) return;
             for(Player p : playerGroup){
                 p.syncWhenIdle = true;
+                netServer.sendWorldData(p);
             }
         }, 2.5f);
     }
