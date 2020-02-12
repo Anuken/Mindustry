@@ -167,6 +167,14 @@ public class Teams{
         public CoreEntity core(){
             return cores.first();
         }
+
+        @Override
+        public String toString(){
+            return "TeamData{" +
+            "cores=" + cores +
+            ", team=" + team +
+            '}';
+        }
     }
 
     /** Represents a block made by this team that was destroyed somewhere on the map.
