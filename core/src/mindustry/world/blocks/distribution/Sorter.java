@@ -7,6 +7,8 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.type.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -61,7 +63,12 @@ public class Sorter extends Block{
         super.draw(tile);
 
         SorterEntity entity = tile.ent();
-        if(entity.sortItem == null) return;
+        if(entity.sortItem == null){
+            Draw.color(Pal.remove);
+            Draw.rect(Icon.cancelSmall.getRegion(), tile.drawx(), tile.drawy());
+            Draw.color();
+            return;
+        }
 
         Draw.color(entity.sortItem.color);
         Draw.rect("center", tile.worldx(), tile.worldy());
