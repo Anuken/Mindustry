@@ -85,14 +85,15 @@ public class ImpactReactor extends PowerGenerator{
                 Core.app.post(() -> {
                     if (tile.entity == null) return;
 
-                    BaseUnit reaper = UnitTypes.reaper.create(tile.getTeam());
-                    reaper.set(tile.drawx(), tile.drawy());
-                    reaper.add();
-                    reaper.applyEffect(StatusEffects.corroded, 999999f);
-                    Events.fire(new UnitCreateEvent(reaper));
+                    if (entity.reaper == null || entity.reaper.isDead()){
+                        entity.reaper = UnitTypes.reaper.create(tile.getTeam());
+                        entity.reaper.set(tile.drawx(), tile.drawy());
+                        entity.reaper.add();
+                        Events.fire(new UnitCreateEvent(entity.reaper));
 
-                    entity.warmup = 0f;
-                    netServer.titanic.add(tile);
+                        entity.warmup = 0f;
+                        netServer.titanic.add(tile);
+                    }
                 });
             }
 
@@ -180,6 +181,7 @@ public class ImpactReactor extends PowerGenerator{
 
     public static class FusionReactorEntity extends GeneratorEntity{
         public float warmup;
+        public BaseUnit reaper;
 
         @Override
         public void write(DataOutput stream) throws IOException{
