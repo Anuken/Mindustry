@@ -666,7 +666,7 @@ public class ServerControl implements ApplicationListener{
                 info.lastKicked = 0;
                 info("Pardoned player: {0}", info.lastName);
             } else{
-                err("That ID isn't hasn't been votekicked!");
+                err("That ID hasn't been votekicked!");
             }
         });
 
