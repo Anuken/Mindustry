@@ -661,7 +661,8 @@ public class ServerControl implements ApplicationListener{
         });
         
         handler.register("pardon", "<ID>", "Pardons a votekicked player by ID and allows them to join again.", arg -> {
-            PlayerInfo info = netServer.admins.getInfo(arg[0]);
+            PlayerInfo info = netServer.admins.getInfoOptional(arg[0]);
+            
             if(info != null){
                 info.lastKicked = 0;
                 info("Pardoned player: {0}", info.lastName);
