@@ -66,12 +66,10 @@ public class Sorter extends Block{
         if(entity.sortItem == null){
             Draw.color(Pal.remove);
             Draw.rect(Icon.cancelSmall.getRegion(), tile.drawx(), tile.drawy());
-            Draw.color();
-            return;
+        }else{ // ▲ unfiltered | filtered ▼
+            Draw.color(entity.sortItem.color);
+            Draw.rect("center", tile.worldx(), tile.worldy());
         }
-
-        Draw.color(entity.sortItem.color);
-        Draw.rect("center", tile.worldx(), tile.worldy());
         Draw.color();
     }
 
