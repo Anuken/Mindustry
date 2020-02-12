@@ -96,7 +96,7 @@ public class Sorter extends Block{
         if(dir == -1) return null;
         Tile to;
 
-        if(((item == entity.sortItem) != invert) == entity.disabled()){
+        if(((item == entity.sortItem) == invert) == (entity.disabled() ^ entity.sortItem == null)){
             //prevent 3-chains
             if(isSame(dest, source) && isSame(dest, dest.getNearby(dir))){
                 return null;
