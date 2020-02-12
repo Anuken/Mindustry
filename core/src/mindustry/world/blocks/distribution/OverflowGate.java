@@ -2,7 +2,7 @@ package mindustry.world.blocks.distribution;
 
 import arc.math.Mathf;
 import arc.util.Time;
-import mindustry.entities.type.TileEntity;
+import mindustry.entities.type.*;
 import mindustry.type.Item;
 import mindustry.world.*;
 import mindustry.world.meta.BlockGroup;
@@ -26,6 +26,11 @@ public class OverflowGate extends Block{
     @Override
     public boolean outputsItems(){
         return true;
+    }
+
+    @Override
+    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+        return 0;
     }
 
     @Override
