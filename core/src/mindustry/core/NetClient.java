@@ -567,6 +567,11 @@ public class NetClient implements ApplicationListener{
     }
 
     String getUsid(String ip){
+        //consistently use the latter part of an IP, if possible
+        if(ip.contains("/")){
+            ip = ip.substring(ip.indexOf("/") + 1);
+        }
+
         if(Core.settings.getString("usid-" + ip, null) != null){
             return Core.settings.getString("usid-" + ip, null);
         }else{
