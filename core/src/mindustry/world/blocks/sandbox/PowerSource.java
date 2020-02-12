@@ -10,11 +10,12 @@ public class PowerSource extends PowerNode{
         maxNodes = 100;
         outputsPower = true;
         consumesPower = false;
+        stopOnDisabled = true;
     }
 
     @Override
     public float getPowerProduction(Tile tile){
-        return 10000f;
+        return tile.entity.enabled() ? 10000f : 0f;
     }
 
 }
