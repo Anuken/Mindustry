@@ -56,6 +56,7 @@ public class LightBlock extends Block{
             ui.picker.show(Tmp.c1.set(entity.color).a(0.5f), false, res -> {
                 entity.color = res.rgba();
                 lastColor = entity.color;
+                tile.configure(lastColor);
             });
             control.input.frag.config.hideConfig();
         }).size(40f);
@@ -64,12 +65,18 @@ public class LightBlock extends Block{
     @Override
     public void configured(Tile tile, Player player, int value){
         tile.<LightEntity>ent().color = value;
+        if(!headless) renderer.minimap.update(tile);
     }
 
     @Override
     public void drawLight(Tile tile){
         LightEntity entity = tile.ent();
         renderer.lights.add(tile.drawx(), tile.drawy(), radius, Tmp.c1.set(entity.color), brightness * tile.entity.efficiency());
+    }
+
+    @Override
+    public int minimapColor(Tile tile){
+        return tile.<LightEntity>ent().color;
     }
 
     public class LightEntity extends TileEntity{

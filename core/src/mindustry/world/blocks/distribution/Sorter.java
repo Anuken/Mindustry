@@ -46,9 +46,7 @@ public class Sorter extends Block{
     @Override
     public void configured(Tile tile, Player player, int value){
         tile.<SorterEntity>ent().sortItem = content.item(value);
-        if(!headless){
-            renderer.minimap.update(tile);
-        }
+        if(!headless) renderer.minimap.update(tile);
     }
 
     @Override
