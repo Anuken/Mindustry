@@ -166,7 +166,6 @@ public class NuclearReactor extends PowerGenerator{
             if(destroyed[0] == 0) return;
             for(Player p : playerGroup){
                 p.syncWhenIdle = true;
-                netServer.sendWorldData(p);
             }
         }, 2.5f);
     }
