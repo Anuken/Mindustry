@@ -83,7 +83,7 @@ public class Blocks implements ContentList{
     dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad,
 
     //logic
-    switchBlock, signalBlock, signalNode, signalRouter, analyzer, controller, reverser, relay, notGate, andGate, orGate, xorGate, adder, subtractor, divider, remainder, multiplier, equalizer, comparator, fontSignal, displayBlock;
+    switchBlock, signalBlock, signalNode, signalRouter, analyzer, controller, flipper, relay, notGate, andGate, orGate, xorGate, adder, subtractor, divider, remainder, multiplier, equalizer, comparator, fontSignal, displayBlock;
 
     @Override
     public void load(){
@@ -1894,7 +1894,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
         }};
 
-        reverser = new ReverserBlock("reverser"){{
+        flipper = new FlipperBlock("flipper"){{
             requirements(Category.effect, BuildVisibility.bytelogicOnly, ItemStack.with(Items.lead, 4));
         }};
 

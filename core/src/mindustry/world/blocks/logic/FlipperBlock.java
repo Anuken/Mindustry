@@ -11,9 +11,9 @@ import mindustry.world.blocks.distribution.Conveyor.*;
 
 import static mindustry.Vars.tilesize;
 
-public class ReverserBlock extends UnaryLogicBlock{
+public class FlipperBlock extends UnaryLogicBlock{
 
-    public ReverserBlock(String name){
+    public FlipperBlock(String name){
         super(name);
         processor = in -> in;
     }
@@ -24,11 +24,14 @@ public class ReverserBlock extends UnaryLogicBlock{
 
         LogicEntity entity = tile.ent();
         Tile facing = tile.front();
-        if(facing != null && facing.entity != null && facing.block().controllable){
+        if(facing != null && facing.entity != null && facing.block().rotate){
 
             if(    (entity.nextSignal == 0 && (facing.rotation() == 0 || facing.rotation() == 1))
                 || (entity.nextSignal != 0 && (facing.rotation() == 2 || facing.rotation() == 3))
-            )facing.rotation(Mathf.mod(facing.rotation() + 2, 4));
+            ) {
+                facing.rotation(Mathf.mod(facing.rotation() + 2, 4));
+                facing.entity.updateProximity();
+            }
         }
     }
 
@@ -37,7 +40,7 @@ public class ReverserBlock extends UnaryLogicBlock{
         super.drawSelect(tile);
 
         Tile facing = tile.front();
-        if(facing != null && facing.entity != null && facing.block().controllable){
+        if(facing != null && facing.entity != null && facing.block().rotate){
             Drawf.selected(facing.x, facing.y, facing.block(), Pal.accent);
         }else{
             Draw.color(Pal.remove);
