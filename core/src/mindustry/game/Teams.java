@@ -98,6 +98,7 @@ public class Teams{
 
     /** Do not modify. */
     public Array<TeamData> getActive(){
+        active.removeAll(t -> !t.active());
         return active;
     }
 
