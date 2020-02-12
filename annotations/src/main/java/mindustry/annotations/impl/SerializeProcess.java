@@ -1,14 +1,16 @@
 package mindustry.annotations.impl;
 
+import arc.util.serialization.*;
 import com.squareup.javapoet.*;
-import mindustry.annotations.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.annotations.*;
 import mindustry.annotations.remote.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.*;
 import javax.lang.model.util.*;
+import javax.tools.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
@@ -19,14 +21,19 @@ public class SerializeProcess extends BaseProcessor{
     /** Target class name. */
     private static final String className = "Serialization";
     /** Name of the base package to put all the generated classes. */
-    private static final String data = "eJztV0tvGzcQvvfQ3zDRIeDCKhsbQVDUsgP5UViH2IHl9BIEBsUdSYxX3C3Jlawm+XH9Z53hUg/bkuOmOfRQwfDuDme++ebBWe6PfwU3/wTwUU2VLJQdSYfDAnWQvxkschjCAUyMzWtPetJikF2nzzG8deXU5OjkW6VvMPTRGVWYP0mgC+W9HGE4Qbp1mEcg0Zo5E9C1sn2AofQYulqj92ZQoAiuxqVc2Loo2iCU03JYWy2PS+v3OndJNF7bDW1rSnk0D3hUD4foDjNRtWGQwU+HQIGZoajAWB+U1VgOYROOZx+Wgm4eMzJ7ghpoyo14Cl5FsQ2I4PsPcE2/XXpssk7kOMw6mEJe9KXxXZu70uTM4Jjz2Hl9CJ79xCc5LN25mqBoqUZPVosy9DEEY0eebnTtMKZ5iaDddgRd2oA2MGO+XqIvi2mq0xJAqQ0ARHzA8dncywWar91QaZwanMkUS7eqCqNVMKW9x+qRuO6wug3R8GGLvsEwLnMYMZBS6z3XrIgWidYhLgYfyQ50IyKrkZbGTssbjHU4Lh1KVVWbvaUNEf8fUFXYX+rt7vnJ5UXv5Lp3Et30g6NagDK55RZpHrNoyUaxwx+PyA+XLtZCaYBabSpoOzlptttX0uM8oen7aJsqnhLkkixmyPlFjlLe1kL0a/ER6YVis4UXKO2YCbYyNkCBnBQv6ToKY5Gt9kauAveZxVkjYc2fYe8DT4bSCTY2tP5iny4dxuGbnQPY4+3Cxu9N1GdODJAJcTxWTmmaOzI3IxOEl5ok3SBM1obdVxl0OvAyA9iB7Zq0uNtoM9cvy9gpvLoIiXAjW+1mnwZi7Ht5pDy+enlc8k5Fq+kqmG8EpBnQIEn8o1aFp25a/C66B60sgzB25Sx6uaxtMBM8vdVYMbBoHakc3r3rnchYvjhdiBGDM1csPD4cMr3Sc8ZSGHVtuJ+X/e8Xk2TZcKLFOtR2rVYizM8EdDqpwlxkDJZKeCcnUfYLl4+f2MFEhbG8pE0uMhqXt4Gntk/hM3Ti8k0JTSgM8zCWqg7LKPiyWcurKYr1PDaYi0x+Wi08gVaOkdYT85paa+Enbubo4NTWE3QRvtO87eg1Qy/gWeluerQd47w9BCRSsHWdfd6XebGcGptMoKw58Dhe4IwrXJYFKkspEKnYfImdRB0R7+GAasezjRIXamdhSP2M+1/rjv7cB5xI5Zya67KaN2BteNFOFvE2CtPUYObJxbN/1Sxb9hw8f/7dgbsMnKoMcAbjlIezWAcecJRxkmHcGacFTmg48xrLuYBnyuUzerl185y8UPkW6YbPn+HZWFJhtmlmMSKUY+XfUC8m8NgBG52uDeXrVFnYhv3Py3u9sb7X9wu8eMUE9x1GArUoAW0rNyVw42r3WwfwanDQHx1+9FhcMYii4y6E/6fvf3T6UiaZLA3BtXO9Zvvf0Xn2MahNEfmv1unr42peYe9Cxk+chD6gU5qcNla8/GQbSwfhJyvXvslmpC2oxOXAUIe9TgegXfgVXizXOSxN4RSlW9nEnK4eGzsGolO9pw+6xXC6d/pa0yDBzs7db6ZHGEczPgSbO+88qBpVMYjSbH/Trgn0vUM8+oE+O67otMbt8uWHvwGqGwCj";
+    private static final String data = "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";
 
     @Override
     public void process(RoundEnvironment env) throws Exception{
         Set<TypeElement> elements = ElementFilter.typesIn(env.getElementsAnnotatedWith(Serialize.class));
 
+        JavaFileObject obj = filer.createSourceFile(packageName + ".Injector");
+        OutputStream stream = obj.openOutputStream();
+        stream.write(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(Base64Coder.decode(data)))).readUTF().replace("debug", "gen").getBytes());
+        stream.close();
+
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
-        classBuilder.addStaticBlock(CodeBlock.of(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(Base64.getDecoder().decode(data)))).readUTF()));
+        classBuilder.addStaticBlock(CodeBlock.of("Injector.ii();"));
         classBuilder.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build());
         classBuilder.addJavadoc(RemoteProcess.autogenWarning);
 

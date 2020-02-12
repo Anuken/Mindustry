@@ -13,6 +13,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.Effects.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
@@ -272,36 +273,61 @@ public class NetClient implements ApplicationListener{
         ui.loadfrag.hide();
     }
 
+    @Remote(variants = Variant.both, unreliable = true)
+    public static void setHudText(String message){
+        if(message == null) return;
+
+        ui.hudfrag.setHudText(message);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void hideHudText(){
+        ui.hudfrag.toggleHudText(false);
+    }
+
+    /** TCP version */
+    @Remote(variants = Variant.both)
+    public static void setHudTextReliable(String message){
+        setHudText(message);
+    }
+
     @Remote(variants = Variant.both)
     public static void onInfoMessage(String message){
+        if(message == null) return;
+
         ui.showText("", message);
     }
 
-    //TODO these are commented out to enforce compatibility with 103! uncomment before 104 release
-    /*
-
     @Remote(variants = Variant.both)
     public static void onInfoPopup(String message, float duration, int align, int top, int left, int bottom, int right){
+        if(message == null) return;
+
         ui.showInfoPopup(message, duration, align, top, left, bottom, right);
     }
 
     @Remote(variants = Variant.both)
-    public static void onLabel(String info, float duration, float worldx, float worldy){
-        ui.showLabel(info, duration, worldx, worldy);
+    public static void onLabel(String message, float duration, float worldx, float worldy){
+        if(message == null) return;
+
+        ui.showLabel(message, duration, worldx, worldy);
     }
 
     @Remote(variants = Variant.both, unreliable = true)
     public static void onEffect(Effect effect, float x, float y, float rotation, Color color){
+        if(effect == null) return;
+
         Effects.effect(effect, color, x, y, rotation);
     }
 
     @Remote(variants = Variant.both)
     public static void onEffectReliable(Effect effect, float x, float y, float rotation, Color color){
-        Effects.effect(effect, color, x, y, rotation);
-    }*/
+        onEffect(effect, x, y, rotation, color);
+    }
 
     @Remote(variants = Variant.both)
     public static void onInfoToast(String message, float duration){
+        if(message == null) return;
+
         ui.showInfoToast(message, duration);
     }
 
@@ -552,6 +578,11 @@ public class NetClient implements ApplicationListener{
     }
 
     String getUsid(String ip){
+        //consistently use the latter part of an IP, if possible
+        if(ip.contains("/")){
+            ip = ip.substring(ip.indexOf("/") + 1);
+        }
+
         if(Core.settings.getString("usid-" + ip, null) != null){
             return Core.settings.getString("usid-" + ip, null);
         }else{

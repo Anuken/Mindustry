@@ -13,6 +13,7 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
@@ -25,6 +26,7 @@ public class JoinDialog extends FloatingDialog{
     Server renaming;
     Table local = new Table();
     Table remote = new Table();
+    Table global = new Table();
     Table hosts = new Table();
     int totalHosts;
 
@@ -80,15 +82,11 @@ public class JoinDialog extends FloatingDialog{
             }
         });
 
-        keyDown(KeyCode.F5, () -> {
-            refreshLocal();
-            refreshRemote();
-        });
+        keyDown(KeyCode.F5, this::refreshAll);
 
         shown(() -> {
             setup();
-            refreshLocal();
-            refreshRemote();
+            refreshAll();
 
             if(!steam){
                 Core.app.post(() -> Core.settings.getBoolOnce("joininfo", () -> ui.showInfo("$join.info")));
@@ -97,9 +95,14 @@ public class JoinDialog extends FloatingDialog{
 
         onResize(() -> {
             setup();
-            refreshLocal();
-            refreshRemote();
+            refreshAll();
         });
+    }
+
+    void refreshAll(){
+        refreshLocal();
+        refreshRemote();
+        refreshGlobal();
     }
 
     void setupRemote(){
@@ -128,21 +131,12 @@ public class JoinDialog extends FloatingDialog{
             inner.add(button.getLabel()).growX();
 
             inner.addImageButton(Icon.upOpen, Styles.emptyi, () -> {
-                int index = servers.indexOf(server);
-                if(index > 0){
-                    servers.remove(index);
-                    servers.insert(0, server);
+                moveRemote(server, -1);
 
-                    saveServers();
-                    setupRemote();
-                    for(Server other : servers){
-                        if(other.lastHost != null){
-                            setupServer(other, other.lastHost);
-                        }else{
-                            refreshServer(other);
-                        }
-                    }
-                }
+            }).margin(3f).padTop(6f).top().right();
+
+            inner.addImageButton(Icon.downOpen, Styles.emptyi, () -> {
+                moveRemote(server, +1);
 
             }).margin(3f).padTop(6f).top().right();
 
@@ -157,7 +151,7 @@ public class JoinDialog extends FloatingDialog{
 
             inner.addImageButton(Icon.trash, Styles.emptyi, () -> {
                 ui.showConfirm("$confirm", "$server.delete", () -> {
-                    servers.removeValue(server, true);
+                    servers.remove(server, true);
                     saveServers();
                     setupRemote();
                     refreshRemote();
@@ -169,6 +163,26 @@ public class JoinDialog extends FloatingDialog{
             server.content = button.table(t -> {}).grow().get();
 
             remote.row();
+        }
+    }
+
+    void moveRemote(Server server, int sign){
+        int index = servers.indexOf(server);
+
+        if(index + sign < 0) return;
+        if(index + sign > servers.size - 1) return;
+
+        servers.remove(index);
+        servers.insert(index + sign, server);
+
+        saveServers();
+        setupRemote();
+        for(Server other : servers){
+            if(other.lastHost != null){
+                setupServer(other, other.lastHost);
+            }else{
+                refreshServer(other);
+            }
         }
     }
 
@@ -232,9 +246,9 @@ public class JoinDialog extends FloatingDialog{
 
         hosts.clear();
 
-        hosts.add(remote).growX();
-        hosts.row();
-        hosts.add(local).width(w);
+        section("$servers.local", local);
+        section("$servers.remote", remote);
+        section("$servers.global", global);
 
         ScrollPane pane = new ScrollPane(hosts);
         pane.setFadeScrollBars(false);
@@ -289,6 +303,24 @@ public class JoinDialog extends FloatingDialog{
         });
     }
 
+    void section(String label, Table servers){
+        Collapser coll = new Collapser(servers, Core.settings.getBool("collapsed-" + label, false));
+        coll.setDuration(0.1f);
+
+        hosts.table(name -> {
+            name.add(label).pad(10).growX().left().color(Pal.accent);
+            name.addImageButton(Icon.downOpen, Styles.emptyi, () -> {
+                coll.toggle(false);
+                Core.settings.putSave("collapsed-" + label, coll.isCollapsed());
+            }).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(40f).right().padRight(10f);
+        }).growX();
+        hosts.row();
+        hosts.addImage().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
+        hosts.row();
+        hosts.add(coll).width(targetWidth());
+        hosts.row();
+    }
+
     void refreshLocal(){
         totalHosts = 0;
 
@@ -296,12 +328,17 @@ public class JoinDialog extends FloatingDialog{
         local.background(null);
         local.table(Tex.button, t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering.any") + Strings.animated(Time.time(), 4, 10f, ".")).pad(10f)).growX();
         net.discoverServers(this::addLocalHost, this::finishLocalHosts);
+    }
+
+    void refreshGlobal(){
+        global.clear();
+        global.background(null);
         for(String host : defaultServers){
             String resaddress = host.contains(":") ? host.split(":")[0] : host;
             int resport = host.contains(":") ? Strings.parseInt(host.split(":")[1]) : port;
             net.pingHost(resaddress, resport, res -> {
                 res.port = resport;
-                addLocalHost(res);
+                addGlobalHost(res);
             }, e -> {});
         }
     }
@@ -329,6 +366,18 @@ public class JoinDialog extends FloatingDialog{
         local.row();
 
         TextButton button = local.addButton("", Styles.cleart, () -> safeConnect(host.address, host.port, host.version))
+        .width(w).pad(5f).get();
+        button.clearChildren();
+        buildServer(host, button);
+    }
+
+    void addGlobalHost(Host host){
+        global.background(null);
+        float w = targetWidth();
+
+        global.row();
+
+        TextButton button = global.addButton("", Styles.cleart, () -> safeConnect(host.address, host.port, host.version))
         .width(w).pad(5f).get();
         button.clearChildren();
         buildServer(host, button);

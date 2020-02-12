@@ -22,6 +22,7 @@ logs/
 /server/build/
 changelog
 saves/
+/core/assets-raw/fontgen/out/
 core/assets/saves/
 /core/assets/saves/
 steam_appid.txt
