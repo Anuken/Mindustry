@@ -12,12 +12,12 @@ import static mindustry.Vars.net;
 
 @Component
 abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
-    transient float x, y;
-    transient Vec2 vel;
+    @Import float x, y;
+    @Import Vec2 vel;
 
     float elevation;
     float drownTime;
-    float splashTimer;
+    transient float splashTimer;
 
     boolean isGrounded(){
         return elevation < 0.001f;

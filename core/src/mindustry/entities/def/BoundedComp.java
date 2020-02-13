@@ -11,8 +11,8 @@ import static mindustry.Vars.*;
 abstract class BoundedComp implements Velc, Posc, Healthc, Flyingc{
     static final float warpDst = 180f;
 
-    transient float x, y;
-    transient Vec2 vel;
+    @Import float x, y;
+    @Import Vec2 vel;
 
     @Override
     public void update(){

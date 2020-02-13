@@ -30,7 +30,7 @@ public class WaveInfoDialog extends FloatingDialog{
 
     private Table table, preview;
     private int start = 0;
-    private UnitDef lastType = UnitTypes.dagger;
+    private UnitType lastType = UnitTypes.dagger;
     private float updateTimer, updatePeriod = 1f;
 
     public WaveInfoDialog(MapEditor editor){
@@ -221,7 +221,7 @@ public class WaveInfoDialog extends FloatingDialog{
         dialog.setFillParent(true);
         dialog.cont.pane(p -> {
             int i = 0;
-            for(UnitDef type : content.units()){
+            for(UnitType type : content.units()){
                 p.addButton(t -> {
                     t.left();
                     t.addImage(type.icon(mindustry.ui.Cicon.medium)).size(40f).padRight(2f);
@@ -256,7 +256,7 @@ public class WaveInfoDialog extends FloatingDialog{
 
                 for(int j = 0; j < spawned.length; j++){
                     if(spawned[j] > 0){
-                        UnitDef type = content.getByID(ContentType.unit, j);
+                        UnitType type = content.getByID(ContentType.unit, j);
                         table.addImage(type.icon(Cicon.medium)).size(8f * 4f).padRight(4);
                         table.add(spawned[j] + "x").color(Color.lightGray).padRight(6);
                         table.row();

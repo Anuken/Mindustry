@@ -11,7 +11,7 @@ import static mindustry.Vars.collisions;
 //just a proof of concept
 @Component
 abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc{
-    transient float x, y;
+    @Import float x, y;
 
     @Replace
     @Override

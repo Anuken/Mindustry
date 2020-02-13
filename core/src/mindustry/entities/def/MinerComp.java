@@ -18,9 +18,9 @@ import static mindustry.Vars.*;
 
 @Component
 abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc{
-    transient float x, y, rotation;
+    @Import float x, y, rotation;
 
-    float mineTimer;
+    transient float mineTimer;
     @Nullable Tile mineTile;
 
     abstract boolean canMine(Item item);

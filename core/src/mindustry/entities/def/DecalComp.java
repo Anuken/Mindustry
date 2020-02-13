@@ -9,7 +9,7 @@ import mindustry.gen.*;
 @EntityDef(value = {Decalc.class}, pooled = true)
 @Component
 abstract class DecalComp implements Drawc, Timedc, Rotc, Posc, DrawLayerFloorc{
-    transient float x, y, rotation;
+    @Import float x, y, rotation;
 
     Color color = new Color(1, 1, 1, 1);
     TextureRegion region;

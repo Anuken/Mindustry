@@ -6,22 +6,22 @@ import mindustry.gen.*;
 import mindustry.type.*;
 
 public class UnitTypes implements ContentList{
-    public static UnitDef
+    public static UnitType
     draug, spirit, phantom,
     wraith, ghoul, revenant, lich, reaper,
     crawler, titan, fortress, eruptor, chaosArray, eradicator;
 
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitDef dagger;
-    public static @EntityDef({Unitc.class, WaterMovec.class}) UnitDef vanguard;
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType dagger;
+    public static @EntityDef({Unitc.class, WaterMovec.class}) UnitType vanguard;
 
-    public static UnitDef alpha, delta, tau, omega, dart, javelin, trident, glaive;
-    public static UnitDef starter;
+    public static UnitType alpha, delta, tau, omega, dart, javelin, trident, glaive;
+    public static UnitType starter;
 
 
     @Override
     public void load(){
 
-        dagger = new UnitDef("dagger"){{
+        dagger = new UnitType("dagger"){{
             speed = 1f;
             drag = 0.3f;
             hitsize = 8f;
@@ -36,7 +36,7 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        vanguard = new UnitDef("vanguard"){{
+        vanguard = new UnitType("vanguard"){{
             speed = 1.3f;
             drag = 0.1f;
             hitsize = 8f;

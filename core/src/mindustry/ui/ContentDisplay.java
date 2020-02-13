@@ -131,7 +131,7 @@ public class ContentDisplay{
         table.row();
     }
 
-    public static void displayUnit(Table table, UnitDef unit){
+    public static void displayUnit(Table table, UnitType unit){
         table.table(title -> {
             title.addImage(unit.icon(Cicon.xlarge)).size(8 * 6);
             title.add("[accent]" + unit.localizedName).padLeft(5);

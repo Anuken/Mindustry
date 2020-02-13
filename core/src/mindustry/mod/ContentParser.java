@@ -274,14 +274,14 @@ public class ContentParser{
 
             return block;
         },
-        ContentType.unit, (TypeParser<UnitDef>)(mod, name, value) -> {
+        ContentType.unit, (TypeParser<UnitType>)(mod, name, value) -> {
             readBundle(ContentType.unit, name, value);
 
             //TODO fix
-            UnitDef unit;
+            UnitType unit;
             if(locate(ContentType.unit, name) == null){
                 Class<Unitc> type = resolve(legacyUnitMap.get(Strings.capitalize(getType(value)), getType(value)), "mindustry.entities.type.base");
-                unit = new UnitDef(mod + "-" + name);
+                unit = new UnitType(mod + "-" + name);
             }else{
                 unit = locate(ContentType.unit, name);
             }

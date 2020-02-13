@@ -5,7 +5,6 @@ import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.entities.units.*;
-import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -328,9 +327,9 @@ public class EventType{
     //TODO rename
     public static class MechChangeEvent{
         public final Playerc player;
-        public final UnitDef mech;
+        public final UnitType mech;
 
-        public MechChangeEvent(Playerc player, UnitDef mech){
+        public MechChangeEvent(Playerc player, UnitType mech){
             this.player = player;
             this.mech = mech;
         }

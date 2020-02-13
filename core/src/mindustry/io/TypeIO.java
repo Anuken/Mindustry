@@ -155,13 +155,13 @@ public class TypeIO{
         return AdminAction.values()[buffer.get()];
     }
 
-    @WriteClass(UnitDef.class)
-    public static void writeUnitDef(ByteBuffer buffer, UnitDef effect){
+    @WriteClass(UnitType.class)
+    public static void writeUnitDef(ByteBuffer buffer, UnitType effect){
         buffer.putShort(effect.id);
     }
 
-    @ReadClass(UnitDef.class)
-    public static UnitDef readUnitDef(ByteBuffer buffer){
+    @ReadClass(UnitType.class)
+    public static UnitType readUnitDef(ByteBuffer buffer){
         return content.getByID(ContentType.unit, buffer.getShort());
     }
 

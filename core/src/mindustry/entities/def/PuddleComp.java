@@ -25,7 +25,7 @@ abstract class PuddleComp implements Posc, DrawLayerFloorOverc{
     private static final Rect rect2 = new Rect();
     private static int seeds;
 
-    transient float x, y;
+    @Import float x, y;
 
     float amount, lastRipple, accepting, updateTime;
     int generation;

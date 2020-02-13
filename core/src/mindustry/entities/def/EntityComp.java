@@ -12,8 +12,8 @@ import static mindustry.Vars.player;
 @Component
 @BaseComponent
 abstract class EntityComp{
-    private boolean added;
-    int id = EntityGroup.nextId();
+    private transient boolean added;
+    transient int id = EntityGroup.nextId();
 
     boolean isAdded(){
         return added;
@@ -48,6 +48,9 @@ abstract class EntityComp{
 
     @InternalImpl
     abstract int classId();
+
+    @InternalImpl
+    abstract boolean serialize();
 
     void read(DataInput input) throws IOException{
         //TODO dynamic io

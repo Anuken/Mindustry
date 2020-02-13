@@ -23,8 +23,7 @@ import static mindustry.Vars.*;
 @EntityDef({Playerc.class})
 @Component
 abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
-    @NonNull
-    @ReadOnly Unitc unit = Nulls.unit;
+    @NonNull @ReadOnly Unitc unit = Nulls.unit;
 
     @ReadOnly Team team = Team.sharded;
     String name = "noname";
@@ -33,7 +32,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
     Color color = new Color();
     float mouseX, mouseY;
 
-    @Nullable String lastText;
+    String lastText = "";
     float textFadeTime;
 
     public boolean isBuilder(){
@@ -51,7 +50,6 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
     public void reset(){
         team = state.rules.defaultTeam;
         admin = typing = false;
-        lastText = null;
         textFadeTime = 0f;
         if(!dead()){
             unit.controller(unit.type().createController());

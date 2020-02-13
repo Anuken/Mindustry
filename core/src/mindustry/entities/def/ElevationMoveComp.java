@@ -7,7 +7,7 @@ import static mindustry.Vars.collisions;
 
 @Component
 abstract class ElevationMoveComp implements Velc, Posc, Flyingc, Hitboxc{
-    transient float x, y;
+    @Import float x, y;
 
     @Replace
     @Override

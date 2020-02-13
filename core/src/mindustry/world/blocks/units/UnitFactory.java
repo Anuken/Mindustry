@@ -22,7 +22,7 @@ import java.io.*;
 import static mindustry.Vars.net;
 
 public class UnitFactory extends Block{
-    public UnitDef unitType;
+    public UnitType unitType;
     public float produceTime = 1000f;
     public float launchVelocity = 0f;
     public TextureRegion topRegion;

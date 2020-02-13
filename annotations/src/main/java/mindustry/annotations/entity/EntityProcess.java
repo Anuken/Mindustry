@@ -1,4 +1,4 @@
-package mindustry.annotations.impl;
+package mindustry.annotations.entity;
 
 import arc.files.*;
 import arc.func.*;
@@ -118,7 +118,7 @@ public class EntityProcess extends BaseProcessor{
                     .build())).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
                 }
 
-                for(Svar field : component.fields().select(e -> !e.is(Modifier.STATIC) && !e.is(Modifier.PRIVATE) && !e.is(Modifier.TRANSIENT))){
+                for(Svar field : component.fields().select(e -> !e.is(Modifier.STATIC) && !e.is(Modifier.PRIVATE) && !e.has(Import.class))){
                     String cname = field.name();
 
                     //getter
@@ -221,18 +221,31 @@ public class EntityProcess extends BaseProcessor{
                 Array<GroupDefinition> groups = groupDefs.select(g -> (!g.components.isEmpty() && !g.components.contains(s -> !components.contains(s))) || g.manualInclusions.contains(type));
                 ObjectMap<String, Array<Smethod>> methods = new ObjectMap<>();
                 ObjectMap<FieldSpec, Svar> specVariables = new ObjectMap<>();
+                ObjectSet<String> usedFields = new ObjectSet<>();
+
+                //add serialize() boolean
+                builder.addMethod(MethodSpec.methodBuilder("serialize").addModifiers(Modifier.PUBLIC, Modifier.FINAL).returns(boolean.class).addStatement("return " + ann.serialize()).build());
 
                 //add all components
                 for(Stype comp : components){
 
                     //write fields to the class; ignoring transient ones
-                    Array<Svar> fields = comp.fields().select(f -> !f.is(Modifier.TRANSIENT));
+                    Array<Svar> fields = comp.fields().select(f -> !f.has(Import.class));
                     for(Svar f : fields){
+                        if(!usedFields.add(f.name())){
+                            err("Field '" + f.name() + "' of component '" + comp.name() + "' re-defines a field in entity '" + type.name() + "'");
+                            continue;
+                        }
+
                         FieldSpec.Builder fbuilder = FieldSpec.builder(f.tname(), f.name());
                         //keep statics/finals
                         if(f.is(Modifier.STATIC)){
                             fbuilder.addModifiers(Modifier.STATIC);
                             if(f.is(Modifier.FINAL)) fbuilder.addModifiers(Modifier.FINAL);
+                        }
+                        //add transient modifier for serialization
+                        if(f.is(Modifier.TRANSIENT)){
+                            fbuilder.addModifiers(Modifier.TRANSIENT);
                         }
                         //add initializer if it exists
                         if(varInitializers.containsKey(f)){
@@ -309,6 +322,18 @@ public class EntityProcess extends BaseProcessor{
                         for(GroupDefinition def : groups){
                             //remove/add from each group, assume imported
                             mbuilder.addStatement("Groups.$L.$L(this)", def.name, first.name());
+                        }
+                    }
+
+                    //SPECIAL CASE: I/O code
+                    //note that serialization is generated even for non-serializing entities for manual usage
+                    if(first.name().equals("read") || first.name().equals("write")){
+                        EntityIO writer = new EntityIO(mbuilder, first.name().equals("write"));
+                        //write or read each non-transient field
+                        for(FieldSpec spec : builder.fieldSpecs){
+                            if(!spec.hasModifier(Modifier.TRANSIENT) && !spec.hasModifier(Modifier.STATIC) && !spec.hasModifier(Modifier.FINAL)){
+                                writer.io(spec.type, "this." + spec.name);
+                            }
                         }
                     }
 

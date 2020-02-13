@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 abstract class FireComp implements Timedc, Posc, Firec{
     private static final float spreadChance = 0.05f, fireballChance = 0.07f;
 
-    transient float time, lifetime, x, y;
+    @Import float time, lifetime, x, y;
 
     Tile tile;
     private Block block;

@@ -224,6 +224,8 @@ public abstract class SaveVersion extends SaveFileReader{
 
         stream.writeInt(Groups.sync.size());
         for(Syncc entity : Groups.sync){
+            if(!entity.serialize()) continue;
+
             writeChunk(stream, true, out -> {
                 out.writeByte(entity.classId());
                 entity.write(out);

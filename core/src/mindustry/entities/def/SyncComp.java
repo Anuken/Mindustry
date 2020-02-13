@@ -7,7 +7,7 @@ import mindustry.net.*;
 
 @Component
 abstract class SyncComp implements Posc{
-    transient float x, y;
+    @Import float x, y;
 
     Interpolator interpolator = new Interpolator();
 

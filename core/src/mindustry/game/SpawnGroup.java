@@ -19,7 +19,7 @@ public class SpawnGroup implements Serializable{
     public static final int never = Integer.MAX_VALUE;
 
     /** The unit type spawned */
-    public UnitDef type;
+    public UnitType type;
     /** When this spawn should end */
     public int end = never;
     /** When this spawn should start */
@@ -37,7 +37,7 @@ public class SpawnGroup implements Serializable{
     /** Items this unit spawns with. Null to disable. */
     public ItemStack items;
 
-    public SpawnGroup(UnitDef type){
+    public SpawnGroup(UnitType type){
         this.type = type;
     }
 

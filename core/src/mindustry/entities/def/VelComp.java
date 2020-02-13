@@ -7,7 +7,7 @@ import mindustry.gen.*;
 
 @Component
 abstract class VelComp implements Posc{
-    transient float x, y;
+    @Import float x, y;
 
     final Vec2 vel = new Vec2();
     float drag = 0f;

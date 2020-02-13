@@ -20,7 +20,7 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
-    public UnitDef mech = UnitTypes.starter;
+    public UnitType mech = UnitTypes.starter;
 
     public CoreBlock(String name){
         super(name);

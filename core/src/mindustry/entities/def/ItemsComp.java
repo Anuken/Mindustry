@@ -8,7 +8,7 @@ import mindustry.type.*;
 @Component
 abstract class ItemsComp implements Posc{
     @ReadOnly ItemStack stack = new ItemStack();
-    float itemTime;
+    transient float itemTime;
 
     abstract int itemCapacity();
 

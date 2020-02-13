@@ -24,6 +24,12 @@ public class Annotations{
     public @interface Replace{
     }
 
+    /** Indicates that a component field is imported from other components. */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Import{
+    }
+
     /** Indicates that a component field is read-only. */
     @Target({ElementType.FIELD, ElementType.METHOD})
     @Retention(RetentionPolicy.SOURCE)
@@ -70,6 +76,7 @@ public class Annotations{
         Class[] value();
         boolean isFinal() default true;
         boolean pooled() default false;
+        boolean serialize() default true;
     }
 
     /** Indicates an internal interface for entity components. */

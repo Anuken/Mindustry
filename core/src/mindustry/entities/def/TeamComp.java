@@ -9,7 +9,7 @@ import static mindustry.Vars.state;
 
 @Component
 abstract class TeamComp implements Posc{
-    transient float x, y;
+    @Import float x, y;
 
     Team team = Team.sharded;
 

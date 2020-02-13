@@ -12,7 +12,7 @@ import mindustry.type.*;
 
 @Component
 abstract class WeaponsComp implements Teamc, Posc, Rotc{
-    transient float x, y, rotation;
+    @Import float x, y, rotation;
 
     /** minimum cursor distance from player, fixes 'cross-eyed' shooting */
     static final float minAimDst = 20f;
@@ -22,7 +22,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     /** weapon mount array, never null */
     @ReadOnly WeaponMount[] mounts = {};
 
-    void setupWeapons(UnitDef def){
+    void setupWeapons(UnitType def){
         mounts = new WeaponMount[def.weapons.size];
         for(int i = 0; i < mounts.length; i++){
             mounts[i] = new WeaponMount(def.weapons.get(i));

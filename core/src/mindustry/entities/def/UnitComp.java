@@ -20,10 +20,10 @@ import static mindustry.Vars.*;
 @Component
 abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, Drawc, Boundedc,
         DrawLayerGroundc, DrawLayerFlyingc, DrawLayerGroundShadowsc, DrawLayerFlyingShadowsc{
-    transient float x, y, rotation;
+    @Import float x, y, rotation;
 
     private UnitController controller;
-    private UnitDef type;
+    private UnitType type;
 
     @Override
     public float clipSize(){
@@ -52,7 +52,7 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     }
 
     @Override
-    public void set(UnitDef def, UnitController controller){
+    public void set(UnitType def, UnitController controller){
         type(type);
         controller(controller);
     }
@@ -75,7 +75,7 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     }
 
     @Override
-    public void type(UnitDef type){
+    public void type(UnitType type){
         this.type = type;
         maxHealth(type.health);
         heal();
@@ -86,7 +86,7 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     }
 
     @Override
-    public UnitDef type(){
+    public UnitType type(){
         return type;
     }
 

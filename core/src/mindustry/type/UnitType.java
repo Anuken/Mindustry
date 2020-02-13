@@ -21,8 +21,7 @@ import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
-//TODO change to UnitType or Shell or something
-public class UnitDef extends UnlockableContent{
+public class UnitType extends UnlockableContent{
     static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
 
     public @NonNull Prov<? extends UnitController> defaultController = AIController::new;
@@ -53,7 +52,7 @@ public class UnitDef extends UnlockableContent{
     public Array<Weapon> weapons = new Array<>();
     public TextureRegion baseRegion, legRegion, region, cellRegion, occlusionRegion;
 
-    public UnitDef(String name){
+    public UnitType(String name){
         super(name);
 
         if(EntityMapping.map(name) != null){

@@ -20,7 +20,7 @@ import static mindustry.Vars.*;
 
 //TODO remove
 public class MechPad extends Block{
-    public @NonNull UnitDef mech;
+    public @NonNull UnitType mech;
     public float buildTime = 60 * 5;
 
     public MechPad(String name){

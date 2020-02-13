@@ -6,7 +6,7 @@ import mindustry.gen.*;
 
 @Component
 abstract class ChildComp implements Posc{
-    transient float x, y;
+    @Import float x, y;
 
     @Nullable Posc parent;
     float offsetX, offsetY;

@@ -12,7 +12,7 @@ import static mindustry.Vars.net;
 
 public class RespawnBlock{
     
-    public static void drawRespawn(Tile tile, float heat, float progress, float time, Playerc player, UnitDef to){
+    public static void drawRespawn(Tile tile, float heat, float progress, float time, Playerc player, UnitType to){
         progress = Mathf.clamp(progress);
 
         Draw.color(Pal.darkMetal);

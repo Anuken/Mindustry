@@ -4,10 +4,9 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.struct.*;
 import arc.struct.Queue;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -27,10 +26,10 @@ import static mindustry.Vars.*;
 abstract class BuilderComp implements Unitc{
     static final Vec2[] tmptr = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
-    transient float x, y, rotation;
+    @Import float x, y, rotation;
 
     Queue<BuildRequest> requests = new Queue<>();
-    float buildSpeed = 1f;
+    transient float buildSpeed = 1f;
     //boolean building;
 
     void updateBuilding(){
