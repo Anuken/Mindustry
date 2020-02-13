@@ -21,6 +21,7 @@ public class PlayerListFragment extends Fragment{
     private boolean visible = false;
     private Table content = new Table().marginRight(13f).marginLeft(13f);
     private Interval timer = new Interval();
+    private String searchToken = "";
 
     @Override
     public void build(Group parent){
@@ -44,6 +45,14 @@ public class PlayerListFragment extends Fragment{
             cont.table(Tex.buttonTrans, pane -> {
                 pane.label(() -> Core.bundle.format(playerGroup.size() == 1 ? "players.single" : "players", playerGroup.size()));
                 pane.row();
+                TextField field = pane.addField(null, text -> {
+                    searchToken = text.toLowerCase();
+                    Log.info(searchToken);
+                    rebuild();
+                }).grow().pad(8).get();
+                field.setMaxLength(maxNameLength);
+                field.setMessageText(Core.bundle.format("players.search"));
+                pane.row();
                 pane.pane(content).grow().get().setScrollingDisabled(true, false);
                 pane.row();
 
@@ -65,83 +74,90 @@ public class PlayerListFragment extends Fragment{
         content.clear();
 
         float h = 74f;
+        boolean drawEach = (searchToken.length() > 0 && playerGroup.all().contains(user -> user.name.toLowerCase().contains(searchToken))) || searchToken.length() == 0;
 
-        playerGroup.all().sort(Structs.comparing(Unit::getTeam));
-        playerGroup.all().each(user -> {
-            NetConnection connection = user.con;
+        if(drawEach) {
+            playerGroup.all().sort(Structs.comparing(Unit::getTeam));
+            playerGroup.all().each(user -> {
+                NetConnection connection = user.con;
 
-            if(connection == null && net.server() && !user.isLocal) return;
+                if (connection == null && net.server() && !user.isLocal) return;
+                if (!user.name.toLowerCase().contains(searchToken)) return;
 
-            Table button = new Table();
-            button.left();
-            button.margin(5).marginBottom(10);
+                Table button = new Table();
+                button.left();
+                button.margin(5).marginBottom(10);
 
-            Table table = new Table(){
-                @Override
-                public void draw(){
-                    super.draw();
-                    Draw.color(Pal.gray);
-                    Draw.alpha(parentAlpha);
-                    Lines.stroke(Scl.scl(4f));
-                    Lines.rect(x, y, width, height);
-                    Draw.reset();
+                Table table = new Table() {
+                    @Override
+                    public void draw() {
+                        super.draw();
+                        Draw.color(Pal.gray);
+                        Draw.alpha(parentAlpha);
+                        Lines.stroke(Scl.scl(4f));
+                        Lines.rect(x, y, width, height);
+                        Draw.reset();
+                    }
+                };
+                table.margin(8);
+                table.add(new Image(user.getIconRegion()).setScaling(Scaling.none)).grow();
+
+                button.add(table).size(h);
+                button.labelWrap("[#" + user.color.toString().toUpperCase() + "]" + user.name).width(170f).pad(10);
+                button.add().grow();
+
+                button.addImage(Icon.admin).visible(() -> user.isAdmin && !(!user.isLocal && net.server())).padRight(5).get().updateVisibility();
+
+                if ((net.server() || player.isAdmin) && !user.isLocal && (!user.isAdmin || net.server())) {
+                    button.add().growY();
+
+                    float bs = (h) / 2f;
+
+                    button.table(t -> {
+                        t.defaults().size(bs);
+
+                        t.addImageButton(Icon.hammer, Styles.clearPartiali,
+                                () -> ui.showConfirm("$confirm", "$confirmban", () -> Call.onAdminRequest(user, AdminAction.ban)));
+                        t.addImageButton(Icon.cancel, Styles.clearPartiali,
+                                () -> ui.showConfirm("$confirm", "$confirmkick", () -> Call.onAdminRequest(user, AdminAction.kick)));
+
+                        t.row();
+
+                        t.addImageButton(Icon.admin, Styles.clearTogglePartiali, () -> {
+                            if (net.client()) return;
+
+                            String id = user.uuid;
+
+                            if (netServer.admins.isAdmin(id, connection.address)) {
+                                ui.showConfirm("$confirm", "$confirmunadmin", () -> netServer.admins.unAdminPlayer(id));
+                            } else {
+                                ui.showConfirm("$confirm", "$confirmadmin", () -> netServer.admins.adminPlayer(id, user.usid));
+                            }
+                        })
+                                .update(b -> b.setChecked(user.isAdmin))
+                                .disabled(b -> net.client())
+                                .touchable(() -> net.client() ? Touchable.disabled : Touchable.enabled)
+                                .checked(user.isAdmin);
+
+                        t.addImageButton(Icon.zoom, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
+
+                    }).padRight(12).size(bs + 10f, bs);
+                } else if (!user.isLocal && !user.isAdmin && net.client() && playerGroup.size() >= 3 && player.getTeam() == user.getTeam()) { //votekick
+                    button.add().growY();
+
+                    button.addImageButton(Icon.hammer, Styles.clearPartiali,
+                            () -> ui.showConfirm("$confirm", "$confirmvotekick", () -> Call.sendChatMessage("/votekick " + user.name))).size(h);
                 }
-            };
-            table.margin(8);
-            table.add(new Image(user.getIconRegion()).setScaling(Scaling.none)).grow();
 
-            button.add(table).size(h);
-            button.labelWrap("[#" + user.color.toString().toUpperCase() + "]" + user.name).width(170f).pad(10);
-            button.add().grow();
-
-            button.addImage(Icon.admin).visible(() -> user.isAdmin && !(!user.isLocal && net.server())).padRight(5).get().updateVisibility();
-
-            if((net.server() || player.isAdmin) && !user.isLocal && (!user.isAdmin || net.server())){
-                button.add().growY();
-
-                float bs = (h) / 2f;
-
-                button.table(t -> {
-                    t.defaults().size(bs);
-
-                    t.addImageButton(Icon.hammer, Styles.clearPartiali,
-                    () -> ui.showConfirm("$confirm", "$confirmban", () -> Call.onAdminRequest(user, AdminAction.ban)));
-                    t.addImageButton(Icon.cancel, Styles.clearPartiali,
-                    () -> ui.showConfirm("$confirm", "$confirmkick", () -> Call.onAdminRequest(user, AdminAction.kick)));
-
-                    t.row();
-
-                    t.addImageButton(Icon.admin, Styles.clearTogglePartiali, () -> {
-                        if(net.client()) return;
-
-                        String id = user.uuid;
-
-                        if(netServer.admins.isAdmin(id, connection.address)){
-                            ui.showConfirm("$confirm", "$confirmunadmin", () -> netServer.admins.unAdminPlayer(id));
-                        }else{
-                            ui.showConfirm("$confirm", "$confirmadmin", () -> netServer.admins.adminPlayer(id, user.usid));
-                        }
-                    })
-                    .update(b -> b.setChecked(user.isAdmin))
-                    .disabled(b -> net.client())
-                    .touchable(() -> net.client() ? Touchable.disabled : Touchable.enabled)
-                    .checked(user.isAdmin);
-
-                    t.addImageButton(Icon.zoom, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
-
-                }).padRight(12).size(bs + 10f, bs);
-            }else if(!user.isLocal && !user.isAdmin && net.client() && playerGroup.size() >= 3 && player.getTeam() == user.getTeam()){ //votekick
-                button.add().growY();
-
-                button.addImageButton(Icon.hammer, Styles.clearPartiali,
-                () -> ui.showConfirm("$confirm", "$confirmvotekick", () -> Call.sendChatMessage("/votekick " + user.name))).size(h);
-            }
-
-            content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
+                content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
+                content.row();
+                content.addImage().height(4f).color(state.rules.pvp ? user.getTeam().color : Pal.gray).growX();
+                content.row();
+            });
+        }else{
+            content.add(Core.bundle.format("players.notfound")).padBottom(6).width(350f).maxHeight(h + 14);
             content.row();
-            content.addImage().height(4f).color(state.rules.pvp ? user.getTeam().color : Pal.gray).growX();
-            content.row();
-        });
+        }
 
         content.marginBottom(5);
     }
