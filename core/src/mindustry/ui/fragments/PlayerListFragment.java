@@ -21,7 +21,7 @@ public class PlayerListFragment extends Fragment{
     private boolean visible = false;
     private Table content = new Table().marginRight(13f).marginLeft(13f);
     private Interval timer = new Interval();
-    private TextField field;
+    private TextField sField;
 
     @Override
     public void build(Group parent){
@@ -45,11 +45,11 @@ public class PlayerListFragment extends Fragment{
             cont.table(Tex.buttonTrans, pane -> {
                 pane.label(() -> Core.bundle.format(playerGroup.size() == 1 ? "players.single" : "players", playerGroup.size()));
                 pane.row();
-                field = pane.addField(null, text -> {
+                sField = pane.addField(null, text -> {
                     rebuild();
                 }).grow().pad(8).get();
-                field.setMaxLength(maxNameLength);
-                field.setMessageText(Core.bundle.format("players.search"));
+                sField.setMaxLength(maxNameLength);
+                sField.setMessageText(Core.bundle.format("players.search"));
                 pane.row();
                 pane.pane(content).grow().get().setScrollingDisabled(true, false);
                 pane.row();
@@ -72,7 +72,7 @@ public class PlayerListFragment extends Fragment{
         content.clear();
 
         float h = 74f;
-        boolean drawEach = (field.getText().toLowerCase().length() > 0 && playerGroup.all().contains(user -> user.name.toLowerCase().contains(field.getText().toLowerCase()))) || field.getText().toLowerCase().length() == 0;
+        boolean drawEach = (sField.getText().toLowerCase().length() > 0 && playerGroup.all().contains(user -> user.name.toLowerCase().contains(sField.getText().toLowerCase()))) || sField.getText().toLowerCase().length() == 0;
 
         if(drawEach) {
             playerGroup.all().sort(Structs.comparing(Unit::getTeam));
@@ -80,7 +80,7 @@ public class PlayerListFragment extends Fragment{
                 NetConnection connection = user.con;
 
                 if (connection == null && net.server() && !user.isLocal) return;
-                if (!user.name.toLowerCase().contains(field.getText().toLowerCase())) return;
+                if (!user.name.toLowerCase().contains(sField.getText().toLowerCase())) return;
 
                 Table button = new Table();
                 button.left();
@@ -166,7 +166,7 @@ public class PlayerListFragment extends Fragment{
             rebuild();
         }else{
             Core.scene.setKeyboardFocus(null);
-            field.clearText();
+            sField.clearText();
         }
     }
 
