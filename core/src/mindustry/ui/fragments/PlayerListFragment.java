@@ -47,7 +47,6 @@ public class PlayerListFragment extends Fragment{
                 pane.row();
                 TextField field = pane.addField(null, text -> {
                     searchToken = text.toLowerCase();
-                    Log.info(searchToken);
                     rebuild();
                 }).grow().pad(8).get();
                 field.setMaxLength(maxNameLength);
