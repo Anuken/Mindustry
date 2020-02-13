@@ -27,6 +27,11 @@ public class OverflowGate extends Block{
     }
 
     @Override
+    public int acceptStack(Item item, int amount, Tile tile, Teamc source){
+        return 0;
+    }
+
+    @Override
     public int removeStack(Tile tile, Item item, int amount){
         OverflowGateEntity entity = tile.ent();
         int result = super.removeStack(tile, item, amount);

@@ -92,6 +92,10 @@ public class EventType{
         }
     }
 
+    public static class ClientCreateEvent{
+
+    }
+
     /** Called when the client game is first loaded. */
     public static class ClientLoadEvent{
 
