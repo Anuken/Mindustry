@@ -252,6 +252,8 @@ public class Control implements ApplicationListener, Loadable{
         ui.loadAnd(() -> {
             ui.planet.hide();
             SaveSlot slot = saves.getSectorSave(sector);
+            //TODO remove for persistent sector slots
+            slot = null;
             if(slot != null){
                 try{
                     net.reset();
@@ -272,7 +274,8 @@ public class Control implements ApplicationListener, Loadable{
                 state.rules.sector = sector;
                 logic.play();
                 control.saves.saveSector(sector);
-                Events.fire(Trigger.newGame);
+                //TODO uncomment for efffect
+                //Events.fire(Trigger.newGame);
             }
         });
     }
