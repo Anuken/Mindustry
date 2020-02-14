@@ -732,7 +732,7 @@ public class ServerControl implements ApplicationListener{
             Core.app.post(() -> {
                 try{
                     SaveIO.load(file);
-                    state.rules.zone = null;
+                    state.rules.sector = null;
                     info("Save loaded.");
                     state.set(State.playing);
                     netServer.openServer();

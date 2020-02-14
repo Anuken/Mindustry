@@ -45,5 +45,9 @@ public class TypeIOResolver{
             this.writers = writers;
             this.readers = readers;
         }
+
+        public boolean has(String type){
+            return writers.containsKey(type) && readers.containsKey(type);
+        }
     }
 }

@@ -68,6 +68,25 @@ public abstract class BaseProcessor extends AbstractProcessor{
         }
     }
 
+    //in bytes
+    public static int typeSize(String kind){
+        switch(kind){
+            case "boolean":
+            case "byte":
+                return 1;
+            case "short":
+                return 2;
+            case "float":
+            case "char":
+            case "int":
+                return 4;
+            case "long":
+                return 8;
+            default:
+                throw new IllegalArgumentException("Invalid primitive type: " + kind + "");
+        }
+    }
+
     public static String simpleName(String str){
         return str.contains(".") ? str.substring(str.lastIndexOf('.') + 1) : str;
     }

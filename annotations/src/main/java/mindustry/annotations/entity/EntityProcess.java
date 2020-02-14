@@ -275,6 +275,8 @@ public class EntityProcess extends BaseProcessor{
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return $S + $L", name + "#", "id").build());
 
+                EntityIO io = new EntityIO(type.name(), builder, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(name));
+
                 //add all methods from components
                 for(ObjectMap.Entry<String, Array<Smethod>> entry : methods){
                     if(entry.value.contains(m -> m.has(Replace.class))){
@@ -332,15 +334,7 @@ public class EntityProcess extends BaseProcessor{
                     //SPECIAL CASE: I/O code
                     //note that serialization is generated even for non-serializing entities for manual usage
                     if((first.name().equals("read") || first.name().equals("write")) && ann.genio()){
-                        Array<FieldSpec> fields = Array.with(builder.fieldSpecs).select(spec -> !spec.hasModifier(Modifier.TRANSIENT) && !spec.hasModifier(Modifier.STATIC) && !spec.hasModifier(Modifier.FINAL));
-                        fields.sortComparing(f -> f.name); //sort to keep order
-                        EntityIO writer = new EntityIO(mbuilder, first.name().equals("write"), serializer);
-                        //subclasses *have* to call this method
-                        mbuilder.addAnnotation(CallSuper.class);
-                        //write or read each non-transient field
-                        for(FieldSpec spec : fields){
-                            writer.io(spec.type, "this." + spec.name);
-                        }
+                        io.write(mbuilder, first.name().equals("write"));
                     }
 
                     for(Smethod elem : entry.value){
