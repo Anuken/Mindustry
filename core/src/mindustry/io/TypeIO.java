@@ -114,7 +114,7 @@ public class TypeIO{
     }
 
     public static void writeTeam(Writes write, Team reason){
-        write.b((byte) (int)reason.id);
+        write.b(reason.id);
     }
 
     public static Team readTeam(Reads read){

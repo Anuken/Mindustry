@@ -3,7 +3,7 @@ package mindustry.annotations.remote;
 import arc.util.io.*;
 import com.squareup.javapoet.*;
 import mindustry.annotations.*;
-import mindustry.annotations.remote.TypeIOResolver.*;
+import mindustry.annotations.util.TypeIOResolver.*;
 
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.*;

@@ -3,7 +3,8 @@ package mindustry.annotations.remote;
 import com.squareup.javapoet.*;
 import mindustry.annotations.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.annotations.remote.TypeIOResolver.*;
+import mindustry.annotations.util.*;
+import mindustry.annotations.util.TypeIOResolver.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
@@ -14,8 +15,7 @@ import java.util.stream.*;
 /** The annotation processor for generating remote method call code. */
 @SupportedAnnotationTypes({
 "mindustry.annotations.Annotations.Remote",
-"mindustry.annotations.Annotations.WriteClass",
-"mindustry.annotations.Annotations.ReadClass",
+"mindustry.annotations.Annotations.TypeIOHandler"
 })
 public class RemoteProcess extends BaseProcessor{
     /** Maximum size of each event packet. */

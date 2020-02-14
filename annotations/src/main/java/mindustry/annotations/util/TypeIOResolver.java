@@ -1,9 +1,8 @@
-package mindustry.annotations.remote;
+package mindustry.annotations.util;
 
 import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.annotations.*;
-import mindustry.annotations.util.*;
 
 import javax.lang.model.element.*;
 

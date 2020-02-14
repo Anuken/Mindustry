@@ -5,7 +5,7 @@ import arc.util.io.*;
 import com.squareup.javapoet.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.annotations.*;
-import mindustry.annotations.remote.TypeIOResolver.*;
+import mindustry.annotations.util.TypeIOResolver.*;
 
 import javax.lang.model.element.*;
 import java.io.*;

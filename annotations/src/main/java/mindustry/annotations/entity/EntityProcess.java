@@ -12,6 +12,7 @@ import com.squareup.javapoet.TypeSpec.*;
 import com.sun.source.tree.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.annotations.*;
+import mindustry.annotations.util.TypeIOResolver.*;
 import mindustry.annotations.util.*;
 
 import javax.annotation.processing.*;
@@ -23,7 +24,8 @@ import java.lang.annotation.*;
 "mindustry.annotations.Annotations.EntityDef",
 "mindustry.annotations.Annotations.GroupDef",
 "mindustry.annotations.Annotations.EntityInterface",
-"mindustry.annotations.Annotations.BaseComponent"
+"mindustry.annotations.Annotations.BaseComponent",
+"mindustry.annotations.Annotations.TypeIOHandler"
 })
 public class EntityProcess extends BaseProcessor{
     Array<EntityDefinition> definitions = new Array<>();
@@ -38,6 +40,7 @@ public class EntityProcess extends BaseProcessor{
     Array<Selement> allGroups = new Array<>();
     Array<Selement> allDefs = new Array<>();
     Array<Stype> allInterfaces = new Array<>();
+    ClassSerializer serializer;
 
     {
         rounds = 3;
@@ -51,6 +54,7 @@ public class EntityProcess extends BaseProcessor{
 
         //round 1: generate component interfaces
         if(round == 1){
+            serializer = TypeIOResolver.resolve(this);
             baseComponents = types(BaseComponent.class);
             Array<Stype> allComponents = types(Component.class);
 
@@ -330,7 +334,7 @@ public class EntityProcess extends BaseProcessor{
                     if((first.name().equals("read") || first.name().equals("write")) && ann.genio()){
                         Array<FieldSpec> fields = Array.with(builder.fieldSpecs).select(spec -> !spec.hasModifier(Modifier.TRANSIENT) && !spec.hasModifier(Modifier.STATIC) && !spec.hasModifier(Modifier.FINAL));
                         fields.sortComparing(f -> f.name); //sort to keep order
-                        EntityIO writer = new EntityIO(mbuilder, first.name().equals("write"));
+                        EntityIO writer = new EntityIO(mbuilder, first.name().equals("write"), serializer);
                         //subclasses *have* to call this method
                         mbuilder.addAnnotation(CallSuper.class);
                         //write or read each non-transient field
