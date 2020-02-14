@@ -247,7 +247,6 @@ public abstract class SaveVersion extends SaveFileReader{
             }
         }
 
-
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
             readChunk(stream, true, in -> {

@@ -328,14 +328,14 @@ public class EntityProcess extends BaseProcessor{
                     //SPECIAL CASE: I/O code
                     //note that serialization is generated even for non-serializing entities for manual usage
                     if((first.name().equals("read") || first.name().equals("write")) && ann.genio()){
+                        Array<FieldSpec> fields = Array.with(builder.fieldSpecs).select(spec -> !spec.hasModifier(Modifier.TRANSIENT) && !spec.hasModifier(Modifier.STATIC) && !spec.hasModifier(Modifier.FINAL));
+                        fields.sortComparing(f -> f.name); //sort to keep order
                         EntityIO writer = new EntityIO(mbuilder, first.name().equals("write"));
                         //subclasses *have* to call this method
                         mbuilder.addAnnotation(CallSuper.class);
                         //write or read each non-transient field
-                        for(FieldSpec spec : builder.fieldSpecs){
-                            if(!spec.hasModifier(Modifier.TRANSIENT) && !spec.hasModifier(Modifier.STATIC) && !spec.hasModifier(Modifier.FINAL)){
-                                writer.io(spec.type, "this." + spec.name);
-                            }
+                        for(FieldSpec spec : fields){
+                            writer.io(spec.type, "this." + spec.name);
                         }
                     }
 

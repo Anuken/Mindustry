@@ -20,7 +20,7 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-@EntityDef({Playerc.class})
+@EntityDef(value = {Playerc.class}, serialize = false)
 @Component
 abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
     @NonNull @ReadOnly Unitc unit = Nulls.unit;

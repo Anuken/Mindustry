@@ -18,8 +18,12 @@ abstract class HitboxComp implements Posc, QuadTreeObject{
 
     @Override
     public void add(){
-        lastX = x;
-        lastY = y;
+        updateLastPosition();
+    }
+
+    @Override
+    public void afterRead(){
+        updateLastPosition();
     }
 
     void updateLastPosition(){
