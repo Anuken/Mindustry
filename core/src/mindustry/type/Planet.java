@@ -22,26 +22,25 @@ public class Planet extends UnlockableContent{
     /** Detail in divisions. Must be between 1 and 10. 6 is a good number for this.*/
     public int detail = 3;
     /** Size in terms of divisions. This only controls the amount of sectors on the planet, not the visuals. */
-    public int size = 3;
+    public int size;
     /** Radius of the mesh/sphere. */
     public float radius = 1f;
 
-    public Planet(String name){
+    public Planet(String name, int size){
         super(name);
-    }
 
-    @Override
-    public void load(){
-        mesh = new PlanetMesh(detail, generator);
-    }
+        this.size = 3;
 
-    @Override
-    public void init(){
         grid = PlanetGrid.newGrid(size);
         sectors = new Array<>(grid.tiles.length);
         for(int i = 0; i < grid.tiles.length; i++){
             sectors.add(new Sector(this, grid.tiles[i]));
         }
+    }
+
+    @Override
+    public void load(){
+        mesh = new PlanetMesh(detail, generator);
     }
 
     /** Gets a sector a tile position. */

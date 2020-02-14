@@ -178,12 +178,12 @@ public class World{
         return generating;
     }
 
-    public boolean isZone(){
-        return getZone() != null;
+    public boolean isCampaign(){
+        return getSector() != null;
     }
 
-    public Zone getZone(){
-        return state.rules.zone;
+    public Sector getSector(){
+        return state.rules.sector;
     }
 
     public void loadGenerator(int width, int height, Cons<Tiles> generator){

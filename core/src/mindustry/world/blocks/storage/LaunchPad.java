@@ -73,7 +73,7 @@ public class LaunchPad extends StorageBlock{
     public void update(Tile tile){
         Tilec entity = tile.entity;
 
-        if(world.isZone() && entity.consValid() && entity.items().total() >= itemCapacity && entity.timer(timerLaunch, launchTime / entity.timeScale())){
+        if(world.isCampaign() && entity.consValid() && entity.items().total() >= itemCapacity && entity.timer(timerLaunch, launchTime / entity.timeScale())){
             for(Item item : Vars.content.items()){
                 Events.fire(Trigger.itemLaunch);
                 Fx.padlaunch.at(tile);

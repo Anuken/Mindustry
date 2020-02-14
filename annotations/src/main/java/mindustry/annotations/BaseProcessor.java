@@ -45,6 +45,12 @@ public abstract class BaseProcessor extends AbstractProcessor{
         || type.equals("long") || type.equals("float") || type.equals("double") || type.equals("char");
     }
 
+    public static boolean instanceOf(String type, String other){
+        TypeElement a = elementu.getTypeElement(type);
+        TypeElement b = elementu.getTypeElement(other);
+        return a != null && b != null && typeu.isSubtype(a.asType(), b.asType());
+    }
+
     public static String getDefault(String value){
         switch(value){
             case "float":

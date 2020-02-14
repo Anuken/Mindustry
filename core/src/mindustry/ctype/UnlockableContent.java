@@ -70,7 +70,7 @@ public abstract class UnlockableContent extends MappableContent{
 
     /** @return whether this content is unlocked, or the player is in a custom game. */
     public final boolean unlockedCur(){
-        return Vars.data.isUnlocked(this) || !Vars.world.isZone();
+        return Vars.data.isUnlocked(this) || !Vars.world.isCampaign();
     }
 
     public final boolean locked(){

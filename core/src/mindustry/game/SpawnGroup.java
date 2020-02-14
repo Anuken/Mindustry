@@ -19,7 +19,7 @@ public class SpawnGroup implements Serializable{
     public static final int never = Integer.MAX_VALUE;
 
     /** The unit type spawned */
-    public UnitType type;
+    public UnitType type = UnitTypes.dagger;
     /** When this spawn should end */
     public int end = never;
     /** When this spawn should start */
@@ -73,6 +73,7 @@ public class SpawnGroup implements Serializable{
 
     @Override
     public void write(Json json){
+        if(type == null) type = UnitTypes.dagger;
         json.writeValue("type", type.name);
         if(begin != 0) json.writeValue("begin", begin);
         if(end != never) json.writeValue("end", end);

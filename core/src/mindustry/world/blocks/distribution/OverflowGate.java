@@ -7,6 +7,8 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import java.io.*;
+
 public class OverflowGate extends Block{
     public float speed = 1f;
     public boolean invert = false;
@@ -120,5 +122,13 @@ public class OverflowGate extends Block{
         Item lastItem;
         Tile lastInput;
         float time;
+
+        @Override
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
+            if(revision == 1){
+                new DirectionalItemBuffer(25, 50f).read(stream);
+            }
+        }
     }
 }

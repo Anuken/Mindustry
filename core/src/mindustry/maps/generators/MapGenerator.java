@@ -3,6 +3,7 @@ package mindustry.maps.generators;
 import arc.math.*;
 import arc.math.geom.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.io.*;
 import mindustry.maps.*;
@@ -47,10 +48,10 @@ public class MapGenerator extends Generator{
         SaveIO.load(map.file);
 
         for(Tile tile : tiles){
-            if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && world.getZone() != null){
-                for(Item item : world.getZone().resources){
-                    if(Mathf.chance(0.3)){
-                        tile.entity.items().add(item, Math.min(Mathf.random(500), tile.block().itemCapacity));
+            if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && world.getSector() != null){
+                for(Content content : world.getSector().resources){
+                    if(content instanceof Item && Mathf.chance(0.3)){
+                        tile.entity.items().add((Item)content, Math.min(Mathf.random(500), tile.block().itemCapacity));
                     }
                 }
             }

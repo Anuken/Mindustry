@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.async.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
@@ -23,11 +24,11 @@ import static mindustry.Vars.*;
 
 public class Saves{
     private Array<SaveSlot> saves = new Array<>();
-    private SaveSlot current;
+    private @Nullable SaveSlot current;
+    private @Nullable SaveSlot lastSectorSave;
     private AsyncExecutor previewExecutor = new AsyncExecutor(1);
     private boolean saving;
     private float time;
-    private Fi zoneFile;
 
     private long totalPlaytime;
     private long lastTimestamp;
@@ -46,7 +47,6 @@ public class Saves{
 
     public void load(){
         saves.clear();
-        zoneFile = saveDirectory.child("-1.msav");
 
         for(Fi file : saveDirectory.list()){
             if(!file.name().contains("backup") && SaveIO.isSaveValid(file)){
@@ -55,9 +55,15 @@ public class Saves{
                 slot.meta = SaveIO.getMeta(file);
             }
         }
+
+        lastSectorSave = saves.find(s -> s.isSector() && s.getName().equals(Core.settings.getString("last-sector-save", "<<none>>")));
     }
 
-    public SaveSlot getCurrent(){
+    public @Nullable SaveSlot getLastSector(){
+        return lastSectorSave;
+    }
+
+    public @Nullable SaveSlot getCurrent(){
         return current;
     }
 
@@ -80,7 +86,7 @@ public class Saves{
                 Time.runTask(2f, () -> {
                     try{
                         current.save();
-                    }catch(Exception e){
+                    }catch(Throwable e){
                         e.printStackTrace();
                     }
                     saving = false;
@@ -105,12 +111,26 @@ public class Saves{
         return saving;
     }
 
-    public void zoneSave(){
-        SaveSlot slot = new SaveSlot(zoneFile);
-        slot.setName("zone");
-        saves.remove(s -> s.file.equals(zoneFile));
-        saves.add(slot);
+    public Fi getSectorFile(Sector sector){
+        return saveDirectory.child("sector-" + sector.planet.name + "-" + sector.id + "." + saveExtension);
+    }
+
+    public @Nullable SaveSlot getSectorSave(Sector sector){
+        Fi fi = getSectorFile(sector);
+        return saves.find(s -> s.isSector() && s.file.equals(fi));
+    }
+
+    public void saveSector(Sector sector){
+        SaveSlot slot = getSectorSave(sector);
+        if(slot == null){
+            slot = new SaveSlot(getSectorFile(sector));
+            slot.setName(slot.file.nameWithoutExtension());
+            saves.add(slot);
+        }
         slot.save();
+        lastSectorSave = slot;
+        Log.info("Saving " + slot.getName());
+        Core.settings.putSave("last-sector-save", slot.getName());
     }
 
     public SaveSlot addSave(String name){
@@ -131,11 +151,6 @@ public class Saves{
         return slot;
     }
 
-    public SaveSlot getZoneSlot(){
-        SaveSlot slot = getSaveSlots().find(s -> s.file.equals(zoneFile));
-        return slot == null || slot.getZone() == null ? null : slot;
-    }
-
     public Fi getNextSlotFile(){
         int i = 0;
         Fi file;
@@ -150,7 +165,6 @@ public class Saves{
     }
 
     public class SaveSlot{
-        //public final int index;
         public final Fi file;
         boolean requestedPreview;
         SaveMeta meta;
@@ -225,7 +239,7 @@ public class Saves{
         }
 
         public boolean isHidden(){
-            return getZone() != null;
+            return isSector();
         }
 
         public String getPlayTime(){
@@ -268,8 +282,12 @@ public class Saves{
             return meta.mods;
         }
 
-        public Zone getZone(){
-            return meta == null || meta.rules == null ? null : meta.rules.zone;
+        public Sector getSector(){
+            return meta == null || meta.rules == null ? null : meta.rules.sector;
+        }
+
+        public boolean isSector(){
+            return getSector() != null;
         }
 
         public Gamemode mode(){

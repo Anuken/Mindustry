@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.gen.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
@@ -87,8 +86,8 @@ public class LightBlock extends Block{
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
-            super.read(stream);
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             color = stream.readInt();
         }
     }

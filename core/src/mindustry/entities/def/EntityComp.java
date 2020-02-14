@@ -52,11 +52,16 @@ abstract class EntityComp{
     @InternalImpl
     abstract boolean serialize();
 
+    @MethodPriority(1)
     void read(DataInput input) throws IOException{
-        //TODO dynamic io
+        afterRead();
     }
 
     void write(DataOutput output) throws IOException{
-        //TODO dynamic io
+
+    }
+
+    void afterRead(){
+
     }
 }

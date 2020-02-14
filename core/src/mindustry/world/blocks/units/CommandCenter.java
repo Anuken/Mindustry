@@ -132,8 +132,8 @@ public class CommandCenter extends Block{
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
-            super.read(stream);
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             command = UnitCommand.all[stream.readByte()];
         }
     }

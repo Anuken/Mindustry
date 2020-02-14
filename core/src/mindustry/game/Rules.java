@@ -57,7 +57,7 @@ public class Rules{
     /** How many times longer a launch wave takes. */
     public float launchWaveMultiplier = 2f;
     /** Zone for saves that have them.*/
-    public Zone zone;
+    public Sector sector;
     /** Spawn layout. */
     public Array<SpawnGroup> spawns = new Array<>();
     /** Determines if there should be limited respawns. */

@@ -35,7 +35,7 @@ public class ConsumeItemFilter extends Consume{
     @Override
     public void build(Tile tile, Table table){
         MultiReqImage image = new MultiReqImage();
-        content.items().each(i -> filter.get(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), 1), () -> tile.entity != null && tile.entity.items() != null && tile.entity.items().has(item))));
+        content.items().each(i -> filter.get(i) && (!world.isCampaign() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), 1), () -> tile.entity != null && tile.entity.items() != null && tile.entity.items().has(item))));
 
         table.add(image).size(8 * 4);
     }

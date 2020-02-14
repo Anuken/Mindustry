@@ -255,7 +255,8 @@ public class DesktopLauncher extends ClientLauncher{
 
         if(inGame){
             if(world.getMap() != null){
-                gameMapWithWave = world.isZone() ? world.getZone().localizedName : Strings.capitalize(world.getMap().name());
+                //TODO implement nice name for sector
+                gameMapWithWave = Strings.capitalize(world.getMap().name());
             }
             if(state.rules.waves){
                 gameMapWithWave += " | Wave " + state.wave;

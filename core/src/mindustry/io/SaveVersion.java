@@ -186,7 +186,10 @@ public abstract class SaveVersion extends SaveFileReader{
 
                 if(tile.entity != null){
                     try{
-                        readChunk(stream, true, in -> tile.entity.read(in));
+                        readChunk(stream, true, in -> {
+                            byte revision = in.readByte();
+                            tile.entity.read(in, revision);
+                        });
                     }catch(Exception e){
                         throw new IOException("Failed to read tile entity of block: " + block, e);
                     }
@@ -222,7 +225,7 @@ public abstract class SaveVersion extends SaveFileReader{
             }
         }
 
-        stream.writeInt(Groups.sync.size());
+        stream.writeInt(Groups.sync.count(Entityc::serialize));
         for(Syncc entity : Groups.sync){
             if(!entity.serialize()) continue;
 
@@ -251,6 +254,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 byte typeid = in.readByte();
                 Syncc sync = (Syncc)EntityMapping.map(typeid).get();
                 sync.read(in);
+                sync.add();
             });
         }
     }

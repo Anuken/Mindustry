@@ -361,8 +361,8 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
-            super.read(stream);
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             int amount = stream.readInt();
             len = Math.min(amount, capacity);
 

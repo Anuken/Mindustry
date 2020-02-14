@@ -187,9 +187,10 @@ public class SStats implements SteamUserStatsCallback{
 
         Events.on(LoseEvent.class, e -> {
             if(campaign()){
-                if(world.getZone().metCondition() && (state.wave - world.getZone().conditionWave) / world.getZone().launchPeriod >= 1){
-                    skipLaunching2Death.complete();
-                }
+                //TODO implement
+                //if(world.getSector().metCondition() && (state.wave - world.getSector().conditionWave) / world.getSector().launchPeriod >= 1){
+                //    skipLaunching2Death.complete();
+                //}
             }
         });
 
@@ -239,7 +240,7 @@ public class SStats implements SteamUserStatsCallback{
                     SStat.attacksWon.add();
                 }
 
-                RankResult result = state.stats.calculateRank(world.getZone(), state.launched);
+                RankResult result = state.stats.calculateRank(world.getSector(), state.launched);
                 if(result.rank == Rank.S) earnSRank.complete();
                 if(result.rank == Rank.SS) earnSSRank.complete();
             }
@@ -273,7 +274,7 @@ public class SStats implements SteamUserStatsCallback{
     }
 
     private boolean campaign(){
-        return Vars.world.isZone();
+        return Vars.world.isCampaign();
     }
 
     @Override

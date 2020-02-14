@@ -73,10 +73,16 @@ public class Annotations{
     /** Indicates an entity definition. */
     @Retention(RetentionPolicy.SOURCE)
     public @interface EntityDef{
+        /** List of component interfaces */
         Class[] value();
+        /** Whether the class is final */
         boolean isFinal() default true;
+        /** If true, entities are recycled. */
         boolean pooled() default false;
+        /** Whether to serialize (makes the serialize method return this value) */
         boolean serialize() default true;
+        /** Whether to generate IO code */
+        boolean genio() default true;
     }
 
     /** Indicates an internal interface for entity components. */

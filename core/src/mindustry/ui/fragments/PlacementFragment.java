@@ -440,7 +440,7 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean unlocked(Block block){
-        return !world.isZone() || data.isUnlocked(block);
+        return !world.isCampaign() || data.isUnlocked(block);
     }
 
     /** Returns the currently displayed block in the top box. */

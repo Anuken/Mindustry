@@ -9,7 +9,6 @@ import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
-import mindustry.gen.*;
 import mindustry.world.*;
 
 import java.io.*;
@@ -99,8 +98,8 @@ public class Door extends Wall{
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
-            super.read(stream);
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             open = stream.readBoolean();
         }
     }

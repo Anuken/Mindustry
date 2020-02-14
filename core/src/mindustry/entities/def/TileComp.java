@@ -3,40 +3,42 @@ package mindustry.entities.def;
 import arc.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.modules.*;
 
+import java.io.*;
+
 import static mindustry.Vars.*;
 
-@EntityDef(value = {Tilec.class}, isFinal = false)
+@EntityDef(value = {Tilec.class}, isFinal = false, genio = false, serialize = false)
 @Component
 abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     static final float timeToSleep = 60f * 1;
     static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
     static int sleepingEntities = 0;
 
-    Tile tile;
-    Block block;
-    Array<Tile> proximity = new Array<>(8);
+    transient Tile tile;
+    transient Block block;
+    transient Array<Tile> proximity = new Array<>(8);
 
     PowerModule power;
     ItemModule items;
     LiquidModule liquids;
     ConsumeModule cons;
 
-    private float timeScale = 1f, timeScaleDuration;
+    private transient float timeScale = 1f, timeScaleDuration;
 
-    private @Nullable SoundLoop sound;
+    private transient @Nullable SoundLoop sound;
 
-    private boolean sleeping;
-    private float sleepTime;
+    private transient boolean sleeping;
+    private transient float sleepTime;
 
     /** Sets this tile entity data to this tile, and adds it if necessary. */
     @Override
@@ -58,6 +60,33 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         }
 
         return this;
+    }
+
+    @CallSuper
+    public void write(DataOutput output) throws IOException{
+        output.writeFloat(health());
+        output.writeByte(tile.rotation());
+        output.writeByte(tile.getTeamID());
+        if(items != null) items.write(output);
+        if(power != null) power.write(output);
+        if(liquids != null) liquids.write(output);
+        if(cons != null) cons.write(output);
+    }
+
+    @CallSuper
+    @Override
+    public void read(DataInput input, byte revision) throws IOException{
+        health(input.readFloat());
+        byte rotation = input.readByte();
+        byte team = input.readByte();
+
+        tile.setTeam(Team.get(team));
+        tile.rotation(rotation);
+
+        if(items != null) items.read(input);
+        if(power != null) power.read(input);
+        if(liquids != null) liquids.read(input);
+        if(cons != null) cons.read(input);
     }
 
     @Override
@@ -116,6 +145,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     }
 
     /** Returns the version of this TileEntity IO code.*/
+    //TODO implement
     @Override
     public byte version(){
         return 0;

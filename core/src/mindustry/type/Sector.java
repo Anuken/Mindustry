@@ -2,18 +2,39 @@ package mindustry.type;
 
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.ctype.*;
 import mindustry.graphics.PlanetGrid.*;
+
+import static mindustry.Vars.state;
 
 /** A small section of a planet. */
 public class Sector{
     public final SectorRect rect;
     public final Planet planet;
     public final Ptile tile;
+    public final int id;
+
+    //TODO generate a class file with 2D arrays of resources for each sector for each planet
+    public final Content[] resources = {};
+    //TODO implement a dynamic (?) launch period
+    public int launchPeriod = 10;
 
     public Sector(Planet planet, Ptile tile){
         this.planet = planet;
         this.tile = tile;
         this.rect = makeRect();
+        this.id = tile.id;
+    }
+
+    //TODO implement
+    public boolean isLaunchWave(int wave){
+        return metCondition() && wave % launchPeriod == 0;
+    }
+
+
+    public boolean metCondition(){
+        //TODO implement
+        return false;
     }
 
     /** Projects this sector onto a 4-corner square for use in map gen.

@@ -9,8 +9,7 @@ import mindustry.gen.*;
 abstract class HitboxComp implements Posc, QuadTreeObject{
     @Import float x, y;
 
-    float hitSize;
-    float lastX, lastY;
+    transient float lastX, lastY, hitSize;
 
     @Override
     public void update(){

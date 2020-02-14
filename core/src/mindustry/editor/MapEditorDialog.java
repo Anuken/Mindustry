@@ -266,7 +266,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             state.teams = new Teams();
             player.reset();
             state.rules = Gamemode.editor.apply(lastSavedRules.copy());
-            state.rules.zone = null;
+            state.rules.sector = null;
             world.setMap(new Map(StringMap.of(
                 "name", "Editor Playtesting",
                 "width", editor.width(),

@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 
 @Component
 abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, Drawc, Boundedc,
-        DrawLayerGroundc, DrawLayerFlyingc, DrawLayerGroundShadowsc, DrawLayerFlyingShadowsc{
+        DrawLayerGroundc, DrawLayerFlyingc, DrawLayerGroundShadowsc, DrawLayerFlyingShadowsc, Syncc{
     @Import float x, y, rotation;
 
     private UnitController controller;
@@ -96,6 +96,12 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
 
     public void lookAt(Position pos){
         lookAt(angleTo(pos));
+    }
+
+    @Override
+    public void afterRead(){
+        //set up type info after reading
+        type(this.type);
     }
 
     @Override

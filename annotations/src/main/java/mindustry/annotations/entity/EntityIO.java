@@ -5,10 +5,9 @@ import com.squareup.javapoet.*;
 import com.squareup.javapoet.MethodSpec.*;
 import mindustry.annotations.*;
 
-import javax.lang.model.element.*;
+import static mindustry.annotations.BaseProcessor.instanceOf;
 
 public class EntityIO{
-    final TypeElement contentElem = BaseProcessor.elementu.getTypeElement("mindustry.ctype.Content");
     final MethodSpec.Builder builder;
     final boolean write;
 
@@ -18,13 +17,12 @@ public class EntityIO{
     }
 
     void io(TypeName type, String field) throws Exception{
-        TypeElement element = BaseProcessor.elementu.getTypeElement(type.toString());
 
         if(type.isPrimitive()){
             s(type.toString(), field);
         }else if(type.toString().equals("java.lang.String")){
             s("UTF", field);
-        }else if(element != null && BaseProcessor.typeu.isSubtype(element.asType(), contentElem.asType())){
+        }else if(instanceOf(type.toString(), "mindustry.ctype.Content")){
             if(write){
                 s("short", field + ".id");
             }else{

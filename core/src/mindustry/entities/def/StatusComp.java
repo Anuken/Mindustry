@@ -22,9 +22,7 @@ abstract class StatusComp implements Posc, Flyingc{
     private Array<StatusEntry> statuses = new Array<>();
     private Bits applied = new Bits(content.getBy(ContentType.status).size);
 
-    @ReadOnly float speedMultiplier;
-    @ReadOnly float damageMultiplier;
-    @ReadOnly float armorMultiplier;
+    @ReadOnly transient float speedMultiplier, damageMultiplier, armorMultiplier;
 
     /** @return damage taken based on status armor multipliers */
     float getShieldDamage(float amount){

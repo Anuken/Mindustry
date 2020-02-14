@@ -10,7 +10,7 @@ public class Planets implements ContentList{
 
     @Override
     public void load(){
-        starter = new Planet("//TODO"){{
+        starter = new Planet("TODO", 3){{
             detail = 6;
             generator = new TestPlanetGenerator();
         }};

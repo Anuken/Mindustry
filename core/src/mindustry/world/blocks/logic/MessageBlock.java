@@ -12,7 +12,6 @@ import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
-import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -157,8 +156,8 @@ public class MessageBlock extends Block{
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
-            super.read(stream);
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             message = stream.readUTF();
         }
     }

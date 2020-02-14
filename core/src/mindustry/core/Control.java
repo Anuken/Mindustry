@@ -15,8 +15,10 @@ import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Saves.*;
 import mindustry.gen.*;
 import mindustry.input.*;
+import mindustry.io.SaveIO.*;
 import mindustry.maps.Map;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
@@ -102,12 +104,14 @@ public class Control implements ApplicationListener, Loadable{
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.onGameOver(event.winner);
+            //TODO set meta to indicate game over
+            /*
             if(state.rules.zone != null && !net.client()){
                 //remove zone save on game over
                 if(saves.getZoneSlot() != null && !state.rules.tutorial){
                     saves.getZoneSlot().delete();
                 }
-            }
+            }*/
         });
 
         //autohost for pvp maps
@@ -174,7 +178,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
-            if(world.isZone()){
+            if(world.isCampaign()){
                 data.unlockContent(e.unit.type());
             }
         });
@@ -234,7 +238,7 @@ public class Control implements ApplicationListener, Loadable{
             logic.reset();
             world.loadMap(map, rules);
             state.rules = rules;
-            state.rules.zone = null;
+            state.rules.sector = null;
             state.rules.editor = false;
             logic.play();
             if(settings.getBool("savecreate") && !world.isInvalidMap()){
@@ -246,13 +250,30 @@ public class Control implements ApplicationListener, Loadable{
 
     public void playSector(Sector sector){
         ui.loadAnd(() -> {
-            net.reset();
-            logic.reset();
-            world.loadSector(sector);
-            logic.play();
-            control.saves.zoneSave();
             ui.planet.hide();
-            Events.fire(Trigger.newGame);
+            SaveSlot slot = saves.getSectorSave(sector);
+            if(slot != null){
+                try{
+                    net.reset();
+                    slot.load();
+                    state.rules.sector = sector;
+                    state.set(State.playing);
+                }catch(SaveException e){
+                    Log.err(e);
+                    ui.showErrorMessage("$save.corrupted");
+                    slot.delete();
+                    playSector(sector);
+                }
+                ui.planet.hide();
+            }else{
+                net.reset();
+                logic.reset();
+                world.loadSector(sector);
+                state.rules.sector = sector;
+                logic.play();
+                control.saves.saveSector(sector);
+                Events.fire(Trigger.newGame);
+            }
         });
     }
 
@@ -291,7 +312,8 @@ public class Control implements ApplicationListener, Loadable{
             world.endMapLoad();
 
             zone.rules.get(state.rules);
-            state.rules.zone = zone;
+            //TODO assign zone!!
+            //state.rules.zone = zone;
             for(Tilec core : state.teams.playerCores()){
                 for(ItemStack stack : zone.getStartingItems()){
                     core.items().add(stack.item, stack.amount);
@@ -420,7 +442,7 @@ public class Control implements ApplicationListener, Loadable{
         if(!state.is(State.menu)){
             input.update();
 
-            if(world.isZone()){
+            if(world.isCampaign()){
                 for(Tilec tile : state.teams.cores(player.team())){
                     for(Item item : content.items()){
                         if(tile.items().has(item)){
