@@ -1,9 +1,8 @@
 package mindustry.world.modules;
 
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.world.consumers.Consume;
-
-import java.io.*;
 
 public class ConsumeModule extends BlockModule{
     private boolean valid, optionalValid;
@@ -59,12 +58,12 @@ public class ConsumeModule extends BlockModule{
     }
 
     @Override
-    public void write(DataOutput stream) throws IOException{
-        stream.writeBoolean(valid);
+    public void write(Writes write){
+        write.bool(valid);
     }
 
     @Override
-    public void read(DataInput stream) throws IOException{
-        valid = stream.readBoolean();
+    public void read(Reads read){
+        valid = read.bool();
     }
 }

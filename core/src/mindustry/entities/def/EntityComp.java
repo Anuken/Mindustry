@@ -1,11 +1,10 @@
 package mindustry.entities.def;
 
 import arc.func.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
-
-import java.io.*;
 
 import static mindustry.Vars.player;
 
@@ -53,11 +52,11 @@ abstract class EntityComp{
     abstract boolean serialize();
 
     @MethodPriority(1)
-    void read(DataInput input) throws IOException{
+    void read(Reads read){
         afterRead();
     }
 
-    void write(DataOutput output) throws IOException{
+    void write(Writes write){
 
     }
 

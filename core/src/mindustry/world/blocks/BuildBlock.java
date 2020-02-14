@@ -7,6 +7,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -347,37 +348,37 @@ public class BuildBlock extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeFloat(progress);
-            stream.writeShort(previous == null ? -1 : previous.id);
-            stream.writeShort(cblock == null ? -1 : cblock.id);
+        public void write(Writes write){
+            super.write(write);
+            write.f(progress);
+            write.s(previous == null ? -1 : previous.id);
+            write.s(cblock == null ? -1 : cblock.id);
 
             if(accumulator == null){
-                stream.writeByte(-1);
+                write.b(-1);
             }else{
-                stream.writeByte(accumulator.length);
+                write.b(accumulator.length);
                 for(int i = 0; i < accumulator.length; i++){
-                    stream.writeFloat(accumulator[i]);
-                    stream.writeFloat(totalAccumulator[i]);
+                    write.f(accumulator[i]);
+                    write.f(totalAccumulator[i]);
                 }
             }
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            progress = stream.readFloat();
-            short pid = stream.readShort();
-            short rid = stream.readShort();
-            byte acsize = stream.readByte();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            progress = read.f();
+            short pid = read.s();
+            short rid = read.s();
+            byte acsize = read.b();
 
             if(acsize != -1){
                 accumulator = new float[acsize];
                 totalAccumulator = new float[acsize];
                 for(int i = 0; i < acsize; i++){
-                    accumulator[i] = stream.readFloat();
-                    totalAccumulator[i] = stream.readFloat();
+                    accumulator[i] = read.f();
+                    totalAccumulator[i] = read.f();
                 }
             }
 

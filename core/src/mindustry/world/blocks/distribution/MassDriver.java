@@ -5,6 +5,7 @@ import arc.struct.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import arc.util.io.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
 import mindustry.content.*;
@@ -332,19 +333,19 @@ public class MassDriver extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeInt(link);
-            stream.writeFloat(rotation);
-            stream.writeByte((byte)state.ordinal());
+        public void write(Writes write){
+            super.write(write);
+            write.i(link);
+            write.f(rotation);
+            write.b((byte)state.ordinal());
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            link = stream.readInt();
-            rotation = stream.readFloat();
-            state = DriverState.values()[stream.readByte()];
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            link = read.i();
+            rotation = read.f();
+            state = DriverState.values()[read.b()];
         }
     }
 

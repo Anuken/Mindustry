@@ -8,6 +8,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.graphics.*;
@@ -375,27 +376,27 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeInt(link);
-            stream.writeFloat(uptime);
-            stream.writeByte(incoming.size);
+        public void write(Writes write){
+            super.write(write);
+            write.i(link);
+            write.f(uptime);
+            write.b(incoming.size);
 
             IntSetIterator it = incoming.iterator();
 
             while(it.hasNext){
-                stream.writeInt(it.next());
+                write.i(it.next());
             }
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            link = stream.readInt();
-            uptime = stream.readFloat();
-            byte links = stream.readByte();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            link = read.i();
+            uptime = read.f();
+            byte links = read.b();
             for(int i = 0; i < links; i++){
-                incoming.add(stream.readInt());
+                incoming.add(read.i());
             }
         }
     }

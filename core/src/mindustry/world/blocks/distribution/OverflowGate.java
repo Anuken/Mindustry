@@ -2,6 +2,7 @@ package mindustry.world.blocks.distribution;
 
 import arc.math.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -124,10 +125,10 @@ public class OverflowGate extends Block{
         float time;
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
             if(revision == 1){
-                new DirectionalItemBuffer(25, 50f).read(stream);
+                new DirectionalItemBuffer(25, 50f).read(read);
             }
         }
     }

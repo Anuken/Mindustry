@@ -3,11 +3,10 @@ package mindustry.annotations.remote;
 import com.squareup.javapoet.*;
 import mindustry.annotations.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.annotations.remote.IOFinder.*;
+import mindustry.annotations.remote.TypeIOResolver.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
-import javax.tools.Diagnostic.*;
 import java.util.*;
 import java.util.stream.*;
 
@@ -32,7 +31,7 @@ public class RemoteProcess extends BaseProcessor{
     private static final String callLocation = "Call";
 
     //class serializers
-    private HashMap<String, ClassSerializer> serializers;
+    private ClassSerializer serializer;
     //all elements with the Remote annotation
     private Set<? extends Element> elements;
     //map of all classes to generate by name
@@ -51,7 +50,7 @@ public class RemoteProcess extends BaseProcessor{
         //round 1: find all annotations, generate *writers*
         if(round == 1){
             //get serializers
-            serializers = new IOFinder().findSerializers(roundEnv);
+            serializer = TypeIOResolver.resolve(this);
             //last method ID used
             int lastMethodID = 0;
             //find all elements with the Remote annotation
@@ -98,12 +97,12 @@ public class RemoteProcess extends BaseProcessor{
             }
 
             //create read/write generators
-            RemoteWriteGenerator writegen = new RemoteWriteGenerator(serializers);
+            RemoteWriteGenerator writegen = new RemoteWriteGenerator(serializer);
 
             //generate the methods to invoke (write)
             writegen.generateFor(classes, packageName);
         }else if(round == 2){ //round 2: generate all *readers*
-            RemoteReadGenerator readgen = new RemoteReadGenerator(serializers);
+            RemoteReadGenerator readgen = new RemoteReadGenerator(serializer);
 
             //generate server readers
             readgen.generateFor(methods.stream().filter(method -> method.where.isClient).collect(Collectors.toList()), readServerName, packageName, true);

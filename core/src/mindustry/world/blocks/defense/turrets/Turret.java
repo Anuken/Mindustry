@@ -12,6 +12,7 @@ import arc.math.Angles;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.util.Time;
+import arc.util.io.*;
 import mindustry.content.Fx;
 import mindustry.entities.*;
 import mindustry.entities.bullet.BulletType;
@@ -320,17 +321,17 @@ public abstract class Turret extends Block{
         public Posc target;
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeFloat(reload);
-            stream.writeFloat(rotation);
+        public void write(Writes write){
+            super.write(write);
+            write.f(reload);
+            write.f(rotation);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            reload = stream.readFloat();
-            rotation = stream.readFloat();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            reload = read.f();
+            rotation = read.f();
         }
 
         @Override

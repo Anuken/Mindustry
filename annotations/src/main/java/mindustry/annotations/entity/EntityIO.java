@@ -1,6 +1,5 @@
 package mindustry.annotations.entity;
 
-import arc.util.*;
 import com.squareup.javapoet.*;
 import com.squareup.javapoet.MethodSpec.*;
 import mindustry.annotations.*;
@@ -19,14 +18,14 @@ public class EntityIO{
     void io(TypeName type, String field) throws Exception{
 
         if(type.isPrimitive()){
-            s(type.toString(), field);
+            s(type == TypeName.BOOLEAN ? "bool" : type.toString().charAt(0) + "", field);
         }else if(type.toString().equals("java.lang.String")){
-            s("UTF", field);
+            s("str", field);
         }else if(instanceOf(type.toString(), "mindustry.ctype.Content")){
             if(write){
-                s("short", field + ".id");
+                s("s", field + ".id");
             }else{
-                st(field + " = mindustry.Vars.content.getByID(mindustry.ctype.ContentType.$L, input.readShort())", BaseProcessor.simpleName(type.toString()).toLowerCase().replace("type", ""));
+                st(field + " = mindustry.Vars.content.getByID(mindustry.ctype.ContentType.$L, read.s())", BaseProcessor.simpleName(type.toString()).toLowerCase().replace("type", ""));
             }
         }
     }
@@ -45,9 +44,9 @@ public class EntityIO{
 
     private void s(String type, String field){
         if(write){
-            builder.addStatement("output.write$L($L)", Strings.capitalize(type), field);
+            builder.addStatement("write.$L($L)", type, field);
         }else{
-            builder.addStatement("$L = input.read$L()", field, Strings.capitalize(type));
+            builder.addStatement("$L = read.$L()", field, type);
         }
     }
 }

@@ -7,6 +7,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -171,23 +172,23 @@ public class ForceProjector extends Block{
         float phaseHeat;
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeBoolean(broken);
-            stream.writeFloat(buildup);
-            stream.writeFloat(radscl);
-            stream.writeFloat(warmup);
-            stream.writeFloat(phaseHeat);
+        public void write(Writes write){
+            super.write(write);
+            write.bool(broken);
+            write.f(buildup);
+            write.f(radscl);
+            write.f(warmup);
+            write.f(phaseHeat);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            broken = stream.readBoolean();
-            buildup = stream.readFloat();
-            radscl = stream.readFloat();
-            warmup = stream.readFloat();
-            phaseHeat = stream.readFloat();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            broken = read.bool();
+            buildup = read.f();
+            radscl = read.f();
+            warmup = read.f();
+            phaseHeat = read.f();
         }
     }
 

@@ -218,21 +218,9 @@ public class Annotations{
      * This method must return void and have two parameters, the first being of type {@link java.nio.ByteBuffer} and the second
      * being the type returned by {@link #value()}.
      */
-    @Target(ElementType.METHOD)
+    @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface WriteClass{
-        Class<?> value();
-    }
-
-    /**
-     * Specifies that this method will be used to read classes of the type returned by {@link #value()}. <br>
-     * This method must return the type returned by {@link #value()},
-     * and have one parameter, being of type {@link java.nio.ByteBuffer}.
-     */
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface ReadClass{
-        Class<?> value();
+    public @interface TypeIOHandler{
     }
 
     //endregion

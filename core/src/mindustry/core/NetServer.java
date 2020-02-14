@@ -61,8 +61,8 @@ public class NetServer implements ApplicationListener{
     private boolean closing = false;
     private Interval timer = new Interval();
 
-    private ByteBuffer writeBuffer = ByteBuffer.allocate(127);
-    private ByteBufferOutput outputBuffer = new ByteBufferOutput(writeBuffer);
+    private ReusableByteOutStream writeBuffer = new ReusableByteOutStream(127);
+    private Writes outputBuffer = new Writes(new DataOutputStream(writeBuffer));
 
     /** Stream for writing player sync data to. */
     private ReusableByteOutStream syncStream = new ReusableByteOutStream();
@@ -214,7 +214,7 @@ public class NetServer implements ApplicationListener{
             }
 
             try{
-                writeBuffer.position(0);
+                writeBuffer.reset();
                 player.write(outputBuffer);
             }catch(Throwable t){
                 t.printStackTrace();
@@ -237,7 +237,7 @@ public class NetServer implements ApplicationListener{
         net.handleServer(InvokePacket.class, (con, packet) -> {
             if(con.player == null) return;
             try{
-                RemoteReadServer.readPacket(packet.writeBuffer, packet.type, con.player);
+                RemoteReadServer.readPacket(packet.reader(), packet.type, con.player);
             }catch(ValidateException e){
                 Log.debug("Validation failed for '{0}': {1}", e.player, e.getMessage());
             }catch(RuntimeException e){
@@ -704,7 +704,7 @@ public class NetServer implements ApplicationListener{
             sent ++;
 
             dataStream.writeInt(entity.tile().pos());
-            entity.write(dataStream);
+            entity.write(Writes.get(dataStream));
 
             if(syncStream.size() > maxSnapshotSize){
                 dataStream.close();
@@ -730,7 +730,7 @@ public class NetServer implements ApplicationListener{
 
         for(CoreEntity entity : cores){
             dataStream.writeInt(entity.tile().pos());
-            entity.items().write(dataStream);
+            entity.items().write(Writes.get(dataStream));
         }
 
         dataStream.close();
@@ -749,7 +749,7 @@ public class NetServer implements ApplicationListener{
             //write all entities now
             dataStream.writeInt(entity.id()); //write id
             dataStream.writeByte(entity.classId()); //write type ID
-            entity.write(dataStream); //write entity
+            entity.write(Writes.get(dataStream)); //write entity
 
             sent++;
 

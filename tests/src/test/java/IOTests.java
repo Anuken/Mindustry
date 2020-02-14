@@ -1,13 +1,22 @@
 import arc.util.*;
+import arc.util.io.*;
+import mindustry.content.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.io.*;
 import org.junit.jupiter.api.*;
 
+import java.io.*;
 import java.nio.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class IOTests{
+
+    @Test
+    void writeEntities(){
+        //TODO
+    }
 
     @Test
     void writeEnglish(){

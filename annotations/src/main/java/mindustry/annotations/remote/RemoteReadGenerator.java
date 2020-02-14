@@ -1,21 +1,21 @@
 package mindustry.annotations.remote;
 
+import arc.util.io.*;
 import com.squareup.javapoet.*;
 import mindustry.annotations.*;
-import mindustry.annotations.remote.IOFinder.*;
+import mindustry.annotations.remote.TypeIOResolver.*;
 
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.*;
 import java.lang.reflect.*;
-import java.nio.*;
 import java.util.*;
 
 /** Generates code for reading remote invoke packets on the client and server. */
 public class RemoteReadGenerator{
-    private final HashMap<String, ClassSerializer> serializers;
+    private final ClassSerializer serializers;
 
     /** Creates a read generator that uses the supplied serializer setup. */
-    public RemoteReadGenerator(HashMap<String, ClassSerializer> serializers){
+    public RemoteReadGenerator(ClassSerializer serializers){
         this.serializers = serializers;
     }
 
@@ -34,7 +34,7 @@ public class RemoteReadGenerator{
         //create main method builder
         MethodSpec.Builder readMethod = MethodSpec.methodBuilder("readPacket")
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-        .addParameter(ByteBuffer.class, "buffer") //buffer to read form
+        .addParameter(Reads.class, "read") //buffer to read form
         .addParameter(int.class, "id") //ID of method type to read
         .returns(void.class);
 
@@ -76,26 +76,22 @@ public class RemoteReadGenerator{
                     //name of parameter
                     String varName = var.getSimpleName().toString();
                     //captialized version of type name for reading primitives
-                    String capName = typeName.equals("byte") ? "" : Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
+                    String pname = typeName.equals("boolean") ? "bool" : typeName.charAt(0) + "";
 
                     //write primitives automatically
                     if(BaseProcessor.isPrimitive(typeName)){
-                        if(typeName.equals("boolean")){
-                            readBlock.addStatement("boolean " + varName + " = buffer.get() == 1");
-                        }else{
-                            readBlock.addStatement(typeName + " " + varName + " = buffer.get" + capName + "()");
-                        }
+                        readBlock.addStatement("$L $L = read.$L()", typeName, varName, pname);
                     }else{
                         //else, try and find a serializer
-                        ClassSerializer ser = serializers.getOrDefault(typeName, SerializerResolver.locate(entry.element, var.asType()));
+                        String ser = serializers.readers.get(typeName, SerializerResolver.locate(entry.element, var.asType(), false));
 
                         if(ser == null){ //make sure a serializer exists!
-                            BaseProcessor.err("No @ReadClass method to read class type '" + typeName + "' in method " + entry.targetMethod, var);
+                            BaseProcessor.err("No read method to read class type '" + typeName + "' in method " + entry.targetMethod + "; " + serializers.readers, var);
                             return;
                         }
 
                         //add statement for reading it
-                        readBlock.addStatement(typeName + " " + varName + " = " + ser.readMethod + "(buffer)");
+                        readBlock.addStatement(typeName + " " + varName + " = " + ser + "(read)");
                     }
 
                     //append variable name to string builder

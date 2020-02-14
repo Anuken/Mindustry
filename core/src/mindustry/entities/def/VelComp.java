@@ -10,7 +10,7 @@ abstract class VelComp implements Posc{
     @Import float x, y;
 
     final Vec2 vel = new Vec2();
-    float drag = 0f;
+    transient float drag = 0f;
 
     //velocity needs to be called first, as it affects delta and lastPosition
     @MethodPriority(-1)

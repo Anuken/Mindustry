@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.type.*;
@@ -101,15 +102,15 @@ public class ItemSource extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeShort(outputItem == null ? -1 : outputItem.id);
+        public void write(Writes write){
+            super.write(write);
+            write.s(outputItem == null ? -1 : outputItem.id);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            outputItem = content.item(stream.readShort());
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            outputItem = content.item(read.s());
         }
     }
 }

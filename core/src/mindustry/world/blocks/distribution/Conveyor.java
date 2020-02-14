@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.entities.units.*;
@@ -351,23 +352,23 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeInt(len);
+        public void write(Writes write){
+            super.write(write);
+            write.i(len);
 
             for(int i = 0; i < len; i++){
-                stream.writeInt(Pack.intBytes((byte)ids[i].id, (byte)(xs[i] * 127), (byte)(ys[i] * 255 - 128), (byte)0));
+                write.i(Pack.intBytes((byte)ids[i].id, (byte)(xs[i] * 127), (byte)(ys[i] * 255 - 128), (byte)0));
             }
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            int amount = stream.readInt();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            int amount = read.i();
             len = Math.min(amount, capacity);
 
             for(int i = 0; i < amount; i++){
-                int val = stream.readInt();
+                int val = read.i();
                 byte id = (byte)(val >> 24);
                 float x = (float)((byte)(val >> 16)) / 127f;
                 float y = ((float)((byte)(val >> 8)) + 128f) / 255f;

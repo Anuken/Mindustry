@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
@@ -140,19 +141,19 @@ public class MechPad extends Block{
         float heat;
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeFloat(progress);
-            stream.writeFloat(time);
-            stream.writeFloat(heat);
+        public void write(Writes write){
+            super.write(write);
+            write.f(progress);
+            write.f(time);
+            write.f(heat);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            progress = stream.readFloat();
-            time = stream.readFloat();
-            heat = stream.readFloat();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            progress = read.f();
+            time = read.f();
+            heat = read.f();
         }
     }
 }

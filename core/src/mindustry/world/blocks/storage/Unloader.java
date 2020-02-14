@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.type.*;
@@ -138,15 +139,15 @@ public class Unloader extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeByte(sortItem == null ? -1 : sortItem.id);
+        public void write(Writes write){
+            super.write(write);
+            write.b(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            byte id = stream.readByte();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            byte id = read.b();
             sortItem = id == -1 ? null : content.items().get(id);
         }
     }

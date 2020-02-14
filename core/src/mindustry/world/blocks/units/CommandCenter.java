@@ -8,6 +8,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -126,15 +127,15 @@ public class CommandCenter extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeByte(command.ordinal());
+        public void write(Writes write){
+            super.write(write);
+            write.b(command.ordinal());
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            command = UnitCommand.all[stream.readByte()];
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            command = UnitCommand.all[read.b()];
         }
     }
 }

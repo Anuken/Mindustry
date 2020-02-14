@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.type.*;
@@ -156,18 +157,18 @@ public class Sorter extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeShort(sortItem == null ? -1 : sortItem.id);
+        public void write(Writes write){
+            super.write(write);
+            write.s(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            sortItem = content.item(stream.readShort());
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            sortItem = content.item(read.s());
 
             if(revision == 1){
-                new DirectionalItemBuffer(20, 45f).read(stream);
+                new DirectionalItemBuffer(20, 45f).read(read);
             }
         }
     }

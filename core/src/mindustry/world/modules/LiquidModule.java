@@ -1,9 +1,9 @@
 package mindustry.world.modules;
 
 import arc.math.*;
+import arc.util.io.*;
 import mindustry.type.Liquid;
 
-import java.io.*;
 import java.util.Arrays;
 
 import static mindustry.Vars.content;
@@ -83,31 +83,31 @@ public class LiquidModule extends BlockModule{
     }
 
     @Override
-    public void write(DataOutput stream) throws IOException{
+    public void write(Writes write){
         byte amount = 0;
         for(float liquid : liquids){
             if(liquid > 0) amount++;
         }
 
-        stream.writeByte(amount); //amount of liquids
+        write.b(amount); //amount of liquids
 
         for(int i = 0; i < liquids.length; i++){
             if(liquids[i] > 0){
-                stream.writeByte(i); //liquid ID
-                stream.writeFloat(liquids[i]); //item amount
+                write.b(i); //liquid ID
+                write.f(liquids[i]); //item amount
             }
         }
     }
 
     @Override
-    public void read(DataInput stream) throws IOException{
+    public void read(Reads read){
         Arrays.fill(liquids, 0);
         total = 0f;
-        byte count = stream.readByte();
+        byte count = read.b();
 
         for(int j = 0; j < count; j++){
-            int liquidid = stream.readByte();
-            float amount = stream.readFloat();
+            int liquidid = read.b();
+            float amount = read.f();
             liquids[liquidid] = amount;
             if(amount > 0){
                 current = content.liquid(liquidid);

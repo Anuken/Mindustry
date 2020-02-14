@@ -1,6 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import arc.util.Time;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.gen.BufferItem;
 import mindustry.type.Item;
@@ -9,8 +10,6 @@ import mindustry.world.DirectionalItemBuffer;
 import mindustry.world.Tile;
 import mindustry.world.meta.BlockGroup;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 
 import static mindustry.Vars.content;
@@ -89,15 +88,15 @@ public class Junction extends Block{
         DirectionalItemBuffer buffer = new DirectionalItemBuffer(capacity, speed);
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            buffer.write(stream);
+        public void write(Writes write){
+            super.write(write);
+            buffer.write(write);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            buffer.read(stream);
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            buffer.read(read);
         }
     }
 }

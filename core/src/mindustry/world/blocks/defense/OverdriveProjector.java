@@ -6,6 +6,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.util.Time;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -124,17 +125,17 @@ public class OverdriveProjector extends Block{
         float phaseHeat;
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeFloat(heat);
-            stream.writeFloat(phaseHeat);
+        public void write(Writes write){
+            super.write(write);
+            write.f(heat);
+            write.f(phaseHeat);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            heat = stream.readFloat();
-            phaseHeat = stream.readFloat();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            heat = read.f();
+            phaseHeat = read.f();
         }
     }
 }

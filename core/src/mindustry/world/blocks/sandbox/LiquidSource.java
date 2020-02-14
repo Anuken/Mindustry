@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -97,15 +98,15 @@ public class LiquidSource extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeByte(source == null ? -1 : source.id);
+        public void write(Writes write){
+            super.write(write);
+            write.b(source == null ? -1 : source.id);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            byte id = stream.readByte();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            byte id = read.b();
             source = id == -1 ? null : content.liquid(id);
         }
     }

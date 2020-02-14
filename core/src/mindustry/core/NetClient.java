@@ -121,8 +121,7 @@ public class NetClient implements ApplicationListener{
         });
 
         net.handleClient(InvokePacket.class, packet -> {
-            packet.writeBuffer.position(0);
-            RemoteReadClient.readPacket(packet.writeBuffer, packet.type);
+            RemoteReadClient.readPacket(packet.reader(), packet.type);
         });
     }
 
@@ -377,7 +376,7 @@ public class NetClient implements ApplicationListener{
                 }
 
                 //read the entity
-                entity.read(input);
+                entity.read(Reads.get(input));
 
                 if(created && entity.interpolator().target != null){
                     //set initial starting position
@@ -407,7 +406,7 @@ public class NetClient implements ApplicationListener{
                     Log.warn("Missing entity at {0}. Skipping block snapshot.", tile);
                     break;
                 }
-                tile.entity.read(input, tile.entity.version());
+                tile.entity.read(Reads.get(input), tile.entity.version());
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -435,9 +434,9 @@ public class NetClient implements ApplicationListener{
                 Tile tile = world.tile(pos);
 
                 if(tile != null && tile.entity != null){
-                    tile.entity.items().read(input);
+                    tile.entity.items().read(Reads.get(input));
                 }else{
-                    new ItemModule().read(input);
+                    new ItemModule().read(Reads.get(input));
                 }
             }
 

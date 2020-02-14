@@ -1,6 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import arc.math.*;
+import arc.util.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -41,15 +42,15 @@ public class BufferedItemBridge extends ExtendingItemBridge{
         ItemBuffer buffer = new ItemBuffer(bufferCapacity, speed);
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            buffer.write(stream);
+        public void write(Writes write){
+            super.write(write);
+            buffer.write(write);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            buffer.read(stream);
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            buffer.read(read);
         }
     }
 }

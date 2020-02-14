@@ -5,6 +5,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -12,8 +13,6 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.modules.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -63,30 +62,30 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     }
 
     @CallSuper
-    public void write(DataOutput output) throws IOException{
-        output.writeFloat(health());
-        output.writeByte(tile.rotation());
-        output.writeByte(tile.getTeamID());
-        if(items != null) items.write(output);
-        if(power != null) power.write(output);
-        if(liquids != null) liquids.write(output);
-        if(cons != null) cons.write(output);
+    public void write(Writes write){
+        write.f(health());
+        write.b(tile.rotation());
+        write.b(tile.getTeamID());
+        if(items != null) items.write(write);
+        if(power != null) power.write(write);
+        if(liquids != null) liquids.write(write);
+        if(cons != null) cons.write(write);
     }
 
     @CallSuper
     @Override
-    public void read(DataInput input, byte revision) throws IOException{
-        health(input.readFloat());
-        byte rotation = input.readByte();
-        byte team = input.readByte();
+    public void read(Reads read, byte revision){
+        health(read.f());
+        byte rotation = read.b();
+        byte team = read.b();
 
         tile.setTeam(Team.get(team));
         tile.rotation(rotation);
 
-        if(items != null) items.read(input);
-        if(power != null) power.read(input);
-        if(liquids != null) liquids.read(input);
-        if(cons != null) cons.read(input);
+        if(items != null) items.read(read);
+        if(power != null) power.read(read);
+        if(liquids != null) liquids.read(read);
+        if(cons != null) cons.read(read);
     }
 
     @Override

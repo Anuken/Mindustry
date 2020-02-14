@@ -1,6 +1,7 @@
 package mindustry.world.blocks.defense;
 
 import arc.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
@@ -92,15 +93,15 @@ public class Door extends Wall{
         public boolean open = false;
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeBoolean(open);
+        public void write(Writes write){
+            super.write(write);
+            write.bool(open);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            open = stream.readBoolean();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            open = read.bool();
         }
     }
 

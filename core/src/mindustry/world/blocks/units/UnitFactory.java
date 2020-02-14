@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -189,17 +190,17 @@ public class UnitFactory extends Block{
         int spawned;
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeFloat(buildTime);
-            stream.writeInt(spawned);
+        public void write(Writes write){
+            super.write(write);
+            write.f(buildTime);
+            write.i(spawned);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            buildTime = stream.readFloat();
-            spawned = stream.readInt();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            buildTime = read.f();
+            spawned = read.i();
         }
     }
 }

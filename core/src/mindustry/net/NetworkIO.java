@@ -1,9 +1,10 @@
 package mindustry.net;
 
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.core.*;
-import mindustry.gen.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.maps.Map;
 import mindustry.net.Administration.*;
@@ -26,7 +27,7 @@ public class NetworkIO{
             stream.writeFloat(state.wavetime);
 
             stream.writeInt(player.id());
-            player.write(stream);
+            player.write(Writes.get(stream));
 
             SaveIO.getSaveWriter().writeContentHeader(stream);
             SaveIO.getSaveWriter().writeMap(stream);
@@ -48,7 +49,7 @@ public class NetworkIO{
             Groups.all.clear();
             int id = stream.readInt();
             player.reset();
-            player.read(stream);
+            player.read(Reads.get(stream));
             player.id(id);
             player.add();
 

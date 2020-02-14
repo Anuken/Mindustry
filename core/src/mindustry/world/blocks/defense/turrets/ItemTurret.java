@@ -3,6 +3,7 @@ package mindustry.world.blocks.defense.turrets;
 import arc.*;
 import arc.struct.*;
 import arc.scene.ui.layout.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
@@ -151,23 +152,23 @@ public class ItemTurret extends CooledTurret{
 
     public class ItemTurretEntity extends TurretEntity{
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeByte(ammo.size);
+        public void write(Writes write){
+            super.write(write);
+            write.b(ammo.size);
             for(AmmoEntry entry : ammo){
                 ItemEntry i = (ItemEntry)entry;
-                stream.writeByte(i.item.id);
-                stream.writeShort(i.amount);
+                write.b(i.item.id);
+                write.s(i.amount);
             }
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            byte amount = stream.readByte();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            byte amount = read.b();
             for(int i = 0; i < amount; i++){
-                Item item = Vars.content.item(stream.readByte());
-                short a = stream.readShort();
+                Item item = Vars.content.item(read.b());
+                short a = read.s();
                 totalAmmo += a;
                 ammo.add(new ItemEntry(item, a));
             }
