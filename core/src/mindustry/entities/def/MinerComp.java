@@ -17,7 +17,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc{
+abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, DrawLayerGroundc{
     @Import float x, y, rotation;
 
     transient float mineTimer;
@@ -79,7 +79,8 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc{
         }
     }
 
-    void drawOver(){
+    @Override
+    public void drawGround(){
         if(!mining()) return;
         float focusLen = 4f + Mathf.absin(Time.time(), 1.1f, 0.5f);
         float swingScl = 12f, swingMag = tilesize / 8f;

@@ -5,15 +5,15 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import arc.util.pooling.*;
 import arc.util.pooling.Pool.*;
+import arc.util.pooling.*;
 import com.squareup.javapoet.*;
 import com.squareup.javapoet.TypeSpec.*;
 import com.sun.source.tree.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.annotations.*;
-import mindustry.annotations.util.TypeIOResolver.*;
 import mindustry.annotations.util.*;
+import mindustry.annotations.util.TypeIOResolver.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
@@ -325,6 +325,8 @@ public class EntityProcess extends BaseProcessor{
 
                     //SPECIAL CASE: inject group add/remove code
                     if(first.name().equals("add") || first.name().equals("remove")){
+                        mbuilder.addStatement("if(added == $L) return", first.name().equals("add"));
+
                         for(GroupDefinition def : groups){
                             //remove/add from each group, assume imported
                             mbuilder.addStatement("Groups.$L.$L(this)", def.name, first.name());
@@ -367,7 +369,7 @@ public class EntityProcess extends BaseProcessor{
                         if(writeBlock) mbuilder.addCode("}\n");
                     }
 
-                    //add free code to remove methods
+                    //add free code to remove methods - always at the end
                     if(first.name().equals("remove") && ann.pooled()){
                         mbuilder.addStatement("$T.free(this)", Pools.class);
                     }
@@ -375,7 +377,7 @@ public class EntityProcess extends BaseProcessor{
                     builder.addMethod(mbuilder.build());
                 }
 
-                //add pool reset method and implment Poolable
+                //add pool reset method and implement Poolable
                 if(ann.pooled()){
                     builder.addSuperinterface(Poolable.class);
                     //implement reset()

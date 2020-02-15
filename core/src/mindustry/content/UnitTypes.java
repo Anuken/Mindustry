@@ -1,5 +1,6 @@
 package mindustry.content;
 
+import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
@@ -44,6 +45,7 @@ public class UnitTypes implements ContentList{
             hitsize = 8f;
             mass = 1.75f;
             health = 130;
+            immunities = ObjectSet.with(StatusEffects.wet);
             weapons.add(new Weapon("chain-blaster"){{
                 reload = 10f;
                 x = 1.25f;

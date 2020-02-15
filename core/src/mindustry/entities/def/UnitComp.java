@@ -172,6 +172,11 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     }
 
     @Override
+    public boolean isPlayer(){
+        return controller instanceof Playerc;
+    }
+
+    @Override
     public void killed(){
         float explosiveness = 2f + item().explosiveness * stack().amount;
         float flammability = item().flammability * stack().amount;
@@ -189,20 +194,17 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
         }
     }
 
-    //TODO this is bad
-
-    public boolean isPlayer(){
-        return controller instanceof Playerc;
-    }
-
+    @Override
     public boolean canMine(Item item){
         return type.drillTier >= item.hardness;
     }
 
+    @Override
     public float miningSpeed(){
         return type.mineSpeed;
     }
 
+    @Override
     public boolean offloadImmediately(){
         return false;
     }
