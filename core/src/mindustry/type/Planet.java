@@ -39,7 +39,6 @@ public class Planet extends UnlockableContent{
 
         sectors = new Array<>(grid.tiles.length);
         for(int i = 0; i < grid.tiles.length; i++){
-            //TODO load sector data
             sectors.add(new Sector(this, grid.tiles[i], new SectorData()));
         }
 

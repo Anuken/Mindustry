@@ -122,6 +122,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawItems(Unitc unit){
+        applyColor(unit);
 
         //draw back items
         if(unit.hasItem() && unit.itemTime() > 0.01f){
@@ -154,7 +155,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawWeapons(Unitc unit){
-        Draw.mixcol(Color.white, unit.hitTime());
+        applyColor(unit);
 
         for(WeaponMount mount : unit.mounts()){
             Weapon weapon = mount.weapon;
@@ -179,7 +180,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawBody(Unitc unit){
-        Draw.mixcol(Color.white, unit.hitTime());
+        applyColor(unit);
 
         Draw.rect(region, unit, unit.rotation() - 90);
 
@@ -187,9 +188,11 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawCell(Unitc unit){
+        applyColor(unit);
+
         Draw.color(Color.black, unit.team().color, unit.healthf() + Mathf.absin(Time.time(), Math.max(unit.healthf() * 5f, 1f), 1f - unit.healthf()));
         Draw.rect(cellRegion, unit, unit.rotation() - 90);
-        Draw.color();
+        Draw.reset();
     }
 
     public void drawLight(Unitc unit){
@@ -225,6 +228,13 @@ public class UnitType extends UnlockableContent{
         Draw.rect(baseRegion, unit, unit.baseRotation() - 90);
 
         Draw.mixcol();
+    }
+
+    public void applyColor(Unitc unit){
+        Draw.mixcol(Color.white, unit.hitTime());
+        if(unit.drownTime() > 0 && unit.floorOn().isDeep()){
+            Draw.mixcol(unit.floorOn().color, unit.drownTime() * 0.8f);
+        }
     }
 
     //endregion

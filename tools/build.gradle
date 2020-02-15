@@ -351,6 +351,9 @@ task genSectorData(dependsOn: classes, type: JavaExec){
     workingDir = "../core/assets/"
 }
 
+task updateCache(dependsOn: [genSectorData]){
+}
+
 task updateBundles(dependsOn: classes, type: JavaExec){
     file(genFolder).mkdirs()
 

@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.net.Net;
@@ -58,6 +59,9 @@ public class SectorDataGenerator{
 
                     if(!tile.block().isStatic()){
                         floors.increment(tile.floor());
+                        if(tile.overlay() != Blocks.air){
+                            floors.increment(tile.overlay());
+                        }
                     }
                 }
 
@@ -76,7 +80,7 @@ public class SectorDataGenerator{
 
                 data.resources = content.asArray().sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id))).toArray(Content.class);
 
-                if(count[0]++ % 5 == 0){
+                if(count[0]++ % 10 == 0){
                     Log.info("&lyDone with sector &lm{0}/{1}", count[0], planet.sectors.size);
                 }
 

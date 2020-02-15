@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
@@ -69,6 +70,9 @@ public class Effects{
     public static void scorch(float x, float y, int size){
         if(headless) return;
 
+        Tile tile = world.tileWorld(x, y);
+        if(tile == null || tile.floor().isLiquid) return;
+
         size = Mathf.clamp(size, 0, 9);
 
         TextureRegion region = Core.atlas.find("scorch-" + size + "-" + Mathf.random(2));
@@ -78,6 +82,9 @@ public class Effects{
 
     public static void rubble(float x, float y, int blockSize){
         if(headless) return;
+
+        Tile tile = world.tileWorld(x, y);
+        if(tile == null || tile.floor().isLiquid) return;
 
         TextureRegion region = Core.atlas.find("rubble-" + blockSize + "-" + (Core.atlas.has("rubble-" + blockSize + "-1") ? Mathf.random(0, 1) : "0"));
         decal(region, x, y, Mathf.random(4) * 90, 3600, Pal.rubble);
