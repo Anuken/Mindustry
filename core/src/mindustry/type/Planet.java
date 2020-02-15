@@ -1,14 +1,18 @@
 package mindustry.type;
 
+import arc.files.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.io.*;
+import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.graphics.*;
 import mindustry.graphics.PlanetGrid.*;
 import mindustry.maps.planet.*;
+import mindustry.type.Sector.*;
 
 public class Planet extends UnlockableContent{
     /** Mesh used for rendering. Created on load() - will be null on the server! */
@@ -32,9 +36,25 @@ public class Planet extends UnlockableContent{
         this.size = 3;
 
         grid = PlanetGrid.newGrid(size);
+
         sectors = new Array<>(grid.tiles.length);
         for(int i = 0; i < grid.tiles.length; i++){
-            sectors.add(new Sector(this, grid.tiles[i]));
+            //TODO load sector data
+            sectors.add(new Sector(this, grid.tiles[i], new SectorData()));
+        }
+
+        //read data
+        Fi data = Vars.tree.get("planets/" + name + ".dat");
+        if(data.exists()){
+            try(Reads read = data.reads()){
+                short dsize = read.s();
+                for(int i = 0; i < dsize; i++){
+                    sectors.get(i).data.read(read);
+                }
+            }
+        }else{
+            //TODO crash instead - this is a critical error!
+            Log.err("Planet {0} is missing its data file.");
         }
     }
 

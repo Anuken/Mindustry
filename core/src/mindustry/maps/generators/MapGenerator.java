@@ -49,7 +49,7 @@ public class MapGenerator extends Generator{
 
         for(Tile tile : tiles){
             if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && world.getSector() != null){
-                for(Content content : world.getSector().resources){
+                for(Content content : world.getSector().data.resources){
                     if(content instanceof Item && Mathf.chance(0.3)){
                         tile.entity.items().add((Item)content, Math.min(Mathf.random(500), tile.block().itemCapacity));
                     }

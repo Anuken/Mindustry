@@ -39,7 +39,7 @@ public class Stats{
 
         //weigh used fractions
         float frac = 0f;
-        Array<Item> obtainable = Array.with(zone.resources).select(i -> i instanceof Item && ((Item)i).type == ItemType.material).as(Item.class);
+        Array<Item> obtainable = Array.with(zone.data.resources).select(i -> i instanceof Item && ((Item)i).type == ItemType.material).as(Item.class);
         for(Item item : obtainable){
             frac += Mathf.clamp((float)itemsDelivered.get(item, 0) / capacity) / (float)obtainable.size;
         }

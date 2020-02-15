@@ -65,7 +65,6 @@ public class TestPlanetGenerator implements PlanetGenerator{
         height *= 1.2f;
         height = Mathf.clamp(height);
 
-
         return arr[Mathf.clamp((int)(temp * arr.length), 0, arr.length - 1)][Mathf.clamp((int)(height * arr[0].length), 0, arr[0].length - 1)];
     }
 }
