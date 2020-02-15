@@ -11,6 +11,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -19,8 +20,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.modules.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -55,7 +54,7 @@ public class BuildBlock extends Block{
     public static void onDeconstructFinish(Tile tile, Block block, int builderID){
         Team team = tile.team();
         Fx.breakBlock.at(tile.drawx(), tile.drawy(), block.size);
-        Events.fire(new BlockBuildEndEvent(tile, Groups.player.getByID(builderID), team, true));
+        Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, true));
         tile.remove();
         if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
     }
@@ -105,7 +104,7 @@ public class BuildBlock extends Block{
         Call.onConstructFinish(tile, block, builderID, rotation, team, skipConfig);
         tile.block().placed(tile);
 
-        Events.fire(new BlockBuildEndEvent(tile, Groups.player.getByID(builderID), team, false));
+        Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, false));
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
     }
 
@@ -141,16 +140,13 @@ public class BuildBlock extends Block{
     public void tapped(Tile tile, Playerc player){
         BuildEntity entity = tile.ent();
 
-        //TODO building
-        /*
         //if the target is constructible, begin constructing
-        if(entity.cblock != null){
-            if(player.buildWasAutoPaused && !player.isBuilding){
-                player.isBuilding = true;
+        if(!headless && entity.cblock != null){
+            if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
+                control.input.isBuilding = true;
             }
-            //player.clearBuilding();
             player.builder().addBuild(new BuildRequest(tile.x, tile.y, tile.rotation(), entity.cblock), false);
-        }*/
+        }
     }
 
     @Override
@@ -281,9 +277,7 @@ public class BuildBlock extends Block{
 
             progress = Mathf.clamp(progress - amount);
 
-            if(builder instanceof Playerc){
-                builderID = builder.id();
-            }
+            builderID = builder.id();
 
             if(progress <= 0 || state.rules.infiniteResources){
                 Call.onDeconstructFinish(tile, this.cblock == null ? previous : this.cblock, builderID);

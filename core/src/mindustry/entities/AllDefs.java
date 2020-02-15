@@ -10,7 +10,7 @@ class AllDefs{
 
     }
 
-    @GroupDef(Playerc.class)
+    @GroupDef(value = Playerc.class, mapping = true)
     class player{
 
     }
@@ -20,7 +20,7 @@ class AllDefs{
 
     }
 
-    @GroupDef(value = Unitc.class, spatial = true, collide = {unit.class})
+    @GroupDef(value = Unitc.class, spatial = true, collide = {unit.class}, mapping = true)
     class unit{
 
     }
@@ -30,7 +30,7 @@ class AllDefs{
 
     }
 
-    @GroupDef(Syncc.class)
+    @GroupDef(value = Syncc.class, mapping = true)
     class sync{
 
     }

@@ -105,7 +105,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(BlockBuildEndEvent.class, e -> {
-            if(campaign() && e.player == player && !e.breaking){
+            if(campaign() && e.unit != null && e.unit.isLocal() && !e.breaking){
                 SStat.blocksBuilt.add();
 
                 if(e.tile.block() == Blocks.router && e.tile.entity.proximity().contains(t -> t.block() == Blocks.router)){

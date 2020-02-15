@@ -23,7 +23,7 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class BuilderComp implements Unitc{
+abstract class BuilderComp implements Unitc, DrawLayerFlyingc{
     static final Vec2[] tmptr = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
     @Import float x, y, rotation;
@@ -32,7 +32,8 @@ abstract class BuilderComp implements Unitc{
     transient float buildSpeed = 1f;
     //boolean building;
 
-    void updateBuilding(){
+    @Override
+    public void update(){
         float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange;
 
         Iterator<BuildRequest> it = requests.iterator();
@@ -189,7 +190,8 @@ abstract class BuilderComp implements Unitc{
         return requests.size == 0 ? null : requests.first();
     }
 
-    void drawOver(){
+    @Override
+    public void drawFlying(){
         if(!isBuilding()) return;
         BuildRequest request = buildRequest();
         Tile tile = world.tile(request.x, request.y);
@@ -211,7 +213,7 @@ abstract class BuilderComp implements Unitc{
         tmptr[2].set(tile.drawx() - sz, tile.drawy() + sz);
         tmptr[3].set(tile.drawx() + sz, tile.drawy() + sz);
 
-        Arrays.sort(tmptr, Structs.comparingFloat(vec -> Angles.angleDist(angleTo(vec), ang)));
+        Arrays.sort(tmptr, Structs.comparingFloat(vec -> -Angles.angleDist(angleTo(vec), ang)));
 
         float x1 = tmptr[0].x, y1 = tmptr[0].y,
         x3 = tmptr[1].x, y3 = tmptr[1].y;

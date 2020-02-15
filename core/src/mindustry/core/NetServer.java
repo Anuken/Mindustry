@@ -10,6 +10,7 @@ import arc.util.CommandHandler.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -501,8 +502,6 @@ public class NetServer implements ApplicationListener{
         BuildRequest[] requests,
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
-        //TODO this entire thing needs to be rewritten.
-        /*
         NetConnection connection = player.con();
         if(connection == null || snapshotID < connection.lastRecievedClientSnapshot) return;
 
@@ -515,78 +514,90 @@ public class NetServer implements ApplicationListener{
         connection.viewWidth = viewWidth;
         connection.viewHeight = viewHeight;
 
-        long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
-
-        float maxSpeed = boosting && !player.mech.flying ? player.mech.compoundSpeedBoost : player.mech.compoundSpeed;
-        float maxMove = elapsed / 1000f * 60f * Math.min(maxSpeed, player.mech.maxSpeed) * 1.2f;
-
         player.mouseX(pointerX);
         player.mouseY(pointerY);
-        player.miner().mineTile(mining);
-        player.isTyping = chatting;
-        player.isBoosting = boosting;
-        player.isShooting = shooting;
-        player.isBuilding = building;
-        player.builder().requests().clear();
+        player.typing(chatting);
 
-        for(BuildRequest req : requests){
-            if(req == null) continue;
-            Tile tile = world.tile(req.x, req.y);
-            if(tile == null || (!req.breaking && req.block == null)) continue;
-            //auto-skip done requests
-            if(req.breaking && tile.block() == Blocks.air){
-                continue;
-            }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.rotation() == req.rotation)){
-                continue;
-            }else if(connection.rejectedRequests.contains(r -> r.breaking == req.breaking && r.x == req.x && r.y == req.y)){ //check if request was recently rejected, and skip it if so
-                continue;
-            }else if(!netServer.admins.allowAction(player, req.breaking ? ActionType.breakBlock : ActionType.placeBlock, tile, action -> { //make sure request is allowed by the server
-                action.block = req.block;
-                action.rotation = req.rotation;
-                action.config = req.config;
-            })){
-                //force the player to remove this request if that's not the case
-                Call.removeQueueBlock(player.con(), req.x, req.y, req.breaking);
-                connection.rejectedRequests.add(req);
-                continue;
+        player.unit().controlWeapons(shooting, shooting);
+        player.unit().aim(pointerX, pointerY);
+
+        if(player.isBuilder()){
+            player.builder().clearBuilding();
+        }
+
+        if(player.isMiner()){
+            player.miner().mineTile(mining);
+        }
+
+        if(requests != null){
+            for(BuildRequest req : requests){
+                if(req == null) continue;
+                Tile tile = world.tile(req.x, req.y);
+                if(tile == null || (!req.breaking && req.block == null)) continue;
+                //auto-skip done requests
+                if(req.breaking && tile.block() == Blocks.air){
+                    continue;
+                }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.rotation() == req.rotation)){
+                    continue;
+                }else if(connection.rejectedRequests.contains(r -> r.breaking == req.breaking && r.x == req.x && r.y == req.y)){ //check if request was recently rejected, and skip it if so
+                    continue;
+                }else if(!netServer.admins.allowAction(player, req.breaking ? ActionType.breakBlock : ActionType.placeBlock, tile, action -> { //make sure request is allowed by the server
+                    action.block = req.block;
+                    action.rotation = req.rotation;
+                    action.config = req.config;
+                })){
+                    //force the player to remove this request if that's not the case
+                    Call.removeQueueBlock(player.con(), req.x, req.y, req.breaking);
+                    connection.rejectedRequests.add(req);
+                    continue;
+                }
+                player.builder().requests().addLast(req);
             }
-            player.builder().requests().addLast(req);
         }
 
         connection.rejectedRequests.clear();
 
-        vector.set(x - player.getInterpolator().target.x, y - player.getInterpolator().target.y);
-        vector.limit(maxMove);
+        if(!player.dead()){
+            Unitc unit = player.unit();
+            long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
+            float maxSpeed = player.dead() ? Float.MAX_VALUE : player.unit().type().speed;
+            float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
 
-        float prevx = player.x, prevy = player.y;
-        player.set(player.getInterpolator().target.x, player.getInterpolator().target.y);
-        if(!player.mech.flying && player.boostHeat < 0.01f){
-            player.move(vector.x, vector.y);
+            vector.set(x - unit.interpolator().target.x, y - unit.interpolator().target.y);
+            vector.limit(maxMove);
+
+            float prevx = unit.x(), prevy = unit.y();
+            unit.set(unit.interpolator().target.x, unit.interpolator().target.y);
+            if(!unit.isFlying()){
+                unit.move(vector.x, vector.y);
+            }else{
+                unit.trns(vector.x, vector.y);
+            }
+            float newx = unit.x(), newy = unit.y();
+
+            if(!verifyPosition){
+                unit.x(prevx);
+                unit.y(prevy);
+                newx = x;
+                newy = y;
+            }else if(Mathf.dst(x, y, newx, newy) > correctDist){
+                Call.onPositionSet(player.con(), newx, newy); //teleport and correct position when necessary
+            }
+
+            //reset player to previous synced position so it gets interpolated
+            unit.x(prevx);
+            unit.y(prevy);
+
+            //set interpolator target to *new* position so it moves toward it
+            unit.interpolator().read(unit.x(), unit.y(), newx, newy, rotation, baseRotation);
+            unit.vel().set(xVelocity, yVelocity); //only for visual calculation purposes, doesn't actually update the player
         }else{
-            player.x += vector.x;
-            player.y += vector.y;
+            player.x(x);
+            player.y(y);
         }
-        float newx = player.x, newy = player.y;
-
-        if(!verifyPosition){
-            player.x = prevx;
-            player.y = prevy;
-            newx = x;
-            newy = y;
-        }else if(Mathf.dst(x, y, newx, newy) > correctDist){
-            Call.onPositionSet(player.con(), newx, newy); //teleport and correct position when necessary
-        }
-
-        //reset player to previous synced position so it gets interpolated
-        player.x = prevx;
-        player.y = prevy;
-
-        //set interpolator target to *new* position so it moves toward it
-        player.getInterpolator().read(player.x, player.y, newx, newy, rotation, baseRotation);
-        player.vel().set(xVelocity, yVelocity); //only for visual calculation purposes, doesn't actually update the player
 
         connection.lastRecievedClientSnapshot = snapshotID;
-        connection.lastRecievedClientTime = Time.millis();*/
+        connection.lastRecievedClientTime = Time.millis();
     }
 
     @Remote(targets = Loc.client, called = Loc.server)

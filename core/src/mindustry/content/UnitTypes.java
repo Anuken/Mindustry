@@ -7,12 +7,14 @@ import mindustry.type.*;
 
 public class UnitTypes implements ContentList{
     public static UnitType
-    draug, spirit, phantom,
     wraith, ghoul, revenant, lich, reaper,
     crawler, titan, fortress, eruptor, chaosArray, eradicator;
 
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType dagger;
     public static @EntityDef({Unitc.class, WaterMovec.class}) UnitType vanguard;
+    public static @EntityDef({Unitc.class, Minerc.class}) UnitType draug;
+    public static @EntityDef({Unitc.class}) UnitType spirit;
+    public static @EntityDef({Unitc.class, Builderc.class}) UnitType phantom;
 
     public static UnitType alpha, delta, tau, omega, dart, javelin, trident, glaive;
     public static UnitType starter;
@@ -52,63 +54,51 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        /*
-        draug = new UnitDef("draug", MinerDrone::new){{
+        draug = new UnitType("draug"){{
             flying = true;
-            drag = 0.01f;
-            speed = 0.3f;
-            maxVelocity = 1.2f;
+            drag = 0.05f;
+            speed = 1.5f;
             range = 50f;
             health = 80;
-            minePower = 0.9f;
+            mineSpeed = 0.9f;
             engineSize = 1.8f;
             engineOffset = 5.7f;
+            drillTier = 1;
         }};
 
-        spirit = new UnitDef("spirit", RepairDrone::new){{
+        spirit = new UnitType("spirit"){{
             flying = true;
-            drag = 0.01f;
-            speed = 0.42f;
-            maxVelocity = 1.6f;
+            drag = 0.05f;
+            speed = 1.5f;
             range = 50f;
             health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
-            weapon = new Weapon(){{
-                length = 1.5f;
+            weapons.add(new Weapon(){{
+                y = 1.5f;
                 reload = 40f;
-                width = 0.5f;
+                x = 0.5f;
                 alternate = true;
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 bullet = Bullets.healBulletBig;
                 shootSound = Sounds.pew;
-            }};
+            }});
         }};
 
-        phantom = new UnitDef("phantom", BuilderDrone::new){{
+        phantom = new UnitType("phantom"){{
             flying = true;
-            drag = 0.01f;
+            drag = 0.05f;
             mass = 2f;
-            speed = 0.45f;
-            maxVelocity = 1.9f;
+            speed = 1.5f;
             range = 70f;
             itemCapacity = 70;
             health = 400;
-            buildPower = 0.4f;
+            buildSpeed = 0.4f;
             engineOffset = 6.5f;
-            toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium);
-            weapon = new Weapon(){{
-                length = 1.5f;
-                reload = 20f;
-                width = 0.5f;
-                alternate = true;
-                ejectEffect = Fx.none;
-                recoil = 2f;
-                bullet = Bullets.healBullet;
-            }};
         }};
 
+        /*
         dagger = new UnitDef("dagger", GroundUnit::new){{
             maxVelocity = 1.1f;
             speed = 0.2f;
@@ -421,7 +411,7 @@ public class UnitTypes implements ContentList{
             {
                 flying = true;
                 drillTier = 1;
-                minePower = 4f;
+                mineSpeed = 4f;
                 speed = 0.49f;
                 drag = 0.09f;
                 health = 200f;
@@ -430,7 +420,7 @@ public class UnitTypes implements ContentList{
                 weaponOffsetY = -1;
                 engineColor = Pal.lightTrail;
                 cellTrnsY = 1f;
-                buildPower = 1.2f;
+                buildSpeed = 1.2f;
                 weapon = new Weapon("vanguard-blaster"){{
                     length = 1.5f;
                     reload = 30f;
@@ -479,7 +469,7 @@ public class UnitTypes implements ContentList{
                 itemCapacity = 15;
                 mass = 0.9f;
                 health = 150f;
-                buildPower = 0.9f;
+                buildSpeed = 0.9f;
                 weaponOffsetX = 1;
                 weaponOffsetY = -1;
                 engineColor = Pal.heal;
@@ -519,7 +509,7 @@ public class UnitTypes implements ContentList{
                 speed = 0.5f;
                 itemCapacity = 40;
                 boostSpeed = 0.95f;
-                buildPower = 1.2f;
+                buildSpeed = 1.2f;
                 engineColor = Color.valueOf("ffd37f");
                 health = 250f;
                 weaponOffsetX = 4f;
@@ -559,7 +549,7 @@ public class UnitTypes implements ContentList{
                 boostSpeed = 0.8f;
                 canHeal = true;
                 health = 200f;
-                buildPower = 1.6f;
+                buildSpeed = 1.6f;
                 engineColor = Pal.heal;
 
                 weapon = new Weapon("heal-blaster"){{
@@ -609,7 +599,7 @@ public class UnitTypes implements ContentList{
                 weaponOffsetY = 0;
                 engineColor = Color.valueOf("feb380");
                 health = 350f;
-                buildPower = 1.5f;
+                buildSpeed = 1.5f;
                 weapon = new Weapon("swarmer"){{
                     length = 1.5f;
                     recoil = 4f;
@@ -682,7 +672,7 @@ public class UnitTypes implements ContentList{
                 weaponOffsetY = -1;
                 engineColor = Pal.lightTrail;
                 cellTrnsY = 1f;
-                buildPower = 1.1f;
+                buildSpeed = 1.1f;
                 weapon = new Weapon("blaster"){{
                     length = 1.5f;
                     reload = 15f;
@@ -789,7 +779,7 @@ public class UnitTypes implements ContentList{
                 itemCapacity = 30;
                 engineColor = Color.valueOf("84f491");
                 cellTrnsY = 1f;
-                buildPower = 2.5f;
+                buildSpeed = 2.5f;
                 weapon = new Weapon("bomber"){{
                     length = 0f;
                     width = 2f;
@@ -831,7 +821,7 @@ public class UnitTypes implements ContentList{
                 itemCapacity = 60;
                 engineColor = Color.valueOf("feb380");
                 cellTrnsY = 1f;
-                buildPower = 1.2f;
+                buildSpeed = 1.2f;
 
                 weapon = new Weapon("bomber"){{
                     length = 1.5f;

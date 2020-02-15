@@ -3,8 +3,8 @@ package mindustry.game;
 import arc.util.ArcAnnotate.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
-import mindustry.gen.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -264,14 +264,13 @@ public class EventType{
     public static class BlockBuildEndEvent{
         public final Tile tile;
         public final Team team;
-        public final @Nullable
-        Playerc player;
+        public final @Nullable Unitc unit;
         public final boolean breaking;
 
-        public BlockBuildEndEvent(Tile tile, @Nullable Playerc player, Team team, boolean breaking){
+        public BlockBuildEndEvent(Tile tile, @Nullable Unitc unit, Team team, boolean breaking){
             this.tile = tile;
             this.team = team;
-            this.player = player;
+            this.unit = unit;
             this.breaking = breaking;
         }
     }

@@ -1,7 +1,6 @@
 package mindustry.entities.units;
 
 import arc.math.*;
-import arc.util.*;
 import mindustry.gen.*;
 
 public class AIController implements UnitController{
@@ -21,11 +20,12 @@ public class AIController implements UnitController{
 
     @Override
     public void update(){
-        rot += Mathf.range(3f) * Time.delta();
+        //TODO implement
+        //rot += Mathf.range(3f) * Time.delta();
 
-        unit.moveAt(Tmp.v1.trns(rot, unit.type().speed));
-        if(!unit.vel().isZero()){
-            unit.lookAt(unit.vel().angle());
-        }
+        //unit.moveAt(Tmp.v1.trns(rot, unit.type().speed));
+        //if(!unit.vel().isZero()){
+        //    unit.lookAt(unit.vel().angle());
+        //}
     }
 }

@@ -11,6 +11,7 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -528,23 +529,28 @@ public class NetClient implements ApplicationListener{
     }
 
     void sync(){
-        //TODO implement
-        /*
         if(timer.get(0, playerSyncTime)){
-            BuildRequest[] requests;
-            //limit to 10 to prevent buffer overflows
-            int usedRequests = Math.min(player.builder().requests().size, 10);
+            BuildRequest[] requests = null;
+            if(player.isBuilder() && control.input.isBuilding){
+                //limit to 10 to prevent buffer overflows
+                int usedRequests = Math.min(player.builder().requests().size, 10);
 
-            requests = new BuildRequest[usedRequests];
-            for(int i = 0; i < usedRequests; i++){
-                requests[i] = player.builder().requests().get(i);
+                requests = new BuildRequest[usedRequests];
+                for(int i = 0; i < usedRequests; i++){
+                    requests[i] = player.builder().requests().get(i);
+                }
             }
 
-            Call.onClientShapshot(lastSent++, player.x, player.y,
-            player.pointerX, player.pointerY, player.rotation, player.baseRotation,
-            player.vel().x, player.vel().y,
+            Unitc unit = player.dead() ? Nulls.unit : player.unit();
+
+            Call.onClientShapshot(lastSent++,
+            unit.x(), unit.y(),
+            player.mouseX(), player.mouseY(),
+            unit.rotation(),
+            unit instanceof Legsc ? ((Legsc)unit).baseRotation() : 0,
+            unit.vel().x, unit.vel().y,
             player.miner().mineTile(),
-            player.isBoosting, player.isShooting, ui.chatfrag.shown(), player.isBuilding,
+            /*player.isBoosting*/false, control.input.isShooting, ui.chatfrag.shown(),
             requests,
             Core.camera.position.x, Core.camera.position.y,
             Core.camera.width * viewScale, Core.camera.height * viewScale);
@@ -552,7 +558,7 @@ public class NetClient implements ApplicationListener{
 
         if(timer.get(1, 60)){
             Call.onPing(Time.millis());
-        }*/
+        }
     }
 
     String getUsid(String ip){

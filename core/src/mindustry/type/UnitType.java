@@ -35,7 +35,7 @@ public class UnitType extends UnlockableContent{
 
     public int itemCapacity = 30;
     public int drillTier = -1;
-    public float buildPower = 1f, minePower = 1f;
+    public float buildSpeed = 1f, mineSpeed = 1f;
 
     public Color engineColor = Pal.boostTo;
     public float engineOffset = 5f, engineSize = 2.5f;
@@ -45,6 +45,8 @@ public class UnitType extends UnlockableContent{
     public float lightRadius = 60f, lightOpacity = 0.6f;
     public Color lightColor = Pal.powerLight;
     public boolean drawCell = true, drawItems = true;
+
+    //public ObjectSet<Item> mineables = new ObjectSet<>();
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;

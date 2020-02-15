@@ -8,9 +8,9 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
-import mindustry.entities.type.base.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.net.Net;
@@ -103,8 +103,8 @@ public class ApplicationTests{
         Time.update();
         Time.update();
         Time.setDeltaProvider(() -> 1f);
-        unitGroup.update();
-        assertFalse(unitGroup.isEmpty(), "No enemies spawned.");
+        Groups.unit.update();
+        assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
     }
 
     @Test
@@ -335,18 +335,18 @@ public class ApplicationTests{
     void buildingOverlap(){
         initBuilding();
 
-        BuilderDrone d1 = (BuilderDrone)UnitTypes.phantom.create(Team.sharded);
-        BuilderDrone d2 = (BuilderDrone)UnitTypes.phantom.create(Team.sharded);
+        Builderc d1 = (Builderc)UnitTypes.phantom.create(Team.sharded);
+        Builderc d2 = (Builderc)UnitTypes.phantom.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
 
-        d1.addBuildRequest(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
-        d2.addBuildRequest(new BuildRequest(1, 1, 0, Blocks.copperWallLarge));
+        d1.addBuild(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
+        d2.addBuild(new BuildRequest(1, 1, 0, Blocks.copperWallLarge));
 
         Time.setDeltaProvider(() -> 9999999f);
-        d1.updateBuilding();
-        d2.updateBuilding();
+        d1.update();
+        d2.update();
 
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
@@ -357,26 +357,26 @@ public class ApplicationTests{
     void buildingDestruction(){
         initBuilding();
 
-        BuilderDrone d1 = (BuilderDrone)UnitTypes.phantom.create(Team.sharded);
-        BuilderDrone d2 = (BuilderDrone)UnitTypes.phantom.create(Team.sharded);
+        Builderc d1 = (Builderc)UnitTypes.phantom.create(Team.sharded);
+        Builderc d2 = (Builderc)UnitTypes.phantom.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
 
-        d1.addBuildRequest(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
-        d2.addBuildRequest(new BuildRequest(1, 1));
+        d1.addBuild(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
+        d2.addBuild(new BuildRequest(1, 1));
 
         Time.setDeltaProvider(() -> 3f);
-        d1.updateBuilding();
+        d1.update();
         Time.setDeltaProvider(() -> 1f);
-        d2.updateBuilding();
+        d2.update();
 
         assertEquals(content.getByName(ContentType.block, "build2"), world.tile(0, 0).block());
 
         Time.setDeltaProvider(() -> 9999f);
 
-        d1.updateBuilding();
-        d2.updateBuilding();
+        d1.update();
+        d2.update();
 
         assertEquals(Blocks.air, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
@@ -414,8 +414,8 @@ public class ApplicationTests{
                     }catch(Throwable t){
                         fail("Failed to update block '" + tile.block() + "'.", t);
                     }
-                    assertEquals(tile.block(), tile.entity.block);
-                    assertEquals(tile.block().health, tile.entity.health);
+                    assertEquals(tile.block(), tile.entity.block());
+                    assertEquals(tile.block().health, tile.entity.health());
                 }
             }
         }

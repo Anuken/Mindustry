@@ -20,7 +20,7 @@ import static mindustry.Vars.*;
 @Component
 abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, Drawc, Boundedc,
         DrawLayerGroundc, DrawLayerFlyingc, DrawLayerGroundShadowsc, DrawLayerFlyingShadowsc, Syncc{
-    @Import float x, y, rotation;
+    @Import float x, y, rotation, elevation;
 
     private UnitController controller;
     private UnitType type;
@@ -83,6 +83,8 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
         hitSize(type.hitsize);
         controller(type.createController());
         setupWeapons(type);
+
+        elevation = type.flying ? 1f : 0f;
     }
 
     @Override
@@ -185,5 +187,23 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
         if(explosiveness > 7f && isLocal()){
             Events.fire(Trigger.suicideBomb);
         }
+    }
+
+    //TODO this is bad
+
+    public boolean isPlayer(){
+        return controller instanceof Playerc;
+    }
+
+    public boolean canMine(Item item){
+        return type.drillTier >= item.hardness;
+    }
+
+    public float miningSpeed(){
+        return type.mineSpeed;
+    }
+
+    public boolean offloadImmediately(){
+        return false;
     }
 }
