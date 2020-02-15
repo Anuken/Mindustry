@@ -82,6 +82,8 @@ public class Rules{
     public boolean lighting = false;
     /** Ambient light color, used when lighting is enabled. */
     public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
+    /** Solar panel power output is multiplied by this. */
+    public float solarEfficiency = 1f;
     /** team of the player by default */
     public Team defaultTeam = Team.sharded;
     /** team of the enemy in waves/sectors */
