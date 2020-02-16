@@ -84,7 +84,7 @@ public class ItemSource extends Block{
         ItemSelection.buildTable(table, content.items(), () -> entity.outputItem, item -> {
             lastItem = item;
             tile.configure(item == null ? -1 : item.id);
-        });
+        }, true);
     }
 
     @Override
