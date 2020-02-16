@@ -12,7 +12,7 @@ import static mindustry.Vars.net;
 
 @Component
 abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
-    @Import float x, y;
+    @Import float x, y, drag;
     @Import Vec2 vel;
 
     float elevation;
@@ -31,11 +31,24 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
         return isGrounded();
     }
 
+    void wobble(){
+        x += Mathf.sin(Time.time() + id() * 99, 25f, 0.05f) * Time.delta() * elevation;
+        y += Mathf.cos(Time.time() + id() * 99, 25f, 0.05f) * Time.delta() * elevation;
+    }
+
     void moveAt(Vec2 vector){
+        moveAt(vector, 1f);
+    }
+
+    void moveAt(Vec2 vector, float acceleration){
         Vec2 t = Tmp.v3.set(vector).scl(floorSpeedMultiplier()); //target vector
-        float mag = Tmp.v3.len();
-        vel.x = Mathf.approach(vel.x, t.x, mag);
-        vel.y = Mathf.approach(vel.y, t.y, mag);
+        Tmp.v1.set(t).sub(vel).limit(acceleration * vector.len()); //delta vector
+        vel.add(Tmp.v1);
+
+        //float mag = Tmp.v3.len() * acceleration;
+        //vel.lerp(t, Tmp.v3.len() * acceleration);
+        //vel.x = Mathf.approach(vel.x, t.x, mag);
+        //vel.y = Mathf.approach(vel.y, t.y, mag);
     }
 
     float floorSpeedMultiplier(){
@@ -46,6 +59,10 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     @Override
     public void update(){
         Floor floor = floorOn();
+
+        if(isFlying() && !net.client()){
+            wobble();
+        }
 
         if(isGrounded() && floor.isLiquid){
             if((splashTimer += Mathf.dst(deltaX(), deltaY())) >= 7f){

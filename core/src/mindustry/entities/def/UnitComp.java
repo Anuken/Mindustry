@@ -144,6 +144,7 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
 
     @Override
     public void draw(){
+        type.drawEngine(this);
         type.drawBody(this);
         type.drawWeapons(this);
         if(type.drawCell) type.drawCell(this);

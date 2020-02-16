@@ -59,8 +59,9 @@ public class UnitTypes implements ContentList{
         draug = new UnitType("draug"){{
             flying = true;
             drag = 0.05f;
-            speed = 1.5f;
+            speed = 2f;
             range = 50f;
+            accel = 0.2f;
             health = 80;
             mineSpeed = 0.9f;
             engineSize = 1.8f;
@@ -71,7 +72,8 @@ public class UnitTypes implements ContentList{
         spirit = new UnitType("spirit"){{
             flying = true;
             drag = 0.05f;
-            speed = 1.5f;
+            accel = 0.2f;
+            speed = 2f;
             range = 50f;
             health = 100;
             engineSize = 1.8f;
@@ -92,6 +94,8 @@ public class UnitTypes implements ContentList{
             flying = true;
             drag = 0.05f;
             mass = 2f;
+            speed = 2f;
+            accel = 0.1f;
             speed = 1.5f;
             range = 70f;
             itemCapacity = 70;

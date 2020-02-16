@@ -56,8 +56,8 @@ public abstract class BulletType extends Content{
     public boolean collidesTiles = true;
     /** Whether this bullet type collides with tiles that are of the same team. */
     public boolean collidesTeam = false;
-    /** Whether this bullet type collides with air units. */
-    public boolean collidesAir = true;
+    /** Whether this bullet type collides with air/ground units. */
+    public boolean collidesAir = true, collidesGround = true;
     /** Whether this bullet types collides with anything at all. */
     public boolean collides = true;
     /** Whether velocity is inherited from the shooter. */

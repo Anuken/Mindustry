@@ -28,6 +28,7 @@ import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
+    private Vec2 movement = new Vec2();
     /** Current cursor type. */
     private Cursor cursorType = SystemCursor.arrow;
     /** Position where the player started dragging a line. */
@@ -501,15 +502,23 @@ public class DesktopInput extends InputHandler{
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
 
-        Vec2 movement = Tmp.v1.set(speed * xa, speed * ya).limit(speed);
+        movement.set(xa, ya).nor().scl(speed);
+        float mouseAngle = Angles.mouseAngle(unit.x(), unit.y());
+        boolean aimCursor = omni && isShooting && unit.type().hasWeapons();
+
+        if(aimCursor){
+            unit.lookAt(mouseAngle);
+        }else{
+            if(!unit.vel().isZero(0.01f)) unit.lookAt(unit.vel().angle());
+        }
 
         if(omni){
-            unit.moveAt(movement);
-            unit.lookAt(Angles.mouseAngle(unit.x(), unit.y()));
+            unit.moveAt(movement, unit.type().accel);
         }else{
-            if(!unit.vel().isZero(0.01f)) unit.rotation(unit.vel().angle());
-            unit.moveAt(Tmp.v2.trns(unit.rotation(), movement.len()));
-            if(!movement.isZero()) unit.vel().rotateTo(movement.angle(), unit.type().rotateSpeed * Time.delta());
+            unit.moveAt(Tmp.v2.trns(unit.rotation(), movement.len()), unit.type().accel);
+            if(!movement.isZero()){
+                unit.vel().rotateTo(movement.angle(), unit.type().rotateSpeed * Time.delta());
+            }
         }
 
         unit.aim(Core.input.mouseWorld());

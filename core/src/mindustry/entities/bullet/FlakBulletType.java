@@ -1,14 +1,12 @@
 package mindustry.entities.bullet;
 
-import arc.math.geom.Rect;
-import arc.util.Time;
-import mindustry.content.Fx;
-import mindustry.entities.Units;
+import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 
 public class FlakBulletType extends BasicBulletType{
-    protected static Rect rect = new Rect();
-    protected float explodeRange = 30f;
+    public float explodeRange = 30f;
 
     public FlakBulletType(float speed, float damage){
         super(speed, damage, "shell");
@@ -17,6 +15,7 @@ public class FlakBulletType extends BasicBulletType{
         hitEffect = Fx.flakExplosionBig;
         bulletWidth = 8f;
         bulletHeight = 10f;
+        collidesGround = false;
     }
 
     public FlakBulletType(){
@@ -29,8 +28,8 @@ public class FlakBulletType extends BasicBulletType{
         if(b.data() instanceof Integer) return;
 
         if(b.timer(2, 6)){
-            Units.nearbyEnemies(b.team(), rect.setSize(explodeRange * 2f).setCenter(b.x(), b.y()), unit -> {
-                if(b.data() instanceof Float) return;
+            Units.nearbyEnemies(b.team(), Tmp.r1.setSize(explodeRange * 2f).setCenter(b.x(), b.y()), unit -> {
+                if(b.data() instanceof Float || (unit.isFlying() && !collidesAir) || (unit.isGrounded() && !collidesGround)) return;
 
                 if(unit.dst(b) < explodeRange){
                     b.data(0);
