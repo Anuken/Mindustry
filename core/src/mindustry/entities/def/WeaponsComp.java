@@ -67,7 +67,11 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                 float axisX = this.x + Angles.trnsx(rotation, axisXOffset, weapon.y),
                 axisY = this.y + Angles.trnsy(rotation, axisXOffset, weapon.y);
 
-                mount.rotation = Angles.moveToward(mount.rotation, Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation(), weapon.rotateSpeed);
+                mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation();
+                mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed);
+            }else{
+                mount.rotation = this.rotation;
+                mount.targetRotation = angleTo(mount.aimX, mount.aimY);
             }
 
             if(mount.shoot){
@@ -75,17 +79,17 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
 
                 //shoot if applicable
                 //TODO only shoot if angle is reached, don't shoot inaccurately
-                if(mount.reload <= 0.0001f){
+                if(mount.reload <= 0.0001f && Angles.within(mount.rotation, mount.targetRotation, 1.5f)){
                     for(int i : (weapon.mirror && !weapon.alternate ? Mathf.signs : Mathf.one)){
                         i *= Mathf.sign(weapon.flipped) * Mathf.sign(mount.side);
 
                         //m a t h
                         float weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0);
                         float mountX = this.x + Angles.trnsx(rotation, weapon.x * i, weapon.y),
-                        mountY = this.y + Angles.trnsy(rotation, weapon.x * i, weapon.y);
+                            mountY = this.y + Angles.trnsy(rotation, weapon.x * i, weapon.y);
                         float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX * i, weapon.shootY),
-                        shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX * i, weapon.shootY);
-                        float shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY);
+                            shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX * i, weapon.shootY);
+                        float shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + (this.rotation - angleTo(mount.aimX, mount.aimY));
 
                         shoot(weapon, shootX, shootY, shootAngle);
                     }

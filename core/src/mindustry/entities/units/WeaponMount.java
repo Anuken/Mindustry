@@ -9,6 +9,8 @@ public class WeaponMount{
     public float reload;
     /** rotation relative to the unit this mount is on */
     public float rotation;
+    /** destination rotation; do not modify! */
+    public float targetRotation;
     /** aiming position in world coordinates */
     public float aimX, aimY;
     /** side that's being shot - only valid for mirrors */

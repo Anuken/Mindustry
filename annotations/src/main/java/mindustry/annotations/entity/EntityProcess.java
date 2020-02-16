@@ -520,6 +520,7 @@ public class EntityProcess extends BaseProcessor{
                     .returns(int.class).addModifiers(Modifier.PUBLIC).addStatement("return " + def.classID).build());
             }
 
+
             idBuilder.addStaticBlock(idStore.build());
 
             write(idBuilder);

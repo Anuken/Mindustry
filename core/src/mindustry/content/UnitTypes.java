@@ -31,7 +31,7 @@ public class UnitTypes implements ContentList{
             mass = 1.75f;
             health = 130;
             weapons.add(new Weapon("chain-blaster"){{
-                reload = 28f;
+                reload = 14f;
                 x = 4f;
                 alternate = true;
                 ejectEffect = Fx.shellEjectSmall;
