@@ -125,7 +125,7 @@ public abstract class SaveVersion extends SaveFileReader{
             if(tile.entity != null){
                 writeChunk(stream, true, out -> {
                     out.writeByte(tile.entity.version());
-                    tile.entity.write(Writes.get(out));
+                    tile.entity.writeAll(Writes.get(out));
                 });
             }else{
                 //write consecutive non-entity blocks
@@ -188,7 +188,7 @@ public abstract class SaveVersion extends SaveFileReader{
                     try{
                         readChunk(stream, true, in -> {
                             byte revision = in.readByte();
-                            tile.entity.read(Reads.get(in), revision);
+                            tile.entity.readAll(Reads.get(in), revision);
                         });
                     }catch(Exception e){
                         throw new IOException("Failed to read tile entity of block: " + block, e);

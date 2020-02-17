@@ -73,6 +73,10 @@ public class Puddles{
         map.remove(tile.pos());
     }
 
+    public static void register(Puddlec puddle){
+        map.put(puddle.tile().pos(), puddle);
+    }
+
     /** Reacts two liquids together at a location. */
     private static float reactPuddle(Liquid dest, Liquid liquid, float amount, Tile tile, float x, float y){
         if((dest.flammability > 0.3f && liquid.temperature > 0.7f) ||

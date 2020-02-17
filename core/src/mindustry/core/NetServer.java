@@ -715,7 +715,7 @@ public class NetServer implements ApplicationListener{
             sent ++;
 
             dataStream.writeInt(entity.tile().pos());
-            entity.write(Writes.get(dataStream));
+            entity.writeAll(Writes.get(dataStream));
 
             if(syncStream.size() > maxSnapshotSize){
                 dataStream.close();

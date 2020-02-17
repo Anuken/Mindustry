@@ -1,4 +1,4 @@
-package mindustry.io.versions;
+package mindustry.io.legacy;
 
 /*
 Latest data: [build 81]

@@ -53,7 +53,7 @@ public class Planet extends UnlockableContent{
             }
         }else{
             //TODO crash instead - this is a critical error!
-            Log.err("Planet {0} is missing its data file.");
+            Log.err("Planet {0} is missing its data file.", name);
         }
     }
 

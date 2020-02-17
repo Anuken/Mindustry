@@ -1,18 +1,16 @@
 package mindustry.world.blocks.defense;
 
-import arc.Core;
-import arc.struct.IntSet;
-import arc.graphics.Color;
+import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.Mathf;
-import arc.util.Time;
+import arc.math.*;
+import arc.struct.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -90,7 +88,7 @@ public class OverdriveProjector extends Block{
             float realBoost = (speedBoost + entity.phaseHeat * speedBoostPhase) * entity.efficiency();
 
             entity.charge = 0f;
-            indexer.eachBlock(entity, realRange, other -> other.entity.timeScale() <= realBoost, other -> other.entity.applyBoost(realBoost, reload + 1f));
+            indexer.eachBlock(entity, realRange, other -> other.entity.timeScale() < realBoost, other -> other.entity.applyBoost(realBoost, reload + 1f));
         }
     }
 

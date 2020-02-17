@@ -61,8 +61,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         return this;
     }
 
-    @CallSuper
-    public void write(Writes write){
+    public final void writeBase(Writes write){
         write.f(health());
         write.b(tile.rotation());
         write.b(tile.getTeamID());
@@ -72,20 +71,36 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         if(cons != null) cons.write(write);
     }
 
-    @CallSuper
-    @Override
-    public void read(Reads read, byte revision){
+    public final void readBase(Reads read){
         health(read.f());
-        byte rotation = read.b();
-        byte team = read.b();
-
-        tile.setTeam(Team.get(team));
-        tile.rotation(rotation);
-
+        tile.rotation(read.b());
+        tile.setTeam(Team.get(read.b()));
         if(items != null) items.read(read);
         if(power != null) power.read(read);
         if(liquids != null) liquids.read(read);
         if(cons != null) cons.read(read);
+    }
+
+    public void writeAll(Writes write){
+        writeBase(write);
+        write(write);
+    }
+
+    public void readAll(Reads read, byte revision){
+        readBase(read);
+        read(read, revision);
+    }
+
+    @CallSuper
+    @Override
+    public void write(Writes write){
+        //overriden by subclasses!
+    }
+
+    @CallSuper
+    @Override
+    public void read(Reads read, byte revision){
+        //overriden by subclasses!
     }
 
     @Override
@@ -144,7 +159,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     }
 
     /** Returns the version of this TileEntity IO code.*/
-    //TODO implement
     @Override
     public byte version(){
         return 0;

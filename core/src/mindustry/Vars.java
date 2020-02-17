@@ -152,7 +152,7 @@ public class Vars implements Loadable{
     /** list of all locales that can be switched to */
     public static Locale[] locales;
 
-    public static FileTree tree;
+    public static FileTree tree = new FileTree();
     public static Net net;
     public static ContentLoader content;
     public static GameState state;

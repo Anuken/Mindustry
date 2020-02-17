@@ -95,4 +95,8 @@ abstract class FireComp implements Timedc, Posc, Firec{
         Fires.remove(tile);
     }
 
+    @Override
+    public void afterRead(){
+        Fires.register(this);
+    }
 }

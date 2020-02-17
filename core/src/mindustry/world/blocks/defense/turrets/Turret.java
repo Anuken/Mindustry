@@ -1,28 +1,22 @@
 package mindustry.world.blocks.defense.turrets;
 
-import arc.Core;
+import arc.*;
 import arc.audio.*;
-import arc.struct.Array;
-import arc.struct.EnumSet;
-import arc.func.Cons2;
-import arc.graphics.Blending;
-import arc.graphics.Color;
+import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.Angles;
-import arc.math.Mathf;
-import arc.math.geom.Vec2;
-import arc.util.Time;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
 import arc.util.io.*;
-import mindustry.content.Fx;
+import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.bullet.BulletType;
+import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.Block;
-import mindustry.world.Tile;
+import mindustry.world.*;
 import mindustry.world.meta.*;
-
-import java.io.*;
 
 import static mindustry.Vars.tilesize;
 
@@ -330,8 +324,10 @@ public abstract class Turret extends Block{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            reload = read.f();
-            rotation = read.f();
+            if(revision == 1){
+                reload = read.f();
+                rotation = read.f();
+            }
         }
 
         @Override

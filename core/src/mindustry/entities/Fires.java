@@ -62,4 +62,8 @@ public class Fires{
     public static void remove(Tile tile){
         map.remove(tile.pos());
     }
+
+    public static void register(Firec fire){
+        map.put(fire.tile().pos(), fire);
+    }
 }

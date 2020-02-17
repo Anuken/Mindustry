@@ -46,7 +46,7 @@ abstract class HealthComp implements Entityc{
     }
 
     boolean damaged(){
-        return health <= maxHealth - 0.0001f;
+        return health < maxHealth - 0.001f;
     }
 
     void damage(float amount){

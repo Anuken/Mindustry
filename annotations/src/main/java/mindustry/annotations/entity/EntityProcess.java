@@ -1,5 +1,6 @@
 package mindustry.annotations.entity;
 
+import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
@@ -166,6 +167,7 @@ public class EntityProcess extends BaseProcessor{
                 String name = "DrawLayer" + Strings.capitalize(layer.name()) + "c";
                 TypeSpec.Builder inter = TypeSpec.interfaceBuilder(name)
                 .addSuperinterface(tname(packageName + ".Entityc"))
+                .addSuperinterface(tname(packageName + ".Drawc"))
                 .addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
                 inter.addMethod(MethodSpec.methodBuilder("draw" + Strings.capitalize(layer.name())).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
                 write(inter);
@@ -370,8 +372,9 @@ public class EntityProcess extends BaseProcessor{
                     }
 
                     //add free code to remove methods - always at the end
+                    //this only gets called next frame.
                     if(first.name().equals("remove") && ann.pooled()){
-                        mbuilder.addStatement("$T.free(this)", Pools.class);
+                        mbuilder.addStatement("$T.app.post(() -> $T.free(this))", Core.class, Pools.class);
                     }
 
                     builder.addMethod(mbuilder.build());

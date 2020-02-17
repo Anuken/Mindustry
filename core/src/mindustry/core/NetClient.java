@@ -407,7 +407,7 @@ public class NetClient implements ApplicationListener{
                     Log.warn("Missing entity at {0}. Skipping block snapshot.", tile);
                     break;
                 }
-                tile.entity.read(Reads.get(input), tile.entity.version());
+                tile.entity.readAll(Reads.get(input), tile.entity.version());
             }
         }catch(Exception e){
             e.printStackTrace();

@@ -1,19 +1,17 @@
 package mindustry.world.blocks.defense;
 
-import arc.Core;
-import arc.struct.IntSet;
-import arc.graphics.Color;
+import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.Mathf;
+import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.content.Fx;
+import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
