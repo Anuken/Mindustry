@@ -53,7 +53,6 @@ public class TestPlanetGenerator implements PlanetGenerator{
     @Override
     public void generate(Vec3 position, TileGen tile){
         tile.floor = getBlock(position);
-        tile.overlay = Mathf.chance(0.01) ? Blocks.oreCopper : Blocks.air;
     }
 
     Block getBlock(Vec3 position){

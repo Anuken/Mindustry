@@ -78,7 +78,6 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                 float rotation = this.rotation - 90;
 
                 //shoot if applicable
-                //TODO only shoot if angle is reached, don't shoot inaccurately
                 if(mount.reload <= 0.0001f && Angles.within(mount.rotation, mount.targetRotation, 1.5f)){
                     for(int i : (weapon.mirror && !weapon.alternate ? Mathf.signs : Mathf.one)){
                         i *= Mathf.sign(weapon.flipped) * Mathf.sign(mount.side);
@@ -91,7 +90,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                             shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX * i, weapon.shootY);
                         float shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + (this.rotation - angleTo(mount.aimX, mount.aimY));
 
-                        shoot(weapon, shootX, shootY, shootAngle);
+                        shoot(weapon, shootX, shootY, shootAngle, -i);
                     }
 
                     mount.side = !mount.side;
@@ -101,7 +100,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
         }
     }
 
-    private void shoot(Weapon weapon, float x, float y, float rotation){
+    private void shoot(Weapon weapon, float x, float y, float rotation, int side){
         float baseX = this.x, baseY = this.y;
 
         weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
@@ -129,7 +128,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
         boolean parentize = ammo.keepVelocity;
 
         Effects.shake(weapon.shake, weapon.shake, x, y);
-        weapon.ejectEffect.at(x, y, rotation);
+        weapon.ejectEffect.at(x, y, rotation * side);
         ammo.shootEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? this : null);
         ammo.smokeEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? this : null);
     }

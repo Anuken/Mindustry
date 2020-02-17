@@ -6,7 +6,7 @@ import arc.audio.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.mock.MockSound;
+import arc.mock.*;
 import arc.struct.Array;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
@@ -173,9 +173,11 @@ public class ContentParser{
             readBundle(ContentType.block, name, value);
 
             Block block;
+            boolean exists;
 
             if(locate(ContentType.block, name) != null){
                 block = locate(ContentType.block, name);
+                exists = true;
 
                 if(value.has("type")){
                     throw new IllegalArgumentException("When defining properties for an existing block, you must not re-declare its type. The original type will be used. Block: " + name);
@@ -183,6 +185,7 @@ public class ContentParser{
             }else{
                 //TODO generate dynamically instead of doing.. this
                 Class<? extends Block> type;
+                exists = false;
 
                 try{
                     type = resolve(getType(value),
@@ -249,12 +252,16 @@ public class ContentParser{
                 //add research tech node
                 if(research[0] != null){
                     Block parent = find(ContentType.block, research[0]);
-                    TechNode baseNode = TechTree.create(parent, block);
+                    TechNode baseNode = exists && TechTree.all.contains(t -> t.block == block) ? TechTree.all.find(t -> t.block == block) : TechTree.create(parent, block);
                     LoadedMod cur = currentMod;
 
                     postreads.add(() -> {
                         currentContent = block;
                         currentMod = cur;
+
+                        if(baseNode.parent != null){
+                            baseNode.parent.children.remove(baseNode);
+                        }
 
                         TechNode parnode = TechTree.all.find(t -> t.block == parent);
                         if(parnode == null){
@@ -263,7 +270,9 @@ public class ContentParser{
                         if(!parnode.children.contains(baseNode)){
                             parnode.children.add(baseNode);
                         }
+                        baseNode.parent = parnode;
                     });
+
                 }
 
                 //make block visible by default if there are requirements and no visibility set
