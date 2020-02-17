@@ -69,15 +69,24 @@ public class ItemModule extends BlockModule{
         return total;
     }
 
+    public Item first(){
+        for(int i = 0; i < items.length; i++){
+            if(items[i] > 0){
+                return content.item(i);
+            }
+        }
+        return null;
+    }
+
     public Item take(){
         for(int i = 0; i < items.length; i++){
             int index = (i + takeRotation);
-            if(index >= items.length) index -= items.length; //conditional instead of mod
+            if(index >= items.length) index -= items.length;
             if(items[index] > 0){
                 items[index] --;
                 total --;
                 takeRotation = index + 1;
-                return content.item(index % items.length);
+                return content.item(index);
             }
         }
         return null;
