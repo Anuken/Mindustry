@@ -388,14 +388,14 @@ public class ApplicationTests{
         Tiles tiles = world.resize(256*2 + 20, 10);
 
         world.beginMapLoad();
-        for(int x = 0; x < tiles.width(); x++){
-            for(int y = 0; y < tiles.height(); y++){
+        for(int x = 0; x < tiles.width; x++){
+            for(int y = 0; y < tiles.height; y++){
                 tiles.set(x, y, new Tile(x, y, Blocks.stone, Blocks.air, Blocks.air));
             }
         }
         int i = 0;
 
-        for(int x = 5; x < tiles.width() && i < content.blocks().size; ){
+        for(int x = 5; x < tiles.width && i < content.blocks().size; ){
             Block block = content.block(i++);
             if(block.isBuildable()){
                 x += block.size;
@@ -405,8 +405,8 @@ public class ApplicationTests{
         }
         world.endMapLoad();
 
-        for(int x = 0; x < tiles.width(); x++){
-            for(int y = 0; y < tiles.height(); y++){
+        for(int x = 0; x < tiles.width; x++){
+            for(int y = 0; y < tiles.height; y++){
                 Tile tile = world.rawTile(x, y);
                 if(tile.entity != null){
                     try{

@@ -7,7 +7,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -69,11 +68,11 @@ public class World{
     }
 
     public int width(){
-        return tiles.width();
+        return tiles.width;
     }
 
     public int height(){
-        return tiles.height();
+        return tiles.height;
     }
 
     public int unitWidth(){
@@ -130,7 +129,7 @@ public class World{
     public Tiles resize(int width, int height){
         clearTileEntities();
 
-        if(tiles.width() != width || tiles.height() != height){
+        if(tiles.width != width || tiles.height != height){
             tiles = new Tiles(width, height);
         }
 
@@ -164,7 +163,7 @@ public class World{
             addDarkness(tiles);
         }
 
-        Groups.resize(-finalWorldBounds, -finalWorldBounds, tiles.width() * tilesize + finalWorldBounds * 2, tiles.height() * tilesize + finalWorldBounds * 2);
+        Groups.resize(-finalWorldBounds, -finalWorldBounds, tiles.width * tilesize + finalWorldBounds * 2, tiles.height * tilesize + finalWorldBounds * 2);
 
         generating = false;
         Events.fire(new WorldLoadEvent());
@@ -207,8 +206,7 @@ public class World{
                 sector.planet.generator.generate(position, gen);
                 tiles.set(x, y, new Tile(x, y, gen.floor, gen.overlay, gen.block));
             });
-
-            tiles.get(size/2, size/2).setBlock(Blocks.coreShard, Team.sharded);
+            sector.planet.generator.decorate(tiles);
         });
     }
 
@@ -300,8 +298,8 @@ public class World{
     }
 
     public void addDarkness(Tiles tiles){
-        byte[] dark = new byte[tiles.width() * tiles.height()];
-        byte[] writeBuffer = new byte[tiles.width() * tiles.height()];
+        byte[] dark = new byte[tiles.width * tiles.height];
+        byte[] writeBuffer = new byte[tiles.width * tiles.height];
 
         byte darkIterations = 4;
 
@@ -314,11 +312,11 @@ public class World{
 
         for(int i = 0; i < darkIterations; i++){
             for(Tile tile : tiles){
-                int idx = tile.y * tiles.width() + tile.x;
+                int idx = tile.y * tiles.width + tile.x;
                 boolean min = false;
                 for(Point2 point : Geometry.d4){
                     int newX = tile.x + point.x, newY = tile.y + point.y;
-                    int nidx = newY * tiles.width() + newX;
+                    int nidx = newY * tiles.width + newX;
                     if(tiles.in(newX, newY) && dark[nidx] < dark[idx]){
                         min = true;
                         break;
@@ -331,7 +329,7 @@ public class World{
         }
 
         for(Tile tile : tiles){
-            int idx = tile.y * tiles.width() + tile.x;
+            int idx = tile.y * tiles.width + tile.x;
 
             if(tile.isDarkened()){
                 tile.rotation(dark[idx]);
@@ -341,7 +339,7 @@ public class World{
                 boolean full = true;
                 for(Point2 p : Geometry.d4){
                     int px = p.x + tile.x, py = p.y + tile.y;
-                    int nidx = py * tiles.width() + px;
+                    int nidx = py * tiles.width + px;
                     if(tiles.in(px, py) && !(tile.isDarkened() && dark[nidx] == 4)){
                         full = false;
                         break;

@@ -7,8 +7,9 @@ import java.util.*;
 
 /** A tile container. */
 public class Tiles implements Iterable<Tile>{
+    public final int width, height;
+
     private final Tile[] array;
-    private final int width, height;
     private final TileIterator iterator = new TileIterator();
 
     public Tiles(int width, int height){
@@ -61,14 +62,6 @@ public class Tiles implements Iterable<Tile>{
     /** @return a tile at an int position (not equivalent to geti) */
     public @Nullable Tile getp(int pos){
         return get(Pos.x(pos), Pos.y(pos));
-    }
-
-    public int width(){
-        return width;
-    }
-
-    public int height(){
-        return height;
     }
 
     @Override

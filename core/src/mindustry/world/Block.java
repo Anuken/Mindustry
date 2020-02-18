@@ -161,6 +161,10 @@ public class Block extends BlockStorage{
         this.solid = false;
     }
 
+    public boolean isAir(){
+        return id == 0;
+    }
+
     public boolean canBreak(Tile tile){
         return true;
     }

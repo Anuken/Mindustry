@@ -7,6 +7,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.schematics;
 
+//TODO remove
 public class DesertWastesGenerator extends BasicGenerator{
 
     public DesertWastesGenerator(int width, int height){

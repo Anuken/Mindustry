@@ -302,6 +302,7 @@ public class Blocks implements ContentList{
 
         icerocks = new StaticWall("icerocks"){{
             variants = 2;
+            iceSnow.asFloor().wall = this;
         }};
 
         snowrocks = new StaticWall("snowrocks"){{
@@ -365,11 +366,13 @@ public class Blocks implements ContentList{
         moss = new Floor("moss"){{
             variants = 3;
             attributes.set(Attribute.spores, 0.15f);
+            wall = sporePine;
         }};
 
         sporeMoss = new Floor("spore-moss"){{
             variants = 3;
             attributes.set(Attribute.spores, 0.3f);
+            wall = sporerocks;
         }};
 
         metalFloor = new Floor("metal-floor"){{

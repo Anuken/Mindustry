@@ -20,11 +20,14 @@ public abstract class RandomGenerator extends Generator{
     public void generate(Tiles tiles){
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                floor = Blocks.air;
-                block = Blocks.air;
-                ore = Blocks.air;
+                Tile prev = tiles.getn(x, y);
+                floor = prev.floor();
+                block = prev.block();
+                ore = prev.overlay();
                 generate(x, y);
-                tiles.set(x, y, new Tile(x, y, floor, ore, block));
+                prev.setFloor(floor.asFloor());
+                prev.setBlock(block);
+                prev.setOverlay(ore);
             }
         }
 

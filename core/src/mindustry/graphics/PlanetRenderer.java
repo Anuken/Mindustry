@@ -120,4 +120,9 @@ public class PlanetRenderer implements PlanetGenerator{
     public void generate(Vec3 position, TileGen tile){
 
     }
+
+    @Override
+    public void decorate(Tiles tiles){
+
+    }
 }

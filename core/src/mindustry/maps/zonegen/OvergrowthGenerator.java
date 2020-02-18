@@ -7,6 +7,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.schematics;
 
+//TODO remove
 public class OvergrowthGenerator extends BasicGenerator{
 
     public OvergrowthGenerator(int width, int height){
@@ -15,13 +16,12 @@ public class OvergrowthGenerator extends BasicGenerator{
 
     @Override
     public void generate(int x, int y){
-        floor = Blocks.moss;
     }
 
     @Override
     public void decorate(Tiles tiles){
         ores(tiles);
-        terrain(tiles, Blocks.sporePine, 70f, 1.4f, 1f);
+        //terrain(tiles, Blocks.sporePine, 70f, 1.4f, 1f);
 
         int rand = 40;
         int border = 25;
@@ -36,7 +36,7 @@ public class OvergrowthGenerator extends BasicGenerator{
         distort(tiles, 20f, 4f);
         inverseFloodFill(tiles, tiles.getn(spawnX, spawnY), Blocks.sporerocks);
 
-        noise(tiles, Blocks.darksandTaintedWater, Blocks.duneRocks, 4, 0.7f, 120f, 0.64f);
+        //noise(tiles, Blocks.darksandTaintedWater, Blocks.duneRocks, 4, 0.7f, 120f, 0.64f);
         //scatter(tiles, Blocks.sporePine, Blocks.whiteTreeDead, 1f);
 
         tiles.getn(endX, endY).setOverlay(Blocks.spawn);

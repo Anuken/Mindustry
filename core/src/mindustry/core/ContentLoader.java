@@ -233,6 +233,10 @@ public class ContentLoader{
         return (Block)getByID(ContentType.block, id);
     }
 
+    public Block block(String name){
+        return (Block)getByName(ContentType.block, name);
+    }
+
     public Array<Item> items(){
         return getBy(ContentType.item);
     }

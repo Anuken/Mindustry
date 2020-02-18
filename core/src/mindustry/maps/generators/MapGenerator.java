@@ -62,7 +62,7 @@ public class MapGenerator extends Generator{
         for(Tile tile : tiles){
             if(tile.overlay() == Blocks.spawn){
                 int rad = 10;
-                Geometry.circle(tile.x, tile.y, tiles.width(), tiles.height(), rad, (wx, wy) -> {
+                Geometry.circle(tile.x, tile.y, tiles.width, tiles.height, rad, (wx, wy) -> {
                     if(tile.overlay().itemDrop != null){
                         tile.clearOverlay();
                     }

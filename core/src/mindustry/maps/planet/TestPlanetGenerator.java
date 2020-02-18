@@ -3,11 +3,14 @@ package mindustry.maps.planet;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
+import mindustry.game.*;
 import mindustry.world.*;
 
+//TODO refactor into generic planet class
 public class TestPlanetGenerator implements PlanetGenerator{
     Simplex noise = new Simplex();
     float scl = 5f;
@@ -53,6 +56,57 @@ public class TestPlanetGenerator implements PlanetGenerator{
     @Override
     public void generate(Vec3 position, TileGen tile){
         tile.floor = getBlock(position);
+        tile.block = tile.floor.asFloor().wall;
+
+        if(noise.octaveNoise3D(5, 0.6, 8.0, position.x, position.y, position.z) > 0.65){
+            tile.block = Blocks.air;
+        }
+    }
+
+    @Override
+    public void decorate(Tiles tiles){
+        //OvergrowthGenerator generator = new OvergrowthGenerator(tiles.width, tiles.height);
+        //generator.init(Loadouts.basicNucleus);
+        //generator.generate(tiles);
+        GridBits write = new GridBits(tiles.width, tiles.height);
+        GridBits read = new GridBits(tiles.width, tiles.height);
+
+        //double removalChance = 0.2;
+        //remove random tiles
+        //tiles.each((x, y) -> {
+
+        //});
+
+        tiles.each((x, y) -> read.set(x, y, !tiles.get(x, y).block().isAir()));
+
+        int iterations = 4, birthLimit = 16, deathLimit = 16, radius = 3;
+
+        for(int i = 0; i < iterations; i++){
+            tiles.each((x, y) -> {
+                int alive = 0;
+
+                for(int cx = -radius; cx <= radius; cx++){
+                    for(int cy = -radius; cy <= radius; cy++){
+                        if((cx == 0 && cy == 0) || !Mathf.within(cx, cy, radius)) continue;
+                        if(!Structs.inBounds(x + cx, y + cy, tiles.width, tiles.height) || read.get(x + cx, y + cy)){
+                            alive++;
+                        }
+                    }
+                }
+
+                if(read.get(x, y)){
+                    write.set(x, y, alive >= deathLimit);
+                }else{
+                    write.set(x, y, alive > birthLimit);
+                }
+            });
+
+            //flush results.
+            tiles.each((x, y) -> read.set(x, y, write.get(x, y)));
+        }
+
+        tiles.each((x, y) -> tiles.get(x, y).setBlock(!write.get(x, y) ? Blocks.air : tiles.get(x, y).floor().wall));
+        tiles.get(tiles.width /2, tiles.height /2).setBlock(Blocks.coreShard, Team.sharded);
     }
 
     Block getBlock(Vec3 position){

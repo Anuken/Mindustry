@@ -6,8 +6,8 @@ import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
 import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
@@ -16,7 +16,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class Floor extends Block{
     /** number of different variant regions to use */
@@ -57,6 +57,8 @@ public class Floor extends Block{
     public boolean oreDefault = false;
     /** Ore generation params. */
     public float oreScale = 24f, oreThreshold = 0.828f;
+    /** Wall variant of this block. May be Blocks.air if not found. */
+    public Block wall = Blocks.air;
 
     protected TextureRegion[][] edges;
     protected byte eq = 0;
@@ -90,6 +92,20 @@ public class Floor extends Block{
         }
         region = variantRegions[0];
         edgeRegion = Core.atlas.find("edge");
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(wall == Blocks.air){
+            wall = content.block(name + "Rocks");
+            if(wall == null) wall = content.block(name + "rocks");
+            if(wall == null) wall = content.block(name.replace("darksand", "dune") + "rocks");
+        }
+
+        //keep default value if not found...
+        if(wall == null) wall = Blocks.air;
     }
 
     @Override
