@@ -1,12 +1,13 @@
 package mindustry.ios;
 
 import arc.*;
-import com.badlogic.gdx.backends.iosrobovm.*;
+import arc.Input.*;
 import arc.files.*;
 import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
+import com.badlogic.gdx.backends.iosrobovm.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Saves.*;
@@ -41,7 +42,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
             @Override
             public void showFileChooser(boolean open, String extension, Cons<Fi> cons){
                 UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray<NSString>)null);
-
 
                 NSArray<UIBarButtonItem> arr = new NSArray<>(new UIBarButtonItem(Core.bundle.get("cancel"), UIBarButtonItemStyle.Plain,
                     uiBarButtonItem -> cont.dismissViewController(true, () -> {})));
@@ -88,16 +88,37 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                     @Override
                     public void didRequestDocumentCreationWithHandler(UIDocumentBrowserViewController controller, VoidBlock2<NSURL, UIDocumentBrowserImportMode> importHandler){
+                        Core.app.post(() -> {
+                            //ask for name
+                            Core.input.getTextInput(new TextInput(){{
+                                title = Core.bundle.get("name");
+                                accepted = name -> {
+                                    try{
+                                        //write result
+                                        Fi result = tmpDirectory.child(name + "." + extension);
+                                        cons.get(result);
 
+                                        //import the document
+                                        importHandler.invoke(new NSURL(result.absolutePath()), UIDocumentBrowserImportMode.Move);
+                                    }catch(Throwable t){
+                                        ui.showException(t);
+                                    }
+                                };
+                            }});
+                        });
                     }
 
                     @Override
                     public void didImportDocument(UIDocumentBrowserViewController controller, NSURL sourceURL, NSURL destinationURL){
+                        //hide it, done with export
+                        cont.dismissViewController(true, () -> {});
                     }
 
                     @Override
                     public void failedToImportDocument(UIDocumentBrowserViewController controller, NSURL documentURL, NSError error){
-
+                        //failed, still hide it but show error message
+                        Core.app.post(() -> ui.showErrorMessage(error.getLocalizedDescription() + "\n" + error.getLocalizedFailureReason()));
+                        cont.dismissViewController(true, () -> {});
                     }
 
                     @Override
