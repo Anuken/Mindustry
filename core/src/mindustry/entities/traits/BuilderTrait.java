@@ -81,6 +81,10 @@ public interface BuilderTrait extends Entity, TeamTrait{
         }
 
         if(tile.entity instanceof BuildEntity && !current.initialized){
+            if(getTeam() != tile.getTeam()){
+                buildQueue().removeFirst();
+                return;
+            }
             Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking)));
             current.initialized = true;
         }
