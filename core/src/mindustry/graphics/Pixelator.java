@@ -28,10 +28,6 @@ public class Pixelator implements Disposable{
         camera.width = (int)camera.width;
         camera.height = (int)camera.height;
 
-        boolean hadShields = Core.settings.getBool("animatedshields");
-        boolean hadWater = Core.settings.getBool("animatedwater");
-        Core.settings.put("animatedwater", false);
-        Core.settings.put("animatedshields", false);
         graphics.clear(0f, 0f, 0f, 1f);
 
         float px = Core.camera.position.x, py = Core.camera.position.y;
@@ -58,15 +54,7 @@ public class Pixelator implements Disposable{
         playerGroup.draw(p -> !p.isDead(), Player::drawName);
 
         Core.camera.position.set(px, py);
-        Core.settings.put("animatedwater", hadWater);
-        Core.settings.put("animatedshields", hadShields);
         renderer.setScale(pre);
-    }
-
-    public void rebind(){
-        if(enabled()){
-            buffer.begin();
-        }
     }
 
     public boolean enabled(){
