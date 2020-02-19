@@ -195,6 +195,7 @@ public class World{
     }
 
     public void loadSector(Sector sector){
+        state.rules.sector = sector;
         int size = (int)(sector.rect.radius * 2500);
 
         loadGenerator(size, size, tiles -> {
@@ -206,7 +207,7 @@ public class World{
                 sector.planet.generator.generate(position, gen);
                 tiles.set(x, y, new Tile(x, y, gen.floor, gen.overlay, gen.block));
             });
-            sector.planet.generator.decorate(tiles);
+            sector.planet.generator.decorate(tiles, sector);
         });
     }
 

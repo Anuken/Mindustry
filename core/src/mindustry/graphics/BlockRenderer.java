@@ -1,13 +1,14 @@
 package mindustry.graphics;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
+import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
@@ -75,15 +76,11 @@ public class BlockRenderer implements Disposable{
             for(int x = 0; x < world.width(); x++){
                 for(int y = 0; y < world.height(); y++){
                     Tile tile = world.rawTile(x, y);
-                    int edgeBlend = 2;
-                    float rot = tile.rotation();
-                    boolean fillable = (tile.block().solid && tile.block().fillsTile && !tile.block().synthetic());
-                    int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (world.width() - 1)), Math.abs(y - (world.height() - 1)))));
-                    if(edgeDst <= edgeBlend){
-                        rot = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), fillable ? rot : 0);
-                    }
-                    if(rot > 0 && (fillable || edgeDst <= edgeBlend)){
-                        Draw.color(0f, 0f, 0f, Math.min((rot + 0.5f) / 4f, 1f));
+
+                    float darkness = getDarkness(x, y);
+
+                    if(darkness > 0){
+                        Draw.color(0f, 0f, 0f, Math.min((darkness + 0.5f) / 4f, 1f));
                         Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                     }
                 }
@@ -106,6 +103,33 @@ public class BlockRenderer implements Disposable{
                 lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
             }
         });
+    }
+
+    public float getDarkness(int x, int y){
+        int edgeBlend = 2;
+
+        float dark = 0;
+        int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (world.width() - 1)), Math.abs(y - (world.height() - 1)))));
+        if(edgeDst <= edgeBlend){
+            dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
+        }
+
+        //TODO tweak noise and radius
+        if(world.isCampaign()){
+            int circleBlend = 14;
+            float rawDst = Mathf.dst(x, y, world.width() / 2, world.height() / 2) + Noise.nnoise(x, y, 7f, 8f) + Noise.nnoise(x, y, 20f, 25f);
+            int circleDst = (int)(rawDst - (world.width() / 2 - circleBlend));
+            if(circleDst > 0){
+                dark = Math.max(circleDst / 1.4f, dark);
+            }
+        }
+
+        Tile tile = world.rawTile(x, y);
+        if(tile.block().solid && tile.block().fillsTile && !tile.block().synthetic()){
+            dark = Math.max(dark, tile.rotation());
+        }
+
+        return dark;
     }
 
     public void drawFog(){

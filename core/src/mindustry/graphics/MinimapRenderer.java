@@ -1,19 +1,19 @@
 package mindustry.graphics;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.Pixmap.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.entities.*;
-import mindustry.gen.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -161,7 +161,10 @@ public class MinimapRenderer implements Disposable{
         if(bc != 0){
             return bc;
         }
-        return Tmp.c1.set(MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.team())).mul(tile.block().cacheLayer == CacheLayer.walls ? 1f - tile.rotation() / 4f : 1f).rgba();
+        Color color = Tmp.c1.set(MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.team()));
+        color.mul(1f - Mathf.clamp(renderer.blocks.getDarkness(tile.x, tile.y) / 4f));
+
+        return color.rgba();
     }
 
     @Override

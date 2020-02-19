@@ -6,14 +6,19 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 //TODO refactor into generic planet class
 public class TestPlanetGenerator implements PlanetGenerator{
     Simplex noise = new Simplex();
+    RidgedPerlin rid = new RidgedPerlin(1, 2);
     float scl = 5f;
+    Sector sector;
+    Tiles tiles;
 
     //TODO generate array from planet image later
     Block[][] arr = {
@@ -59,12 +64,19 @@ public class TestPlanetGenerator implements PlanetGenerator{
         tile.block = tile.floor.asFloor().wall;
 
         if(noise.octaveNoise3D(5, 0.6, 8.0, position.x, position.y, position.z) > 0.65){
+            //tile.block = Blocks.air;
+        }
+
+        if(rid.getValue(position.x, position.y, position.z, 22) > 0.34){
             tile.block = Blocks.air;
         }
     }
 
     @Override
-    public void decorate(Tiles tiles){
+    public void decorate(Tiles tiles, Sector sec){
+        this.tiles = tiles;
+        this.sector = sec;
+
         //OvergrowthGenerator generator = new OvergrowthGenerator(tiles.width, tiles.height);
         //generator.init(Loadouts.basicNucleus);
         //generator.generate(tiles);
@@ -101,12 +113,38 @@ public class TestPlanetGenerator implements PlanetGenerator{
                 }
             });
 
-            //flush results.
-            tiles.each((x, y) -> read.set(x, y, write.get(x, y)));
+            //flush results
+            read.set(write);
         }
 
-        tiles.each((x, y) -> tiles.get(x, y).setBlock(!write.get(x, y) ? Blocks.air : tiles.get(x, y).floor().wall));
+        tiles.each((x, y) -> tiles.get(x, y).setBlock(!read.get(x, y) ? Blocks.air : tiles.get(x, y).floor().wall));
+        distort(0.01f, 8f);
+
         tiles.get(tiles.width /2, tiles.height /2).setBlock(Blocks.coreShard, Team.sharded);
+    }
+
+    void distort(float scl, float mag){
+        short[] blocks = new short[tiles.width * tiles.height];
+        short[] floors = new short[blocks.length];
+
+        tiles.each((x, y) -> {
+            int idx = y*tiles.width + x;
+            float cx = x + noise(x, y, scl, mag) - mag / 2f, cy = y + noise(x, y + 152f, scl, mag) - mag / 2f;
+            Tile other = tiles.getn(Mathf.clamp((int)cx, 0, tiles.width-1), Mathf.clamp((int)cy, 0, tiles.height-1));
+            blocks[idx] = other.block().id;
+            floors[idx] = other.floor().id;
+        });
+
+        for(int i = 0; i < blocks.length; i++){
+            Tile tile = tiles.geti(i);
+            tile.setFloor(Vars.content.block(floors[i]).asFloor());
+            tile.setBlock(Vars.content.block(blocks[i]));
+        }
+    }
+
+    protected float noise(float x, float y, float scl, float mag){
+        Vec3 v = sector.rect.project(x / tiles.width, y / tiles.height);
+        return (float)noise.octaveNoise3D(1f, 0f, 1f / scl, v.x, v.y, v.z) * mag;
     }
 
     Block getBlock(Vec3 position){

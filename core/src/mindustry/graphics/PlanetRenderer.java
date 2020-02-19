@@ -122,7 +122,7 @@ public class PlanetRenderer implements PlanetGenerator{
     }
 
     @Override
-    public void decorate(Tiles tiles){
+    public void decorate(Tiles tiles, Sector sec){
 
     }
 }
