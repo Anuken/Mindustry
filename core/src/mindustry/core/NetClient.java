@@ -102,6 +102,7 @@ public class NetClient implements ApplicationListener{
             state.set(State.menu);
             logic.reset();
             platform.updateRPC();
+            player.name = Core.settings.getString("name");
 
             if(quiet) return;
 
