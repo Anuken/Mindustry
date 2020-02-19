@@ -1,7 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.struct.*;
+import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
@@ -10,6 +10,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.game.*;
@@ -214,14 +215,27 @@ public class SchematicsDialog extends FloatingDialog{
                     Core.app.setClipboardText(schematics.writeBase64(s));
                 }).marginLeft(12f);
                 t.row();
-                t.addImageTextButton("$schematic.exportfile", Icon.export, style, () -> platform.showFileChooser(false, schematicExtension, file -> {
-                    dialog.hide();
-                    try{
-                        Schematics.write(s, file);
-                    }catch(Exception e){
-                        ui.showException(e);
+                t.addImageTextButton("$schematic.exportfile", Icon.export, style, () -> {
+                    if(!ios){
+                        platform.showFileChooser(false, schematicExtension, file -> {
+                            dialog.hide();
+                            try{
+                                Schematics.write(s, file);
+                            }catch(Throwable e){
+                                ui.showException(e);
+                            }
+                        });
+                    }else{
+                        dialog.hide();
+                        try{
+                            Fi file = Core.files.local(s.name() + "." + schematicExtension);
+                            Schematics.write(s, file);
+                            platform.shareFile(file);
+                        }catch(Throwable e){
+                            ui.showException(e);
+                        }
                     }
-                })).marginLeft(12f);
+                }).marginLeft(12f);
             });
         });
 
