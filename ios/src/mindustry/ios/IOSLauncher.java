@@ -42,7 +42,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
             @Override
             public void showFileChooser(boolean open, String extension, Cons<Fi> cons){
                 if(!open){ //when exporting, just share it.
-                        //ask for export name
+                    //ask for export name
                     Core.input.getTextInput(new TextInput(){{
                         title = Core.bundle.get("filename");
                         accepted = name -> {
