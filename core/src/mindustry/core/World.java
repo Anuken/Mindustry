@@ -379,7 +379,7 @@ public class World{
             float rawDst = Intersector.distanceLinePoint(Tmp.v1.trns(prev, length), Tmp.v2.trns(next, length), Tmp.v3.set(x - world.width()/2, y - world.height()/2).rotate(offset)) / Mathf.sqrt3 - 1;
 
             //noise
-            rawDst += Noise.nnoise(x, y, 11f, 7f) + Noise.nnoise(x, y, 22f, 15f);
+            rawDst += Noise.noise(x, y, 11f, 7f) + Noise.noise(x, y, 22f, 15f);
 
             int circleDst = (int)(rawDst - (world.width() / 2 - circleBlend));
             if(circleDst > 0){
