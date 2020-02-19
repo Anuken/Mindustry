@@ -82,8 +82,8 @@ public class Build{
             return false;
         }
 
-        //campaign circle check
-        if(world.isCampaign() && !Mathf.within(x, y, world.width()/2, world.height()/2, world.width()/2 - 8)){
+        //ca check
+        if(world.getDarkness(x, y) >= 3){
             return false;
         }
 

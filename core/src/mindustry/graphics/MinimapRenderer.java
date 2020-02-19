@@ -162,7 +162,7 @@ public class MinimapRenderer implements Disposable{
             return bc;
         }
         Color color = Tmp.c1.set(MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.team()));
-        color.mul(1f - Mathf.clamp(renderer.blocks.getDarkness(tile.x, tile.y) / 4f));
+        color.mul(1f - Mathf.clamp(world.getDarkness(tile.x, tile.y) / 4f));
 
         return color.rgba();
     }

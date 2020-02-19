@@ -118,7 +118,7 @@ public class TestPlanetGenerator implements PlanetGenerator{
         }
 
         tiles.each((x, y) -> tiles.get(x, y).setBlock(!read.get(x, y) ? Blocks.air : tiles.get(x, y).floor().wall));
-        distort(0.01f, 8f);
+        distort(0.009f, 12f);
 
         tiles.get(tiles.width /2, tiles.height /2).setBlock(Blocks.coreShard, Team.sharded);
     }

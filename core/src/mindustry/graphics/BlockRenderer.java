@@ -8,7 +8,6 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
@@ -77,7 +76,7 @@ public class BlockRenderer implements Disposable{
                 for(int y = 0; y < world.height(); y++){
                     Tile tile = world.rawTile(x, y);
 
-                    float darkness = getDarkness(x, y);
+                    float darkness = world.getDarkness(x, y);
 
                     if(darkness > 0){
                         Draw.color(0f, 0f, 0f, Math.min((darkness + 0.5f) / 4f, 1f));
@@ -103,33 +102,6 @@ public class BlockRenderer implements Disposable{
                 lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
             }
         });
-    }
-
-    public float getDarkness(int x, int y){
-        int edgeBlend = 2;
-
-        float dark = 0;
-        int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (world.width() - 1)), Math.abs(y - (world.height() - 1)))));
-        if(edgeDst <= edgeBlend){
-            dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
-        }
-
-        //TODO tweak noise and radius
-        if(world.isCampaign()){
-            int circleBlend = 14;
-            float rawDst = Mathf.dst(x, y, world.width() / 2, world.height() / 2) + Noise.nnoise(x, y, 7f, 7f) + Noise.nnoise(x, y, 20f, 15f);
-            int circleDst = (int)(rawDst - (world.width() / 2 - circleBlend));
-            if(circleDst > 0){
-                dark = Math.max(circleDst / 1.6f, dark);
-            }
-        }
-
-        Tile tile = world.rawTile(x, y);
-        if(tile.block().solid && tile.block().fillsTile && !tile.block().synthetic()){
-            dark = Math.max(dark, tile.rotation());
-        }
-
-        return dark;
     }
 
     public void drawFog(){

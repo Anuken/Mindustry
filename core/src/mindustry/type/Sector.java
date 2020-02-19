@@ -58,22 +58,28 @@ public class Sector{
         Plane plane = new Plane();
         plane.set(corners[0], corners[2], corners[4]);
 
-        Vec3 planeTop = plane.project(center.cpy().add(0f, 1f, 0f)).sub(center).setLength(radius).add(center);
-        Vec3 planeRight = plane.project(center.cpy().rotate(Vec3.Y, -4f)).sub(center).setLength(radius).add(center);
+        //relative vectors
+        Vec3 planeTop = plane.project(center.cpy().add(0f, 1f, 0f)).sub(center).setLength(radius);
+        Vec3 planeRight = plane.project(center.cpy().rotate(Vec3.Y, -4f)).sub(center).setLength(radius);
 
-        return new SectorRect(radius, center, planeTop.sub(center), planeRight.sub(center));
+        //get angle from first corner to top vector
+        Vec3 first = corners[1].cpy().sub(center); //first vector relative to center
+        float angle = first.angle(planeTop);
+
+        return new SectorRect(radius, center, planeTop, planeRight, angle);
     }
 
     public static class SectorRect{
         public final Vec3 center, top, right;
         public final Vec3 result = new Vec3();
-        public final float radius;
+        public final float radius, rotation;
 
-        public SectorRect(float radius, Vec3 center, Vec3 top, Vec3 right){
+        public SectorRect(float radius, Vec3 center, Vec3 top, Vec3 right, float rotation){
             this.center = center;
             this.top = top;
             this.right = right;
             this.radius = radius;
+            this.rotation = rotation;
         }
 
         /** Project a coordinate into 3D space.

@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.noise.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -196,7 +197,7 @@ public class World{
 
     public void loadSector(Sector sector){
         state.rules.sector = sector;
-        int size = (int)(sector.rect.radius * 2500);
+        int size = (int)(sector.rect.radius * 3200);
 
         loadGenerator(size, size, tiles -> {
             TileGen gen = new TileGen();
@@ -350,6 +351,48 @@ public class World{
                 if(full) tile.rotation(5);
             }
         }
+    }
+
+    public float getDarkness(int x, int y){
+        int edgeBlend = 2;
+
+        float dark = 0;
+        int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (world.width() - 1)), Math.abs(y - (world.height() - 1)))));
+        if(edgeDst <= edgeBlend){
+            dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
+        }
+
+        //TODO tweak noise and radius
+        if(world.isCampaign()){
+            int circleBlend = 14;
+            //quantized angle
+            float offset = getSector().rect.rotation + 90;
+            float angle = Angles.angle(x, y, world.width()/2, world.height()/2) + offset;
+            //polygon sides, depends on sector
+            int sides = getSector().tile.corners.length;
+            float step = 360f / sides;
+            //prev and next angles of poly
+            float prev = Mathf.round(angle, step);
+            float next = prev + step;
+            //raw line length to be translated
+            float length = world.width()/2f;
+            float rawDst = Intersector.distanceLinePoint(Tmp.v1.trns(prev, length), Tmp.v2.trns(next, length), Tmp.v3.set(x - world.width()/2, y - world.height()/2).rotate(offset)) / Mathf.sqrt3 - 1;
+
+            //noise
+            rawDst += Noise.nnoise(x, y, 11f, 7f) + Noise.nnoise(x, y, 22f, 15f);
+
+            int circleDst = (int)(rawDst - (world.width() / 2 - circleBlend));
+            if(circleDst > 0){
+                dark = Math.max(circleDst / 0.8f, dark);
+            }
+        }
+
+        Tile tile = world.rawTile(x, y);
+        if(tile.block().solid && tile.block().fillsTile && !tile.block().synthetic()){
+            dark = Math.max(dark, tile.rotation());
+        }
+
+        return dark;
     }
 
     /**

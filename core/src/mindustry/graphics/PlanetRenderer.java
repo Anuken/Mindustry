@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 public class PlanetRenderer implements PlanetGenerator{
     private final Color outlineColor = Pal.accent.cpy().a(0.7f);
     private final float camLength = 4f, outlineRad = 1.15f;
-    private final boolean drawRect = false;
+    private final boolean drawRect = true;
 
     private final PlanetMesh[] outlines = new PlanetMesh[10];
     private final Camera3D cam = new Camera3D();
@@ -64,15 +64,18 @@ public class PlanetRenderer implements PlanetGenerator{
                 rect.right.scl(outlineRad);
                 rect.top.scl(outlineRad);
 
-                batch.color(Pal.place);
-                batch.vertex(rect.project(0, 0));
-                batch.color(Pal.place);
-                batch.vertex(rect.project(1, 0));
-                batch.color(Pal.place);
-                batch.vertex(rect.project(1, 1));
-                batch.color(Pal.place);
-                batch.vertex(rect.project(0, 1));
-                batch.flush(cam.combined(), Gl.lineLoop);
+                batch.color(Color.red);
+                batch.vertex(rect.center);
+                batch.color(Color.red);
+                batch.vertex(sector.tile.corners[0].v);
+
+                batch.color(Color.green);
+                batch.vertex(rect.center);
+                batch.color(Color.green);
+                batch.vertex(rect.top.cpy().add(rect.center));
+                batch.flush(cam.combined(), Gl.lines);
+
+                //Log.info((int)(sector.tile.corners[0].v.cpy().sub(rect.center).angle(rect.top)));
 
                 rect.center.scl(1f / outlineRad);
                 rect.right.scl(1f / outlineRad);
