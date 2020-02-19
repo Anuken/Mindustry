@@ -107,6 +107,7 @@ public class Separator extends Block{
             entity.consume();
 
             if(item != null && entity.items().get(item) < itemCapacity){
+                useContent(tile, item);
                 offloadNear(tile, item);
             }
         }

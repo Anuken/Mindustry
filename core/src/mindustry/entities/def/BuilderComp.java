@@ -76,6 +76,9 @@ abstract class BuilderComp implements Unitc, DrawLayerFlyingc{
                 requests.removeFirst();
                 return;
             }
+        }else if(tile.team() != team()){
+            requests.removeFirst();
+            return;
         }
 
         if(tile.entity instanceof BuildEntity && !current.initialized){

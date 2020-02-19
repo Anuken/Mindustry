@@ -1,12 +1,13 @@
 package mindustry.ios;
 
 import arc.*;
-import com.badlogic.gdx.backends.iosrobovm.*;
+import arc.Input.*;
 import arc.files.*;
 import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
+import com.badlogic.gdx.backends.iosrobovm.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Saves.*;
@@ -40,13 +41,32 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
             @Override
             public void showFileChooser(boolean open, String extension, Cons<Fi> cons){
-                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray<NSString>)null);
+                if(!open){ //when exporting, just share it.
+                    //ask for export name
+                    Core.input.getTextInput(new TextInput(){{
+                        title = Core.bundle.get("filename");
+                        accepted = name -> {
+                            try{
+                                //write result
+                                Fi result = tmpDirectory.child(name + "." + extension);
+                                cons.get(result);
 
+                                //import the document
+                                shareFile(result);
+                            }catch(Throwable t){
+                                ui.showException(t);
+                            }
+                        };
+                    }});
+                    return;
+                }
+
+                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray<NSString>)null);
 
                 NSArray<UIBarButtonItem> arr = new NSArray<>(new UIBarButtonItem(Core.bundle.get("cancel"), UIBarButtonItemStyle.Plain,
                     uiBarButtonItem -> cont.dismissViewController(true, () -> {})));
 
-                cont.setAllowsDocumentCreation(!open);
+                cont.setAllowsDocumentCreation(false);
                 cont.setAdditionalLeadingNavigationBarButtonItems(arr);
 
                 class ChooserDelegate extends NSObject implements UIDocumentBrowserViewControllerDelegate{
@@ -97,7 +117,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                     @Override
                     public void failedToImportDocument(UIDocumentBrowserViewController controller, NSURL documentURL, NSError error){
-
                     }
 
                     @Override
