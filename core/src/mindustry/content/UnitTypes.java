@@ -96,9 +96,9 @@ public class UnitTypes implements ContentList{
             flying = true;
             drag = 0.05f;
             mass = 2f;
-            speed = 2f;
-            accel = 0.1f;
-            speed = 1.5f;
+            speed = 3f;
+            rotateSpeed = 12f;
+            accel = 0.3f;
             range = 70f;
             itemCapacity = 70;
             health = 400;

@@ -82,6 +82,11 @@ public class Build{
             return false;
         }
 
+        //campaign circle check
+        if(world.isCampaign() && !Mathf.within(x, y, world.width()/2, world.height()/2, world.width()/2 - 8)){
+            return false;
+        }
+
         Tile tile = world.tile(x, y);
 
         if(tile == null) return false;

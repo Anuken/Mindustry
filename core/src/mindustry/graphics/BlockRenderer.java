@@ -117,10 +117,10 @@ public class BlockRenderer implements Disposable{
         //TODO tweak noise and radius
         if(world.isCampaign()){
             int circleBlend = 14;
-            float rawDst = Mathf.dst(x, y, world.width() / 2, world.height() / 2) + Noise.nnoise(x, y, 7f, 8f) + Noise.nnoise(x, y, 20f, 25f);
+            float rawDst = Mathf.dst(x, y, world.width() / 2, world.height() / 2) + Noise.nnoise(x, y, 7f, 7f) + Noise.nnoise(x, y, 20f, 15f);
             int circleDst = (int)(rawDst - (world.width() / 2 - circleBlend));
             if(circleDst > 0){
-                dark = Math.max(circleDst / 1.4f, dark);
+                dark = Math.max(circleDst / 1.6f, dark);
             }
         }
 
