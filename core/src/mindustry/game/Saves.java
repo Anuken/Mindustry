@@ -129,7 +129,6 @@ public class Saves{
         }
         slot.save();
         lastSectorSave = slot;
-        Log.info("Saving " + slot.getName());
         Core.settings.putSave("last-sector-save", slot.getName());
     }
 
