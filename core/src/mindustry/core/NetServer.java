@@ -217,6 +217,11 @@ public class NetServer implements ApplicationListener{
             player.color.set(packet.color);
             player.color.a = 1f;
 
+            //save admin ID but don't overwrite it
+            if(!player.isAdmin && !info.admin){
+                info.adminUsid = packet.usid;
+            }
+
             try{
                 writeBuffer.position(0);
                 player.write(outputBuffer);

@@ -155,16 +155,6 @@ public class AndroidLauncher extends AndroidApplication{
         Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
         Core.settings.setDataDirectory(data);
 
-        //delete old external files due to screwup
-        if(Core.files.local("files_moved").exists() && !Core.files.local("files_moved_103").exists()){
-            for(Fi fi : data.list()){
-                fi.deleteDirectory();
-            }
-
-            Core.files.local("files_moved").delete();
-            Core.files.local("files_moved_103").writeString("files moved again");
-        }
-
         //move to internal storage if there's no file indicating that it moved
         if(!Core.files.local("files_moved").exists()){
             Log.info("Moving files to external storage...");

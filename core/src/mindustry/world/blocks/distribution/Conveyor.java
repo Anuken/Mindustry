@@ -264,6 +264,7 @@ public class Conveyor extends Block implements Autotiler{
     @Override
     public void handleStack(Item item, int amount, Tile tile, Unit source){
         ConveyorEntity e = tile.ent();
+        amount = Math.min(amount, itemCapacity - e.len);
 
         for(int i = amount - 1; i >= 0; i--){
             e.add(0);

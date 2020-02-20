@@ -122,11 +122,11 @@ public class AssetsProcess extends BaseProcessor{
 
             dispose.addStatement("arc.Core.assets.unload(" + filename + ")");
             dispose.addStatement(name + " = null");
-            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.audio.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1)+ "()").build());
+            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1)+ "()").build());
         });
 
         if(classname.equals("Sounds")){
-            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.audio.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1)+ "()").build());
+            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1)+ "()").build());
         }
 
         type.addMethod(loadBegin.build());

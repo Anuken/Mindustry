@@ -3,7 +3,7 @@ package mindustry.mod;
 import arc.*;
 import arc.assets.*;
 import arc.audio.*;
-import arc.audio.mock.*;
+import arc.mock.*;
 import arc.struct.Array;
 import arc.struct.*;
 import arc.files.*;
