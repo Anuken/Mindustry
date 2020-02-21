@@ -124,7 +124,7 @@ public abstract class BasicGenerator implements WorldGenerator{
 
         tiles.each((x, y) -> {
             int idx = y*tiles.width + x;
-            float cx = x + noise(x, y, scl, mag) - mag / 2f, cy = y + noise(x, y + 152f, scl, mag) - mag / 2f;
+            float cx = x + noise(x, y, scl, mag) - mag / 2f, cy = y + noise(x + 155f, y + 155f, scl, mag) - mag / 2f;
             Tile other = tiles.getn(Mathf.clamp((int)cx, 0, tiles.width-1), Mathf.clamp((int)cy, 0, tiles.height-1));
             blocks[idx] = other.block().id;
             floors[idx] = other.floor().id;

@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
 import arc.input.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.graphics.PlanetGrid.*;
@@ -16,9 +17,9 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class PlanetRenderer implements PlanetGenerator{
-    private final Color outlineColor = Pal.accent.cpy().a(0.7f);
-    private final float camLength = 4f, outlineRad = 1.15f;
-    private final boolean drawRect = true;
+    private static final Color outlineColor = Pal.accent.cpy().a(0.7f);
+    private static final float camLength = 4f, outlineRad = 1.15f;
+    private static final boolean drawRect = false;
 
     private final PlanetMesh[] outlines = new PlanetMesh[10];
     private final Camera3D cam = new Camera3D();
@@ -103,8 +104,24 @@ public class PlanetRenderer implements PlanetGenerator{
         Vec3 v = Tmp.v33.set(Core.input.mouseX(), Core.input.mouseY(), 0);
 
         if(Core.input.keyDown(KeyCode.MOUSE_LEFT)){
-            cam.position.rotate(Vec3.Y, (v.x - lastX) / 10);
+            float upV = cam.position.angle(Vec3.Y);
+            float margin = 1;
+
+            //scale X speed depending on polar coordinate
+            float speed = 1f - Math.abs(upV - 90) / 90f;
+
+            cam.position.rotate(cam.up, (v.x - lastX) / 10 * speed);
+
+            //prevent user from scrolling all the way up and glitching it out
+            float amount = (v.y - lastY) / 10;
+            amount = Mathf.clamp(upV + amount, margin, 180f - margin) - upV;
+
+            cam.position.rotate(Tmp.v31.set(cam.up).rotate(cam.direction, 90), amount);
         }
+
+        //lock to Y coordinate so planet rotation doesn't get confusing
+        cam.up.set(Vec3.Y);
+
         lastX = v.x;
         lastY = v.y;
     }

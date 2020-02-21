@@ -4,7 +4,6 @@ import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
 import mindustry.game.*;
 import mindustry.maps.generators.*;
-import mindustry.maps.zonegen.*;
 import mindustry.type.*;
 
 import static arc.struct.Array.with;
@@ -31,7 +30,8 @@ public class Zones implements ContentList{
             resources = with(copper, scrap, lead);
         }};
 
-        desertWastes = new Zone("desertWastes", starter, new DesertWastesGenerator()){{
+        //TODO remove
+        desertWastes = new Zone("desertWastes", starter, new FileMapGenerator("groundZero")){{
             startingItems = list(copper, 120);
             conditionWave = 20;
             launchPeriod = 10;

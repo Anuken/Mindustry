@@ -6,11 +6,12 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
-import mindustry.*;
 import mindustry.content.*;
-import mindustry.maps.zonegen.*;
+import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
+
+import static mindustry.Vars.schematics;
 
 //TODO refactor into generic planet class
 public class TestPlanetGenerator implements PlanetGenerator{
@@ -24,9 +25,9 @@ public class TestPlanetGenerator implements PlanetGenerator{
     Block[][] arr = {
     {Blocks.water, Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.darksandTaintedWater, Blocks.snow, Blocks.ice},
     {Blocks.water, Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.darksandTaintedWater, Blocks.snow, Blocks.snow, Blocks.ice},
-    {Blocks.water, Blocks.darksandWater, Blocks.darksand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.darksandTaintedWater, Blocks.snow, Blocks.ice, Blocks.ice},
-    {Blocks.water, Blocks.sandWater, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.iceSnow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice},
-    {Blocks.deepwater, Blocks.water, Blocks.sandWater, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.moss, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.ice},
+    {Blocks.water, Blocks.darksandWater, Blocks.darksand, Blocks.sand, Blocks.salt, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.darksandTaintedWater, Blocks.snow, Blocks.ice, Blocks.ice},
+    {Blocks.water, Blocks.sandWater, Blocks.sand, Blocks.salt, Blocks.salt, Blocks.salt, Blocks.sand, Blocks.sand, Blocks.iceSnow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice},
+    {Blocks.deepwater, Blocks.water, Blocks.sandWater, Blocks.sand, Blocks.salt, Blocks.sand, Blocks.sand, Blocks.moss, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.ice},
     {Blocks.deepwater, Blocks.water, Blocks.sandWater, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.moss, Blocks.iceSnow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.snow, Blocks.ice},
     {Blocks.deepwater, Blocks.sandWater, Blocks.sand, Blocks.sand, Blocks.moss, Blocks.moss, Blocks.moss, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.snow, Blocks.ice},
     {Blocks.taintedWater, Blocks.darksandTaintedWater, Blocks.darksand, Blocks.darksand, Blocks.darksandTaintedWater, Blocks.moss, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.snow, Blocks.ice, Blocks.ice},
@@ -55,7 +56,9 @@ public class TestPlanetGenerator implements PlanetGenerator{
 
     @Override
     public Color getColor(Vec3 position){
-        return getBlock(position).color;
+        Block block = getBlock(position);
+        //replace salt with sand color
+        return block == Blocks.salt ? Blocks.sand.color : block.color;
     }
 
     @Override
@@ -77,77 +80,7 @@ public class TestPlanetGenerator implements PlanetGenerator{
         this.tiles = tiles;
         this.sector = sec;
 
-        //OvergrowthGenerator generator = new OvergrowthGenerator(tiles.width, tiles.height);
-        //generator.init(Loadouts.basicNucleus);
-        //generator.generate(tiles);
-        GridBits write = new GridBits(tiles.width, tiles.height);
-        GridBits read = new GridBits(tiles.width, tiles.height);
-
-        //double removalChance = 0.2;
-        //remove random tiles
-        //tiles.each((x, y) -> {
-
-        //});
-
-        tiles.each((x, y) -> read.set(x, y, !tiles.get(x, y).block().isAir()));
-
-        int iterations = 4, birthLimit = 16, deathLimit = 16, radius = 3;
-
-        for(int i = 0; i < iterations; i++){
-            tiles.each((x, y) -> {
-                int alive = 0;
-
-                for(int cx = -radius; cx <= radius; cx++){
-                    for(int cy = -radius; cy <= radius; cy++){
-                        if((cx == 0 && cy == 0) || !Mathf.within(cx, cy, radius)) continue;
-                        if(!Structs.inBounds(x + cx, y + cy, tiles.width, tiles.height) || read.get(x + cx, y + cy)){
-                            alive++;
-                        }
-                    }
-                }
-
-                if(read.get(x, y)){
-                    write.set(x, y, alive >= deathLimit);
-                }else{
-                    write.set(x, y, alive > birthLimit);
-                }
-            });
-
-            //flush results
-            read.set(write);
-        }
-
-        tiles.each((x, y) -> tiles.get(x, y).setBlock(!read.get(x, y) ? Blocks.air : tiles.get(x, y).floor().wall));
-        distort(0.009f, 12f);
-
-        OvergrowthGenerator gen = new OvergrowthGenerator();
-        gen.generate(tiles);
-
-        //tiles.get(tiles.width /2, tiles.height /2).setBlock(Blocks.coreShard, Team.sharded);
-    }
-
-    void distort(float scl, float mag){
-        short[] blocks = new short[tiles.width * tiles.height];
-        short[] floors = new short[blocks.length];
-
-        tiles.each((x, y) -> {
-            int idx = y*tiles.width + x;
-            float cx = x + noise(x, y, scl, mag) - mag / 2f, cy = y + noise(x, y + 152f, scl, mag) - mag / 2f;
-            Tile other = tiles.getn(Mathf.clamp((int)cx, 0, tiles.width-1), Mathf.clamp((int)cy, 0, tiles.height-1));
-            blocks[idx] = other.block().id;
-            floors[idx] = other.floor().id;
-        });
-
-        for(int i = 0; i < blocks.length; i++){
-            Tile tile = tiles.geti(i);
-            tile.setFloor(Vars.content.block(floors[i]).asFloor());
-            tile.setBlock(Vars.content.block(blocks[i]));
-        }
-    }
-
-    protected float noise(float x, float y, float scl, float mag){
-        Vec3 v = sector.rect.project(x / tiles.width, y / tiles.height);
-        return (float)noise.octaveNoise3D(1f, 0f, 1f / scl, v.x, v.y, v.z) * mag;
+        new Terrain().generate(tiles);
     }
 
     Block getBlock(Vec3 position){
@@ -161,5 +94,97 @@ public class TestPlanetGenerator implements PlanetGenerator{
         height = Mathf.clamp(height);
 
         return arr[Mathf.clamp((int)(temp * arr.length), 0, arr.length - 1)][Mathf.clamp((int)(height * arr[0].length), 0, arr[0].length - 1)];
+    }
+
+    class Terrain extends BasicGenerator{
+        Array<Block> ores = Array.with(Blocks.oreCopper, Blocks.oreLead, Blocks.oreCoal, Blocks.oreCopper);
+
+        @Override
+        protected void generate(){
+
+            cells(4);
+            distort(20f, 12f);
+
+            float constraint = 1.3f;
+            float radius = width / 2f / Mathf.sqrt3;
+            int rooms = Mathf.random(2, 5);
+            Array<Point3> array = new Array<>();
+
+            //TODO replace random calls with seed
+
+            for(int i = 0; i < rooms; i++){
+                Tmp.v1.trns(Mathf.random(360f), Mathf.random(radius / constraint));
+                float rx = (width/2f + Tmp.v1.x);
+                float ry = (height/2f + Tmp.v1.y);
+                float maxrad = radius - Tmp.v1.len();
+                float rrad = Math.min(Mathf.random(9f, maxrad / 2f), 30f);
+                array.add(new Point3((int)rx, (int)ry, (int)rrad));
+            }
+
+            for(Point3 room : array){
+                erase(room.x, room.y, room.z);
+            }
+
+            int connections = Mathf.random(Math.max(rooms - 1, 1), rooms + 3);
+            for(int i = 0; i < connections; i++){
+                Point3 from = array.random();
+                Point3 to = array.random();
+
+                float nscl = Mathf.random(20f, 60f);
+                int stroke = Mathf.random(4, 12);
+                brush(pathfind(from.x, from.y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + (float)sim.octaveNoise2D(1, 1, 1f / nscl, tile.x, tile.y) * 50, manhattan), stroke);
+            }
+
+            cells(1);
+            distort(20f, 6f);
+
+            Point3 spawn = array.random();
+            inverseFloodFill(tiles.getn(spawn.x, spawn.y));
+
+            ores(ores);
+
+            for(Point3 other : array){
+                if(other != spawn){
+                   // tiles.getn(other.x, other.y).setOverlay(Blocks.spawn);
+                }
+            }
+
+            schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
+        }
+
+        void cells(int iterations){
+            GridBits write = new GridBits(tiles.width, tiles.height);
+            GridBits read = new GridBits(tiles.width, tiles.height);
+
+            tiles.each((x, y) -> read.set(x, y, !tiles.get(x, y).block().isAir()));
+
+            int birthLimit = 16, deathLimit = 16, cradius = 3;
+
+            for(int i = 0; i < iterations; i++){
+                tiles.each((x, y) -> {
+                    int alive = 0;
+
+                    for(int cx = -cradius; cx <= cradius; cx++){
+                        for(int cy = -cradius; cy <= cradius; cy++){
+                            if((cx == 0 && cy == 0) || !Mathf.within(cx, cy, cradius)) continue;
+                            if(!Structs.inBounds(x + cx, y + cy, tiles.width, tiles.height) || read.get(x + cx, y + cy)){
+                                alive++;
+                            }
+                        }
+                    }
+
+                    if(read.get(x, y)){
+                        write.set(x, y, alive >= deathLimit);
+                    }else{
+                        write.set(x, y, alive > birthLimit);
+                    }
+                });
+
+                //flush results
+                read.set(write);
+            }
+
+            tiles.each((x, y) -> tiles.get(x, y).setBlock(!read.get(x, y) ? Blocks.air : tiles.get(x, y).floor().wall));
+        }
     }
 }
