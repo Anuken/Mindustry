@@ -1,6 +1,7 @@
 package mindustry.server;
 
 import arc.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.ui.*;
 
@@ -10,6 +11,10 @@ import java.util.zip.*;
 import static mindustry.Vars.netServer;
 
 public class EmojiFilter implements ApplicationListener{
+
+    private Array<String> blacklist = new Array<String>(){{
+        addAll("spawn", "wave");
+    }};
 
     @Override
     public void init(){
@@ -36,7 +41,7 @@ public class EmojiFilter implements ApplicationListener{
             }
 
             for(String word : text.split("\\s+")){
-                if(Fonts.getUnicode(word.toLowerCase()) != 0){
+                if(Fonts.getUnicode(word.toLowerCase()) != 0 && !blacklist.contains(text)){
                     text = text.replaceAll("(?i)" + word, (char) Fonts.getUnicode(word.toLowerCase()) + "");
                 }
             }
