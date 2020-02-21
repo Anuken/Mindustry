@@ -85,6 +85,7 @@ public class NetworkIO{
             name = "<:plastanium:632785242805239810> craters welcome you️";
             name = "<:slag:632785242968686632> join us, we have :cookie:";
             name = "<:slag:632785242968686632> we would be honored if you would join us";
+            name = "<:blastcompound:597478221944193024> come have a blast!";
         }
 
 
