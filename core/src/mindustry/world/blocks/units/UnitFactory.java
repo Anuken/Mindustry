@@ -7,7 +7,7 @@ import arc.struct.EnumSet;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import mindustry.Vars;
-import mindustry.content.Fx;
+import mindustry.content.*;
 import mindustry.entities.Effects;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
@@ -58,13 +58,19 @@ public class UnitFactory extends Block{
         Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
 
         if(!net.client()){
-            BaseUnit unit = factory.unitType.create(tile.getTeam());
-            unit.setSpawner(tile);
-            unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
-            unit.add();
-            unit.velocity().y = factory.launchVelocity;
-            Events.fire(new UnitCreateEvent(unit));
+            spawn(tile, factory.unitType);
+            if(factory.unitType == UnitTypes.draug) spawn(tile, UnitTypes.spirit);
+            if(factory.unitType == UnitTypes.draug) spawn(tile, UnitTypes.phantom);
         }
+    }
+
+    protected static void spawn(Tile tile, UnitType type){
+        BaseUnit unit = type.create(tile.getTeam());
+        unit.setSpawner(tile);
+        unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
+        unit.add();
+        unit.velocity().y = ((UnitFactory)tile.block()).launchVelocity;
+        Events.fire(new UnitCreateEvent(unit));
     }
 
     @Override
@@ -113,6 +119,8 @@ public class UnitFactory extends Block{
         UnitFactoryEntity entity = tile.ent();
         entity.spawned--;
         entity.spawned = Math.max(entity.spawned, 0);
+
+        if(((UnitFactory)tile.block()).unitType == UnitTypes.draug) entity.damage(entity.health);
     }
 
     @Override
