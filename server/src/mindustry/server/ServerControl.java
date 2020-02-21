@@ -712,6 +712,12 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        handler.register("overthrow", "Overthrows all admins.", arg -> {
+            for(PlayerInfo info : netServer.admins.getAdmins()){
+                netServer.admins.unAdminPlayer(info.id);
+            }
+        });
+
         handler.register("players", "List all players currently in game.", arg -> {
             if(playerGroup.size() == 0){
                 info("No players are currently in the server.");
