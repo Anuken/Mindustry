@@ -8,5 +8,5 @@ public class Vault extends StorageBlock{
         update = false;
         destructible = true;
     }
-    
+
 }
