@@ -72,6 +72,7 @@ public class Incinerator extends Block{
         }
 
         if(Mathf.chance(0.05)){
+            tile.<IncineratorEntity>ent().index++;
             if(net.server()){
                 Core.app.post(() -> {
                     Tile out = tryOffloadNear(tile, Items.pyratite, t -> t.block() instanceof Conveyor);
@@ -104,7 +105,13 @@ public class Incinerator extends Block{
         return entity.heat > 0.5f;
     }
 
+    @Override
+    public void iceberg(Tile tile){
+        super.iceberg(tile);
+    }
+
     public static class IncineratorEntity extends TileEntity{
         public float heat;
+        public int index;
     }
 }

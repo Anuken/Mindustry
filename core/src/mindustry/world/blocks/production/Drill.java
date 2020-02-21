@@ -71,6 +71,7 @@ public class Drill extends Block{
 
         idleSound = Sounds.drill;
         idleSoundVolume = 0.003f;
+        sync = true;
     }
 
     @Override
@@ -290,13 +291,16 @@ public class Drill extends Block{
 
             Effects.effect(drillEffect, entity.dominantItem.color,
             entity.x + Mathf.range(size), entity.y + Mathf.range(size));
+        }
+    }
 
-            if(tile.block() == Blocks.blastDrill && (entity.index % 10) == 0){
-                int max = Mathf.clamp(Mathf.round(entity.healthf() * 10), 0, entity.block.itemCapacity - entity.items.total());
-                entity.items.add(entity.dominantItem, max);
-                entity.damage(max * 10f);
-                netServer.titanic.add(tile);
-            }
+    @Override
+    public void iceberg(Tile tile){
+        DrillEntity entity = tile.ent();
+
+        if(tile.block == Blocks.blastDrill){
+            entity.items.add(entity.dominantItem, entity.index);
+            entity.index = 0;
         }
     }
 

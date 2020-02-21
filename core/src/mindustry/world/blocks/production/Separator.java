@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
+import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.GenericCrafter.*;
@@ -116,5 +117,10 @@ public class Separator extends Block{
         if(entity.timer.get(timerDump, dumpTime)){
             tryDump(tile);
         }
+    }
+
+    @Override
+    public void iceberg(Tile tile){
+        tile.entity.liquids.reset(Liquids.slag, 100f); // just over 50f gets used when max boosted
     }
 }

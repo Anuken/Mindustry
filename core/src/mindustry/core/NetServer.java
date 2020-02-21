@@ -709,13 +709,10 @@ public class NetServer implements ApplicationListener{
 
     /** Writes a block snapshot to all players. */
     public void writeBlockSnapshots(){
-
         for(TileEntity entity : tileGroup.all()){
             if(!entity.block.sync) continue;
 
-            if(entity.block instanceof Separator){
-                entity.liquids.reset(Liquids.slag, 100f); // just over 50f gets used when max boosted
-            }
+            entity.block.iceberg(entity.tile);
 
             titanic.add(entity.tile);
         }

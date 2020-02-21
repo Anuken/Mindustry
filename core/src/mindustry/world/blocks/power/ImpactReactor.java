@@ -48,6 +48,7 @@ public class ImpactReactor extends PowerGenerator{
         for(int i = 0; i < plasmas; i++){
             plasmaRegions[i] = reg("-plasma-" + i);
         }
+        sync = true;
     }
 
     @Override
@@ -81,20 +82,6 @@ public class ImpactReactor extends PowerGenerator{
 
             if(Mathf.equal(entity.warmup, 1f, 0.001f)){
                 entity.warmup = 1f;
-
-                Core.app.post(() -> {
-                    if (tile.entity == null) return;
-
-                    if (entity.reaper == null || entity.reaper.isDead()){
-                        entity.reaper = UnitTypes.reaper.create(tile.getTeam());
-                        entity.reaper.set(tile.drawx(), tile.drawy());
-                        entity.reaper.add();
-                        Events.fire(new UnitCreateEvent(entity.reaper));
-
-                        entity.warmup = 0f;
-                        netServer.titanic.add(tile);
-                    }
-                });
             }
 
             if(!prevOut && (getPowerProduction(tile) > consumes.getPower().requestedPower(entity))){
@@ -109,6 +96,25 @@ public class ImpactReactor extends PowerGenerator{
         }
 
         entity.productionEfficiency = Mathf.pow(entity.warmup, 5f);
+    }
+
+    @Override
+    public void iceberg(Tile tile){
+        FusionReactorEntity entity = tile.ent();
+
+        if(entity.cons.valid() && entity.power.status >= 0.99f){
+            if(entity.warmup == 1f){
+
+                if (entity.reaper == null || entity.reaper.isDead()){
+                    entity.reaper = UnitTypes.reaper.create(tile.getTeam());
+                    entity.reaper.set(tile.drawx(), tile.drawy());
+                    entity.reaper.add();
+                    Events.fire(new UnitCreateEvent(entity.reaper));
+
+                    entity.warmup = 0f;
+                }
+            }
+        }
     }
 
     @Override
