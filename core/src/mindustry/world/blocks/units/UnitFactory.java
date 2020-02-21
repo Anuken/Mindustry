@@ -59,8 +59,8 @@ public class UnitFactory extends Block{
 
         if(!net.client()){
             spawn(tile, factory.unitType);
-            if(factory.unitType == UnitTypes.draug) spawn(tile, UnitTypes.spirit);
-            if(factory.unitType == UnitTypes.draug) spawn(tile, UnitTypes.phantom);
+//            if(factory.unitType == UnitTypes.draug) spawn(tile, UnitTypes.spirit);
+//            if(factory.unitType == UnitTypes.draug) spawn(tile, UnitTypes.phantom);
         }
     }
 
@@ -120,7 +120,7 @@ public class UnitFactory extends Block{
         entity.spawned--;
         entity.spawned = Math.max(entity.spawned, 0);
 
-        if(((UnitFactory)tile.block()).unitType == UnitTypes.draug) entity.damage(entity.health);
+//        if(((UnitFactory)tile.block()).unitType == UnitTypes.draug) entity.damage(entity.health);
     }
 
     @Override
