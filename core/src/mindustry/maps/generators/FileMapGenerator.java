@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.game.*;
 import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.type.*;
@@ -13,32 +12,11 @@ import mindustry.world.blocks.storage.*;
 
 import static mindustry.Vars.*;
 
-//TODO:
-//- limited # of enemy spawns as filter
-//- spawn loadout selection as filter
-//- configure map loadout, make 1 core the default
-public class MapGenerator extends Generator{
-    private Map map;
-    private String mapName;
+public class FileMapGenerator implements WorldGenerator{
+    public final Map map;
 
-    public MapGenerator(String mapName){
-        this.mapName = mapName;
-    }
-
-    public void removePrefix(String name){
-        this.mapName = this.mapName.substring(name.length() + 1);
-    }
-
-    public Map getMap(){
-        return map;
-    }
-
-    @Override
-    public void init(Schematic loadout){
-        this.loadout = loadout;
-        map = maps.loadInternalMap(mapName);
-        width = map.width;
-        height = map.height;
+    public FileMapGenerator(String mapName){
+        this.map = maps.loadInternalMap(mapName);
     }
 
     @Override
@@ -70,7 +48,8 @@ public class MapGenerator extends Generator{
             }
 
             if(tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam){
-                schematics.placeLoadout(loadout, tile.x, tile.y);
+                //TODO PLACE THE LOADOUT
+                //schematics.placeLoadout(loadout, tile.x, tile.y);
                 anyCores = true;
             }
         }

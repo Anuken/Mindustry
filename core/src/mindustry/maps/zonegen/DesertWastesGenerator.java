@@ -1,15 +1,11 @@
 package mindustry.maps.zonegen;
 
-import arc.math.Mathf;
-import mindustry.content.Blocks;
-import mindustry.maps.generators.BasicGenerator;
-import mindustry.world.*;
-
-import static mindustry.Vars.schematics;
+import mindustry.maps.generators.*;
 
 //TODO remove
 public class DesertWastesGenerator extends BasicGenerator{
 
+    /*
     public DesertWastesGenerator(int width, int height){
         super(width, height, Blocks.oreCopper, Blocks.oreLead, Blocks.oreCoal, Blocks.oreCopper);
     }
@@ -35,7 +31,7 @@ public class DesertWastesGenerator extends BasicGenerator{
         erase(tiles, endX, endY, 10);
         erase(tiles, spawnX, spawnY, 20);
         distort(tiles, 20f, 4f);
-        inverseFloodFill(tiles, tiles.getn(spawnX, spawnY), Blocks.sandRocks);
+        inverseFloodFill(tiles, tiles.getn(spawnX, spawnY));
 
         noise(tiles, Blocks.salt, Blocks.saltRocks, 5, 0.6f, 200f, 0.55f);
         noise(tiles, Blocks.darksand, Blocks.duneRocks, 5, 0.7f, 120f, 0.5f);
@@ -46,5 +42,5 @@ public class DesertWastesGenerator extends BasicGenerator{
 
         tiles.getn(endX, endY).setOverlay(Blocks.spawn);
         schematics.placeLoadout(loadout, spawnX, spawnY);
-    }
+    }*/
 }

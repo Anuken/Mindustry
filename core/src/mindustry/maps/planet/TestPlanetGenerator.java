@@ -120,8 +120,8 @@ public class TestPlanetGenerator implements PlanetGenerator{
         tiles.each((x, y) -> tiles.get(x, y).setBlock(!read.get(x, y) ? Blocks.air : tiles.get(x, y).floor().wall));
         distort(0.009f, 12f);
 
-        OvergrowthGenerator gen = new OvergrowthGenerator(tiles.width, tiles.height);
-        gen.decorate(tiles);
+        OvergrowthGenerator gen = new OvergrowthGenerator();
+        gen.generate(tiles);
 
         //tiles.get(tiles.width /2, tiles.height /2).setBlock(Blocks.coreShard, Team.sharded);
     }

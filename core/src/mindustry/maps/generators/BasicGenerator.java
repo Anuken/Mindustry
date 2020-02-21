@@ -1,56 +1,65 @@
 package mindustry.maps.generators;
 
+import arc.func.*;
+import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
-import arc.func.Intc2;
-import arc.math.Mathf;
-import arc.math.geom.Geometry;
-import arc.math.geom.Point2;
-import arc.util.Structs;
-import arc.util.noise.Simplex;
-import mindustry.content.Blocks;
+import arc.util.*;
+import arc.util.noise.*;
+import mindustry.*;
+import mindustry.content.*;
 import mindustry.world.*;
-import mindustry.world.blocks.Floor;
 
-import java.util.PriorityQueue;
+import java.util.*;
 
-public abstract class BasicGenerator extends RandomGenerator{
+import static mindustry.Vars.world;
+
+public abstract class BasicGenerator implements WorldGenerator{
     protected static final DistanceHeuristic manhattan = (x1, y1, x2, y2) -> Math.abs(x1 - x2) + Math.abs(y1 - y2);
 
-    protected Array<Block> ores;
     protected Simplex sim = new Simplex();
     protected Simplex sim2 = new Simplex();
+    
+    protected int width, height;
+    protected Tiles tiles;
 
-    public BasicGenerator(int width, int height, Block... ores){
-        super(width, height);
-        this.ores = Array.with(ores);
-    }
+    //for drawing
+    protected Block floor;
+    protected Block block;
+    protected Block ore;
 
     @Override
     public void generate(Tiles tiles){
+        this.tiles = tiles;
+        this.width = tiles.width;
+        this.height = tiles.height;
         int seed = Mathf.random(99999999);
         sim.setSeed(seed);
         sim2.setSeed(seed + 1);
-        super.generate(tiles);
+
+        generate();
     }
 
-    public void ores(Tiles tiles){
-        pass(tiles, (x, y) -> {
-            if(ores != null){
-                int offsetX = x - 4, offsetY = y + 23;
-                for(int i = ores.size - 1; i >= 0; i--){
-                    Block entry = ores.get(i);
-                    if(Math.abs(0.5f - sim.octaveNoise2D(2, 0.7, 1f / (40 + i * 2), offsetX, offsetY + i*999)) > 0.26f &&
-                    Math.abs(0.5f - sim2.octaveNoise2D(1, 1, 1f / (30 + i * 4), offsetX, offsetY - i*999)) > 0.37f){
-                        ore = entry;
-                        break;
-                    }
+    protected void generate(){
+
+    }
+
+    public void ores(Array<Block> ores){
+        pass((x, y) -> {
+            int offsetX = x - 4, offsetY = y + 23;
+            for(int i = ores.size - 1; i >= 0; i--){
+                Block entry = ores.get(i);
+                if(Math.abs(0.5f - sim.octaveNoise2D(2, 0.7, 1f / (40 + i * 2), offsetX, offsetY + i*999)) > 0.26f &&
+                Math.abs(0.5f - sim2.octaveNoise2D(1, 1, 1f / (30 + i * 4), offsetX, offsetY - i*999)) > 0.37f){
+                    ore = entry;
+                    break;
                 }
             }
         });
     }
 
-    public void terrain(Tiles tiles, Block dst, float scl, float mag, float cmag){
-        pass(tiles, (x, y) -> {
+    public void terrain(Block dst, float scl, float mag, float cmag){
+        pass((x, y) -> {
             double rocks = sim.octaveNoise2D(5, 0.5, 1f / scl, x, y) * mag
             + Mathf.dst((float)x / width, (float)y / height, 0.5f, 0.5f) * cmag;
 
@@ -61,14 +70,14 @@ public abstract class BasicGenerator extends RandomGenerator{
             }
 
             if(rocks > 0.9){
-                block =dst;
+                block = dst;
             }
         });
     }
 
-    public void noise(Tiles tiles, Block floor, Block block, int octaves, float falloff, float scl, float threshold){
+    public void noise(Block floor, Block block, int octaves, float falloff, float scl, float threshold){
         sim.setSeed(Mathf.random(99999));
-        pass(tiles, (x, y) -> {
+        pass((x, y) -> {
             if(sim.octaveNoise2D(octaves, falloff, 1f / scl, x, y) > threshold){
                 Tile tile = tiles.getn(x, y);
                 this.floor = floor;
@@ -79,19 +88,19 @@ public abstract class BasicGenerator extends RandomGenerator{
         });
     }
 
-    public void overlay(Tiles tiles, Block floor, Block block, float chance, int octaves, float falloff, float scl, float threshold){
+    public void overlay(Block floor, Block block, float chance, int octaves, float falloff, float scl, float threshold){
         sim.setSeed(Mathf.random(99999));
-        pass(tiles, (x, y) -> {
+        pass((x, y) -> {
             if(sim.octaveNoise2D(octaves, falloff, 1f / scl, x, y) > threshold && Mathf.chance(chance) && tiles.getn(x, y).floor() == floor){
                 ore = block;
             }
         });
     }
 
-    public void tech(Tiles tiles){
+    public void tech(){
         Block[] blocks = {Blocks.darkPanel3};
         int secSize = 20;
-        pass(tiles, (x, y) -> {
+        pass((x, y) -> {
             int mx = x % secSize, my = y % secSize;
             int sclx = x / secSize, scly = y / secSize;
             if(noise(sclx, scly, 10f, 1f) > 0.63f && (mx == 0 || my == 0 || mx == secSize - 1 || my == secSize - 1)){
@@ -109,25 +118,27 @@ public abstract class BasicGenerator extends RandomGenerator{
         });
     }
 
-    public void distort(Tiles tiles, float scl, float mag){
-        Block[][] blocks = new Block[width][height];
-        Floor[][] floors = new Floor[width][height];
+    public void distort(float scl, float mag){
+        short[] blocks = new short[tiles.width * tiles.height];
+        short[] floors = new short[blocks.length];
 
-        each((x, y) -> {
-            float cx = x + noise(x, y, scl, mag) - mag / 2f, cy = y + noise(x, y + 1525215f, scl, mag) - mag / 2f;
-            Tile other = tiles.getn(Mathf.clamp((int)cx, 0, width-1), Mathf.clamp((int)cy, 0, height-1));
-            blocks[x][y] = other.block();
-            floors[x][y] = other.floor();
+        tiles.each((x, y) -> {
+            int idx = y*tiles.width + x;
+            float cx = x + noise(x, y, scl, mag) - mag / 2f, cy = y + noise(x, y + 152f, scl, mag) - mag / 2f;
+            Tile other = tiles.getn(Mathf.clamp((int)cx, 0, tiles.width-1), Mathf.clamp((int)cy, 0, tiles.height-1));
+            blocks[idx] = other.block().id;
+            floors[idx] = other.floor().id;
         });
 
-        pass(tiles, (x, y) -> {
-            floor = floors[x][y];
-            block = blocks[x][y];
-        });
+        for(int i = 0; i < blocks.length; i++){
+            Tile tile = tiles.geti(i);
+            tile.setFloor(Vars.content.block(floors[i]).asFloor());
+            tile.setBlock(Vars.content.block(blocks[i]));
+        }
     }
 
-    public void scatter(Tiles tiles, Block target, Block dst, float chance){
-        pass(tiles, (x, y) -> {
+    public void scatter(Block target, Block dst, float chance){
+        pass((x, y) -> {
             if(!Mathf.chance(chance)) return;
             if(floor == target){
                 floor = dst;
@@ -149,23 +160,23 @@ public abstract class BasicGenerator extends RandomGenerator{
         return (float)sim2.octaveNoise2D(1f, 0f, 1f / scl, x + 0x361266f, y + 0x251259f) * mag;
     }
 
-    public void pass(Tiles tiles, Intc2 r){
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                floor = tiles.getn(x, y).floor();
-                block = tiles.getn(x, y).block();
-                ore = tiles.getn(x, y).overlay();
-                r.get(x, y);
-                tiles.set(x, y, new Tile(x, y, floor, ore, block));
-            }
+    public void pass(Intc2 r){
+        for(Tile tile : tiles){
+            floor = tile.floor();
+            block = tile.block();
+            ore = tile.overlay();
+            r.get(tile.x, tile.y);
+            tile.setFloor(floor.asFloor());
+            tile.setBlock(block);
+            tile.setOverlay(ore);
         }
     }
 
-    public void brush(Tiles tiles, Array<Tile> path, int rad){
-        path.each(tile -> erase(tiles, tile.x, tile.y, rad));
+    public void brush(Array<Tile> path, int rad){
+        path.each(tile -> erase(tile.x, tile.y, rad));
     }
 
-    public void erase(Tiles tiles, int cx, int cy, int rad){
+    public void erase(int cx, int cy, int rad){
         for(int x = -rad; x <= rad; x++){
             for(int y = -rad; y <= rad; y++){
                 int wx = cx + x, wy = cy + y;
@@ -177,7 +188,7 @@ public abstract class BasicGenerator extends RandomGenerator{
         }
     }
 
-    public Array<Tile> pathfind(Tiles tiles, int startX, int startY, int endX, int endY, TileHueristic th, DistanceHeuristic dh){
+    public Array<Tile> pathfind(int startX, int startY, int endX, int endY, TileHueristic th, DistanceHeuristic dh){
         Tile start = tiles.getn(startX, startY);
         Tile end = tiles.getn(endX, endY);
         GridBits closed = new GridBits(width, height);
@@ -195,7 +206,7 @@ public abstract class BasicGenerator extends RandomGenerator{
             closed.set(next.x, next.y);
             for(Point2 point : Geometry.d4){
                 int newx = next.x + point.x, newy = next.y + point.y;
-                if(Structs.inBounds(newx, newy, width, height)){
+                if(Structs.inBounds(newx, newy, width, height) && world.getDarkness(newx, newy) == 0){
                     Tile child = tiles.getn(newx, newy);
                     if(!closed.get(child.x, child.y)){
                         closed.set(child.x, child.y);
@@ -223,7 +234,7 @@ public abstract class BasicGenerator extends RandomGenerator{
         return out;
     }
 
-    public void inverseFloodFill(Tiles tiles, Tile start, Block block){
+    public void inverseFloodFill(Tile start){
         IntArray arr = new IntArray();
         arr.add(start.pos());
         while(!arr.isEmpty()){
@@ -242,12 +253,9 @@ public abstract class BasicGenerator extends RandomGenerator{
             }
         }
 
-        for(int x = 0; x < width; x ++){
-            for(int y = 0; y < height; y++){
-                Tile tile = tiles.getn(x, y);
-                if(tile.cost != 2 && tile.block() == Blocks.air){
-                    tile.setBlock(block);
-                }
+        for(Tile tile : tiles){
+            if((tile.cost != 2 && tile.block() == Blocks.air) || world.getDarkness(tile.x, tile.y) != 0){
+                tile.setBlock(tile.floor().wall);
             }
         }
     }

@@ -357,7 +357,7 @@ public class World{
         int edgeBlend = 2;
 
         float dark = 0;
-        int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (world.width() - 1)), Math.abs(y - (world.height() - 1)))));
+        int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (tiles.width - 1)), Math.abs(y - (tiles.height - 1)))));
         if(edgeDst <= edgeBlend){
             dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
         }
@@ -367,7 +367,7 @@ public class World{
             int circleBlend = 14;
             //quantized angle
             float offset = getSector().rect.rotation + 90;
-            float angle = Angles.angle(x, y, world.width()/2, world.height()/2) + offset;
+            float angle = Angles.angle(x, y, tiles.width/2, tiles.height/2) + offset;
             //polygon sides, depends on sector
             int sides = getSector().tile.corners.length;
             float step = 360f / sides;
@@ -375,15 +375,15 @@ public class World{
             float prev = Mathf.round(angle, step);
             float next = prev + step;
             //raw line length to be translated
-            float length = world.width()/2f;
-            float rawDst = Intersector.distanceLinePoint(Tmp.v1.trns(prev, length), Tmp.v2.trns(next, length), Tmp.v3.set(x - world.width()/2, y - world.height()/2).rotate(offset)) / Mathf.sqrt3 - 1;
+            float length = tiles.width/2f;
+            float rawDst = Intersector.distanceLinePoint(Tmp.v1.trns(prev, length), Tmp.v2.trns(next, length), Tmp.v3.set(x - tiles.width/2, y - tiles.height/2).rotate(offset)) / Mathf.sqrt3 - 1;
 
             //noise
             rawDst += Noise.noise(x, y, 11f, 7f) + Noise.noise(x, y, 22f, 15f);
 
-            int circleDst = (int)(rawDst - (world.width() / 2 - circleBlend));
+            int circleDst = (int)(rawDst - (tiles.width / 2 - circleBlend));
             if(circleDst > 0){
-                dark = Math.max(circleDst / 0.8f, dark);
+                dark = Math.max(circleDst / 1f, dark);
             }
         }
 

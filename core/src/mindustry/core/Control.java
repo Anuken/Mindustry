@@ -6,7 +6,6 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
-import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
@@ -23,7 +22,6 @@ import mindustry.maps.Map;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-import mindustry.world.blocks.storage.*;
 
 import java.io.*;
 import java.text.*;
@@ -281,6 +279,9 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     public void playTutorial(){
+        //TODO implement
+        ui.showInfo("death");
+        /*
         Zone zone = Zones.groundZero;
         ui.loadAnd(() -> {
             logic.reset();
@@ -331,7 +332,7 @@ public class Control implements ApplicationListener, Loadable{
             state.rules.buildCostMultiplier = 0.3f;
             state.rules.tutorial = true;
             Events.fire(Trigger.newGame);
-        });
+        });*/
     }
 
     public boolean isHighScore(){

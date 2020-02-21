@@ -14,8 +14,9 @@ import mindustry.maps.generators.*;
 
 import static mindustry.Vars.*;
 
+//TODO ? remove ?
 public class Zone extends UnlockableContent{
-    public @NonNull Generator generator;
+    public @NonNull WorldGenerator generator;
     public @NonNull Objective configureObjective = new ZoneWave(this, 15);
     public @NonNull Planet planet;
     public Array<Objective> requirements = new Array<>();
@@ -34,19 +35,19 @@ public class Zone extends UnlockableContent{
 
     private Array<ItemStack> defaultStartingItems = new Array<>();
 
-    public Zone(String name, Planet planet, Generator generator){
+    public Zone(String name, Planet planet, WorldGenerator generator){
         super(name);
         this.generator = generator;
         this.planet = planet;
     }
 
     public Zone(String name){
-        this(name, Planets.starter, new MapGenerator(name));
+        this(name, Planets.starter, new FileMapGenerator(name));
     }
 
     public Rules getRules(){
-        if(generator instanceof MapGenerator){
-            return ((MapGenerator)generator).getMap().rules();
+        if(generator instanceof FileMapGenerator){
+            return ((FileMapGenerator)generator).map.rules();
         }else{
             Rules rules = new Rules();
             this.rules.get(rules);
@@ -167,11 +168,6 @@ public class Zone extends UnlockableContent{
 
     @Override
     public void init(){
-        if(generator instanceof MapGenerator && minfo.mod != null){
-            ((MapGenerator)generator).removePrefix(minfo.mod.name);
-        }
-
-        generator.init(loadout);
         resources.sort();
 
         for(ItemStack stack : startingItems){
