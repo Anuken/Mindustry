@@ -1102,11 +1102,10 @@ public class Blocks implements ContentList{
             size = 2;
             maxNodes = 30;
             laserRange = 9.5f;
-            flags = EnumSet.of(BlockFlag.surgeable);
         }};
 
         surgeTower = new PowerNode("surge-tower"){{
-            requirements(Category.power, ItemStack.with(Items.titanium, 7, Items.lead, 10, Items.silicon, 15));
+            requirements(Category.power, ItemStack.with(Items.titanium, 7, Items.lead, 10, Items.silicon, 15, Items.surgealloy, 15));
             size = 2;
             maxNodes = 2;
             laserRange = 30f;
