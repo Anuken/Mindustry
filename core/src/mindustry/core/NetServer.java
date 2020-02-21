@@ -44,7 +44,6 @@ public class NetServer implements ApplicationListener{
     private final static float correctDist = 16f;
 
     public final Administration admins = new Administration();
-    public final Ascension chain = new Ascension();
     public final CommandHandler clientCommands = new CommandHandler("/");
     public TeamAssigner assigner = (player, players) -> {
         if(state.rules.pvp){
@@ -331,12 +330,8 @@ public class NetServer implements ApplicationListener{
             void vote(Player player, int d){
                 int b = d;
 
-                if(netServer.chain.highlord(player)){
-                    b = d*3;
-                }
-
                 if(player.isAdmin){
-                    b = d*5;
+                    b = d*3;
                 }
 
                 votes += b;
@@ -610,7 +605,7 @@ public class NetServer implements ApplicationListener{
     @Remote(targets = Loc.client, called = Loc.server)
     public static void onAdminRequest(Player player, Player other, AdminAction action){
 
-        if( !(player.isAdmin || netServer.chain.highlord(player)) ){
+        if(!player.isAdmin){
             Log.warn("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
             player.name, player.con.address);
             return;
@@ -621,37 +616,25 @@ public class NetServer implements ApplicationListener{
             return;
         }
 
-        if(player.isAdmin){
-            if(action == AdminAction.wave){
-                //no verification is done, so admins can hypothetically spam waves
-                //not a real issue, because server owners may want to do just that
-                state.wavetime = 0f;
-            }else if(action == AdminAction.ban){
-                netServer.admins.banPlayerIP(other.con.address);
-                other.con.kick(KickReason.banned);
-                Log.info("&lc{0} has banned {1}.", player.name, other.name);
-            }else if(action == AdminAction.kick){
-                other.con.kick(KickReason.kick);
-                Log.info("&lc{0} has kicked {1}.", player.name, other.name);
-            }else if(action == AdminAction.trace){
-                TraceInfo info = new TraceInfo(other.con.address, other.uuid, other.con.modclient, other.con.mobile);
-                if(player.con != null){
-                    Call.onTraceInfo(player.con, other, info);
-                }else{
-                    NetClient.onTraceInfo(other, info);
-                }
-                Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
+        if(action == AdminAction.wave){
+            //no verification is done, so admins can hypothetically spam waves
+            //not a real issue, because server owners may want to do just that
+            state.wavetime = 0f;
+        }else if(action == AdminAction.ban){
+            netServer.admins.banPlayerIP(other.con.address);
+            other.con.kick(KickReason.banned);
+            Log.info("&lc{0} has banned {1}.", player.name, other.name);
+        }else if(action == AdminAction.kick){
+            other.con.kick(KickReason.kick);
+            Log.info("&lc{0} has kicked {1}.", player.name, other.name);
+        }else if(action == AdminAction.trace){
+            TraceInfo info = new TraceInfo(other.con.address, other.uuid, other.con.modclient, other.con.mobile);
+            if(player.con != null){
+                Call.onTraceInfo(player.con, other, info);
+            }else{
+                NetClient.onTraceInfo(other, info);
             }
-        }else{
-            if(action == AdminAction.wave){
-                state.wavetime = state.rules.waveSpacing;
-            }else if(action == AdminAction.ban){
-                Call.onPlayerDeath(other);
-            }else if(action == AdminAction.kick){
-                netServer.clientCommands.handleMessage("/votekick #" + other.id, player);
-            }else if(action == AdminAction.trace){
-                netServer.chain.declare(other);
-            }
+            Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
         }
     }
 

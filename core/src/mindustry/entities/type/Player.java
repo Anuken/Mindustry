@@ -902,7 +902,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
         TypeIO.writeStringData(buffer, name);
-        buffer.writeByte(Pack.byteValue(isAdmin || netServer.chain.highlord(this)) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2) | (Pack.byteValue(isTyping) << 3)| (Pack.byteValue(isBuilding) << 4));
+        buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2) | (Pack.byteValue(isTyping) << 3)| (Pack.byteValue(isBuilding) << 4));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
         buffer.writeInt(mining == null ? noSpawner : mining.pos());
@@ -965,7 +965,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         if(gamemode == Gamemode.attack) icon = Iconc.modeAttack;
         if(gamemode == Gamemode.sandbox) icon = Iconc.wrench;
 
-        if(netServer.chain.highlord(this)) icon = Iconc.hammer;
         if(this.isAdmin) icon = Iconc.admin;
 
         String name = "[#" + color.toString().toUpperCase() + "]" + this.name;
