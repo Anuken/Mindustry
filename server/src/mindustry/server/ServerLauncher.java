@@ -84,7 +84,6 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(new PixelThanos());
         Core.app.addListener(new CraterCorner());
 //        Core.app.addListener(new Katamari());
-//        Core.app.addListener(new PiertotumLocomotor());
 
         mods.eachClass(Mod::init);
 
