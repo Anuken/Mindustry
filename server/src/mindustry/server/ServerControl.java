@@ -33,6 +33,7 @@ import java.net.*;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
+import java.util.zip.*;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
@@ -697,6 +698,12 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("yeet", "<uuid...>", "Removes admin status from an offline player", arg -> {
             netServer.admins.unAdminPlayer(arg[0]);
+        });
+
+        handler.register("password", "<chat...>", "Generate password.", arg -> {
+            CRC32 crc = new CRC32();
+            crc.update(arg[0].getBytes());
+            Log.info(crc.getValue());
         });
 
         handler.register("admins", "List all admins.", arg -> {
