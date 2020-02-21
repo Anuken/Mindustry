@@ -41,7 +41,7 @@ public class EmojiFilter implements ApplicationListener{
             }
 
             for(String word : text.split("\\s+")){
-                if(Fonts.getUnicode(word.toLowerCase()) != 0 && !blacklist.contains(text)){
+                if(Fonts.getUnicode(word.toLowerCase()) != 0 && !blacklist.contains(word)){
                     text = text.replaceAll("(?i)" + word, (char) Fonts.getUnicode(word.toLowerCase()) + "");
                 }
             }
