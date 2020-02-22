@@ -155,9 +155,9 @@ public class TestPlanetGenerator extends BasicGenerator implements PlanetGenerat
         }
 
         int connections = rand.random(Math.max(rooms - 1, 1), rooms + 3);
-        Room spawn = array.random();
+        Room spawn = array.random(rand);
         for(int i = 0; i < connections; i++){
-            array.random().connect(array.random());
+            array.random(rand).connect(array.random(rand));
         }
 
         for(Room room : array){
@@ -184,13 +184,20 @@ public class TestPlanetGenerator extends BasicGenerator implements PlanetGenerat
         tech();
 
         pass((x, y) -> {
+            if(floor == Blocks.sporeMoss && rand.chance(0.9)){
+                floor = Blocks.moss;
+            }
+
+            //random stuff
+
             for(int i = 0; i < 4; i++){
                 Tile near = world.tile(x + Geometry.d4[i].x, y + Geometry.d4[i].y);
                 if(near != null && near.block() != Blocks.air){
                     return;
                 }
             }
-            if(Mathf.chance(0.01) && !floor.asFloor().isLiquid && block == Blocks.air){
+
+            if(rand.chance(0.01) && !floor.asFloor().isLiquid && block == Blocks.air){
                 block = dec.get(floor, floor.asFloor().decoration);
             }
         });
