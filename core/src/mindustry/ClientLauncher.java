@@ -33,8 +33,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void setup(){
-        Events.fire(new ClientCreateEvent());
-
         Vars.loadLogger();
         Vars.loadFileLogger();
         Vars.platform = this;

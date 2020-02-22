@@ -270,7 +270,7 @@ public class Renderer implements ApplicationListener{
         drawAllTeams(true);
 
         Draw.flush();
-        if(bloom != null){
+        if(bloom != null && !pixelator.enabled()){
             bloom.capture();
         }
 
@@ -278,7 +278,7 @@ public class Renderer implements ApplicationListener{
         effectGroup.draw();
 
         Draw.flush();
-        if(bloom != null){
+        if(bloom != null && !pixelator.enabled()){
             bloom.render();
         }
 
@@ -417,6 +417,11 @@ public class Renderer implements ApplicationListener{
             return;
         }
 
+        boolean hadShields = Core.settings.getBool("animatedshields");
+        boolean hadWater = Core.settings.getBool("animatedwater");
+        Core.settings.put("animatedwater", false);
+        Core.settings.put("animatedshields", false);
+
         FrameBuffer buffer = new FrameBuffer(w, h);
 
         float vpW = camera.width, vpH = camera.height, px = camera.position.x, py = camera.position.y;
@@ -448,6 +453,9 @@ public class Renderer implements ApplicationListener{
         ui.showInfoFade(Core.bundle.format("screenshot", file.toString()));
 
         buffer.dispose();
+
+        Core.settings.put("animatedwater", hadWater);
+        Core.settings.put("animatedshields", hadShields);
     }
 
 }

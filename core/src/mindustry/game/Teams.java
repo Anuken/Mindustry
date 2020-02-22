@@ -98,7 +98,6 @@ public class Teams{
 
     /** Do not modify. */
     public Array<TeamData> getActive(){
-        active.removeAll(t -> !t.active());
         return active;
     }
 
@@ -167,14 +166,6 @@ public class Teams{
 
         public CoreEntity core(){
             return cores.first();
-        }
-
-        @Override
-        public String toString(){
-            return "TeamData{" +
-            "cores=" + cores +
-            ", team=" + team +
-            '}';
         }
     }
 

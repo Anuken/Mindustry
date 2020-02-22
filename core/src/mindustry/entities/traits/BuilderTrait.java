@@ -1,15 +1,14 @@
 package mindustry.entities.traits;
 
 import arc.*;
+import arc.struct.Queue;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.struct.Queue;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.entities.type.TileEntity;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -22,7 +21,7 @@ import java.io.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
-import static mindustry.entities.traits.BuilderTrait.BuildDataStatic.tmptr;
+import static mindustry.entities.traits.BuilderTrait.BuildDataStatic.*;
 
 /** Interface for units that build things.*/
 public interface BuilderTrait extends Entity, TeamTrait{
@@ -75,9 +74,6 @@ public interface BuilderTrait extends Entity, TeamTrait{
                 buildQueue().removeFirst();
                 return;
             }
-        }else if(tile.getTeam() != getTeam()){
-            buildQueue().removeFirst();
-            return;
         }
 
         if(tile.entity instanceof BuildEntity && !current.initialized){

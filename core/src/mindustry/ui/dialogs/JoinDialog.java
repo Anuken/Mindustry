@@ -242,9 +242,6 @@ public class JoinDialog extends FloatingDialog{
     }
 
     void setup(){
-        local.clear();
-        remote.clear();
-        global.clear();
         float w = targetWidth();
 
         hosts.clear();
@@ -258,6 +255,7 @@ public class JoinDialog extends FloatingDialog{
         pane.setScrollingDisabled(true, false);
 
         setupRemote();
+        refreshRemote();
 
         cont.clear();
         cont.table(t -> {

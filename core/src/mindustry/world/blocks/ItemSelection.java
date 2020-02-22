@@ -51,7 +51,6 @@ public class ItemSelection{
             scrollPos = pane.getScrollY();
         });
 
-        pane.setOverscroll(false, false);
-        table.add(pane).maxHeight(Scl.scl(40 * 5));
+        table.add(pane).maxHeight(40 * 5);
     }
 }
