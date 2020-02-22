@@ -33,7 +33,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, spawn, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
+    air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
     holostone, rocks, sporerocks, icerocks, cliffs, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, sandBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock, saltRocks,
@@ -122,6 +122,8 @@ public class Blocks implements ContentList{
             }
             public void draw(Tile tile){}
         };
+
+        cliff = new Cliff("cliff");
 
         //Registers build blocks
         //no reference is needed here since they can be looked up by name later

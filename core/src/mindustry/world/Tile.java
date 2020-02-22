@@ -123,7 +123,7 @@ public class Tile implements Position{
     }
 
     public boolean isDarkened(){
-        return block().solid && !block().synthetic() && block().fillsTile;
+        return block.solid && !block.synthetic() && block.fillsTile;
     }
 
     public @NonNull Floor floor(){

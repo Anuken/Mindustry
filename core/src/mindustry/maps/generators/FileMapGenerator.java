@@ -13,10 +13,11 @@ import mindustry.world.blocks.storage.*;
 import static mindustry.Vars.*;
 
 public class FileMapGenerator implements WorldGenerator{
-    public final Map map;
+    public final Map map = null;
 
     public FileMapGenerator(String mapName){
-        this.map = maps.loadInternalMap(mapName);
+        //TODO doesn't work
+        //this.map = maps.loadInternalMap(mapName);
     }
 
     @Override

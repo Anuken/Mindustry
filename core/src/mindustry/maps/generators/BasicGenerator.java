@@ -45,6 +45,32 @@ public abstract class BasicGenerator implements WorldGenerator{
 
     }
 
+    public void cliffs(){
+        for(Tile tile : tiles){
+            if(!tile.block().isStatic()) continue;
+
+            int rotation = 0;
+            for(int i = 0; i < 4; i++){
+                Tile other = tiles.get(tile.x + Geometry.d4[i].x, tile.y + Geometry.d4[i].y);
+                if(other != null && !other.block().isStatic()){
+                    rotation |= (1 << i);
+                }
+            }
+
+            if(rotation != 0){
+                tile.setBlock(Blocks.cliff);
+            }
+
+            tile.rotation(rotation);
+        }
+
+        for(Tile tile : tiles){
+            if(tile.block() != Blocks.cliff && tile.block().isStatic()){
+                tile.setBlock(Blocks.air);
+            }
+        }
+    }
+
     public void median(int radius){
         median(radius, 0.5);
     }
