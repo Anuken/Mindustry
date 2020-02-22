@@ -185,7 +185,7 @@ public class NetClient implements ApplicationListener{
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
 
-            message = message.replaceAll("(\\[.*?])", "");
+            message = Strings.stripColors(message);
             Pattern p = Pattern.compile("[A-Z]+");
             Matcher m = p.matcher(message);
             StringBuffer sb = new StringBuffer();
