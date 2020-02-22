@@ -296,9 +296,8 @@ public class Drill extends Block{
 
     @Override
     public void iceberg(Tile tile){
-        DrillEntity entity = tile.ent();
-
         if(tile.block == Blocks.blastDrill){
+            DrillEntity entity = tile.ent();
             entity.items.add(entity.dominantItem, entity.index);
             entity.index = 0;
         }
