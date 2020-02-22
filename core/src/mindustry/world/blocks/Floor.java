@@ -59,6 +59,8 @@ public class Floor extends Block{
     public float oreScale = 24f, oreThreshold = 0.828f;
     /** Wall variant of this block. May be Blocks.air if not found. */
     public Block wall = Blocks.air;
+    /** Decoration block. Usually a rock. May be air. */
+    public Block decoration = Blocks.air;
 
     protected TextureRegion[][] edges;
     protected byte eq = 0;
@@ -106,6 +108,10 @@ public class Floor extends Block{
 
         //keep default value if not found...
         if(wall == null) wall = Blocks.air;
+
+        if(decoration == Blocks.air){
+            decoration = content.blocks().min(b -> b instanceof Rock && b.breakable ? color.diff(b.color) : Float.POSITIVE_INFINITY);
+        }
     }
 
     @Override

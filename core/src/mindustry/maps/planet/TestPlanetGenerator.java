@@ -11,10 +11,10 @@ import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.schematics;
+import static mindustry.Vars.*;
 
 //TODO refactor into generic planet class
-public class TestPlanetGenerator implements PlanetGenerator{
+public class TestPlanetGenerator extends BasicGenerator implements PlanetGenerator{
     Simplex noise = new Simplex();
     RidgedPerlin rid = new RidgedPerlin(1, 2);
     float scl = 5f;
@@ -37,6 +37,12 @@ public class TestPlanetGenerator implements PlanetGenerator{
     {Blocks.darksandTaintedWater, Blocks.darksandTaintedWater, Blocks.darksand, Blocks.sporeMoss, Blocks.moss, Blocks.sporeMoss, Blocks.iceSnow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice},
     {Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.ice, Blocks.iceSnow, Blocks.iceSnow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice}
     };
+
+    Array<Block> ores = Array.with(Blocks.oreCopper, Blocks.oreLead, Blocks.oreCoal, Blocks.oreCopper);
+    ObjectMap<Block, Block> dec = ObjectMap.of(
+        Blocks.sporeMoss, Blocks.sporeCluster,
+        Blocks.moss, Blocks.sporeCluster
+    );
 
     float water = 2f / arr[0].length;
 
@@ -79,8 +85,9 @@ public class TestPlanetGenerator implements PlanetGenerator{
     public void decorate(Tiles tiles, Sector sec){
         this.tiles = tiles;
         this.sector = sec;
+        rand.setSeed(sec.id);
 
-        new Terrain().generate(tiles);
+        generate(tiles);
     }
 
     Block getBlock(Vec3 position){
@@ -96,119 +103,99 @@ public class TestPlanetGenerator implements PlanetGenerator{
         return arr[Mathf.clamp((int)(temp * arr.length), 0, arr.length - 1)][Mathf.clamp((int)(height * arr[0].length), 0, arr[0].length - 1)];
     }
 
-    class Terrain extends BasicGenerator{
-        Array<Block> ores = Array.with(Blocks.oreCopper, Blocks.oreLead, Blocks.oreCoal, Blocks.oreCopper);
-
-        @Override
-        protected void generate(){
-
-            class Room{
-                int x, y, radius;
-                ObjectSet<Room> connected = new ObjectSet<>();
-
-                Room(int x, int y, int radius){
-                    this.x = x;
-                    this.y = y;
-                    this.radius = radius;
-                    connected.add(this);
-                }
-
-                void connect(Room to){
-                    if(connected.contains(to)) return;
-
-                    connected.add(to);
-                    float nscl = Mathf.random(20f, 60f);
-                    int stroke = Mathf.random(4, 12);
-                    brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + (float)sim.octaveNoise2D(1, 1, 1f / nscl, tile.x, tile.y) * 50, manhattan), stroke);
-                }
-            }
-
-            cells(4);
-            distort(20f, 12f);
-
-            float constraint = 1.3f;
-            float radius = width / 2f / Mathf.sqrt3;
-            int rooms = Mathf.random(2, 5);
-            Array<Room> array = new Array<>();
-
-            //TODO replace random calls with seed
-
-            for(int i = 0; i < rooms; i++){
-                Tmp.v1.trns(Mathf.random(360f), Mathf.random(radius / constraint));
-                float rx = (width/2f + Tmp.v1.x);
-                float ry = (height/2f + Tmp.v1.y);
-                float maxrad = radius - Tmp.v1.len();
-                float rrad = Math.min(Mathf.random(9f, maxrad / 2f), 30f);
-                array.add(new Room((int)rx, (int)ry, (int)rrad));
-            }
-
-            for(Room room : array){
-                erase(room.x, room.y, room.radius);
-            }
-
-            int connections = Mathf.random(Math.max(rooms - 1, 1), rooms + 3);
-            Room spawn = array.random();
-            for(int i = 0; i < connections; i++){
-                array.random().connect(array.random());
-            }
-
-            for(Room room : array){
-                spawn.connect(room);
-            }
-
-            cells(1);
-            distort(20f, 6f);
-
-            inverseFloodFill(tiles.getn(spawn.x, spawn.y));
-
-            ores(ores);
-
-            for(Room other : array){
-                if(other != spawn){
-                   // tiles.getn(other.x, other.y).setOverlay(Blocks.spawn);
-                }
-            }
-
-            trimDark();
-
-            median(2);
-
-            schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
-        }
-
-        void cells(int iterations){
-            GridBits write = new GridBits(tiles.width, tiles.height);
-            GridBits read = new GridBits(tiles.width, tiles.height);
-
-            tiles.each((x, y) -> read.set(x, y, !tiles.get(x, y).block().isAir()));
-
-            int birthLimit = 16, deathLimit = 16, cradius = 3;
-
-            for(int i = 0; i < iterations; i++){
-                tiles.each((x, y) -> {
-                    int alive = 0;
-
-                    for(int cx = -cradius; cx <= cradius; cx++){
-                        for(int cy = -cradius; cy <= cradius; cy++){
-                            if((cx == 0 && cy == 0) || !Mathf.within(cx, cy, cradius)) continue;
-                            if(!Structs.inBounds(x + cx, y + cy, tiles.width, tiles.height) || read.get(x + cx, y + cy)){
-                                alive++;
-                            }
-                        }
-                    }
-
-                    if(read.get(x, y)){
-                        write.set(x, y, alive >= deathLimit);
-                    }else{
-                        write.set(x, y, alive > birthLimit);
-                    }
-                });
-
-                //flush results
-                read.set(write);
-            }
-
-            tiles.each((x, y) -> tiles.get(x, y).setBlock(!read.get(x, y) ? Blocks.air : tiles.get(x, y).floor().wall));
-        }
+    @Override
+    protected float noise(float x, float y, double octaves, double falloff, double scl, double mag){
+        Vec3 v = sector.rect.project(x, y).scl(5f);
+        return (float)noise.octaveNoise3D(octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
     }
+
+    @Override
+    protected void generate(){
+
+        class Room{
+            int x, y, radius;
+            ObjectSet<Room> connected = new ObjectSet<>();
+
+            Room(int x, int y, int radius){
+                this.x = x;
+                this.y = y;
+                this.radius = radius;
+                connected.add(this);
+            }
+
+            void connect(Room to){
+                if(connected.contains(to)) return;
+
+                connected.add(to);
+                float nscl = rand.random(20f, 60f);
+                int stroke = rand.random(4, 12);
+                brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + noise(tile.x, tile.y, 1, 1, 1f / nscl) * 50, manhattan), stroke);
+            }
+        }
+
+        cells(4);
+        distort(10f, 12f);
+
+        float constraint = 1.3f;
+        float radius = width / 2f / Mathf.sqrt3;
+        int rooms = rand.random(2, 5);
+        Array<Room> array = new Array<>();
+
+        for(int i = 0; i < rooms; i++){
+            Tmp.v1.trns(rand.random(360f), rand.random(radius / constraint));
+            float rx = (width/2f + Tmp.v1.x);
+            float ry = (height/2f + Tmp.v1.y);
+            float maxrad = radius - Tmp.v1.len();
+            float rrad = Math.min(rand.random(9f, maxrad / 2f), 30f);
+            array.add(new Room((int)rx, (int)ry, (int)rrad));
+        }
+
+        for(Room room : array){
+            erase(room.x, room.y, room.radius);
+        }
+
+        int connections = rand.random(Math.max(rooms - 1, 1), rooms + 3);
+        Room spawn = array.random();
+        for(int i = 0; i < connections; i++){
+            array.random().connect(array.random());
+        }
+
+        for(Room room : array){
+            spawn.connect(room);
+        }
+
+        cells(1);
+        distort(10f, 6f);
+
+        inverseFloodFill(tiles.getn(spawn.x, spawn.y));
+
+        ores(ores);
+
+        for(Room other : array){
+            if(other != spawn){
+                // tiles.getn(other.x, other.y).setOverlay(Blocks.spawn);
+            }
+        }
+
+        trimDark();
+
+        median(2);
+
+        tech();
+
+        pass((x, y) -> {
+            for(int i = 0; i < 4; i++){
+                Tile near = world.tile(x + Geometry.d4[i].x, y + Geometry.d4[i].y);
+                if(near != null && near.block() != Blocks.air){
+                    return;
+                }
+            }
+            if(Mathf.chance(0.01) && !floor.asFloor().isLiquid && block == Blocks.air){
+                block = dec.get(floor, floor.asFloor().decoration);
+            }
+        });
+
+        schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
+    }
+
 }

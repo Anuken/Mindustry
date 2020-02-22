@@ -5,7 +5,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.noise.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.world.*;
@@ -18,9 +17,8 @@ public abstract class BasicGenerator implements WorldGenerator{
     protected static final DistanceHeuristic manhattan = (x1, y1, x2, y2) -> Math.abs(x1 - x2) + Math.abs(y1 - y2);
     protected static final ShortArray ints1 = new ShortArray(), ints2 = new ShortArray();
 
-    protected Simplex sim = new Simplex();
-    protected Simplex sim2 = new Simplex();
-    
+    protected Rand rand = new Rand();
+
     protected int width, height;
     protected Tiles tiles;
 
@@ -34,9 +32,6 @@ public abstract class BasicGenerator implements WorldGenerator{
         this.tiles = tiles;
         this.width = tiles.width;
         this.height = tiles.height;
-        int seed = Mathf.random(99999999);
-        sim.setSeed(seed);
-        sim2.setSeed(seed + 1);
 
         generate();
     }
@@ -49,7 +44,7 @@ public abstract class BasicGenerator implements WorldGenerator{
     public void cliffs2(){
         for(Tile tile : tiles){
             tile.setBlock(Blocks.air);
-            tile.cost = tile.floor().isLiquid ? 0 : (byte)(sim.octaveNoise2D(4, 0.5, 1.0 / 90.0, tile.x, tile.y) * 5);
+            tile.cost = tile.floor().isLiquid ? 0 : (byte)(noise(tile.x, tile.y, 4, 0.5f, 90f, 1) * 5);
         }
 
         for(Tile tile : tiles){
@@ -137,8 +132,8 @@ public abstract class BasicGenerator implements WorldGenerator{
             int offsetX = x - 4, offsetY = y + 23;
             for(int i = ores.size - 1; i >= 0; i--){
                 Block entry = ores.get(i);
-                if(Math.abs(0.5f - sim.octaveNoise2D(2, 0.7, 1f / (40 + i * 2), offsetX, offsetY + i*999)) > 0.26f &&
-                Math.abs(0.5f - sim2.octaveNoise2D(1, 1, 1f / (30 + i * 4), offsetX, offsetY - i*999)) > 0.37f){
+                if(Math.abs(0.5f - noise(offsetX, offsetY + i*999, 2, 0.7, (40 + i * 2))) > 0.26f &&
+                Math.abs(0.5f - noise(offsetX, offsetY - i*999, 1, 1, (30 + i * 4))) > 0.37f){
                     ore = entry;
                     break;
                 }
@@ -148,7 +143,7 @@ public abstract class BasicGenerator implements WorldGenerator{
 
     public void terrain(Block dst, float scl, float mag, float cmag){
         pass((x, y) -> {
-            double rocks = sim.octaveNoise2D(5, 0.5, 1f / scl, x, y) * mag
+            double rocks = noise(x, y, 5, 0.5, scl) * mag
             + Mathf.dst((float)x / width, (float)y / height, 0.5f, 0.5f) * cmag;
 
             double edgeDist = Math.min(x, Math.min(y, Math.min(Math.abs(x - (width - 1)), Math.abs(y - (height - 1)))));
@@ -164,9 +159,8 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void noise(Block floor, Block block, int octaves, float falloff, float scl, float threshold){
-        sim.setSeed(Mathf.random(99999));
         pass((x, y) -> {
-            if(sim.octaveNoise2D(octaves, falloff, 1f / scl, x, y) > threshold){
+            if(noise(octaves, falloff, scl, x, y) > threshold){
                 Tile tile = tiles.getn(x, y);
                 this.floor = floor;
                 if(tile.block().solid){
@@ -177,9 +171,8 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void overlay(Block floor, Block block, float chance, int octaves, float falloff, float scl, float threshold){
-        sim.setSeed(Mathf.random(99999));
         pass((x, y) -> {
-            if(sim.octaveNoise2D(octaves, falloff, 1f / scl, x, y) > threshold && Mathf.chance(chance) && tiles.getn(x, y).floor() == floor){
+            if(noise(x, y, octaves, falloff, scl) > threshold && Mathf.chance(chance) && tiles.getn(x, y).floor() == floor){
                 ore = block;
             }
         });
@@ -189,11 +182,13 @@ public abstract class BasicGenerator implements WorldGenerator{
         Block[] blocks = {Blocks.darkPanel3};
         int secSize = 20;
         pass((x, y) -> {
+            if(floor.asFloor().isLiquid) return;
+
             int mx = x % secSize, my = y % secSize;
             int sclx = x / secSize, scly = y / secSize;
-            if(noise(sclx, scly, 10f, 1f) > 0.63f && (mx == 0 || my == 0 || mx == secSize - 1 || my == secSize - 1)){
+            if(noise(sclx, scly, 0.2f, 1f) > 0.63f && noise(sclx, scly + 999, 200f, 1f) > 0.6f && (mx == 0 || my == 0 || mx == secSize - 1 || my == secSize - 1)){
                 if(Mathf.chance(noise(x + 0x231523, y, 40f, 1f))){
-                    floor = Structs.random(blocks);
+                    floor = blocks[rand.random(0, blocks.length - 1)];
                     if(Mathf.dst(mx, my, secSize/2, secSize/2) > secSize/2f + 2){
                         floor = Blocks.darkPanel4;
                     }
@@ -212,7 +207,7 @@ public abstract class BasicGenerator implements WorldGenerator{
 
         tiles.each((x, y) -> {
             int idx = y*tiles.width + x;
-            float cx = x + noise(x, y, scl, mag) - mag / 2f, cy = y + noise(x + 155f, y + 155f, scl, mag) - mag / 2f;
+            float cx = x + noise(x - 155f, y - 200f, scl, mag) - mag / 2f, cy = y + noise(x + 155f, y + 155f, scl, mag) - mag / 2f;
             Tile other = tiles.getn(Mathf.clamp((int)cx, 0, tiles.width-1), Mathf.clamp((int)cy, 0, tiles.height-1));
             blocks[idx] = other.block().id;
             floors[idx] = other.floor().id;
@@ -244,8 +239,51 @@ public abstract class BasicGenerator implements WorldGenerator{
         }
     }
 
-    protected float noise(float x, float y, float scl, float mag){
-        return (float)sim2.octaveNoise2D(1f, 0f, 1f / scl, x + 0x361266f, y + 0x251259f) * mag;
+    public void cells(int iterations){
+        cells(iterations, 16, 16, 3);
+    }
+
+    public void cells(int iterations, int birthLimit, int deathLimit, int cradius){
+        GridBits write = new GridBits(tiles.width, tiles.height);
+        GridBits read = new GridBits(tiles.width, tiles.height);
+
+        tiles.each((x, y) -> read.set(x, y, !tiles.get(x, y).block().isAir()));
+
+        for(int i = 0; i < iterations; i++){
+            tiles.each((x, y) -> {
+                int alive = 0;
+
+                for(int cx = -cradius; cx <= cradius; cx++){
+                    for(int cy = -cradius; cy <= cradius; cy++){
+                        if((cx == 0 && cy == 0) || !Mathf.within(cx, cy, cradius)) continue;
+                        if(!Structs.inBounds(x + cx, y + cy, tiles.width, tiles.height) || read.get(x + cx, y + cy)){
+                            alive++;
+                        }
+                    }
+                }
+
+                if(read.get(x, y)){
+                    write.set(x, y, alive >= deathLimit);
+                }else{
+                    write.set(x, y, alive > birthLimit);
+                }
+            });
+
+            //flush results
+            read.set(write);
+        }
+
+        tiles.each((x, y) -> tiles.get(x, y).setBlock(!read.get(x, y) ? Blocks.air : tiles.get(x, y).floor().wall));
+    }
+
+    protected float noise(float x, float y, double scl, double mag){
+        return noise(x, y, 1, 1, scl, mag);
+    }
+
+    protected abstract float noise(float x, float y, double octaves, double falloff, double scl, double mag);
+
+    protected float noise(float x, float y, double octaves, double falloff, double scl){
+        return noise(x, y, octaves, falloff, scl, 1);
     }
 
     public void pass(Intc2 r){
