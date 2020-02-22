@@ -21,7 +21,6 @@ public class SectorDataGenerator{
 
     public static void main(String[] args){
         ArcNativesLoader.load();
-
         Core.files = new MockFiles();
         Core.app = new MockApplication();
         Core.settings = new MockSettings();
