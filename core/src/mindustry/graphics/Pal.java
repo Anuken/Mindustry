@@ -8,8 +8,8 @@ public class Pal{
     items = Color.valueOf("2ea756"),
     command = Color.valueOf("eab678"),
 
-    bulletYellow = Color.valueOf("ffeec9"),
-    bulletYellowBack = Color.valueOf("f9c87a"),
+    bulletYellow = Color.valueOf("fff8e8"),
+    bulletYellowBack = Color.valueOf("f9c27a"),
 
     darkMetal = Color.valueOf("6e7080"),
 

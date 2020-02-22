@@ -349,133 +349,133 @@ conveyor-4-3
   index: -1
 titanium-conveyor-0-1
   rotate: false
-  xy: 1789, 783
+  xy: 1789, 817
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-0-2
   rotate: false
-  xy: 1789, 749
+  xy: 1789, 783
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-0-3
   rotate: false
-  xy: 1789, 715
+  xy: 1789, 749
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-1-0
   rotate: false
-  xy: 1749, 1021
+  xy: 1789, 715
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-1-1
   rotate: false
-  xy: 1749, 987
+  xy: 1749, 1021
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-1-2
   rotate: false
-  xy: 1749, 953
+  xy: 1749, 987
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-1-3
   rotate: false
-  xy: 1767, 919
+  xy: 1749, 953
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-2-0
   rotate: false
-  xy: 1777, 885
+  xy: 1767, 919
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-2-1
   rotate: false
-  xy: 1803, 851
+  xy: 1777, 885
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-2-2
   rotate: false
-  xy: 1823, 817
+  xy: 1803, 851
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-2-3
   rotate: false
-  xy: 1823, 783
+  xy: 1823, 817
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-3-0
   rotate: false
-  xy: 1823, 749
+  xy: 1823, 783
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-3-1
   rotate: false
-  xy: 1823, 715
+  xy: 1823, 749
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-3-2
   rotate: false
-  xy: 989, 233
+  xy: 1823, 715
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-3-3
   rotate: false
-  xy: 989, 199
+  xy: 989, 233
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-4-0
   rotate: false
-  xy: 1023, 233
+  xy: 989, 199
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-4-1
   rotate: false
-  xy: 989, 165
+  xy: 1023, 233
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-4-2
   rotate: false
-  xy: 1057, 233
+  xy: 989, 165
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium-conveyor-4-3
   rotate: false
-  xy: 1023, 199
+  xy: 1057, 233
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -510,7 +510,7 @@ phase-conveyor-end
   index: -1
 underflow-gate
   rotate: false
-  xy: 1091, 233
+  xy: 989, 131
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -1406,7 +1406,7 @@ spore-press-top
   index: -1
 unloader-center
   rotate: false
-  xy: 1057, 199
+  xy: 1091, 233
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -1873,13 +1873,6 @@ shell-back
   orig: 36, 36
   offset: 0, 0
   index: -1
-shot
-  rotate: false
-  xy: 1789, 817
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
 transfer
   rotate: false
   xy: 1277, 1055
@@ -1889,7 +1882,7 @@ transfer
   index: -1
 transfer-arrow
   rotate: false
-  xy: 989, 131
+  xy: 1023, 199
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -4556,7 +4549,7 @@ item-scrap-small
   index: -1
 item-scrap-tiny
   rotate: false
-  xy: 245, 1172
+  xy: 1063, 839
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4591,7 +4584,7 @@ item-silicon-small
   index: -1
 item-silicon-tiny
   rotate: false
-  xy: 1063, 839
+  xy: 1425, 1375
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4626,7 +4619,7 @@ item-spore-pod-small
   index: -1
 item-spore-pod-tiny
   rotate: false
-  xy: 1425, 1375
+  xy: 1083, 215
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4654,7 +4647,7 @@ item-surge-alloy-medium
   index: -1
 item-surge-alloy-small
   rotate: false
-  xy: 1023, 173
+  xy: 1057, 207
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4689,7 +4682,7 @@ item-thorium-medium
   index: -1
 item-thorium-small
   rotate: false
-  xy: 1049, 173
+  xy: 1023, 173
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4766,14 +4759,14 @@ liquid-cryofluid-medium
   index: -1
 liquid-cryofluid-small
   rotate: false
-  xy: 1091, 207
+  xy: 1960, 1925
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 liquid-cryofluid-tiny
   rotate: false
-  xy: 754, 1538
+  xy: 271, 1172
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4801,14 +4794,14 @@ liquid-oil-medium
   index: -1
 liquid-oil-small
   rotate: false
-  xy: 1960, 1925
+  xy: 395, 562
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 liquid-oil-tiny
   rotate: false
-  xy: 823, 1343
+  xy: 754, 1538
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4836,14 +4829,14 @@ liquid-slag-medium
   index: -1
 liquid-slag-small
   rotate: false
-  xy: 395, 562
+  xy: 579, 748
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 liquid-slag-tiny
   rotate: false
-  xy: 19, 5
+  xy: 823, 1343
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4871,14 +4864,14 @@ liquid-water-medium
   index: -1
 liquid-water-small
   rotate: false
-  xy: 579, 748
+  xy: 245, 1164
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 liquid-water-tiny
   rotate: false
-  xy: 865, 757
+  xy: 19, 5
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
