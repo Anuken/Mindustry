@@ -102,13 +102,34 @@ public class TestPlanetGenerator implements PlanetGenerator{
         @Override
         protected void generate(){
 
+            class Room{
+                int x, y, radius;
+                ObjectSet<Room> connected = new ObjectSet<>();
+
+                Room(int x, int y, int radius){
+                    this.x = x;
+                    this.y = y;
+                    this.radius = radius;
+                    connected.add(this);
+                }
+
+                void connect(Room to){
+                    if(connected.contains(to)) return;
+
+                    connected.add(to);
+                    float nscl = Mathf.random(20f, 60f);
+                    int stroke = Mathf.random(4, 12);
+                    brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + (float)sim.octaveNoise2D(1, 1, 1f / nscl, tile.x, tile.y) * 50, manhattan), stroke);
+                }
+            }
+
             cells(4);
             distort(20f, 12f);
 
             float constraint = 1.3f;
             float radius = width / 2f / Mathf.sqrt3;
             int rooms = Mathf.random(2, 5);
-            Array<Point3> array = new Array<>();
+            Array<Room> array = new Array<>();
 
             //TODO replace random calls with seed
 
@@ -118,32 +139,31 @@ public class TestPlanetGenerator implements PlanetGenerator{
                 float ry = (height/2f + Tmp.v1.y);
                 float maxrad = radius - Tmp.v1.len();
                 float rrad = Math.min(Mathf.random(9f, maxrad / 2f), 30f);
-                array.add(new Point3((int)rx, (int)ry, (int)rrad));
+                array.add(new Room((int)rx, (int)ry, (int)rrad));
             }
 
-            for(Point3 room : array){
-                erase(room.x, room.y, room.z);
+            for(Room room : array){
+                erase(room.x, room.y, room.radius);
             }
 
             int connections = Mathf.random(Math.max(rooms - 1, 1), rooms + 3);
+            Room spawn = array.random();
             for(int i = 0; i < connections; i++){
-                Point3 from = array.random();
-                Point3 to = array.random();
+                array.random().connect(array.random());
+            }
 
-                float nscl = Mathf.random(20f, 60f);
-                int stroke = Mathf.random(4, 12);
-                brush(pathfind(from.x, from.y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + (float)sim.octaveNoise2D(1, 1, 1f / nscl, tile.x, tile.y) * 50, manhattan), stroke);
+            for(Room room : array){
+                spawn.connect(room);
             }
 
             cells(1);
             distort(20f, 6f);
 
-            Point3 spawn = array.random();
             inverseFloodFill(tiles.getn(spawn.x, spawn.y));
 
             ores(ores);
 
-            for(Point3 other : array){
+            for(Room other : array){
                 if(other != spawn){
                    // tiles.getn(other.x, other.y).setOverlay(Blocks.spawn);
                 }

@@ -45,13 +45,44 @@ public abstract class BasicGenerator implements WorldGenerator{
 
     }
 
+    //for visual testing only
+    public void cliffs2(){
+        for(Tile tile : tiles){
+            tile.setBlock(Blocks.air);
+            tile.cost = tile.floor().isLiquid ? 0 : (byte)(sim.octaveNoise2D(4, 0.5, 1.0 / 90.0, tile.x, tile.y) * 5);
+        }
+
+        for(Tile tile : tiles){
+            if(tile.floor().isLiquid) continue;
+
+            int rotation = 0;
+            for(int i = 0; i < 8; i++){
+                Tile other = tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
+                if(other != null && other.cost < tile.cost){ //down slope
+                    rotation |= (1 << i);
+                }
+            }
+
+            tile.rotation(rotation);
+        }
+
+        for(Tile tile : tiles){
+            if(tile.rotation() != 0){
+                int rotation = tile.rotation();
+                tile.setBlock(Blocks.cliff);
+                tile.setOverlay(Blocks.air);
+                tile.rotation(rotation);
+            }
+        }
+    }
+
     public void cliffs(){
         for(Tile tile : tiles){
             if(!tile.block().isStatic()) continue;
 
             int rotation = 0;
-            for(int i = 0; i < 4; i++){
-                Tile other = tiles.get(tile.x + Geometry.d4[i].x, tile.y + Geometry.d4[i].y);
+            for(int i = 0; i < 8; i++){
+                Tile other = tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
                 if(other != null && !other.block().isStatic()){
                     rotation |= (1 << i);
                 }
