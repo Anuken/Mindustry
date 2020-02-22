@@ -17,7 +17,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class PlanetRenderer implements PlanetGenerator{
-    private static final Color outlineColor = Pal.accent.cpy().a(0.7f);
+    private static final Color outlineColor = Pal.accent.cpy().a(0.6f);
     private static final float camLength = 4f, outlineRad = 1.15f;
     private static final boolean drawRect = false;
 
@@ -105,15 +105,16 @@ public class PlanetRenderer implements PlanetGenerator{
 
         if(Core.input.keyDown(KeyCode.MOUSE_LEFT)){
             float upV = cam.position.angle(Vec3.Y);
+            float xscale = 9f, yscale = 10f;
             float margin = 1;
 
             //scale X speed depending on polar coordinate
             float speed = 1f - Math.abs(upV - 90) / 90f;
 
-            cam.position.rotate(cam.up, (v.x - lastX) / 10 * speed);
+            cam.position.rotate(cam.up, (v.x - lastX) / xscale * speed);
 
             //prevent user from scrolling all the way up and glitching it out
-            float amount = (v.y - lastY) / 10;
+            float amount = (v.y - lastY) / yscale;
             amount = Mathf.clamp(upV + amount, margin, 180f - margin) - upV;
 
             cam.position.rotate(Tmp.v31.set(cam.up).rotate(cam.direction, 90), amount);

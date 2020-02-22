@@ -149,6 +149,10 @@ public class TestPlanetGenerator implements PlanetGenerator{
                 }
             }
 
+            trimDark();
+
+            median(2);
+
             schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
         }
 

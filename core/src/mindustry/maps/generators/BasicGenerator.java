@@ -12,10 +12,11 @@ import mindustry.world.*;
 
 import java.util.*;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public abstract class BasicGenerator implements WorldGenerator{
     protected static final DistanceHeuristic manhattan = (x1, y1, x2, y2) -> Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    protected static final ShortArray ints1 = new ShortArray(), ints2 = new ShortArray();
 
     protected Simplex sim = new Simplex();
     protected Simplex sim2 = new Simplex();
@@ -44,8 +45,38 @@ public abstract class BasicGenerator implements WorldGenerator{
 
     }
 
+    public void median(int radius){
+        median(radius, 0.5);
+    }
+
+    public void median(int radius, double percentile){
+        short[] blocks = new short[tiles.width * tiles.height];
+        short[] floors = new short[blocks.length];
+
+        tiles.each((x, y) -> {
+            ints1.clear();
+            ints2.clear();
+            Geometry.circle(x, y, width, height, radius, (cx, cy) -> {
+                ints1.add(tiles.getn(cx, cy).floorID());
+                ints2.add(tiles.getn(cx, cy).blockID());
+            });
+            ints1.sort();
+            ints2.sort();
+
+            floors[x + y*width] = ints1.get(Mathf.clamp((int)(ints1.size * percentile), 0, ints1.size - 1));
+            blocks[x + y*width] = ints2.get(Mathf.clamp((int)(ints2.size * percentile), 0, ints2.size - 1));
+        });
+
+        pass((x, y) -> {
+            block = content.block(blocks[x + y * width]);
+            floor = content.block(floors[x + y * width]);
+        });
+    }
+
     public void ores(Array<Block> ores){
         pass((x, y) -> {
+            if(floor.asFloor().isLiquid) return;
+
             int offsetX = x - 4, offsetY = y + 23;
             for(int i = ores.size - 1; i >= 0; i--){
                 Block entry = ores.get(i);
@@ -234,6 +265,19 @@ public abstract class BasicGenerator implements WorldGenerator{
         return out;
     }
 
+    public void trimDark(){
+        for(Tile tile : tiles){
+            boolean any = world.getDarkness(tile.x, tile.y) > 0;
+            for(int i = 0; i < 4 && !any; i++){
+                any = world.getDarkness(tile.x + Geometry.d4[i].x, tile.y + Geometry.d4[i].y) > 0;
+            }
+
+            if(any){
+                tile.setBlock(tile.floor().wall);
+            }
+        }
+    }
+
     public void inverseFloodFill(Tile start){
         IntArray arr = new IntArray();
         arr.add(start.pos());
@@ -254,7 +298,7 @@ public abstract class BasicGenerator implements WorldGenerator{
         }
 
         for(Tile tile : tiles){
-            if((tile.cost != 2 && tile.block() == Blocks.air) || world.getDarkness(tile.x, tile.y) != 0){
+            if(tile.cost != 2 && tile.block() == Blocks.air){
                 tile.setBlock(tile.floor().wall);
             }
         }
