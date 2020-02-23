@@ -1,2 +1,2 @@
-config desc [darkgray]https:[goldenrod]//[]discord.[lightgray]gg[goldenrod]/[darkgray]uQWecPM
+config desc [darkgray]survival, attack & modified jar https:[goldenrod]//[]discord.[lightgray]gg[goldenrod]/[darkgray]uQWecPM
 config motd off

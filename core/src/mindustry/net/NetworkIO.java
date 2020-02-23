@@ -72,23 +72,17 @@ public class NetworkIO{
         }
 
         String name = String.format("[goldenrod]Nydus Network [darkgray]//\\([%s]oo[])/\\\\", eyecolor);
-        String map = world.getMap() == null ? "None" : world.getMap().name().replaceAll("(\\[.*?\\])", "");
-        String description = headless && !Config.desc.string().equals("off") ? Config.desc.string().replaceAll("(\\[.*?\\])", "") : "";
+        String map = world.getMap() == null ? "None" : Strings.stripColors(world.getMap().name());
+        String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
 
         String[] greyscale = {"/127.0.0.1", "/192.99.169.18"};
         Log.info("ping: " + address.toString());
 
         if (Arrays.asList(greyscale).contains(address.toString())){
-            name = name.replaceAll("(\\[.*?\\])", "");
-            name = "First player to join = admin ❤️";
-            name = ":foot: :snake: <:ohno:597477759689687040> :scream:";
-            name = "<:plastanium:632785242805239810> craters welcome you️";
-            name = "<:slag:632785242968686632> join us, we have :cookie:";
-            name = "<:slag:632785242968686632> we would be honored if you would join us";
             name = "<:blastcompound:597478221944193024> come have a blast!";
+            description = Strings.stripColors(description);
         }
-
-
+        
         ByteBuffer buffer = ByteBuffer.allocate(512);
 
         writeString(buffer, name, 100);
