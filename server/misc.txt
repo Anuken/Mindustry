@@ -1,3 +1,3 @@
 config name [goldenrod]Nydus Network [darkgray]//\([lightgray]oo[])/\\
-config desc [lightgray] ,  &  [darkgray]https:[lightgray]//[]discord.gg[lightgray]/[]uQWecPM
+config desc [lightgray] ,  &  [darkgray]https://discord.gg/[goldenrod]uQWecPM
 config motd off
