@@ -52,7 +52,7 @@ public class Sector{
         //v33 is now the center of this shape
         Vec3 center = Tmp.v33.scl(1f / corners.length).cpy();
         //radius of circle
-        float radius = Tmp.v33.dst(corners[0]) * 0.9f;
+        float radius = Tmp.v33.dst(corners[0]) * 0.98f;
 
         //get plane that these points are on
         Plane plane = new Plane();
