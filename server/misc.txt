@@ -1,2 +1,5 @@
+config name [goldenrod]Nydus Network [darkgray]//\([lightgray]oo[])/\\
+config desc [darkgray]https:[goldenrod]//[]discord.[lightgray]gg[goldenrod]/[darkgray]uQWecPM
 config desc [darkgray]survival, attack & modified jar https:[goldenrod]//[]discord.[lightgray]gg[goldenrod]/[darkgray]uQWecPM
+config desc [darkgray] ,  &  https:[goldenrod]//[]discord.[lightgray]gg[goldenrod]/[darkgray]uQWecPM
 config motd off

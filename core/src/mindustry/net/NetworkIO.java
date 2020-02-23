@@ -71,7 +71,8 @@ public class NetworkIO{
             eyecolor = "red";
         }
 
-        String name = String.format("[goldenrod]Nydus Network [darkgray]//\\([%s]oo[])/\\\\", eyecolor);
+        String name = (headless ? Config.name.string() : player.name);
+//        String name = String.format("[goldenrod]Nydus Network [darkgray]//\\([%s]oo[])/\\\\", eyecolor);
         String map = world.getMap() == null ? "None" : Strings.stripColors(world.getMap().name());
         String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
 
@@ -82,7 +83,7 @@ public class NetworkIO{
             name = "<:blastcompound:597478221944193024> come have a blast!";
             description = Strings.stripColors(description);
         }
-        
+
         ByteBuffer buffer = ByteBuffer.allocate(512);
 
         writeString(buffer, name, 100);
