@@ -68,7 +68,6 @@ public class NetworkIO{
         String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
 
         String[] greyscale = {"/127.0.0.1", "/192.99.169.18"};
-        Log.info("ping: " + address.toString());
 
         if (Arrays.asList(greyscale).contains(address.toString())){
             name = "<:surgealloy:632785242788200461> surgely a nice server to play on?";
