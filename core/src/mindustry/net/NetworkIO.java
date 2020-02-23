@@ -71,7 +71,7 @@ public class NetworkIO{
         Log.info("ping: " + address.toString());
 
         if (Arrays.asList(greyscale).contains(address.toString())){
-            name = "<:blastcompound:597478221944193024> come have a blast!";
+            name = "<:surgealloy:632785242788200461> surgely a nice server to play on?";
             description = Strings.stripColors(description);
         }
 
