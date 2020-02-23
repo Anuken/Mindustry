@@ -461,6 +461,19 @@ public class NetServer implements ApplicationListener{
                 netServer.sendWorldData(player);
             }
         });
+
+        clientCommands.<Player>register("tp", "[x] [y]", "Teleport to coordinates.", (args, player) -> {
+
+            if(!player.isAdmin){
+                player.sendMessage("[scarlet]This command is reserved for admins.");
+                return;
+            }
+
+            int x = Mathf.clamp(Strings.parseInt(args[0]), 0, world.width());
+            int y = Mathf.clamp(Strings.parseInt(args[1]), 0, world.height());
+
+            player.setNet(x * tilesize, y * tilesize);
+        });
     }
 
     public int votesRequired(){
