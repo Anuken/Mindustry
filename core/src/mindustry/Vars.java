@@ -24,6 +24,7 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.Net;
 import mindustry.net.*;
+import mindustry.plugin.coreprotect.*;
 import mindustry.world.blocks.defense.ForceProjector.*;
 
 import java.io.*;
@@ -177,6 +178,7 @@ public class Vars implements Loadable{
     public static UI ui;
     public static NetServer netServer;
     public static NetClient netClient;
+    public static CoreProtect coreProtect;
 
     public static Entities entities;
     public static EntityGroup<Player> playerGroup;

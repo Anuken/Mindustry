@@ -154,6 +154,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void onTileTapped(Player player, Tile tile){
         if(tile == null || player == null) return;
+
+        coreProtect.onTileTapped(player, tile);
+
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.tapTile, tile, action -> {}))) throw new ValidateException(player, "Player cannot tap a tile.");
         tile.block().tapped(tile, player);

@@ -1,7 +1,6 @@
 package mindustry.entities.effect;
 
-import mindustry.annotations.Annotations.Loc;
-import mindustry.annotations.Annotations.Remote;
+import mindustry.annotations.Annotations.*;
 import arc.struct.Array;
 import arc.struct.IntSet;
 import arc.graphics.Color;
@@ -20,6 +19,7 @@ import mindustry.entities.type.Unit;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.graphics.Pal;
+import mindustry.net.*;
 import mindustry.world.Tile;
 
 import static mindustry.Vars.*;
@@ -52,7 +52,7 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     }
 
     /** Do not invoke! */
-    @Remote(called = Loc.server, unreliable = true)
+    @Remote(variants = Variant.both, called = Loc.server, unreliable = true)
     public static void createLighting(int seed, Team team, Color color, float damage, float x, float y, float rotation, int length){
 
         Lightning l = Pools.obtain(Lightning.class, Lightning::new);
