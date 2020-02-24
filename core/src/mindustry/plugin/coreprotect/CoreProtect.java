@@ -32,7 +32,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
 
     @Override
     public void registerClientCommands(CommandHandler handler){
-        handler.register("/", "Coreprotect wand toggle.", (args, player) -> {
+        handler.register("/", "Coreprotect toggle.", (args, player) -> {
             Stick stick = sticks.getOr((Player)player, Stick::new);
 
             if(stick.enabled = !stick.enabled){
