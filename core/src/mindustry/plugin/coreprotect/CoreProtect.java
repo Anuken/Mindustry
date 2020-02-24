@@ -60,7 +60,17 @@ public class CoreProtect extends Plugin implements ApplicationListener{
                 return;
             }
 
-            tiles(stick).each(t -> {
+            tiles(stick);
+
+            final int[] results = {0};
+            cuboid.each(t -> {
+                if(!edits.containsKey(t.pos())) return;
+                edits.get(t.pos()).each(edit -> results[0]++);
+            });
+
+            message((Player)player, Strings.format("-=[[ found [accent]{0}[] results ]=- {1}", results[0], Iconc.edit));
+
+            cuboid.each(t -> {
                 if(!edits.containsKey(t.pos())) return;
                 edits.get(t.pos()).each(edit -> {
                     message((Player)player, "- " + edit);
