@@ -12,6 +12,7 @@ import mindustry.world.*;
 /** A small section of a planet. */
 public class Sector{
     public final SectorRect rect;
+    public final Plane plane;
     public final Planet planet;
     public final Ptile tile;
     public final int id;
@@ -23,6 +24,7 @@ public class Sector{
     public Sector(Planet planet, Ptile tile, SectorData data){
         this.planet = planet;
         this.tile = tile;
+        this.plane = new Plane();
         this.rect = makeRect();
         this.id = tile.id;
         this.data = data;
@@ -56,7 +58,6 @@ public class Sector{
         float radius = Tmp.v33.dst(corners[0]) * 0.98f;
 
         //get plane that these points are on
-        Plane plane = new Plane();
         plane.set(corners[0], corners[2], corners[4]);
 
         //relative vectors
