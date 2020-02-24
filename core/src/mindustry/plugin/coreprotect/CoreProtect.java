@@ -17,6 +17,7 @@ import mindustry.net.Administration.*;
 import mindustry.plugin.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
 
@@ -115,7 +116,15 @@ public class CoreProtect extends Plugin implements ApplicationListener{
         Edit edit = new Edit();
         edit.player = Strings.stripColors(pac.player.name);
         edit.action = pac.type.name();
-        edit.block = pac.block == null ? (char)Fonts.getUnicode("dark-metal") : (char)Fonts.getUnicode(pac.block.name);
+
+        edit.visual = null;
+        if(pac.block != null) edit.visual = "" + (char)Fonts.getUnicode(pac.block.name);
+
+        if(pac.type == ActionType.configure){
+            if(pac.tile.block instanceof Sorter) edit.visual = "" + (char)Fonts.getUnicode(content.item(pac.config).name);
+        }
+
+        if(edit.visual == null) edit.visual = "" + (char)Fonts.getUnicode("dark-metal");
 
         edits.get(pac.tile.pos()).add(edit);
     }
@@ -152,12 +161,11 @@ public class CoreProtect extends Plugin implements ApplicationListener{
     }
 
     class Edit{
-        String player, action;
-        char block;
+        String player, visual, action;
 
         @Override
         public String toString(){
-            return Strings.format("[accent]{0} [white]{1} [accent]{2}", action, block, player);
+            return Strings.format("[accent]{0} [white]{1} [accent]{2}", action, visual, player);
         }
     }
 }
