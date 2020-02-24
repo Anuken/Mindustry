@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.CommandHandler.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.effect.*;
@@ -28,6 +29,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
 
     private ObjectMap<Player, Stick> sticks = new ObjectMap<>();
     private Array<Tile> cuboid = new Array<>();
+    private Array<Edit> lookup = new Array<>();
 
     private int timers = 0;
     private int spark = timers++;
@@ -52,7 +54,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
             }
         });
 
-        handler.register("lookup", "Coreprotect lookup.", (args, player) -> {
+        handler.register("lookup", "[size]", "Coreprotect lookup.", (args, player) -> {
             Stick stick = sticks.getOr((Player)player, Stick::new);
 
             if(!stick.enabled){
@@ -61,21 +63,31 @@ public class CoreProtect extends Plugin implements ApplicationListener{
             }
 
             tiles(stick);
-
-            final int[] results = {0};
+            lookup.clear();
             cuboid.each(t -> {
                 if(!edits.containsKey(t.pos())) return;
-                edits.get(t.pos()).each(edit -> results[0]++);
+                edits.get(t.pos()).each(edit -> lookup.add(edit));
             });
+            lookup.sort(edit -> -edit.frame);
 
-            message((Player)player, Strings.format("-=[[ found [accent]{0}[] results ]=- {1}", results[0], Iconc.edit));
+//            int per = 5;
+//            int page = args.length > 0 ? Strings.parseInt(args[0]) : 1;
+//            int pages = Math.max(1, Mathf.ceil(lookup.size / per));
+//
+//            message((Player)player, Strings.format("-=[[ found [accent]{0}[] results, page [accent]{1}[] of [accent]{2}[] ]=- {3}", lookup.size, page, pages, Iconc.edit));
+//
+//            for(int i = (per * page); i < Math.min(per * (page + 1), lookup.size); i++){
+//                message((Player)player, "- " + lookup.get(i));
+//            }
 
-            cuboid.each(t -> {
-                if(!edits.containsKey(t.pos())) return;
-                edits.get(t.pos()).each(edit -> {
-                    message((Player)player, "- " + edit);
-                });
-            });
+            message((Player)player, Strings.format("---"));
+
+            int i = 0;
+            int max = args.length > 0 ? Strings.parseInt(args[0]) : 5;
+            for(Edit edit : lookup){
+                if(i++ > max) break;
+                message((Player)player, "- " + edit);
+            }
         });
     }
 
@@ -125,6 +137,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
         if(!edits.containsKey(pac.tile.pos())) edits.put(pac.tile.pos(), new Array<>());
 
         if(pac.type == ActionType.tapTile) return; // ignore taps
+        if(pac.player == null) return; // sometimes configure has no player
 
         Edit edit = new Edit();
         edit.player = Strings.stripColors(pac.player.name);
@@ -201,7 +214,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
 
         @Override
         public String toString(){
-            return Strings.format("[accent]{0} [white]{1} [accent]{2} : {3} seconds ago", action, icon, player, (Core.graphics.getFrameId() - frame) / 60);
+            return Strings.format("[white]{0} [accent]{1} [white]{2}, {3} seconds ago", player, action, icon, (Core.graphics.getFrameId() - frame) / 60);
         }
     }
 }
