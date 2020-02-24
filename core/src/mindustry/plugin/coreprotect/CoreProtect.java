@@ -19,6 +19,7 @@ import mindustry.net.Administration.*;
 import mindustry.plugin.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
@@ -67,15 +68,14 @@ public class CoreProtect extends Plugin implements ApplicationListener{
     private void lookup(Player player, int max){
         Stick stick = sticks.getOr(player, Stick::new);
 
-        tiles(stick);
         lookup.clear();
-        cuboid.each(t -> {
+        tiles(stick).each(t -> {
             if(!edits.containsKey(t.pos())) return;
             edits.get(t.pos()).each(edit -> lookup.add(edit));
         });
         lookup.sort(edit -> -edit.frame);
 
-        message(player, Strings.format("-- showing [accent]{0}[] of [accent]{1}[] results", max, lookup.size));
+        message(player, Strings.format("-- showing [accent]{0}[] of [accent]{1}[] results", Mathf.clamp(max, 0, lookup.size), lookup.size));
 
         int i = 0;
         for(Edit edit : lookup){
@@ -99,7 +99,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
         }
 
         if(stick.xy1 == stick.xy2){
-            message((Player)player, Strings.format("Selection [accent]disabled[] {0}", Iconc.lock));
+            message(player, Strings.format("Selection [accent]disabled[] {0}", Iconc.lock));
             stick.disable();
             return;
         }
@@ -132,9 +132,12 @@ public class CoreProtect extends Plugin implements ApplicationListener{
         Edit edit = new Edit();
         edit.player = Strings.stripColors(pac.player.name);
         edit.action = pac.type.human;
+        edit.x = pac.tile.x;
+        edit.y = pac.tile.y;
 
         // block
         if(pac.type == ActionType.placeBlock || pac.type == ActionType.breakBlock){
+            if(pac.tile.block instanceof BlockPart) return; // skip block parts
             edit.icon = (char)Fonts.getUnicode(pac.block.name);
         }
 
@@ -163,6 +166,12 @@ public class CoreProtect extends Plugin implements ApplicationListener{
             }
         }
 
+        // prevent chain of (de)construction messages
+        if(edits.get(pac.tile.pos()).size > 0){
+            Edit last = edits.get(pac.tile.pos()).get(edits.get(pac.tile.pos()).size -1);
+            if(edit.similar(last)) return;
+        }
+
         edits.get(pac.tile.pos()).add(edit);
     }
 
@@ -178,7 +187,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
 
         for(int x = result.x; x <= result.x2; x++){
             for(int y = result.y; y <= result.y2; y++){
-                cuboid.add(world.ltile(x, y));
+                cuboid.add(world.tile(x, y));
             }
         }
 
@@ -200,17 +209,23 @@ public class CoreProtect extends Plugin implements ApplicationListener{
             xyi = 0;
             xy1 = Pos.invalid;
             xy2 = Pos.invalid;
+            enabled = false;
         }
     }
 
     class Edit{
+        int x, y;
         String player, action;
         char icon = (char)Fonts.getUnicode("dark-metal");
         long frame = Core.graphics.getFrameId();
 
+        public boolean similar(Edit edit){
+            return player.equals(edit.player) && action.equals(edit.action);
+        }
+
         @Override
         public String toString(){
-            return Strings.format("[white]{0} [accent]{1} [white]{2} {3} seconds ago", player, action, icon, (Core.graphics.getFrameId() - frame) / 60);
+            return Strings.format("[white]{0}[] [accent]{1}[] [white]{2} {3} seconds ago[] {4}, {5}", player, action, icon, (Core.graphics.getFrameId() - frame) / 60, x, y);
         }
     }
 }
