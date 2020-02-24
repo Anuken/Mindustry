@@ -187,10 +187,11 @@ public class CoreProtect extends Plugin implements ApplicationListener{
     class Edit{
         String player, action;
         char icon = (char)Fonts.getUnicode("dark-metal");
+        long frame = Core.graphics.getFrameId();
 
         @Override
         public String toString(){
-            return Strings.format("[accent]{0} [white]{1} [accent]{2}", action, icon, player);
+            return Strings.format("[accent]{0} [white]{1} [accent]{2} : {3} seconds ago", action, icon, player, (Core.graphics.getFrameId() - frame) / 60);
         }
     }
 }
