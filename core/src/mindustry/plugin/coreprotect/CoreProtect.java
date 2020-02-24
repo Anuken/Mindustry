@@ -48,9 +48,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
                 message((Player)player, Strings.format("Selection [accent]enabled[] {0}", Iconc.lockOpen));
             }else{
                 message((Player)player, Strings.format("Selection [accent]disabled[] {0}", Iconc.lock));
-                stick.xyi = 0;
-                stick.xy1 = Pos.invalid;
-                stick.xy2 = Pos.invalid;
+                stick.disable();
             }
         });
 
@@ -62,24 +60,28 @@ public class CoreProtect extends Plugin implements ApplicationListener{
                 return;
             }
 
-            tiles(stick);
-            lookup.clear();
-            cuboid.each(t -> {
-                if(!edits.containsKey(t.pos())) return;
-                edits.get(t.pos()).each(edit -> lookup.add(edit));
-            });
-            lookup.sort(edit -> -edit.frame);
-
-            int i = 0;
-            int max = args.length > 0 ? Strings.parseInt(args[0]) : 5;
-
-            message((Player)player, Strings.format("-- showing [accent]{0}[] of [accent]{1}[] results", max, lookup.size));
-
-            for(Edit edit : lookup){
-                if(i++ > max) break;
-                message((Player)player, "- " + edit);
-            }
+            lookup((Player)player, args.length > 0 ? Strings.parseInt(args[0]) : 5);
         });
+    }
+
+    private void lookup(Player player, int max){
+        Stick stick = sticks.getOr(player, Stick::new);
+
+        tiles(stick);
+        lookup.clear();
+        cuboid.each(t -> {
+            if(!edits.containsKey(t.pos())) return;
+            edits.get(t.pos()).each(edit -> lookup.add(edit));
+        });
+        lookup.sort(edit -> -edit.frame);
+
+        message(player, Strings.format("-- showing [accent]{0}[] of [accent]{1}[] results", max, lookup.size));
+
+        int i = 0;
+        for(Edit edit : lookup){
+            if(i++ > max) break;
+            message(player, "- " + edit);
+        }
     }
 
     public void onTileTapped(Player player, Tile tile){
@@ -87,25 +89,24 @@ public class CoreProtect extends Plugin implements ApplicationListener{
 
         if(!stick.enabled) return;
 
-        switch(stick.xyi++ % 3){
+        switch(stick.xyi++ % 2){
             case 0:
                 stick.xy1 = tile.pos();
-                message(player, Strings.format("Selected [accent]{0}, {1}[] as point 1 {2}", tile.x, tile.y, Iconc.pipette));
                 break;
             case 1:
                 stick.xy2 = tile.pos();
-                message(player, Strings.format("Selected [accent]{0}, {1}[] as point 2 {2}", tile.x, tile.y, Iconc.pipette));
                 break;
-            case 2:
-                stick.xy1 = Pos.invalid;
-                stick.xy2 = Pos.invalid;
-                message(player, Strings.format("Selection [accent]cleared[] {0}", Iconc.trash));
-                break;
+        }
+
+        if(stick.xy1 == stick.xy2){
+            message((Player)player, Strings.format("Selection [accent]disabled[] {0}", Iconc.lock));
+            stick.disable();
+            return;
         }
 
         if(tiles(stick).isEmpty()) return;
 
-        message(player, Strings.format("Selected [accent]{0}[] tiles in total {1}", cuboid.size, Iconc.play));
+        lookup(player, 5);
     }
 
     @Override
@@ -117,8 +118,6 @@ public class CoreProtect extends Plugin implements ApplicationListener{
                 sticks.each((player, stick) -> {
                     if(stick.xy1 != Pos.invalid) spark(player, stick.xy1, blue);
                     if(stick.xy2 != Pos.invalid) spark(player, stick.xy2, red);
-
-//                    tiles(stick).each(Fire::create);
                 });
             }
         });
@@ -196,6 +195,12 @@ public class CoreProtect extends Plugin implements ApplicationListener{
         int xy2 = Pos.invalid;
 
         boolean enabled = false;
+
+        void disable(){
+            xyi = 0;
+            xy1 = Pos.invalid;
+            xy2 = Pos.invalid;
+        }
     }
 
     class Edit{
