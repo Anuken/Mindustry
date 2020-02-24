@@ -83,5 +83,8 @@ public class Pal{
     redDust = Color.valueOf("ffa480"),
     redderDust = Color.valueOf("ff7b69"),
 
-    plasticSmoke = Color.valueOf("f1e479");
+    plasticSmoke = Color.valueOf("f1e479"),
+
+    copy = Color.valueOf("#549de5"),
+    copyBack = Color.valueOf("#3e73a7");
 }

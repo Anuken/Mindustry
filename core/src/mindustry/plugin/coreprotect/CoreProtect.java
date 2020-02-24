@@ -9,10 +9,11 @@ import mindustry.core.GameState.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.plugin.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class CoreProtect extends Plugin implements ApplicationListener{
 
@@ -21,6 +22,8 @@ public class CoreProtect extends Plugin implements ApplicationListener{
     private int timers = 0;
     private int spark = timers++;
     private Interval timer = new Interval(timers);
+
+    private Color red = Pal.remove, blue = Pal.copy;
 
     public void onTileTapped(Player player, Tile tile){
 
@@ -41,6 +44,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
     }
 
     private void spark(Player player, int pos){
-        Call.createLighting(player.con, 0, player.getTeam(), Color.white, 0, Pos.x(pos) * tilesize, Pos.y(pos) * tilesize, 0, 2);
+        Call.createLighting(player.con, 0, player.getTeam(), red, 0, Pos.x(pos) * tilesize, Pos.y(pos) * tilesize, 0, 2);
+        Call.createLighting(player.con, 0, player.getTeam(), blue, 0, Pos.x(pos) * tilesize, Pos.y(pos) * tilesize, 0, 2);
     }
 }
