@@ -70,20 +70,11 @@ public class CoreProtect extends Plugin implements ApplicationListener{
             });
             lookup.sort(edit -> -edit.frame);
 
-//            int per = 5;
-//            int page = args.length > 0 ? Strings.parseInt(args[0]) : 1;
-//            int pages = Math.max(1, Mathf.ceil(lookup.size / per));
-//
-//            message((Player)player, Strings.format("-=[[ found [accent]{0}[] results, page [accent]{1}[] of [accent]{2}[] ]=- {3}", lookup.size, page, pages, Iconc.edit));
-//
-//            for(int i = (per * page); i < Math.min(per * (page + 1), lookup.size); i++){
-//                message((Player)player, "- " + lookup.get(i));
-//            }
-
-            message((Player)player, Strings.format("---"));
-
             int i = 0;
             int max = args.length > 0 ? Strings.parseInt(args[0]) : 5;
+
+            message((Player)player, Strings.format("-- showing [accent]{0}[] of [accent]{1}[] results", max, lookup.size));
+
             for(Edit edit : lookup){
                 if(i++ > max) break;
                 message((Player)player, "- " + edit);
@@ -214,7 +205,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
 
         @Override
         public String toString(){
-            return Strings.format("[white]{0} [accent]{1} [white]{2}, {3} seconds ago", player, action, icon, (Core.graphics.getFrameId() - frame) / 60);
+            return Strings.format("[white]{0} [accent]{1} [white]{2} {3} seconds ago", player, action, icon, (Core.graphics.getFrameId() - frame) / 60);
         }
     }
 }
