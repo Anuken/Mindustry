@@ -575,7 +575,13 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, tapTile, withdrawItem, depositItem
+        breakBlock("demolished"), placeBlock("constructed"), rotate("rotated"), configure("configured"), tapTile("tapped"), withdrawItem("added"), depositItem("removed");
+
+        public final String human;
+
+        ActionType(String human){
+            this.human = human;
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package mindustry.plugin.coreprotect;
 
 import arc.*;
 import arc.graphics.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -18,6 +19,8 @@ import mindustry.plugin.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.sandbox.*;
+import mindustry.world.blocks.storage.*;
 
 import static mindustry.Vars.*;
 
@@ -115,16 +118,37 @@ public class CoreProtect extends Plugin implements ApplicationListener{
 
         Edit edit = new Edit();
         edit.player = Strings.stripColors(pac.player.name);
-        edit.action = pac.type.name();
+        edit.action = pac.type.human;
 
-        edit.visual = null;
-        if(pac.block != null) edit.visual = "" + (char)Fonts.getUnicode(pac.block.name);
-
-        if(pac.type == ActionType.configure){
-            if(pac.tile.block instanceof Sorter) edit.visual = "" + (char)Fonts.getUnicode(content.item(pac.config).name);
+        // block
+        if(pac.type == ActionType.placeBlock || pac.type == ActionType.breakBlock){
+            edit.icon = (char)Fonts.getUnicode(pac.block.name);
         }
 
-        if(edit.visual == null) edit.visual = "" + (char)Fonts.getUnicode("dark-metal");
+        // item
+        if(pac.type == ActionType.configure && (pac.tile.block instanceof Sorter || pac.tile.block instanceof Unloader || pac.tile.block instanceof ItemSource)){
+            edit.icon = (char)Fonts.getUnicode(content.item(pac.config).name);
+        }
+
+        // liquid
+        if(pac.type == ActionType.configure && (pac.tile.block instanceof LiquidSource)){
+            edit.icon = (char)Fonts.getUnicode(content.liquid(pac.config).name);
+        }
+
+        // banking
+        if(pac.type == ActionType.withdrawItem || pac.type == ActionType.depositItem){
+            edit.icon = (char)Fonts.getUnicode(content.item(pac.config).name);
+        }
+
+        // merry go round
+        if(pac.type == ActionType.rotate){
+            switch(pac.rotation){
+                case 0: edit.icon = Iconc.right; break;
+                case 1: edit.icon = Iconc.up;    break;
+                case 2: edit.icon = Iconc.left;  break;
+                case 3: edit.icon = Iconc.down;  break;
+            }
+        }
 
         edits.get(pac.tile.pos()).add(edit);
     }
@@ -161,11 +185,12 @@ public class CoreProtect extends Plugin implements ApplicationListener{
     }
 
     class Edit{
-        String player, visual, action;
+        String player, action;
+        char icon = (char)Fonts.getUnicode("dark-metal");
 
         @Override
         public String toString(){
-            return Strings.format("[accent]{0} [white]{1} [accent]{2}", action, visual, player);
+            return Strings.format("[accent]{0} [white]{1} [accent]{2}", action, icon, player);
         }
     }
 }
