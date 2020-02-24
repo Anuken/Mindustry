@@ -14,6 +14,7 @@ import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.input.Placement.*;
 import mindustry.plugin.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -32,11 +33,25 @@ public class CoreProtect extends Plugin implements ApplicationListener{
     public void onTileTapped(Player player, Tile tile){
         Stick stick = sticks.getOr(player, Stick::new);
 
-        if((stick.xyi++ % 2) == 0){
-            stick.xy1 = tile.pos();
-        }else{
-            stick.xy2 = tile.pos();
+        switch(stick.xyi++ % 3){
+            case 0:
+                stick.xy1 = tile.pos();
+                message(player, Strings.format("Selected [accent]{0}, {1}[] as point 1 {2}", tile.x, tile.y, Iconc.pipette));
+                break;
+            case 1:
+                stick.xy2 = tile.pos();
+                message(player, Strings.format("Selected [accent]{0}, {1}[] as point 2 {2}", tile.x, tile.y, Iconc.pipette));
+                break;
+            case 2:
+                stick.xy1 = Pos.invalid;
+                stick.xy2 = Pos.invalid;
+                message(player, Strings.format("Selection [accent]cleared[] {0}", Iconc.trash));
+                break;
         }
+
+        if(tiles(stick).isEmpty()) return;
+
+        message(player, Strings.format("Selected [accent]{0}[] tiles in total {1}", cuboid.size, Iconc.play));
     }
 
     @Override
@@ -46,8 +61,8 @@ public class CoreProtect extends Plugin implements ApplicationListener{
 
             if(timer.get(spark, 10)){
                 sticks.each((player, stick) -> {
-                    if(stick.xy1 != Pos.invalid) spark(player, stick.xy1, red);
-                    if(stick.xy2 != Pos.invalid) spark(player, stick.xy2, blue);
+                    if(stick.xy1 != Pos.invalid) spark(player, stick.xy1, blue);
+                    if(stick.xy2 != Pos.invalid) spark(player, stick.xy2, red);
 
                     tiles(stick).each(Fire::create);
                 });
@@ -63,20 +78,23 @@ public class CoreProtect extends Plugin implements ApplicationListener{
         cuboid.clear();
         if(stick.xy1 == Pos.invalid || stick.xy2 == Pos.invalid) return cuboid;
 
-        NormalizeResult dresult = Placement.normalizeArea(Pos.x(stick.xy1), Pos.y(stick.xy1), Pos.x(stick.xy2), Pos.y(stick.xy2), 0, false, 1024);
+        NormalizeResult result = Placement.normalizeArea(Pos.x(stick.xy1), Pos.y(stick.xy1), Pos.x(stick.xy2), Pos.y(stick.xy2), 0, false, 1024);
 
-        for(int x = dresult.x; x <= dresult.x2; x++){
-            for(int y = dresult.y; y <= dresult.y2; y++){
-                Tile tile = world.ltile(x, y);
-                Fire.create(tile);
+        for(int x = result.x; x <= result.x2; x++){
+            for(int y = result.y; y <= result.y2; y++){
+                cuboid.add(world.ltile(x, y));
             }
         }
 
         return cuboid;
     }
 
+    private void message(Player player, String message){
+        player.sendMessage(String.format("[royal]%s %s", Iconc.eye, message));
+    }
+
     class Stick{
-        int xyi = Pos.invalid;
+        int xyi = 0;
         int xy1 = Pos.invalid;
         int xy2 = Pos.invalid;
     }
