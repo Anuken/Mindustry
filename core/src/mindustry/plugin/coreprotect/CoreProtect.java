@@ -198,6 +198,11 @@ public class CoreProtect extends Plugin implements ApplicationListener{
         player.sendMessage(String.format("[royal]%s %s", Iconc.eye, message));
     }
 
+    public void reset(){
+        sticks.clear();
+        edits.clear();
+    }
+
     class Stick{
         int xyi = 0;
         int xy1 = Pos.invalid;
