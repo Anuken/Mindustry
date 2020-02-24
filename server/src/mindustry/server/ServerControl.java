@@ -904,7 +904,6 @@ public class ServerControl implements ApplicationListener{
             }
             
             logic.reset();
-            coreProtect.reset();
 
             Call.onWorldDataBegin();
             run.run();
