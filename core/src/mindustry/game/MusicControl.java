@@ -100,6 +100,8 @@ public class MusicControl{
     /** Plays and fades in a music track. This must be called every frame.
      * If something is already playing, fades out that track and fades in this new music.*/
     private void play(@Nullable Music music){
+        if(!shouldPlay()) return;
+
         //update volume of current track
         if(current != null){
             current.setVolume(fade * Core.settings.getInt("musicvol") / 100f);
@@ -143,7 +145,7 @@ public class MusicControl{
 
     /** Plays a music track once and only once. If something is already playing, does nothing.*/
     private void playOnce(Music music){
-        if(current != null || music == null) return; //do not interrupt already-playing tracks
+        if(current != null || music == null || !shouldPlay()) return; //do not interrupt already-playing tracks
 
         //save last random track played to prevent duplicates
         lastRandomPlayed = music;
@@ -160,6 +162,10 @@ public class MusicControl{
             }
         });
         current.play();
+    }
+
+    private boolean shouldPlay(){
+        return Core.settings.getInt("musicvol") > 0;
     }
 
     /** Fades out the current track, unless it has already been silenced. */

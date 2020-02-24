@@ -156,7 +156,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     void removeRequest(BuildRequest request){
-        selectRequests.removeValue(request, true);
+        selectRequests.remove(request, true);
         if(!request.breaking){
             removals.add(request);
         }
@@ -179,19 +179,19 @@ public class MobileInput extends InputHandler implements GestureListener{
         table.row();
         table.left().margin(0f).defaults().size(48f);
 
-        table.addImageButton(Icon.breakSmall, Styles.clearTogglePartiali, () -> {
+        table.addImageButton(Icon.hammer, Styles.clearTogglePartiali, () -> {
             mode = mode == breaking ? block == null ? none : placing : breaking;
             lastBlock = block;
         }).update(l -> l.setChecked(mode == breaking)).name("breakmode");
 
         //diagonal swap button
-        table.addImageButton(Icon.diagonalSmall, Styles.clearTogglePartiali, () -> {
+        table.addImageButton(Icon.diagonal, Styles.clearTogglePartiali, () -> {
             Core.settings.put("swapdiagonal", !Core.settings.getBool("swapdiagonal"));
             Core.settings.save();
         }).update(l -> l.setChecked(Core.settings.getBool("swapdiagonal")));
 
         //rotate button
-        table.addImageButton(Icon.arrowSmall, Styles.clearTogglePartiali, () -> {
+        table.addImageButton(Icon.right, Styles.clearTogglePartiali, () -> {
             if(block != null && block.rotate){
                 rotation = Mathf.mod(rotation + 1, 4);
             }else{
@@ -205,12 +205,12 @@ public class MobileInput extends InputHandler implements GestureListener{
             boolean arrow = block != null && block.rotate;
 
             i.getImage().setRotationOrigin(!arrow ? 0 : rotation * 90, Align.center);
-            i.getStyle().imageUp = arrow ? Icon.arrowSmall : Icon.pasteSmall;
+            i.getStyle().imageUp = arrow ? Icon.right : Icon.paste;
             i.setChecked(!arrow && schematicMode);
         });
 
         //confirm button
-        table.addImageButton(Icon.checkSmall, Styles.clearPartiali, () -> {
+        table.addImageButton(Icon.ok, Styles.clearPartiali, () -> {
             for(BuildRequest request : selectRequests){
                 Tile tile = request.tile();
 
@@ -253,12 +253,12 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         group.fill(t -> {
             t.bottom().left().visible(() -> (player.isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
-            t.addImageTextButton("$cancel", Icon.cancelSmall, () -> {
+            t.addImageTextButton("$cancel", Icon.cancel, () -> {
                 player.clearBuilding();
                 selectRequests.clear();
                 mode = none;
                 block = null;
-            }).width(155f);
+            }).width(155f).margin(12f);
         });
 
         group.fill(t -> {
@@ -269,15 +269,15 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                 ImageButtonStyle style = Styles.clearPartiali;
 
-                b.addImageButton(Icon.floppySmall, style, this::showSchematicSave).disabled(f -> lastSchematic == null || lastSchematic.file != null);
-                b.addImageButton(Icon.cancelSmall, style, () -> {
+                b.addImageButton(Icon.save, style, this::showSchematicSave).disabled(f -> lastSchematic == null || lastSchematic.file != null);
+                b.addImageButton(Icon.cancel, style, () -> {
                     selectRequests.clear();
                 });
                 b.row();
-                b.addImageButton(Icon.flipSmall, style, () -> flipRequests(selectRequests, true));
-                b.addImageButton(Icon.flipSmall, style, () -> flipRequests(selectRequests, false)).update(i -> i.getImage().setRotationOrigin(90f, Align.center));
+                b.addImageButton(Icon.flipX, style, () -> flipRequests(selectRequests, true));
+                b.addImageButton(Icon.flipY, style, () -> flipRequests(selectRequests, false));
                 b.row();
-                b.addImageButton(Icon.rotateSmall, style, () -> rotateRequests(selectRequests, 1));
+                b.addImageButton(Icon.rotate, style, () -> rotateRequests(selectRequests, 1));
 
             }).margin(4f);
         });

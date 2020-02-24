@@ -1,10 +1,8 @@
 package mindustry.content;
 
 import arc.struct.*;
-import mindustry.ctype.ContentList;
+import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.type.*;
-import mindustry.entities.type.Bullet;
 import mindustry.entities.type.base.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -103,23 +101,15 @@ public class UnitTypes implements ContentList{
                 reload = 12f;
                 ejectEffect = Fx.none;
                 shootSound = Sounds.explosion;
-                bullet = new BombBulletType(2f, 3f, "clear"){
-                    {
-                        hitEffect = Fx.pulverize;
-                        lifetime = 30f;
-                        speed = 1.1f;
-                        splashDamageRadius = 55f;
-                        splashDamage = 30f;
-                    }
-
-                    @Override
-                    public void init(Bullet b){
-                        if(b.getOwner() instanceof Unit){
-                            ((Unit)b.getOwner()).kill();
-                        }
-                        b.time(b.lifetime());
-                    }
-                };
+                bullet = new BombBulletType(2f, 3f, "clear"){{
+                    hitEffect = Fx.pulverize;
+                    lifetime = 30f;
+                    speed = 1.1f;
+                    splashDamageRadius = 55f;
+                    instantDisappear = true;
+                    splashDamage = 30f;
+                    killShooter = true;
+                }};
             }};
         }};
 
@@ -137,7 +127,6 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.flame;
                 length = 1f;
                 reload = 14f;
-                range = 30f;
                 alternate = true;
                 recoil = 1f;
                 ejectEffect = Fx.none;

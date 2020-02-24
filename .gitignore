@@ -22,6 +22,7 @@ logs/
 /server/build/
 changelog
 saves/
+/core/assets-raw/fontgen/out/
 core/assets/saves/
 /core/assets/saves/
 steam_appid.txt
@@ -30,6 +31,7 @@ steam_appid.txt
 /android/assets/mindustry-maps/
 /android/assets/mindustry-saves/
 /core/assets/gifexport/
+/annotations/src/main/resources/META-INF/services
 /core/assets/version.properties
 /core/assets/locales
 /ios/src/mindustry/gen/
@@ -40,6 +42,7 @@ config/
 changelog
 *.gif
 /core/assets/saves/
+/out/
 
 version.properties
 

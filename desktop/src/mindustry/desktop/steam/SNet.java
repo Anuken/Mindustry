@@ -172,7 +172,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     @Override
     public void hostServer(int port) throws IOException{
         provider.hostServer(port);
-        smat.createLobby(Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly, 16);
+        smat.createLobby(Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly, Core.settings.getInt("playerlimit"));
 
         Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: {0}\nClient: {1}\nActive: {2}", net.server(), net.client(), net.active()))));
     }
@@ -180,6 +180,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     public void updateLobby(){
         if(currentLobby != null && net.server()){
             smat.setLobbyType(currentLobby, Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly);
+            smat.setLobbyMemberLimit(currentLobby, Core.settings.getInt("playerlimit"));
         }
     }
 
@@ -315,7 +316,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                         Strings.parseInt(smat.getLobbyData(lobby, "version"), -1),
                         smat.getLobbyData(lobby, "versionType"),
                         Gamemode.valueOf(smat.getLobbyData(lobby, "gamemode")),
-                        smat.getLobbyMemberLimit(lobby)
+                        smat.getLobbyMemberLimit(lobby),
+                        ""
                     );
                     hosts.add(out);
                 }catch(Exception e){

@@ -5,6 +5,7 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.content.Fx;
 import mindustry.content.Liquids;
 import mindustry.entities.Effects;
@@ -26,7 +27,7 @@ public class SolidPump extends Pump{
     public float updateEffectChance = 0.02f;
     public float rotateSpeed = 1f;
     /** Attribute that is checked when calculating output. */
-    public Attribute attribute;
+    public @Nullable Attribute attribute;
 
     public SolidPump(String name){
         super(name);
@@ -64,6 +65,9 @@ public class SolidPump extends Pump{
 
         stats.remove(BlockStat.output);
         stats.add(BlockStat.output, result, 60f * pumpAmount, true);
+        if(attribute != null){
+            stats.add(BlockStat.affinities, attribute);
+        }
     }
 
     @Override
@@ -107,6 +111,7 @@ public class SolidPump extends Pump{
             tile.entity.liquids.add(result, maxPump);
             entity.lastPump = maxPump;
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
+            if(tile.entity.timer.get(timerContentCheck, 10)) useContent(tile, result);
             if(Mathf.chance(entity.delta() * updateEffectChance))
                 Effects.effect(updateEffect, entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
         }else{

@@ -18,6 +18,7 @@ import mindustry.graphics.*;
 import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.Net;
+import mindustry.ui.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -32,6 +33,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void setup(){
+        Events.fire(new ClientCreateEvent());
+
         Vars.loadLogger();
         Vars.loadFileLogger();
         Vars.platform = this;
@@ -55,14 +58,15 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Vars.net = new Net(platform.getNet());
         mods = new Mods();
 
-        UI.loadSystemCursors();
+        Fonts.loadSystemCursors();
 
         assets.load(new Vars());
 
-        UI.loadDefaultFont();
+        Fonts.loadDefaultFont();
 
         assets.load(new AssetDescriptor<>("sprites/sprites.atlas", TextureAtlas.class)).loaded = t -> {
             atlas = (TextureAtlas)t;
+            Fonts.mergeFontAtlas(atlas);
         };
 
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());

@@ -24,7 +24,7 @@ import java.io.*;
 import static mindustry.Vars.*;
 
 public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
-    public static final float timeToSleep = 60f * 4; //4 seconds to fall asleep
+    public static final float timeToSleep = 60f * 1; //1 second to fall asleep
     private static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
     /** This value is only used for debugging. */
     public static int sleepingEntities = 0;
@@ -204,7 +204,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
                 other.block().onProximityUpdate(other);
 
                 if(other.entity != null){
-                    other.entity.proximity.removeValue(tile, true);
+                    other.entity.proximity.remove(tile, true);
                 }
             }
         }

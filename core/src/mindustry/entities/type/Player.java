@@ -36,7 +36,6 @@ import static mindustry.Vars.*;
 public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public static final int timerSync = 2;
     public static final int timerAbility = 3;
-    public static final int timerTransfer = 4;
     private static final int timerShootLeft = 0;
     private static final int timerShootRight = 1;
     private static final float liftoffBoost = 0.2f;
@@ -407,9 +406,9 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             if(isAdmin){
                 float s = 3f;
                 Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
-                Draw.rect(Core.atlas.find("icon-admin-badge"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1.5f, s, s);
+                Draw.rect(Icon.adminSmall.getRegion(), x + layout.width / 2f + 2 + 1, y + nameHeight - 1.5f, s, s);
                 Draw.color(color);
-                Draw.rect(Core.atlas.find("icon-admin-badge"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1f, s, s);
+                Draw.rect(Icon.adminSmall.getRegion(), x + layout.width / 2f + 2 + 1, y + nameHeight - 1f, s, s);
             }
         }
 

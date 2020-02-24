@@ -32,7 +32,6 @@ import java.util.*;
 
 import static arc.Core.settings;
 
-@SuppressWarnings("unchecked")
 public class Vars implements Loadable{
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
@@ -60,7 +59,7 @@ public class Vars implements Loadable{
     public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers.json";
     /** URL to the JSON file containing all the BE servers. Only queried in BE. */
     public static final String serverJsonBeURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_be.json";
-    /** URL the links to the wiki's modding guide.*/
+    /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?template=bug_report.md";
     /** list of built-in servers.*/
     public static final Array<String> defaultServers = Array.with();
@@ -88,7 +87,7 @@ public class Vars implements Loadable{
     public static final Color[] playerColors = {
         Color.valueOf("82759a"),
         Color.valueOf("c0c1c5"),
-        Color.valueOf("fff0e7"),
+        Color.valueOf("ffffff"),
         Color.valueOf("7d2953"),
         Color.valueOf("ff074e"),
         Color.valueOf("ff072a"),

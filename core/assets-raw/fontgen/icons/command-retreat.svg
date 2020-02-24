@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg22"
+   width="5.875"
+   height="5.5"
+   viewBox="0 0 5.875 5.5"
+   sodipodi:docname="command-retreat.svg"
+   inkscape:version="0.92.4 (f8dce91, 2019-08-02)">
+  <metadata
+     id="metadata28">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs26" />
+  <sodipodi:namedview
+     pagecolor="#000000"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2560"
+     inkscape:window-height="1318"
+     id="namedview24"
+     showgrid="false"
+     inkscape:zoom="29.5"
+     inkscape:cx="-14.520127"
+     inkscape:cy="1.4618644"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g36" />
+  <g
+     id="g36"
+     transform="translate(-1.0625,-1.25)">
+    <path
+       style="fill:#ffffff;fill-opacity:1"
+       d="M 3,1.5 Q 3.25,1.25 3.5,1.25 3.75,1.25 3.875,1.625 4,2 4.125,2.375 4.25,2.75 4.625,2.875 5,3 5.5,3 6,3 6.375,3.125 6.75,3.25 6.875,3.625 7,4 6.875,4.375 6.75,4.75 6.375,4.875 6,5 5.5,5 5,5 4.625,5.125 4.25,5.25 4.125,5.625 4,6 3.875,6.375 3.75,6.75 3.5,6.75 3.25,6.75 3,6.5 2.75,6.25 2.5,6 2.25,5.75 2,5.5 1.75,5.25 1.5,5 1.25,4.75 1.125,4.375 1,4 1.125,3.625 1.25,3.25 1.5,3 1.75,2.75 2,2.5 2.25,2.25 2.5,2 2.75,1.75 3,1.5"
+       id="path34"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

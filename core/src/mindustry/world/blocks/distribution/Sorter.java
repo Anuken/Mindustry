@@ -3,8 +3,8 @@ package mindustry.world.blocks.distribution;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.type.*;
 import mindustry.type.*;
@@ -14,7 +14,7 @@ import mindustry.world.meta.*;
 
 import java.io.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class Sorter extends Block{
     private static Item lastItem;
@@ -46,6 +46,9 @@ public class Sorter extends Block{
     @Override
     public void configured(Tile tile, Player player, int value){
         tile.<SorterEntity>ent().sortItem = content.item(value);
+        if(!headless){
+            renderer.minimap.update(tile);
+        }
     }
 
     @Override
@@ -85,7 +88,8 @@ public class Sorter extends Block{
     }
 
     boolean isSame(Tile tile, Tile other){
-        return other != null && other.block() instanceof Sorter;
+        //uncomment comment below to prevent sorter/gate chaining (hacky)
+        return other != null && (other.block() instanceof Sorter/* || other.block() instanceof OverflowGate */);
     }
 
     Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
@@ -132,7 +136,7 @@ public class Sorter extends Block{
     @Override
     public void buildConfiguration(Tile tile, Table table){
         SorterEntity entity = tile.ent();
-        ItemSelection.buildItemTable(table, () -> entity.sortItem, item -> {
+        ItemSelection.buildTable(table, content.items(), () -> entity.sortItem, item -> {
             lastItem = item;
             tile.configure(item == null ? -1 : item.id);
         });

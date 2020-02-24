@@ -28,8 +28,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     private Position to;
     private Runnable done;
 
-    public ItemTransfer(){
-    }
+    public ItemTransfer(){}
 
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemEffect(Item item, float x, float y, Unit to){

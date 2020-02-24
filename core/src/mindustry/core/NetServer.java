@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
+import arc.util.serialization.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -15,7 +16,6 @@ import mindustry.entities.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
-import mindustry.net.Administration;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -93,6 +93,16 @@ public class NetServer implements ApplicationListener{
             }
 
             String uuid = packet.uuid;
+            byte[] buuid = Base64Coder.decode(uuid);
+            CRC32 crc = new CRC32();
+            crc.update(buuid, 0, 8);
+            ByteBuffer buff = ByteBuffer.allocate(8);
+            buff.put(buuid, 8, 8);
+            buff.position(0);
+            if(crc.getValue() != buff.getLong()){
+                con.kick(KickReason.clientOutdated);
+                return;
+            }
 
             if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address)) return;
 
@@ -121,7 +131,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(admins.getPlayerLimit() > 0 && playerGroup.size() >= admins.getPlayerLimit()){
+            if(admins.getPlayerLimit() > 0 && playerGroup.size() >= admins.getPlayerLimit() && !netServer.admins.isAdmin(uuid, packet.usid)){
                 con.kick(KickReason.playerLimit);
                 return;
             }
@@ -207,6 +217,11 @@ public class NetServer implements ApplicationListener{
             player.color.set(packet.color);
             player.color.a = 1f;
 
+            //save admin ID but don't overwrite it
+            if(!player.isAdmin && !info.admin){
+                info.adminUsid = packet.usid;
+            }
+
             try{
                 writeBuffer.position(0);
                 player.write(outputBuffer);
@@ -234,6 +249,13 @@ public class NetServer implements ApplicationListener{
                 RemoteReadServer.readPacket(packet.writeBuffer, packet.type, con.player);
             }catch(ValidateException e){
                 Log.debug("Validation failed for '{0}': {1}", e.player, e.getMessage());
+            }catch(RuntimeException e){
+                if(e.getCause() instanceof ValidateException){
+                    ValidateException v = (ValidateException)e.getCause();
+                    Log.debug("Validation failed for '{0}': {1}", v.player, v.getMessage());
+                }else{
+                    throw e;
+                }
             }
         });
 
@@ -257,7 +279,7 @@ public class NetServer implements ApplicationListener{
 
             page --;
 
-            if(page > pages || page < 0){
+            if(page >= pages || page < 0){
                 player.sendMessage("[scarlet]'page' must be a number between[orange] 1[] and[orange] " + pages + "[scarlet].");
                 return;
             }
@@ -277,7 +299,11 @@ public class NetServer implements ApplicationListener{
         });
 
         //duration of a a kick in seconds
-        int kickDuration = 15 * 60;
+        int kickDuration = 60 * 60;
+        //voting round duration in seconds
+        float voteDuration = 0.5f * 60;
+        //cooldown between votes
+        int voteCooldown = 60 * 1;
 
         class VoteSession{
             Player target;
@@ -295,14 +321,14 @@ public class NetServer implements ApplicationListener{
                         map[0] = null;
                         task.cancel();
                     }
-                }, 60 * 1);
+                }, voteDuration);
             }
 
             void vote(Player player, int d){
                 votes += d;
                 voted.addAll(player.uuid, admins.getInfo(player.uuid).lastIP);
                         
-                Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted to kick[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
+                Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted on kicking[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
                             player.name, target.name, votes, votesRequired()));
             }
 
@@ -319,9 +345,7 @@ public class NetServer implements ApplicationListener{
             }
         }
 
-        //cooldown between votes
-        int voteTime = 60 * 3;
-        Timekeeper vtime = new Timekeeper(voteTime);
+        Timekeeper vtime = new Timekeeper(voteCooldown);
         //current kick sessions
         VoteSession[] currentlyKicking = {null};
 
@@ -368,7 +392,7 @@ public class NetServer implements ApplicationListener{
                         player.sendMessage("[scarlet]Only players on your team can be kicked.");
                     }else{
                         if(!vtime.get()){
-                            player.sendMessage("[scarlet]You must wait " + voteTime/60 + " minutes between votekicks.");
+                            player.sendMessage("[scarlet]You must wait " + voteCooldown/60 + " minutes between votekicks.");
                             return;
                         }
 
@@ -463,7 +487,7 @@ public class NetServer implements ApplicationListener{
                 Call.onPlayerDisconnect(player.id);
             }
 
-            Log.info("&lm[{1}] &lc{0} has disconnected. &lg&fi({2})", player.name, player.uuid, reason);
+            if(Config.showConnectMessages.bool()) Log.info("&lm[{1}] &lc{0} has disconnected. &lg&fi({2})", player.name, player.uuid, reason);
         }
 
         player.remove();
@@ -611,8 +635,10 @@ public class NetServer implements ApplicationListener{
 
         player.add();
         player.con.hasConnected = true;
-        if(Config.showConnectMessages.bool()) Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
-        Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
+        if(Config.showConnectMessages.bool()){
+            Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
+            Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
+        }
 
         if(!Config.motd.string().equalsIgnoreCase("off")){
             player.sendMessage(Config.motd.string());
