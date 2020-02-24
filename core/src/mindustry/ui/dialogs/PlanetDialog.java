@@ -28,6 +28,7 @@ public class PlanetDialog extends FloatingDialog{
     private final VertexBatch3D batch = new VertexBatch3D(false, true, 0);
 
     private float lastX, lastY;
+    private Sector selected;
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
@@ -93,6 +94,7 @@ public class PlanetDialog extends FloatingDialog{
         planet.mesh.render(cam.combined());
         outline.render(cam.combined());
 
+        //dftactgrp sqlrpgle
         Ptile tile = outline.getTile(cam.getPickRay(Core.input.mouseX(), Core.input.mouseY()));
         if(tile != null){
             float length = 0.1f;
