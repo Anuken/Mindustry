@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 
 public class CoreProtect extends Plugin implements ApplicationListener{
 
-    private ObjectMap<Player, IntSet> sparks = new ObjectMap<>();
+    private ObjectMap<Player, Stick> sticks = new ObjectMap<>();
 
     private int timers = 0;
     private int spark = timers++;
@@ -26,10 +26,13 @@ public class CoreProtect extends Plugin implements ApplicationListener{
     private Color red = Pal.remove, blue = Pal.copy;
 
     public void onTileTapped(Player player, Tile tile){
+        Stick stick = sticks.getOr(player, Stick::new);
 
-        if(!sparks.containsKey(player)) sparks.put(player, new IntSet());
-
-        sparks.get(player).add(tile.pos());
+        if((stick.xyi++ % 2) == 0){
+            stick.xy1 = tile.pos();
+        }else{
+            stick.xy2 = tile.pos();
+        }
     }
 
     @Override
@@ -38,13 +41,21 @@ public class CoreProtect extends Plugin implements ApplicationListener{
             if(!Vars.state.is(State.playing)) return;
 
             if(timer.get(spark, 10)){
-                sparks.each((player, ints) -> ints.each(pos -> spark(player, pos)));
+                sticks.each((player, stick) -> {
+                    if(stick.xy1 != Pos.invalid) spark(player, stick.xy1, red);
+                    if(stick.xy2 != Pos.invalid) spark(player, stick.xy2, blue);
+                });
             }
         });
     }
 
-    private void spark(Player player, int pos){
-        Call.createLighting(player.con, 0, player.getTeam(), red, 0, Pos.x(pos) * tilesize, Pos.y(pos) * tilesize, 0, 2);
-        Call.createLighting(player.con, 0, player.getTeam(), blue, 0, Pos.x(pos) * tilesize, Pos.y(pos) * tilesize, 0, 2);
+    private void spark(Player player, int pos, Color color){
+        Call.createLighting(player.con, 0, player.getTeam(), color, 0, Pos.x(pos) * tilesize, Pos.y(pos) * tilesize, 0, 2);
+    }
+
+    class Stick{
+        int xyi = Pos.invalid;
+        int xy1 = Pos.invalid;
+        int xy2 = Pos.invalid;
     }
 }
