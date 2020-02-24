@@ -13,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.input.Placement.*;
+import mindustry.net.Administration.*;
 import mindustry.plugin.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -30,9 +31,11 @@ public class CoreProtect extends Plugin implements ApplicationListener{
 
     private Color red = Pal.remove, blue = Pal.copy;
 
+    private IntMap<Array<Edit>> edits = new IntMap<>();
+
     @Override
     public void registerClientCommands(CommandHandler handler){
-        handler.register("/", "Coreprotect toggle.", (args, player) -> {
+        handler.register("/", "Coreprotect wand.", (args, player) -> {
             Stick stick = sticks.getOr((Player)player, Stick::new);
 
             if(stick.enabled = !stick.enabled){
@@ -43,6 +46,22 @@ public class CoreProtect extends Plugin implements ApplicationListener{
                 stick.xy1 = Pos.invalid;
                 stick.xy2 = Pos.invalid;
             }
+        });
+
+        handler.register("lookup", "Coreprotect lookup.", (args, player) -> {
+            Stick stick = sticks.getOr((Player)player, Stick::new);
+
+            if(!stick.enabled){
+                message((Player)player, Strings.format("Selection [accent]required[] {0}", Iconc.block));
+                return;
+            }
+
+            tiles(stick).each(t -> {
+                if(!edits.containsKey(t.pos())) return;
+                edits.get(t.pos()).each(edit -> {
+                    message((Player)player, "- " + edit);
+                });
+            });
         });
     }
 
@@ -88,6 +107,19 @@ public class CoreProtect extends Plugin implements ApplicationListener{
         });
     }
 
+    public void allowedAction(PlayerAction pac){
+        if(!edits.containsKey(pac.tile.pos())) edits.put(pac.tile.pos(), new Array<>());
+
+        if(pac.type == ActionType.tapTile) return; // ignore taps
+
+        Edit edit = new Edit();
+        edit.player = Strings.stripColors(pac.player.name);
+        edit.action = pac.type.name();
+        edit.block = pac.block == null ? (char)Fonts.getUnicode("dark-metal") : (char)Fonts.getUnicode(pac.block.name);
+
+        edits.get(pac.tile.pos()).add(edit);
+    }
+
     private void spark(Player player, int pos, Color color){
         Call.createLighting(player.con, 0, player.getTeam(), color, 0, Pos.x(pos) * tilesize, Pos.y(pos) * tilesize, 0, 2);
     }
@@ -117,5 +149,15 @@ public class CoreProtect extends Plugin implements ApplicationListener{
         int xy2 = Pos.invalid;
 
         boolean enabled = false;
+    }
+
+    class Edit{
+        String player, action;
+        char block;
+
+        @Override
+        public String toString(){
+            return Strings.format("[accent]{0} [white]{1} [accent]{2}", action, block, player);
+        }
     }
 }

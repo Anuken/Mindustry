@@ -13,7 +13,7 @@ import mindustry.entities.type.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.headless;
+import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
 
 public class Administration{
@@ -110,6 +110,8 @@ public class Administration{
                 return false;
             }
         }
+
+        coreProtect.allowedAction(act);
         Pools.free(act);
         return true;
     }
@@ -568,6 +570,7 @@ public class Administration{
             player = null;
             type = null;
             tile = null;
+            block = null;
         }
     }
 
