@@ -4,10 +4,10 @@ import arc.graphics.*;
 import arc.graphics.VertexAttributes.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
+import arc.math3d.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.graphics.PlanetGrid.*;
-import mindustry.maps.planet.*;
 
 public class PlanetMesh{
     private float[] floats = new float[3 + 3 + 1];
@@ -19,13 +19,13 @@ public class PlanetMesh{
     private boolean lines;
     private float radius, intensity = 0.2f;
 
-    private final PlanetGenerator gen;
+    private final PlanetMesher gen;
 
-    public PlanetMesh(int divisions, PlanetGenerator gen){
+    public PlanetMesh(int divisions, PlanetMesher gen){
         this(divisions, gen, 1f, false);
     }
 
-    public PlanetMesh(int divisions, PlanetGenerator gen, float radius, boolean lines){
+    public PlanetMesh(int divisions, PlanetMesher gen, float radius, boolean lines){
         this.gen = gen;
         this.radius = radius;
         this.grid = PlanetGrid.newGrid(divisions);

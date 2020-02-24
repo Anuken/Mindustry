@@ -198,18 +198,7 @@ public class World{
     public void loadSector(Sector sector){
         state.rules.sector = sector;
         int size = (int)(sector.rect.radius * 3200);
-
-        loadGenerator(size, size, tiles -> {
-            TileGen gen = new TileGen();
-            tiles.each((x, y) -> {
-                gen.reset();
-                Vec3 position = sector.rect.project(x / (float)size, y / (float)size);
-
-                sector.planet.generator.generate(position, gen);
-                tiles.set(x, y, new Tile(x, y, gen.floor, gen.overlay, gen.block));
-            });
-            sector.planet.generator.decorate(tiles, sector);
-        });
+        loadGenerator(size, size, tiles -> sector.planet.generator.generate(tiles, sector));
     }
 
     public void loadMap(Map map){

@@ -13,8 +13,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-//TODO refactor into generic planet class
-public class TestPlanetGenerator extends BasicGenerator implements PlanetGenerator{
+public class TestPlanetGenerator extends PlanetGenerator{
     Simplex noise = new Simplex();
     RidgedPerlin rid = new RidgedPerlin(1, 2);
     float scl = 5f;
@@ -68,7 +67,7 @@ public class TestPlanetGenerator extends BasicGenerator implements PlanetGenerat
     }
 
     @Override
-    public void generate(Vec3 position, TileGen tile){
+    public void genTile(Vec3 position, TileGen tile){
         tile.floor = getBlock(position);
         tile.block = tile.floor.asFloor().wall;
 
@@ -79,15 +78,6 @@ public class TestPlanetGenerator extends BasicGenerator implements PlanetGenerat
         if(rid.getValue(position.x, position.y, position.z, 22) > 0.34){
             tile.block = Blocks.air;
         }
-    }
-
-    @Override
-    public void decorate(Tiles tiles, Sector sec){
-        this.tiles = tiles;
-        this.sector = sec;
-        rand.setSeed(sec.id);
-
-        generate(tiles);
     }
 
     Block getBlock(Vec3 position){

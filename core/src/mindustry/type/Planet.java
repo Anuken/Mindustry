@@ -2,6 +2,7 @@ package mindustry.type;
 
 import arc.files.*;
 import arc.math.geom.*;
+import arc.math3d.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
@@ -11,7 +12,7 @@ import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.graphics.*;
 import mindustry.graphics.PlanetGrid.*;
-import mindustry.maps.planet.*;
+import mindustry.maps.generators.*;
 import mindustry.type.Sector.*;
 
 public class Planet extends UnlockableContent{

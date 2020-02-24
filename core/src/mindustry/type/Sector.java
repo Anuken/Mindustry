@@ -1,6 +1,7 @@
 package mindustry.type;
 
 import arc.math.geom.*;
+import arc.math3d.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
