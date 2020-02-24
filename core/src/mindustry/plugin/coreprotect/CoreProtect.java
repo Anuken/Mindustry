@@ -64,7 +64,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
                     if(stick.xy1 != Pos.invalid) spark(player, stick.xy1, blue);
                     if(stick.xy2 != Pos.invalid) spark(player, stick.xy2, red);
 
-                    tiles(stick).each(Fire::create);
+//                    tiles(stick).each(Fire::create);
                 });
             }
         });
