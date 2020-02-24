@@ -268,6 +268,7 @@ public class NetServer implements ApplicationListener{
     @Override
     public void init(){
         mods.eachClass(mod -> mod.registerClientCommands(clientCommands));
+        coreProtect.registerClientCommands(clientCommands);
     }
 
     private void registerCommands(){

@@ -30,8 +30,26 @@ public class CoreProtect extends Plugin implements ApplicationListener{
 
     private Color red = Pal.remove, blue = Pal.copy;
 
+    @Override
+    public void registerClientCommands(CommandHandler handler){
+        handler.register("/", "Coreprotect wand toggle.", (args, player) -> {
+            Stick stick = sticks.getOr((Player)player, Stick::new);
+
+            if(stick.enabled = !stick.enabled){
+                message((Player)player, Strings.format("Selection [accent]enabled[] {0}", Iconc.lockOpen));
+            }else{
+                message((Player)player, Strings.format("Selection [accent]disabled[] {0}", Iconc.lock));
+                stick.xyi = 0;
+                stick.xy1 = Pos.invalid;
+                stick.xy2 = Pos.invalid;
+            }
+        });
+    }
+
     public void onTileTapped(Player player, Tile tile){
         Stick stick = sticks.getOr(player, Stick::new);
+
+        if(!stick.enabled) return;
 
         switch(stick.xyi++ % 3){
             case 0:
@@ -97,5 +115,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
         int xyi = 0;
         int xy1 = Pos.invalid;
         int xy2 = Pos.invalid;
+
+        boolean enabled = false;
     }
 }
