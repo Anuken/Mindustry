@@ -637,9 +637,11 @@ public class NetServer implements ApplicationListener{
         }else if(action == AdminAction.ban){
             netServer.admins.banPlayerIP(other.con.address);
             other.con.kick(KickReason.banned);
+            Call.sendMessage(player.prefix() + "[red]x " + other.name);
             Log.info("&lc{0} has banned {1}.", player.name, other.name);
         }else if(action == AdminAction.kick){
             other.con.kick(KickReason.kick);
+            Call.sendMessage(player.prefix() + "[orange]- " + other.name);
             Log.info("&lc{0} has kicked {1}.", player.name, other.name);
         }else if(action == AdminAction.trace){
             TraceInfo info = new TraceInfo(other.con.address, other.uuid, other.con.modclient, other.con.mobile);
