@@ -121,6 +121,7 @@ public class Separator extends Block{
 
     @Override
     public void iceberg(Tile tile){
+        if(tile.entity.liquids == null) return;
         tile.entity.liquids.reset(Liquids.slag, 100f); // just over 50f gets used when max boosted
     }
 }
