@@ -854,6 +854,10 @@ public class ServerControl implements ApplicationListener{
             for(Player p : playerGroup) Limbo.send(p);
         });
 
+        handler.register("begone", "[ip] [port]", "Sends all players to a different server.", arg -> {
+            for(Player p : playerGroup) Call.onConnect(p.con, arg[0], Strings.parseInt(arg[1]));
+        });
+
         mods.eachClass(p -> p.registerServerCommands(handler));
     }
 
