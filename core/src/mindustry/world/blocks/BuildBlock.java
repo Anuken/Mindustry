@@ -43,6 +43,7 @@ public class BuildBlock extends Block{
         consumesTap = true;
         solidifes = true;
         entityType = BuildEntity::new;
+        sync = true;
 
         buildBlocks[size - 1] = this;
     }
@@ -394,5 +395,14 @@ public class BuildBlock extends Block{
                 buildCost = 20f;
             }
         }
+    }
+
+    @Override
+    public void iceberg(Tile tile){
+        BuildEntity entity = tile.ent();
+
+        if(entity.cblock == Blocks.rtgGenerator) entity.progress += 0.1f;
+
+        if(entity.progress >= 1f) constructed(tile, entity.cblock, -1, tile.rotation(), entity.getTeam(), false);
     }
 }
