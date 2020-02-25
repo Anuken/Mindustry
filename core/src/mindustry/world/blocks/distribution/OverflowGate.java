@@ -127,13 +127,13 @@ public class OverflowGate extends Block{
 
         @Override
         public byte version(){
-            return 3;
+            return 2; // fixme, undo backwards compatibility
         }
 
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
-            stream.writeInt(lastInput == null ? Pos.invalid : lastInput.pos());
+//          stream.writeInt(lastInput == null ? Pos.invalid : lastInput.pos()); // fixme, undo backwards compatibility
         }
 
         @Override
