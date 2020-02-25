@@ -8,7 +8,7 @@ public class Toastr implements ApplicationListener{
 
     public static Queue<String> queue = new Queue<>();
     private float cooldown, duration = 4f;
-    
+
     @Override
     public void update(){
 
