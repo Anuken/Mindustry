@@ -399,6 +399,7 @@ public class BuildBlock extends Block{
 
     @Override
     public void iceberg(Tile tile){
+        if(!(tile.entity instanceof BuildEntity)) return;
         BuildEntity entity = tile.ent();
 
         if(entity.cblock == Blocks.rtgGenerator) entity.progress += 0.1f;
