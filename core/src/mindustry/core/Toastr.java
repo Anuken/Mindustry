@@ -7,15 +7,15 @@ import mindustry.gen.*;
 public class Toastr implements ApplicationListener{
 
     public static Queue<String> queue = new Queue<>();
-    private float cooldown;
-
+    private float cooldown, duration = 4f;
+    
     @Override
     public void update(){
 
         if(cooldown-- > 0) return;
         if(queue.isEmpty()) return;
 
-        cooldown = 2.5f * 60;
-        Call.onInfoToast(queue.removeFirst(), 2.5f);
+        cooldown = duration * 60;
+        Call.onInfoToast(queue.removeFirst(), duration);
     }
 }
