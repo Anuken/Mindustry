@@ -36,9 +36,9 @@ public class CoreProtect extends Plugin implements ApplicationListener{
     private int spark = timers++;
     private Interval timer = new Interval(timers);
 
-    private Color red = Pal.remove, blue = Pal.copy;
-
     private IntMap<Array<Edit>> edits = new IntMap<>();
+
+    Color corner = Color.white, line = Color.black.cpy().a(0.25f);
 
     @Override
     public void registerClientCommands(CommandHandler handler){
@@ -116,8 +116,14 @@ public class CoreProtect extends Plugin implements ApplicationListener{
 
             if(timer.get(spark, 10)){
                 sticks.each((player, stick) -> {
-                    if(stick.xy1 != Pos.invalid) spark(player, stick.xy1, blue);
-                    if(stick.xy2 != Pos.invalid) spark(player, stick.xy2, red);
+                    if(stick.xy1 != Pos.invalid) spark(player, stick.xy1, corner);
+                    if(stick.xy2 != Pos.invalid) spark(player, stick.xy2, corner);
+
+                    if(tiles(stick).isEmpty()) return;
+
+                    NormalizeResult result = stick.cuboid();
+
+                    cuboid.select(t -> t.x == result.x || t.x == result.x2 || t.y == result.y || t.y == result.y2).each(t -> spark(player, t.pos(), line));
                 });
             }
         });
@@ -183,7 +189,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
         cuboid.clear();
         if(stick.xy1 == Pos.invalid || stick.xy2 == Pos.invalid) return cuboid;
 
-        NormalizeResult result = Placement.normalizeArea(Pos.x(stick.xy1), Pos.y(stick.xy1), Pos.x(stick.xy2), Pos.y(stick.xy2), 0, false, 1024);
+        NormalizeResult result = stick.cuboid();
 
         for(int x = result.x; x <= result.x2; x++){
             for(int y = result.y; y <= result.y2; y++){
@@ -215,6 +221,10 @@ public class CoreProtect extends Plugin implements ApplicationListener{
             xy1 = Pos.invalid;
             xy2 = Pos.invalid;
             enabled = false;
+        }
+
+        NormalizeResult cuboid(){
+            return Placement.normalizeArea(Pos.x(xy1), Pos.y(xy1), Pos.x(xy2), Pos.y(xy2), 0, false, 1024);
         }
     }
 
