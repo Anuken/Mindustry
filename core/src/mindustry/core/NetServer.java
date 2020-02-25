@@ -641,6 +641,7 @@ public class NetServer implements ApplicationListener{
             Log.info("&lc{0} has banned {1}.", player.name, other.name);
         }else if(action == AdminAction.kick){
             other.con.kick(KickReason.kick);
+            other.getInfo().lastKicked = Time.millis() + (30 * 60) * 1000;
             Call.sendMessage(player.prefix() + "[orange]- " + other.name);
             Log.info("&lc{0} has kicked {1}.", player.name, other.name);
         }else if(action == AdminAction.trace){
