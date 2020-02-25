@@ -10,7 +10,9 @@ import arc.math.geom.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.PlanetGrid.*;
@@ -31,8 +33,8 @@ public class PlanetDialog extends FloatingDialog{
 
     private Planet planet = Planets.starter;
     private float lastX, lastY;
-    private Sector selected, hovered;
-    private Table selectTable;
+    private @Nullable Sector selected, hovered;
+    private Table stable, infoTable;
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
@@ -75,18 +77,23 @@ public class PlanetDialog extends FloatingDialog{
             @Override
             public void tap(InputEvent event, float x, float y, int count, KeyCode button){
                 selected = hovered;
+                if(selected != null){
+                    updateSelected();
+                }
             }
         });
 
-        selectTable = new Table(t -> {
-            t.background(Tex.button);
+        infoTable = new Table();
+
+        stable = new Table(t -> {
+            t.background(Styles.black3);
             t.margin(12f);
             t.add("this is some arbitrary text.");
         });
 
-        selectTable.act(1f);
-        selectTable.pack();
-        selectTable.setPosition(0, 0, Align.center);
+        stable.act(1f);
+        stable.pack();
+        stable.setPosition(0, 0, Align.center);
 
         shown(this::setup);
     }
@@ -112,6 +119,7 @@ public class PlanetDialog extends FloatingDialog{
         cam.lookAt(0, 0, 0);
         cam.update();
 
+        projector.proj(cam.combined());
         batch.proj(cam.combined());
 
         PlanetMesh outline = outline(planet.size);
@@ -130,23 +138,68 @@ public class PlanetDialog extends FloatingDialog{
 
         if(selected != null){
             drawSelection(selected);
-
-            projector.proj(cam.combined());
-            projector.setPlane(
-                //origin on sector position
-                Tmp.v33.set(selected.tile.v).setLength(outlineRad + 0.05f),
-                //face up
-                selected.plane.project(Tmp.v32.set(selected.tile.v).add(Vec3.Y)).sub(selected.tile.v).nor(),
-                //right vector
-                Tmp.v31.set(Tmp.v32).add(selected.tile.v).rotate(selected.tile.v, 90).sub(selected.tile.v).nor()
-            );
-
-            Draw.batch(projector, () -> {
-                selectTable.draw();
-            });
         }
 
+        Draw.batch(projector, () -> {
+            if(hovered != null){
+                setPlane(hovered);
+                Fonts.outline.draw("" + hovered.id, 0, 0, Align.center);
+            }
+
+            if(selected != null){
+                setPlane(selected);
+                stable.draw();
+            }
+        });
+
+        /*
+                    Vec3 pos = cam.project(Tmp.v31.set(selected.tile.v).setLength(outlineRad));
+            selectTable.setPosition(pos.x, pos.y, Align.center);
+            selectTable.draw();
+         */
+
         Gl.disable(Gl.depthTest);
+    }
+
+    private void updateSelected(){
+        stable.clear();
+        stable.background(Styles.black6);
+
+        //TODO add strings to bundle after prototyping is done
+
+        stable.add("[accent]" + selected.id).row();
+        stable.addImage().color(Pal.accent).fillX().height(3f).pad(3f).row();
+        stable.add(selected.getSave() != null ? selected.getSave().getPlayTime() : "[lightgray]Unexplored").row();
+
+        stable.add("Resources:").row();
+        stable.table(t -> {
+            t.left();
+            int idx = 0;
+            int max = 5;
+            for(UnlockableContent c : selected.data.resources){
+                t.addImage(c.icon(Cicon.small)).padRight(3);
+                if(++idx % max == 0) t.row();
+            }
+
+            for(int i = 0; i < Math.min(selected.data.floorCounts.length, 3); i++){
+                t.addImage(selected.data.floors[i].icon(Cicon.small)).padRight(3);
+                if(++idx % max == 0) t.row();
+            }
+        }).fillX().row();
+
+        stable.pack();
+        stable.setPosition(0, 0, Align.center);
+    }
+
+    private void setPlane(Sector sector){
+        projector.setPlane(
+            //origin on sector position
+            Tmp.v33.set(sector.tile.v).setLength(outlineRad + 0.001f),
+            //face up
+            sector.plane.project(Tmp.v32.set(sector.tile.v).add(Vec3.Y)).sub(sector.tile.v).nor(),
+            //right vector
+            Tmp.v31.set(Tmp.v32).add(sector.tile.v).rotate(sector.tile.v, 90).sub(sector.tile.v).nor()
+        );
     }
 
     private void drawHover(Sector sector){

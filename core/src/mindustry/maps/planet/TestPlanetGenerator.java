@@ -8,7 +8,6 @@ import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.maps.generators.*;
-import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -17,8 +16,6 @@ public class TestPlanetGenerator extends PlanetGenerator{
     Simplex noise = new Simplex();
     RidgedPerlin rid = new RidgedPerlin(1, 2);
     float scl = 5f;
-    Sector sector;
-    Tiles tiles;
 
     //TODO generate array from planet image later
     Block[][] arr = {

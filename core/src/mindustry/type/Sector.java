@@ -3,9 +3,11 @@ package mindustry.type;
 import arc.math.geom.*;
 import arc.math3d.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.ctype.*;
+import mindustry.game.Saves.*;
 import mindustry.graphics.PlanetGrid.*;
 import mindustry.world.*;
 
@@ -28,6 +30,14 @@ public class Sector{
         this.rect = makeRect();
         this.id = tile.id;
         this.data = data;
+    }
+
+    public int getSize(){
+        return (int)(rect.radius * 3200);
+    }
+
+    public @Nullable SaveSlot getSave(){
+        return Vars.headless ? null : Vars.control.saves.getSectorSave(this);
     }
 
     //TODO implement
@@ -94,7 +104,7 @@ public class Sector{
 
     /** Cached data about a sector. */
     public static class SectorData{
-        public Content[] resources = {};
+        public UnlockableContent[] resources = {};
         public int spawnX, spawnY;
 
         public Block[] floors = {};
@@ -116,7 +126,7 @@ public class Sector{
         }
 
         public void read(Reads read){
-            resources = new Content[read.s()];
+            resources = new UnlockableContent[read.s()];
             for(int i = 0; i < resources.length; i++){
                 resources[i] = Vars.content.getByID(ContentType.all[read.b()], read.s());
             }

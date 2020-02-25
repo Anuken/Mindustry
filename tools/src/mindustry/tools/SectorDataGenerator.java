@@ -77,7 +77,7 @@ public class SectorDataGenerator{
                     data.floors[i] = entries.get(i).key;
                 }
 
-                data.resources = content.asArray().sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id))).toArray(Content.class);
+                data.resources = content.asArray().sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id))).toArray(UnlockableContent.class);
 
                 if(count[0]++ % 10 == 0){
                     Log.info("&lyDone with sector &lm{0}/{1}", count[0], planet.sectors.size);

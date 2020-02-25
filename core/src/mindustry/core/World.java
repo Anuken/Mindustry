@@ -197,7 +197,7 @@ public class World{
 
     public void loadSector(Sector sector){
         state.rules.sector = sector;
-        int size = (int)(sector.rect.radius * 3200);
+        int size = sector.getSize();
         loadGenerator(size, size, tiles -> sector.planet.generator.generate(tiles, sector));
     }
 
