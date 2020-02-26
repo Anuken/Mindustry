@@ -4,6 +4,7 @@ import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.TextureRegion;
 import arc.graphics.gl.Shader;
+import arc.math.geom.*;
 import arc.scene.ui.layout.Scl;
 import arc.util.ArcAnnotate.*;
 import arc.util.Time;
@@ -18,6 +19,7 @@ public class Shaders{
     public static LightShader light;
     public static SurfaceShader water, tar, slag;
     public static Shader planet;
+    public static PlanetGridShader planetGrid;
 
     public static void init(){
         shadow = new Shadow();
@@ -37,6 +39,20 @@ public class Shaders{
         tar = new SurfaceShader("tar");
         slag = new SurfaceShader("slag");
         planet = new LoadShader("planet", "planet");
+        planetGrid = new PlanetGridShader();
+    }
+
+    public static class PlanetGridShader extends LoadShader{
+        public Vec3 mouse = new Vec3();
+
+        public PlanetGridShader(){
+            super("planetgrid", "planetgrid");
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("u_mouse", mouse);
+        }
     }
 
     public static class LightShader extends LoadShader{

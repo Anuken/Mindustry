@@ -43,6 +43,12 @@ public class PlanetMesh{
         generateMesh();
     }
 
+    public @Nullable Vec3 intersect(Ray ray){
+        boolean found = Intersector3D.intersectRaySphere(ray, center, radius, Tmp.v33);
+        if(!found) return null;
+        return Tmp.v33;
+    }
+
     /** @return the sector that is hit by this ray, or null if nothing intersects it. */
     public @Nullable Ptile getTile(Ray ray){
         boolean found = Intersector3D.intersectRaySphere(ray, center, radius, Tmp.v33);
@@ -51,10 +57,15 @@ public class PlanetMesh{
     }
 
     public void render(Mat3D mat){
-        Shaders.planet.begin();
-        Shaders.planet.setUniformMatrix4("u_projModelView", mat.val);
-        mesh.render(Shaders.planet, lines ? Gl.lines : Gl.triangles);
-        Shaders.planet.end();
+        render(mat, Shaders.planet);
+    }
+
+    public void render(Mat3D mat, Shader shader){
+        shader.begin();
+        shader.setUniformMatrix4("u_projModelView", mat.val);
+        shader.apply();
+        mesh.render(shader, lines ? Gl.lines : Gl.triangles);
+        shader.end();
     }
 
     private void generateMesh(){
