@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.graphics.VertexAttributes.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
-import arc.math3d.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.graphics.PlanetGrid.*;

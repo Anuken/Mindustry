@@ -22,9 +22,9 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class PlanetDialog extends FloatingDialog{
-    private static final Color outlineColor = Pal.accent.cpy().a(0.6f);
-    private static final float camLength = 4f, outlineRad = 1.15f;
-    private static final boolean drawRect = false;
+    private static final Color outlineColor = Pal.accent.cpy().a(0.6f), shadowColor = new Color(0, 0, 0, 0.7f);
+    private static final float camLength = 4f;
+    float outlineRad = 1.15f;
 
     private final PlanetMesh[] outlines = new PlanetMesh[10];
     private final Camera3D cam = new Camera3D();
@@ -112,6 +112,9 @@ public class PlanetDialog extends FloatingDialog{
         Gl.clear(Gl.depthBufferBit);
         Gl.enable(Gl.depthTest);
 
+        Gl.enable(Gl.cullFace);
+        Gl.cullFace(Gl.back);
+
         //lock to up vector so it doesn't get confusing
         cam.up.set(Vec3.Y);
 
@@ -127,8 +130,14 @@ public class PlanetDialog extends FloatingDialog{
         planet.mesh.render(cam.combined());
         outline.render(cam.combined());
 
+        for(Sector sec : planet.sectors){
+            if(sec.save == null){
+                draw(sec, shadowColor, -0.001f);
+            }
+        }
+
         if(hovered != null){
-            drawHover(hovered);
+            draw(hovered, outlineColor, 0.001f);
 
             //if(Core.input.keyTap(KeyCode.SPACE)){
             //    control.playSector(hovered);
@@ -139,6 +148,8 @@ public class PlanetDialog extends FloatingDialog{
         if(selected != null){
             drawSelection(selected);
         }
+
+        batch.flush(Gl.triangles);
 
         Draw.batch(projector, () -> {
             if(hovered != null){
@@ -169,7 +180,7 @@ public class PlanetDialog extends FloatingDialog{
 
         stable.add("[accent]" + selected.id).row();
         stable.addImage().color(Pal.accent).fillX().height(3f).pad(3f).row();
-        stable.add(selected.getSave() != null ? selected.getSave().getPlayTime() : "[lightgray]Unexplored").row();
+        stable.add(selected.save != null ? selected.save.getPlayTime() : "[lightgray]Unexplored").row();
 
         stable.add("Resources:").row();
         stable.table(t -> {
@@ -202,29 +213,29 @@ public class PlanetDialog extends FloatingDialog{
         );
     }
 
-    private void drawHover(Sector sector){
-        for(Corner c : sector.tile.corners){
-            batch.color(outlineColor);
-            batch.vertex(c.v);
+    private void draw(Sector sector, Color color, float offset){
+        float rr = outlineRad + offset;
+        for(int i = 0; i < sector.tile.corners.length; i++){
+            Corner c = sector.tile.corners[i], next = sector.tile.corners[(i+1) % sector.tile.corners.length];
+            batch.tri(Tmp.v31.set(c.v).setLength(rr), Tmp.v32.set(next.v).setLength(rr), Tmp.v33.set(sector.tile.v).setLength(rr), color);
         }
-        batch.flush(Gl.triangleFan);
     }
 
     private void drawSelection(Sector sector){
         float length = 0.1f;
+        float arad = outlineRad + 0.0001f;
 
         for(int i = 0; i < sector.tile.corners.length; i++){
             Corner next = sector.tile.corners[(i + 1) % sector.tile.corners.length];
             Corner curr = sector.tile.corners[i];
-            sector.tile.v.scl(outlineRad);
+            sector.tile.v.scl(arad);
             Tmp.v31.set(curr.v).sub(sector.tile.v).setLength(length).add(sector.tile.v);
             Tmp.v32.set(next.v).sub(sector.tile.v).setLength(length).add(sector.tile.v);
-            sector.tile.v.scl(1f / outlineRad);
+            sector.tile.v.scl(1f / arad);
 
             batch.tri(curr.v, next.v, Tmp.v31, Pal.accent);
-            batch.tri(Tmp.v31, Tmp.v32, next.v, Pal.accent);
+            batch.tri(Tmp.v31, next.v, Tmp.v32, Pal.accent);
         }
-        batch.flush(Gl.triangles);
     }
 
     private PlanetMesh outline(int size){

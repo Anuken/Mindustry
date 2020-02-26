@@ -1,7 +1,6 @@
 package mindustry.type;
 
 import arc.math.geom.*;
-import arc.math3d.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
@@ -20,6 +19,9 @@ public class Sector{
     public final int id;
 
     public final SectorData data;
+
+    public @Nullable SaveSlot save;
+
     //TODO implement a dynamic (?) launch period
     public int launchPeriod = 10;
 
@@ -34,10 +36,6 @@ public class Sector{
 
     public int getSize(){
         return (int)(rect.radius * 3200);
-    }
-
-    public @Nullable SaveSlot getSave(){
-        return Vars.headless ? null : Vars.control.saves.getSectorSave(this);
     }
 
     //TODO implement

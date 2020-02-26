@@ -2,7 +2,6 @@ package mindustry.type;
 
 import arc.files.*;
 import arc.math.geom.*;
-import arc.math3d.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;

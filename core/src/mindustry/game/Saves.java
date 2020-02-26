@@ -56,7 +56,14 @@ public class Saves{
             }
         }
 
-        lastSectorSave = saves.find(s -> s.isSector() && s.getName().equals(Core.settings.getString("last-sector-save", "<<none>>")));
+        lastSectorSave = saves.find(s -> s.isSector() && s.getName().equals(Core.settings.getString("last-sector-save", "<none>")));
+
+        //automatically assign sector save slots
+        for(SaveSlot slot : saves){
+            if(slot.getSector() != null){
+                slot.getSector().save = slot;
+            }
+        }
     }
 
     public @Nullable SaveSlot getLastSector(){
@@ -115,21 +122,15 @@ public class Saves{
         return saveDirectory.child("sector-" + sector.planet.name + "-" + sector.id + "." + saveExtension);
     }
 
-    public @Nullable SaveSlot getSectorSave(Sector sector){
-        Fi fi = getSectorFile(sector);
-        return saves.find(s -> s.isSector() && s.file.equals(fi));
-    }
-
     public void saveSector(Sector sector){
-        SaveSlot slot = getSectorSave(sector);
-        if(slot == null){
-            slot = new SaveSlot(getSectorFile(sector));
-            slot.setName(slot.file.nameWithoutExtension());
-            saves.add(slot);
+        if(sector.save == null){
+            sector.save = new SaveSlot(getSectorFile(sector));
+            sector.save.setName(sector.save.file.nameWithoutExtension());
+            saves.add(sector.save);
         }
-        slot.save();
-        lastSectorSave = slot;
-        Core.settings.putSave("last-sector-save", slot.getName());
+        sector.save.save();
+        lastSectorSave = sector.save;
+        Core.settings.putSave("last-sector-save", sector.save.getName());
     }
 
     public SaveSlot addSave(String name){

@@ -249,7 +249,7 @@ public class Control implements ApplicationListener, Loadable{
     public void playSector(Sector sector){
         ui.loadAnd(() -> {
             ui.planet.hide();
-            SaveSlot slot = saves.getSectorSave(sector);
+            SaveSlot slot = sector.save;
             //TODO remove for persistent sector slots
             slot = null;
             if(slot != null){
