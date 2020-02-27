@@ -1,4 +1,4 @@
-package mindustry.plugin.chattr;
+package mindustry.plugin.spiderchat;
 
 import arc.*;
 import arc.graphics.*;

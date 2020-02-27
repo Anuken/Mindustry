@@ -24,8 +24,8 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.Net;
 import mindustry.net.*;
-import mindustry.plugin.chattr.*;
 import mindustry.plugin.coreprotect.*;
+import mindustry.plugin.spiderchat.*;
 import mindustry.world.blocks.defense.ForceProjector.*;
 
 import java.io.*;
