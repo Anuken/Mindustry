@@ -84,7 +84,6 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(new IdleSync());
         Core.app.addListener(new Limbo());
         Core.app.addListener(new CraterCorner());
-        Core.app.addListener(new Toastr());
 
         mods.eachClass(Mod::init);
 
