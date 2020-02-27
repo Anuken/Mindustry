@@ -1,7 +1,7 @@
 ---
 name: Feature request
-about: Do not make a new issue for feature requests! Instead, post it on FeatHub,
-  see the README.
+about: Do not make a new issue for feature requests! Instead, post in the suggestions
+  repository. See the README.
 title: ''
 labels: invalid
 assignees: ''
