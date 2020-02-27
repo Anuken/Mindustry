@@ -342,7 +342,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            chattr.message(chattr.server, arg[0]);
+            spiderChat.message(spiderChat.server, arg[0]);
 
             info("&lyServer: &lb{0}", arg[0]);
         });
@@ -589,7 +589,7 @@ public class ServerControl implements ApplicationListener{
             Player target = playerGroup.find(p -> p.name.equals(arg[0]));
 
             if(target != null){
-                chattr.kicked(target);
+                spiderChat.kicked(target);
                 target.con.kick(KickReason.kick);
                 info("It is done.");
             }else{
@@ -618,7 +618,7 @@ public class ServerControl implements ApplicationListener{
 
             for(Player player : playerGroup.all()){
                 if(netServer.admins.isIDBanned(player.uuid)){
-                    chattr.banned(player);
+                    spiderChat.banned(player);
                     player.con.kick(KickReason.banned);
                 }
             }

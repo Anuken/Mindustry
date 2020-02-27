@@ -10,7 +10,7 @@ import mindustry.plugin.*;
 
 import java.util.regex.*;
 
-public class Chattr extends Plugin implements ApplicationListener{
+public class SpiderChat extends Plugin implements ApplicationListener{
 
     public static Player server = new Player(){{
         name = "Server";

@@ -29,7 +29,6 @@ import mindustry.world.*;
 import mindustry.world.modules.*;
 
 import java.io.*;
-import java.util.regex.*;
 import java.util.zip.*;
 
 import static mindustry.Vars.*;
@@ -185,7 +184,7 @@ public class NetClient implements ApplicationListener{
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
 
-            chattr.message(player, chattr.colorcase(Strings.stripColors(message), player.getTeam().color));
+            spiderChat.message(player, spiderChat.colorcase(Strings.stripColors(message), player.getTeam().color));
         }else{
             //log command to console but with brackets
             Log.info("<&y{0}: &lm{1}&lg>", player.name, message);

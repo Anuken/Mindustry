@@ -24,7 +24,6 @@ import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -508,7 +507,7 @@ public class NetServer implements ApplicationListener{
         if(!player.con.hasDisconnected){
             if(player.con.hasConnected){
                 Events.fire(new PlayerLeave(player));
-                if(Config.showConnectMessages.bool()) chattr.disconnected(player);
+                if(Config.showConnectMessages.bool()) spiderChat.disconnected(player);
                 Call.onPlayerDisconnect(player.id);
             }
 
@@ -639,12 +638,12 @@ public class NetServer implements ApplicationListener{
         }else if(action == AdminAction.ban){
             netServer.admins.banPlayerIP(other.con.address);
             other.con.kick(KickReason.banned);
-            chattr.banned(other);
+            spiderChat.banned(other);
             Log.info("&lc{0} has banned {1}.", player.name, other.name);
         }else if(action == AdminAction.kick){
             other.con.kick(KickReason.kick);
             other.getInfo().lastKicked = Time.millis() + (30 * 60) * 1000;
-            chattr.kicked(other);
+            spiderChat.kicked(other);
             Log.info("&lc{0} has kicked {1}.", player.name, other.name);
         }else if(action == AdminAction.trace){
             TraceInfo info = new TraceInfo(other.con.address, other.uuid, other.con.modclient, other.con.mobile);
@@ -664,7 +663,7 @@ public class NetServer implements ApplicationListener{
         player.add();
         player.con.hasConnected = true;
         if(Config.showConnectMessages.bool()){
-            chattr.connected(player);
+            spiderChat.connected(player);
             Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
         }
 

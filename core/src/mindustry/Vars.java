@@ -180,7 +180,7 @@ public class Vars implements Loadable{
     public static NetServer netServer;
     public static NetClient netClient;
     public static CoreProtect coreProtect;
-    public static Chattr chattr;
+    public static SpiderChat spiderChat;
 
     public static Entities entities;
     public static EntityGroup<Player> playerGroup;
@@ -238,7 +238,7 @@ public class Vars implements Loadable{
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
 
-        chattr = new Chattr();
+        spiderChat = new SpiderChat();
 
         entities = new Entities();
         playerGroup = entities.add(Player.class).enableMapping();
