@@ -147,13 +147,15 @@ public class MapIO{
         if(wall.synthetic()){
             return team.color.rgba();
         }
-        return Color.rgba8888(wall.solid ? wall.minimapColor : ore == Blocks.air ? floor.minimapColor : ore.minimapColor);
+        return Color.rgba8888(wall.solid ? wall.mapColor : ore == Blocks.air ? floor.mapColor : ore.mapColor);
     }
 
     public static Pixmap writeImage(Tiles tiles){
         Pixmap pix = new Pixmap(tiles.width, tiles.height);
         for(Tile tile : tiles){
-            int color = tile.block().hasColor && !tile.block().synthetic() ? tile.block().minimapColor.rgba() : tile.floor().minimapColor.rgba();
+            //while synthetic blocks are possible, most of their data is lost, so in order to avoid questions like
+            //"why is there air under my drill" and "why are all my conveyors facing right", they are disabled
+            int color = tile.block().hasColor && !tile.block().synthetic() ? tile.block().mapColor.rgba() : tile.floor().mapColor.rgba();
             pix.draw(tile.x, tiles.height - 1 - tile.y, color);
         }
         return pix;

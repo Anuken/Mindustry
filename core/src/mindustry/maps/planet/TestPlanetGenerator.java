@@ -60,7 +60,7 @@ public class TestPlanetGenerator extends PlanetGenerator{
     public Color getColor(Vec3 position){
         Block block = getBlock(position);
         //replace salt with sand color
-        return block == Blocks.salt ? Blocks.sand.minimapColor : block.minimapColor;
+        return block == Blocks.salt ? Blocks.sand.mapColor : block.mapColor;
     }
 
     @Override

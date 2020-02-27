@@ -19,7 +19,7 @@ public class OreBlock extends OverlayFloor{
         this.localizedName = ore.localizedName;
         this.itemDrop = ore;
         this.variants = 3;
-        this.minimapColor.set(ore.color);
+        this.mapColor.set(ore.color);
     }
 
     /** For mod use only!*/
@@ -31,7 +31,7 @@ public class OreBlock extends OverlayFloor{
     public void setup(Item ore){
         this.localizedName = ore.localizedName;
         this.itemDrop = ore;
-        this.minimapColor.set(ore.color);
+        this.mapColor.set(ore.color);
     }
 
     @Override

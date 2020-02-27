@@ -102,7 +102,7 @@ public class Block extends BlockStorage{
      * The color of this block when displayed on the minimap or map preview.
      * Do not set manually! This is overriden when loading for most blocks.
      */
-    public Color minimapColor = new Color(0, 0, 0, 1);
+    public Color mapColor = new Color(0, 0, 0, 1);
     /** Whether this block has a minimap color. */
     public boolean hasColor = false;
     /** Whether units target this block. */
@@ -765,7 +765,7 @@ public class Block extends BlockStorage{
 
         if(!synthetic()){
             PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full));
-            minimapColor.set(image.getPixel(image.width/2, image.height/2));
+            mapColor.set(image.getPixel(image.width/2, image.height/2));
         }
 
         getGeneratedIcons();

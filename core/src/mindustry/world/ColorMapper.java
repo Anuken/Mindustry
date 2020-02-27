@@ -16,7 +16,7 @@ public class ColorMapper{
         color2block.clear();
 
         for(Block block : Vars.content.blocks()){
-            color2block.put(block.minimapColor.rgba(), block);
+            color2block.put(block.mapColor.rgba(), block);
         }
 
         color2block.put(Color.rgba8888(0, 0, 0, 1), Blocks.air);

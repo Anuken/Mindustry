@@ -134,7 +134,7 @@ public class ContentLoader{
                 if(color == 0 || color == 255) continue;
 
                 Block block = block(i);
-                Color.rgba8888ToColor(block.minimapColor, color);
+                Color.rgba8888ToColor(block.mapColor, color);
                 block.hasColor = true;
             }
         }

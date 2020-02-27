@@ -106,9 +106,7 @@ public class PlanetDialog extends FloatingDialog{
         cont.clear();
         titleTable.remove();
 
-        cont.addRect((x, y, w, h) -> {
-            render();
-        }).grow();
+        cont.addRect((x, y, w, h) -> render()).grow();
     }
 
     private void render(){

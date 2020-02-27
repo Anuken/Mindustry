@@ -66,7 +66,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
 
         if(isGrounded() && floor.isLiquid){
             if((splashTimer += Mathf.dst(deltaX(), deltaY())) >= 7f){
-                floor.walkEffect.at(x, y, 0, floor.minimapColor);
+                floor.walkEffect.at(x, y, 0, floor.mapColor);
                 splashTimer = 0f;
             }
         }
@@ -75,7 +75,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
             drownTime += Time.delta() * 1f / floor.drownTime;
             drownTime = Mathf.clamp(drownTime);
             if(Mathf.chance(Time.delta() * 0.05f)){
-                floor.drownUpdateEffect.at(x, y, 0f, floor.minimapColor);
+                floor.drownUpdateEffect.at(x, y, 0f, floor.mapColor);
             }
 
             //TODO is the netClient check necessary?
