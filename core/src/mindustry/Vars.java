@@ -24,6 +24,7 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.Net;
 import mindustry.net.*;
+import mindustry.plugin.chattr.*;
 import mindustry.plugin.coreprotect.*;
 import mindustry.world.blocks.defense.ForceProjector.*;
 
@@ -179,6 +180,7 @@ public class Vars implements Loadable{
     public static NetServer netServer;
     public static NetClient netClient;
     public static CoreProtect coreProtect;
+    public static Chattr chattr;
 
     public static Entities entities;
     public static EntityGroup<Player> playerGroup;
@@ -235,6 +237,8 @@ public class Vars implements Loadable{
         spawner = new WaveSpawner();
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
+
+        chattr = new Chattr();
 
         entities = new Entities();
         playerGroup = entities.add(Player.class).enableMapping();

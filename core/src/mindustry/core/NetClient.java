@@ -185,16 +185,7 @@ public class NetClient implements ApplicationListener{
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
 
-            message = Strings.stripColors(message);
-            Pattern p = Pattern.compile("[A-Z]+");
-            Matcher m = p.matcher(message);
-            StringBuffer sb = new StringBuffer();
-            while (m.find()) {
-                m.appendReplacement(sb, player.getTeam().color() + m.group() + "[]");
-            }
-            m.appendTail(sb);
-
-            Call.sendMessage(player.prefix() + "[orange]> [white]" + sb.toString());
+            chattr.message(player, chattr.colorcase(Strings.stripColors(message), player.getTeam().color));
         }else{
             //log command to console but with brackets
             Log.info("<&y{0}: &lm{1}&lg>", player.name, message);

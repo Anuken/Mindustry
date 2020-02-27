@@ -50,7 +50,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public float pointerX, pointerY;
     public String name = "noname";
     public @Nullable String uuid, usid;
-    public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
+    public boolean isAdmin, isServer, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
     public boolean buildWasAutoPaused = false;
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
@@ -962,19 +962,23 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     //endregion
 
     public String prefix(){
-        char icon = Iconc.modeSurvival;
-
-        Gamemode gamemode = Gamemode.bestFit(state.rules);
-        if(gamemode == Gamemode.pvp) icon = Iconc.modePvp;
-        if(gamemode == Gamemode.attack) icon = Iconc.modeAttack;
-        if(gamemode == Gamemode.sandbox) icon = Iconc.wrench;
-
-        if(this.isAdmin) icon = Iconc.admin;
-
-        String name = "[#" + color.toString().toUpperCase() + "]" + this.name;
-        String team = getTeam().color() + icon +" ";
+        String name = "[#" + color + "]" + this.name;
+        String team = getTeam().color()  + icon() +" ";
 
         return team + "[lightgray]" + name + " ";
+    }
+
+    private char icon(){
+        if(isServer) return Iconc.star;
+        if(isAdmin) return Iconc.admin;
+
+        Gamemode gamemode = Gamemode.bestFit(state.rules);
+        if(gamemode == Gamemode.pvp)     return Iconc.modePvp;
+        if(gamemode == Gamemode.editor)  return Iconc.fill;
+        if(gamemode == Gamemode.attack)  return Iconc.modeAttack;
+        if(gamemode == Gamemode.sandbox) return Iconc.wrench;
+
+        return Iconc.modeSurvival;
     }
 
     // define when a player is doing nothing (useful)
