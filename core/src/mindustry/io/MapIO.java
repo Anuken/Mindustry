@@ -1,16 +1,16 @@
 package mindustry.io;
 
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Pixmap.*;
+import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.maps.*;
 import mindustry.world.*;
-import mindustry.world.LegacyColorMapper.*;
 import mindustry.world.blocks.storage.*;
 
 import java.io.*;
@@ -147,32 +147,43 @@ public class MapIO{
         if(wall.synthetic()){
             return team.color.rgba();
         }
-        return Color.rgba8888(wall.solid ? wall.color : ore == Blocks.air ? floor.color : ore.color);
+        return Color.rgba8888(wall.solid ? wall.minimapColor : ore == Blocks.air ? floor.minimapColor : ore.minimapColor);
     }
 
-    /** Reads a pixmap in the 3.5 pixmap format. */
-    public static void readPixmap(Pixmap pixmap, Tiles tiles){
-        for(int x = 0; x < pixmap.getWidth(); x++){
-            for(int y = 0; y < pixmap.getHeight(); y++){
-                int color = pixmap.getPixel(x, pixmap.getHeight() - 1 - y);
-                LegacyBlock block = LegacyColorMapper.get(color);
-                Tile tile = tiles.getn(x, y);
+    public static Pixmap writeImage(Tiles tiles){
+        Pixmap pix = new Pixmap(tiles.width, tiles.height);
+        for(Tile tile : tiles){
+            int color = tile.block().hasColor && !tile.block().synthetic() ? tile.block().minimapColor.rgba() : tile.floor().minimapColor.rgba();
+            pix.draw(tile.x, tiles.height - 1 - tile.y, color);
+        }
+        return pix;
+    }
 
-                tile.setFloor(block.floor);
-                tile.setBlock(block.wall);
-                if(block.ore != null) tile.setOverlay(block.ore);
+    public static void readImage(Pixmap pixmap, Tiles tiles){
+        for(Tile tile : tiles){
+            int color = pixmap.getPixel(tile.x, pixmap.getHeight() - 1 - tile.y);
+            Block block = ColorMapper.get(color);
 
-                //place core
-                if(color == Color.rgba8888(Color.green)){
-                    //actual core parts
-                    tile.setBlock(Blocks.coreShard);
-                    tile.setTeam(Team.sharded);
+            if(block.isFloor()){
+                tile.setFloor(block.asFloor());
+            }else if(block.isMultiblock()){
+                tile.set(block, Team.derelict);
+            }else{
+                tile.setBlock(block);
+            }
+        }
+
+        //guess at floors by grabbing a random adjacent floor
+        for(Tile tile : tiles){
+            if(tile.floor() == Blocks.air && tile.block() != Blocks.air){
+                for(Point2 p : Geometry.d4){
+                    Tile other = tiles.get(tile.x + p.x, tile.y + p.y);
+                    if(other != null && other.floor() != Blocks.air){
+                        tile.setFloor(other.floor());
+                        break;
+                    }
                 }
             }
         }
-    }
-
-    interface TileProvider{
-        Tile get(int x, int y);
     }
 }

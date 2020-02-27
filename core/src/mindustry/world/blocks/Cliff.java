@@ -21,7 +21,7 @@ public class Cliff extends Block{
         int r = tile.rotation();
         for(int i = 0; i < 8; i++){
             if((r & (1 << i)) != 0){
-                Draw.color(Tmp.c1.set(tile.floor().color).mul(1.3f + (i >= 4 ? -0.4f : 0.3f)));
+                Draw.color(Tmp.c1.set(tile.floor().minimapColor).mul(1.3f + (i >= 4 ? -0.4f : 0.3f)));
                 Draw.rect(region, tile.worldx(), tile.worldy(), 11f, 11f, i * 45f);
             }
         }
@@ -31,6 +31,6 @@ public class Cliff extends Block{
 
     @Override
     public int minimapColor(Tile tile){
-        return Tmp.c1.set(tile.floor().color).mul(1.2f).rgba();
+        return Tmp.c1.set(tile.floor().minimapColor).mul(1.2f).rgba();
     }
 }

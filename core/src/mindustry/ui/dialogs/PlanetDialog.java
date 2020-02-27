@@ -162,11 +162,6 @@ public class PlanetDialog extends FloatingDialog{
 
         if(true)
         Draw.batch(projector, () -> {
-            if(hovered != null){
-                setPlane(hovered);
-                Fonts.outline.draw("" + hovered.id, 0, 0, Align.center);
-            }
-
             if(selected != null){
                 setPlane(selected);
                 stable.draw();

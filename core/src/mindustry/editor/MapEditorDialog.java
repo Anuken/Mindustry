@@ -87,62 +87,42 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             t.row();
 
-            t.addImageTextButton("$editor.import", Icon.download, () ->
-            createDialog("$editor.import",
-            "$editor.importmap", "$editor.importmap.description", Icon.download, (Runnable)loadDialog::show,
-            "$editor.importfile", "$editor.importfile.description", Icon.file, (Runnable)() ->
-            platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
-                maps.tryCatchMapError(() -> {
-                    if(MapIO.isImage(file)){
-                        ui.showInfo("$editor.errorimage");
-                    }else{
-                        editor.beginEdit(MapIO.createMap(file, true));
-                    }
-                });
-            })),
-
-            "$editor.importimage", "$editor.importimage.description", Icon.fileImage, (Runnable)() ->
-            platform.showFileChooser(true, "png", file ->
-            ui.loadAnd(() -> {
-                try{
-                    Pixmap pixmap = new Pixmap(file);
-                    editor.beginEdit(pixmap);
-                    pixmap.dispose();
-                }catch(Exception e){
-                    ui.showException("$editor.errorload", e);
-                    Log.err(e);
-                }
-            })))
-            );
-
-            t.addImageTextButton("$editor.export", Icon.upload, () -> {
-                if(!ios){
-                    platform.showFileChooser(false, mapExtension, file -> {
-                        ui.loadAnd(() -> {
-                            try{
-                                if(!editor.getTags().containsKey("name")){
-                                    editor.getTags().put("name", file.nameWithoutExtension());
-                                }
-                                MapIO.writeMap(file, editor.createMap(file));
-                            }catch(Exception e){
-                                ui.showException("$editor.errorsave", e);
-                                Log.err(e);
-                            }
-                        });
-                    });
-                }else{
-                    ui.loadAnd(() -> {
-                        try{
-                            Fi result = Core.files.local(editor.getTags().get("name", "unknown") + "." + mapExtension);
-                            MapIO.writeMap(result, editor.createMap(result));
-                            platform.shareFile(result);
-                        }catch(Exception e){
-                            ui.showException("$editor.errorsave", e);
-                            Log.err(e);
+            t.addImageTextButton("$editor.import", Icon.download, () -> createDialog("$editor.import",
+                "$editor.importmap", "$editor.importmap.description", Icon.download, (Runnable)loadDialog::show,
+                "$editor.importfile", "$editor.importfile.description", Icon.file, (Runnable)() ->
+                platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
+                    maps.tryCatchMapError(() -> {
+                        if(MapIO.isImage(file)){
+                            ui.showInfo("$editor.errorimage");
+                        }else{
+                            editor.beginEdit(MapIO.createMap(file, true));
                         }
                     });
-                }
-            });
+                })),
+
+                "$editor.importimage", "$editor.importimage.description", Icon.fileImage, (Runnable)() ->
+                platform.showFileChooser(true, "png", file ->
+                ui.loadAnd(() -> {
+                    try{
+                        Pixmap pixmap = new Pixmap(file);
+                        editor.beginEdit(pixmap);
+                        pixmap.dispose();
+                    }catch(Exception e){
+                        ui.showException("$editor.errorload", e);
+                        Log.err(e);
+                    }
+                })))
+            );
+
+            t.addImageTextButton("$editor.export", Icon.upload, () -> createDialog("$editor.export",
+            "$editor.exportfile", "$editor.exportfile.description", Icon.file,
+                (Runnable)() -> platform.export(editor.getTags().get("name", "unknown"), mapExtension, file -> MapIO.writeMap(file, editor.createMap(file))),
+            "$editor.exportimage", "$editor.exportimage.description", Icon.fileImage,
+                (Runnable)() -> platform.export(editor.getTags().get("name", "unknown"), "png", file -> {
+                    Pixmap out = MapIO.writeImage(editor.tiles());
+                    file.writePNG(out);
+                    out.dispose();
+                })));
         });
 
         menu.cont.row();

@@ -110,7 +110,7 @@ public class Floor extends Block{
         if(wall == null) wall = Blocks.air;
 
         if(decoration == Blocks.air){
-            decoration = content.blocks().min(b -> b instanceof Rock && b.breakable ? color.diff(b.color) : Float.POSITIVE_INFINITY);
+            decoration = content.blocks().min(b -> b instanceof Rock && b.breakable ? minimapColor.diff(b.minimapColor) : Float.POSITIVE_INFINITY);
         }
     }
 
@@ -219,7 +219,7 @@ public class Floor extends Block{
         for(int i = 0; i < 4; i++){
             Tile other = tile.getNearby(i);
             if(other != null && doEdge(other.floor(), sameLayer)){
-                Color color = other.floor().color;
+                Color color = other.floor().minimapColor;
                 Draw.color(color.r, color.g, color.b, 1f);
                 Draw.rect(edgeRegion, tile.worldx(), tile.worldy(), i*90);
             }

@@ -64,7 +64,7 @@ public class MapEditor{
         reset();
 
         createTiles(pixmap.getWidth(), pixmap.getHeight());
-        load(() -> MapIO.readPixmap(pixmap, tiles()));
+        load(() -> MapIO.readImage(pixmap, tiles()));
         renderer.resize(width(), height());
     }
 

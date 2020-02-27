@@ -231,7 +231,7 @@ public class UnitType extends UnlockableContent{
         Floor floor = unit.floorOn();
 
         if(floor.isLiquid){
-            Draw.color(Color.white, floor.color, 0.5f);
+            Draw.color(Color.white, floor.minimapColor, 0.5f);
         }
 
         for(int i : Mathf.signs){
@@ -242,7 +242,7 @@ public class UnitType extends UnlockableContent{
         }
 
         if(floor.isLiquid){
-            Draw.color(Color.white, floor.color, unit.drownTime() * 0.4f);
+            Draw.color(Color.white, floor.minimapColor, unit.drownTime() * 0.4f);
         }else{
             Draw.color(Color.white);
         }
@@ -255,7 +255,7 @@ public class UnitType extends UnlockableContent{
     public void applyColor(Unitc unit){
         Draw.mixcol(Color.white, unit.hitTime());
         if(unit.drownTime() > 0 && unit.floorOn().isDeep()){
-            Draw.mixcol(unit.floorOn().color, unit.drownTime() * 0.8f);
+            Draw.mixcol(unit.floorOn().minimapColor, unit.drownTime() * 0.8f);
         }
     }
 

@@ -39,10 +39,7 @@ public class ContentLoader{
         new TechTree(),
         new Weathers(),
         new Planets(),
-        new Zones(),
-
-        //these are not really content classes, but this makes initialization easier
-        new LegacyColorMapper(),
+        new Zones()
     };
 
     public ContentLoader(){
@@ -134,13 +131,15 @@ public class ContentLoader{
             if(blocks().size > i){
                 int color = pixmap.getPixel(i, 0);
 
-                if(color == 0) continue;
+                if(color == 0 || color == 255) continue;
 
                 Block block = block(i);
-                Color.rgba8888ToColor(block.color, color);
+                Color.rgba8888ToColor(block.minimapColor, color);
+                block.hasColor = true;
             }
         }
         pixmap.dispose();
+        ColorMapper.load();
     }
 
     public void dispose(){
