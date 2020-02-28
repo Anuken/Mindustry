@@ -568,6 +568,7 @@ public class Administration{
             player = null;
             type = null;
             tile = null;
+            block = null;
         }
     }
 
