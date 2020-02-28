@@ -7,7 +7,7 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.game.Saves.*;
-import mindustry.graphics.PlanetGrid.*;
+import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.world.*;
 
 /** A small section of a planet. */

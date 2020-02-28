@@ -1,4 +1,4 @@
-package mindustry.graphics;
+package mindustry.graphics.g3d;
 
 import arc.math.*;
 import arc.math.geom.*;
@@ -47,7 +47,7 @@ public class PlanetGrid{
         }
     }
 
-    public static PlanetGrid newGrid(int size){
+    public static PlanetGrid create(int size){
         //cache grids between calls, since only ~5 different grids total are needed
         if(size < cache.length && cache[size] != null){
             return cache[size];
@@ -57,7 +57,7 @@ public class PlanetGrid{
         if(size == 0){
             result = initialGrid();
         }else{
-            result = subdividedGrid(newGrid(size - 1));
+            result = subdividedGrid(create(size - 1));
         }
 
         //store grid in cache

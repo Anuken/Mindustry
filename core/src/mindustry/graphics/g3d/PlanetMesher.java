@@ -1,4 +1,4 @@
-package mindustry.graphics;
+package mindustry.graphics.g3d;
 
 import arc.graphics.*;
 import arc.math.geom.*;

@@ -9,8 +9,8 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.ctype.*;
-import mindustry.graphics.*;
-import mindustry.graphics.PlanetGrid.*;
+import mindustry.graphics.g3d.*;
+import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
 import mindustry.type.Sector.*;
 
@@ -35,7 +35,7 @@ public class Planet extends UnlockableContent{
 
         this.size = 3;
 
-        grid = PlanetGrid.newGrid(size);
+        grid = PlanetGrid.create(size);
 
         sectors = new Array<>(grid.tiles.length);
         for(int i = 0; i < grid.tiles.length; i++){

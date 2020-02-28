@@ -1,13 +1,14 @@
 package mindustry.graphics;
 
-import arc.Core;
-import arc.graphics.Color;
-import arc.graphics.g2d.TextureRegion;
-import arc.graphics.gl.Shader;
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.graphics.gl.*;
+import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.ui.layout.Scl;
+import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
-import arc.util.Time;
+import arc.util.*;
 
 public class Shaders{
     public static Shadow shadow;
@@ -18,8 +19,9 @@ public class Shaders{
     public static MenuShader menu;
     public static LightShader light;
     public static SurfaceShader water, tar, slag;
-    public static Shader planet;
+    public static PlanetShader planet;
     public static PlanetGridShader planetGrid;
+    public static SunShader sun;
 
     public static void init(){
         shadow = new Shadow();
@@ -38,8 +40,63 @@ public class Shaders{
         water = new SurfaceShader("water");
         tar = new SurfaceShader("tar");
         slag = new SurfaceShader("slag");
-        planet = new LoadShader("planet", "planet");
+        planet = new PlanetShader();
         planetGrid = new PlanetGridShader();
+        sun = new SunShader();
+    }
+
+    public static class PlanetShader extends LoadShader{
+        public Vec3 lightDir = new Vec3(1, 1, 1).nor();
+
+        public PlanetShader(){
+            super("planet", "planet");
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("u_lightdir", lightDir);
+        }
+    }
+
+    public static class SunShader extends LoadShader{
+        public int octaves = 5;
+        public float falloff = 0.5f, scale = 1f, power = 1.3f, magnitude = 0.6f, speed = 99999999999f, spread = 1.3f, seed = Mathf.random(9999f);
+
+        public Color[] colors;
+        public float[] colorValues;
+
+        public Vec3 center = new Vec3();
+
+        public SunShader(){
+            super("sun", "sun");
+        }
+
+        @Override
+        public void apply(){
+            setUniformi("u_octaves", octaves);
+            setUniformf("u_falloff", falloff);
+            setUniformf("u_scale", scale);
+            setUniformf("u_power", power);
+            setUniformf("u_magnitude", magnitude);
+            setUniformf("u_time", Time.globalTime() / speed);
+            setUniformf("u_seed", seed);
+            setUniformf("u_spread", spread);
+            setUniformf("u_center", center);
+
+            setUniformi("u_colornum", colors.length);
+            setUniform4fv("u_colors[0]", colorValues, 0, colorValues.length);
+        }
+
+        public void updateColors(){
+            colorValues = new float[colors.length*4];
+
+            for(int i = 0; i < colors.length; i ++){
+                colorValues[i*4] = colors[i].r;
+                colorValues[i*4 + 1] = colors[i].g;
+                colorValues[i*4 + 2] = colors[i].b;
+                colorValues[i*4 + 3] = colors[i].a;
+            }
+        }
     }
 
     public static class PlanetGridShader extends LoadShader{

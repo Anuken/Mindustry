@@ -15,7 +15,8 @@ import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.PlanetGrid.*;
+import mindustry.graphics.g3d.*;
+import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
@@ -34,6 +35,11 @@ public class PlanetDialog extends FloatingDialog{
     private final Camera3D cam = new Camera3D();
     private final VertexBatch3D batch = new VertexBatch3D(false, true, 0);
     private final PlaneBatch3D projector = new PlaneBatch3D();
+
+    private final SphereMesh sun = new SphereMesh(3, 1.2f);
+    private final Bloom bloom = new Bloom(false){{
+        setClearColor(0, 0, 0, 0);
+    }};
 
     private Planet planet = Planets.starter;
     private float lastX, lastY;
@@ -99,6 +105,23 @@ public class PlanetDialog extends FloatingDialog{
         stable.pack();
         stable.setPosition(0, 0, Align.center);
 
+        Shaders.sun.colors = new Color[]{
+            Color.valueOf("ff7a38"),
+            Color.valueOf("ff9638"),
+            Color.valueOf("ffc64c"),
+            Color.valueOf("ffc64c"),
+            Color.valueOf("ffe371"),
+            Color.valueOf("f4ee8e"),
+        };
+
+        Shaders.sun.updateColors();
+        Shaders.sun.scale = 1f;
+        Shaders.sun.speed = 1000f;
+        Shaders.sun.falloff = 0.3f;
+        Shaders.sun.octaves = 4;
+        Shaders.sun.spread = 1.2f;
+        Shaders.sun.magnitude = 0f;
+
         shown(this::setup);
     }
 
@@ -127,12 +150,9 @@ public class PlanetDialog extends FloatingDialog{
         projector.proj(cam.combined());
         batch.proj(cam.combined());
 
-        PlanetMesh outline = outline(planet.size);
-        Vec3 tile = outline.intersect(cam.getPickRay(Core.input.mouseX(), Core.input.mouseY()));
-        Shaders.planetGrid.mouse.lerp(tile == null ? Vec3.Zero : tile, 0.2f);
+        renderSun();
+        renderPlanet();
 
-        planet.mesh.render(cam.combined());
-        outline.render(cam.combined(), Shaders.planetGrid);
 
         for(Sector sec : planet.sectors){
             if(sec.save == null){
@@ -176,6 +196,27 @@ public class PlanetDialog extends FloatingDialog{
             stable.setPosition(pos.x, pos.y, Align.center);
             stable.draw();
         }
+    }
+
+    private void renderPlanet(){
+        PlanetMesh outline = outline(planet.size);
+        Vec3 tile = outline.intersect(cam.getPickRay(Core.input.mouseX(), Core.input.mouseY()));
+        Shaders.planetGrid.mouse.lerp(tile == null ? Vec3.Zero : tile, 0.2f);
+
+        Shaders.planet.lightDir.set(Shaders.sun.center).nor();
+
+        planet.mesh.render(cam.combined());
+        outline.render(cam.combined(), Shaders.planetGrid);
+    }
+
+    private void renderSun(){
+        bloom.capture();
+        Shaders.sun.center.set(-3f, 0f, 0).rotate(Vec3.Y, Time.time() / 3f);
+        sun.render(cam.combined(), Shaders.sun);
+        bloom.render();
+
+        Gl.enable(Gl.depthTest);
+        Gl.enable(Gl.blend);
     }
 
     private void drawBorders(Sector sector, Color base){
