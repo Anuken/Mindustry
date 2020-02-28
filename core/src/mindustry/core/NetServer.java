@@ -135,7 +135,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(admins.getPlayerLimit() > 0 && playerGroup.size() >= admins.getPlayerLimit() * (info.timesJoined >= 5 ? 2 : 1) && !netServer.admins.isAdmin(uuid, packet.usid)){
+            if(admins.getPlayerLimit() > 0 && playerGroup.size() >= admins.getPlayerLimit() && !netServer.admins.isAdmin(uuid, packet.usid)){
                 con.kick(KickReason.playerLimit);
                 return;
             }
