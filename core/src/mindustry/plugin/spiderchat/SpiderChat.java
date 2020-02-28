@@ -40,7 +40,6 @@ public class SpiderChat extends Plugin implements ApplicationListener{
     }
 
     public String colorcase(String string, Color color){
-        Log.info(string);
         Pattern p = Pattern.compile("[A-Z]+");
         Matcher m = p.matcher(string);
         StringBuffer sb = new StringBuffer();
