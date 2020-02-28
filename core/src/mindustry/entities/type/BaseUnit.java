@@ -297,8 +297,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
             if(factory == null || !(factory.entity instanceof UnitFactoryEntity)){
                 kill();
             }else{
-                float multiplier = 1f - factory.entity.power.status;
-                damage(1 * multiplier);
+//                float multiplier = 1f - factory.entity.power.status;
+//                damage(1 * multiplier);
             }
         }
 
