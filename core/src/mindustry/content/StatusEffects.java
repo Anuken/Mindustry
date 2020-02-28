@@ -100,7 +100,7 @@ public class StatusEffects implements ContentList{
 
         //no effects, just small amounts of damage.
         corroded = new StatusEffect("corroded"){{
-            damage = 1f;
+            damage = 0.1f;
         }};
     }
 }
