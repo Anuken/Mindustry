@@ -3,10 +3,8 @@ package mindustry.world.blocks.distribution;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import mindustry.content.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.type.*;
 import mindustry.type.*;
@@ -21,8 +19,6 @@ import static mindustry.Vars.*;
 public class Sorter extends Block{
     private static Item lastItem;
     public boolean invert;
-
-    public static Array<Tile> thanos = new Array<>();
 
     public Sorter(String name){
         super(name);
@@ -173,17 +169,5 @@ public class Sorter extends Block{
                 new DirectionalItemBuffer(20, 45f).read(stream);
             }
         }
-    }
-
-    @Override
-    public void onProximityUpdate(Tile tile){
-        if (tile.entity.proximity().contains(t -> t.block() == Blocks.incinerator)) thanos(tile);
-    }
-
-    private void thanos(Tile tile){
-        if(thanos.contains(tile)) return;
-        thanos.add(tile);
-
-        tile.entity.proximity().select(t -> t.block instanceof Sorter).each(this::thanos);
     }
 }
