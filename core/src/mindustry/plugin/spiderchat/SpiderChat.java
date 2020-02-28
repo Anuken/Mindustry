@@ -26,9 +26,6 @@ public class SpiderChat extends Plugin implements ApplicationListener{
     public void connected(Player player){
         player.icon = Iconc.download;
         message(player, "connected");
-//        message(server, Strings.format("[#{0}]{1} [white]connected", player.color, player.name));
-//        String msg = player.getTeam().color() + Iconc.download + " connected " + "[#" + player.color + "]" + player.name;
-//        Call.sendMessage(msg);
     }
 
     public void disconnected(Player player){
