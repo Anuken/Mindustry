@@ -25,22 +25,22 @@ public class SpiderChat extends Plugin implements ApplicationListener{
 
     public void connected(Player player){
         player.icon = Iconc.download;
-        message(player, "");
+        Call.sendMessage(player.prefix());
     }
 
     public void disconnected(Player player){
         player.icon = Iconc.upload;
-        message(player, "");
+        Call.sendMessage(player.prefix());
     }
 
     public void kicked(Player player){
         player.icon = Iconc.warning;
-        message(player, "");
+        Call.sendMessage(player.prefix());
     }
 
     public void banned(Player player){
         player.icon = Iconc.block;
-        message(player, "");
+        Call.sendMessage(player.prefix());
     }
 
     public String colorcase(String string, Color color){
