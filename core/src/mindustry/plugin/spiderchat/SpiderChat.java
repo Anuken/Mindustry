@@ -14,7 +14,7 @@ public class SpiderChat extends Plugin implements ApplicationListener{
 
     public static Player server = new Player(){{
         name = "Server";
-        color = Color.scarlet;
+        color = Color.lightGray;
         isServer = true;
         team = Team.derelict;
     }};
@@ -24,19 +24,26 @@ public class SpiderChat extends Plugin implements ApplicationListener{
     }
 
     public void connected(Player player){
-        message(server, Strings.format("[#{0}]{1} [white]has connected", player.color, player.name));
+        player.icon = Iconc.download;
+        message(player, "connected");
+//        message(server, Strings.format("[#{0}]{1} [white]connected", player.color, player.name));
+//        String msg = player.getTeam().color() + Iconc.download + " connected " + "[#" + player.color + "]" + player.name;
+//        Call.sendMessage(msg);
     }
 
     public void disconnected(Player player){
-        message(server, Strings.format("[#{0}]{1} [white]has disconnected", player.color, player.name));
+        player.icon = Iconc.upload;
+        message(player, "disconnected");
     }
 
     public void kicked(Player player){
-        message(server, Strings.format("[#{0}]{1} [white]has been kicked", player.color, player.name));
+        player.icon = Iconc.warning;
+        message(player, "kicked");
     }
 
     public void banned(Player player){
-        message(server, Strings.format("[#{0}]{1} [white]has been banned", player.color, player.name));
+        player.icon = Iconc.block;
+        message(player, "banned");
     }
 
     public String colorcase(String string, Color color){

@@ -77,6 +77,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public int idle = 0;
     public boolean syncWhenIdle = false;
 
+    public Character icon;
+
     //endregion
 
     //region unit and event overrides, utility methods
@@ -969,12 +971,21 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     public String prefix(){
         String name = "[#" + color + "]" + this.name;
-        String team = getTeam().color()  + icon() +" ";
+        String team = getTeam().color() + icon() +" ";
 
         return team + "[lightgray]" + name + " ";
     }
 
     private char icon(){
+
+        if(icon != null){
+            try{
+                return icon;
+            }finally{
+                icon = null;
+            }
+        }
+
         if(isServer) return Iconc.star;
         if(isAdmin) return Iconc.admin;
 
