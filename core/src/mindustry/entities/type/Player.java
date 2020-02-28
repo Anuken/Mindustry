@@ -970,10 +970,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     //endregion
 
     public String prefix(){
-        String name = "[#" + color + "]" + this.name;
-        String team = getTeam().color() + icon() +" ";
-
-        return team + "[lightgray]" + name + " ";
+        return Strings.format("[#{0}]{1} [#{2}]{3} ", getTeam().color, icon(), color, name);
     }
 
     private char icon(){
