@@ -572,6 +572,12 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         if(!mech.flying){
             clampPosition();
         }
+
+        if(idle()){
+            idle++;
+        }else{
+            idle = 0;
+        }
     }
 
     protected void updateKeyboard(){
