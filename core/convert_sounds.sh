@@ -1,3 +1,4 @@
+#!/bin/bash
 #convert from stereo to mono
 cd assets/sounds/
 for i in *.ogg; do
