@@ -9,6 +9,8 @@ import arc.util.*;
 import mindustry.graphics.PlanetGrid.*;
 
 public class PlanetMesh{
+    private static final Vec3 v1 = new Vec3(), v2 = new Vec3(), v3 = new Vec3(), v4 = new Vec3();
+
     private float[] floats = new float[3 + 3 + 1];
     private Vec3 vec = new Vec3();
     private Mesh mesh;
@@ -68,11 +70,11 @@ public class PlanetMesh{
         shader.end();
     }
 
-    private void generateMesh(){
 
+    private void generateMesh(){
         for(Ptile tile : grid.tiles){
 
-            Vec3 nor = Tmp.v31.setZero();
+            Vec3 nor = v1.setZero();
             Corner[] c = tile.corners;
 
             for(Corner corner : c){
@@ -114,6 +116,21 @@ public class PlanetMesh{
                     verts(c[0].v, c[3].v, c[4].v, nor, color);
                 }
             }
+        }
+    }
+
+    //unused, but functional
+    private void createIcosphere(){
+        MeshResult result = Icosphere.create(5);
+        for(int i = 0; i < result.indices.size; i+= 3){
+            v1.set(result.vertices.items, result.indices.items[i] * 3).setLength(radius).setLength(radius + elevation(v1)*intensity);
+            v2.set(result.vertices.items, result.indices.items[i + 1] * 3).setLength(radius).setLength(radius + elevation(v2)*intensity);
+            v3.set(result.vertices.items, result.indices.items[i + 2] * 3).setLength(radius).setLength(radius + elevation(v3)*intensity);
+
+            verts(v1, v3, v2,
+                normal(v1, v2, v3).scl(-1f),
+                color(v4.set(v1).add(v2).add(v3).scl(1f / 3f))
+            );
         }
     }
 
