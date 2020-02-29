@@ -10,6 +10,8 @@ import mindustry.plugin.*;
 
 import java.util.regex.*;
 
+import static mindustry.Vars.*;
+
 public class SpiderChat extends Plugin implements ApplicationListener{
 
     public static Player server = new Player(){{
@@ -20,7 +22,11 @@ public class SpiderChat extends Plugin implements ApplicationListener{
     }};
 
     public void message(Player player, String raw){
-        Call.sendMessage(player.prefix() + "[orange]> [white]" + raw);
+        if(raw.startsWith("!")){
+            playerGroup.all().select(p -> p.isAdmin).each(p -> Call.sendMessage(player.prefix() + "[orange]> [#" + Color.valueOf("ee593b") + "]" + raw));
+        }else{
+            Call.sendMessage(player.prefix() + "[orange]> [white]" + raw);
+        }
     }
 
     public void connected(Player player){
