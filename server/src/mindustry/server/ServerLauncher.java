@@ -43,7 +43,7 @@ public class ServerLauncher implements ApplicationListener{
     @Override
     public void init(){
         Core.settings.setDataDirectory(Core.files.local("config"));
-        loadLocales = false;
+        loadLocales = true;
         headless = true;
 
         Fi plugins = Core.settings.getDataDirectory().child("plugins");
