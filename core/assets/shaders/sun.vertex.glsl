@@ -1,9 +1,9 @@
 attribute vec4 a_position;
 attribute vec3 a_normal;
 
-uniform mat4 u_projModelView;
+uniform mat4 u_proj;
+uniform mat4 u_trans;
 
-uniform vec3 u_center;
 uniform float u_time;
 uniform int u_octaves;
 uniform float u_falloff;
@@ -100,8 +100,7 @@ float onoise(vec4 pos, int octaves, float falloff, float scl, float po){
 }
 
 void main(){
-    vec3 center = u_center;
-    vec4 pos = u_projModelView * (a_position);
+    vec4 pos = a_position;
 
     float height = onoise(vec4(a_position.xyz, u_time + u_seed), u_octaves, u_falloff, u_scale, u_power);
 
@@ -111,7 +110,5 @@ void main(){
 
     v_height = (height + (onoise(vec4(a_position.xyz, u_time + u_seed*2.0), u_octaves, u_falloff, u_scale, u_power) - 0.5) / 6.0 - 0.5) * u_spread + 0.5;
 
-    vec3 rel = (-vec3(pos) + ((vec3(pos) - center) * dst + center));
-
-    gl_Position = u_projModelView * (a_position + vec4(center.xyz, 0.0)) + vec4(rel, 0.0);
+    gl_Position = u_proj * u_trans * a_position; //u_proj * (a_position + vec4(pos.xyz * (dst - 1.0), 0.0));
 }

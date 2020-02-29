@@ -47,6 +47,7 @@ public class Shaders{
 
     public static class PlanetShader extends LoadShader{
         public Vec3 lightDir = new Vec3(1, 1, 1).nor();
+        public Color ambientColor = Color.white.cpy();
 
         public PlanetShader(){
             super("planet", "planet");
@@ -55,6 +56,7 @@ public class Shaders{
         @Override
         public void apply(){
             setUniformf("u_lightdir", lightDir);
+            setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
         }
     }
 
@@ -62,10 +64,7 @@ public class Shaders{
         public int octaves = 5;
         public float falloff = 0.5f, scale = 1f, power = 1.3f, magnitude = 0.6f, speed = 99999999999f, spread = 1.3f, seed = Mathf.random(9999f);
 
-        public Color[] colors;
         public float[] colorValues;
-
-        public Vec3 center = new Vec3();
 
         public SunShader(){
             super("sun", "sun");
@@ -81,21 +80,9 @@ public class Shaders{
             setUniformf("u_time", Time.globalTime() / speed);
             setUniformf("u_seed", seed);
             setUniformf("u_spread", spread);
-            setUniformf("u_center", center);
 
-            setUniformi("u_colornum", colors.length);
+            setUniformi("u_colornum", colorValues.length / 4);
             setUniform4fv("u_colors[0]", colorValues, 0, colorValues.length);
-        }
-
-        public void updateColors(){
-            colorValues = new float[colors.length*4];
-
-            for(int i = 0; i < colors.length; i ++){
-                colorValues[i*4] = colors[i].r;
-                colorValues[i*4 + 1] = colors[i].g;
-                colorValues[i*4 + 2] = colors[i].b;
-                colorValues[i*4 + 3] = colors[i].a;
-            }
         }
     }
 

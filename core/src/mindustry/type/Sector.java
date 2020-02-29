@@ -34,6 +34,14 @@ public class Sector{
         this.data = data;
     }
 
+    /** @return light dot product in the range [0, 1]. */
+    public float getLight(){
+        Vec3 normal = Tmp.v31.set(tile.v).rotate(Vec3.Y, -planet.getRotation()).nor();
+        Vec3 light = Tmp.v32.set(planet.solarSystem.position).sub(planet.position).nor();
+        //lightness in [0, 1]
+        return (normal.dot(light) + 1f) / 2f;
+    }
+
     public int getSize(){
         return (int)(rect.radius * 3200);
     }

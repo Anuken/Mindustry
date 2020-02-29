@@ -204,6 +204,7 @@ public class Logic implements ApplicationListener{
     @Override
     public void update(){
         Events.fire(Trigger.update);
+        universe.updateGlobal();
 
         if(!state.is(State.menu)){
             if(!net.client()){
@@ -211,7 +212,9 @@ public class Logic implements ApplicationListener{
             }
 
             if(!state.isPaused()){
-                universe.update();
+                if(world.isCampaign()){
+                    universe.update();
+                }
                 Time.update();
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){

@@ -1,11 +1,11 @@
 package mindustry.maps.generators;
 
 import arc.math.geom.*;
-import mindustry.graphics.g3d.PlanetMesher;
+import mindustry.graphics.g3d.HexMesher;
 import mindustry.type.*;
 import mindustry.world.*;
 
-public abstract class PlanetGenerator extends BasicGenerator implements PlanetMesher{
+public abstract class PlanetGenerator extends BasicGenerator implements HexMesher{
     protected Sector sector;
 
     protected void genTile(Vec3 position, TileGen tile){
