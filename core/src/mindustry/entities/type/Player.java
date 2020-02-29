@@ -75,7 +75,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     private boolean moved;
 
     public int idle = 0;
-    public boolean syncWhenIdle = false;
 
     public Character icon;
 
@@ -476,6 +475,12 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public void update(){
+        if(idle()){
+            idle++;
+        }else{
+            idle = 0;
+        }
+
         hitTime -= Time.delta();
         textFadeTime -= Time.delta() / (60 * 5);
         itemtime = Mathf.lerpDelta(itemtime, Mathf.num(item.amount > 0), 0.1f);
@@ -573,12 +578,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         if(!mech.flying){
             clampPosition();
-        }
-
-        if(idle()){
-            idle++;
-        }else{
-            idle = 0;
         }
     }
 
@@ -913,7 +912,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     @Override
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
-        TypeIO.writeStringData(buffer, name);
+        if(idle > 60 * 60){
+            TypeIO.writeStringData(buffer, "[lightgray][afk][] " + name);
+        }else{
+            TypeIO.writeStringData(buffer, name);
+        }
         buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2) | (Pack.byteValue(isTyping) << 3)| (Pack.byteValue(isBuilding) << 4));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
@@ -996,10 +999,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     public int voteMultiplier(){
-
-        if(isAdmin) return 3;
-
-        return 1;
+        return isAdmin ? 3 : 1;
     }
 
     // define when a player is doing nothing (useful)
