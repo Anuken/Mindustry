@@ -3,6 +3,7 @@ package mindustry.server;
 import arc.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.ui.*;
 
 import java.util.*;
@@ -14,6 +15,32 @@ public class EmojiFilter implements ApplicationListener{
 
     private Array<String> blacklist = new Array<String>(){{
         addAll("spawn", "wave");
+    }};
+
+    private StringMap alias = new StringMap(){{
+
+        put("core", Blocks.coreShard.name);
+
+        put("laser",    Blocks.laserDrill.name);
+        put("airblast", Blocks.blastDrill.name);
+
+        put("blast",  Items.blastCompound.name);
+        put("glass",  Items.metaglass.name    );
+        put("spore",  Items.sporePod.name     );
+        put("spores", Items.sporePod.name     );
+        put("surge",  Items.surgealloy.name   );
+        put("phase",  Items.phasefabric.name  );
+
+        put("delta",   Blocks.deltaPad.name  );
+        put("tau",     Blocks.tauPad.name    );
+        put("omega",   Blocks.omegaPad.name  );
+        put("javelin", Blocks.javelinPad.name);
+        put("trident", Blocks.tridentPad.name);
+        put("glaive",  Blocks.glaivePad.name );
+
+        put("draug",   Blocks.draugFactory.name);
+        put("spirit",  Blocks.spiritFactory.name);
+        put("phantom", Blocks.phantomFactory.name);
     }};
 
     @Override
@@ -49,5 +76,7 @@ public class EmojiFilter implements ApplicationListener{
 
             return text;
         });
+
+        alias.each((from, to) -> Fonts.unicodeIcons.put(from, Fonts.unicodeIcons.get(to, 0)));
     }
 }
