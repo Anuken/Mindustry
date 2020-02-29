@@ -23,7 +23,7 @@ public class SpiderChat extends Plugin implements ApplicationListener{
 
     public void message(Player player, String raw){
         if(raw.startsWith("!")){
-            playerGroup.all().select(p -> p.isAdmin).each(p -> Call.sendMessage(player.prefix() + "[orange]> [#" + Color.valueOf("ee593b") + "]" + raw));
+            playerGroup.all().select(p -> p.isAdmin).each(p -> p.sendMessage(player.prefix() + "[orange]> [#" + Color.valueOf("ee593b") + "]" + raw));
         }else{
             Call.sendMessage(player.prefix() + "[orange]> [white]" + raw);
         }
