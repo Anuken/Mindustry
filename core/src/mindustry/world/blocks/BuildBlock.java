@@ -20,6 +20,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.distribution.*;
 import mindustry.world.modules.*;
 
 import java.io.*;
@@ -251,6 +252,21 @@ public class BuildBlock extends Block{
                 constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
                 return true;
             }
+
+            // downgrade titanium conveyors
+            if(maxProgress == 0f && cblock == Blocks.titaniumConveyor){
+                constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
+                Core.app.post(() -> tile.setNet(Blocks.conveyor, builder.getTeam(), tile.rotation));
+                return true;
+            }
+
+            // downgrade titanium conduits
+            if(maxProgress == 0f && cblock == Blocks.phaseConduit){
+                constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
+                Core.app.post(() -> tile.setNet(Blocks.conduit, builder.getTeam(), tile.rotation));
+                return true;
+            }
+
             return false;
         }
 
