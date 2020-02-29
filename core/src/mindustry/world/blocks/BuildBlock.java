@@ -261,7 +261,7 @@ public class BuildBlock extends Block{
             }
 
             // downgrade titanium conduits
-            if(maxProgress == 0f && cblock == Blocks.phaseConduit){
+            if(maxProgress == 0f && cblock == Blocks.pulseConduit){
                 constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
                 Core.app.post(() -> tile.setNet(Blocks.conduit, builder.getTeam(), tile.rotation));
                 return true;
