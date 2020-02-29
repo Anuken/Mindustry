@@ -9,7 +9,7 @@ import mindustry.ui.*;
 import java.util.*;
 import java.util.zip.*;
 
-import static mindustry.Vars.netServer;
+import static mindustry.Vars.*;
 
 public class EmojiFilter implements ApplicationListener{
 

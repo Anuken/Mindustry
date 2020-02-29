@@ -22,10 +22,18 @@ public class SpiderChat extends Plugin implements ApplicationListener{
     }};
 
     public void message(Player player, String raw){
+
+        for(String word : raw.split("\\s+")){
+            word = word.replaceAll("\\p{Punct}", "");
+
+            if(playerGroup.levenshtein(word) != null) raw = raw.replace(word, playerGroup.levenshtein(word).prefix() + "[white]");
+        }
+
         if(raw.startsWith("!")){
-            playerGroup.all().select(p -> p.isAdmin).each(p -> p.sendMessage(player.prefix() + "[orange]> [#" + Color.valueOf("ee593b") + "]" + raw));
+            String finalRaw = raw;
+            playerGroup.all().select(p -> p.isAdmin).each(p -> p.sendMessage(player.prefix() + "[orange]> [#" + Color.valueOf("ee593b") + "]" + finalRaw));
         }else{
-            Call.sendMessage(player.prefix() + "[orange]> [white]" + raw);
+            Call.sendMessage(player.prefix() + " [orange]> [white]" + raw);
         }
     }
 
