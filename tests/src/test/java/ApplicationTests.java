@@ -215,6 +215,16 @@ public class ApplicationTests{
     }
 
     @Test
+    void conveyorCrash(){
+        world.loadMap(testMap);
+        state.set(State.playing);
+
+        world.tile(0, 0).setBlock(Blocks.conveyor);
+        world.tile(0, 0).rotation(0);
+        Blocks.conveyor.acceptStack(Items.copper, 1000, world.tile(0, 0), null);
+    }
+
+    @Test
     void conveyorBench(){
         int[] items = {0};
 
