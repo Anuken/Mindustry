@@ -136,6 +136,7 @@ public class PlanetDialog extends FloatingDialog{
         cam.up.set(Vec3.Y);
 
         cam.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+        camRelative.setLength(planet.radius * camLength);
         cam.position.set(planet.position).add(camRelative);
         cam.lookAt(planet.position);
         cam.update();
@@ -147,7 +148,6 @@ public class PlanetDialog extends FloatingDialog{
 
         renderPlanet(solarSystem);
         if(planet.isLandable()){
-            //TODO
             renderSectors(planet);
         }
 
@@ -335,13 +335,20 @@ public class PlanetDialog extends FloatingDialog{
         for(int i = 0; i < sector.tile.corners.length; i++){
             Corner next = sector.tile.corners[(i + 1) % sector.tile.corners.length];
             Corner curr = sector.tile.corners[i];
+
+            next.v.scl(arad);
+            curr.v.scl(arad);
             sector.tile.v.scl(arad);
+
             Tmp.v31.set(curr.v).sub(sector.tile.v).setLength(length).add(sector.tile.v);
             Tmp.v32.set(next.v).sub(sector.tile.v).setLength(length).add(sector.tile.v);
-            sector.tile.v.scl(1f / arad);
 
             batch.tri(curr.v, next.v, Tmp.v31, Pal.accent);
             batch.tri(Tmp.v31, next.v, Tmp.v32, Pal.accent);
+
+            sector.tile.v.scl(1f / arad);
+            next.v.scl(1f / arad);
+            curr.v.scl(1f /arad);
         }
     }
 

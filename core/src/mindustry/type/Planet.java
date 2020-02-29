@@ -20,7 +20,7 @@ import static mindustry.Vars.universe;
 
 public class Planet extends UnlockableContent{
     /** Default spacing between planet orbits in world units. */
-    private static final float orbitSpacing = 5f;
+    private static final float orbitSpacing = 6f;
     /** intersect() temp var. */
     private static final Vec3 intersectResult = new Vec3();
     /** Mesh used for rendering. Created on load() - will be null on the server! */

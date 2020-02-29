@@ -34,26 +34,14 @@ public class MeshBuilder{
 
         for(Ptile tile : grid.tiles){
 
-            Vec3 nor = v1.setZero();
             Corner[] c = tile.corners;
 
             for(Corner corner : c){
-                corner.bv.set(corner.v).setLength(radius);
+                corner.v.setLength((1f + mesher.getHeight(v2.set(corner.v)) * intensity) * radius);
             }
 
-            for(Corner corner : c){
-                corner.v.setLength(radius + hexElevation(corner.bv, mesher, radius)*intensity);
-            }
-
-            for(Corner corner : c){
-                nor.add(corner.v);
-            }
-            nor.nor();
-
-            Vec3 realNormal = normal(c[0].v, c[2].v, c[4].v);
-            nor.set(realNormal);
-
-            Color color = hexColor(tile.v, mesher, radius);
+            Vec3 nor = normal(c[0].v, c[2].v, c[4].v);
+            Color color = mesher.getColor(v2.set(tile.v));
 
             if(lines){
                 nor.set(1f, 1f, 1f);
@@ -76,17 +64,15 @@ public class MeshBuilder{
                     verts(c[0].v, c[3].v, c[4].v, nor, color);
                 }
             }
+
+            //restore mutated corners
+            for(Corner corner : c){
+                corner.v.nor();
+            }
+
         }
 
         return end();
-    }
-
-    private static float hexElevation(Vec3 v, HexMesher mesher, float radius){
-        return mesher.getHeight(v2.set(v).scl(1f / radius));
-    }
-
-    private static Color hexColor(Vec3 v, HexMesher mesher, float radius){
-        return mesher.getColor(v2.set(v).scl(1f / radius));
     }
 
     private static void begin(int count){

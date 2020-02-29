@@ -2,7 +2,6 @@ package mindustry.graphics.g3d;
 
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.*;
 
 //TODO clean this up somehow
 public class PlanetGrid{
@@ -166,7 +165,7 @@ public class PlanetGrid{
     static void addCorner(int id, PlanetGrid grid, int t1, int t2, int t3){
         Corner c = grid.corners[id];
         Ptile[] t = {grid.tiles[t1], grid.tiles[t2], grid.tiles[t3]};
-        c.v = Tmp.v31.set(t[0].v).add(t[1].v).add(t[2].v).cpy().nor();
+        c.v.set(t[0].v).add(t[1].v).add(t[2].v).nor();
         for(int i = 0; i < 3; i++){
             t[i].corners[pos(t[i], t[(i + 2) % 3])] = c;
             c.tiles[i] = t[i];
@@ -245,9 +244,7 @@ public class PlanetGrid{
         public final Ptile[] tiles = new Ptile[3];
         public final Corner[] corners = new Corner[3];
         public final Edge[] edges = new Edge[3];
-
-        public Vec3 v = new Vec3();
-        public Vec3 bv = new Vec3();
+        public final Vec3 v = new Vec3();
 
         public Corner(int id){
             this.id = id;
