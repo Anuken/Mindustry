@@ -1698,6 +1698,8 @@ public class Blocks implements ContentList{
             maxSpawn = 1;
             consumes.power(1.2f);
             consumes.items();
+
+            rebuildable = false;
         }};
 
         spiritFactory = new UnitFactory("spirit-factory"){{

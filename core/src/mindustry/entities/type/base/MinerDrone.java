@@ -11,6 +11,7 @@ import mindustry.type.Item;
 import mindustry.type.ItemType;
 import mindustry.world.Pos;
 import mindustry.world.Tile;
+import mindustry.world.blocks.units.UnitFactory.*;
 
 import java.io.*;
 
@@ -20,6 +21,8 @@ import static mindustry.Vars.*;
 public class MinerDrone extends BaseDrone implements MinerTrait{
     protected Item targetItem;
     protected Tile mineTile;
+
+    protected static final int timerSelfDestruct = timerIndex++;
 
     public final UnitState
 
@@ -38,6 +41,10 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
             //core full of the target item, do nothing
             if(targetItem != null && entity.block.acceptStack(targetItem, 1, entity.tile, MinerDrone.this) == 0){
                 MinerDrone.this.clearItem();
+
+                if(getSpawner() == null || !(getSpawner().entity instanceof UnitFactoryEntity)) return;
+                if(!timer.get(timerSelfDestruct, 60)) return;
+                getSpawner().entity.damage(5);
                 return;
             }
 
