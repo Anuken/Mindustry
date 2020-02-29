@@ -643,12 +643,13 @@ public class NetServer implements ApplicationListener{
         player.add();
         player.con.hasConnected = true;
         if(Config.showConnectMessages.bool()){
-            String name = "[accent]" + player.name + "[accent]";
             if(player.username != null){
-                name += " (" + player.username + ")";
+                Call.sendMessage("[accent]" + player.name + "[accent] (" + player.username + ") has connected");
+                Log.info("&lm[{1}] &y{0} ({2}) has connected. ", player.name, player.uuid, player.username);
+            }else{
+                Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
+                Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
             }
-            Call.sendMessage(name + " has connected.");
-            Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
         }
 
         if(!Config.motd.string().equalsIgnoreCase("off")){

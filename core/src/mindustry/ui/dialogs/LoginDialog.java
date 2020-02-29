@@ -44,17 +44,21 @@ public class LoginDialog extends FloatingDialog {
                 hide();
                 if(info.successCallback != null) info.successCallback.run();
             }else{
-                switch(response.errorCode){
-                    case "INVALID_CREDENTIALS": {
-                        ui.showInfo("$login.invalidcredentials");
-                        break;
+                if(response.errorCode == null){
+                    Authentication.showApiError(response);
+                }else{
+                    switch(response.errorCode){
+                        case "INVALID_CREDENTIALS": {
+                            ui.showInfo("$login.invalidcredentials");
+                            break;
+                        }
+                        case "ACCOUNT_DISABLED": {
+                            ui.showInfo("$login.accountdisabled");
+                            break;
+                        }
+                        default:
+                            Authentication.showApiError(response);
                     }
-                    case "ACCOUNT_DISABLED": {
-                        ui.showInfo("$login.accountdisabled");
-                        break;
-                    }
-                    default:
-                        Authentication.showApiError(response);
                 }
             }
         });
