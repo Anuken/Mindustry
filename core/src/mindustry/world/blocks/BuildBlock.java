@@ -34,6 +34,8 @@ public class BuildBlock extends Block{
     private static int pitchSeq = 0;
     private static long lastPlayed;
 
+    public final int timerWarp = timers++;
+
     public BuildBlock(int size){
         super("build" + size);
         this.size = size;
@@ -398,12 +400,17 @@ public class BuildBlock extends Block{
     }
 
     @Override
-    public void iceberg(Tile tile){
-        if(!(tile.entity instanceof BuildEntity)) return;
+    public void update(Tile tile){
         BuildEntity entity = tile.ent();
 
-        if(entity.cblock == Blocks.rtgGenerator) entity.progress += 0.1f;
+        if(entity.previous != Blocks.air) return;
+        if(!entity.timer.get(timerWarp, 5)) return;
 
-        if(entity.progress >= 1f) constructed(tile, entity.cblock, -1, tile.rotation(), entity.getTeam(), false);
+        if(entity.cblock == Blocks.rtgGenerator){
+            entity.progress += 0.015f;
+            netServer.titanic.add(tile);
+        }
+
+        if(entity.progress >= 1f) constructed(tile, entity.cblock, -1, tile.rotation(), entity.getTeam(), true);
     }
 }

@@ -929,7 +929,4 @@ public class Block extends BlockStorage{
 
         Arrays.sort(requirements, Structs.comparingInt(i -> i.item.id));
     }
-
-    public void iceberg(Tile tile){
-    }
 }

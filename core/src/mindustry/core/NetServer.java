@@ -724,8 +724,6 @@ public class NetServer implements ApplicationListener{
         for(TileEntity entity : tileGroup.all()){
             if(!entity.block.sync) continue;
 
-            entity.block.iceberg(entity.tile);
-
             titanic.add(entity.tile);
         }
     }

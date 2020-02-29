@@ -105,11 +105,6 @@ public class Incinerator extends Block{
         return entity.heat > 0.5f;
     }
 
-    @Override
-    public void iceberg(Tile tile){
-        super.iceberg(tile);
-    }
-
     public static class IncineratorEntity extends TileEntity{
         public float heat;
         public int index;

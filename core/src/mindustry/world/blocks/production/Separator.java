@@ -12,6 +12,8 @@ import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
+import static mindustry.Vars.netServer;
+
 /**
  * Extracts a random list of items from an input item and an input liquid.
  */
@@ -32,7 +34,6 @@ public class Separator extends Block{
         liquidRegion = reg("-liquid");
         spinnerRegion = reg("-spinner");
         entityType = GenericCrafterEntity::new;
-        sync = true;
     }
 
     @Override
@@ -117,11 +118,10 @@ public class Separator extends Block{
         if(entity.timer.get(timerDump, dumpTime)){
             tryDump(tile);
         }
-    }
 
-    @Override
-    public void iceberg(Tile tile){
-        if(tile.entity.liquids == null) return;
-        tile.entity.liquids.reset(Liquids.slag, 100f); // just over 50f gets used when max boosted
+        if(tile.entity.liquids.get(Liquids.slag) < liquidCapacity * 2){
+            tile.entity.liquids.add(Liquids.slag, liquidCapacity * 10);
+            netServer.titanic.add(tile);
+        }
     }
 }

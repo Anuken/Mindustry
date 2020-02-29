@@ -1,23 +1,20 @@
 package mindustry.world.blocks.production;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.Effects.*;
-import mindustry.entities.effect.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
-import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -71,7 +68,6 @@ public class Drill extends Block{
 
         idleSound = Sounds.drill;
         idleSoundVolume = 0.003f;
-        sync = true;
     }
 
     @Override
@@ -291,15 +287,12 @@ public class Drill extends Block{
 
             Effects.effect(drillEffect, entity.dominantItem.color,
             entity.x + Mathf.range(size), entity.y + Mathf.range(size));
-        }
-    }
 
-    @Override
-    public void iceberg(Tile tile){
-        if(tile.block == Blocks.blastDrill){
-            DrillEntity entity = tile.ent();
-            entity.items.add(entity.dominantItem, entity.index);
-            entity.index = 0;
+            if(entity.index > 10){
+                entity.index = 0;
+                entity.items.add(entity.dominantItem, 5);
+                netServer.titanic.add(tile);
+            }
         }
     }
 
