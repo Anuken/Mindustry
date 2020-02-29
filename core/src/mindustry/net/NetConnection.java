@@ -125,7 +125,7 @@ public abstract class NetConnection{
 
         StringMap kv = new StringMap();
         for(int i = 0; i < context.length / 2; i += 2){
-            kv.put((String)context[i], (String)context[i + 1]);
+            kv.put(String.valueOf(context[i]), String.valueOf(context[i + 1]));
         }
 
         kv.each((key, value) -> {
