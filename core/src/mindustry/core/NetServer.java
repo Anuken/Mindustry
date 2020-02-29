@@ -135,7 +135,7 @@ public class NetServer implements ApplicationListener{
             }
 
             if(Time.millis() < info.lastKicked){
-                con.yeet(KickReason.recentKick, "timestamp", info.lastKicked);
+                con.yeet(KickReason.recentKick, "second(s)", (int)Math.ceil((info.lastKicked - Time.millis()) / 1000));
                 return;
             }
 
