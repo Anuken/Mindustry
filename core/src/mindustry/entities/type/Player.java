@@ -995,6 +995,13 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         return Iconc.modeSurvival;
     }
 
+    public int voteMultiplier(){
+
+        if(isAdmin) return 3;
+
+        return 1;
+    }
+
     // define when a player is doing nothing (useful)
     public boolean idle(){
         return velocity.isZero(0.1f) && placeQueue.isEmpty() && !isShooting && !isTyping;
