@@ -273,7 +273,7 @@ public class EntityGroup<T extends Entity> implements Iterable<T>{
 
         for(Player p : playerGroup){
             int dst = Strings.levenshtein(Strings.stripColors(p.name), name);
-            if(dst < 4 && (closest == null || dst < minDst)){
+            if(dst < 10 && (closest == null || dst < minDst)){
                 minDst = dst;
                 closest = p;
             }
