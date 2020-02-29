@@ -267,4 +267,8 @@ public class ContentLoader{
     public Array<UnitType> units(){
         return getBy(ContentType.unit);
     }
+
+    public Array<Planet> planets(){
+        return getBy(ContentType.planet);
+    }
 }

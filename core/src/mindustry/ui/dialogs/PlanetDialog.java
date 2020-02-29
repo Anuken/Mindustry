@@ -31,10 +31,15 @@ public class PlanetDialog extends FloatingDialog{
     private static final float camLength = 4f;
     float outlineRad = 1.15f;
 
+    //the base planet that's being rendered
+    private final Planet solarSystem = Planets.sun;
+
     private final PlanetMesh[] outlines = new PlanetMesh[10];
     private final Camera3D cam = new Camera3D();
     private final VertexBatch3D batch = new VertexBatch3D(false, true, 0);
     private final PlaneBatch3D projector = new PlaneBatch3D();
+    private final Mat3D mat = new Mat3D();
+
 
     private final SphereMesh sun = new SphereMesh(3, 1.2f);
     private final Bloom bloom = new Bloom(false){{
@@ -57,7 +62,7 @@ public class PlanetDialog extends FloatingDialog{
         projector.setScaling(1f / 300f);
 
         update(() -> {
-            Ptile tile = outline(planet.size).getTile(cam.getPickRay(Core.input.mouseX(), Core.input.mouseY()));
+            Ptile tile = outline(planet.grid.size).getTile(cam.getPickRay(Core.input.mouseX(), Core.input.mouseY()));
             hovered = tile == null ? null : planet.getSector(tile);
 
             Vec3 v = Tmp.v33.set(Core.input.mouseX(), Core.input.mouseY(), 0);
@@ -150,9 +155,10 @@ public class PlanetDialog extends FloatingDialog{
         projector.proj(cam.combined());
         batch.proj(cam.combined());
 
-        renderSun();
-        renderPlanet();
+        renderPlanet(solarSystem);
 
+        //renderSun();
+        //renderPlanet();
 
         for(Sector sec : planet.sectors){
             if(sec.save == null){
@@ -198,11 +204,33 @@ public class PlanetDialog extends FloatingDialog{
         }
     }
 
+    private void renderPlanet(Planet planet){
+        //render planet at offsetted position in the world
+        Vec3 position = planet.getWorldPosition(Tmp.v33);
+        mat.set(cam.combined()).trn(position); //TODO this probably won't give the desired result
+        planet.mesh.render(mat);
+
+        renderOrbit(planet);
+
+        for(Planet child : planet.children){
+            renderPlanet(child);
+        }
+    }
+
+    private void renderOrbit(Planet planet){
+        if(planet.parent == null) return;
+
+        Vec3 center = planet.parent.getWorldPosition(Tmp.v31);
+        float radius = planet.radius;
+        int points = (int)(radius * 10);
+        Angles.circleVectors(points, radius, (cx, cy) -> batch.vertex(Tmp.v32.set(center).add(cx, 0, cy), Pal.gray));
+        batch.flush(Gl.lineLoop);
+    }
+
     private void renderPlanet(){
-        PlanetMesh outline = outline(planet.size);
+        PlanetMesh outline = outline(planet.grid.size);
         Vec3 tile = outline.intersect(cam.getPickRay(Core.input.mouseX(), Core.input.mouseY()));
         Shaders.planetGrid.mouse.lerp(tile == null ? Vec3.Zero : tile, 0.2f);
-
         Shaders.planet.lightDir.set(Shaders.sun.center).nor();
 
         planet.mesh.render(cam.combined());

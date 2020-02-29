@@ -165,6 +165,7 @@ public class Vars implements Loadable{
     public static Schematics schematics = new Schematics();
     public static BeControl becontrol;
 
+    public static Universe universe;
     public static World world;
     public static Maps maps;
     public static WaveSpawner spawner;
@@ -217,6 +218,7 @@ public class Vars implements Loadable{
         defaultWaves = new DefaultWaves();
         collisions = new EntityCollisions();
         world = new World();
+        universe = new Universe();
         becontrol = new BeControl();
 
         maps = new Maps();

@@ -270,6 +270,8 @@ public class Control implements ApplicationListener, Loadable{
                 logic.reset();
                 world.loadSector(sector);
                 state.rules.sector = sector;
+                //TODO enable for lighting
+                //state.rules.lighting = true;
                 logic.play();
                 control.saves.saveSector(sector);
                 //TODO uncomment for efffect

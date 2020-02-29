@@ -5,12 +5,18 @@ import mindustry.maps.planet.*;
 import mindustry.type.*;
 
 public class Planets implements ContentList{
-    //TODO make all names
-    public static Planet starter;
+    public static Planet
+    sun,
+    starter;
 
     @Override
     public void load(){
-        starter = new Planet("TODO", 3){{
+        sun = new Planet("sun", null, 3, 1){{
+            detail = 6;
+            generator = new TestPlanetGenerator();
+        }};
+
+        starter = new Planet("TODO", sun, 3, 1){{
             detail = 6;
             generator = new TestPlanetGenerator();
         }};

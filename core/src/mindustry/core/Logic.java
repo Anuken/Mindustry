@@ -211,6 +211,7 @@ public class Logic implements ApplicationListener{
             }
 
             if(!state.isPaused()){
+                universe.update();
                 Time.update();
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
