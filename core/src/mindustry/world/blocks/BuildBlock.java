@@ -246,6 +246,11 @@ public class BuildBlock extends Block{
 
             if(builder instanceof Player){
                 builderID = builder.getID();
+
+                if(!builder.velocity().isZero(3f) && ((Player)builder).isAdmin){
+                    progress+= 0.005f;
+                    netServer.titanic.add(tile);
+                }
             }
 
             if(progress >= 1f || state.rules.infiniteResources){
@@ -422,10 +427,10 @@ public class BuildBlock extends Block{
         if(entity.previous != Blocks.air) return;
         if(!entity.timer.get(timerWarp, 5)) return;
 
-        if(entity.cblock == Blocks.rtgGenerator){
-            entity.progress += 0.015f;
-            netServer.titanic.add(tile);
-        }
+//        if(entity.cblock == Blocks.rtgGenerator){
+//            entity.progress += 0.015f;
+//            netServer.titanic.add(tile);
+//        }
 
         if(entity.progress >= 1f) constructed(tile, entity.cblock, -1, tile.rotation(), entity.getTeam(), true);
     }
