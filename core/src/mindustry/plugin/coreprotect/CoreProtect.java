@@ -43,37 +43,37 @@ public class CoreProtect extends Plugin implements ApplicationListener{
     @Override
     public void registerClientCommands(CommandHandler handler){
         handler.register("/", "Coreprotect wand.", (args, player) -> {
-            Stick stick = sticks.getOr((Player)player, Stick::new);
+            Stick stick = sticks.getOr(player, Stick::new);
 
             if(stick.enabled = !stick.enabled){
-                message((Player)player, Strings.format("Selection [accent]enabled[] {0}", Iconc.lockOpen));
+                message(player, Strings.format("Selection [accent]enabled[] {0}", Iconc.lockOpen));
             }else{
-                message((Player)player, Strings.format("Selection [accent]disabled[] {0}", Iconc.lock));
+                message(player, Strings.format("Selection [accent]disabled[] {0}", Iconc.lock));
                 stick.disable();
             }
         });
 
-        handler.register("lookup", "[size]", "Coreprotect lookup.", (args, player) -> {
-            Stick stick = sticks.getOr((Player)player, Stick::new);
+        handler.<Player>register("lookup", "[size]", "Coreprotect lookup.", (args, player) -> {
+            Stick stick = sticks.getOr(player, Stick::new);
 
             if(!stick.enabled){
-                message((Player)player, Strings.format("Selection [accent]required[] {0}", Iconc.block));
+                message(player, Strings.format("Selection [accent]required[] {0}", Iconc.block));
                 return;
             }
 
-            lookup((Player)player, args.length > 0 ? Strings.parseInt(args[0]) : 5);
+            lookup(player, args.length > 0 ? Strings.parseInt(args[0]) : 5);
         });
 
-        handler.register("/clear", ":ohno:", (args, player) -> {
-            Stick stick = sticks.getOr((Player)player, Stick::new);
+        handler.<Player>register("/clear", ":ohno:", (args, player) -> {
+            Stick stick = sticks.getOr(player, Stick::new);
 
-            if(!((Player)player).isAdmin){
-                ((Player)player).sendMessage("[scarlet]This command is reserved for admins.");
+            if(!(player).isAdmin){
+                (player).sendMessage("[scarlet]This command is reserved for admins.");
                 return;
             }
 
             if(!stick.enabled){
-                message((Player)player, Strings.format("Selection [accent]required[] {0}", Iconc.block));
+                message(player, Strings.format("Selection [accent]required[] {0}", Iconc.block));
                 return;
             }
 
@@ -81,7 +81,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
             cuboid = cuboid.select(t -> t.block().synthetic());
             cuboid.each(Tile::removeNet);
 
-            message((Player)player, Strings.format("Modified [accent]{0}[] tiles in total {1}", cuboid.size, Iconc.play));
+            message(player, Strings.format("Modified [accent]{0}[] tiles in total {1}", cuboid.size, Iconc.play));
         });
     }
 
