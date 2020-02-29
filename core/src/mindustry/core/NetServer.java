@@ -360,8 +360,8 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(playerGroup.size() < 2){
-                player.sendMessage("[scarlet]At least 2 players are needed to start a votekick.");
+            if(playerGroup.size() < 3){
+                player.sendMessage("[scarlet]At least 3 players are needed to start a votekick.");
                 return;
             }
 
