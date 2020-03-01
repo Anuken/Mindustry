@@ -41,7 +41,7 @@ public class PausedDialog extends FloatingDialog{
             cont.addImageTextButton("$back", Icon.left, this::hide).colspan(2).width(dw * 2 + 20f);
 
             cont.row();
-            if(world.isCampaign()){
+            if(state.isCampaign()){
                 cont.addImageTextButton("$techtree", Icon.tree, ui.tech::show);
             }else{
                 cont.addImageTextButton("$database", Icon.book, ui.database::show);
@@ -49,7 +49,7 @@ public class PausedDialog extends FloatingDialog{
             cont.addImageTextButton("$settings", Icon.settings, ui.settings::show);
 
             if(!state.rules.tutorial){
-                if(!world.isCampaign() && !state.isEditor()){
+                if(!state.isCampaign() && !state.isEditor()){
                     cont.row();
                     cont.addImageTextButton("$savegame", Icon.save, save::show);
                     cont.addImageTextButton("$loadgame", Icon.upload, load::show).disabled(b -> net.active());
@@ -79,7 +79,7 @@ public class PausedDialog extends FloatingDialog{
             cont.addRowImageTextButton("$back", Icon.play, this::hide);
             cont.addRowImageTextButton("$settings", Icon.settings, ui.settings::show);
 
-            if(!world.isCampaign() && !state.isEditor()){
+            if(!state.isCampaign() && !state.isEditor()){
                 cont.addRowImageTextButton("$save", Icon.save, save::show);
 
                 cont.row();

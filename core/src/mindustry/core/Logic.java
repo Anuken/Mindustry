@@ -31,9 +31,9 @@ public class Logic implements ApplicationListener{
 
     public Logic(){
         Events.on(WaveEvent.class, event -> {
-            if(world.isCampaign()){
+            if(state.isCampaign()){
                 //TODO implement
-                //world.getSector().updateWave(state.wave);
+                //state.getSector().updateWave(state.wave);
             }
         });
 
@@ -101,7 +101,7 @@ public class Logic implements ApplicationListener{
         Events.fire(new PlayEvent());
 
         //add starting items
-        if(!world.isCampaign()){
+        if(!state.isCampaign()){
             for(TeamData team : state.teams.getActive()){
                 if(team.hasCore()){
                     Tilec entity = team.core();
@@ -130,7 +130,7 @@ public class Logic implements ApplicationListener{
     public void runWave(){
         spawner.spawnEnemies();
         state.wave++;
-        state.wavetime = world.isCampaign() && world.getSector().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
+        state.wavetime = state.isCampaign() && state.getSector().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
 
         Events.fire(new WaveEvent());
     }
@@ -152,7 +152,7 @@ public class Logic implements ApplicationListener{
             }
 
             if(alive != null && !state.gameOver){
-                if(world.isCampaign() && alive == state.rules.defaultTeam){
+                if(state.isCampaign() && alive == state.rules.defaultTeam){
                     //in attack maps, a victorious game over is equivalent to a launch
                     Call.launchZone();
                 }else{
@@ -173,9 +173,9 @@ public class Logic implements ApplicationListener{
             Fx.launch.at(tile);
         }
 
-        if(world.isCampaign()){
+        if(state.isCampaign()){
             //TODO implement
-            //world.getSector().setLaunched();
+            //state.getSector().setLaunched();
         }
 
         Time.runTask(30f, () -> {
@@ -212,7 +212,7 @@ public class Logic implements ApplicationListener{
             }
 
             if(!state.isPaused()){
-                if(world.isCampaign()){
+                if(state.isCampaign()){
                     universe.update();
                 }
                 Time.update();

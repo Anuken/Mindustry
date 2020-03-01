@@ -66,7 +66,7 @@ public class GameOverDialog extends FloatingDialog{
                     t.add(Core.bundle.format("stat.playtime", control.saves.getCurrent().getPlayTime()));
                     t.row();
                 }
-                if(world.isCampaign() && !state.stats.itemsDelivered.isEmpty()){
+                if(state.isCampaign() && !state.stats.itemsDelivered.isEmpty()){
                     t.add("$stat.delivered");
                     t.row();
                     for(Item item : content.items()){
@@ -80,14 +80,14 @@ public class GameOverDialog extends FloatingDialog{
                     }
                 }
 
-                if(world.isCampaign()){
-                    RankResult result = state.stats.calculateRank(world.getSector(), state.launched);
+                if(state.isCampaign()){
+                    RankResult result = state.stats.calculateRank(state.getSector(), state.launched);
                     t.add(Core.bundle.format("stat.rank", result.rank + result.modifier));
                     t.row();
                 }
             }).pad(12);
 
-            if(world.isCampaign()){
+            if(state.isCampaign()){
                 buttons.addButton("$continue", () -> {
                     hide();
                     state.set(State.menu);

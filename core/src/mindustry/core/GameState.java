@@ -1,11 +1,13 @@
 package mindustry.core;
 
 import arc.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.net;
 
 public class GameState{
     /** Current wave number, can be anything in non-wave modes. */
@@ -32,6 +34,20 @@ public class GameState{
     public void set(State astate){
         Events.fire(new StateChangeEvent(state, astate));
         state = astate;
+    }
+
+    /**Note that being in a campaign does not necessarily mean having a sector. */
+    public boolean isCampaign(){
+        return rules.sector != null;
+    }
+
+    public boolean hasSector(){
+        return rules.sector != null;
+    }
+
+    @Nullable
+    public Sector getSector(){
+        return rules.sector;
     }
 
     public boolean isEditor(){

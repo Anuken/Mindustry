@@ -178,14 +178,6 @@ public class World{
         return generating;
     }
 
-    public boolean isCampaign(){
-        return getSector() != null;
-    }
-
-    public Sector getSector(){
-        return state.rules.sector;
-    }
-
     public void loadGenerator(int width, int height, Cons<Tiles> generator){
         beginMapLoad();
 
@@ -352,13 +344,13 @@ public class World{
         }
 
         //TODO tweak noise and radius
-        if(world.isCampaign()){
+        if(state.isCampaign()){
             int circleBlend = 14;
             //quantized angle
-            float offset = getSector().rect.rotation + 90;
+            float offset = state.getSector().rect.rotation + 90;
             float angle = Angles.angle(x, y, tiles.width/2, tiles.height/2) + offset;
             //polygon sides, depends on sector
-            int sides = getSector().tile.corners.length;
+            int sides = state.getSector().tile.corners.length;
             float step = 360f / sides;
             //prev and next angles of poly
             float prev = Mathf.round(angle, step);

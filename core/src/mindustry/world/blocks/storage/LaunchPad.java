@@ -16,8 +16,7 @@ import mindustry.world.Tile;
 import mindustry.world.meta.BlockStat;
 import mindustry.world.meta.StatUnit;
 
-import static mindustry.Vars.data;
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class LaunchPad extends StorageBlock{
     public final int timerLaunch = timers++;
@@ -73,7 +72,7 @@ public class LaunchPad extends StorageBlock{
     public void update(Tile tile){
         Tilec entity = tile.entity;
 
-        if(world.isCampaign() && entity.consValid() && entity.items().total() >= itemCapacity && entity.timer(timerLaunch, launchTime / entity.timeScale())){
+        if(state.isCampaign() && entity.consValid() && entity.items().total() >= itemCapacity && entity.timer(timerLaunch, launchTime / entity.timeScale())){
             for(Item item : Vars.content.items()){
                 Events.fire(Trigger.itemLaunch);
                 Fx.padlaunch.at(tile);

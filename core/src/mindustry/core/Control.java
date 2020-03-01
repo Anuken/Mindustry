@@ -176,7 +176,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
-            if(world.isCampaign()){
+            if(state.isCampaign()){
                 data.unlockContent(e.unit.type());
             }
         });
@@ -448,7 +448,7 @@ public class Control implements ApplicationListener, Loadable{
         if(!state.is(State.menu)){
             input.update();
 
-            if(world.isCampaign()){
+            if(state.isCampaign()){
                 for(Tilec tile : state.teams.cores(player.team())){
                     for(Item item : content.items()){
                         if(tile.items().has(item)){

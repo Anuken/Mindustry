@@ -27,8 +27,8 @@ public class FileMapGenerator implements WorldGenerator{
         SaveIO.load(map.file);
 
         for(Tile tile : tiles){
-            if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && world.getSector() != null){
-                for(Content content : world.getSector().data.resources){
+            if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && state.getSector() != null){
+                for(Content content : state.getSector().data.resources){
                     if(content instanceof Item && Mathf.chance(0.3)){
                         tile.entity.items().add((Item)content, Math.min(Mathf.random(500), tile.block().itemCapacity));
                     }

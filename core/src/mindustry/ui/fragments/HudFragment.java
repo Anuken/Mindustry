@@ -84,7 +84,7 @@ public class HudFragment extends Fragment{
                             }else{
                                 ui.chatfrag.toggle();
                             }
-                        }else if(world.isCampaign()){
+                        }else if(state.isCampaign()){
                             ui.tech.show();
                         }else{
                             ui.database.show();
@@ -497,10 +497,10 @@ public class HudFragment extends Fragment{
     }
 
     private boolean inLaunchWave(){
-        return world.isCampaign() &&
-            world.getSector().metCondition() &&
+        return state.isCampaign() &&
+            state.getSector().metCondition() &&
             !net.client() &&
-            state.wave % world.getSector().launchPeriod == 0 && !spawner.isSpawning();
+            state.wave % state.getSector().launchPeriod == 0 && !spawner.isSpawning();
     }
 
     private boolean canLaunch(){
@@ -559,7 +559,7 @@ public class HudFragment extends Fragment{
                 }else{
                     builder.append(Core.bundle.get("launch"));
                     builder.append("\n");
-                    builder.append(Core.bundle.format("launch.next", state.wave + world.getSector().launchPeriod));
+                    builder.append(Core.bundle.format("launch.next", state.wave + state.getSector().launchPeriod));
                     builder.append("\n");
                 }
                 builder.append("[]\n");
