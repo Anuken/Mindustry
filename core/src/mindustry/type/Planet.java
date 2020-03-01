@@ -55,6 +55,8 @@ public class Planet extends UnlockableContent{
     public @NonNull Planet solarSystem;
     /** All planets orbiting this one, in ascending order of radius. */
     public Array<Planet> children = new Array<>();
+    /** Sattelites orbiting this planet. */
+    public Array<Satellite> satellites = new Array<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
     protected Prov<PlanetMesh> meshLoader = () -> new SunMesh(this, 2);
 

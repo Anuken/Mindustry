@@ -343,7 +343,6 @@ public class World{
             dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
         }
 
-        //TODO tweak noise and radius
         if(state.hasSector()){
             int circleBlend = 14;
             //quantized angle
