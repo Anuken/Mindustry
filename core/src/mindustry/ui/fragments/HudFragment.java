@@ -497,7 +497,7 @@ public class HudFragment extends Fragment{
     }
 
     private boolean inLaunchWave(){
-        return state.isCampaign() &&
+        return state.hasSector() &&
             state.getSector().metCondition() &&
             !net.client() &&
             state.wave % state.getSector().launchPeriod == 0 && !spawner.isSpawning();

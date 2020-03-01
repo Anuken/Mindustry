@@ -130,7 +130,7 @@ public class Logic implements ApplicationListener{
     public void runWave(){
         spawner.spawnEnemies();
         state.wave++;
-        state.wavetime = state.isCampaign() && state.getSector().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
+        state.wavetime = state.hasSector() && state.getSector().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
 
         Events.fire(new WaveEvent());
     }

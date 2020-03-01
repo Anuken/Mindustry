@@ -344,7 +344,7 @@ public class World{
         }
 
         //TODO tweak noise and radius
-        if(state.isCampaign()){
+        if(state.hasSector()){
             int circleBlend = 14;
             //quantized angle
             float offset = state.getSector().rect.rotation + 90;

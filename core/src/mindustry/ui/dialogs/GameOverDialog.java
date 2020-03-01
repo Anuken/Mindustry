@@ -80,7 +80,7 @@ public class GameOverDialog extends FloatingDialog{
                     }
                 }
 
-                if(state.isCampaign()){
+                if(state.hasSector()){
                     RankResult result = state.stats.calculateRank(state.getSector(), state.launched);
                     t.add(Core.bundle.format("stat.rank", result.rank + result.modifier));
                     t.row();

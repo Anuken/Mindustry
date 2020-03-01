@@ -231,7 +231,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(WinEvent.class, e -> {
-            if(campaign()){
+            if(state.hasSector()){
                 if(Vars.state.wave <= 5 && state.rules.attackMode){
                     defeatAttack5Waves.complete();
                 }
