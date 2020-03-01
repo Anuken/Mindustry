@@ -446,7 +446,6 @@ public class Renderer implements ApplicationListener{
         PixmapIO.writePNG(file, fullPixmap);
         fullPixmap.dispose();
         ui.showInfoFade(Core.bundle.format("screenshot", file.toString()));
-
         buffer.dispose();
     }
 
