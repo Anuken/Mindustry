@@ -441,7 +441,7 @@ public class Renderer implements ApplicationListener{
         }
         buffer.end();
         Pixmap fullPixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-        BufferUtils.copy(lines, 0, fullPixmap.getPixels(), lines.length);
+        Buffers.copy(lines, 0, fullPixmap.getPixels(), lines.length);
         Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
         PixmapIO.writePNG(file, fullPixmap);
         fullPixmap.dispose();
