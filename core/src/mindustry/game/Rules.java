@@ -74,6 +74,9 @@ public class Rules{
     public boolean tutorial = false;
     /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
     public boolean canGameOver = true;
+    /** Whether to draw shadows of blocks at map edges and static blocks.
+     * Do not change unless you know exactly what you are doing.*/
+    public boolean drawFog = true;
     /** Starting items put in cores */
     public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 100));
     /** Blocks that cannot be placed. */

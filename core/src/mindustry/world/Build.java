@@ -82,14 +82,14 @@ public class Build{
             return false;
         }
 
+        Tile tile = world.tile(x, y);
+
+        if(tile == null) return false;
+
         //ca check
         if(world.getDarkness(x, y) >= 3){
             return false;
         }
-
-        Tile tile = world.tile(x, y);
-
-        if(tile == null) return false;
 
         if(type.isMultiblock()){
             if(type.canReplace(tile.block()) && tile.block().size == type.size && type.canPlaceOn(tile) && tile.interactable(team)){

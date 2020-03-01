@@ -93,7 +93,7 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     }
 
     public void lookAt(float angle){
-        rotation = Angles.moveToward(rotation, angle, type.rotateSpeed);
+        rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta());
     }
 
     public void lookAt(Position pos){

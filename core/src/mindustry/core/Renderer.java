@@ -6,7 +6,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
@@ -33,7 +32,6 @@ public class Renderer implements ApplicationListener{
     private float camerascale = targetscale;
     private float landscale = 0f, landTime;
     private float minZoomScl = Scl.scl(0.01f);
-    private Rect rect = new Rect(), rect2 = new Rect();
     private float shakeIntensity, shaketime;
 
     public Renderer(){
@@ -169,6 +167,8 @@ public class Renderer implements ApplicationListener{
 
         Draw.proj(camera.projection());
 
+        drawBackground();
+
         blocks.floor.drawFloor();
 
         Groups.drawFloor();
@@ -183,7 +183,9 @@ public class Renderer implements ApplicationListener{
         blocks.floor.endDraw();
 
         blocks.drawBlocks(Layer.block);
-        blocks.drawFog();
+        if(state.rules.drawFog){
+            blocks.drawFog();
+        }
 
         blocks.drawDestroyed();
 
@@ -238,6 +240,10 @@ public class Renderer implements ApplicationListener{
 
         Draw.color();
         Draw.flush();
+    }
+
+    private void drawBackground(){
+
     }
 
     private void drawLanding(){

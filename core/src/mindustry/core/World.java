@@ -376,8 +376,8 @@ public class World{
             }
         }
 
-        Tile tile = world.rawTile(x, y);
-        if(tile.block().solid && tile.block().fillsTile && !tile.block().synthetic()){
+        Tile tile = world.tile(x, y);
+        if(tile != null && tile.block().solid && tile.block().fillsTile && !tile.block().synthetic()){
             dark = Math.max(dark, tile.rotation());
         }
 

@@ -68,7 +68,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                 axisY = this.y + Angles.trnsy(rotation, axisXOffset, weapon.y);
 
                 mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation();
-                mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed);
+                mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed * Time.delta());
             }else{
                 mount.rotation = this.rotation;
                 mount.targetRotation = angleTo(mount.aimX, mount.aimY);
