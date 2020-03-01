@@ -14,6 +14,8 @@ import mindustry.world.*;
  */
 @Serialize
 public class Rules{
+    /** Whether allow cheating */
+    public boolean cheating;
     /** Whether the player has infinite resources. */
     public boolean infiniteResources;
     /** Whether the waves come automatically on a timer. If not, waves come when the play button is pressed. */

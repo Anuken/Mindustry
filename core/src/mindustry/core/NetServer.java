@@ -4,11 +4,13 @@ import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.Action;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
+import mindustry.Vars;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -23,6 +25,7 @@ import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
+import mindustry.type.Item;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -298,6 +301,295 @@ public class NetServer implements ApplicationListener{
 
         clientCommands.<Player>register("t", "<message...>", "Send a message only to your teammates.", (args, player) -> {
             playerGroup.all().each(p -> p.getTeam() == player.getTeam(), o -> o.sendMessage(args[0], player, "[#" + player.getTeam().color.toString() + "]<T>" + NetClient.colorizeName(player.id, player.name)));
+        });
+
+        clientCommands.<Player>register("getposition", "", "Prints your position.", (args, player) -> {
+            player.sendMessage("Your positon is x:" + player.x + " y:" + player.y);
+        });
+
+        clientCommands.<Player>register("waveset", "[wavenumber]", "Sets your wave.", (args, player) -> {
+            if(!Vars.state.rules.cheating){
+                player.sendMessage("[scarlet]Cheating is not turned on, please turn cheats on using [orange]cheatson [scarlet]command. [yellow]WARNING: [orange]cheatson [yellow] cannot be reverted.");
+                return;
+            }
+
+            if(!player.isLocal){
+                player.sendMessage("[scarlet]You must be host in order to execute this type of command!");
+                return;
+            }
+
+            if(args.length != 1){
+                player.sendMessage("[scarlet]You must specify 1 argument(wave number).");
+                return;
+            }
+
+            if(!Strings.canParseInt(args[0])){
+                player.sendMessage("[scarlet]Arguments is not number.");
+                return;
+            }
+
+            if(Integer.parseInt(args[0]) > 999){
+
+            }
+            
+            Vars.state.wave = Integer.parseInt(args[0]);
+            player.sendMessage("Succesfuly set wave number to " + args[0] + ".");
+        });
+
+        clientCommands.<Player>register("tpto", "<playername>", "Teleports you to player(admin-only).(if has has color in name, write it too)", (args, player) -> {
+            if(!Vars.state.rules.cheating){
+                player.sendMessage("[scarlet]Cheating is not turned on, please turn cheats on using [orange]cheatson [scarlet]command. [yellow]WARNING: [orange]cheatson [yellow] cannot be reverted.");
+                return;
+            }
+
+            if(!(player.isAdmin || player.isLocal)){
+                player.sendMessage("[scarlet]You must be admin or host in order to execute this type of command!");
+                return;
+            }
+
+            if(args.length != 1){
+                player.sendMessage("[scarlet]You must specify 1 argument(player name).");
+                return;
+            }
+
+            for(Player pl : Vars.playerGroup.all()){
+                if(pl.name.equals(args[0])){
+                    player.x = pl.x;
+                    player.y = pl.y;
+                    Effects.effect(Fx.spawn, player);
+                    return;
+                }
+            }
+            player.sendMessage("[scarlet]Player was not found.");
+        });
+
+        clientCommands.<Player>register("giveme", "<itemId> <count>", "Gives you item/s (admin-only).", (args, player) -> {
+            if(!Vars.state.rules.cheating){
+                player.sendMessage("[scarlet]Cheating is not turned on, please turn cheats on using [orange]cheatson [scarlet]command. [yellow]WARNING: [orange]cheatson [yellow] cannot be reverted.");
+                return;
+            }
+
+            if(!(player.isAdmin || player.isLocal)){
+                player.sendMessage("[scarlet]You must be admin or host in order to execute this type of command!");
+                return;
+            }
+
+            if(args.length != 2){
+                player.sendMessage("[scarlet]You must specify 2 arguments.");
+                return;
+            }
+
+            if(!(Strings.canParseInt(args[0]) && Strings.canParseInt(args[1]))){
+                player.sendMessage("[scarlet]One of specified arguments is not number.");
+                return;
+            }
+
+            if(content.item(Integer.parseInt(args[0])) == null){
+                player.sendMessage("[scarlet]Item with this id doesn't exist. Use [orange]/itemlist[white].");
+                return;
+            }
+
+            player.addItem(content.item(Integer.parseInt(args[0])), Integer.parseInt(args[1]));
+            
+        });
+
+        clientCommands.<Player>register("itemlist", "", "Gives you list of all items.", (args, player) -> {
+
+            if(args.length != 0){
+                player.sendMessage("[scarlet]You can't specify arguments.");
+                return;
+            }
+
+            player.sendMessage("[orange]Items:");
+
+            for(int i = 0;i < 10000;i++){
+                Item it = content.item(i);
+                if(it == null)
+                    break;
+
+                player.sendMessage("[white]" + i + ":" + it.localizedName);
+            }
+            
+        });
+
+        clientCommands.<Player>register("statuslist", "", "Gives you list of all statuses.", (args, player) -> {
+            
+
+            if(args.length != 0){
+                player.sendMessage("[scarlet]You can't specify arguments.");
+                return;
+            }
+
+            player.sendMessage("[orange]Status effects:");
+            player.sendMessage("[white]boss");
+            player.sendMessage("[white]burning");
+            player.sendMessage("[white]corroded");
+            player.sendMessage("[white]freezing");
+            player.sendMessage("[white]melting");
+            player.sendMessage("[white]overdrive");
+            player.sendMessage("[white]shielded");
+            player.sendMessage("[white]shocked");
+            player.sendMessage("[white]tarred");
+            player.sendMessage("[white]wet");
+        });
+
+        clientCommands.<Player>register("applystatusme", "<statusId> <duration>", "Applies status effect to you(admin-only).", (args, player) -> {
+            if(!Vars.state.rules.cheating){
+                player.sendMessage("[scarlet]Cheating is not turned on, please turn cheats on using [orange]cheatson [scarlet]command. [yellow]WARNING: [orange]cheatson [yellow] cannot be reverted.");
+                return;
+            }
+
+            if(!(player.isAdmin || player.isLocal)){
+                player.sendMessage("[scarlet]You must be admin or host in order to execute this type of command!");
+                return;
+            }
+
+            if(args.length != 2){
+                player.sendMessage("[scarlet]You must specify 2 arguments or use list.");
+                return;
+            }
+
+            if(!(Strings.canParseInt(args[1]))){
+                player.sendMessage("[scarlet]Duration arguments is not number.");
+                return;
+            }
+
+
+
+            if(args[0].equals("boss")){
+                player.applyEffect(StatusEffects.boss, Integer.parseInt(args[1]));
+            } else if(args[0].equals("burning")){
+                player.applyEffect(StatusEffects.burning, Integer.parseInt(args[1]));
+            } else if(args[0].equals("corroded")){
+                player.applyEffect(StatusEffects.corroded, Integer.parseInt(args[1]));
+            } else if(args[0].equals("freezing")){
+                player.applyEffect(StatusEffects.freezing, Integer.parseInt(args[1]));
+            } else if(args[0].equals("melting")){
+                player.applyEffect(StatusEffects.melting, Integer.parseInt(args[1]));
+            } else if(args[0].equals("overdrive")){
+                player.applyEffect(StatusEffects.overdrive, Integer.parseInt(args[1]));
+            } else if(args[0].equals("shielded")){
+                player.applyEffect(StatusEffects.shielded, Integer.parseInt(args[1]));
+            } else if(args[0].equals("shocked")){
+                player.applyEffect(StatusEffects.shocked, Integer.parseInt(args[1]));
+            } else if(args[0].equals("tarred")){
+                player.applyEffect(StatusEffects.tarred, Integer.parseInt(args[1]));
+            } else if(args[0].equals("wet")){
+                player.applyEffect(StatusEffects.wet, Integer.parseInt(args[1]));
+            } else {
+                player.sendMessage("[scarlet]Effect was not found. Type [orange]applystatusme list[white] to list all effects");
+            }
+
+            return;
+            
+            
+        });
+
+        clientCommands.<Player>register("cheats", "", "Prints whenever you are cheating.", (args, player) -> {
+            if(Vars.state.rules.cheating){
+                player.sendMessage("Cheats are turned [green]on.");
+            } else {
+                player.sendMessage("Cheats are turned [scarlet]off.");
+            }
+        });
+
+        clientCommands.<Player>register("cheatson", "", "Turns on cheating mode(admin-only). [yellow]WARNING: [orange]cheatson [yellow] cannot be reverted.", (args, player) -> {
+            if(!(player.isAdmin || player.isLocal)){
+                player.sendMessage("[scarlet]You must be admin or host in order to execute this type of command!");
+                return;
+            }
+
+            Vars.state.rules.cheating = true;
+            player.sendMessage("Turned cheats on.");
+        });
+
+        clientCommands.<Player>register("tpme", "[x] [y]", "teleports you to specific location(admin-only).", (args, player) -> {
+
+            if(!Vars.state.rules.cheating){
+                player.sendMessage("[scarlet]Cheating is not turned on, please turn cheats on using [orange]cheatson [scarlet]command. [yellow]WARNING: [orange]cheatson [yellow] cannot be reverted.");
+                return;
+            }
+
+            if(!(player.isAdmin || player.isLocal)){
+                player.sendMessage("[scarlet]You must be admin or host in order to execute this type of command!");
+                return;
+            }
+
+            if(args.length != 2){
+                player.sendMessage("[scarlet]You must specify 2 arguments.");
+                return;
+            }
+
+
+            if(!(Strings.canParseInt(args[0]) && Strings.canParseInt(args[1]))){
+                player.sendMessage("[scarlet]One of specified position arguments is not number.");
+                return;
+            }
+
+            player.x = Integer.parseInt(args[0]);
+            player.y = Integer.parseInt(args[1]);
+
+            Effects.effect(Fx.spawn, player);
+        });
+
+        clientCommands.<Player>register("setblock", "<position> <block>", "Sets block(admin-only).", (args, player) -> {
+
+            if(!Vars.state.rules.cheating){
+                player.sendMessage("[scarlet]Cheating is not turned on, please turn cheats on using [orange]cheatson [scarlet]command. [yellow]WARNING: [orange]cheatson [yellow] cannot be reverted.");
+                return;
+            }
+
+
+            if(!(player.isAdmin || player.isLocal)){
+                player.sendMessage("[scarlet]You must be admin or host in order to execute this type of command!");
+                return;
+            }
+
+            if(args.length != 2){
+                player.sendMessage("[scarlet]You must specify 2 arguments.");
+                return;
+            }
+
+            int x = 0;
+            int y = 0;
+
+            if(args[0].equals("here")){
+                x = (int) player.x;
+                y = (int) player.y;
+            } else {
+                String[] parsed = args[0].split(",");
+                if(parsed.length != 2){
+                    player.sendMessage("[scarlet]Position must look like: [red]x,y[scarlet].");
+                    return;
+                }
+
+                if(!(Strings.canParseInt(parsed[0]) && Strings.canParseInt(parsed[1]))){
+                    player.sendMessage("[scarlet]One of specified position arguments is not number.");
+                    return;
+                }
+
+                x = Integer.parseInt(parsed[0]);
+                y = Integer.parseInt(parsed[1]);
+            }
+
+            if(!Strings.canParseInt(args[1])){
+                player.sendMessage("[scarlet]You must type number in  blockId field.");
+                return;
+            }
+
+            if(content.block(Integer.parseInt(args[1])) == null){
+                player.sendMessage("[scarlet]You entered not-existing block id.");
+                return;
+            }
+
+            if(Vars.world.tile(x, y) == null){
+                player.sendMessage("[scarlet]This tile doesn't exist.");
+                return;
+            }
+
+            
+            Vars.world.tile(x, y).setBlock(content.block(Integer.parseInt(args[1])), player.getTeam());
+            player.sendMessage("Set tile at x: " + Integer.toString(x) + " y: " + Integer.toString(y) + ".");
         });
 
         //duration of a a kick in seconds

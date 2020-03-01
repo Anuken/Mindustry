@@ -1,0 +1,5 @@
+mindustry.annotations.remote.RemoteProcess
+mindustry.annotations.impl.SerializeProcess
+mindustry.annotations.impl.CallSuperProcess
+mindustry.annotations.impl.AssetsProcess
+mindustry.annotations.impl.StructProcess
