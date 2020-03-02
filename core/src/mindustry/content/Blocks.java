@@ -956,6 +956,8 @@ public class Blocks implements ContentList{
             range = 4;
             speed = 70f;
             bufferCapacity = 14;
+
+            flags = EnumSet.of(BlockFlag.collapsable);
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
@@ -1078,6 +1080,8 @@ public class Blocks implements ContentList{
             requirements(Category.liquid, ItemStack.with(Items.graphite, 4, Items.metaglass, 8));
             range = 4;
             hasPower = false;
+
+            flags = EnumSet.of(BlockFlag.collapsable);
         }};
 
         phaseConduit = new LiquidBridge("phase-conduit"){{

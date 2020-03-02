@@ -19,7 +19,9 @@ public enum BlockFlag{
     /** Scalables. */
     scalable,
     /** Upgradables. */
-    upgradable;
+    upgradable,
+    /** Portal Bridge Builder. */
+    collapsable;
 
     public final static BlockFlag[] all = values();
 }
