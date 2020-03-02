@@ -221,6 +221,10 @@ public class Tile implements Position, TargetTrait{
         Call.removeTile(this);
     }
 
+    public void deconstructNet(){
+        Call.onDeconstructFinish(this, Blocks.air, -1);
+    }
+
     /** set()-s this tile, except it's synced across the network */
     public void setNet(Block block, Team team, int rotation){
         Call.setTile(this, block, team, rotation);
