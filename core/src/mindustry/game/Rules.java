@@ -1,5 +1,6 @@
 package mindustry.game;
 
+import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import arc.struct.*;
 import arc.graphics.*;
@@ -56,8 +57,10 @@ public class Rules{
     public float bossWaveMultiplier = 3f;
     /** How many times longer a launch wave takes. */
     public float launchWaveMultiplier = 2f;
-    /** Zone for saves that have them.*/
-    public Sector sector;
+    /** Sector for saves that have them.*/
+    public @Nullable Sector sector;
+    /** Satellite that save is on. Indicates campaign.  */
+    public @Nullable Satellite satellite;
     /** Spawn layout. */
     public Array<SpawnGroup> spawns = new Array<>();
     /** Determines if there should be limited respawns. */
