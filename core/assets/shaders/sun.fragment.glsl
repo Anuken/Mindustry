@@ -1,12 +1,16 @@
 #ifdef GL_ES
 precision mediump float;
+precision lowp int;
+#define INTEGER lowp int
+#else
+#define INTEGER int
 #endif
 
 #define gradients false
 
 const int MAX_COLORS = 10;
 
-uniform int u_colornum;
+uniform INTEGER u_colornum;
 uniform vec4 u_colors[MAX_COLORS];
 
 varying float v_height;

@@ -36,7 +36,6 @@ public class ZoneTests{
 
         for(Zone zone : content.zones()){
             out.add(dynamicTest(zone.name, () -> {
-                zone.generator.init(zone.loadout);
                 logic.reset();
                 try{
                     //world.loadGenerator(zone.generator);

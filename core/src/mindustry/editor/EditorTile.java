@@ -1,5 +1,6 @@
 package mindustry.editor;
 
+import arc.util.ArcAnnotate.*;
 import mindustry.content.Blocks;
 import mindustry.core.GameState.State;
 import mindustry.editor.DrawOperation.OpType;
@@ -20,7 +21,7 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    public void setFloor(Floor type){
+    public void setFloor(@NonNull Floor type){
         if(state.is(State.playing)){
             super.setFloor(type);
             return;

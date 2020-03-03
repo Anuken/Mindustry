@@ -21,9 +21,9 @@ public class Tile implements Position{
     /** Tile entity, usually null. */
     public Tilec entity;
     public short x, y;
-    protected Block block;
-    protected Floor floor;
-    protected Floor overlay;
+    protected @NonNull Block block;
+    protected @NonNull Floor floor;
+    protected @NonNull Floor overlay;
     /** Rotation, 0-3. Also used to store offload location, in which case it can be any number.*/
     protected byte rotation;
     /** Team ordinal. */
@@ -175,10 +175,13 @@ public class Tile implements Position{
         changed();
     }
 
-    /**This resets the overlay!*/
+    /** This resets the overlay! */
     public void setFloor(@NonNull Floor type){
         this.floor = type;
         this.overlay = (Floor)Blocks.air;
+
+        recache();
+        block.onProximityUpdate(this);
     }
 
     /** Sets the floor, preserving overlay.*/
@@ -186,6 +189,19 @@ public class Tile implements Position{
         Block overlay = this.overlay;
         setFloor(floor);
         setOverlay(overlay);
+    }
+
+    public void recache(){
+        if(!headless && !world.isGenerating()){
+            renderer.blocks.floor.recacheTile(this);
+            renderer.minimap.update(this);
+            for(int i = 0; i < 8; i++){
+                Tile other = world.tile(x + Geometry.d8[i].x, y + Geometry.d8[i].y);
+                if(other != null){
+                    renderer.blocks.floor.recacheTile(other);
+                }
+            }
+        }
     }
 
     public void remove(){
@@ -441,9 +457,13 @@ public class Tile implements Position{
     }
 
     protected void preChanged(){
-        block().removed(this);
+        block.removed(this);
         if(entity != null){
             entity.removeFromProximity();
+        }
+        //recache when static blocks get changed
+        if(block.isStatic()){
+            recache();
         }
         team = 0;
     }
@@ -482,6 +502,11 @@ public class Tile implements Position{
         updateOcclusion();
 
         world.notifyChanged(this);
+
+        //recache when static block is added
+        if(block.isStatic()){
+            recache();
+        }
     }
 
     @Override

@@ -235,14 +235,20 @@ public class Drill extends Block{
     }
 
     @Override
+    public void onProximityUpdate(Tile tile){
+        DrillEntity entity = tile.ent();
+
+        countOre(tile);
+        entity.dominantItem = returnItem;
+        entity.dominantItems = returnCount;
+    }
+
+    @Override
     public void update(Tile tile){
         DrillEntity entity = tile.ent();
 
         if(entity.dominantItem == null){
-            countOre(tile);
-            if(returnItem == null) return;
-            entity.dominantItem = returnItem;
-            entity.dominantItems = returnCount;
+            return;
         }
 
         if(entity.timer(timerDump, dumpTime)){

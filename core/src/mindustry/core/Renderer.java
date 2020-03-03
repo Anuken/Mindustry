@@ -169,6 +169,7 @@ public class Renderer implements ApplicationListener{
 
         drawBackground();
 
+        blocks.floor.checkChanges();
         blocks.floor.drawFloor();
 
         Groups.drawFloor();

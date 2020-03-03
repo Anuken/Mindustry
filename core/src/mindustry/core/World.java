@@ -99,6 +99,7 @@ public class World{
         return tile.block().linked(tile);
     }
 
+    @NonNull
     public Tile rawTile(int x, int y){
         return tiles.getn(x, y);
     }

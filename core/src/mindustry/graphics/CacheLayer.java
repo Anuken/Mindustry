@@ -42,8 +42,20 @@ public enum CacheLayer{
             endShader(Shaders.slag);
         }
     },
-    normal,
+    normal(5),
     walls;
+
+    public static final CacheLayer[] all = values();
+    /** Capacity multiplier. */
+    public final int capacity;
+
+    CacheLayer(){
+        this(2);
+    }
+
+    CacheLayer(int capacity){
+        this.capacity = capacity;
+    }
 
     public void begin(){
 

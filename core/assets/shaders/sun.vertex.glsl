@@ -1,3 +1,11 @@
+#ifdef GL_ES
+precision mediump float;
+precision lowp int;
+#define INTEGER lowp int
+#else
+#define INTEGER int
+#endif
+
 attribute vec4 a_position;
 attribute vec3 a_normal;
 
@@ -14,7 +22,7 @@ uniform float u_spread;
 uniform float u_magnitude;
 uniform float u_seed;
 
-uniform int u_colornum;
+uniform INTEGER u_colornum;
 
 varying float v_height;
 

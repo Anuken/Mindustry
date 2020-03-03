@@ -40,6 +40,7 @@ public class MenuRenderer implements Disposable{
     }
 
     private void generate(){
+        world.beginMapLoad();
         Tiles tiles = world.resize(width, height);
         Array<Block> ores = content.blocks().select(b -> b instanceof OreBlock);
         shadows = new FrameBuffer(width, height);
@@ -159,6 +160,8 @@ public class MenuRenderer implements Disposable{
                 tile.setOverlay(ore);
             }
         }
+
+        world.endMapLoad();
     }
 
     private void cache(){
