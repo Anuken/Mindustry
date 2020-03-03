@@ -201,7 +201,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
         edits.get(pac.tile.pos()).add(edit);
     }
 
-    private void spark(Player player, int pos, Color color){
+    public void spark(Player player, int pos, Color color){
         Call.createLighting(player.con, 0, player.getTeam(), color, 0, Pos.x(pos) * tilesize, Pos.y(pos) * tilesize, 0, 2);
     }
 

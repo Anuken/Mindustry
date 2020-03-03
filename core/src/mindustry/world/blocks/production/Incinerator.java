@@ -1,28 +1,26 @@
 package mindustry.world.blocks.production;
 
-import arc.*;
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.math.Mathf;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.Effects;
-import mindustry.entities.Effects.Effect;
-import mindustry.entities.type.TileEntity;
+import mindustry.entities.*;
+import mindustry.entities.Effects.*;
+import mindustry.entities.type.*;
 import mindustry.gen.*;
-import mindustry.type.Item;
-import mindustry.type.Liquid;
-import mindustry.world.Block;
-import mindustry.world.Tile;
+import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
-import static mindustry.Vars.netServer;
 
 public class Incinerator extends Block{
     public Effect effect = Fx.fuelburn;
     public Color flameColor = Color.valueOf("ffad9d");
+    private Array<Tile> nearby = new Array<>();
 
     public Incinerator(String name){
         super(name);
@@ -74,16 +72,22 @@ public class Incinerator extends Block{
         if(Mathf.chance(0.05)){
             tile.<IncineratorEntity>ent().index++;
             if(net.server()){
-                Core.app.post(() -> {
-                    Tile out = tryOffloadNear(tile, Items.pyratite, t -> t.block() instanceof Conveyor);
-                    if(out != null) {
-                        Call.rotateBlock(null, out, true);
-                        Call.rotateBlock(null, out, false);
-                        netServer.titanic.add(out);
-                    }
-                });
+                nearby.clear();
+                Geometry.circle(tile.x, tile.y, 10, (x, y) -> nearby.add(world.ltile(x, y)));
+
+                nearby.removeAll(t -> t == null);
+                nearby.removeAll(t -> t.block instanceof Incinerator);
+                nearby.removeAll(t -> t.block instanceof Conveyor);
+                nearby.removeAll(t -> !t.block.acceptItem(Items.pyratite, t, t));
+
+                Call.transferItemTo(Items.pyratite, 1, tile.drawx(), tile.drawy(), nearby.random());
             }
         }
+    }
+
+    @Override
+    public void tapped(Tile tile, Player player){
+        Geometry.circle(tile.x, tile.y, 10, (x, y) -> coreProtect.spark(player, Pos.get(x, y), Items.pyratite.color));
     }
 
     @Override
