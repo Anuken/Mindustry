@@ -49,7 +49,7 @@ public class GlobalData{
             for(Fi add : files){
                 if(add.isDirectory()) continue;
                 zos.putNextEntry(new ZipEntry(add.path().substring(base.length())));
-                Streams.copyStream(add.read(), zos);
+                Streams.copy(add.read(), zos);
                 zos.closeEntry();
             }
 
