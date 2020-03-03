@@ -3,6 +3,7 @@ package mindustry.game;
 import arc.*;
 import arc.struct.*;
 import arc.files.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -19,6 +20,8 @@ import static mindustry.Vars.*;
 public class GlobalData{
     private ObjectMap<ContentType, ObjectSet<String>> unlocked = new ObjectMap<>();
     private ObjectIntMap<Item> items = new ObjectIntMap<>();
+    private Array<Satellite> satellites = new Array<>();
+    private ObjectMap<String, MapRegion> regions = new ObjectMap<>();
     private boolean modified;
 
     public GlobalData(){
@@ -33,6 +36,10 @@ public class GlobalData{
             int amount = stream.readInt();
             return new ItemStack(content.getByName(ContentType.item, name), amount);
         });
+    }
+
+    public @Nullable MapRegion getRegion(String name){
+        return regions.get(name);
     }
 
     public void exportData(Fi file) throws IOException{

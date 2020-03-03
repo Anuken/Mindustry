@@ -59,8 +59,8 @@ public class Rules{
     public float launchWaveMultiplier = 2f;
     /** Sector for saves that have them.*/
     public @Nullable Sector sector;
-    /** Satellite that save is on. Indicates campaign.  */
-    public @Nullable Satellite satellite;
+    /** Region that save is on. Indicates campaign.  */
+    public @Nullable MapRegion region;
     /** Spawn layout. */
     public Array<SpawnGroup> spawns = new Array<>();
     /** Determines if there should be limited respawns. */
