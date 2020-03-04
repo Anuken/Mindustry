@@ -128,10 +128,8 @@ public class MinimapRenderer implements Disposable{
     }
 
     public void updateAll(){
-        for(int x = 0; x < world.width(); x++){
-            for(int y = 0; y < world.height(); y++){
-                pixmap.draw(x, pixmap.getHeight() - 1 - y, colorFor(world.tile(x, y)));
-            }
+        for(Tile tile : world.tiles){
+            pixmap.draw(tile.x, pixmap.getHeight() - 1 - tile.y, colorFor(tile));
         }
         texture.draw(pixmap, 0, 0);
     }

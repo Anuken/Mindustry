@@ -47,15 +47,12 @@ public class ZoneTests{
                 ObjectSet<Item> resources = new ObjectSet<>();
                 boolean hasSpawnPoint = false;
 
-                for(int x = 0; x < world.width(); x++){
-                    for(int y = 0; y < world.height(); y++){
-                        Tile tile = world.tile(x, y);
-                        if(tile.drop() != null){
-                            resources.add(tile.drop());
-                        }
-                        if(tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam){
-                            hasSpawnPoint = true;
-                        }
+                for(Tile tile : world.tiles){
+                    if(tile.drop() != null){
+                        resources.add(tile.drop());
+                    }
+                    if(tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam){
+                        hasSpawnPoint = true;
                     }
                 }
 

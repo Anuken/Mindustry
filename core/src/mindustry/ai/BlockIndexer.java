@@ -78,18 +78,14 @@ public class BlockIndexer{
             //create bitset for each team type that contains each quadrant
             structQuadrants = new GridBits[Team.all().length];
 
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    Tile tile = world.tile(x, y);
+            for(Tile tile : world.tiles){
+                process(tile);
 
-                    process(tile);
-
-                    if(tile.entity != null && tile.entity.damaged()){
-                        notifyTileDamaged(tile.entity);
-                    }
-
-                    if(tile.drop() != null) allOres.add(tile.drop());
+                if(tile.entity != null && tile.entity.damaged()){
+                    notifyTileDamaged(tile.entity);
                 }
+
+                if(tile.drop() != null) allOres.add(tile.drop());
             }
 
             for(int x = 0; x < quadWidth(); x++){
@@ -119,14 +115,11 @@ public class BlockIndexer{
         if(structQuadrants == null) return;
 
         //go through every tile... ouch
-        for(int x = 0; x < world.width(); x++){
-            for(int y = 0; y < world.height(); y++){
-                Tile tile = world.tile(x, y);
-                if(tile.team() == team){
-                    int quadrantX = tile.x / quadrantSize;
-                    int quadrantY = tile.y / quadrantSize;
-                    structQuadrant(team).set(quadrantX, quadrantY);
-                }
+        for(Tile tile : world.tiles){
+            if(tile.team() == team){
+                int quadrantX = tile.x / quadrantSize;
+                int quadrantY = tile.y / quadrantSize;
+                structQuadrant(team).set(quadrantX, quadrantY);
             }
         }
     }
@@ -403,20 +396,16 @@ public class BlockIndexer{
             ores.put(item, new ObjectSet<>());
         }
 
-        for(int x = 0; x < world.width(); x++){
-            for(int y = 0; y < world.height(); y++){
-                int qx = (x / quadrantSize);
-                int qy = (y / quadrantSize);
+        for(Tile tile : world.tiles){
+            int qx = (tile.x / quadrantSize);
+            int qy = (tile.y / quadrantSize);
 
-                Tile tile = world.tile(x, y);
-
-                //add position of quadrant to list when an ore is found
-                if(tile.drop() != null && scanOres.contains(tile.drop()) && tile.block() == Blocks.air){
-                    ores.get(tile.drop()).add(world.tile(
-                    //make sure to clamp quadrant middle position, since it might go off bounds
-                    Mathf.clamp(qx * quadrantSize + quadrantSize / 2, 0, world.width() - 1),
-                    Mathf.clamp(qy * quadrantSize + quadrantSize / 2, 0, world.height() - 1)));
-                }
+            //add position of quadrant to list when an ore is found
+            if(tile.drop() != null && scanOres.contains(tile.drop()) && tile.block() == Blocks.air){
+                ores.get(tile.drop()).add(world.tile(
+                //make sure to clamp quadrant middle position, since it might go off bounds
+                Mathf.clamp(qx * quadrantSize + quadrantSize / 2, 0, world.width() - 1),
+                Mathf.clamp(qy * quadrantSize + quadrantSize / 2, 0, world.height() - 1)));
             }
         }
     }

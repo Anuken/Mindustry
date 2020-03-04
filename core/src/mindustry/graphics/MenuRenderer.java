@@ -170,13 +170,13 @@ public class MenuRenderer implements Disposable{
         Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
         shadows.beginDraw(Color.clear);
         Draw.color(Color.black);
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                if(world.rawTile(x, y).block() != Blocks.air){
-                    Fill.rect(x + 0.5f, y + 0.5f, 1, 1);
-                }
+
+        for(Tile tile : world.tiles){
+            if(tile.block() != Blocks.air){
+                Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
             }
         }
+
         Draw.color();
         shadows.endDraw();
 
@@ -185,32 +185,19 @@ public class MenuRenderer implements Disposable{
         Core.batch = batch = new CacheBatch(new SpriteCache(width * height * 6, false));
         batch.beginCache();
 
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                Tile tile = world.rawTile(x, y);
-                tile.floor().draw(tile);
-            }
+        for(Tile tile : world.tiles){
+            tile.floor().draw(tile);
         }
 
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                Tile tile = world.rawTile(x, y);
-                if(tile.overlay() != Blocks.air){
-                    tile.overlay().draw(tile);
-                }
-            }
+        for(Tile tile : world.tiles){
+            tile.overlay().draw(tile);
         }
 
         cacheFloor = batch.endCache();
         batch.beginCache();
 
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                Tile tile = world.rawTile(x, y);
-                if(tile.block() != Blocks.air){
-                    tile.block().draw(tile);
-                }
-            }
+        for(Tile tile : world.tiles){
+            tile.block().draw(tile);
         }
 
         cacheWall = batch.endCache();

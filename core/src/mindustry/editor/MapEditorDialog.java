@@ -254,12 +254,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
             )));
             world.endMapLoad();
             //add entities so they update. is this really needed?
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    Tile tile = world.rawTile(x, y);
-                    if(tile.entity != null){
-                        tile.entity.add();
-                    }
+            for(Tile tile : world.tiles){
+                if(tile.entity != null){
+                    tile.entity.add();
                 }
             }
             player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);

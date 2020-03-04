@@ -1,13 +1,13 @@
 package mindustry.ai;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.math.geom.*;
-import arc.util.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.async.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -45,10 +45,8 @@ public class Pathfinder implements Runnable{
             created = new GridBits(Team.all().length, PathTarget.all.length);
             list = new Array<>();
 
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    tiles[x][y] = packTile(world.rawTile(x, y));
-                }
+            for(Tile tile : world.tiles){
+                tiles[tile.x][tile.y] = packTile(tile);
             }
 
             //special preset which may help speed things up; this is optional

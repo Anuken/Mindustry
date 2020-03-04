@@ -118,12 +118,9 @@ public class WaveSpawner{
         flySpawns.clear();
         groundSpawns.clear();
 
-        for(int x = 0; x < world.width(); x++){
-            for(int y = 0; y < world.height(); y++){
-
-                if(world.tile(x, y).overlay() == Blocks.spawn){
-                    addSpawns(x, y);
-                }
+        for(Tile tile : world.tiles){
+            if(tile.overlay() == Blocks.spawn){
+                addSpawns(tile.x, tile.y);
             }
         }
     }

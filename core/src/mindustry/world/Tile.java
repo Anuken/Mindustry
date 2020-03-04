@@ -243,6 +243,16 @@ public class Tile implements Position{
         Call.setTile(this, block, team, rotation);
     }
 
+    /** set()-s this tile, except it's synced across the network */
+    public void setFloorNet(Block floor, Block overlay){
+        Call.setFloor(this, floor, overlay);
+    }
+
+    /** set()-s this tile, except it's synced across the network */
+    public void setFloorNet(Block floor){
+        setFloorNet(floor, Blocks.air);
+    }
+
     public byte rotation(){
         return rotation;
     }
@@ -525,6 +535,12 @@ public class Tile implements Position{
     }
 
     //remote utility methods
+
+    @Remote(called = Loc.server)
+    public static void setFloor(Tile tile, Block floor, Block overlay){
+        tile.setFloor(floor.asFloor());
+        tile.setOverlay(overlay);
+    }
 
     @Remote(called = Loc.server)
     public static void removeTile(Tile tile){

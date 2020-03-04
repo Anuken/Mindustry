@@ -53,12 +53,9 @@ public class BlockRenderer implements Disposable{
 
             Draw.color(shadowColor);
 
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    Tile tile = world.rawTile(x, y);
-                    if(tile.block().hasShadow){
-                        Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
-                    }
+            for(Tile tile : world.tiles){
+                if(tile.block().hasShadow){
+                    Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                 }
             }
 
@@ -72,16 +69,12 @@ public class BlockRenderer implements Disposable{
             Core.graphics.clear(Color.white);
             Draw.proj().setOrtho(0, 0, fog.getWidth(), fog.getHeight());
 
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    Tile tile = world.rawTile(x, y);
+            for(Tile tile : world.tiles){
+                float darkness = world.getDarkness(tile.x, tile.y);
 
-                    float darkness = world.getDarkness(x, y);
-
-                    if(darkness > 0){
-                        Draw.color(0f, 0f, 0f, Math.min((darkness + 0.5f) / 4f, 1f));
-                        Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
-                    }
+                if(darkness > 0){
+                    Draw.color(0f, 0f, 0f, Math.min((darkness + 0.5f) / 4f, 1f));
+                    Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                 }
             }
 
