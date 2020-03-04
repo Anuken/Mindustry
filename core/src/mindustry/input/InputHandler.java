@@ -159,15 +159,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void onTileTapped(Playerc player, Tile tile){
-        if(tile == null || player == null) return;
-        if(net.server() && (!Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.tapTile, tile, action -> {}))) throw new ValidateException(player, "Player cannot tap a tile.");
-        tile.block().tapped(tile, player);
-        Core.app.post(() -> Events.fire(new TapEvent(tile, player)));
-    }
-
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void onTileConfig(Playerc player, Tile tile, @Nullable Object value){
         if(tile == null) return;
@@ -318,13 +309,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             if(req.config instanceof Point2){
                 int corigin = x ? req.originalWidth/2 : req.originalHeight/2;
-                int nvalue = -((x ? Pos.x(req.config) : Pos.y(req.config)) - corigin) + corigin;
+                int nvalue = -((x ? ((Point2)req.config).x : ((Point2)req.config).y) - corigin) + corigin;
                 if(x){
                     req.originalX = -(req.originalX - corigin) + corigin;
-                    req.config = Pos.get(nvalue, Pos.y(req.config));
+                    req.config = Pos.get(nvalue, ((Point2)req.config).y);
                 }else{
                     req.originalY = -(req.originalY - corigin) + corigin;
-                    req.config = Pos.get(Pos.x(req.config), nvalue);
+                    req.config = Pos.get(((Point2)req.config).x, nvalue);
                 }
             }
 
@@ -459,8 +450,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
                 BuildRequest copy = req.copy();
-                if(copy.hasConfig && copy.block.posConfig){
-                    copy.config = Pos.get(Pos.x(copy.config) + copy.x - copy.originalX, Pos.y(copy.config) + copy.y - copy.originalY);
+                if(copy.hasConfig && copy.config instanceof Point2){
+                    copy.config = Pos.get(((Point2)copy.config).x + copy.x - copy.originalX, ((Point2)copy.config).x + copy.y - copy.originalY);
                 }
                 player.builder().addBuild(copy);
             }

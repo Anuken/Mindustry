@@ -574,7 +574,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem
+        breakBlock, placeBlock, rotate, configure, tapTile, withdrawItem, depositItem
     }
 
 }

@@ -10,6 +10,7 @@ import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.io.*;
 import arc.util.io.Streams.*;
 import arc.util.serialization.*;
 import mindustry.*;
@@ -20,6 +21,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.Schematic.*;
 import mindustry.input.*;
 import mindustry.input.Placement.*;
+import mindustry.io.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.production.*;
@@ -35,7 +37,7 @@ public class Schematics implements Loadable{
     public static final String base64Header = "bXNjaAB";
 
     private static final byte[] header = {'m', 's', 'c', 'h'};
-    private static final byte version = 0;
+    private static final byte version = 1;
 
     private static final int padding = 2;
     private static final int maxPreviewsMobile = 32;
@@ -259,8 +261,8 @@ public class Schematics implements Loadable{
 
             tile.set(st.block, state.rules.defaultTeam);
             tile.rotation(st.rotation);
-            if(st.block.posConfig){
-                tile.configureAny(Pos.get(tile.x - st.x + Pos.x(st.config), tile.y - st.y + Pos.y(st.config)));
+            if(st.config instanceof Point2){
+                tile.configureAny(Pos.get(tile.x - st.x + ((Point2)st.config).x, tile.y - st.y + ((Point2)st.config).y));
             }else{
                 tile.configureAny(st.config);
             }
@@ -348,7 +350,7 @@ public class Schematics implements Loadable{
                     && (tile.entity.block().isVisible() || (tile.entity.block() instanceof CoreBlock && Core.settings.getBool("coreselect")))){
                     Object config = tile.entity.config();
                     if(config instanceof Point2){
-                        config = Pos.get(Pos.x(config) + offsetX, Pos.y(config) + offsetY);
+                        config = Pos.get(((Point2)config).x + offsetX, ((Point2)config).y + offsetY);
                     }
 
                     tiles.add(new Stile(tile.block(), tile.x + offsetX, tile.y + offsetY, config, tile.rotation()));
@@ -398,10 +400,7 @@ public class Schematics implements Loadable{
             }
         }
 
-        int ver;
-        if((ver = input.read()) != version){
-            throw new IOException("Unknown version: " + ver);
-        }
+        int ver = input.read();
 
         try(DataInputStream stream = new DataInputStream(new InflaterInputStream(input))){
             short width = stream.readShort(), height = stream.readShort();
@@ -424,7 +423,7 @@ public class Schematics implements Loadable{
             for(int i = 0; i < total; i++){
                 Block block = blocks.get(stream.readByte());
                 int position = stream.readInt();
-                int config = stream.readInt();
+                Object config = ver == 0 ? stream.readInt() : TypeIO.readObject(Reads.get(stream));
                 byte rotation = stream.readByte();
                 if(block != Blocks.air){
                     tiles.add(new Stile(block, Pos.x(position), Pos.y(position), config, rotation));
@@ -468,7 +467,7 @@ public class Schematics implements Loadable{
             for(Stile tile : schematic.tiles){
                 stream.writeByte(blocks.orderedItems().indexOf(tile.block));
                 stream.writeInt(Pos.get(tile.x, tile.y));
-                stream.writeInt(tile.config);
+                TypeIO.writeObject(Writes.get(stream), tile.config);
                 stream.writeByte(tile.rotation);
             }
         }

@@ -38,7 +38,7 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void configured(Tile tile, Playerc player, int value){
+    public void configured(Tile tile, Playerc player, Object value){
         Tilec entity = tile.entity;
         Tile other = world.tile(value);
         boolean contains = entity.power().links.contains(value), valid = other != null && other.entity != null && other.entity.power() != null;

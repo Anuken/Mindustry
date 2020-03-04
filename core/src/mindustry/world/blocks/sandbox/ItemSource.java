@@ -30,7 +30,7 @@ public class ItemSource extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Playerc player, int value){
+    public void configured(Tile tile, Playerc player, Object value){
         tile.<ItemSourceEntity>ent().outputItem = content.item(value);
     }
 

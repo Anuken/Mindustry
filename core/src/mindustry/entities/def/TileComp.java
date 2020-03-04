@@ -232,10 +232,14 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         return proximity;
     }
 
-    /** Tile configuration. Defaults to 0. Used for block rebuilding. */
-    @Override
-    public int config(){
-        return 0;
+    /** Tile configuration. Defaults to null. Used for block rebuilding. */
+    public Object config(){
+        return null;
+    }
+
+    /** Sets the config object and casts it. Does nothing by default. */
+    public void setConfig(Object config){
+
     }
 
     @Override

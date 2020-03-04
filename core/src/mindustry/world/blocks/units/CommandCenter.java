@@ -103,7 +103,7 @@ public class CommandCenter extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Playerc player, int value){
+    public void configured(Tile tile, Playerc player, Object value){
         UnitCommand command = UnitCommand.all[value];
         ((CommandCenter)tile.block()).effect.at(tile);
 

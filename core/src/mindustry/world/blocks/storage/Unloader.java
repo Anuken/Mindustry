@@ -55,7 +55,7 @@ public class Unloader extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Playerc player, int value){
+    public void configured(Tile tile, Playerc player, Object value){
         tile.entity.items().clear();
         tile.<UnloaderEntity>ent().sortItem = content.item(value);
     }

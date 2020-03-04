@@ -477,9 +477,10 @@ public class Block extends BlockStorage{
     /** Called when arbitrary configuration is applied to a tile. */
     public void configured(Tile tile, @Nullable Playerc player, @Nullable Object value){
         if(value == null){
-            tapped(tile, player);
+            //TODO
+            //tapped(tile, player);
         }else if(configurations.containsKey(value.getClass())){
-            configurations.get(value.getClass()).configured(tile, player, value);
+            configurations.get(value.getClass()).configured(tile, value);
         }
     }
 
@@ -929,7 +930,7 @@ public class Block extends BlockStorage{
     }
 
     public interface ConfigHandler<T>{
-        void configured(Tile tile, Player player, T value);
+        void configured(Tile tile, T value);
     }
 
 }

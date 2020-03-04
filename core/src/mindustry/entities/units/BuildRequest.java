@@ -17,7 +17,7 @@ public class BuildRequest{
     /** Whether this request comes with a config int. If yes, any blocks placed with this request will not call playerPlaced.*/
     public boolean hasConfig;
     /** Config int. Not used unless hasConfig is true.*/
-    public int config;
+    public Object config;
     /** Original position, only used in schematics.*/
     public int originalX, originalY, originalWidth, originalHeight;
 
@@ -101,7 +101,7 @@ public class BuildRequest{
         return y*tilesize + block.offset();
     }
 
-    public BuildRequest configure(int config){
+    public BuildRequest configure(Object config){
         this.config = config;
         this.hasConfig = true;
         return this;

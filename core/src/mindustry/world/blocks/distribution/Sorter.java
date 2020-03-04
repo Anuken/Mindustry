@@ -30,7 +30,8 @@ public class Sorter extends Block{
         configurable = true;
         unloadable = false;
         entityType = SorterEntity::new;
-        config(Item.class, (tile, player, item) -> tile.<SorterEntity>ent().sortItem = item);
+
+        config(Item.class, (tile, item) -> tile.<SorterEntity>ent().sortItem = item);
     }
 
     @Override
@@ -46,8 +47,8 @@ public class Sorter extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Playerc player, int value){
-        tile.<SorterEntity>ent().sortItem = content.item(value);
+    public void configured(Tile tile, Playerc player, Object value){
+        tile.<SorterEntity>ent().sortItem = (Item)value;
         if(!headless){
             renderer.minimap.update(tile);
         }
@@ -148,7 +149,7 @@ public class Sorter extends Block{
         @Nullable Item sortItem;
 
         @Override
-        public Item config(){
+        public Object config(){
             return sortItem;
         }
 

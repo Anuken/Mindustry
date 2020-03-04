@@ -28,6 +28,8 @@ public class LiquidSource extends Block{
         configurable = true;
         outputsLiquid = true;
         entityType = LiquidSourceEntity::new;
+
+        config();
     }
 
     @Override
@@ -85,7 +87,7 @@ public class LiquidSource extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Playerc player, int value){
+    public void configured(Tile tile, Playerc player, Object value){
         tile.<LiquidSourceEntity>ent().source = value == -1 ? null : content.liquid(value);
     }
 
@@ -93,8 +95,8 @@ public class LiquidSource extends Block{
         public @Nullable Liquid source = null;
 
         @Override
-        public int config(){
-            return source == null ? -1 : source.id;
+        public Object config(){
+            return source;
         }
 
         @Override

@@ -221,7 +221,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 stream.writeShort(block.y);
                 stream.writeShort(block.rotation);
                 stream.writeShort(block.block);
-                stream.writeInt(block.config);
+                TypeIO.writeObject(Writes.get(stream), block.config);
             }
         }
 
@@ -243,7 +243,7 @@ public abstract class SaveVersion extends SaveFileReader{
             TeamData data = team.data();
             int blocks = stream.readInt();
             for(int j = 0; j < blocks; j++){
-                data.brokenBlocks.addLast(new BrokenBlock(stream.readShort(), stream.readShort(), stream.readShort(), content.block(stream.readShort()).id, stream.readInt()));
+                data.brokenBlocks.addLast(new BrokenBlock(stream.readShort(), stream.readShort(), stream.readShort(), content.block(stream.readShort()).id, TypeIO.readObject(Reads.get(stream))));
             }
         }
 

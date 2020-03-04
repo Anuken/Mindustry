@@ -62,7 +62,7 @@ public class LightBlock extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Playerc player, int value){
+    public void configured(Tile tile, Playerc player, Object value){
         tile.<LightEntity>ent().color = value;
     }
 

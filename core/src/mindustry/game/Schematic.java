@@ -116,10 +116,10 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     public static class Stile{
         public @NonNull Block block;
         public short x, y;
-        public int config;
+        public Object config;
         public byte rotation;
 
-        public Stile(Block block, int x, int y, int config, byte rotation){
+        public Stile(Block block, int x, int y, Object config, byte rotation){
             this.block = block;
             this.x = (short)x;
             this.y = (short)y;

@@ -37,17 +37,13 @@ public class ItemBridge extends Block{
         layer = Layer.power;
         expanded = true;
         itemCapacity = 10;
-        posConfig = true;
         configurable = true;
         hasItems = true;
         unloadable = false;
         group = BlockGroup.transportation;
         entityType = ItemBridgeEntity::new;
-    }
 
-    @Override
-    public void configured(Tile tile, Playerc player, int value){
-        tile.<ItemBridgeEntity>ent().link = value;
+        config(Integer.class, (tile, i) -> tile.<ItemBridgeEntity>ent().link = i);
     }
 
     @Override
@@ -371,7 +367,7 @@ public class ItemBridge extends Block{
         public float cycleSpeed = 1f;
 
         @Override
-        public int config(){
+        public Object config(){
             return link;
         }
 

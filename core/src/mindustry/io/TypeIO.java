@@ -110,7 +110,7 @@ public class TypeIO{
                 write.s(request.block.id);
                 write.b((byte)request.rotation);
                 write.b(request.hasConfig ? (byte)1 : 0);
-                write.i(request.config);
+                writeObject(write, request.config);
             }
         }
     }
@@ -133,7 +133,7 @@ public class TypeIO{
                 short block = read.s();
                 byte rotation = read.b();
                 boolean hasConfig = read.b() == 1;
-                int config = read.i();
+                Object config = readObject(read);
                 currentRequest = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.block(block));
                 if(hasConfig){
                     currentRequest.configure(config);
