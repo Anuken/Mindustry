@@ -3,12 +3,12 @@ package mindustry.core;
 import arc.*;
 import arc.assets.*;
 import arc.audio.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.geom.*;
 import arc.scene.ui.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -114,7 +114,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         //autohost for pvp maps
-        Events.on(WorldLoadEvent.class, event -> {
+        Events.on(WorldLoadEvent.class, event -> app.post(() -> {
             if(state.rules.pvp && !net.active()){
                 try{
                     net.host(port);
@@ -124,7 +124,7 @@ public class Control implements ApplicationListener, Loadable{
                     Core.app.post(() -> state.set(State.menu));
                 }
             }
-        });
+        }));
 
         Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
 
