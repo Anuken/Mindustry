@@ -121,7 +121,7 @@ public class Control implements ApplicationListener, Loadable{
                     player.isAdmin = true;
                 }catch(IOException e){
                     ui.showException("$server.error", e);
-                    Core.app.post(() -> state.set(State.menu));
+                    state.set(State.menu);
                 }
             }
         }));
