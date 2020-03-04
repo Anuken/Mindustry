@@ -378,7 +378,7 @@ public abstract class BasicGenerator implements WorldGenerator{
         arr.add(start.pos());
         while(!arr.isEmpty()){
             int i = arr.pop();
-            int x = Pos.x(i), y = Pos.y(i);
+            int x = Point2.x(i), y = Point2.y(i);
             tiles.getn(x, y).cost = 2;
             for(Point2 point : Geometry.d4){
                 int newx = x + point.x, newy = y + point.y;

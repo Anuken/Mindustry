@@ -3,6 +3,7 @@ package mindustry.world.blocks;
 import arc.Core;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
+import arc.math.geom.*;
 import mindustry.graphics.CacheLayer;
 import mindustry.world.*;
 
@@ -25,7 +26,7 @@ public class StaticWall extends Rock{
         int rx = tile.x / 2 * 2;
         int ry = tile.y / 2 * 2;
 
-        if(Core.atlas.isFound(large) && eq(rx, ry) && Mathf.randomSeed(Pos.get(rx, ry)) < 0.5){
+        if(Core.atlas.isFound(large) && eq(rx, ry) && Mathf.randomSeed(Point2.pack(rx, ry)) < 0.5){
             Draw.rect(split[tile.x % 2][1 - tile.y % 2], tile.worldx(), tile.worldy());
         }else if(variants > 0){
             Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());

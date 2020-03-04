@@ -1,20 +1,17 @@
 package mindustry.world.blocks.defense;
 
 import arc.*;
-import arc.util.io.*;
-import mindustry.annotations.Annotations.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
+import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
-import java.io.*;
-
-import static mindustry.Vars.*;
+import static mindustry.Vars.pathfinder;
 
 public class Door extends Wall{
     protected final static Rect rect = new Rect();
@@ -31,23 +28,19 @@ public class Door extends Wall{
         solidifes = true;
         consumesTap = true;
         entityType = DoorEntity::new;
-    }
 
-    @Remote(called = Loc.server)
-    public static void onDoorToggle(Playerc player, Tile tile, boolean open){
-        DoorEntity entity = tile.ent();
-        if(entity != null){
+        config(Boolean.class, (tile, open) -> {
+            DoorEntity entity = tile.ent();
             entity.open = open;
-            Door door = (Door)tile.block();
 
             pathfinder.updateTile(tile);
             if(!entity.open){
-                door.openfx.at(tile.drawx(), tile.drawy());
+                openfx.at(tile.drawx(), tile.drawy());
             }else{
-                door.closefx.at(tile.drawx(), tile.drawy());
+                closefx.at(tile.drawx(), tile.drawy());
             }
             Sounds.door.at(tile);
-        }
+        });
     }
 
     @Override
@@ -86,11 +79,16 @@ public class Door extends Wall{
             return;
         }
 
-        Call.onDoorToggle(null, tile, !entity.open);
+        tile.configure(!entity.open);
     }
 
     public class DoorEntity extends TileEntity{
         public boolean open = false;
+
+        @Override
+        public Boolean config(){
+            return open;
+        }
 
         @Override
         public void write(Writes write){

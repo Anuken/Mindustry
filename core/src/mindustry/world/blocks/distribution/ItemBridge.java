@@ -1,22 +1,20 @@
 package mindustry.world.blocks.distribution;
 
 import arc.*;
-import arc.struct.*;
-import arc.struct.IntSet.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
+import arc.struct.IntSet.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.gen.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -27,7 +25,7 @@ public class ItemBridge extends Block{
     public TextureRegion endRegion, bridgeRegion, arrowRegion;
 
     private static BuildRequest otherReq;
-    private static int lastPlaced = Pos.invalid;
+    private static int lastPlaced = -1;
 
     public ItemBridge(String name){
         super(name);
@@ -43,6 +41,7 @@ public class ItemBridge extends Block{
         group = BlockGroup.transportation;
         entityType = ItemBridgeEntity::new;
 
+        config(Point2.class, (tile, i) -> tile.<ItemBridgeEntity>ent().link = i.pack());
         config(Integer.class, (tile, i) -> tile.<ItemBridgeEntity>ent().link = i);
     }
 
@@ -59,7 +58,7 @@ public class ItemBridge extends Block{
     public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
         otherReq = null;
         list.each(other -> {
-            if(other.block == this && req.config == Pos.get(other.x, other.y)){
+            if(other.block == this && req.config instanceof Point2 && ((Point2)req.config).equals(other.x, other.y)){
                 otherReq = other;
             }
         });
@@ -87,7 +86,7 @@ public class ItemBridge extends Block{
     }
 
     public Tile findLink(int x, int y){
-        if(world.tile(x, y) != null && linkValid(world.tile(x, y), world.tile(lastPlaced)) && lastPlaced != Pos.get(x, y)){
+        if(world.tile(x, y) != null && linkValid(world.tile(x, y), world.tile(lastPlaced)) && lastPlaced != Point2.pack(x, y)){
             return world.tile(lastPlaced);
         }
         return null;
@@ -152,7 +151,7 @@ public class ItemBridge extends Block{
 
         if(linkValid(tile, other)){
             if(entity.link == other.pos()){
-                tile.configure(Pos.invalid);
+                tile.configure(-1);
             }else{
                 tile.configure(other.pos());
             }
@@ -283,7 +282,7 @@ public class ItemBridge extends Block{
 
             while(it.hasNext){
                 int v = it.next();
-                if(tile.absoluteRelativeTo(Pos.x(v), Pos.y(v)) == i){
+                if(tile.absoluteRelativeTo(Point2.x(v), Point2.y(v)) == i){
                     return false;
                 }
             }
@@ -328,7 +327,7 @@ public class ItemBridge extends Block{
 
             while(it.hasNext){
                 int v = it.next();
-                if(tile.absoluteRelativeTo(Pos.x(v), Pos.y(v)) == i){
+                if(tile.absoluteRelativeTo(Point2.x(v), Point2.y(v)) == i){
                     return false;
                 }
             }
@@ -359,7 +358,7 @@ public class ItemBridge extends Block{
     }
 
     public static class ItemBridgeEntity extends TileEntity{
-        public int link = Pos.invalid;
+        public int link = -1;
         public IntSet incoming = new IntSet();
         public float uptime;
         public float time;
@@ -367,8 +366,8 @@ public class ItemBridge extends Block{
         public float cycleSpeed = 1f;
 
         @Override
-        public Object config(){
-            return link;
+        public Point2 config(){
+            return Point2.unpack(link);
         }
 
         @Override

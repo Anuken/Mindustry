@@ -25,6 +25,8 @@ import static mindustry.Vars.*;
 @TypeIOHandler
 public class TypeIO{
 
+    //TODO read/write enums like commands!
+
     public static void writeObject(Writes write, Object object){
         if(object == null){
             write.b((byte)0);
@@ -57,6 +59,12 @@ public class TypeIO{
             write.b((byte)7);
             write.i(((Point2)object).x);
             write.i(((Point2)object).y);
+        }else if(object instanceof Point2[]){
+            write.b((byte)8);
+            write.b(((Point2[])object).length);
+            for(int i = 0; i < ((Point2[])object).length; i++){
+                write.i(((Point2[])object)[i].pack());
+            }
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -73,6 +81,7 @@ public class TypeIO{
             case 5: return content.getByID(ContentType.all[read.b()], read.s());
             case 6: short length = read.s(); IntArray arr = new IntArray(); for(int i = 0; i < length; i ++) arr.add(read.i()); return arr;
             case 7: return new Point2(read.i(), read.i());
+            case 8: byte len = read.b(); Point2[] out = new Point2[len]; for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i()); return out;
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
     }
@@ -86,7 +95,7 @@ public class TypeIO{
     }
 
     public static void writeTile(Writes write, Tile tile){
-        write.i(tile == null ? Pos.get(-1, -1) : tile.pos());
+        write.i(tile == null ? Point2.pack(-1, -1) : tile.pos());
     }
 
     public static Tile readTile(Reads read){
@@ -105,7 +114,7 @@ public class TypeIO{
         write.s((short)requests.length);
         for(BuildRequest request : requests){
             write.b(request.breaking ? (byte)1 : 0);
-            write.i(Pos.get(request.x, request.y));
+            write.i(Point2.pack(request.x, request.y));
             if(!request.breaking){
                 write.s(request.block.id);
                 write.b((byte)request.rotation);
@@ -128,13 +137,13 @@ public class TypeIO{
             }
 
             if(type == 1){ //remove
-                currentRequest = new BuildRequest(Pos.x(position), Pos.y(position));
+                currentRequest = new BuildRequest(Point2.x(position), Point2.y(position));
             }else{ //place
                 short block = read.s();
                 byte rotation = read.b();
                 boolean hasConfig = read.b() == 1;
                 Object config = readObject(read);
-                currentRequest = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.block(block));
+                currentRequest = new BuildRequest(Point2.x(position), Point2.y(position), rotation, content.block(block));
                 if(hasConfig){
                     currentRequest.configure(config);
                 }

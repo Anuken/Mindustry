@@ -11,15 +11,13 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -37,6 +35,21 @@ public class CommandCenter extends Block{
         solid = true;
         configurable = true;
         entityType = CommandCenterEntity::new;
+
+        config(Integer.class, (tile, value) -> {
+            UnitCommand command = UnitCommand.all[value];
+            ((CommandCenter)tile.block()).effect.at(tile);
+
+            for(Tile center : indexer.getAllied(tile.team(), BlockFlag.comandCenter)){
+                if(center.block() instanceof CommandCenter){
+                    CommandCenterEntity entity = center.ent();
+                    entity.command = command;
+                }
+            }
+
+            Groups.unit.each(t -> t.team() == tile.team(), u -> u.controller().command(command));
+            Events.fire(new CommandIssueEvent(tile, command));
+        });
     }
 
     @Override
@@ -102,27 +115,11 @@ public class CommandCenter extends Block{
         table.label(() -> entity.command.localized()).style(Styles.outlineLabel).center().growX().get().setAlignment(Align.center);
     }
 
-    @Override
-    public void configured(Tile tile, Playerc player, Object value){
-        UnitCommand command = UnitCommand.all[value];
-        ((CommandCenter)tile.block()).effect.at(tile);
-
-        for(Tile center : indexer.getAllied(tile.team(), BlockFlag.comandCenter)){
-            if(center.block() instanceof CommandCenter){
-                CommandCenterEntity entity = center.ent();
-                entity.command = command;
-            }
-        }
-
-        Groups.unit.each(t -> t.team() == tile.team(), u -> u.controller().command(command));
-        Events.fire(new CommandIssueEvent(tile, command));
-    }
-
     public class CommandCenterEntity extends TileEntity{
         public UnitCommand command = UnitCommand.attack;
 
         @Override
-        public int config(){
+        public Integer config(){
             return command.ordinal();
         }
 

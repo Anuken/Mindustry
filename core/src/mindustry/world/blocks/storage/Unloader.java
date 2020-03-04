@@ -5,13 +5,11 @@ import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.gen.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-
-import java.io.*;
 
 import static mindustry.Vars.content;
 
@@ -29,11 +27,18 @@ public class Unloader extends Block{
         hasItems = true;
         configurable = true;
         entityType = UnloaderEntity::new;
+
+        config(Item.class, (tile, item) -> {
+            tile.entity.items().clear();
+            tile.<UnloaderEntity>ent().sortItem = item;
+        });
+
+        configClear(tile -> tile.<UnloaderEntity>ent().sortItem = null);
     }
 
     @Override
     public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
-        drawRequestConfigCenter(req, content.item(req.config), "unloader-center");
+        drawRequestConfigCenter(req, (Item)req.config, "unloader-center");
     }
 
     @Override
@@ -50,14 +55,8 @@ public class Unloader extends Block{
     @Override
     public void playerPlaced(Tile tile){
         if(lastItem != null){
-            tile.configure(lastItem.id);
+            tile.configure(lastItem);
         }
-    }
-
-    @Override
-    public void configured(Tile tile, Playerc player, Object value){
-        tile.entity.items().clear();
-        tile.<UnloaderEntity>ent().sortItem = content.item(value);
     }
 
     @Override
@@ -123,19 +122,15 @@ public class Unloader extends Block{
 
     @Override
     public void buildConfiguration(Tile tile, Table table){
-        UnloaderEntity entity = tile.ent();
-        ItemSelection.buildTable(table, content.items(), () -> entity.sortItem, item -> {
-            lastItem = item;
-            tile.configure(item == null ? -1 : item.id);
-        });
+        ItemSelection.buildTable(table, content.items(), () -> tile.<UnloaderEntity>ent().sortItem, item -> tile.configure(lastItem = item));
     }
 
     public static class UnloaderEntity extends TileEntity{
         public Item sortItem = null;
 
         @Override
-        public int config(){
-            return sortItem == null ? -1 : sortItem.id;
+        public Item config(){
+            return sortItem;
         }
 
         @Override

@@ -50,9 +50,9 @@ public class Tile implements Position{
         this(x, y, content.block(floor), content.block(overlay), content.block(wall));
     }
 
-    /** Returns this tile's position as a {@link Pos}. */
+    /** Returns this tile's position as a packed point. */
     public int pos(){
-        return Pos.get(x, y);
+        return Point2.pack(x, y);
     }
 
     public byte relativeTo(Tile tile){

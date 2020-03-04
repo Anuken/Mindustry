@@ -1,5 +1,6 @@
 package mindustry.entities.units;
 
+import arc.func.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.world.*;
@@ -49,6 +50,28 @@ public class BuildRequest{
 
     public BuildRequest(){
 
+    }
+
+    public static Object pointConfig(Object config, Cons<Point2> cons){
+        if(config instanceof Point2){
+            config = ((Point2)config).cpy();
+            cons.get((Point2)config);
+        }else if(config instanceof Point2[]){
+            Point2[] result = new Point2[((Point2[])config).length];
+            int i = 0;
+            for(Point2 p : (Point2[])config){
+                result[i] = p.cpy();
+                cons.get(result[i++]);
+            }
+            config = result;
+        }
+        return config;
+    }
+
+    /** If this requests's config is a Point2 or an array of Point2s, this returns a copy of them for transformation.
+     * Otherwise does nothing. */
+    public void pointConfig(Cons<Point2> cons){
+        this.config = pointConfig(this.config, cons);
     }
 
     public BuildRequest copy(){

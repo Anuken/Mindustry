@@ -86,7 +86,7 @@ public class World{
 
     public @Nullable
     Tile tile(int pos){
-        return tiles == null ? null : tile(Pos.x(pos), Pos.y(pos));
+        return tiles == null ? null : tile(Point2.x(pos), Point2.y(pos));
     }
 
     public @Nullable Tile tile(int x, int y){
@@ -396,8 +396,8 @@ public class World{
         for(int i = 0; i < multiblocks.size; i++){
             int pos = multiblocks.get(i);
 
-            int x = Pos.x(pos);
-            int y = Pos.y(pos);
+            int x = Point2.x(pos);
+            int y = Point2.y(pos);
             Tile tile = tiles.getn(x, y);
 
             Block result = tile.block();

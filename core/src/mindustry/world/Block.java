@@ -476,14 +476,20 @@ public class Block extends BlockStorage{
 
     /** Called when arbitrary configuration is applied to a tile. */
     public void configured(Tile tile, @Nullable Playerc player, @Nullable Object value){
-        if(value == null){
-            //TODO
-            //tapped(tile, player);
-        }else if(configurations.containsKey(value.getClass())){
-            configurations.get(value.getClass()).configured(tile, value);
+        //null is of type Void.class; anonymous classes use their superclass.
+        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
+
+        if(configurations.containsKey(type)){
+            configurations.get(type).configured(tile, value);
         }
     }
 
+    /** Configure when a null value is passed.*/
+    public void configClear(Cons<Tile> cons){
+        configurations.put(void.class, (tile, value) -> cons.get(tile));
+    }
+
+    /** Listen for a config by class type. */
     public <T> void config(Class<T> type, ConfigHandler<T> config){
         configurations.put(type, config);
     }
@@ -743,7 +749,7 @@ public class Block extends BlockStorage{
 
     }
 
-    public void drawRequestConfigCenter(BuildRequest req, Content content, String region){
+    public void drawRequestConfigCenter(BuildRequest req, Object content, String region){
         Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
         if(color == null) return;
 

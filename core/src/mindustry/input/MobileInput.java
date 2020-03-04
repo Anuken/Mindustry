@@ -222,9 +222,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                             BuildRequest other = getRequest(request.x, request.y, request.block.size, null);
                             BuildRequest copy = request.copy();
 
-                            if(copy.hasConfig && copy.config instanceof Point2){
-                                copy.config = Pos.get(((Point2)copy.config).x + copy.x - copy.originalX, ((Point2)copy.config).y + copy.y - copy.originalY);
-                            }
+                            copy.pointConfig(p -> p.add(copy.x - copy.originalX, copy.y - copy.originalY));
 
                             if(other == null){
                                 player.builder().addBuild(copy);

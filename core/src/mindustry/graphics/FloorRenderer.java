@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.struct.IntSet.*;
 import arc.util.*;
@@ -32,7 +33,7 @@ public class FloorRenderer implements Disposable{
 
     /**Queues up a cache change for a tile. Only runs in render loop. */
     public void recacheTile(Tile tile){
-        recacheSet.add(Pos.get(tile.x / chunksize, tile.y / chunksize));
+        recacheSet.add(Point2.pack(tile.x / chunksize, tile.y / chunksize));
     }
 
     public void drawFloor(){
@@ -106,7 +107,7 @@ public class FloorRenderer implements Disposable{
             IntSetIterator iterator = recacheSet.iterator();
             while(iterator.hasNext){
                 int chunk = iterator.next();
-                cacheChunk(Pos.x(chunk), Pos.y(chunk));
+                cacheChunk(Point2.x(chunk), Point2.y(chunk));
             }
 
             recacheSet.clear();

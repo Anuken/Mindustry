@@ -10,8 +10,6 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.*;
-import mindustry.annotations.Annotations.*;
-import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.ui.*;
@@ -21,8 +19,9 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class MessageBlock extends Block{
-    protected static int maxTextLength = 220;
-    protected static int maxNewlines = 24;
+    //don't change this too much unless you want to run into issues with packet sizes
+    public int maxTextLength = 220;
+    public int maxNewlines = 24;
 
     public MessageBlock(String name){
         super(name);
@@ -30,40 +29,32 @@ public class MessageBlock extends Block{
         solid = true;
         destructible = true;
         entityType = MessageBlockEntity::new;
-    }
 
-    @Remote(targets = Loc.both, called = Loc.both, forward = true)
-    public static void setMessageBlockText(Playerc player, Tile tile, String text){
-        if(!Units.canInteract(player, tile)) return;
-        if(net.server() && text.length() > maxTextLength){
-            throw new ValidateException(player, "Player has gone above text limit.");
-        }
-
-        //can be broken while a player is typing
-        if(!(tile.block() instanceof MessageBlock)){
-            return;
-        }
-
-        StringBuilder result = new StringBuilder(text.length());
-        text = text.trim();
-        int count = 0;
-        for(int i = 0; i < text.length(); i++){
-            char c = text.charAt(i);
-            if(c == '\n' || c == '\r'){
-                count ++;
-                if(count <= maxNewlines){
-                    result.append('\n');
-                }
-            }else{
-                result.append(c);
+        config(String.class, (tile, text) -> {
+            if(net.server() && text.length() > maxTextLength){
+                throw new ValidateException(player, "Player has gone above text limit.");
             }
-        }
 
-        MessageBlockEntity entity = tile.ent();
-        if(entity != null){
+            MessageBlockEntity entity = tile.ent();
+
+            StringBuilder result = new StringBuilder(text.length());
+            text = text.trim();
+            int count = 0;
+            for(int i = 0; i < text.length(); i++){
+                char c = text.charAt(i);
+                if(c == '\n' || c == '\r'){
+                    count ++;
+                    if(count <= maxNewlines){
+                        result.append('\n');
+                    }
+                }else{
+                    result.append(c);
+                }
+            }
+
             entity.message = result.toString();
             entity.lines = entity.message.split("\n");
-        }
+        });
     }
 
     @Override
@@ -102,9 +93,7 @@ public class MessageBlock extends Block{
                     text = entity.message;
                     multiline = true;
                     maxLength = maxTextLength;
-                    accepted = out -> {
-                        Call.setMessageBlockText(player, tile, out);
-                    };
+                    accepted = tile::configure;
                 }});
             }else{
                 FloatingDialog dialog = new FloatingDialog("$editmessage");
@@ -124,11 +113,11 @@ public class MessageBlock extends Block{
                 });
                 a.setMaxLength(maxTextLength);
                 dialog.buttons.addButton("$ok", () -> {
-                    Call.setMessageBlockText(player, tile, a.getText());
+                    tile.configure(a.getText());
                     dialog.hide();
                 }).size(130f, 60f);
                 dialog.update(() -> {
-                    if(!entity.isValid()){
+                    if(tile.block() != this){
                         dialog.hide();
                     }
                 });
@@ -147,6 +136,11 @@ public class MessageBlock extends Block{
     public class MessageBlockEntity extends TileEntity{
         public String message = "";
         public String[] lines = {""};
+
+        @Override
+        public String config(){
+            return message;
+        }
 
         @Override
         public void write(Writes write){

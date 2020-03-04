@@ -35,45 +35,52 @@ public class PowerNode extends PowerBlock{
         configurable = true;
         consumesPower = false;
         outputsPower = false;
-    }
+        entityType = PowerNodeEntity::new;
 
-    @Override
-    public void configured(Tile tile, Playerc player, Object value){
-        Tilec entity = tile.entity;
-        Tile other = world.tile(value);
-        boolean contains = entity.power().links.contains(value), valid = other != null && other.entity != null && other.entity.power() != null;
+        config(Integer.class, (tile, value) -> {
+            Tilec entity = tile.entity;
+            Tile other = world.tile(value);
+            boolean contains = entity.power().links.contains(value), valid = other != null && other.entity != null && other.entity.power() != null;
 
-        if(contains){
-            //unlink
-            entity.power().links.removeValue(value);
-            if(valid) other.entity.power().links.removeValue(tile.pos());
+            if(contains){
+                //unlink
+                entity.power().links.removeValue(value);
+                if(valid) other.entity.power().links.removeValue(tile.pos());
 
-            PowerGraph newgraph = new PowerGraph();
+                PowerGraph newgraph = new PowerGraph();
 
-            //reflow from this point, covering all tiles on this side
-            newgraph.reflow(tile);
+                //reflow from this point, covering all tiles on this side
+                newgraph.reflow(tile);
 
-            if(valid && other.entity.power().graph != newgraph){
-                //create new graph for other end
-                PowerGraph og = new PowerGraph();
-                //reflow from other end
-                og.reflow(other);
-            }
-        }else if(linkValid(tile, other) && valid && entity.power().links.size < maxNodes){
-
-            if(!entity.power().links.contains(other.pos())){
-                entity.power().links.add(other.pos());
-            }
-
-            if(other.getTeamID() == tile.getTeamID()){
-
-                if(!other.entity.power().links.contains(tile.pos())){
-                    other.entity.power().links.add(tile.pos());
+                if(valid && other.entity.power().graph != newgraph){
+                    //create new graph for other end
+                    PowerGraph og = new PowerGraph();
+                    //reflow from other end
+                    og.reflow(other);
                 }
-            }
+            }else if(linkValid(tile, other) && valid && entity.power().links.size < maxNodes){
 
-            entity.power().graph.add(other.entity.power().graph);
-        }
+                if(!entity.power().links.contains(other.pos())){
+                    entity.power().links.add(other.pos());
+                }
+
+                if(other.getTeamID() == tile.getTeamID()){
+
+                    if(!other.entity.power().links.contains(tile.pos())){
+                        other.entity.power().links.add(tile.pos());
+                    }
+                }
+
+                entity.power().graph.add(other.entity.power().graph);
+            }
+        });
+
+        config(Point2[].class, (tile, value) -> {
+            tile.entity.power().links.clear();
+            for(Point2 p : value){
+                tile.entity.power().links.add(p.pack());
+            }
+        });
     }
 
     @Override
@@ -359,5 +366,17 @@ public class PowerNode extends PowerBlock{
 
             return false;
         });
+    }
+
+    public class PowerNodeEntity extends TileEntity{
+
+        @Override
+        public Point2[] config(){
+            Point2[] out = new Point2[power.links.size];
+            for(int i = 0; i < out.length; i++){
+                out[i] = Point2.unpack(power.links.get(i));
+            }
+            return out;
+        }
     }
 }

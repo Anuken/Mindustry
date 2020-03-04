@@ -6,14 +6,12 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.gen.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -32,6 +30,7 @@ public class Sorter extends Block{
         entityType = SorterEntity::new;
 
         config(Item.class, (tile, item) -> tile.<SorterEntity>ent().sortItem = item);
+        configClear(tile -> tile.<SorterEntity>ent().sortItem = null);
     }
 
     @Override
@@ -48,7 +47,8 @@ public class Sorter extends Block{
 
     @Override
     public void configured(Tile tile, Playerc player, Object value){
-        tile.<SorterEntity>ent().sortItem = (Item)value;
+        super.configured(tile, player, value);
+
         if(!headless){
             renderer.minimap.update(tile);
         }
@@ -139,23 +139,15 @@ public class Sorter extends Block{
     @Override
     public void buildConfiguration(Tile tile, Table table){
         SorterEntity entity = tile.ent();
-        ItemSelection.buildTable(table, content.items(), () -> entity.sortItem, item -> {
-            lastItem = item;
-            tile.configure(item == null ? -1 : item.id);
-        });
+        ItemSelection.buildTable(table, content.items(), () -> entity.sortItem, item -> tile.configure(lastItem = item));
     }
 
     public class SorterEntity extends TileEntity{
         @Nullable Item sortItem;
 
         @Override
-        public Object config(){
+        public Item config(){
             return sortItem;
-        }
-
-        @Override
-        public void setConfig(Object config){
-            sortItem = (Item)config;
         }
 
         @Override

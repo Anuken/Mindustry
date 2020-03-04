@@ -216,7 +216,7 @@ public class Pathfinder implements Runnable{
             //add targets
             for(int i = 0; i < path.targets.size; i++){
                 int pos = path.targets.get(i);
-                int tx = Pos.x(pos), ty = Pos.y(pos);
+                int tx = Point2.x(pos), ty = Point2.y(pos);
 
                 path.weights[tx][ty] = 0;
                 path.searches[tx][ty] = (short)path.search;
@@ -253,7 +253,7 @@ public class Pathfinder implements Runnable{
         //add targets
         for(int i = 0; i < path.targets.size; i++){
             int pos = path.targets.get(i);
-            path.weights[Pos.x(pos)][Pos.y(pos)] = 0;
+            path.weights[Point2.x(pos)][Point2.y(pos)] = 0;
             path.frontier.addFirst(pos);
         }
 
@@ -283,7 +283,7 @@ public class Pathfinder implements Runnable{
 
                     if(other != null && (path.weights[dx][dy] > cost + other.cost || path.searches[dx][dy] < path.search) && passable(dx, dy, path.team)){
                         if(other.cost < 0) throw new IllegalArgumentException("Tile cost cannot be negative! " + other);
-                        path.frontier.addFirst(Pos.get(dx, dy));
+                        path.frontier.addFirst(Point2.pack(dx, dy));
                         path.weights[dx][dy] = cost + other.cost;
                         path.searches[dx][dy] = (short)path.search;
                     }

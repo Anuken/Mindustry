@@ -6,13 +6,12 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-
-import java.io.*;
 
 import static mindustry.Vars.content;
 
@@ -29,13 +28,14 @@ public class LiquidSource extends Block{
         outputsLiquid = true;
         entityType = LiquidSourceEntity::new;
 
-        config();
+        config(Liquid.class, (tile, l) -> tile.<LiquidSourceEntity>ent().source = l);
+        configClear(tile -> tile.<LiquidSourceEntity>ent().source = null);
     }
 
     @Override
     public void playerPlaced(Tile tile){
         if(lastLiquid != null){
-            Core.app.post(() -> tile.configure(lastLiquid.id));
+            Core.app.post(() -> tile.configure(lastLiquid));
         }
     }
 
@@ -60,7 +60,7 @@ public class LiquidSource extends Block{
 
     @Override
     public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
-        drawRequestConfigCenter(req, content.liquid(req.config), "center");
+        drawRequestConfigCenter(req, (Content)req.config, "center");
     }
 
     @Override
@@ -80,22 +80,14 @@ public class LiquidSource extends Block{
     public void buildConfiguration(Tile tile, Table table){
         LiquidSourceEntity entity = tile.ent();
 
-        ItemSelection.buildTable(table, content.liquids(), () -> entity.source, liquid -> {
-            lastLiquid = liquid;
-            tile.configure(liquid == null ? -1 : liquid.id);
-        });
-    }
-
-    @Override
-    public void configured(Tile tile, Playerc player, Object value){
-        tile.<LiquidSourceEntity>ent().source = value == -1 ? null : content.liquid(value);
+        ItemSelection.buildTable(table, content.liquids(), () -> entity.source, liquid -> tile.configure(lastLiquid = liquid));
     }
 
     class LiquidSourceEntity extends TileEntity{
         public @Nullable Liquid source = null;
 
         @Override
-        public Object config(){
+        public Liquid config(){
             return source;
         }
 

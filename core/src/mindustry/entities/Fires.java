@@ -1,6 +1,7 @@
 package mindustry.entities;
 
 import arc.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
@@ -34,14 +35,14 @@ public class Fires{
     }
 
     public static Firec get(int x, int y){
-        return map.get(Pos.get(x, y));
+        return map.get(Point2.pack(x, y));
     }
 
     public static boolean has(int x, int y){
-        if(!Structs.inBounds(x, y, world.width(), world.height()) || !map.containsKey(Pos.get(x, y))){
+        if(!Structs.inBounds(x, y, world.width(), world.height()) || !map.containsKey(Point2.pack(x, y))){
             return false;
         }
-        Firec fire = map.get(Pos.get(x, y));
+        Firec fire = map.get(Point2.pack(x, y));
         return fire.isAdded() && fire.fin() < 1f && fire.tile() != null && fire.tile().x == x && fire.tile().y == y;
     }
 

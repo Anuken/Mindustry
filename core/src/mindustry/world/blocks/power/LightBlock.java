@@ -9,8 +9,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
-import java.io.*;
-
 import static mindustry.Vars.*;
 
 public class LightBlock extends Block{
@@ -27,6 +25,8 @@ public class LightBlock extends Block{
         topRegion = reg("-top");
         configurable = true;
         entityType = LightEntity::new;
+
+        config(Integer.class, (tile, value) -> tile.<LightEntity>ent().color = value);
     }
 
     @Override
@@ -62,11 +62,6 @@ public class LightBlock extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Playerc player, Object value){
-        tile.<LightEntity>ent().color = value;
-    }
-
-    @Override
     public void drawLight(Tile tile){
         LightEntity entity = tile.ent();
         renderer.lights.add(tile.drawx(), tile.drawy(), radius, Tmp.c1.set(entity.color), brightness * tile.entity.efficiency());
@@ -76,7 +71,7 @@ public class LightBlock extends Block{
         public int color = Pal.accent.rgba();
 
         @Override
-        public int config(){
+        public Integer config(){
             return color;
         }
 

@@ -1,6 +1,7 @@
 package mindustry.world;
 
 import arc.func.*;
+import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 
 import java.util.*;
@@ -61,7 +62,7 @@ public class Tiles implements Iterable<Tile>{
 
     /** @return a tile at an int position (not equivalent to geti) */
     public @Nullable Tile getp(int pos){
-        return get(Pos.x(pos), Pos.y(pos));
+        return get(Point2.x(pos), Point2.y(pos));
     }
 
     @Override

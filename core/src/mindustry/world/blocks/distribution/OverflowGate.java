@@ -136,7 +136,7 @@ public class OverflowGate extends Block{
 
         @Override
         public void write(Writes write){
-            write.i(lastInput == null ? Pos.invalid : lastInput.pos());
+            write.i(lastInput == null ? -1 : lastInput.pos());
         }
 
         @Override

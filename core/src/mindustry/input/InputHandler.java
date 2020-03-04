@@ -264,9 +264,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         int ox = schemOriginX(), oy = schemOriginY();
 
         requests.each(req -> {
-            //rotate config position
-            if(req.config instanceof Point2){
-                int cx = ((Point2)req.config).x - req.originalX, cy = ((Point2)req.config).y - req.originalY;
+            req.pointConfig(p -> {
+                int cx = p.x - req.originalX, cy = p.y - req.originalY;
                 int lx = cx;
 
                 if(direction >= 0){
@@ -276,8 +275,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     cx = cy;
                     cy = -lx;
                 }
-                req.config = new Point2(cx + req.originalX, cy + req.originalY);
-            }
+                p.set(cx + req.originalX, cy + req.originalY);
+            });
 
             //rotate actual request, centered on its multiblock position
             float wx = (req.x - ox) * tilesize + req.block.offset(), wy = (req.y - oy) * tilesize + req.block.offset();
@@ -307,17 +306,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 req.y = (int)((value - req.block.offset()) / tilesize);
             }
 
-            if(req.config instanceof Point2){
+            req.pointConfig(p -> {
                 int corigin = x ? req.originalWidth/2 : req.originalHeight/2;
-                int nvalue = -((x ? ((Point2)req.config).x : ((Point2)req.config).y) - corigin) + corigin;
+                int nvalue = -((x ? p.x : p.y) - corigin) + corigin;
                 if(x){
                     req.originalX = -(req.originalX - corigin) + corigin;
-                    req.config = Pos.get(nvalue, ((Point2)req.config).y);
+                    p.x = nvalue;
                 }else{
                     req.originalY = -(req.originalY - corigin) + corigin;
-                    req.config = Pos.get(((Point2)req.config).x, nvalue);
+                    p.y = nvalue;
                 }
-            }
+            });
 
             //flip rotation
             if(x == (req.rotation % 2 == 0)){
@@ -450,9 +449,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
                 BuildRequest copy = req.copy();
-                if(copy.hasConfig && copy.config instanceof Point2){
-                    copy.config = Pos.get(((Point2)copy.config).x + copy.x - copy.originalX, ((Point2)copy.config).x + copy.y - copy.originalY);
-                }
+                copy.pointConfig(p -> p.add(copy.x - copy.originalX, copy.y - copy.originalY));
                 player.builder().addBuild(copy);
             }
         }

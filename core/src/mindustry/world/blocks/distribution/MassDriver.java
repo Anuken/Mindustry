@@ -1,9 +1,10 @@
 package mindustry.world.blocks.distribution;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.Pool.*;
@@ -14,8 +15,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -42,11 +41,9 @@ public class MassDriver extends Block{
         hasPower = true;
         outlineIcon = true;
         entityType = MassDriverEntity::new;
-    }
 
-    @Override
-    public void configured(Tile tile, Playerc player, Object value){
-        tile.<MassDriverEntity>ent().link = value;
+        config(Point2.class, (tile, point) -> tile.<MassDriverEntity>ent().link = point.pack());
+        config(Integer.class, (tile, point) -> tile.<MassDriverEntity>ent().link = point);
     }
 
     @Override
@@ -327,8 +324,8 @@ public class MassDriver extends Block{
         }
 
         @Override
-        public int config(){
-            return link;
+        public Point2 config(){
+            return Point2.unpack(link);
         }
 
         @Override

@@ -2,20 +2,20 @@ package mindustry.game;
 
 import arc.*;
 import arc.assets.*;
-import arc.math.geom.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
-import arc.util.*;
+import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.io.*;
 import arc.util.io.Streams.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.ContentType;
+import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Schematic.*;
@@ -24,8 +24,12 @@ import mindustry.input.Placement.*;
 import mindustry.io.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
+import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.units.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -127,7 +131,7 @@ public class Schematics implements Loadable{
             }
 
             return s;
-        }catch(IOException e){
+        }catch(Throwable e){
             Log.err(e);
         }
         return null;
@@ -261,11 +265,9 @@ public class Schematics implements Loadable{
 
             tile.set(st.block, state.rules.defaultTeam);
             tile.rotation(st.rotation);
-            if(st.config instanceof Point2){
-                tile.configureAny(Pos.get(tile.x - st.x + ((Point2)st.config).x, tile.y - st.y + ((Point2)st.config).y));
-            }else{
-                tile.configureAny(st.config);
-            }
+
+            Object config = BuildRequest.pointConfig(st.config, point -> point.add(tile.x - st.x, tile.y - st.y));
+            tile.configureAny(config);
 
             if(st.block instanceof Drill){
                 tile.getLinkedTiles(t -> t.setOverlay(Blocks.oreCopper));
@@ -348,10 +350,7 @@ public class Schematics implements Loadable{
 
                 if(tile != null && tile.entity != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
                     && (tile.entity.block().isVisible() || (tile.entity.block() instanceof CoreBlock && Core.settings.getBool("coreselect")))){
-                    Object config = tile.entity.config();
-                    if(config instanceof Point2){
-                        config = Pos.get(((Point2)config).x + offsetX, ((Point2)config).y + offsetY);
-                    }
+                    Object config = BuildRequest.pointConfig(tile.entity.config(), point -> point.add(offsetX, offsetY));
 
                     tiles.add(new Stile(tile.block(), tile.x + offsetX, tile.y + offsetY, config, tile.rotation()));
                     counted.add(tile.pos());
@@ -423,10 +422,10 @@ public class Schematics implements Loadable{
             for(int i = 0; i < total; i++){
                 Block block = blocks.get(stream.readByte());
                 int position = stream.readInt();
-                Object config = ver == 0 ? stream.readInt() : TypeIO.readObject(Reads.get(stream));
+                Object config = ver == 0 ? mapConfig(block, stream.readInt()) : TypeIO.readObject(Reads.get(stream));
                 byte rotation = stream.readByte();
                 if(block != Blocks.air){
-                    tiles.add(new Stile(block, Pos.x(position), Pos.y(position), config, rotation));
+                    tiles.add(new Stile(block, Point2.x(position), Point2.y(position), config, rotation));
                 }
             }
 
@@ -466,11 +465,21 @@ public class Schematics implements Loadable{
             //write each tile
             for(Stile tile : schematic.tiles){
                 stream.writeByte(blocks.orderedItems().indexOf(tile.block));
-                stream.writeInt(Pos.get(tile.x, tile.y));
+                stream.writeInt(Point2.pack((int)tile.x, (int)tile.y));
                 TypeIO.writeObject(Writes.get(stream), tile.config);
                 stream.writeByte(tile.rotation);
             }
         }
+    }
+
+    /** Maps legacy int configs to new config objects. */
+    private static Object mapConfig(Block block, int value){
+        if(block instanceof Sorter || block instanceof Unloader || block instanceof ItemSource) return content.item(value);
+        if(block instanceof MassDriver || block instanceof ItemBridge) return Point2.unpack(value);
+        if(block instanceof LiquidSource) return content.liquid(value);
+        if(block instanceof LightBlock || block instanceof CommandCenter) return value;
+
+        return null;
     }
 
     //endregion

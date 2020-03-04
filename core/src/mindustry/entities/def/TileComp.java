@@ -233,13 +233,10 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     }
 
     /** Tile configuration. Defaults to null. Used for block rebuilding. */
+    @Nullable
+    @Override
     public Object config(){
         return null;
-    }
-
-    /** Sets the config object and casts it. Does nothing by default. */
-    public void setConfig(Object config){
-
     }
 
     @Override
