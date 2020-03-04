@@ -86,7 +86,7 @@ public class ItemBridge extends Block{
     }
 
     public Tile findLink(int x, int y){
-        if(world.tile(x, y) != null && linkValid(world.tile(x, y), world.tile(lastPlaced)) && lastPlaced != Point2.pack(x, y)){
+        if(world.tiles.in(x, y) && linkValid(world.tile(x, y), world.tile(lastPlaced)) && lastPlaced != Point2.pack(x, y)){
             return world.tile(lastPlaced);
         }
         return null;

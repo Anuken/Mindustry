@@ -68,7 +68,7 @@ public class BuildBlock extends Block{
             tile.entity.health(block.health * healthf);
         }
         //last builder was this local client player, call placed()
-        if(!headless && builderID == player.id()){
+        if(!headless && builderID == player.unit().id()){
             if(!skipConfig){
                 tile.block().playerPlaced(tile);
             }

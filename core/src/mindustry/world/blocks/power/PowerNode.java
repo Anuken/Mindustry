@@ -1,14 +1,15 @@
 package mindustry.world.blocks.power;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -20,6 +21,7 @@ import static mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
     protected static boolean returnValue = false;
+    protected static BuildRequest otherReq;
 
     protected final ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     protected final Vec2 t1 = new Vec2(), t2 = new Vec2();
@@ -287,6 +289,25 @@ public class PowerNode extends PowerBlock{
         Draw.reset();
     }
 
+    @Override
+    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+        if(req.config instanceof Point2[]){
+            for(Point2 point : (Point2[])req.config){
+                otherReq = null;
+                list.each(other -> {
+                    if(other.x == point.x && other.y == point.y){
+                        Log.info("found match " + other);
+                        otherReq = other;
+                    }
+                });
+
+                if(otherReq == null || otherReq.block == null) return;
+
+                drawLaser(req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy(), 1f, size, otherReq.block.size);
+            }
+        }
+    }
+
     protected boolean linked(Tile tile, Tile other){
         return tile.entity.power().links.contains(other.pos());
     }
@@ -321,24 +342,25 @@ public class PowerNode extends PowerBlock{
     }
 
     protected void drawLaser(Tile tile, Tile target){
+        drawLaser(tile.drawx(), tile.drawy(), target.drawx(), target.drawy(), tile.entity.power().graph.getSatisfaction(), size, target.block().size);
+    }
+
+    protected void drawLaser(float x1, float y1, float x2, float y2, float satisfaction, int size1, int size2){
         int opacityPercentage = Core.settings.getInt("lasersopacity");
         if(opacityPercentage == 0) return;
 
         float opacity = opacityPercentage / 100f;
 
-        float x1 = tile.drawx(), y1 = tile.drawy(),
-        x2 = target.drawx(), y2 = target.drawy();
-
         float angle1 = Angles.angle(x1, y1, x2, y2);
-        t1.trns(angle1, tile.block().size * tilesize / 2f - 1.5f);
-        t2.trns(angle1 + 180f, target.block().size * tilesize / 2f - 1.5f);
+        t1.trns(angle1, size1 * tilesize / 2f - 1.5f);
+        t2.trns(angle1 + 180f, size2 * tilesize / 2f - 1.5f);
 
         x1 += t1.x;
         y1 += t1.y;
         x2 += t2.x;
         y2 += t2.y;
 
-        float fract = 1f - tile.entity.power().graph.getSatisfaction();
+        float fract = 1f - satisfaction;
 
         Draw.color(Color.white, Pal.powerLight, fract * 0.86f + Mathf.absin(3f, 0.1f));
         Draw.alpha(opacity);
