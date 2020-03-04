@@ -1,6 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import arc.math.*;
+import arc.util.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -23,12 +24,12 @@ public class BufferedItemBridge extends ExtendingItemBridge{
     public void updateTransport(Tile tile, Tile other){
         BufferedItemBridgeEntity entity = tile.ent();
 
-        if(entity.buffer.accepts() && entity.items.total() > 0){
-            entity.buffer.accept(entity.items.take());
+        if(entity.buffer.accepts() && entity.items().total() > 0){
+            entity.buffer.accept(entity.items().take());
         }
 
         Item item = entity.buffer.poll();
-        if(entity.timer.get(timerAccept, 4) && item != null && other.block().acceptItem(item, other, tile)){
+        if(entity.timer(timerAccept, 4) && item != null && other.block().acceptItem(item, other, tile)){
             entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
             other.block().handleItem(item, other, tile);
             entity.buffer.remove();
@@ -41,15 +42,15 @@ public class BufferedItemBridge extends ExtendingItemBridge{
         ItemBuffer buffer = new ItemBuffer(bufferCapacity, speed);
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            buffer.write(stream);
+        public void write(Writes write){
+            super.write(write);
+            buffer.write(write);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            buffer.read(stream);
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            buffer.read(read);
         }
     }
 }

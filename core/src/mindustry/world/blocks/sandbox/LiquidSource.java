@@ -1,24 +1,20 @@
 package mindustry.world.blocks.sandbox;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.g2d.*;
-import arc.scene.style.*;
-import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import arc.util.*;
+import arc.util.io.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import java.io.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.content;
 
 public class LiquidSource extends Block{
     public static Liquid lastLiquid;
@@ -53,9 +49,9 @@ public class LiquidSource extends Block{
         LiquidSourceEntity entity = tile.ent();
 
         if(entity.source == null){
-            tile.entity.liquids.clear();
+            tile.entity.liquids().clear();
         }else{
-            tile.entity.liquids.add(entity.source, liquidCapacity);
+            tile.entity.liquids().add(entity.source, liquidCapacity);
             tryDumpLiquid(tile, entity.source);
         }
     }
@@ -82,33 +78,14 @@ public class LiquidSource extends Block{
     public void buildConfiguration(Tile tile, Table table){
         LiquidSourceEntity entity = tile.ent();
 
-        Array<Liquid> items = content.liquids();
-
-        ButtonGroup<ImageButton> group = new ButtonGroup<>();
-        group.setMinCheckCount(0);
-        Table cont = new Table();
-
-        for(int i = 0; i < items.size; i++){
-            final int f = i;
-            ImageButton button = cont.addImageButton(Tex.clear, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).size(38).group(group).get();
-            button.changed(() -> {
-                tile.configure(button.isChecked() ? items.get(f).id : -1);
-                control.input.frag.config.hideConfig();
-                lastLiquid = items.get(f);
-            });
-            button.getStyle().imageUp = new TextureRegionDrawable(items.get(i).icon(Cicon.medium));
-            button.setChecked(entity.source == items.get(i));
-
-            if(i % 4 == 3){
-                cont.row();
-            }
-        }
-
-        table.add(cont);
+        ItemSelection.buildTable(table, content.liquids(), () -> entity.source, liquid -> {
+            lastLiquid = liquid;
+            tile.configure(liquid == null ? -1 : liquid.id);
+        });
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
+    public void configured(Tile tile, Playerc player, int value){
         tile.<LiquidSourceEntity>ent().source = value == -1 ? null : content.liquid(value);
     }
 
@@ -121,15 +98,15 @@ public class LiquidSource extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeByte(source == null ? -1 : source.id);
+        public void write(Writes write){
+            super.write(write);
+            write.b(source == null ? -1 : source.id);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            byte id = stream.readByte();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            byte id = read.b();
             source = id == -1 ? null : content.liquid(id);
         }
     }

@@ -22,7 +22,7 @@ public class GameOverDialog extends FloatingDialog{
     public void show(Team winner){
         this.winner = winner;
         show();
-        if(winner == player.getTeam()){
+        if(winner == player.team()){
             Events.fire(new WinEvent());
         }else{
             Events.fire(new LoseEvent());
@@ -62,7 +62,11 @@ public class GameOverDialog extends FloatingDialog{
                 t.row();
                 t.add(Core.bundle.format("stat.deconstructed", state.stats.buildingsDeconstructed));
                 t.row();
-                if(world.isZone() && !state.stats.itemsDelivered.isEmpty()){
+                if(control.saves.getCurrent() != null){
+                    t.add(Core.bundle.format("stat.playtime", control.saves.getCurrent().getPlayTime()));
+                    t.row();
+                }
+                if(state.isCampaign() && !state.stats.itemsDelivered.isEmpty()){
                     t.add("$stat.delivered");
                     t.row();
                     for(Item item : content.items()){
@@ -76,19 +80,19 @@ public class GameOverDialog extends FloatingDialog{
                     }
                 }
 
-                if(world.isZone()){
-                    RankResult result = state.stats.calculateRank(world.getZone(), state.launched);
+                if(state.hasSector()){
+                    RankResult result = state.stats.calculateRank(state.getSector(), state.launched);
                     t.add(Core.bundle.format("stat.rank", result.rank + result.modifier));
                     t.row();
                 }
             }).pad(12);
 
-            if(world.isZone()){
+            if(state.isCampaign()){
                 buttons.addButton("$continue", () -> {
                     hide();
                     state.set(State.menu);
                     logic.reset();
-                    ui.deploy.show();
+                    ui.planet.show();
                 }).size(130f, 60f);
             }else{
                 buttons.addButton("$menu", () -> {

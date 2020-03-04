@@ -2,6 +2,7 @@ package mindustry.maps.filters;
 
 import arc.struct.*;
 import arc.math.*;
+import arc.util.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
@@ -12,12 +13,17 @@ public class MedianFilter extends GenerateFilter{
     float percentile = 0.5f;
     IntArray blocks = new IntArray(), floors = new IntArray();
 
-    {
-        buffered = true;
-        options(
-            new SliderOption("radius", () -> radius, f -> radius = f, 1f, 12f),
-            new SliderOption("percentile", () -> percentile, f -> percentile = f, 0f, 1f)
+    @Override
+    public FilterOption[] options(){
+        return Structs.arr(
+        new SliderOption("radius", () -> radius, f -> radius = f, 1f, 12f),
+        new SliderOption("percentile", () -> percentile, f -> percentile = f, 0f, 1f)
         );
+    }
+
+    @Override
+    public boolean isBuffered(){
+        return true;
     }
 
     @Override

@@ -7,8 +7,6 @@ import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -17,15 +15,15 @@ import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
-public class Tile implements Position, TargetTrait{
+public class Tile implements Position{
     /** Tile traversal cost. */
     public byte cost = 1;
     /** Tile entity, usually null. */
-    public TileEntity entity;
+    public Tilec entity;
     public short x, y;
-    protected Block block;
-    protected Floor floor;
-    protected Floor overlay;
+    protected @NonNull Block block;
+    protected @NonNull Floor floor;
+    protected @NonNull Floor overlay;
     /** Rotation, 0-3. Also used to store offload location, in which case it can be any number.*/
     protected byte rotation;
     /** Team ordinal. */
@@ -37,15 +35,19 @@ public class Tile implements Position, TargetTrait{
         block = floor = overlay = (Floor)Blocks.air;
     }
 
-    public Tile(int x, int y, int floor, int overlay, int wall){
+    public Tile(int x, int y, Block floor, Block overlay, Block wall){
         this.x = (short)x;
         this.y = (short)y;
-        this.floor = (Floor)content.block(floor);
-        this.overlay = (Floor)content.block(overlay);
-        this.block = content.block(wall);
+        this.floor = (Floor)floor;
+        this.overlay = (Floor)overlay;
+        this.block = wall;
 
         //update entity and create it if needed
         changed();
+    }
+
+    public Tile(int x, int y, int floor, int overlay, int wall){
+        this(x, y, content.block(floor), content.block(overlay), content.block(wall));
     }
 
     /** Returns this tile's position as a {@link Pos}. */
@@ -121,7 +123,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean isDarkened(){
-        return block().solid && !block().synthetic() && block().fillsTile;
+        return block.solid && !block.synthetic() && block.fillsTile;
     }
 
     public @NonNull Floor floor(){
@@ -141,8 +143,7 @@ public class Tile implements Position, TargetTrait{
         return (T)block;
     }
 
-    @Override
-    public Team getTeam(){
+    public Team team(){
         return Team.get(link().team);
     }
 
@@ -174,10 +175,13 @@ public class Tile implements Position, TargetTrait{
         changed();
     }
 
-    /**This resets the overlay!*/
+    /** This resets the overlay! */
     public void setFloor(@NonNull Floor type){
         this.floor = type;
         this.overlay = (Floor)Blocks.air;
+
+        recache();
+        block.onProximityUpdate(this);
     }
 
     /** Sets the floor, preserving overlay.*/
@@ -185,6 +189,19 @@ public class Tile implements Position, TargetTrait{
         Block overlay = this.overlay;
         setFloor(floor);
         setOverlay(overlay);
+    }
+
+    public void recache(){
+        if(!headless && !world.isGenerating()){
+            renderer.blocks.floor.recacheTile(this);
+            renderer.minimap.update(this);
+            for(int i = 0; i < 8; i++){
+                Tile other = world.tile(x + Geometry.d8[i].x, y + Geometry.d8[i].y);
+                if(other != null){
+                    renderer.blocks.floor.recacheTile(other);
+                }
+            }
+        }
     }
 
     public void remove(){
@@ -224,6 +241,16 @@ public class Tile implements Position, TargetTrait{
     /** set()-s this tile, except it's synced across the network */
     public void setNet(Block block, Team team, int rotation){
         Call.setTile(this, block, team, rotation);
+    }
+
+    /** set()-s this tile, except it's synced across the network */
+    public void setFloorNet(Block floor, Block overlay){
+        Call.setFloor(this, floor, overlay);
+    }
+
+    /** set()-s this tile, except it's synced across the network */
+    public void setFloorNet(Block floor){
+        setFloorNet(floor, Blocks.air);
     }
 
     public byte rotation(){
@@ -280,7 +307,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean isEnemyCheat(){
-        return getTeam() == state.rules.waveTeam && state.rules.enemyCheat;
+        return team() == state.rules.waveTeam && state.rules.enemyCheat;
     }
 
     public boolean isLinked(){
@@ -384,7 +411,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean interactable(Team team){
-        return state.teams.canInteract(team, getTeam());
+        return state.teams.canInteract(team, team());
     }
 
     public @Nullable Item drop(){
@@ -440,9 +467,13 @@ public class Tile implements Position, TargetTrait{
     }
 
     protected void preChanged(){
-        block().removed(this);
+        block.removed(this);
         if(entity != null){
             entity.removeFromProximity();
+        }
+        //recache when static blocks get changed
+        if(block.isStatic()){
+            recache();
         }
         team = 0;
     }
@@ -457,12 +488,12 @@ public class Tile implements Position, TargetTrait{
 
         if(block.hasEntity()){
             entity = block.newEntity().init(this, block.update);
-            entity.cons = new ConsumeModule(entity);
-            if(block.hasItems) entity.items = new ItemModule();
-            if(block.hasLiquids) entity.liquids = new LiquidModule();
+            entity.cons(new ConsumeModule(entity));
+            if(block.hasItems) entity.items(new ItemModule());
+            if(block.hasLiquids) entity.liquids(new LiquidModule());
             if(block.hasPower){
-                entity.power = new PowerModule();
-                entity.power.graph.add(this);
+                entity.power(new PowerModule());
+                entity.power().graph.add(this);
             }
 
             if(!world.isGenerating()){
@@ -481,16 +512,11 @@ public class Tile implements Position, TargetTrait{
         updateOcclusion();
 
         world.notifyChanged(this);
-    }
 
-    @Override
-    public boolean isDead(){
-        return entity == null;
-    }
-
-    @Override
-    public Vec2 velocity(){
-        return Vec2.ZERO;
+        //recache when static block is added
+        if(block.isStatic()){
+            recache();
+        }
     }
 
     @Override
@@ -499,26 +525,22 @@ public class Tile implements Position, TargetTrait{
     }
 
     @Override
-    public void setX(float x){
-        throw new IllegalArgumentException("Tile position cannot change.");
-    }
-
-    @Override
     public float getY(){
         return drawy();
     }
 
     @Override
-    public void setY(float y){
-        throw new IllegalArgumentException("Tile position cannot change.");
-    }
-
-    @Override
     public String toString(){
-        return floor.name + ":" + block.name + ":" + overlay + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) + ":" + getTeam();
+        return floor.name + ":" + block.name + ":" + overlay + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) + ":" + team();
     }
 
     //remote utility methods
+
+    @Remote(called = Loc.server)
+    public static void setFloor(Tile tile, Block floor, Block overlay){
+        tile.setFloor(floor.asFloor());
+        tile.setOverlay(overlay);
+    }
 
     @Remote(called = Loc.server)
     public static void removeTile(Tile tile){
@@ -528,5 +550,22 @@ public class Tile implements Position, TargetTrait{
     @Remote(called = Loc.server)
     public static void setTile(Tile tile, Block block, Team team, int rotation){
         tile.set(block, team, rotation);
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void onTileDamage(Tile tile, float health){
+        if(tile.entity != null){
+            tile.entity.health(health);
+
+            if(tile.entity.damaged()){
+                indexer.notifyTileDamaged(tile.entity);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server)
+    public static void onTileDestroyed(Tile tile){
+        if(tile.entity == null) return;
+        tile.entity.killed();
     }
 }

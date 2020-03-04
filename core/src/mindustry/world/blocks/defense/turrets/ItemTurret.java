@@ -3,10 +3,11 @@ package mindustry.world.blocks.defense.turrets;
 import arc.*;
 import arc.struct.*;
 import arc.scene.ui.layout.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -46,14 +47,14 @@ public class ItemTurret extends CooledTurret{
             @Override
             public void build(Tile tile, Table table){
                 MultiReqImage image = new MultiReqImage();
-                content.items().each(i -> filter.get(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
+                content.items().each(i -> filter.get(i) && (!state.isCampaign() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
                     () -> tile.entity != null && !((ItemTurretEntity)tile.entity).ammo.isEmpty() && ((ItemEntry)tile.<ItemTurretEntity>ent().ammo.peek()).item == item)));
 
                 table.add(image).size(8 * 4);
             }
 
             @Override
-            public boolean valid(TileEntity entity){
+            public boolean valid(Tilec entity){
                 //valid when there's any ammo in the turret
                 return !((ItemTurretEntity)entity).ammo.isEmpty();
             }
@@ -86,7 +87,7 @@ public class ItemTurret extends CooledTurret{
     }
 
     @Override
-    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+    public int acceptStack(Item item, int amount, Tile tile, Teamc source){
         TurretEntity entity = tile.ent();
 
         BulletType type = ammo.get(item);
@@ -97,7 +98,7 @@ public class ItemTurret extends CooledTurret{
     }
 
     @Override
-    public void handleStack(Item item, int amount, Tile tile, Unit source){
+    public void handleStack(Item item, int amount, Tile tile, Teamc source){
         for(int i = 0; i < amount; i++){
             handleItem(item, tile, null);
         }
@@ -151,23 +152,23 @@ public class ItemTurret extends CooledTurret{
 
     public class ItemTurretEntity extends TurretEntity{
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeByte(ammo.size);
+        public void write(Writes write){
+            super.write(write);
+            write.b(ammo.size);
             for(AmmoEntry entry : ammo){
                 ItemEntry i = (ItemEntry)entry;
-                stream.writeByte(i.item.id);
-                stream.writeShort(i.amount);
+                write.b(i.item.id);
+                write.s(i.amount);
             }
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            byte amount = stream.readByte();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            byte amount = read.b();
             for(int i = 0; i < amount; i++){
-                Item item = Vars.content.item(stream.readByte());
-                short a = stream.readShort();
+                Item item = Vars.content.item(read.b());
+                short a = read.s();
                 totalAmmo += a;
                 ammo.add(new ItemEntry(item, a));
             }

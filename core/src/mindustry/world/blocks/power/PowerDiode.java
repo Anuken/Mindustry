@@ -2,6 +2,7 @@ package mindustry.world.blocks.power;
 
 import arc.Core;
 import arc.math.Mathf;
+import mindustry.entities.units.*;
 import mindustry.ui.Bar;
 import arc.util.Eachable;
 import mindustry.ui.Cicon;
@@ -10,7 +11,6 @@ import mindustry.world.Block;
 import arc.graphics.g2d.Draw;
 import mindustry.graphics.Pal;
 import arc.graphics.g2d.TextureRegion;
-import mindustry.entities.traits.BuilderTrait;
 
 public class PowerDiode extends Block{
     public TextureRegion arrow;
@@ -27,10 +27,10 @@ public class PowerDiode extends Block{
     public void update(Tile tile){
         super.update(tile);
 
-        if(tile.front() == null || tile.back() == null || !tile.back().block().hasPower || !tile.front().block().hasPower || tile.back().getTeam() != tile.front().getTeam()) return;
+        if(tile.front() == null || tile.back() == null || !tile.back().block().hasPower || !tile.front().block().hasPower || tile.back().team() != tile.front().team()) return;
 
-        PowerGraph backGraph = tile.back().entity.power.graph;
-        PowerGraph frontGraph = tile.front().entity.power.graph;
+        PowerGraph backGraph = tile.back().entity.power().graph;
+        PowerGraph frontGraph = tile.front().entity.power().graph;
         if(backGraph == frontGraph) return;
 
         // 0f - 1f of battery capacity in use
@@ -51,15 +51,15 @@ public class PowerDiode extends Block{
 
     // battery % of the graph on either side, defaults to zero
     public float bar(Tile tile){
-        return (tile != null && tile.block().hasPower) ? tile.entity.power.graph.getBatteryStored() / tile.entity.power.graph.getTotalBatteryCapacity() : 0f;
+        return (tile != null && tile.block().hasPower) ? tile.entity.power().graph.getBatteryStored() / tile.entity.power().graph.getTotalBatteryCapacity() : 0f;
     }
 
     @Override
     public void setBars(){
         super.setBars();
 
-        bars.add("back", entity -> new Bar("bar.input", Pal.powerBar, () -> bar(entity.tile.back())));
-        bars.add("front", entity -> new Bar("bar.output", Pal.powerBar, () -> bar(entity.tile.front())));
+        bars.add("back", entity -> new Bar("bar.input", Pal.powerBar, () -> bar(entity.tile().back())));
+        bars.add("front", entity -> new Bar("bar.output", Pal.powerBar, () -> bar(entity.tile().front())));
     }
 
     @Override
@@ -75,7 +75,7 @@ public class PowerDiode extends Block{
     }
 
     @Override
-    public void drawRequestRegion(BuilderTrait.BuildRequest req, Eachable<BuilderTrait.BuildRequest> list) {
+    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list) {
         TextureRegion reg = icon(Cicon.full);
         Draw.rect(icon(Cicon.full), req.drawx(), req.drawy(),
                 reg.getWidth() * req.animScale * Draw.scl,

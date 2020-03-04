@@ -1,7 +1,6 @@
 package mindustry.world.blocks.logic;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.Input.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -9,16 +8,15 @@ import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import arc.util.io.*;
 import arc.util.pooling.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -35,7 +33,7 @@ public class MessageBlock extends Block{
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
-    public static void setMessageBlockText(Player player, Tile tile, String text){
+    public static void setMessageBlockText(Playerc player, Tile tile, String text){
         if(!Units.canInteract(player, tile)) return;
         if(net.server() && text.length() > maxTextLength){
             throw new ValidateException(player, "Player has gone above text limit.");
@@ -98,7 +96,7 @@ public class MessageBlock extends Block{
     public void buildConfiguration(Tile tile, Table table){
         MessageBlockEntity entity = tile.ent();
 
-        table.addImageButton(Icon.pencilSmall, () -> {
+        table.addImageButton(Icon.pencil, () -> {
             if(mobile){
                 Core.input.getTextInput(new TextInput(){{
                     text = entity.message;
@@ -151,15 +149,15 @@ public class MessageBlock extends Block{
         public String[] lines = {""};
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeUTF(message);
+        public void write(Writes write){
+            super.write(write);
+            write.str(message);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            message = stream.readUTF();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            message = read.str();
         }
     }
 }

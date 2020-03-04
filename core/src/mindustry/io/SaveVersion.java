@@ -6,13 +6,10 @@ import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
-import mindustry.entities.*;
-import mindustry.entities.traits.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
+import mindustry.gen.*;
 import mindustry.maps.*;
-import mindustry.type.*;
 import mindustry.world.*;
 
 import java.io.*;
@@ -128,7 +125,7 @@ public abstract class SaveVersion extends SaveFileReader{
             if(tile.entity != null){
                 writeChunk(stream, true, out -> {
                     out.writeByte(tile.entity.version());
-                    tile.entity.write(out);
+                    tile.entity.writeAll(Writes.get(out));
                 });
             }else{
                 //write consecutive non-entity blocks
@@ -190,8 +187,8 @@ public abstract class SaveVersion extends SaveFileReader{
                 if(tile.entity != null){
                     try{
                         readChunk(stream, true, in -> {
-                            byte version = in.readByte();
-                            tile.entity.read(in, version);
+                            byte revision = in.readByte();
+                            tile.entity.readAll(Reads.get(in), revision);
                         });
                     }catch(Exception e){
                         throw new IOException("Failed to read tile entity of block: " + block, e);
@@ -228,30 +225,14 @@ public abstract class SaveVersion extends SaveFileReader{
             }
         }
 
-        //write entity chunk
-        int groups = 0;
+        stream.writeInt(Groups.sync.count(Entityc::serialize));
+        for(Syncc entity : Groups.sync){
+            if(!entity.serialize()) continue;
 
-        for(EntityGroup<?> group : entities.all()){
-            if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
-                groups++;
-            }
-        }
-
-        stream.writeByte(groups);
-
-        for(EntityGroup<?> group : entities.all()){
-            if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
-                stream.writeInt(group.size());
-                for(Entity entity : group.all()){
-                    SaveTrait save = (SaveTrait)entity;
-                    //each entity is a separate chunk.
-                    writeChunk(stream, true, out -> {
-                        out.writeByte(save.getTypeID().id);
-                        out.writeByte(save.version());
-                        save.writeSave(out);
-                    });
-                }
-            }
+            writeChunk(stream, true, out -> {
+                out.writeByte(entity.classId());
+                entity.write(Writes.get(out));
+            });
         }
     }
 
@@ -266,19 +247,14 @@ public abstract class SaveVersion extends SaveFileReader{
             }
         }
 
-        byte groups = stream.readByte();
-
-        for(int i = 0; i < groups; i++){
-            int amount = stream.readInt();
-            for(int j = 0; j < amount; j++){
-                //TODO throw exception on read fail
-                readChunk(stream, true, in -> {
-                    byte typeid = in.readByte();
-                    byte version = in.readByte();
-                    SaveTrait trait = (SaveTrait)content.<TypeID>getByID(ContentType.typeid, typeid).constructor.get();
-                    trait.readSave(in, version);
-                });
-            }
+        int amount = stream.readInt();
+        for(int j = 0; j < amount; j++){
+            readChunk(stream, true, in -> {
+                byte typeid = in.readByte();
+                Syncc sync = (Syncc)EntityMapping.map(typeid).get();
+                sync.read(Reads.get(in));
+                sync.add();
+            });
         }
     }
 

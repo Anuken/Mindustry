@@ -1,18 +1,17 @@
 package mindustry.world.blocks;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -21,8 +20,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.modules.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -55,10 +52,10 @@ public class BuildBlock extends Block{
 
     @Remote(called = Loc.server)
     public static void onDeconstructFinish(Tile tile, Block block, int builderID){
-        Team team = tile.getTeam();
-        Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
+        Team team = tile.team();
+        Fx.breakBlock.at(tile.drawx(), tile.drawy(), block.size);
+        Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, true));
         tile.remove();
-        Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, true));
         if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
     }
 
@@ -68,15 +65,15 @@ public class BuildBlock extends Block{
         float healthf = tile.entity == null ? 1f : tile.entity.healthf();
         tile.set(block, team, rotation);
         if(tile.entity != null){
-            tile.entity.health = block.health * healthf;
+            tile.entity.health(block.health * healthf);
         }
         //last builder was this local client player, call placed()
-        if(!headless && builderID == player.id){
+        if(!headless && builderID == player.id()){
             if(!skipConfig){
                 tile.block().playerPlaced(tile);
             }
         }
-        Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
+        Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
     }
 
     static boolean shouldPlay(){
@@ -107,7 +104,7 @@ public class BuildBlock extends Block{
         Call.onConstructFinish(tile, block, builderID, rotation, team, skipConfig);
         tile.block().placed(tile);
 
-        Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false));
+        Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, false));
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
     }
 
@@ -140,25 +137,24 @@ public class BuildBlock extends Block{
     }
 
     @Override
-    public void tapped(Tile tile, Player player){
+    public void tapped(Tile tile, Playerc player){
         BuildEntity entity = tile.ent();
 
         //if the target is constructible, begin constructing
-        if(entity.cblock != null){
-            if(player.buildWasAutoPaused && !player.isBuilding){
-                player.isBuilding = true;
+        if(!headless && entity.cblock != null){
+            if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
+                control.input.isBuilding = true;
             }
-            //player.clearBuilding();
-            player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.rotation(), entity.cblock), false);
+            player.builder().addBuild(new BuildRequest(tile.x, tile.y, tile.rotation(), entity.cblock), false);
         }
     }
 
     @Override
     public void onDestroyed(Tile tile){
-        Effects.effect(Fx.blockExplosionSmoke, tile);
+        Fx.blockExplosionSmoke.at(tile);
 
         if(!tile.floor().solid && !tile.floor().isLiquid){
-            RubbleDecal.create(tile.drawx(), tile.drawy(), size);
+            Effects.rubble(tile.drawx(), tile.drawy(), size);
         }
     }
 
@@ -218,7 +214,7 @@ public class BuildBlock extends Block{
         private float[] accumulator;
         private float[] totalAccumulator;
 
-        public boolean construct(Unit builder, @Nullable TileEntity core, float amount, boolean configured){
+        public boolean construct(Unitc builder, @Nullable Tilec core, float amount, boolean configured){
             if(cblock == null){
                 kill();
                 return false;
@@ -228,7 +224,7 @@ public class BuildBlock extends Block{
                 setConstruct(previous, cblock);
             }
 
-            float maxProgress = core == null ? amount : checkRequired(core.items, amount, false);
+            float maxProgress = core == null ? amount : checkRequired(core.items(), amount, false);
 
             for(int i = 0; i < cblock.requirements.length; i++){
                 int reqamount = Math.round(state.rules.buildCostMultiplier * cblock.requirements[i].amount);
@@ -236,22 +232,19 @@ public class BuildBlock extends Block{
                 totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * maxProgress, reqamount);
             }
 
-            maxProgress = core == null ? maxProgress : checkRequired(core.items, maxProgress, true);
+            maxProgress = core == null ? maxProgress : checkRequired(core.items(), maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
-
-            if(builder instanceof Player){
-                builderID = builder.getID();
-            }
+            builderID = builder.id();
 
             if(progress >= 1f || state.rules.infiniteResources){
-                constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
+                constructed(tile, cblock, builderID, tile.rotation(), builder.team(), configured);
                 return true;
             }
             return false;
         }
 
-        public void deconstruct(Unit builder, @Nullable TileEntity core, float amount){
+        public void deconstruct(Unitc builder, @Nullable Tilec core, float amount){
             float deconstructMultiplier = 0.5f;
 
             if(cblock != null){
@@ -272,8 +265,8 @@ public class BuildBlock extends Block{
 
                     if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
                         if(core != null){
-                            int accepting = core.tile.block().acceptStack(requirements[i].item, accumulated, core.tile, builder);
-                            core.tile.block().handleStack(requirements[i].item, accepting, core.tile, builder);
+                            int accepting = core.tile().block().acceptStack(requirements[i].item, accumulated, core.tile(), builder);
+                            core.tile().block().handleStack(requirements[i].item, accepting, core.tile(), builder);
                             accumulator[i] -= accepting;
                         }else{
                             accumulator[i] -= accumulated;
@@ -284,9 +277,7 @@ public class BuildBlock extends Block{
 
             progress = Mathf.clamp(progress - amount);
 
-            if(builder instanceof Player){
-                builderID = builder.getID();
-            }
+            builderID = builder.id();
 
             if(progress <= 0 || state.rules.infiniteResources){
                 Call.onDeconstructFinish(tile, this.cblock == null ? previous : this.cblock, builderID);
@@ -351,37 +342,37 @@ public class BuildBlock extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeFloat(progress);
-            stream.writeShort(previous == null ? -1 : previous.id);
-            stream.writeShort(cblock == null ? -1 : cblock.id);
+        public void write(Writes write){
+            super.write(write);
+            write.f(progress);
+            write.s(previous == null ? -1 : previous.id);
+            write.s(cblock == null ? -1 : cblock.id);
 
             if(accumulator == null){
-                stream.writeByte(-1);
+                write.b(-1);
             }else{
-                stream.writeByte(accumulator.length);
+                write.b(accumulator.length);
                 for(int i = 0; i < accumulator.length; i++){
-                    stream.writeFloat(accumulator[i]);
-                    stream.writeFloat(totalAccumulator[i]);
+                    write.f(accumulator[i]);
+                    write.f(totalAccumulator[i]);
                 }
             }
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            progress = stream.readFloat();
-            short pid = stream.readShort();
-            short rid = stream.readShort();
-            byte acsize = stream.readByte();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            progress = read.f();
+            short pid = read.s();
+            short rid = read.s();
+            byte acsize = read.b();
 
             if(acsize != -1){
                 accumulator = new float[acsize];
                 totalAccumulator = new float[acsize];
                 for(int i = 0; i < acsize; i++){
-                    accumulator[i] = stream.readFloat();
-                    totalAccumulator[i] = stream.readFloat();
+                    accumulator[i] = read.f();
+                    totalAccumulator[i] = read.f();
                 }
             }
 

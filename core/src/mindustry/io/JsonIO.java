@@ -5,7 +5,6 @@ import arc.util.serialization.Json.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -68,6 +67,19 @@ public class JsonIO{
         json.setIgnoreUnknownFields(true);
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
+
+        json.setSerializer(Sector.class, new Serializer<Sector>(){
+            @Override
+            public void write(Json json, Sector object, Class knownType){
+                json.writeValue(object.planet.name + "-" + object.id);
+            }
+
+            @Override
+            public Sector read(Json json, JsonValue jsonData, Class type){
+                String[] split = jsonData.asString().split("-");
+                return Vars.content.<Planet>getByName(ContentType.planet, split[0]).sectors.get(Integer.parseInt(split[1]));
+            }
+        });
 
         json.setSerializer(Zone.class, new Serializer<Zone>(){
             @Override

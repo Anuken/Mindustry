@@ -29,21 +29,17 @@ public class ContentLoader{
     private @Nullable Content lastAdded;
     private ObjectSet<Cons<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
-        new Fx(),
         new Items(),
         new StatusEffects(),
         new Liquids(),
         new Bullets(),
-        new Mechs(),
         new UnitTypes(),
         new Blocks(),
         new Loadouts(),
         new TechTree(),
-        new Zones(),
-        new TypeIDs(),
-
-        //these are not really content classes, but this makes initialization easier
-        new LegacyColorMapper(),
+        new Weathers(),
+        new Planets(),
+        new Zones()
     };
 
     public ContentLoader(){
@@ -135,13 +131,15 @@ public class ContentLoader{
             if(blocks().size > i){
                 int color = pixmap.getPixel(i, 0);
 
-                if(color == 0) continue;
+                if(color == 0 || color == 255) continue;
 
                 Block block = block(i);
-                Color.rgba8888ToColor(block.color, color);
+                Color.rgba8888ToColor(block.mapColor, color);
+                block.hasColor = true;
             }
         }
         pixmap.dispose();
+        ColorMapper.load();
     }
 
     public void dispose(){
@@ -234,6 +232,10 @@ public class ContentLoader{
         return (Block)getByID(ContentType.block, id);
     }
 
+    public Block block(String name){
+        return (Block)getByName(ContentType.block, name);
+    }
+
     public Array<Item> items(){
         return getBy(ContentType.item);
     }
@@ -264,5 +266,9 @@ public class ContentLoader{
 
     public Array<UnitType> units(){
         return getBy(ContentType.unit);
+    }
+
+    public Array<Planet> planets(){
+        return getBy(ContentType.planet);
     }
 }

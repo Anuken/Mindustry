@@ -1,31 +1,27 @@
 package mindustry.world.blocks.units;
 
-import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.EnumSet;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
+import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.entities.*;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
-import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import java.io.*;
 
 import static mindustry.Vars.*;
 
+//TODO remove
 public class MechPad extends Block{
-    public @NonNull Mech mech;
+    public @NonNull UnitType mech;
     public float buildTime = 60 * 5;
 
     public MechPad(String name){
@@ -46,13 +42,13 @@ public class MechPad extends Block{
     }
 
     @Remote(targets = Loc.both, called = Loc.server)
-    public static void onMechFactoryTap(Player player, Tile tile){
+    public static void onMechFactoryTap(Playerc player, Tile tile){
         if(player == null || tile == null || !(tile.block() instanceof MechPad) || !checkValidTap(tile, player)) return;
 
         MechFactoryEntity entity = tile.ent();
 
-        if(!entity.cons.valid()) return;
-        player.beginRespawning(entity);
+        if(!entity.consValid()) return;
+        //player.beginRespawning(entity);
         entity.sameMech = false;
     }
 
@@ -62,27 +58,27 @@ public class MechPad extends Block{
 
         MechFactoryEntity entity = tile.ent();
 
-        Effects.effect(Fx.spawn, entity);
+        Fx.spawn.at(entity);
 
         if(entity.player == null) return;
-        Mech mech = ((MechPad)tile.block()).mech;
-        boolean resetSpawner = !entity.sameMech && entity.player.mech == mech;
-        entity.player.mech = !entity.sameMech && entity.player.mech == mech ? Mechs.starter : mech;
+        //Mech mech = ((MechPad)tile.block()).mech;
+        //boolean resetSpawner = !entity.sameMech && entity.player.mech == mech;
+        //entity.player.mech = !entity.sameMech && entity.player.mech == mech ? UnitTypes.starter : mech;
 
-        Player player = entity.player;
+        Playerc player = entity.player;
 
-        entity.progress = 0;
-        entity.player.onRespawn(tile);
-        if(resetSpawner) entity.player.lastSpawner = null;
-        entity.player = null;
+        //entity.progress = 0;
+        //entity.player.onRespawn(tile);
+        //if(resetSpawner) entity.player.lastSpawner = null;
+        //entity.player = null;
 
-        Events.fire(new MechChangeEvent(player, player.mech));
+        //Events.fire(new MechChangeEvent(player, player.mech));
     }
 
-    protected static boolean checkValidTap(Tile tile, Player player){
+    protected static boolean checkValidTap(Tile tile, Playerc player){
         MechFactoryEntity entity = tile.ent();
-        return !player.isDead() && tile.interactable(player.getTeam()) && Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize &&
-        Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize && entity.cons.valid() && entity.player == null;
+        return false;//!player.dead() && tile.interactable(player.team()) && Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize &&
+        //Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize && entity.consValid() && entity.player == null;
     }
 
     @Override
@@ -96,14 +92,15 @@ public class MechPad extends Block{
     }
 
     @Override
-    public void tapped(Tile tile, Player player){
+    public void tapped(Tile tile, Playerc player){
         MechFactoryEntity entity = tile.ent();
 
         if(checkValidTap(tile, player)){
             Call.onMechFactoryTap(player, tile);
-        }else if(player.isLocal && mobile && !player.isDead() && entity.cons.valid() && entity.player == null){
+        }else if(player.isLocal() && mobile && !player.dead() && entity.consValid() && entity.player == null){
             //deselect on double taps
-            player.moveTarget = player.moveTarget == tile.entity ? null : tile.entity;
+            //TODO remove
+            //player.moveTarget = player.moveTarget == tile.entity ? null : tile.entity;
         }
     }
 
@@ -112,7 +109,8 @@ public class MechPad extends Block{
         MechFactoryEntity entity = tile.ent();
 
         if(entity.player != null){
-            RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.player, (!entity.sameMech && entity.player.mech == mech ? Mechs.starter : mech));
+            //TODO remove
+            //RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.player, (!entity.sameMech && entity.player.mech == mech ? UnitTypes.starter : mech));
         }
     }
 
@@ -135,43 +133,27 @@ public class MechPad extends Block{
         }
     }
 
-    public class MechFactoryEntity extends TileEntity implements SpawnerTrait{
-        Player player;
+    public class MechFactoryEntity extends TileEntity{
+        Playerc player;
         boolean sameMech;
         float progress;
         float time;
         float heat;
 
         @Override
-        public boolean hasUnit(Unit unit){
-            return unit == player;
+        public void write(Writes write){
+            super.write(write);
+            write.f(progress);
+            write.f(time);
+            write.f(heat);
         }
 
         @Override
-        public void updateSpawning(Player unit){
-            if(player == null){
-                progress = 0f;
-                player = unit;
-                sameMech = true;
-
-                player.beginRespawning(this);
-            }
-        }
-
-        @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeFloat(progress);
-            stream.writeFloat(time);
-            stream.writeFloat(heat);
-        }
-
-        @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            progress = stream.readFloat();
-            time = stream.readFloat();
-            heat = stream.readFloat();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            progress = read.f();
+            time = read.f();
+            heat = read.f();
         }
     }
 }

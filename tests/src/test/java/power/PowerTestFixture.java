@@ -1,6 +1,7 @@
 package power;
 
 import arc.*;
+import arc.mock.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.*;
 
 import java.lang.reflect.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 /**
  * This class provides objects commonly used by power related unit tests.
@@ -26,8 +27,11 @@ public class PowerTestFixture{
 
     @BeforeAll
     static void initializeDependencies(){
+        headless = true;
         Core.graphics = new FakeGraphics();
+        Core.files = new MockFiles();
         Vars.state = new GameState();
+        Vars.tree = new FileTree();
         Vars.content = new ContentLoader(){
             @Override
             public void handleMappableContent(MappableContent content){
@@ -87,24 +91,24 @@ public class PowerTestFixture{
 
             // Simulate the "changed" method. Calling it through reflections would require half the game to be initialized.
             tile.entity = block.newEntity().init(tile, false);
-            tile.entity.cons = new ConsumeModule(tile.entity);
-            if(block.hasItems) tile.entity.items = new ItemModule();
-            if(block.hasLiquids) tile.entity.liquids = new LiquidModule();
+            tile.entity.cons(new ConsumeModule(tile.entity));
+            if(block.hasItems) tile.entity.items(new ItemModule());
+            if(block.hasLiquids) tile.entity.liquids(new LiquidModule());
             if(block.hasPower){
-                tile.entity.power = new PowerModule();
-                tile.entity.power.graph = new PowerGraph(){
+                tile.entity.power(new PowerModule());
+                tile.entity.power().graph = new PowerGraph(){
                     //assume there's always something consuming power
                     @Override
                     public float getUsageFraction(){
                         return 1f;
                     }
                 };
-                tile.entity.power.graph.add(tile);
+                tile.entity.power().graph.add(tile);
             }
 
             // Assign incredibly high health so the block does not get destroyed on e.g. burning Blast Compound
             block.health = 100000;
-            tile.entity.health = 100000.0f;
+            tile.entity.health(100000.0f);
 
             return tile;
         }catch(Exception ex){

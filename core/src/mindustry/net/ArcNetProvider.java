@@ -21,7 +21,7 @@ import static mindustry.Vars.*;
 
 public class ArcNetProvider implements NetProvider{
     final Client client;
-    final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[256], 256);
+    final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[512], 512);
 
     final Server server;
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();

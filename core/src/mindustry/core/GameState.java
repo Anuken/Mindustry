@@ -1,11 +1,13 @@
 package mindustry.core;
 
 import arc.*;
-import mindustry.entities.type.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.type.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.net;
 
 public class GameState{
     /** Current wave number, can be anything in non-wave modes. */
@@ -25,13 +27,27 @@ public class GameState{
     /** Current game state. */
     private State state = State.menu;
 
-    public BaseUnit boss(){
-        return unitGroup.find(u -> u.isBoss() && u.getTeam() == rules.waveTeam);
+    public Unitc boss(){
+        return Groups.unit.find(u -> u.isBoss() && u.team() == rules.waveTeam);
     }
 
     public void set(State astate){
         Events.fire(new StateChangeEvent(state, astate));
         state = astate;
+    }
+
+    /** Note that being in a campaign does not necessarily mean having a sector. */
+    public boolean isCampaign(){
+        return rules.sector != null || rules.region != null;
+    }
+
+    public boolean hasSector(){
+        return rules.sector != null;
+    }
+
+    @Nullable
+    public Sector getSector(){
+        return rules.sector;
     }
 
     public boolean isEditor(){

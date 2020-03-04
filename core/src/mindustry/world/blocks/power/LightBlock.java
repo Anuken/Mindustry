@@ -4,7 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.entities.type.*;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -52,7 +52,7 @@ public class LightBlock extends Block{
     public void buildConfiguration(Tile tile, Table table){
         LightEntity entity = tile.ent();
 
-        table.addImageButton(Icon.pencilSmall, () -> {
+        table.addImageButton(Icon.pencil, () -> {
             ui.picker.show(Tmp.c1.set(entity.color).a(0.5f), false, res -> {
                 entity.color = res.rgba();
                 lastColor = entity.color;
@@ -62,7 +62,7 @@ public class LightBlock extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
+    public void configured(Tile tile, Playerc player, int value){
         tile.<LightEntity>ent().color = value;
     }
 
@@ -81,15 +81,15 @@ public class LightBlock extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeInt(color);
+        public void write(Writes write){
+            super.write(write);
+            write.i(color);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            color = stream.readInt();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            color = read.i();
         }
     }
 }

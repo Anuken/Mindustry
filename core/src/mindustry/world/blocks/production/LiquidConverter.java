@@ -35,7 +35,7 @@ public class LiquidConverter extends GenericCrafter{
     @Override
     public void drawLight(Tile tile){
         if(hasLiquids && drawLiquidLight && outputLiquid.liquid.lightColor.a > 0.001f){
-            drawLiquidLight(tile, outputLiquid.liquid, tile.entity.liquids.get(outputLiquid.liquid));
+            drawLiquidLight(tile, outputLiquid.liquid, tile.entity.liquids().get(outputLiquid.liquid));
         }
     }
 
@@ -44,14 +44,14 @@ public class LiquidConverter extends GenericCrafter{
         GenericCrafterEntity entity = tile.ent();
         ConsumeLiquidBase cl = consumes.get(ConsumeType.liquid);
 
-        if(tile.entity.cons.valid()){
-            float use = Math.min(cl.amount * entity.delta(), liquidCapacity - entity.liquids.get(outputLiquid.liquid)) * entity.efficiency();
+        if(tile.entity.cons().valid()){
+            float use = Math.min(cl.amount * entity.delta(), liquidCapacity - entity.liquids().get(outputLiquid.liquid)) * entity.efficiency();
 
             useContent(tile, outputLiquid.liquid);
             entity.progress += use / cl.amount / craftTime;
-            entity.liquids.add(outputLiquid.liquid, use);
+            entity.liquids().add(outputLiquid.liquid, use);
             if(entity.progress >= 1f){
-                entity.cons.trigger();
+                entity.consume();
                 entity.progress = 0f;
             }
         }

@@ -1,9 +1,10 @@
 package mindustry.net;
 
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.core.*;
-import mindustry.entities.type.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.maps.Map;
 import mindustry.net.Administration.*;
@@ -16,7 +17,7 @@ import static mindustry.Vars.*;
 
 public class NetworkIO{
 
-    public static void writeWorld(Player player, OutputStream os){
+    public static void writeWorld(Playerc player, OutputStream os){
 
         try(DataOutputStream stream = new DataOutputStream(os)){
             stream.writeUTF(JsonIO.write(state.rules));
@@ -25,8 +26,8 @@ public class NetworkIO{
             stream.writeInt(state.wave);
             stream.writeFloat(state.wavetime);
 
-            stream.writeInt(player.id);
-            player.write(stream);
+            stream.writeInt(player.id());
+            player.write(Writes.get(stream));
 
             SaveIO.getSaveWriter().writeContentHeader(stream);
             SaveIO.getSaveWriter().writeMap(stream);
@@ -45,11 +46,11 @@ public class NetworkIO{
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();
 
-            entities.clear();
+            Groups.all.clear();
             int id = stream.readInt();
-            player.resetNoAdd();
-            player.read(stream);
-            player.resetID(id);
+            player.reset();
+            player.read(Reads.get(stream));
+            player.id(id);
             player.add();
 
             SaveIO.getSaveWriter().readContentHeader(stream);
@@ -62,21 +63,24 @@ public class NetworkIO{
     }
 
     public static ByteBuffer writeServerData(){
-        String name = (headless ? Config.name.string() : player.name);
+        String name = (headless ? Config.name.string() : player.name());
+        String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
         String map = world.getMap() == null ? "None" : world.getMap().name();
 
-        ByteBuffer buffer = ByteBuffer.allocate(256);
+        ByteBuffer buffer = ByteBuffer.allocate(512);
 
         writeString(buffer, name, 100);
         writeString(buffer, map);
 
-        buffer.putInt(playerGroup.size());
+        buffer.putInt(Groups.player.size());
         buffer.putInt(state.wave);
         buffer.putInt(Version.build);
         writeString(buffer, Version.type);
 
         buffer.put((byte)Gamemode.bestFit(state.rules).ordinal());
         buffer.putInt(netServer.admins.getPlayerLimit());
+
+        writeString(buffer, description, 100);
         return buffer;
     }
 
@@ -89,8 +93,9 @@ public class NetworkIO{
         String vertype = readString(buffer);
         Gamemode gamemode = Gamemode.all[buffer.get()];
         int limit = buffer.getInt();
+        String description = readString(buffer);
 
-        return new Host(host, hostAddress, map, wave, players, version, vertype, gamemode, limit);
+        return new Host(host, hostAddress, map, wave, players, version, vertype, gamemode, limit, description);
     }
 
     private static void writeString(ByteBuffer buffer, String string, int maxlen){

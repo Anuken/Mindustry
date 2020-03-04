@@ -1,6 +1,7 @@
 package mindustry.maps.filters;
 
 import arc.math.Mathf;
+import arc.util.*;
 import mindustry.content.Blocks;
 import mindustry.maps.filters.FilterOption.BlockOption;
 import mindustry.maps.filters.FilterOption.SliderOption;
@@ -13,8 +14,9 @@ public class TerrainFilter extends GenerateFilter{
     float scl = 40, threshold = 0.9f, octaves = 3f, falloff = 0.5f, magnitude = 1f, circleScl = 2.1f;
     Block floor = Blocks.stone, block = Blocks.rocks;
 
-    {
-        options(
+    @Override
+    public FilterOption[] options(){
+        return Structs.arr(
         new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
         new SliderOption("mag", () -> magnitude, f -> magnitude = f, 0f, 2f),
         new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),

@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
@@ -12,6 +11,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.SettingsDialog.SettingsTable.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
@@ -84,7 +84,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             t.defaults().size(270f, 60f).left();
             TextButtonStyle style = Styles.cleart;
 
-            t.addImageTextButton("$settings.cleardata", Icon.trash16Small, style, () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
+            t.addImageTextButton("$settings.cleardata", Icon.trash, style, () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
                 ObjectMap<String, Object> map = new ObjectMap<>();
                 for(String value : Core.settings.keys()){
                     if(value.contains("usid") || value.contains("uuid")){
@@ -104,7 +104,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.row();
 
-            t.addImageTextButton("$data.export", Icon.loadMapSmall, style, () -> {
+            t.addImageTextButton("$data.export", Icon.download, style, () -> {
                 if(ios){
                     Fi file = Core.files.local("mindustry-data-export.zip");
                     try{
@@ -128,7 +128,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.row();
 
-            t.addImageTextButton("$data.import", Icon.saveMapSmall, style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
+            t.addImageTextButton("$data.import", Icon.download, style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
                 try{
                     data.importData(file);
                     Core.app.exit();
@@ -144,9 +144,9 @@ public class SettingsMenuDialog extends SettingsDialog{
                 }
             })));
 
-            if(!ios){
+            if(!mobile){
                 t.row();
-                t.addImageTextButton("$data.openfolder", Icon.folderSmall, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath()));
+                t.addImageTextButton("$data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath()));
             }
         });
 
@@ -240,10 +240,17 @@ public class SettingsMenuDialog extends SettingsDialog{
             game.checkPref("buildautopause", false);
         }
 
-        if(steam && !Version.modifier.contains("beta")){
-            game.checkPref("publichost", false, i -> {
+        if(steam){
+            game.sliderPref("playerlimit", 16, 2, 32, i -> {
                 platform.updateLobby();
+                return i + "";
             });
+
+            if(!Version.modifier.contains("beta")){
+                game.checkPref("publichost", false, i -> {
+                    platform.updateLobby();
+                });
+            }
         }
 
         game.pref(new Setting(){
@@ -295,7 +302,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             if(Core.settings.getBool("borderlesswindow")){
                 Core.app.post(() -> Core.graphics.setUndecorated(true));
             }
-        }else{
+        }else if(!ios){
             graphics.checkPref("landscape", false, b -> {
                 if(b){
                     platform.beginForceLandscape();
@@ -323,7 +330,12 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(Shaders.shield != null){
             graphics.checkPref("animatedshields", !mobile);
         }
-        graphics.checkPref("bloom", !mobile, val -> renderer.toggleBloom(val));
+        if(!ios){
+            graphics.checkPref("bloom", !mobile, val -> renderer.toggleBloom(val));
+        }else{
+            Core.settings.put("bloom", false);
+        }
+
         graphics.checkPref("pixelate", false, val -> {
             if(val){
                 Events.fire(Trigger.enablePixelation);
@@ -362,7 +374,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     @Override
     public void addCloseButton(){
-        buttons.addImageTextButton("$back", Icon.arrowLeftSmaller, () -> {
+        buttons.addImageTextButton("$back", Icon.leftOpen, () -> {
             if(prefs.getChildren().first() != menu){
                 back();
             }else{

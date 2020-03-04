@@ -5,8 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
-import mindustry.entities.type.*;
-import mindustry.entities.type.Bullet;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.tilesize;
@@ -42,33 +41,36 @@ public class DeflectorWall extends Wall{
     }
 
     @Override
-    public void handleBulletHit(TileEntity entity, Bullet bullet){
+    public void handleBulletHit(Tilec entity, Bulletc bullet){
         super.handleBulletHit(entity, bullet);
 
+        //TODO fix and test
         //doesn't reflect powerful bullets
-        if(bullet.damage() > maxDamageDeflect || bullet.isDeflected()) return;
+        if(bullet.damage() > maxDamageDeflect) return;
 
-        float penX = Math.abs(entity.x - bullet.x), penY = Math.abs(entity.y - bullet.y);
+        float penX = Math.abs(entity.getX() - bullet.x()), penY = Math.abs(entity.getY() - bullet.y());
 
         bullet.hitbox(rect2);
 
-        Vec2 position = Geometry.raycastRect(bullet.x - bullet.velocity().x*Time.delta(), bullet.y - bullet.velocity().y*Time.delta(), bullet.x + bullet.velocity().x*Time.delta(), bullet.y + bullet.velocity().y*Time.delta(),
-        rect.setSize(size * tilesize + rect2.width*2 + rect2.height*2).setCenter(entity.x, entity.y));
+        Vec2 position = Geometry.raycastRect(bullet.x() - bullet.vel().x*Time.delta(), bullet.y() - bullet.vel().y*Time.delta(), bullet.x() + bullet.vel().x*Time.delta(), bullet.y() + bullet.vel().y*Time.delta(),
+        rect.setSize(size * tilesize + rect2.width*2 + rect2.height*2).setCenter(entity.getX(), entity.getY()));
 
         if(position != null){
             bullet.set(position.x, position.y);
         }
 
         if(penX > penY){
-            bullet.velocity().x *= -1;
+            bullet.vel().x *= -1;
         }else{
-            bullet.velocity().y *= -1;
+            bullet.vel().y *= -1;
         }
 
         //bullet.updateVelocity();
-        bullet.resetOwner(entity, entity.getTeam());
-        bullet.scaleTime(1f);
-        bullet.deflect();
+        bullet.owner(entity);
+        bullet.team(entity.team());
+        bullet.time(bullet.time() + 1f);
+        //TODO deflect
+        //bullet.deflect();
 
         ((DeflectorEntity)entity).hit = 1f;
     }

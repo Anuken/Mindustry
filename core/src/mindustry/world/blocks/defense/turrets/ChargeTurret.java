@@ -30,13 +30,13 @@ public class ChargeTurret extends PowerTurret{
         useAmmo(tile);
 
         tr.trns(entity.rotation, size * tilesize / 2);
-        Effects.effect(chargeBeginEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+        chargeBeginEffect.at(tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
 
         for(int i = 0; i < chargeEffects; i++){
             Time.run(Mathf.random(chargeMaxDelay), () -> {
                 if(!isTurret(tile)) return;
                 tr.trns(entity.rotation, size * tilesize / 2);
-                Effects.effect(chargeEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+                chargeEffect.at(tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
             });
         }
 

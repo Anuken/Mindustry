@@ -3,14 +3,15 @@ package mindustry.world.blocks.units;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
@@ -20,10 +21,10 @@ import mindustry.world.meta.*;
 
 import java.io.*;
 
-import static mindustry.Vars.indexer;
+import static mindustry.Vars.*;
 
 public class CommandCenter extends Block{
-    protected TextureRegion[] commandRegions = new TextureRegion[UnitCommand.all.length];
+    protected TextureRegionDrawable[] commandRegions = new TextureRegionDrawable[UnitCommand.all.length];
     protected Color topColor = Pal.command;
     protected Color bottomColor = Color.valueOf("5e5e5e");
     protected Effect effect = Fx.commandSend;
@@ -41,7 +42,7 @@ public class CommandCenter extends Block{
     @Override
     public void placed(Tile tile){
         super.placed(tile);
-        ObjectSet<Tile> set = indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter);
+        ObjectSet<Tile> set = indexer.getAllied(tile.team(), BlockFlag.comandCenter);
 
         if(set.size > 0){
             CommandCenterEntity entity = tile.ent();
@@ -54,10 +55,10 @@ public class CommandCenter extends Block{
     public void removed(Tile tile){
         super.removed(tile);
 
-        ObjectSet<Tile> set = indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter);
+        ObjectSet<Tile> set = indexer.getAllied(tile.team(), BlockFlag.comandCenter);
 
         if(set.size == 1){
-            Units.each(tile.getTeam(), u -> u.onCommand(UnitCommand.all[0]));
+            Groups.unit.each(t -> t.team() == tile.team(), u -> u.controller().command(UnitCommand.all[0]));
         }
     }
 
@@ -65,8 +66,10 @@ public class CommandCenter extends Block{
     public void load(){
         super.load();
 
-        for(UnitCommand cmd : UnitCommand.all){
-            commandRegions[cmd.ordinal()] = Core.atlas.find("icon-command-" + cmd.name() + "-small");
+        if(ui != null){
+            for(UnitCommand cmd : UnitCommand.all){
+                commandRegions[cmd.ordinal()] = ui.getIcon("command" + Strings.capitalize(cmd.name()));
+            }
         }
     }
 
@@ -75,12 +78,12 @@ public class CommandCenter extends Block{
         CommandCenterEntity entity = tile.ent();
         super.draw(tile);
 
-        float size = IconSize.small.size/4f;
+        float size = 6f;
 
         Draw.color(bottomColor);
-        Draw.rect(commandRegions[entity.command.ordinal()], tile.drawx(), tile.drawy() - 1, size, size);
+        Draw.rect(commandRegions[entity.command.ordinal()].getRegion(), tile.drawx(), tile.drawy() - 1, size, size);
         Draw.color(topColor);
-        Draw.rect(commandRegions[entity.command.ordinal()], tile.drawx(), tile.drawy(), size, size);
+        Draw.rect(commandRegions[entity.command.ordinal()].getRegion(), tile.drawx(), tile.drawy(), size, size);
         Draw.color();
     }
 
@@ -91,7 +94,7 @@ public class CommandCenter extends Block{
         Table buttons = new Table();
 
         for(UnitCommand cmd : UnitCommand.all){
-            buttons.addImageButton(Core.atlas.drawable("icon-command-" + cmd.name() + "-small"), Styles.clearToggleTransi, () -> tile.configure(cmd.ordinal()))
+            buttons.addImageButton(commandRegions[cmd.ordinal()], Styles.clearToggleTransi, () -> tile.configure(cmd.ordinal()))
             .size(44).group(group).update(b -> b.setChecked(entity.command == cmd));
         }
         table.add(buttons);
@@ -100,18 +103,18 @@ public class CommandCenter extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
+    public void configured(Tile tile, Playerc player, int value){
         UnitCommand command = UnitCommand.all[value];
-        Effects.effect(((CommandCenter)tile.block()).effect, tile);
+        ((CommandCenter)tile.block()).effect.at(tile);
 
-        for(Tile center : indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter)){
+        for(Tile center : indexer.getAllied(tile.team(), BlockFlag.comandCenter)){
             if(center.block() instanceof CommandCenter){
                 CommandCenterEntity entity = center.ent();
                 entity.command = command;
             }
         }
 
-        Units.each(tile.getTeam(), u -> u.onCommand(command));
+        Groups.unit.each(t -> t.team() == tile.team(), u -> u.controller().command(command));
         Events.fire(new CommandIssueEvent(tile, command));
     }
 
@@ -124,15 +127,15 @@ public class CommandCenter extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeByte(command.ordinal());
+        public void write(Writes write){
+            super.write(write);
+            write.b(command.ordinal());
         }
 
         @Override
-        public void read(DataInput stream, byte version) throws IOException{
-            super.read(stream, version);
-            command = UnitCommand.all[stream.readByte()];
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            command = UnitCommand.all[read.b()];
         }
     }
 }

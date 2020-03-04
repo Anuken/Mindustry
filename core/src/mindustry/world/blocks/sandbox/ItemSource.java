@@ -4,8 +4,9 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import arc.util.io.*;
+import mindustry.gen.*;
+import mindustry.entities.units.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -29,7 +30,7 @@ public class ItemSource extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
+    public void configured(Tile tile, Playerc player, int value){
         tile.<ItemSourceEntity>ent().outputItem = content.item(value);
     }
 
@@ -73,15 +74,15 @@ public class ItemSource extends Block{
         ItemSourceEntity entity = tile.ent();
         if(entity.outputItem == null) return;
 
-        entity.items.set(entity.outputItem, 1);
+        entity.items().set(entity.outputItem, 1);
         tryDump(tile, entity.outputItem);
-        entity.items.set(entity.outputItem, 0);
+        entity.items().set(entity.outputItem, 0);
     }
 
     @Override
     public void buildConfiguration(Tile tile, Table table){
         ItemSourceEntity entity = tile.ent();
-        ItemSelection.buildItemTable(table, () -> entity.outputItem, item -> {
+        ItemSelection.buildTable(table, content.items(), () -> entity.outputItem, item -> {
             lastItem = item;
             tile.configure(item == null ? -1 : item.id);
         });
@@ -101,15 +102,15 @@ public class ItemSource extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeShort(outputItem == null ? -1 : outputItem.id);
+        public void write(Writes write){
+            super.write(write);
+            write.s(outputItem == null ? -1 : outputItem.id);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            outputItem = content.item(stream.readShort());
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            outputItem = content.item(read.s());
         }
     }
 }

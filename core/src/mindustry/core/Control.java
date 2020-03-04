@@ -3,26 +3,25 @@ package mindustry.core;
 import arc.*;
 import arc.assets.*;
 import arc.audio.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
-import arc.math.geom.*;
 import arc.scene.ui.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Saves.*;
 import mindustry.gen.*;
 import mindustry.input.*;
+import mindustry.io.SaveIO.*;
 import mindustry.maps.Map;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-import mindustry.world.blocks.storage.*;
 
 import java.io.*;
 import java.text.*;
@@ -63,21 +62,19 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(PlayEvent.class, event -> {
-            player.setTeam(netServer.assignTeam(player, playerGroup.all()));
-            player.setDead(true);
+            player.team(netServer.assignTeam(player));
             player.add();
 
             state.set(State.playing);
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            Core.app.post(() -> Core.app.post(() -> {
-                if(net.active() && player.getClosestCore() != null){
-                    //set to closest core since that's where the player will probably respawn; prevents camera jumps
-                    Core.camera.position.set(player.isDead() ? player.getClosestCore() : player);
-                }else{
-                    //locally, set to player position since respawning occurs immediately
-                    Core.camera.position.set(player);
+            //TODO test this
+            app.post(() -> app.post(() -> {
+                //TODO 0,0 seems like a bad choice?
+                Tilec core = state.teams.closestCore(0, 0, player.team());
+                if(core != null){
+                    camera.position.set(core);
                 }
             }));
         });
@@ -105,12 +102,14 @@ public class Control implements ApplicationListener, Loadable{
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.onGameOver(event.winner);
+            //TODO set meta to indicate game over
+            /*
             if(state.rules.zone != null && !net.client()){
                 //remove zone save on game over
                 if(saves.getZoneSlot() != null && !state.rules.tutorial){
                     saves.getZoneSlot().delete();
                 }
-            }
+            }*/
         });
 
         //autohost for pvp maps
@@ -118,7 +117,7 @@ public class Control implements ApplicationListener, Loadable{
             if(state.rules.pvp && !net.active()){
                 try{
                     net.host(port);
-                    player.isAdmin = true;
+                    player.admin(true);
                 }catch(IOException e){
                     ui.showException("$server.error", e);
                     Core.app.post(() -> state.set(State.menu));
@@ -129,7 +128,7 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
 
         Events.on(BlockBuildEndEvent.class, e -> {
-            if(e.team == player.getTeam()){
+            if(e.team == player.team()){
                 if(e.breaking){
                     state.stats.buildingsDeconstructed++;
                 }else{
@@ -139,13 +138,13 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(BlockDestroyEvent.class, e -> {
-            if(e.tile.getTeam() == player.getTeam()){
+            if(e.tile.team() == player.team()){
                 state.stats.buildingsDestroyed++;
             }
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
-            if(e.unit.getTeam() != player.getTeam()){
+            if(e.unit.team() != player.team()){
                 state.stats.enemyUnitsDestroyed++;
             }
         });
@@ -163,22 +162,22 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(Trigger.newGame, () -> {
-            TileEntity core = player.getClosestCore();
+            Tilec core = player.closestCore();
 
             if(core == null) return;
 
             app.post(() -> ui.hudfrag.showLand());
             renderer.zoomIn(Fx.coreLand.lifetime);
-            app.post(() -> Effects.effect(Fx.coreLand, core.x, core.y, 0, core.block));
+            app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block()));
             Time.run(Fx.coreLand.lifetime, () -> {
-                Effects.effect(Fx.launch, core);
+                Fx.launch.at(core);
                 Effects.shake(5f, 5f, core);
             });
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
-            if(e.unit instanceof BaseUnit && world.isZone()){
-                data.unlockContent(((BaseUnit)e.unit).getType());
+            if(state.isCampaign()){
+                data.unlockContent(e.unit.type());
             }
         });
     }
@@ -204,11 +203,9 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     void createPlayer(){
-        player = new Player();
-        player.name = Core.settings.getString("name");
-        player.color.set(Core.settings.getInt("color-0"));
-        player.isLocal = true;
-        player.isMobile = mobile;
+        player = PlayerEntity.create();
+        player.name(Core.settings.getString("name"));
+        player.color().set(Core.settings.getInt("color-0"));
 
         if(mobile){
             input = new MobileInput();
@@ -239,7 +236,7 @@ public class Control implements ApplicationListener, Loadable{
             logic.reset();
             world.loadMap(map, rules);
             state.rules = rules;
-            state.rules.zone = null;
+            state.rules.sector = null;
             state.rules.editor = false;
             logic.play();
             if(settings.getBool("savecreate") && !world.isInvalidMap()){
@@ -249,27 +246,44 @@ public class Control implements ApplicationListener, Loadable{
         });
     }
 
-    public void playZone(Zone zone){
+    public void playSector(Sector sector){
         ui.loadAnd(() -> {
-            logic.reset();
-            net.reset();
-            world.loadGenerator(zone.generator);
-            zone.rules.get(state.rules);
-            state.rules.zone = zone;
-            for(TileEntity core : state.teams.playerCores()){
-                for(ItemStack stack : zone.getStartingItems()){
-                    core.items.add(stack.item, stack.amount);
+            ui.planet.hide();
+            SaveSlot slot = sector.save;
+            //TODO remove for persistent sector slots
+            slot = null;
+            if(slot != null){
+                try{
+                    net.reset();
+                    slot.load();
+                    state.rules.sector = sector;
+                    state.set(State.playing);
+                }catch(SaveException e){
+                    Log.err(e);
+                    ui.showErrorMessage("$save.corrupted");
+                    slot.delete();
+                    playSector(sector);
                 }
+                ui.planet.hide();
+            }else{
+                net.reset();
+                logic.reset();
+                world.loadSector(sector);
+                state.rules.sector = sector;
+                //TODO enable for lighting
+                //state.rules.lighting = true;
+                logic.play();
+                control.saves.saveSector(sector);
+                //TODO uncomment for efffect
+                //Events.fire(Trigger.newGame);
             }
-            state.set(State.playing);
-            state.wavetime = state.rules.waveSpacing;
-            control.saves.zoneSave();
-            logic.play();
-            Events.fire(Trigger.newGame);
         });
     }
 
     public void playTutorial(){
+        //TODO implement
+        ui.showInfo("death");
+        /*
         Zone zone = Zones.groundZero;
         ui.loadAnd(() -> {
             logic.reset();
@@ -277,8 +291,8 @@ public class Control implements ApplicationListener, Loadable{
 
             world.beginMapLoad();
 
-            world.createTiles(zone.generator.width, zone.generator.height);
-            zone.generator.generate(world.getTiles());
+            world.resize(zone.generator.width, zone.generator.height);
+            zone.generator.generate(world.tiles);
 
             Tile coreb = null;
 
@@ -294,7 +308,7 @@ public class Control implements ApplicationListener, Loadable{
 
             Geometry.circle(coreb.x, coreb.y, 10, (cx, cy) -> {
                 Tile tile = world.ltile(cx, cy);
-                if(tile != null && tile.getTeam() == state.rules.defaultTeam && !(tile.block() instanceof CoreBlock)){
+                if(tile != null && tile.team() == state.rules.defaultTeam && !(tile.block() instanceof CoreBlock)){
                     tile.remove();
                 }
             });
@@ -304,14 +318,15 @@ public class Control implements ApplicationListener, Loadable{
             world.endMapLoad();
 
             zone.rules.get(state.rules);
-            state.rules.zone = zone;
-            for(TileEntity core : state.teams.playerCores()){
+            //TODO assign zone!!
+            //state.rules.zone = zone;
+            for(Tilec core : state.teams.playerCores()){
                 for(ItemStack stack : zone.getStartingItems()){
-                    core.items.add(stack.item, stack.amount);
+                    core.items().add(stack.item, stack.amount);
                 }
             }
-            TileEntity core = state.teams.playerCores().first();
-            core.items.clear();
+            Tilec core = state.teams.playerCores().first();
+            core.items().clear();
 
             logic.play();
             state.rules.waveTimer = false;
@@ -319,7 +334,7 @@ public class Control implements ApplicationListener, Loadable{
             state.rules.buildCostMultiplier = 0.3f;
             state.rules.tutorial = true;
             Events.fire(Trigger.newGame);
-        });
+        });*/
     }
 
     public boolean isHighScore(){
@@ -433,10 +448,10 @@ public class Control implements ApplicationListener, Loadable{
         if(!state.is(State.menu)){
             input.update();
 
-            if(world.isZone()){
-                for(TileEntity tile : state.teams.cores(player.getTeam())){
+            if(state.isCampaign()){
+                for(Tilec tile : state.teams.cores(player.team())){
                     for(Item item : content.items()){
-                        if(tile.items.has(item)){
+                        if(tile.items().has(item)){
                             data.unlockContent(item);
                         }
                     }

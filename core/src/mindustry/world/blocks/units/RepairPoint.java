@@ -9,8 +9,7 @@ import arc.math.Mathf;
 import arc.math.geom.Rect;
 import arc.util.Time;
 import mindustry.entities.Units;
-import mindustry.entities.type.TileEntity;
-import mindustry.entities.type.Unit;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.Block;
 import mindustry.world.Tile;
@@ -96,7 +95,7 @@ public class RepairPoint extends Block{
             Draw.color(Color.valueOf("e8ffd7"));
             Drawf.laser(laser, laserEnd,
                 tile.drawx() + Angles.trnsx(ang, len), tile.drawy() + Angles.trnsy(ang, len),
-                entity.target.x, entity.target.y, entity.strength);
+                entity.target.x(), entity.target.y(), entity.strength);
             Draw.color();
         }
     }
@@ -111,11 +110,10 @@ public class RepairPoint extends Block{
         RepairPointEntity entity = tile.ent();
 
         boolean targetIsBeingRepaired = false;
-        if(entity.target != null && (entity.target.isDead() || entity.target.dst(tile) > repairRadius || entity.target.health >= entity.target.maxHealth())){
+        if(entity.target != null && (entity.target.dead() || entity.target.dst(tile) > repairRadius || entity.target.health() >= entity.target.maxHealth())){
             entity.target = null;
-        }else if(entity.target != null && entity.cons.valid()){
-            entity.target.health += repairSpeed * Time.delta() * entity.strength * entity.efficiency();
-            entity.target.clampHealth();
+        }else if(entity.target != null && entity.consValid()){
+            entity.target.heal(repairSpeed * Time.delta() * entity.strength * entity.efficiency());
             entity.rotation = Mathf.slerpDelta(entity.rotation, entity.angleTo(entity.target), 0.5f);
             targetIsBeingRepaired = true;
         }
@@ -126,10 +124,9 @@ public class RepairPoint extends Block{
             entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.07f * Time.delta());
         }
 
-        if(entity.timer.get(timerTarget, 20)){
+        if(entity.timer(timerTarget, 20)){
             rect.setSize(repairRadius * 2).setCenter(tile.drawx(), tile.drawy());
-            entity.target = Units.closest(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius,
-            unit -> unit.health < unit.maxHealth());
+            entity.target = Units.closest(tile.team(), tile.drawx(), tile.drawy(), repairRadius, Unitc::damaged);
         }
     }
 
@@ -141,7 +138,7 @@ public class RepairPoint extends Block{
     }
 
     public class RepairPointEntity extends TileEntity{
-        public Unit target;
+        public Unitc target;
         public float strength, rotation = 90;
     }
 }

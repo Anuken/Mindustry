@@ -1,12 +1,12 @@
 package mindustry.graphics;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
@@ -53,12 +53,9 @@ public class BlockRenderer implements Disposable{
 
             Draw.color(shadowColor);
 
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    Tile tile = world.rawTile(x, y);
-                    if(tile.block().hasShadow){
-                        Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
-                    }
+            for(Tile tile : world.tiles){
+                if(tile.block().hasShadow){
+                    Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                 }
             }
 
@@ -72,20 +69,12 @@ public class BlockRenderer implements Disposable{
             Core.graphics.clear(Color.white);
             Draw.proj().setOrtho(0, 0, fog.getWidth(), fog.getHeight());
 
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    Tile tile = world.rawTile(x, y);
-                    int edgeBlend = 2;
-                    float rot = tile.rotation();
-                    boolean fillable = (tile.block().solid && tile.block().fillsTile && !tile.block().synthetic());
-                    int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (world.width() - 1)), Math.abs(y - (world.height() - 1)))));
-                    if(edgeDst <= edgeBlend){
-                        rot = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), fillable ? rot : 0);
-                    }
-                    if(rot > 0 && (fillable || edgeDst <= edgeBlend)){
-                        Draw.color(0f, 0f, 0f, Math.min((rot + 0.5f) / 4f, 1f));
-                        Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
-                    }
+            for(Tile tile : world.tiles){
+                float darkness = world.getDarkness(tile.x, tile.y);
+
+                if(darkness > 0){
+                    Draw.color(0f, 0f, 0f, Math.min((darkness + 0.5f) / 4f, 1f));
+                    Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                 }
             }
 
@@ -134,7 +123,7 @@ public class BlockRenderer implements Disposable{
         }
 
         if(brokenFade > 0.001f){
-            for(BrokenBlock block : state.teams.get(player.getTeam()).brokenBlocks){
+            for(BrokenBlock block : state.teams.get(player.team()).brokenBlocks){
                 Block b = content.block(block.block);
                 if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset(), block.y * tilesize + b.offset()))) continue;
 
@@ -168,7 +157,6 @@ public class BlockRenderer implements Disposable{
             shadowEvents.clear();
 
             Draw.proj(camera.projection());
-            renderer.pixelator.rebind();
         }
 
         float ww = world.width() * tilesize, wh = world.height() * tilesize;
@@ -233,7 +221,7 @@ public class BlockRenderer implements Disposable{
                             addRequest(tile, block.layer2);
                         }
 
-                        if(tile.entity != null && tile.entity.power != null && tile.entity.power.links.size > 0){
+                        if(tile.entity != null && tile.entity.power() != null && tile.entity.power().links.size > 0){
                             for(Tile other : block.getPowerConnections(tile, outArray)){
                                 if(other.block().layer == Layer.power){
                                     addRequest(other, Layer.power);
@@ -275,7 +263,7 @@ public class BlockRenderer implements Disposable{
                 if(request.tile.entity != null && request.tile.entity.damaged()){
                     block.drawCracks(request.tile);
                 }
-                if(block.synthetic() && request.tile.getTeam() != player.getTeam()){
+                if(block.synthetic() && request.tile.team() != player.team()){
                     block.drawTeam(request.tile);
                 }
 

@@ -8,7 +8,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
-import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.*;
@@ -42,7 +41,7 @@ public class PlayerListFragment extends Fragment{
             });
 
             cont.table(Tex.buttonTrans, pane -> {
-                pane.label(() -> Core.bundle.format(playerGroup.size() == 1 ? "players.single" : "players", playerGroup.size()));
+                pane.label(() -> Core.bundle.format(Groups.player.size() == 1 ? "players.single" : "players", Groups.player.size()));
                 pane.row();
                 pane.pane(content).grow().get().setScrollingDisabled(true, false);
                 pane.row();
@@ -66,11 +65,11 @@ public class PlayerListFragment extends Fragment{
 
         float h = 74f;
 
-        playerGroup.all().sort(Structs.comparing(Unit::getTeam));
-        playerGroup.all().each(user -> {
-            NetConnection connection = user.con;
+        Groups.player.sort(Structs.comparing(Playerc::team));
+        Groups.player.each(user -> {
+            NetConnection connection = user.con();
 
-            if(connection == null && net.server() && !user.isLocal) return;
+            if(connection == null && net.server() && !user.isLocal()) return;
 
             Table button = new Table();
             button.left();
@@ -88,15 +87,16 @@ public class PlayerListFragment extends Fragment{
                 }
             };
             table.margin(8);
-            table.add(new Image(user.getIconRegion()).setScaling(Scaling.none)).grow();
+            //TODO dead players should have no region
+            table.add(new Image(user.unit().type().region).setScaling(Scaling.none)).grow();
 
             button.add(table).size(h);
-            button.labelWrap("[#" + user.color.toString().toUpperCase() + "]" + user.name).width(170f).pad(10);
+            button.labelWrap("[#" + user.color().toString().toUpperCase() + "]" + user.name()).width(170f).pad(10);
             button.add().grow();
 
-            button.addImage(Icon.admin).visible(() -> user.isAdmin && !(!user.isLocal && net.server())).padRight(5).get().updateVisibility();
+            button.addImage(Icon.admin).visible(() -> user.admin() && !(!user.isLocal() && net.server())).padRight(5).get().updateVisibility();
 
-            if((net.server() || player.isAdmin) && !user.isLocal && (!user.isAdmin || net.server())){
+            if((net.server() || player.admin()) && !user.isLocal() && (!user.admin() || net.server())){
                 button.add().growY();
 
                 float bs = (h) / 2f;
@@ -104,42 +104,42 @@ public class PlayerListFragment extends Fragment{
                 button.table(t -> {
                     t.defaults().size(bs);
 
-                    t.addImageButton(Icon.banSmall, Styles.clearPartiali,
+                    t.addImageButton(Icon.hammer, Styles.clearPartiali,
                     () -> ui.showConfirm("$confirm", "$confirmban", () -> Call.onAdminRequest(user, AdminAction.ban)));
-                    t.addImageButton(Icon.cancelSmall, Styles.clearPartiali,
+                    t.addImageButton(Icon.cancel, Styles.clearPartiali,
                     () -> ui.showConfirm("$confirm", "$confirmkick", () -> Call.onAdminRequest(user, AdminAction.kick)));
 
                     t.row();
 
-                    t.addImageButton(Icon.adminSmall, Styles.clearTogglePartiali, () -> {
+                    t.addImageButton(Icon.admin, Styles.clearTogglePartiali, () -> {
                         if(net.client()) return;
 
-                        String id = user.uuid;
+                        String id = user.uuid();
 
                         if(netServer.admins.isAdmin(id, connection.address)){
                             ui.showConfirm("$confirm", "$confirmunadmin", () -> netServer.admins.unAdminPlayer(id));
                         }else{
-                            ui.showConfirm("$confirm", "$confirmadmin", () -> netServer.admins.adminPlayer(id, user.usid));
+                            ui.showConfirm("$confirm", "$confirmadmin", () -> netServer.admins.adminPlayer(id, user.usid()));
                         }
                     })
-                    .update(b -> b.setChecked(user.isAdmin))
+                    .update(b -> b.setChecked(user.admin()))
                     .disabled(b -> net.client())
                     .touchable(() -> net.client() ? Touchable.disabled : Touchable.enabled)
-                    .checked(user.isAdmin);
+                    .checked(user.admin());
 
-                    t.addImageButton(Icon.zoomSmall, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
+                    t.addImageButton(Icon.zoom, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
-            }else if((!user.isLocal && !user.isAdmin) && net.client() && playerGroup.size() >= 3 && player.getTeam() != user.getTeam()){ //votekick
+            }else if(!user.isLocal() && !user.admin() && net.client() && Groups.player.size() >= 3 && player.team() == user.team()){ //votekick
                 button.add().growY();
 
-                button.addImageButton(Icon.banSmall, Styles.clearPartiali,
-                () -> ui.showConfirm("$confirm", "$confirmvotekick", () -> Call.sendChatMessage("/votekick " + user.name))).size(h);
+                button.addImageButton(Icon.hammer, Styles.clearPartiali,
+                () -> ui.showConfirm("$confirm", "$confirmvotekick", () -> Call.sendChatMessage("/votekick " + user.name()))).size(h);
             }
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
             content.row();
-            content.addImage().height(4f).color(state.rules.pvp ? user.getTeam().color : Pal.gray).growX();
+            content.addImage().height(4f).color(state.rules.pvp ? user.team().color : Pal.gray).growX();
             content.row();
         });
 

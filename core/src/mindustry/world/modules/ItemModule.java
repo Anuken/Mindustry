@@ -1,9 +1,9 @@
 package mindustry.world.modules;
 
+import arc.util.io.*;
 import mindustry.type.Item;
 import mindustry.type.ItemStack;
 
-import java.io.*;
 import java.util.Arrays;
 
 import static mindustry.Vars.content;
@@ -11,6 +11,9 @@ import static mindustry.Vars.content;
 public class ItemModule extends BlockModule{
     private int[] items = new int[content.items().size];
     private int total;
+
+    // Make the take() loop persistent so it does not return the same item twice in a row unless there is nothing else to return.
+    protected int takeRotation;
 
     public void forEach(ItemConsumer cons){
         for(int i = 0; i < items.length; i++){
@@ -66,12 +69,24 @@ public class ItemModule extends BlockModule{
         return total;
     }
 
-    public Item take(){
+    public Item first(){
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
-                items[i]--;
-                total--;
                 return content.item(i);
+            }
+        }
+        return null;
+    }
+
+    public Item take(){
+        for(int i = 0; i < items.length; i++){
+            int index = (i + takeRotation);
+            if(index >= items.length) index -= items.length;
+            if(items[index] > 0){
+                items[index] --;
+                total --;
+                takeRotation = index + 1;
+                return content.item(index);
             }
         }
         return null;
@@ -115,32 +130,32 @@ public class ItemModule extends BlockModule{
     }
 
     @Override
-    public void write(DataOutput stream) throws IOException{
+    public void write(Writes write){
         byte amount = 0;
         for(int item : items){
             if(item > 0) amount++;
         }
 
-        stream.writeByte(amount); //amount of items
+        write.b(amount); //amount of items
 
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
-                stream.writeByte(i); //item ID
-                stream.writeInt(items[i]); //item amount
+                write.b(i); //item ID
+                write.i(items[i]); //item amount
             }
         }
     }
 
     @Override
-    public void read(DataInput stream) throws IOException{
+    public void read(Reads read){
         //just in case, reset items
         Arrays.fill(items, 0);
-        byte count = stream.readByte();
+        byte count = read.b();
         total = 0;
 
         for(int j = 0; j < count; j++){
-            int itemid = stream.readByte();
-            int itemamount = stream.readInt();
+            int itemid = read.b();
+            int itemamount = read.i();
             items[content.item(itemid).id] = itemamount;
             total += itemamount;
         }

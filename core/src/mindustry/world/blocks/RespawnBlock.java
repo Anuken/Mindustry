@@ -2,7 +2,7 @@ package mindustry.world.blocks;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -12,7 +12,7 @@ import static mindustry.Vars.net;
 
 public class RespawnBlock{
     
-    public static void drawRespawn(Tile tile, float heat, float progress, float time, Player player, Mech to){
+    public static void drawRespawn(Tile tile, float heat, float progress, float time, Playerc player, UnitType to){
         progress = Mathf.clamp(progress);
 
         Draw.color(Pal.darkMetal);
@@ -67,7 +67,7 @@ public class RespawnBlock{
         Draw.reset();
 
         if(net.active() && player != null){
-            tile.block().drawPlaceText(player.name, tile.x, tile.y - (Math.max((tile.block().size-1)/2, 0)), true);
+            tile.block().drawPlaceText(player.name(), tile.x, tile.y - (Math.max((tile.block().size-1)/2, 0)), true);
         }
     }
 }

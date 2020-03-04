@@ -1,5 +1,6 @@
 package mindustry.game;
 
+import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import arc.struct.*;
 import arc.graphics.*;
@@ -56,8 +57,10 @@ public class Rules{
     public float bossWaveMultiplier = 3f;
     /** How many times longer a launch wave takes. */
     public float launchWaveMultiplier = 2f;
-    /** Zone for saves that have them.*/
-    public Zone zone;
+    /** Sector for saves that have them.*/
+    public @Nullable Sector sector;
+    /** Region that save is on. Indicates campaign.  */
+    public @Nullable MapRegion region;
     /** Spawn layout. */
     public Array<SpawnGroup> spawns = new Array<>();
     /** Determines if there should be limited respawns. */
@@ -74,6 +77,9 @@ public class Rules{
     public boolean tutorial = false;
     /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
     public boolean canGameOver = true;
+    /** Whether to draw shadows of blocks at map edges and static blocks.
+     * Do not change unless you know exactly what you are doing.*/
+    public boolean drawFog = true;
     /** Starting items put in cores */
     public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 100));
     /** Blocks that cannot be placed. */
@@ -82,6 +88,9 @@ public class Rules{
     public boolean lighting = false;
     /** Ambient light color, used when lighting is enabled. */
     public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
+    /** Multiplier for solar panel power output.
+    negative = use ambient light if lighting is enabled. */
+    public float solarPowerMultiplier = -1f;
     /** team of the player by default */
     public Team defaultTeam = Team.sharded;
     /** team of the enemy in waves/sectors */

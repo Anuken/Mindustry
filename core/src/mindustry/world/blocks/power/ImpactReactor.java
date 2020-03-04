@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -53,7 +54,7 @@ public class ImpactReactor extends PowerGenerator{
 
         bars.add("poweroutput", entity -> new Bar(() ->
         Core.bundle.format("bar.poweroutput",
-        Strings.fixed(Math.max(entity.block.getPowerProduction(entity.tile) - consumes.getPower().usage, 0) * 60 * entity.timeScale, 1)),
+        Strings.fixed(Math.max(entity.block().getPowerProduction(entity.tile()) - consumes.getPower().usage, 0) * 60 * entity.timeScale(), 1)),
         () -> Pal.powerBar,
         () -> ((GeneratorEntity)entity).productionEfficiency));
     }
@@ -71,7 +72,7 @@ public class ImpactReactor extends PowerGenerator{
     public void update(Tile tile){
         FusionReactorEntity entity = tile.ent();
 
-        if(entity.cons.valid() && entity.power.status >= 0.99f){
+        if(entity.consValid() && entity.power().status >= 0.99f){
             boolean prevOut = getPowerProduction(tile) <= consumes.getPower().requestedPower(entity);
 
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
@@ -83,8 +84,8 @@ public class ImpactReactor extends PowerGenerator{
                 Events.fire(Trigger.impactPower);
             }
 
-            if(entity.timer.get(timerUse, itemDuration / entity.timeScale)){
-                entity.cons.trigger();
+            if(entity.timer(timerUse, itemDuration / entity.timeScale())){
+                entity.consume();
             }
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.01f);
@@ -138,9 +139,9 @@ public class ImpactReactor extends PowerGenerator{
         Sounds.explosionbig.at(tile);
 
         Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
-        Effects.effect(Fx.impactShockwave, tile.worldx(), tile.worldy());
+        Fx.impactShockwave.at(tile.worldx(), tile.worldy());
         for(int i = 0; i < 6; i++){
-            Time.run(Mathf.random(80), () -> Effects.effect(Fx.impactcloud, tile.worldx(), tile.worldy()));
+            Time.run(Mathf.random(80), () -> Fx.impactcloud.at(tile.worldx(), tile.worldy()));
         }
 
         Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
@@ -149,14 +150,14 @@ public class ImpactReactor extends PowerGenerator{
         for(int i = 0; i < 20; i++){
             Time.run(Mathf.random(80), () -> {
                 Tmp.v1.rnd(Mathf.random(40f));
-                Effects.effect(Fx.explosion, Tmp.v1.x + tile.worldx(), Tmp.v1.y + tile.worldy());
+                Fx.explosion.at(Tmp.v1.x + tile.worldx(), Tmp.v1.y + tile.worldy());
             });
         }
 
         for(int i = 0; i < 70; i++){
             Time.run(Mathf.random(90), () -> {
                 Tmp.v1.rnd(Mathf.random(120f));
-                Effects.effect(Fx.impactsmoke, Tmp.v1.x + tile.worldx(), Tmp.v1.y + tile.worldy());
+                Fx.impactsmoke.at(Tmp.v1.x + tile.worldx(), Tmp.v1.y + tile.worldy());
             });
         }
     }
@@ -165,15 +166,15 @@ public class ImpactReactor extends PowerGenerator{
         public float warmup;
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeFloat(warmup);
+        public void write(Writes write){
+            super.write(write);
+            write.f(warmup);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            warmup = stream.readFloat();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            warmup = read.f();
         }
     }
 }

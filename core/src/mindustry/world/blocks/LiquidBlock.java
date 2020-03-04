@@ -36,7 +36,7 @@ public class LiquidBlock extends Block{
 
     @Override
     public void draw(Tile tile){
-        LiquidModule mod = tile.entity.liquids;
+        LiquidModule mod = tile.entity.liquids();
 
         int rotation = rotate ? tile.rotation() * 90 : 0;
 

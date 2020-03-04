@@ -1,28 +1,21 @@
 package mindustry.world.blocks.defense.turrets;
 
-import arc.Core;
+import arc.*;
 import arc.audio.*;
-import arc.struct.Array;
-import arc.struct.EnumSet;
-import arc.func.Cons2;
-import arc.graphics.Blending;
-import arc.graphics.Color;
+import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.Angles;
-import arc.math.Mathf;
-import arc.math.geom.Vec2;
-import arc.util.Time;
-import mindustry.content.Fx;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
+import arc.util.io.*;
+import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.Effect;
-import mindustry.entities.type.Bullet;
-import mindustry.entities.bullet.BulletType;
-import mindustry.entities.traits.TargetTrait;
-import mindustry.entities.type.TileEntity;
+import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.Block;
-import mindustry.world.Tile;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.tilesize;
@@ -133,7 +126,7 @@ public abstract class Turret extends Block{
 
     @Override
     public void drawSelect(Tile tile){
-        Drawf.dashCircle(tile.drawx(), tile.drawy(), range, tile.getTeam().color);
+        Drawf.dashCircle(tile.drawx(), tile.drawy(), range, tile.team().color);
     }
 
     @Override
@@ -152,7 +145,7 @@ public abstract class Turret extends Block{
 
         if(hasAmmo(tile)){
 
-            if(entity.timer.get(timerTarget, targetInterval)){
+            if(entity.timer(timerTarget, targetInterval)){
                 findTarget(tile);
             }
 
@@ -186,16 +179,16 @@ public abstract class Turret extends Block{
 
     protected boolean validateTarget(Tile tile){
         TurretEntity entity = tile.ent();
-        return !Units.invalidateTarget(entity.target, tile.getTeam(), tile.drawx(), tile.drawy());
+        return !Units.invalidateTarget(entity.target, tile.team(), tile.drawx(), tile.drawy());
     }
 
     protected void findTarget(Tile tile){
         TurretEntity entity = tile.ent();
 
         if(targetAir && !targetGround){
-            entity.target = Units.closestEnemy(tile.getTeam(), tile.drawx(), tile.drawy(), range, e -> !e.isDead() && e.isFlying());
+            entity.target = Units.closestEnemy(tile.team(), tile.drawx(), tile.drawy(), range, e -> !e.dead() && !e.isGrounded());
         }else{
-            entity.target = Units.closestTarget(tile.getTeam(), tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir) && (e.isFlying() || targetGround));
+            entity.target = Units.closestTarget(tile.team(), tile.drawx(), tile.drawy(), range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround));
         }
     }
 
@@ -269,7 +262,7 @@ public abstract class Turret extends Block{
     }
 
     protected void bullet(Tile tile, BulletType type, float angle){
-        Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
+        type.create(tile.entity, tile.team(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
     }
 
     protected void effects(Tile tile){
@@ -278,8 +271,8 @@ public abstract class Turret extends Block{
 
         TurretEntity entity = tile.ent();
 
-        Effects.effect(shootEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
-        Effects.effect(smokeEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+        shootEffect.at(tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+        smokeEffect.at(tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
         shootSound.at(tile, Mathf.random(0.9f, 1.1f));
 
         if(shootShake > 0){
@@ -293,7 +286,7 @@ public abstract class Turret extends Block{
         if(!isTurret(tile)) return;
         TurretEntity entity = tile.ent();
 
-        Effects.effect(ammoUseEffect, tile.drawx() - Angles.trnsx(entity.rotation, ammoEjectBack),
+        ammoUseEffect.at(tile.drawx() - Angles.trnsx(entity.rotation, ammoEjectBack),
         tile.drawy() - Angles.trnsy(entity.rotation, ammoEjectBack), entity.rotation);
     }
 
@@ -319,6 +312,27 @@ public abstract class Turret extends Block{
         public float recoil = 0f;
         public float heat;
         public int shots;
-        public TargetTrait target;
+        public Posc target;
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.f(reload);
+            write.f(rotation);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            if(revision == 1){
+                reload = read.f();
+                rotation = read.f();
+            }
+        }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
     }
 }

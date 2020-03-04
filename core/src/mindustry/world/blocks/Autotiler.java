@@ -4,7 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.entities.traits.BuilderTrait.*;
+import mindustry.entities.units.*;
 import mindustry.world.*;
 
 import java.util.*;
@@ -84,7 +84,7 @@ public interface Autotiler{
     default boolean blends(Tile tile, int rotation, int direction){
         Tile other = tile.getNearby(Mathf.mod(rotation - direction, 4));
         if(other != null) other = other.link();
-        return other != null && blends(tile, rotation, other.x, other.y, other.rotation(), other.block());
+        return other != null && other.team() == tile.team() && blends(tile, rotation, other.x, other.y, other.rotation(), other.block());
     }
 
     default boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){

@@ -1,21 +1,22 @@
 package mindustry.world.blocks;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
-import mindustry.entities.Effects.*;
+import mindustry.entities.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class Floor extends Block{
     /** number of different variant regions to use */
@@ -35,13 +36,13 @@ public class Floor extends Block{
     /** Effect displayed when drowning on this floor. */
     public Effect drownUpdateEffect = Fx.bubble;
     /** Status effect applied when walking on. */
-    public StatusEffect status = StatusEffects.none;
+    public @NonNull StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect. */
     public float statusDuration = 60f;
     /** liquids that drop from this block, used for pumps */
-    public Liquid liquidDrop = null;
+    public @Nullable Liquid liquidDrop = null;
     /** item that drops from this block, used for drills */
-    public Item itemDrop = null;
+    public @Nullable Item itemDrop = null;
     /** whether this block can be drowned in */
     public boolean isLiquid;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
@@ -52,6 +53,14 @@ public class Floor extends Block{
     public Effect updateEffect = Fx.none;
     /** Array of affinities to certain things. */
     public Attributes attributes = new Attributes();
+    /** Whether this ore generates in maps by default. */
+    public boolean oreDefault = false;
+    /** Ore generation params. */
+    public float oreScale = 24f, oreThreshold = 0.828f;
+    /** Wall variant of this block. May be Blocks.air if not found. */
+    public Block wall = Blocks.air;
+    /** Decoration block. Usually a rock. May be air. */
+    public Block decoration = Blocks.air;
 
     protected TextureRegion[][] edges;
     protected byte eq = 0;
@@ -85,6 +94,24 @@ public class Floor extends Block{
         }
         region = variantRegions[0];
         edgeRegion = Core.atlas.find("edge");
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(wall == Blocks.air){
+            wall = content.block(name + "Rocks");
+            if(wall == null) wall = content.block(name + "rocks");
+            if(wall == null) wall = content.block(name.replace("darksand", "dune") + "rocks");
+        }
+
+        //keep default value if not found...
+        if(wall == null) wall = Blocks.air;
+
+        if(decoration == Blocks.air){
+            decoration = content.blocks().min(b -> b instanceof Rock && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
+        }
     }
 
     @Override
@@ -192,7 +219,7 @@ public class Floor extends Block{
         for(int i = 0; i < 4; i++){
             Tile other = tile.getNearby(i);
             if(other != null && doEdge(other.floor(), sameLayer)){
-                Color color = other.floor().color;
+                Color color = other.floor().mapColor;
                 Draw.color(color.r, color.g, color.b, 1f);
                 Draw.rect(edgeRegion, tile.worldx(), tile.worldy(), i*90);
             }

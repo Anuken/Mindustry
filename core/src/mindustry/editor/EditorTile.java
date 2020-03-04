@@ -1,5 +1,6 @@
 package mindustry.editor;
 
+import arc.util.ArcAnnotate.*;
 import mindustry.content.Blocks;
 import mindustry.core.GameState.State;
 import mindustry.editor.DrawOperation.OpType;
@@ -13,7 +14,6 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.state;
 import static mindustry.Vars.ui;
 
-//TODO somehow remove or replace this class with a more flexible solution
 public class EditorTile extends Tile{
 
     public EditorTile(int x, int y, int floor, int overlay, int wall){
@@ -21,7 +21,7 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    public void setFloor(Floor type){
+    public void setFloor(@NonNull Floor type){
         if(state.is(State.playing)){
             super.setFloor(type);
             return;
@@ -140,10 +140,10 @@ public class EditorTile extends Tile{
 
         if(block.hasEntity()){
             entity = block.newEntity().init(this, false);
-            entity.cons = new ConsumeModule(entity);
-            if(block.hasItems) entity.items = new ItemModule();
-            if(block.hasLiquids) entity.liquids = new LiquidModule();
-            if(block.hasPower) entity.power = new PowerModule();
+            entity.cons(new ConsumeModule(entity));
+            if(block.hasItems) entity.items(new ItemModule());
+            if(block.hasLiquids) entity.liquids(new LiquidModule());
+            if(block.hasPower) entity.power(new PowerModule());
         }
     }
 

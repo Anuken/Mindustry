@@ -8,8 +8,9 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import arc.util.io.*;
+import mindustry.gen.*;
+import mindustry.entities.units.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -45,7 +46,7 @@ public class ItemBridge extends Block{
     }
 
     @Override
-    public void configured(Tile tile, Player player, int value){
+    public void configured(Tile tile, Playerc player, int value){
         tile.<ItemBridgeEntity>ent().link = value;
     }
 
@@ -187,7 +188,7 @@ public class ItemBridge extends Block{
         }else{
             ((ItemBridgeEntity)world.tile(entity.link).entity).incoming.add(tile.pos());
 
-            if(entity.cons.valid() && Mathf.zero(1f - entity.efficiency())){
+            if(entity.consValid() && Mathf.zero(1f - entity.efficiency())){
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
@@ -200,14 +201,14 @@ public class ItemBridge extends Block{
     public void updateTransport(Tile tile, Tile other){
         ItemBridgeEntity entity = tile.ent();
 
-        if(entity.uptime >= 0.5f && entity.timer.get(timerTransport, transportTime)){
-            Item item = entity.items.take();
+        if(entity.uptime >= 0.5f && entity.timer(timerTransport, transportTime)){
+            Item item = entity.items().take();
             if(item != null && other.block().acceptItem(item, other, tile)){
                 other.block().handleItem(item, other, tile);
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
             }else{
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 1f, 0.01f);
-                if(item != null) entity.items.add(item, 1);
+                if(item != null) entity.items().add(item, 1);
             }
         }
     }
@@ -255,7 +256,7 @@ public class ItemBridge extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        if(tile.getTeam() != source.getTeam()) return false;
+        if(tile.team() != source.team()) return false;
 
         ItemBridgeEntity entity = tile.ent();
         Tile other = world.tile(entity.link);
@@ -266,10 +267,10 @@ public class ItemBridge extends Block{
 
             if(rel == rel2) return false;
         }else{
-            return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>ent().link == tile.pos() && tile.entity.items.total() < itemCapacity;
+            return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>ent().link == tile.pos() && tile.entity.items().total() < itemCapacity;
         }
 
-        return tile.entity.items.total() < itemCapacity;
+        return tile.entity.items().total() < itemCapacity;
     }
 
 
@@ -301,7 +302,7 @@ public class ItemBridge extends Block{
 
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        if(tile.getTeam() != source.getTeam() || !hasLiquids) return false;
+        if(tile.team() != source.team() || !hasLiquids) return false;
 
         ItemBridgeEntity entity = tile.ent();
         Tile other = world.tile(entity.link);
@@ -315,7 +316,7 @@ public class ItemBridge extends Block{
             return false;
         }
 
-        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f);
+        return tile.entity.liquids().get(liquid) + amount < liquidCapacity && (tile.entity.liquids().current() == liquid || tile.entity.liquids().get(tile.entity.liquids().current()) < 0.2f);
     }
 
     @Override
@@ -375,27 +376,27 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeInt(link);
-            stream.writeFloat(uptime);
-            stream.writeByte(incoming.size);
+        public void write(Writes write){
+            super.write(write);
+            write.i(link);
+            write.f(uptime);
+            write.b(incoming.size);
 
             IntSetIterator it = incoming.iterator();
 
             while(it.hasNext){
-                stream.writeInt(it.next());
+                write.i(it.next());
             }
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            link = stream.readInt();
-            uptime = stream.readFloat();
-            byte links = stream.readByte();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            link = read.i();
+            uptime = read.f();
+            byte links = read.b();
             for(int i = 0; i < links; i++){
-                incoming.add(stream.readInt());
+                incoming.add(read.i());
             }
         }
     }

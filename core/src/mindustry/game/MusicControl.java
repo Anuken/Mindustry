@@ -48,7 +48,7 @@ public class MusicControl{
     public void update(){
         if(state.is(State.menu)){
             silenced = false;
-            if(ui.deploy.isShown()){
+            if(ui.planet.isShown()){
                 play(Musics.launch);
             }else if(ui.editor.isShown()){
                 play(Musics.editor);
@@ -83,7 +83,7 @@ public class MusicControl{
 
     /** Whether to play dark music.*/
     private boolean isDark(){
-        if(state.teams.get(player.getTeam()).hasCore() && state.teams.get(player.getTeam()).core().healthf() < 0.85f){
+        if(state.teams.get(player.team()).hasCore() && state.teams.get(player.team()).core().healthf() < 0.85f){
             //core damaged -> dark
             return true;
         }
@@ -100,6 +100,8 @@ public class MusicControl{
     /** Plays and fades in a music track. This must be called every frame.
      * If something is already playing, fades out that track and fades in this new music.*/
     private void play(@Nullable Music music){
+        if(!shouldPlay()) return;
+
         //update volume of current track
         if(current != null){
             current.setVolume(fade * Core.settings.getInt("musicvol") / 100f);
@@ -143,7 +145,7 @@ public class MusicControl{
 
     /** Plays a music track once and only once. If something is already playing, does nothing.*/
     private void playOnce(Music music){
-        if(current != null || music == null) return; //do not interrupt already-playing tracks
+        if(current != null || music == null || !shouldPlay()) return; //do not interrupt already-playing tracks
 
         //save last random track played to prevent duplicates
         lastRandomPlayed = music;
@@ -160,6 +162,10 @@ public class MusicControl{
             }
         });
         current.play();
+    }
+
+    private boolean shouldPlay(){
+        return Core.settings.getInt("musicvol") > 0;
     }
 
     /** Fades out the current track, unless it has already been silenced. */

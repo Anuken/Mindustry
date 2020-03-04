@@ -1,6 +1,6 @@
 package mindustry.world;
 
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.game.Team;
 import mindustry.world.modules.*;
 
@@ -15,7 +15,7 @@ public class CachedTile extends Tile{
     }
 
     @Override
-    public Team getTeam(){
+    public Team team(){
         return Team.get(getTeamID());
     }
 
@@ -32,13 +32,13 @@ public class CachedTile extends Tile{
         Block block = block();
 
         if(block.hasEntity()){
-            TileEntity n = block.newEntity();
-            n.cons = new ConsumeModule(entity);
-            n.tile = this;
-            n.block = block;
-            if(block.hasItems) n.items = new ItemModule();
-            if(block.hasLiquids) n.liquids = new LiquidModule();
-            if(block.hasPower) n.power = new PowerModule();
+            Tilec n = block.newEntity();
+            n.cons(new ConsumeModule(entity));
+            n.tile(this);
+            n.block(block);
+            if(block.hasItems) n.items(new ItemModule());
+            if(block.hasLiquids) n.liquids(new LiquidModule());
+            if(block.hasPower) n.power(new PowerModule());
             entity = n;
         }
     }

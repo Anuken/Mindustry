@@ -1,30 +1,26 @@
 package mindustry.world.blocks.units;
 
 import arc.*;
-import mindustry.annotations.Annotations.Loc;
-import mindustry.annotations.Annotations.Remote;
-import arc.struct.EnumSet;
 import arc.graphics.g2d.*;
-import arc.math.Mathf;
-import mindustry.Vars;
-import mindustry.content.Fx;
-import mindustry.entities.Effects;
-import mindustry.entities.type.*;
+import arc.math.*;
+import arc.struct.*;
+import arc.util.io.*;
+import mindustry.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.game.EventType.*;
-import mindustry.gen.Call;
-import mindustry.graphics.Pal;
-import mindustry.graphics.Shaders;
+import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.ui.Bar;
-import mindustry.ui.Cicon;
-import mindustry.world.Block;
-import mindustry.world.Tile;
-import mindustry.world.consumers.ConsumeItems;
-import mindustry.world.consumers.ConsumeType;
+import mindustry.ui.*;
+import mindustry.world.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import java.io.*;
-import static mindustry.Vars.*;
+
+import static mindustry.Vars.net;
 
 public class UnitFactory extends Block{
     public UnitType unitType;
@@ -55,14 +51,13 @@ public class UnitFactory extends Block{
         entity.spawned = spawns;
 
         Effects.shake(2f, 3f, entity);
-        Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
+        Fx.producesmoke.at(tile.drawx(), tile.drawy());
 
         if(!net.client()){
-            BaseUnit unit = factory.unitType.create(tile.getTeam());
-            unit.setSpawner(tile);
+            Unitc unit = factory.unitType.create(tile.team());
             unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
             unit.add();
-            unit.velocity().y = factory.launchVelocity;
+            unit.vel().y = factory.launchVelocity;
             Events.fire(new UnitCreateEvent(unit));
         }
     }
@@ -109,7 +104,7 @@ public class UnitFactory extends Block{
     }
 
     @Override
-    public void unitRemoved(Tile tile, Unit unit){
+    public void unitRemoved(Tile tile, Unitc unit){
         UnitFactoryEntity entity = tile.ent();
         entity.spawned--;
         entity.spawned = Math.max(entity.spawned, 0);
@@ -159,7 +154,7 @@ public class UnitFactory extends Block{
             return;
         }
 
-        if(entity.cons.valid() || tile.isEnemyCheat()){
+        if(entity.consValid() || tile.isEnemyCheat()){
             entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier * entity.efficiency();
             entity.buildTime += entity.delta() * entity.efficiency() * Vars.state.rules.unitBuildSpeedMultiplier;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
@@ -173,7 +168,7 @@ public class UnitFactory extends Block{
             Call.onUnitFactorySpawn(tile, entity.spawned + 1);
             useContent(tile, unitType);
 
-            entity.cons.trigger();
+            entity.consume();
         }
     }
 
@@ -195,17 +190,17 @@ public class UnitFactory extends Block{
         int spawned;
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeFloat(buildTime);
-            stream.writeInt(spawned);
+        public void write(Writes write){
+            super.write(write);
+            write.f(buildTime);
+            write.i(spawned);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            buildTime = stream.readFloat();
-            spawned = stream.readInt();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            buildTime = read.f();
+            spawned = read.i();
         }
     }
 }

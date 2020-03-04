@@ -3,12 +3,12 @@ package mindustry.mod;
 import arc.*;
 import arc.assets.*;
 import arc.audio.*;
-import arc.audio.mock.*;
-import arc.struct.Array;
-import arc.struct.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.mock.*;
+import arc.struct.Array;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.serialization.*;
@@ -18,9 +18,8 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
-import mindustry.entities.Effects.*;
+import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.type.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
@@ -174,9 +173,11 @@ public class ContentParser{
             readBundle(ContentType.block, name, value);
 
             Block block;
+            boolean exists;
 
             if(locate(ContentType.block, name) != null){
                 block = locate(ContentType.block, name);
+                exists = true;
 
                 if(value.has("type")){
                     throw new IllegalArgumentException("When defining properties for an existing block, you must not re-declare its type. The original type will be used. Block: " + name);
@@ -184,6 +185,7 @@ public class ContentParser{
             }else{
                 //TODO generate dynamically instead of doing.. this
                 Class<? extends Block> type;
+                exists = false;
 
                 try{
                     type = resolve(getType(value),
@@ -250,12 +252,16 @@ public class ContentParser{
                 //add research tech node
                 if(research[0] != null){
                     Block parent = find(ContentType.block, research[0]);
-                    TechNode baseNode = TechTree.create(parent, block);
+                    TechNode baseNode = exists && TechTree.all.contains(t -> t.block == block) ? TechTree.all.find(t -> t.block == block) : TechTree.create(parent, block);
                     LoadedMod cur = currentMod;
 
                     postreads.add(() -> {
                         currentContent = block;
                         currentMod = cur;
+
+                        if(baseNode.parent != null){
+                            baseNode.parent.children.remove(baseNode);
+                        }
 
                         TechNode parnode = TechTree.all.find(t -> t.block == parent);
                         if(parnode == null){
@@ -264,7 +270,9 @@ public class ContentParser{
                         if(!parnode.children.contains(baseNode)){
                             parnode.children.add(baseNode);
                         }
+                        baseNode.parent = parnode;
                     });
+
                 }
 
                 //make block visible by default if there are requirements and no visibility set
@@ -278,10 +286,11 @@ public class ContentParser{
         ContentType.unit, (TypeParser<UnitType>)(mod, name, value) -> {
             readBundle(ContentType.unit, name, value);
 
+            //TODO fix
             UnitType unit;
             if(locate(ContentType.unit, name) == null){
-                Class<BaseUnit> type = resolve(legacyUnitMap.get(Strings.capitalize(getType(value)), getType(value)), "mindustry.entities.type.base");
-                unit = new UnitType(mod + "-" + name, supply(type));
+                Class<Unitc> type = resolve(legacyUnitMap.get(Strings.capitalize(getType(value)), getType(value)), "mindustry.entities.type.base");
+                unit = new UnitType(mod + "-" + name);
             }else{
                 unit = locate(ContentType.unit, name);
             }
@@ -293,7 +302,6 @@ public class ContentParser{
         },
         ContentType.item, parser(ContentType.item, Item::new),
         ContentType.liquid, parser(ContentType.liquid, Liquid::new),
-        ContentType.mech, parser(ContentType.mech, Mech::new),
         ContentType.zone, parser(ContentType.zone, Zone::new)
     );
 

@@ -1,11 +1,9 @@
 package mindustry.io;
 
-import arc.struct.ObjectMap;
-import arc.struct.ObjectMap.Entry;
-import arc.struct.StringMap;
-import arc.util.io.CounterInputStream;
-import arc.util.io.ReusableByteOutStream;
-import mindustry.world.WorldContext;
+import arc.struct.*;
+import arc.struct.ObjectMap.*;
+import arc.util.io.*;
+import mindustry.world.*;
 
 import java.io.*;
 
@@ -14,7 +12,9 @@ public abstract class SaveFileReader{
     protected final DataOutputStream dataBytes = new DataOutputStream(byteOutput);
     protected final ReusableByteOutStream byteOutputSmall = new ReusableByteOutStream();
     protected final DataOutputStream dataBytesSmall = new DataOutputStream(byteOutputSmall);
-    protected final ObjectMap<String, String> fallback = ObjectMap.of();
+    protected final ObjectMap<String, String> fallback = ObjectMap.of(
+        "dart-mech-pad", "dart-ship-pad"
+    );
 
     protected void region(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{
         counter.resetCount();

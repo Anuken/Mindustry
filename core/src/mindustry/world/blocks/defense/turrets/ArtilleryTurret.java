@@ -3,7 +3,6 @@ package mindustry.world.blocks.defense.turrets;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import mindustry.entities.Predict;
-import mindustry.entities.type.Bullet;
 import mindustry.entities.bullet.BulletType;
 import mindustry.world.Tile;
 
@@ -37,7 +36,7 @@ public class ArtilleryTurret extends ItemTurret{
         float maxTraveled = type.lifetime * type.speed;
 
         for(int i = 0; i < shots; i++){
-            Bullet.create(ammo, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y,
+            ammo.create(tile.entity, tile.team(), tile.drawx() + tr.x, tile.drawy() + tr.y,
             entity.rotation + Mathf.range(inaccuracy + type.inaccuracy), 1f + Mathf.range(velocityInaccuracy), (dst / maxTraveled));
         }
 

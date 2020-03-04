@@ -15,8 +15,11 @@ public class MirrorFilter extends GenerateFilter{
 
     int angle = 45;
 
-    {
-        options(new SliderOption("angle", () -> angle, f -> angle = (int)f, 0, 360, 45));
+    @Override
+    public FilterOption[] options(){
+        return Structs.arr(
+        new SliderOption("angle", () -> angle, f -> angle = (int)f, 0, 360, 45)
+        );
     }
 
     @Override

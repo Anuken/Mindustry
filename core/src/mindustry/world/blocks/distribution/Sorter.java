@@ -3,10 +3,11 @@ package mindustry.world.blocks.distribution;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import arc.util.*;
+import arc.util.io.*;
+import mindustry.gen.*;
+import mindustry.entities.units.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -14,7 +15,7 @@ import mindustry.world.meta.*;
 
 import java.io.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class Sorter extends Block{
     private static Item lastItem;
@@ -45,6 +46,14 @@ public class Sorter extends Block{
     }
 
     @Override
+    public void configured(Tile tile, Playerc player, int value){
+        tile.<SorterEntity>ent().sortItem = content.item(value);
+        if(!headless){
+            renderer.minimap.update(tile);
+        }
+    }
+
+    @Override
     public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
         drawRequestConfigCenter(req, (Item)req.config, "center");
     }
@@ -70,7 +79,7 @@ public class Sorter extends Block{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         Tile to = getTileTarget(item, tile, source, false);
 
-        return to != null && to.block().acceptItem(item, to, tile) && to.getTeam() == tile.getTeam();
+        return to != null && to.block().acceptItem(item, to, tile) && to.team() == tile.team();
     }
 
     @Override
@@ -81,7 +90,8 @@ public class Sorter extends Block{
     }
 
     boolean isSame(Tile tile, Tile other){
-        return other != null && other.block() instanceof Sorter;
+        //uncomment comment below to prevent sorter/gate chaining (hacky)
+        return other != null && (other.block() instanceof Sorter/* || other.block() instanceof OverflowGate */);
     }
 
     Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
@@ -128,7 +138,7 @@ public class Sorter extends Block{
     @Override
     public void buildConfiguration(Tile tile, Table table){
         SorterEntity entity = tile.ent();
-        ItemSelection.buildItemTable(table, () -> entity.sortItem, item -> {
+        ItemSelection.buildTable(table, content.items(), () -> entity.sortItem, item -> {
             lastItem = item;
             tile.configure(item == null ? -1 : item.id);
         });
@@ -153,17 +163,18 @@ public class Sorter extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeShort(sortItem == null ? -1 : sortItem.id);
+        public void write(Writes write){
+            super.write(write);
+            write.s(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            sortItem = content.item(stream.readShort());
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            sortItem = content.item(read.s());
+
             if(revision == 1){
-                new DirectionalItemBuffer(20, 45f).read(stream);
+                new DirectionalItemBuffer(20, 45f).read(read);
             }
         }
     }
