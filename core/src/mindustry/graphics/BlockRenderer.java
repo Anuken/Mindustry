@@ -282,7 +282,7 @@ public class BlockRenderer implements Disposable{
                 block.drawLight(request.tile);
             }else if(request.layer == block.layer){
                 block.drawLayer(request.tile);
-                // fixme: someday remove these 3 debugging lines
+                // fixme, someday remove these 3 sleep debug lines
                 Lines.stroke(1f, request.tile.entity.isSleeping() ? Color.red : Color.green);
                 Lines.circle(request.tile.drawx() + (tilesize/3f), request.tile.drawy() - (tilesize/3f), 0.5f);
                 Draw.reset();
