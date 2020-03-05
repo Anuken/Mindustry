@@ -153,8 +153,8 @@ public class CraterConveyor extends Block implements Autotiler{
         // reel in crater
         if(entity.reload > 0f) entity.reload = Mathf.clamp(entity.reload - speed, 0f, 1f);
 
-        // no crater means no logic
-        if(entity.from == Pos.invalid){
+        // sleep when idle
+        if(entity.from == Pos.invalid && entity.reload == 0f){
             tile.entity.sleep();
             return;
         }
