@@ -159,8 +159,10 @@ public class CraterConveyor extends Block implements Autotiler{
             return;
         }
 
+        if(entity.reload > 0f) return;
+
         // unload
-        if(entity.reload < 0.25f && entity.blendbit2 == 6 && entity.from != tile.pos()){
+        if(entity.blendbit2 == 6 && entity.from != tile.pos()){
             while(true) if(!tryDump(tile)) break; // unload as much as possible
             if(entity.items.total() == 0) poofOut(tile);
         }
@@ -168,7 +170,7 @@ public class CraterConveyor extends Block implements Autotiler{
         // transfer
         if(shouldLaunch(tile)){
             Tile destination = tile.front();
-            if(destination != null && destination.getTeam() == tile.getTeam() && entity.reload == 0 && destination.block() instanceof CraterConveyor){
+            if(destination != null && destination.getTeam() == tile.getTeam() && destination.block() instanceof CraterConveyor){
                 // update as to potentially make room
                 destination.block().update(destination);
 
