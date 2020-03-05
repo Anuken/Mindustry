@@ -734,8 +734,8 @@ public class Block extends BlockStorage{
     }
 
     public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
-        TextureRegion reg = icon(Cicon.full);
-        Draw.rect(icon(Cicon.full), req.drawx(), req.drawy(),
+        TextureRegion reg = getRequestRegion(req, list);
+        Draw.rect(reg, req.drawx(), req.drawy(),
             reg.getWidth() * req.animScale * Draw.scl,
             reg.getHeight() * req.animScale * Draw.scl,
             !rotate ? 0 : req.rotation * 90);
@@ -743,6 +743,10 @@ public class Block extends BlockStorage{
         if(req.hasConfig){
             drawRequestConfig(req, list);
         }
+    }
+
+    public TextureRegion getRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+        return icon(Cicon.full);
     }
 
     public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){

@@ -5,9 +5,11 @@ import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
@@ -52,12 +54,12 @@ public class Door extends Wall{
     @Override
     public void draw(Tile tile){
         DoorEntity entity = tile.ent();
+        Draw.rect(entity.open ? openRegion : region, tile.drawx(), tile.drawy());
+    }
 
-        if(!entity.open){
-            Draw.rect(region, tile.drawx(), tile.drawy());
-        }else{
-            Draw.rect(openRegion, tile.drawx(), tile.drawy());
-        }
+    @Override
+    public TextureRegion getRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+        return req.config == Boolean.TRUE ? openRegion : region;
     }
 
     @Override

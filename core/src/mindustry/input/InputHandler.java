@@ -159,6 +159,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    public static void onTileTapped(Playerc player, Tile tile){
+        if(tile == null || player == null) return;
+        if(net.server() && (!Units.canInteract(player, tile) ||
+        !netServer.admins.allowAction(player, ActionType.tapTile, tile, action -> {}))) throw new ValidateException(player, "Player cannot tap a tile.");
+        tile.block().tapped(tile, player);
+        Core.app.post(() -> Events.fire(new TapEvent(tile, player)));
+    }
+
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void onTileConfig(Playerc player, Tile tile, @Nullable Object value){
         if(tile == null) return;
@@ -583,7 +592,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         //call tapped event
         if(!consumed && tile.interactable(player.team())){
-            Call.onTileConfig(player, tile, null);
+            Call.onTileTapped(player, tile);
         }
 
         //consume tap event if necessary
