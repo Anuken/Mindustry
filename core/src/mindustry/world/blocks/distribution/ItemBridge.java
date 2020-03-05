@@ -200,8 +200,8 @@ public class ItemBridge extends Block{
 
         if(entity.uptime >= 0.5f && entity.timer(timerTransport, transportTime)){
             Item item = entity.items().take();
-            if(item != null && other.block().acceptItem(item, other, tile)){
-                other.block().handleItem(item, other, tile);
+            if(item != null && other.block().acceptItem(other, tile, item)){
+                other.block().handleItem(other, tile, item);
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
             }else{
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 1f, 0.01f);
@@ -252,7 +252,7 @@ public class ItemBridge extends Block{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
+    public boolean acceptItem(Tile tile, Tile source, Item item){
         if(tile.team() != source.team()) return false;
 
         ItemBridgeEntity entity = tile.ent();

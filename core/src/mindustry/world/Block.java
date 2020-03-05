@@ -1,8 +1,6 @@
 package mindustry.world;
 
 import arc.*;
-import arc.Graphics.*;
-import arc.Graphics.Cursor.*;
 import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -11,11 +9,11 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.Array;
 import arc.struct.EnumSet;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
@@ -26,17 +24,33 @@ import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
+import java.lang.reflect.*;
 import java.util.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.tilesize;
 
-public class Block extends BlockStorage{
+public class Block extends UnlockableContent{
     public static final int crackRegions = 8, maxCrackSize = 5;
+
+    public boolean hasItems;
+    public boolean hasLiquids;
+    public boolean hasPower;
+
+    public boolean outputsLiquid = false;
+    public boolean consumesPower = true;
+    public boolean outputsPower = false;
+
+    public int itemCapacity = 10;
+    public float liquidCapacity = 10f;
+    public float liquidPressure = 1f;
+
+    public final BlockStats stats = new BlockStats();
+    public final BlockBars bars = new BlockBars();
+    public final Consumers consumes = new Consumers();
 
     /** whether this block has a tile entity that updates */
     public boolean update;
@@ -140,12 +154,13 @@ public class Block extends BlockStorage{
     public boolean instantTransfer = false;
     public boolean alwaysUnlocked = false;
 
+    protected Prov<Tilec> entityType = null; //initialized later
     protected TextureRegion[] cacheRegions = {};
     protected Array<String> cacheRegionStrings = new Array<>();
-    protected Prov<Tilec> entityType = TileEntity::create;
-    protected ObjectMap<Class<?>, ConfigHandler> configurations = new ObjectMap<>();
+    protected ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
     protected Array<Tile> tempTiles = new Array<>();
+    protected Array<Tilec> tempTileEnts = new Array<>();
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] variantRegions, editorVariantRegions;
     protected TextureRegion region, editorIcon;
@@ -162,302 +177,6 @@ public class Block extends BlockStorage{
         this.solid = false;
     }
 
-    public boolean isAir(){
-        return id == 0;
-    }
-
-    public boolean canBreak(Tile tile){
-        return true;
-    }
-
-    public boolean isBuildable(){
-        return buildVisibility != BuildVisibility.hidden && buildVisibility != BuildVisibility.debugOnly;
-    }
-
-    public boolean isStatic(){
-        return cacheLayer == CacheLayer.walls;
-    }
-
-    public void onProximityRemoved(Tile tile){
-        if(tile.entity.power() != null){
-            tile.block().powerGraphRemoved(tile);
-        }
-    }
-
-    public void onProximityAdded(Tile tile){
-        if(tile.block().hasPower) tile.block().updatePowerGraph(tile);
-    }
-
-    protected void updatePowerGraph(Tile tile){
-        Tilec entity = tile.ent();
-
-        for(Tile other : getPowerConnections(tile, tempTiles)){
-            if(other.entity.power() != null){
-                other.entity.power().graph.add(entity.power().graph);
-            }
-        }
-    }
-
-    protected void powerGraphRemoved(Tile tile){
-        if(tile.entity == null || tile.entity.power() == null){
-            return;
-        }
-
-        tile.entity.power().graph.remove(tile);
-        for(int i = 0; i < tile.entity.power().links.size; i++){
-            Tile other = world.tile(tile.entity.power().links.get(i));
-            if(other != null && other.entity != null && other.entity.power() != null){
-                other.entity.power().links.removeValue(tile.pos());
-            }
-        }
-    }
-
-    public Array<Tile> getPowerConnections(Tile tile, Array<Tile> out){
-        out.clear();
-        if(tile == null || tile.entity == null || tile.entity.power() == null) return out;
-
-        for(Tile other : tile.entity.proximity()){
-            if(other != null && other.entity != null && other.entity.power() != null
-            && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
-            && !tile.entity.power().links.contains(other.pos())){
-                out.add(other);
-            }
-        }
-
-        for(int i = 0; i < tile.entity.power().links.size; i++){
-            Tile link = world.tile(tile.entity.power().links.get(i));
-            if(link != null && link.entity != null && link.entity.power() != null) out.add(link);
-        }
-        return out;
-    }
-
-    protected float getProgressIncrease(Tilec entity, float baseTime){
-        return 1f / baseTime * entity.delta() * entity.efficiency();
-    }
-
-    /** @return whether this block should play its active sound.*/
-    public boolean shouldActiveSound(Tile tile){
-        return false;
-    }
-
-    /** @return whether this block should play its idle sound.*/
-    public boolean shouldIdleSound(Tile tile){
-        return shouldConsume(tile);
-    }
-
-    public void drawLayer(Tile tile){
-    }
-
-    public void drawLayer2(Tile tile){
-    }
-
-    public void drawCracks(Tile tile){
-        if(!tile.entity.damaged() || size > maxCrackSize) return;
-        int id = tile.pos();
-        TextureRegion region = cracks[size - 1][Mathf.clamp((int)((1f - tile.entity.healthf()) * crackRegions), 0, crackRegions-1)];
-        Draw.colorl(0.2f, 0.1f + (1f - tile.entity.healthf())* 0.6f);
-        Draw.rect(region, tile.drawx(), tile.drawy(), (id%4)*90);
-        Draw.color();
-    }
-
-    /** Draw the block overlay that is shown when a cursor is over the block. */
-    public void drawSelect(Tile tile){
-    }
-
-    /** Drawn when you are placing a block. */
-    public void drawPlace(int x, int y, int rotation, boolean valid){
-    }
-
-    public float drawPlaceText(String text, int x, int y, boolean valid){
-        if(renderer.pixelator.enabled()) return 0;
-
-        Color color = valid ? Pal.accent : Pal.remove;
-        BitmapFont font = Fonts.outline;
-        GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
-        boolean ints = font.usesIntegerPositions();
-        font.setUseIntegerPositions(false);
-        font.getData().setScale(1f / 4f / Scl.scl(1f));
-        layout.setText(font, text);
-
-        float width = layout.width;
-
-        font.setColor(color);
-        float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 3;
-        font.draw(text, dx, dy + layout.height + 1, Align.center);
-        dy -= 1f;
-        Lines.stroke(2f, Color.darkGray);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
-        Lines.stroke(1f, color);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
-
-        font.setUseIntegerPositions(ints);
-        font.setColor(Color.white);
-        font.getData().setScale(1f);
-        Draw.reset();
-        Pools.free(layout);
-        return width;
-    }
-
-    public void draw(Tile tile){
-        Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation() * 90 : 0);
-    }
-
-    public void drawLight(Tile tile){
-        if(tile.entity != null && hasLiquids && drawLiquidLight && tile.entity.liquids().current().lightColor.a > 0.001f){
-            drawLiquidLight(tile, tile.entity.liquids().current(), tile.entity.liquids().smoothAmount());
-        }
-    }
-
-    public void drawLiquidLight(Tile tile, Liquid liquid, float amount){
-        if(amount > 0.01f){
-            Color color = liquid.lightColor;
-            float fract = 1f;
-            float opacity = color.a * fract;
-            if(opacity > 0.001f){
-                renderer.lights.add(tile.drawx(), tile.drawy(), size * 30f * fract, color, opacity);
-            }
-        }
-    }
-
-    public void drawTeam(Tile tile){
-        Draw.color(tile.team().color);
-        Draw.rect("block-border", tile.drawx() - size * tilesize / 2f + 4, tile.drawy() - size * tilesize / 2f + 4);
-        Draw.color();
-    }
-
-    /** Called after the block is placed by this client. */
-    @CallSuper
-    public void playerPlaced(Tile tile){
-
-    }
-
-    /** Called after the block is placed by anyone. */
-    @CallSuper
-    public void placed(Tile tile){
-        if(net.client()) return;
-
-        if((consumesPower && !outputsPower) || (!consumesPower && outputsPower)){
-            int range = 10;
-            tempTiles.clear();
-            Geometry.circle(tile.x, tile.y, range, (x, y) -> {
-                Tile other = world.ltile(x, y);
-                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile) && !PowerNode.insulated(other, tile) && !other.entity.proximity().contains(tile) &&
-                !(outputsPower && tile.entity.proximity().contains(p -> p.entity != null && p.entity.power() != null && p.entity.power().graph == other.entity.power().graph))){
-                    tempTiles.add(other);
-                }
-            });
-            tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
-            if(!tempTiles.isEmpty()){
-                Tile toLink = tempTiles.first();
-                if(!toLink.entity.power().links.contains(tile.pos())){
-                    toLink.configureAny(tile.pos());
-                }
-            }
-        }
-    }
-
-    public void removed(Tile tile){
-    }
-
-    /** Called every frame a unit is on this tile. */
-    public void unitOn(Tile tile, Unitc unit){
-    }
-
-    /** Called when a unit that spawned at this tile is removed. */
-    public void unitRemoved(Tile tile, Unitc unit){
-    }
-
-    /** Returns whether ot not this block can be place on the specified tile. */
-    public boolean canPlaceOn(Tile tile){
-        return true;
-    }
-
-    /** Call when some content is produced. This unlocks the content if it is applicable. */
-    public void useContent(Tile tile, UnlockableContent content){
-        //only unlocks content in zones
-        if(!headless && tile.team() == player.team() && state.isCampaign()){
-            logic.handleContent(content);
-        }
-    }
-
-    public float sumAttribute(Attribute attr, int x, int y){
-        Tile tile = world.tile(x, y);
-        if(tile == null) return 0;
-        float sum = 0;
-        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-            sum += other.floor().attributes.get(attr);
-        }
-        return sum;
-    }
-
-    public float percentSolid(int x, int y){
-        Tile tile = world.tile(x, y);
-        if(tile == null) return 0;
-        float sum = 0;
-        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-            sum += !other.floor.isLiquid ? 1f : 0f;
-        }
-        return sum / size / size;
-    }
-
-    @Override
-    public void displayInfo(Table table){
-        ContentDisplay.displayBlock(table, this);
-    }
-
-    @Override
-    public ContentType getContentType(){
-        return ContentType.block;
-    }
-
-    /** Called after all blocks are created. */
-    @Override
-    @CallSuper
-    public void init(){
-        //initialize default health based on size
-        if(health == -1){
-            health = size * size * 40;
-        }
-
-        buildCost = 0f;
-        for(ItemStack stack : requirements){
-            buildCost += stack.amount * stack.item.cost;
-        }
-        buildCost *= buildCostMultiplier;
-
-        if(consumes.has(ConsumeType.power)) hasPower = true;
-        if(consumes.has(ConsumeType.item)) hasItems = true;
-        if(consumes.has(ConsumeType.liquid)) hasLiquids = true;
-
-        setStats();
-        setBars();
-
-        consumes.init();
-
-        if(!outputsPower && consumes.hasPower() && consumes.getPower().buffered){
-            throw new IllegalArgumentException("Consumer using buffered power: " + name);
-        }
-    }
-
-    @Override
-    public void load(){
-        region = Core.atlas.find(name);
-
-        cacheRegions = new TextureRegion[cacheRegionStrings.size];
-        for(int i = 0; i < cacheRegions.length; i++){
-            cacheRegions[i] = Core.atlas.find(cacheRegionStrings.get(i));
-        }
-
-        if(cracks == null || (cracks[0][0].getTexture() != null && cracks[0][0].getTexture().isDisposed())){
-            cracks = new TextureRegion[maxCrackSize][crackRegions];
-            for(int size = 1; size <= maxCrackSize; size++){
-                for(int i = 0; i < crackRegions; i++){
-                    cracks[size - 1][i] = Core.atlas.find("cracks-" + size + "-" + i);
-                }
-            }
-        }
-    }
-
     /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #reg(int)}. */
     protected int reg(String suffix){
         cacheRegionStrings.add(name + suffix);
@@ -469,76 +188,8 @@ public class Block extends BlockStorage{
         return cacheRegions[id];
     }
 
-    /** Called when the block is tapped. This is equivalent to being configured with null. */
-    public void tapped(Tile tile, Playerc player){
-
-    }
-
-    /** Called when arbitrary configuration is applied to a tile. */
-    public void configured(Tile tile, @Nullable Playerc player, @Nullable Object value){
-        //null is of type Void.class; anonymous classes use their superclass.
-        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
-
-        if(configurations.containsKey(type)){
-            configurations.get(type).configured(tile, value);
-        }
-    }
-
-    /** Configure when a null value is passed.*/
-    public void configClear(Cons<Tile> cons){
-        configurations.put(void.class, (tile, value) -> cons.get(tile));
-    }
-
-    /** Listen for a config by class type. */
-    public <T> void config(Class<T> type, ConfigHandler<T> config){
-        configurations.put(type, config);
-    }
-
-    /** Returns whether or not a hand cursor should be shown over this block. */
-    public Cursor getCursor(Tile tile){
-        return configurable ? SystemCursor.hand : SystemCursor.arrow;
-    }
-
-    /**
-     * Called when this block is tapped to build a UI on the table.
-     * {@link #configurable} must return true for this to be called.
-     */
-    public void buildConfiguration(Tile tile, Table table){
-    }
-
-    /** Update table alignment after configuring.*/
-    public void updateTableAlign(Tile tile, Table table){
-        Vec2 pos = Core.input.mouseScreen(tile.drawx(), tile.drawy() - tile.block().size * tilesize / 2f - 1);
-        table.setPosition(pos.x, pos.y, Align.top);
-    }
-
-    /**
-     * Called when another tile is tapped while this block is selected.
-     * Returns whether or not this block should be deselected.
-     */
-    public boolean onConfigureTileTapped(Tile tile, Tile other){
-        return tile != other;
-    }
-
-    /** Returns whether this config menu should show when the specified player taps it. */
-    public boolean shouldShowConfigure(Tile tile, Playerc player){
-        return true;
-    }
-
-    /** Whether this configuration should be hidden now. Called every frame the config is open. */
-    public boolean shouldHideConfigure(Tile tile, Playerc player){
-        return false;
-    }
-
     public boolean synthetic(){
         return update || destructible;
-    }
-
-    public void drawConfigure(Tile tile){
-        Draw.color(Pal.accent);
-        Lines.stroke(1f);
-        Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1f);
-        Draw.reset();
     }
 
     public void setStats(){
@@ -568,7 +219,7 @@ public class Block extends BlockStorage{
                 current = entity -> entity.liquids().current();
             }
             bars.add("liquid", entity -> new Bar(() -> entity.liquids().get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
-                    () -> current.get(entity).barColor(), () -> entity.liquids().get(current.get(entity)) / liquidCapacity));
+            () -> current.get(entity).barColor(), () -> entity.liquids().get(current.get(entity)) / liquidCapacity));
         }
 
         if(hasPower && consumes.hasPower()){
@@ -577,20 +228,12 @@ public class Block extends BlockStorage{
             float capacity = cons.capacity;
 
             bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power().status * capacity) ? "<ERROR>" : (int)(entity.power().status * capacity)) :
-                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power().graph.getPowerProduced() + entity.power().graph.getBatteryStored() > 0f ? 1f : entity.power().status));
+            Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power().graph.getPowerProduced() + entity.power().graph.getBatteryStored() > 0f ? 1f : entity.power().status));
         }
 
         if(hasItems && configurable){
             bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items().total()), () -> Pal.items, () -> (float)entity.items().total() / itemCapacity));
         }
-    }
-
-    public Tile linked(Tile tile){
-        return tile;
-    }
-
-    public boolean isSolidFor(Tile tile){
-        return false;
     }
 
     public boolean canReplace(Block other){
@@ -600,129 +243,6 @@ public class Block extends BlockStorage{
     /** @return a possible replacement for this block when placed in a line by the player. */
     public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
         return this;
-    }
-
-    public float handleDamage(Tile tile, float amount){
-        return amount;
-    }
-
-    public void handleBulletHit(Tilec entity, Bulletc bullet){
-        entity.damage(bullet.damage());
-    }
-
-    public void update(Tile tile){
-    }
-
-    public boolean isAccessible(){
-        return (hasItems && itemCapacity > 0);
-    }
-
-    /** Called when the block is destroyed. */
-    public void onDestroyed(Tile tile){
-        float x = tile.worldx(), y = tile.worldy();
-        float explosiveness = baseExplosiveness;
-        float flammability = 0f;
-        float power = 0f;
-
-        if(hasItems){
-            for(Item item : content.items()){
-                int amount = tile.entity.items().get(item);
-                explosiveness += item.explosiveness * amount;
-                flammability += item.flammability * amount;
-            }
-        }
-
-        if(hasLiquids){
-            flammability += tile.entity.liquids().sum((liquid, amount) -> liquid.explosiveness * amount / 2f);
-            explosiveness += tile.entity.liquids().sum((liquid, amount) -> liquid.flammability * amount / 2f);
-        }
-
-        if(consumes.hasPower() && consumes.getPower().buffered){
-            power += tile.entity.power().status * consumes.getPower().capacity;
-        }
-
-        if(hasLiquids){
-
-            tile.entity.liquids().each((liquid, amount) -> {
-                float splash = Mathf.clamp(amount / 4f, 0f, 10f);
-
-                for(int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++){
-                    Time.run(i / 2f, () -> {
-                        Tile other = world.tile(tile.x + Mathf.range(size / 2), tile.y + Mathf.range(size / 2));
-                        if(other != null){
-                            Puddles.deposit(other, liquid, splash);
-                        }
-                    });
-                }
-            });
-        }
-
-        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * size / 2f, Pal.darkFlame);
-        if(!tile.floor().solid && !tile.floor().isLiquid){
-            Effects.rubble(tile.drawx(), tile.drawy(), size);
-        }
-    }
-
-    /**
-     * Returns the flammability of the tile. Used for fire calculations.
-     * Takes flammability of floor liquid into account.
-     */
-    public float getFlammability(Tile tile){
-        if(!hasItems || tile.entity == null){
-            if(tile.floor().isLiquid && !solid){
-                return tile.floor().liquidDrop.flammability;
-            }
-            return 0;
-        }else{
-            float result = tile.entity.items().sum((item, amount) -> item.flammability * amount);
-
-            if(hasLiquids){
-                result += tile.entity.liquids().sum((liquid, amount) -> liquid.flammability * amount / 3f);
-            }
-
-            return result;
-        }
-    }
-
-    public String getDisplayName(Tile tile){
-        return localizedName;
-    }
-
-    public TextureRegion getDisplayIcon(Tile tile){
-        return icon(Cicon.medium);
-    }
-
-    public void display(Tile tile, Table table){
-        Tilec entity = tile.entity;
-
-        if(entity != null){
-            table.table(bars -> {
-                bars.defaults().growX().height(18f).pad(4);
-
-                displayBars(tile, bars);
-            }).growX();
-            table.row();
-            table.table(ctable -> {
-                displayConsumption(tile, ctable);
-            }).growX();
-
-            table.marginBottom(-5);
-        }
-    }
-
-    public void displayConsumption(Tile tile, Table table){
-        table.left();
-        for(Consume cons : consumes.all()){
-            if(cons.isOptional() && cons.isBoost()) continue;
-            cons.build(tile, table);
-        }
-    }
-
-    public void displayBars(Tile tile, Table table){
-        for(Func<Tilec, Bar> bar : bars.list()){
-            table.add(bar.get(tile.entity)).growX();
-            table.row();
-        }
     }
 
     public void drawRequest(BuildRequest req, Eachable<BuildRequest> list, boolean valid){
@@ -736,9 +256,9 @@ public class Block extends BlockStorage{
     public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
         TextureRegion reg = getRequestRegion(req, list);
         Draw.rect(reg, req.drawx(), req.drawy(),
-            reg.getWidth() * req.animScale * Draw.scl,
-            reg.getHeight() * req.animScale * Draw.scl,
-            !rotate ? 0 : req.rotation * 90);
+        reg.getWidth() * req.animScale * Draw.scl,
+        reg.getHeight() * req.animScale * Draw.scl,
+        !rotate ? 0 : req.rotation * 90);
 
         if(req.hasConfig){
             drawRequestConfig(req, list);
@@ -766,75 +286,32 @@ public class Block extends BlockStorage{
         Draw.color();
     }
 
-    /** @return a custom minimap color for this tile, or 0 to use default colors. */
-    public int minimapColor(Tile tile){
-        return 0;
-    }
-
     public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
 
     }
 
-    @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    /** Called when arbitrary configuration is applied to a tile. */
+    public void configured(Tilec tile, @Nullable Playerc player, @Nullable Object value){
+        //null is of type Void.class; anonymous classes use their superclass.
+        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
 
-        packer.add(PageType.editor, name + "-icon-editor", Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)));
-
-        if(!synthetic()){
-            PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full));
-            mapColor.set(image.getPixel(image.width/2, image.height/2));
+        if(configurations.containsKey(type)){
+            configurations.get(type).get(tile, value);
         }
+    }
 
-        getGeneratedIcons();
+    /** Configure when a null value is passed.*/
+    public void configClear(Cons<Tilec> cons){
+        configurations.put(void.class, (tile, value) -> cons.get((Tilec)tile));
+    }
 
-        Pixmap last = null;
+    /** Listen for a config by class type. */
+    public <T> void config(Class<T> type, Cons2<Tile, T> config){
+        configurations.put(type, config);
+    }
 
-        if(outlineIcon){
-            final int radius = 4;
-            PixmapRegion region = Core.atlas.getPixmap(getGeneratedIcons()[getGeneratedIcons().length-1]);
-            Pixmap out = new Pixmap(region.width, region.height);
-            Color color = new Color();
-            for(int x = 0; x < region.width; x++){
-                for(int y = 0; y < region.height; y++){
-
-                    region.getPixel(x, y, color);
-                    out.draw(x, y, color);
-                    if(color.a < 1f){
-                        boolean found = false;
-                        outer:
-                        for(int rx = -radius; rx <= radius; rx++){
-                            for(int ry = -radius; ry <= radius; ry++){
-                                if(Structs.inBounds(rx + x, ry + y, region.width, region.height) && Mathf.dst2(rx, ry) <= radius*radius && color.set(region.getPixel(rx + x, ry + y)).a > 0.01f){
-                                    found = true;
-                                    break outer;
-                                }
-                            }
-                        }
-                        if(found){
-                            out.draw(x, y, outlineColor);
-                        }
-                    }
-                }
-            }
-            last = out;
-
-            packer.add(PageType.main, name, out);
-        }
-
-        if(generatedIcons.length > 1){
-            Pixmap base = Core.atlas.getPixmap(generatedIcons[0]).crop();
-            for(int i = 1; i < generatedIcons.length; i++){
-                if(i == generatedIcons.length - 1 && last != null){
-                    base.drawPixmap(last);
-                }else{
-                    base.draw(Core.atlas.getPixmap(generatedIcons[i]));
-                }
-            }
-            packer.add(PageType.main, "block-" + name + "-full", base);
-            generatedIcons = null;
-            Arrays.fill(cicons, null);
-        }
+    public boolean isAccessible(){
+        return (hasItems && itemCapacity > 0);
     }
 
     /** Never use outside of the editor! */
@@ -911,14 +388,16 @@ public class Block extends BlockStorage{
         return (Floor)this;
     }
 
-    @Override
-    public boolean isHidden(){
-        return !buildVisibility.visible();
+    public boolean isAir(){
+        return id == 0;
     }
 
-    @Override
-    public boolean alwaysUnlocked(){
-        return alwaysUnlocked;
+    public boolean isBuildable(){
+        return buildVisibility != BuildVisibility.hidden && buildVisibility != BuildVisibility.debugOnly;
+    }
+
+    public boolean isStatic(){
+        return cacheLayer == CacheLayer.walls;
     }
 
     protected void requirements(Category cat, ItemStack[] stacks, boolean unlocked){
@@ -939,8 +418,157 @@ public class Block extends BlockStorage{
         Arrays.sort(requirements, Structs.comparingInt(i -> i.item.id));
     }
 
-    public interface ConfigHandler<T>{
-        void configured(Tile tile, T value);
+    @Override
+    public void displayInfo(Table table){
+        ContentDisplay.displayBlock(table, this);
+    }
+
+    @Override
+    public ContentType getContentType(){
+        return ContentType.block;
+    }
+
+    /** Called after all blocks are created. */
+    @Override
+    @CallSuper
+    public void init(){
+        //initialize default health based on size
+        if(health == -1){
+            health = size * size * 40;
+        }
+
+        if(entityType == null){
+            //assign default value for now
+            entityType = TileEntity::create;
+
+            //attempt to find the first declared class and use it as the entity type
+            try{
+                Class<?>[] classes = getClass().getDeclaredClasses();
+                //first class that is subclass of Tilec
+                Class<?> type = Structs.find(classes, Tilec.class::isAssignableFrom);
+                if(type != null){
+                    Constructor<? extends Tilec> cons = (Constructor<? extends Tilec>)type.getConstructor();
+                    entityType = () -> {
+                        try{
+                            return cons.newInstance();
+                        }catch(Exception e){
+                            throw new RuntimeException(e);
+                        }
+                    };
+                }
+            }catch(Throwable ignored){
+            }
+        }
+
+        buildCost = 0f;
+        for(ItemStack stack : requirements){
+            buildCost += stack.amount * stack.item.cost;
+        }
+        buildCost *= buildCostMultiplier;
+
+        if(consumes.has(ConsumeType.power)) hasPower = true;
+        if(consumes.has(ConsumeType.item)) hasItems = true;
+        if(consumes.has(ConsumeType.liquid)) hasLiquids = true;
+
+        setStats();
+        setBars();
+
+        consumes.init();
+
+        if(!outputsPower && consumes.hasPower() && consumes.getPower().buffered){
+            throw new IllegalArgumentException("Consumer using buffered power: " + name);
+        }
+    }
+
+    @Override
+    public void load(){
+        region = Core.atlas.find(name);
+
+        cacheRegions = new TextureRegion[cacheRegionStrings.size];
+        for(int i = 0; i < cacheRegions.length; i++){
+            cacheRegions[i] = Core.atlas.find(cacheRegionStrings.get(i));
+        }
+
+        if(cracks == null || (cracks[0][0].getTexture() != null && cracks[0][0].getTexture().isDisposed())){
+            cracks = new TextureRegion[maxCrackSize][crackRegions];
+            for(int size = 1; size <= maxCrackSize; size++){
+                for(int i = 0; i < crackRegions; i++){
+                    cracks[size - 1][i] = Core.atlas.find("cracks-" + size + "-" + i);
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean isHidden(){
+        return !buildVisibility.visible();
+    }
+
+    @Override
+    public boolean alwaysUnlocked(){
+        return alwaysUnlocked;
+    }
+
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+
+        packer.add(PageType.editor, name + "-icon-editor", Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)));
+
+        if(!synthetic()){
+            PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full));
+            mapColor.set(image.getPixel(image.width/2, image.height/2));
+        }
+
+        getGeneratedIcons();
+
+        Pixmap last = null;
+
+        if(outlineIcon){
+            final int radius = 4;
+            PixmapRegion region = Core.atlas.getPixmap(getGeneratedIcons()[getGeneratedIcons().length-1]);
+            Pixmap out = new Pixmap(region.width, region.height);
+            Color color = new Color();
+            for(int x = 0; x < region.width; x++){
+                for(int y = 0; y < region.height; y++){
+
+                    region.getPixel(x, y, color);
+                    out.draw(x, y, color);
+                    if(color.a < 1f){
+                        boolean found = false;
+                        outer:
+                        for(int rx = -radius; rx <= radius; rx++){
+                            for(int ry = -radius; ry <= radius; ry++){
+                                if(Structs.inBounds(rx + x, ry + y, region.width, region.height) && Mathf.dst2(rx, ry) <= radius*radius && color.set(region.getPixel(rx + x, ry + y)).a > 0.01f){
+                                    found = true;
+                                    break outer;
+                                }
+                            }
+                        }
+                        if(found){
+                            out.draw(x, y, outlineColor);
+                        }
+                    }
+                }
+            }
+            last = out;
+
+            packer.add(PageType.main, name, out);
+        }
+
+        if(generatedIcons.length > 1){
+            Pixmap base = Core.atlas.getPixmap(generatedIcons[0]).crop();
+            for(int i = 1; i < generatedIcons.length; i++){
+                if(i == generatedIcons.length - 1 && last != null){
+                    base.drawPixmap(last);
+                }else{
+                    base.draw(Core.atlas.getPixmap(generatedIcons[i]));
+                }
+            }
+            packer.add(PageType.main, "block-" + name + "-full", base);
+            generatedIcons = null;
+            Arrays.fill(cicons, null);
+        }
     }
 
 }

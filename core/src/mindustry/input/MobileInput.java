@@ -75,12 +75,11 @@ public class MobileInput extends InputHandler implements GestureListener{
             player.miner().mineTile(null);
             target = unit;
         }else{
-            Tile tile = world.ltileWorld(x, y);
+            Tilec tile = world.entWorld(x, y);
 
-            if(tile != null && tile.synthetic() && player.team().isEnemy(tile.team())){
-                Tilec entity = tile.entity;
+            if(tile != null && player.team().isEnemy(tile.team())){
                 player.miner().mineTile(null);
-                target = entity;
+                target = tile;
                 //TODO implement healing
             }//else if(tile != null && player.unit().canHeal && tile.entity != null && tile.team() == player.team() && tile.entity.damaged()){
              ///   player.miner().mineTile(null);
@@ -505,9 +504,9 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Tile tile = tileAt(screenX, screenY);
 
-            if(tile == null) return false;
+            if(tile == null || tile.entity == null) return false;
 
-            tryDropItems(tile.link(), Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
+            tryDropItems(tile.entity.tile(), Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
         }
         return false;
     }
@@ -551,6 +550,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //ignore off-screen taps
         if(cursor == null || Core.scene.hasMouse(x, y)) return false;
+        Tile linked = cursor.entity == null ? cursor : cursor.entity.tile();
 
         checkTargets(worldx, worldy);
 
@@ -560,11 +560,10 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
             //add to selection queue if it's a valid place position
             selectRequests.add(lastPlaced = new BuildRequest(cursor.x, cursor.y, rotation, block));
-        }else if(mode == breaking && validBreak(cursor.link().x, cursor.link().y) && !hasRequest(cursor.link())){
+        }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasRequest(linked)){
             //add to selection queue if it's a valid BREAK position
-            cursor = cursor.link();
-            selectRequests.add(new BuildRequest(cursor.x, cursor.y));
-        }else if(!canTapPlayer(worldx, worldy) && !tileTapped(cursor.link())){
+            selectRequests.add(new BuildRequest(linked.x, linked.y));
+        }else if(!canTapPlayer(worldx, worldy) && !tileTapped(linked)){
             tryBeginMine(cursor);
         }
 

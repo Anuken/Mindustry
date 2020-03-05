@@ -5,8 +5,6 @@ import arc.util.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-import java.io.*;
-
 public class BufferedItemBridge extends ExtendingItemBridge{
     public final int timerAccept = timers++;
 
@@ -29,9 +27,9 @@ public class BufferedItemBridge extends ExtendingItemBridge{
         }
 
         Item item = entity.buffer.poll();
-        if(entity.timer(timerAccept, 4) && item != null && other.block().acceptItem(item, other, tile)){
+        if(entity.timer(timerAccept, 4) && item != null && other.block().acceptItem(other, tile, item)){
             entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
-            other.block().handleItem(item, other, tile);
+            other.block().handleItem(other, tile, item);
             entity.buffer.remove();
         }else{
             entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 0f, 0.008f);

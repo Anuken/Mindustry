@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.*;
 import mindustry.world.blocks.*;
 
 public class HealBulletType extends BulletType{
@@ -28,8 +27,8 @@ public class HealBulletType extends BulletType{
     }
 
     @Override
-    public boolean collides(Bulletc b, Tile tile){
-        return tile.team() != b.team() || tile.entity.healthf() < 1f;
+    public boolean collides(Bulletc b, Tilec tile){
+        return tile.team() != b.team() || tile.healthf() < 1f;
     }
 
     @Override
@@ -43,13 +42,12 @@ public class HealBulletType extends BulletType{
     }
 
     @Override
-    public void hitTile(Bulletc b, Tile tile){
+    public void hitTile(Bulletc b, Tilec tile){
         super.hit(b);
-        tile = tile.link();
 
-        if(tile.entity != null && tile.team() == b.team() && !(tile.block() instanceof BuildBlock)){
-            Fx.healBlockFull.at(tile.drawx(), tile.drawy(), tile.block().size, Pal.heal);
-            tile.entity.heal(healPercent / 100f * tile.entity.maxHealth());
+        if(tile.team() == b.team() && !(tile.block() instanceof BuildBlock)){
+            Fx.healBlockFull.at(tile.x(), tile.y(), tile.block().size, Pal.heal);
+            tile.heal(healPercent / 100f * tile.maxHealth());
         }
     }
 }

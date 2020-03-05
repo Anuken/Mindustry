@@ -38,7 +38,7 @@ public class LaunchPad extends StorageBlock{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
+    public boolean acceptItem(Tile tile, Tile source, Item item){
         return item.type == ItemType.material && tile.entity.items().total() < itemCapacity;
     }
 

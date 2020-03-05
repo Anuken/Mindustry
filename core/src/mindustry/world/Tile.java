@@ -19,15 +19,13 @@ public class Tile implements Position{
     /** Tile traversal cost. */
     public byte cost = 1;
     /** Tile entity, usually null. */
-    public Tilec entity;
+    public @Nullable Tilec entity;
     public short x, y;
     protected @NonNull Block block;
     protected @NonNull Floor floor;
     protected @NonNull Floor overlay;
     /** Rotation, 0-3. Also used to store offload location, in which case it can be any number.*/
     protected byte rotation;
-    /** Team ordinal. */
-    protected byte team;
 
     public Tile(int x, int y){
         this.x = (short)x;
@@ -144,23 +142,63 @@ public class Tile implements Position{
     }
 
     public Team team(){
-        return Team.get(link().team);
+        return entity == null ? Team.derelict : entity.team();
     }
 
     public void setTeam(Team team){
-        this.team = (byte) team.id;
+        if(entity != null){
+            entity.team(team);
+        }
+    }
+
+    public boolean isCenter(){
+        return entity == null || entity.tile() == this;
     }
 
     public byte getTeamID(){
-        return team;
+        return team().id;
     }
 
     public void setBlock(@NonNull Block type, Team team, int rotation){
         preChanged();
         this.block = type;
-        this.team = (byte) team.id;
-        this.rotation = (byte)Mathf.mod(rotation, 4);
+        this.rotation = rotation == 0 ? 0 : (byte)Mathf.mod(rotation, 4);
         changed();
+
+        if(entity != null){
+            entity.team(team);
+        }
+
+        //set up multiblock
+        if(block.isMultiblock()){
+            int offsetx = -(block.size - 1) / 2;
+            int offsety = -(block.size - 1) / 2;
+
+            //two passes: first one clears, second one sets
+            for(int pass = 0; pass < 2; pass++){
+                for(int dx = 0; dx < block.size; dx++){
+                    for(int dy = 0; dy < block.size; dy++){
+                        int worldx = dx + offsetx + x;
+                        int worldy = dy + offsety + y;
+                        if(!(worldx == x && worldy == y)){
+                            Tile other = world.tile(worldx, worldy);
+
+                            if(other != null){
+                                if(pass == 0){
+                                    //first pass: delete existing blocks - this should automatically trigger removal if overlap exists
+                                    other.setBlock(Blocks.air);
+                                }else{
+                                    //second pass: assign changed data
+                                    //assign entity and type to blocks, so they act as proxies for this one
+                                    other.entity = entity;
+                                    other.block = block;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void setBlock(@NonNull Block type, Team team){
@@ -168,11 +206,7 @@ public class Tile implements Position{
     }
 
     public void setBlock(@NonNull Block type){
-        if(type == null) throw new IllegalArgumentException("Block cannot be null.");
-        preChanged();
-        this.block = type;
-        this.rotation = 0;
-        changed();
+        setBlock(type, Team.derelict, 0);
     }
 
     /** This resets the overlay! */
@@ -181,7 +215,9 @@ public class Tile implements Position{
         this.overlay = (Floor)Blocks.air;
 
         recache();
-        block.onProximityUpdate(this);
+        if(entity != null){
+            block.onProximityUpdate(entity);
+        }
     }
 
     /** Sets the floor, preserving overlay.*/
@@ -205,32 +241,8 @@ public class Tile implements Position{
     }
 
     public void remove(){
-        link().getLinkedTiles(other -> other.setBlock(Blocks.air));
-    }
-
-    public void set(Block block, Team team){
-        set(block, team, 0);
-    }
-
-    public void set(Block block, Team team, int rotation){
-        setBlock(block, team, rotation);
-        if(block.isMultiblock()){
-            int offsetx = -(block.size - 1) / 2;
-            int offsety = -(block.size - 1) / 2;
-
-            for(int dx = 0; dx < block.size; dx++){
-                for(int dy = 0; dy < block.size; dy++){
-                    int worldx = dx + offsetx + x;
-                    int worldy = dy + offsety + y;
-                    if(!(worldx == x && worldy == y)){
-                        Tile toplace = world.tile(worldx, worldy);
-                        if(toplace != null){
-                            toplace.setBlock(BlockPart.get(dx + offsetx, dy + offsety), team);
-                        }
-                    }
-                }
-            }
-        }
+        //this automatically removes multiblock references to this block
+        setBlock(Blocks.air);
     }
 
     /** remove()-s this tile, except it's synced across the network */
@@ -274,11 +286,13 @@ public class Tile implements Position{
     }
 
     public void setOverlayID(short ore){
-        this.overlay = (Floor)content.block(ore);
+        setOverlay(content.block(ore));
     }
 
     public void setOverlay(Block block){
         this.overlay = (Floor)block;
+
+        recache();
     }
 
     public void clearOverlay(){
@@ -286,7 +300,7 @@ public class Tile implements Position{
     }
 
     public boolean passable(){
-        return isLinked() || !((floor.solid && (block == Blocks.air || block.solidifes)) || (block.solid && (!block.destructible && !block.update)));
+        return !((floor.solid && (block == Blocks.air || block.solidifes)) || (block.solid && (!block.destructible && !block.update)));
     }
 
     /** Whether this block was placed by a player/unit. */
@@ -295,27 +309,19 @@ public class Tile implements Position{
     }
 
     public boolean solid(){
-        return block.solid || block.isSolidFor(this) || (isLinked() && link() != this && link().solid());
+        return block.solid || (entity != null && block.isSolidFor(entity));
     }
 
     public boolean breakable(){
-        return !isLinked() ? (block.destructible || block.breakable || block.update) : link().breakable();
-    }
-
-    public Tile link(){
-        return block.linked(this);
+        return block.destructible || block.breakable || block.update;
     }
 
     public boolean isEnemyCheat(){
         return team() == state.rules.waveTeam && state.rules.enemyCheat;
     }
 
-    public boolean isLinked(){
-        return block instanceof BlockPart;
-    }
-
     /**
-     * Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
+     * Returns the list of all tiles linked to this multiblock, or just itself if it's not a multiblock.
      * This array contains all linked tiles, including this tile itself.
      */
     public void getLinkedTiles(Cons<Tile> cons){
@@ -385,29 +391,29 @@ public class Tile implements Position{
         return null;
     }
 
-    public Tile getNearbyLink(int rotation){
-        if(rotation == 0) return world.ltile(x + 1, y);
-        if(rotation == 1) return world.ltile(x, y + 1);
-        if(rotation == 2) return world.ltile(x - 1, y);
-        if(rotation == 3) return world.ltile(x, y - 1);
+    public Tilec getNearbyEntity(int rotation){
+        if(rotation == 0) return world.ent(x + 1, y);
+        if(rotation == 1) return world.ent(x, y + 1);
+        if(rotation == 2) return world.ent(x - 1, y);
+        if(rotation == 3) return world.ent(x, y - 1);
         return null;
     }
 
     // ▲ ▲ ▼ ▼ ◀ ▶ ◀ ▶ B A
-    public @Nullable Tile front(){
-        return getNearbyLink((rotation + 4) % 4);
+    public @Nullable Tilec front(){
+        return getNearbyEntity((rotation + 4) % 4);
     }
 
-    public @Nullable Tile right(){
-        return getNearbyLink((rotation + 3) % 4);
+    public @Nullable Tilec right(){
+        return getNearbyEntity((rotation + 3) % 4);
     }
 
-    public @Nullable Tile back(){
-        return getNearbyLink((rotation + 2) % 4);
+    public @Nullable Tilec back(){
+        return getNearbyEntity((rotation + 2) % 4);
     }
 
-    public @Nullable Tile left(){
-        return getNearbyLink((rotation + 1) % 4);
+    public @Nullable Tilec left(){
+        return getNearbyEntity((rotation + 1) % 4);
     }
 
     public boolean interactable(Team team){
@@ -443,8 +449,8 @@ public class Tile implements Position{
 
         //+26
 
-        if(link().synthetic() && link().solid()){
-            cost += Mathf.clamp(link().block.health / 10f, 0, 20);
+        if(block.synthetic() && solid()){
+            cost += Mathf.clamp(block.health / 10f, 0, 20);
         }
 
         //+46
@@ -467,15 +473,34 @@ public class Tile implements Position{
     }
 
     protected void preChanged(){
-        block.removed(this);
         if(entity != null){
+            //only call removed() for the center block - this only gets called once.
+            block.removed(entity);
             entity.removeFromProximity();
+
+            //remove this tile's dangling entities
+            if(entity.block().isMultiblock()){
+                int size = entity.block().size;
+                int offsetx = -(size - 1) / 2;
+                int offsety = -(size - 1) / 2;
+                for(int dx = 0; dx < size; dx++){
+                    for(int dy = 0; dy < size; dy++){
+                        Tile other = world.tile(entity.tileX() + dx + offsetx, entity.tileY() + dy + offsety);
+                        if(other != null){
+                            //reset entity and block *manually* - thus, preChanged() will not be called anywhere else, for multiblocks
+                            other.entity = null;
+                            other.block = Blocks.air;
+                        }
+                    }
+                }
+            }
         }
+
+
         //recache when static blocks get changed
         if(block.isStatic()){
             recache();
         }
-        team = 0;
     }
 
     protected void changed(){
@@ -493,18 +518,18 @@ public class Tile implements Position{
             if(block.hasLiquids) entity.liquids(new LiquidModule());
             if(block.hasPower){
                 entity.power(new PowerModule());
-                entity.power().graph.add(this);
+                entity.power().graph.add(entity);
             }
 
             if(!world.isGenerating()){
                 entity.updateProximity();
             }
-        }else if(!(block instanceof BlockPart) && !world.isGenerating()){
+        }else if(!world.isGenerating()){
             //since the entity won't update proximity for us, update proximity for all nearby tiles manually
             for(Point2 p : Geometry.d4){
-                Tile tile = world.ltile(x + p.x, y + p.y);
+                Tile tile = world.tile(x + p.x, y + p.y);
                 if(tile != null){
-                    tile.block().onProximityUpdate(tile);
+                    tile.block().onProximityUpdate(entity);
                 }
             }
         }
@@ -549,7 +574,7 @@ public class Tile implements Position{
 
     @Remote(called = Loc.server)
     public static void setTile(Tile tile, Block block, Team team, int rotation){
-        tile.set(block, team, rotation);
+        tile.setBlock(block, team, rotation);
     }
 
     @Remote(called = Loc.server, unreliable = true)

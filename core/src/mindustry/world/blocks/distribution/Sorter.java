@@ -77,17 +77,17 @@ public class Sorter extends Block{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
+    public boolean acceptItem(Tile tile, Tile source, Item item){
         Tile to = getTileTarget(item, tile, source, false);
 
-        return to != null && to.block().acceptItem(item, to, tile) && to.team() == tile.team();
+        return to != null && to.block().acceptItem(to, tile, item) && to.team() == tile.team();
     }
 
     @Override
-    public void handleItem(Item item, Tile tile, Tile source){
+    public void handleItem(Tile tile, Tile source, Item item){
         Tile to = getTileTarget(item, tile, source, true);
 
-        to.block().handleItem(item, to, tile);
+        to.block().handleItem(to, tile, item);
     }
 
     boolean isSame(Tile tile, Tile other){
@@ -112,9 +112,9 @@ public class Sorter extends Block{
             Tile a = dest.getNearby(Mathf.mod(dir - 1, 4));
             Tile b = dest.getNearby(Mathf.mod(dir + 1, 4));
             boolean ac = a != null && !(a.block().instantTransfer && source.block().instantTransfer) &&
-                    a.block().acceptItem(item, a, dest);
+                    a.block().acceptItem(a, dest, item);
             boolean bc = b != null && !(b.block().instantTransfer && source.block().instantTransfer) &&
-                    b.block().acceptItem(item, b, dest);
+                    b.block().acceptItem(b, dest, item);
 
             if(ac && !bc){
                 to = a;

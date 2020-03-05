@@ -12,11 +12,11 @@ public class ItemVoid extends Block{
     }
 
     @Override
-    public void handleItem(Item item, Tile tile, Tile source){
+    public void handleItem(Tile tile, Tile source, Item item){
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
+    public boolean acceptItem(Tile tile, Tile source, Item item){
         return true;
     }
 }

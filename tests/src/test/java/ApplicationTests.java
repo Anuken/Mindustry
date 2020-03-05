@@ -16,7 +16,6 @@ import mindustry.maps.*;
 import mindustry.net.Net;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import org.junit.jupiter.api.*;
 
 import static mindustry.Vars.*;
@@ -121,7 +120,7 @@ public class ApplicationTests{
         createMap();
         int bx = 4;
         int by = 4;
-        world.tile(bx, by).set(Blocks.coreShard, Team.sharded);
+        world.tile(bx, by).setBlock(Blocks.coreShard, Team.sharded, 0);
         assertEquals(world.tile(bx, by).team(), Team.sharded);
         for(int x = bx - 1; x <= bx + 1; x++){
             for(int y = by - 1; y <= by + 1; y++){
@@ -216,7 +215,7 @@ public class ApplicationTests{
 
         world.tile(0, 0).setBlock(Blocks.conveyor);
         world.tile(0, 0).rotation(0);
-        Blocks.conveyor.acceptStack(Items.copper, 1000, world.tile(0, 0), null);
+        Blocks.conveyor.acceptStack(world.tile(0, 0), Items.copper, 1000, null);
     }
 
     @Test
@@ -239,12 +238,12 @@ public class ApplicationTests{
 
         world.tile(length + 1, 0).setBlock(new Block("___"){
             @Override
-            public void handleItem(Item item, Tile tile, Tile source){
+            public void handleItem(Tile tile, Tile source, Item item){
                 items[0] ++;
             }
 
             @Override
-            public boolean acceptItem(Item item, Tile tile, Tile source){
+            public boolean acceptItem(Tile tile, Tile source, Item item){
                 return true;
             }
         });
@@ -425,7 +424,7 @@ public class ApplicationTests{
         createMap();
 
         Tile core = world.tile(5, 5);
-        core.set(Blocks.coreShard, Team.sharded);
+        core.setBlock(Blocks.coreShard, Team.sharded, 0);
         for(Item item : content.items()){
             core.entity.items().set(item, 3000);
         }
@@ -440,16 +439,16 @@ public class ApplicationTests{
 
         assertNotNull(tile.entity, "Tile should have an entity, but does not: " + tile);
 
-        int deposited = tile.block().acceptStack(item, capacity - 1, tile, unit);
+        int deposited = tile.block().acceptStack(tile, item, capacity - 1, unit);
         assertEquals(capacity - 1, deposited);
 
-        tile.block().handleStack(item, capacity - 1, tile, unit);
+        tile.block().handleStack(tile, item, capacity - 1, unit);
         assertEquals(tile.entity.items().get(item), capacity - 1);
 
-        int overflow = tile.block().acceptStack(item, 10, tile, unit);
+        int overflow = tile.block().acceptStack(tile, item, 10, unit);
         assertEquals(1, overflow);
 
-        tile.block().handleStack(item, 1, tile, unit);
+        tile.block().handleStack(tile, item, 1, unit);
         assertEquals(capacity, tile.entity.items().get(item));
     }
 }

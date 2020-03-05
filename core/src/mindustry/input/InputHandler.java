@@ -110,22 +110,19 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
-    public static void rotateBlock(Playerc player, Tile tile, boolean direction){
+    public static void rotateBlock(Playerc player, Tilec tile, boolean direction){
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.rotate, tile, action -> action.rotation = Mathf.mod(tile.rotation() + Mathf.sign(direction), 4)))){
             throw new ValidateException(player, "Player cannot rotate a block.");
         }
 
         tile.rotation(Mathf.mod(tile.rotation() + Mathf.sign(direction), 4));
-
-        if(tile.entity != null){
-            tile.entity.updateProximity();
-            tile.entity.noSleep();
-        }
+        tile.updateProximity();
+        tile.noSleep();
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
-    public static void transferInventory(Playerc player, Tile tile){
+    public static void transferInventory(Playerc player, Tilec tile){
         if(player == null) return;
         if(net.server() && (player.unit().stack().amount <= 0 || !Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.depositItem, tile, action -> {
@@ -139,7 +136,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Item item = player.unit().item();
         int amount = player.unit().stack().amount;
-        int accepted = tile.block().acceptStack(item, amount, tile, player.unit());
+        int accepted = tile.block().acceptStack(tile, item, amount, player.unit());
         player.unit().stack().amount -= accepted;
 
         int sent = Mathf.clamp(accepted / 4, 1, 8);
@@ -148,19 +145,19 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Core.app.post(() -> Events.fire(new DepositEvent(tile, player, item, accepted)));
 
         for(int i = 0; i < sent; i++){
-            tile.block().getStackOffset(item, tile, stackTrns);
+            tile.block().getStackOffset(tile, item, stackTrns);
 
             createItemTransfer(item, player.x() + Angles.trnsx(player.unit().rotation() + 180f, backTrns), player.y() + Angles.trnsy(player.unit().rotation() + 180f, backTrns),
-            new Vec2(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
-                if(tile.block() != block || tile.entity == null || tile.entity.items() == null) return;
+            new Vec2(tile.x() + stackTrns.x, tile.y() + stackTrns.y), () -> {
+                if(tile.block() != block || tile.entity == null || tile.items() == null) return;
 
-                tile.block().handleStack(item, accepted, tile, player.unit());
+                tile.block().handleStack(tile, item, accepted, player.unit());
             });
         }
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void onTileTapped(Playerc player, Tile tile){
+    public static void onTileTapped(Playerc player, Tilec tile){
         if(tile == null || player == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
         !netServer.admins.allowAction(player, ActionType.tapTile, tile, action -> {}))) throw new ValidateException(player, "Player cannot tap a tile.");
@@ -169,7 +166,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
-    public static void onTileConfig(Playerc player, Tile tile, @Nullable Object value){
+    public static void onTileConfig(Playerc player, Tilec tile, @Nullable Object value){
         if(tile == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.configure, tile, action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
@@ -247,7 +244,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void drawBreaking(int x, int y){
-        Tile tile = world.ltile(x, y);
+        Tile tile = world.tile(x, y);
         if(tile == null) return;
         Block block = tile.block();
 
@@ -388,7 +385,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         for(int x = dresult.x; x <= dresult.x2; x++){
             for(int y = dresult.y; y <= dresult.y2; y++){
-                Tile tile = world.ltile(x, y);
+                Tile tile = world.tilec(x, y);
                 if(tile == null || !validBreak(tile.x, tile.y)) continue;
 
                 drawBreaking(tile.x, tile.y);
@@ -497,13 +494,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 int wx = x1 + x * Mathf.sign(x2 - x1);
                 int wy = y1 + y * Mathf.sign(y2 - y1);
 
-                Tile tile = world.ltile(wx, wy);
+                Tile tile = world.tilec(wx, wy);
 
                 if(tile == null) continue;
 
                 if(!flush){
                     tryBreakBlock(wx, wy);
-                }else if(validBreak(tile.x, tile.y) && !selectRequests.contains(r -> r.tile() != null && r.tile().link() == tile)){
+                }else if(validBreak(tile.x, tile.y) && !selectRequests.contains(r -> r.tile() != null && r.tile() == tile)){
                     selectRequests.add(new BuildRequest(tile.x, tile.y));
                 }
             }
@@ -563,9 +560,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     /** Handles tile tap events that are not platform specific. */
-    boolean tileTapped(Tile tile){
-        tile = tile.link();
-
+    boolean tileTapped(@Nullable Tilec tile){
+        if(tile == null) return false;
         boolean consumed = false, showedInventory = false;
 
         //check if tapped block is configurable
@@ -599,7 +595,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(tile.interactable(player.team()) && tile.block().consumesTap){
             consumed = true;
         }else if(tile.interactable(player.team()) && tile.block().synthetic() && !consumed){
-            if(tile.block().hasItems && tile.entity.items().total() > 0){
+            if(tile.block().hasItems && tile.items().total() > 0){
                 frag.inv.showFor(tile);
                 consumed = true;
                 showedInventory = true;
@@ -642,6 +638,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
         && player.unit().acceptsItem(tile.drop())
         && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= miningRange;
+    }
+
+    Tilec entAt(float x, float y){
+        return world.ent(tileX(x), tileY(y));
     }
 
     /** Returns the tile at the specified MOUSE coordinates. */
@@ -740,7 +740,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return droppingItem;
     }
 
-    public void tryDropItems(Tile tile, float x, float y){
+    public void tryDropItems(Tilec tile, float x, float y){
         if(!droppingItem || player.unit().stack().amount <= 0 || canTapPlayer(x, y) || state.isPaused() ){
             droppingItem = false;
             return;
@@ -750,7 +750,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         ItemStack stack = player.unit().stack();
 
-        if(tile.block().acceptStack(stack.item, stack.amount, tile, player.unit()) > 0 && tile.interactable(player.team()) && tile.block().hasItems && player.unit().stack().amount > 0 && tile.interactable(player.team())){
+        if(tile.block().acceptStack(tile, stack.item, stack.amount, player.unit()) > 0 && tile.interactable(player.team()) && tile.block().hasItems && player.unit().stack().amount > 0 && tile.interactable(player.team())){
             Call.transferInventory(player, tile);
         }else{
             Call.dropItem(player.angleTo(x, y));
@@ -798,7 +798,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void breakBlock(int x, int y){
-        Tile tile = world.ltile(x, y);
+        Tile tile = world.tile(x, y);
+        //TODO hacky
+        if(tile.entity != null) tile = tile.entity.tile();
         player.builder().addBuild(new BuildRequest(tile.x, tile.y));
     }
 
@@ -849,7 +851,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                 //check with how many powernodes the *next* tile will overlap
                 for(int j = 0; j < i; j++){
-                    if(!skip.contains(points.get(j)) && ((PowerNode)block).overlaps(world.ltile(point.x, point.y), world.ltile(points.get(j).x, points.get(j).y))){
+                    if(!skip.contains(points.get(j)) && ((PowerNode)block).overlaps(world.tile(point.x, point.y), world.tile(points.get(j).x, points.get(j).y))){
                         overlaps++;
                     }
                 }

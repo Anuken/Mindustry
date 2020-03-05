@@ -59,8 +59,8 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public boolean shouldIdleSound(Tile tile){
-        return tile.entity.cons().valid();
+    public boolean shouldIdleSound(Tilec tile){
+        return tile.cons().valid();
     }
 
     @Override

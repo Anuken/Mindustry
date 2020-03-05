@@ -127,7 +127,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         final float expectedRemainingItemAmount = Math.max(0, amount - 1);
 
         createGenerator(inputType);
-        assertTrue(generator.acceptItem(item, tile, null), inputType + " | " + parameterDescription + ": Items which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
+        assertTrue(generator.acceptItem(tile, null, item), inputType + " | " + parameterDescription + ": Items which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
 
         if(amount > 0){
             entity.items().add(item, amount);

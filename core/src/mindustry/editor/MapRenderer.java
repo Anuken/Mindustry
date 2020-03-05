@@ -15,7 +15,6 @@ import mindustry.game.Team;
 import mindustry.graphics.IndexedRenderer;
 import mindustry.world.Block;
 import mindustry.world.Tile;
-import mindustry.world.blocks.BlockPart;
 
 import static mindustry.Vars.tilesize;
 

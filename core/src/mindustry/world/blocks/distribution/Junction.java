@@ -10,8 +10,6 @@ import mindustry.world.DirectionalItemBuffer;
 import mindustry.world.Tile;
 import mindustry.world.meta.BlockGroup;
 
-import java.io.IOException;
-
 import static mindustry.Vars.content;
 
 public class Junction extends Block{
@@ -28,7 +26,7 @@ public class Junction extends Block{
     }
 
     @Override
-    public int acceptStack(Item item, int amount, Tile tile, Teamc source){
+    public int acceptStack(Tile tile, Item item, int amount, Teamc source){
         return 0;
     }
 
@@ -55,11 +53,11 @@ public class Junction extends Block{
                     if(dest != null) dest = dest.link();
 
                     //skip blocks that don't want the item, keep waiting until they do
-                    if(dest == null || !dest.block().acceptItem(item, dest, tile) || dest.team() != tile.team()){
+                    if(dest == null || !dest.block().acceptItem(dest, tile, item) || dest.team() != tile.team()){
                         continue;
                     }
 
-                    dest.block().handleItem(item, dest, tile);
+                    dest.block().handleItem(dest, tile, item);
                     System.arraycopy(buffer.buffers[i], 1, buffer.buffers[i], 0, buffer.indexes[i] - 1);
                     buffer.indexes[i] --;
                 }
@@ -68,14 +66,14 @@ public class Junction extends Block{
     }
 
     @Override
-    public void handleItem(Item item, Tile tile, Tile source){
+    public void handleItem(Tile tile, Tile source, Item item){
         JunctionEntity entity = tile.ent();
         int relative = source.relativeTo(tile.x, tile.y);
         entity.buffer.accept(relative, item);
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
+    public boolean acceptItem(Tile tile, Tile source, Item item){
         JunctionEntity entity = tile.ent();
         int relative = source.relativeTo(tile.x, tile.y);
 

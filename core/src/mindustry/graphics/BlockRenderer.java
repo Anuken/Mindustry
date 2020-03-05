@@ -13,7 +13,6 @@ import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 
 import static arc.Core.camera;
 import static mindustry.Vars.*;
@@ -199,15 +198,14 @@ public class BlockRenderer implements Disposable{
             for(int y = miny; y <= maxy; y++){
                 boolean expanded = (Math.abs(x - avgx) > rangex || Math.abs(y - avgy) > rangey);
                 Tile tile = world.rawTile(x, y);
-                if(tile == null) continue; //how is this possible?
                 Block block = tile.block();
 
-                if(block != Blocks.air && block.cacheLayer == CacheLayer.normal){
+                if(block != Blocks.air && tile.isCenter() && block.cacheLayer == CacheLayer.normal){
                     if(!expanded){
                         addRequest(tile, Layer.block);
                     }
 
-                    if(state.rules.lighting && tile.block().synthetic() && !(tile.block() instanceof BlockPart)){
+                    if(state.rules.lighting && tile.block().synthetic()){
                         addRequest(tile, Layer.lights);
                     }
 

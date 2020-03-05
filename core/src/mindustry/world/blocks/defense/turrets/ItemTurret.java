@@ -18,8 +18,6 @@ import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
-import java.io.*;
-
 import static mindustry.Vars.*;
 
 public class ItemTurret extends CooledTurret{
@@ -45,7 +43,7 @@ public class ItemTurret extends CooledTurret{
         stats.add(BlockStat.ammo, new AmmoListValue<>(ammo));
         consumes.add(new ConsumeItemFilter(i -> ammo.containsKey(i)){
             @Override
-            public void build(Tile tile, Table table){
+            public void build(Tilec tile, Table table){
                 MultiReqImage image = new MultiReqImage();
                 content.items().each(i -> filter.get(i) && (!state.isCampaign() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
                     () -> tile.entity != null && !((ItemTurretEntity)tile.entity).ammo.isEmpty() && ((ItemEntry)tile.<ItemTurretEntity>ent().ammo.peek()).item == item)));
@@ -72,7 +70,7 @@ public class ItemTurret extends CooledTurret{
 
         //add first ammo item to cheaty blocks so they can shoot properly
         if(tile.isEnemyCheat() && ammo.size > 0){
-            handleItem(ammo.entries().next().key, tile, tile);
+            handleItem(tile, tile, ammo.entries().next().key);
         }
     }
 
@@ -87,7 +85,7 @@ public class ItemTurret extends CooledTurret{
     }
 
     @Override
-    public int acceptStack(Item item, int amount, Tile tile, Teamc source){
+    public int acceptStack(Tile tile, Item item, int amount, Teamc source){
         TurretEntity entity = tile.ent();
 
         BulletType type = ammo.get(item);
@@ -98,9 +96,9 @@ public class ItemTurret extends CooledTurret{
     }
 
     @Override
-    public void handleStack(Item item, int amount, Tile tile, Teamc source){
+    public void handleStack(Tile tile, Item item, int amount, Teamc source){
         for(int i = 0; i < amount; i++){
-            handleItem(item, tile, null);
+            handleItem(tile, null, item);
         }
     }
 
@@ -111,7 +109,7 @@ public class ItemTurret extends CooledTurret{
     }
 
     @Override
-    public void handleItem(Item item, Tile tile, Tile source){
+    public void handleItem(Tile tile, Tile source, Item item){
         TurretEntity entity = tile.ent();
         if(entity == null) return;
 
@@ -144,7 +142,7 @@ public class ItemTurret extends CooledTurret{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
+    public boolean acceptItem(Tile tile, Tile source, Item item){
         TurretEntity entity = tile.ent();
 
         return ammo != null && ammo.get(item) != null && entity.totalAmmo + ammo.get(item).ammoMultiplier <= maxAmmo;

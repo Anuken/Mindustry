@@ -19,8 +19,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
-import java.io.*;
-
 import static mindustry.Vars.*;
 
 public class Conveyor extends Block implements Autotiler{
@@ -251,18 +249,18 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public void getStackOffset(Item item, Tile tile, Vec2 trns){
+    public void getStackOffset(Tile tile, Item item, Vec2 trns){
         trns.trns(tile.rotation() * 90 + 180f, tilesize / 2f);
     }
 
     @Override
-    public int acceptStack(Item item, int amount, Tile tile, Teamc source){
+    public int acceptStack(Tile tile, Item item, int amount, Teamc source){
         ConveyorEntity entity = tile.ent();
         return Math.min((int)(entity.minitem / itemSpace), amount);
     }
 
     @Override
-    public void handleStack(Item item, int amount, Tile tile, Teamc source){
+    public void handleStack(Tile tile, Item item, int amount, Teamc source){
         ConveyorEntity e = tile.ent();
         amount = Math.min(amount, itemCapacity - e.len);
 
@@ -278,7 +276,7 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
+    public boolean acceptItem(Tile tile, Tile source, Item item){
         ConveyorEntity e = tile.ent();
         if(e.len >= capacity) return false;
         int direction = source == null ? 0 : Math.abs(source.relativeTo(tile.x, tile.y) - tile.rotation());
@@ -286,7 +284,7 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public void handleItem(Item item, Tile tile, Tile source){
+    public void handleItem(Tile tile, Tile source, Item item){
         ConveyorEntity e = tile.ent();
         if(e.len >= capacity) return;
 

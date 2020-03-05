@@ -36,7 +36,7 @@ public class Router extends Block{
 
             if(target != null && (entity.time >= 1f || !(target.block() instanceof Router))){
                 getTileTarget(tile, entity.lastItem, entity.lastInput, true);
-                target.block().handleItem(entity.lastItem, target, Edges.getFacingEdge(tile, target));
+                target.block().handleItem(target, Edges.getFacingEdge(tile, target), entity.lastItem);
                 entity.items().remove(entity.lastItem, 1);
                 entity.lastItem = null;
             }
@@ -44,14 +44,14 @@ public class Router extends Block{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
+    public boolean acceptItem(Tile tile, Tile source, Item item){
         RouterEntity entity = tile.ent();
 
         return tile.team() == source.team() && entity.lastItem == null && entity.items().total() == 0;
     }
 
     @Override
-    public void handleItem(Item item, Tile tile, Tile source){
+    public void handleItem(Tile tile, Tile source, Item item){
         RouterEntity entity = tile.ent();
         entity.items().add(item, 1);
         entity.lastItem = item;
@@ -66,7 +66,7 @@ public class Router extends Block{
             Tile other = proximity.get((i + counter) % proximity.size);
             if(set) tile.rotation((byte)((tile.rotation() + 1) % proximity.size));
             if(other == from && from.block() == Blocks.overflowGate) continue;
-            if(other.block().acceptItem(item, other, Edges.getFacingEdge(tile, other))){
+            if(other.block().acceptItem(other, Edges.getFacingEdge(tile, other), item)){
                 return other;
             }
         }

@@ -68,7 +68,7 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
+    public boolean acceptItem(Tile tile, Tile source, Item item){
         return tile.entity.items().get(item) < getMaximumAccepted(tile, item);
     }
 
@@ -191,9 +191,9 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public void handleItem(Item item, Tile tile, Tile source){
+    public void handleItem(Tile tile, Tile source, Item item){
         if(net.server() || !net.active()){
-            super.handleItem(item, tile, source);
+            super.handleItem(tile, source, item);
             if(state.rules.tutorial){
                 Events.fire(new CoreItemDeliverEvent());
             }

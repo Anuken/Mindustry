@@ -169,7 +169,7 @@ public class MapIO{
             if(block.isFloor()){
                 tile.setFloor(block.asFloor());
             }else if(block.isMultiblock()){
-                tile.set(block, Team.derelict);
+                tile.setBlock(block, Team.derelict, 0);
             }else{
                 tile.setBlock(block);
             }

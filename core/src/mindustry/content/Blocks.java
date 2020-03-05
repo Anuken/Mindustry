@@ -106,16 +106,6 @@ public class Blocks implements ContentList{
             }
         };
 
-        //create special blockpart variants
-        for(int dx = 0; dx < BlockPart.maxSize; dx++){
-            for(int dy = 0; dy < BlockPart.maxSize; dy++){
-                int fx = dx - BlockPart.maxSize/2, fy = dy - BlockPart.maxSize/2;
-                if(fx != 0 || fy != 0){
-                    new BlockPart(fx, fy);
-                }
-            }
-        }
-
         spawn = new OverlayFloor("spawn"){
             {
                 variants = 0;

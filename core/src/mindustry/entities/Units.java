@@ -16,7 +16,7 @@ public class Units{
     private static boolean boolResult;
 
     /** @return whether this player can interact with a specific tile. if either of these are null, returns true.*/
-    public static boolean canInteract(Playerc player, Tile tile){
+    public static boolean canInteract(Playerc player, Tilec tile){
         return player == null || tile == null || tile.interactable(player.team());
     }
 

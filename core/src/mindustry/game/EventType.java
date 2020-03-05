@@ -146,12 +146,12 @@ public class EventType{
 
     /** Called when the player withdraws items from a block. */
     public static class WithdrawEvent{
-        public final Tile tile;
+        public final Tilec tile;
         public final Playerc player;
         public final Item item;
         public final int amount;
 
-        public WithdrawEvent(Tile tile, Playerc player, Item item, int amount){
+        public WithdrawEvent(Tilec tile, Playerc player, Item item, int amount){
             this.tile = tile;
             this.player = player;
             this.item = item;
@@ -161,12 +161,12 @@ public class EventType{
 
     /** Called when a player deposits items to a block.*/
     public static class DepositEvent{
-        public final Tile tile;
+        public final Tilec tile;
         public final Playerc player;
         public final Item item;
         public final int amount;
 
-        public DepositEvent(Tile tile, Playerc player, Item item, int amount){
+        public DepositEvent(Tilec tile, Playerc player, Item item, int amount){
             this.tile = tile;
             this.player = player;
             this.item = item;
@@ -176,10 +176,10 @@ public class EventType{
 
     /** Called when the player taps a block. */
     public static class TapEvent{
-        public final Tile tile;
+        public final Tilec tile;
         public final Playerc player;
 
-        public TapEvent(Tile tile, Playerc player){
+        public TapEvent(Tilec tile, Playerc player){
             this.tile = tile;
             this.player = player;
         }
@@ -187,11 +187,11 @@ public class EventType{
 
     /** Called when the player sets a specific block. */
     public static class TapConfigEvent{
-        public final Tile tile;
+        public final Tilec tile;
         public final Playerc player;
         public final Object value;
 
-        public TapConfigEvent(Tile tile, Playerc player, Object value){
+        public TapConfigEvent(Tilec tile, Playerc player, Object value){
             this.tile = tile;
             this.player = player;
             this.value = value;

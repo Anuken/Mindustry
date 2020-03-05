@@ -7,7 +7,6 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.Cicon;
-import mindustry.world.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
@@ -36,7 +35,7 @@ public class ConsumeItems extends Consume{
     }
 
     @Override
-    public void build(Tile tile, Table table){
+    public void build(Tilec tile, Table table){
         for(ItemStack stack : items){
             table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount), () -> tile.entity != null && tile.entity.items() != null && tile.entity.items().has(stack.item, stack.amount))).size(8 * 4).padRight(5);
         }

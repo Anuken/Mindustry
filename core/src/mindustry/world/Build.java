@@ -15,18 +15,15 @@ import static mindustry.Vars.*;
 
 public class Build{
 
-    /** Returns block type that was broken, or null if unsuccesful. */
     @Remote(called = Loc.server)
     public static void beginBreak(Team team, int x, int y){
         if(!validBreak(team, x, y)){
             return;
         }
 
-        Tile tile = world.ltile(x, y);
+        Tile tile = world.tilec(x, y);
+        //this should never happen, but it doesn't hurt to check for links
         float prevPercent = 1f;
-
-        //just in case
-        if(tile == null) return;
 
         if(tile.entity != null){
             prevPercent = tile.entity.healthf();
@@ -36,7 +33,7 @@ public class Build{
         Block previous = tile.block();
         Block sub = BuildBlock.get(previous.size);
 
-        tile.set(sub, team, rotation);
+        tile.setBlock(sub, team, rotation);
         tile.<BuildEntity>ent().setDeconstruct(previous);
         tile.entity.health(tile.entity.maxHealth() * prevPercent);
 
@@ -58,7 +55,7 @@ public class Build{
         Block previous = tile.block();
         Block sub = BuildBlock.get(result.size);
 
-        tile.set(sub, team, rotation);
+        tile.setBlock(sub, team, rotation);
         tile.<BuildEntity>ent().setConstruct(previous, result);
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
@@ -152,7 +149,7 @@ public class Build{
 
     /** Returns whether the tile at this position is breakable by this team */
     public static boolean validBreak(Team team, int x, int y){
-        Tile tile = world.ltile(x, y);
+        Tile tile = world.tile(x, y);
         return tile != null && tile.block().canBreak(tile) && tile.breakable() && tile.interactable(team);
     }
 }

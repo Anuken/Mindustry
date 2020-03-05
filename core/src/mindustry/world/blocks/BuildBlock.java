@@ -63,7 +63,7 @@ public class BuildBlock extends Block{
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         if(tile == null) return;
         float healthf = tile.entity == null ? 1f : tile.entity.healthf();
-        tile.set(block, team, rotation);
+        tile.setBlock(block, team, (int)rotation);
         if(tile.entity != null){
             tile.entity.health(block.health * healthf);
         }
@@ -265,8 +265,8 @@ public class BuildBlock extends Block{
 
                     if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
                         if(core != null){
-                            int accepting = core.tile().block().acceptStack(requirements[i].item, accumulated, core.tile(), builder);
-                            core.tile().block().handleStack(requirements[i].item, accepting, core.tile(), builder);
+                            int accepting = core.tile().block().acceptStack(core.tile(), requirements[i].item, accumulated, builder);
+                            core.tile().block().handleStack(core.tile(), requirements[i].item, accepting, builder);
                             accumulator[i] -= accepting;
                         }else{
                             accumulator[i] -= accumulated;

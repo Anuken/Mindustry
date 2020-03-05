@@ -229,9 +229,9 @@ public class DesktopInput extends InputHandler{
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 
         if(cursor != null){
-            cursor = cursor.link();
-
-            cursorType = cursor.block().getCursor(cursor);
+            if(cursor.entity != null){
+                cursorType = cursor.block().getCursor(cursor.entity);
+            }
 
             if(isPlacing() || !selectRequests.isEmpty()){
                 cursorType = SystemCursor.hand;
@@ -249,8 +249,8 @@ public class DesktopInput extends InputHandler{
                 cursorType = ui.unloadCursor;
             }
 
-            if(cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate){
-                Call.rotateBlock(player, cursor, Core.input.axisTap(Binding.rotate) > 0);
+            if(cursor.entity != null && cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate){
+                Call.rotateBlock(player, cursor.entity, Core.input.axisTap(Binding.rotate) > 0);
             }
         }
 
@@ -401,7 +401,7 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().requests().size == 0 || !player.builder().isBuilding()) && !droppingItem &&
+                if(!tileTapped(selected.entity) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().requests().size == 0 || !player.builder().isBuilding()) && !droppingItem &&
                 !tryBeginMine(selected) && player.miner().mineTile() == null && !Core.scene.hasKeyboard()){
                     isShooting = true;
                 }
@@ -450,8 +450,8 @@ public class DesktopInput extends InputHandler{
                 removeSelection(selectX, selectY, cursorX, cursorY);
             }
 
-            if(selected != null){
-                tryDropItems(selected.link(), Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            if(selected != null && selected.entity != null){
+                tryDropItems(selected.entity, Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             }
 
             if(sreq != null){

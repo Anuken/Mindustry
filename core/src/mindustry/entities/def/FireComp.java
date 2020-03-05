@@ -49,7 +49,7 @@ abstract class FireComp implements Timedc, Posc, Firec{
             return;
         }
 
-        Tilec entity = tile.link().entity;
+        Tilec entity = tile.entity;
         boolean damage = entity != null;
 
         float flammability = baseFlammability + puddleFlammability;

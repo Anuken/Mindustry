@@ -13,7 +13,6 @@ import mindustry.gen.TileOp;
 import mindustry.io.MapIO;
 import mindustry.maps.Map;
 import mindustry.world.*;
-import mindustry.world.blocks.BlockPart;
 
 import static mindustry.Vars.*;
 
@@ -83,7 +82,7 @@ public class MapEditor{
         //re-add them
         for(Tile tile : tiles){
             if(tile.block().isMultiblock()){
-                tile.set(tile.block(), tile.team());
+                tile.setBlock(tile.block(), tile.team(), 0);
             }
 
         }
@@ -173,7 +172,7 @@ public class MapEditor{
                 }
             }
 
-            tile(x, y).set(drawBlock, drawTeam);
+            tile(x, y).setBlock(drawBlock, drawTeam, 0);
         }else{
             boolean isFloor = drawBlock.isFloor() && drawBlock != Blocks.air;
 

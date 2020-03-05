@@ -8,7 +8,6 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.Cicon;
-import mindustry.world.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
@@ -33,7 +32,7 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void build(Tile tile, Table table){
+    public void build(Tilec tile, Table table){
         MultiReqImage image = new MultiReqImage();
         content.items().each(i -> filter.get(i) && (!state.isCampaign() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), 1), () -> tile.entity != null && tile.entity.items() != null && tile.entity.items().has(item))));
 

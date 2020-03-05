@@ -6,7 +6,6 @@ import mindustry.annotations.Annotations.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
@@ -90,12 +89,12 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         if(type.hitTiles){
             world.raycastEach(world.toTile(lastX()), world.toTile(lastY()), tileX(), tileY(), (x, y) -> {
 
-                Tile tile = world.ltile(x, y);
+                Tilec tile = world.ent(x, y);
                 if(tile == null) return false;
 
-                if(tile.entity != null && tile.entity.collide(this) && type.collides(this, tile) && !tile.entity.dead() && (type.collidesTeam || tile.team() != team())){
+                if(tile.collide(this) && type.collides(this, tile) && !tile.dead() && (type.collidesTeam || tile.team() != team())){
                     if(tile.team() != team()){
-                        tile.entity.collision(this);
+                        tile.collision(this);
                     }
 
                     type.hitTile(this, tile);

@@ -19,7 +19,6 @@ import mindustry.maps.filters.*;
 import mindustry.maps.filters.GenerateFilter.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
@@ -84,19 +83,36 @@ public class World{
         return height()*tilesize;
     }
 
-    public @Nullable
-    Tile tile(int pos){
-        return tiles == null ? null : tile(Point2.x(pos), Point2.y(pos));
+    @Nullable
+    public Tile tile(int pos){
+        return tile(Point2.x(pos), Point2.y(pos));
     }
 
-    public @Nullable Tile tile(int x, int y){
+    @Nullable
+    public Tile tile(int x, int y){
         return tiles.get(x, y);
     }
 
-    public @Nullable Tile ltile(int x, int y){
+    @Nullable
+    public Tile tilec(int x, int y){
+        Tile tile = tiles.get(x, y);
+        if(tile == null) return null;
+        if(tile.entity != null) return tile.entity.tile();
+        return tile;
+    }
+
+    @Nullable
+    public Tilec ent(int x, int y){
         Tile tile = tile(x, y);
         if(tile == null) return null;
-        return tile.block().linked(tile);
+        return tile.entity;
+    }
+
+    @Nullable
+    public Tilec ent(int pos){
+        Tile tile = tile(pos);
+        if(tile == null) return null;
+        return tile.entity;
     }
 
     @NonNull
@@ -104,12 +120,14 @@ public class World{
         return tiles.getn(x, y);
     }
 
-    public @Nullable Tile tileWorld(float x, float y){
+    @Nullable
+    public Tile tileWorld(float x, float y){
         return tile(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
-    public @Nullable Tile ltileWorld(float x, float y){
-        return ltile(Math.round(x / tilesize), Math.round(y / tilesize));
+    @Nullable
+    public Tilec entWorld(float x, float y){
+        return ent(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
     public int toTile(float coord){
@@ -384,6 +402,8 @@ public class World{
      */
     public void prepareTiles(Tiles tiles){
 
+        //TODO FIX
+        /*
         //find multiblocks
         IntArray multiblocks = new IntArray();
         for(Tile tile : tiles){
@@ -418,7 +438,7 @@ public class World{
                     }
                 }
             }
-        }
+        }*/
     }
 
     public interface Raycaster{

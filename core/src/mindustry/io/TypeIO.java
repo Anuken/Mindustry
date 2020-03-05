@@ -94,6 +94,14 @@ public class TypeIO{
         return (T)Groups.all.getByID(read.i());
     }
 
+    public static void writeTilec(Writes write, Tilec tile){
+        write.i(tile == null ? -1 : tile.pos());
+    }
+
+    public static Tilec readTilec(Reads read){
+        return world.ent(read.i());
+    }
+
     public static void writeTile(Writes write, Tile tile){
         write.i(tile == null ? Point2.pack(-1, -1) : tile.pos());
     }

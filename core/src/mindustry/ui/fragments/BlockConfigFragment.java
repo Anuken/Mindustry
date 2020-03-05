@@ -8,14 +8,13 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
-import mindustry.world.*;
+import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
 public class BlockConfigFragment extends Fragment{
     private Table table = new Table();
-    private Tile configTile;
-    private Block configBlock;
+    private Tilec configTile;
 
     @Override
     public void build(Group parent){
@@ -40,13 +39,12 @@ public class BlockConfigFragment extends Fragment{
         return table.isVisible() && configTile != null;
     }
 
-    public Tile getSelectedTile(){
+    public Tilec getSelectedTile(){
         return configTile;
     }
 
-    public void showConfig(Tile tile){
+    public void showConfig(Tilec tile){
         configTile = tile;
-        configBlock = tile.block();
 
         table.visible(true);
         table.clear();

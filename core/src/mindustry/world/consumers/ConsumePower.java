@@ -3,7 +3,6 @@ package mindustry.world.consumers;
 import arc.math.Mathf;
 import arc.scene.ui.layout.Table;
 import mindustry.gen.*;
-import mindustry.world.Tile;
 import mindustry.world.meta.*;
 
 /** Consumer class for blocks which consume power while being connected to a power graph. */
@@ -31,7 +30,7 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public void build(Tile tile, Table table){
+    public void build(Tilec tile, Table table){
         //No tooltip for power, for now
     }
 

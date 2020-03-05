@@ -8,7 +8,6 @@ import mindustry.type.Liquid;
 import mindustry.ui.Cicon;
 import mindustry.ui.MultiReqImage;
 import mindustry.ui.ReqImage;
-import mindustry.world.Tile;
 import mindustry.world.meta.BlockStat;
 import mindustry.world.meta.BlockStats;
 import mindustry.world.meta.values.LiquidFilterValue;
@@ -29,7 +28,7 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     }
 
     @Override
-    public void build(Tile tile, Table table){
+    public void build(Tilec tile, Table table){
         Array<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.get(l));
         MultiReqImage image = new MultiReqImage();
         list.each(liquid -> image.add(new ReqImage(liquid.icon(Cicon.medium), () -> tile.entity != null && tile.entity.liquids() != null && tile.entity.liquids().get(liquid) >= use(tile.entity))));

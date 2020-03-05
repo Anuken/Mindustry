@@ -30,7 +30,7 @@ public class OverflowGate extends Block{
     }
 
     @Override
-    public int acceptStack(Item item, int amount, Tile tile, Teamc source){
+    public int acceptStack(Tile tile, Item item, int amount, Teamc source){
         return 0;
     }
 
@@ -63,7 +63,7 @@ public class OverflowGate extends Block{
 
             if(target != null && (entity.time >= 1f)){
                 getTileTarget(tile, entity.lastItem, entity.lastInput, true);
-                target.block().handleItem(entity.lastItem, target, Edges.getFacingEdge(tile, target));
+                target.block().handleItem(target, Edges.getFacingEdge(tile, target), entity.lastItem);
                 entity.items().remove(entity.lastItem, 1);
                 entity.lastItem = null;
             }
@@ -71,14 +71,14 @@ public class OverflowGate extends Block{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
+    public boolean acceptItem(Tile tile, Tile source, Item item){
         OverflowGateEntity entity = tile.ent();
 
         return tile.team() == source.team() && entity.lastItem == null && entity.items().total() == 0;
     }
 
     @Override
-    public void handleItem(Item item, Tile tile, Tile source){
+    public void handleItem(Tile tile, Tile source, Item item){
         OverflowGateEntity entity = tile.ent();
         entity.items().add(item, 1);
         entity.lastItem = item;
@@ -94,13 +94,13 @@ public class OverflowGate extends Block{
         Tile to = tile.getNearby((from + 2) % 4);
         if(to == null) return null;
         Tile edge = Edges.getFacingEdge(tile, to);
-        boolean canForward = to.block().acceptItem(item, to, edge) && to.team() == tile.team() && !(to.block() instanceof OverflowGate);
+        boolean canForward = to.block().acceptItem(to, edge, item) && to.team() == tile.team() && !(to.block() instanceof OverflowGate);
 
         if(!canForward || invert){
             Tile a = tile.getNearby(Mathf.mod(from - 1, 4));
             Tile b = tile.getNearby(Mathf.mod(from + 1, 4));
-            boolean ac = a != null && a.block().acceptItem(item, a, edge) && !(a.block() instanceof OverflowGate) && a.team() == tile.team();
-            boolean bc = b != null && b.block().acceptItem(item, b, edge) && !(b.block() instanceof OverflowGate) && b.team() == tile.team();
+            boolean ac = a != null && a.block().acceptItem(a, edge, item) && !(a.block() instanceof OverflowGate) && a.team() == tile.team();
+            boolean bc = b != null && b.block().acceptItem(b, edge, item) && !(b.block() instanceof OverflowGate) && b.team() == tile.team();
 
             if(!ac && !bc){
                 return invert && canForward ? to : null;

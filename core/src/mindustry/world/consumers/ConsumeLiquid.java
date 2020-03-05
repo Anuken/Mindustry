@@ -7,7 +7,6 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.Cicon;
-import mindustry.world.*;
 import mindustry.world.meta.*;
 
 public class ConsumeLiquid extends ConsumeLiquidBase{
@@ -28,7 +27,7 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
     }
 
     @Override
-    public void build(Tile tile, Table table){
+    public void build(Tilec tile, Table table){
         table.add(new ReqImage(liquid.icon(Cicon.medium), () -> valid(tile.entity))).size(8 * 4);
     }
 

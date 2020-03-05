@@ -10,8 +10,8 @@ public class ArmoredConveyor extends Conveyor{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        return super.acceptItem(item, tile, source) && (source.block() instanceof Conveyor || Edges.getFacingEdge(source, tile).relativeTo(tile) == tile.rotation());
+    public boolean acceptItem(Tile tile, Tile source, Item item){
+        return super.acceptItem(tile, source, item) && (source.block() instanceof Conveyor || Edges.getFacingEdge(source, tile).relativeTo(tile) == tile.rotation());
     }
 
     @Override

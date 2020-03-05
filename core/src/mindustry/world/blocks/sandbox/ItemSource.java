@@ -82,7 +82,7 @@ public class ItemSource extends Block{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
+    public boolean acceptItem(Tile tile, Tile source, Item item){
         return false;
     }
 

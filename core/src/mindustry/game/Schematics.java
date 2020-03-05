@@ -263,7 +263,7 @@ public class Schematics implements Loadable{
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
-            tile.set(st.block, state.rules.defaultTeam);
+            tile.setBlock(st.block, state.rules.defaultTeam, 0);
             tile.rotation(st.rotation);
 
             Object config = st.config;

@@ -313,12 +313,12 @@ public class PowerNode extends PowerBlock{
         return tile.entity.power().links.contains(other.pos());
     }
 
-    public boolean linkValid(Tile tile, Tile link){
+    public boolean linkValid(Tilec tile, Tilec link){
         return linkValid(tile, link, true);
     }
 
-    public boolean linkValid(Tile tile, Tile link, boolean checkMaxNodes){
-        if(tile == link || link == null || link.entity == null || tile.entity == null || !link.block().hasPower || tile.team() != link.team()) return false;
+    public boolean linkValid(Tilec tile, Tilec link, boolean checkMaxNodes){
+        if(tile == link || link == null || !link.block().hasPower || tile.team() != link.team()) return false;
 
         if(overlaps(tile, link, laserRange * tilesize) || (link.block() instanceof PowerNode && overlaps(link, tile, link.<PowerNode>cblock().laserRange * tilesize))){
             if(checkMaxNodes && link.block() instanceof PowerNode){
@@ -369,8 +369,8 @@ public class PowerNode extends PowerBlock{
         Draw.color();
     }
 
-    public static boolean insulated(Tile tile, Tile other){
-        return insulated(tile.x, tile.y, other.x, other.y);
+    public static boolean insulated(Tilec tile, Tilec other){
+        return insulated(tile.tileX(), tile.tileY(), other.tileX(), other.tileY());
     }
 
     public static boolean insulated(int x, int y, int x2, int y2){

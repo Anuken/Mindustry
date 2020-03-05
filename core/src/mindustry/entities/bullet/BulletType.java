@@ -12,7 +12,6 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.world.*;
 
 public abstract class BulletType extends Content{
     public float lifetime;
@@ -97,11 +96,11 @@ public abstract class BulletType extends Content{
         return speed * lifetime * (1f - drag);
     }
 
-    public boolean collides(Bulletc bullet, Tile tile){
+    public boolean collides(Bulletc bullet, Tilec tile){
         return true;
     }
 
-    public void hitTile(Bulletc b, Tile tile){
+    public void hitTile(Bulletc b, Tilec tile){
         hit(b);
     }
 

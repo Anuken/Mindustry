@@ -83,11 +83,11 @@ public class Damage{
         collidedBlocks.clear();
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {
-            Tile tile = world.ltile(cx, cy);
-            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.entity != null && tile.getTeamID() != team.id && tile.entity.collide(hitter)){
-                tile.entity.collision(hitter);
+            Tilec tile = world.ent(cx, cy);
+            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.entity != null && tile.team() != team && tile.collide(hitter)){
+                tile.collision(hitter);
                 collidedBlocks.add(tile.pos());
-                hitter.type().hit(hitter, tile.worldx(), tile.worldy());
+                hitter.type().hit(hitter, tile.x(), tile.y());
             }
         };
 
@@ -227,15 +227,15 @@ public class Damage{
             int scaledDamage = (int)(damage * (1f - (float)dst / radius));
 
             bits.set(bitOffset + x, bitOffset + y);
-            Tile tile = world.ltile(startx + x, starty + y);
+            Tilec tile = world.ent(startx + x, starty + y);
 
             if(scaledDamage <= 0 || tile == null) continue;
 
             //apply damage to entity if needed
-            if(tile.entity != null && tile.team() != team){
-                int health = (int)tile.entity.health();
-                if(tile.entity.health() > 0){
-                    tile.entity.damage(scaledDamage);
+            if(tile.team() != team){
+                int health = (int)tile.health();
+                if(tile.health() > 0){
+                    tile.damage(scaledDamage);
                     scaledDamage -= health;
 
                     if(scaledDamage <= 0) continue;

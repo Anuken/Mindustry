@@ -59,14 +59,14 @@ public class Incinerator extends Block{
     }
 
     @Override
-    public void handleItem(Item item, Tile tile, Tile source){
+    public void handleItem(Tile tile, Tile source, Item item){
         if(Mathf.chance(0.3)){
             effect.at(tile.drawx(), tile.drawy());
         }
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
+    public boolean acceptItem(Tile tile, Tile source, Item item){
         IncineratorEntity entity = tile.ent();
         return entity.heat > 0.5f;
     }
