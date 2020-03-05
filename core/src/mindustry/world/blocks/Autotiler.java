@@ -9,8 +9,6 @@ import mindustry.world.*;
 
 import java.util.*;
 
-import static mindustry.Vars.world;
-
 public interface Autotiler{
     class AutotilerHolder{
         static final int[] blendresult = new int[3];
@@ -91,13 +89,13 @@ public interface Autotiler{
 
     default boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
-                || ((world.tile(otherx, othery).entity.isOmnidirectional() && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
+                || ((!otherblock.rotate && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
                 Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) || (otherblock.rotate && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y))));
     }
 
     default boolean lookingAt(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
-        || (world.tile(otherx, othery).entity.isOmnidirectional() || Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
+        || (!otherblock.rotate || Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
     }
 
     boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock);

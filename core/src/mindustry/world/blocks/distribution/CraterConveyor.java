@@ -269,11 +269,6 @@ public class CraterConveyor extends Block implements Autotiler{
             dump = stream.readByte();
             reload = stream.readFloat();
         }
-
-        @Override
-        public boolean isOmnidirectional(){
-            return blendbit2 == 6;
-        }
     }
 
     // crater conveyor tiles that input into this one
