@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
+import arc.util.serialization.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -15,7 +16,6 @@ import mindustry.entities.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
-import mindustry.net.Administration;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -48,6 +48,8 @@ public class NetServer implements ApplicationListener{
         if(state.rules.pvp){
             //find team with minimum amount of players and auto-assign player to that.
             TeamData re = state.teams.getActive().min(data -> {
+                if((state.rules.waveTeam == data.team && state.rules.waves) || !data.team.active()) return Integer.MAX_VALUE;
+
                 int count = 0;
                 for(Player other : players){
                     if(other.getTeam() == data.team && other != player){
@@ -93,6 +95,16 @@ public class NetServer implements ApplicationListener{
             }
 
             String uuid = packet.uuid;
+            byte[] buuid = Base64Coder.decode(uuid);
+            CRC32 crc = new CRC32();
+            crc.update(buuid, 0, 8);
+            ByteBuffer buff = ByteBuffer.allocate(8);
+            buff.put(buuid, 8, 8);
+            buff.position(0);
+            if(crc.getValue() != buff.getLong()){
+                con.kick(KickReason.clientOutdated);
+                return;
+            }
 
             if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address)) return;
 
@@ -121,7 +133,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(admins.getPlayerLimit() > 0 && playerGroup.size() >= admins.getPlayerLimit()){
+            if(admins.getPlayerLimit() > 0 && playerGroup.size() >= admins.getPlayerLimit() && !netServer.admins.isAdmin(uuid, packet.usid)){
                 con.kick(KickReason.playerLimit);
                 return;
             }
@@ -206,6 +218,11 @@ public class NetServer implements ApplicationListener{
             player.setNet(player.x, player.y);
             player.color.set(packet.color);
             player.color.a = 1f;
+
+            //save admin ID but don't overwrite it
+            if(!player.isAdmin && !info.admin){
+                info.adminUsid = packet.usid;
+            }
 
             try{
                 writeBuffer.position(0);
@@ -313,7 +330,7 @@ public class NetServer implements ApplicationListener{
                 votes += d;
                 voted.addAll(player.uuid, admins.getInfo(player.uuid).lastIP);
                         
-                Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted to kick[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
+                Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted on kicking[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
                             player.name, target.name, votes, votesRequired()));
             }
 

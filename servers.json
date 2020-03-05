@@ -3,6 +3,15 @@
     "address": "mindustry.us.to"
   },
   {
+    "address": "mindustry.indielm.com:1101"
+  },
+  {
+    "address": "mindustry.indielm.com"
+  },
+  {
+    "address": "mindustry.nydus.app:1337"
+  },
+  {
     "address": "mindustry.ecansol.com:6597"
   },
   {
@@ -10,6 +19,9 @@
   },
   {
     "address": "mindustry.ru"
+  },
+  {
+    "address": "mindustry.ru:7000"
   },
   {
     "address": "mindustry.io"
@@ -22,5 +34,8 @@
   },
   {
     "address": "mindustry.io:3000"
+  },
+  {
+    "address": "aamindustry.play.ai"
   }
 ]

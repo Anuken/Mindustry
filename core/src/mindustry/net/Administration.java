@@ -230,7 +230,7 @@ public class Administration{
     }
 
     /**
-     * Returns list of all players with admin status
+     * Returns list of all players which are banned
      */
     public Array<PlayerInfo> getBanned(){
         Array<PlayerInfo> result = new Array<>();
@@ -568,6 +568,7 @@ public class Administration{
             player = null;
             type = null;
             tile = null;
+            block = null;
         }
     }
 

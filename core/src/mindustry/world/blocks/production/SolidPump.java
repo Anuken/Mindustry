@@ -111,6 +111,7 @@ public class SolidPump extends Pump{
             tile.entity.liquids.add(result, maxPump);
             entity.lastPump = maxPump;
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
+            if(tile.entity.timer.get(timerContentCheck, 10)) useContent(tile, result);
             if(Mathf.chance(entity.delta() * updateEffectChance))
                 Effects.effect(updateEffect, entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
         }else{

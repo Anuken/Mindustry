@@ -2,12 +2,14 @@ package mindustry.world.blocks.distribution;
 
 import arc.math.Mathf;
 import arc.util.Time;
-import mindustry.entities.type.TileEntity;
+import mindustry.entities.type.*;
 import mindustry.type.Item;
 import mindustry.world.*;
 import mindustry.world.meta.BlockGroup;
 
 import java.io.*;
+
+import static mindustry.Vars.world;
 
 public class OverflowGate extends Block{
     public float speed = 1f;
@@ -29,6 +31,11 @@ public class OverflowGate extends Block{
     }
 
     @Override
+    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+        return 0;
+    }
+
+    @Override
     public int removeStack(Tile tile, Item item, int amount){
         OverflowGateEntity entity = tile.ent();
         int result = super.removeStack(tile, item, amount);
@@ -47,6 +54,11 @@ public class OverflowGate extends Block{
         }
 
         if(entity.lastItem != null){
+            if(entity.lastInput == null){
+                entity.lastItem = null;
+                return;
+            }
+
             entity.time += 1f / speed * Time.delta();
             Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);
 
@@ -120,19 +132,24 @@ public class OverflowGate extends Block{
 
         @Override
         public byte version(){
-            return 2;
+            return 3;
         }
 
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
+            stream.writeInt(lastInput == null ? Pos.invalid : lastInput.pos());
         }
 
         @Override
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
+
             if(revision == 1){
                 new DirectionalItemBuffer(25, 50f).read(stream);
+            }else if(revision == 3){
+                lastInput = world.tile(stream.readInt());
+                lastItem = items.first();
             }
         }
     }

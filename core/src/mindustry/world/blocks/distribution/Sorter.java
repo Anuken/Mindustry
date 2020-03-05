@@ -14,7 +14,7 @@ import mindustry.world.meta.*;
 
 import java.io.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class Sorter extends Block{
     private static Item lastItem;
@@ -46,6 +46,9 @@ public class Sorter extends Block{
     @Override
     public void configured(Tile tile, Player player, int value){
         tile.<SorterEntity>ent().sortItem = content.item(value);
+        if(!headless){
+            renderer.minimap.update(tile);
+        }
     }
 
     @Override
@@ -133,7 +136,7 @@ public class Sorter extends Block{
     @Override
     public void buildConfiguration(Tile tile, Table table){
         SorterEntity entity = tile.ent();
-        ItemSelection.buildItemTable(table, () -> entity.sortItem, item -> {
+        ItemSelection.buildTable(table, content.items(), () -> entity.sortItem, item -> {
             lastItem = item;
             tile.configure(item == null ? -1 : item.id);
         });
