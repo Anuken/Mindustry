@@ -28,6 +28,7 @@ public class DoubleTurret extends ItemTurret{
     protected void shoot(Tile tile, BulletType ammo){
         TurretEntity entity = tile.ent();
         entity.shots++;
+        entity.heat = 1f;
 
         int i = Mathf.signs[entity.shots % 2];
 
