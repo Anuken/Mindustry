@@ -316,10 +316,10 @@ public class CraterConveyor extends Block implements Autotiler{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         CraterConveyorEntity entity = tile.ent();
 
+        if (tile == source) return true;                                  // player threw items
         return!((entity.blendbit2 != 5)                                   // not a loading dock
             ||  (entity.items.total() > 0 && !entity.items.has(item))     // incompatible items
             ||  (entity.items.total() >= getMaximumAccepted(tile, item))  // filled to capacity
             ||  (tile.front() == source));                                // fed from the front
     }
-
 }
