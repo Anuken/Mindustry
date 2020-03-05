@@ -53,6 +53,8 @@ public class Block extends BlockStorage{
     public boolean solidifes;
     /** whether this is rotateable */
     public boolean rotate;
+    /** whether this dumps as well */
+    public boolean dumpling;
     /** whether you can break this with rightclick */
     public boolean breakable;
     /** whether to add this block to brokenblocks */
@@ -665,6 +667,13 @@ public class Block extends BlockStorage{
 
             return result;
         }
+    }
+
+    /**
+     * Whether blending this tile should respect dumpling.
+     */
+    public boolean blendDumpling(Tile tile){
+        return false;
     }
 
     public String getDisplayName(Tile tile){
