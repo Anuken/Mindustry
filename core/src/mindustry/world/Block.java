@@ -716,6 +716,17 @@ public class Block extends BlockStorage{
         Draw.reset();
     }
 
+    public void drawTinted(Tile tile, Color tint){
+        if(tile.entity == null) return;
+
+        Draw.reset();
+        Draw.color(tint, Mathf.absin(Time.globalTime(), 6f, 0.28f));
+
+        Fill.square(tile.drawx(), tile.drawy(), tilesize * size / 2);
+
+        Draw.reset();
+    }
+
     public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
         TextureRegion reg = icon(Cicon.full);
         Draw.rect(icon(Cicon.full), req.drawx(), req.drawy(),

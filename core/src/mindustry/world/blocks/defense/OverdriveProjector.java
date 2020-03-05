@@ -1,11 +1,12 @@
 package mindustry.world.blocks.defense;
 
 import arc.Core;
+import arc.func.*;
 import arc.struct.IntSet;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
-import arc.util.Time;
+import arc.util.*;
 import mindustry.entities.type.TileEntity;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -85,30 +86,38 @@ public class OverdriveProjector extends Block{
         }
 
         if(entity.charge >= reload){
-            float realRange = range + entity.phaseHeat * phaseRangeBoost;
             float realBoost = (speedBoost + entity.phaseHeat * speedBoostPhase) * entity.efficiency();
 
             entity.charge = 0f;
 
-            int tileRange = (int)(realRange / tilesize + 1);
             healed.clear();
 
-            for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
-                for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    if(!Mathf.within(x * tilesize, y * tilesize, tile.drawx(), tile.drawy(), realRange)) continue;
-
-                    Tile other = world.ltile(x, y);
-
-                    if(other == null) continue;
-
-                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null){
-                        if(other.entity.timeScale <= realBoost){
-                            other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
-                            other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
-                        }
-                        healed.add(other.pos());
+            inRange(tile, other -> {
+                if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null){
+                    if(other.entity.timeScale <= realBoost){
+                        other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
+                        other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
                     }
+                    healed.add(other.pos());
                 }
+            });
+        }
+    }
+
+    private void inRange(Tile tile, Cons<Tile> cons){
+        OverdriveEntity entity = tile.ent();
+
+        float realRange = range + entity.phaseHeat * phaseRangeBoost;
+
+        int tileRange = (int)(realRange / tilesize + 1);
+
+        for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
+            for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
+                if(!Mathf.within(x * tilesize, y * tilesize, tile.drawx(), tile.drawy(), realRange)) continue;
+
+                Tile other = world.ltile(x, y);
+
+                if(other != null) cons.get(other);
             }
         }
     }
@@ -118,6 +127,7 @@ public class OverdriveProjector extends Block{
         OverdriveEntity entity = tile.ent();
         float realRange = range + entity.phaseHeat * phaseRangeBoost;
 
+        inRange(tile, other -> other.block().drawTinted(other, baseColor));
         Drawf.dashCircle(tile.drawx(), tile.drawy(), realRange, baseColor);
     }
 

@@ -1,6 +1,7 @@
 package mindustry.world.blocks.defense;
 
 import arc.Core;
+import arc.func.*;
 import arc.struct.IntSet;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
@@ -75,26 +76,32 @@ public class MendProjector extends Block{
         }
 
         if(entity.charge >= reload){
-            float realRange = range + entity.phaseHeat * phaseRangeBoost;
             entity.charge = 0f;
-
-            int tileRange = (int)(realRange / tilesize + 1);
             healed.clear();
 
-            for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
-                for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    if(!Mathf.within(x * tilesize, y * tilesize, tile.drawx(), tile.drawy(), realRange)) continue;
-
-                    Tile other = world.ltile(x, y);
-
-                    if(other == null) continue;
-
-                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null && other.entity.health < other.entity.maxHealth()){
-                        other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.efficiency());
-                        Effects.effect(Fx.healBlockFull, Tmp.c1.set(baseColor).lerp(phaseColor, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
-                        healed.add(other.pos());
-                    }
+            inRange(tile, other -> {
+                if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null && other.entity.health < other.entity.maxHealth()){
+                    other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.efficiency());
+                    Effects.effect(Fx.healBlockFull, Tmp.c1.set(baseColor).lerp(phaseColor, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
+                    healed.add(other.pos());
                 }
+            });
+        }
+    }
+
+    private void inRange(Tile tile, Cons<Tile> cons){
+        MendEntity entity = tile.ent();
+
+        float realRange = range + entity.phaseHeat * phaseRangeBoost;
+        int tileRange = (int)(realRange / tilesize + 1);
+
+        for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
+            for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
+                if(!Mathf.within(x * tilesize, y * tilesize, tile.drawx(), tile.drawy(), realRange)) continue;
+
+                Tile other = world.ltile(x, y);
+
+                if(other != null) cons.get(other);
             }
         }
     }
@@ -109,6 +116,7 @@ public class MendProjector extends Block{
         MendEntity entity = tile.ent();
         float realRange = range + entity.phaseHeat * phaseRangeBoost;
 
+        inRange(tile, other -> other.block().drawTinted(other, baseColor));
         Drawf.dashCircle(tile.drawx(), tile.drawy(), realRange, baseColor);
     }
 
