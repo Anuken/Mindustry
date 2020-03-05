@@ -97,7 +97,7 @@ public class CraterConveyor extends Block implements Autotiler{
         float b = tile.rotation() * 90;
         if(from.rotation() == 3 && tile.rotation() == 0) a = -1 * 90;
         if(from.rotation() == 0 && tile.rotation() == 3) a = 4 * 90;
-        float rotation = Mathf.lerp(a, b, Interpolation.linear.apply(1f - Mathf.clamp(entity.reload * 2, 0f, 1f)));
+        float rotation = Mathf.lerp(a, b, Interpolation.smooth.apply(1f - Mathf.clamp(entity.reload * 2, 0f, 1f)));
 
         // draw crater
         Draw.rect(regions[7], Tmp.v1.x, Tmp.v1.y, rotation);
