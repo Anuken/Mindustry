@@ -171,6 +171,18 @@ public class CraterConveyor extends Block implements Autotiler{
         }
 
         if(shouldLaunch(tile)){
+
+            // when near the center of the target tile...
+            if(entity.reload < 0.25f){
+                if(entity.blendbit2 != 5 && (entity.from != tile.pos() || entity.blendbit2 == 6)){ // ...and if its not a crater conveyor, start unloading (everything)
+                    while(true) if(!tryDump(tile)) break;
+                    if(entity.items.total() == 0){
+                        Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
+                        bump(tile);
+                    }
+                }
+            }
+
             Tile destination = tile.front();
 
             // failsafe
@@ -181,15 +193,6 @@ public class CraterConveyor extends Block implements Autotiler{
 
             // update the target first to potentially make room
             destination.block().update(destination);
-
-            // when near the center of the target tile...
-            if(entity.reload < 0.25f){
-                if(entity.blendbit2 != 5 && (entity.from != tile.pos() || entity.blendbit2 == 6)){ // ...and if its not a crater conveyor, start unloading (everything)
-                    while(entity.items.total() > 0 && entity.items.first() != null && offloadDir(tile, entity.items.first())) entity.items.remove(entity.items.first(), 1);
-                    if(entity.items.total() == 0) Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
-                    if(entity.items.total() == 0) bump(tile);
-                }
-            }
 
             // when basically exactly on the center:
             if(entity.reload == 0){
@@ -254,11 +257,14 @@ public class CraterConveyor extends Block implements Autotiler{
         int from = Pos.invalid;
         float reload;
 
+        byte dump;
+
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
 
             stream.writeInt(from);
+            stream.writeByte(dump);
             stream.writeFloat(reload);
         }
 
@@ -267,6 +273,7 @@ public class CraterConveyor extends Block implements Autotiler{
             super.read(stream, revision);
 
             from = stream.readInt();
+            dump = stream.readByte();
             reload = stream.readFloat();
         }
     }
@@ -321,5 +328,17 @@ public class CraterConveyor extends Block implements Autotiler{
             ||  (entity.items.total() > 0 && !entity.items.has(item))     // incompatible items
             ||  (entity.items.total() >= getMaximumAccepted(tile, item))  // filled to capacity
             ||  (tile.front() == source));                                // fed from the front
+    }
+
+    @Override
+    protected int retrieveDump(Tile tile){
+        return tile.<CraterConveyorEntity>ent().dump;
+    }
+
+    @Override
+    protected void incrementDump(Tile tile, int prox){
+        CraterConveyorEntity entity = tile.ent();
+
+        entity.dump = (byte)((entity.dump + 1) % prox);
     }
 }
