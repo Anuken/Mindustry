@@ -305,35 +305,21 @@ public class CraterConveyor extends Block implements Autotiler{
         });
     }
 
-    public boolean shouldLaunch(Tile tile){
+    private boolean shouldLaunch(Tile tile){
         CraterConveyorEntity entity = tile.ent();
 
-        // unless its a loading dock, always move
-        if(entity.blendbit2 != 5) return true;
-
-        // its considered full (enough, at this point in time)
-        if(entity.items.total() >= getMaximumAccepted(tile, entity.items.first())) return true;
-
-        return false;
+        // prevent(s) launch only when the crater is on a loading dock that still has room for items
+        return entity.blendbit2 != 5 || (entity.items.total() >= getMaximumAccepted(tile, entity.items.first()));
     }
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         CraterConveyorEntity entity = tile.ent();
 
-        // is a loading dock
-        if(entity.blendbit2 != 5) return false;
-
-        // doesn't yet have a different item
-        if(entity.items.total() > 0 && !entity.items.has(item)) return false;
-
-        // is not filled to capacity
-        if(entity.items.total() >= getMaximumAccepted(tile, item)) return false;
-
-        // is not fed from the front
-        if(tile.front() == source) return false;
-
-        return true;
+        return!((entity.blendbit2 != 5)                                   // not a loading dock
+            ||  (entity.items.total() > 0 && !entity.items.has(item))     // incompatible items
+            ||  (entity.items.total() >= getMaximumAccepted(tile, item))  // filled to capacity
+            ||  (tile.front() == source));                                // fed from the front
     }
 
 }
