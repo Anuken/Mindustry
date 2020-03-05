@@ -84,30 +84,28 @@ public class CraterConveyor extends Block implements Autotiler{
     public void drawLayer(Tile tile){
         CraterConveyorEntity entity = tile.ent();
 
-        //     no from == no crater
         if(entity.from == Pos.invalid) return;
 
+        // position
         Tile from = world.tile(entity.from);
         Tmp.v1.set(from.getX(), from.getY());
         Tmp.v2.set(tile.drawx(), tile.drawy());
         Tmp.v1.interpolate(Tmp.v2, 1f - entity.reload, Interpolation.linear);
 
-        // rotating smoothly
+        // fixme
         float a = from.rotation() * 90;
         float b = tile.rotation() * 90;
         if(from.rotation() == 3 && tile.rotation() == 0) a = -1 * 90;
         if(from.rotation() == 0 && tile.rotation() == 3) a = 4 * 90;
+
+        // rotation
         float rotation = Mathf.lerp(a, b, Interpolation.smooth.apply(1f - Mathf.clamp(entity.reload * 2, 0f, 1f)));
 
-        // draw crater
+        // crater
         Draw.rect(regions[7], Tmp.v1.x, Tmp.v1.y, rotation);
 
-        // failsafe
-        if(entity.items.first() == null) return;
-
-        // draw resource
-        float size = itemSize / 2f;
-        size += entity.items.total() * 0.1f / (itemCapacity / 8f);
+        // item
+        float size = (itemSize / 2f) + entity.items.total() * 0.1f / (itemCapacity / 8f);
         Draw.rect(entity.items.first().icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
     }
 
@@ -159,8 +157,8 @@ public class CraterConveyor extends Block implements Autotiler{
                 entity.sleep();
                 return;
             }
-            Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
             entity.from = tile.pos();
+            Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
         }else{
             // poof out crater
             if(entity.items.total() == 0){
@@ -177,6 +175,7 @@ public class CraterConveyor extends Block implements Autotiler{
                 while(true) if(!tryDump(tile)) break; // unload as much as possible
                 if(entity.items.total() == 0){
                     Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
+                    entity.from = Pos.invalid;
                     bump(tile);
                 }
             }
@@ -231,8 +230,11 @@ public class CraterConveyor extends Block implements Autotiler{
     @Override
     public int removeStack(Tile tile, Item item, int amount){
         int i = super.removeStack(tile, item, amount);
-        if(tile.entity.items.total() == 0) Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
-        if(tile.entity.items.total() == 0) bump(tile);
+        if(tile.entity.items.total() == 0){
+            Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
+            tile.<CraterConveyorEntity>ent().from = Pos.invalid;
+            bump(tile);
+        }
         return i;
     }
 
