@@ -138,8 +138,6 @@ public class CraterConveyor extends Block implements Autotiler{
         entity.blendbit1 = bits[0];
         entity.blendsclx = bits[1];
         entity.blendscly = bits[2];
-
-        entity.proximity().each(t -> t.block() instanceof Conveyor, t -> t.block().onProximityUpdate(t));
     }
 
     @Override
