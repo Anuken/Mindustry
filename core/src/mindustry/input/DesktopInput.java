@@ -115,6 +115,10 @@ public class DesktopInput extends InputHandler{
             drawRequest(request);
         }
 
+        for(BuildRequest request : selectRequests){
+            drawOverRequest(request);
+        }
+
         if(sreq != null){
             boolean valid = validPlace(sreq.x, sreq.y, sreq.block, sreq.rotation, sreq);
             if(sreq.block.rotate){

@@ -42,7 +42,8 @@ public class MassDriver extends Block{
         outlineIcon = true;
         entityType = MassDriverEntity::new;
 
-        config(Point2.class, (tile, point) -> tile.<MassDriverEntity>ent().link = point.pack());
+        //point2 is relative
+        config(Point2.class, (tile, point) -> tile.<MassDriverEntity>ent().link = Point2.pack(point.x + tile.x, point.y + tile.y));
         config(Integer.class, (tile, point) -> tile.<MassDriverEntity>ent().link = point);
     }
 
@@ -325,7 +326,7 @@ public class MassDriver extends Block{
 
         @Override
         public Point2 config(){
-            return Point2.unpack(link);
+            return Point2.unpack(link).sub(tile.x, tile.y);
         }
 
         @Override

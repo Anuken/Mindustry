@@ -41,7 +41,9 @@ public class ItemBridge extends Block{
         group = BlockGroup.transportation;
         entityType = ItemBridgeEntity::new;
 
-        config(Point2.class, (tile, i) -> tile.<ItemBridgeEntity>ent().link = i.pack());
+        //point2 config is relative
+        config(Point2.class, (tile, i) -> tile.<ItemBridgeEntity>ent().link = Point2.pack(i.x + tile.x, i.y + tile.y));
+        //integer is not
         config(Integer.class, (tile, i) -> tile.<ItemBridgeEntity>ent().link = i);
     }
 
@@ -58,7 +60,7 @@ public class ItemBridge extends Block{
     public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
         otherReq = null;
         list.each(other -> {
-            if(other.block == this && req.config instanceof Point2 && ((Point2)req.config).equals(other.x, other.y)){
+            if(other.block == this && req != other && req.config instanceof Point2 && ((Point2)req.config).equals(other.x - req.x, other.y - req.y)){
                 otherReq = other;
             }
         });
@@ -367,7 +369,7 @@ public class ItemBridge extends Block{
 
         @Override
         public Point2 config(){
-            return Point2.unpack(link);
+            return Point2.unpack(link).sub(tile.x, tile.y);
         }
 
         @Override

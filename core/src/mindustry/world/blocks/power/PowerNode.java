@@ -80,7 +80,9 @@ public class PowerNode extends PowerBlock{
         config(Point2[].class, (tile, value) -> {
             tile.entity.power().links.clear();
             for(Point2 p : value){
-                tile.entity.power().links.add(p.pack());
+                if(tile.entity.power().links.size < maxNodes){
+                    tile.entity.power().links.add(Point2.pack(p.x + tile.x, p.y + tile.y));
+                }
             }
         });
     }
@@ -295,8 +297,7 @@ public class PowerNode extends PowerBlock{
             for(Point2 point : (Point2[])req.config){
                 otherReq = null;
                 list.each(other -> {
-                    if(other.x == point.x && other.y == point.y){
-                        Log.info("found match " + other);
+                    if((other.x == req.x + point.x && other.y == req.y + point.y) && other != req){
                         otherReq = other;
                     }
                 });
@@ -396,7 +397,7 @@ public class PowerNode extends PowerBlock{
         public Point2[] config(){
             Point2[] out = new Point2[power.links.size];
             for(int i = 0; i < out.length; i++){
-                out[i] = Point2.unpack(power.links.get(i));
+                out[i] = Point2.unpack(power.links.get(i)).sub(tile.x, tile.y);
             }
             return out;
         }

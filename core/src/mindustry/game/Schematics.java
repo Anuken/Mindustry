@@ -266,7 +266,7 @@ public class Schematics implements Loadable{
             tile.set(st.block, state.rules.defaultTeam);
             tile.rotation(st.rotation);
 
-            Object config = BuildRequest.pointConfig(st.config, point -> point.add(tile.x - st.x, tile.y - st.y));
+            Object config = st.config;
             tile.configureAny(config);
 
             if(st.block instanceof Drill){
@@ -350,7 +350,7 @@ public class Schematics implements Loadable{
 
                 if(tile != null && tile.entity != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
                     && (tile.entity.block().isVisible() || (tile.entity.block() instanceof CoreBlock && Core.settings.getBool("coreselect")))){
-                    Object config = BuildRequest.pointConfig(tile.entity.config(), point -> point.add(offsetX, offsetY));
+                    Object config = tile.entity.config();
 
                     tiles.add(new Stile(tile.block(), tile.x + offsetX, tile.y + offsetY, config, tile.rotation()));
                     counted.add(tile.pos());
@@ -422,7 +422,7 @@ public class Schematics implements Loadable{
             for(int i = 0; i < total; i++){
                 Block block = blocks.get(stream.readByte());
                 int position = stream.readInt();
-                Object config = ver == 0 ? mapConfig(block, stream.readInt()) : TypeIO.readObject(Reads.get(stream));
+                Object config = ver == 0 ? mapConfig(block, stream.readInt(), position) : TypeIO.readObject(Reads.get(stream));
                 byte rotation = stream.readByte();
                 if(block != Blocks.air){
                     tiles.add(new Stile(block, Point2.x(position), Point2.y(position), config, rotation));
@@ -473,10 +473,10 @@ public class Schematics implements Loadable{
     }
 
     /** Maps legacy int configs to new config objects. */
-    private static Object mapConfig(Block block, int value){
+    private static Object mapConfig(Block block, int value, int position){
         if(block instanceof Sorter || block instanceof Unloader || block instanceof ItemSource) return content.item(value);
-        if(block instanceof MassDriver || block instanceof ItemBridge) return Point2.unpack(value);
         if(block instanceof LiquidSource) return content.liquid(value);
+        if(block instanceof MassDriver || block instanceof ItemBridge) return Point2.unpack(value).sub(Point2.x(position), Point2.y(position));
         if(block instanceof LightBlock || block instanceof CommandCenter) return value;
 
         return null;

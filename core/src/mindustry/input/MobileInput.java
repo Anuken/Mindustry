@@ -222,8 +222,6 @@ public class MobileInput extends InputHandler implements GestureListener{
                             BuildRequest other = getRequest(request.x, request.y, request.block.size, null);
                             BuildRequest copy = request.copy();
 
-                            copy.pointConfig(p -> p.add(copy.x - copy.originalX, copy.y - copy.originalY));
-
                             if(other == null){
                                 player.builder().addBuild(copy);
                             }else if(!other.breaking && other.x == request.x && other.y == request.y && other.block.size == request.block.size){
@@ -340,7 +338,6 @@ public class MobileInput extends InputHandler implements GestureListener{
                 if(request.block.rotate) drawArrow(request.block, tile.x, tile.y, request.rotation);
             }
 
-            //Draw.mixcol(Tmp.c1, 1f);
             Draw.reset();
             drawRequest(request);
 

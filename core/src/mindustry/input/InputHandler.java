@@ -265,7 +265,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         requests.each(req -> {
             req.pointConfig(p -> {
-                int cx = p.x - req.originalX, cy = p.y - req.originalY;
+                int cx = p.x, cy = p.y;
                 int lx = cx;
 
                 if(direction >= 0){
@@ -275,7 +275,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     cx = cy;
                     cy = -lx;
                 }
-                p.set(cx + req.originalX, cy + req.originalY);
+                p.set(cx, cy);
             });
 
             //rotate actual request, centered on its multiblock position
@@ -308,7 +308,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             req.pointConfig(p -> {
                 int corigin = x ? req.originalWidth/2 : req.originalHeight/2;
-                int nvalue = -((x ? p.x : p.y) - corigin) + corigin;
+                int nvalue = -(x ? p.x : p.y);
                 if(x){
                     req.originalX = -(req.originalX - corigin) + corigin;
                     p.x = nvalue;
@@ -449,10 +449,19 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
                 BuildRequest copy = req.copy();
-                copy.pointConfig(p -> p.add(copy.x - copy.originalX, copy.y - copy.originalY));
                 player.builder().addBuild(copy);
             }
         }
+    }
+
+    protected void drawOverRequest(BuildRequest request){
+        boolean valid = validPlace(request.x, request.y, request.block, request.rotation);
+
+        Draw.reset();
+        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
+        Draw.alpha(1f);
+        request.block.drawRequestConfigTop(request, selectRequests);
+        Draw.reset();
     }
 
     protected void drawRequest(BuildRequest request){
