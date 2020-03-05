@@ -17,7 +17,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.distribution.CraterConveyor.*;
 import mindustry.world.meta.*;
 
 import java.io.*;
