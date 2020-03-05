@@ -43,7 +43,6 @@ public class CraterConveyor extends Block implements Autotiler{
         idleSound = Sounds.conveyor;
         idleSoundVolume = 0.004f;
         unloadable = false;
-        dumpling = true;
     }
 
     @Override
@@ -270,6 +269,11 @@ public class CraterConveyor extends Block implements Autotiler{
             dump = stream.readByte();
             reload = stream.readFloat();
         }
+
+        @Override
+        public boolean isOmnidirectional(){
+            return blendbit2 == 6;
+        }
     }
 
     // crater conveyor tiles that input into this one
@@ -335,10 +339,5 @@ public class CraterConveyor extends Block implements Autotiler{
         CraterConveyorEntity entity = tile.ent();
 
         entity.dump = (byte)((entity.dump + 1) % prox);
-    }
-
-    @Override
-    public boolean blendDumpling(Tile tile){
-        return tile.<CraterConveyorEntity>ent().blendbit2 == 6;
     }
 }

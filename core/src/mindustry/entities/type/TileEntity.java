@@ -122,6 +122,10 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return dead || tile.entity != this;
     }
 
+    public boolean isOmnidirectional(){
+        return !block.rotate;
+    }
+
     @CallSuper
     public void write(DataOutput stream) throws IOException{
         stream.writeShort((short)health);

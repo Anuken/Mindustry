@@ -285,7 +285,7 @@ public class Conveyor extends Block implements Autotiler{
         ConveyorEntity e = tile.ent();
         if(e.len >= capacity) return false;
         int direction = source == null ? 0 : Math.abs(source.relativeTo(tile.x, tile.y) - tile.rotation());
-        return (((direction == 0) && e.minitem >= itemSpace) || ((direction % 2 == 1) && e.minitem > 0.7f)) && (source == null || !((source.block().rotate && !source.block().dumpling) && (source.rotation() + 2) % 4 == tile.rotation()));
+        return (((direction == 0) && e.minitem >= itemSpace) || ((direction % 2 == 1) && e.minitem > 0.7f)) && (source == null || source.entity.isOmnidirectional() && (source.rotation() + 2) % 4 == tile.rotation());
     }
 
     @Override

@@ -91,13 +91,13 @@ public interface Autotiler{
 
     default boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
-                || ((!otherblock.rotate && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
+                || ((world.tile(otherx, othery).entity.isOmnidirectional() && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
                 Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) || (otherblock.rotate && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y))));
     }
 
     default boolean lookingAt(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
-        || (!(otherblock.rotate && !(otherblock.dumpling && otherblock.blendDumpling(world.tile(otherx, othery)))) || Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
+        || (world.tile(otherx, othery).entity.isOmnidirectional() || Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
     }
 
     boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock);
