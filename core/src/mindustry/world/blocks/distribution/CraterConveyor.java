@@ -92,7 +92,7 @@ public class CraterConveyor extends Block implements Autotiler{
         Tmp.v2.set(tile.drawx(), tile.drawy());
         Tmp.v1.interpolate(Tmp.v2, 1f - entity.reload, Interpolation.linear);
 
-        // fixme
+        // fixme, cleanup
         float a = from.rotation() * 90;
         float b = tile.rotation() * 90;
         if(from.rotation() == 3 && tile.rotation() == 0) a = -1 * 90;
@@ -148,94 +148,83 @@ public class CraterConveyor extends Block implements Autotiler{
         if(entity.lastFrameUpdated == Core.graphics.getFrameId()) return;
         entity.lastFrameUpdated = Core.graphics.getFrameId();
 
-        entity.reload = Mathf.clamp(entity.reload - speed, 0f, 1f);
+        // reel in crater
+        if(entity.reload > 0f) entity.reload = Mathf.clamp(entity.reload - speed, 0f, 1f);
 
-        // ensure a crater exists below this block
+        // no crater means no logic
         if(entity.from == Pos.invalid){
-            // poof in crater
-            if(entity.items.total() <= 0 || entity.reload > 0){
-                entity.sleep();
-                return;
-            }
-            entity.from = tile.pos();
-            Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
-        }else{
-            // poof out crater
-            if(entity.items.total() == 0){
-                entity.from = Pos.invalid;
-                entity.sleep();
-                return;
-            }
+            tile.entity.sleep();
+            return;
         }
 
-        if(shouldLaunch(tile)){
+        // unload
+        if(entity.reload < 0.25f && entity.blendbit2 == 6 && entity.from != tile.pos()){
+            while(true) if(!tryDump(tile)) break; // unload as much as possible
+            if(entity.items.total() == 0) poofOut(tile);
+        }
 
-            // close enough to the center && is unloading dock && didn't originate here
-            if(entity.reload < 0.25f && entity.blendbit2 == 6 && entity.from != tile.pos()){
-                while(true) if(!tryDump(tile)) break; // unload as much as possible
-                if(entity.items.total() == 0){
-                    Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
+        // transfer
+        if(shouldLaunch(tile)){
+            Tile destination = tile.front();
+            if(destination != null && destination.getTeam() == tile.getTeam() && entity.reload == 0 && destination.block() instanceof CraterConveyor){
+                // update as to potentially make room
+                destination.block().update(destination);
+
+                CraterConveyorEntity other = destination.ent();
+
+                // check if other is occupied
+                if(other.from != Pos.invalid){
+                    entity.sleep();
+                }else{
+                    // transfer crater ownership
+                    other.from  = tile.pos();
                     entity.from = Pos.invalid;
+
+                    other.reload  = 1; // start reeling in
+                    entity.reload = 1; // prevent spawning
+
+                    // transfer inventory of conveyor
+                    other.items.addAll(entity.items);
+                    entity.items.clear();
+
+                    other.noSleep();
                     bump(tile);
                 }
             }
-
-            Tile destination = tile.front();
-
-            // failsafe
-            if(destination == null) return;
-
-            // prevent trading
-            if(destination.getTeam() != tile.getTeam()) return;
-
-            // update the target first to potentially make room
-            destination.block().update(destination);
-
-            // when basically exactly on the center:
-            if(entity.reload == 0){
-                if(destination.block() instanceof CraterConveyor){
-                    CraterConveyorEntity e = destination.ent();
-
-                    // check if next crater conveyor is not occupied
-                    if(e.items.total() == 0){
-                        // transfer ownership of crater
-                        entity.from = Pos.invalid;
-                        e.from = tile.pos();
-
-                        // prevent this tile from spawning a new crater to avoid collisions
-                        entity.reload = 1;
-                        e.reload = 1;
-
-                        // transfer inventory of conveyor
-                        e.items.addAll(entity.items);
-                        entity.items.clear();
-
-                        e.noSleep();
-                        bump(tile);
-                    }else{
-                        entity.sleep();
-                    }
-                }
-            }
         }
+    }
+
+    private void poofIn(Tile tile){
+        tile.<CraterConveyorEntity>ent().from = tile.pos();
+        Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
+        tile.entity.noSleep();
+    }
+
+    private void poofOut(Tile tile){
+        Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
+        tile.<CraterConveyorEntity>ent().from = Pos.invalid;
+        bump(tile);
     }
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
+        if(tile.entity.items.total() == 0) poofIn(tile);
         super.handleItem(item, tile, source);
+    }
 
-        tile.entity.noSleep();
+    @Override
+    public void handleStack(Item item, int amount, Tile tile, Unit source){
+        if(tile.entity.items.total() == 0) poofIn(tile);
+        super.handleStack(item, amount, tile, source);
     }
 
     @Override
     public int removeStack(Tile tile, Item item, int amount){
-        int i = super.removeStack(tile, item, amount);
-        if(tile.entity.items.total() == 0){
-            Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
-            tile.<CraterConveyorEntity>ent().from = Pos.invalid;
-            bump(tile);
+        try{
+            return super.removeStack(tile, item, amount);
+        }finally{
+            if(tile.entity.items.total() == 0) poofOut(tile);
         }
-        return i;
     }
 
     @Override
@@ -324,6 +313,7 @@ public class CraterConveyor extends Block implements Autotiler{
         CraterConveyorEntity entity = tile.ent();
 
         if (tile == source) return true;                                  // player threw items
+        if (entity.reload > 0f) return false;                             // spawner @ cooldown
         return!((entity.blendbit2 != 5)                                   // not a loading dock
             ||  (entity.items.total() > 0 && !entity.items.has(item))     // incompatible items
             ||  (entity.items.total() >= getMaximumAccepted(tile, item))  // filled to capacity
