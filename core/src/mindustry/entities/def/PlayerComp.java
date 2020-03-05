@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
@@ -13,10 +14,11 @@ import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.net.*;
 import mindustry.net.Administration.*;
+import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 
@@ -66,15 +68,21 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
             x(unit.x());
             y(unit.y());
             unit.team(team);
+        }else if(!team.cores().isEmpty()){
+            //try to respawn
+            Array<CoreEntity> cores = team.cores();
+
+            if(!cores.isEmpty()){
+                //TODO respawning
+            }
         }
+
         textFadeTime -= Time.delta() / (60 * 5);
     }
 
     public void team(Team team){
         this.team = team;
-        if(unit != null){
-            unit.team(team);
-        }
+        unit.team(team);
     }
 
     public void clearUnit(){

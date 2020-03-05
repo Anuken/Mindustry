@@ -39,14 +39,15 @@ public class CoreBlock extends StorageBlock{
     public static void onUnitRespawn(Tile tile, Playerc player){
         if(player == null || tile.entity == null) return;
 
+        //TODO really fix
         CoreEntity entity = tile.ent();
         Fx.spawn.at(entity);
-        entity.progress = 0;
-        entity.spawnPlayer = player;
+        //entity.progress = 0;
+        //entity.spawnPlayer = player;
         //TODO fix
         //entity.spawnPlayer.onRespawn(tile);
         //entity.spawnPlayer.applyImpulse(0, 8f);
-        entity.spawnPlayer = null;
+        //entity.spawnPlayer = null;
     }
 
     @Override
@@ -232,8 +233,8 @@ public class CoreBlock extends StorageBlock{
     }
 
     public class CoreEntity extends TileEntity{
-        protected Playerc spawnPlayer;
-        protected float progress;
+       // protected Playerc spawnPlayer;
+        //protected float progress;
         protected float time;
         protected float heat;
         protected int storageCapacity;
