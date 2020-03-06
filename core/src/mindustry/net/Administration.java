@@ -101,9 +101,9 @@ public class Administration{
     }
 
     /** @return whether this action is allowed by the action filters. */
-    public boolean allowAction(Playerc player, ActionType type, Tilec tile, Cons<PlayerAction> setter){
+    public boolean allowAction(Playerc player, ActionType type, Tile tile, Cons<PlayerAction> setter){
         PlayerAction act = Pools.obtain(PlayerAction.class, PlayerAction::new);
-        setter.get(act.set(player, type, tile.tile()));
+        setter.get(act.set(player, type, tile));
         for(ActionFilter filter : actionFilters){
             if(!filter.allow(act)){
                 Pools.free(act);

@@ -19,6 +19,7 @@ import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Schematic.*;
+import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.input.Placement.*;
 import mindustry.io.*;
@@ -318,15 +319,15 @@ public class Schematics implements Loadable{
         boolean found = false;
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
-                Tile linked = world.ltile(cx, cy);
+                Tilec linked = world.ent(cx, cy);
 
-                if(linked != null && linked.entity != null && linked.entity.block().isVisible() && !(linked.block() instanceof BuildBlock)){
+                if(linked != null &&linked.block().isVisible() && !(linked.block() instanceof BuildBlock)){
                     int top = linked.block().size/2;
                     int bot = linked.block().size % 2 == 1 ? -linked.block().size/2 : -(linked.block().size - 1)/2;
-                    minx = Math.min(linked.x + bot, minx);
-                    miny = Math.min(linked.y + bot, miny);
-                    maxx = Math.max(linked.x + top, maxx);
-                    maxy = Math.max(linked.y + top, maxy);
+                    minx = Math.min(linked.tileX() + bot, minx);
+                    miny = Math.min(linked.tileY() + bot, miny);
+                    maxx = Math.max(linked.tileX() + top, maxx);
+                    maxy = Math.max(linked.tileY() + top, maxy);
                     found = true;
                 }
             }
@@ -346,13 +347,13 @@ public class Schematics implements Loadable{
         IntSet counted = new IntSet();
         for(int cx = ox; cx <= ox2; cx++){
             for(int cy = oy; cy <= oy2; cy++){
-                Tile tile = world.ltile(cx, cy);
+                Tilec tile = world.ent(cx, cy);
 
-                if(tile != null && tile.entity != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
-                    && (tile.entity.block().isVisible() || (tile.entity.block() instanceof CoreBlock && Core.settings.getBool("coreselect")))){
-                    Object config = tile.entity.config();
+                if(tile != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
+                    && (tile.block().isVisible() || (tile.block() instanceof CoreBlock && Core.settings.getBool("coreselect")))){
+                    Object config = tile.config();
 
-                    tiles.add(new Stile(tile.block(), tile.x + offsetX, tile.y + offsetY, config, tile.rotation()));
+                    tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation()));
                     counted.add(tile.pos());
                 }
             }

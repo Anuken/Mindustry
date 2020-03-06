@@ -22,7 +22,7 @@ public class ConsumeModule extends BlockModule{
         boolean prevValid = valid();
         valid = true;
         optionalValid = true;
-        boolean docons = entity.block().shouldConsume(entity.tile()) && entity.block().productionValid(entity.tile());
+        boolean docons = entity.shouldConsume() && entity.productionValid();
 
         for(Consume cons : entity.block().consumes.all()){
             if(cons.isOptional()) continue;
@@ -50,7 +50,7 @@ public class ConsumeModule extends BlockModule{
     }
 
     public boolean valid(){
-        return valid && entity.block().shouldConsume(entity.tile());
+        return valid && entity.shouldConsume();
     }
 
     public boolean optionalValid(){

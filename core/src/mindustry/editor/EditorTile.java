@@ -51,7 +51,7 @@ public class EditorTile extends Tile{
         if(block == type) return;
         op(OpType.block, block.id);
         if(rotation != 0) op(OpType.rotation, rotation);
-        if(team != 0) op(OpType.team, team);
+        if(team() != Team.derelict) op(OpType.team, team().id);
         super.setBlock(type);
     }
 

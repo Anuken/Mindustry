@@ -89,7 +89,7 @@ public class Build{
         }
 
         if(type.isMultiblock()){
-            if(type.canReplace(tile.block()) && tile.size == type.size && type.canPlaceOn() && tile.interactable(team)){
+            if(type.canReplace(tile.block()) && tile.block().size == type.size && type.canPlaceOn(tile) && tile.interactable(team)){
                 return true;
             }
 
@@ -121,7 +121,7 @@ public class Build{
             && tile.floor().placeableOn
             && ((type.canReplace(tile.block())
             && !(type == tile.block() && rotation == tile.rotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
-            && tile.isMultiblock() == type.isMultiblock() && type.canPlaceOn();
+            && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);
         }
     }
 
@@ -150,6 +150,6 @@ public class Build{
     /** Returns whether the tile at this position is breakable by this team */
     public static boolean validBreak(Team team, int x, int y){
         Tile tile = world.tile(x, y);
-        return tile != null && tile.canBreak() && tile.breakable() && tile.interactable(team);
+        return tile != null && tile.block().canBreak(tile) && tile.breakable() && tile.interactable(team);
     }
 }

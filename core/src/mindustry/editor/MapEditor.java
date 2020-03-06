@@ -70,22 +70,7 @@ public class MapEditor{
     //adds missing blockparts
     //TODO remove, may not be necessary with blockpart refactor later
     public void checkLinkedTiles(){
-        Tiles tiles = world.tiles;
-
-        //clear old parts
-        for(Tile tile : tiles){
-            if(tile.block() instanceof BlockPart){
-                tile.setBlock(Blocks.air);
-            }
-        }
-
-        //re-add them
-        for(Tile tile : tiles){
-            if(tile.block().isMultiblock()){
-                tile.setBlock(tile.block(), tile.team(), 0);
-            }
-
-        }
+        //TODO actually remove
     }
 
     public void load(Runnable r){
@@ -152,6 +137,7 @@ public class MapEditor{
             int offsetx = -(drawBlock.size - 1) / 2;
             int offsety = -(drawBlock.size - 1) / 2;
 
+            //TODO this is completely unnecessary now!
             for(int dx = 0; dx < drawBlock.size; dx++){
                 for(int dy = 0; dy < drawBlock.size; dy++){
                     int worldx = dx + offsetx + x;
@@ -163,7 +149,7 @@ public class MapEditor{
                         Block block = tile.block();
 
                         //bail out if there's anything blocking the way
-                        if(block.isMultiblock() || block instanceof BlockPart){
+                        if(block.isMultiblock()){
                             return;
                         }
 
@@ -180,9 +166,10 @@ public class MapEditor{
                 if(!tester.get(tile)) return;
 
                 //remove linked tiles blocking the way
-                if(!isFloor && (tile.isLinked() || tile.block().isMultiblock())){
-                    tile.link().remove();
-                }
+                //TODO also unnecessary
+                //if(!isFloor && (tile.isLinked() || tile.block().isMultiblock())){
+                //    tile.link().remove();
+                //}
 
                 if(isFloor){
                     tile.setFloor(drawBlock.asFloor());

@@ -506,7 +506,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             if(tile == null || tile.entity == null) return false;
 
-            tryDropItems(tile.entity.tile(), Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
+            tryDropItems(tile.entity, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
         }
         return false;
     }
@@ -563,7 +563,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasRequest(linked)){
             //add to selection queue if it's a valid BREAK position
             selectRequests.add(new BuildRequest(linked.x, linked.y));
-        }else if(!canTapPlayer(worldx, worldy) && !tileTapped(linked)){
+        }else if(!canTapPlayer(worldx, worldy) && !tileTapped(linked.entity)){
             tryBeginMine(cursor);
         }
 

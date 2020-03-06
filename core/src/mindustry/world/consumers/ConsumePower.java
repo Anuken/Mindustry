@@ -73,7 +73,7 @@ public class ConsumePower extends Consume{
             return (1f-entity.power().status)*capacity;
         }else{
             try{
-                return usage * Mathf.num(entity.block().shouldConsume(entity.tile()));
+                return usage * Mathf.num(entity.shouldConsume());
             }catch(Exception e){
                 //HACK an error will only happen with a bar that is checking its requested power, and the entity is null/a different class
                 return 0;

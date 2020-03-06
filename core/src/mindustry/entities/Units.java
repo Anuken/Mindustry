@@ -73,12 +73,12 @@ public class Units{
     }
 
     /** Returns the neareset ally tile in a range. */
-    public static Tilec findAllyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
+    public static Tilec findAllyTile(Team team, float x, float y, float range, Boolf<Tilec> pred){
         return indexer.findTile(team, x, y, range, pred);
     }
 
     /** Returns the neareset enemy tile in a range. */
-    public static Tilec findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
+    public static Tilec findEnemyTile(Team team, float x, float y, float range, Boolf<Tilec> pred){
         if(team == Team.derelict) return null;
 
         return indexer.findEnemyTile(team, x, y, range, pred);
@@ -95,7 +95,7 @@ public class Units{
     }
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
-    public static Teamc closestTarget(Team team, float x, float y, float range, Boolf<Unitc> unitPred, Boolf<Tile> tilePred){
+    public static Teamc closestTarget(Team team, float x, float y, float range, Boolf<Unitc> unitPred, Boolf<Tilec> tilePred){
         if(team == Team.derelict) return null;
 
         Unitc unit = closestEnemy(team, x, y, range, unitPred);

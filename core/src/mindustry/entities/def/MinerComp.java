@@ -38,7 +38,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, DrawLayerGroundc{
         Tilec core = closestCore();
 
         if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && dst(core) < mineTransferRange){
-            int accepted = core.tile().block().acceptStack(core.tile(), item(), stack().amount, this);
+            int accepted = core.acceptStack(item(), stack().amount, this);
             if(accepted > 0){
                 Call.transferItemTo(item(), accepted,
                 mineTile.worldx() + Mathf.range(tilesize / 2f),
@@ -60,7 +60,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, DrawLayerGroundc{
             if(mineTimer >= 50f + item.hardness*10f){
                 mineTimer = 0;
 
-                if(dst(core) < mineTransferRange && core.tile().block().acceptStack(core.tile(), item, 1, this) == 1 && offloadImmediately()){
+                if(dst(core) < mineTransferRange && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
                     Call.transferItemTo(item, 1,
                     mineTile.worldx() + Mathf.range(tilesize / 2f),
                     mineTile.worldy() + Mathf.range(tilesize / 2f), core.tile());

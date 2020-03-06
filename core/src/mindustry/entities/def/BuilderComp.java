@@ -107,7 +107,7 @@ abstract class BuilderComp implements Unitc, DrawLayerFlyingc{
         }else{
             if(entity.construct(this, core, 1f / entity.buildCost * Time.delta() * buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
                 if(current.hasConfig){
-                    Call.onTileConfig(null, tile, current.config);
+                    Call.onTileConfig(null, tile.entity, current.config);
                 }
             }
         }

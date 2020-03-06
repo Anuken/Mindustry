@@ -242,7 +242,7 @@ public class Tutorial{
         static void placeBlocks(){
             Tilec core = state.teams.playerCores().first();
             for(int i = 0; i < blocksToBreak; i++){
-                world.ltile(core.tile().x + blockOffset, core.tile().y + i).remove();
+                world.tile(core.tile().x + blockOffset, core.tile().y + i).remove();
                 world.tile(core.tile().x + blockOffset, core.tile().y + i).setBlock(Blocks.scrapWall, state.rules.defaultTeam);
             }
         }

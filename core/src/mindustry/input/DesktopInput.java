@@ -230,7 +230,7 @@ public class DesktopInput extends InputHandler{
 
         if(cursor != null){
             if(cursor.entity != null){
-                cursorType = cursor.block().getCursor(cursor.entity);
+                cursorType = cursor.entity.getCursor();
             }
 
             if(isPlacing() || !selectRequests.isEmpty()){

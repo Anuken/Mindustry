@@ -126,7 +126,9 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
 
         if(tile != null){
             //unit block update
-            tile.unitOn(this);
+            if(tile.entity != null){
+                tile.entity.unitOn(this);
+            }
 
             //apply damage
             if(floor.damageTaken > 0f){

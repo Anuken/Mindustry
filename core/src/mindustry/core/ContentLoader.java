@@ -100,6 +100,7 @@ public class ContentLoader{
 
     /** Calls Content#load() on everything. Use only after all modules have been created on the client.*/
     public void load(){
+        Log.info("CALLING LOAD()");
         initialize(Content::load);
     }
 

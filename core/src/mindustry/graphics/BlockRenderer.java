@@ -11,6 +11,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
+import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
@@ -31,6 +32,7 @@ public class BlockRenderer implements Disposable{
     private float brokenFade = 0f;
     private FrameBuffer shadows = new FrameBuffer(2, 2);
     private FrameBuffer fog = new FrameBuffer(2, 2);
+    private Array<Tilec> outArray2 = new Array<>();
     private Array<Tile> outArray = new Array<>();
     private Array<Tile> shadowEvents = new Array<>();
 
@@ -220,9 +222,9 @@ public class BlockRenderer implements Disposable{
                         }
 
                         if(tile.entity != null && tile.entity.power() != null && tile.entity.power().links.size > 0){
-                            for(Tile other : block.getPowerConnections(tile, outArray)){
+                            for(Tilec other : tile.entity.getPowerConnections(outArray2)){
                                 if(other.block().layer == Layer.power){
-                                    addRequest(other, Layer.power);
+                                    addRequest(other.tile(), Layer.power);
                                 }
                             }
                         }
@@ -257,16 +259,16 @@ public class BlockRenderer implements Disposable{
             Block block = request.tile.block();
 
             if(request.layer == Layer.block){
-                block.draw(request.tile);
+                block.drawBase(request.tile);
                 if(request.tile.entity != null && request.tile.entity.damaged()){
-                    block.drawCracks(request.tile);
+                    request.tile.entity.drawCracks();
                 }
                 if(block.synthetic() && request.tile.team() != player.team()){
-                    block.drawTeam(request.tile);
+                    request.tile.entity.drawTeam();
                 }
 
             }else if(request.layer == Layer.lights){
-                block.drawLight(request.tile);
+                request.tile.entity.drawLight();
             }else if(request.layer == block.layer){
                 block.drawLayer(request.tile);
             }else if(request.layer == block.layer2){

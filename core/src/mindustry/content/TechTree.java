@@ -301,6 +301,7 @@ public class TechTree implements ContentList{
                         });
                     });
 
+                    /*
                     node(dartPad, () -> {
                         node(deltaPad, () -> {
 
@@ -316,7 +317,7 @@ public class TechTree implements ContentList{
                                 });
                             });
                         });
-                    });
+                    });*/
                 });
             });
         });

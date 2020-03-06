@@ -119,7 +119,7 @@ public class MapRenderer implements Disposable{
         int idxWall = (wx % chunkSize) + (wy % chunkSize) * chunkSize;
         int idxDecal = (wx % chunkSize) + (wy % chunkSize) * chunkSize + chunkSize * chunkSize;
 
-        if(wall != Blocks.air && (wall.synthetic() || wall instanceof BlockPart)){
+        if(wall != Blocks.air && wall.synthetic()){
             region = !Core.atlas.isFound(wall.editorIcon()) ? Core.atlas.find("clear-editor") : wall.editorIcon();
 
             if(wall.rotate){

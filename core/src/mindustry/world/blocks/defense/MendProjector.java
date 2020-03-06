@@ -59,6 +59,11 @@ public class MendProjector extends Block{
         stats.add(BlockStat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
     }
 
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.accent);
+    }
+
     public class MendEntity extends TileEntity{
         float heat;
         float charge = Mathf.random(reload);
@@ -84,11 +89,6 @@ public class MendProjector extends Block{
                     Fx.healBlockFull.at(other.x(), other.y(), other.block().size, Tmp.c1.set(baseColor).lerp(phaseColor, phaseHeat));
                 });
             }
-        }
-
-        @Override
-        public void drawPlace(int x, int y, int rotation, boolean valid){
-            Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.accent);
         }
 
         @Override

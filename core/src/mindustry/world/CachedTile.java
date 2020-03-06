@@ -1,7 +1,6 @@
 package mindustry.world;
 
 import mindustry.gen.*;
-import mindustry.game.Team;
 import mindustry.world.modules.*;
 
 /**
@@ -12,11 +11,6 @@ public class CachedTile extends Tile{
 
     public CachedTile(){
         super(0, 0);
-    }
-
-    @Override
-    public Team team(){
-        return Team.get(getTeamID());
     }
 
     @Override

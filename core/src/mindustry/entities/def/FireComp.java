@@ -59,7 +59,7 @@ abstract class FireComp implements Timedc, Posc, Firec{
         }
 
         if(baseFlammability < 0 || block != tile.block()){
-            baseFlammability = tile.getFlammability();
+            baseFlammability = tile.entity == null ? 0 : tile.entity.getFlammability();
             block = tile.block();
         }
 

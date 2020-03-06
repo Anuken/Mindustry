@@ -532,17 +532,21 @@ public class Block extends UnlockableContent{
 
             //attempt to find the first declared class and use it as the entity type
             try{
-                Class<?>[] classes = getClass().getDeclaredClasses();
                 Class<?> current = getClass();
+
+                if(current.isAnonymousClass()){
+                    current = current.getSuperclass();
+                }
 
                 while(entityType == null && Block.class.isAssignableFrom(current)){
                     //first class that is subclass of Tilec
-                    Class<?> type = Structs.find(classes, Tilec.class::isAssignableFrom);
+                    Class<?> type = Structs.find(current.getDeclaredClasses(), Tilec.class::isAssignableFrom);
                     if(type != null){
-                        Constructor<? extends Tilec> cons = (Constructor<? extends Tilec>)type.getConstructor();
+                        //these are inner classes, so they have an implicit parameter generated
+                        Constructor<? extends Tilec> cons = (Constructor<? extends Tilec>)type.getDeclaredConstructor(type.getDeclaringClass());
                         entityType = () -> {
                             try{
-                                return cons.newInstance();
+                                return cons.newInstance(this);
                             }catch(Exception e){
                                 throw new RuntimeException(e);
                             }

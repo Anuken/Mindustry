@@ -112,7 +112,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
     public static void rotateBlock(Playerc player, Tilec tile, boolean direction){
         if(net.server() && (!Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.rotate, tile, action -> action.rotation = Mathf.mod(tile.rotation() + Mathf.sign(direction), 4)))){
+            !netServer.admins.allowAction(player, ActionType.rotate, tile.tile(), action -> action.rotation = Mathf.mod(tile.rotation() + Mathf.sign(direction), 4)))){
             throw new ValidateException(player, "Player cannot rotate a block.");
         }
 
@@ -123,16 +123,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Playerc player, Tilec tile){
-        if(player == null) return;
+        if(player == null || tile == null) return;
         if(net.server() && (player.unit().stack().amount <= 0 || !Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.depositItem, tile, action -> {
+            !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile(), action -> {
                 action.itemAmount = player.unit().stack().amount;
                 action.item = player.unit().item();
             }))){
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
-
-        if(tile.entity == null) return;
 
         Item item = player.unit().item();
         int amount = player.unit().stack().amount;
@@ -149,7 +147,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             createItemTransfer(item, player.x() + Angles.trnsx(player.unit().rotation() + 180f, backTrns), player.y() + Angles.trnsy(player.unit().rotation() + 180f, backTrns),
             new Vec2(tile.x() + stackTrns.x, tile.y() + stackTrns.y), () -> {
-                if(tile.block() != block || tile.entity == null || tile.items() == null) return;
+                if(tile.block() != block || !tile.isValid() || tile.items() == null) return;
 
                 tile.handleStack(item, accepted, player.unit());
             });
@@ -160,7 +158,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void onTileTapped(Playerc player, Tilec tile){
         if(tile == null || player == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
-        !netServer.admins.allowAction(player, ActionType.tapTile, tile, action -> {}))) throw new ValidateException(player, "Player cannot tap a tile.");
+        !netServer.admins.allowAction(player, ActionType.tapTile, tile.tile(), action -> {}))) throw new ValidateException(player, "Player cannot tap a tile.");
         tile.tapped(player);
         Core.app.post(() -> Events.fire(new TapEvent(tile, player)));
     }
@@ -169,7 +167,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void onTileConfig(Playerc player, Tilec tile, @Nullable Object value){
         if(tile == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.configure, tile, action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
+            !netServer.admins.allowAction(player, ActionType.configure, tile.tile(), action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
         tile.configured(player, value);
         Core.app.post(() -> Events.fire(new TapConfigEvent(tile, player, value)));
     }
@@ -569,14 +567,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             consumed = true;
             if(((!frag.config.isShown() && tile.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
-            || (frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)))){
+            || (frag.config.isShown() && frag.config.getSelectedTile().onConfigureTileTapped(tile)))){
                 Sounds.click.at(tile);
                 frag.config.showConfig(tile);
             }
             //otherwise...
         }else if(!frag.config.hasConfigMouse()){ //make sure a configuration fragment isn't on the cursor
             //then, if it's shown and the current block 'agrees' to hide, hide it.
-            if(frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)){
+            if(frag.config.isShown() && frag.config.getSelectedTile().onConfigureTileTapped(tile)){
                 consumed = true;
                 frag.config.hideConfig();
             }

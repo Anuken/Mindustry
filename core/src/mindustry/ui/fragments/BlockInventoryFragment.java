@@ -41,7 +41,7 @@ public class BlockInventoryFragment extends Fragment{
         int fa = amount;
 
         if(net.server() && (!Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.withdrawItem, tile, action -> {
+            !netServer.admins.allowAction(player, ActionType.withdrawItem, tile.tile(), action -> {
                 action.item = item;
                 action.itemAmount = fa;
             }))) throw new ValidateException(player, "Player cannot request items.");

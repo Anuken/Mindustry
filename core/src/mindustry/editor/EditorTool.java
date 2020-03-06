@@ -8,7 +8,6 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 
 public enum EditorTool{
     zoom,
@@ -16,7 +15,7 @@ public enum EditorTool{
         public void touched(MapEditor editor, int x, int y){
             if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
 
-            Tile tile = editor.tile(x, y).link();
+            Tile tile = editor.tile(x, y);
             editor.drawBlock = tile.block() == Blocks.air ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
         }
     },
@@ -63,7 +62,7 @@ public enum EditorTool{
                 editor.drawBlocks(x, y, true, tile -> true);
             }else if(mode == 2){
                 //draw teams
-                editor.drawCircle(x, y, tile -> tile.link().setTeam(editor.drawTeam));
+                editor.drawCircle(x, y, tile -> tile.setTeam(editor.drawTeam));
             }
 
         }
@@ -108,7 +107,7 @@ public enum EditorTool{
             //mode 0 or 1, fill everything with the floor/tile or replace it
             if(mode == 0 || mode == -1){
                 //can't fill parts or multiblocks
-                if(tile.block() instanceof BlockPart || tile.block().isMultiblock()){
+                if(tile.block().isMultiblock()){
                     return;
                 }
 
@@ -137,10 +136,10 @@ public enum EditorTool{
             }else if(mode == 1){ //mode 1 is team fill
 
                 //only fill synthetic blocks, it's meaningless otherwise
-                if(tile.link().synthetic()){
+                if(tile.synthetic()){
                     Team dest = tile.team();
                     if(dest == editor.drawTeam) return;
-                    fill(editor, x, y, false, t -> t.getTeamID() == (int)dest.id && t.link().synthetic(), t -> t.setTeam(editor.drawTeam));
+                    fill(editor, x, y, false, t -> t.getTeamID() == (int)dest.id && t.synthetic(), t -> t.setTeam(editor.drawTeam));
                 }
             }
         }

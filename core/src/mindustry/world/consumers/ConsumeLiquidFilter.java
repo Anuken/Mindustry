@@ -31,7 +31,7 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     public void build(Tilec tile, Table table){
         Array<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.get(l));
         MultiReqImage image = new MultiReqImage();
-        list.each(liquid -> image.add(new ReqImage(liquid.icon(Cicon.medium), () -> tile.entity != null && tile.entity.liquids() != null && tile.entity.liquids().get(liquid) >= use(tile.entity))));
+        list.each(liquid -> image.add(new ReqImage(liquid.icon(Cicon.medium), () -> tile.liquids() != null && tile.liquids().get(liquid) >= use(tile))));
 
         table.add(image).size(8 * 4);
     }
