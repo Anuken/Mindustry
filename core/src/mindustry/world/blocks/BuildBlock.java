@@ -49,27 +49,27 @@ public class BuildBlock extends Block{
     }
 
     @Remote(called = Loc.server)
-    public static void onDeconstructFinish(Block block, int builderID){
-        Team team = team;
-        Fx.breakBlock.at(x, y, block.size);
+    public static void onDeconstructFinish(Tile tile, Block block, int builderID){
+        Team team = tile.team();
+        Fx.breakBlock.at(tile.drawx(), tile.drawy(), block.size);
         Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, true));
         tile.remove();
         if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
     }
 
     @Remote(called = Loc.server)
-    public static void onConstructFinish(Block block, int builderID, byte rotation, Team team, boolean skipConfig){
+    public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         if(tile == null) return;
-        float healthf = tile.healthf();
+        float healthf = tile.entity.healthf();
         tile.setBlock(block, team, (int)rotation);
-        tile.health(block.health * healthf);
+        tile.entity.health(block.health * healthf);
         //last builder was this local client player, call placed()
         if(!headless && builderID == player.unit().id()){
             if(!skipConfig){
-                tile.playerPlaced();
+                tile.entity.playerPlaced();
             }
         }
-        Fx.placeBlock.at(x, y, block.size);
+        Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
     }
 
     static boolean shouldPlay(){
@@ -96,9 +96,9 @@ public class BuildBlock extends Block{
         }
     }
 
-    public static void constructed(Block block, int builderID, byte rotation, Team team, boolean skipConfig){
+    public static void constructed(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         Call.onConstructFinish(tile, block, builderID, rotation, team, skipConfig);
-        tile.placed();
+        tile.entity.placed();
 
         Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, false));
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));

@@ -1,10 +1,10 @@
 package mindustry.world.blocks.production;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -62,7 +62,7 @@ public class Drill extends Block{
         hasLiquids = true;
         liquidCapacity = 5f;
         hasItems = true;
-    idleSound = Sounds.drill;
+        idleSound = Sounds.drill;
         idleSoundVolume = 0.003f;
     }
 
@@ -73,7 +73,7 @@ public class Drill extends Block{
         bars.add("drillspeed", e -> {
             DrillEntity entity = (DrillEntity)e;
 
-            return new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(lastDrillSpeed * 60 * timeScale(), 2)), () -> Pal.ammo, () -> warmup);
+            return new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(entity.lastDrillSpeed * 60 * entity.timeScale(), 2)), () -> Pal.ammo, () -> entity.warmup);
         });
     }
 
@@ -85,50 +85,22 @@ public class Drill extends Block{
         topRegion = Core.atlas.find(name + "-top");
     }
 
-    @Override
-    public void drawCracks(){}
+    public Item getDrop(Tile tile){
+        return tile.drop();
+    }
 
     @Override
-    public void draw(){
-        float s = 0.3f;
-        float ts = 0.6f;
-
-        Draw.rect(region, x, y);
-        super.drawCracks();
-
-        if(drawRim){
-            Draw.color(heatColor);
-            Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time(), 3f, s)));
-            Draw.blend(Blending.additive);
-            Draw.rect(rimRegion, x, y);
-            Draw.blend();
-            Draw.color();
+    public boolean canPlaceOn(Tile tile){
+        if(isMultiblock()){
+            for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+                if(canMine(other)){
+                    return true;
+                }
+            }
+            return false;
+        }else{
+            return canMine(tile);
         }
-
-        Draw.rect(rotatorRegion, x, y, drillTime * rotateSpeed);
-
-        Draw.rect(topRegion, x, y);
-
-        if(dominantItem != null && drawMineItem){
-            Draw.color(dominantItem.color);
-            Draw.rect("drill-top", x, y, 1f);
-            Draw.color();
-        }
-    }
-
-    @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
-    }
-
-    @Override
-    public boolean shouldConsume(){
-        return tile.items.total() < itemCapacity;
-    }
-
-    @Override
-    public boolean shouldIdleSound(){
-        return tile.efficiency() > 0.01f;
     }
 
     @Override
@@ -151,17 +123,6 @@ public class Drill extends Block{
             if(item != null){
                 drawPlaceText(Core.bundle.get("bar.drilltierreq"), x, y, valid);
             }
-        }
-    }
-
-    @Override
-    public void drawSelect(){
-        if(dominantItem != null){
-            float dx = x - size * tilesize/2f, dy = y + size * tilesize/2f;
-            Draw.mixcol(Color.darkGray, 1f);
-            Draw.rect(dominantItem.icon(Cicon.small), dx, dy - 1);
-            Draw.reset();
-            Draw.rect(dominantItem.icon(Cicon.small), dx, dy);
         }
     }
 
@@ -195,7 +156,12 @@ public class Drill extends Block{
         }
     }
 
-    void countOre(){
+    @Override
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
+    }
+
+    void countOre(Tile tile){
         returnItem = null;
         returnCount = 0;
 
@@ -203,7 +169,7 @@ public class Drill extends Block{
         itemArray.clear();
 
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-            if(isValid(other)){
+            if(canMine(other)){
                 oreCount.getAndIncrement(getDrop(other), 0, 1);
             }
         }
@@ -228,84 +194,7 @@ public class Drill extends Block{
         returnCount = oreCount.get(itemArray.peek(), 0);
     }
 
-    @Override
-    public void onProximityUpdate(){
-        countOre(tile);
-        dominantItem = returnItem;
-        dominantItems = returnCount;
-    }
-
-    @Override
-    public void updateTile(){
-        if(dominantItem == null){
-            return;
-        }
-
-        if(timer(timerDump, dumpTime)){
-            tryDump(tile, dominantItem);
-        }
-
-        drillTime += warmup * delta();
-
-        if(items.total() < itemCapacity && dominantItems > 0 && consValid()){
-
-            float speed = 1f;
-
-            if(cons().optionalValid()){
-                speed = liquidBoostIntensity;
-            }
-
-            speed *= efficiency(); // Drill slower when not at full power
-
-            lastDrillSpeed = (speed * dominantItems * warmup) / (drillTime + hardnessDrillMultiplier * dominantItem.hardness);
-            warmup = Mathf.lerpDelta(warmup, speed, warmupSpeed);
-            progress += delta()
-            * dominantItems * speed * warmup;
-
-            if(Mathf.chance(Time.delta() * updateEffectChance * warmup))
-                updateEffect.at(getX() + Mathf.range(size * 2f), getY() + Mathf.range(size * 2f));
-        }else{
-            lastDrillSpeed = 0f;
-            warmup = Mathf.lerpDelta(warmup, 0f, warmupSpeed);
-            return;
-        }
-
-        if(dominantItems > 0 && progress >= drillTime + hardnessDrillMultiplier * dominantItem.hardness && tile.items.total() < itemCapacity){
-
-            offloadNear(tile, dominantItem);
-
-            useContent(tile, dominantItem);
-
-            index++;
-            progress = 0f;
-
-            drillEffect.at(getX() + Mathf.range(size), getY() + Mathf.range(size), dominantItem.color);
-        }
-    }
-
-    @Override
-    public boolean canPlaceOn(){
-        if(isMultiblock()){
-            for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-                if(isValid(other)){
-                    return true;
-                }
-            }
-            return false;
-        }else{
-            return isValid(tile);
-        }
-    }
-
-    public int tier(){
-        return tier;
-    }
-
-    public Item getDrop(){
-        return tile.drop();
-    }
-
-    public boolean isValid(){
+    public boolean canMine(Tile tile){
         if(tile == null) return false;
         Item drops = tile.drop();
         return drops != null && drops.hardness <= tier;
@@ -320,6 +209,112 @@ public class Drill extends Block{
 
         int dominantItems;
         Item dominantItem;
+
+
+        @Override
+        public boolean shouldConsume(){
+            return items.total() < itemCapacity;
+        }
+
+        @Override
+        public boolean shouldIdleSound(){
+            return efficiency() > 0.01f;
+        }
+
+        @Override
+        public void drawSelect(){
+            if(dominantItem != null){
+                float dx = x - size * tilesize/2f, dy = y + size * tilesize/2f;
+                Draw.mixcol(Color.darkGray, 1f);
+                Draw.rect(dominantItem.icon(Cicon.small), dx, dy - 1);
+                Draw.reset();
+                Draw.rect(dominantItem.icon(Cicon.small), dx, dy);
+            }
+        }
+
+        @Override
+        public void onProximityUpdate(){
+            countOre(tile);
+            dominantItem = returnItem;
+            dominantItems = returnCount;
+        }
+
+        @Override
+        public void updateTile(){
+            if(dominantItem == null){
+                return;
+            }
+
+            if(timer(timerDump, dumpTime)){
+                dump(dominantItem);
+            }
+
+            drillTime += warmup * delta();
+
+            if(items.total() < itemCapacity && dominantItems > 0 && consValid()){
+
+                float speed = 1f;
+
+                if(cons().optionalValid()){
+                    speed = liquidBoostIntensity;
+                }
+
+                speed *= efficiency(); // Drill slower when not at full power
+
+                lastDrillSpeed = (speed * dominantItems * warmup) / (drillTime + hardnessDrillMultiplier * dominantItem.hardness);
+                warmup = Mathf.lerpDelta(warmup, speed, warmupSpeed);
+                progress += delta()
+                * dominantItems * speed * warmup;
+
+                if(Mathf.chance(Time.delta() * updateEffectChance * warmup))
+                    updateEffect.at(getX() + Mathf.range(size * 2f), getY() + Mathf.range(size * 2f));
+            }else{
+                lastDrillSpeed = 0f;
+                warmup = Mathf.lerpDelta(warmup, 0f, warmupSpeed);
+                return;
+            }
+
+            if(dominantItems > 0 && progress >= drillTime + hardnessDrillMultiplier * dominantItem.hardness && items.total() < itemCapacity){
+                offloadNear(dominantItem);
+                useContent(dominantItem);
+
+                index++;
+                progress = 0f;
+
+                drillEffect.at(getX() + Mathf.range(size), getY() + Mathf.range(size), dominantItem.color);
+            }
+        }
+
+        @Override
+        public void drawCracks(){}
+
+        @Override
+        public void draw(){
+            float s = 0.3f;
+            float ts = 0.6f;
+
+            Draw.rect(region, x, y);
+            super.drawCracks();
+
+            if(drawRim){
+                Draw.color(heatColor);
+                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time(), 3f, s)));
+                Draw.blend(Blending.additive);
+                Draw.rect(rimRegion, x, y);
+                Draw.blend();
+                Draw.color();
+            }
+
+            Draw.rect(rotatorRegion, x, y, drillTime * rotateSpeed);
+
+            Draw.rect(topRegion, x, y);
+
+            if(dominantItem != null && drawMineItem){
+                Draw.color(dominantItem.color);
+                Draw.rect("drill-top", x, y, 1f);
+                Draw.color();
+            }
+        }
     }
 
 }

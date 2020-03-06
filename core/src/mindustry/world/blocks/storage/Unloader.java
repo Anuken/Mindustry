@@ -26,12 +26,12 @@ public class Unloader extends Block{
         health = 70;
         hasItems = true;
         configurable = true;
-    config(Item.class, (tile, item) -> {
-            tile.items.clear();
-            tile.<UnloaderEntity>ent().sortItem = item;
+        config(Item.class, (tile, item) -> {
+            tile.items().clear();
+            ((UnloaderEntity)tile).sortItem = item;
         });
 
-        configClear(tile -> tile.<UnloaderEntity>ent().sortItem = null);
+        configClear(tile -> ((UnloaderEntity)tile).sortItem = null);
     }
 
     @Override
@@ -40,87 +40,74 @@ public class Unloader extends Block{
     }
 
     @Override
-    public boolean canDump(Tile to, Item item){
-        return !(to.block() instanceof StorageBlock);
-    }
-
-    @Override
     public void setBars(){
         super.setBars();
         bars.remove("items");
     }
 
-    @Override
-    public void playerPlaced(){
-        if(lastItem != null){
-            tile.configure(lastItem);
-        }
-    }
-
-    @Override
-    public void updateTile(){
-        if(timer(timerUnload, speed / timeScale()) && tile.items.total() == 0){
-            for(Tile other : tile.proximity()){
-                if(other.interactable(team) && other.block().unloadable && other.block().hasItems && items.total() == 0 &&
-                ((sortItem == null && other.items.total() > 0) || hasItem(other, sortItem))){
-                    offloadNear(tile, removeItem(other, sortItem));
-                }
-            }
-        }
-
-        if(items.total() > 0){
-            tryDump(tile);
-        }
-    }
-
-    /**
-     * Removes an item and returns it. If item is not null, it should return the item.
-     * Returns null if no items are there.
-     */
-    private Item removeItem(Item item){
-        Tilec entity = tile.entity;
-
-        if(item == null){
-            return items.take();
-        }else{
-            if(items.has(item)){
-                items.remove(item, 1);
-                return item;
-            }
-
-            return null;
-        }
-    }
-
-    /**
-     * Returns whether this storage block has the specified item.
-     * If the item is null, it should return whether it has ANY items.
-     */
-    private boolean hasItem(Item item){
-        Tilec entity = tile.entity;
-        if(item == null){
-            return items.total() > 0;
-        }else{
-            return items.has(item);
-        }
-    }
-
-    @Override
-    public void draw(){
-        super.draw();
-
-        Draw.color(sortItem == null ? Color.clear : sortItem.color);
-        Draw.rect("unloader-center", x, y);
-        Draw.color();
-    }
-
-    @Override
-    public void buildConfiguration(Table table){
-        ItemSelection.buildTable(table, content.items(), () -> tile.<UnloaderEntity>ent().sortItem, item -> tile.configure(lastItem = item));
-    }
-
     public class UnloaderEntity extends TileEntity{
         public Item sortItem = null;
+
+        private Item removeItem(Tilec tile, Item item){
+            if(item == null){
+                return tile.items().take();
+            }else{
+                if(tile.items().has(item)){
+                    tile.items().remove(item, 1);
+                    return item;
+                }
+
+                return null;
+            }
+        }
+
+        private boolean hasItem(Tilec tile, Item item){
+            if(item == null){
+                return tile.items().total() > 0;
+            }else{
+                return tile.items().has(item);
+            }
+        }
+
+        @Override
+        public void playerPlaced(){
+            if(lastItem != null){
+                tile.configure(lastItem);
+            }
+        }
+
+        @Override
+        public void updateTile(){
+            if(timer(timerUnload, speed / timeScale()) && items.total() == 0){
+                for(Tilec other : proximity){
+                    if(other.interactable(team) && other.block().unloadable && other.block().hasItems && items.total() == 0 &&
+                        ((sortItem == null && items.total() > 0) || hasItem(other, sortItem))){
+                        offloadNear(removeItem(other, sortItem));
+                    }
+                }
+            }
+
+            dump();
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            Draw.color(sortItem == null ? Color.clear : sortItem.color);
+            Draw.rect("unloader-center", x, y);
+            Draw.color();
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            ItemSelection.buildTable(table, content.items(), () -> tile.<UnloaderEntity>ent().sortItem, item -> tile.configure(lastItem = item));
+        }
+
+        @Override
+        public boolean canDump(Tilec to, Item item){
+            return !(to.block() instanceof StorageBlock);
+        }
 
         @Override
         public Item config(){

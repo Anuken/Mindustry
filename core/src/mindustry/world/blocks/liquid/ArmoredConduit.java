@@ -21,8 +21,8 @@ public class ArmoredConduit extends Conduit{
     }
 
     @Override
-    public boolean blends(int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return otherblock.outputsLiquid && blendsArmored(rotation, otherx, othery, otherrot, otherblock);
+    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return otherblock.outputsLiquid && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
     public class ArmoredConduitEntity extends TileEntity{

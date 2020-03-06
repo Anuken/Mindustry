@@ -409,6 +409,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     public void offloadNear(Item item){
         Array<Tilec> proximity = proximity();
         int dump = rotation();
+        useContent(item);
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -544,8 +545,8 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         return out;
     }
 
-    public float getProgressIncrease(Tilec entity, float baseTime){
-        return 1f / baseTime * entity.delta() * entity.efficiency();
+    public float getProgressIncrease(float baseTime){
+        return 1f / baseTime * delta() * efficiency();
     }
 
     /** @return whether this block should play its active sound.*/
@@ -652,16 +653,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         if(!headless && team() == player.team() && state.isCampaign()){
             logic.handleContent(content);
         }
-    }
-
-    public float percentSolid(int x, int y){
-        Tile tile = world.tile(x, y);
-        if(tile == null) return 0;
-        float sum = 0;
-        for(Tile other : tile.getLinkedTilesAs(block, tempTiles)){
-            sum += !other.floor().isLiquid ? 1f : 0f;
-        }
-        return sum / block.size / block.size;
     }
 
     /** Called when arbitrary configuration is applied to a tile. */

@@ -76,8 +76,8 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public boolean blends(int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return otherblock.outputsItems() && lookingAt(rotation, otherx, othery, otherrot, otherblock);
+    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return otherblock.outputsItems() && lookingAt(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class Conveyor extends Block implements Autotiler{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            int[] bits = buildBlending(rotation(), null, true);
+            int[] bits = buildBlending(tile, rotation(), null, true);
             blendbits = bits[0];
             blendsclx = bits[1];
             blendscly = bits[2];

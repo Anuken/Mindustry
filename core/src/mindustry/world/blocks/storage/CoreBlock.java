@@ -99,7 +99,7 @@ public class CoreBlock extends StorageBlock{
             storageCapacity = itemCapacity + proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
             proximity.each(this::isContainer, t -> {
                 t.items(items);
-                ((StorageBlockEntity)t).linkedCore = tile;
+                ((StorageBlockEntity)t).linkedCore = this;
             });
 
             for(Tilec other : state.teams.cores(team)){

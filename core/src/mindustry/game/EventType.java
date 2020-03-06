@@ -51,10 +51,10 @@ public class EventType{
     public static class MapPublishEvent{}
 
     public static class CommandIssueEvent{
-        public final Tile tile;
+        public final Tilec tile;
         public final UnitCommand command;
 
-        public CommandIssueEvent(Tile tile, UnitCommand command){
+        public CommandIssueEvent(Tilec tile, UnitCommand command){
             this.tile = tile;
             this.command = command;
         }

@@ -37,7 +37,7 @@ public interface Autotiler{
         return buildBlending(req.tile(), req.rotation, directionals, req.worldContext);
     }
 
-    default int[] buildBlending(int rotation, BuildRequest[] directional, boolean world){
+    default int[] buildBlending(Tile tile, int rotation, BuildRequest[] directional, boolean world){
         int[] blendresult = AutotilerHolder.blendresult;
         blendresult[0] = 0;
         blendresult[1] = blendresult[2] = 1;
@@ -71,7 +71,7 @@ public interface Autotiler{
         }
     }
 
-    default boolean blends(int rotation, @Nullable BuildRequest[] directional, int direction, boolean checkWorld){
+    default boolean blends(Tile tile, int rotation, @Nullable BuildRequest[] directional, int direction, boolean checkWorld){
         int realDir = Mathf.mod(rotation - direction, 4);
         if(directional != null && directional[realDir] != null){
             BuildRequest req = directional[realDir];
@@ -82,21 +82,21 @@ public interface Autotiler{
         return checkWorld && blends(tile, rotation, direction);
     }
 
-    default boolean blends(int rotation, int direction){
+    default boolean blends(Tile tile, int rotation, int direction){
         Tilec other = tile.getNearbyEntity(Mathf.mod(rotation - direction, 4));
-        return other != null && other.team() == team && blends(tile, rotation, other.tileX(), other.tileY(), other.rotation(), other.block());
+        return other != null && other.team() == tile.team() && blends(tile, rotation, other.tileX(), other.tileY(), other.rotation(), other.block());
     }
 
-    default boolean blendsArmored(int rotation, int otherx, int othery, int otherrot, Block otherblock){
+    default boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
                 || ((!otherblock.rotate && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
                 Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) || (otherblock.rotate && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y))));
     }
 
-    default boolean lookingAt(int rotation, int otherx, int othery, int otherrot, Block otherblock){
+    default boolean lookingAt(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
         || (!otherblock.rotate || Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
     }
 
-    boolean blends(int rotation, int otherx, int othery, int otherrot, Block otherblock);
+    boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock);
 }

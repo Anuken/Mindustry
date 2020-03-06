@@ -168,6 +168,7 @@ public class Block extends UnlockableContent{
     //TODO move
     public static TextureRegion[][] cracks;
     protected static final Array<Tile> tempTiles = new Array<>();
+    protected static final Array<Tilec> tempTileEnts = new Array<>();
 
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
@@ -187,6 +188,16 @@ public class Block extends UnlockableContent{
         }else{
             Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation * 90 : 0);
         }
+    }
+
+    public float percentSolid(int x, int y){
+        Tile tile = world.tile(x, y);
+        if(tile == null) return 0;
+        float sum = 0;
+        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+            sum += !other.floor().isLiquid ? 1f : 0f;
+        }
+        return sum / size / size;
     }
 
     public void drawLayer(Tile tile){

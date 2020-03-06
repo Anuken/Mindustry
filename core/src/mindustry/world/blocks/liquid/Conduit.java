@@ -74,8 +74,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
     }
 
     @Override
-    public boolean blends(int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return otherblock.hasLiquids && otherblock.outputsLiquid && lookingAt(rotation, otherx, othery, otherrot, otherblock);
+    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return otherblock.hasLiquids && otherblock.outputsLiquid && lookingAt(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            blendbits = buildBlending(rotation(), null, true)[0];
+            blendbits = buildBlending(tile, rotation(), null, true)[0];
         }
 
         @Override

@@ -56,23 +56,9 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public boolean shouldIdleSound(Tilec tile){
-        return tile.cons().valid();
-    }
-
-    @Override
     public void init(){
         outputsLiquid = outputLiquid != null;
         super.init();
-    }
-
-    @Override
-    public void draw(){
-        if(drawer == null){
-            super.draw();
-        }else{
-            drawer.get(tile);
-        }
     }
 
     @Override
@@ -81,70 +67,84 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public void updateTile(){
-        if(consValid()){
-
-            progress += getProgressIncrease(entity, craftTime);
-            totalProgress += delta();
-            warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
-
-            if(Mathf.chance(Time.delta() * updateEffectChance)){
-                updateEffect.at(getX() + Mathf.range(size * 4f), getY() + Mathf.range(size * 4));
-            }
-        }else{
-            warmup = Mathf.lerp(warmup, 0f, 0.02f);
-        }
-
-        if(progress >= 1f){
-            consume();
-
-            if(outputItem != null){
-                useContent(tile, outputItem.item);
-                for(int i = 0; i < outputItem.amount; i++){
-                    offloadNear(tile, outputItem.item);
-                }
-            }
-
-            if(outputLiquid != null){
-                useContent(tile, outputLiquid.liquid);
-                handleLiquid(tile, tile, outputLiquid.liquid, outputLiquid.amount);
-            }
-
-            craftEffect.at(x, y);
-            progress = 0f;
-        }
-
-        if(outputItem != null && timer(timerDump, dumpTime)){
-            tryDump(tile, outputItem.item);
-        }
-
-        if(outputLiquid != null){
-            tryDumpLiquid(tile, outputLiquid.liquid);
-        }
-    }
-
-    @Override
     public boolean outputsItems(){
         return outputItem != null;
-    }
-
-    @Override
-    public boolean shouldConsume(){
-        if(outputItem != null && tile.items.get(outputItem.item) >= itemCapacity){
-            return false;
-        }
-        return outputLiquid == null || !(tile.liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.001f);
-    }
-
-    @Override
-    public int getMaximumAccepted(Item item){
-        return itemCapacity;
     }
 
     public class GenericCrafterEntity extends TileEntity{
         public float progress;
         public float totalProgress;
         public float warmup;
+
+        @Override
+        public void draw(){
+            if(drawer == null){
+                super.draw();
+            }else{
+                drawer.get(this);
+            }
+        }
+
+        @Override
+        public boolean shouldConsume(){
+            if(outputItem != null && items.get(outputItem.item) >= itemCapacity){
+                return false;
+            }
+            return outputLiquid == null || !(liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.001f);
+        }
+
+        @Override
+        public void updateTile(){
+            if(consValid()){
+
+                progress += getProgressIncrease(craftTime);
+                totalProgress += delta();
+                warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
+
+                if(Mathf.chance(Time.delta() * updateEffectChance)){
+                    updateEffect.at(getX() + Mathf.range(size * 4f), getY() + Mathf.range(size * 4));
+                }
+            }else{
+                warmup = Mathf.lerp(warmup, 0f, 0.02f);
+            }
+
+            if(progress >= 1f){
+                consume();
+
+                if(outputItem != null){
+                    useContent(outputItem.item);
+                    for(int i = 0; i < outputItem.amount; i++){
+                        offloadNear(outputItem.item);
+                    }
+                }
+
+                if(outputLiquid != null){
+                    useContent(outputLiquid.liquid);
+                    handleLiquid(this, outputLiquid.liquid, outputLiquid.amount);
+                }
+
+                craftEffect.at(x, y);
+                progress = 0f;
+            }
+
+            if(outputItem != null && timer(timerDump, dumpTime)){
+                dump(outputItem.item);
+            }
+
+            if(outputLiquid != null){
+                dumpLiquid(outputLiquid.liquid);
+            }
+        }
+
+        @Override
+        public int getMaximumAccepted(Item item){
+            return itemCapacity;
+        }
+
+        @Override
+        public boolean shouldIdleSound(){
+            return cons.valid();
+        }
 
         @Override
         public void write(Writes write){
