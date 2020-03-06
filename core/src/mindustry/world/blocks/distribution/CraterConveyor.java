@@ -158,16 +158,14 @@ public class CraterConveyor extends Block implements Autotiler{
         // crater needs to be centered
         if(entity.reload > 0f) return;
 
-        // unload
         if(entity.blendbit2 == 6){
             while(tryDump(tile)){
                 if(entity.items.total() == 0) poofOut(tile);
             }
         }
 
-        else
+        /* unload */ else /* transfer */
 
-        // transfer
         if(entity.blendbit2 != 5 || (entity.items.total() >= getMaximumAccepted(tile, entity.items.first()))){
             if(tile.front() != null
             && tile.front().getTeam() == tile.getTeam()
