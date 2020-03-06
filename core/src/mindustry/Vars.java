@@ -276,6 +276,10 @@ public class Vars implements Loadable{
         maps.load();
     }
 
+    public static int getPing(){
+        return netClient.getPing();
+    }
+
     public static void loadLogger(){
         if(loadedLogger) return;
 

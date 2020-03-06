@@ -782,6 +782,10 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
     }
 
+    public int getPing(){
+        return Vars.getPing();
+    }
+
     public PlayerInfo getInfo(){
         if(uuid == null){
             throw new IllegalArgumentException("Local players cannot be traced and do not have info.");
