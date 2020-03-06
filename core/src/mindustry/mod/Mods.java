@@ -21,6 +21,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.plugin.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 

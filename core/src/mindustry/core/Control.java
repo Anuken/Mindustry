@@ -113,17 +113,17 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         //autohost for pvp maps
-        Events.on(WorldLoadEvent.class, event -> {
+        Events.on(WorldLoadEvent.class, event -> app.post(() -> {
             if(state.rules.pvp && !net.active()){
                 try{
                     net.host(port);
                     player.admin(true);
                 }catch(IOException e){
                     ui.showException("$server.error", e);
-                    Core.app.post(() -> state.set(State.menu));
+                    state.set(State.menu);
                 }
             }
-        });
+        }));
 
         Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
 
