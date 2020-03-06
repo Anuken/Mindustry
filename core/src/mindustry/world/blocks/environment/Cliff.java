@@ -17,7 +17,7 @@ public class Cliff extends Block{
     }
 
     @Override
-    public void drawBase(){
+    public void drawBase(Tile tile){
         int r = tile.rotation();
         for(int i = 0; i < 8; i++){
             if((r & (1 << i)) != 0){
@@ -30,7 +30,7 @@ public class Cliff extends Block{
     }
 
     @Override
-    public int minimapColor(){
+    public int minimapColor(Tile tile){
         return Tmp.c1.set(tile.floor().mapColor).mul(1.2f).rgba();
     }
 }

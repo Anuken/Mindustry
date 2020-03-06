@@ -14,11 +14,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -46,7 +43,7 @@ public class NuclearReactor extends PowerGenerator{
         liquidCapacity = 30;
         hasItems = true;
         hasLiquids = true;
-    rebuildable = false;
+        rebuildable = false;
     }
 
     @Override
@@ -72,111 +69,110 @@ public class NuclearReactor extends PowerGenerator{
         bars.add("heat", entity -> new Bar("bar.heat", Pal.lightOrange, () -> ((NuclearReactorEntity)entity).heat));
     }
 
-    @Override
-    public void updateTile(){
-        ConsumeLiquid cliquid = consumes.get(ConsumeType.liquid);
-        Item item = consumes.<ConsumeItems>get(ConsumeType.item).items[0].item;
-
-        int fuel = items.get(item);
-        float fullness = (float)fuel / itemCapacity;
-        productionEfficiency = fullness;
-
-        if(fuel > 0){
-            heat += fullness * heating * Math.min(delta(), 4f);
-
-            if(timer(timerFuel, itemDuration / timeScale())){
-                consume();
-            }
-        }
-
-        Liquid liquid = cliquid.liquid;
-
-        if(heat > 0){
-            float maxUsed = Math.min(liquids.get(liquid), heat / coolantPower);
-            heat -= maxUsed * coolantPower;
-            liquids.remove(liquid, maxUsed);
-        }
-
-        if(heat > smokeThreshold){
-            float smoke = 1.0f + (heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
-            if(Mathf.chance(smoke / 20.0 * delta())){
-                Fx.reactorsmoke.at(tile.worldx() + Mathf.range(size * tilesize / 2f),
-                tile.worldy() + Mathf.random(size * tilesize / 2f));
-            }
-        }
-
-        heat = Mathf.clamp(heat);
-
-        if(heat >= 0.999f){
-            Events.fire(Trigger.thoriumReactorOverheat);
-            kill();
-        }
-    }
-
-    @Override
-    public void onDestroyed(){
-        super.onDestroyed();
-
-        Sounds.explosionbig.at(tile);
-
-        int fuel = items.get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
-
-        if((fuel < 5 && heat < 0.5f) || !state.rules.reactorExplosions) return;
-
-        Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
-        Fx.nuclearShockwave.at(tile.worldx(), tile.worldy());
-        for(int i = 0; i < 6; i++){
-            Time.run(Mathf.random(40), () -> Fx.nuclearcloud.at(tile.worldx(), tile.worldy()));
-        }
-
-        Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
-
-        for(int i = 0; i < 20; i++){
-            Time.run(Mathf.random(50), () -> {
-                tr.rnd(Mathf.random(40f));
-                Fx.explosion.at(tr.x + tile.worldx(), tr.y + tile.worldy());
-            });
-        }
-
-        for(int i = 0; i < 70; i++){
-            Time.run(Mathf.random(80), () -> {
-                tr.rnd(Mathf.random(120f));
-                Fx.nuclearsmoke.at(tr.x + tile.worldx(), tr.y + tile.worldy());
-            });
-        }
-    }
-
-    @Override
-    public void drawLight(){
-        float fract = productionEfficiency;
-        renderer.lights.add(x, y, (90f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * fract);
-    }
-
-    @Override
-    public void draw(){
-        super.draw();
-
-        Draw.color(coolColor, hotColor, heat);
-        Fill.rect(x, y, size * tilesize, size * tilesize);
-
-        Draw.color(liquids.current().color);
-        Draw.alpha(liquids.currentAmount() / liquidCapacity);
-        Draw.rect(topRegion, x, y);
-
-        if(heat > flashThreshold){
-            float flash = 1f + ((heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;
-            flash += flash * Time.delta();
-            Draw.color(Color.red, Color.yellow, Mathf.absin(flash, 9f, 1f));
-            Draw.alpha(0.6f);
-            Draw.rect(lightsRegion, x, y);
-        }
-
-        Draw.reset();
-    }
-
     public class NuclearReactorEntity extends GeneratorEntity{
         public float heat;
-        public float flash;
+
+        @Override
+        public void updateTile(){
+            ConsumeLiquid cliquid = consumes.get(ConsumeType.liquid);
+            Item item = consumes.<ConsumeItems>get(ConsumeType.item).items[0].item;
+
+            int fuel = items.get(item);
+            float fullness = (float)fuel / itemCapacity;
+            productionEfficiency = fullness;
+
+            if(fuel > 0){
+                heat += fullness * heating * Math.min(delta(), 4f);
+
+                if(timer(timerFuel, itemDuration / timeScale())){
+                    consume();
+                }
+            }
+
+            Liquid liquid = cliquid.liquid;
+
+            if(heat > 0){
+                float maxUsed = Math.min(liquids.get(liquid), heat / coolantPower);
+                heat -= maxUsed * coolantPower;
+                liquids.remove(liquid, maxUsed);
+            }
+
+            if(heat > smokeThreshold){
+                float smoke = 1.0f + (heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
+                if(Mathf.chance(smoke / 20.0 * delta())){
+                    Fx.reactorsmoke.at(x + Mathf.range(size * tilesize / 2f),
+                    y + Mathf.random(size * tilesize / 2f));
+                }
+            }
+
+            heat = Mathf.clamp(heat);
+
+            if(heat >= 0.999f){
+                Events.fire(Trigger.thoriumReactorOverheat);
+                kill();
+            }
+        }
+
+        @Override
+        public void onDestroyed(){
+            super.onDestroyed();
+
+            Sounds.explosionbig.at(tile);
+
+            int fuel = items.get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
+
+            if((fuel < 5 && heat < 0.5f) || !state.rules.reactorExplosions) return;
+
+            Effects.shake(6f, 16f, x, y);
+            Fx.nuclearShockwave.at(x, y);
+            for(int i = 0; i < 6; i++){
+                Time.run(Mathf.random(40), () -> Fx.nuclearcloud.at(x, y));
+            }
+
+            Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
+
+            for(int i = 0; i < 20; i++){
+                Time.run(Mathf.random(50), () -> {
+                    tr.rnd(Mathf.random(40f));
+                    Fx.explosion.at(tr.x + x, tr.y + y);
+                });
+            }
+
+            for(int i = 0; i < 70; i++){
+                Time.run(Mathf.random(80), () -> {
+                    tr.rnd(Mathf.random(120f));
+                    Fx.nuclearsmoke.at(tr.x + x, tr.y + y);
+                });
+            }
+        }
+
+        @Override
+        public void drawLight(){
+            float fract = productionEfficiency;
+            renderer.lights.add(x, y, (90f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * fract);
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            Draw.color(coolColor, hotColor, heat);
+            Fill.rect(x, y, size * tilesize, size * tilesize);
+
+            Draw.color(liquids.current().color);
+            Draw.alpha(liquids.currentAmount() / liquidCapacity);
+            Draw.rect(topRegion, x, y);
+
+            if(heat > flashThreshold){
+                float flash = 1f + ((heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;
+                flash += flash * Time.delta();
+                Draw.color(Color.red, Color.yellow, Mathf.absin(flash, 9f, 1f));
+                Draw.alpha(0.6f);
+                Draw.rect(lightsRegion, x, y);
+            }
+
+            Draw.reset();
+        }
 
         @Override
         public void write(Writes write){

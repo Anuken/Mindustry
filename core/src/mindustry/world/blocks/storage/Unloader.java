@@ -110,7 +110,7 @@ public class Unloader extends Block{
         super.draw();
 
         Draw.color(sortItem == null ? Color.clear : sortItem.color);
-        Draw.rect("unloader-center", tile.worldx(), tile.worldy());
+        Draw.rect("unloader-center", x, y);
         Draw.color();
     }
 

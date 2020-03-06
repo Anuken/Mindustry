@@ -54,14 +54,14 @@ public class Incinerator extends Block{
     }
 
     @Override
-    public void handleItem(Tile source, Item item){
+    public void handleItem(Tilec source, Item item){
         if(Mathf.chance(0.3)){
             effect.at(x, y);
         }
     }
 
     @Override
-    public boolean acceptItem(Tile source, Item item){
+    public boolean acceptItem(Tilec source, Item item){
         return heat > 0.5f;
     }
 

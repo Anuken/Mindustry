@@ -27,29 +27,8 @@ public class Sorter extends Block{
         group = BlockGroup.transportation;
         configurable = true;
         unloadable = false;
-    config(Item.class, (tile, item) -> tile.<SorterEntity>ent().sortItem = item);
-        configClear(tile -> tile.<SorterEntity>ent().sortItem = null);
-    }
-
-    @Override
-    public boolean outputsItems(){
-        return true;
-    }
-
-    @Override
-    public void playerPlaced(){
-        if(lastItem != null){
-            tile.configure(lastItem);
-        }
-    }
-
-    @Override
-    public void configured(Playerc player, Object value){
-        super.configured(tile, player, value);
-
-        if(!headless){
-            renderer.minimap.update(tile);
-        }
+        config(Item.class, (tile, item) -> ((SorterEntity)tile).sortItem = item);
+        configClear(tile -> ((SorterEntity)tile).sortItem = null);
     }
 
     @Override
@@ -58,88 +37,107 @@ public class Sorter extends Block{
     }
 
     @Override
-    public void draw(){
-        super.draw();
-
-        if(sortItem == null) return;
-
-        Draw.color(sortItem.color);
-        Draw.rect("center", tile.worldx(), tile.worldy());
-        Draw.color();
+    public boolean outputsItems(){
+        return true;
     }
 
     @Override
-    public int minimapColor(){
+    public int minimapColor(Tile tile){
         return tile.<SorterEntity>ent().sortItem == null ? 0 : tile.<SorterEntity>ent().sortItem.color.rgba();
-    }
-
-    @Override
-    public boolean acceptItem(Tile source, Item item){
-        Tile to = getTileTarget(item, tile, source, false);
-
-        return to != null && to.block().acceptItem(to, tile, item) && to.team() == team;
-    }
-
-    @Override
-    public void handleItem(Tile source, Item item){
-        Tile to = getTileTarget(item, tile, source, true);
-
-        to.block().handleItem(to, tile, item);
-    }
-
-    boolean isSame(Tile other){
-        //uncomment comment below to prevent sorter/gate chaining (hacky)
-        return other != null && (other.block() instanceof Sorter/* || other.block() instanceof OverflowGate */);
-    }
-
-    Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
-        SorterEntity entity = dest.ent();
-
-        int dir = source.relativeTo(dest.x, dest.y);
-        if(dir == -1) return null;
-        Tile to;
-
-        if((item == sortItem) != invert){
-            //prevent 3-chains
-            if(isSame(dest, source) && isSame(dest, dest.getNearby(dir))){
-                return null;
-            }
-            to = dest.getNearby(dir);
-        }else{
-            Tile a = dest.getNearby(Mathf.mod(dir - 1, 4));
-            Tile b = dest.getNearby(Mathf.mod(dir + 1, 4));
-            boolean ac = a != null && !(a.block().instantTransfer && source.block().instantTransfer) &&
-                    a.block().acceptItem(a, dest, item);
-            boolean bc = b != null && !(b.block().instantTransfer && source.block().instantTransfer) &&
-                    b.block().acceptItem(b, dest, item);
-
-            if(ac && !bc){
-                to = a;
-            }else if(bc && !ac){
-                to = b;
-            }else if(!bc){
-                return null;
-            }else{
-                if(dest.rotation() == 0){
-                    to = a;
-                    if(flip) dest.rotation((byte)1);
-                }else{
-                    to = b;
-                    if(flip) dest.rotation((byte)0);
-                }
-            }
-        }
-
-        return to;
-    }
-
-    @Override
-    public void buildConfiguration(Table table){
-        ItemSelection.buildTable(table, content.items(), () -> sortItem, item -> tile.configure(lastItem = item));
     }
 
     public class SorterEntity extends TileEntity{
         @Nullable Item sortItem;
+
+        @Override
+        public void playerPlaced(){
+            if(lastItem != null){
+                tile.configure(lastItem);
+            }
+        }
+
+        @Override
+        public void configured(Playerc player, Object value){
+            super.configured(player, value);
+
+            if(!headless){
+                renderer.minimap.update(tile);
+            }
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            if(sortItem == null) return;
+
+            Draw.color(sortItem.color);
+            Draw.rect("center", x, y);
+            Draw.color();
+        }
+
+        @Override
+        public boolean acceptItem(Tilec source, Item item){
+            Tilec to = getTileTarget(item, source, false);
+
+            return to != null && to.acceptItem(this, item) && to.team() == team;
+        }
+
+        @Override
+        public void handleItem(Tilec source, Item item){
+            Tilec to = getTileTarget(item, source, true);
+
+            to.handleItem(this, item);
+        }
+
+        boolean isSame(Tilec other){
+            //uncomment comment below to prevent sorter/gate chaining (hacky)
+            return other != null && (other.block() instanceof Sorter/* || other.block() instanceof OverflowGate */);
+        }
+
+        Tilec getTileTarget(Item item, Tilec source, boolean flip){
+            int dir = source.relativeTo(tile.x, tile.y);
+            if(dir == -1) return null;
+            Tilec to;
+
+            if((item == sortItem) != invert){
+                //prevent 3-chains
+                if(isSame(source) && isSame(nearby(dir))){
+                    return null;
+                }
+                to = nearby(dir);
+            }else{
+                Tilec a = nearby(Mathf.mod(dir - 1, 4));
+                Tilec b = nearby(Mathf.mod(dir + 1, 4));
+                boolean ac = a != null && !(a.block().instantTransfer && source.block().instantTransfer) &&
+                a.acceptItem(this, item);
+                boolean bc = b != null && !(b.block().instantTransfer && source.block().instantTransfer) &&
+                b.acceptItem(this, item);
+
+                if(ac && !bc){
+                    to = a;
+                }else if(bc && !ac){
+                    to = b;
+                }else if(!bc){
+                    return null;
+                }else{
+                    if(rotation() == 0){
+                        to = a;
+                        if(flip) rotation((byte)1);
+                    }else{
+                        to = b;
+                        if(flip) rotation((byte)0);
+                    }
+                }
+            }
+
+            return to;
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            ItemSelection.buildTable(table, content.items(), () -> sortItem, item -> tile.configure(lastItem = item));
+        }
 
         @Override
         public Item config(){

@@ -153,7 +153,7 @@ public class Floor extends Block{
     }
 
     @Override
-    public void drawBase(){
+    public void drawBase(Tile tile){
         Mathf.random.setSeed(tile.pos());
 
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
@@ -170,17 +170,17 @@ public class Floor extends Block{
         return drownTime > 0;
     }
 
-    public void drawNonLayer(){
+    public void drawNonLayer(Tile tile){
         Mathf.random.setSeed(tile.pos());
 
         drawEdges(tile, true);
     }
 
-    protected void drawEdges(){
+    protected void drawEdges(Tile tile){
         drawEdges(tile, false);
     }
 
-    protected void drawEdges(boolean sameLayer){
+    protected void drawEdges(Tile tile, boolean sameLayer){
         blenders.clear();
         blended.clear();
         eq = 0;
@@ -216,7 +216,7 @@ public class Floor extends Block{
     }
 
     //'new' style of edges with shadows instead of colors, not used currently
-    protected void drawEdgesFlat(boolean sameLayer){
+    protected void drawEdgesFlat(Tile tile, boolean sameLayer){
         for(int i = 0; i < 4; i++){
             Tile other = tile.getNearby(i);
             if(other != null && doEdge(other.floor(), sameLayer)){

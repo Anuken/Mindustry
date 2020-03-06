@@ -1,16 +1,13 @@
 package mindustry.world.blocks.power;
 
-import arc.Core;
-import arc.struct.EnumSet;
-import arc.util.Strings;
+import arc.*;
+import arc.struct.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
-import mindustry.graphics.Pal;
-import mindustry.ui.Bar;
-import mindustry.world.Tile;
+import mindustry.graphics.*;
+import mindustry.ui.*;
 import mindustry.world.meta.*;
-
-import java.io.*;
 
 public class PowerGenerator extends PowerDistributor{
     /** The amount of power produced per tick in case of an efficiency of 1.0, which represents 100%. */
@@ -37,15 +34,10 @@ public class PowerGenerator extends PowerDistributor{
         if(hasPower && outputsPower && !consumes.hasPower()){
             bars.add("power", entity -> new Bar(() ->
             Core.bundle.format("bar.poweroutput",
-            Strings.fixed(block().getPowerProduction(tile()) * 60 * timeScale(), 1)),
+            Strings.fixed(entity.getPowerProduction() * 60 * entity.timeScale(), 1)),
             () -> Pal.powerBar,
             () -> ((GeneratorEntity)entity).productionEfficiency));
         }
-    }
-
-    @Override
-    public float getPowerProduction(){
-        return powerProduction * tile.<GeneratorEntity>ent().productionEfficiency;
     }
 
     @Override
@@ -57,6 +49,11 @@ public class PowerGenerator extends PowerDistributor{
         public float generateTime;
         /** The efficiency of the producer. An efficiency of 1.0 means 100% */
         public float productionEfficiency = 0.0f;
+
+        @Override
+        public float getPowerProduction(){
+            return powerProduction * productionEfficiency;
+        }
 
         @Override
         public void write(Writes write){

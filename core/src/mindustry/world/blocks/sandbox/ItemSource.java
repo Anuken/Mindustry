@@ -24,15 +24,8 @@ public class ItemSource extends Block{
         solid = true;
         group = BlockGroup.transportation;
         configurable = true;
-    config(Item.class, (tile, item) -> tile.<ItemSourceEntity>ent().outputItem = item);
-        configClear(tile -> tile.<ItemSourceEntity>ent().outputItem = null);
-    }
-
-    @Override
-    public void playerPlaced(){
-        if(lastItem != null){
-            Core.app.post(() -> tile.configure(lastItem));
-        }
+        config(Item.class, (tile, item) -> ((ItemSourceEntity)tile).outputItem = item);
+        configClear(tile -> ((ItemSourceEntity)tile).outputItem = null);
     }
 
     @Override
@@ -51,38 +44,45 @@ public class ItemSource extends Block{
         return true;
     }
 
-    @Override
-    public void draw(){
-        super.draw();
-
-        if(outputItem == null) return;
-
-        Draw.color(outputItem.color);
-        Draw.rect("center", tile.worldx(), tile.worldy());
-        Draw.color();
-    }
-
-    @Override
-    public void updateTile(){
-        if(outputItem == null) return;
-
-        items.set(outputItem, 1);
-        tryDump(tile, outputItem);
-        items.set(outputItem, 0);
-    }
-
-    @Override
-    public void buildConfiguration(Table table){
-        ItemSelection.buildTable(table, content.items(), () -> outputItem, item -> tile.configure(lastItem = item));
-    }
-
-    @Override
-    public boolean acceptItem(Tile source, Item item){
-        return false;
-    }
-
     public class ItemSourceEntity extends TileEntity{
         Item outputItem;
+
+        @Override
+        public void playerPlaced(){
+            if(lastItem != null){
+                Core.app.post(() -> tile.configure(lastItem));
+            }
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            if(outputItem == null) return;
+
+            Draw.color(outputItem.color);
+            Draw.rect("center", x, y);
+            Draw.color();
+        }
+
+        @Override
+        public void updateTile(){
+            if(outputItem == null) return;
+
+            items.set(outputItem, 1);
+            dump(outputItem);
+            items.set(outputItem, 0);
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            ItemSelection.buildTable(table, content.items(), () -> outputItem, item -> tile.configure(lastItem = item));
+        }
+
+        @Override
+        public boolean acceptItem(Tilec source, Item item){
+            return false;
+        }
 
         @Override
         public Item config(){

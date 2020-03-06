@@ -24,44 +24,44 @@ public class LightBlock extends Block{
         update = true;
         topRegion = reg("-top");
         configurable = true;
-    config(Integer.class, (tile, value) -> tile.<LightEntity>ent().color = value);
-    }
-
-    @Override
-    public void playerPlaced(){
-        if(lastColor != 0){
-            tile.configure(lastColor);
-        }
-    }
-
-    @Override
-    public void draw(){
-        super.draw();
-        Draw.blend(Blending.additive);
-        Draw.color(Tmp.c1.set(color), efficiency() * 0.3f);
-        Draw.rect(reg(topRegion), x, y);
-        Draw.color();
-        Draw.blend();
-    }
-
-    @Override
-    public void buildConfiguration(Table table){
-        table.addImageButton(Icon.pencil, () -> {
-            ui.picker.show(Tmp.c1.set(color).a(0.5f), false, res -> {
-                color = res.rgba();
-                lastColor = color;
-            });
-            control.input.frag.config.hideConfig();
-        }).size(40f);
-    }
-
-    @Override
-    public void drawLight(){
-        renderer.lights.add(x, y, radius, Tmp.c1.set(color), brightness * tile.efficiency());
+        config(Integer.class, (tile, value) -> ((LightEntity)tile).color = value);
     }
 
     public class LightEntity extends TileEntity{
         public int color = Pal.accent.rgba();
+
+        @Override
+        public void playerPlaced(){
+            if(lastColor != 0){
+                tile.configure(lastColor);
+            }
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+            Draw.blend(Blending.additive);
+            Draw.color(Tmp.c1.set(color), efficiency() * 0.3f);
+            Draw.rect(reg(topRegion), x, y);
+            Draw.color();
+            Draw.blend();
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            table.addImageButton(Icon.pencil, () -> {
+                ui.picker.show(Tmp.c1.set(color).a(0.5f), false, res -> {
+                    color = res.rgba();
+                    lastColor = color;
+                });
+                control.input.frag.config.hideConfig();
+            }).size(40f);
+        }
+
+        @Override
+        public void drawLight(){
+            renderer.lights.add(x, y, radius, Tmp.c1.set(color), brightness * efficiency());
+        }
 
         @Override
         public Integer config(){

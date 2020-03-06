@@ -63,8 +63,7 @@ public class PowerGraph{
     public float getPowerProduced(){
         float powerProduced = 0f;
         for(Tilec producer : producers){
-            if(producer.entity == null) continue;
-            powerProduced += producer.block().getPowerProduction(producer) * producer.delta();
+            powerProduced += producer.getPowerProduction() * producer.delta();
         }
         return powerProduced;
     }
@@ -230,7 +229,7 @@ public class PowerGraph{
     }
 
     public void add(Tilec tile){
-        if(tile.entity == null || tile.power() == null) return;
+        if(tile == null || tile.power() == null) return;
         tile.power().graph = this;
         all.add(tile);
 
@@ -253,7 +252,7 @@ public class PowerGraph{
         while(queue.size > 0){
             Tilec child = queue.removeFirst();
             add(child);
-            for(Tilec next : child.block().getPowerConnections(child, outArray2)){
+            for(Tilec next : child.getPowerConnections(outArray2)){
                 if(!closedSet.contains(next.pos())){
                     queue.addLast(next);
                     closedSet.add(next.pos());
@@ -275,7 +274,7 @@ public class PowerGraph{
         closedSet.clear();
 
         //go through all the connections of this tile
-        for(Tilec other : tile.block().getPowerConnections(tile, outArray1)){
+        for(Tilec other : tile.getPowerConnections(outArray1)){
             //a graph has already been assigned to this tile from a previous call, skip it
             if(other.power().graph != this) continue;
 
@@ -293,7 +292,7 @@ public class PowerGraph{
                 //add it to the new branch graph
                 graph.add(child);
                 //go through connections
-                for(Tilec next : child.block().getPowerConnections(child, outArray2)){
+                for(Tilec next : child.getPowerConnections(outArray2)){
                     //make sure it hasn't looped back, and that the new graph being assigned hasn't already been assigned
                     //also skip closed tiles
                     if(next != tile && next.power().graph != graph && !closedSet.contains(next.pos())){

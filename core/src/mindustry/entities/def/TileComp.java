@@ -13,7 +13,6 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
-import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
@@ -28,7 +27,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
-import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
@@ -134,6 +132,18 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         timeScaleDuration = Math.max(timeScaleDuration, duration);
     }
 
+    public Tilec nearby(int dx, int dy){
+        return world.ent(tile.x + dx, tile.y + dy);
+    }
+
+    public Tilec nearby(int rotation){
+        if(rotation == 0) return world.ent(tile.x + 1, tile.y);
+        if(rotation == 1) return world.ent(tile.x, tile.y + 1);
+        if(rotation == 2) return world.ent(tile.x - 1, tile.y);
+        if(rotation == 3) return world.ent(tile.x, tile.y - 1);
+        return null;
+    }
+
     public byte relativeTo(Tile tile){
         return relativeTo(tile.x, tile.y);
     }
@@ -153,6 +163,22 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         if(x <= cx - 1 && y == cy) return 0;
         if(x >= cx + 1 && y == cy) return 2;
         return -1;
+    }
+
+    public @Nullable Tilec front(){
+        return nearby((rotation() + 4) % 4);
+    }
+
+    public @Nullable Tilec right(){
+        return nearby((rotation() + 3) % 4);
+    }
+
+    public @Nullable Tilec back(){
+        return nearby((rotation() + 2) % 4);
+    }
+
+    public @Nullable Tilec left(){
+        return nearby((rotation() + 1) % 4);
     }
 
     public int pos(){
@@ -551,36 +577,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     public void drawSelect(){
     }
 
-    public float drawPlaceText(String text, int x, int y, boolean valid){
-        if(renderer.pixelator.enabled()) return 0;
-
-        Color color = valid ? Pal.accent : Pal.remove;
-        BitmapFont font = Fonts.outline;
-        GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
-        boolean ints = font.usesIntegerPositions();
-        font.setUseIntegerPositions(false);
-        font.getData().setScale(1f / 4f / Scl.scl(1f));
-        layout.setText(font, text);
-
-        float width = layout.width;
-
-        font.setColor(color);
-        float dx = x * tilesize + block.offset(), dy = y * tilesize + block.offset() + block.size * tilesize / 2f + 3;
-        font.draw(text, dx, dy + layout.height + 1, Align.center);
-        dy -= 1f;
-        Lines.stroke(2f, Color.darkGray);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
-        Lines.stroke(1f, color);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
-
-        font.setUseIntegerPositions(ints);
-        font.setColor(Color.white);
-        font.getData().setScale(1f);
-        Draw.reset();
-        Pools.free(layout);
-        return width;
-    }
-
     public void draw(){
         Draw.rect(block.region, x, y, block.rotate ? rotation() * 90 : 0);
     }
@@ -658,16 +654,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         }
     }
 
-    public float sumAttribute(Attribute attr, int x, int y){
-        Tile tile = world.tile(x, y);
-        if(tile == null) return 0;
-        float sum = 0;
-        for(Tile other : tile.getLinkedTilesAs(block, tempTiles)){
-            sum += other.floor().attributes.get(attr);
-        }
-        return sum;
-    }
-
     public float percentSolid(int x, int y){
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
@@ -678,7 +664,17 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         return sum / block.size / block.size;
     }
 
-    /** Called when the block is tapped. This is equivalent to being configured with null. */
+    /** Called when arbitrary configuration is applied to a tile. */
+    public void configured(@Nullable Playerc player, @Nullable Object value){
+        //null is of type Void.class; anonymous classes use their superclass.
+        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
+
+        if(block.configurations.containsKey(type)){
+            block.configurations.get(type).get(tile, value);
+        }
+    }
+
+    /** Called when the block is tapped.*/
     public void tapped(Playerc player){
 
     }

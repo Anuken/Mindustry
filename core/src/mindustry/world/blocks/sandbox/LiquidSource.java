@@ -26,15 +26,8 @@ public class LiquidSource extends Block{
         liquidCapacity = 100f;
         configurable = true;
         outputsLiquid = true;
-    config(Liquid.class, (tile, l) -> tile.<LiquidSourceEntity>ent().source = l);
-        configClear(tile -> tile.<LiquidSourceEntity>ent().source = null);
-    }
-
-    @Override
-    public void playerPlaced(){
-        if(lastLiquid != null){
-            Core.app.post(() -> tile.configure(lastLiquid));
-        }
+        config(Liquid.class, (tile, l) -> ((LiquidSourceEntity)tile).source = l);
+        configClear(tile -> ((LiquidSourceEntity)tile).source = null);
     }
 
     @Override
@@ -45,38 +38,45 @@ public class LiquidSource extends Block{
     }
 
     @Override
-    public void updateTile(){
-        if(source == null){
-            tile.liquids.clear();
-        }else{
-            tile.liquids.add(source, liquidCapacity);
-            tryDumpLiquid(tile, source);
-        }
-    }
-
-    @Override
     public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
         drawRequestConfigCenter(req, (Content)req.config, "center");
     }
 
-    @Override
-    public void draw(){
-        super.draw();
-
-        if(source != null){
-            Draw.color(source.color);
-            Draw.rect("center", tile.worldx(), tile.worldy());
-            Draw.color();
-        }
-    }
-
-    @Override
-    public void buildConfiguration(Table table){
-        ItemSelection.buildTable(table, content.liquids(), () -> source, liquid -> tile.configure(lastLiquid = liquid));
-    }
-
     class LiquidSourceEntity extends TileEntity{
         public @Nullable Liquid source = null;
+
+        @Override
+        public void updateTile(){
+            if(source == null){
+                liquids.clear();
+            }else{
+                liquids.add(source, liquidCapacity);
+                dumpLiquid(source);
+            }
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            if(source != null){
+                Draw.color(source.color);
+                Draw.rect("center", x, y);
+                Draw.color();
+            }
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            ItemSelection.buildTable(table, content.liquids(), () -> source, liquid -> tile.configure(lastLiquid = liquid));
+        }
+
+        @Override
+        public void playerPlaced(){
+            if(lastLiquid != null){
+                Core.app.post(() -> tile.configure(lastLiquid));
+            }
+        }
 
         @Override
         public Liquid config(){

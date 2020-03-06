@@ -10,7 +10,6 @@ public class LiquidRouter extends LiquidBlock{
     }
 
     public class LiquidRouterEntity extends LiquidBlockEntity{
-
         @Override
         public void updateTile(){
             if(liquids.total() > 0.01f){

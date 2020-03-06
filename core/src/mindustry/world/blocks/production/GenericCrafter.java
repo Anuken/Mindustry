@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
-import mindustry.entities.AllDefs.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;

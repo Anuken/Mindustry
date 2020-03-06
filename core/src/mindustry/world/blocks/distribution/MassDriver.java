@@ -212,7 +212,7 @@ public class MassDriver extends Block{
     }
 
     @Override
-    public boolean acceptItem(Tile source, Item item){
+    public boolean acceptItem(Tilec source, Item item){
         //mass drivers that ouput only cannot accept items
         return tile.items.total() < itemCapacity && linkValid(tile);
     }

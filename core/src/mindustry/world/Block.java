@@ -13,7 +13,7 @@ import arc.struct.Array;
 import arc.struct.EnumSet;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
@@ -31,7 +31,7 @@ import mindustry.world.meta.values.*;
 import java.lang.reflect.*;
 import java.util.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class Block extends UnlockableContent{
     public static final int crackRegions = 8, maxCrackSize = 5;
@@ -157,7 +157,8 @@ public class Block extends UnlockableContent{
     protected Prov<Tilec> entityType = null; //initialized later
     protected TextureRegion[] cacheRegions = {};
     protected Array<String> cacheRegionStrings = new Array<>();
-    protected ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
+    //TODO move
+    public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
     //TODO move
     protected TextureRegion[] generatedIcons;
@@ -166,6 +167,7 @@ public class Block extends UnlockableContent{
 
     //TODO move
     public static TextureRegion[][] cracks;
+    protected static final Array<Tile> tempTiles = new Array<>();
 
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
@@ -187,8 +189,60 @@ public class Block extends UnlockableContent{
         }
     }
 
+    public void drawLayer(Tile tile){
+        if(tile.entity != null) tile.entity.drawLayer();
+    }
+
+    public void drawLayer2(Tile tile){
+        if(tile.entity != null) tile.entity.drawLayer2();
+    }
+
     /** Drawn when you are placing a block. */
     public void drawPlace(int x, int y, int rotation, boolean valid){
+    }
+
+    public float drawPlaceText(String text, int x, int y, boolean valid){
+        if(renderer.pixelator.enabled()) return 0;
+
+        Color color = valid ? Pal.accent : Pal.remove;
+        BitmapFont font = Fonts.outline;
+        GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+        boolean ints = font.usesIntegerPositions();
+        font.setUseIntegerPositions(false);
+        font.getData().setScale(1f / 4f / Scl.scl(1f));
+        layout.setText(font, text);
+
+        float width = layout.width;
+
+        font.setColor(color);
+        float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 3;
+        font.draw(text, dx, dy + layout.height + 1, Align.center);
+        dy -= 1f;
+        Lines.stroke(2f, Color.darkGray);
+        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
+        Lines.stroke(1f, color);
+        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
+
+        font.setUseIntegerPositions(ints);
+        font.setColor(Color.white);
+        font.getData().setScale(1f);
+        Draw.reset();
+        Pools.free(layout);
+        return width;
+    }
+
+    public float sumAttribute(Attribute attr, int x, int y){
+        Tile tile = world.tile(x, y);
+        if(tile == null) return 0;
+        float sum = 0;
+        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+            sum += other.floor().attributes.get(attr);
+        }
+        return sum;
+    }
+
+    public String getDisplayName(Tile tile){
+        return tile.entity == null ? localizedName : tile.entity.getDisplayName();
     }
 
     /** @return a custom minimap color for this or 0 to use default colors. */
@@ -320,16 +374,6 @@ public class Block extends UnlockableContent{
 
     public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
 
-    }
-
-    /** Called when arbitrary configuration is applied to a tile. */
-    public void configured(Tilec tile, @Nullable Playerc player, @Nullable Object value){
-        //null is of type Void.class; anonymous classes use their superclass.
-        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
-
-        if(configurations.containsKey(type)){
-            configurations.get(type).get(tile, value);
-        }
     }
 
     /** Configure when a null value is passed.*/

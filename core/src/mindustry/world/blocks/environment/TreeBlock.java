@@ -16,10 +16,10 @@ public class TreeBlock extends Block{
     }
 
     @Override
-    public void drawBase(){}
+    public void drawBase(Tile tile){}
 
     @Override
-    public void drawLayer(){
-        Draw.rect(region, x, y, Mathf.randomSeed(tile.pos(), 0, 4) * 90);
+    public void drawLayer(Tile tile){
+        Draw.rect(region, tile.worldx(), tile.worldy(), Mathf.randomSeed(tile.pos(), 0, 4) * 90);
     }
 }
