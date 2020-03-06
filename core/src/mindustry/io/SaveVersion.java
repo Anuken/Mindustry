@@ -122,11 +122,17 @@ public abstract class SaveVersion extends SaveFileReader{
             Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.blockID());
 
+            //only write the entity for multiblocks once - in the center
             if(tile.entity != null){
-                writeChunk(stream, true, out -> {
-                    out.writeByte(tile.entity.version());
-                    tile.entity.writeAll(Writes.get(out));
-                });
+                if(tile.isCenter()){
+                    stream.writeBoolean(true);
+                    writeChunk(stream, true, out -> {
+                        out.writeByte(tile.entity.version());
+                        tile.entity.writeAll(Writes.get(out));
+                    });
+                }else{
+                    stream.writeBoolean(false);
+                }
             }else{
                 //write consecutive non-entity blocks
                 int consecutives = 0;
@@ -182,16 +188,27 @@ public abstract class SaveVersion extends SaveFileReader{
                 Block block = content.block(stream.readShort());
                 Tile tile = context.tile(x, y);
                 if(block == null) block = Blocks.air;
-                tile.setBlock(block);
+                boolean isCenter = true;
 
-                if(tile.entity != null){
-                    try{
-                        readChunk(stream, true, in -> {
-                            byte revision = in.readByte();
-                            tile.entity.readAll(Reads.get(in), revision);
-                        });
-                    }catch(Exception e){
-                        throw new IOException("Failed to read tile entity of block: " + block, e);
+                if(block.hasEntity()){
+                    isCenter = stream.readBoolean();
+                }
+
+                //set block only if this is the center; otherwise, it's handled elsewhere
+                if(isCenter){
+                    tile.setBlock(block);
+                }
+
+                if(block.hasEntity()){
+                    if(isCenter){ //only read entity for center blocks
+                        try{
+                            readChunk(stream, true, in -> {
+                                byte revision = in.readByte();
+                                tile.entity.readAll(Reads.get(in), revision);
+                            });
+                        }catch(Throwable e){
+                            throw new IOException("Failed to read tile entity of block: " + block, e);
+                        }
                     }
                 }else{
                     int consecutives = stream.readUnsignedByte();

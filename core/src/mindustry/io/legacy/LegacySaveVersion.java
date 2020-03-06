@@ -53,9 +53,16 @@ public abstract class LegacySaveVersion extends SaveVersion{
                 Block block = content.block(stream.readShort());
                 Tile tile = context.tile(x, y);
                 if(block == null) block = Blocks.air;
-                tile.setBlock(block);
 
-                if(tile.entity != null){
+                //occupied by multiblock part
+                boolean occupied = tile.entity != null && !tile.isCenter();
+
+                //do not override occupied cells
+                if(!occupied){
+                    tile.setBlock(block);
+                }
+
+                if(block.hasEntity()){
                     try{
                         readChunk(stream, true, in -> {
                             byte version = in.readByte();
@@ -76,15 +83,18 @@ public abstract class LegacySaveVersion extends SaveVersion{
                             //read only from subclasses!
                             tile.entity.read(Reads.get(in), version);
                         });
-                    }catch(Exception e){
+                    }catch(Throwable e){
                         throw new IOException("Failed to read tile entity of block: " + block, e);
                     }
                 }else{
                     int consecutives = stream.readUnsignedByte();
 
-                    for(int j = i + 1; j < i + 1 + consecutives; j++){
-                        int newx = j % width, newy = j / width;
-                        context.tile(newx, newy).setBlock(block);
+                    //air is a waste of time and may mess up multiblocks
+                    if(block != Blocks.air){
+                        for(int j = i + 1; j < i + 1 + consecutives; j++){
+                            int newx = j % width, newy = j / width;
+                            context.tile(newx, newy).setBlock(block);
+                        }
                     }
 
                     i += consecutives;

@@ -34,6 +34,10 @@ public class BlockInventoryFragment extends Fragment{
     private boolean holding;
     private Item lastItem;
 
+    {
+        Events.on(WorldLoadEvent.class, e -> hide());
+    }
+
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Playerc player, Tilec tile, Item item, int amount){
         if(player == null || tile == null || !tile.interactable(player.team())) return;
@@ -87,7 +91,6 @@ public class BlockInventoryFragment extends Fragment{
     }
 
     private void rebuild(boolean actions){
-
         IntSet container = new IntSet();
 
         table.clearChildren();

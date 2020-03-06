@@ -182,7 +182,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     }
 
     public int pos(){
-        return pos();
+        return tile.pos();
     }
 
     public int rotation(){
@@ -194,7 +194,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     }
 
     public Floor floor(){
-        return floor();
+        return tile.floor();
     }
 
     public boolean interactable(Team team){
