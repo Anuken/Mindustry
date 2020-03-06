@@ -34,7 +34,7 @@ public class CraterConveyor extends Block implements Autotiler{
         layer = Layer.overlay;
         group = BlockGroup.transportation;
         hasItems = true;
-        itemCapacity = 4;
+        itemCapacity = 8;
         conveyorPlacement = true;
         entityType = CraterConveyorEntity::new;
 
