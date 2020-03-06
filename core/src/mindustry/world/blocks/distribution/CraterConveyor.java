@@ -72,7 +72,7 @@ public class CraterConveyor extends Block implements Autotiler{
         draw(tile, entity.blendbit2);
     }
 
-    public void draw(Tile tile, int bit){
+    private void draw(Tile tile, int bit){
         CraterConveyorEntity entity = tile.ent();
 
         Draw.rect(regions[Mathf.clamp(bit, 0, regions.length - 1)], tile.drawx(), tile.drawy(), tilesize * entity.blendsclx, tilesize * entity.blendscly, tile.rotation() * 90);
