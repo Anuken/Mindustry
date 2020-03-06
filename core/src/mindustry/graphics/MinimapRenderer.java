@@ -155,7 +155,7 @@ public class MinimapRenderer implements Disposable{
     private int colorFor(Tile tile){
         if(tile == null) return 0;
         tile = tile.link();
-        int bc = tile.block().minimapColor(tile);
+        int bc = tile.minimapColor();
         Color color = Tmp.c1.set(bc == 0 ? MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.team()) : bc);
         color.mul(1f - Mathf.clamp(world.getDarkness(tile.x, tile.y) / 4f));
 

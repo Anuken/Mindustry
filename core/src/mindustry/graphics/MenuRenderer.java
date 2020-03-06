@@ -186,18 +186,18 @@ public class MenuRenderer implements Disposable{
         batch.beginCache();
 
         for(Tile tile : world.tiles){
-            tile.floor().draw(tile);
+            tile.floor().drawBase(tile);
         }
 
         for(Tile tile : world.tiles){
-            tile.overlay().draw(tile);
+            tile.overlay().drawBase(tile);
         }
 
         cacheFloor = batch.endCache();
         batch.beginCache();
 
         for(Tile tile : world.tiles){
-            tile.block().draw(tile);
+            tile.block().drawBase(tile);
         }
 
         cacheWall = batch.endCache();

@@ -136,7 +136,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Item item = player.unit().item();
         int amount = player.unit().stack().amount;
-        int accepted = tile.block().acceptStack(tile, item, amount, player.unit());
+        int accepted = tile.acceptStack(item, amount, player.unit());
         player.unit().stack().amount -= accepted;
 
         int sent = Mathf.clamp(accepted / 4, 1, 8);
@@ -145,13 +145,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Core.app.post(() -> Events.fire(new DepositEvent(tile, player, item, accepted)));
 
         for(int i = 0; i < sent; i++){
-            tile.block().getStackOffset(tile, item, stackTrns);
+            tile.getStackOffset(item, stackTrns);
 
             createItemTransfer(item, player.x() + Angles.trnsx(player.unit().rotation() + 180f, backTrns), player.y() + Angles.trnsy(player.unit().rotation() + 180f, backTrns),
             new Vec2(tile.x() + stackTrns.x, tile.y() + stackTrns.y), () -> {
                 if(tile.block() != block || tile.entity == null || tile.items() == null) return;
 
-                tile.block().handleStack(tile, item, accepted, player.unit());
+                tile.handleStack(item, accepted, player.unit());
             });
         }
     }
@@ -161,7 +161,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(tile == null || player == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
         !netServer.admins.allowAction(player, ActionType.tapTile, tile, action -> {}))) throw new ValidateException(player, "Player cannot tap a tile.");
-        tile.block().tapped(tile, player);
+        tile.tapped(player);
         Core.app.post(() -> Events.fire(new TapEvent(tile, player)));
     }
 
@@ -170,7 +170,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(tile == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.configure, tile, action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
-        tile.block().configured(tile, player, value);
+        tile.configured(player, value);
         Core.app.post(() -> Events.fire(new TapConfigEvent(tile, player, value)));
     }
 
@@ -567,7 +567,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //check if tapped block is configurable
         if(tile.block().configurable && tile.interactable(player.team())){
             consumed = true;
-            if(((!frag.config.isShown() && tile.block().shouldShowConfigure(tile, player)) //if the config fragment is hidden, show
+            if(((!frag.config.isShown() && tile.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
             || (frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)))){
                 Sounds.click.at(tile);
@@ -750,7 +750,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         ItemStack stack = player.unit().stack();
 
-        if(tile.block().acceptStack(tile, stack.item, stack.amount, player.unit()) > 0 && tile.interactable(player.team()) && tile.block().hasItems && player.unit().stack().amount > 0 && tile.interactable(player.team())){
+        if(tile.acceptStack(stack.item, stack.amount, player.unit()) > 0 && tile.interactable(player.team()) && tile.block().hasItems && player.unit().stack().amount > 0 && tile.interactable(player.team())){
             Call.transferInventory(player, tile);
         }else{
             Call.dropItem(player.angleTo(x, y));
@@ -1003,7 +1003,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(dst(moveTarget) <= 2f * Time.delta()){
                 if(tapping && !dead()){
                     Tile tile = ((Tilec)moveTarget).tile;
-                    tile.block().tapped(tile, this);
+                    tile.tapped(this);
                 }
 
                 moveTarget = null;

@@ -37,7 +37,8 @@ public class ConsumeItems extends Consume{
     @Override
     public void build(Tilec tile, Table table){
         for(ItemStack stack : items){
-            table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount), () -> tile.entity != null && tile.entity.items() != null && tile.entity.items().has(stack.item, stack.amount))).size(8 * 4).padRight(5);
+            table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
+                () -> tile.items() != null && tile.items().has(stack.item, stack.amount))).size(8 * 4).padRight(5);
         }
     }
 

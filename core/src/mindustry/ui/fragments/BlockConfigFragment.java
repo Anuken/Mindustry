@@ -48,23 +48,23 @@ public class BlockConfigFragment extends Fragment{
 
         table.visible(true);
         table.clear();
-        tile.block().buildConfiguration(tile, table);
+        tile.buildConfiguration(table);
         table.pack();
         table.setTransform(true);
         table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
         Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
 
         table.update(() -> {
-            if(configTile != null && configTile.block().shouldHideConfigure(configTile, player)){
+            if(configTile != null && configTile.shouldHideConfigure(player)){
                 hideConfig();
                 return;
             }
 
             table.setOrigin(Align.center);
-            if(configTile == null || configTile.block() == Blocks.air || configTile.block() != configBlock){
+            if(configTile == null || configTile.block() == Blocks.air || !configTile.isValid()){
                 hideConfig();
             }else{
-                configTile.block().updateTableAlign(tile, table);
+                configTile.updateTableAlign(table);
             }
         });
     }

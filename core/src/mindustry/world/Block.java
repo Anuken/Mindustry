@@ -252,6 +252,10 @@ public class Block extends UnlockableContent{
         return sum;
     }
 
+    public TextureRegion getDisplayIcon(Tile tile){
+        return tile.entity == null ? icon(Cicon.medium) : tile.entity.getDisplayIcon();
+    }
+
     public String getDisplayName(Tile tile){
         return tile.entity == null ? localizedName : tile.entity.getDisplayName();
     }

@@ -439,16 +439,16 @@ public class ApplicationTests{
 
         assertNotNull(tile.entity, "Tile should have an entity, but does not: " + tile);
 
-        int deposited = tile.block().acceptStack(tile, item, capacity - 1, unit);
+        int deposited = tile.acceptStack(item, capacity - 1, unit);
         assertEquals(capacity - 1, deposited);
 
-        tile.block().handleStack(tile, item, capacity - 1, unit);
+        tile.handleStack(item, capacity - 1, unit);
         assertEquals(tile.entity.items().get(item), capacity - 1);
 
-        int overflow = tile.block().acceptStack(tile, item, 10, unit);
+        int overflow = tile.acceptStack(item, 10, unit);
         assertEquals(1, overflow);
 
-        tile.block().handleStack(tile, item, 1, unit);
+        tile.handleStack(item, 1, unit);
         assertEquals(capacity, tile.entity.items().get(item));
     }
 }

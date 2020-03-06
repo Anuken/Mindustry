@@ -41,12 +41,12 @@ public class BlockInventoryFragment extends Fragment{
         int fa = amount;
 
         if(net.server() && (!Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.withdrawItem, tile.tile(), action -> {
+            !netServer.admins.allowAction(player, ActionType.withdrawItem, tile, action -> {
                 action.item = item;
                 action.itemAmount = fa;
             }))) throw new ValidateException(player, "Player cannot request items.");
 
-        int removed = tile.block().removeStack(tile, item, amount);
+        int removed = tile.removeStack(item, amount);
 
         player.unit().addItem(item, removed);
         Events.fire(new WithdrawEvent(tile, player, item, amount));
@@ -96,7 +96,7 @@ public class BlockInventoryFragment extends Fragment{
         table.touchable(Touchable.enabled);
         table.update(() -> {
 
-            if(state.is(State.menu) || tile == null || tile.entity == null || !tile.block().isAccessible() || tile.items().total() == 0){
+            if(state.is(State.menu) || tile == null || !tile.isValid() || !tile.block().isAccessible() || tile.items().total() == 0){
                 hide();
             }else{
                 if(holding && lastItem != null){
@@ -144,7 +144,7 @@ public class BlockInventoryFragment extends Fragment{
                 l.setEnabled(canPick);
 
                 Element image = itemImage(item.icon(Cicon.xlarge), () -> {
-                    if(tile == null || tile.entity == null){
+                    if(tile == null || !tile.isValid()){
                         return "";
                     }
                     return round(tile.items().get(item));
@@ -154,7 +154,7 @@ public class BlockInventoryFragment extends Fragment{
                 image.addListener(new InputListener(){
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                        if(!canPick.get() || tile == null || tile.entity == null || tile.items() == null || !tile.items().has(item)) return false;
+                        if(!canPick.get() || tile == null || !tile.isValid() || tile.items() == null || !tile.items().has(item)) return false;
                         int amount = Math.min(1, player.unit().maxAccepted(item));
                         if(amount > 0){
                             Call.requestItem(player, tile, item, amount);

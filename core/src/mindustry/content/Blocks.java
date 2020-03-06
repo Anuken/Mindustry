@@ -76,10 +76,11 @@ public class Blocks implements ContentList{
 
     //units
     commandCenter, draugFactory, spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
-    fortressFactory, repairPoint,
+    fortressFactory, repairPoint
 
     //upgrades
-    dartPad, alphaPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    //dartPad, alphaPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    ;
 
     @Override
     public void load(){
@@ -1285,13 +1286,13 @@ public class Blocks implements ContentList{
             size = 5;
         }};
 
-        vault = new Vault("vault"){{
+        vault = new StorageBlock("vault"){{
             requirements(Category.effect, ItemStack.with(Items.titanium, 250, Items.thorium, 125));
             size = 3;
             itemCapacity = 1000;
         }};
 
-        container = new Vault("container"){{
+        container = new StorageBlock("container"){{
             requirements(Category.effect, ItemStack.with(Items.titanium, 100));
             size = 2;
             itemCapacity = 300;
@@ -1764,6 +1765,8 @@ public class Blocks implements ContentList{
         //endregion
         //region upgrades
 
+        //mechs are dead for now
+        /*
         dartPad = new MechPad("dart-ship-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 100, Items.graphite, 50, Items.copper, 75));
             mech = UnitTypes.dart;
@@ -1818,7 +1821,7 @@ public class Blocks implements ContentList{
             mech = UnitTypes.glaive;
             size = 3;
             consumes.power(1.2f);
-        }};
+        }};*/
 
         //endregion
         //region sandbox

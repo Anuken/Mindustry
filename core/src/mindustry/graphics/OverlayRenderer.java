@@ -50,15 +50,17 @@ public class OverlayRenderer{
             }
 
             Groups.unit.each(unit -> {
-                    if(unit != player && unit.team() != player.team() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f).setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x(), unit.y())){
-                        Tmp.v1.set(unit.x(), unit.y()).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
+                if(!unit.isLocal() && unit.team() != player.team() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f).setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x(), unit.y())){
+                    Tmp.v1.set(unit.x(), unit.y()).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
 
-                        Lines.stroke(1f, unit.team().color);
-                        Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 3f);
-                        Draw.reset();
-                    }
-                });
+                    Lines.stroke(1f, unit.team().color);
+                    Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 3f);
+                    Draw.reset();
+                }
+            });
 
+            //mech pads are gone
+            /*
             if(ui.hudfrag.blockfrag.currentCategory == Category.upgrade){
                 for(Tile mechpad : indexer.getAllied(player.team(), BlockFlag.mechPad)){
                     if(!(mechpad.block() instanceof MechPad)) continue;
@@ -72,7 +74,7 @@ public class OverlayRenderer{
                         Draw.reset();
                     }
                 }
-            }
+            }*/
         }
 
         if(player.dead()) return; //dead players don't draw
@@ -82,7 +84,7 @@ public class OverlayRenderer{
         //draw config selected block
         if(input.frag.config.isShown()){
             Tile tile = input.frag.config.getSelectedTile();
-            tile.block().drawConfigure(tile);
+            tile.drawConfigure();
         }
 
         input.drawTop();
@@ -122,7 +124,7 @@ public class OverlayRenderer{
             Tile tile = world.ltileWorld(vec.x, vec.y);
 
             if(tile != null && tile.block() != Blocks.air && tile.team() == player.team()){
-                tile.block().drawSelect(tile);
+                tile.drawSelect();
 
                 if(Core.input.keyDown(Binding.rotateplaced) && tile.block().rotate && tile.interactable(player.team())){
                     control.input.drawArrow(tile.block(), tile.x, tile.y, tile.rotation(), true);
@@ -143,7 +145,7 @@ public class OverlayRenderer{
             Draw.reset();
 
             Tile tile = world.ltileWorld(v.x, v.y);
-            if(tile != null && tile.interactable(player.team()) && tile.block().acceptStack(tile, player.unit().item(), player.unit().stack().amount, player.unit()) > 0){
+            if(tile != null && tile.interactable(player.team()) && tile.acceptStack(player.unit().item(), player.unit().stack().amount, player.unit()) > 0){
                 Lines.stroke(3f, Pal.gray);
                 Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 3 + Mathf.absin(Time.time(), 5f, 1f));
                 Lines.stroke(1f, Pal.place);

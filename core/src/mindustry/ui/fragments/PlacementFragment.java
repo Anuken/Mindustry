@@ -90,7 +90,7 @@ public class PlacementFragment extends Fragment{
         scrollPositions.put(currentCategory, blockPane.getScrollY());
 
         if(Core.input.keyDown(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
-            Tile tile = world.ltileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Tilec tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             Block tryRecipe = tile == null ? null : tile.block();
 
             for(BuildRequest req : player.builder().requests()){
@@ -341,7 +341,9 @@ public class PlacementFragment extends Fragment{
                                 topTable.row();
                                 topTable.table(t -> {
                                     t.left().defaults().left();
-                                    lastDisplay.display(hoverTile, t);
+                                    if(hoverTile.entity != null){
+                                        hoverTile.entity.display(t);
+                                    }
                                 }).left().growX();
                             }
                         }
@@ -451,12 +453,7 @@ public class PlacementFragment extends Fragment{
 
         //setup hovering tile
         if(!Core.scene.hasMouse() && topTable.hit(v.x, v.y, false) == null){
-            Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-            if(tile != null){
-                hoverTile = tile.link();
-            }else{
-                hoverTile = null;
-            }
+            hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         }else{
             hoverTile = null;
         }

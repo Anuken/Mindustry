@@ -22,7 +22,6 @@ public class CachedTile extends Tile{
     @Override
     protected void preChanged(){
         //this basically overrides the old tile code and doesn't remove from proximity
-        team = 0;
     }
 
     @Override

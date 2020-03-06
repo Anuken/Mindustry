@@ -207,9 +207,9 @@ public class FloorRenderer implements Disposable{
                 }
 
                 if(tile.block().cacheLayer == layer && layer == CacheLayer.walls && !(tile.isDarkened() && tile.rotation() >= 5)){
-                    tile.block().draw(tile);
+                    tile.block().drawBase(tile);
                 }else if(floor.cacheLayer == layer && (world.isAccessible(tile.x, tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
-                    floor.draw(tile);
+                    floor.drawBase(tile);
                 }else if(floor.cacheLayer.ordinal() < layer.ordinal() && layer != CacheLayer.walls){
                     floor.drawNonLayer(tile);
                 }
