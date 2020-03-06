@@ -559,7 +559,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** Handles tile tap events that are not platform specific. */
     boolean tileTapped(@Nullable Tilec tile){
-        if(tile == null) return false;
+        if(tile == null){
+            frag.inv.hide();
+            return false;
+        }
         boolean consumed = false, showedInventory = false;
 
         //check if tapped block is configurable

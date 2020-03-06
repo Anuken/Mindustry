@@ -485,10 +485,12 @@ public class Tile implements Position{
                 int offsety = -(size - 1) / 2;
                 for(int dx = 0; dx < size; dx++){
                     for(int dy = 0; dy < size; dy++){
-                        Tile other = world.tile(entity.tileX() + dx + offsetx, entity.tileY() + dy + offsety);
+                        Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
                         if(other != null){
                             //reset entity and block *manually* - thus, preChanged() will not be called anywhere else, for multiblocks
-                            other.entity = null;
+                            if(other != this){ //do not remove own entity so it can be processed in changed()
+                                other.entity = null;
+                            }
                             other.block = Blocks.air;
                         }
                     }
