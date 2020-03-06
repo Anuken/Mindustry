@@ -43,7 +43,7 @@ public class LaunchPad extends StorageBlock{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
 
         //TODO broken
@@ -69,7 +69,7 @@ public class LaunchPad extends StorageBlock{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         Tilec entity = tile.entity;
 
         if(state.isCampaign() && entity.consValid() && entity.items().total() >= itemCapacity && entity.timer(timerLaunch, launchTime / entity.timeScale())){

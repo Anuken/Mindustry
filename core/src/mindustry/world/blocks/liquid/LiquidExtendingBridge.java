@@ -2,6 +2,7 @@ package mindustry.world.blocks.liquid;
 
 import arc.math.*;
 import arc.util.*;
+import mindustry.entities.AllDefs.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
@@ -20,7 +21,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         ItemBridgeEntity entity = tile.ent();
 
         entity.time += entity.cycleSpeed * Time.delta();

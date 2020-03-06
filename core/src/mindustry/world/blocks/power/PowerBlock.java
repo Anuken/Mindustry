@@ -1,4 +1,4 @@
-package mindustry.world.blocks;
+package mindustry.world.blocks.power;
 
 import mindustry.world.Block;
 import mindustry.world.meta.BlockGroup;

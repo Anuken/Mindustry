@@ -4,21 +4,29 @@ import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
+import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
+import mindustry.ctype.*;
+import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
@@ -31,7 +39,12 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     //region vars and initialization
     static final float timeToSleep = 60f * 1;
     static final ObjectSet<Tilec> tmpTiles = new ObjectSet<>();
+    static final Array<Tilec> tempTileEnts = new Array<>();
+    static final Array<Tile> tempTiles = new Array<>();
     static int sleepingEntities = 0;
+    
+    @Import float x, y, health;
+    @Import Team team;
 
     transient Tile tile;
     transient Block block;
@@ -49,10 +62,10 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     private transient boolean sleeping;
     private transient float sleepTime;
 
-    /** Sets this tile entity data to this tile, and adds it if necessary. */
+    /** Sets this tile entity data to this and adds it if necessary. */
     public Tilec init(Tile tile, boolean shouldAdd){
         this.tile = tile;
-        this.block = tile.block();
+        this.block = block();
 
         set(tile.drawx(), tile.drawy());
         if(block.activeSound != Sounds.none){
@@ -74,9 +87,9 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     //region io
 
     public final void writeBase(Writes write){
-        write.f(health());
-        write.b(tile.rotation());
-        write.b(tile.getTeamID());
+        write.f(health);
+        write.b(rotation());
+        write.b(team.id);
         if(items != null) items.write(write);
         if(power != null) power.write(write);
         if(liquids != null) liquids.write(write);
@@ -84,9 +97,9 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     }
 
     public final void readBase(Reads read){
-        health(read.f());
-        tile.rotation(read.b());
-        tile.setTeam(Team.get(read.b()));
+        health = read.f();
+        rotation(read.b());
+        team = Team.get(read.b());
         if(items != null) items.read(read);
         if(power != null) power.read(read);
         if(liquids != null) liquids.read(read);
@@ -121,20 +134,41 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         timeScaleDuration = Math.max(timeScaleDuration, duration);
     }
 
+    public byte relativeTo(Tile tile){
+        return relativeTo(tile.x, tile.y);
+    }
+
+    /** Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile. */
+    public byte relativeTo(int cx, int cy){
+        if(x == cx && y == cy - 1) return 1;
+        if(x == cx && y == cy + 1) return 3;
+        if(x == cx - 1 && y == cy) return 0;
+        if(x == cx + 1 && y == cy) return 2;
+        return -1;
+    }
+
+    public byte absoluteRelativeTo(int cx, int cy){
+        if(x == cx && y <= cy - 1) return 1;
+        if(x == cx && y >= cy + 1) return 3;
+        if(x <= cx - 1 && y == cy) return 0;
+        if(x >= cx + 1 && y == cy) return 2;
+        return -1;
+    }
+
     public int pos(){
-        return tile.pos();
+        return pos();
     }
 
     public int rotation(){
-        return tile.rotation();
+        return rotation();
     }
 
     public void rotation(int rotation){
-        tile.rotation(rotation);
+        rotation(rotation);
     }
 
     public Floor floor(){
-        return tile.floor();
+        return floor();
     }
 
     public boolean interactable(Team team){
@@ -190,146 +224,140 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
 
     //endregion
     //region handler methods
-
-
-    public boolean shouldConsume(Tilec tile){
+    
+    public boolean shouldConsume(){
         return true;
     }
 
-    public boolean productionValid(Tilec tile){
+    public boolean productionValid(){
         return true;
     }
 
-    public float getPowerProduction(Tilec tile){
+    public float getPowerProduction(){
         return 0f;
     }
 
     /** Returns the amount of items this block can accept. */
-    public int acceptStack(Tilec tile, Item item, int amount, Teamc source){
-        if(acceptItem(tile, tile, item) && hasItems && (source == null || source.team() == tile.team())){
-            return Math.min(getMaximumAccepted(tile, item) - tile.items().get(item), amount);
+    public int acceptStack(Item item, int amount, Teamc source){
+        if(acceptItem(this, item) && block.hasItems && (source == null || source.team() == team())){
+            return Math.min(getMaximumAccepted(item) - items.get(item), amount);
         }else{
             return 0;
         }
     }
 
-    public int getMaximumAccepted(Tilec tile, Item item){
-        return itemCapacity;
+    public int getMaximumAccepted(Item item){
+        return block.itemCapacity;
     }
 
     /** Remove a stack from this inventory, and return the amount removed. */
-    public int removeStack(Tilec tile, Item item, int amount){
-        if(tile.entity == null || tile.items() == null) return 0;
-        amount = Math.min(amount, tile.items().get(item));
-        tile.noSleep();
-        tile.items().remove(item, amount);
+    public int removeStack(Item item, int amount){
+        if(items == null) return 0;
+        amount = Math.min(amount, items.get(item));
+        noSleep();
+        items.remove(item, amount);
         return amount;
     }
 
     /** Handle a stack input. */
-    public void handleStack(Tilec tile, Item item, int amount, Teamc source){
-        tile.noSleep();
-        tile.items().add(item, amount);
-    }
-
-    public boolean outputsItems(){
-        return hasItems;
+    public void handleStack(Item item, int amount, Teamc source){
+        noSleep();
+        items.add(item, amount);
     }
 
     /** Returns offset for stack placement. */
-    public void getStackOffset(Tilec tile, Item item, Vec2 trns){
+    public void getStackOffset(Item item, Vec2 trns){
 
     }
 
-    public void onProximityUpdate(Tilec tile){
-        tile.noSleep();
+    public void onProximityUpdate(){
+        noSleep();
     }
 
-    public void handleItem(Tilec tile, Tilec source, Item item){
-        tile.items().add(item, 1);
+    public void handleItem(Tilec source, Item item){
+        items.add(item, 1);
     }
 
-    public boolean acceptItem(Tilec tile, Tilec source, Item item){
-        return consumes.itemFilters.get(item.id) && tile.items().get(item) < getMaximumAccepted(tile, item);
+    public boolean acceptItem(Tilec source, Item item){
+        return block.consumes.itemFilters.get(item.id) && items.get(item) < getMaximumAccepted(item);
     }
 
-    public boolean acceptLiquid(Tilec tile, Tilec source, Liquid liquid, float amount){
-        return hasLiquids && tile.liquids().get(liquid) + amount < liquidCapacity && consumes.liquidfilters.get(liquid.id);
+    public boolean acceptLiquid(Tilec source, Liquid liquid, float amount){
+        return block.hasLiquids && liquids().get(liquid) + amount < block.liquidCapacity && block.consumes.liquidfilters.get(liquid.id);
     }
 
-    public void handleLiquid(Tilec tile, Tilec source, Liquid liquid, float amount){
-        tile.liquids().add(liquid, amount);
+    public void handleLiquid(Tilec source, Liquid liquid, float amount){
+        liquids().add(liquid, amount);
     }
 
-    public void tryDumpLiquid(Tilec tile, Liquid liquid){
-        Array<Tilec> proximity = tile.proximity();
-        int dump = tile.rotation();
+    public void dumpLiquid(Liquid liquid){
+        Array<Tilec> proximity = proximity();
+        int dump = rotation();
 
         for(int i = 0; i < proximity.size; i++){
-            incrementDump(tile, proximity.size);
+            incrementDump(proximity.size);
             Tilec other = proximity.get((i + dump) % proximity.size);
-            //TODO fix, this is incorrect
-            Tilec in = Edges.getFacingEdge(tile.tile(), other.tile()).entity;
+            other = other.getLiquidDestination(this, liquid);
 
-            other = other.block().getLiquidDestination(other, in, liquid);
-
-            if(other != null && other.team() == tile.team() && other.block().hasLiquids && canDumpLiquid(tile, other, liquid) && other.liquids() != null){
+            if(other != null && other.team() == team() && other.block().hasLiquids && canDumpLiquid(other, liquid) && other.liquids() != null){
                 float ofract = other.liquids().get(liquid) / other.block().liquidCapacity;
-                float fract = tile.liquids().get(liquid) / liquidCapacity;
+                float fract = liquids().get(liquid) / block.liquidCapacity;
 
-                if(ofract < fract) tryMoveLiquid(tile, in, other, (fract - ofract) * liquidCapacity / 2f, liquid);
+                if(ofract < fract) moveLiquid(other, (fract - ofract) * block.liquidCapacity / 2f, liquid);
             }
         }
 
     }
 
-    public boolean canDumpLiquid(Tilec tile, Tilec to, Liquid liquid){
+    public boolean canDumpLiquid(Tilec to, Liquid liquid){
         return true;
     }
 
-    public void tryMoveLiquid(Tilec tile, Tilec tileSource, Tilec next, float amount, Liquid liquid){
+    //TODO why does this exist?
+    /*
+    public void tryMoveLiquid(Tilec next, float amount, Liquid liquid){
         float flow = Math.min(next.block().liquidCapacity - next.liquids().get(liquid) - 0.001f, amount);
 
-        if(next.block().acceptLiquid(next, tileSource, liquid, flow)){
-            next.block().handleLiquid(next, tileSource, liquid, flow);
-            tile.liquids().remove(liquid, flow);
+        if(next.acceptLiquid(liquid, flow)){
+            next.handleLiquid(liquid, flow);
+            liquids().remove(liquid, flow);
         }
+    }*/
+
+    public float moveLiquid(Tilec next, boolean leak, Liquid liquid){
+        return moveLiquid(next, leak ? 1.5f : 100, liquid);
     }
 
-    public float tryMoveLiquid(Tilec tile, Tilec next, boolean leak, Liquid liquid){
-        return tryMoveLiquid(tile, next, leak ? 1.5f : 100, liquid);
-    }
-
-    public float tryMoveLiquid(Tilec tile, Tilec next, float leakResistance, Liquid liquid){
+    public float moveLiquid(Tilec next, float leakResistance, Liquid liquid){
         if(next == null) return 0;
 
-        next = next.block().getLiquidDestination(next, tile, liquid);
+        next = next.getLiquidDestination(next, liquid);
 
-        if(next.team() == tile.team() && next.block().hasLiquids && tile.liquids().get(liquid) > 0f){
+        if(next.team() == team() && next.block().hasLiquids && liquids().get(liquid) > 0f){
 
-            if(next.block().acceptLiquid(next, tile, liquid, 0f)){
+            if(next.acceptLiquid(next, liquid, 0f)){
                 float ofract = next.liquids().get(liquid) / next.block().liquidCapacity;
-                float fract = tile.liquids().get(liquid) / liquidCapacity * liquidPressure;
-                float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (liquidCapacity), tile.liquids().get(liquid));
+                float fract = liquids().get(liquid) / block.liquidCapacity * block.liquidPressure;
+                float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (block.liquidCapacity), liquids().get(liquid));
                 flow = Math.min(flow, next.block().liquidCapacity - next.liquids().get(liquid) - 0.001f);
 
-                if(flow > 0f && ofract <= fract && next.block().acceptLiquid(next, tile, liquid, flow)){
-                    next.block().handleLiquid(next, tile, liquid, flow);
-                    tile.liquids().remove(liquid, flow);
+                if(flow > 0f && ofract <= fract && next.acceptLiquid(this, liquid, flow)){
+                    next.handleLiquid(this, liquid, flow);
+                    liquids().remove(liquid, flow);
                     return flow;
                 }else if(ofract > 0.1f && fract > 0.1f){
                     //TODO these are incorrect effect positions
-                    float fx = (tile.x() + next.x()) / 2f, fy = (tile.y() + next.y()) / 2f;
+                    float fx = (x() + next.x()) / 2f, fy = (y() + next.y()) / 2f;
 
                     Liquid other = next.liquids().current();
                     if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
-                        tile.damage(1 * Time.delta());
+                        damage(1 * Time.delta());
                         next.damage(1 * Time.delta());
                         if(Mathf.chance(0.1 * Time.delta())){
                             Fx.fire.at(fx, fy);
                         }
                     }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
-                        tile.liquids().remove(liquid, Math.min(tile.liquids().get(liquid), 0.7f * Time.delta()));
+                        liquids().remove(liquid, Math.min(liquids().get(liquid), 0.7f * Time.delta()));
                         if(Mathf.chance(0.2f * Time.delta())){
                             Fx.steam.at(fx, fy);
                         }
@@ -337,195 +365,190 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
                 }
             }
         }else if(leakResistance != 100f && !next.block().solid && !next.block().hasLiquids){
-            float leakAmount = tile.liquids().get(liquid) / leakResistance;
-            Puddles.deposit(next.tile(), tile.tile(), liquid, leakAmount);
-            tile.liquids().remove(liquid, leakAmount);
+            float leakAmount = liquids().get(liquid) / leakResistance;
+            Puddles.deposit(next.tile(), tile(), liquid, leakAmount);
+            liquids().remove(liquid, leakAmount);
         }
         return 0;
     }
 
-    public Tilec getLiquidDestination(Tilec tile, Tilec from, Liquid liquid){
-        return tile;
+    public Tilec getLiquidDestination(Tilec from, Liquid liquid){
+        return this;
     }
 
     /**
      * Tries to put this item into a nearby container, if there are no available
      * containers, it gets added to the block's inventory.
      */
-    public void offloadNear(Tilec tile, Item item){
-        Array<Tilec> proximity = tile.proximity();
-        int dump = tile.rotation();
+    public void offloadNear(Item item){
+        Array<Tilec> proximity = proximity();
+        int dump = rotation();
 
         for(int i = 0; i < proximity.size; i++){
-            incrementDump(tile, proximity.size);
+            incrementDump(proximity.size);
             Tilec other = proximity.get((i + dump) % proximity.size);
             //TODO fix position
-            Tilec in = Edges.getFacingEdge(tile.tile(), other.tile()).entity;
-            if(other.team() == tile.team() && other.block().acceptItem(other, in, item) && canDump(tile, other, item)){
-                other.block().handleItem(other, in, item);
+            Tilec in = Edges.getFacingEdge(tile(), other.tile()).entity;
+            if(other.team() == team() && other.acceptItem(in, item) && canDump(other, item)){
+                other.handleItem(in, item);
                 return;
             }
         }
 
-        handleItem(tile, tile, item);
+        handleItem(this, item);
     }
 
-    /** Try dumping any item near the tile. */
-    public boolean tryDump(Tilec tile){
-        return tryDump(tile, null);
+    /** Try dumping any item near the  */
+    public boolean dump(){
+        return dump(null);
     }
 
     /**
-     * Try dumping a specific item near the tile.
+     * Try dumping a specific item near the 
      * @param todump Item to dump. Can be null to dump anything.
      */
-    public boolean tryDump(Tilec entity, Item todump){
-        if(entity == null || !hasItems || entity.items().total() == 0 || (todump != null && !entity.items().has(todump)))
-            return false;
+    public boolean dump(Item todump){
+        if(!block.hasItems || items.total() == 0 || (todump != null && !items.has(todump))) return false;
 
-        Array<Tilec> proximity = entity.proximity();
-        int dump = entity.rotation();
+        Array<Tilec> proximity = proximity();
+        int dump = rotation();
 
         if(proximity.size == 0) return false;
 
         for(int i = 0; i < proximity.size; i++){
             Tilec other = proximity.get((i + dump) % proximity.size);
             //TODO fix position
-            Tilec in = Edges.getFacingEdge(entity.tile(), other.tile()).entity;
+            Tilec in = Edges.getFacingEdge(tile, other.tile()).entity;
 
             if(todump == null){
 
                 for(int ii = 0; ii < content.items().size; ii++){
                     Item item = content.item(ii);
 
-                    if(other.team() == entity.team() && entity.items().has(item) && other.block().acceptItem(other, in, item) && canDump(entity, other, item)){
-                        other.block().handleItem(other, in, item);
-                        entity.items().remove(item, 1);
-                        incrementDump(entity, proximity.size);
+                    if(other.team() == team() && items.has(item) && other.acceptItem(in, item) && canDump(other, item)){
+                        other.handleItem(in, item);
+                        items.remove(item, 1);
+                        incrementDump(proximity.size);
                         return true;
                     }
                 }
             }else{
-                if(other.team() == entity.team() && other.block().acceptItem(other, in, todump) && canDump(entity, other, todump)){
-                    other.block().handleItem(other, in, todump);
-                    entity.items().remove(todump, 1);
-                    incrementDump(entity, proximity.size);
+                if(other.team() == team() && other.acceptItem(in, todump) && canDump(other, todump)){
+                    other.handleItem(in, todump);
+                    items.remove(todump, 1);
+                    incrementDump(proximity.size);
                     return true;
                 }
             }
 
-            incrementDump(entity, proximity.size);
+            incrementDump(proximity.size);
         }
 
         return false;
     }
 
-    protected void incrementDump(Tilec tile, int prox){
-        tile.rotation((byte)((tile.rotation() + 1) % prox));
+    public void incrementDump(int prox){
+        rotation((byte)((rotation() + 1) % prox));
     }
 
     /** Used for dumping items. */
-    public boolean canDump(Tilec tile, Tilec to, Item item){
+    public boolean canDump(Tilec to, Item item){
         return true;
     }
 
     /** Try offloading an item to a nearby container in its facing direction. Returns true if success. */
-    public boolean offloadDir(Tilec tile, Item item){
-        Tilec other = tile.tile().front();
-        if(other != null && other.team() == tile.team() && other.block().acceptItem(other, tile, item)){
-            other.block().handleItem(other, tile, item);
+    public boolean moveForward(Item item){
+        Tilec other = tile().front();
+        if(other != null && other.team() == team() && other.acceptItem(this, item)){
+            other.handleItem(this, item);
             return true;
         }
         return false;
     }
 
-    public boolean canBreak(Tile tile){
-        return true;
-    }
-
-    public void onProximityRemoved(Tilec tile){
-        if(tile.power() != null){
-            tile.block().powerGraphRemoved(tile);
+    public void onProximityRemoved(){
+        if(power != null){
+            powerGraphRemoved();
         }
     }
 
-    public void onProximityAdded(Tilec tile){
-        if(tile.block().hasPower) tile.block().updatePowerGraph(tile);
+    public void onProximityAdded(){
+        if(block.hasPower) updatePowerGraph();
     }
 
-    protected void updatePowerGraph(Tilec tile){
+    public void updatePowerGraph(){
 
-        for(Tilec other : getPowerConnections(tile, tempTileEnts)){
+        for(Tilec other : getPowerConnections(tempTileEnts)){
             if(other.power() != null){
-                other.power().graph.add(tile.power().graph);
+                other.power().graph.add(power.graph);
             }
         }
     }
 
-    protected void powerGraphRemoved(Tilec tile){
-        if(tile.entity == null || tile.power() == null){
+    public void powerGraphRemoved(){
+        if(power == null){
             return;
         }
 
-        tile.power().graph.remove(tile);
-        for(int i = 0; i < tile.power().links.size; i++){
-            Tile other = world.tile(tile.power().links.get(i));
+        power.graph.remove(this);
+        for(int i = 0; i < power.links.size; i++){
+            Tile other = world.tile(power.links.get(i));
             if(other != null && other.entity != null && other.entity.power() != null){
-                other.entity.power().links.removeValue(tile.pos());
+                other.entity.power().links.removeValue(pos());
             }
         }
     }
 
-    public Array<Tilec> getPowerConnections(Tilec tile, Array<Tilec> out){
+    public Array<Tilec> getPowerConnections(Array<Tilec> out){
         out.clear();
-        if(tile == null || tile.entity == null || tile.power() == null) return out;
+        if(power == null) return out;
 
-        for(Tilec other : tile.proximity()){
-            if(other != null && other.entity != null && other.power() != null
-            && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
-            && !tile.power().links.contains(other.pos())){
+        for(Tilec other : proximity()){
+            if(other != null && other.power() != null
+            && !(block.consumesPower && other.block().consumesPower && !block.outputsPower && !other.block().outputsPower)
+            && !power.links.contains(other.pos())){
                 out.add(other);
             }
         }
 
-        for(int i = 0; i < tile.power().links.size; i++){
-            Tile link = world.tile(tile.power().links.get(i));
+        for(int i = 0; i < power.links.size; i++){
+            Tile link = world.tile(power.links.get(i));
             if(link != null && link.entity != null && link.entity.power() != null) out.add(link.entity);
         }
         return out;
     }
 
-    protected float getProgressIncrease(Tilec entity, float baseTime){
+    public float getProgressIncrease(Tilec entity, float baseTime){
         return 1f / baseTime * entity.delta() * entity.efficiency();
     }
 
     /** @return whether this block should play its active sound.*/
-    public boolean shouldActiveSound(Tilec tile){
+    public boolean shouldActiveSound(){
         return false;
     }
 
     /** @return whether this block should play its idle sound.*/
-    public boolean shouldIdleSound(Tilec tile){
-        return shouldConsume(tile);
+    public boolean shouldIdleSound(){
+        return shouldConsume();
     }
 
-    public void drawLayer(Tilec tile){
+    public void drawLayer(){
     }
 
-    public void drawLayer2(Tilec tile){
+    public void drawLayer2(){
     }
 
-    public void drawCracks(Tilec tile){
-        if(!tile.damaged() || size > maxCrackSize) return;
-        int id = tile.pos();
-        TextureRegion region = cracks[size - 1][Mathf.clamp((int)((1f - tile.healthf()) * crackRegions), 0, crackRegions-1)];
-        Draw.colorl(0.2f, 0.1f + (1f - tile.healthf())* 0.6f);
-        Draw.rect(region, tile.x(), tile.y(), (id%4)*90);
+    public void drawCracks(){
+        if(!damaged() || block.size > Block.maxCrackSize) return;
+        int id = pos();
+        TextureRegion region = Block.cracks[block.size - 1][Mathf.clamp((int)((1f - healthf()) * Block.crackRegions), 0, Block.crackRegions-1)];
+        Draw.colorl(0.2f, 0.1f + (1f - healthf())* 0.6f);
+        Draw.rect(region, x(), y(), (id%4)*90);
         Draw.color();
     }
 
     /** Draw the block overlay that is shown when a cursor is over the block. */
-    public void drawSelect(Tilec tile){
+    public void drawSelect(){
     }
 
     /** Drawn when you are placing a block. */
@@ -546,7 +569,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         float width = layout.width;
 
         font.setColor(color);
-        float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 3;
+        float dx = x * tilesize + block.offset(), dy = y * tilesize + block.offset() + block.size * tilesize / 2f + 3;
         font.draw(text, dx, dy + layout.height + 1, Align.center);
         dy -= 1f;
         Lines.stroke(2f, Color.darkGray);
@@ -562,84 +585,79 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         return width;
     }
 
-    public void draw(Tilec tile){
-        Draw.rect(region, tile.x(), tile.y(), rotate ? tile.rotation() * 90 : 0);
+    public void draw(){
+        Draw.rect(block.region, x, y, block.rotate ? rotation() * 90 : 0);
     }
 
-    public void drawLight(Tilec tile){
-        if(tile.entity != null && hasLiquids && drawLiquidLight && tile.liquids().current().lightColor.a > 0.001f){
-            drawLiquidLight(tile, tile.liquids().current(), tile.liquids().smoothAmount());
+    public void drawLight(){
+        if(block.hasLiquids && block.drawLiquidLight && liquids().current().lightColor.a > 0.001f){
+            drawLiquidLight(liquids().current(), liquids().smoothAmount());
         }
     }
 
-    public void drawLiquidLight(Tilec tile, Liquid liquid, float amount){
+    public void drawLiquidLight(Liquid liquid, float amount){
         if(amount > 0.01f){
             Color color = liquid.lightColor;
             float fract = 1f;
             float opacity = color.a * fract;
             if(opacity > 0.001f){
-                renderer.lights.add(tile.x(), tile.y(), size * 30f * fract, color, opacity);
+                renderer.lights.add(x, y, block.size * 30f * fract, color, opacity);
             }
         }
     }
 
-    public void drawTeam(Tilec tile){
-        Draw.color(tile.team().color);
-        Draw.rect("block-border", tile.x() - size * tilesize / 2f + 4, tile.y() - size * tilesize / 2f + 4);
+    public void drawTeam(){
+        Draw.color(team().color);
+        Draw.rect("block-border", x - block.size * tilesize / 2f + 4, y - block.size * tilesize / 2f + 4);
         Draw.color();
     }
 
     /** Called after the block is placed by this client. */
     @CallSuper
-    public void playerPlaced(Tilec tile){
+    public void playerPlaced(){
 
     }
 
     /** Called after the block is placed by anyone. */
     @CallSuper
-    public void placed(Tilec tile){
+    public void placed(){
         if(net.client()) return;
 
-        if((consumesPower && !outputsPower) || (!consumesPower && outputsPower)){
+        if((block.consumesPower && !block.outputsPower) || (!block.consumesPower && block.outputsPower)){
             int range = 10;
             tempTiles.clear();
-            Geometry.circle(tile.tileX(), tile.tileY(), range, (x, y) -> {
+            Geometry.circle(tileX(), tileY(), range, (x, y) -> {
                 Tilec other = world.ent(x, y);
-                if(other != null && other.block() instanceof PowerNode && ((PowerNode)other.block()).linkValid(other, tile) && !PowerNode.insulated(other, tile) && !other.proximity().contains(tile) &&
-                !(outputsPower && tile.proximity().contains(p -> p.entity != null && p.power() != null && p.power().graph == other.power().graph))){
+                if(other != null && other.block() instanceof PowerNode && ((PowerNode)other.block()).linkValid(other, this) && !PowerNode.insulated(other, this) && !other.proximity().contains(this) &&
+                !(block.outputsPower && proximity().contains(p -> p.power() != null && p.power().graph == other.power().graph))){
                     tempTiles.add(other.tile());
                 }
             });
             tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
             if(!tempTiles.isEmpty()){
                 Tile toLink = tempTiles.first();
-                if(!toLink.entity.power().links.contains(tile.pos())){
-                    toLink.configureAny(tile.pos());
+                if(!toLink.entity.power().links.contains(pos())){
+                    toLink.configureAny(pos());
                 }
             }
         }
     }
 
-    public void removed(Tilec tile){
+    public void onRemoved(){
     }
 
-    /** Called every frame a unit is on this tile. */
-    public void unitOn(Tilec tile, Unitc unit){
+    /** Called every frame a unit is on this  */
+    public void unitOn(Unitc unit){
     }
 
     /** Called when a unit that spawned at this tile is removed. */
-    public void unitRemoved(Tilec tile, Unitc unit){
-    }
-
-    /** Returns whether ot not this block can be place on the specified tile. */
-    public boolean canPlaceOn(Tile tile){
-        return true;
+    public void unitRemoved(Unitc unit){
     }
 
     /** Call when some content is produced. This unlocks the content if it is applicable. */
-    public void useContent(Tilec tile, UnlockableContent content){
+    public void useContent(UnlockableContent content){
         //only unlocks content in zones
-        if(!headless && tile.team() == player.team() && state.isCampaign()){
+        if(!headless && team() == player.team() && state.isCampaign()){
             logic.handleContent(content);
         }
     }
@@ -648,7 +666,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
         float sum = 0;
-        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+        for(Tile other : tile.getLinkedTilesAs(block, tempTiles)){
             sum += other.floor().attributes.get(attr);
         }
         return sum;
@@ -658,49 +676,48 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
         float sum = 0;
-        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-            sum += !other.floor.isLiquid ? 1f : 0f;
+        for(Tile other : tile.getLinkedTilesAs(block, tempTiles)){
+            sum += !other.floor().isLiquid ? 1f : 0f;
         }
-        return sum / size / size;
+        return sum / block.size / block.size;
     }
 
     /** Called when the block is tapped. This is equivalent to being configured with null. */
-    public void tapped(Tilec tile, Playerc player){
+    public void tapped(Playerc player){
 
     }
 
     /** Called when the block is destroyed. */
-    public void onDestroyed(Tilec tile){
-        float x = tile.x(), y = tile.y();
-        float explosiveness = baseExplosiveness;
+    public void onDestroyed(){
+        float explosiveness = block.baseExplosiveness;
         float flammability = 0f;
         float power = 0f;
 
-        if(hasItems){
+        if(block.hasItems){
             for(Item item : content.items()){
-                int amount = tile.items().get(item);
+                int amount = items.get(item);
                 explosiveness += item.explosiveness * amount;
                 flammability += item.flammability * amount;
             }
         }
 
-        if(hasLiquids){
-            flammability += tile.liquids().sum((liquid, amount) -> liquid.explosiveness * amount / 2f);
-            explosiveness += tile.liquids().sum((liquid, amount) -> liquid.flammability * amount / 2f);
+        if(block.hasLiquids){
+            flammability += liquids().sum((liquid, amount) -> liquid.explosiveness * amount / 2f);
+            explosiveness += liquids().sum((liquid, amount) -> liquid.flammability * amount / 2f);
         }
 
-        if(consumes.hasPower() && consumes.getPower().buffered){
-            power += tile.power().status * consumes.getPower().capacity;
+        if(block.consumes.hasPower() && block.consumes.getPower().buffered){
+            power += this.power.status * block.consumes.getPower().capacity;
         }
 
-        if(hasLiquids){
+        if(block.hasLiquids){
 
-            tile.liquids().each((liquid, amount) -> {
+            liquids().each((liquid, amount) -> {
                 float splash = Mathf.clamp(amount / 4f, 0f, 10f);
 
                 for(int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++){
                     Time.run(i / 2f, () -> {
-                        Tile other = world.tile(tile.tileX() + Mathf.range(size / 2), tile.tileY() + Mathf.range(size / 2));
+                        Tile other = world.tile(tileX() + Mathf.range(block.size / 2), tileY() + Mathf.range(block.size / 2));
                         if(other != null){
                             Puddles.deposit(other, liquid, splash);
                         }
@@ -709,133 +726,118 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
             });
         }
 
-        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * size / 2f, Pal.darkFlame);
-        if(!tile.floor().solid && !tile.floor().isLiquid){
-            Effects.rubble(tile.x(), tile.y(), size);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, Pal.darkFlame);
+        if(!floor().solid && !floor().isLiquid){
+            Effects.rubble(x, y, block.size);
         }
     }
 
     /**
-     * Returns the flammability of the tile. Used for fire calculations.
+     * Returns the flammability of the  Used for fire calculations.
      * Takes flammability of floor liquid into account.
      */
-    public float getFlammability(Tilec tile){
-        if(!hasItems || tile.entity == null){
-            if(tile.floor().isLiquid && !solid){
-                return tile.floor().liquidDrop.flammability;
+    public float getFlammability(){
+        if(!block.hasItems){
+            if(floor().isLiquid && !block.solid){
+                return floor().liquidDrop.flammability;
             }
             return 0;
         }else{
-            float result = tile.items().sum((item, amount) -> item.flammability * amount);
+            float result = items.sum((item, amount) -> item.flammability * amount);
 
-            if(hasLiquids){
-                result += tile.liquids().sum((liquid, amount) -> liquid.flammability * amount / 3f);
+            if(block.hasLiquids){
+                result += liquids().sum((liquid, amount) -> liquid.flammability * amount / 3f);
             }
 
             return result;
         }
     }
 
-    public String getDisplayName(Tilec tile){
+    public String getDisplayName(){
         return block.localizedName;
     }
 
-    public TextureRegion getDisplayIcon(Tilec tile){
+    public TextureRegion getDisplayIcon(){
         return block.icon(Cicon.medium);
     }
 
-    public void display(Tilec entity, Table table){
+    public void display(Table table){
+        table.table(bars -> {
+            bars.defaults().growX().height(18f).pad(4);
 
-        if(entity != null){
-            table.table(bars -> {
-                bars.defaults().growX().height(18f).pad(4);
+            displayBars(bars);
+        }).growX();
+        table.row();
+        table.table(ctable -> {
+            displayConsumption(ctable);
+        }).growX();
 
-                displayBars(entity, bars);
-            }).growX();
-            table.row();
-            table.table(ctable -> {
-                displayConsumption(entity, ctable);
-            }).growX();
-
-            table.marginBottom(-5);
-        }
+        table.marginBottom(-5);
     }
 
-    public void displayConsumption(Tilec tile, Table table){
+    public void displayConsumption(Table table){
         table.left();
-        for(Consume cons : consumes.all()){
+        for(Consume cons : block.consumes.all()){
             if(cons.isOptional() && cons.isBoost()) continue;
-            cons.build(tile, table);
+            cons.build(this, table);
         }
     }
 
-    public void displayBars(Tilec tile, Table table){
-        for(Func<Tilec, Bar> bar : bars.list()){
-            table.add(bar.get(tile)).growX();
+    public void displayBars(Table table){
+        for(Func<Tilec, Bar> bar : block.bars.list()){
+            table.add(bar.get(this)).growX();
             table.row();
         }
     }
 
      /** Called when this block is tapped to build a UI on the table.
       * configurable must be true for this to be called.*/
-    public void buildConfiguration(Tilec tile, Table table){
+    public void buildConfiguration(Table table){
     }
 
     /** Update table alignment after configuring.*/
-    public void updateTableAlign(Tilec tile, Table table){
-        Vec2 pos = Core.input.mouseScreen(tile.x(), tile.y() - tile.block().size * tilesize / 2f - 1);
+    public void updateTableAlign(Table table){
+        Vec2 pos = Core.input.mouseScreen(x, y - block().size * tilesize / 2f - 1);
         table.setPosition(pos.x, pos.y, Align.top);
     }
 
     /** Returns whether or not a hand cursor should be shown over this block. */
-    public Cursor getCursor(Tilec tile){
-        return configurable ? SystemCursor.hand : SystemCursor.arrow;
+    public Cursor getCursor(){
+        return block.configurable ? SystemCursor.hand : SystemCursor.arrow;
     }
 
     /**
      * Called when another tile is tapped while this block is selected.
      * Returns whether or not this block should be deselected.
      */
-    public boolean onConfigureTileTapped(Tilec tile, Tilec other){
+    public boolean onConfigureTileTapped(Tilec other){
         return tile != other;
     }
 
     /** Returns whether this config menu should show when the specified player taps it. */
-    public boolean shouldShowConfigure(Tilec tile, Playerc player){
+    public boolean shouldShowConfigure(Playerc player){
         return true;
     }
 
     /** Whether this configuration should be hidden now. Called every frame the config is open. */
-    public boolean shouldHideConfigure(Tilec tile, Playerc player){
+    public boolean shouldHideConfigure(Playerc player){
         return false;
     }
 
-    public void drawConfigure(Tilec tile){
+    public void drawConfigure(){
         Draw.color(Pal.accent);
         Lines.stroke(1f);
-        Lines.square(tile.x(), tile.y(), tile.block().size * tilesize / 2f + 1f);
+        Lines.square(x, y, block().size * tilesize / 2f + 1f);
         Draw.reset();
     }
 
-    public boolean isSolidFor(Tilec tile){
+    public boolean checkSolid(){
         return false;
     }
 
 
-    public float handleDamage(Tilec tile, float amount){
+    public float handleDamage(float amount){
         return amount;
-    }
-
-    public void handleBulletHit(Tilec entity, Bulletc bullet){
-        entity.damage(bullet.damage());
-    }
-
-    /** @return a custom minimap color for this tile, or 0 to use default colors. */
-    public int minimapColor(Tile tile){
-        return 0;
-    }
-
-    public void update(Tilec tile){
     }
 
     public boolean collide(Bulletc other){
@@ -843,18 +845,18 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     }
 
     public void collision(Bulletc other){
-        block.handleBulletHit(this, other);
+        damage(other.damage());
     }
 
     public void removeFromProximity(){
-        block.onProximityRemoved(this);
+        onProximityRemoved();
 
         Point2[] nearby = Edges.getEdges(block.size);
         for(Point2 point : nearby){
             Tilec other = world.ent(tile.x + point.x, tile.y + point.y);
             //remove this tile from all nearby tile's proximities
             if(other != null){
-                other.block().onProximityUpdate(other);
+                other.onProximityUpdate();
                 other.proximity().remove(this, true);
             }
         }
@@ -863,12 +865,12 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     public void updateProximity(){
         tmpTiles.clear();
         proximity.clear();
-
+        
         Point2[] nearby = Edges.getEdges(block.size);
         for(Point2 point : nearby){
             Tilec other = world.ent(tile.x + point.x, tile.y + point.y);
 
-            if(other == null || !(other.tile().interactable(tile.team()))) continue;
+            if(other == null || !(other.tile().interactable(team()))) continue;
 
             //add this tile to proximity of nearby tiles
             if(!other.proximity().contains(this, true)){
@@ -883,12 +885,16 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
             proximity.add(tile);
         }
 
-        block.onProximityAdded(this);
-        block.onProximityUpdate(this);
+        onProximityAdded();
+        onProximityUpdate();
 
         for(Tilec other : tmpTiles){
-            other.block().onProximityUpdate(other);
+            other.onProximityUpdate();
         }
+    }
+
+    public void updateTile(){
+
     }
 
     //endregion
@@ -911,8 +917,8 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     public void killed(){
         Events.fire(new BlockDestroyEvent(tile));
         block.breakSound.at(tile);
-        block.onDestroyed(this);
-        tile.remove();
+        onDestroyed();
+        remove();
     }
 
     @Override
@@ -923,14 +929,14 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         }
 
         if(sound != null){
-            sound.update(x(), y(), block.shouldActiveSound(this));
+            sound.update(x, y, shouldActiveSound());
         }
 
-        if(block.idleSound != Sounds.none && block.shouldIdleSound(this)){
+        if(block.idleSound != Sounds.none && shouldIdleSound()){
             loops.play(block.idleSound, this, block.idleSoundVolume);
         }
 
-        block.update(this);
+        updateTile();
 
         if(liquids != null){
             liquids.update();

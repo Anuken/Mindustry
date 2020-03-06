@@ -115,7 +115,7 @@ public class MechPad extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         MechFactoryEntity entity = tile.ent();
 
         if(entity.player != null){

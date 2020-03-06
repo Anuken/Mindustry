@@ -23,7 +23,7 @@ import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
@@ -159,13 +159,13 @@ public class Block extends UnlockableContent{
     protected Array<String> cacheRegionStrings = new Array<>();
     protected ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
-    protected Array<Tile> tempTiles = new Array<>();
-    protected Array<Tilec> tempTileEnts = new Array<>();
+    //TODO move
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] variantRegions, editorVariantRegions;
-    protected TextureRegion region, editorIcon;
+    public TextureRegion region, editorIcon;
 
-    protected static TextureRegion[][] cracks;
+    //TODO move
+    public static TextureRegion[][] cracks;
 
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
@@ -175,6 +175,34 @@ public class Block extends UnlockableContent{
     public Block(String name){
         super(name);
         this.solid = false;
+    }
+
+    //TODO rename to draw() once class refactoring is done.
+    public void drawBase(Tile tile){
+        //delegates to entity unless it is null
+        if(tile.entity != null){
+            tile.entity.draw();
+        }else{
+            Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation * 90 : 0);
+        }
+    }
+
+    /** @return a custom minimap color for this or 0 to use default colors. */
+    public int minimapColor(Tile tile){
+        return 0;
+    }
+
+    public boolean outputsItems(){
+        return hasItems;
+    }
+
+    /** Returns whether ot not this block can be place on the specified  */
+    public boolean canPlaceOn(Tile tile){
+        return true;
+    }
+
+    public boolean canBreak(Tile tile){
+        return true;
     }
 
     /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #reg(int)}. */
@@ -438,25 +466,36 @@ public class Block extends UnlockableContent{
         }
 
         if(entityType == null){
-            //assign default value for now
-            entityType = TileEntity::create;
 
             //attempt to find the first declared class and use it as the entity type
             try{
                 Class<?>[] classes = getClass().getDeclaredClasses();
-                //first class that is subclass of Tilec
-                Class<?> type = Structs.find(classes, Tilec.class::isAssignableFrom);
-                if(type != null){
-                    Constructor<? extends Tilec> cons = (Constructor<? extends Tilec>)type.getConstructor();
-                    entityType = () -> {
-                        try{
-                            return cons.newInstance();
-                        }catch(Exception e){
-                            throw new RuntimeException(e);
-                        }
-                    };
+                Class<?> current = getClass();
+
+                while(entityType == null && Block.class.isAssignableFrom(current)){
+                    //first class that is subclass of Tilec
+                    Class<?> type = Structs.find(classes, Tilec.class::isAssignableFrom);
+                    if(type != null){
+                        Constructor<? extends Tilec> cons = (Constructor<? extends Tilec>)type.getConstructor();
+                        entityType = () -> {
+                            try{
+                                return cons.newInstance();
+                            }catch(Exception e){
+                                throw new RuntimeException(e);
+                            }
+                        };
+                    }
+
+                    //scan through every superclass looking for it
+                    current = current.getSuperclass();
                 }
+
             }catch(Throwable ignored){
+            }
+
+            if(entityType == null){
+                //assign default value
+                entityType = TileEntity::create;
             }
         }
 

@@ -86,7 +86,7 @@ public class ForceProjector extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         ForceEntity entity = tile.ent();
 
         if(entity.shield == null){
@@ -149,7 +149,7 @@ public class ForceProjector extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
 
         ForceEntity entity = tile.ent();

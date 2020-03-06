@@ -47,7 +47,7 @@ public class LiquidSource extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         LiquidSourceEntity entity = tile.ent();
 
         if(entity.source == null){
@@ -64,7 +64,7 @@ public class LiquidSource extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
 
         LiquidSourceEntity entity = tile.ent();

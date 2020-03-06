@@ -1,4 +1,4 @@
-package mindustry.world.blocks;
+package mindustry.world.blocks.environment;
 
 import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
@@ -16,7 +16,7 @@ public class TreeBlock extends Block{
     }
 
     @Override
-    public void draw(Tile tile){}
+    public void drawBase(Tile tile){}
 
     @Override
     public void drawLayer(Tile tile){

@@ -91,7 +91,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         ItemLiquidGeneratorEntity entity = tile.ent();
 
         //Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.
@@ -152,7 +152,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
 
         ItemLiquidGeneratorEntity entity = tile.ent();

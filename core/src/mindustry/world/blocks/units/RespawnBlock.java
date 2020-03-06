@@ -1,4 +1,4 @@
-package mindustry.world.blocks;
+package mindustry.world.blocks.units;
 
 import arc.graphics.g2d.*;
 import arc.math.*;

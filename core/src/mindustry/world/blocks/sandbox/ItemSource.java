@@ -54,7 +54,7 @@ public class ItemSource extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
 
         ItemSourceEntity entity = tile.ent();
@@ -66,7 +66,7 @@ public class ItemSource extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         ItemSourceEntity entity = tile.ent();
         if(entity.outputItem == null) return;
 

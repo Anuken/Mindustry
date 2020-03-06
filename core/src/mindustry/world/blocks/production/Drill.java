@@ -91,7 +91,7 @@ public class Drill extends Block{
     public void drawCracks(Tile tile){}
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         float s = 0.3f;
         float ts = 0.6f;
 
@@ -244,7 +244,7 @@ public class Drill extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         DrillEntity entity = tile.ent();
 
         if(entity.dominantItem == null){

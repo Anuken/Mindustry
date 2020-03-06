@@ -62,15 +62,13 @@ public class BuildBlock extends Block{
     @Remote(called = Loc.server)
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         if(tile == null) return;
-        float healthf = tile.entity == null ? 1f : tile.entity.healthf();
+        float healthf = tile.entity.healthf();
         tile.setBlock(block, team, (int)rotation);
-        if(tile.entity != null){
-            tile.entity.health(block.health * healthf);
-        }
+        tile.entity.health(block.health * healthf);
         //last builder was this local client player, call placed()
         if(!headless && builderID == player.unit().id()){
             if(!skipConfig){
-                tile.block().playerPlaced(tile);
+                tile.entity.playerPlaced();
             }
         }
         Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
@@ -102,7 +100,7 @@ public class BuildBlock extends Block{
 
     public static void constructed(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         Call.onConstructFinish(tile, block, builderID, rotation, team, skipConfig);
-        tile.block().placed(tile);
+        tile.entity.placed();
 
         Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, false));
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
@@ -113,94 +111,12 @@ public class BuildBlock extends Block{
         return true;
     }
 
-    @Override
-    public String getDisplayName(Tile tile){
-        BuildEntity entity = tile.ent();
-        return Core.bundle.format("block.constructing", entity.cblock == null ? entity.previous.localizedName : entity.cblock.localizedName);
-    }
-
-    @Override
-    public TextureRegion getDisplayIcon(Tile tile){
-        BuildEntity entity = tile.ent();
-        return (entity.cblock == null ? entity.previous : entity.cblock).icon(mindustry.ui.Cicon.full);
-    }
-
-    @Override
-    public boolean isSolidFor(Tile tile){
-        BuildEntity entity = tile.ent();
-        return entity == null || (entity.cblock != null && entity.cblock.solid) || entity.previous == null || entity.previous.solid;
-    }
-
-    @Override
-    public Cursor getCursor(Tile tile){
-        return SystemCursor.hand;
-    }
-
-    @Override
-    public void tapped(Tile tile, Playerc player){
-        BuildEntity entity = tile.ent();
-
-        //if the target is constructible, begin constructing
-        if(!headless && entity.cblock != null){
-            if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
-                control.input.isBuilding = true;
-            }
-            player.builder().addBuild(new BuildRequest(tile.x, tile.y, tile.rotation(), entity.cblock), false);
-        }
-    }
-
-    @Override
-    public void onDestroyed(Tile tile){
-        Fx.blockExplosionSmoke.at(tile);
-
-        if(!tile.floor().solid && !tile.floor().isLiquid){
-            Effects.rubble(tile.drawx(), tile.drawy(), size);
-        }
-    }
-
-    @Override
-    public void draw(Tile tile){
-        BuildEntity entity = tile.ent();
-
-        //When breaking, don't draw the previous block... since it's the thing you were breaking
-        if(entity.cblock != null && entity.previous == entity.cblock){
-            return;
-        }
-
-        if(entity.previous == null || entity.cblock == null) return;
-
-        if(Core.atlas.isFound(entity.previous.icon(Cicon.full))){
-            Draw.rect(entity.previous.icon(Cicon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.rotation() * 90 : 0);
-        }
-    }
-
-    @Override
-    public void drawLayer(Tile tile){
-
-        BuildEntity entity = tile.ent();
-
-        Shaders.blockbuild.color = Pal.accent;
-
-        Block target = entity.cblock == null ? entity.previous : entity.cblock;
-
-        if(target == null) return;
-
-        for(TextureRegion region : target.getGeneratedIcons()){
-            Shaders.blockbuild.region = region;
-            Shaders.blockbuild.progress = entity.progress;
-
-            Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.rotation() * 90 : 0);
-            Draw.flush();
-        }
-    }
-
     public class BuildEntity extends TileEntity{
         /**
          * The recipe of the block that is being constructed.
          * If there is no recipe for this block, as is the case with rocks, 'previous' is used.
          */
-        public @Nullable
-        Block cblock;
+        public @Nullable Block cblock;
 
         public float progress = 0;
         public float buildCost;
@@ -213,6 +129,77 @@ public class BuildBlock extends Block{
 
         private float[] accumulator;
         private float[] totalAccumulator;
+        
+        @Override
+        public String getDisplayName(){
+            return Core.bundle.format("block.constructing", cblock == null ? previous.localizedName : cblock.localizedName);
+        }
+
+        @Override
+        public TextureRegion getDisplayIcon(){
+            return (cblock == null ? previous : cblock).icon(Cicon.full);
+        }
+
+        @Override
+        public boolean checkSolid(){
+            return (cblock != null && cblock.solid) || previous == null || previous.solid;
+        }
+
+        @Override
+        public Cursor getCursor(){
+            return SystemCursor.hand;
+        }
+
+        @Override
+        public void tapped(Playerc player){
+            //if the target is constructible, begin constructing
+            if(!headless && cblock != null){
+                if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
+                    control.input.isBuilding = true;
+                }
+                player.builder().addBuild(new BuildRequest(tile.x, tile.y, tile.rotation(), cblock), false);
+            }
+        }
+
+        @Override
+        public void onDestroyed(){
+            Fx.blockExplosionSmoke.at(tile);
+
+            if(!tile.floor().solid && !tile.floor().isLiquid){
+                Effects.rubble(tile.drawx(), tile.drawy(), size);
+            }
+        }
+
+        @Override
+        public void draw(){
+            //When breaking, don't draw the previous block... since it's the thing you were breaking
+            if(cblock != null && previous == cblock){
+                return;
+            }
+
+            if(previous == null || cblock == null) return;
+
+            if(Core.atlas.isFound(previous.icon(Cicon.full))){
+                Draw.rect(previous.icon(Cicon.full), tile.drawx(), tile.drawy(), previous.rotate ? tile.rotation() * 90 : 0);
+            }
+        }
+
+        @Override
+        public void drawLayer(){
+            Shaders.blockbuild.color = Pal.accent;
+
+            Block target = cblock == null ? previous : cblock;
+
+            if(target == null) return;
+
+            for(TextureRegion region : target.getGeneratedIcons()){
+                Shaders.blockbuild.region = region;
+                Shaders.blockbuild.progress = progress;
+
+                Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.rotation() * 90 : 0);
+                Draw.flush();
+            }
+        }
 
         public boolean construct(Unitc builder, @Nullable Tilec core, float amount, boolean configured){
             if(cblock == null){
@@ -265,8 +252,8 @@ public class BuildBlock extends Block{
 
                     if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
                         if(core != null){
-                            int accepting = core.tile().block().acceptStack(core.tile(), requirements[i].item, accumulated, builder);
-                            core.tile().block().handleStack(core.tile(), requirements[i].item, accepting, builder);
+                            int accepting = core.acceptStack(requirements[i].item, accumulated, builder);
+                            core.handleStack(requirements[i].item, accepting, builder);
                             accumulator[i] -= accepting;
                         }else{
                             accumulator[i] -= accumulated;

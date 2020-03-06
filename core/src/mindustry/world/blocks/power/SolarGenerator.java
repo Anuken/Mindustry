@@ -16,7 +16,7 @@ public class SolarGenerator extends PowerGenerator{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         tile.<GeneratorEntity>ent().productionEfficiency = state.rules.solarPowerMultiplier < 0 ? (state.rules.lighting ? 1f - state.rules.ambientLight.a : 1f) : state.rules.solarPowerMultiplier;
     }
 

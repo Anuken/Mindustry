@@ -1,13 +1,13 @@
-package mindustry.world.blocks;
+package mindustry.world.blocks.environment;
 
-import arc.Core;
+import arc.*;
 import arc.graphics.g2d.*;
-import arc.math.Mathf;
+import arc.math.*;
 import arc.math.geom.*;
-import mindustry.graphics.CacheLayer;
+import mindustry.graphics.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.world;
 
 public class StaticWall extends Rock{
     TextureRegion large;
@@ -22,7 +22,7 @@ public class StaticWall extends Rock{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void drawBase(Tile tile){
         int rx = tile.x / 2 * 2;
         int ry = tile.y / 2 * 2;
 

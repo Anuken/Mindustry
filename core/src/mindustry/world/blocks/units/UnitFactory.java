@@ -116,7 +116,7 @@ public class UnitFactory extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         UnitFactoryEntity entity = tile.ent();
         TextureRegion region = unitType.icon(Cicon.full);
 
@@ -147,7 +147,7 @@ public class UnitFactory extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         UnitFactoryEntity entity = tile.ent();
 
         if(entity.spawned >= maxSpawn){

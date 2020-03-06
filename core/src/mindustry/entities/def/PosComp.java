@@ -6,7 +6,7 @@ import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.world;
 

@@ -48,7 +48,7 @@ public class Fracker extends SolidPump{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         FrackerEntity entity = tile.ent();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
@@ -69,7 +69,7 @@ public class Fracker extends SolidPump{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         FrackerEntity entity = tile.ent();
 
         if(entity.consValid()){

@@ -72,7 +72,7 @@ public class OverdriveProjector extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         OverdriveEntity entity = tile.ent();
         entity.heat = Mathf.lerpDelta(entity.heat, entity.consValid() ? 1f : 0f, 0.08f);
         entity.charge += entity.heat * Time.delta();
@@ -101,7 +101,7 @@ public class OverdriveProjector extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
 
         OverdriveEntity entity = tile.ent();

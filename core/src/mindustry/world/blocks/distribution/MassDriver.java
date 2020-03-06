@@ -60,7 +60,7 @@ public class MassDriver extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         MassDriverEntity entity = tile.ent();
         Tile link = world.tile(entity.link);
         boolean hasLink = linkValid(tile);
@@ -143,7 +143,7 @@ public class MassDriver extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         Draw.rect(baseRegion, tile.drawx(), tile.drawy());
     }
 

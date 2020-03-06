@@ -60,7 +60,7 @@ public class Unloader extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         UnloaderEntity entity = tile.ent();
 
         if(tile.entity.timer(timerUnload, speed / entity.timeScale()) && tile.entity.items().total() == 0){
@@ -110,7 +110,7 @@ public class Unloader extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
 
         UnloaderEntity entity = tile.ent();

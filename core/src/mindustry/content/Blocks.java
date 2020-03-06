@@ -1,13 +1,14 @@
 package mindustry.content;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
+import mindustry.entities.AllDefs.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -18,6 +19,7 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.power.*;
@@ -91,7 +93,7 @@ public class Blocks implements ContentList{
                 hasShadow = false;
             }
 
-            public void draw(Tile tile){}
+            public void draw(){}
             public void load(){}
             public void init(){}
             public boolean isHidden(){
@@ -110,7 +112,7 @@ public class Blocks implements ContentList{
             {
                 variants = 0;
             }
-            public void draw(Tile tile){}
+            public void draw(){}
         };
 
         cliff = new Cliff("cliff");
@@ -511,13 +513,10 @@ public class Blocks implements ContentList{
 
             int topRegion = reg("-top");
 
-            drawer = tile -> {
-                Draw.rect(region, tile.drawx(), tile.drawy());
-
-                GenericCrafterEntity entity = tile.ent();
-
+            drawer = entity -> {
+                Draw.rect(region, entity.x(), entity.y());
                 Draw.alpha(Mathf.absin(entity.totalProgress, 3f, 0.9f) * entity.warmup);
-                Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
+                Draw.rect(reg(topRegion), entity.x(), entity.y());
                 Draw.reset();
             };
         }};
@@ -538,24 +537,22 @@ public class Blocks implements ContentList{
 
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name), Core.atlas.find(name + "-weave")};
 
-            drawer = tile -> {
-                GenericCrafterEntity entity = tile.ent();
-
-                Draw.rect(reg(bottomRegion), tile.drawx(), tile.drawy());
-                Draw.rect(reg(weaveRegion), tile.drawx(), tile.drawy(), entity.totalProgress);
+            drawer = entity -> {
+                Draw.rect(reg(bottomRegion), entity.x(), entity.y());
+                Draw.rect(reg(weaveRegion), entity.x(), entity.y(), entity.totalProgress);
 
                 Draw.color(Pal.accent);
                 Draw.alpha(entity.warmup);
 
                 Lines.lineAngleCenter(
-                tile.drawx() + Mathf.sin(entity.totalProgress, 6f, Vars.tilesize / 3f * size),
-                tile.drawy(),
+                entity.x() + Mathf.sin(entity.totalProgress, 6f, Vars.tilesize / 3f * size),
+                entity.y(),
                 90,
                 size * Vars.tilesize / 2f);
 
                 Draw.reset();
 
-                Draw.rect(region, tile.drawx(), tile.drawy());
+                Draw.rect(region, entity.x(), entity.y());
             };
         }};
 
@@ -1039,7 +1036,7 @@ public class Blocks implements ContentList{
             liquidCapacity = 20f;
         }};
 
-        liquidTank = new LiquidTank("liquid-tank"){{
+        liquidTank = new LiquidRouter("liquid-tank"){{
             requirements(Category.liquid, ItemStack.with(Items.titanium, 25, Items.metaglass, 25));
             size = 3;
             liquidCapacity = 1500f;

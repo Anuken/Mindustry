@@ -1,4 +1,4 @@
-package mindustry.world.blocks;
+package mindustry.world.blocks.environment;
 
 import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
@@ -12,7 +12,7 @@ public class OverlayFloor extends Floor{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void drawBase(Tile tile){
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
     }
 }

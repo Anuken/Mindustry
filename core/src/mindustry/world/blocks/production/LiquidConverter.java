@@ -40,7 +40,7 @@ public class LiquidConverter extends GenericCrafter{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         GenericCrafterEntity entity = tile.ent();
         ConsumeLiquidBase cl = consumes.get(ConsumeType.liquid);
 

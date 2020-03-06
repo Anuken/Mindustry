@@ -23,7 +23,7 @@ public class Router extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         RouterEntity entity = tile.ent();
 
         if(entity.lastItem == null && entity.items().total() > 0){

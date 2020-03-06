@@ -36,7 +36,7 @@ public class Junction extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         JunctionEntity entity = tile.ent();
         DirectionalItemBuffer buffer = entity.buffer;
 

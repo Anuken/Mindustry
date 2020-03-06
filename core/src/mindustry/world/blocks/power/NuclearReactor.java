@@ -74,7 +74,7 @@ public class NuclearReactor extends PowerGenerator{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         NuclearReactorEntity entity = tile.ent();
 
         ConsumeLiquid cliquid = consumes.get(ConsumeType.liquid);
@@ -159,7 +159,7 @@ public class NuclearReactor extends PowerGenerator{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
 
         NuclearReactorEntity entity = tile.ent();

@@ -25,7 +25,7 @@ public class GenericSmelter extends GenericCrafter{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
 
         GenericCrafterEntity entity = tile.ent();

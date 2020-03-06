@@ -14,7 +14,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -177,7 +176,7 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         tile.entity.power().graph.update();
     }
 

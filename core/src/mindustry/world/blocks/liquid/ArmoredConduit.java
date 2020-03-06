@@ -1,12 +1,10 @@
 package mindustry.world.blocks.liquid;
 
-import arc.Core;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import mindustry.type.Liquid;
-import mindustry.world.Block;
-import mindustry.world.Edges;
-import mindustry.world.Tile;
+import arc.*;
+import arc.graphics.g2d.*;
+import mindustry.entities.AllDefs.*;
+import mindustry.type.*;
+import mindustry.world.*;
 
 public class ArmoredConduit extends Conduit{
     public TextureRegion capRegion;
@@ -23,7 +21,7 @@ public class ArmoredConduit extends Conduit{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
 
         // draw the cap when a conduit would normally leak

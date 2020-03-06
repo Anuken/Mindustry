@@ -41,7 +41,7 @@ public class ShockMine extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         //nope
     }
 

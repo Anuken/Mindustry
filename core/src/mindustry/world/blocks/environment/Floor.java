@@ -1,4 +1,4 @@
-package mindustry.world.blocks;
+package mindustry.world.blocks.environment;
 
 import arc.*;
 import arc.graphics.*;
@@ -15,6 +15,7 @@ import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
@@ -152,7 +153,7 @@ public class Floor extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void drawBase(Tile tile){
         Mathf.random.setSeed(tile.pos());
 
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
@@ -161,7 +162,7 @@ public class Floor extends Block{
 
         Floor floor = tile.overlay();
         if(floor != Blocks.air && floor != this){ //ore should never have itself on top, but it's possible, so prevent a crash in that case
-            floor.draw(tile);
+            floor.drawBase(tile);
         }
     }
 

@@ -6,7 +6,7 @@ import mindustry.game.Team;
 import mindustry.gen.TileOp;
 import mindustry.world.Block;
 import mindustry.world.Tile;
-import mindustry.world.blocks.Floor;
+import mindustry.world.blocks.environment.Floor;
 
 import static mindustry.Vars.content;
 

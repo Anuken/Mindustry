@@ -52,7 +52,7 @@ public class Door extends Wall{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         DoorEntity entity = tile.ent();
         Draw.rect(entity.open ? openRegion : region, tile.drawx(), tile.drawy());
     }

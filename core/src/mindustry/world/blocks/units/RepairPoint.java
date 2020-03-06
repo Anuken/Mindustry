@@ -72,7 +72,7 @@ public class RepairPoint extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         Draw.rect(baseRegion, tile.drawx(), tile.drawy());
     }
 
@@ -106,7 +106,7 @@ public class RepairPoint extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         RepairPointEntity entity = tile.ent();
 
         boolean targetIsBeingRepaired = false;

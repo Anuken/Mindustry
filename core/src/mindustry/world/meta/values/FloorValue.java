@@ -3,7 +3,7 @@ package mindustry.world.meta.values;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import mindustry.ui.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
 
 public class FloorValue implements StatValue{

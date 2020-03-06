@@ -2,9 +2,9 @@ package mindustry.world.blocks.liquid;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import mindustry.entities.AllDefs.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 public class LiquidJunction extends LiquidBlock{
@@ -26,7 +26,7 @@ public class LiquidJunction extends LiquidBlock{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         Draw.rect(name, tile.worldx(), tile.worldy());
     }
 

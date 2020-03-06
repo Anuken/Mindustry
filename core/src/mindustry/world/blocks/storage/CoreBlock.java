@@ -201,7 +201,7 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         CoreEntity entity = tile.ent();
 
         //TODO implement

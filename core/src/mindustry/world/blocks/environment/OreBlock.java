@@ -1,4 +1,4 @@
-package mindustry.world.blocks;
+package mindustry.world.blocks.environment;
 
 import arc.*;
 import mindustry.annotations.Annotations.*;

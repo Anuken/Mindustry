@@ -8,7 +8,7 @@ import mindustry.game.Team;
 import mindustry.gen.TileOp;
 import mindustry.world.Block;
 import mindustry.world.Tile;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.modules.*;
 
 import static mindustry.Vars.state;

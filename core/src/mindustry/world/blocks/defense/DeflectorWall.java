@@ -23,7 +23,7 @@ public class DeflectorWall extends Wall{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
 
         DeflectorEntity entity = tile.ent();

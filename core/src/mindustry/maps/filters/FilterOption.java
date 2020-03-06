@@ -12,7 +12,7 @@ import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 

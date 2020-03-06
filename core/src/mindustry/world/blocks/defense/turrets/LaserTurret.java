@@ -37,7 +37,7 @@ public class LaserTurret extends PowerTurret{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         super.update(tile);
 
         LaserTurretEntity entity = tile.ent();

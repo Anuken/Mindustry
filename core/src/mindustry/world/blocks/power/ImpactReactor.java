@@ -69,7 +69,7 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         FusionReactorEntity entity = tile.ent();
 
         if(entity.consValid() && entity.power().status >= 0.99f){
@@ -95,7 +95,7 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         FusionReactorEntity entity = tile.ent();
 
         Draw.rect(reg(bottomRegion), tile.drawx(), tile.drawy());

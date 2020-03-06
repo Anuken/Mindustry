@@ -34,7 +34,7 @@ public class Wall extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         if(variants == 0){
             Draw.rect(region, tile.drawx(), tile.drawy());
         }else{

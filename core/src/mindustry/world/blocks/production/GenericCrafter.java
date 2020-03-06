@@ -6,14 +6,13 @@ import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
+import mindustry.entities.AllDefs.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-
-import java.io.*;
 
 public class GenericCrafter extends Block{
     public ItemStack outputItem;
@@ -24,7 +23,7 @@ public class GenericCrafter extends Block{
     public Effect updateEffect = Fx.none;
     public float updateEffectChance = 0.04f;
 
-    public Cons<Tile> drawer = null;
+    public Cons<GenericCrafterEntity> drawer = null;
     public Prov<TextureRegion[]> drawIcons = null;
 
     public GenericCrafter(String name){
@@ -70,7 +69,7 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         if(drawer == null){
             super.draw(tile);
         }else{
@@ -84,7 +83,7 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         GenericCrafterEntity entity = tile.ent();
 
         if(entity.consValid()){

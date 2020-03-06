@@ -101,7 +101,7 @@ public abstract class Turret extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         Draw.rect(baseRegion, tile.drawx(), tile.drawy());
         Draw.color();
     }
@@ -135,7 +135,7 @@ public abstract class Turret extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         TurretEntity entity = tile.ent();
 
         if(!validateTarget(tile)) entity.target = null;

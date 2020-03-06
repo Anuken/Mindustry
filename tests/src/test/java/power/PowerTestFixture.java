@@ -8,7 +8,6 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.modules.*;
 import org.junit.jupiter.api.*;

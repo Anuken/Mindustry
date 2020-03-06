@@ -10,7 +10,7 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
@@ -92,17 +92,17 @@ public class Tile implements Position{
 
     /** Configure a tile with the current, local player. */
     public void configure(Object value){
-        Call.onTileConfig(player, this, value);
+        if(entity != null) Call.onTileConfig(player, entity, value);
     }
 
     public void configureAny(Object value){
-        Call.onTileConfig(null, this, value);
+        if(entity != null) Call.onTileConfig(null, entity, value);
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends TileEntity> T ent(){
-        return (T)entity;
-    }
+    //@SuppressWarnings("unchecked")
+    //public <T extends TileEntity> T ent(){
+    //    return (T)entity;
+    //}
 
     public float worldx(){
         return x * tilesize;
@@ -216,7 +216,7 @@ public class Tile implements Position{
 
         recache();
         if(entity != null){
-            block.onProximityUpdate(entity);
+            entity.onProximityUpdate();
         }
     }
 
@@ -309,7 +309,7 @@ public class Tile implements Position{
     }
 
     public boolean solid(){
-        return block.solid || (entity != null && block.isSolidFor(entity));
+        return block.solid || (entity != null && entity.checkSolid());
     }
 
     public boolean breakable(){
@@ -475,7 +475,7 @@ public class Tile implements Position{
     protected void preChanged(){
         if(entity != null){
             //only call removed() for the center block - this only gets called once.
-            block.removed(entity);
+            entity.onRemoved();
             entity.removeFromProximity();
 
             //remove this tile's dangling entities
@@ -527,9 +527,9 @@ public class Tile implements Position{
         }else if(!world.isGenerating()){
             //since the entity won't update proximity for us, update proximity for all nearby tiles manually
             for(Point2 p : Geometry.d4){
-                Tile tile = world.tile(x + p.x, y + p.y);
+                Tilec tile = world.ent(x + p.x, y + p.y);
                 if(tile != null){
-                    tile.block().onProximityUpdate(entity);
+                    tile.onProximityUpdate();
                 }
             }
         }

@@ -27,7 +27,7 @@ public class Incinerator extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         IncineratorEntity entity = tile.ent();
 
         if(entity.consValid()){
@@ -38,7 +38,7 @@ public class Incinerator extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
 
         IncineratorEntity entity = tile.ent();

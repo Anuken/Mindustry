@@ -60,7 +60,7 @@ public class Sorter extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
 
         SorterEntity entity = tile.ent();

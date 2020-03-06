@@ -37,7 +37,7 @@ public class LightBlock extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
         LightEntity entity = tile.ent();
 

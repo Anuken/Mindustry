@@ -163,7 +163,7 @@ public class ItemBridge extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         ItemBridgeEntity entity = tile.ent();
 
         entity.time += entity.cycleSpeed * entity.delta();

@@ -9,7 +9,7 @@ import mindustry.graphics.Layer;
 import mindustry.type.Liquid;
 import mindustry.ui.Cicon;
 import mindustry.world.Tile;
-import mindustry.world.blocks.LiquidBlock;
+import mindustry.world.blocks.liquid.LiquidBlock;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.tilesize;
@@ -45,7 +45,7 @@ public class Pump extends LiquidBlock{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         Draw.rect(name, tile.drawx(), tile.drawy());
 
         Draw.color(tile.entity.liquids().current().color);
@@ -102,7 +102,7 @@ public class Pump extends LiquidBlock{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         float tiles = 0f;
         Liquid liquidDrop = null;
 

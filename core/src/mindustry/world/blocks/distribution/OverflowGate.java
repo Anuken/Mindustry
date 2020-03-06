@@ -45,7 +45,7 @@ public class OverflowGate extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         OverflowGateEntity entity = tile.ent();
 
         if(entity.lastItem == null && entity.items().total() > 0){

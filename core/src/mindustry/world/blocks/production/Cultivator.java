@@ -40,7 +40,7 @@ public class Cultivator extends GenericCrafter{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         super.update(tile);
 
         CultivatorEntity entity = tile.ent();
@@ -70,7 +70,7 @@ public class Cultivator extends GenericCrafter{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         CultivatorEntity entity = tile.ent();
 
         Draw.rect(region, tile.drawx(), tile.drawy());

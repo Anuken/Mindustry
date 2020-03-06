@@ -1,9 +1,8 @@
-package mindustry.world;
+package mindustry.world.blocks.environment;
 
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.util.Tmp;
-import mindustry.world.blocks.StaticWall;
+import arc.graphics.g2d.*;
+import arc.util.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.tilesize;
 
@@ -14,7 +13,7 @@ public class StaticTree extends StaticWall{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void drawBase(Tile tile){
         TextureRegion r = Tmp.tr1;
         r.set(region);
         int crop = (region.getWidth() - tilesize*4) / 2;

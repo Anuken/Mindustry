@@ -27,7 +27,7 @@ public class ThermalGenerator extends PowerGenerator{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         GeneratorEntity entity = tile.ent();
 
         if(entity.productionEfficiency > 0.1f && Mathf.chance(0.05 * entity.delta())){

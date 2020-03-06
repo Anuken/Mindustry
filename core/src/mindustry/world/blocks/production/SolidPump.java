@@ -70,7 +70,7 @@ public class SolidPump extends Pump{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         SolidPumpEntity entity = tile.ent();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
@@ -88,7 +88,7 @@ public class SolidPump extends Pump{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         SolidPumpEntity entity = tile.ent();
 
         float fraction = 0f;

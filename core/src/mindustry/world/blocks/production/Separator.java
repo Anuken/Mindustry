@@ -58,7 +58,7 @@ public class Separator extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         super.draw(tile);
 
         GenericCrafterEntity entity = tile.ent();
@@ -74,7 +74,7 @@ public class Separator extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         GenericCrafterEntity entity = tile.ent();
 
         entity.totalProgress += entity.warmup * entity.delta();

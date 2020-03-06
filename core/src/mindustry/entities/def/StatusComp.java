@@ -11,7 +11,7 @@ import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
 
 import java.io.*;
 

@@ -10,7 +10,7 @@ import arc.struct.IntSet.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
 
 import java.util.*;
 

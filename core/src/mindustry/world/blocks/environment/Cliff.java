@@ -1,4 +1,4 @@
-package mindustry.world.blocks;
+package mindustry.world.blocks.environment;
 
 import arc.graphics.g2d.*;
 import arc.util.*;
@@ -17,7 +17,7 @@ public class Cliff extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void drawBase(Tile tile){
         int r = tile.rotation();
         for(int i = 0; i < 8; i++){
             if((r & (1 << i)) != 0){

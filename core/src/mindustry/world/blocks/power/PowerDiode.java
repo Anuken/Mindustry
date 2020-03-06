@@ -24,7 +24,7 @@ public class PowerDiode extends Block{
     }
 
     @Override
-    public void update(Tile tile){
+    public void updateTile(){
         super.update(tile);
 
         if(tile.front() == null || tile.back() == null || !tile.back().block().hasPower || !tile.front().block().hasPower || tile.back().team() != tile.front().team()) return;
@@ -69,7 +69,7 @@ public class PowerDiode extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void draw(){
         Draw.rect(region, tile.drawx(), tile.drawy(), 0);
         Draw.rect(arrow, tile.drawx(), tile.drawy(), rotate ? tile.rotation() * 90 : 0);
     }

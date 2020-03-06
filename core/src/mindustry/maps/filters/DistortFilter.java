@@ -3,7 +3,7 @@ package mindustry.maps.filters;
 import arc.util.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
 
 public class DistortFilter extends GenerateFilter{
     float scl = 40, mag = 5;
