@@ -63,7 +63,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     /** Sets this tile entity data to this and adds it if necessary. */
     public Tilec init(Tile tile, boolean shouldAdd){
         this.tile = tile;
-        this.block = block();
+        this.block = tile.block();
 
         set(tile.drawx(), tile.drawy());
         if(block.activeSound != Sounds.none){
@@ -186,11 +186,11 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     }
 
     public int rotation(){
-        return rotation();
+        return tile.rotation();
     }
 
     public void rotation(int rotation){
-        rotation(rotation);
+        tile.rotation(rotation);
     }
 
     public Floor floor(){

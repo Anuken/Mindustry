@@ -92,7 +92,7 @@ public class Blocks implements ContentList{
                 hasShadow = false;
             }
 
-            public void draw(){}
+            public void drawBase(Tile tile){}
             public void load(){}
             public void init(){}
             public boolean isHidden(){
