@@ -139,10 +139,6 @@ public class CraterConveyor extends Block implements Autotiler{
     public void update(Tile tile){
         CraterConveyorEntity entity = tile.ent();
 
-        // only update once per frame
-        if(entity.lastFrameUpdated == Core.graphics.getFrameId()) return;
-        entity.lastFrameUpdated = Core.graphics.getFrameId();
-
         // reel in crater
         if(entity.cooldown > 0f) entity.cooldown = Mathf.clamp(entity.cooldown - speed, 0f, 1f);
 
@@ -167,9 +163,6 @@ public class CraterConveyor extends Block implements Autotiler{
             if(tile.front() != null
             && tile.front().getTeam() == tile.getTeam()
             && tile.front().block() instanceof CraterConveyor){
-
-                // always let destination update first
-                tile.front().block().update(tile.front());
                 CraterConveyorEntity e = tile.front().ent();
 
                 // sleep if its occupied
@@ -233,8 +226,6 @@ public class CraterConveyor extends Block implements Autotiler{
     }
 
     class CraterConveyorEntity extends TileEntity{
-        float lastFrameUpdated = -1;
-
         int blendbit1, blendbit2;
         int blendsclx, blendscly;
 
