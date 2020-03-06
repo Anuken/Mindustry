@@ -36,7 +36,7 @@ public class LiquidJunction extends LiquidBlock{
     }
 
     @Override
-    public Tile getLiquidDestination(Tile tile, Tile source, Liquid liquid){
+    public Tile getLiquidDestination(Tile source, Liquid liquid){
         int dir = source.relativeTo(tile.x, tile.y);
         dir = (dir + 4) % 4;
         Tile next = tile.getNearbyLink(dir);

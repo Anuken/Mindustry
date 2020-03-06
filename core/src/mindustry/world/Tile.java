@@ -99,10 +99,10 @@ public class Tile implements Position{
         if(entity != null) Call.onTileConfig(null, entity, value);
     }
 
-    //@SuppressWarnings("unchecked")
-    //public <T extends TileEntity> T ent(){
-    //    return (T)entity;
-    //}
+    @SuppressWarnings("unchecked")
+    public <T extends TileEntity> T ent(){
+        return (T)entity;
+    }
 
     public float worldx(){
         return x * tilesize;

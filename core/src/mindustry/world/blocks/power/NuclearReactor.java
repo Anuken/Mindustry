@@ -46,8 +46,7 @@ public class NuclearReactor extends PowerGenerator{
         liquidCapacity = 30;
         hasItems = true;
         hasLiquids = true;
-        entityType = NuclearReactorEntity::new;
-        rebuildable = false;
+    rebuildable = false;
     }
 
     @Override
@@ -75,58 +74,54 @@ public class NuclearReactor extends PowerGenerator{
 
     @Override
     public void updateTile(){
-        NuclearReactorEntity entity = tile.ent();
-
         ConsumeLiquid cliquid = consumes.get(ConsumeType.liquid);
         Item item = consumes.<ConsumeItems>get(ConsumeType.item).items[0].item;
 
-        int fuel = entity.items().get(item);
+        int fuel = items.get(item);
         float fullness = (float)fuel / itemCapacity;
-        entity.productionEfficiency = fullness;
+        productionEfficiency = fullness;
 
         if(fuel > 0){
-            entity.heat += fullness * heating * Math.min(entity.delta(), 4f);
+            heat += fullness * heating * Math.min(delta(), 4f);
 
-            if(entity.timer(timerFuel, itemDuration / entity.timeScale())){
-                entity.consume();
+            if(timer(timerFuel, itemDuration / timeScale())){
+                consume();
             }
         }
 
         Liquid liquid = cliquid.liquid;
 
-        if(entity.heat > 0){
-            float maxUsed = Math.min(entity.liquids().get(liquid), entity.heat / coolantPower);
-            entity.heat -= maxUsed * coolantPower;
-            entity.liquids().remove(liquid, maxUsed);
+        if(heat > 0){
+            float maxUsed = Math.min(liquids.get(liquid), heat / coolantPower);
+            heat -= maxUsed * coolantPower;
+            liquids.remove(liquid, maxUsed);
         }
 
-        if(entity.heat > smokeThreshold){
-            float smoke = 1.0f + (entity.heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
-            if(Mathf.chance(smoke / 20.0 * entity.delta())){
+        if(heat > smokeThreshold){
+            float smoke = 1.0f + (heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
+            if(Mathf.chance(smoke / 20.0 * delta())){
                 Fx.reactorsmoke.at(tile.worldx() + Mathf.range(size * tilesize / 2f),
                 tile.worldy() + Mathf.random(size * tilesize / 2f));
             }
         }
 
-        entity.heat = Mathf.clamp(entity.heat);
+        heat = Mathf.clamp(heat);
 
-        if(entity.heat >= 0.999f){
+        if(heat >= 0.999f){
             Events.fire(Trigger.thoriumReactorOverheat);
-            entity.kill();
+            kill();
         }
     }
 
     @Override
-    public void onDestroyed(Tile tile){
-        super.onDestroyed(tile);
+    public void onDestroyed(){
+        super.onDestroyed();
 
         Sounds.explosionbig.at(tile);
 
-        NuclearReactorEntity entity = tile.ent();
+        int fuel = items.get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
 
-        int fuel = entity.items().get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
-
-        if((fuel < 5 && entity.heat < 0.5f) || !state.rules.reactorExplosions) return;
+        if((fuel < 5 && heat < 0.5f) || !state.rules.reactorExplosions) return;
 
         Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
         Fx.nuclearShockwave.at(tile.worldx(), tile.worldy());
@@ -152,37 +147,34 @@ public class NuclearReactor extends PowerGenerator{
     }
 
     @Override
-    public void drawLight(Tile tile){
-        NuclearReactorEntity entity = tile.ent();
-        float fract = entity.productionEfficiency;
-        renderer.lights.add(tile.drawx(), tile.drawy(), (90f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(lightColor).lerp(Color.scarlet, entity.heat), 0.6f * fract);
+    public void drawLight(){
+        float fract = productionEfficiency;
+        renderer.lights.add(x, y, (90f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * fract);
     }
 
     @Override
     public void draw(){
-        super.draw(tile);
+        super.draw();
 
-        NuclearReactorEntity entity = tile.ent();
+        Draw.color(coolColor, hotColor, heat);
+        Fill.rect(x, y, size * tilesize, size * tilesize);
 
-        Draw.color(coolColor, hotColor, entity.heat);
-        Fill.rect(tile.drawx(), tile.drawy(), size * tilesize, size * tilesize);
+        Draw.color(liquids.current().color);
+        Draw.alpha(liquids.currentAmount() / liquidCapacity);
+        Draw.rect(topRegion, x, y);
 
-        Draw.color(entity.liquids().current().color);
-        Draw.alpha(entity.liquids().currentAmount() / liquidCapacity);
-        Draw.rect(topRegion, tile.drawx(), tile.drawy());
-
-        if(entity.heat > flashThreshold){
-            float flash = 1f + ((entity.heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;
-            entity.flash += flash * Time.delta();
-            Draw.color(Color.red, Color.yellow, Mathf.absin(entity.flash, 9f, 1f));
+        if(heat > flashThreshold){
+            float flash = 1f + ((heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;
+            flash += flash * Time.delta();
+            Draw.color(Color.red, Color.yellow, Mathf.absin(flash, 9f, 1f));
             Draw.alpha(0.6f);
-            Draw.rect(lightsRegion, tile.drawx(), tile.drawy());
+            Draw.rect(lightsRegion, x, y);
         }
 
         Draw.reset();
     }
 
-    public static class NuclearReactorEntity extends GeneratorEntity{
+    public class NuclearReactorEntity extends GeneratorEntity{
         public float heat;
         public float flash;
 

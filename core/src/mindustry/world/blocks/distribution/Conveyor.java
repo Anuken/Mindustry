@@ -76,8 +76,8 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return otherblock.outputsItems() && lookingAt(tile, rotation, otherx, othery, otherrot, otherblock);
+    public boolean blends(int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return otherblock.outputsItems() && lookingAt(rotation, otherx, othery, otherrot, otherblock);
     }
 
     @Override
@@ -125,7 +125,7 @@ public class Conveyor extends Block implements Autotiler{
         public void draw(){
             byte rotation = tile.rotation();
             int frame = clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * timeScale())) % 4) : 0;
-            Draw.rect(regions[Mathf.clamp(blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], tile.drawx(), tile.drawy(),
+            Draw.rect(regions[Mathf.clamp(blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], x, y,
             tilesize * blendsclx, tilesize * blendscly, rotation * 90);
         }
 
@@ -138,14 +138,14 @@ public class Conveyor extends Block implements Autotiler{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            int[] bits = buildBlending(tile, rotation(), null, true);
+            int[] bits = buildBlending(rotation(), null, true);
             blendbits = bits[0];
             blendsclx = bits[1];
             blendscly = bits[2];
 
             if(tile.front() != null && tile.front() != null){
                 next = tile.front();
-                nextc = next instanceof ConveyorEntity && next.team() == tile.team() ? (ConveyorEntity)next : null;
+                nextc = next instanceof ConveyorEntity && next.team() == team ? (ConveyorEntity)next : null;
                 aligned = nextc != null && tile.rotation() == next.tile().rotation();
             }
         }

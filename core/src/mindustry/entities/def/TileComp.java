@@ -551,10 +551,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     public void drawSelect(){
     }
 
-    /** Drawn when you are placing a block. */
-    public void drawPlace(int x, int y, int rotation, boolean valid){
-    }
-
     public float drawPlaceText(String text, int x, int y, boolean valid){
         if(renderer.pixelator.enabled()) return 0;
 

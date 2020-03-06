@@ -22,35 +22,33 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
 
     @Override
     public void updateTile(){
-        ItemBridgeEntity entity = tile.ent();
+        time += cycleSpeed * Time.delta();
+        time2 += (cycleSpeed - 1f) * Time.delta();
 
-        entity.time += entity.cycleSpeed * Time.delta();
-        entity.time2 += (entity.cycleSpeed - 1f) * Time.delta();
-
-        Tile other = world.tile(entity.link);
+        Tile other = world.tile(link);
         if(!linkValid(tile, other)){
-            tryDumpLiquid(tile, entity.liquids().current());
+            tryDumpLiquid(tile, liquids.current());
         }else{
-            ((ItemBridgeEntity)world.tile(entity.link).entity).incoming.add(tile.pos());
+            ((ItemBridgeEntity)world.tile(link).entity).incoming.add(tile.pos());
 
-            if(entity.consValid()){
-                entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
+            if(consValid()){
+                uptime = Mathf.lerpDelta(uptime, 1f, 0.04f);
             }else{
-                entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
+                uptime = Mathf.lerpDelta(uptime, 0f, 0.02f);
             }
 
-            if(entity.uptime >= 0.5f){
-                if(tryMoveLiquid(tile, other, false, entity.liquids().current()) > 0.1f){
-                    entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
+            if(uptime >= 0.5f){
+                if(tryMoveLiquid(tile, other, false, liquids.current()) > 0.1f){
+                    cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f);
                 }else{
-                    entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 1f, 0.01f);
+                    cycleSpeed = Mathf.lerpDelta(cycleSpeed, 1f, 0.01f);
                 }
             }
         }
     }
 
     @Override
-    public boolean acceptItem(Tile tile, Tile source, Item item){
+    public boolean acceptItem(Tile source, Item item){
         return false;
     }
 }

@@ -24,14 +24,12 @@ public class ItemSource extends Block{
         solid = true;
         group = BlockGroup.transportation;
         configurable = true;
-        entityType = ItemSourceEntity::new;
-
-        config(Item.class, (tile, item) -> tile.<ItemSourceEntity>ent().outputItem = item);
+    config(Item.class, (tile, item) -> tile.<ItemSourceEntity>ent().outputItem = item);
         configClear(tile -> tile.<ItemSourceEntity>ent().outputItem = null);
     }
 
     @Override
-    public void playerPlaced(Tile tile){
+    public void playerPlaced(){
         if(lastItem != null){
             Core.app.post(() -> tile.configure(lastItem));
         }
@@ -55,34 +53,31 @@ public class ItemSource extends Block{
 
     @Override
     public void draw(){
-        super.draw(tile);
+        super.draw();
 
-        ItemSourceEntity entity = tile.ent();
-        if(entity.outputItem == null) return;
+        if(outputItem == null) return;
 
-        Draw.color(entity.outputItem.color);
+        Draw.color(outputItem.color);
         Draw.rect("center", tile.worldx(), tile.worldy());
         Draw.color();
     }
 
     @Override
     public void updateTile(){
-        ItemSourceEntity entity = tile.ent();
-        if(entity.outputItem == null) return;
+        if(outputItem == null) return;
 
-        entity.items().set(entity.outputItem, 1);
-        tryDump(tile, entity.outputItem);
-        entity.items().set(entity.outputItem, 0);
+        items.set(outputItem, 1);
+        tryDump(tile, outputItem);
+        items.set(outputItem, 0);
     }
 
     @Override
-    public void buildConfiguration(Tile tile, Table table){
-        ItemSourceEntity entity = tile.ent();
-        ItemSelection.buildTable(table, content.items(), () -> entity.outputItem, item -> tile.configure(lastItem = item));
+    public void buildConfiguration(Table table){
+        ItemSelection.buildTable(table, content.items(), () -> outputItem, item -> tile.configure(lastItem = item));
     }
 
     @Override
-    public boolean acceptItem(Tile tile, Tile source, Item item){
+    public boolean acceptItem(Tile source, Item item){
         return false;
     }
 

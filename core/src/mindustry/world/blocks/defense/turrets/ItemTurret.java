@@ -1,19 +1,17 @@
 package mindustry.world.blocks.defense.turrets;
 
 import arc.*;
-import arc.struct.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
-import mindustry.gen.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
-import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
@@ -22,17 +20,16 @@ import static mindustry.Vars.*;
 
 public class ItemTurret extends CooledTurret{
     public int maxAmmo = 30;
-    public ObjectMap<Item, BulletType> ammo = new ObjectMap<>();
+    public ObjectMap<Item, BulletType> ammoTypes = new ObjectMap<>();
 
     public ItemTurret(String name){
         super(name);
         hasItems = true;
-        entityType = ItemTurretEntity::new;
     }
 
     /** Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...] */
     protected void ammo(Object... objects){
-        ammo = OrderedMap.of(objects);
+        ammoTypes = OrderedMap.of(objects);
     }
 
     @Override
@@ -40,13 +37,13 @@ public class ItemTurret extends CooledTurret{
         super.setStats();
 
         stats.remove(BlockStat.itemCapacity);
-        stats.add(BlockStat.ammo, new AmmoListValue<>(ammo));
-        consumes.add(new ConsumeItemFilter(i -> ammo.containsKey(i)){
+        stats.add(BlockStat.ammo, new AmmoListValue<>(ammoTypes));
+        consumes.add(new ConsumeItemFilter(i -> ammoTypes.containsKey(i)){
             @Override
             public void build(Tilec tile, Table table){
                 MultiReqImage image = new MultiReqImage();
                 content.items().each(i -> filter.get(i) && (!state.isCampaign() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
-                    () -> tile.entity != null && !((ItemTurretEntity)tile.entity).ammo.isEmpty() && ((ItemEntry)tile.<ItemTurretEntity>ent().ammo.peek()).item == item)));
+                    () -> tile != null && !((ItemTurretEntity)tile).ammo.isEmpty() && ((ItemEntry)((ItemTurretEntity)tile).ammo.peek()).item == item)));
 
                 table.add(image).size(8 * 4);
             }
@@ -64,91 +61,83 @@ public class ItemTurret extends CooledTurret{
         });
     }
 
-    @Override
-    public void onProximityAdded(Tile tile){
-        super.onProximityAdded(tile);
+    public class ItemTurretEntity extends TurretEntity{
+        @Override
+        public void onProximityAdded(){
+            super.onProximityAdded();
 
-        //add first ammo item to cheaty blocks so they can shoot properly
-        if(tile.isEnemyCheat() && ammo.size > 0){
-            handleItem(tile, tile, ammo.entries().next().key);
-        }
-    }
-
-    @Override
-    public void displayBars(Tile tile, Table bars){
-        super.displayBars(tile, bars);
-
-        TurretEntity entity = tile.ent();
-
-        bars.add(new Bar("blocks.ammo", Pal.ammo, () -> (float)entity.totalAmmo / maxAmmo)).growX();
-        bars.row();
-    }
-
-    @Override
-    public int acceptStack(Tile tile, Item item, int amount, Teamc source){
-        TurretEntity entity = tile.ent();
-
-        BulletType type = ammo.get(item);
-
-        if(type == null) return 0;
-
-        return Math.min((int)((maxAmmo - entity.totalAmmo) / ammo.get(item).ammoMultiplier), amount);
-    }
-
-    @Override
-    public void handleStack(Tile tile, Item item, int amount, Teamc source){
-        for(int i = 0; i < amount; i++){
-            handleItem(tile, null, item);
-        }
-    }
-
-    //currently can't remove items from turrets.
-    @Override
-    public int removeStack(Tile tile, Item item, int amount){
-        return 0;
-    }
-
-    @Override
-    public void handleItem(Tile tile, Tile source, Item item){
-        TurretEntity entity = tile.ent();
-        if(entity == null) return;
-
-        if(item == Items.pyratite){
-            Events.fire(Trigger.flameAmmo);
-        }
-
-        BulletType type = ammo.get(item);
-        entity.totalAmmo += type.ammoMultiplier;
-
-        //find ammo entry by type
-        for(int i = 0; i < entity.ammo.size; i++){
-            ItemEntry entry = (ItemEntry)entity.ammo.get(i);
-
-            //if found, put it to the right
-            if(entry.item == item){
-                entry.amount += type.ammoMultiplier;
-                entity.ammo.swap(i, entity.ammo.size - 1);
-                return;
+            //add first ammo item to cheaty blocks so they can shoot properly
+            if(tile.isEnemyCheat() && ammo.size > 0){
+                handleItem(this, ammoTypes.entries().next().key);
             }
         }
 
-        //must not be found
-        entity.ammo.add(new ItemEntry(item, (int)type.ammoMultiplier));
+        @Override
+        public void displayBars(Table bars){
+            super.displayBars(bars);
 
-        //fire events for the tutorial
-        if(state.rules.tutorial){
-            Events.fire(new TurretAmmoDeliverEvent());
+            bars.add(new Bar("blocks.ammo", Pal.ammo, () -> (float)totalAmmo / maxAmmo)).growX();
+            bars.row();
         }
-    }
 
-    @Override
-    public boolean acceptItem(Tile tile, Tile source, Item item){
-        TurretEntity entity = tile.ent();
+        @Override
+        public int acceptStack(Item item, int amount, Teamc source){
+            BulletType type = ammoTypes.get(item);
 
-        return ammo != null && ammo.get(item) != null && entity.totalAmmo + ammo.get(item).ammoMultiplier <= maxAmmo;
-    }
+            if(type == null) return 0;
 
-    public class ItemTurretEntity extends TurretEntity{
+            return Math.min((int)((maxAmmo - totalAmmo) / ammoTypes.get(item).ammoMultiplier), amount);
+        }
+
+        @Override
+        public void handleStack(Item item, int amount, Teamc source){
+            for(int i = 0; i < amount; i++){
+                handleItem(null, item);
+            }
+        }
+
+        //currently can't remove items from turrets.
+        @Override
+        public int removeStack(Item item, int amount){
+            return 0;
+        }
+
+        @Override
+        public void handleItem(Tilec source, Item item){
+
+            if(item == Items.pyratite){
+                Events.fire(Trigger.flameAmmo);
+            }
+
+            BulletType type = ammoTypes.get(item);
+            totalAmmo += type.ammoMultiplier;
+
+            //find ammo entry by type
+            for(int i = 0; i < ammo.size; i++){
+                ItemEntry entry = (ItemEntry)ammo.get(i);
+
+                //if found, put it to the right
+                if(entry.item == item){
+                    entry.amount += type.ammoMultiplier;
+                    ammo.swap(i, ammo.size - 1);
+                    return;
+                }
+            }
+
+            //must not be found
+            ammo.add(new ItemEntry(item, (int)type.ammoMultiplier));
+
+            //fire events for the tutorial
+            if(state.rules.tutorial){
+                Events.fire(new TurretAmmoDeliverEvent());
+            }
+        }
+
+        @Override
+        public boolean acceptItem(Tilec source, Item item){
+            return ammoTypes.get(item) != null && totalAmmo + ammoTypes.get(item).ammoMultiplier <= maxAmmo;
+        }
+
         @Override
         public void write(Writes write){
             super.write(write);
@@ -183,7 +172,7 @@ public class ItemTurret extends CooledTurret{
 
         @Override
         public BulletType type(){
-            return ammo.get(item);
+            return ammoTypes.get(item);
         }
     }
 }

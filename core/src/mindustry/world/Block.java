@@ -187,6 +187,10 @@ public class Block extends UnlockableContent{
         }
     }
 
+    /** Drawn when you are placing a block. */
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+    }
+
     /** @return a custom minimap color for this or 0 to use default colors. */
     public int minimapColor(Tile tile){
         return 0;
@@ -334,7 +338,7 @@ public class Block extends UnlockableContent{
     }
 
     /** Listen for a config by class type. */
-    public <T> void config(Class<T> type, Cons2<Tile, T> config){
+    public <T> void config(Class<T> type, Cons2<Tilec, T> config){
         configurations.put(type, config);
     }
 

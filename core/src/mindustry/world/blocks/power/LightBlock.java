@@ -24,13 +24,11 @@ public class LightBlock extends Block{
         update = true;
         topRegion = reg("-top");
         configurable = true;
-        entityType = LightEntity::new;
-
-        config(Integer.class, (tile, value) -> tile.<LightEntity>ent().color = value);
+    config(Integer.class, (tile, value) -> tile.<LightEntity>ent().color = value);
     }
 
     @Override
-    public void playerPlaced(Tile tile){
+    public void playerPlaced(){
         if(lastColor != 0){
             tile.configure(lastColor);
         }
@@ -38,33 +36,28 @@ public class LightBlock extends Block{
 
     @Override
     public void draw(){
-        super.draw(tile);
-        LightEntity entity = tile.ent();
-
+        super.draw();
         Draw.blend(Blending.additive);
-        Draw.color(Tmp.c1.set(entity.color), entity.efficiency() * 0.3f);
-        Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
+        Draw.color(Tmp.c1.set(color), efficiency() * 0.3f);
+        Draw.rect(reg(topRegion), x, y);
         Draw.color();
         Draw.blend();
     }
 
     @Override
-    public void buildConfiguration(Tile tile, Table table){
-        LightEntity entity = tile.ent();
-
+    public void buildConfiguration(Table table){
         table.addImageButton(Icon.pencil, () -> {
-            ui.picker.show(Tmp.c1.set(entity.color).a(0.5f), false, res -> {
-                entity.color = res.rgba();
-                lastColor = entity.color;
+            ui.picker.show(Tmp.c1.set(color).a(0.5f), false, res -> {
+                color = res.rgba();
+                lastColor = color;
             });
             control.input.frag.config.hideConfig();
         }).size(40f);
     }
 
     @Override
-    public void drawLight(Tile tile){
-        LightEntity entity = tile.ent();
-        renderer.lights.add(tile.drawx(), tile.drawy(), radius, Tmp.c1.set(entity.color), brightness * tile.entity.efficiency());
+    public void drawLight(){
+        renderer.lights.add(x, y, radius, Tmp.c1.set(color), brightness * tile.efficiency());
     }
 
     public class LightEntity extends TileEntity{

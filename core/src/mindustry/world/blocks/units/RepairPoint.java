@@ -37,7 +37,6 @@ public class RepairPoint extends Block{
         layer2 = Layer.power;
         hasPower = true;
         outlineIcon = true;
-        entityType = RepairPointEntity::new;
     }
 
     @Override
@@ -62,8 +61,8 @@ public class RepairPoint extends Block{
     }
 
     @Override
-    public void drawSelect(Tile tile){
-        Drawf.dashCircle(tile.drawx(), tile.drawy(), repairRadius, Pal.accent);
+    public void drawSelect(){
+        Drawf.dashCircle(x, y, repairRadius, Pal.accent);
     }
 
     @Override
@@ -73,29 +72,25 @@ public class RepairPoint extends Block{
 
     @Override
     public void draw(){
-        Draw.rect(baseRegion, tile.drawx(), tile.drawy());
+        Draw.rect(baseRegion, x, y);
     }
 
     @Override
-    public void drawLayer(Tile tile){
-        RepairPointEntity entity = tile.ent();
-
-        Draw.rect(region, tile.drawx(), tile.drawy(), entity.rotation - 90);
+    public void drawLayer(){
+        Draw.rect(region, x, y, rotation - 90);
     }
 
     @Override
-    public void drawLayer2(Tile tile){
-        RepairPointEntity entity = tile.ent();
-
-        if(entity.target != null &&
-        Angles.angleDist(entity.angleTo(entity.target), entity.rotation) < 30f){
-            float ang = entity.angleTo(entity.target);
+    public void drawLayer2(){
+        if(target != null &&
+        Angles.angleDist(angleTo(target), rotation) < 30f){
+            float ang = angleTo(target);
             float len = 5f;
 
             Draw.color(Color.valueOf("e8ffd7"));
             Drawf.laser(laser, laserEnd,
-                tile.drawx() + Angles.trnsx(ang, len), tile.drawy() + Angles.trnsy(ang, len),
-                entity.target.x(), entity.target.y(), entity.strength);
+                x + Angles.trnsx(ang, len), y + Angles.trnsy(ang, len),
+                target.x(), target.y(), strength);
             Draw.color();
         }
     }
@@ -107,34 +102,30 @@ public class RepairPoint extends Block{
 
     @Override
     public void updateTile(){
-        RepairPointEntity entity = tile.ent();
-
         boolean targetIsBeingRepaired = false;
-        if(entity.target != null && (entity.target.dead() || entity.target.dst(tile) > repairRadius || entity.target.health() >= entity.target.maxHealth())){
-            entity.target = null;
-        }else if(entity.target != null && entity.consValid()){
-            entity.target.heal(repairSpeed * Time.delta() * entity.strength * entity.efficiency());
-            entity.rotation = Mathf.slerpDelta(entity.rotation, entity.angleTo(entity.target), 0.5f);
+        if(target != null && (target.dead() || target.dst(tile) > repairRadius || target.health() >= target.maxHealth())){
+            target = null;
+        }else if(target != null && consValid()){
+            target.heal(repairSpeed * Time.delta() * strength * efficiency());
+            rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.5f);
             targetIsBeingRepaired = true;
         }
 
-        if(entity.target != null && targetIsBeingRepaired){
-            entity.strength = Mathf.lerpDelta(entity.strength, 1f, 0.08f * Time.delta());
+        if(target != null && targetIsBeingRepaired){
+            strength = Mathf.lerpDelta(strength, 1f, 0.08f * Time.delta());
         }else{
-            entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.07f * Time.delta());
+            strength = Mathf.lerpDelta(strength, 0f, 0.07f * Time.delta());
         }
 
-        if(entity.timer(timerTarget, 20)){
-            rect.setSize(repairRadius * 2).setCenter(tile.drawx(), tile.drawy());
-            entity.target = Units.closest(tile.team(), tile.drawx(), tile.drawy(), repairRadius, Unitc::damaged);
+        if(timer(timerTarget, 20)){
+            rect.setSize(repairRadius * 2).setCenter(x, y);
+            target = Units.closest(team, x, y, repairRadius, Unitc::damaged);
         }
     }
 
     @Override
-    public boolean shouldConsume(Tile tile){
-        RepairPointEntity entity = tile.ent();
-
-        return entity.target != null;
+    public boolean shouldConsume(){
+        return target != null;
     }
 
     public class RepairPointEntity extends TileEntity{

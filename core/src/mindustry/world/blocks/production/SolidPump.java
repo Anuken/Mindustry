@@ -31,7 +31,6 @@ public class SolidPump extends Pump{
     public SolidPump(String name){
         super(name);
         hasPower = true;
-        entityType = SolidPumpEntity::new;
     }
 
     @Override
@@ -71,15 +70,13 @@ public class SolidPump extends Pump{
 
     @Override
     public void draw(){
-        SolidPumpEntity entity = tile.ent();
-
-        Draw.rect(region, tile.drawx(), tile.drawy());
-        Draw.color(tile.entity.liquids().current().color);
-        Draw.alpha(tile.entity.liquids().total() / liquidCapacity);
-        Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
+        Draw.rect(region, x, y);
+        Draw.color(tile.liquids.current().color);
+        Draw.alpha(tile.liquids.total() / liquidCapacity);
+        Draw.rect(liquidRegion, x, y);
         Draw.color();
-        Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), entity.pumpTime * rotateSpeed);
-        Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+        Draw.rect(name + "-rotator", x, y, pumpTime * rotateSpeed);
+        Draw.rect(name + "-top", x, y);
     }
 
     @Override
@@ -89,8 +86,6 @@ public class SolidPump extends Pump{
 
     @Override
     public void updateTile(){
-        SolidPumpEntity entity = tile.ent();
-
         float fraction = 0f;
 
         if(isMultiblock()){
@@ -103,28 +98,28 @@ public class SolidPump extends Pump{
             if(isValid(tile)) fraction = 1f;
         }
 
-        fraction += entity.boost;
+        fraction += boost;
 
-        if(tile.entity.cons().valid() && typeLiquid(tile) < liquidCapacity - 0.001f){
-            float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction * entity.efficiency());
-            tile.entity.liquids().add(result, maxPump);
-            entity.lastPump = maxPump;
-            entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
-            if(tile.entity.timer(timerContentCheck, 10)) useContent(tile, result);
-            if(Mathf.chance(entity.delta() * updateEffectChance))
-                updateEffect.at(entity.getX() + Mathf.range(size * 2f), entity.getY() + Mathf.range(size * 2f));
+        if(tile.cons().valid() && typeLiquid(tile) < liquidCapacity - 0.001f){
+            float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * delta() * fraction * efficiency());
+            tile.liquids.add(result, maxPump);
+            lastPump = maxPump;
+            warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
+            if(timer(timerContentCheck, 10)) useContent(tile, result);
+            if(Mathf.chance(delta() * updateEffectChance))
+                updateEffect.at(getX() + Mathf.range(size * 2f), getY() + Mathf.range(size * 2f));
         }else{
-            entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
-            entity.lastPump = 0f;
+            warmup = Mathf.lerpDelta(warmup, 0f, 0.02f);
+            lastPump = 0f;
         }
 
-        entity.pumpTime += entity.warmup * entity.delta();
+        pumpTime += warmup * delta();
 
         tryDumpLiquid(tile, result);
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile){
+    public boolean canPlaceOn(){
         if(isMultiblock()){
             for(Tile other : tile.getLinkedTilesAs(this, drawTiles)){
                 if(isValid(other)){
@@ -138,25 +133,24 @@ public class SolidPump extends Pump{
     }
 
     @Override
-    protected boolean isValid(Tile tile){
+    protected boolean isValid(){
         return tile != null && !tile.floor().isLiquid;
     }
 
     @Override
-    public void onProximityAdded(Tile tile){
-        super.onProximityAdded(tile);
+    public void onProximityAdded(){
+        super.onProximityAdded();
 
         if(attribute != null){
-            SolidPumpEntity entity = tile.ent();
-            entity.boost = sumAttribute(attribute, tile.x, tile.y);
+        boost = sumAttribute(attribute, tile.x, tile.y);
         }
     }
 
-    public float typeLiquid(Tile tile){
-        return tile.entity.liquids().total();
+    public float typeLiquid(){
+        return tile.liquids.total();
     }
 
-    public static class SolidPumpEntity extends TileEntity{
+    public class SolidPumpEntity extends TileEntity{
         public float warmup;
         public float pumpTime;
         public float boost;

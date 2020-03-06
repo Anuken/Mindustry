@@ -22,7 +22,6 @@ public class PowerGenerator extends PowerDistributor{
         sync = true;
         baseExplosiveness = 5f;
         flags = EnumSet.of(BlockFlag.producer);
-        entityType = GeneratorEntity::new;
     }
 
     @Override
@@ -38,14 +37,14 @@ public class PowerGenerator extends PowerDistributor{
         if(hasPower && outputsPower && !consumes.hasPower()){
             bars.add("power", entity -> new Bar(() ->
             Core.bundle.format("bar.poweroutput",
-            Strings.fixed(entity.block().getPowerProduction(entity.tile()) * 60 * entity.timeScale(), 1)),
+            Strings.fixed(block().getPowerProduction(tile()) * 60 * timeScale(), 1)),
             () -> Pal.powerBar,
             () -> ((GeneratorEntity)entity).productionEfficiency));
         }
     }
 
     @Override
-    public float getPowerProduction(Tile tile){
+    public float getPowerProduction(){
         return powerProduction * tile.<GeneratorEntity>ent().productionEfficiency;
     }
 
@@ -54,7 +53,7 @@ public class PowerGenerator extends PowerDistributor{
         return false;
     }
 
-    public static class GeneratorEntity extends TileEntity{
+    public class GeneratorEntity extends TileEntity{
         public float generateTime;
         /** The efficiency of the producer. An efficiency of 1.0 means 100% */
         public float productionEfficiency = 0.0f;

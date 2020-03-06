@@ -37,25 +37,23 @@ public class UnitFactory extends Block{
         hasItems = true;
         solid = false;
         flags = EnumSet.of(BlockFlag.producer);
-        entityType = UnitFactoryEntity::new;
     }
 
     @Remote(called = Loc.server)
-    public static void onUnitFactorySpawn(Tile tile, int spawns){
+    public static void onUnitFactorySpawn(int spawns){
         if(!(tile.entity instanceof UnitFactoryEntity) || !(tile.block() instanceof UnitFactory)) return;
 
-        UnitFactoryEntity entity = tile.ent();
         UnitFactory factory = (UnitFactory)tile.block();
 
-        entity.buildTime = 0f;
-        entity.spawned = spawns;
+        buildTime = 0f;
+        spawned = spawns;
 
         Effects.shake(2f, 3f, entity);
-        Fx.producesmoke.at(tile.drawx(), tile.drawy());
+        Fx.producesmoke.at(x, y);
 
         if(!net.client()){
-            Unitc unit = factory.unitType.create(tile.team());
-            unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
+            Unitc unit = factory.unitType.create(team);
+            unit.set(x + Mathf.range(4), y + Mathf.range(4));
             unit.add();
             unit.vel().y = factory.launchVelocity;
             Events.fire(new UnitCreateEvent(unit));
@@ -104,10 +102,9 @@ public class UnitFactory extends Block{
     }
 
     @Override
-    public void unitRemoved(Tile tile, Unitc unit){
-        UnitFactoryEntity entity = tile.ent();
-        entity.spawned--;
-        entity.spawned = Math.max(entity.spawned, 0);
+    public void unitRemoved(Unitc unit){
+        spawned--;
+        spawned = Math.max(spawned, 0);
     }
 
     @Override
@@ -117,73 +114,69 @@ public class UnitFactory extends Block{
 
     @Override
     public void draw(){
-        UnitFactoryEntity entity = tile.ent();
         TextureRegion region = unitType.icon(Cicon.full);
 
-        Draw.rect(name, tile.drawx(), tile.drawy());
+        Draw.rect(name, x, y);
 
         Shaders.build.region = region;
-        Shaders.build.progress = entity.buildTime / produceTime;
+        Shaders.build.progress = buildTime / produceTime;
         Shaders.build.color.set(Pal.accent);
-        Shaders.build.color.a = entity.speedScl;
-        Shaders.build.time = -entity.time / 20f;
+        Shaders.build.color.a = speedScl;
+        Shaders.build.time = -time / 20f;
 
         Draw.shader(Shaders.build);
-        Draw.rect(region, tile.drawx(), tile.drawy());
+        Draw.rect(region, x, y);
         Draw.shader();
 
         Draw.color(Pal.accent);
-        Draw.alpha(entity.speedScl);
+        Draw.alpha(speedScl);
 
         Lines.lineAngleCenter(
-        tile.drawx() + Mathf.sin(entity.time, 20f, Vars.tilesize / 2f * size - 2f),
-        tile.drawy(),
+        x + Mathf.sin(time, 20f, Vars.tilesize / 2f * size - 2f),
+        y,
         90,
         size * Vars.tilesize - 4f);
 
         Draw.reset();
 
-        Draw.rect(topRegion, tile.drawx(), tile.drawy());
+        Draw.rect(topRegion, x, y);
     }
 
     @Override
     public void updateTile(){
-        UnitFactoryEntity entity = tile.ent();
-
-        if(entity.spawned >= maxSpawn){
+        if(spawned >= maxSpawn){
             return;
         }
 
-        if(entity.consValid() || tile.isEnemyCheat()){
-            entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier * entity.efficiency();
-            entity.buildTime += entity.delta() * entity.efficiency() * Vars.state.rules.unitBuildSpeedMultiplier;
-            entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
+        if(consValid() || tile.isEnemyCheat()){
+            time += delta() * speedScl * Vars.state.rules.unitBuildSpeedMultiplier * efficiency();
+            buildTime += delta() * efficiency() * Vars.state.rules.unitBuildSpeedMultiplier;
+            speedScl = Mathf.lerpDelta(speedScl, 1f, 0.05f);
         }else{
-            entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
+            speedScl = Mathf.lerpDelta(speedScl, 0f, 0.05f);
         }
 
-        if(entity.buildTime >= produceTime){
-            entity.buildTime = 0f;
+        if(buildTime >= produceTime){
+            buildTime = 0f;
 
-            Call.onUnitFactorySpawn(tile, entity.spawned + 1);
+            Call.onUnitFactorySpawn(tile, spawned + 1);
             useContent(tile, unitType);
 
-            entity.consume();
+            consume();
         }
     }
 
     @Override
-    public int getMaximumAccepted(Tile tile, Item item){
+    public int getMaximumAccepted(Item item){
         return capacities[item.id];
     }
 
     @Override
-    public boolean shouldConsume(Tile tile){
-        UnitFactoryEntity entity = tile.ent();
-        return entity.spawned < maxSpawn;
+    public boolean shouldConsume(){
+        return spawned < maxSpawn;
     }
 
-    public static class UnitFactoryEntity extends TileEntity{
+    public class UnitFactoryEntity extends TileEntity{
         float buildTime;
         float time;
         float speedScl;

@@ -22,7 +22,7 @@ public class StaticWall extends Rock{
     }
 
     @Override
-    public void drawBase(Tile tile){
+    public void drawBase(){
         int rx = tile.x / 2 * 2;
         int ry = tile.y / 2 * 2;
 

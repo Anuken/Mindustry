@@ -15,7 +15,6 @@ public class Fracker extends SolidPump{
     public Fracker(String name){
         super(name);
         hasItems = true;
-        entityType = FrackerEntity::new;
     }
 
     @Override
@@ -40,27 +39,25 @@ public class Fracker extends SolidPump{
     }
 
     @Override
-    public void drawCracks(Tile tile){}
+    public void drawCracks(){}
 
     @Override
-    public boolean shouldConsume(Tile tile){
-        return tile.entity.liquids().get(result) < liquidCapacity - 0.01f;
+    public boolean shouldConsume(){
+        return tile.liquids.get(result) < liquidCapacity - 0.01f;
     }
 
     @Override
     public void draw(){
-        FrackerEntity entity = tile.ent();
-
-        Draw.rect(region, tile.drawx(), tile.drawy());
-        super.drawCracks(tile);
+        Draw.rect(region, x, y);
+        super.drawCracks();
 
         Draw.color(result.color);
-        Draw.alpha(tile.entity.liquids().get(result) / liquidCapacity);
-        Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
+        Draw.alpha(tile.liquids.get(result) / liquidCapacity);
+        Draw.rect(liquidRegion, x, y);
         Draw.color();
 
-        Draw.rect(rotatorRegion, tile.drawx(), tile.drawy(), entity.pumpTime);
-        Draw.rect(topRegion, tile.drawx(), tile.drawy());
+        Draw.rect(rotatorRegion, x, y, pumpTime);
+        Draw.rect(topRegion, x, y);
     }
 
     @Override
@@ -70,27 +67,25 @@ public class Fracker extends SolidPump{
 
     @Override
     public void updateTile(){
-        FrackerEntity entity = tile.ent();
-
-        if(entity.consValid()){
-            if(entity.accumulator >= itemUseTime){
-                entity.consume();
-                entity.accumulator -= itemUseTime;
+        if(consValid()){
+            if(accumulator >= itemUseTime){
+                consume();
+                accumulator -= itemUseTime;
             }
 
-            super.update(tile);
-            entity.accumulator += entity.delta() * entity.efficiency();
+            super.updateTile();
+            accumulator += delta() * efficiency();
         }else{
             tryDumpLiquid(tile, result);
         }
     }
 
     @Override
-    public float typeLiquid(Tile tile){
-        return tile.entity.liquids().get(result);
+    public float typeLiquid(){
+        return tile.liquids.get(result);
     }
 
-    public static class FrackerEntity extends SolidPumpEntity{
+    public class FrackerEntity extends SolidPumpEntity{
         public float accumulator;
     }
 }

@@ -35,7 +35,6 @@ public class MendProjector extends Block{
         update = true;
         hasPower = true;
         hasItems = true;
-        entityType = MendEntity::new;
     }
 
     @Override
@@ -60,69 +59,66 @@ public class MendProjector extends Block{
         stats.add(BlockStat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
     }
 
-    @Override
-    public void updateTile(){
-        MendEntity entity = tile.ent();
-        entity.heat = Mathf.lerpDelta(entity.heat, entity.consValid() || tile.isEnemyCheat() ? 1f : 0f, 0.08f);
-        entity.charge += entity.heat * entity.delta();
-
-        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons().optionalValid()), 0.1f);
-
-        if(entity.cons().optionalValid() && entity.timer(timerUse, useTime) && entity.efficiency() > 0){
-            entity.consume();
-        }
-
-        if(entity.charge >= reload){
-            float realRange = range + entity.phaseHeat * phaseRangeBoost;
-            entity.charge = 0f;
-
-            indexer.eachBlock(entity, realRange, other -> other.entity.damaged(), other -> {
-                other.entity.heal(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.efficiency());
-                Fx.healBlockFull.at(other.drawx(), other.drawy(), other.block().size, Tmp.c1.set(baseColor).lerp(phaseColor, entity.phaseHeat));
-            });
-        }
-    }
-
-    @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.accent);
-    }
-
-    @Override
-    public void drawSelect(Tile tile){
-        MendEntity entity = tile.ent();
-        float realRange = range + entity.phaseHeat * phaseRangeBoost;
-
-        Drawf.dashCircle(tile.drawx(), tile.drawy(), realRange, baseColor);
-    }
-
-    @Override
-    public void draw(){
-        super.draw(tile);
-
-        MendEntity entity = tile.ent();
-        float f = 1f - (Time.time() / 100f) % 1f;
-
-        Draw.color(baseColor, phaseColor, entity.phaseHeat);
-        Draw.alpha(entity.heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
-        Draw.rect(topRegion, tile.drawx(), tile.drawy());
-
-        Draw.alpha(1f);
-        Lines.stroke((2f * f + 0.2f) * entity.heat);
-        Lines.square(tile.drawx(), tile.drawy(), ((1f - f) * 8f) * size / 2f);
-
-        Draw.reset();
-    }
-
-    @Override
-    public void drawLight(Tile tile){
-        renderer.lights.add(tile.drawx(), tile.drawy(), 50f * tile.entity.efficiency(), baseColor, 0.7f * tile.entity.efficiency());
-    }
-
-    class MendEntity extends TileEntity{
+    public class MendEntity extends TileEntity{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
+
+        @Override
+        public void updateTile(){
+            heat = Mathf.lerpDelta(heat, consValid() || tile.isEnemyCheat() ? 1f : 0f, 0.08f);
+            charge += heat * delta();
+
+            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons().optionalValid()), 0.1f);
+
+            if(cons().optionalValid() && timer(timerUse, useTime) && efficiency() > 0){
+                consume();
+            }
+
+            if(charge >= reload){
+                float realRange = range + phaseHeat * phaseRangeBoost;
+                charge = 0f;
+
+                indexer.eachBlock(this, realRange, other -> other.damaged(), other -> {
+                    other.heal(other.maxHealth() * (healPercent + phaseHeat * phaseBoost) / 100f * efficiency());
+                    Fx.healBlockFull.at(other.x(), other.y(), other.block().size, Tmp.c1.set(baseColor).lerp(phaseColor, phaseHeat));
+                });
+            }
+        }
+
+        @Override
+        public void drawPlace(int x, int y, int rotation, boolean valid){
+            Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.accent);
+        }
+
+        @Override
+        public void drawSelect(){
+            float realRange = range + phaseHeat * phaseRangeBoost;
+
+            Drawf.dashCircle(x, y, realRange, baseColor);
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            float f = 1f - (Time.time() / 100f) % 1f;
+
+            Draw.color(baseColor, phaseColor, phaseHeat);
+            Draw.alpha(heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
+            Draw.rect(topRegion, x, y);
+
+            Draw.alpha(1f);
+            Lines.stroke((2f * f + 0.2f) * heat);
+            Lines.square(x, y, ((1f - f) * 8f) * size / 2f);
+
+            Draw.reset();
+        }
+
+        @Override
+        public void drawLight(){
+            renderer.lights.add(x, y, 50f * efficiency(), baseColor, 0.7f * efficiency());
+        }
 
         @Override
         public void write(Writes write){

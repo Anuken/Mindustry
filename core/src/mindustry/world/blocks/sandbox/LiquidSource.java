@@ -26,14 +26,12 @@ public class LiquidSource extends Block{
         liquidCapacity = 100f;
         configurable = true;
         outputsLiquid = true;
-        entityType = LiquidSourceEntity::new;
-
-        config(Liquid.class, (tile, l) -> tile.<LiquidSourceEntity>ent().source = l);
+    config(Liquid.class, (tile, l) -> tile.<LiquidSourceEntity>ent().source = l);
         configClear(tile -> tile.<LiquidSourceEntity>ent().source = null);
     }
 
     @Override
-    public void playerPlaced(Tile tile){
+    public void playerPlaced(){
         if(lastLiquid != null){
             Core.app.post(() -> tile.configure(lastLiquid));
         }
@@ -48,13 +46,11 @@ public class LiquidSource extends Block{
 
     @Override
     public void updateTile(){
-        LiquidSourceEntity entity = tile.ent();
-
-        if(entity.source == null){
-            tile.entity.liquids().clear();
+        if(source == null){
+            tile.liquids.clear();
         }else{
-            tile.entity.liquids().add(entity.source, liquidCapacity);
-            tryDumpLiquid(tile, entity.source);
+            tile.liquids.add(source, liquidCapacity);
+            tryDumpLiquid(tile, source);
         }
     }
 
@@ -65,22 +61,18 @@ public class LiquidSource extends Block{
 
     @Override
     public void draw(){
-        super.draw(tile);
+        super.draw();
 
-        LiquidSourceEntity entity = tile.ent();
-
-        if(entity.source != null){
-            Draw.color(entity.source.color);
+        if(source != null){
+            Draw.color(source.color);
             Draw.rect("center", tile.worldx(), tile.worldy());
             Draw.color();
         }
     }
 
     @Override
-    public void buildConfiguration(Tile tile, Table table){
-        LiquidSourceEntity entity = tile.ent();
-
-        ItemSelection.buildTable(table, content.liquids(), () -> entity.source, liquid -> tile.configure(lastLiquid = liquid));
+    public void buildConfiguration(Table table){
+        ItemSelection.buildTable(table, content.liquids(), () -> source, liquid -> tile.configure(lastLiquid = liquid));
     }
 
     class LiquidSourceEntity extends TileEntity{

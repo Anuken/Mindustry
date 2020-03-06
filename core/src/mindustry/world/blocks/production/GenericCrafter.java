@@ -35,7 +35,6 @@ public class GenericCrafter extends Block{
         idleSound = Sounds.machine;
         sync = true;
         idleSoundVolume = 0.03f;
-        entityType = GenericCrafterEntity::new;
     }
 
     @Override
@@ -71,7 +70,7 @@ public class GenericCrafter extends Block{
     @Override
     public void draw(){
         if(drawer == null){
-            super.draw(tile);
+            super.draw();
         }else{
             drawer.get(tile);
         }
@@ -84,23 +83,21 @@ public class GenericCrafter extends Block{
 
     @Override
     public void updateTile(){
-        GenericCrafterEntity entity = tile.ent();
+        if(consValid()){
 
-        if(entity.consValid()){
-
-            entity.progress += getProgressIncrease(entity, craftTime);
-            entity.totalProgress += entity.delta();
-            entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
+            progress += getProgressIncrease(entity, craftTime);
+            totalProgress += delta();
+            warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
 
             if(Mathf.chance(Time.delta() * updateEffectChance)){
-                updateEffect.at(entity.getX() + Mathf.range(size * 4f), entity.getY() + Mathf.range(size * 4));
+                updateEffect.at(getX() + Mathf.range(size * 4f), getY() + Mathf.range(size * 4));
             }
         }else{
-            entity.warmup = Mathf.lerp(entity.warmup, 0f, 0.02f);
+            warmup = Mathf.lerp(warmup, 0f, 0.02f);
         }
 
-        if(entity.progress >= 1f){
-            entity.consume();
+        if(progress >= 1f){
+            consume();
 
             if(outputItem != null){
                 useContent(tile, outputItem.item);
@@ -114,11 +111,11 @@ public class GenericCrafter extends Block{
                 handleLiquid(tile, tile, outputLiquid.liquid, outputLiquid.amount);
             }
 
-            craftEffect.at(tile.drawx(), tile.drawy());
-            entity.progress = 0f;
+            craftEffect.at(x, y);
+            progress = 0f;
         }
 
-        if(outputItem != null && tile.entity.timer(timerDump, dumpTime)){
+        if(outputItem != null && timer(timerDump, dumpTime)){
             tryDump(tile, outputItem.item);
         }
 
@@ -133,19 +130,19 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public boolean shouldConsume(Tile tile){
-        if(outputItem != null && tile.entity.items().get(outputItem.item) >= itemCapacity){
+    public boolean shouldConsume(){
+        if(outputItem != null && tile.items.get(outputItem.item) >= itemCapacity){
             return false;
         }
-        return outputLiquid == null || !(tile.entity.liquids().get(outputLiquid.liquid) >= liquidCapacity - 0.001f);
+        return outputLiquid == null || !(tile.liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.001f);
     }
 
     @Override
-    public int getMaximumAccepted(Tile tile, Item item){
+    public int getMaximumAccepted(Item item){
         return itemCapacity;
     }
 
-    public static class GenericCrafterEntity extends TileEntity{
+    public class GenericCrafterEntity extends TileEntity{
         public float progress;
         public float totalProgress;
         public float warmup;

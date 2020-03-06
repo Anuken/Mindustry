@@ -8,7 +8,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
-import mindustry.entities.AllDefs.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -29,7 +28,6 @@ import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-import mindustry.world.modules.*;
 
 public class Blocks implements ContentList{
     public static Block
@@ -588,21 +586,19 @@ public class Blocks implements ContentList{
 
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name + "-top")};
 
-            drawer = tile -> {
-                LiquidModule mod = tile.entity.liquids();
+            drawer = entity -> {
+                int rotation = rotate ? entity.rotation() * 90 : 0;
 
-                int rotation = rotate ? tile.rotation() * 90 : 0;
+                Draw.rect(reg(bottomRegion), entity.x(), entity.y(), rotation);
 
-                Draw.rect(reg(bottomRegion), tile.drawx(), tile.drawy(), rotation);
-
-                if(mod.total() > 0.001f){
+                if(entity.liquids().total() > 0.001f){
                     Draw.color(outputLiquid.liquid.color);
-                    Draw.alpha(mod.get(outputLiquid.liquid) / liquidCapacity);
-                    Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy(), rotation);
+                    Draw.alpha(entity.liquids().get(outputLiquid.liquid) / liquidCapacity);
+                    Draw.rect(reg(liquidRegion), entity.x(), entity.y(), rotation);
                     Draw.color();
                 }
 
-                Draw.rect(reg(topRegion), tile.drawx(), tile.drawy(), rotation);
+                Draw.rect(reg(topRegion), entity.x(), entity.y(), rotation);
             };
         }};
 
@@ -680,15 +676,13 @@ public class Blocks implements ContentList{
             int topRegion = reg("-top");
 
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top")};
-            drawer = tile -> {
-                GenericCrafterEntity entity = tile.ent();
-
-                Draw.rect(region, tile.drawx(), tile.drawy());
-                Draw.rect(reg(frameRegions[(int)Mathf.absin(entity.totalProgress, 5f, 2.999f)]), tile.drawx(), tile.drawy());
-                Draw.color(Color.clear, tile.entity.liquids().current().color, tile.entity.liquids().total() / liquidCapacity);
-                Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
+            drawer = entity -> {
+                Draw.rect(region, entity.x(), entity.y());
+                Draw.rect(reg(frameRegions[(int)Mathf.absin(entity.totalProgress, 5f, 2.999f)]), entity.x(), entity.y());
+                Draw.color(Color.clear, entity.liquids().current().color, entity.liquids().total() / liquidCapacity);
+                Draw.rect(reg(liquidRegion), entity.x(), entity.y());
                 Draw.color();
-                Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
+                Draw.rect(reg(topRegion), entity.x(), entity.y());
             };
         }};
 
@@ -707,11 +701,9 @@ public class Blocks implements ContentList{
 
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator")};
 
-            drawer = tile -> {
-                GenericCrafterEntity entity = tile.ent();
-
-                Draw.rect(region, tile.drawx(), tile.drawy());
-                Draw.rect(reg(rotatorRegion), tile.drawx(), tile.drawy(), entity.totalProgress * 2f);
+            drawer = entity -> {
+                Draw.rect(region, entity.x(), entity.y());
+                Draw.rect(reg(rotatorRegion), entity.x(), entity.y(), entity.totalProgress * 2f);
             };
         }};
 
@@ -1340,7 +1332,7 @@ public class Blocks implements ContentList{
             Items.pyratite, Bullets.standardIncendiary,
             Items.silicon, Bullets.standardHoming
             );
-            reload = 20f;
+            reloadTime = 20f;
             restitution = 0.03f;
             range = 100;
             shootCone = 15f;
@@ -1357,14 +1349,14 @@ public class Blocks implements ContentList{
             Items.lead, Bullets.flakLead,
             Items.metaglass, Bullets.flakGlass
             );
-            reload = 18f;
+            reloadTime = 18f;
             range = 170f;
             size = 2;
             burstSpacing = 5f;
             shots = 2;
             targetGround = false;
 
-            recoil = 2f;
+            recoilAmount = 2f;
             rotatespeed = 15f;
             inaccuracy = 17f;
             shootCone = 35f;
@@ -1379,8 +1371,8 @@ public class Blocks implements ContentList{
             Items.coal, Bullets.basicFlame,
             Items.pyratite, Bullets.pyraFlame
             );
-            recoil = 0f;
-            reload = 5f;
+            recoilAmount = 0f;
+            reloadTime = 5f;
             coolantMultiplier = 2f;
             range = 60f;
             shootCone = 50f;
@@ -1397,8 +1389,8 @@ public class Blocks implements ContentList{
             Items.silicon, Bullets.artilleryHoming,
             Items.pyratite, Bullets.artilleryIncendiary
             );
-            reload = 60f;
-            recoil = 2f;
+            reloadTime = 60f;
+            recoilAmount = 2f;
             range = 230f;
             inaccuracy = 1f;
             shootCone = 10f;
@@ -1415,8 +1407,8 @@ public class Blocks implements ContentList{
             Liquids.oil, Bullets.oilShot
             );
             size = 2;
-            recoil = 0f;
-            reload = 2f;
+            recoilAmount = 0f;
+            reloadTime = 2f;
             inaccuracy = 5f;
             shootCone = 50f;
             shootEffect = Fx.shootLiquid;
@@ -1432,8 +1424,8 @@ public class Blocks implements ContentList{
             chargeMaxDelay = 30f;
             chargeEffects = 7;
             shootType = Bullets.lancerLaser;
-            recoil = 2f;
-            reload = 90f;
+            recoilAmount = 2f;
+            reloadTime = 90f;
             cooldown = 0.03f;
             powerUse = 2.5f;
             shootShake = 2f;
@@ -1451,7 +1443,7 @@ public class Blocks implements ContentList{
         arc = new PowerTurret("arc"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 35, Items.lead, 50));
             shootType = Bullets.arc;
-            reload = 35f;
+            reloadTime = 35f;
             shootCone = 40f;
             rotatespeed = 8f;
             powerUse = 1.5f;
@@ -1459,7 +1451,7 @@ public class Blocks implements ContentList{
             range = 90f;
             shootEffect = Fx.lightningShoot;
             heatColor = Color.red;
-            recoil = 1f;
+            recoilAmount = 1f;
             size = 1;
             health = 260;
             shootSound = Sounds.spark;
@@ -1472,7 +1464,7 @@ public class Blocks implements ContentList{
             Items.pyratite, Bullets.missileIncendiary,
             Items.surgealloy, Bullets.missileSurge
             );
-            reload = 40f;
+            reloadTime = 40f;
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;
@@ -1495,11 +1487,11 @@ public class Blocks implements ContentList{
 
             size = 2;
             range = 150f;
-            reload = 38f;
+            reloadTime = 38f;
             restitution = 0.03f;
             ammoEjectBack = 3f;
             cooldown = 0.03f;
-            recoil = 3f;
+            recoilAmount = 3f;
             shootShake = 2f;
             burstSpacing = 3f;
             shots = 4;
@@ -1511,10 +1503,10 @@ public class Blocks implements ContentList{
         fuse = new ItemTurret("fuse"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 225, Items.graphite, 225, Items.thorium, 100));
 
-            reload = 35f;
+            reloadTime = 35f;
             shootShake = 4f;
             range = 90f;
-            recoil = 5f;
+            recoilAmount = 5f;
             shots = 3;
             spread = 20f;
             restitution = 0.1f;
@@ -1573,13 +1565,13 @@ public class Blocks implements ContentList{
             size = 3;
             shots = 4;
             inaccuracy = 12f;
-            reload = 60f;
+            reloadTime = 60f;
             ammoEjectBack = 5f;
             ammoUseEffect = Fx.shellEjectBig;
             cooldown = 0.03f;
             velocityInaccuracy = 0.2f;
             restitution = 0.02f;
-            recoil = 6f;
+            recoilAmount = 6f;
             shootShake = 2f;
             range = 290f;
 
@@ -1596,10 +1588,10 @@ public class Blocks implements ContentList{
             Items.surgealloy, Bullets.flakSurge
             );
             xRand = 4f;
-            reload = 6f;
+            reloadTime = 6f;
             range = 200f;
             size = 3;
-            recoil = 3f;
+            recoilAmount = 3f;
             rotatespeed = 10f;
             inaccuracy = 10f;
             shootCone = 30f;
@@ -1615,13 +1607,13 @@ public class Blocks implements ContentList{
             Items.pyratite, Bullets.standardIncendiaryBig,
             Items.thorium, Bullets.standardThoriumBig
             );
-            reload = 6f;
+            reloadTime = 6f;
             coolantMultiplier = 0.5f;
             restitution = 0.1f;
             ammoUseEffect = Fx.shellEjectBig;
             range = 200f;
             inaccuracy = 3f;
-            recoil = 3f;
+            recoilAmount = 3f;
             xRand = 3f;
             shotWidth = 4f;
             shootShake = 2f;
@@ -1639,11 +1631,11 @@ public class Blocks implements ContentList{
             shootType = Bullets.meltdownLaser;
             shootEffect = Fx.shootBigSmoke2;
             shootCone = 40f;
-            recoil = 4f;
+            recoilAmount = 4f;
             size = 4;
             shootShake = 2f;
             range = 190f;
-            reload = 80f;
+            reloadTime = 80f;
             firingMoveFract = 0.5f;
             shootDuration = 220f;
             powerUse = 14f;

@@ -23,68 +23,61 @@ public class Incinerator extends Block{
         hasLiquids = true;
         update = true;
         solid = true;
-        entityType = IncineratorEntity::new;
     }
 
     @Override
     public void updateTile(){
-        IncineratorEntity entity = tile.ent();
-
-        if(entity.consValid()){
-            entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.04f);
+        if(consValid()){
+            heat = Mathf.lerpDelta(heat, 1f, 0.04f);
         }else{
-            entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.02f);
+            heat = Mathf.lerpDelta(heat, 0f, 0.02f);
         }
     }
 
     @Override
     public void draw(){
-        super.draw(tile);
+        super.draw();
 
-        IncineratorEntity entity = tile.ent();
-
-        if(entity.heat > 0f){
+        if(heat > 0f){
             float g = 0.3f;
             float r = 0.06f;
 
-            Draw.alpha(((1f - g) + Mathf.absin(Time.time(), 8f, g) + Mathf.random(r) - r) * entity.heat);
+            Draw.alpha(((1f - g) + Mathf.absin(Time.time(), 8f, g) + Mathf.random(r) - r) * heat);
 
             Draw.tint(flameColor);
-            Fill.circle(tile.drawx(), tile.drawy(), 2f);
-            Draw.color(1f, 1f, 1f, entity.heat);
-            Fill.circle(tile.drawx(), tile.drawy(), 1f);
+            Fill.circle(x, y, 2f);
+            Draw.color(1f, 1f, 1f, heat);
+            Fill.circle(x, y, 1f);
 
             Draw.color();
         }
     }
 
     @Override
-    public void handleItem(Tile tile, Tile source, Item item){
+    public void handleItem(Tile source, Item item){
         if(Mathf.chance(0.3)){
-            effect.at(tile.drawx(), tile.drawy());
+            effect.at(x, y);
         }
     }
 
     @Override
-    public boolean acceptItem(Tile tile, Tile source, Item item){
-        IncineratorEntity entity = tile.ent();
-        return entity.heat > 0.5f;
+    public boolean acceptItem(Tile source, Item item){
+        return heat > 0.5f;
     }
 
     @Override
-    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+    public void handleLiquid(Tile source, Liquid liquid, float amount){
         if(Mathf.chance(0.02)){
-            effect.at(tile.drawx(), tile.drawy());
+            effect.at(x, y);
         }
     }
 
     @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        IncineratorEntity entity = tile.ent();
-        return entity.heat > 0.5f;
+    public boolean acceptLiquid(Tile source, Liquid liquid, float amount){
+        return heat > 0.5f;
     }
 
-    public static class IncineratorEntity extends TileEntity{
+    public class IncineratorEntity extends TileEntity{
         public float heat;
     }
 }

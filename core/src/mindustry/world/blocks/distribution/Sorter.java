@@ -27,9 +27,7 @@ public class Sorter extends Block{
         group = BlockGroup.transportation;
         configurable = true;
         unloadable = false;
-        entityType = SorterEntity::new;
-
-        config(Item.class, (tile, item) -> tile.<SorterEntity>ent().sortItem = item);
+    config(Item.class, (tile, item) -> tile.<SorterEntity>ent().sortItem = item);
         configClear(tile -> tile.<SorterEntity>ent().sortItem = null);
     }
 
@@ -39,14 +37,14 @@ public class Sorter extends Block{
     }
 
     @Override
-    public void playerPlaced(Tile tile){
+    public void playerPlaced(){
         if(lastItem != null){
             tile.configure(lastItem);
         }
     }
 
     @Override
-    public void configured(Tile tile, Playerc player, Object value){
+    public void configured(Playerc player, Object value){
         super.configured(tile, player, value);
 
         if(!headless){
@@ -61,36 +59,35 @@ public class Sorter extends Block{
 
     @Override
     public void draw(){
-        super.draw(tile);
+        super.draw();
 
-        SorterEntity entity = tile.ent();
-        if(entity.sortItem == null) return;
+        if(sortItem == null) return;
 
-        Draw.color(entity.sortItem.color);
+        Draw.color(sortItem.color);
         Draw.rect("center", tile.worldx(), tile.worldy());
         Draw.color();
     }
 
     @Override
-    public int minimapColor(Tile tile){
+    public int minimapColor(){
         return tile.<SorterEntity>ent().sortItem == null ? 0 : tile.<SorterEntity>ent().sortItem.color.rgba();
     }
 
     @Override
-    public boolean acceptItem(Tile tile, Tile source, Item item){
+    public boolean acceptItem(Tile source, Item item){
         Tile to = getTileTarget(item, tile, source, false);
 
-        return to != null && to.block().acceptItem(to, tile, item) && to.team() == tile.team();
+        return to != null && to.block().acceptItem(to, tile, item) && to.team() == team;
     }
 
     @Override
-    public void handleItem(Tile tile, Tile source, Item item){
+    public void handleItem(Tile source, Item item){
         Tile to = getTileTarget(item, tile, source, true);
 
         to.block().handleItem(to, tile, item);
     }
 
-    boolean isSame(Tile tile, Tile other){
+    boolean isSame(Tile other){
         //uncomment comment below to prevent sorter/gate chaining (hacky)
         return other != null && (other.block() instanceof Sorter/* || other.block() instanceof OverflowGate */);
     }
@@ -102,7 +99,7 @@ public class Sorter extends Block{
         if(dir == -1) return null;
         Tile to;
 
-        if((item == entity.sortItem) != invert){
+        if((item == sortItem) != invert){
             //prevent 3-chains
             if(isSame(dest, source) && isSame(dest, dest.getNearby(dir))){
                 return null;
@@ -137,9 +134,8 @@ public class Sorter extends Block{
     }
 
     @Override
-    public void buildConfiguration(Tile tile, Table table){
-        SorterEntity entity = tile.ent();
-        ItemSelection.buildTable(table, content.items(), () -> entity.sortItem, item -> tile.configure(lastItem = item));
+    public void buildConfiguration(Table table){
+        ItemSelection.buildTable(table, content.items(), () -> sortItem, item -> tile.configure(lastItem = item));
     }
 
     public class SorterEntity extends TileEntity{

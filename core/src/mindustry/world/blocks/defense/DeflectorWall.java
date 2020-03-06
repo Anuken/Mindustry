@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.gen.*;
-import mindustry.world.*;
 
 import static mindustry.Vars.tilesize;
 
@@ -19,63 +18,60 @@ public class DeflectorWall extends Wall{
 
     public DeflectorWall(String name){
         super(name);
-        entityType = DeflectorEntity::new;
     }
 
-    @Override
-    public void draw(){
-        super.draw(tile);
-
-        DeflectorEntity entity = tile.ent();
-
-        if(entity.hit < 0.0001f) return;
-
-        Draw.color(Color.white);
-        Draw.alpha(entity.hit * 0.5f);
-        Draw.blend(Blending.additive);
-        Fill.rect(tile.drawx(), tile.drawy(), tilesize * size, tilesize * size);
-        Draw.blend();
-        Draw.reset();
-
-        entity.hit = Mathf.clamp(entity.hit - Time.delta() / hitTime);
-    }
-
-    @Override
-    public void handleBulletHit(Tilec entity, Bulletc bullet){
-        super.handleBulletHit(entity, bullet);
-
-        //TODO fix and test
-        //doesn't reflect powerful bullets
-        if(bullet.damage() > maxDamageDeflect) return;
-
-        float penX = Math.abs(entity.getX() - bullet.x()), penY = Math.abs(entity.getY() - bullet.y());
-
-        bullet.hitbox(rect2);
-
-        Vec2 position = Geometry.raycastRect(bullet.x() - bullet.vel().x*Time.delta(), bullet.y() - bullet.vel().y*Time.delta(), bullet.x() + bullet.vel().x*Time.delta(), bullet.y() + bullet.vel().y*Time.delta(),
-        rect.setSize(size * tilesize + rect2.width*2 + rect2.height*2).setCenter(entity.getX(), entity.getY()));
-
-        if(position != null){
-            bullet.set(position.x, position.y);
-        }
-
-        if(penX > penY){
-            bullet.vel().x *= -1;
-        }else{
-            bullet.vel().y *= -1;
-        }
-
-        //bullet.updateVelocity();
-        bullet.owner(entity);
-        bullet.team(entity.team());
-        bullet.time(bullet.time() + 1f);
-        //TODO deflect
-        //bullet.deflect();
-
-        ((DeflectorEntity)entity).hit = 1f;
-    }
-
-    public static class DeflectorEntity extends TileEntity{
+    public class DeflectorEntity extends TileEntity{
         public float hit;
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            if(hit < 0.0001f) return;
+
+            Draw.color(Color.white);
+            Draw.alpha(hit * 0.5f);
+            Draw.blend(Blending.additive);
+            Fill.rect(x, y, tilesize * size, tilesize * size);
+            Draw.blend();
+            Draw.reset();
+
+            hit = Mathf.clamp(hit - Time.delta() / hitTime);
+        }
+
+        @Override
+        public void collision(Bulletc bullet){
+            super.collision(bullet);
+
+            //TODO fix and test
+            //doesn't reflect powerful bullets
+            if(bullet.damage() > maxDamageDeflect) return;
+
+            float penX = Math.abs(getX() - bullet.x()), penY = Math.abs(getY() - bullet.y());
+
+            bullet.hitbox(rect2);
+
+            Vec2 position = Geometry.raycastRect(bullet.x() - bullet.vel().x*Time.delta(), bullet.y() - bullet.vel().y*Time.delta(), bullet.x() + bullet.vel().x*Time.delta(), bullet.y() + bullet.vel().y*Time.delta(),
+            rect.setSize(size * tilesize + rect2.width*2 + rect2.height*2).setCenter(getX(), getY()));
+
+            if(position != null){
+                bullet.set(position.x, position.y);
+            }
+
+            if(penX > penY){
+                bullet.vel().x *= -1;
+            }else{
+                bullet.vel().y *= -1;
+            }
+
+            //bullet.updateVelocity();
+            bullet.owner(this);
+            bullet.team(team());
+            bullet.time(bullet.time() + 1f);
+            //TODO deflect
+            //bullet.deflect();
+
+            hit = 1f;
+        }
     }
 }

@@ -14,11 +14,13 @@ public class SurgeWall extends Wall{
         super(name);
     }
 
-    @Override
-    public void handleBulletHit(Tilec entity, Bulletc bullet){
-        super.handleBulletHit(entity, bullet);
-        if(Mathf.chance(lightningChance)){
-            Lightning.create(entity.team(), Pal.surge, lightningDamage, bullet.x(), bullet.y(), bullet.rotation() + 180f, lightningLength);
+    public class SurgeEntity extends TileEntity{
+        @Override
+        public void collision(Bulletc bullet){
+            super.collision(bullet);
+            if(Mathf.chance(lightningChance)){
+                Lightning.create(team(), Pal.surge, lightningDamage, bullet.x(), bullet.y(), bullet.rotation() + 180f, lightningLength);
+            }
         }
     }
 }

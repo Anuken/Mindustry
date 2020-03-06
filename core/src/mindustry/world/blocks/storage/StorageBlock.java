@@ -11,25 +11,22 @@ public abstract class StorageBlock extends Block{
     public StorageBlock(String name){
         super(name);
         hasItems = true;
-        entityType = StorageBlockEntity::new;
     }
 
     @Override
-    public boolean acceptItem(Tile tile, Tile source, Item item){
-        StorageBlockEntity entity = tile.ent();
-        return entity.linkedCore != null ? entity.linkedCore.block().acceptItem(entity.linkedCore, source, item) : tile.entity.items().get(item) < getMaximumAccepted(tile, item);
+    public boolean acceptItem(Tile source, Item item){
+        return linkedCore != null ? linkedCore.block().acceptItem(linkedCore, source, item) : tile.items.get(item) < getMaximumAccepted(tile, item);
     }
 
     @Override
-    public int getMaximumAccepted(Tile tile, Item item){
+    public int getMaximumAccepted(Item item){
         return itemCapacity;
     }
 
     @Override
-    public void drawSelect(Tile tile){
-        StorageBlockEntity entity = tile.ent();
-        if(entity.linkedCore != null){
-            entity.linkedCore.block().drawSelect(entity.linkedCore);
+    public void drawSelect(){
+        if(linkedCore != null){
+            linkedCore.block().drawSelect(linkedCore);
         }
     }
 
@@ -42,14 +39,14 @@ public abstract class StorageBlock extends Block{
      * Removes an item and returns it. If item is not null, it should return the item.
      * Returns null if no items are there.
      */
-    public Item removeItem(Tile tile, Item item){
+    public Item removeItem(Item item){
         Tilec entity = tile.entity;
 
         if(item == null){
-            return entity.items().take();
+            return items.take();
         }else{
-            if(entity.items().has(item)){
-                entity.items().remove(item, 1);
+            if(items.has(item)){
+                items.remove(item, 1);
                 return item;
             }
 
@@ -61,12 +58,12 @@ public abstract class StorageBlock extends Block{
      * Returns whether this storage block has the specified item.
      * If the item is null, it should return whether it has ANY items.
      */
-    public boolean hasItem(Tile tile, Item item){
+    public boolean hasItem(Item item){
         Tilec entity = tile.entity;
         if(item == null){
-            return entity.items().total() > 0;
+            return items.total() > 0;
         }else{
-            return entity.items().has(item);
+            return items.has(item);
         }
     }
 

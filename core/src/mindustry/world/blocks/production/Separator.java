@@ -30,7 +30,6 @@ public class Separator extends Block{
 
         liquidRegion = reg("-liquid");
         spinnerRegion = reg("-spinner");
-        entityType = GenericCrafterEntity::new;
     }
 
     @Override
@@ -53,41 +52,37 @@ public class Separator extends Block{
     }
 
     @Override
-    public boolean shouldConsume(Tile tile){
-        return tile.entity.items().total() < itemCapacity;
+    public boolean shouldConsume(){
+        return tile.items.total() < itemCapacity;
     }
 
     @Override
     public void draw(){
-        super.draw(tile);
+        super.draw();
 
-        GenericCrafterEntity entity = tile.ent();
-
-        Draw.color(tile.entity.liquids().current().color);
-        Draw.alpha(tile.entity.liquids().total() / liquidCapacity);
-        Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
+        Draw.color(tile.liquids.current().color);
+        Draw.alpha(tile.liquids.total() / liquidCapacity);
+        Draw.rect(reg(liquidRegion), x, y);
 
         Draw.reset();
         if(Core.atlas.isFound(reg(spinnerRegion))){
-            Draw.rect(reg(spinnerRegion), tile.drawx(), tile.drawy(), entity.totalProgress * spinnerSpeed);
+            Draw.rect(reg(spinnerRegion), x, y, totalProgress * spinnerSpeed);
         }
     }
 
     @Override
     public void updateTile(){
-        GenericCrafterEntity entity = tile.ent();
+        totalProgress += warmup * delta();
 
-        entity.totalProgress += entity.warmup * entity.delta();
-
-        if(entity.consValid()){
-            entity.progress += getProgressIncrease(entity, craftTime);
-            entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
+        if(consValid()){
+            progress += getProgressIncrease(entity, craftTime);
+            warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
         }else{
-            entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
+            warmup = Mathf.lerpDelta(warmup, 0f, 0.02f);
         }
 
-        if(entity.progress >= 1f){
-            entity.progress = 0f;
+        if(progress >= 1f){
+            progress = 0f;
             int sum = 0;
             for(ItemStack stack : results) sum += stack.amount;
 
@@ -104,15 +99,15 @@ public class Separator extends Block{
                 count += stack.amount;
             }
 
-            entity.consume();
+            consume();
 
-            if(item != null && entity.items().get(item) < itemCapacity){
+            if(item != null && items.get(item) < itemCapacity){
                 useContent(tile, item);
                 offloadNear(tile, item);
             }
         }
 
-        if(entity.timer(timerDump, dumpTime)){
+        if(timer(timerDump, dumpTime)){
             tryDump(tile);
         }
     }

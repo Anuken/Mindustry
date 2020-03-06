@@ -13,7 +13,7 @@ public class PowerSource extends PowerNode{
     }
 
     @Override
-    public float getPowerProduction(Tile tile){
+    public float getPowerProduction(){
         return 10000f;
     }
 

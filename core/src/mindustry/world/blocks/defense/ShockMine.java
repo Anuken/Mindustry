@@ -26,32 +26,35 @@ public class ShockMine extends Block{
         rebuildable = false;
     }
 
-    @Override
-    public void drawLayer(Tile tile){
-        super.draw(tile);
-        Draw.color(tile.team().color);
-        Draw.alpha(0.22f);
-        Fill.rect(tile.drawx(), tile.drawy(), 2f, 2f);
-        Draw.color();
-    }
+    public class ShockMineEntity extends TileEntity{
 
-    @Override
-    public void drawTeam(Tile tile){
-        //no
-    }
+        @Override
+        public void drawLayer(){
+            super.draw();
+            Draw.color(team.color);
+            Draw.alpha(0.22f);
+            Fill.rect(x, y, 2f, 2f);
+            Draw.color();
+        }
 
-    @Override
-    public void draw(){
-        //nope
-    }
+        @Override
+        public void drawTeam(){
+            //no
+        }
 
-    @Override
-    public void unitOn(Tile tile, Unitc unit){
-        if(unit.team() != tile.team() && tile.entity.timer(timerDamage, cooldown)){
-            for(int i = 0; i < tendrils; i++){
-                Lightning.create(tile.team(), Pal.lancerLaser, damage, tile.drawx(), tile.drawy(), Mathf.random(360f), length);
+        @Override
+        public void draw(){
+            //nope
+        }
+
+        @Override
+        public void unitOn(Unitc unit){
+            if(unit.team() != team && timer(timerDamage, cooldown)){
+                for(int i = 0; i < tendrils; i++){
+                    Lightning.create(team, Pal.lancerLaser, damage, x, y, Mathf.random(360f), length);
+                }
+                damage(tileDamage);
             }
-            tile.entity.damage(tileDamage);
         }
     }
 }

@@ -28,7 +28,6 @@ public class Cultivator extends GenericCrafter{
     public Cultivator(String name){
         super(name);
         craftEffect = Fx.none;
-        entityType = CultivatorEntity::new;
     }
 
     @Override
@@ -41,10 +40,9 @@ public class Cultivator extends GenericCrafter{
 
     @Override
     public void updateTile(){
-        super.update(tile);
+        super.updateTile();
 
-        CultivatorEntity entity = tile.ent();
-        entity.warmup = Mathf.lerpDelta(entity.warmup, entity.consValid() ? 1f : 0f, 0.015f);
+        warmup = Mathf.lerpDelta(warmup, consValid() ? 1f : 0f, 0.015f);
     }
 
     @Override
@@ -71,15 +69,13 @@ public class Cultivator extends GenericCrafter{
 
     @Override
     public void draw(){
-        CultivatorEntity entity = tile.ent();
-
-        Draw.rect(region, tile.drawx(), tile.drawy());
+        Draw.rect(region, x, y);
 
         Draw.color(plantColor);
-        Draw.alpha(entity.warmup);
-        Draw.rect(middleRegion, tile.drawx(), tile.drawy());
+        Draw.alpha(warmup);
+        Draw.rect(middleRegion, x, y);
 
-        Draw.color(bottomColor, plantColorLight, entity.warmup);
+        Draw.color(bottomColor, plantColorLight, warmup);
 
         random.setSeed(tile.pos());
         for(int i = 0; i < 12; i++){
@@ -88,13 +84,13 @@ public class Cultivator extends GenericCrafter{
             float life = 1f - (((Time.time() + offset) / 50f) % recurrence);
 
             if(life > 0){
-                Lines.stroke(entity.warmup * (life * 1f + 0.2f));
-                Lines.poly(tile.drawx() + x, tile.drawy() + y, 8, (1f - life) * 3f);
+                Lines.stroke(warmup * (life * 1f + 0.2f));
+                Lines.poly(x + x, y + y, 8, (1f - life) * 3f);
             }
         }
 
         Draw.color();
-        Draw.rect(topRegion, tile.drawx(), tile.drawy());
+        Draw.rect(topRegion, x, y);
     }
 
     @Override
@@ -103,11 +99,10 @@ public class Cultivator extends GenericCrafter{
     }
 
     @Override
-    public void onProximityAdded(Tile tile){
-        super.onProximityAdded(tile);
+    public void onProximityAdded(){
+        super.onProximityAdded();
 
-        CultivatorEntity entity = tile.ent();
-        entity.boost = sumAttribute(attribute, tile.x, tile.y);
+        boost = sumAttribute(attribute, tile.x, tile.y);
     }
 
     @Override
@@ -116,7 +111,7 @@ public class Cultivator extends GenericCrafter{
         return super.getProgressIncrease(entity, baseTime) * (1f + c.boost);
     }
 
-    public static class CultivatorEntity extends GenericCrafterEntity{
+    public class CultivatorEntity extends GenericCrafterEntity{
         public float warmup;
         public float boost;
 

@@ -79,7 +79,7 @@ public class OreBlock extends OverlayFloor{
     }
 
     @Override
-    public String getDisplayName(Tile tile){
+    public String getDisplayName(){
         return itemDrop.localizedName;
     }
 }

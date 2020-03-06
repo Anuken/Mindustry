@@ -1,10 +1,8 @@
 package mindustry.world.blocks.defense.turrets;
 
-import arc.math.Mathf;
-import mindustry.entities.bullet.BulletType;
-import mindustry.world.Tile;
-import mindustry.world.meta.BlockStat;
-import mindustry.world.meta.StatUnit;
+import arc.math.*;
+import mindustry.entities.bullet.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.tilesize;
 
@@ -21,21 +19,22 @@ public class DoubleTurret extends ItemTurret{
         super.setStats();
 
         stats.remove(BlockStat.reload);
-        stats.add(BlockStat.reload, 60f / reload, StatUnit.none);
+        stats.add(BlockStat.reload, 60f / reloadTime, StatUnit.none);
     }
 
-    @Override
-    protected void shoot(Tile tile, BulletType ammo){
-        TurretEntity entity = tile.ent();
-        entity.shots++;
-        entity.heat = 1f;
+    public class DoubleTurretEntity extends ItemTurretEntity{
+        @Override
+        protected void shoot(BulletType ammo){
+            shots++;
+            heat = 1f;
 
-        int i = Mathf.signs[entity.shots % 2];
+            int i = Mathf.signs[shots % 2];
 
-        tr.trns(entity.rotation - 90, shotWidth * i, size * tilesize / 2);
-        bullet(tile, ammo, entity.rotation + Mathf.range(inaccuracy));
+            tr.trns(rotation - 90, shotWidth * i, size * tilesize / 2);
+            bullet(ammo, rotation + Mathf.range(inaccuracy));
 
-        effects(tile);
-        useAmmo(tile);
+            effects();
+            useAmmo();
+        }
     }
 }

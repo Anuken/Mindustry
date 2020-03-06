@@ -156,11 +156,11 @@ public class BlockIndexer{
         return flagMap[team.id][type.ordinal()];
     }
 
-    public boolean eachBlock(Teamc team, float range, Boolf<Tile> pred, Cons<Tile> cons){
+    public boolean eachBlock(Teamc team, float range, Boolf<Tilec> pred, Cons<Tilec> cons){
         return eachBlock(team.team(), team.getX(), team.getY(), range, pred, cons);
     }
 
-    public boolean eachBlock(Team team, float wx, float wy, float range, Boolf<Tile> pred, Cons<Tile> cons){
+    public boolean eachBlock(Team team, float wx, float wy, float range, Boolf<Tilec> pred, Cons<Tilec> cons){
         intSet.clear();
 
         int tx = world.toTile(wx);
@@ -174,11 +174,11 @@ public class BlockIndexer{
             for(int y = -tileRange + ty; y <= tileRange + ty; y++){
                 if(!Mathf.within(x * tilesize, y * tilesize, wx, wy, range)) continue;
 
-                Tile other = world.ltile(x, y);
+                Tilec other = world.ent(x, y);
 
                 if(other == null) continue;
 
-                if(other.team() == team && !intSet.contains(other.pos()) && other.entity != null && pred.get(other)){
+                if(other.team() == team && !intSet.contains(other.pos()) && pred.get(other)){
                     cons.get(other);
                     any = true;
                     intSet.add(other.pos());
@@ -214,7 +214,7 @@ public class BlockIndexer{
         set.add(entity.tile());
     }
 
-    public Tilec findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
+    public Tilec findEnemyTile(Team team, float x, float y, float range, Boolf<Tilec> pred){
         for(Team enemy : activeTeams){
             if(!team.isEnemy(enemy)) continue;
 
@@ -227,11 +227,11 @@ public class BlockIndexer{
         return null;
     }
 
-    public Tilec findTile(Team team, float x, float y, float range, Boolf<Tile> pred){
+    public Tilec findTile(Team team, float x, float y, float range, Boolf<Tilec> pred){
         return findTile(team, x, y, range, pred, false);
     }
 
-    public Tilec findTile(Team team, float x, float y, float range, Boolf<Tile> pred, boolean usePriority){
+    public Tilec findTile(Team team, float x, float y, float range, Boolf<Tilec> pred, boolean usePriority){
         Tilec closest = null;
         float dst = 0;
         float range2 = range*range;
@@ -243,14 +243,12 @@ public class BlockIndexer{
 
                 for(int tx = rx * quadrantSize; tx < (rx + 1) * quadrantSize && tx < world.width(); tx++){
                     for(int ty = ry * quadrantSize; ty < (ry + 1) * quadrantSize && ty < world.height(); ty++){
-                        Tile other = world.ltile(tx, ty);
+                        Tilec e = world.ent(tx, ty);
 
-                        if(other == null) continue;
+                        if(e == null) continue;
 
-                        if(other.entity == null || other.team() != team || !pred.get(other) || !other.block().targetable)
+                        if(e.team() != team || !pred.get(e) || !e.block().targetable)
                             continue;
-
-                        Tilec e = other.entity;
 
                         float ndst = e.dst2(x, y);
                         if(ndst < range2 && (closest == null ||
@@ -365,9 +363,9 @@ public class BlockIndexer{
             outer:
             for(int x = quadrantX * quadrantSize; x < world.width() && x < (quadrantX + 1) * quadrantSize; x++){
                 for(int y = quadrantY * quadrantSize; y < world.height() && y < (quadrantY + 1) * quadrantSize; y++){
-                    Tile result = world.ltile(x, y);
+                    Tilec result = world.ent(x, y);
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
-                    if(result.entity != null && result.team() == team){
+                    if(result!= null && result.team() == team){
                         bits.set(quadrantX, quadrantY);
                         break outer;
                     }

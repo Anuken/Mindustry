@@ -46,11 +46,11 @@ public class Pump extends LiquidBlock{
 
     @Override
     public void draw(){
-        Draw.rect(name, tile.drawx(), tile.drawy());
+        Draw.rect(name, x, y);
 
-        Draw.color(tile.entity.liquids().current().color);
-        Draw.alpha(tile.entity.liquids().total() / liquidCapacity);
-        Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
+        Draw.color(tile.liquids.current().color);
+        Draw.alpha(tile.liquids.total() / liquidCapacity);
+        Draw.rect(liquidRegion, x, y);
         Draw.color();
     }
 
@@ -85,7 +85,7 @@ public class Pump extends LiquidBlock{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile){
+    public boolean canPlaceOn(){
         if(isMultiblock()){
             Liquid last = null;
             for(Tile other : tile.getLinkedTilesAs(this, drawTiles)){
@@ -118,19 +118,19 @@ public class Pump extends LiquidBlock{
             liquidDrop = tile.floor().liquidDrop;
         }
 
-        if(tile.entity.cons().valid() && liquidDrop != null){
-            float maxPump = Math.min(liquidCapacity - tile.entity.liquids().total(), tiles * pumpAmount * tile.entity.delta() / size / size) * tile.entity.efficiency();
-            tile.entity.liquids().add(liquidDrop, maxPump);
+        if(tile.cons().valid() && liquidDrop != null){
+            float maxPump = Math.min(liquidCapacity - tile.liquids.total(), tiles * pumpAmount * tile.delta() / size / size) * tile.efficiency();
+            tile.liquids.add(liquidDrop, maxPump);
         }
 
-        if(tile.entity.liquids().currentAmount() > 0f && tile.entity.timer(timerContentCheck, 10)){
-            useContent(tile, tile.entity.liquids().current());
+        if(tile.liquids.currentAmount() > 0f && timer(timerContentCheck, 10)){
+            useContent(tile, tile.liquids.current());
         }
 
-        tryDumpLiquid(tile, tile.entity.liquids().current());
+        tryDumpLiquid(tile, tile.liquids.current());
     }
 
-    protected boolean isValid(Tile tile){
+    protected boolean isValid(){
         return tile != null && tile.floor().liquidDrop != null;
     }
 

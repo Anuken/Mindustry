@@ -32,22 +32,20 @@ public class CoreBlock extends StorageBlock{
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
         layer = Layer.overlay;
-        entityType = CoreEntity::new;
     }
 
     @Remote(called = Loc.server)
-    public static void onUnitRespawn(Tile tile, Playerc player){
+    public static void onUnitRespawn(Playerc player){
         if(player == null || tile.entity == null) return;
 
         //TODO really fix
-        CoreEntity entity = tile.ent();
         Fx.spawn.at(entity);
-        //entity.progress = 0;
-        //entity.spawnPlayer = player;
+        //progress = 0;
+        //spawnPlayer = player;
         //TODO fix
-        //entity.spawnPlayer.onRespawn(tile);
-        //entity.spawnPlayer.applyImpulse(0, 8f);
-        //entity.spawnPlayer = null;
+        //spawnPlayer.onRespawn(tile);
+        //spawnPlayer.applyImpulse(0, 8f);
+        //spawnPlayer = null;
     }
 
     @Override
@@ -63,56 +61,53 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public void drawLight(Tile tile){
-        renderer.lights.add(tile.drawx(), tile.drawy(), 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
+    public void drawLight(){
+        renderer.lights.add(x, y, 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
     }
 
     @Override
-    public boolean acceptItem(Tile tile, Tile source, Item item){
-        return tile.entity.items().get(item) < getMaximumAccepted(tile, item);
+    public boolean acceptItem(Tile source, Item item){
+        return tile.items.get(item) < getMaximumAccepted(tile, item);
     }
 
     @Override
-    public int getMaximumAccepted(Tile tile, Item item){
-        CoreEntity entity = tile.ent();
-        return item.type == ItemType.material ? entity.storageCapacity : 0;
+    public int getMaximumAccepted(Item item){
+        return item.type == ItemType.material ? storageCapacity : 0;
     }
 
     @Override
-    public void onProximityUpdate(Tile tile){
-        CoreEntity entity = tile.ent();
-
-        for(Tilec other : state.teams.cores(tile.team())){
+    public void onProximityUpdate(){
+        for(Tilec other : state.teams.cores(team)){
             if(other.tile() != tile){
-                entity.items(other.items());
+                items(other.items());
             }
         }
         state.teams.registerCore(entity);
 
-        entity.storageCapacity = itemCapacity + entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
-        entity.proximity().each(this::isContainer, t -> {
-            t.entity.items(entity.items());
+        storageCapacity = itemCapacity + proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
+        proximity().each(this::isContainer, t -> {
+            t.items(items);
             t.<StorageBlockEntity>ent().linkedCore = tile;
         });
 
-        for(Tilec other : state.teams.cores(tile.team())){
+        for(Tilec other : state.teams.cores(team)){
             if(other.tile() == tile) continue;
-            entity.storageCapacity += other.block().itemCapacity + other.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
+            storageCapacity += other.block().itemCapacity + other.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         }
 
         if(!world.isGenerating()){
             for(Item item : content.items()){
-                entity.items().set(item, Math.min(entity.items().get(item), entity.storageCapacity));
+                items.set(item, Math.min(items.get(item), storageCapacity));
             }
         }
 
-        for(CoreEntity other : state.teams.cores(tile.team())){
-            other.storageCapacity = entity.storageCapacity;
+        for(CoreEntity other : state.teams.cores(team)){
+            other.storageCapacity = storageCapacity;
         }
     }
 
     @Override
-    public void drawSelect(Tile tile){
+    public void drawSelect(){
         Lines.stroke(1f, Pal.accent);
         Cons<Tile> outline = t -> {
             for(int i = 0; i < 4; i++){
@@ -121,77 +116,73 @@ public class CoreBlock extends StorageBlock{
                 Draw.rect("block-select", t.drawx() + offset * p.x, t.drawy() + offset * p.y, i * 90);
             }
         };
-        if(tile.entity.proximity().contains(e -> isContainer(e) && e.entity.items() == tile.entity.items())){
+        if(tile.proximity().contains(e -> isContainer(e) && e.items == tile.items)){
             outline.get(tile);
         }
-        tile.entity.proximity().each(e -> isContainer(e) && e.entity.items() == tile.entity.items(), outline);
+        tile.proximity().each(e -> isContainer(e) && e.items == tile.items, outline);
         Draw.reset();
     }
 
 
-    public boolean isContainer(Tile tile){
+    public boolean isContainer(){
         return tile.entity instanceof StorageBlockEntity;
     }
 
     @Override
-    public float handleDamage(Tile tile, float amount){
-        if(player != null && tile.team() == player.team()){
+    public float handleDamage(float amount){
+        if(player != null && team == player.team()){
             Events.fire(Trigger.teamCoreDamage);
         }
         return amount;
     }
 
     @Override
-    public boolean canBreak(Tile tile){
+    public boolean canBreak(){
         return false;
     }
 
     @Override
-    public void removed(Tile tile){
-        CoreEntity entity = tile.ent();
-        int total = tile.entity.proximity().count(e -> e.entity != null && e.entity.items() != null && e.entity.items() == tile.entity.items());
-        float fract = 1f / total / state.teams.cores(tile.team()).size;
+    public void removed(){
+        int total = tile.proximity().count(e -> e.entity != null && e.items != null && e.items == tile.items);
+        float fract = 1f / total / state.teams.cores(team).size;
 
-        tile.entity.proximity().each(e -> isContainer(e) && e.entity.items() == tile.entity.items(), t -> {
+        tile.proximity().each(e -> isContainer(e) && e.items == tile.items, t -> {
             StorageBlockEntity ent = (StorageBlockEntity)t.entity;
             ent.linkedCore = null;
             ent.items(new ItemModule());
             for(Item item : content.items()){
-                ent.items().set(item, (int)(fract * tile.entity.items().get(item)));
+                ent.items().set(item, (int)(fract * tile.items.get(item)));
             }
         });
 
         state.teams.unregisterCore(entity);
 
-        int max = itemCapacity * state.teams.cores(tile.team()).size;
+        int max = itemCapacity * state.teams.cores(team).size;
         for(Item item : content.items()){
-            tile.entity.items().set(item, Math.min(tile.entity.items().get(item), max));
+            tile.items.set(item, Math.min(tile.items.get(item), max));
         }
 
-        for(CoreEntity other : state.teams.cores(tile.team())){
+        for(CoreEntity other : state.teams.cores(team)){
             other.block().onProximityUpdate(other.tile());
         }
     }
 
     @Override
-    public void placed(Tile tile){
-        super.placed(tile);
-        CoreEntity entity = tile.ent();
+    public void placed(){
+        super.placed();
         state.teams.registerCore(entity);
     }
 
     @Override
-    public void drawLayer(Tile tile){
-        CoreEntity entity = tile.ent();
-
-        if(entity.heat > 0.001f){
+    public void drawLayer(){
+        if(heat > 0.001f){
             //TODO implement
-            //RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.spawnPlayer, mech);
+            //RespawnBlock.drawRespawn(tile, heat, progress, time, spawnPlayer, mech);
         }
     }
 
     @Override
-    public void handleItem(Tile tile, Tile source, Item item){
+    public void handleItem(Tile source, Item item){
         if(net.server() || !net.active()){
             super.handleItem(tile, source, item);
             if(state.rules.tutorial){
@@ -202,34 +193,30 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void updateTile(){
-        CoreEntity entity = tile.ent();
-
         //TODO implement
         /*
-        if(entity.spawnPlayer != null){
-            if(!entity.spawnPlayer.dead() || !entity.spawnPlayer.isAdded()){
-                entity.spawnPlayer = null;
+        if(spawnPlayer != null){
+            if(!spawnPlayer.dead() || !spawnPlayer.isAdded()){
+                spawnPlayer = null;
                 return;
             }
 
-            entity.spawnPlayer.set(tile.drawx(), tile.drawy());
-            entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
-            entity.time += entity.delta();
-            entity.progress += 1f / state.rules.respawnTime * entity.delta();
+            spawnPlayer.set(x, y);
+            heat = Mathf.lerpDelta(heat, 1f, 0.1f);
+            time += delta();
+            progress += 1f / state.rules.respawnTime * delta();
 
-            if(entity.progress >= 1f){
-                Call.onUnitRespawn(tile, entity.spawnPlayer);
+            if(progress >= 1f){
+                Call.onUnitRespawn(tile, spawnPlayer);
             }
         }else{
-            entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
+            heat = Mathf.lerpDelta(heat, 0f, 0.1f);
         }*/
     }
 
     @Override
-    public boolean shouldActiveSound(Tile tile){
-        CoreEntity entity = tile.ent();
-
-        return entity.spawnPlayer != null;
+    public boolean shouldActiveSound(){
+        return spawnPlayer != null;
     }
 
     public class CoreEntity extends TileEntity{

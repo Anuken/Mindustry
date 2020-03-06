@@ -28,10 +28,8 @@ public class ThermalGenerator extends PowerGenerator{
 
     @Override
     public void updateTile(){
-        GeneratorEntity entity = tile.ent();
-
-        if(entity.productionEfficiency > 0.1f && Mathf.chance(0.05 * entity.delta())){
-            generateEffect.at(tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
+        if(productionEfficiency > 0.1f && Mathf.chance(0.05 * delta())){
+            generateEffect.at(x + Mathf.range(3f), y + Mathf.range(3f));
         }
     }
 
@@ -41,28 +39,26 @@ public class ThermalGenerator extends PowerGenerator{
     }
 
     @Override
-    public void drawLight(Tile tile){
-        GeneratorEntity entity = tile.ent();
-        renderer.lights.add(tile.drawx(), tile.drawy(), (40f + Mathf.absin(10f, 5f)) * entity.productionEfficiency * size, Color.scarlet, 0.4f);
+    public void drawLight(){
+        renderer.lights.add(x, y, (40f + Mathf.absin(10f, 5f)) * productionEfficiency * size, Color.scarlet, 0.4f);
     }
 
     @Override
-    public void onProximityAdded(Tile tile){
-        super.onProximityAdded(tile);
+    public void onProximityAdded(){
+        super.onProximityAdded();
 
-        GeneratorEntity entity = tile.ent();
-        entity.productionEfficiency = sumAttribute(attribute, tile.x, tile.y);
+        productionEfficiency = sumAttribute(attribute, tile.x, tile.y);
     }
 
     @Override
-    public float getPowerProduction(Tile tile){
+    public float getPowerProduction(){
         //in this case, productionEfficiency means 'total heat'
         //thus, it may be greater than 1.0
         return powerProduction * tile.<GeneratorEntity>ent().productionEfficiency;
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile){
+    public boolean canPlaceOn(){
         //make sure there's heat at this location
         return tile.getLinkedTilesAs(this, tempTiles).sumf(other -> other.floor().attributes.get(attribute)) > 0.01f;
     }

@@ -2,6 +2,7 @@ package mindustry.world.blocks.distribution;
 
 import arc.math.*;
 import arc.util.io.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -15,29 +16,26 @@ public class BufferedItemBridge extends ExtendingItemBridge{
         super(name);
         hasPower = false;
         hasItems = true;
-        entityType = BufferedItemBridgeEntity::new;
     }
 
-    @Override
-    public void updateTransport(Tile tile, Tile other){
-        BufferedItemBridgeEntity entity = tile.ent();
-
-        if(entity.buffer.accepts() && entity.items().total() > 0){
-            entity.buffer.accept(entity.items().take());
-        }
-
-        Item item = entity.buffer.poll();
-        if(entity.timer(timerAccept, 4) && item != null && other.block().acceptItem(other, tile, item)){
-            entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
-            other.block().handleItem(other, tile, item);
-            entity.buffer.remove();
-        }else{
-            entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 0f, 0.008f);
-        }
-    }
-
-    class BufferedItemBridgeEntity extends ItemBridgeEntity{
+    public class BufferedItemBridgeEntity extends ItemBridgeEntity{
         ItemBuffer buffer = new ItemBuffer(bufferCapacity, speed);
+
+        @Override
+        public void updateTransport(Tilec other){
+            if(buffer.accepts() && items.total() > 0){
+                buffer.accept(items.take());
+            }
+
+            Item item = buffer.poll();
+            if(timer(timerAccept, 4) && item != null && other.acceptItem(this, item)){
+                cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f);
+                other.handleItem(this, item);
+                buffer.remove();
+            }else{
+                cycleSpeed = Mathf.lerpDelta(cycleSpeed, 0f, 0.008f);
+            }
+        }
 
         @Override
         public void write(Writes write){

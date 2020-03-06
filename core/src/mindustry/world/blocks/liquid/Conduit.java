@@ -28,7 +28,6 @@ public class Conduit extends LiquidBlock implements Autotiler{
         solid = false;
         floating = true;
         conveyorPlacement = true;
-        entityType = ConduitEntity::new;
     }
 
     @Override
@@ -75,7 +74,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     }
 
     @Override
-    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+    public boolean blends(int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return otherblock.hasLiquids && otherblock.outputsLiquid && lookingAt(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
@@ -93,14 +92,14 @@ public class Conduit extends LiquidBlock implements Autotiler{
             int rotation = rotation() * 90;
 
             Draw.colorl(0.34f);
-            Draw.rect(botRegions[blendbits], tile.drawx(), tile.drawy(), rotation);
+            Draw.rect(botRegions[blendbits], x, y, rotation);
 
             Draw.color(liquids.current().color);
             Draw.alpha(smoothLiquid);
-            Draw.rect(botRegions[blendbits], tile.drawx(), tile.drawy(), rotation);
+            Draw.rect(botRegions[blendbits], x, y, rotation);
             Draw.color();
 
-            Draw.rect(topRegions[blendbits], tile.drawx(), tile.drawy(), rotation);
+            Draw.rect(topRegions[blendbits], x, y, rotation);
         }
 
         @Override

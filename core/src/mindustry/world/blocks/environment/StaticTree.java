@@ -13,7 +13,7 @@ public class StaticTree extends StaticWall{
     }
 
     @Override
-    public void drawBase(Tile tile){
+    public void drawBase(){
         TextureRegion r = Tmp.tr1;
         r.set(region);
         int crop = (region.getWidth() - tilesize*4) / 2;
@@ -38,6 +38,6 @@ public class StaticTree extends StaticWall{
                 }
             }
         }
-        Draw.rect(r, tile.drawx() + ox * Draw.scl, tile.drawy() + oy * Draw.scl);
+        Draw.rect(r, x + ox * Draw.scl, y + oy * Draw.scl);
     }
 }

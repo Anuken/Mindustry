@@ -11,7 +11,6 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.world.*;
 
 import static mindustry.Vars.pathfinder;
 
@@ -29,19 +28,12 @@ public class Door extends Wall{
         solid = false;
         solidifes = true;
         consumesTap = true;
-        entityType = DoorEntity::new;
-
-        config(Boolean.class, (tile, open) -> {
-            DoorEntity entity = tile.ent();
-            entity.open = open;
-
-            pathfinder.updateTile(tile);
-            if(!entity.open){
-                openfx.at(tile.drawx(), tile.drawy());
-            }else{
-                closefx.at(tile.drawx(), tile.drawy());
-            }
-            Sounds.door.at(tile);
+    config(Boolean.class, (entity, open) -> {
+            DoorEntity door = (DoorEntity)entity;
+            door.open = open;
+            pathfinder.updateTile(door.tile());
+            (open ? closefx : openfx).at(door);
+            Sounds.door.at(door);
         });
     }
 
@@ -52,40 +44,36 @@ public class Door extends Wall{
     }
 
     @Override
-    public void draw(){
-        DoorEntity entity = tile.ent();
-        Draw.rect(entity.open ? openRegion : region, tile.drawx(), tile.drawy());
-    }
-
-    @Override
     public TextureRegion getRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
         return req.config == Boolean.TRUE ? openRegion : region;
     }
 
-    @Override
-    public Cursor getCursor(Tile tile){
-        return SystemCursor.hand;
-    }
-
-    @Override
-    public boolean isSolidFor(Tile tile){
-        DoorEntity entity = tile.ent();
-        return !entity.open;
-    }
-
-    @Override
-    public void tapped(Tile tile, Playerc player){
-        DoorEntity entity = tile.ent();
-
-        if((Units.anyEntities(tile) && entity.open) || !tile.entity.timer(timerToggle, 30f)){
-            return;
-        }
-
-        tile.configure(!entity.open);
-    }
-
     public class DoorEntity extends TileEntity{
         public boolean open = false;
+
+        @Override
+        public void draw(){
+            Draw.rect(open ? openRegion : region, x, y);
+        }
+
+        @Override
+        public Cursor getCursor(){
+            return SystemCursor.hand;
+        }
+
+        @Override
+        public boolean checkSolid(){
+            return !open;
+        }
+
+        @Override
+        public void tapped(Playerc player){
+            if((Units.anyEntities(tile) && open) || !timer(timerToggle, 30f)){
+                return;
+            }
+
+            tile.configure(!open);
+        }
 
         @Override
         public Boolean config(){

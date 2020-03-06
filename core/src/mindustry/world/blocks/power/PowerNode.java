@@ -36,51 +36,49 @@ public class PowerNode extends PowerBlock{
         configurable = true;
         consumesPower = false;
         outputsPower = false;
-        entityType = PowerNodeEntity::new;
-
-        config(Integer.class, (tile, value) -> {
+    config(Integer.class, (tile, value) -> {
             Tilec entity = tile.entity;
             Tile other = world.tile(value);
-            boolean contains = entity.power().links.contains(value), valid = other != null && other.entity != null && other.entity.power() != null;
+            boolean contains = power.links.contains(value), valid = other != null && other.entity != null && other.power != null;
 
             if(contains){
                 //unlink
-                entity.power().links.removeValue(value);
-                if(valid) other.entity.power().links.removeValue(tile.pos());
+                power.links.removeValue(value);
+                if(valid) other.power.links.removeValue(tile.pos());
 
                 PowerGraph newgraph = new PowerGraph();
 
                 //reflow from this point, covering all tiles on this side
                 newgraph.reflow(tile);
 
-                if(valid && other.entity.power().graph != newgraph){
+                if(valid && other.power.graph != newgraph){
                     //create new graph for other end
                     PowerGraph og = new PowerGraph();
                     //reflow from other end
                     og.reflow(other);
                 }
-            }else if(linkValid(tile, other) && valid && entity.power().links.size < maxNodes){
+            }else if(linkValid(tile, other) && valid && power.links.size < maxNodes){
 
-                if(!entity.power().links.contains(other.pos())){
-                    entity.power().links.add(other.pos());
+                if(!power.links.contains(other.pos())){
+                    power.links.add(other.pos());
                 }
 
                 if(other.getTeamID() == tile.getTeamID()){
 
-                    if(!other.entity.power().links.contains(tile.pos())){
-                        other.entity.power().links.add(tile.pos());
+                    if(!other.power.links.contains(tile.pos())){
+                        other.power.links.add(tile.pos());
                     }
                 }
 
-                entity.power().graph.add(other.entity.power().graph);
+                power.graph.add(other.power.graph);
             }
         });
 
         config(Point2[].class, (tile, value) -> {
-            tile.entity.power().links.clear();
+            tile.power.links.clear();
             for(Point2 p : value){
-                if(tile.entity.power().links.size < maxNodes){
-                    tile.entity.power().links.add(Point2.pack(p.x + tile.x, p.y + tile.y));
+                if(tile.power.links.size < maxNodes){
+                    tile.power.links.add(Point2.pack(p.x + tile.x, p.y + tile.y));
                 }
             }
         });
@@ -99,23 +97,23 @@ public class PowerNode extends PowerBlock{
         super.setBars();
         bars.add("power", entity -> new Bar(() ->
         Core.bundle.format("bar.powerbalance",
-        ((entity.power().graph.getPowerBalance() >= 0 ? "+" : "") + Strings.fixed(entity.power().graph.getPowerBalance() * 60, 1))),
+        ((power.graph.getPowerBalance() >= 0 ? "+" : "") + Strings.fixed(power.graph.getPowerBalance() * 60, 1))),
         () -> Pal.powerBar,
-        () -> Mathf.clamp(entity.power().graph.getLastPowerProduced() / entity.power().graph.getLastPowerNeeded())));
+        () -> Mathf.clamp(power.graph.getLastPowerProduced() / power.graph.getLastPowerNeeded())));
 
         bars.add("batteries", entity -> new Bar(() ->
         Core.bundle.format("bar.powerstored",
-        (ui.formatAmount((int)entity.power().graph.getBatteryStored())), ui.formatAmount((int)entity.power().graph.getTotalBatteryCapacity())),
+        (ui.formatAmount((int)power.graph.getBatteryStored())), ui.formatAmount((int)power.graph.getTotalBatteryCapacity())),
         () -> Pal.powerBar,
-        () -> Mathf.clamp(entity.power().graph.getBatteryStored() / entity.power().graph.getTotalBatteryCapacity())));
+        () -> Mathf.clamp(power.graph.getBatteryStored() / power.graph.getTotalBatteryCapacity())));
     }
 
     @Override
-    public void placed(Tile tile){
+    public void placed(){
         if(net.client()) return;
 
         Boolf<Tile> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) && linkValid(tile, other)
-        && !other.entity.proximity().contains(tile) && other.entity.power().graph != tile.entity.power().graph;
+        && !other.proximity().contains(tile) && other.power.graph != tile.power.graph;
 
         tempTiles.clear();
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
@@ -133,19 +131,19 @@ public class PowerNode extends PowerBlock{
             return Float.compare(a.dst2(tile), b.dst2(tile));
         });
         tempTiles.each(valid, other -> {
-            if(!tile.entity.power().links.contains(other.pos())){
+            if(!tile.power.links.contains(other.pos())){
                 tile.configureAny(other.pos());
             }
         });
 
-        super.placed(tile);
+        super.placed();
     }
 
-    private void getPotentialLinks(Tile tile, Cons<Tile> others){
-        Boolf<Tile> valid = other -> other != null && other != tile && other.entity != null && other.entity.power() != null &&
+    private void getPotentialLinks(Cons<Tile> others){
+        Boolf<Tile> valid = other -> other != null && other != tile && other.entity != null && other.power != null &&
         ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) &&
         overlaps(tile.x * tilesize + offset(), tile.y * tilesize + offset(), other, laserRange * tilesize) && other.team() == player.team()
-        && !other.entity.proximity().contains(tile) && !graphs.contains(other.entity.power().graph);
+        && !other.proximity().contains(tile) && !graphs.contains(other.power.graph);
 
         tempTiles.clear();
         graphs.clear();
@@ -162,7 +160,7 @@ public class PowerNode extends PowerBlock{
             return Float.compare(a.dst2(tile), b.dst2(tile));
         });
         tempTiles.each(valid, t -> {
-            graphs.add(t.entity.power().graph);
+            graphs.add(t.power.graph);
             others.get(t);
         });
     }
@@ -177,11 +175,11 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void updateTile(){
-        tile.entity.power().graph.update();
+        tile.power.graph.update();
     }
 
     @Override
-    public boolean onConfigureTileTapped(Tile tile, Tile other){
+    public boolean onConfigureTileTapped(Tile other){
         Tilec entity = tile.ent();
         other = other.link();
 
@@ -191,7 +189,7 @@ public class PowerNode extends PowerBlock{
         }
 
         if(tile == other){
-            if(other.entity.power().links.size == 0){
+            if(other.power.links.size == 0){
                 int[] total = {0};
                 getPotentialLinks(tile, link -> {
                     if(!insulated(tile, link) && total[0]++ < maxNodes){
@@ -199,8 +197,8 @@ public class PowerNode extends PowerBlock{
                     }
                 });
             }else{
-                while(entity.power().links.size > 0){
-                    tile.configure(entity.power().links.get(0));
+                while(power.links.size > 0){
+                    tile.configure(power.links.get(0));
                 }
             }
             return false;
@@ -210,26 +208,26 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void drawSelect(Tile tile){
-        super.drawSelect(tile);
+    public void drawSelect(){
+        super.drawSelect();
 
         Lines.stroke(1f);
 
         Draw.color(Pal.accent);
-        Drawf.circles(tile.drawx(), tile.drawy(), laserRange * tilesize);
+        Drawf.circles(x, y, laserRange * tilesize);
         Draw.reset();
     }
 
     @Override
-    public void drawConfigure(Tile tile){
+    public void drawConfigure(){
 
         Draw.color(Pal.accent);
 
         Lines.stroke(1.5f);
-        Lines.circle(tile.drawx(), tile.drawy(),
+        Lines.circle(x, y,
         tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time(), 4f, 1f));
 
-        Drawf.circles(tile.drawx(), tile.drawy(), laserRange * tilesize);
+        Drawf.circles(x, y, laserRange * tilesize);
 
         Lines.stroke(1.5f);
 
@@ -272,13 +270,13 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void drawLayer(Tile tile){
+    public void drawLayer(){
         if(Core.settings.getInt("lasersopacity") == 0) return;
 
         Tilec entity = tile.ent();
 
-        for(int i = 0; i < entity.power().links.size; i++){
-            Tile link = world.tile(entity.power().links.get(i));
+        for(int i = 0; i < power.links.size; i++){
+            Tile link = world.tile(power.links.get(i));
 
             if(!linkValid(tile, link)) continue;
 
@@ -308,8 +306,8 @@ public class PowerNode extends PowerBlock{
         }
     }
 
-    protected boolean linked(Tile tile, Tile other){
-        return tile.entity.power().links.contains(other.pos());
+    protected boolean linked(Tile other){
+        return tile.power.links.contains(other.pos());
     }
 
     public boolean linkValid(Tilec tile, Tilec link){
@@ -317,11 +315,11 @@ public class PowerNode extends PowerBlock{
     }
 
     public boolean linkValid(Tilec tile, Tilec link, boolean checkMaxNodes){
-        if(tile == link || link == null || !link.block().hasPower || tile.team() != link.team()) return false;
+        if(tile == link || link == null || !link.block().hasPower || team != link.team()) return false;
 
         if(overlaps(tile, link, laserRange * tilesize) || (link.block() instanceof PowerNode && overlaps(link, tile, link.<PowerNode>cblock().laserRange * tilesize))){
             if(checkMaxNodes && link.block() instanceof PowerNode){
-                return link.entity.power().links.size < link.<PowerNode>cblock().maxNodes || link.entity.power().links.contains(tile.pos());
+                return link.power.links.size < link.<PowerNode>cblock().maxNodes || link.power.links.contains(tile.pos());
             }
             return true;
         }
@@ -341,8 +339,8 @@ public class PowerNode extends PowerBlock{
         return Intersector.overlaps(Tmp.cr1.set(src.worldx() + offset(), src.worldy() + offset(), laserRange * tilesize), Tmp.r1.setSize(size * tilesize).setCenter(other.worldx() + offset(), other.worldy() + offset()));
     }
 
-    protected void drawLaser(Tile tile, Tile target){
-        drawLaser(tile.drawx(), tile.drawy(), target.drawx(), target.drawy(), tile.entity.power().graph.getSatisfaction(), size, target.block().size);
+    protected void drawLaser(Tile target){
+        drawLaser(x, y, target.drawx(), target.drawy(), tile.power.graph.getSatisfaction(), size, target.block().size);
     }
 
     protected void drawLaser(float x1, float y1, float x2, float y2, float satisfaction, int size1, int size2){

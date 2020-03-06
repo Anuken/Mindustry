@@ -26,7 +26,7 @@ class AllDefs{
     }
 
     @GroupDef(Tilec.class)
-    class tile{
+    class gtile{
 
     }
 

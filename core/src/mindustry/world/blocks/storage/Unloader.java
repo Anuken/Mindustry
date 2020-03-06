@@ -26,10 +26,8 @@ public class Unloader extends Block{
         health = 70;
         hasItems = true;
         configurable = true;
-        entityType = UnloaderEntity::new;
-
-        config(Item.class, (tile, item) -> {
-            tile.entity.items().clear();
+    config(Item.class, (tile, item) -> {
+            tile.items.clear();
             tile.<UnloaderEntity>ent().sortItem = item;
         });
 
@@ -42,7 +40,7 @@ public class Unloader extends Block{
     }
 
     @Override
-    public boolean canDump(Tile tile, Tile to, Item item){
+    public boolean canDump(Tile to, Item item){
         return !(to.block() instanceof StorageBlock);
     }
 
@@ -53,7 +51,7 @@ public class Unloader extends Block{
     }
 
     @Override
-    public void playerPlaced(Tile tile){
+    public void playerPlaced(){
         if(lastItem != null){
             tile.configure(lastItem);
         }
@@ -61,18 +59,16 @@ public class Unloader extends Block{
 
     @Override
     public void updateTile(){
-        UnloaderEntity entity = tile.ent();
-
-        if(tile.entity.timer(timerUnload, speed / entity.timeScale()) && tile.entity.items().total() == 0){
-            for(Tile other : tile.entity.proximity()){
-                if(other.interactable(tile.team()) && other.block().unloadable && other.block().hasItems && entity.items().total() == 0 &&
-                ((entity.sortItem == null && other.entity.items().total() > 0) || hasItem(other, entity.sortItem))){
-                    offloadNear(tile, removeItem(other, entity.sortItem));
+        if(timer(timerUnload, speed / timeScale()) && tile.items.total() == 0){
+            for(Tile other : tile.proximity()){
+                if(other.interactable(team) && other.block().unloadable && other.block().hasItems && items.total() == 0 &&
+                ((sortItem == null && other.items.total() > 0) || hasItem(other, sortItem))){
+                    offloadNear(tile, removeItem(other, sortItem));
                 }
             }
         }
 
-        if(entity.items().total() > 0){
+        if(items.total() > 0){
             tryDump(tile);
         }
     }
@@ -81,14 +77,14 @@ public class Unloader extends Block{
      * Removes an item and returns it. If item is not null, it should return the item.
      * Returns null if no items are there.
      */
-    private Item removeItem(Tile tile, Item item){
+    private Item removeItem(Item item){
         Tilec entity = tile.entity;
 
         if(item == null){
-            return entity.items().take();
+            return items.take();
         }else{
-            if(entity.items().has(item)){
-                entity.items().remove(item, 1);
+            if(items.has(item)){
+                items.remove(item, 1);
                 return item;
             }
 
@@ -100,32 +96,30 @@ public class Unloader extends Block{
      * Returns whether this storage block has the specified item.
      * If the item is null, it should return whether it has ANY items.
      */
-    private boolean hasItem(Tile tile, Item item){
+    private boolean hasItem(Item item){
         Tilec entity = tile.entity;
         if(item == null){
-            return entity.items().total() > 0;
+            return items.total() > 0;
         }else{
-            return entity.items().has(item);
+            return items.has(item);
         }
     }
 
     @Override
     public void draw(){
-        super.draw(tile);
+        super.draw();
 
-        UnloaderEntity entity = tile.ent();
-
-        Draw.color(entity.sortItem == null ? Color.clear : entity.sortItem.color);
+        Draw.color(sortItem == null ? Color.clear : sortItem.color);
         Draw.rect("unloader-center", tile.worldx(), tile.worldy());
         Draw.color();
     }
 
     @Override
-    public void buildConfiguration(Tile tile, Table table){
+    public void buildConfiguration(Table table){
         ItemSelection.buildTable(table, content.items(), () -> tile.<UnloaderEntity>ent().sortItem, item -> tile.configure(lastItem = item));
     }
 
-    public static class UnloaderEntity extends TileEntity{
+    public class UnloaderEntity extends TileEntity{
         public Item sortItem = null;
 
         @Override

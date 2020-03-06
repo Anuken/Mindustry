@@ -19,11 +19,11 @@ public class LiquidVoid extends Block{
     }
 
     @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+    public boolean acceptLiquid(Tile source, Liquid liquid, float amount){
         return true;
     }
 
     @Override
-    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){}
+    public void handleLiquid(Tile source, Liquid liquid, float amount){}
 
 }

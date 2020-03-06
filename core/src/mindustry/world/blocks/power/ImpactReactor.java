@@ -39,9 +39,7 @@ public class ImpactReactor extends PowerGenerator{
         liquidCapacity = 30f;
         hasItems = true;
         outputsPower = consumesPower = true;
-        entityType = FusionReactorEntity::new;
-
-        bottomRegion = reg("-bottom");
+    bottomRegion = reg("-bottom");
         plasmaRegions = new int[plasmas];
         for(int i = 0; i < plasmas; i++){
             plasmaRegions[i] = reg("-plasma-" + i);
@@ -54,7 +52,7 @@ public class ImpactReactor extends PowerGenerator{
 
         bars.add("poweroutput", entity -> new Bar(() ->
         Core.bundle.format("bar.poweroutput",
-        Strings.fixed(Math.max(entity.block().getPowerProduction(entity.tile()) - consumes.getPower().usage, 0) * 60 * entity.timeScale(), 1)),
+        Strings.fixed(Math.max(block().getPowerProduction(tile()) - consumes.getPower().usage, 0) * 60 * timeScale(), 1)),
         () -> Pal.powerBar,
         () -> ((GeneratorEntity)entity).productionEfficiency));
     }
@@ -70,57 +68,53 @@ public class ImpactReactor extends PowerGenerator{
 
     @Override
     public void updateTile(){
-        FusionReactorEntity entity = tile.ent();
-
-        if(entity.consValid() && entity.power().status >= 0.99f){
+        if(consValid() && power.status >= 0.99f){
             boolean prevOut = getPowerProduction(tile) <= consumes.getPower().requestedPower(entity);
 
-            entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
-            if(Mathf.equal(entity.warmup, 1f, 0.001f)){
-                entity.warmup = 1f;
+            warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed);
+            if(Mathf.equal(warmup, 1f, 0.001f)){
+                warmup = 1f;
             }
 
             if(!prevOut && (getPowerProduction(tile) > consumes.getPower().requestedPower(entity))){
                 Events.fire(Trigger.impactPower);
             }
 
-            if(entity.timer(timerUse, itemDuration / entity.timeScale())){
-                entity.consume();
+            if(timer(timerUse, itemDuration / timeScale())){
+                consume();
             }
         }else{
-            entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.01f);
+            warmup = Mathf.lerpDelta(warmup, 0f, 0.01f);
         }
 
-        entity.productionEfficiency = Mathf.pow(entity.warmup, 5f);
+        productionEfficiency = Mathf.pow(warmup, 5f);
     }
 
     @Override
     public void draw(){
-        FusionReactorEntity entity = tile.ent();
-
-        Draw.rect(reg(bottomRegion), tile.drawx(), tile.drawy());
+        Draw.rect(reg(bottomRegion), x, y);
 
         for(int i = 0; i < plasmas; i++){
             float r = 29f + Mathf.absin(Time.time(), 2f + i * 1f, 5f - i * 0.5f);
 
             Draw.color(plasma1, plasma2, (float)i / plasmas);
-            Draw.alpha((0.3f + Mathf.absin(Time.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * entity.warmup);
+            Draw.alpha((0.3f + Mathf.absin(Time.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * warmup);
             Draw.blend(Blending.additive);
-            Draw.rect(reg(plasmaRegions[i]), tile.drawx(), tile.drawy(), r, r, Time.time() * (12 + i * 6f) * entity.warmup);
+            Draw.rect(reg(plasmaRegions[i]), x, y, r, r, Time.time() * (12 + i * 6f) * warmup);
             Draw.blend();
         }
 
         Draw.color();
 
-        Draw.rect(region, tile.drawx(), tile.drawy());
+        Draw.rect(region, x, y);
 
         Draw.color();
     }
 
     @Override
-    public void drawLight(Tile tile){
+    public void drawLight(){
         float fract = tile.<FusionReactorEntity>ent().warmup;
-        renderer.lights.add(tile.drawx(), tile.drawy(), (110f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(plasma2).lerp(plasma1, Mathf.absin(7f, 0.2f)), 0.8f * fract);
+        renderer.lights.add(x, y, (110f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(plasma2).lerp(plasma1, Mathf.absin(7f, 0.2f)), 0.8f * fract);
     }
 
     @Override
@@ -129,12 +123,10 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     @Override
-    public void onDestroyed(Tile tile){
-        super.onDestroyed(tile);
+    public void onDestroyed(){
+        super.onDestroyed();
 
-        FusionReactorEntity entity = tile.ent();
-
-        if(entity.warmup < 0.4f || !state.rules.reactorExplosions) return;
+        if(warmup < 0.4f || !state.rules.reactorExplosions) return;
 
         Sounds.explosionbig.at(tile);
 
@@ -162,7 +154,7 @@ public class ImpactReactor extends PowerGenerator{
         }
     }
 
-    public static class FusionReactorEntity extends GeneratorEntity{
+    public class FusionReactorEntity extends GeneratorEntity{
         public float warmup;
 
         @Override

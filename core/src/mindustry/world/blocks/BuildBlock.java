@@ -39,9 +39,7 @@ public class BuildBlock extends Block{
         layer = Layer.placement;
         consumesTap = true;
         solidifes = true;
-        entityType = BuildEntity::new;
-
-        buildBlocks[size - 1] = this;
+    buildBlocks[size - 1] = this;
     }
 
     /** Returns a BuildBlock by size. */
@@ -51,27 +49,27 @@ public class BuildBlock extends Block{
     }
 
     @Remote(called = Loc.server)
-    public static void onDeconstructFinish(Tile tile, Block block, int builderID){
-        Team team = tile.team();
-        Fx.breakBlock.at(tile.drawx(), tile.drawy(), block.size);
+    public static void onDeconstructFinish(Block block, int builderID){
+        Team team = team;
+        Fx.breakBlock.at(x, y, block.size);
         Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, true));
         tile.remove();
         if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
     }
 
     @Remote(called = Loc.server)
-    public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
+    public static void onConstructFinish(Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         if(tile == null) return;
-        float healthf = tile.entity.healthf();
+        float healthf = tile.healthf();
         tile.setBlock(block, team, (int)rotation);
-        tile.entity.health(block.health * healthf);
+        tile.health(block.health * healthf);
         //last builder was this local client player, call placed()
         if(!headless && builderID == player.unit().id()){
             if(!skipConfig){
-                tile.entity.playerPlaced();
+                tile.playerPlaced();
             }
         }
-        Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
+        Fx.placeBlock.at(x, y, block.size);
     }
 
     static boolean shouldPlay(){
@@ -98,9 +96,9 @@ public class BuildBlock extends Block{
         }
     }
 
-    public static void constructed(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
+    public static void constructed(Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         Call.onConstructFinish(tile, block, builderID, rotation, team, skipConfig);
-        tile.entity.placed();
+        tile.placed();
 
         Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, false));
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
@@ -166,7 +164,7 @@ public class BuildBlock extends Block{
             Fx.blockExplosionSmoke.at(tile);
 
             if(!tile.floor().solid && !tile.floor().isLiquid){
-                Effects.rubble(tile.drawx(), tile.drawy(), size);
+                Effects.rubble(x, y, size);
             }
         }
 
@@ -180,7 +178,7 @@ public class BuildBlock extends Block{
             if(previous == null || cblock == null) return;
 
             if(Core.atlas.isFound(previous.icon(Cicon.full))){
-                Draw.rect(previous.icon(Cicon.full), tile.drawx(), tile.drawy(), previous.rotate ? tile.rotation() * 90 : 0);
+                Draw.rect(previous.icon(Cicon.full), x, y, previous.rotate ? tile.rotation() * 90 : 0);
             }
         }
 
@@ -196,7 +194,7 @@ public class BuildBlock extends Block{
                 Shaders.blockbuild.region = region;
                 Shaders.blockbuild.progress = progress;
 
-                Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.rotation() * 90 : 0);
+                Draw.rect(region, x, y, target.rotate ? tile.rotation() * 90 : 0);
                 Draw.flush();
             }
         }
