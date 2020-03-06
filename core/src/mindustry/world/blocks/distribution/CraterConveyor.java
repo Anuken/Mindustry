@@ -2,10 +2,8 @@ package mindustry.world.blocks.distribution;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -157,20 +155,27 @@ public class CraterConveyor extends Block implements Autotiler{
             return;
         }
 
+        // crater needs to be centered
         if(entity.reload > 0f) return;
 
-        if(entity.blendbit2 == 6){ // unload
-            while(true){
-                if(!tryDump(tile)) break;
+        // unload
+        if(entity.blendbit2 == 6){
+            while(tryDump(tile)){
+                if(entity.items.total() == 0) poofOut(tile);
             }
-            if(entity.items.total() == 0) poofOut(tile);
-        }else if(shouldLaunch(tile)){ // transfer
-            Tile destination = tile.front();
-            if(destination != null && destination.getTeam() == tile.getTeam() && destination.block() instanceof CraterConveyor){
+        }
+
+        else
+
+        // transfer
+        if(entity.blendbit2 != 5 || (entity.items.total() >= getMaximumAccepted(tile, entity.items.first()))){
+            if(tile.front() != null
+            && tile.front().getTeam() == tile.getTeam()
+            && tile.front().block() instanceof CraterConveyor){
 
                 // always let destination update first
-                destination.block().update(destination);
-                CraterConveyorEntity e = destination.ent();
+                tile.front().block().update(tile.front());
+                CraterConveyorEntity e = tile.front().ent();
 
                 // sleep if its occupied
                 if(e.from != Pos.invalid){
@@ -216,8 +221,7 @@ public class CraterConveyor extends Block implements Autotiler{
 
     @Override
     public int removeStack(Tile tile, Item item, int amount){
-        try{
-            return super.removeStack(tile, item, amount);
+        try{return super.removeStack(tile, item, amount);
         }finally{
             if(tile.entity.items.total() == 0) poofOut(tile);
         }
@@ -285,8 +289,6 @@ public class CraterConveyor extends Block implements Autotiler{
         ) cons.get(tile.left());
     }
 
-    // ▲ | ▼ fixme: refactor
-
     // awaken inputting conveyors
     private void bump(Tile tile){
         upstream(tile, t -> {
@@ -295,13 +297,6 @@ public class CraterConveyor extends Block implements Autotiler{
                 bump(t);
             }
         });
-    }
-
-    private boolean shouldLaunch(Tile tile){
-        CraterConveyorEntity entity = tile.ent();
-
-        // prevent(s) launch only when the crater is on a loading dock that still has room for items
-        return entity.blendbit2 != 5 || (entity.items.total() >= getMaximumAccepted(tile, entity.items.first()));
     }
 
     @Override
