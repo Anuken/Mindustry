@@ -169,27 +169,23 @@ public class CraterConveyor extends Block implements Autotiler{
         if(shouldLaunch(tile)){
             Tile destination = tile.front();
             if(destination != null && destination.getTeam() == tile.getTeam() && destination.block() instanceof CraterConveyor){
-                // update as to potentially make room
+
+                // always let destination update first
                 destination.block().update(destination);
+                CraterConveyorEntity e = destination.ent();
 
-                CraterConveyorEntity other = destination.ent();
-
-                // check if other is occupied
-                if(other.from != Pos.invalid){
+                // sleep if its occupied
+                if(e.from != Pos.invalid){
                     entity.sleep();
                 }else{
-                    // transfer crater ownership
-                    other.from  = tile.pos();
+                    e.items.addAll(entity.items);
+                    e.from = tile.pos();
+                    // ▲ new | old ▼
                     entity.from = Pos.invalid;
-
-                    other.reload  = 1; // start reeling in
-                    entity.reload = 1; // prevent spawning
-
-                    // transfer inventory of conveyor
-                    other.items.addAll(entity.items);
                     entity.items.clear();
 
-                    other.noSleep();
+                    e.reload = entity.reload = 1;
+                    e.noSleep();
                     bump(tile);
                 }
             }
@@ -276,7 +272,7 @@ public class CraterConveyor extends Block implements Autotiler{
         if(    entity.blendbit1 == 0 // 1 input from the back, 0 from the sides
             || entity.blendbit1 == 2 // 1 input from the back, 1 from the sides
             || entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
-        ) cons.get(tile.back());
+        ) cons.get(tile.back());     // fixme, fires for 0 while nothing behind
 
         if(    entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
             || entity.blendbit1 == 4 // 0 input from the back, 2 from the sides
