@@ -86,8 +86,8 @@ public class CraterConveyor extends Block implements Autotiler{
 
         // position
         Tile from = world.tile(entity.from);
-        Tmp.v1.set(from.getX(), from.getY());
-        Tmp.v2.set(tile.drawx(), tile.drawy());
+        Tmp.v1.set(from);
+        Tmp.v2.set(tile);
         Tmp.v1.interpolate(Tmp.v2, 1f - entity.reload, Interpolation.linear);
 
         // fixme, cleanup
