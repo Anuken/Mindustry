@@ -24,7 +24,7 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class BuildBlock extends Block{
-    public static final int maxSize = 9;
+    public static final int maxSize = 16;
     private static final BuildBlock[] buildBlocks = new BuildBlock[maxSize];
 
     private static long lastTime = 0;
@@ -39,7 +39,7 @@ public class BuildBlock extends Block{
         layer = Layer.placement;
         consumesTap = true;
         solidifes = true;
-    buildBlocks[size - 1] = this;
+        buildBlocks[size - 1] = this;
     }
 
     /** Returns a BuildBlock by size. */

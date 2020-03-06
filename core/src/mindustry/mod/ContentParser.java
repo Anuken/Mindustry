@@ -26,6 +26,7 @@ import mindustry.gen.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -245,8 +246,8 @@ public class ContentParser{
 
                 readFields(block, value, true);
 
-                if(block.size > 8){
-                    throw new IllegalArgumentException("Blocks cannot be larger than 8x8.");
+                if(block.size > BuildBlock.maxSize){
+                    throw new IllegalArgumentException("Blocks cannot be larger than " + BuildBlock.maxSize);
                 }
 
                 //add research tech node
