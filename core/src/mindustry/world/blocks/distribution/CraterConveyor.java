@@ -287,10 +287,9 @@ public class CraterConveyor extends Block implements Autotiler{
     // awaken inputting conveyors
     private void bump(Tile tile){
         upstream(tile, t -> {
-            if(t != null && t.entity != null && t.entity.isSleeping() && t.entity.items.total() > 0){
-                t.entity.noSleep();
-                bump(t);
-            }
+            if(t == null || t.entity == null || !t.entity.isSleeping() || t.entity.items.total() <= 0) return;
+            t.entity.noSleep();
+            bump(t);
         });
     }
 
