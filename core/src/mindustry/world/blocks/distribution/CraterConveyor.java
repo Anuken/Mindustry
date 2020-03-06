@@ -88,7 +88,7 @@ public class CraterConveyor extends Block implements Autotiler{
         Tile from = world.tile(entity.from);
         Tmp.v1.set(from);
         Tmp.v2.set(tile);
-        Tmp.v1.interpolate(Tmp.v2, 1f - entity.reload, Interpolation.linear);
+        Tmp.v1.interpolate(Tmp.v2, 1f - entity.cooldown, Interpolation.linear);
 
         // fixme, cleanup
         float a = from.rotation() * 90;
@@ -97,7 +97,7 @@ public class CraterConveyor extends Block implements Autotiler{
         if(from.rotation() == 0 && tile.rotation() == 3) a = 4 * 90;
 
         // crater
-        Draw.rect(regions[7], Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interpolation.smooth.apply(1f - Mathf.clamp(entity.reload * 2, 0f, 1f))));
+        Draw.rect(regions[7], Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interpolation.smooth.apply(1f - Mathf.clamp(entity.cooldown * 2, 0f, 1f))));
 
         // item
         float size = (itemSize / 2f) + entity.items.total() * 0.1f / (itemCapacity / 8f);
@@ -144,16 +144,16 @@ public class CraterConveyor extends Block implements Autotiler{
         entity.lastFrameUpdated = Core.graphics.getFrameId();
 
         // reel in crater
-        if(entity.reload > 0f) entity.reload = Mathf.clamp(entity.reload - speed, 0f, 1f);
+        if(entity.cooldown > 0f) entity.cooldown = Mathf.clamp(entity.cooldown - speed, 0f, 1f);
 
         // sleep when idle
         if(entity.from == Pos.invalid){
-            if(entity.reload == 0f) tile.entity.sleep();
+            if(entity.cooldown == 0f) tile.entity.sleep();
             return;
         }
 
         // crater needs to be centered
-        if(entity.reload > 0f) return;
+        if(entity.cooldown > 0f) return;
 
         if(entity.blendbit2 == 6){
             while(tryDump(tile)){
@@ -182,7 +182,7 @@ public class CraterConveyor extends Block implements Autotiler{
                     entity.from = Pos.invalid;
                     entity.items.clear();
 
-                    e.reload = entity.reload = 1;
+                    e.cooldown = entity.cooldown = 1;
                     e.noSleep();
                     bump(tile);
                 }
@@ -239,7 +239,7 @@ public class CraterConveyor extends Block implements Autotiler{
         int blendsclx, blendscly;
 
         int from = Pos.invalid;
-        float reload;
+        float cooldown;
 
         byte dump;
 
@@ -249,7 +249,7 @@ public class CraterConveyor extends Block implements Autotiler{
 
             stream.writeInt(from);
             stream.writeByte(dump);
-            stream.writeFloat(reload);
+            stream.writeFloat(cooldown);
         }
 
         @Override
@@ -258,7 +258,7 @@ public class CraterConveyor extends Block implements Autotiler{
 
             from = stream.readInt();
             dump = stream.readByte();
-            reload = stream.readFloat();
+            cooldown = stream.readFloat();
         }
     }
 
@@ -299,7 +299,7 @@ public class CraterConveyor extends Block implements Autotiler{
         CraterConveyorEntity entity = tile.ent();
 
         if (tile == source) return true;                                  // player threw items
-        if (entity.reload > 0f) return false;                             // spawner @ cooldown
+        if (entity.cooldown > 0f) return false;                           // still cooling down
         return!((entity.blendbit2 != 5)                                   // not a loading dock
             ||  (entity.items.total() > 0 && !entity.items.has(item))     // incompatible items
             ||  (entity.items.total() >= getMaximumAccepted(tile, item))  // filled to capacity
