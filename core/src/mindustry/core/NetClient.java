@@ -481,8 +481,7 @@ public class NetClient implements ApplicationListener{
         connecting = false;
         ui.join.hide();
         net.setClientLoaded(true);
-        //TODO connect confirm
-        //Core.app.post(Call::connectConfirm);
+        Core.app.post(Call::connectConfirm);
         Time.runTask(40f, platform::updateRPC);
         Core.app.post(() -> ui.loadfrag.hide());
     }

@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
@@ -501,7 +502,7 @@ public class NetServer implements ApplicationListener{
         float xVelocity, float yVelocity,
         Tile mining,
         boolean boosting, boolean shooting, boolean chatting,
-        BuildRequest[] requests,
+        @Nullable BuildRequest[] requests,
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
         NetConnection connection = player.con();

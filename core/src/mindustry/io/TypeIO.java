@@ -119,6 +119,11 @@ public class TypeIO{
     }
 
     public static void writeRequests(Writes write, BuildRequest[] requests){
+        if(requests == null){
+            write.s(-1);
+            return;
+        }
+
         write.s((short)requests.length);
         for(BuildRequest request : requests){
             write.b(request.breaking ? (byte)1 : 0);
@@ -134,6 +139,10 @@ public class TypeIO{
 
     public static BuildRequest[] readRequests(Reads read){
         short reqamount = read.s();
+        if(reqamount == -1){
+            return null;
+        }
+
         BuildRequest[] reqs = new BuildRequest[reqamount];
         for(int i = 0; i < reqamount; i++){
             byte type = read.b();

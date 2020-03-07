@@ -100,7 +100,12 @@ public class MusicControl{
     /** Plays and fades in a music track. This must be called every frame.
      * If something is already playing, fades out that track and fades in this new music.*/
     private void play(@Nullable Music music){
-        if(!shouldPlay()) return;
+        if(!shouldPlay()){
+            if(current != null){
+                current.setVolume(0);
+            }
+            return;
+        }
 
         //update volume of current track
         if(current != null){

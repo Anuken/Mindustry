@@ -80,7 +80,7 @@ public class Packets{
             type = buffer.get();
             priority = buffer.get();
             short writeLength = buffer.getShort();
-            byte[] bytes = new byte[writeLength];
+            bytes = new byte[writeLength];
             buffer.get(bytes);
         }
 
