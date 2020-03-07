@@ -220,16 +220,18 @@ public class Blocks implements ContentList{
         }};
 
         ignarock = new Floor("ignarock"){{
-
+            attributes.set(Attribute.water, -0.1f);
         }};
 
         hotrock = new Floor("hotrock"){{
             attributes.set(Attribute.heat, 0.5f);
+            attributes.set(Attribute.water, -0.2f);
             blendGroup = ignarock;
         }};
 
         magmarock = new Floor("magmarock"){{
             attributes.set(Attribute.heat, 0.75f);
+            attributes.set(Attribute.water, -0.5f);
             updateEffect = Fx.magmasmoke;
             blendGroup = ignarock;
         }};
@@ -254,6 +256,7 @@ public class Blocks implements ContentList{
 
         salt = new Floor("salt"){{
             variants = 0;
+            attributes.set(Attribute.water, -0.2f);
         }};
 
         snow = new Floor("snow"){{
