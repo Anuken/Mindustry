@@ -9,8 +9,10 @@ import mindustry.world.*;
 
 public class SiliconValley implements ApplicationListener{
 
-    public static final Block gate = Blocks.siliconSmelter;
+    private static final Block gate = Blocks.siliconSmelter;
     private Interval timer = new Interval();
+
+    private boolean restartWhenEmpty = true;
 
     @Override
     public void update(){
@@ -20,8 +22,10 @@ public class SiliconValley implements ApplicationListener{
         Vars.playerGroup.all().each(p -> {
             if(p.spiderling.unlockedBlocks.contains(gate)){
                 p.con.yeet(KickReason.serverRestarting, "unlocked", gate.name);
-                Time.runTask(5f, () -> System.exit(2));
+                restartWhenEmpty = true;
             }
         });
+
+        if(Vars.playerGroup.isEmpty() && restartWhenEmpty) System.exit(2);
     }
 }
