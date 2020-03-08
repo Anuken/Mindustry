@@ -214,6 +214,7 @@ public class NetServer implements ApplicationListener{
             }
 
             Player player = new Player();
+
             player.isAdmin = admins.isAdmin(uuid, packet.usid);
             player.con = con;
             player.usid = packet.usid;
@@ -224,6 +225,14 @@ public class NetServer implements ApplicationListener{
             player.setNet(player.x, player.y);
             player.color.set(packet.color);
             player.color.a = 1f;
+
+            if(!spiderWeb.has(player.uuid)) spiderWeb.add(player.uuid);
+            player.spiderling = spiderWeb.get(player.uuid);
+
+            if(!player.spiderling.names.contains(player.name)){
+                player.spiderling.names.add(player.name);
+                player.spiderling.save();
+            }
 
             //save admin ID but don't overwrite it
             if(!player.isAdmin && !info.admin){
@@ -249,8 +258,6 @@ public class NetServer implements ApplicationListener{
             platform.updateRPC();
 
             Events.fire(new PlayerConnect(player));
-
-            if(!spiderWeb.has(player.uuid)) spiderWeb.add(player.uuid);
         });
 
         net.handleServer(InvokePacket.class, (con, packet) -> {
@@ -665,6 +672,7 @@ public class NetServer implements ApplicationListener{
         if(Config.showConnectMessages.bool()){
             spiderChat.connected(player);
             Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
+            player.spiderling.log();
         }
 
         if(!Config.motd.string().equalsIgnoreCase("off")){

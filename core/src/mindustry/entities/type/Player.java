@@ -24,6 +24,7 @@ import mindustry.input.*;
 import mindustry.io.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
+import mindustry.plugin.spiderweb.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -60,6 +61,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public int respawns;
 
     public @Nullable NetConnection con;
+    public @Nullable Spiderling spiderling;
     public boolean isLocal = false;
     public Interval timer = new Interval(6);
     public TargetTrait target;
