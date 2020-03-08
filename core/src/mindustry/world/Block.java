@@ -17,7 +17,6 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
-import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.ctype.ContentType;
 import mindustry.entities.*;
@@ -30,7 +29,6 @@ import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -596,12 +594,6 @@ public class Block extends BlockStorage{
     }
 
     public void handleBulletHit(TileEntity entity, Bullet bullet){
-        if(entity.block instanceof Sorter){
-            int config = entity.config();
-            entity.tile.setNet(entity.block, bullet.getTeam(), entity.tile.rotation);
-            entity.tile.configureAny(config);
-        }
-
         entity.damage(bullet.damage());
     }
 
