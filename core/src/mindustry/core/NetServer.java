@@ -681,6 +681,12 @@ public class NetServer implements ApplicationListener{
         }
 
         Events.fire(new PlayerJoin(player));
+
+        if(!state.rules.tags.containsKey("silicon")){
+            if(!player.spiderling.unlockedBlocks.contains(Blocks.siliconSmelter)){
+                Call.onConnect(player.con, "mindustry.nydus.app", 6569);
+            }
+        }
     }
 
     public boolean isWaitingForPlayers(){
