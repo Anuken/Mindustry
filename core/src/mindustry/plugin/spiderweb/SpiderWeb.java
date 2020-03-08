@@ -125,7 +125,7 @@ public class SpiderWeb implements ApplicationListener{
         Events.on(BlockBuildEndEvent.class, event -> {
             if(event.breaking) return;
             if(event.player == null) return;
-            if(Vars.state.rules.zone == null) return;
+            if(!Vars.world.isZone()) return;
             if(event.player.spiderling.unlockedBlocks.contains(event.tile.block)) return;
             event.player.spiderling.unlockedBlocks.add(event.tile.block);
             event.player.spiderling.save();
