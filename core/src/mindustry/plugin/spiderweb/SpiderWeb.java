@@ -29,13 +29,6 @@ public class SpiderWeb implements ApplicationListener{
         }
     }
 
-    /*
-    CREATE USER 'rtg'@'localhost' IDENTIFIED BY 'generator';
-    GRANT ALL PRIVILEGES ON *.* TO 'rtg'@'localhost' WITH GRANT OPTION;
-    CREATE USER 'rtg'@'%' IDENTIFIED BY 'generator';
-    GRANT ALL PRIVILEGES ON *.* TO 'rtg'@'%' WITH GRANT OPTION;
-     */
-
     public boolean has(String uuid){
         return get(uuid) != null;
     }
