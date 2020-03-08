@@ -4,6 +4,9 @@ import arc.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.game.*;
+import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.net.Packets.*;
 import mindustry.world.*;
 
@@ -21,7 +24,8 @@ public class SiliconValley implements ApplicationListener{
 
         Vars.playerGroup.all().each(p -> {
             if(p.spiderling.unlockedBlocks.contains(gate)){
-                p.con.yeet(KickReason.serverRestarting, "unlocked", gate.name);
+                Call.onConnect(p.con, "mindustry.nydus.app", 6567);
+                Events.fire(new GameOverEvent(Team.crux));
             }
         });
 
