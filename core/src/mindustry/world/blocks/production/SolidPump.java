@@ -2,16 +2,21 @@ package mindustry.world.blocks.production;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.struct.Array;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
+import mindustry.maps.Map;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
 
 /**
  * Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.
@@ -19,6 +24,10 @@ import mindustry.world.meta.*;
 public class SolidPump extends Pump{
     public Liquid result = Liquids.water;
     public Effect updateEffect = Fx.none;
+    /** How near a pump must be to be "nearby" */
+    public float deficiencyRadius = 0f;
+    /** Raw efficiency is multiplied by this for every nearby pump */
+    public float deficiencyScale = 0.97f;
     public float updateEffectChance = 0.02f;
     public float rotateSpeed = 1f;
     /** Attribute that is checked when calculating output. */
@@ -93,6 +102,13 @@ public class SolidPump extends Pump{
         public float pumpTime;
         public float boost;
         public float lastPump;
+        public float deficiency = 1f;
+
+        @Override
+        public float efficiency(){
+            float raw = power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
+            return raw * deficiency;
+        }
 
         @Override
         public void draw(){
@@ -151,6 +167,48 @@ public class SolidPump extends Pump{
 
         public float typeLiquid(){
             return liquids.total();
+        }
+
+        @Override
+        public void onRemoved(){
+            super.onRemoved();
+            updateDeficiency(true);
+        }
+
+        @Override
+        public void placed(){
+            super.placed();
+            updateDeficiency(false);
+        }
+
+        protected int clampCoord(float n, int sign, int mapSize){
+            return (int) Mathf.clamp(n + sign * deficiencyRadius, 0, mapSize);
+        }
+
+        public void updateDeficiency(boolean increase){
+            if(deficiencyScale != 1 && deficiencyRadius > 0.5) {
+                deficiency = 1f;
+                Tile t;
+                Array<Tile> pumps = new Array<>();
+                Map map = world.getMap();
+                int xMin = clampCoord(x / tilesize, -1, map.width);
+                int xMax = clampCoord(x / tilesize, 1, map.width);
+                int yMin = clampCoord(y / tilesize, -1, map.height);
+                int yMax = clampCoord(y / tilesize, 1, map.height);
+                for(int a = xMin; a < xMax; a++){
+                    for(int b = yMin; b < yMax; b++){
+                        t = world.tile(a, b);
+                        if(t != null && t.block() instanceof SolidPump){
+                            pumps.add(t);
+                        }
+                    }
+                }
+
+                deficiency = Mathf.pow(deficiencyScale, (float) pumps.size - 1f);
+                for(Tile pump : pumps){
+                    ((SolidPumpEntity) pump.entity).deficiency = deficiency;
+                }
+            }
         }
     }
 }

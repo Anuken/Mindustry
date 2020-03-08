@@ -1228,6 +1228,7 @@ public class Blocks implements ContentList{
             liquidCapacity = 30f;
             rotateSpeed = 1.4f;
             attribute = Attribute.water;
+            deficiencyRadius = 16f;
 
             consumes.power(1f);
         }};
