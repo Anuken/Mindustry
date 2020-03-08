@@ -25,7 +25,6 @@ public class UnitFactory extends Block{
     public float produceTime = 1000f;
     public float launchVelocity = 0f;
     public TextureRegion topRegion;
-    public int maxSpawn = 4;
     public int[] capacities;
 
     public UnitFactory(String name){
@@ -38,14 +37,13 @@ public class UnitFactory extends Block{
     }
 
     @Remote(called = Loc.server)
-    public static void onUnitFactorySpawn(Tile tile, int spawns){
+    public static void onUnitFactorySpawn(Tile tile){
         if(!(tile.entity instanceof UnitFactoryEntity) || !(tile.block() instanceof UnitFactory)) return;
 
         UnitFactory factory = (UnitFactory)tile.block();
         UnitFactoryEntity entity = tile.ent();
 
         entity.buildTime = 0f;
-        entity.spawned = spawns;
 
         Effects.shake(2f, 3f, entity);
         Fx.producesmoke.at(entity);
@@ -83,7 +81,6 @@ public class UnitFactory extends Block{
     public void setBars(){
         super.setBars();
         bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, () -> ((UnitFactoryEntity)entity).buildTime / produceTime));
-        bars.add("spawned", entity -> new Bar(() -> Core.bundle.format("bar.spawned", ((UnitFactoryEntity)entity).spawned, maxSpawn), () -> Pal.command, () -> (float)((UnitFactoryEntity)entity).spawned / maxSpawn));
     }
 
     @Override
@@ -97,7 +94,6 @@ public class UnitFactory extends Block{
 
         stats.remove(BlockStat.itemCapacity);
         stats.add(BlockStat.productionTime, produceTime / 60f, StatUnit.seconds);
-        stats.add(BlockStat.maxUnits, maxSpawn, StatUnit.none);
     }
 
     @Override
@@ -109,8 +105,7 @@ public class UnitFactory extends Block{
         float buildTime;
         float time;
         float speedScl;
-        int spawned;
-
+        //int spawned;
 
         @Override
         public void draw(){
@@ -144,9 +139,6 @@ public class UnitFactory extends Block{
 
         @Override
         public void updateTile(){
-            if(spawned >= maxSpawn){
-                return;
-            }
 
             if(consValid() || tile.isEnemyCheat()){
                 time += delta() * speedScl * Vars.state.rules.unitBuildSpeedMultiplier * efficiency();
@@ -159,7 +151,7 @@ public class UnitFactory extends Block{
             if(buildTime >= produceTime){
                 buildTime = 0f;
 
-                Call.onUnitFactorySpawn(tile, spawned + 1);
+                Call.onUnitFactorySpawn(tile);
                 useContent(unitType);
                 consume();
             }
@@ -171,22 +163,25 @@ public class UnitFactory extends Block{
         }
 
         @Override
-        public boolean shouldConsume(){
-            return spawned < maxSpawn;
+        public byte version(){
+            return 1;
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
             write.f(buildTime);
-            write.i(spawned);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
             buildTime = read.f();
-            spawned = read.i();
+
+            if(revision == 0){
+                //spawn count
+                read.i();
+            }
         }
     }
 }

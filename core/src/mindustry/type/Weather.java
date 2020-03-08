@@ -1,5 +1,6 @@
 package mindustry.type;
 
+import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 
 public abstract class Weather extends MappableContent{
@@ -19,4 +20,9 @@ public abstract class Weather extends MappableContent{
     }
 
     //TODO implement
+
+    @Component
+    class WeatherComp{
+        Weather weather;
+    }
 }

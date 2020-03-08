@@ -1659,7 +1659,6 @@ public class Blocks implements ContentList{
             unitType = UnitTypes.draug;
             produceTime = 2500;
             size = 2;
-            maxSpawn = 1;
             consumes.power(1.2f);
             consumes.items();
         }};
@@ -1669,7 +1668,6 @@ public class Blocks implements ContentList{
             unitType = UnitTypes.spirit;
             produceTime = 4000;
             size = 2;
-            maxSpawn = 1;
             consumes.power(1.2f);
             consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30));
         }};
@@ -1679,7 +1677,6 @@ public class Blocks implements ContentList{
             unitType = UnitTypes.phantom;
             produceTime = 4400;
             size = 2;
-            maxSpawn = 1;
             consumes.power(2.5f);
             consumes.items(new ItemStack(Items.silicon, 50), new ItemStack(Items.lead, 30), new ItemStack(Items.titanium, 20));
         }};
@@ -1705,7 +1702,6 @@ public class Blocks implements ContentList{
             unitType = UnitTypes.ghoul;
             produceTime = 1150;
             size = 3;
-            maxSpawn = 2;
             consumes.power(1.2f);
             consumes.items(new ItemStack(Items.silicon, 15), new ItemStack(Items.titanium, 10));
         }};
@@ -1715,7 +1711,6 @@ public class Blocks implements ContentList{
             unitType = UnitTypes.revenant;
             produceTime = 2000;
             size = 4;
-            maxSpawn = 2;
             consumes.power(3f);
             consumes.items(new ItemStack(Items.silicon, 40), new ItemStack(Items.titanium, 30));
         }};
@@ -1734,7 +1729,6 @@ public class Blocks implements ContentList{
             unitType = UnitTypes.crawler;
             produceTime = 300;
             size = 2;
-            maxSpawn = 6;
             consumes.power(0.5f);
             consumes.items(new ItemStack(Items.coal, 10));
         }};
@@ -1753,7 +1747,6 @@ public class Blocks implements ContentList{
             unitType = UnitTypes.fortress;
             produceTime = 2000;
             size = 3;
-            maxSpawn = 3;
             consumes.power(1.4f);
             consumes.items(new ItemStack(Items.silicon, 20), new ItemStack(Items.graphite, 10));
         }};
