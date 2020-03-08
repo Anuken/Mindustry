@@ -10,14 +10,15 @@ public class Spiderling{
     public String uuid;
 
     public Array<String> names = new Array<>();
-    public ObjectSet<Block> unlocked = new ObjectSet<>();
+    public ObjectSet<Block> unlockedBlocks = new ObjectSet<>();
 
     public void save(){
         spiderWeb.save(this);
+        spiderWeb.saveUnlockedBlocks(this);
     }
 
     public void log(){
         Log.warn("names: " + names);
-        Log.warn("unlocked: " + unlocked);
+        Log.warn("unlocked: " + unlockedBlocks);
     }
 }

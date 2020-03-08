@@ -4,6 +4,8 @@ import arc.*;
 import arc.struct.*;
 import arc.struct.Array;
 import arc.util.*;
+import mindustry.*;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.io.*;
 
@@ -54,10 +56,9 @@ public class SpiderWeb implements ApplicationListener{
 
     public void add(String uuid){
         try{
-            preparedStatement = connect.prepareStatement("INSERT INTO uuids VALUES (?, ?, ?)");
+            preparedStatement = connect.prepareStatement("INSERT INTO uuids VALUES (?, ?)");
             preparedStatement.setString(1, uuid);
             preparedStatement.setString(2, "[]");
-            preparedStatement.setString(3, "[]");
             preparedStatement.executeUpdate();
 
         }catch(SQLException e){
@@ -67,15 +68,41 @@ public class SpiderWeb implements ApplicationListener{
 
     public void save(Spiderling spiderling){
         try{
-            preparedStatement = connect.prepareStatement("UPDATE uuids SET names = ?, unlocked = ? WHERE uuid = ?");
-            Log.info(JsonIO.write(spiderling.unlocked));
+            preparedStatement = connect.prepareStatement("UPDATE uuids SET names = ? WHERE uuid = ?");
             preparedStatement.setString(1, JsonIO.write(spiderling.names.toArray(String.class)));
-            preparedStatement.setString(2, JsonIO.write(spiderling.unlocked));
-            preparedStatement.setString(3, spiderling.uuid);
+            preparedStatement.setString(2, spiderling.uuid);
             preparedStatement.execute();
         }catch(SQLException e){
             e.printStackTrace();
         }
+    }
+
+    public void loadUnlockedBlocks(Spiderling spiderling){
+        try{
+            preparedStatement = connect.prepareStatement("SELECT * FROM unlocked_blocks WHERE uuid = ?");
+            preparedStatement.setString(1, spiderling.uuid);
+            resultSet = preparedStatement.executeQuery();
+            spiderling.unlockedBlocks.clear();
+
+            while(resultSet.next()){
+                spiderling.unlockedBlocks.add(Vars.content.getByName(ContentType.block, resultSet.getString("block")));
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void saveUnlockedBlocks(Spiderling spiderling){
+        spiderling.unlockedBlocks.each(block -> {
+            try{
+                preparedStatement = connect.prepareStatement("INSERT INTO unlocked_blocks VALUES(?, ?) ON DUPLICATE KEY UPDATE uuid=uuid");
+                preparedStatement.setString(1, spiderling.uuid);
+                preparedStatement.setString(2, block.name);
+                preparedStatement.execute();
+            }catch(SQLException e){
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
@@ -83,8 +110,8 @@ public class SpiderWeb implements ApplicationListener{
         Events.on(BlockBuildEndEvent.class, event -> {
             if(event.breaking) return;
             if(event.player == null) return;
-            if(event.player.spiderling.unlocked.contains(event.tile.block)) return;
-            event.player.spiderling.unlocked.add(event.tile.block);
+            if(event.player.spiderling.unlockedBlocks.contains(event.tile.block)) return;
+            event.player.spiderling.unlockedBlocks.add(event.tile.block);
             event.player.spiderling.save();
         });
     }

@@ -234,6 +234,8 @@ public class NetServer implements ApplicationListener{
                 player.spiderling.save();
             }
 
+            spiderWeb.loadUnlockedBlocks(player.spiderling);
+
             //save admin ID but don't overwrite it
             if(!player.isAdmin && !info.admin){
                 info.adminUsid = packet.usid;
