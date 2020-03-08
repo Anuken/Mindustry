@@ -84,6 +84,7 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(new Limbo());
         Core.app.addListener(new CraterCorner());
         Core.app.addListener(new BridgeBuilder());
+        Core.app.addListener(spiderWeb);
 
         mods.eachClass(Mod::init);
 

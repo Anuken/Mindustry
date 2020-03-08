@@ -1,13 +1,15 @@
 package mindustry.plugin.spiderweb;
 
+import arc.*;
 import arc.struct.*;
 import arc.struct.Array;
 import arc.util.*;
+import mindustry.game.EventType.*;
 import mindustry.io.*;
 
 import java.sql.*;
 
-public class SpiderWeb{
+public class SpiderWeb implements ApplicationListener{
 
     private Connection connect = null;
     private Statement statement = null;
@@ -40,6 +42,7 @@ public class SpiderWeb{
                 Spiderling sl = new Spiderling();
                 sl.uuid = resultSet.getString("uuid");
                 sl.names = Array.with(JsonIO.read(String[].class, resultSet.getString("names")));
+//                sl.unlocked = JsonIO.read(ObjectSet.class, resultSet.getString("unlocked"));
                 return sl;
             }
 
@@ -51,9 +54,10 @@ public class SpiderWeb{
 
     public void add(String uuid){
         try{
-            preparedStatement = connect.prepareStatement("INSERT INTO uuids VALUES (?, ?)");
+            preparedStatement = connect.prepareStatement("INSERT INTO uuids VALUES (?, ?, ?)");
             preparedStatement.setString(1, uuid);
             preparedStatement.setString(2, "[]");
+            preparedStatement.setString(3, "[]");
             preparedStatement.executeUpdate();
 
         }catch(SQLException e){
@@ -61,14 +65,27 @@ public class SpiderWeb{
         }
     }
 
-    public void saveNames(Spiderling spiderling){
+    public void save(Spiderling spiderling){
         try{
-            preparedStatement = connect.prepareStatement("UPDATE uuids SET names = ? WHERE uuid = ?");
+            preparedStatement = connect.prepareStatement("UPDATE uuids SET names = ?, unlocked = ? WHERE uuid = ?");
+            Log.info(JsonIO.write(spiderling.unlocked));
             preparedStatement.setString(1, JsonIO.write(spiderling.names.toArray(String.class)));
-            preparedStatement.setString(2, spiderling.uuid);
+            preparedStatement.setString(2, JsonIO.write(spiderling.unlocked));
+            preparedStatement.setString(3, spiderling.uuid);
             preparedStatement.execute();
         }catch(SQLException e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void init(){
+        Events.on(BlockBuildEndEvent.class, event -> {
+            if(event.breaking) return;
+            if(event.player == null) return;
+            if(event.player.spiderling.unlocked.contains(event.tile.block)) return;
+            event.player.spiderling.unlocked.add(event.tile.block);
+            event.player.spiderling.save();
+        });
     }
 }
