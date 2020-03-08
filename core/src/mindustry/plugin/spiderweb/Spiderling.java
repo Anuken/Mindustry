@@ -4,7 +4,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.spiderWeb;
+import static mindustry.Vars.spiderweb;
 
 public class Spiderling{
     public String uuid;
@@ -13,13 +13,13 @@ public class Spiderling{
     public ObjectSet<Block> unlockedBlocks = new ObjectSet<>();
 
     public void load(){
-        spiderWeb.loadNames(this);
-        spiderWeb.loadUnlockedBlocks(this);
+        spiderweb.loadNames(this);
+        spiderweb.loadUnlockedBlocks(this);
     }
 
     public void save(){
-        spiderWeb.saveNames(this);
-        spiderWeb.saveUnlockedBlocks(this);
+        spiderweb.saveNames(this);
+        spiderweb.saveUnlockedBlocks(this);
     }
 
     public void log(){

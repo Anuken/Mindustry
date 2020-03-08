@@ -226,8 +226,8 @@ public class NetServer implements ApplicationListener{
             player.color.set(packet.color);
             player.color.a = 1f;
 
-            if(!spiderWeb.has(player.uuid)) spiderWeb.add(player.uuid);
-            player.spiderling = spiderWeb.get(player.uuid);
+            if(!spiderweb.has(player.uuid)) spiderweb.add(player.uuid);
+            player.spiderling = spiderweb.get(player.uuid);
 
             player.spiderling.load();
 

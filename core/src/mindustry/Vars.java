@@ -182,7 +182,7 @@ public class Vars implements Loadable{
     public static NetClient netClient;
     public static CoreProtect coreProtect;
     public static SpiderChat spiderChat;
-    public static SpiderWeb spiderWeb;
+    public static SpiderWeb spiderweb;
 
     public static Entities entities;
     public static EntityGroup<Player> playerGroup;
@@ -241,7 +241,7 @@ public class Vars implements Loadable{
         pathfinder = new Pathfinder();
 
         spiderChat = new SpiderChat();
-        spiderWeb = new SpiderWeb();
+        spiderweb = new SpiderWeb();
 
         entities = new Entities();
         playerGroup = entities.add(Player.class).enableMapping();
