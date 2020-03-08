@@ -73,6 +73,8 @@ public class SpiderWeb implements ApplicationListener{
             while(resultSet.next()){
                 spiderling.names.add(resultSet.getString("name"));
             }
+
+            spiderling.names.ready();
         }catch(SQLException e){
             e.printStackTrace();
         }
@@ -88,6 +90,8 @@ public class SpiderWeb implements ApplicationListener{
             while(resultSet.next()){
                 spiderling.unlockedBlocks.add(Vars.content.getByName(ContentType.block, resultSet.getString("block")));
             }
+
+            spiderling.unlockedBlocks.ready();
         }catch(SQLException e){
             e.printStackTrace();
         }

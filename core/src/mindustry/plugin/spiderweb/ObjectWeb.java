@@ -9,9 +9,15 @@ public class ObjectWeb<T> extends ObjectSet<T>{
 
     Cons2<SpiderWeb, T> adder = (web, T) -> {};
 
+    private boolean ready = false;
+
+    public void ready(){
+        ready = true;
+    }
+
     @Override
     public boolean add(T key){
-        adder.get(spiderweb, key);
+        if(ready) adder.get(spiderweb, key);
         return super.add(key);
     }
 }
