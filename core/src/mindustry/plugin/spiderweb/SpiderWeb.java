@@ -95,7 +95,7 @@ public class SpiderWeb implements ApplicationListener{
     public void saveUnlockedBlocks(Spiderling spiderling){
         spiderling.unlockedBlocks.each(block -> {
             try{
-                preparedStatement = connect.prepareStatement("INSERT INTO unlocked_blocks VALUES(?, ?) ON DUPLICATE KEY UPDATE uuid=uuid");
+                preparedStatement = connect.prepareStatement("INSERT INTO unlocked_blocks VALUES(?, ?) ON DUPLICATE KEY UPDATE uuid = uuid");
                 preparedStatement.setString(1, spiderling.uuid);
                 preparedStatement.setString(2, block.name);
                 preparedStatement.execute();
