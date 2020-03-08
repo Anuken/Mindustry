@@ -23,11 +23,18 @@ public class SpiderWeb implements ApplicationListener{
     public SpiderWeb(){
         try{
             Class.forName("com.mysql.jdbc.Driver");
-            connect = DriverManager.getConnection("jdbc:mysql://localhost/nydus?user=root&password=root&useSSL=false");
+            connect = DriverManager.getConnection("jdbc:mysql://localhost/nydus?user=rtg&password=generator&useSSL=false");
         }catch(ClassNotFoundException | SQLException e){
             e.printStackTrace();
         }
     }
+
+    /*
+    CREATE USER 'rtg'@'localhost' IDENTIFIED BY 'generator';
+    GRANT ALL PRIVILEGES ON *.* TO 'rtg'@'localhost' WITH GRANT OPTION;
+    CREATE USER 'rtg'@'%' IDENTIFIED BY 'generator';
+    GRANT ALL PRIVILEGES ON *.* TO 'rtg'@'%' WITH GRANT OPTION;
+     */
 
     public boolean has(String uuid){
         return get(uuid) != null;
