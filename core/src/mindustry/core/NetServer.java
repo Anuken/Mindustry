@@ -229,12 +229,12 @@ public class NetServer implements ApplicationListener{
             if(!spiderWeb.has(player.uuid)) spiderWeb.add(player.uuid);
             player.spiderling = spiderWeb.get(player.uuid);
 
+            player.spiderling.load();
+
             if(!player.spiderling.names.contains(player.name)){
                 player.spiderling.names.add(player.name);
                 player.spiderling.save();
             }
-
-            spiderWeb.loadUnlockedBlocks(player.spiderling);
 
             //save admin ID but don't overwrite it
             if(!player.isAdmin && !info.admin){

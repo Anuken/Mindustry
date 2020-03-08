@@ -43,8 +43,6 @@ public class SpiderWeb implements ApplicationListener{
             if(resultSet.next()){
                 Spiderling sl = new Spiderling();
                 sl.uuid = resultSet.getString("uuid");
-                sl.names = Array.with(JsonIO.read(String[].class, resultSet.getString("names")));
-//                sl.unlocked = JsonIO.read(ObjectSet.class, resultSet.getString("unlocked"));
                 return sl;
             }
 
@@ -56,9 +54,8 @@ public class SpiderWeb implements ApplicationListener{
 
     public void add(String uuid){
         try{
-            preparedStatement = connect.prepareStatement("INSERT INTO uuids VALUES (?, ?)");
+            preparedStatement = connect.prepareStatement("INSERT INTO uuids VALUES (?)");
             preparedStatement.setString(1, uuid);
-            preparedStatement.setString(2, "[]");
             preparedStatement.executeUpdate();
 
         }catch(SQLException e){
@@ -66,16 +63,34 @@ public class SpiderWeb implements ApplicationListener{
         }
     }
 
-    public void save(Spiderling spiderling){
+    public void loadNames(Spiderling spiderling){
         try{
-            preparedStatement = connect.prepareStatement("UPDATE uuids SET names = ? WHERE uuid = ?");
-            preparedStatement.setString(1, JsonIO.write(spiderling.names.toArray(String.class)));
-            preparedStatement.setString(2, spiderling.uuid);
-            preparedStatement.execute();
+            preparedStatement = connect.prepareStatement("SELECT * FROM names WHERE uuid = ?");
+            preparedStatement.setString(1, spiderling.uuid);
+            resultSet = preparedStatement.executeQuery();
+            spiderling.names.clear();
+
+            while(resultSet.next()){
+                spiderling.names.add(resultSet.getString("name"));
+            }
         }catch(SQLException e){
             e.printStackTrace();
         }
     }
+
+    public void saveNames(Spiderling spiderling){
+        spiderling.names.each(name -> {
+            try{
+                preparedStatement = connect.prepareStatement("INSERT INTO names VALUES(?, ?) ON DUPLICATE KEY UPDATE uuid = uuid");
+                preparedStatement.setString(1, spiderling.uuid);
+                preparedStatement.setString(2, name);
+                preparedStatement.execute();
+            }catch(SQLException e){
+                e.printStackTrace();
+            }
+        });
+    }
+
 
     public void loadUnlockedBlocks(Spiderling spiderling){
         try{

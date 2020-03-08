@@ -9,11 +9,16 @@ import static mindustry.Vars.spiderWeb;
 public class Spiderling{
     public String uuid;
 
-    public Array<String> names = new Array<>();
+    public ObjectSet<String> names = new ObjectSet<>();
     public ObjectSet<Block> unlockedBlocks = new ObjectSet<>();
 
+    public void load(){
+        spiderWeb.loadNames(this);
+        spiderWeb.loadUnlockedBlocks(this);
+    }
+
     public void save(){
-        spiderWeb.save(this);
+        spiderWeb.saveNames(this);
         spiderWeb.saveUnlockedBlocks(this);
     }
 
