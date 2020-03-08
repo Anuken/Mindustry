@@ -1,6 +1,5 @@
 CREATE TABLE `uuids` (
   `uuid` char(24) NOT NULL DEFAULT '',
-  `names` json DEFAULT NULL,
   UNIQUE KEY `uuid` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -18,8 +17,3 @@ CREATE TABLE `names` (
   KEY `names_uuid_foreign` (`uuid`),
   CONSTRAINT `names_uuid_foreign` FOREIGN KEY (`uuid`) REFERENCES `uuids` (`uuid`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-CREATE USER 'rtg'@'localhost' IDENTIFIED BY 'generator';
-GRANT ALL PRIVILEGES ON *.* TO 'rtg'@'localhost' WITH GRANT OPTION;
-CREATE USER 'rtg'@'%' IDENTIFIED BY 'generator';
-GRANT ALL PRIVILEGES ON *.* TO 'rtg'@'%' WITH GRANT OPTION;
