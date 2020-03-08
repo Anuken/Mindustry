@@ -5,7 +5,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
@@ -45,7 +44,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
         return unit instanceof Minerc;
     }
 
-    public @Nullable Tilec closestCore(){
+    public @Nullable CoreEntity closestCore(){
         return state.teams.closestCore(x(), y(), team);
     }
 
@@ -64,17 +63,14 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
             clearUnit();
         }
 
+        CoreEntity core = closestCore();
+
         if(!dead()){
             x(unit.x());
             y(unit.y());
             unit.team(team);
-        }else if(!team.cores().isEmpty()){
-            //try to respawn
-            Array<CoreEntity> cores = team.cores();
-
-            if(!cores.isEmpty()){
-                //TODO respawning
-            }
+        }else if(core != null){
+            core.requestSpawn((Playerc)this);
         }
 
         textFadeTime -= Time.delta() / (60 * 5);

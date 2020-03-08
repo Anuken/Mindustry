@@ -20,7 +20,7 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
-    public UnitType mech = UnitTypes.starter;
+    public UnitType unitType = UnitTypes.phantom;
 
     public CoreBlock(String name){
         super(name);
@@ -35,17 +35,19 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Remote(called = Loc.server)
-    public static void onUnitRespawn(Tilec tile, Playerc player){
+    public static void onPlayerSpawn(Tile tile, Playerc player){
         if(player == null || tile == null) return;
 
-        //TODO really fix
-        Fx.spawn.at(tile);
-        //progress = 0;
-        //spawnPlayer = player;
-        //TODO fix
-        //spawnPlayer.onRespawn(tile);
-        //spawnPlayer.applyImpulse(0, 8f);
-        //spawnPlayer = null;
+        CoreEntity entity = tile.ent();
+        CoreBlock block = (CoreBlock)tile.block();
+        Fx.spawn.at(entity);
+        entity.progress = 0;
+
+        Unitc unit = block.unitType.create(tile.team());
+        unit.set(entity);
+        unit.impulse(0f, 8f);
+        unit.controller(player);
+        unit.add();
     }
 
     @Override
@@ -67,10 +69,21 @@ public class CoreBlock extends StorageBlock{
 
     public class CoreEntity extends TileEntity{
        // protected Playerc spawnPlayer;
-        //protected float progress;
-        protected float time;
-        protected float heat;
+        protected float time, heat, progress;
         protected int storageCapacity;
+        protected boolean shouldBuild;
+        protected Playerc lastRequested;
+
+        public void requestSpawn(Playerc player){
+            shouldBuild = true;
+            if(lastRequested == null){
+                lastRequested = player;
+            }
+
+            if(progress >= 1f){
+                Call.onPlayerSpawn(tile, player);
+            }
+        }
 
         @Override
         public void drawLight(){
@@ -183,8 +196,7 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void drawLayer(){
             if(heat > 0.001f){
-                //TODO implement
-                //RespawnBlock.drawRespawn(tile, heat, progress, time, spawnPlayer, mech);
+                Drawf.drawRespawn(this, heat, progress, time, unitType, lastRequested);
             }
         }
 
@@ -200,31 +212,23 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void updateTile(){
-            //TODO implement
-        /*
-        if(spawnPlayer != null){
-            if(!spawnPlayer.dead() || !spawnPlayer.isAdded()){
-                spawnPlayer = null;
-                return;
+
+            if(shouldBuild){
+                heat = Mathf.lerpDelta(heat, 1f, 0.1f);
+                time += delta();
+                progress += 1f / state.rules.respawnTime * delta();
+            }else{
+                progress = 0f;
+                heat = Mathf.lerpDelta(heat, 0f, 0.1f);
             }
 
-            spawnPlayer.set(x, y);
-            heat = Mathf.lerpDelta(heat, 1f, 0.1f);
-            time += delta();
-            progress += 1f / state.rules.respawnTime * delta();
-
-            if(progress >= 1f){
-                Call.onUnitRespawn(tile, spawnPlayer);
-            }
-        }else{
-            heat = Mathf.lerpDelta(heat, 0f, 0.1f);
-        }*/
+            shouldBuild = false;
+            lastRequested = null;
         }
 
         @Override
         public boolean shouldActiveSound(){
-            //TODO
-            return false;//spawnPlayer != null;
+            return shouldBuild;
         }
     }
 }
