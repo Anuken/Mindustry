@@ -233,7 +233,6 @@ public class NetServer implements ApplicationListener{
 
             if(!player.spiderling.names.contains(player.name)){
                 player.spiderling.names.add(player.name);
-                player.spiderling.save();
             }
 
             //save admin ID but don't overwrite it

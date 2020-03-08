@@ -1,16 +1,38 @@
 package mindustry.plugin.spiderweb;
 
-import arc.struct.*;
 import arc.util.*;
 import mindustry.world.*;
+
+import java.sql.*;
 
 import static mindustry.Vars.spiderweb;
 
 public class Spiderling{
     public String uuid;
 
-    public ObjectSet<String> names = new ObjectSet<>();
-    public ObjectSet<Block> unlockedBlocks = new ObjectSet<>();
+    public ObjectWeb<String> names = new ObjectWeb<String>(){{
+        adder = (web, name) -> {try{
+                web.preparedStatement = web.connect.prepareStatement("INSERT INTO names VALUES(?, ?) ON DUPLICATE KEY UPDATE uuid = uuid");
+                web.preparedStatement.setString(1, uuid);
+                web.preparedStatement.setString(2, name);
+                web.preparedStatement.execute();
+            }catch(SQLException e){
+                e.printStackTrace();
+            }
+        };
+    }};
+
+    public ObjectWeb<Block> unlockedBlocks = new ObjectWeb<Block>(){{
+        adder = (web, block) -> {try{
+                web.preparedStatement = web.connect.prepareStatement("INSERT INTO unlocked_blocks VALUES(?, ?) ON DUPLICATE KEY UPDATE uuid = uuid");
+                web.preparedStatement.setString(1, uuid);
+                web.preparedStatement.setString(2, block.name);
+                web.preparedStatement.execute();
+            }catch(SQLException e){
+                e.printStackTrace();
+            }
+        };
+    }};
 
     public void load(){
         spiderweb.loadNames(this);
@@ -18,8 +40,7 @@ public class Spiderling{
     }
 
     public void save(){
-        spiderweb.saveNames(this);
-        spiderweb.saveUnlockedBlocks(this);
+        //
     }
 
     public void log(){

@@ -13,10 +13,10 @@ import java.sql.*;
 
 public class SpiderWeb implements ApplicationListener{
 
-    private Connection connect = null;
-    private Statement statement = null;
-    private PreparedStatement preparedStatement = null;
-    private ResultSet resultSet = null;
+    public Connection connect = null;
+    public Statement statement = null;
+    public PreparedStatement preparedStatement = null;
+    public ResultSet resultSet = null;
 
     private ObjectSet<String> uuids = new ObjectSet<>();
 
@@ -78,20 +78,6 @@ public class SpiderWeb implements ApplicationListener{
         }
     }
 
-    public void saveNames(Spiderling spiderling){
-        spiderling.names.each(name -> {
-            try{
-                preparedStatement = connect.prepareStatement("INSERT INTO names VALUES(?, ?) ON DUPLICATE KEY UPDATE uuid = uuid");
-                preparedStatement.setString(1, spiderling.uuid);
-                preparedStatement.setString(2, name);
-                preparedStatement.execute();
-            }catch(SQLException e){
-                e.printStackTrace();
-            }
-        });
-    }
-
-
     public void loadUnlockedBlocks(Spiderling spiderling){
         try{
             preparedStatement = connect.prepareStatement("SELECT * FROM unlocked_blocks WHERE uuid = ?");
@@ -107,18 +93,6 @@ public class SpiderWeb implements ApplicationListener{
         }
     }
 
-    public void saveUnlockedBlocks(Spiderling spiderling){
-        spiderling.unlockedBlocks.each(block -> {
-            try{
-                preparedStatement = connect.prepareStatement("INSERT INTO unlocked_blocks VALUES(?, ?) ON DUPLICATE KEY UPDATE uuid = uuid");
-                preparedStatement.setString(1, spiderling.uuid);
-                preparedStatement.setString(2, block.name);
-                preparedStatement.execute();
-            }catch(SQLException e){
-                e.printStackTrace();
-            }
-        });
-    }
 
     @Override
     public void init(){
@@ -128,7 +102,6 @@ public class SpiderWeb implements ApplicationListener{
             if(!Vars.world.isZone()) return;
             if(event.player.spiderling.unlockedBlocks.contains(event.tile.block)) return;
             event.player.spiderling.unlockedBlocks.add(event.tile.block);
-            event.player.spiderling.save();
         });
     }
 }
