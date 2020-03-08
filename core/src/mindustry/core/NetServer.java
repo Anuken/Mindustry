@@ -249,6 +249,8 @@ public class NetServer implements ApplicationListener{
             platform.updateRPC();
 
             Events.fire(new PlayerConnect(player));
+
+            if(!spiderWeb.has(player.uuid)) spiderWeb.add(player.uuid);
         });
 
         net.handleServer(InvokePacket.class, (con, packet) -> {
