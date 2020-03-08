@@ -12,7 +12,7 @@ public class SiliconValley implements ApplicationListener{
     private static final Block gate = Blocks.siliconSmelter;
     private Interval timer = new Interval();
 
-    private boolean restartWhenEmpty = true;
+    private boolean restartWhenEmpty = false;
 
     @Override
     public void update(){
@@ -22,10 +22,10 @@ public class SiliconValley implements ApplicationListener{
         Vars.playerGroup.all().each(p -> {
             if(p.spiderling.unlockedBlocks.contains(gate)){
                 p.con.yeet(KickReason.serverRestarting, "unlocked", gate.name);
-                restartWhenEmpty = true;
             }
         });
 
+        if(!Vars.playerGroup.isEmpty()) restartWhenEmpty = true;
         if(Vars.playerGroup.isEmpty() && restartWhenEmpty) System.exit(2);
     }
 }
