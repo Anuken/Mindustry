@@ -18,7 +18,7 @@ public class BufferedItemBridge extends ExtendingItemBridge{
         hasItems = true;
     }
 
-    public class BufferedItemBridgeEntity extends ItemBridgeEntity{
+    public class BufferedItemBridgeEntity extends ExtendingItemBridgeEntity{
         ItemBuffer buffer = new ItemBuffer(bufferCapacity, speed);
 
         @Override

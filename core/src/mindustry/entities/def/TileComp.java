@@ -661,7 +661,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
 
         if(block.configurations.containsKey(type)){
-            block.configurations.get(type).get(tile, value);
+            block.configurations.get(type).get(this, value);
         }
     }
 
