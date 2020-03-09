@@ -4,6 +4,7 @@ config desc [lightgray] ,  &  [darkgray]https://discord.gg/[goldenrod]u
 
 config name [goldenrod]Nydus Network [darkgray]//\([white][])/\\
 config desc [lightgray]join and build a [darkgray]silicon smelter
+rules add bannedBlocks [power-source, power-void, item-source, item-void, liquid-source, liquid-void]
 
 config motd off
 config allowCustomClients true
