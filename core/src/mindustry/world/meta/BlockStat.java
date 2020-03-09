@@ -47,7 +47,8 @@ public enum BlockStat{
 
     booster(StatCategory.optional),
     boostEffect(StatCategory.optional),
-    affinities(StatCategory.optional);
+    affinities(StatCategory.optional),
+    aversions(StatCategory.optional);
 
     public final StatCategory category;
 
