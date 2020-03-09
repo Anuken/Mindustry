@@ -23,7 +23,7 @@ public class SpiderWeb implements ApplicationListener{
     public SpiderWeb(){
         try{
             Class.forName("com.mysql.jdbc.Driver");
-            connect = DriverManager.getConnection("jdbc:mysql://mindustry.nydus.app/nydus?user=crater&password=conveyor&useSSL=false");
+            connect = DriverManager.getConnection("jdbc:mysql://mindustry.nydus.app/nydus?user=crater&password=conveyor&useSSL=false&characterEncoding=UTF-8");
         }catch(ClassNotFoundException | SQLException e){
             e.printStackTrace();
         }
