@@ -495,6 +495,8 @@ public class World{
                     Tile tile = world.tile(x, y);
                     Tile orig = tmp.tile(x, y);
 
+                    if(tile.isLinked() || orig.isLinked()) continue;
+
                     if(tile.block != orig.block || tile.team != orig.team){
                         if(orig.block == Blocks.air){
                             tile.removeNet();
