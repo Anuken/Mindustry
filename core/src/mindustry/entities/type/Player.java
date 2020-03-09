@@ -528,18 +528,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             spawner = null;
         }
 
-//        Tile water = indexer.findClosestLiquid(x, y, Liquids.water);
-//        if(water != null){
-//            Log.info(water.dst(this));
-//            coreProtect.spark(this, water.pos(), Liquids.water.color);
-//        }
-
-        Tile oil = indexer.findClosestLiquid(x, y, Liquids.oil);
-        if(oil != null){
-            Log.info(oil.dst(this));
-            coreProtect.spark(this, oil.pos(), Liquids.oil.color);
-        }
-
         if(isLocal || net.server()){
             avoidOthers();
         }
