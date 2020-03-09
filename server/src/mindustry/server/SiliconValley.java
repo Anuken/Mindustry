@@ -25,7 +25,7 @@ public class SiliconValley implements ApplicationListener{
 
         Vars.playerGroup.all().each(p -> {
             if(p.spiderling.unlockedBlocks.contains(gate)){
-                Call.onConnect(p.con, "mindustry.nydus.app", 6567);
+                Call.onConnect(p.con, "mindustry.nydus.app", 1337);
                 Events.fire(new GameOverEvent(Team.crux));
             }
         });
