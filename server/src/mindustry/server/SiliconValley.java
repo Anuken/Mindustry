@@ -9,8 +9,6 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.world;
-
 public class SiliconValley implements ApplicationListener{
 
     private static final Block gate = Blocks.siliconSmelter;
@@ -39,6 +37,12 @@ public class SiliconValley implements ApplicationListener{
         Events.on(WaveEvent.class, event -> {
             if(!Vars.state.rules.tags.containsKey("silicon")) return;
             Events.fire(new GameOverEvent(Team.crux));
+        });
+
+        Events.on(BlockBuildEndEvent.class, event -> {
+            if(!Vars.state.rules.tags.containsKey("silicon")) return;
+            Vars.state.wavetime -= 60f;
+            if(Vars.state.wavetime < 0f) Vars.state.wavetime = 0f;
         });
     }
 }
