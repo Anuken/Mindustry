@@ -20,7 +20,6 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.distribution.*;
 import mindustry.world.modules.*;
 
 import java.io.*;
@@ -256,31 +255,7 @@ public class BuildBlock extends Block{
                 }
             }
 
-            boolean embargo = false;
-            if(cblock == Blocks.oilExtractor){
-                Tile oil = indexer.findClosestLiquid(tile.drawx(), tile.drawy(), Liquids.oil);
-                if(oil != null){
-                    float dst = oil.dst(this);
-                    if(dst < 500){
-
-                        world.raycastEach(tile.x, tile.y, oil.x, oil.y, (wx, wy) -> {
-                            Tile on = world.tile(wx, wy);
-                            Puddle.deposit(on, Liquids.oil, 1f);
-                            return Puddle.getPuddle(on).getAmount() < 50f;
-                        });
-
-                        embargo = true;
-                    }
-                }
-            }
-
             if(progress >= 1f || state.rules.infiniteResources){
-
-                if(embargo){
-                    progress = 1f - 0.00001f;
-                    return false;
-                }
-
                 constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
                 return true;
             }

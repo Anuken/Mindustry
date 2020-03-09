@@ -10,6 +10,7 @@ import mindustry.content.Fx;
 import mindustry.content.Liquids;
 import mindustry.entities.Effects;
 import mindustry.entities.Effects.Effect;
+import mindustry.entities.effect.*;
 import mindustry.entities.type.TileEntity;
 import mindustry.graphics.Pal;
 import mindustry.type.Liquid;
@@ -17,6 +18,8 @@ import mindustry.ui.Bar;
 import mindustry.world.Tile;
 import mindustry.world.meta.Attribute;
 import mindustry.world.meta.BlockStat;
+
+import static mindustry.Vars.*;
 
 /**
  * Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.
@@ -122,6 +125,8 @@ public class SolidPump extends Pump{
         entity.pumpTime += entity.warmup * entity.delta();
 
         tryDumpLiquid(tile, result);
+
+        darwin(tile);
     }
 
     @Override
@@ -155,6 +160,24 @@ public class SolidPump extends Pump{
 
     public float typeLiquid(Tile tile){
         return tile.entity.liquids.total();
+    }
+
+    public void darwin(Tile tile){
+        Tile oil = indexer.findClosestLiquid(tile.drawx(), tile.drawy(), result);
+        if(oil != null){
+            float dst = oil.dst(tile);
+            if(dst < tilesize * 50){
+
+                world.raycastEach(tile.x, tile.y, oil.x, oil.y, (wx, wy) -> {
+                    Tile on = world.tile(wx, wy);
+                    if(on.floor().liquidDrop == result) Core.app.post(tile::deconstructNet);
+                    Puddle.deposit(on, result, 2f);
+                    if(Puddle.getPuddle(on) == null) return false;
+                    return Puddle.getPuddle(on).getAmount() < 50f;
+                });
+
+            }
+        }
     }
 
     public static class SolidPumpEntity extends TileEntity{
