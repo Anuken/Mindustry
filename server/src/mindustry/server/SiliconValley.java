@@ -7,8 +7,9 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
-import mindustry.net.Packets.*;
 import mindustry.world.*;
+
+import static mindustry.Vars.world;
 
 public class SiliconValley implements ApplicationListener{
 
@@ -31,5 +32,13 @@ public class SiliconValley implements ApplicationListener{
 
         if(!Vars.playerGroup.isEmpty()) restartWhenEmpty = true;
         if(Vars.playerGroup.isEmpty() && restartWhenEmpty) System.exit(2);
+    }
+
+    @Override
+    public void init(){
+        Events.on(WaveEvent.class, event -> {
+            if(!Vars.state.rules.tags.containsKey("silicon")) return;
+            world.reload();
+        });
     }
 }

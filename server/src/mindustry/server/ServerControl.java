@@ -869,6 +869,10 @@ public class ServerControl implements ApplicationListener{
             for(Player p : playerGroup) Call.onConnect(p.con, arg[0], Strings.parseInt(arg[1]));
         });
 
+        handler.register("reload", "Reload the current map.", arg -> {
+            world.reload();
+        });
+
         mods.eachClass(p -> p.registerServerCommands(handler));
     }
 
