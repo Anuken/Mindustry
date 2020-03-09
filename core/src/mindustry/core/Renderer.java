@@ -2,6 +2,7 @@ package mindustry.core;
 
 import arc.*;
 import arc.files.*;
+import arc.fx.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
@@ -26,6 +27,7 @@ public class Renderer implements ApplicationListener{
 
     public FrameBuffer effectBuffer = new FrameBuffer(2, 2);
     private Bloom bloom;
+    private FxProcessor fx = new FxProcessor();
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
     private float targetscale = Scl.scl(4);
     private float camerascale = targetscale;
@@ -99,6 +101,8 @@ public class Renderer implements ApplicationListener{
         if(settings.getBool("bloom")){
             setupBloom();
         }
+
+        fx.resize(width, height);
     }
 
     @Override
@@ -137,6 +141,23 @@ public class Renderer implements ApplicationListener{
         }
     }
 
+    void beginFx(){
+        if(!fx.hasEnabledEffects()) return;
+
+        Draw.flush();
+        fx.clear();
+        fx.begin();
+    }
+
+    void endFx(){
+        if(!fx.hasEnabledEffects()) return;
+
+        Draw.flush();
+        fx.end();
+        fx.applyEffects();
+        fx.render(0, 0, fx.getWidth(), fx.getHeight());
+    }
+
     void updateShake(float scale){
         if(shaketime > 0){
             float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * scale;
@@ -163,6 +184,8 @@ public class Renderer implements ApplicationListener{
         }
 
         Draw.proj(camera.projection());
+
+        beginFx();
 
         drawBackground();
 
@@ -225,6 +248,8 @@ public class Renderer implements ApplicationListener{
         }
 
         overlays.drawTop();
+
+        endFx();
 
         if(!pixelator.enabled()){
             Groups.drawNames();
