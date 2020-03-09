@@ -107,9 +107,6 @@ public class BuildBlock extends Block{
     }
 
     public static void constructed(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
-
-
-
         Call.onConstructFinish(tile, block, builderID, rotation, team, skipConfig);
         tile.block().placed(tile);
 
