@@ -86,7 +86,6 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(new BridgeBuilder());
         Core.app.addListener(spiderweb);
         Core.app.addListener(new SiliconValley());
-        Core.app.addListener(new RangedVenom());
 
         mods.eachClass(Mod::init);
 
