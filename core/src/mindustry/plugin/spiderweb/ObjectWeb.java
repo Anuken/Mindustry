@@ -7,6 +7,7 @@ import static mindustry.Vars.spiderweb;
 
 public class ObjectWeb<T> extends ObjectSet<T>{
 
+    Cons<SpiderWeb>    loader = (web) -> {};
     Cons2<SpiderWeb, T> adder = (web, T) -> {};
 
     private boolean ready = false;

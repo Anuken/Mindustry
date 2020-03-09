@@ -63,41 +63,6 @@ public class SpiderWeb implements ApplicationListener{
         }
     }
 
-    public void loadNames(Spiderling spiderling){
-        try{
-            preparedStatement = connect.prepareStatement("SELECT * FROM names WHERE uuid = ?");
-            preparedStatement.setString(1, spiderling.uuid);
-            resultSet = preparedStatement.executeQuery();
-            spiderling.names.clear();
-
-            while(resultSet.next()){
-                spiderling.names.add(resultSet.getString("name"));
-            }
-
-            spiderling.names.ready();
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-    }
-
-    public void loadUnlockedBlocks(Spiderling spiderling){
-        try{
-            preparedStatement = connect.prepareStatement("SELECT * FROM unlocked_blocks WHERE uuid = ?");
-            preparedStatement.setString(1, spiderling.uuid);
-            resultSet = preparedStatement.executeQuery();
-            spiderling.unlockedBlocks.clear();
-
-            while(resultSet.next()){
-                spiderling.unlockedBlocks.add(Vars.content.getByName(ContentType.block, resultSet.getString("block")));
-            }
-
-            spiderling.unlockedBlocks.ready();
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-    }
-
-
     @Override
     public void init(){
         Events.on(BlockBuildEndEvent.class, event -> {
