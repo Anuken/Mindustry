@@ -144,7 +144,7 @@ public class ServerControl implements ApplicationListener{
             nextMapOverride = null;
             if(map != null){
 
-                if(map.tags.containsKey("silicon")){
+                if(state.rules.tags.containsKey("silicon")){
                     play(false, () -> world.loadMap(map, map.applyRules(lastMode)));
                 }else{
                     Call.onInfoMessage((state.rules.pvp
