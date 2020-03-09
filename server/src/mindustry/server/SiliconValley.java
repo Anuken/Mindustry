@@ -39,10 +39,10 @@ public class SiliconValley implements ApplicationListener{
             Events.fire(new GameOverEvent(Team.crux));
         });
 
-        Events.on(BlockBuildEndEvent.class, event -> {
-            if(!Vars.state.rules.tags.containsKey("silicon")) return;
-            Vars.state.wavetime -= 60f;
-            if(Vars.state.wavetime < 0f) Vars.state.wavetime = 0f;
-        });
+//        Events.on(BlockBuildEndEvent.class, event -> {
+//            if(!Vars.state.rules.tags.containsKey("silicon")) return;
+//            Vars.state.wavetime -= 60f;
+//            if(Vars.state.wavetime < 0f) Vars.state.wavetime = 0f;
+//        });
     }
 }
