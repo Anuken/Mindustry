@@ -127,6 +127,8 @@ public class Scripts implements Disposable{
                     if(!dir.exists()) return null; // Mod and folder not found
                     return loadSource(script, dir, validator);
                 }
+
+                currentMod = required;
                 return loadSource(script, required.root.child("scripts"), validator);
             }
 
