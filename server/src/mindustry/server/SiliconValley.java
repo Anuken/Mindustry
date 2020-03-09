@@ -38,7 +38,6 @@ public class SiliconValley implements ApplicationListener{
     public void init(){
         Events.on(WaveEvent.class, event -> {
             if(!Vars.state.rules.tags.containsKey("silicon")) return;
-            world.reload();
             Events.fire(new GameOverEvent(Team.crux));
         });
     }
