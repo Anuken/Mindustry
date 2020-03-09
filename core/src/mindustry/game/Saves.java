@@ -77,7 +77,7 @@ public class Saves{
     public void update(){
         SaveSlot current = this.current;
 
-        if(current != null && !state.is(State.menu)
+        if(current != null && state.isGame()
         && !(state.isPaused() && Core.scene.hasDialog())){
             if(lastTimestamp != 0){
                 totalPlaytime += Time.timeSinceMillis(lastTimestamp);
@@ -85,7 +85,7 @@ public class Saves{
             lastTimestamp = Time.millis();
         }
 
-        if(!state.is(State.menu) && !state.gameOver && current != null && current.isAutosave() && !state.rules.tutorial){
+        if(state.isGame() && !state.gameOver && current != null && current.isAutosave() && !state.rules.tutorial){
             time += Time.delta();
             if(time > Core.settings.getInt("saveinterval") * 60){
                 saving = true;
@@ -192,7 +192,7 @@ public class Saves{
 
             SaveIO.save(file);
             meta = SaveIO.getMeta(file);
-            if(!state.is(State.menu)){
+            if(state.isGame()){
                 current = this;
             }
 

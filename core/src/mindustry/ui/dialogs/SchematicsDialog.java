@@ -122,7 +122,7 @@ public class SchematicsDialog extends FloatingDialog{
                         })).size(200f);
                     }, () -> {
                         if(sel[0].childrenPressed()) return;
-                        if(state.is(State.menu)){
+                        if(state.isMenu()){
                             showInfo(s);
                         }else{
                             control.input.useSchematic(s);

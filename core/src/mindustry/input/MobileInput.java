@@ -432,7 +432,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, KeyCode button){
-        if(state.is(State.menu)) return false;
+        if(state.isMenu()) return false;
 
         down = true;
 
@@ -513,7 +513,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean longPress(float x, float y){
-        if(state.is(State.menu) || mode == none || player.dead()) return false;
+        if(state.isMenu() || mode == none || player.dead()) return false;
 
         //get tile on cursor
         Tile cursor = tileAt(x, y);
@@ -541,7 +541,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean tap(float x, float y, int count, KeyCode button){
-        if(state.is(State.menu) || lineMode) return false;
+        if(state.isMenu() || lineMode) return false;
 
         float worldx = Core.input.mouseWorld(x, y).x, worldy = Core.input.mouseWorld(x, y).y;
 
@@ -574,7 +574,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     public void update(){
         super.update();
 
-        if(state.is(State.menu) ){
+        if(state.isMenu() ){
             selectRequests.clear();
             removals.clear();
             mode = none;

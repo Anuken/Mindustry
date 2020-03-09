@@ -7,7 +7,6 @@ import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.core.GameState.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.*;
@@ -26,7 +25,7 @@ public class PlayerListFragment extends Fragment{
         parent.fill(cont -> {
             cont.visible(() -> visible);
             cont.update(() -> {
-                if(!(net.active() && !state.is(State.menu))){
+                if(!(net.active() && state.isGame())){
                     visible = false;
                     return;
                 }

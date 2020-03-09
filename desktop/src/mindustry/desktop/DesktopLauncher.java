@@ -13,7 +13,6 @@ import arc.util.serialization.*;
 import club.minnced.discord.rpc.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
-import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.desktop.steam.*;
 import mindustry.game.EventType.*;
@@ -248,7 +247,7 @@ public class DesktopLauncher extends ClientLauncher{
         if(!useDiscord && !steam) return;
 
         //common elements they each share
-        boolean inGame = !state.is(State.menu);
+        boolean inGame = state.isGame();
         String gameMapWithWave = "Unknown Map";
         String gameMode = "";
         String gamePlayersSuffix = "";

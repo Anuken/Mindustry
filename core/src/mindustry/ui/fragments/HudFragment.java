@@ -229,7 +229,7 @@ public class HudFragment extends Fragment{
             });
 
             t.top().visible(() -> {
-                if(state.is(State.menu) || !state.teams.get(player.team()).hasCore()){
+                if(state.isMenu() || !state.teams.get(player.team()).hasCore()){
                     coreAttackTime[0] = 0f;
                     return false;
                 }
@@ -288,7 +288,7 @@ public class HudFragment extends Fragment{
             .style(Styles.outlineLabel)).padTop(10).visible(p.color.a >= 0.001f);
             p.update(() -> {
                 p.color.a = Mathf.lerpDelta(p.color.a, Mathf.num(showHudText), 0.2f);
-                if(state.is(State.menu)){
+                if(state.isMenu()){
                     p.color.a = 0f;
                     showHudText = false;
                 }
@@ -328,14 +328,14 @@ public class HudFragment extends Fragment{
     }
 
     public void showToast(String text){
-        if(state.is(State.menu)) return;
+        if(state.isMenu()) return;
 
         scheduleToast(() -> {
             Sounds.message.play();
 
             Table table = new Table(Tex.button);
             table.update(() -> {
-                if(state.is(State.menu)){
+                if(state.isMenu()){
                     table.remove();
                 }
             });
@@ -362,7 +362,7 @@ public class HudFragment extends Fragment{
     public void showUnlock(UnlockableContent content){
         //some content may not have icons... yet
         //also don't play in the tutorial to prevent confusion
-        if(state.is(State.menu) || state.rules.tutorial) return;
+        if(state.isMenu() || state.rules.tutorial) return;
 
         Sounds.message.play();
 
@@ -371,7 +371,7 @@ public class HudFragment extends Fragment{
             scheduleToast(() -> {
                 Table table = new Table(Tex.button);
                 table.update(() -> {
-                    if(state.is(State.menu)){
+                    if(state.isMenu()){
                         table.remove();
                         lastUnlockLayout = null;
                         lastUnlockTable = null;
@@ -454,7 +454,7 @@ public class HudFragment extends Fragment{
         image.setFillParent(true);
         image.actions(Actions.fadeIn(40f / 60f));
         image.update(() -> {
-            if(state.is(State.menu)){
+            if(state.isMenu()){
                 image.remove();
             }
         });
@@ -469,7 +469,7 @@ public class HudFragment extends Fragment{
         image.actions(Actions.fadeOut(0.8f), Actions.remove());
         image.update(() -> {
             image.toFront();
-            if(state.is(State.menu)){
+            if(state.isMenu()){
                 image.remove();
             }
         });

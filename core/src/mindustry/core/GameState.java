@@ -58,6 +58,15 @@ public class GameState{
         return (is(State.paused) && !net.active()) || (gameOver && !net.active());
     }
 
+    /** @return whether the current state is *not* the menu. */
+    public boolean isGame(){
+        return state != State.menu;
+    }
+
+    public boolean isMenu(){
+        return state == State.menu;
+    }
+
     public boolean is(State astate){
         return state == astate;
     }

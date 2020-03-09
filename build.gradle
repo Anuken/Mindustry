@@ -253,6 +253,7 @@ project(":core"){
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
         compile arcModule("extensions:g3d")
+        compile arcModule("extensions:fx")
         compile arcModule("extensions:arcnet")
         compile "org.mozilla:rhino-runtime:1.7.12"
         if(localArc() && debugged()) compile arcModule("extensions:recorder")

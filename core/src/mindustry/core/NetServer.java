@@ -673,7 +673,7 @@ public class NetServer implements ApplicationListener{
     @Override
     public void update(){
 
-        if(!headless && !closing && net.server() && state.is(State.menu)){
+        if(!headless && !closing && net.server() && state.isMenu()){
             closing = true;
             ui.loadfrag.show("$server.closing");
             Time.runTask(5f, () -> {
@@ -683,7 +683,7 @@ public class NetServer implements ApplicationListener{
             });
         }
 
-        if(!state.is(State.menu) && net.server()){
+        if(state.isGame() && net.server()){
             sync();
         }
     }

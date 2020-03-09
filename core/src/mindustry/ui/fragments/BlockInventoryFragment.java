@@ -99,7 +99,7 @@ public class BlockInventoryFragment extends Fragment{
         table.touchable(Touchable.enabled);
         table.update(() -> {
 
-            if(state.is(State.menu) || tile == null || !tile.isValid() || !tile.block().isAccessible() || tile.items().total() == 0){
+            if(state.isMenu() || tile == null || !tile.isValid() || !tile.block().isAccessible() || tile.items().total() == 0){
                 hide();
             }else{
                 if(holding && lastItem != null){

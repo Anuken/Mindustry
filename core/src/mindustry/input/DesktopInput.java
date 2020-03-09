@@ -177,11 +177,11 @@ public class DesktopInput extends InputHandler{
             isShooting = false;
         }
 
-        if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap) && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
+        if(state.isGame() && Core.input.keyTap(Binding.minimap) && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
             ui.minimapfrag.toggle();
         }
 
-        if(state.is(State.menu) || Core.scene.hasDialog()) return;
+        if(state.isMenu() || Core.scene.hasDialog()) return;
 
         //zoom camera
         if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonal_placement)) && !ui.chatfrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0
@@ -491,7 +491,7 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void updateState(){
-        if(state.is(State.menu)){
+        if(state.isMenu()){
             droppingItem = false;
             mode = none;
             block = null;

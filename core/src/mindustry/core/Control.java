@@ -213,7 +213,7 @@ public class Control implements ApplicationListener, Loadable{
             input = new DesktopInput();
         }
 
-        if(!state.is(State.menu)){
+        if(state.isGame()){
             player.add();
         }
 
@@ -445,7 +445,7 @@ public class Control implements ApplicationListener, Loadable{
             settings.save();
         }
 
-        if(!state.is(State.menu)){
+        if(state.isGame()){
             input.update();
 
             if(state.isCampaign()){

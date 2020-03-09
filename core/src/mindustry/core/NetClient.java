@@ -451,7 +451,7 @@ public class NetClient implements ApplicationListener{
     public void update(){
         if(!net.client()) return;
 
-        if(!state.is(State.menu)){
+        if(state.isGame()){
             if(!connecting) sync();
         }else if(!connecting){
             net.disconnect();

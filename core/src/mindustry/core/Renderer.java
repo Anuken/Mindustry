@@ -9,7 +9,6 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -27,7 +26,7 @@ public class Renderer implements ApplicationListener{
 
     public FrameBuffer effectBuffer = new FrameBuffer(2, 2);
     private Bloom bloom;
-    private Color clearColor;
+    private Color clearColor = new Color(0f, 0f, 0f, 1f);
     private float targetscale = Scl.scl(4);
     private float camerascale = targetscale;
     private float landscale = 0f, landTime;
@@ -37,8 +36,6 @@ public class Renderer implements ApplicationListener{
     public Renderer(){
         camera = new Camera();
         Shaders.init();
-
-        clearColor = new Color(0f, 0f, 0f, 1f);
     }
 
     public void shake(float intensity, float duration){
@@ -68,7 +65,7 @@ public class Renderer implements ApplicationListener{
         camera.width = graphics.getWidth() / camerascale;
         camera.height = graphics.getHeight() / camerascale;
 
-        if(state.is(State.menu)){
+        if(state.isMenu()){
             landTime = 0f;
             graphics.clear(Color.black);
         }else{

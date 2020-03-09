@@ -37,7 +37,7 @@ public class SettingsMenuDialog extends SettingsDialog{
     public SettingsMenuDialog(){
         hidden(() -> {
             Sounds.back.play();
-            if(!state.is(State.menu)){
+            if(state.isGame()){
                 if(!wasPaused || net.active())
                     state.set(State.playing);
             }
@@ -45,7 +45,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         shown(() -> {
             back();
-            if(!state.is(State.menu)){
+            if(state.isGame()){
                 wasPaused = state.is(State.paused);
                 state.set(State.paused);
             }

@@ -15,7 +15,7 @@ public class SaveDialog extends LoadDialog{
         super("$savegame");
 
         update(() -> {
-            if(state.is(State.menu) && isShown()){
+            if(state.isMenu() && isShown()){
                 hide();
             }
         });

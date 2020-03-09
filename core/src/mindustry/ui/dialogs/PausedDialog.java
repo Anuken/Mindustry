@@ -29,7 +29,7 @@ public class PausedDialog extends FloatingDialog{
         cont.clear();
 
         update(() -> {
-            if(state.is(State.menu) && isShown()){
+            if(state.isMenu() && isShown()){
                 hide();
             }
         });

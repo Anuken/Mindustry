@@ -27,7 +27,7 @@ public class BlockConfigFragment extends Fragment{
             @Override
             public void act(float delta){
                 super.act(delta);
-                if(state.is(State.menu)){
+                if(state.isMenu()){
                     table.visible(false);
                     configTile = null;
                 }

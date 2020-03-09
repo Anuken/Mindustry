@@ -46,7 +46,7 @@ public class MusicControl{
 
     /** Update and play the right music track.*/
     public void update(){
-        if(state.is(State.menu)){
+        if(state.isMenu()){
             silenced = false;
             if(ui.planet.isShown()){
                 play(Musics.launch);

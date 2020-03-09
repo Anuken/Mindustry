@@ -276,7 +276,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("status", "Display server status.", arg -> {
-            if(state.is(State.menu)){
+            if(state.isMenu()){
                 info("Status: &rserver closed");
             }else{
                 info("Status:");
@@ -777,7 +777,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("gameover", "Force a game over.", arg -> {
-            if(state.is(State.menu)){
+            if(state.isMenu()){
                 err("Not playing a map.");
                 return;
             }
