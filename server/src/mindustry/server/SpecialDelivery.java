@@ -30,13 +30,14 @@ public class SpecialDelivery implements ApplicationListener{
                     if(t == null || t.block.upgrade == null || t.block.upgrade.get() == null) return false;
 
                     if(!ce.items.has(t.block.upgrade.get().requirements, state.rules.buildCostMultiplier * 100)) return false;
-                    for(ItemStack is: t.block.upgrade.get().requirements){
-                        ce.items.remove(is.item, (int)(is.amount * state.rules.buildCostMultiplier));
-                    }
 
                     return true;
                 }));
                 if(upgradable == null) return;
+
+                for(ItemStack is: upgradable.block.upgrade.get().requirements){
+                    ce.items.remove(is.item, (int)(is.amount * state.rules.buildCostMultiplier));
+                }
 
                 float dst = ce.dst(upgradable);
                 float maxTraveled = Bullets.driverBolt.lifetime * Bullets.driverBolt.speed;
