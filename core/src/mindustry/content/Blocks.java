@@ -1240,6 +1240,9 @@ public class Blocks implements ContentList{
             size = 2;
             drawMineItem = true;
             consumes.liquid(Liquids.water, 0.05f).boost();
+
+            flags = EnumSet.of(BlockFlag.upgradable);
+            upgrade = () -> pneumaticDrill;
         }};
 
         pneumaticDrill = new Drill("pneumatic-drill"){{
