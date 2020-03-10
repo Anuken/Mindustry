@@ -38,6 +38,8 @@ public class Renderer implements ApplicationListener{
     public Renderer(){
         camera = new Camera();
         Shaders.init();
+
+        fx.addEffect(new SnowFilter());
     }
 
     public void shake(float intensity, float duration){

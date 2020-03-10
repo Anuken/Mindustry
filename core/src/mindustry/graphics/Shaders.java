@@ -229,7 +229,7 @@ public class Shaders{
 
     public static class LoadShader extends Shader{
         public LoadShader(String frag, String vert){
-            super(Core.files.internal("shaders/" + vert + ".vertex.glsl"), Core.files.internal("shaders/" + frag + ".fragment.glsl"));
+            super(Core.files.internal("shaders/" + vert + ".vert"), Core.files.internal("shaders/" + frag + ".frag"));
         }
     }
 }

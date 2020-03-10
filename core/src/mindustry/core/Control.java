@@ -114,6 +114,7 @@ public class Control implements ApplicationListener, Loadable{
 
         //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> app.post(() -> {
+            player.add();
             if(state.rules.pvp && !net.active()){
                 try{
                     net.host(port);
