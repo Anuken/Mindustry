@@ -156,7 +156,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     void removeRequest(BuildRequest request){
-        selectRequests.removeValue(request, true);
+        selectRequests.remove(request, true);
         if(!request.breaking){
             removals.add(request);
         }

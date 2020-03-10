@@ -33,7 +33,7 @@ public class RemoteReadGenerator{
     throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException, IOException{
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
-        classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
+        classBuilder.addJavadoc(RemoteProcess.autogenWarning);
 
         //create main method builder
         MethodSpec.Builder readMethod = MethodSpec.methodBuilder("readPacket")

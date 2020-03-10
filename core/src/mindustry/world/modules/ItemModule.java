@@ -1,16 +1,18 @@
 package mindustry.world.modules;
 
-import mindustry.type.Item;
-import mindustry.type.ItemStack;
+import mindustry.type.*;
 
 import java.io.*;
-import java.util.Arrays;
+import java.util.*;
 
 import static mindustry.Vars.content;
 
 public class ItemModule extends BlockModule{
     private int[] items = new int[content.items().size];
     private int total;
+
+    // Make the take() loop persistent so it does not return the same item twice in a row unless there is nothing else to return.
+    protected int takeRotation;
 
     public void forEach(ItemConsumer cons){
         for(int i = 0; i < items.length; i++){
@@ -66,12 +68,24 @@ public class ItemModule extends BlockModule{
         return total;
     }
 
-    public Item take(){
+    public Item first(){
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
-                items[i]--;
-                total--;
                 return content.item(i);
+            }
+        }
+        return null;
+    }
+
+    public Item take(){
+        for(int i = 0; i < items.length; i++){
+            int index = (i + takeRotation);
+            if(index >= items.length) index -= items.length;
+            if(items[index] > 0){
+                items[index] --;
+                total --;
+                takeRotation = index + 1;
+                return content.item(index);
             }
         }
         return null;

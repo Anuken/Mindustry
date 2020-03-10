@@ -17,6 +17,10 @@ public class Teams{
     /** Active teams. */
     private Array<TeamData> active = new Array<>();
 
+    public Teams(){
+        active.add(get(Team.crux));
+    }
+
     public @Nullable CoreEntity closestEnemyCore(float x, float y, Team team){
         for(TeamData data : active){
             if(areEnemies(team, data.team)){
@@ -85,7 +89,6 @@ public class Teams{
 
     /** Returns whether {@param other} is an enemy of {@param #team}. */
     public boolean areEnemies(Team team, Team other){
-        //todo what about derelict?
         return team != other;
     }
 
@@ -95,6 +98,7 @@ public class Teams{
 
     /** Do not modify. */
     public Array<TeamData> getActive(){
+        active.removeAll(t -> !t.active());
         return active;
     }
 
@@ -125,7 +129,7 @@ public class Teams{
     }
 
     private void updateEnemies(){
-        if(!active.contains(get(state.rules.waveTeam))){
+        if(state.rules.waves && !active.contains(get(state.rules.waveTeam))){
             active.add(get(state.rules.waveTeam));
         }
 
@@ -163,6 +167,14 @@ public class Teams{
 
         public CoreEntity core(){
             return cores.first();
+        }
+
+        @Override
+        public String toString(){
+            return "TeamData{" +
+            "cores=" + cores +
+            ", team=" + team +
+            '}';
         }
     }
 

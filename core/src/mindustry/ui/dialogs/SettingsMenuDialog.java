@@ -144,7 +144,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                 }
             })));
 
-            if(!ios){
+            if(!mobile){
                 t.row();
                 t.addImageTextButton("$data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath()));
             }
@@ -330,7 +330,12 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(Shaders.shield != null){
             graphics.checkPref("animatedshields", !mobile);
         }
-        graphics.checkPref("bloom", !mobile, val -> renderer.toggleBloom(val));
+        if(!ios){
+            graphics.checkPref("bloom", !mobile, val -> renderer.toggleBloom(val));
+        }else{
+            Core.settings.put("bloom", false);
+        }
+
         graphics.checkPref("pixelate", false, val -> {
             if(val){
                 Events.fire(Trigger.enablePixelation);

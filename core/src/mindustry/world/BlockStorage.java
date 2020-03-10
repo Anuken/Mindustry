@@ -274,8 +274,7 @@ public abstract class BlockStorage extends UnlockableContent{
 
     /** Try offloading an item to a nearby container in its facing direction. Returns true if success. */
     public boolean offloadDir(Tile tile, Item item){
-        Tile other = tile.getNearby(tile.rotation());
-        if(other != null) other = other.link();
+        Tile other = tile.front();
         if(other != null && other.getTeam() == tile.getTeam() && other.block().acceptItem(item, other, tile)){
             other.block().handleItem(item, other, tile);
             return true;

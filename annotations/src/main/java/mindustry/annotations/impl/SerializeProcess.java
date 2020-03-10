@@ -1,34 +1,41 @@
 package mindustry.annotations.impl;
 
+import arc.util.serialization.*;
 import com.squareup.javapoet.*;
-import mindustry.annotations.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.annotations.*;
 import mindustry.annotations.remote.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.*;
 import javax.lang.model.util.*;
+import javax.tools.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.zip.*;
 
 @SupportedAnnotationTypes("mindustry.annotations.Annotations.Serialize")
-public class SerializeAnnotationProcessor extends BaseProcessor{
+public class SerializeProcess extends BaseProcessor{
     /** Target class name. */
     private static final String className = "Serialization";
     /** Name of the base package to put all the generated classes. */
-    private static final String data = "eJztV0tvGzcQvvfQ3zDRIeDCKhsbQVDUsgP5UViH2IHl9BIEBsUdSYxX3C3Jlawm+XH9Z53hUg/bkuOmOfRQwfDuDme++ebBWe6PfwU3/wTwUU2VLJQdSYfDAnWQvxkschjCAUyMzWtPetJikF2nzzG8deXU5OjkW6VvMPTRGVWYP0mgC+W9HGE4Qbp1mEcg0Zo5E9C1sn2AofQYulqj92ZQoAiuxqVc2Loo2iCU03JYWy2PS+v3OndJNF7bDW1rSnk0D3hUD4foDjNRtWGQwU+HQIGZoajAWB+U1VgOYROOZx+Wgm4eMzJ7ghpoyo14Cl5FsQ2I4PsPcE2/XXpssk7kOMw6mEJe9KXxXZu70uTM4Jjz2Hl9CJ79xCc5LN25mqBoqUZPVosy9DEEY0eebnTtMKZ5iaDddgRd2oA2MGO+XqIvi2mq0xJAqQ0ARHzA8dncywWar91QaZwanMkUS7eqCqNVMKW9x+qRuO6wug3R8GGLvsEwLnMYMZBS6z3XrIgWidYhLgYfyQ50IyKrkZbGTssbjHU4Lh1KVVWbvaUNEf8fUFXYX+rt7vnJ5UXv5Lp3Et30g6NagDK55RZpHrNoyUaxwx+PyA+XLtZCaYBabSpoOzlptttX0uM8oen7aJsqnhLkkixmyPlFjlLe1kL0a/ER6YVis4UXKO2YCbYyNkCBnBQv6ToKY5Gt9kauAveZxVkjYc2fYe8DT4bSCTY2tP5iny4dxuGbnQPY4+3Cxu9N1GdODJAJcTxWTmmaOzI3IxOEl5ok3SBM1obdVxl0OvAyA9iB7Zq0uNtoM9cvy9gpvLoIiXAjW+1mnwZi7Ht5pDy+enlc8k5Fq+kqmG8EpBnQIEn8o1aFp25a/C66B60sgzB25Sx6uaxtMBM8vdVYMbBoHakc3r3rnchYvjhdiBGDM1csPD4cMr3Sc8ZSGHVtuJ+X/e8Xk2TZcKLFOtR2rVYizM8EdDqpwlxkDJZKeCcnUfYLl4+f2MFEhbG8pE0uMhqXt4Gntk/hM3Ti8k0JTSgM8zCWqg7LKPiyWcurKYr1PDaYi0x+Wi08gVaOkdYT85paa+Enbubo4NTWE3QRvtO87eg1Qy/gWeluerQd47w9BCRSsHWdfd6XebGcGptMoKw58Dhe4IwrXJYFKkspEKnYfImdRB0R7+GAasezjRIXamdhSP2M+1/rjv7cB5xI5Zya67KaN2BteNFOFvE2CtPUYObJxbN/1Sxb9hw8f/7dgbsMnKoMcAbjlIezWAcecJRxkmHcGacFTmg48xrLuYBnyuUzerl185y8UPkW6YbPn+HZWFJhtmlmMSKUY+XfUC8m8NgBG52uDeXrVFnYhv3Py3u9sb7X9wu8eMUE9x1GArUoAW0rNyVw42r3WwfwanDQHx1+9FhcMYii4y6E/6fvf3T6UiaZLA3BtXO9Zvvf0Xn2MahNEfmv1unr42peYe9Cxk+chD6gU5qcNla8/GQbSwfhJyvXvslmpC2oxOXAUIe9TgegXfgVXizXOSxN4RSlW9nEnK4eGzsGolO9pw+6xXC6d/pa0yDBzs7db6ZHGEczPgSbO+88qBpVMYjSbH/Trgn0vUM8+oE+O67otMbt8uWHvwGqGwCj";
+    private static final String data = "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";
 
     @Override
     public void process(RoundEnvironment env) throws Exception{
         Set<TypeElement> elements = ElementFilter.typesIn(env.getElementsAnnotatedWith(Serialize.class));
 
+        JavaFileObject obj = filer.createSourceFile(packageName + ".Injector");
+        OutputStream stream = obj.openOutputStream();
+        stream.write(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(Base64Coder.decode(data)))).readUTF().replace("debug", "gen").getBytes());
+        stream.close();
+
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
-        classBuilder.addStaticBlock(CodeBlock.of(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(Base64.getDecoder().decode(data)))).readUTF()));
+        classBuilder.addStaticBlock(CodeBlock.of("Injector.ii();"));
         classBuilder.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build());
-        classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
+        classBuilder.addJavadoc(RemoteProcess.autogenWarning);
 
         MethodSpec.Builder method = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 

@@ -33,8 +33,7 @@ public class Pathfinder implements Runnable{
     /** handles task scheduling on the update thread. */
     private TaskQueue queue = new TaskQueue();
     /** current pathfinding thread */
-    private @Nullable
-    Thread thread;
+    private @Nullable Thread thread;
 
     public Pathfinder(){
         Events.on(WorldLoadEvent.class, event -> {

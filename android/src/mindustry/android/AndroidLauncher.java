@@ -81,7 +81,7 @@ public class AndroidLauncher extends AndroidApplication{
                 if(VERSION.SDK_INT >= VERSION_CODES.Q){
                     Intent intent = new Intent(open ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType(extension.equals("zip") ? "application/zip" : "*/*");
+                    intent.setType(extension.equals("zip") && !open ? "application/zip" : "*/*");
                     addResultListener(i -> startActivityForResult(intent, i), (code, in) -> {
                         if(code == Activity.RESULT_OK && in != null && in.getData() != null){
                             Uri uri = in.getData();
@@ -155,16 +155,6 @@ public class AndroidLauncher extends AndroidApplication{
         Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
         Core.settings.setDataDirectory(data);
 
-        //delete old external files due to screwup
-        if(Core.files.local("files_moved").exists() && !Core.files.local("files_moved_103").exists()){
-            for(Fi fi : data.list()){
-                fi.deleteDirectory();
-            }
-
-            Core.files.local("files_moved").delete();
-            Core.files.local("files_moved_103").writeString("files moved again");
-        }
-
         //move to internal storage if there's no file indicating that it moved
         if(!Core.files.local("files_moved").exists()){
             Log.info("Moving files to external storage...");
@@ -177,6 +167,7 @@ public class AndroidLauncher extends AndroidApplication{
                 }
                 //create marker
                 Core.files.local("files_moved").writeString("files moved to " + data);
+                Core.files.local("files_moved_103").writeString("files moved again");
                 Log.info("Files moved.");
             }catch(Throwable t){
                 Log.err("Failed to move files!");

@@ -1,5 +1,0 @@
-mindustry.annotations.remote.RemoteMethodAnnotationProcessor
-mindustry.annotations.impl.StructAnnotationProcessor
-mindustry.annotations.impl.SerializeAnnotationProcessor
-mindustry.annotations.impl.AssetsAnnotationProcessor
-mindustry.annotations.impl.CallSuperAnnotationProcessor

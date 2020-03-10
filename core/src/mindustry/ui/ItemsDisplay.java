@@ -44,7 +44,7 @@ public class ItemsDisplay extends Table{
                 t.setText(state.is(State.menu) ? "$launcheditems" : "$launchinfo");
                 t.setChecked(col.isCollapsed());
                 ((Image)t.getChildren().get(1)).setDrawable(col.isCollapsed() ? Icon.upOpen : Icon.downOpen);
-            }).padBottom(4).left().fillX().margin(12f);
+            }).padBottom(4).left().fillX().margin(12f).minWidth(200f);
             c.row();
             c.add(col);
         });

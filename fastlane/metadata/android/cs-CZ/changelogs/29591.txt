@@ -1,0 +1,9 @@
+- Přidány nové ikony s hladkým škálováním
+- Přidána černá díra na kapaliny (přispěno uživatelem @GioIacca9)
+- Přidáno nastavení průsvitnosti přemostění přepravníku (přispěno uživatelem @Quezler)
+- Přidána brána s podtokem (protikus k bráně s přetečením)
+- Přidány emotikony do kanálu zpráv, pro většinu bloků a předmětů
+- Přidán nový strom technologií, s lepší podporou pro modifikace
+- Přidán soubor s logem hry, uložený v adresáři s daty
+- Přidán nový oddělovač pro sprity a animace (ocení modéři)
+- Přidán seznam synergetických dlaždic do statistik některých bloků (viz například vrt na vodu)

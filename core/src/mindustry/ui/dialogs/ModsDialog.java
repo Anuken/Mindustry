@@ -40,7 +40,7 @@ public class ModsDialog extends FloatingDialog{
                         }else{
                             try{
                                 Fi file = tmpDirectory.child(text.replace("/", "") + ".zip");
-                                Streams.copyStream(result.getResultAsStream(), file.write(false));
+                                Streams.copy(result.getResultAsStream(), file.write(false));
                                 mods.importMod(file);
                                 file.delete();
                                 Core.app.post(() -> {
@@ -87,7 +87,7 @@ public class ModsDialog extends FloatingDialog{
     void modError(Throwable error){
         ui.loadfrag.hide();
 
-        if(Strings.getCauses(error).contains(t -> t.getMessage() != null && (t.getMessage().contains("SSL") || t.getMessage().contains("protocol")))){
+        if(Strings.getCauses(error).contains(t -> t.getMessage() != null && (t.getMessage().contains("trust anchor") || t.getMessage().contains("SSL") || t.getMessage().contains("protocol")))){
             ui.showErrorMessage("$feature.unsupported");
         }else{
             ui.showException(error);

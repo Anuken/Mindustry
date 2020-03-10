@@ -2,6 +2,11 @@ const log = function(context, obj){
     Vars.mods.getScripts().log(context, obj ? String(obj) : "null")
 }
 
+var scriptName = "base.js"
+var modName = "none"
+
+const print = text => log(modName + "/" + scriptName, text);
+
 const extendContent = function(classType, name, params){
     return new JavaAdapter(classType, params, name)
 }

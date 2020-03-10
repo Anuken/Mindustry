@@ -62,6 +62,10 @@ public class GameOverDialog extends FloatingDialog{
                 t.row();
                 t.add(Core.bundle.format("stat.deconstructed", state.stats.buildingsDeconstructed));
                 t.row();
+                if(control.saves.getCurrent() != null){
+                    t.add(Core.bundle.format("stat.playtime", control.saves.getCurrent().getPlayTime()));
+                    t.row();
+                }
                 if(world.isZone() && !state.stats.itemsDelivered.isEmpty()){
                     t.add("$stat.delivered");
                     t.row();

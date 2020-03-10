@@ -1,24 +1,19 @@
 package mindustry.world.blocks.sandbox;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.g2d.*;
-import arc.scene.style.*;
-import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.type.*;
-import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import java.io.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.content;
 
 public class LiquidSource extends Block{
     public static Liquid lastLiquid;
@@ -82,29 +77,10 @@ public class LiquidSource extends Block{
     public void buildConfiguration(Tile tile, Table table){
         LiquidSourceEntity entity = tile.ent();
 
-        Array<Liquid> items = content.liquids();
-
-        ButtonGroup<ImageButton> group = new ButtonGroup<>();
-        group.setMinCheckCount(0);
-        Table cont = new Table();
-
-        for(int i = 0; i < items.size; i++){
-            final int f = i;
-            ImageButton button = cont.addImageButton(Tex.clear, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).size(38).group(group).get();
-            button.changed(() -> {
-                tile.configure(button.isChecked() ? items.get(f).id : -1);
-                control.input.frag.config.hideConfig();
-                lastLiquid = items.get(f);
-            });
-            button.getStyle().imageUp = new TextureRegionDrawable(items.get(i).icon(Cicon.medium));
-            button.setChecked(entity.source == items.get(i));
-
-            if(i % 4 == 3){
-                cont.row();
-            }
-        }
-
-        table.add(cont);
+        ItemSelection.buildTable(table, content.liquids(), () -> entity.source, liquid -> {
+            lastLiquid = liquid;
+            tile.configure(liquid == null ? -1 : liquid.id);
+        });
     }
 
     @Override
