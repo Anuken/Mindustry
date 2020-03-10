@@ -37,7 +37,7 @@ public class PlanetDialog extends FloatingDialog{
 
     private final Mesh[] outlines = new Mesh[10];
     private final Camera3D cam = new Camera3D();
-    private final VertexBatch3D batch = new VertexBatch3D(false, true, 0);
+    private final VertexBatch3D batch = new VertexBatch3D(10000, false, true, 0);
     private final PlaneBatch3D projector = new PlaneBatch3D();
     private final Mat3D mat = new Mat3D();
     private final Vec3 camRelative = new Vec3();
