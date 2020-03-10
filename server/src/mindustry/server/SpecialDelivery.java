@@ -29,7 +29,7 @@ public class SpecialDelivery implements ApplicationListener{
                     if(upgrading.containsValue(t, false)) return false;
                     if(t == null || t.block.upgrade == null || t.block.upgrade.get() == null) return false;
 
-                    if(!ce.items.has(t.block.upgrade.get().requirements, state.rules.buildCostMultiplier)) return false;
+                    if(!ce.items.has(t.block.upgrade.get().requirements, state.rules.buildCostMultiplier * 10)) return false;
                     for(ItemStack is: t.block.upgrade.get().requirements){
                         ce.items.remove(is.item, (int)(is.amount * state.rules.buildCostMultiplier));
                     }
