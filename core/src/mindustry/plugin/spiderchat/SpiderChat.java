@@ -32,7 +32,7 @@ public class SpiderChat extends Plugin implements ApplicationListener{
 
         if(raw.startsWith("!")){
             String finalRaw = raw;
-            playerGroup.all().select(p -> p.isAdmin).each(p -> p.sendMessage(player.prefix() + "[orange]> [#" + Color.valueOf("ee593b") + "]" + finalRaw));
+            playerGroup.all().select(p -> p.isAdmin).each(p -> p.sendMessage(player.prefix() + " [orange]> [lightgray]" + finalRaw));
         }else{
             Call.sendMessage(player.prefix() + " [orange]> [white]" + raw);
         }
