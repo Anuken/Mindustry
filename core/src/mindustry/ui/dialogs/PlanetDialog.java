@@ -242,12 +242,11 @@ public class PlanetDialog extends FloatingDialog{
         //Log.info(tile);
         Shaders.planetGrid.mouse.lerp(tile == null ? Vec3.Zero : tile.sub(planet.position).rotate(Vec3.Y, planet.getRotation()), 0.2f);
 
-        shader.begin();
+        shader.bind();
         shader.setUniformMatrix4("u_proj", cam.combined().val);
         shader.setUniformMatrix4("u_trans", planet.getTransform(mat).val);
         shader.apply();
         mesh.render(shader, Gl.lines);
-        shader.end();
     }
 
     private void drawBorders(Sector sector, Color base){

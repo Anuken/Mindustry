@@ -657,7 +657,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
 
     /** Called when arbitrary configuration is applied to a tile. */
     public void configured(@Nullable Playerc player, @Nullable Object value){
-        //null is of type Void.class; anonymous classes use their superclass.
+        //null is of type void.class; anonymous classes use their superclass.
         Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
 
         if(block.configurations.containsKey(type)){

@@ -2,7 +2,6 @@ package mindustry.graphics.g3d;
 
 import arc.graphics.*;
 import arc.graphics.gl.*;
-import arc.math.geom.*;
 import mindustry.type.*;
 
 /** Defines a mesh that is rendered for a planet. Subclasses provide a mesh and a shader. */
@@ -22,11 +21,10 @@ public abstract class PlanetMesh{
 
     public void render(Mat3D projection, Mat3D transform){
         preRender();
-        shader.begin();
+        shader.bind();
         shader.setUniformMatrix4("u_proj", projection.val);
         shader.setUniformMatrix4("u_trans", transform.val);
         shader.apply();
         mesh.render(shader, Gl.triangles);
-        shader.end();
     }
 }

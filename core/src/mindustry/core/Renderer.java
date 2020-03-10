@@ -247,6 +247,8 @@ public class Renderer implements ApplicationListener{
             player.builder().drawBuildRequests();
         }
 
+        Groups.drawOverlays();
+
         overlays.drawTop();
 
         endFx();

@@ -15,6 +15,7 @@ public class Annotations{
         flying,
         bullets,
         effects,
+        overlays,
         names,
     }
 
@@ -213,11 +214,6 @@ public class Annotations{
         PacketPriority priority() default PacketPriority.normal;
     }
 
-    /**
-     * Specifies that this method will be used to write classes of the type returned by {@link #value()}.<br>
-     * This method must return void and have two parameters, the first being of type {@link java.nio.ByteBuffer} and the second
-     * being the type returned by {@link #value()}.
-     */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
     public @interface TypeIOHandler{
