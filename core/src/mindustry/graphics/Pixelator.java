@@ -38,11 +38,8 @@ public class Pixelator implements Disposable{
             buffer.resize(w, h);
         }
 
-        Draw.flush();
         buffer.begin();
         renderer.draw();
-
-        Draw.flush();
         buffer.end();
 
         Draw.blend(Blending.disabled);

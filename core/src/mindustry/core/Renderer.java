@@ -120,7 +120,7 @@ public class Renderer implements ApplicationListener{
             }
             bloom = new Bloom(true);
             bloom.setClearColor(0f, 0f, 0f, 0f);
-        }catch(Exception e){
+        }catch(Throwable e){
             e.printStackTrace();
             settings.put("bloom", false);
             settings.save();
@@ -339,10 +339,8 @@ public class Renderer implements ApplicationListener{
         camera.height = h;
         camera.position.x = w / 2f + tilesize / 2f;
         camera.position.y = h / 2f + tilesize / 2f;
-        Draw.flush();
         buffer.begin();
         draw();
-        Draw.flush();
         buffer.end();
         disableUI = false;
         camera.width = vpW;
