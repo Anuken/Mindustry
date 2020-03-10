@@ -2,6 +2,7 @@ package mindustry.graphics.g3d;
 
 import arc.graphics.*;
 import arc.graphics.gl.*;
+import arc.math.geom.*;
 import mindustry.type.*;
 
 /** Defines a mesh that is rendered for a planet. Subclasses provide a mesh and a shader. */
