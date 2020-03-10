@@ -290,7 +290,7 @@ public class BlockIndexer{
         for(int x = Math.max(0, tile.x - quadrantSize / 2); x < tile.x + quadrantSize / 2 && x < world.width(); x++){
             for(int y = Math.max(0, tile.y - quadrantSize / 2); y < tile.y + quadrantSize / 2 && y < world.height(); y++){
                 Tile res = world.tile(x, y);
-                if(res.block() == Blocks.air && res.floor().liquidDrop == liquid){
+                if(res.floor().liquidDrop == liquid){
                     return res;
                 }
             }
@@ -433,7 +433,7 @@ public class BlockIndexer{
 
                 //add position of quadrant to list when an liquid is found
 //                if(tile.floor().liquidDrop != null) Log.info(tile);
-                if(tile.floor().liquidDrop != null && scanLiquids.contains(tile.floor().liquidDrop) && tile.block() == Blocks.air){
+                if(tile.floor().liquidDrop != null && scanLiquids.contains(tile.floor().liquidDrop)){
                     liquids.get(tile.floor().liquidDrop).add(world.tile(
                     //make sure to clamp quadrant middle position, since it might go off bounds
                     Mathf.clamp(qx * quadrantSize + quadrantSize / 2, 0, world.width() - 1),
