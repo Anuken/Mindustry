@@ -24,13 +24,19 @@ public class SpecialDelivery implements ApplicationListener{
 
         state.teams.getActive().each(td -> {
             td.cores.each(ce -> {
-                Tile upgradable = Geometry.findClosest(ce.x, ce.y, indexer.getAllied(ce.getTeam(), BlockFlag.upgradable).select(t -> !upgrading.containsValue(t, false) ));
-                if(upgradable == null || upgradable.block.upgrade == null || upgradable.block.upgrade.get() == null) return;
+                Tile upgradable = Geometry.findClosest(ce.x, ce.y, indexer.getAllied(ce.getTeam(), BlockFlag.upgradable).select(t -> {
 
-                if(!ce.items.has(upgradable.block.upgrade.get().requirements, state.rules.buildCostMultiplier)) return;
-                for(ItemStack is: upgradable.block.upgrade.get().requirements){
-                    ce.items.remove(is.item, (int)(is.amount * state.rules.buildCostMultiplier));
-                }
+                    if(upgrading.containsValue(t, false)) return false;
+                    if(t == null || t.block.upgrade == null || t.block.upgrade.get() == null) return false;
+
+                    if(!ce.items.has(t.block.upgrade.get().requirements, state.rules.buildCostMultiplier)) return false;
+                    for(ItemStack is: t.block.upgrade.get().requirements){
+                        ce.items.remove(is.item, (int)(is.amount * state.rules.buildCostMultiplier));
+                    }
+
+                    return true;
+                }));
+                if(upgradable == null) return;
 
                 float dst = ce.dst(upgradable);
                 float maxTraveled = Bullets.driverBolt.lifetime * Bullets.driverBolt.speed;
