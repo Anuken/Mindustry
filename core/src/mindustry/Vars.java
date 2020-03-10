@@ -27,6 +27,7 @@ import mindustry.net.*;
 import mindustry.plugin.coreprotect.*;
 import mindustry.plugin.spiderchat.*;
 import mindustry.plugin.spiderweb.SpiderWeb;
+import mindustry.world.*;
 import mindustry.world.blocks.defense.ForceProjector.*;
 
 import java.io.*;
@@ -195,6 +196,8 @@ public class Vars implements Loadable{
     public static EntityGroup<Fire> fireGroup;
     public static EntityGroup<BaseUnit> unitGroup;
 
+    public static ObjectMap<Bullet, Tile> upgrading;
+
     public static Player player;
 
     @Override
@@ -253,6 +256,8 @@ public class Vars implements Loadable{
         shieldGroup = entities.add(ShieldEntity.class, false);
         fireGroup = entities.add(Fire.class).enableMapping();
         unitGroup = entities.add(BaseUnit.class).enableMapping();
+
+        upgrading = new ObjectMap<>();
 
         for(EntityGroup<?> group : entities.all()){
             group.setRemoveListener(entity -> {

@@ -146,6 +146,7 @@ public class Block extends BlockStorage{
     public boolean alwaysUnlocked = false;
     /** What this block can merge into */
     public Prov<Block> upscale;
+    public Prov<Block> upgrade;
 
     protected TextureRegion[] cacheRegions = {};
     protected Array<String> cacheRegionStrings = new Array<>();
@@ -922,4 +923,9 @@ public class Block extends BlockStorage{
         Arrays.sort(requirements, Structs.comparingInt(i -> i.item.id));
     }
 
+    public void upgrade(Tile tile){
+        if(upgrade == null || upgrade.get() == null) return;
+
+        tile.constructNet(upgrade.get(), tile.getTeam(), tile.rotation);
+    }
 }

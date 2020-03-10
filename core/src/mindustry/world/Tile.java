@@ -230,6 +230,10 @@ public class Tile implements Position, TargetTrait{
         Call.setTile(this, block, team, rotation);
     }
 
+    public void constructNet(Block block, Team team, byte rotation){
+        Call.onConstructFinish(this, block, -1, rotation, team, true);
+    }
+
     public byte rotation(){
         return rotation;
     }

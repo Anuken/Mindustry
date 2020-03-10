@@ -742,12 +742,18 @@ public class Blocks implements ContentList{
 
             flags = EnumSet.of(BlockFlag.scalable);
             upscale = () -> copperWallLarge;
+
+            flags = EnumSet.of(BlockFlag.upgradable);
+            upgrade = () -> titaniumWall;
         }};
 
         copperWallLarge = new Wall("copper-wall-large"){{
             requirements(Category.defense, ItemStack.mult(copperWall.requirements, 4));
             health = 80 * 4 * wallHealthMultiplier;
             size = 2;
+
+            flags = EnumSet.of(BlockFlag.upgradable);
+            upgrade = () -> titaniumWallLarge;
         }};
 
         titaniumWall = new Wall("titanium-wall"){{
@@ -756,12 +762,18 @@ public class Blocks implements ContentList{
 
             flags = EnumSet.of(BlockFlag.scalable);
             upscale = () -> titaniumWallLarge;
+
+            flags = EnumSet.of(BlockFlag.upgradable);
+            upgrade = () -> thoriumWall;
         }};
 
         titaniumWallLarge = new Wall("titanium-wall-large"){{
             requirements(Category.defense, ItemStack.mult(titaniumWall.requirements, 4));
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
+
+            flags = EnumSet.of(BlockFlag.upgradable);
+            upgrade = () -> thoriumWallLarge;
         }};
 
         plastaniumWall = new Wall("plastanium-wall"){{
@@ -786,12 +798,18 @@ public class Blocks implements ContentList{
 
             flags = EnumSet.of(BlockFlag.scalable);
             upscale = () -> thoriumWallLarge;
+
+            flags = EnumSet.of(BlockFlag.upgradable);
+            upgrade = () -> surgeWall;
         }};
 
         thoriumWallLarge = new Wall("thorium-wall-large"){{
             requirements(Category.defense, ItemStack.mult(thoriumWall.requirements, 4));
             health = 200 * wallHealthMultiplier * 4;
             size = 2;
+
+            flags = EnumSet.of(BlockFlag.upgradable);
+            upgrade = () -> surgeWallLarge;
         }};
 
         phaseWall = new DeflectorWall("phase-wall"){{
@@ -926,7 +944,9 @@ public class Blocks implements ContentList{
             health = 45;
             speed = 0.03f;
             displayedSpeed = 4.2f;
+
             flags = EnumSet.of(BlockFlag.upgradable);
+            upgrade = () -> titaniumConveyor;
         }};
 
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
@@ -1041,6 +1061,9 @@ public class Blocks implements ContentList{
         conduit = new Conduit("conduit"){{
             requirements(Category.liquid, ItemStack.with(Items.metaglass, 1));
             health = 45;
+
+            flags = EnumSet.of(BlockFlag.upgradable);
+            upgrade = () -> pulseConduit;
         }};
 
         pulseConduit = new Conduit("pulse-conduit"){{

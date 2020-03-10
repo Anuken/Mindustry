@@ -272,6 +272,7 @@ public class Bullet extends SolidEntity implements DamageTrait, Scaled, Poolable
 
     @Override
     public void removed(){
+        type.removed(this);
         Pools.free(this);
     }
 
