@@ -1,5 +1,6 @@
 package mindustry.world.meta;
 
+import arc.math.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import mindustry.*;
@@ -43,11 +44,7 @@ public class BlockStats{
 
     public void add(BlockStat stat, Attribute attr, int sign){
         for(Block block : Vars.content.blocks()){
-            switch(sign){
-                case-1: if(!block.isFloor() || block.asFloor().attributes.get(attr) >= 0) continue; break;
-                case 0: if(!block.isFloor() || block.asFloor().attributes.get(attr) == 0) continue; break;
-                case+1: if(!block.isFloor() || block.asFloor().attributes.get(attr) <= 0) continue; break;
-            }
+            if(!block.isFloor() || !Mathf.equal(Math.signum(block.asFloor().attributes.get(attr)), sign)) continue;
             add(stat, new FloorValue(block.asFloor()));
         }
     }
