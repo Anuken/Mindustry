@@ -16,6 +16,8 @@ import mindustry.world.meta.*;
 
 import java.io.*;
 
+import static mindustry.Vars.netServer;
+
 public class GenericCrafter extends Block{
     public ItemStack outputItem;
     public LiquidStack outputLiquid;
@@ -101,7 +103,7 @@ public class GenericCrafter extends Block{
             entity.warmup = Mathf.lerp(entity.warmup, 0f, 0.02f);
         }
 
-        if(entity.progress >= 1f){
+        if(entity.progress >= 1f && entity.cons.valid()){
             entity.cons.trigger();
 
             if(outputItem != null){
@@ -117,7 +119,13 @@ public class GenericCrafter extends Block{
             }
 
             Effects.effect(craftEffect, tile.drawx(), tile.drawy());
-            entity.progress = 0f;
+
+            if(tile.block == Blocks.surgeSmelter){
+                netServer.titanic.add(tile);
+                entity.warmup = 10f;
+            }else{
+                entity.progress = 0f;
+            }
         }
 
         if(outputItem != null && tile.entity.timer.get(timerDump, dumpTime)){
