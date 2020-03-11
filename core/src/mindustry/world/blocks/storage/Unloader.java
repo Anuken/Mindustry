@@ -1,5 +1,6 @@
 package mindustry.world.blocks.storage;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
@@ -75,6 +76,13 @@ public class Unloader extends Block{
         if(entity.items.total() > 0){
             tryDump(tile);
         }
+    }
+
+    @Override
+    public void onProximityUpdate(Tile tile){
+        super.onProximityUpdate(tile);
+
+        if(tile.entity.proximity().count(t -> !t.block.extractable) > 0) Core.app.post(tile::deconstructNet);
     }
 
     /**
