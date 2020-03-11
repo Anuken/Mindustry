@@ -181,7 +181,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         Call.onTileDamage(tile, health - block.handleDamage(tile, damage));
 
         if(health <= 0){
-            Call.onTileDestroyed(tile);
+            if(block.downgrade == null){
+                Call.onTileDestroyed(tile);
+            }else{
+                tile.setNet(block.downgrade.get(), tile.getTeam(), tile.rotation);
+            }
         }
 
         if(preHealth >= maxHealth() - 0.00001f && health < maxHealth() && world != null){ //when just damaged

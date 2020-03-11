@@ -148,6 +148,7 @@ public class Block extends BlockStorage{
     /** What this block can merge into */
     public Prov<Block> upscale;
     public Prov<Block> upgrade;
+    public Prov<Block> downgrade;
 
     protected TextureRegion[] cacheRegions = {};
     protected Array<String> cacheRegionStrings = new Array<>();

@@ -765,6 +765,7 @@ public class Blocks implements ContentList{
 
             flags = EnumSet.of(BlockFlag.upgradable);
             upgrade = () -> thoriumWall;
+            downgrade = () -> copperWall;
         }};
 
         titaniumWallLarge = new Wall("titanium-wall-large"){{
@@ -774,6 +775,7 @@ public class Blocks implements ContentList{
 
             flags = EnumSet.of(BlockFlag.upgradable);
             upgrade = () -> thoriumWallLarge;
+            downgrade = () -> copperWallLarge;
         }};
 
         plastaniumWall = new Wall("plastanium-wall"){{
@@ -801,6 +803,7 @@ public class Blocks implements ContentList{
 
             flags = EnumSet.of(BlockFlag.upgradable);
             upgrade = () -> surgeWall;
+            downgrade = () -> titaniumWall;
         }};
 
         thoriumWallLarge = new Wall("thorium-wall-large"){{
@@ -810,6 +813,7 @@ public class Blocks implements ContentList{
 
             flags = EnumSet.of(BlockFlag.upgradable);
             upgrade = () -> surgeWallLarge;
+            downgrade = () -> titaniumWallLarge;
         }};
 
         phaseWall = new DeflectorWall("phase-wall"){{
@@ -832,12 +836,14 @@ public class Blocks implements ContentList{
 
             flags = EnumSet.of(BlockFlag.scalable);
             upscale = () -> surgeWallLarge;
+            downgrade = () -> thoriumWall;
         }};
 
         surgeWallLarge = new SurgeWall("surge-wall-large"){{
             requirements(Category.defense, ItemStack.mult(surgeWall.requirements, 4));
             health = 230 * 4 * wallHealthMultiplier;
             size = 2;
+            downgrade = () -> thoriumWallLarge;
         }};
 
         door = new Door("door"){{
@@ -954,6 +960,7 @@ public class Blocks implements ContentList{
             health = 65;
             speed = 0.08f;
             displayedSpeed = 10f;
+            downgrade = () -> conveyor;
         }};
 
         armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
@@ -961,6 +968,7 @@ public class Blocks implements ContentList{
             health = 180;
             speed = 0.08f;
             displayedSpeed = 10f;
+            downgrade = () -> titaniumConveyor;
         }};
 
         junction = new Junction("junction"){{
@@ -1071,6 +1079,7 @@ public class Blocks implements ContentList{
             liquidCapacity = 16f;
             liquidPressure = 1.025f;
             health = 90;
+            downgrade = () -> conduit;
         }};
 
         platedConduit = new ArmoredConduit("plated-conduit"){{
@@ -1252,6 +1261,7 @@ public class Blocks implements ContentList{
             size = 2;
             drawMineItem = true;
             consumes.liquid(Liquids.water, 0.06f).boost();
+            downgrade = () -> mechanicalDrill;
         }};
 
         laserDrill = new Drill("laser-drill"){{
