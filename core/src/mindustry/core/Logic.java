@@ -30,6 +30,11 @@ import static mindustry.Vars.*;
 public class Logic implements ApplicationListener{
 
     public Logic(){
+        Events.on(WorldLoadEvent.class, event -> {
+            //TODO remove later
+            Weathers.snow.create();
+        });
+
         Events.on(WaveEvent.class, event -> {
             if(state.isCampaign()){
                 //TODO implement

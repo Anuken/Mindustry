@@ -10,6 +10,12 @@ public class Weathers implements ContentList{
 
     @Override
     public void load(){
+        snow = new Weather("snow"){
 
+            @Override
+            public void draw(){
+                //TODO
+            }
+        };
     }
 }

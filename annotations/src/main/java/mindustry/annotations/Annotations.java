@@ -17,6 +17,7 @@ public class Annotations{
         effects,
         overlays,
         names,
+        weather
     }
 
     /** Indicates that a method overrides other methods. */

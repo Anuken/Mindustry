@@ -35,13 +35,10 @@ void main(){
     //TODO this is very slow
     for(float i=0.0; i<LAYERS; i++){
         vec2 q = uv* (1.+i*DEPTH);
-        q += vec2( q.y* WIDTH *( fract(i*7.238917) - .5 ),
-        SPEED* u_time / (1.+i*DEPTH*.03) );
-        vec3 n = vec3(floor(q), 31.189+i), m = floor(n)/1e5 + fract(n), mp = (31.9+m) / fract(p*m),
-        r = fract(mp);
+        q += vec2(q.y* WIDTH * (fract(i*7.238917) - .5), SPEED * u_time / (1.+i*DEPTH*.03));
+        vec3 n = vec3(floor(q), 31.189+i), m = floor(n)/1e5 + fract(n), mp = (31.9+m) / fract(p*m), r = fract(mp);
         vec2 s = abs(fract(q)-.5 +.9*r.xy-.45) + .01*abs(2.0*fract(10.*q.yx) - 1.0);
-        float d = .6 * (s.x+s.y) + max(s.x,s.y) -.01,
-        edge = .005*SIZE + .05 * SIZE * min( .5* abs(i-5.-dof), 1.);
+        float d = .6 * (s.x+s.y) + max(s.x,s.y) -.01, edge = .005*SIZE + .05 * SIZE * min(.5* abs(i-5.-dof), 1.);
 
         gl_FragColor += smoothstep(edge,-edge,d) * r.x / (1.+.02*i*DEPTH);
     }

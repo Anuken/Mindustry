@@ -39,7 +39,7 @@ public class Renderer implements ApplicationListener{
         camera = new Camera();
         Shaders.init();
 
-        fx.addEffect(new SnowFilter());
+        //fx.addEffect(new SnowFilter());
     }
 
     public void shake(float intensity, float duration){
@@ -252,6 +252,8 @@ public class Renderer implements ApplicationListener{
         Groups.drawOverlays();
 
         overlays.drawTop();
+
+        Groups.drawWeather();
 
         endFx();
 
