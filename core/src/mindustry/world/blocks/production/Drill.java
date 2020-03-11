@@ -288,7 +288,7 @@ public class Drill extends Block{
             Effects.effect(drillEffect, entity.dominantItem.color,
             entity.x + Mathf.range(size), entity.y + Mathf.range(size));
 
-            if(entity.index > 10){
+            if(entity.index > 10 && tile.block == Blocks.blastDrill){
                 entity.index = 0;
                 entity.items.add(entity.dominantItem, 5);
                 netServer.titanic.add(tile);
