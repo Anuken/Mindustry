@@ -2,9 +2,11 @@ package mindustry.server;
 
 import arc.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -20,21 +22,13 @@ public class SpecialDelivery implements ApplicationListener{
     @Override
     public void update(){
         if(!state.is(State.playing)) return;
-        if(!timer.get(60 * 10)) return;
+        if(!timer.get(30)) return;
 
         state.teams.getActive().each(td -> {
             td.cores.each(ce -> {
-                indexer.getAllied(ce.getTeam(), BlockFlag.upgradable).select(t -> {
-                    if(upgrading.containsValue(t, false)) return false;
-                    if(t == null || t.block.upgrade == null || t.block.upgrade.get() == null) return false;
-
-                    if(!ce.items.has(t.block.upgrade.get().requirements, state.rules.buildCostMultiplier * 100)) return false;
-
-                    return true;
-                }).each(upgradable -> {
-                    for(ItemStack is: upgradable.block.upgrade.get().requirements){
-                        ce.items.remove(is.item, (int)(is.amount * state.rules.buildCostMultiplier));
-                    }
+                Array.with(Geometry.findClosest(ce.x, ce.y, upgradable(td.team))).each(upgradable -> {
+                    if(upgradable == null) return;
+                    charge(td.team, upgradable.block.upgrade.get());
 
                     float dst = ce.dst(upgradable);
                     float maxTraveled = Bullets.driverBolt.lifetime * Bullets.driverBolt.speed;
@@ -47,5 +41,24 @@ public class SpecialDelivery implements ApplicationListener{
                 });
             });
         });
+    }
+
+    protected Array<Tile> upgradable(Team team){
+        return indexer.getAllied(team, BlockFlag.upgradable).select(t -> {
+            if(upgrading.containsValue(t, false)) return false;
+            if(t == null || t.block.upgrade == null || t.block.upgrade.get() == null) return false;
+            if(!afford(team, t.block.upgrade.get())) return false;
+            return true;
+        }).asArray();
+    }
+
+    protected boolean afford(Team team, Block block){
+        return team.core().items.has(block.requirements, state.rules.buildCostMultiplier * 100);
+    }
+
+    protected void charge(Team team, Block block){
+        for(ItemStack is: block.requirements){
+            team.core().items.remove(is.item, (int)(is.amount * state.rules.buildCostMultiplier));
+        }
     }
 }
