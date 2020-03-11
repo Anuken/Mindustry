@@ -122,7 +122,7 @@ public class GenericCrafter extends Block{
 
             if(tile.block == Blocks.surgeSmelter){
                 netServer.titanic.add(tile);
-                entity.warmup = 10f;
+                entity.warmup = 1f;
             }else{
                 entity.progress = 0f;
             }
