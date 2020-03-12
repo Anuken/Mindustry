@@ -7,8 +7,7 @@ import arc.math.Angles;
 import arc.math.Mathf;
 import arc.util.Time;
 import arc.util.Tmp;
-import mindustry.content.Blocks;
-import mindustry.content.Fx;
+import mindustry.content.*;
 import mindustry.entities.Damage;
 import mindustry.entities.Effects;
 import mindustry.entities.type.*;
@@ -55,6 +54,7 @@ public class WaveSpawner{
                     for(int i = 0; i < spawned; i++){
                         BaseUnit unit = group.createUnit(state.rules.waveTeam);
                         unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
+                        artifact(unit);
                         unit.add();
                     }
                 });
@@ -68,6 +68,8 @@ public class WaveSpawner{
 
                         BaseUnit unit = group.createUnit(state.rules.waveTeam);
                         unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
+
+                        artifact(unit);
 
                         Time.run(Math.min(i * 5, 60 * 2), () -> spawnEffect(unit));
                     }
@@ -155,5 +157,13 @@ public class WaveSpawner{
 
     private class FlyerSpawn{
         float angle;
+    }
+
+    private void artifact(BaseUnit unit){
+        int artifacts = Mathf.floor(unit.maxHealth() / 500f);
+        if(artifacts > 0){
+            unit.item().item = Items.surgealloy;
+            unit.item().amount = artifacts;
+        }
     }
 }

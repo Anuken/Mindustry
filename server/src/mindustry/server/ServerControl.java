@@ -12,6 +12,7 @@ import arc.util.Timer.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -173,6 +174,7 @@ public class ServerControl implements ApplicationListener{
             try{
                 JsonValue value = JsonIO.json().fromJson(null, Core.settings.getString("globalrules"));
                 JsonIO.json().readFields(state.rules, value);
+                state.rules.bannedBlocks.add(Blocks.surgeSmelter);
             }catch(Throwable t){
                 Log.err("Error applying custom rules, proceeding without them.", t);
             }
