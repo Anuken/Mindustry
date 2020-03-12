@@ -6,11 +6,11 @@ import mindustry.content.Items;
 import mindustry.entities.type.BaseUnit;
 import mindustry.entities.type.TileEntity;
 import mindustry.gen.Call;
-import mindustry.type.Item;
+import mindustry.type.*;
+
 import static mindustry.Vars.*;
 
 public class UnitDrops{
-    private static Item[] dropTable;
 
     public static void dropItems(BaseUnit unit){
         //items only dropped in waves for enemy team
@@ -20,27 +20,18 @@ public class UnitDrops{
 
         TileEntity core = unit.getClosestEnemyCore();
 
-        if(core == null || core.dst(unit) > Vars.mineTransferRange){
+        if(core == null){
             return;
         }
 
-        if(dropTable == null){
-            dropTable = new Item[]{Items.titanium, Items.silicon};
-        }
+        Item item = Items.surgealloy;
 
-        for(int i = 0; i < 3; i++){
-            for(Item item : dropTable){
-                //only drop unlocked items
-                if(!Vars.headless && !Vars.data.isUnlocked(item)){
-                    continue;
-                }
+        if(!Vars.headless && !Vars.data.isUnlocked(item)) return;
 
-                int amount = Mathf.random(10, 20);
-                amount = core.tile.block().acceptStack(item, amount, core.tile, null);
-                if(amount > 0){
-                    Call.transferItemTo(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), core.tile);
-                }
-            }
+        int amount = Mathf.ceil(unit.maxHealth() / 100f);
+        amount = core.tile.block().acceptStack(item, amount, core.tile, null);
+        if(amount > 0){
+            Call.transferItemTo(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), core.tile);
         }
     }
 }
