@@ -16,8 +16,6 @@ import mindustry.world.meta.*;
 
 import java.io.*;
 
-import static mindustry.Vars.netServer;
-
 public class GenericCrafter extends Block{
     public ItemStack outputItem;
     public LiquidStack outputLiquid;
@@ -119,13 +117,7 @@ public class GenericCrafter extends Block{
             }
 
             Effects.effect(craftEffect, tile.drawx(), tile.drawy());
-
-            if(tile.block == Blocks.surgeSmelter){
-                netServer.titanic.add(tile);
-                entity.warmup = 1f;
-            }else{
-                entity.progress = 0f;
-            }
+            entity.progress = 0f;
         }
 
         if(outputItem != null && tile.entity.timer.get(timerDump, dumpTime)){
