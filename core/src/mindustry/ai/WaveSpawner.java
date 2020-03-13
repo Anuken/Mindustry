@@ -11,6 +11,7 @@ import mindustry.content.*;
 import mindustry.entities.Damage;
 import mindustry.entities.Effects;
 import mindustry.entities.type.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.WorldLoadEvent;
 import mindustry.game.SpawnGroup;
 import mindustry.world.Tile;
@@ -54,7 +55,7 @@ public class WaveSpawner{
                     for(int i = 0; i < spawned; i++){
                         BaseUnit unit = group.createUnit(state.rules.waveTeam);
                         unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
-                        unit.dropper();
+                        UnitDrops.seed(unit);
                         unit.add();
                     }
                 });
@@ -68,8 +69,7 @@ public class WaveSpawner{
 
                         BaseUnit unit = group.createUnit(state.rules.waveTeam);
                         unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
-
-                        unit.dropper();
+                        UnitDrops.seed(unit);
 
                         Time.run(Math.min(i * 5, 60 * 2), () -> spawnEffect(unit));
                     }

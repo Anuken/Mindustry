@@ -40,10 +40,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected static final int timerShootLeft = timerIndex++;
     protected static final int timerShootRight = timerIndex++;
 
-    protected static Array<Item> dropItems = new Array<Item>(){{
-        addAll(Items.titanium, Items.silicon, Items.metaglass);
-    }};
-
     protected boolean loaded;
     protected UnitType type;
     protected Interval timer = new Interval(5);
@@ -425,16 +421,5 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     public void onSuperDeath(){
         super.onDeath();
-    }
-
-    public void dropper(){
-        if(maxHealth() >= 500){
-            item.item = Items.surgealloy;
-            item.amount = Mathf.floor(maxHealth() / 100f);
-            return;
-        }
-
-        item.item = dropItems.random();
-        item.amount = Mathf.floor(maxHealth() / 50f);
     }
 }
