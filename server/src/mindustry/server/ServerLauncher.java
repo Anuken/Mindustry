@@ -11,9 +11,12 @@ import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
+import mindustry.net.Administration.*;
 import mindustry.net.Net;
 import mindustry.net.*;
 import mindustry.plugin.coreprotect.*;
+import mindustry.type.*;
+import mindustry.world.blocks.units.*;
 
 import java.time.*;
 
@@ -89,6 +92,17 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(new SpecialDelivery());
 
         mods.eachClass(Mod::init);
+
+        netServer.admins.addActionFilter(action -> {
+            if(action.type != ActionType.placeBlock) return true;
+            if(action.block.category != Category.upgrade) return true;
+
+            if(action.player.getTeam().core().items.has(action.block.requirements, state.rules.buildCostMultiplier) && !state.rules.infiniteResources) return false;
+            action.player.mech = ((MechPad)action.block).mech;
+            action.player.heal();
+
+            return false;
+        });
 
         Events.fire(new ServerLoadEvent());
     }
