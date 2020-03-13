@@ -1,6 +1,7 @@
 package mindustry.entities.type;
 
 import arc.*;
+import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -38,6 +39,10 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected static final int timerTarget2 = timerIndex++;
     protected static final int timerShootLeft = timerIndex++;
     protected static final int timerShootRight = timerIndex++;
+
+    protected static Array<Item> dropItems = new Array<Item>(){{
+        addAll(Items.titanium, Items.silicon, Items.metaglass);
+    }};
 
     protected boolean loaded;
     protected UnitType type;
@@ -420,5 +425,16 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     public void onSuperDeath(){
         super.onDeath();
+    }
+
+    public void dropper(){
+        if(maxHealth() >= 500){
+            item.item = Items.surgealloy;
+            item.amount = Mathf.floor(maxHealth() / 100f);
+            return;
+        }
+
+        item.item = dropItems.random();
+        item.amount = Mathf.floor(maxHealth() / 50f);
     }
 }

@@ -54,7 +54,7 @@ public class WaveSpawner{
                     for(int i = 0; i < spawned; i++){
                         BaseUnit unit = group.createUnit(state.rules.waveTeam);
                         unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
-                        artifact(unit);
+                        unit.dropper();
                         unit.add();
                     }
                 });
@@ -69,7 +69,7 @@ public class WaveSpawner{
                         BaseUnit unit = group.createUnit(state.rules.waveTeam);
                         unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
 
-                        artifact(unit);
+                        unit.dropper();
 
                         Time.run(Math.min(i * 5, 60 * 2), () -> spawnEffect(unit));
                     }
@@ -157,13 +157,5 @@ public class WaveSpawner{
 
     private class FlyerSpawn{
         float angle;
-    }
-
-    private void artifact(BaseUnit unit){
-        int artifacts = Mathf.floor(unit.maxHealth() / 100f);
-        if(artifacts > 0){
-            unit.item().item = Items.surgealloy;
-            unit.item().amount = artifacts;
-        }
     }
 }
