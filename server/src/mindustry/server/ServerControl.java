@@ -175,6 +175,7 @@ public class ServerControl implements ApplicationListener{
                 JsonValue value = JsonIO.json().fromJson(null, Core.settings.getString("globalrules"));
                 JsonIO.json().readFields(state.rules, value);
                 state.rules.bannedBlocks.add(Blocks.surgeSmelter);
+                state.rules.bannedBlocks.add(Blocks.pyratiteMixer);
             }catch(Throwable t){
                 Log.err("Error applying custom rules, proceeding without them.", t);
             }
