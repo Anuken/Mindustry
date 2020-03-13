@@ -97,7 +97,7 @@ public class ServerLauncher implements ApplicationListener{
             if(action.type != ActionType.placeBlock) return true;
             if(action.block.category != Category.upgrade) return true;
 
-            if(action.player.getTeam().core().items.has(action.block.requirements, state.rules.buildCostMultiplier) && !state.rules.infiniteResources) return false;
+            if(!action.player.getTeam().core().items.has(action.block.requirements, state.rules.buildCostMultiplier) && !state.rules.infiniteResources) return false;
             action.player.mech = ((MechPad)action.block).mech;
             action.player.heal();
 
