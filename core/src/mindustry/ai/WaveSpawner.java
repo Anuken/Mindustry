@@ -160,7 +160,7 @@ public class WaveSpawner{
     }
 
     private void artifact(BaseUnit unit){
-        int artifacts = Mathf.floor(unit.maxHealth() / 500f);
+        int artifacts = Mathf.floor(unit.maxHealth() / 100f);
         if(artifacts > 0){
             unit.item().item = Items.surgealloy;
             unit.item().amount = artifacts;
