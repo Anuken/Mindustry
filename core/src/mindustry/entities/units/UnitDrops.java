@@ -5,6 +5,7 @@ import arc.struct.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 
 import static mindustry.Vars.state;
@@ -33,7 +34,7 @@ public class UnitDrops{
         if(unit.item().amount > 0 && unit.item().item != null){
             if(!Vars.headless && !Vars.data.isUnlocked(unit.item().item)) return;
             unit.item().amount = core.tile.block().acceptStack(unit.item().item, unit.item().amount, core.tile, null);
-            core.items.add(unit.item().item, unit.item().amount);
+            Call.transferItemTo(unit.item().item, unit.item().amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), core.tile);
         }
     }
 
