@@ -69,7 +69,7 @@ public class Incinerator extends Block{
             Effects.effect(effect, tile.drawx(), tile.drawy());
         }
 
-        if(Mathf.chance(0.05)){
+        if(Mathf.chance(0.10)){
             tile.<IncineratorEntity>ent().index++;
             if(net.server()){
                 nearby.clear();
