@@ -6,6 +6,7 @@ import arc.backend.headless.*;
 import arc.files.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -98,7 +99,12 @@ public class ServerLauncher implements ApplicationListener{
             if(action.block.category != Category.upgrade) return true;
 
             if(!action.player.getTeam().core().items.has(action.block.requirements, state.rules.buildCostMultiplier) && !state.rules.infiniteResources) return false;
-            action.player.mech = ((MechPad)action.block).mech;
+
+            if(action.player.mech == ((MechPad)action.block).mech){
+                action.player.mech = Mechs.starter;
+            }else{
+                action.player.mech = ((MechPad)action.block).mech;
+            }
             action.player.heal();
 
             return false;
