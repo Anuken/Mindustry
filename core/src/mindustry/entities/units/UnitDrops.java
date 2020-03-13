@@ -1,12 +1,9 @@
 package mindustry.entities.units;
 
-import arc.math.Mathf;
-import mindustry.Vars;
-import mindustry.entities.type.BaseUnit;
-import mindustry.entities.type.TileEntity;
-import mindustry.gen.Call;
+import mindustry.*;
+import mindustry.entities.type.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.state;
 
 public class UnitDrops{
 
@@ -24,7 +21,7 @@ public class UnitDrops{
 
         if(unit.item().amount > 0 && unit.item().item != null){
             if(!Vars.headless && !Vars.data.isUnlocked(unit.item().item)) return;
-            Call.transferItemTo(unit.item().item, unit.item().amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), core.tile);
+            core.items.add(unit.item().item, unit.item().amount);
         }
     }
 }
