@@ -14,6 +14,8 @@ public class DraugFactory extends UnitFactory{
 
     protected final int timerEnable = timers++;
 
+    protected final int amount = 25;
+
     public DraugFactory(String name){
         super(name);
         entityType = DraugFactoryEntity::new;
@@ -26,8 +28,7 @@ public class DraugFactory extends UnitFactory{
         if(ore  == null) return;
         Tile vein = indexer.findClosestOre(core.x, core.y, ore);
         if(vein == null) return;
-        int amount = core.block.acceptStack(ore, 25, core.tile, null);
-        if(amount > 0) Call.transferItemTo(ore, amount, vein.drawx(), vein.drawy(), core.tile);
+        Call.transferItemTo(ore, amount, vein.drawx(), vein.drawy(), core.tile);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class DraugFactory extends UnitFactory{
         if(!tile.entity.timer.get(timerEnable, 120)) return;
 
         Tile core = tile.getTeam().core().tile;
-        tile.<DraugFactoryEntity>ent().spawned(core.block.acceptStack(Items.copper, 25, core, null) >= 25 || core.block.acceptStack(Items.lead, 25, core, null) >= 25 ? 0 : 1);
+        tile.<DraugFactoryEntity>ent().spawned(core.block.acceptStack(Items.copper,  amount, core, null) >= amount || core.block.acceptStack(Items.lead, amount, core, null) >= amount ? 0 : 1);
     }
 
     class DraugFactoryEntity extends UnitFactoryEntity{
