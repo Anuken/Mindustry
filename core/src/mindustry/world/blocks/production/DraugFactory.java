@@ -1,6 +1,7 @@
 package mindustry.world.blocks.production;
 
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -11,8 +12,11 @@ import static mindustry.Vars.*;
 
 public class DraugFactory extends UnitFactory{
 
+    protected final int timerEnable = timers++;
+
     public DraugFactory(String name){
         super(name);
+        entityType = DraugFactoryEntity::new;
     }
 
     public void trigger(Tile tile){
@@ -24,5 +28,25 @@ public class DraugFactory extends UnitFactory{
         if(vein == null) return;
         int amount = core.block.acceptStack(ore, 25, core.tile, null);
         if(amount > 0) Call.transferItemTo(ore, amount, vein.drawx(), vein.drawy(), core.tile);
+    }
+
+    @Override
+    public void update(Tile tile){
+        super.update(tile);
+
+        if(!tile.entity.timer.get(timerEnable, 120)) return;
+
+        Tile core = tile.getTeam().core().tile;
+        tile.<DraugFactoryEntity>ent().spawned(core.block.acceptItem(Items.copper, core, null) || core.block.acceptItem(Items.lead, core, null) ? 0 : 1);
+    }
+
+    class DraugFactoryEntity extends UnitFactoryEntity{
+        private int spawnedSync;
+
+        public void spawned(int spawned){
+            this.spawned = spawned;
+            if(this.spawned != spawnedSync) netServer.titanic.add(tile);
+            spawnedSync = spawned;
+        }
     }
 }
