@@ -1,11 +1,13 @@
 package mindustry.world.blocks.production;
 
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.blocks.units.*;
 
 import static mindustry.Vars.*;
@@ -37,8 +39,7 @@ public class DraugFactory extends UnitFactory{
 
         if(!tile.entity.timer.get(timerEnable, 60)) return;
 
-        Tile core = tile.getTeam().core().tile;
-        tile.<DraugFactoryEntity>ent().spawned(core.block.acceptItem(Items.copper, core, null) || core.block.acceptItem(Items.lead, core, null) ? 0 : 1);
+        tile.<DraugFactoryEntity>ent().spawned(accepts(tile.getTeam().core(), unitType.toMine) ? 0 : 1);
     }
 
     class DraugFactoryEntity extends UnitFactoryEntity{
@@ -49,5 +50,9 @@ public class DraugFactory extends UnitFactory{
             if(this.spawned != spawnedSync) netServer.titanic.add(tile);
             spawnedSync = spawned;
         }
+    }
+
+    protected boolean accepts(CoreEntity core, ObjectSet<Item> ores){
+        return ores.asArray().count(item -> core.block.acceptItem(item, core.tile, null)) > 0;
     }
 }
