@@ -37,7 +37,7 @@ public class DraugFactory extends UnitFactory{
         super.update(tile);
 
         if(!tile.entity.timer.get(timerEnable, 60)) return;
-        if(tile.getTeam().core() == null) return;
+        if(tile.getTeam().cores().isEmpty()) return;
 
         tile.<DraugFactoryEntity>ent().spawned(accepts(tile.getTeam().core(), unitType.toMine) ? 0 : 1);
     }
