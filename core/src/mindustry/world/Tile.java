@@ -41,7 +41,7 @@ public class Tile implements Position{
         this.block = wall;
 
         //update entity and create it if needed
-        changed();
+        changed(Team.derelict);
     }
 
     public Tile(int x, int y, int floor, int overlay, int wall){
@@ -163,7 +163,7 @@ public class Tile implements Position{
         preChanged();
         this.block = type;
         this.rotation = rotation == 0 ? 0 : (byte)Mathf.mod(rotation, 4);
-        changed();
+        changed(team);
 
         if(entity != null){
             entity.team(team);
@@ -510,7 +510,7 @@ public class Tile implements Position{
         }
     }
 
-    protected void changed(){
+    protected void changed(Team team){
         if(entity != null){
             entity.remove();
             entity = null;
@@ -519,7 +519,7 @@ public class Tile implements Position{
         Block block = block();
 
         if(block.hasEntity()){
-            entity = block.newEntity().init(this, block.update);
+            entity = block.newEntity().init(this, team, block.update);
             entity.cons(new ConsumeModule(entity));
             if(block.hasItems) entity.items(new ItemModule());
             if(block.hasLiquids) entity.liquids(new LiquidModule());

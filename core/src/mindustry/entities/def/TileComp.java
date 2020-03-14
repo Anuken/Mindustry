@@ -61,9 +61,10 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     private transient float sleepTime;
 
     /** Sets this tile entity data to this and adds it if necessary. */
-    public Tilec init(Tile tile, boolean shouldAdd){
+    public Tilec init(Tile tile, Team team, boolean shouldAdd){
         this.tile = tile;
         this.block = tile.block();
+        this.team = team;
 
         set(tile.drawx(), tile.drawy());
         if(block.activeSound != Sounds.none){

@@ -120,9 +120,9 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    protected void changed(){
+    protected void changed(Team team){
         if(state.is(State.playing)){
-            super.changed();
+            super.changed(team);
             return;
         }
 
@@ -139,7 +139,7 @@ public class EditorTile extends Tile{
         Block block = block();
 
         if(block.hasEntity()){
-            entity = block.newEntity().init(this, false);
+            entity = block.newEntity().init(this, team, false);
             entity.cons(new ConsumeModule(entity));
             if(block.hasItems) entity.items(new ItemModule());
             if(block.hasLiquids) entity.liquids(new LiquidModule());

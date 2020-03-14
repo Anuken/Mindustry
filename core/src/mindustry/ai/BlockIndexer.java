@@ -115,13 +115,13 @@ public class BlockIndexer{
         if(structQuadrants == null) return;
 
         //go through every tile... ouch
-        world.tiles.each(tile -> {
+        for(Tile tile : world.tiles){
             if(tile.team() == team){
                 int quadrantX = tile.x / quadrantSize;
                 int quadrantY = tile.y / quadrantSize;
                 structQuadrant(team).set(quadrantX, quadrantY);
             }
-        });
+        }
     }
 
     /** @return whether this item is present on this map.*/

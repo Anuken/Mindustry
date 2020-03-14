@@ -11,7 +11,7 @@ import static mindustry.Vars.state;
 abstract class TeamComp implements Posc{
     @Import float x, y;
 
-    Team team = Team.sharded;
+    Team team = Team.derelict;
 
     public @Nullable
     Tilec closestCore(){

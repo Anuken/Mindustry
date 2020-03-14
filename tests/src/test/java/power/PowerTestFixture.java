@@ -7,12 +7,12 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.modules.*;
 import org.junit.jupiter.api.*;
-
-import java.lang.reflect.*;
 
 import static mindustry.Vars.*;
 
@@ -44,18 +44,21 @@ public class PowerTestFixture{
 
     protected static PowerGenerator createFakeProducerBlock(float producedPower){
         return new PowerGenerator("fakegen"){{
+            entityType = () -> new GeneratorEntity();
             powerProduction = producedPower;
         }};
     }
 
     protected static Battery createFakeBattery(float capacity){
         return new Battery("fakebattery"){{
+            entityType = () -> new BatteryEntity();
             consumes.powerBuffered(capacity);
         }};
     }
 
     protected static Block createFakeDirectConsumer(float powerPerTick){
         return new PowerBlock("fakedirectconsumer"){{
+            entityType = TileEntity::create;
             consumes.power(powerPerTick);
         }};
     }
@@ -80,16 +83,11 @@ public class PowerTestFixture{
             // Since this part shall not be part of the test and would require more work anyway, we manually set the block and floor
             // through reflections and then simulate part of what the changed() method does.
 
-            Field field = Tile.class.getDeclaredField("block");
-            field.setAccessible(true);
-            field.set(tile, block);
-
-            field = Tile.class.getDeclaredField("floor");
-            field.setAccessible(true);
-            field.set(tile, Blocks.sand);
+            Reflect.set(Tile.class, tile, "block", block);
+            Reflect.set(Tile.class, tile, "floor", Blocks.sand);
 
             // Simulate the "changed" method. Calling it through reflections would require half the game to be initialized.
-            tile.entity = block.newEntity().init(tile, false);
+            tile.entity = block.newEntity().init(tile, Team.sharded, false);
             tile.entity.cons(new ConsumeModule(tile.entity));
             if(block.hasItems) tile.entity.items(new ItemModule());
             if(block.hasLiquids) tile.entity.liquids(new LiquidModule());
@@ -102,7 +100,7 @@ public class PowerTestFixture{
                         return 1f;
                     }
                 };
-                tile.entity.power().graph.add(tile);
+                tile.entity.power().graph.add(tile.entity);
             }
 
             // Assign incredibly high health so the block does not get destroyed on e.g. burning Blast Compound

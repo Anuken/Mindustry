@@ -42,7 +42,7 @@ public class LiquidSource extends Block{
         drawRequestConfigCenter(req, (Content)req.config, "center");
     }
 
-    class LiquidSourceEntity extends TileEntity{
+    public class LiquidSourceEntity extends TileEntity{
         public @Nullable Liquid source = null;
 
         @Override

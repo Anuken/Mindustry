@@ -11,7 +11,6 @@ public class Tiles implements Iterable<Tile>{
     public final int width, height;
 
     private final Tile[] array;
-    private final TileIterator iterator = new TileIterator();
 
     public Tiles(int width, int height){
         this.array = new Tile[width * height];
@@ -73,12 +72,8 @@ public class Tiles implements Iterable<Tile>{
 
     @Override
     public Iterator<Tile> iterator(){
-        if(iterator.index != 0 && iterator.index != array.length){
-            iterator.index = 0;
-            throw new IllegalArgumentException("Double iteration. " + iterator.index + " != " + array.length);
-        }
-        iterator.index = 0;
-        return iterator;
+        //iterating through the entire map is expensive anyway, so a new allocation doesn't make much of a difference
+        return new TileIterator();
     }
 
     private class TileIterator implements Iterator<Tile>{

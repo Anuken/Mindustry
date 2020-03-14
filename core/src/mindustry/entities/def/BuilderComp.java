@@ -94,10 +94,6 @@ abstract class BuilderComp implements Unitc, DrawLayerFlyingc{
         //otherwise, update it.
         BuildEntity entity = tile.ent();
 
-        if(entity == null){
-            return;
-        }
-
         if(dst(tile) <= finalPlaceDst){
             rotation = Mathf.slerpDelta(rotation, angleTo(entity), 0.4f);
         }

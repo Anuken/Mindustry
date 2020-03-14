@@ -1,5 +1,6 @@
 package mindustry.world;
 
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.modules.*;
 
@@ -19,7 +20,7 @@ public class CachedTile extends Tile{
     }
 
     @Override
-    protected void changed(){
+    protected void changed(Team team){
         entity = null;
 
         Block block = block();

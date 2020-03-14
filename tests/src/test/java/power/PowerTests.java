@@ -58,8 +58,8 @@ public class PowerTests extends PowerTestFixture{
             Tile directConsumerTile = createFakeTile(0, 1, createFakeDirectConsumer(requiredPower));
 
             PowerGraph powerGraph = new PowerGraph();
-            powerGraph.add(producerTile);
-            powerGraph.add(directConsumerTile);
+            powerGraph.add(producerTile.entity);
+            powerGraph.add(directConsumerTile.entity);
 
             assertEquals(producedPower * Time.delta(), powerGraph.getPowerProduced(), Mathf.FLOAT_ROUNDING_ERROR);
             assertEquals(requiredPower * Time.delta(), powerGraph.getPowerNeeded(), Mathf.FLOAT_ROUNDING_ERROR);
@@ -95,18 +95,18 @@ public class PowerTests extends PowerTestFixture{
             if(producedPower > 0.0f){
                 Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
                 producerTile.<PowerGenerator.GeneratorEntity>ent().productionEfficiency = 1f;
-                powerGraph.add(producerTile);
+                powerGraph.add(producerTile.entity);
             }
             Tile directConsumerTile = null;
             if(requestedPower > 0.0f){
                 directConsumerTile = createFakeTile(0, 1, createFakeDirectConsumer(requestedPower));
-                powerGraph.add(directConsumerTile);
+                powerGraph.add(directConsumerTile.entity);
             }
             float maxCapacity = 100f;
             Tile batteryTile = createFakeTile(0, 2, createFakeBattery(maxCapacity));
             batteryTile.entity.power().status = initialBatteryCapacity / maxCapacity;
 
-            powerGraph.add(batteryTile);
+            powerGraph.add(batteryTile.entity);
 
             powerGraph.update();
             assertEquals(expectedBatteryCapacity / maxCapacity, batteryTile.entity.power().status, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Expected battery status did not match");
@@ -123,14 +123,14 @@ public class PowerTests extends PowerTestFixture{
             Tile consumerTile = createFakeTile(0, 1, createFakeDirectConsumer(5.0f));
 
             PowerGraph powerGraph = new PowerGraph();
-            powerGraph.add(producerTile);
-            powerGraph.add(consumerTile);
+            powerGraph.add(producerTile.entity);
+            powerGraph.add(consumerTile.entity);
             powerGraph.update();
 
             assertEquals(1.0f, consumerTile.entity.power().status, Mathf.FLOAT_ROUNDING_ERROR);
 
-            powerGraph.remove(producerTile);
-            powerGraph.add(consumerTile);
+            powerGraph.remove(producerTile.entity);
+            powerGraph.add(consumerTile.entity);
             powerGraph.update();
 
             assertEquals(0.0f, consumerTile.entity.power().status, Mathf.FLOAT_ROUNDING_ERROR);

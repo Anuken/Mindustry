@@ -11,7 +11,6 @@ import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.core.GameState.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -89,6 +88,13 @@ public class SchematicsDialog extends FloatingDialog{
 
                             buttons.addImageButton(Icon.pencil, style, () -> {
                                 ui.showTextInput("$schematic.rename", "$name", s.name(), res -> {
+                                    Schematic replacement = schematics.all().find(other -> other.name().equals(res) && other != s);
+                                    if(replacement != null){
+                                        //renaming to an existing schematic is not allowed, as it is not clear how the tags would be merged, and which one should be removed
+                                        ui.showErrorMessage("$schematic.exists");
+                                        return;
+                                    }
+
                                     s.tags.put("name", res);
                                     s.save();
                                     rebuildPane[0].run();
