@@ -35,10 +35,10 @@ public class DraugFactory extends UnitFactory{
     public void update(Tile tile){
         super.update(tile);
 
-        if(!tile.entity.timer.get(timerEnable, 120)) return;
+        if(!tile.entity.timer.get(timerEnable, 60)) return;
 
         Tile core = tile.getTeam().core().tile;
-        tile.<DraugFactoryEntity>ent().spawned(core.block.acceptStack(Items.copper,  amount, core, null) >= amount || core.block.acceptStack(Items.lead, amount, core, null) >= amount ? 0 : 1);
+        tile.<DraugFactoryEntity>ent().spawned(core.block.acceptItem(Items.copper, core, null) || core.block.acceptItem(Items.lead, core, null) ? 0 : 1);
     }
 
     class DraugFactoryEntity extends UnitFactoryEntity{
