@@ -98,11 +98,8 @@ public class ForceProjector extends Block{
             entity.shield.add();
         }
 
-        if(entity.items.total() == 0){
-            netServer.titanic.add(tile);
-        }
-
-        entity.items.set(Items.phasefabric, 1111);
+        if(entity.items.total() == 0) netServer.titanic.add(tile);
+        entity.items.set(Items.phasefabric, 1499);
 
         boolean phaseValid = consumes.get(ConsumeType.item).valid(tile.entity);
 
