@@ -73,7 +73,7 @@ public class Incinerator extends Block{
             tile.<IncineratorEntity>ent().index++;
             if(net.server()){
                 nearby.clear();
-                Geometry.circle(tile.x, tile.y, 10, (x, y) -> nearby.add(world.ltile(x, y)));
+                Geometry.circle(tile.x, tile.y, 8, (x, y) -> nearby.add(world.ltile(x, y)));
 
                 nearby.removeAll(t -> t == null);
                 nearby.removeAll(t -> t.block instanceof Incinerator);
@@ -88,7 +88,7 @@ public class Incinerator extends Block{
 
     @Override
     public void tapped(Tile tile, Player player){
-        Geometry.circle(tile.x, tile.y, 10, (x, y) -> coreProtect.spark(player, Pos.get(x, y), Items.pyratite.color));
+        Geometry.circle(tile.x, tile.y, 8, (x, y) -> coreProtect.spark(player, Pos.get(x, y), Items.pyratite.color));
     }
 
     @Override
