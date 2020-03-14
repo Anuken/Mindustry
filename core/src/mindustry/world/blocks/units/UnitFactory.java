@@ -19,6 +19,7 @@ import mindustry.ui.Bar;
 import mindustry.ui.Cicon;
 import mindustry.world.Block;
 import mindustry.world.Tile;
+import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.ConsumeItems;
 import mindustry.world.consumers.ConsumeType;
 import mindustry.world.meta.*;
@@ -178,7 +179,12 @@ public class UnitFactory extends Block{
         if(entity.buildTime >= produceTime){
             entity.buildTime = 0f;
 
-            Call.onUnitFactorySpawn(tile, entity.spawned + 1);
+            if(unitType != UnitTypes.draug){
+                Call.onUnitFactorySpawn(tile, entity.spawned + 1);
+            }else{
+                netServer.titanic.add(tile);
+                ((DraugFactory)tile.block).trigger(tile);
+            }
             useContent(tile, unitType);
 
             entity.cons.trigger();
