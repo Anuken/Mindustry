@@ -151,6 +151,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
 
     /** Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile. */
     public byte relativeTo(int cx, int cy){
+        int x = tile.x, y = tile.y;
         if(x == cx && y == cy - 1) return 1;
         if(x == cx && y == cy + 1) return 3;
         if(x == cx - 1 && y == cy) return 0;
@@ -159,6 +160,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     }
 
     public byte absoluteRelativeTo(int cx, int cy){
+        int x = tile.x, y = tile.y;
         if(x == cx && y <= cy - 1) return 1;
         if(x == cx && y >= cy + 1) return 3;
         if(x <= cx - 1 && y == cy) return 0;
@@ -486,7 +488,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
 
     /** Try offloading an item to a nearby container in its facing direction. Returns true if success. */
     public boolean moveForward(Item item){
-        Tilec other = tile().front();
+        Tilec other = front();
         if(other != null && other.team() == team() && other.acceptItem(this, item)){
             other.handleItem(this, item);
             return true;

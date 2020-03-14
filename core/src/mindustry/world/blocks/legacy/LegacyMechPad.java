@@ -2,13 +2,13 @@ package mindustry.world.blocks.legacy;
 
 import arc.util.io.*;
 import mindustry.gen.*;
-import mindustry.world.*;
 
-public class LegacyMechPad extends Block{
+public class LegacyMechPad extends LegacyBlock{
 
     public LegacyMechPad(String name){
         super(name);
         update = true;
+        hasPower = true;
     }
 
     public class LegacyMechPadEntity extends TileEntity{

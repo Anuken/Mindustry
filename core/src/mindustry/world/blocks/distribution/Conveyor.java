@@ -118,15 +118,11 @@ public class Conveyor extends Block implements Autotiler{
 
         int blendbits;
         int blendsclx, blendscly;
-        boolean everupdated = false;
 
         float clogHeat = 0f;
 
         @Override
         public void draw(){
-            if(!everupdated){
-                Log.info("--DID NOT UPDATE {0}", tile);
-            }
             byte rotation = tile.rotation();
             int frame = clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * timeScale())) % 4) : 0;
             Draw.rect(regions[Mathf.clamp(blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], x, y,
@@ -146,7 +142,6 @@ public class Conveyor extends Block implements Autotiler{
             blendbits = bits[0];
             blendsclx = bits[1];
             blendscly = bits[2];
-            everupdated = true;
 
             if(tile.front() != null && tile.front() != null){
                 next = tile.front();

@@ -242,6 +242,8 @@ public class ApplicationTests{
 
         world.tile(length + 1, 0).setBlock(new Block("___"){{
             hasItems = true;
+            destructible = true;
+            //2470.6772ms to process 21127 items
             entityType = () -> new TileEntity(){
                 @Override
                 public void handleItem(Tilec source, Item item){
