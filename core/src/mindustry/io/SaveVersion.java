@@ -186,7 +186,7 @@ public abstract class SaveVersion extends SaveFileReader{
             for(int i = 0; i < width * height; i++){
                 int x = i % width, y = i / width;
                 Block block = content.block(stream.readShort());
-                Tile tile = context.tile(x, y);
+                Tile tile = context.tile(i);
                 if(block == null) block = Blocks.air;
                 boolean isCenter = true;
 
@@ -214,8 +214,7 @@ public abstract class SaveVersion extends SaveFileReader{
                     int consecutives = stream.readUnsignedByte();
 
                     for(int j = i + 1; j < i + 1 + consecutives; j++){
-                        int newx = j % width, newy = j / width;
-                        context.tile(newx, newy).setBlock(block);
+                        context.tile(j).setBlock(block);
                     }
 
                     i += consecutives;

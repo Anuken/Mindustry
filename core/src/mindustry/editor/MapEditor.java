@@ -292,8 +292,8 @@ public class MapEditor{
 
     class Context implements WorldContext{
         @Override
-        public Tile tile(int x, int y){
-            return world.tile(x, y);
+        public Tile tile(int index){
+            return world.tiles.geti(index);
         }
 
         @Override

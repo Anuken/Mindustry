@@ -104,9 +104,9 @@ public class MapIO{
                 @Override public void end(){}
 
                 @Override
-                public Tile tile(int x, int y){
-                    tile.x = (short)x;
-                    tile.y = (short)y;
+                public Tile tile(int index){
+                    tile.x = (short)(index % map.width);
+                    tile.y = (short)(index / map.width);
                     return tile;
                 }
 

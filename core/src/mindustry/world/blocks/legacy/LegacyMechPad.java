@@ -1,0 +1,25 @@
+package mindustry.world.blocks.legacy;
+
+import arc.util.io.*;
+import mindustry.gen.*;
+import mindustry.world.*;
+
+public class LegacyMechPad extends Block{
+
+    public LegacyMechPad(String name){
+        super(name);
+        update = true;
+    }
+
+    public class LegacyMechPadEntity extends TileEntity{
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            //read 3 floats for pad data, and discard them
+            read.f();
+            read.f();
+            read.f();
+        }
+    }
+}

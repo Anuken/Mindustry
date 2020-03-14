@@ -8,6 +8,7 @@ import java.io.*;
 import static mindustry.Vars.content;
 
 public class Save3 extends LegacySaveVersion{
+
     public Save3(){
         super(3);
     }

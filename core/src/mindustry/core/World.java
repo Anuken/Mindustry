@@ -19,6 +19,7 @@ import mindustry.maps.filters.*;
 import mindustry.maps.filters.GenerateFilter.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.legacy.*;
 
 import static mindustry.Vars.*;
 
@@ -172,6 +173,12 @@ public class World{
         prepareTiles(tiles);
 
         for(Tile tile : tiles){
+            //remove legacy blocks; they need to stop existing
+            if(tile.block() instanceof LegacyBlock){
+                tile.remove();
+                continue;
+            }
+
             tile.updateOcclusion();
 
             if(tile.entity != null){
@@ -447,8 +454,8 @@ public class World{
 
     private class Context implements WorldContext{
         @Override
-        public Tile tile(int x, int y){
-            return tiles.get(x, y);
+        public Tile tile(int index){
+            return tiles.geti(index);
         }
 
         @Override

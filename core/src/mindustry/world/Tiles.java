@@ -65,8 +65,18 @@ public class Tiles implements Iterable<Tile>{
         return get(Point2.x(pos), Point2.y(pos));
     }
 
+    public void each(Cons<Tile> cons){
+        for(Tile tile : array){
+            cons.get(tile);
+        }
+    }
+
     @Override
     public Iterator<Tile> iterator(){
+        if(iterator.index != 0 && iterator.index != array.length){
+            iterator.index = 0;
+            throw new IllegalArgumentException("Double iteration. " + iterator.index + " != " + array.length);
+        }
         iterator.index = 0;
         return iterator;
     }

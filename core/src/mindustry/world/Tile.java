@@ -173,6 +173,8 @@ public class Tile implements Position{
         if(block.isMultiblock()){
             int offsetx = -(block.size - 1) / 2;
             int offsety = -(block.size - 1) / 2;
+            Tilec entity = this.entity;
+            Block block = this.block;
 
             //two passes: first one clears, second one sets
             for(int pass = 0; pass < 2; pass++){
@@ -198,6 +200,9 @@ public class Tile implements Position{
                     }
                 }
             }
+
+            this.entity = entity;
+            this.block = block;
         }
     }
 

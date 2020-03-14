@@ -19,6 +19,7 @@ import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.power.*;
@@ -1862,6 +1863,12 @@ public class Blocks implements ContentList{
             radius = 120f;
             consumes.power(0.05f);
         }};
+
+        //endregion
+        //region legacy
+
+        //looked up by name, no ref needed
+        new LegacyMechPad("legacy-mech-pad");
 
         //endregion
     }

@@ -13,7 +13,15 @@ public abstract class SaveFileReader{
     protected final ReusableByteOutStream byteOutputSmall = new ReusableByteOutStream();
     protected final DataOutputStream dataBytesSmall = new DataOutputStream(byteOutputSmall);
     protected final ObjectMap<String, String> fallback = ObjectMap.of(
-        "dart-mech-pad", "dart-ship-pad"
+    "dart-mech-pad", "legacy-mech-pad",
+    "dart-ship-pad", "legacy-mech-pad",
+    "javelin-ship-pad", "legacy-mech-pad",
+    "trident-ship-pad", "legacy-mech-pad",
+    "glaive-ship-pad", "legacy-mech-pad",
+    "alpha-mech-pad", "legacy-mech-pad",
+    "tau-mech-pad", "legacy-mech-pad",
+    "omega-mech-pad", "legacy-mech-pad",
+    "delta-mech-pad", "legacy-mech-pad"
     );
 
     protected void region(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{

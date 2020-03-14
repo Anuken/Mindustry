@@ -49,13 +49,12 @@ public abstract class LegacySaveVersion extends SaveVersion{
 
             //read blocks
             for(int i = 0; i < width * height; i++){
-                int x = i % width, y = i / width;
                 Block block = content.block(stream.readShort());
-                Tile tile = context.tile(x, y);
+                Tile tile = context.tile(i);
                 if(block == null) block = Blocks.air;
 
                 //occupied by multiblock part
-                boolean occupied = tile.entity != null && !tile.isCenter();
+                boolean occupied = tile.entity != null && !tile.isCenter() && (tile.entity.block() == block || block == Blocks.air);
 
                 //do not override occupied cells
                 if(!occupied){
@@ -92,8 +91,7 @@ public abstract class LegacySaveVersion extends SaveVersion{
                     //air is a waste of time and may mess up multiblocks
                     if(block != Blocks.air){
                         for(int j = i + 1; j < i + 1 + consecutives; j++){
-                            int newx = j % width, newy = j / width;
-                            context.tile(newx, newy).setBlock(block);
+                            context.tile(j).setBlock(block);
                         }
                     }
 

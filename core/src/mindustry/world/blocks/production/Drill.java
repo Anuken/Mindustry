@@ -204,7 +204,7 @@ public class Drill extends Block{
         float progress;
         int index;
         float warmup;
-        float drillTime;
+        float timeDrilled;
         float lastDrillSpeed;
 
         int dominantItems;
@@ -249,7 +249,7 @@ public class Drill extends Block{
                 dump(dominantItem);
             }
 
-            drillTime += warmup * delta();
+            timeDrilled += warmup * delta();
 
             if(items.total() < itemCapacity && dominantItems > 0 && consValid()){
 
@@ -263,8 +263,7 @@ public class Drill extends Block{
 
                 lastDrillSpeed = (speed * dominantItems * warmup) / (drillTime + hardnessDrillMultiplier * dominantItem.hardness);
                 warmup = Mathf.lerpDelta(warmup, speed, warmupSpeed);
-                progress += delta()
-                * dominantItems * speed * warmup;
+                progress += delta() * dominantItems * speed * warmup;
 
                 if(Mathf.chance(Time.delta() * updateEffectChance * warmup))
                     updateEffect.at(getX() + Mathf.range(size * 2f), getY() + Mathf.range(size * 2f));
@@ -305,7 +304,7 @@ public class Drill extends Block{
                 Draw.color();
             }
 
-            Draw.rect(rotatorRegion, x, y, drillTime * rotateSpeed);
+            Draw.rect(rotatorRegion, x, y, timeDrilled * rotateSpeed);
 
             Draw.rect(topRegion, x, y);
 
