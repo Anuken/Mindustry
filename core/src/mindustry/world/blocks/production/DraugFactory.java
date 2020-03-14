@@ -15,7 +15,7 @@ public class DraugFactory extends UnitFactory{
 
     protected final int timerEnable = timers++;
 
-    protected final int amount = 25;
+    protected final int amount = 100;
 
     public DraugFactory(String name){
         super(name);
