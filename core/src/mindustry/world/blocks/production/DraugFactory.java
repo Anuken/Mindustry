@@ -37,7 +37,7 @@ public class DraugFactory extends UnitFactory{
         if(!tile.entity.timer.get(timerEnable, 120)) return;
 
         Tile core = tile.getTeam().core().tile;
-        tile.<DraugFactoryEntity>ent().spawned(core.block.acceptItem(Items.copper, core, null) || core.block.acceptItem(Items.lead, core, null) ? 0 : 1);
+        tile.<DraugFactoryEntity>ent().spawned(core.block.acceptStack(Items.copper, 25, core, null) >= 25 || core.block.acceptStack(Items.lead, 25, core, null) >= 25 ? 0 : 1);
     }
 
     class DraugFactoryEntity extends UnitFactoryEntity{
