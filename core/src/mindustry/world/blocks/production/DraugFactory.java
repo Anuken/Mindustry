@@ -2,7 +2,6 @@ package mindustry.world.blocks.production;
 
 import arc.struct.*;
 import arc.util.*;
-import mindustry.content.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.type.*;
