@@ -1,5 +1,6 @@
 package mindustry.core;
 
+import arc.files.*;
 import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -182,6 +183,9 @@ public class ContentLoader{
         }
         if(currentMod != null){
             content.minfo.mod = currentMod;
+            if(content.minfo.sourceFile == null){
+                content.minfo.sourceFile = new Fi(content.name);
+            }
         }
         contentNameMap[content.getContentType().ordinal()].put(content.name, content);
     }

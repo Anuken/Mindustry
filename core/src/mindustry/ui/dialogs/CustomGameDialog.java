@@ -73,7 +73,6 @@ public class CustomGameDialog extends FloatingDialog{
             image.row();
             image.add(img).size(images);
 
-
             BorderImage border = new BorderImage(map.safeTexture(), 3f);
             border.setScaling(Scaling.fit);
             image.replaceImage(border);

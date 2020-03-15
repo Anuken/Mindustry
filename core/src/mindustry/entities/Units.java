@@ -26,8 +26,8 @@ public class Units{
      * Validates a target.
      * @param target The target to validate
      * @param team The team of the thing doing tha targeting
-     * @param x The X position of the thing doign the targeting
-     * @param y The Y position of the thing doign the targeting
+     * @param x The X position of the thing doing the targeting
+     * @param y The Y position of the thing doing the targeting
      * @param range The maximum distance from the target X/Y the targeter can be for it to be valid
      * @return whether the target is invalid
      */

@@ -16,7 +16,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
-import mindustry.world.blocks.power.*;
 
 import java.util.*;
 
@@ -245,7 +244,6 @@ public class Logic implements ApplicationListener{
                     unitGroup.updateEvents();
                     collisions.updatePhysics(unitGroup);
                 }
-
 
                 playerGroup.update();
 
