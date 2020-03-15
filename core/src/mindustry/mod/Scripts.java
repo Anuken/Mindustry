@@ -91,6 +91,9 @@ public class Scripts implements Disposable{
             context.evaluateString(scope, script, file, 1, null);
             return true;
         }catch(Throwable t){
+            if(currentMod != null){
+                file = currentMod.name + "/" + file;
+            }
             log(LogLevel.err, file, "" + getError(t));
             return false;
         }
@@ -124,6 +127,8 @@ public class Scripts implements Disposable{
                     if(!dir.exists()) return null; // Mod and folder not found
                     return loadSource(script, dir, validator);
                 }
+
+                currentMod = required;
                 return loadSource(script, required.root.child("scripts"), validator);
             }
 

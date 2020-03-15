@@ -252,7 +252,7 @@ public class BuildBlock extends Block{
         }
 
         public void deconstruct(Unit builder, @Nullable TileEntity core, float amount){
-            float deconstructMultiplier = 0.5f;
+            float deconstructMultiplier = state.rules.deconstructRefundMultiplier;
 
             if(cblock != null){
                 ItemStack[] requirements = cblock.requirements;

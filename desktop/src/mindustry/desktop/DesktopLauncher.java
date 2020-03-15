@@ -180,9 +180,10 @@ public class DesktopLauncher extends ClientLauncher{
     static void handleCrash(Throwable e){
         Cons<Runnable> dialog = Runnable::run;
         boolean badGPU = false;
+        String total = Strings.getCauses(e).toString();
 
-        if(e.getMessage() != null && (e.getMessage().contains("Couldn't create window") ||
-            e.getMessage().contains("OpenGL 2.0 or higher") || e.getMessage().toLowerCase().contains("pixel format") || e.getMessage().contains("GLEW"))){
+        if(total.contains("Couldn't create window") ||
+        total.contains("OpenGL 2.0 or higher") || total.toLowerCase().contains("pixel format") || total.contains("GLEW")){
 
             dialog.get(() -> message(
                     e.getMessage().contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + e.getMessage() :
