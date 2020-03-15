@@ -484,6 +484,16 @@ public class NetServer implements ApplicationListener{
 
             player.setNet(x * tilesize, y * tilesize);
         });
+
+        clientCommands.<Player>register("js", "<script...>", "Run arbitrary Javascript.", (args, player) -> {
+
+            if(!player.isAdmin){
+                player.sendMessage("[scarlet]This command is reserved for admins.");
+                return;
+            }
+
+            player.sendMessage("[lightgray]" + mods.getScripts().runConsole(args[0]));
+        });
     }
 
     public int votesRequired(){
