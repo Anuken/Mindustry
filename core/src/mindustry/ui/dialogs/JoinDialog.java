@@ -427,7 +427,7 @@ public class JoinDialog extends FloatingDialog{
         servers = Core.settings.getObject("server-list", Array.class, Array::new);
 
         //get servers
-        Core.net.httpGet(becontrol.active() ? serverJsonBeURL : serverJsonURL, result -> {
+        Core.net.httpGet(serverJsonCraterURL, result -> {
             try{
                 Jval val = Jval.read(result.getResultAsString());
                 Core.app.post(() -> {
