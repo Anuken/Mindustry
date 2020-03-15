@@ -58,6 +58,8 @@ public class UnitFactory extends Block{
         Effects.shake(2f, 3f, entity);
         Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
 
+        if(factory.unitType == UnitTypes.draug) return;
+
         if(!net.client()){
             spawn(tile, factory.unitType);
 //            if(factory.unitType == UnitTypes.draug) spawn(tile, UnitTypes.spirit);
@@ -179,12 +181,7 @@ public class UnitFactory extends Block{
         if(entity.buildTime >= produceTime){
             entity.buildTime = 0f;
 
-            if(unitType != UnitTypes.draug){
-                Call.onUnitFactorySpawn(tile, entity.spawned + 1);
-            }else{
-                netServer.titanic.add(tile);
-                ((DraugFactory)tile.block).trigger(tile);
-            }
+            Call.onUnitFactorySpawn(tile, entity.spawned + 1);
             useContent(tile, unitType);
 
             entity.cons.trigger();
