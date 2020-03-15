@@ -692,7 +692,7 @@ public class Blocks implements ContentList{
             };
         }};
 
-        pulverizer = new GenericCrafter("pulverizer"){{
+        pulverizer = new Pulverizer("pulverizer"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 30, Items.lead, 25));
             outputItem = new ItemStack(Items.sand, 1);
             craftEffect = Fx.pulverize;
