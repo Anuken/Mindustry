@@ -118,6 +118,7 @@ public class ContentLoader{
                     callable.get(content);
                 }catch(Throwable e){
                     if(content.minfo.mod != null){
+                        Log.err(e);
                         mods.handleContentError(content, e);
                     }else{
                         throw new RuntimeException(e);
