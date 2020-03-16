@@ -161,10 +161,14 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
 
     public byte absoluteRelativeTo(int cx, int cy){
         int x = tile.x, y = tile.y;
-        if(x == cx && y <= cy - 1) return 1;
-        if(x == cx && y >= cy + 1) return 3;
-        if(x <= cx - 1 && y == cy) return 0;
-        if(x >= cx + 1 && y == cy) return 2;
+        if(Math.abs(x - cx) > Math.abs(y - cy)){
+            if(x <= cx - 1 && y == cy) return 0;
+            if(x >= cx + 1 && y == cy) return 2;
+        }else{
+            if(x == cx && y <= cy - 1) return 1;
+            if(x == cx && y >= cy + 1) return 3;
+        }
+
         return -1;
     }
 
@@ -360,11 +364,11 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     public float moveLiquid(Tilec next, float leakResistance, Liquid liquid){
         if(next == null) return 0;
 
-        next = next.getLiquidDestination(next, liquid);
+        next = next.getLiquidDestination(this, liquid);
 
         if(next.team() == team() && next.block().hasLiquids && liquids().get(liquid) > 0f){
 
-            if(next.acceptLiquid(next, liquid, 0f)){
+            if(next.acceptLiquid(this, liquid, 0f)){
                 float ofract = next.liquids().get(liquid) / next.block().liquidCapacity;
                 float fract = liquids().get(liquid) / block.liquidCapacity * block.liquidPressure;
                 float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (block.liquidCapacity), liquids().get(liquid));

@@ -212,6 +212,61 @@ public class ApplicationTests{
         assertTrue(state.teams.playerCores().size > 0);
     }
 
+    void updateBlocks(int times){
+        for(Tile tile : world.tiles){
+            if(tile.entity != null && tile.isCenter()){
+                tile.entity.updateProximity();
+            }
+        }
+
+        for(int i = 0; i < times; i++){
+            Time.update();
+            for(Tile tile : world.tiles){
+                if(tile.entity != null && tile.isCenter()){
+                    tile.entity.update();
+                }
+            }
+        }
+    }
+
+    @Test
+    void liquidOutput(){
+        world.loadMap(testMap);
+        state.set(State.playing);
+
+        world.tile(0, 0).setBlock(Blocks.liquidSource);
+        world.tile(0, 0).configureAny(Liquids.water);
+
+        world.tile(2, 1).setBlock(Blocks.liquidTank);
+
+        updateBlocks(10);
+
+        assertTrue(world.tile(2, 1).entity.liquids().currentAmount() >= 1);
+        assertTrue(world.tile(2, 1).entity.liquids().current() == Liquids.water);
+    }
+
+    @Test
+    void liquidJunctionOutput(){
+        world.loadMap(testMap);
+        state.set(State.playing);
+
+        Tile source = world.rawTile(0, 0), tank = world.rawTile(1, 4), junction = world.rawTile(0, 1), conduit = world.rawTile(0, 2);
+
+        source.setBlock(Blocks.liquidSource);
+        source.configureAny(Liquids.water);
+
+        junction.setBlock(Blocks.liquidJunction);
+
+        conduit.setBlock(Blocks.conduit, Team.derelict, 1);
+
+        tank.setBlock(Blocks.liquidTank);
+
+        updateBlocks(10);
+
+        assertTrue(tank.entity.liquids().currentAmount() >= 1, "Liquid not moved through junction");
+        assertTrue(tank.entity.liquids().current() == Liquids.water, "Tank has no water");
+    }
+
     @Test
     void conveyorCrash(){
         world.loadMap(testMap);

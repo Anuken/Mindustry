@@ -121,7 +121,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
             smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / liquidCapacity, 0.05f);
 
             if(liquids.total() > 0.001f && timer(timerFlow, 1)){
-                moveLiquid(tile.getNearbyEntity(tile.rotation()), leakResistance, liquids.current());
+                moveLiquid(tile.getNearbyEntity(rotation()), leakResistance, liquids.current());
                 noSleep();
             }else{
                 sleep();
