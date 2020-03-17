@@ -72,10 +72,10 @@ public class Placement{
         }
         // if the end is nowhere on the line, don't return anything
 
-        if(!points.contains(p -> p.equals((Pools.obtain(Point2.class, Point2::new).set(endX, endY))))){
+        if(!points.contains(p -> p.equals(endX, endY))){
             Pools.freeAll(points);
             points.clear();
-            points.add(new Point2(startX, startY));
+            points.add(Pools.obtain(Point2.class, Point2::new).set(startX, startY));
         }
         return points;
     }
