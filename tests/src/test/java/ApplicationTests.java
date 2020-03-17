@@ -404,6 +404,8 @@ public class ApplicationTests{
 
         //infinite build range
         state.rules.editor = true;
+        state.rules.infiniteResources = true;
+        state.rules.buildSpeedMultiplier = 999999f;
 
         d1.set(0f, 0f);
         d2.set(20f, 20f);
@@ -411,7 +413,6 @@ public class ApplicationTests{
         d1.addBuild(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
         d2.addBuild(new BuildRequest(1, 1, 0, Blocks.copperWallLarge));
 
-        Time.setDeltaProvider(() -> 9999999f);
         d1.update();
         d2.update();
 

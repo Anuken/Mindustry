@@ -39,6 +39,7 @@ public class SectorDataGenerator{
 
         for(Planet planet : content.<Planet>getBy(ContentType.planet)){
             int[] count = {0};
+            if(planet.grid == null) continue;
 
             Fi fi = Fi.get("planets").child(planet.name + ".dat");
 

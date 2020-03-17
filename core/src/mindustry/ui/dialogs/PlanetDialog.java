@@ -162,12 +162,15 @@ public class PlanetDialog extends FloatingDialog{
         bloom.render();
 
         Gl.disable(Gl.cullFace);
-        //Gl.disable(Gl.depthTest);
+        Gl.disable(Gl.depthTest);
 
-        if(false && selected != null){
-            Vec3 pos = cam.project(Tmp.v31.set(selected.tile.v).setLength(outlineRad));
+        if(selected != null){
+            addChild(stable);
+            Vec3 pos = cam.project(Tmp.v31.set(selected.tile.v).setLength(outlineRad).rotate(Vec3.Y, -planet.getRotation()).add(planet.position));
             stable.setPosition(pos.x, pos.y, Align.center);
-            stable.draw();
+            stable.toFront();
+        }else{
+            stable.remove();
         }
 
         cam.update();
@@ -225,12 +228,6 @@ public class PlanetDialog extends FloatingDialog{
         if(selected != null){
             drawSelection(selected);
             drawBorders(selected, borderColor);
-
-            //TODO use better input
-            if(Core.input.keyTap(KeyCode.SPACE)){
-                control.playSector(selected);
-                ui.planet.hide();
-            }
         }
 
         batch.flush(Gl.triangles);
@@ -277,6 +274,7 @@ public class PlanetDialog extends FloatingDialog{
     }
 
     private void updateSelected(){
+        float x = stable.getX(Align.center), y = stable.getY(Align.center);
         stable.clear();
         stable.background(Styles.black6);
 
@@ -302,8 +300,17 @@ public class PlanetDialog extends FloatingDialog{
             }
         }).fillX().row();
 
+        stable.row();
+
+        stable.addButton("Launch", () -> {
+            if(selected != null){
+                control.playSector(selected);
+                hide();
+            }
+        }).size(120f, 50f).pad(2f);
+
         stable.pack();
-        stable.setPosition(0, 0, Align.center);
+        stable.setPosition(x, y, Align.center);
     }
 
     private void setPlane(Sector sector){
