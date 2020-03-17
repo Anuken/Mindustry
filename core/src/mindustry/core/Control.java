@@ -260,6 +260,7 @@ public class Control implements ApplicationListener, Loadable{
                     state.rules.sector = sector;
                     state.set(State.playing);
                 }catch(SaveException e){
+                    sector.save = null;
                     Log.err(e);
                     ui.showErrorMessage("$save.corrupted");
                     slot.delete();
@@ -271,12 +272,9 @@ public class Control implements ApplicationListener, Loadable{
                 logic.reset();
                 world.loadSector(sector);
                 state.rules.sector = sector;
-                //TODO enable for lighting
-                //state.rules.lighting = true;
                 logic.play();
                 control.saves.saveSector(sector);
-                //TODO uncomment for efffect
-                //Events.fire(Trigger.newGame);
+                Events.fire(Trigger.newGame);
             }
         });
     }
