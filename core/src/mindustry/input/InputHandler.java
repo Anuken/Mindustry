@@ -808,6 +808,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void drawArrow(Block block, int x, int y, int rotation, boolean valid){
         Draw.color(!valid ? Pal.removeBack : Pal.accentBack);
+        if(Core.input.keyDown(Binding.upgrade_blocks) && valid){
+            Draw.color(Pal.upgradeBack);
+        }
+
         Draw.rect(Core.atlas.find("place-arrow"),
         x * tilesize + block.offset(),
         y * tilesize + block.offset() - 1,
@@ -815,6 +819,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
 
         Draw.color(!valid ? Pal.remove : Pal.accent);
+        if(Core.input.keyDown(Binding.upgrade_blocks) && valid){
+            Draw.color(Pal.upgrade);
+        }
+
         Draw.rect(Core.atlas.find("place-arrow"),
         x * tilesize + block.offset(),
         y * tilesize + block.offset(),
@@ -825,6 +833,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){
         Array<Point2> points;
         boolean diagonal = Core.input.keyDown(Binding.diagonal_placement);
+        boolean follower = Core.input.keyDown(Binding.upgrade_blocks);
 
         if(Core.settings.getBool("swapdiagonal") && mobile){
             diagonal = !diagonal;
@@ -836,6 +845,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(diagonal){
             points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
+
+        }else if(follower){
+            points = Placement.followLineUntil(startX, startY, endX, endY);
+
         }else{
             points = Placement.normalizeLine(startX, startY, endX, endY);
         }
@@ -882,7 +895,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             line.x = point.x;
             line.y = point.y;
             if(!overrideLineRotation || diagonal){
-                line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : baseRotation;
+                line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : (follower ? world.ltile(point.x, point.y).rotation() : baseRotation);
             }else{
                 line.rotation = rotation;
             }

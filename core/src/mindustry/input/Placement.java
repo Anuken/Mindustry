@@ -56,6 +56,32 @@ public class Placement{
         return points;
     }
 
+    public static Array<Point2> followLineUntil(int startX, int startY, int endX, int endY){
+        Pools.freeAll(points);
+        points.clear();
+
+        Tile cursor = world.ltile(startX, startY);
+        Block filter = cursor.block();
+
+        while(true){
+            if(cursor.block() != filter) break;                        // keep looking until encountering a different block
+            //if(points.contains(p -> p.equals(cursorX, cursorY))) break; // avoid biting its own tail
+            if(points.contains(Pools.obtain(Point2.class, Point2::new).set(cursor.x, cursor.y))) break; // avoid biting its own tail
+            points.add(Pools.obtain(Point2.class, Point2::new).set(cursor.x, cursor.y));
+            if(cursor.x == endX && cursor.y == endY) break;            // do not look further than the cursor
+            cursor = cursor.getNearby(cursor.rotation());              // move cursor to next block to check
+        }
+        // if the end is nowhere on the line, don't return anything
+
+        if(!points.contains(p -> p.equals((Pools.obtain(Point2.class, Point2::new).set(endX, endY))))){
+        //if(!points.contains(new Point2(endX, endY))){
+            Pools.freeAll(points);
+            points.clear();
+            points.add(new Point2(startX, startY));
+        }
+        return points;
+    }
+
     private static float tileHeuristic(Tile tile, Tile other){
         Block block = control.input.block;
 

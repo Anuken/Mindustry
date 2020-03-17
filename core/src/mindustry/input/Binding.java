@@ -23,6 +23,7 @@ public enum Binding implements KeyBind{
     schematic_select(KeyCode.F),
     schematic_flip_x(KeyCode.Z),
     schematic_flip_y(KeyCode.X),
+    upgrade_blocks(KeyCode.V),
     schematic_menu(KeyCode.T),
     category_prev(KeyCode.COMMA),
     category_next(KeyCode.PERIOD),
