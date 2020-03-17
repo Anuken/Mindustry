@@ -64,8 +64,10 @@ public class Placement{
         Block filter = cursor.block();
 
         while(true){
+            if(!cursor.block().rotate) break;                                  // The block we're looking at can't rotate? Don't even bother continuing
+            Tile cursorlambda = cursor;                                // Lambda var holder
             if(cursor.block() != filter) break;                        // keep looking until encountering a different block
-            if(points.contains(Pools.obtain(Point2.class, Point2::new).set(cursor.x, cursor.y))) break; // avoid biting its own tail
+            if(points.contains(p -> p.equals(cursorlambda.x, cursorlambda.y))) break; // avoid biting its own tail
             points.add(Pools.obtain(Point2.class, Point2::new).set(cursor.x, cursor.y));
             if(cursor.x == endX && cursor.y == endY) break;            // do not look further than the cursor
             cursor = cursor.getNearby(cursor.rotation());              // move cursor to next block to check
