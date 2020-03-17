@@ -25,10 +25,10 @@ public class DoubleTurret extends ItemTurret{
     public class DoubleTurretEntity extends ItemTurretEntity{
         @Override
         protected void shoot(BulletType ammo){
-            shots++;
+            shotCount++;
             heat = 1f;
 
-            int i = Mathf.signs[shots % 2];
+            int i = Mathf.signs[shotCount % 2];
 
             tr.trns(rotation - 90, shotWidth * i, size * tilesize / 2);
             bullet(ammo, rotation + Mathf.range(inaccuracy));

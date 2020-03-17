@@ -260,8 +260,8 @@ public class Control implements ApplicationListener, Loadable{
                     state.rules.sector = sector;
                     state.set(State.playing);
                 }catch(SaveException e){
-                    sector.save = null;
                     Log.err(e);
+                    sector.save = null;
                     ui.showErrorMessage("$save.corrupted");
                     slot.delete();
                     playSector(sector);

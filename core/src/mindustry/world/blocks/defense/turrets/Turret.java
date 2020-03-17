@@ -122,7 +122,7 @@ public abstract class Turret extends Block{
         public float rotation = 90;
         public float recoil = 0f;
         public float heat;
-        public int shots;
+        public int shotCount;
         public Posc target;
 
         @Override
@@ -217,7 +217,7 @@ public abstract class Turret extends Block{
             entry.amount -= ammoPerShot;
             if(entry.amount == 0) ammo.pop();
             totalAmmo -= ammoPerShot;
-            Time.run(reload / 2f, () -> ejectEffects());
+            Time.run(reloadTime / 2f, () -> ejectEffects());
             return entry.type();
         }
 
@@ -236,7 +236,7 @@ public abstract class Turret extends Block{
         }
 
         protected void updateShooting(){
-            if(reload >= reload){
+            if(reload >= reloadTime){
                 BulletType type = peekAmmo();
 
                 shoot(type);
@@ -254,7 +254,7 @@ public abstract class Turret extends Block{
             tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
 
             for(int i = 0; i < shots; i++){
-                bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - shots / 2) * spread);
+                bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - shots / 2f) * spread);
             }
 
             effects();
