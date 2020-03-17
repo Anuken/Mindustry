@@ -1329,7 +1329,7 @@ public class Blocks implements ContentList{
         //endregion
         //region turrets
 
-        duo = new DoubleTurret("duo"){{
+        duo = new ItemTurret("duo"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 35), true);
             ammo(
             Items.copper, Bullets.standardCopper,
@@ -1337,6 +1337,10 @@ public class Blocks implements ContentList{
             Items.pyratite, Bullets.standardIncendiary,
             Items.silicon, Bullets.standardHoming
             );
+
+            spread = 4f;
+            shots = 2;
+            alternate = true;
             reloadTime = 20f;
             restitution = 0.03f;
             range = 100;
@@ -1605,7 +1609,7 @@ public class Blocks implements ContentList{
             health = 145 * size * size;
         }};
 
-        spectre = new DoubleTurret("spectre"){{
+        spectre = new ItemTurret("spectre"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 350, Items.graphite, 300, Items.surgealloy, 250, Items.plastanium, 175, Items.thorium, 250));
             ammo(
             Items.graphite, Bullets.standardDenseBig,
@@ -1619,8 +1623,8 @@ public class Blocks implements ContentList{
             range = 200f;
             inaccuracy = 3f;
             recoilAmount = 3f;
-            xRand = 3f;
-            shotWidth = 4f;
+            spread = 8f;
+            alternate = true;
             shootShake = 2f;
             shots = 2;
             size = 4;

@@ -44,6 +44,7 @@ public abstract class Turret extends Block{
     public float shootCone = 8f;
     public float shootShake = 0f;
     public float xRand = 0f;
+    public boolean alternate = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
 
@@ -122,7 +123,7 @@ public abstract class Turret extends Block{
         public float rotation = 90;
         public float recoil = 0f;
         public float heat;
-        public int shotCount;
+        public int shotCounter;
         public Posc target;
 
         @Override
@@ -251,11 +252,21 @@ public abstract class Turret extends Block{
             recoil = recoilAmount;
             heat = 1f;
 
-            tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
+            if(alternate){
+                float i = (shotCounter % shots) - shots/2f + (((shots+1)%2) / 2f);
+                Log.info(i);
 
-            for(int i = 0; i < shots; i++){
-                bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - shots / 2f) * spread);
+                tr.trns(rotation - 90, spread * i + Mathf.range(xRand), size * tilesize / 2);
+                bullet(type, rotation + Mathf.range(inaccuracy));
+            }else{
+                tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
+
+                for(int i = 0; i < shots; i++){
+                    bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - shots / 2f) * spread);
+                }
             }
+
+            shotCounter++;
 
             effects();
             useAmmo();
