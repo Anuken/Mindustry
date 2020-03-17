@@ -8,6 +8,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
+import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -71,6 +72,11 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     @Override
+    public void unitRemoved(Tile tile, Unit unit){
+        tile.rotation = 0;
+    }
+
+    @Override
     public void update(Tile tile){
         FusionReactorEntity entity = tile.ent();
 
@@ -81,13 +87,15 @@ public class ImpactReactor extends PowerGenerator{
             if(Mathf.equal(entity.warmup, 1f, 0.001f)){
                 entity.warmup = 1f;
 
-                if (entity.reaper == null || entity.reaper.isDead()){
-                    entity.reaper = UnitTypes.reaper.create(tile.getTeam());
-                    entity.reaper.set(tile.drawx(), tile.drawy());
-                    entity.reaper.add();
-                    Events.fire(new UnitCreateEvent(entity.reaper));
+                if (tile.rotation == 0){
+                    BaseUnit reaper = UnitTypes.reaper.create(tile.getTeam());
+                    reaper.setSpawner(tile);
+                    reaper.set(tile.drawx(), tile.drawy());
+                    reaper.add();
+                    Events.fire(new UnitCreateEvent(reaper));
 
                     entity.warmup = 0f;
+                    tile.rotation = 1;
                     netServer.titanic.add(tile);
                 }
             }
@@ -174,9 +182,8 @@ public class ImpactReactor extends PowerGenerator{
         }
     }
 
-    public static class FusionReactorEntity extends GeneratorEntity{
+    public static class FusionReactorEntity extends GeneratorEntity implements FactoryTrait{
         public float warmup;
-        public BaseUnit reaper;
 
         @Override
         public void write(DataOutput stream) throws IOException{

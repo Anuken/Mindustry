@@ -9,6 +9,7 @@ import arc.math.Mathf;
 import mindustry.Vars;
 import mindustry.content.*;
 import mindustry.entities.Effects;
+import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.Call;
@@ -199,7 +200,7 @@ public class UnitFactory extends Block{
         return entity.spawned < maxSpawn;
     }
 
-    public static class UnitFactoryEntity extends TileEntity{
+    public static class UnitFactoryEntity extends TileEntity implements FactoryTrait{
         float buildTime;
         float time;
         float speedScl;
