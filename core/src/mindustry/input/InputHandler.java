@@ -570,6 +570,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     boolean tileTapped(@Nullable Tilec tile){
         if(tile == null){
             frag.inv.hide();
+            frag.config.hideConfig();
             return false;
         }
         boolean consumed = false, showedInventory = false;

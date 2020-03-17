@@ -497,6 +497,10 @@ public class Tile implements Position{
                                 other.entity = null;
                             }
                             other.block = Blocks.air;
+
+                            //manually call changed event
+                            other.updateOcclusion();
+                            world.notifyChanged(other);
                         }
                     }
                 }

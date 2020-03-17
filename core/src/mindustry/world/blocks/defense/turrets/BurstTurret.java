@@ -21,8 +21,7 @@ public class BurstTurret extends ItemTurret{
 
             for(int i = 0; i < shots; i++){
                 Time.run(burstSpacing * i, () -> {
-                    if(!(tile.entity instanceof TurretEntity) ||
-                    !hasAmmo()) return;
+                    if(!(tile.entity instanceof TurretEntity) || !hasAmmo()) return;
 
                     recoil = recoilAmount;
 

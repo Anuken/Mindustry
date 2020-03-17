@@ -421,10 +421,8 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
             Tilec other = proximity.get((i + dump) % proximity.size);
-            //TODO fix position
-            Tilec in = Edges.getFacingEdge(tile(), other.tile()).entity;
-            if(other.team() == team() && other.acceptItem(in, item) && canDump(other, item)){
-                other.handleItem(in, item);
+            if(other.team() == team() && other.acceptItem(this, item) && canDump(other, item)){
+                other.handleItem(this, item);
                 return;
             }
         }
@@ -451,24 +449,22 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
 
         for(int i = 0; i < proximity.size; i++){
             Tilec other = proximity.get((i + dump) % proximity.size);
-            //TODO fix position
-            Tilec in = Edges.getFacingEdge(tile, other.tile()).entity;
 
             if(todump == null){
 
                 for(int ii = 0; ii < content.items().size; ii++){
                     Item item = content.item(ii);
 
-                    if(other.team() == team() && items.has(item) && other.acceptItem(in, item) && canDump(other, item)){
-                        other.handleItem(in, item);
+                    if(other.team() == team() && items.has(item) && other.acceptItem(this, item) && canDump(other, item)){
+                        other.handleItem(this, item);
                         items.remove(item, 1);
                         incrementDump(proximity.size);
                         return true;
                     }
                 }
             }else{
-                if(other.team() == team() && other.acceptItem(in, todump) && canDump(other, todump)){
-                    other.handleItem(in, todump);
+                if(other.team() == team() && other.acceptItem(this, todump) && canDump(other, todump)){
+                    other.handleItem(this, todump);
                     items.remove(todump, 1);
                     incrementDump(proximity.size);
                     return true;
@@ -798,10 +794,10 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
 
     /**
      * Called when another tile is tapped while this block is selected.
-     * Returns whether or not this block should be deselected.
+     * @return whether or not this block should be deselected.
      */
     public boolean onConfigureTileTapped(Tilec other){
-        return tile != other;
+        return this != other;
     }
 
     /** Returns whether this config menu should show when the specified player taps it. */

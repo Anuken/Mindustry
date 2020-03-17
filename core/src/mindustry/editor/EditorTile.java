@@ -42,29 +42,16 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    public void setBlock(Block type){
-        if(state.is(State.playing)){
-            super.setBlock(type);
-            return;
-        }
-
-        if(block == type) return;
-        op(OpType.block, block.id);
-        if(rotation != 0) op(OpType.rotation, rotation);
-        if(team() != Team.derelict) op(OpType.team, team().id);
-        super.setBlock(type);
-    }
-
-    @Override
     public void setBlock(Block type, Team team, int rotation){
         if(state.is(State.playing)){
             super.setBlock(type, team, rotation);
             return;
         }
 
-        setBlock(type);
-        setTeam(team);
-        rotation(rotation);
+        op(OpType.block, block.id);
+        if(rotation != 0) op(OpType.rotation, (byte)rotation);
+        if(team() != Team.derelict) op(OpType.team, team().id);
+        super.setBlock(type, team, rotation);
     }
 
     @Override
@@ -93,20 +80,15 @@ public class EditorTile extends Tile{
 
     @Override
     public void setOverlay(Block overlay){
-        setOverlayID(overlay.id);
-    }
-
-    @Override
-    public void setOverlayID(short overlay){
         if(state.is(State.playing)){
-            super.setOverlayID(overlay);
+            super.setOverlay(overlay);
             return;
         }
 
         if(floor.isLiquid) return;
-        if(overlayID() == overlay) return;
+        if(overlay() == overlay) return;
         op(OpType.overlay, this.overlay.id);
-        super.setOverlayID(overlay);
+        super.setOverlay(overlay);
     }
 
     @Override
