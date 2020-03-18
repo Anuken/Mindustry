@@ -127,7 +127,7 @@ public class BuildBlock extends Block{
 
         private float[] accumulator;
         private float[] totalAccumulator;
-        
+
         @Override
         public String getDisplayName(){
             return Core.bundle.format("block.constructing", cblock == null ? previous.localizedName : cblock.localizedName);
@@ -230,7 +230,7 @@ public class BuildBlock extends Block{
         }
 
         public void deconstruct(Unitc builder, @Nullable Tilec core, float amount){
-            float deconstructMultiplier = 0.5f;
+            float deconstructMultiplier = state.rules.deconstructRefundMultiplier;
 
             if(cblock != null){
                 ItemStack[] requirements = cblock.requirements;
