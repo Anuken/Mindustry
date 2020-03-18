@@ -151,15 +151,19 @@ public class PlanetDialog extends FloatingDialog{
             renderSectors(planet);
         }
 
-        if(false)
-        Draw.batch(projector, () -> {
-            if(selected != null){
-                setPlane(selected);
-                stable.draw();
-            }
-        });
-
         bloom.render();
+
+        Gl.enable(Gl.blend);
+
+        if(hovered != null){
+            Draw.batch(projector, () -> {
+                setPlane(hovered);
+
+                if(false){ //TODO locked check
+                    Draw.rect(Icon.lock.getRegion(), 0, 0);
+                }
+            });
+        }
 
         Gl.disable(Gl.cullFace);
         Gl.disable(Gl.depthTest);
@@ -179,19 +183,7 @@ public class PlanetDialog extends FloatingDialog{
     private void renderPlanet(Planet planet){
         //render planet at offsetted position in the world
 
-        if(false){
-            bloom.capture();
-        }
-
         planet.mesh.render(cam.combined(), planet.getTransform(mat));
-
-        if(false){
-            bloom.render();
-
-            Gl.enable(Gl.depthTest);
-            Gl.enable(Gl.blend);
-            Gl.depthMask(true);
-        }
 
         renderOrbit(planet);
 
@@ -314,15 +306,16 @@ public class PlanetDialog extends FloatingDialog{
     }
 
     private void setPlane(Sector sector){
-        float rotation = planet.getRotation();
+        float rotation = -planet.getRotation();
+        float length = 0.01f;
 
         projector.setPlane(
             //origin on sector position
-            Tmp.v33.set(sector.tile.v).setLength(outlineRad + 0.1f),
+            Tmp.v33.set(sector.tile.v).setLength(outlineRad + length).rotate(Vec3.Y, rotation).add(planet.position),
             //face up
-            sector.plane.project(Tmp.v32.set(sector.tile.v).add(Vec3.Y)).sub(sector.tile.v).nor(),
+            sector.plane.project(Tmp.v32.set(sector.tile.v).add(Vec3.Y)).sub(sector.tile.v).rotate(Vec3.Y, rotation).nor(),
             //right vector
-            Tmp.v31.set(Tmp.v32).add(sector.tile.v).rotate(sector.tile.v, 90).sub(sector.tile.v).nor()
+            Tmp.v31.set(Tmp.v32).add(sector.tile.v).rotate(sector.tile.v, 90).sub(sector.tile.v).rotate(Vec3.Y, rotation).nor()
         );
     }
 
