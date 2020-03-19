@@ -50,14 +50,24 @@ public class SectorDataGenerator{
                 ObjectSet<Content> content = new ObjectSet<>();
 
                 world.loadSector(sector);
+                int waterFloors = 0, totalFloors = 0;
+                state.rules.sector = sector;
 
                 for(Tile tile : world.tiles){
+                    if(world.getDarkness(tile.x, tile.y) >= 3){
+                        continue;
+                    }
+
                     Item item = tile.floor().itemDrop;
                     Liquid liquid = tile.floor().liquidDrop;
                     if(item != null) content.add(item);
                     if(liquid != null) content.add(liquid);
 
                     if(!tile.block().isStatic()){
+                        totalFloors ++;
+                        if(liquid == Liquids.water){
+                            waterFloors ++;
+                        }
                         floors.increment(tile.floor());
                         if(tile.overlay() != Blocks.air){
                             floors.increment(tile.overlay());
@@ -79,6 +89,13 @@ public class SectorDataGenerator{
                 }
 
                 data.resources = content.asArray().sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id))).toArray(UnlockableContent.class);
+
+                //50% water -> naval attribute
+                //TODO also select sectors with water spawns
+                if((float)waterFloors / totalFloors >= 0.5f){
+                    Log.info("Floor percentage for sector {0} : {1}", sector.id, (int)((float)waterFloors / totalFloors * 100));
+                    data.attributes |= (1 << SectorAttribute.naval.ordinal());
+                }
 
                 if(count[0]++ % 10 == 0){
                     Log.info("&lyDone with sector &lm{0}/{1}", count[0], planet.sectors.size);

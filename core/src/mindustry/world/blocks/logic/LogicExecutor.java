@@ -1,6 +1,7 @@
 package mindustry.world.blocks.logic;
 
 import arc.math.*;
+import mindustry.gen.*;
 
 public class LogicExecutor{
     Instruction[] instructions;
@@ -17,26 +18,69 @@ public class LogicExecutor{
         if(counter >= instructions.length) counter = 0;
     }
 
+    Tilec device(short id){
+        return null; //TODO
+    }
+
     interface Instruction{
         void exec();
     }
 
-    class RegisterI{
+    class RegisterI implements Instruction{
+        /** operation to perform */
         Op op;
-        short from, to;
-        int immediate;
+        /** destination register */
+        short dest;
+        /** registers to take data from. -1 for no register. */
+        short left, right;
+        /** left/right immediate values, only used if no registers are present. */
+        int ileft, iright;
 
+        @Override
         public void exec(){
-            registers[to] = op.function.get(registers[from], immediate);
+            registers[dest] = op.function.get(left == -1 ? ileft : registers[left], right == -1 ? iright : registers[right]);
         }
     }
 
-    static class ReadI{
+    class ReadI implements Instruction{
+        /** register to write result to */
+        short dest;
+        /** device to read from */
+        short device;
+        /** the type of data to be read */
+        ReadOp op;
+        /** any additional read parameters */
+        int parameter;
 
+        @Override
+        public void exec(){
+            registers[dest] = op.function.get(device(device), parameter);
+        }
     }
 
-    static class WriteI{
+    class WriteI implements Instruction{
 
+        @Override
+        public void exec(){
+
+        }
+    }
+
+    enum ReadOp{
+        item((tile, id) -> tile.items() == null ? 0 : tile.items().get(id)),
+        itemTotal((tile, param) -> tile.items() == null ? 0 : tile.items().total());
+
+        final ReadOpLambda function;
+        final String symbol;
+
+        ReadOp(ReadOpLambda function){
+            this.symbol = name();
+            this.function = function;
+        }
+
+        interface ReadOpLambda{
+            int get(Tilec tile, int parameter);
+        }
     }
 
     enum Op{
@@ -52,16 +96,18 @@ public class LogicExecutor{
         and("and", (a, b) -> a & b),
         xor("xor", (a, b) -> a ^ b);
 
-        final BinaryOp function;
+        final OpLambda function;
         final String symbol;
 
-        Op(String symbol, BinaryOp function){
+        Op(String symbol, OpLambda function){
             this.symbol = symbol;
             this.function = function;
         }
+
+        interface OpLambda{
+            int get(int a, int b);
+        }
     }
 
-    interface BinaryOp{
-        int get(int a, int b);
-    }
+
 }

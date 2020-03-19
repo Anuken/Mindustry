@@ -19,6 +19,7 @@ import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
+import mindustry.type.Sector.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
@@ -30,7 +31,7 @@ public class PlanetDialog extends FloatingDialog{
         borderColor = Pal.accent.cpy().a(0.3f),
         shadowColor = new Color(0, 0, 0, 0.7f);
     private static final float camLength = 4f;
-    float outlineRad = 1.15f;
+    float outlineRad = 1.16f;
 
     //the base planet that's being rendered
     private final Planet solarSystem = Planets.sun;
@@ -59,7 +60,7 @@ public class PlanetDialog extends FloatingDialog{
         buttons.addImageTextButton("$techtree", Icon.tree, () -> ui.tech.show()).size(230f, 64f);
 
         camRelative.set(0, 0f, camLength);
-        projector.setScaling(1f / 300f);
+        projector.setScaling(1f / 150f);
 
         update(() -> {
             Vec3 v = Tmp.v33.set(Core.input.mouseX(), Core.input.mouseY(), 0);
@@ -95,7 +96,7 @@ public class PlanetDialog extends FloatingDialog{
         addListener(new ElementGestureListener(){
             @Override
             public void tap(InputEvent event, float x, float y, int count, KeyCode button){
-                selected = hovered;
+                selected = hovered != null && hovered.locked() ? null : hovered;
                 if(selected != null){
                     updateSelected();
                 }
@@ -158,10 +159,15 @@ public class PlanetDialog extends FloatingDialog{
         if(hovered != null){
             Draw.batch(projector, () -> {
                 setPlane(hovered);
+                Draw.color(Color.white, Pal.accent, Mathf.absin(5f, 1f));
 
-                if(false){ //TODO locked check
-                    Draw.rect(Icon.lock.getRegion(), 0, 0);
+                TextureRegion icon = hovered.locked() ? Icon.lock.getRegion() : hovered.hasAttribute(SectorAttribute.naval) ? Liquids.water.icon(Cicon.large) : null;
+
+                if(icon != null){
+                    Draw.rect(icon, 0, 0);
                 }
+
+                Draw.reset();
             });
         }
 

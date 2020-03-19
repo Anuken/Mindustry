@@ -77,11 +77,15 @@ public class Planet extends UnlockableContent{
             //read data for sectors
             Fi data = Vars.tree.get("planets/" + name + ".dat");
             if(data.exists()){
-                try(Reads read = data.reads()){
-                    short dsize = read.s();
-                    for(int i = 0; i < dsize; i++){
-                        sectors.get(i).data.read(read);
+                try{
+                    try(Reads read = data.reads()){
+                        short dsize = read.s();
+                        for(int i = 0; i < dsize; i++){
+                            sectors.get(i).data.read(read);
+                        }
                     }
+                }catch(Throwable t){
+                    t.printStackTrace();
                 }
             }
         }else{

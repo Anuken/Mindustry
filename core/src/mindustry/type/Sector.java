@@ -1,8 +1,8 @@
 package mindustry.type;
 
 import arc.math.geom.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.ctype.*;
@@ -32,6 +32,10 @@ public class Sector{
         this.rect = makeRect();
         this.id = tile.id;
         this.data = data;
+    }
+
+    public boolean locked(){
+        return true;
     }
 
     /** @return light dot product in the range [0, 1]. */
@@ -87,6 +91,10 @@ public class Sector{
         return new SectorRect(radius, center, planeTop, planeRight, angle);
     }
 
+    public boolean hasAttribute(SectorAttribute attribute){
+        return (data.attributes & (1 << attribute.ordinal())) != 0;
+    }
+
     public static class SectorRect{
         public final Vec3 center, top, right;
         public final Vec3 result = new Vec3();
@@ -115,6 +123,7 @@ public class Sector{
 
         public Block[] floors = {};
         public int[] floorCounts = {};
+        public int attributes;
 
         public void write(Writes write){
             write.s(resources.length);
@@ -129,6 +138,8 @@ public class Sector{
                 write.s(floors[i].id);
                 write.i(floorCounts[i]);
             }
+
+            write.i(attributes);
         }
 
         public void read(Reads read){
@@ -144,6 +155,12 @@ public class Sector{
                 floors[i] = Vars.content.block(read.s());
                 floorCounts[i] = read.i();
             }
+            attributes = read.i();
         }
+    }
+
+    public enum SectorAttribute{
+        /** Requires naval technology to land on, e.g. mostly water */
+        naval
     }
 }

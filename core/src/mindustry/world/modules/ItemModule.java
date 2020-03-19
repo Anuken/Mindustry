@@ -92,6 +92,10 @@ public class ItemModule extends BlockModule{
         return null;
     }
 
+    public int get(int id){
+        return items[id];
+    }
+
     public int get(Item item){
         return items[item.id];
     }
