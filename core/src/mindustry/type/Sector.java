@@ -21,6 +21,7 @@ public class Sector{
     public final SectorData data;
 
     public @Nullable SaveSlot save;
+    public boolean unlocked;
 
     //TODO implement a dynamic (?) launch period
     public int launchPeriod = 10;
@@ -35,7 +36,7 @@ public class Sector{
     }
 
     public boolean locked(){
-        return true;
+        return !unlocked;
     }
 
     /** @return light dot product in the range [0, 1]. */

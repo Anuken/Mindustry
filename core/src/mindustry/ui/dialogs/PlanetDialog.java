@@ -213,7 +213,7 @@ public class PlanetDialog extends FloatingDialog{
         batch.proj().mul(planet.getTransform(mat));
 
         for(Sector sec : planet.sectors){
-            if(sec.save == null){
+            if(sec.locked()){
                 draw(sec, shadowColor, -0.001f);
             }
         }

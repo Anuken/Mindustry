@@ -92,8 +92,7 @@ public class SectorDataGenerator{
 
                 //50% water -> naval attribute
                 //TODO also select sectors with water spawns
-                if((float)waterFloors / totalFloors >= 0.5f){
-                    Log.info("Floor percentage for sector {0} : {1}", sector.id, (int)((float)waterFloors / totalFloors * 100));
+                if((float)waterFloors / totalFloors >= 0.6f){
                     data.attributes |= (1 << SectorAttribute.naval.ordinal());
                 }
 

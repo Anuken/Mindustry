@@ -88,6 +88,8 @@ public class Planet extends UnlockableContent{
                     t.printStackTrace();
                 }
             }
+
+            sectors.random().unlocked = true;
         }else{
             sectors = new Array<>();
         }
