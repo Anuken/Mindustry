@@ -1,7 +1,7 @@
 package mindustry.entities.type.base;
 
 import arc.math.Mathf;
-import arc.util.Structs;
+import arc.util.*;
 import mindustry.content.Blocks;
 import mindustry.entities.traits.MinerTrait;
 import mindustry.entities.type.TileEntity;
@@ -39,6 +39,17 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
             if(targetItem != null && entity.block.acceptStack(targetItem, 1, entity.tile, MinerDrone.this) == 0){
                 MinerDrone.this.clearItem();
                 return;
+            }
+
+            int transfer = 1;
+            if(entity.items.get(item.item) > 50 ) transfer = 25;
+            if(entity.items.get(item.item) > 100) transfer = 50;
+            if(entity.items.get(item.item) > 500) transfer = 250;
+            transfer = Mathf.random(0, transfer);
+
+            if(item.amount > transfer && Mathf.chance(0.5f) && entity.block.acceptStack(item.item, transfer, entity.tile, MinerDrone.this) > 0){
+                Call.transferItemTo(item.item, transfer, x, y, entity.tile);
+                item.amount -= transfer;
             }
 
             //if inventory is full, drop it off.
@@ -144,7 +155,7 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
 
     @Override
     public float getMinePower(){
-        return type.minePower;
+        return (type.minePower * team.draugfactories / type.toMine.size) + 0.1f;
     }
 
     @Override
@@ -174,6 +185,12 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
         if(entity == null){
             return;
         }
-        targetItem = Structs.findMin(type.toMine, indexer::hasOre, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
+        targetItem = item.item;
+        if(targetItem == null) kill();
+    }
+
+    @Override
+    public void clearItem(){
+        item.amount = 1;
     }
 }

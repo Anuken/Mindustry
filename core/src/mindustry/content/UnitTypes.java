@@ -25,6 +25,7 @@ public class UnitTypes implements ContentList{
             minePower = 0.9f;
             engineSize = 1.8f;
             engineOffset = 5.7f;
+            itemCapacity = Integer.MAX_VALUE;
             weapon = new Weapon("you have incurred my wrath. prepare to die."){{
                 bullet = Bullets.lancerLaser;
             }};
