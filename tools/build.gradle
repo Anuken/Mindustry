@@ -27,8 +27,8 @@ def transformColors = { List<List<String>> list ->
         }
 
         newColors.each{ color ->
-            colorMap.put(Color.argb8888(color), newColors)
-            colorIndexMap.put(Color.argb8888(color), newColors.indexOf(color))
+            colorMap.put(color.argb8888(), newColors)
+            colorIndexMap.put(color.argb8888(), newColors.indexOf(color))
         }
     }
 }
