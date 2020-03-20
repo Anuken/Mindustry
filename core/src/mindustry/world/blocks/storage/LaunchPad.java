@@ -79,7 +79,6 @@ public class LaunchPad extends StorageBlock{
                 Effects.effect(Fx.padlaunch, tile);
                 int used = Math.min(entity.items.get(item), itemCapacity);
                 data.addItem(item, used);
-                tile.getTeam().core().items.add(item, tile.getTeam().core().block.acceptStack(item, used, tile.getTeam().core().tile, null));
                 entity.items.remove(item, used);
                 Events.fire(new LaunchItemEvent(item, used));
             }
