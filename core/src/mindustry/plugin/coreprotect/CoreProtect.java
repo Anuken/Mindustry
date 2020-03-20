@@ -79,7 +79,10 @@ public class CoreProtect extends Plugin implements ApplicationListener{
 
             tiles(stick);
             cuboid = cuboid.select(t -> t.block().synthetic());
-            cuboid.each(Tile::removeNet);
+            cuboid.each(t -> {
+                t.block.removed(t);
+                t.removeNet();
+            });
 
             message(player, Strings.format("Modified [accent]{0}[] tiles in total {1}", cuboid.size, Iconc.play));
         });
