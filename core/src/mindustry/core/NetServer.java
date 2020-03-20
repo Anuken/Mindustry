@@ -78,7 +78,7 @@ public class NetServer implements ApplicationListener{
     public StatusAssigner statusAssigner = (player) -> {
         String prefix = "";
 
-        if(!player.con.hasConnected) return prefix;
+        if(player == null || player.con == null || !player.con.hasConnected) return prefix;
 
         prefix += Strings.format("[#{0}] ", player.getTeam().color);
 
