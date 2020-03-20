@@ -377,7 +377,7 @@ public class NetServer implements ApplicationListener{
             void vote(Player player, int d){
                 votes += (d * player.voteMultiplier());
                 voted.addAll(player.uuid, admins.getInfo(player.uuid).lastIP);
-                
+
                 Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted on kicking[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
                             player.name, target.name, votes, votesRequired()));
             }
