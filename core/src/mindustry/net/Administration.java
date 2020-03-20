@@ -18,7 +18,7 @@ import static mindustry.game.EventType.*;
 
 public class Administration{
     /** All player info. Maps UUIDs to info. This persists throughout restarts. */
-    private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
+    public ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
     private Array<String> bannedIPs = new Array<>();
     private Array<String> whitelist = new Array<>();
     private Array<ChatFilter> chatFilters = new Array<>();
@@ -505,6 +505,8 @@ public class Administration{
         public transient long lastMessageTime, lastSyncTime;
         public transient String lastSentMessage;
         public transient int messageInfractions;
+
+        public String nick;
 
         PlayerInfo(String id){
             this.id = id;

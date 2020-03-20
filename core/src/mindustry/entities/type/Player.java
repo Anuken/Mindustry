@@ -49,7 +49,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     public float baseRotation;
     public float pointerX, pointerY;
-    public String name = "noname";
+    public String name = "noname", nick = "0000";
     public @Nullable String uuid, usid;
     public boolean isAdmin, isServer, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
     public boolean buildWasAutoPaused = false;
@@ -912,11 +912,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     @Override
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
-        if(idle > 60 * 60){
-            TypeIO.writeStringData(buffer, "[lightgray][afk][] " + name);
-        }else{
-            TypeIO.writeStringData(buffer, name);
-        }
+        TypeIO.writeStringData(buffer, netServer.statusAssigner.assign(this) + name);
         buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2) | (Pack.byteValue(isTyping) << 3)| (Pack.byteValue(isBuilding) << 4));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);

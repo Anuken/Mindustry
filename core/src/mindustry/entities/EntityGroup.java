@@ -1,17 +1,15 @@
 package mindustry.entities;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.geom.*;
-import arc.util.*;
+import arc.struct.*;
 import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
 
 import java.util.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.collisions;
 
 /** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")
@@ -265,20 +263,5 @@ public class EntityGroup<T extends Entity> implements Iterable<T>{
     @Override
     public Iterator<T> iterator(){
         return entityArray.iterator();
-    }
-
-    public Player levenshtein(String name){
-        int minDst = 0;
-        Player closest = null;
-
-        for(Player p : playerGroup){
-            int dst = Strings.levenshtein(Strings.stripColors(p.name), name);
-            if(dst < 10 && (closest == null || dst < minDst)){
-                minDst = dst;
-                closest = p;
-            }
-        }
-
-        return closest;
     }
 }

@@ -24,9 +24,14 @@ public class SpiderChat extends Plugin implements ApplicationListener{
     public void message(Player player, String raw){
 
         for(String word : raw.split("\\s+")){
-            if(word.startsWith("@")){
-                word = word.replaceAll("\\p{Punct}", "");
-                if (playerGroup.levenshtein(word) != null) raw = raw.replace("@" + word, playerGroup.levenshtein(word).prefix() + "[white]");
+            if(word.startsWith("#")){
+                word = word.replace("#", "").replaceAll("\\p{Punct}", "");
+
+                for(Player p : playerGroup.all()){
+                    if(netServer.admins.getInfo(p.uuid).nick.toLowerCase().equals(word.toLowerCase())){
+                        raw = raw.replace("#" + word, p.prefix() + "[white]");
+                    }
+                }
             }
         }
 
