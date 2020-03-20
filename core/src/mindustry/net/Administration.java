@@ -429,7 +429,9 @@ public class Administration{
         socketInputAddress("The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
         allowCustomClients("Whether custom clients are allowed to connect.", !headless, "allow-custom"),
         whitelist("Whether the whitelist is used.", false),
-        motd("The message displayed to people on connection.", "off");
+        motd("The message displayed to people on connection.", "off"),
+
+        crater("Whether the crater is repeatedly placed in the top left corner.", false);
 
         public static final Config[] all = values();
 

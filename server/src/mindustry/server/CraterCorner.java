@@ -6,6 +6,7 @@ import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.net.Administration.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -19,6 +20,8 @@ public class CraterCorner implements ApplicationListener{
     @Override
     public void update(){
         if(!state.is(State.playing)) return;
+
+        if(!Config.crater.bool()) return;
 
         if(!timer.get(0, 60)) return;
 
