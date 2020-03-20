@@ -365,8 +365,8 @@ public class NetServer implements ApplicationListener{
 
             boolean checkPass(){
                 if(votes >= votesRequired()){
-                    Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] {0}[orange] will be banned from the server for {1} minutes.", target.name, (kickDuration/60*target.getInfo().timesKicked)));
-                    target.getInfo().lastKicked = Time.millis() + kickDuration*1000*target.getInfo().timesKicked;
+                    Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] {0}[orange] will be banned from the server for {1} minutes.", target.name, (kickDuration/60*(target.getInfo().timesKicked+1))));
+                    target.getInfo().lastKicked = Time.millis() + kickDuration*1000*(target.getInfo().timesKicked+1);
                     playerGroup.all().each(p -> p.uuid != null && p.uuid.equals(target.uuid), p -> p.con.yeet(KickReason.vote));
                     map[0] = null;
                     task.cancel();
