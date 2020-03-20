@@ -104,10 +104,6 @@ public class Team implements Comparable<Team>{
         return name;
     }
 
-    public String color(){
-        return "[#" + color + "]";
-    }
-
     public Array<MinerDrone> miners(Item ore){
         return unitGroup.all().select(u -> u.getTeam() == this && u.getType() == UnitTypes.draug && u.item().item == ore).map(u -> (MinerDrone)u);
     }
