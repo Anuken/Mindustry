@@ -74,7 +74,7 @@ public class MapIO{
 
             Pixmap floors = new Pixmap(map.width, map.height, Format.RGBA8888);
             Pixmap walls = new Pixmap(map.width, map.height, Format.RGBA8888);
-            int black = Color.rgba8888(Color.black);
+            int black = 255;
             int shade = Color.rgba8888(0f, 0f, 0f, 0.5f);
             CachedTile tile = new CachedTile(){
                 @Override
@@ -147,7 +147,7 @@ public class MapIO{
         if(wall.synthetic()){
             return team.color.rgba();
         }
-        return Color.rgba8888(wall.solid ? wall.mapColor : ore == Blocks.air ? floor.mapColor : ore.mapColor);
+        return (wall.solid ? wall.mapColor : ore == Blocks.air ? floor.mapColor : ore.mapColor).rgba();
     }
 
     public static Pixmap writeImage(Tiles tiles){

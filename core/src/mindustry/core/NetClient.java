@@ -1,7 +1,6 @@
 package mindustry.core;
 
 import arc.*;
-import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -75,7 +74,7 @@ public class NetClient implements ApplicationListener{
             c.mods = mods.getModStrings();
             c.mobile = mobile;
             c.versionType = Version.type;
-            c.color = Color.rgba8888(player.color());
+            c.color = player.color().rgba();
             c.usid = getUsid(packet.addressTCP);
             c.uuid = platform.getUUID();
 

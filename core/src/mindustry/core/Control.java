@@ -3,7 +3,6 @@ package mindustry.core;
 import arc.*;
 import arc.assets.*;
 import arc.audio.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.scene.ui.*;
@@ -193,7 +192,7 @@ public class Control implements ApplicationListener, Loadable{
 
         Core.settings.defaults(
         "ip", "localhost",
-        "color-0", Color.rgba8888(playerColors[8]),
+        "color-0", playerColors[8].rgba(),
         "name", "",
         "lastBuild", 0
         );

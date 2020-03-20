@@ -17,8 +17,7 @@ import static mindustry.Vars.*;
 public class WaveSpawner{
     private static final float margin = 40f, coreMargin = tilesize * 3; //how far away from the edge flying units spawn
 
-    private Array<FlyerSpawn> flySpawns = new Array<>();
-    private Array<Tile> groundSpawns = new Array<>();
+    private Array<Tile> spawns = new Array<>();
     private boolean spawning = false;
 
     public WaveSpawner(){
@@ -26,16 +25,16 @@ public class WaveSpawner{
     }
 
     public int countSpawns(){
-        return groundSpawns.size;
+        return spawns.size;
     }
 
-    public Array<Tile> getGroundSpawns(){
-        return groundSpawns;
+    public Array<Tile> getSpawns(){
+        return spawns;
     }
 
     /** @return true if the player is near a ground spawn point. */
     public boolean playerNear(){
-        return !player.dead() && groundSpawns.contains(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x(), player.y()) < state.rules.dropZoneRadius && player.team() != state.rules.waveTeam);
+        return !player.dead() && spawns.contains(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x(), player.y()) < state.rules.dropZoneRadius && player.team() != state.rules.waveTeam);
     }
 
     public void spawnEnemies(){
@@ -81,7 +80,7 @@ public class WaveSpawner{
     }
 
     private void eachGroundSpawn(SpawnConsumer cons){
-        for(Tile spawn : groundSpawns){
+        for(Tile spawn : spawns){
             cons.accept(spawn.worldx(), spawn.worldy(), true);
         }
 
@@ -95,10 +94,12 @@ public class WaveSpawner{
     }
 
     private void eachFlyerSpawn(Floatc2 cons){
-        for(FlyerSpawn spawn : flySpawns){
+        for(Tile tile : spawns){
+            float angle = Angles.angle(tile.x, tile.y, world.width()/2, world.height()/2);
+
             float trns = (world.width() + world.height()) * tilesize;
-            float spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(spawn.angle, trns), -margin, world.width() * tilesize + margin);
-            float spawnY = Mathf.clamp(world.height() * tilesize / 2f + Angles.trnsy(spawn.angle, trns), -margin, world.height() * tilesize + margin);
+            float spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(angle, trns), -margin, world.width() * tilesize + margin);
+            float spawnY = Mathf.clamp(world.height() * tilesize / 2f + Angles.trnsy(angle, trns), -margin, world.height() * tilesize + margin);
             cons.get(spawnX, spawnY);
         }
 
@@ -114,23 +115,13 @@ public class WaveSpawner{
     }
 
     private void reset(){
-
-        flySpawns.clear();
-        groundSpawns.clear();
+        spawns.clear();
 
         for(Tile tile : world.tiles){
             if(tile.overlay() == Blocks.spawn){
-                addSpawns(tile.x, tile.y);
+                spawns.add(tile);
             }
         }
-    }
-
-    private void addSpawns(int x, int y){
-        groundSpawns.add(world.tile(x, y));
-
-        FlyerSpawn fspawn = new FlyerSpawn();
-        fspawn.angle = Angles.angle(world.width() / 2f, world.height() / 2f, x, y);
-        flySpawns.add(fspawn);
     }
 
     private void spawnEffect(Unitc unit){
@@ -143,9 +134,5 @@ public class WaveSpawner{
 
     private interface SpawnConsumer{
         void accept(float x, float y, boolean shockwave);
-    }
-
-    private class FlyerSpawn{
-        float angle;
     }
 }

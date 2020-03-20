@@ -226,7 +226,7 @@ public class TypeIO{
     }
 
     public static void writeColor(Writes write, Color color){
-        write.i(Color.rgba8888(color));
+        write.i(color.rgba());
     }
 
     public static Color readColor(Reads read){

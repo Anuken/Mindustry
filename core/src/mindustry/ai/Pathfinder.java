@@ -301,7 +301,7 @@ public class Pathfinder implements Runnable{
 
             //spawn points are also enemies.
             if(state.rules.waves && team == state.rules.defaultTeam){
-                for(Tile other : spawner.getGroundSpawns()){
+                for(Tile other : spawner.getSpawns()){
                     out.add(other.pos());
                 }
             }
