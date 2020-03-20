@@ -90,7 +90,7 @@ public class NetServer implements ApplicationListener{
             prefix += Iconc.play;
         }
 
-        prefix += " []";
+        prefix += " []\n";
 
         return prefix;
     };
