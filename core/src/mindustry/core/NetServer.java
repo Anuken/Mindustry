@@ -414,6 +414,7 @@ public class NetServer implements ApplicationListener{
             }
 
             if(playerGroup.size() < 3){
+            if(playerGroup.size() < 1){
                 player.sendMessage("[scarlet]At least 3 players are needed to start a votekick.");
                 return;
             }
@@ -439,6 +440,14 @@ public class NetServer implements ApplicationListener{
                     found = playerGroup.find(p -> p.id == id);
                 }else{
                     found = playerGroup.find(p -> p.name.equalsIgnoreCase(args[0]));
+                }
+
+                if(found == null && args[0].length() > 1 && args[0].startsWith("#")){
+                    for(Player p : playerGroup.all()){
+                        if(p.spiderling.nick.equals(args[0].split(" ")[0].substring(1))){
+                            found = p;
+                        }
+                    }
                 }
 
                 if(found != null){
