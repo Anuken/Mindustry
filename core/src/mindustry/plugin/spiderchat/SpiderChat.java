@@ -28,7 +28,7 @@ public class SpiderChat extends Plugin implements ApplicationListener{
                 word = word.replace("#", "").replaceAll("\\p{Punct}", "");
 
                 for(Player p : playerGroup.all()){
-                    if(netServer.admins.getInfo(p.uuid).nick.toLowerCase().equals(word.toLowerCase())){
+                    if(p.spiderling.nick.toLowerCase().equals(word.toLowerCase())){
                         raw = raw.replace("#" + word, p.prefix() + "[white]");
                     }
                 }

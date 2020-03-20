@@ -506,8 +506,6 @@ public class Administration{
         public transient String lastSentMessage;
         public transient int messageInfractions;
 
-        public String nick;
-
         PlayerInfo(String id){
             this.id = id;
         }

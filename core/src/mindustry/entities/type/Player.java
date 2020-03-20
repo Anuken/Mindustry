@@ -49,7 +49,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     public float baseRotation;
     public float pointerX, pointerY;
-    public String name = "noname", nick = "0000";
+    public String name = "noname";
     public @Nullable String uuid, usid;
     public boolean isAdmin, isServer, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
     public boolean buildWasAutoPaused = false;

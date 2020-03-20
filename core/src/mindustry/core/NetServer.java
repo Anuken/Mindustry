@@ -80,7 +80,7 @@ public class NetServer implements ApplicationListener{
 
         if(!player.con.hasConnected) return prefix;
 
-        prefix += Strings.format("[#{0}]#{1} ", player.getTeam().color, player.nick);
+        prefix += Strings.format("[#{0}]#{1} ", player.getTeam().color, player.spiderling.nick);
 
         if(player.idle > 60 * 60){
             prefix += Iconc.pause;
@@ -257,11 +257,10 @@ public class NetServer implements ApplicationListener{
             player.color.set(packet.color);
             player.color.a = 1f;
 
-            player.nick = info.nick;
-            if(info.nick == null || info.nick.equals("")) player.nick = Strings.format("{0}{1}{2}{3}", Mathf.random(0,9), Mathf.random(0,9), Mathf.random(0,9), Mathf.random(0,9));
-
             if(!spiderweb.has(player.uuid)) spiderweb.add(player.uuid);
             player.spiderling = spiderweb.get(player.uuid);
+
+            if(player.spiderling.nick == null) player.spiderling.nick = Strings.format("{0}{1}{2}{3}", Mathf.random(0,9), Mathf.random(0,9), Mathf.random(0,9), Mathf.random(0,9));
 
             player.spiderling.load();
 
@@ -541,14 +540,14 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            for(PlayerInfo info : admins.playerInfo.values()){
-                if(info.nick.equals(args[0])){
+            for(Player p : playerGroup.all()){
+                if(p.spiderling.nick.toLowerCase().equals(args[0].toLowerCase())){
                     player.sendMessage("[scarlet]nickname is already taken.");
                     return;
                 }
             }
 
-            player.nick = admins.getInfo(player.uuid).nick = args[0];
+            player.spiderling.nick(args[0]);
             admins.save();
 
             player.sendMessage("[scarlet]nickname changed.");
