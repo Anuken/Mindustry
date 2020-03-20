@@ -70,7 +70,6 @@ public class Incinerator extends Block{
         }
 
         if(Mathf.chance(0.10)){
-            tile.<IncineratorEntity>ent().index++;
             if(net.server()){
                 nearby.clear();
                 Geometry.circle(tile.x, tile.y, 8, (x, y) -> nearby.add(world.ltile(x, y)));
@@ -112,6 +111,5 @@ public class Incinerator extends Block{
 
     public static class IncineratorEntity extends TileEntity{
         public float heat;
-        public int index;
     }
 }
