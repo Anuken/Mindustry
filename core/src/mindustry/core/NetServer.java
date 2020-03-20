@@ -64,8 +64,8 @@ public class NetServer implements ApplicationListener{
         return state.rules.defaultTeam;
     };
     public IconAssigner iconAssigner = (player) -> {
-        if(player.isServer) return Iconc.star;
         if(player.isAdmin) return Iconc.admin;
+        if(player.isTrusted) return Iconc.star;
 
         Gamemode gamemode = Gamemode.bestFit(state.rules);
         if(gamemode == Gamemode.pvp)     return Iconc.modePvp;
@@ -247,6 +247,7 @@ public class NetServer implements ApplicationListener{
             Player player = new Player();
 
             player.isAdmin = admins.isAdmin(uuid, packet.usid);
+            player.isTrusted = admins.isTrusted(uuid, packet.usid);
             player.con = con;
             player.usid = packet.usid;
             player.name = packet.name;
@@ -270,6 +271,11 @@ public class NetServer implements ApplicationListener{
 
             //save admin ID but don't overwrite it
             if(!player.isAdmin && !info.admin){
+                info.adminUsid = packet.usid;
+            }
+
+            //save trusted ID but don't overwrite it
+            if(!player.isTrusted && !info.trusted){
                 info.adminUsid = packet.usid;
             }
 
@@ -528,7 +534,7 @@ public class NetServer implements ApplicationListener{
             player.sendMessage("[lightgray]" + mods.getScripts().runConsole(args[0]));
         });
 
-        clientCommands.<Player>register("nick", "[4chars]", "Modify your #nick name.", (args, player) -> {
+        clientCommands.<Player>register("nick", "[nick]", "Modify your #nick name.", (args, player) -> {
 
             if(args[0].length() != 4){
                 player.sendMessage("[scarlet]wrong length.");
@@ -551,6 +557,31 @@ public class NetServer implements ApplicationListener{
             admins.save();
 
             player.sendMessage("[scarlet]nickname changed.");
+        });
+
+        clientCommands.<Player>register("trust", "[#nick]", "(un)trust this user.", (args, player) -> {
+
+            if(!player.isAdmin){
+                player.sendMessage("[scarlet]This command is reserved for admins.");
+                return;
+            }
+
+            for(Player p : playerGroup.all()){
+                if(p.spiderling.nick.toLowerCase().equals(args[0].replace("#", "").toLowerCase())){
+                    if(p.isTrusted){
+                        admins.unTrustPlayer(p.usid);
+                        p.isTrusted = false;
+                    }else{
+                        admins.trustPlayer(p.uuid, p.usid);
+                        p.isTrusted = true;
+                    }
+                    admins.save();
+                    player.sendMessage("[scarlet]player (un)trusted.");
+                    return;
+                }
+            }
+
+            player.sendMessage("[scarlet]#nick not found.");
         });
     }
 

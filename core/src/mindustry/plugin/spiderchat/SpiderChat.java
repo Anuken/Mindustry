@@ -17,7 +17,7 @@ public class SpiderChat extends Plugin implements ApplicationListener{
     public static Player server = new Player(){{
         name = "Server";
         color = Color.lightGray;
-        isServer = true;
+        isTrusted = true;
         team = Team.derelict;
     }};
 

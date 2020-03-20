@@ -282,6 +282,37 @@ public class Administration{
         return true;
     }
 
+    /**
+     * Makes a player trusted. Returns whether this player was already trusted.
+     */
+    public boolean trustPlayer(String id, String usid){
+        PlayerInfo info = getCreateInfo(id);
+
+        if(info.trusted && info.trustUsid != null && info.trustUsid.equals(usid))
+            return false;
+
+        info.trustUsid = usid;
+        info.trusted = true;
+        save();
+
+        return true;
+    }
+
+    /**
+     * Makes a player no longer trusted. Returns whether this player was trusted in the first place.
+     */
+    public boolean unTrustPlayer(String id){
+        PlayerInfo info = getCreateInfo(id);
+
+        if(!info.trusted)
+            return false;
+
+        info.trusted = false;
+        save();
+
+        return true;
+    }
+
     public boolean isWhitelistEnabled(){
         return Config.whitelist.bool();
     }
@@ -319,6 +350,11 @@ public class Administration{
     public boolean isAdmin(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
         return info.admin && usid.equals(info.adminUsid);
+    }
+
+    public boolean isTrusted(String id, String usid){
+        PlayerInfo info = getCreateInfo(id);
+        return info.trusted && usid.equals(info.adminUsid);
     }
 
     /** Finds player info by IP, UUID and name. */
@@ -496,10 +532,10 @@ public class Administration{
         public String lastName = "<unknown>", lastIP = "<unknown>";
         public Array<String> ips = new Array<>();
         public Array<String> names = new Array<>();
-        public String adminUsid;
+        public String adminUsid, trustUsid;
         public int timesKicked;
         public int timesJoined;
-        public boolean banned, admin;
+        public boolean banned, admin, trusted;
         public long lastKicked; //last kicked time to expiration
 
         public transient long lastMessageTime, lastSyncTime;
