@@ -43,15 +43,15 @@ public class LegacyColorMapper implements ContentList{
     }
 
     private void map(String color, Block block, Block wall, Block ore){
-        blockMap.put(Color.rgba8888(Color.valueOf(color)), new LegacyBlock(block, wall, ore));
+        blockMap.put(Color.valueOf(color).rgba(), new LegacyBlock(block, wall, ore));
     }
 
     private void map(String color, Block block, Block wall){
-        blockMap.put(Color.rgba8888(Color.valueOf(color)), new LegacyBlock(block, wall));
+        blockMap.put(Color.valueOf(color).rgba(), new LegacyBlock(block, wall));
     }
 
     private void map(String color, Block block){
-        blockMap.put(Color.rgba8888(Color.valueOf(color)), new LegacyBlock(block, Blocks.air));
+        blockMap.put(Color.valueOf(color).rgba(), new LegacyBlock(block, Blocks.air));
     }
 
     public static class LegacyBlock{

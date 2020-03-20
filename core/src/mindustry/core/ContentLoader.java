@@ -140,7 +140,7 @@ public class ContentLoader{
                 if(color == 0) continue;
 
                 Block block = block(i);
-                Color.rgba8888ToColor(block.color, color);
+                block.color.set(color);
             }
         }
         pixmap.dispose();
