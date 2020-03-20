@@ -534,7 +534,9 @@ public class NetServer implements ApplicationListener{
             player.sendMessage("[lightgray]" + mods.getScripts().runConsole(args[0]));
         });
 
-        clientCommands.<Player>register("nick", "[nick]", "Modify your #nick name.", (args, player) -> {
+        clientCommands.<Player>register("nick", "[#nick]", "Modify your #nick name.", (args, player) -> {
+
+            args[0] = args[0].replace("#", "");
 
             if(args[0].length() != 4){
                 player.sendMessage("[scarlet]wrong length.");
@@ -561,13 +563,15 @@ public class NetServer implements ApplicationListener{
 
         clientCommands.<Player>register("trust", "[#nick]", "(un)trust this user.", (args, player) -> {
 
+            args[0] = args[0].replace("#", "");
+
             if(!player.isAdmin){
                 player.sendMessage("[scarlet]This command is reserved for admins.");
                 return;
             }
 
             for(Player p : playerGroup.all()){
-                if(p.spiderling.nick.toLowerCase().equals(args[0].replace("#", "").toLowerCase())){
+                if(p.spiderling.nick.toLowerCase().equals(args[0].toLowerCase())){
                     if(p.isTrusted){
                         admins.unTrustPlayer(p.usid);
                         p.isTrusted = false;
