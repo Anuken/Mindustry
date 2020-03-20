@@ -587,7 +587,6 @@ public class NetServer implements ApplicationListener{
                         admins.trustPlayer(p.uuid, p.usid);
                         p.isTrusted = true;
                     }
-                    admins.save();
                     player.sendMessage("[scarlet]player (un)trusted.");
                     return;
                 }

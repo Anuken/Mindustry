@@ -354,7 +354,7 @@ public class Administration{
 
     public boolean isTrusted(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
-        return info.trusted && usid.equals(info.adminUsid);
+        return info.trusted && usid.equals(info.trustUsid);
     }
 
     /** Finds player info by IP, UUID and name. */
