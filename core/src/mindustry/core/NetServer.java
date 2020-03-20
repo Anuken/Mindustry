@@ -276,7 +276,7 @@ public class NetServer implements ApplicationListener{
 
             //save trusted ID but don't overwrite it
             if(!player.isTrusted && !info.trusted){
-                info.adminUsid = packet.usid;
+                info.trustUsid = packet.usid;
             }
 
             try{
