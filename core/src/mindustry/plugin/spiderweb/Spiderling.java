@@ -10,7 +10,7 @@ import java.sql.*;
 import static mindustry.Vars.spiderweb;
 
 public class Spiderling{
-    public String uuid, nick;
+    public String uuid;
 
     public ObjectWeb<String> names = new ObjectWeb<String>(){{
         loader = (web -> {try{
@@ -80,17 +80,5 @@ public class Spiderling{
     public void log(){
         Log.warn("names: " + names);
         Log.warn("unlocked: " + unlockedBlocks);
-    }
-
-    public void nick(String nick){
-        SpiderWeb web = spiderweb;
-        try{
-            spiderweb.preparedStatement = web.connect.prepareStatement("UPDATE uuids SET nick = ? WHERE uuid = ?");
-            web.preparedStatement.setString(1, this.nick = nick);
-            web.preparedStatement.setString(2, uuid);
-            web.preparedStatement.execute();
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
     }
 }

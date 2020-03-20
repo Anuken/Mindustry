@@ -64,8 +64,8 @@ public class NetServer implements ApplicationListener{
         return state.rules.defaultTeam;
     };
     public IconAssigner iconAssigner = (player) -> {
+        if(player.isServer) return Iconc.star;
         if(player.isAdmin) return Iconc.admin;
-        if(player.isTrusted) return Iconc.star;
 
         Gamemode gamemode = Gamemode.bestFit(state.rules);
         if(gamemode == Gamemode.pvp)     return Iconc.modePvp;
@@ -80,7 +80,7 @@ public class NetServer implements ApplicationListener{
 
         if(!player.con.hasConnected) return prefix;
 
-        prefix += Strings.format("[#{0}]#{1} ", player.getTeam().color, player.spiderling.nick);
+        prefix += Strings.format("[#{0}] ", player.getTeam().color);
 
         if(player.idle > 60 * 60){
             prefix += Iconc.pause;
@@ -90,7 +90,7 @@ public class NetServer implements ApplicationListener{
             prefix += Iconc.play;
         }
 
-        prefix += " []\n";
+        prefix += " []";
 
         return prefix;
     };
@@ -247,7 +247,6 @@ public class NetServer implements ApplicationListener{
             Player player = new Player();
 
             player.isAdmin = admins.isAdmin(uuid, packet.usid);
-            player.isTrusted = admins.isTrusted(uuid, packet.usid);
             player.con = con;
             player.usid = packet.usid;
             player.name = packet.name;
@@ -261,8 +260,6 @@ public class NetServer implements ApplicationListener{
             if(!spiderweb.has(player.uuid)) spiderweb.add(player.uuid);
             player.spiderling = spiderweb.get(player.uuid);
 
-            if(player.spiderling.nick == null) player.spiderling.nick = Strings.format("{0}{1}{2}{3}", Mathf.random(0,9), Mathf.random(0,9), Mathf.random(0,9), Mathf.random(0,9));
-
             player.spiderling.load();
 
             if(!player.spiderling.names.contains(player.name)){
@@ -272,11 +269,6 @@ public class NetServer implements ApplicationListener{
             //save admin ID but don't overwrite it
             if(!player.isAdmin && !info.admin){
                 info.adminUsid = packet.usid;
-            }
-
-            //save trusted ID but don't overwrite it
-            if(!player.isTrusted && !info.trusted){
-                info.trustUsid = packet.usid;
             }
 
             try{
@@ -385,7 +377,7 @@ public class NetServer implements ApplicationListener{
             void vote(Player player, int d){
                 votes += (d * player.voteMultiplier());
                 voted.addAll(player.uuid, admins.getInfo(player.uuid).lastIP);
-                        
+                
                 Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted on kicking[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
                             player.name, target.name, votes, votesRequired()));
             }
@@ -441,9 +433,9 @@ public class NetServer implements ApplicationListener{
                     found = playerGroup.find(p -> p.name.equalsIgnoreCase(args[0]));
                 }
 
-                if(found == null && args[0].length() > 1 && args[0].startsWith("#")){
+                if(found == null && args[0].length() > 1){
                     for(Player p : playerGroup.all()){
-                        if(p.spiderling.nick.equals(args[0].split(" ")[0].substring(1))){
+                        if((netServer.statusAssigner.assign(p) + p.name).equals(args[0])){
                             found = p;
                         }
                     }
@@ -464,7 +456,7 @@ public class NetServer implements ApplicationListener{
 
                         VoteSession session = new VoteSession(currentlyKicking, found);
                         session.vote(player, 1);
-                        vtime.reset();                  
+                        vtime.reset();
                         currentlyKicking[0] = session;
                     }
                 }else{
@@ -540,59 +532,6 @@ public class NetServer implements ApplicationListener{
             }
 
             player.sendMessage("[lightgray]" + mods.getScripts().runConsole(args[0]));
-        });
-
-        clientCommands.<Player>register("nick", "[#nick]", "Modify your #nick name.", (args, player) -> {
-
-            args[0] = args[0].replace("#", "");
-
-            if(args[0].length() != 4){
-                player.sendMessage("[scarlet]wrong length.");
-                return;
-            }
-
-            if(!args[0].matches("^[a-zA-Z]*$")){
-                player.sendMessage("[scarlet]may only contain letters a through z.");
-                return;
-            }
-
-            for(Player p : playerGroup.all()){
-                if(p.spiderling.nick.toLowerCase().equals(args[0].toLowerCase())){
-                    player.sendMessage("[scarlet]nickname is already taken.");
-                    return;
-                }
-            }
-
-            player.spiderling.nick(args[0]);
-            admins.save();
-
-            player.sendMessage("[scarlet]nickname changed.");
-        });
-
-        clientCommands.<Player>register("trust", "[#nick]", "(un)trust this user.", (args, player) -> {
-
-            args[0] = args[0].replace("#", "");
-
-            if(!player.isAdmin){
-                player.sendMessage("[scarlet]This command is reserved for admins.");
-                return;
-            }
-
-            for(Player p : playerGroup.all()){
-                if(p.spiderling.nick.toLowerCase().equals(args[0].toLowerCase())){
-                    if(p.isTrusted){
-                        admins.unTrustPlayer(p.usid);
-                        p.isTrusted = false;
-                    }else{
-                        admins.trustPlayer(p.uuid, p.usid);
-                        p.isTrusted = true;
-                    }
-                    player.sendMessage("[scarlet]player (un)trusted.");
-                    return;
-                }
-            }
-
-            player.sendMessage("[scarlet]#nick not found.");
         });
     }
 

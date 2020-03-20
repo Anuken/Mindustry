@@ -43,7 +43,6 @@ public class SpiderWeb implements ApplicationListener{
             if(resultSet.next()){
                 Spiderling sl = new Spiderling();
                 sl.uuid = resultSet.getString("uuid");
-                sl.nick = resultSet.getString("nick");
                 return sl;
             }
 

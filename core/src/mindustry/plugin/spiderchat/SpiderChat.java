@@ -17,27 +17,13 @@ public class SpiderChat extends Plugin implements ApplicationListener{
     public static Player server = new Player(){{
         name = "Server";
         color = Color.lightGray;
-        isTrusted = true;
+        isServer = true;
         team = Team.derelict;
     }};
 
     public void message(Player player, String raw){
-
-        for(String word : raw.split("\\s+")){
-            if(word.startsWith("#")){
-                word = word.replace("#", "").replaceAll("\\p{Punct}", "");
-
-                for(Player p : playerGroup.all()){
-                    if(p.spiderling.nick.toLowerCase().equals(word.toLowerCase())){
-                        raw = raw.replace("#" + word, p.prefix() + "[white]");
-                    }
-                }
-            }
-        }
-
         if(raw.startsWith("!")){
-            String finalRaw = raw;
-            playerGroup.all().select(p -> p.isAdmin).each(p -> p.sendMessage(player.prefix() + " [orange]> [lightgray]" + finalRaw));
+            playerGroup.all().select(p -> p.isAdmin).each(p -> p.sendMessage(player.prefix() + " [orange]> [lightgray]" + raw));
         }else{
             Call.sendMessage(player.prefix() + " [orange]> [white]" + raw);
         }
