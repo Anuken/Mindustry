@@ -294,6 +294,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         if(spawner != noSpawner && (world.tile(spawner) == null || !(world.tile(spawner).entity instanceof FactoryTrait))){
             kill();
+        }
 
         updateTargeting();
 
