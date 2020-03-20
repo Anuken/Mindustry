@@ -194,9 +194,6 @@ public class SolidPump extends Pump{
                     on.constructNet(block, team, (byte)l.rotation);
                 });
                 linked.each(t -> t.constructNet(Blocks.liquidRouter, team, (byte)0));
-//                (new InputHandler()).iterateConduit(oil.x, oil.y, tile.x, tile.y, Placement.points, aqueduct::add);
-//                if(world.tile(aqueduct.first().x, aqueduct.first().y).floor().liquidDrop != result) aqueduct.reverse();
-//                aqueduct.each(l -> world.tile(l.x, l.y).constructNet(i[0]++ == 0 ? Blocks.mechanicalPump : Blocks.conduit, team, (byte)l.rotation));
             }else{
                 tile.set(this, team);
             }
