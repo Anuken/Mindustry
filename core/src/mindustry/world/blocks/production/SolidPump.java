@@ -1,23 +1,23 @@
 package mindustry.world.blocks.production;
 
-import arc.Core;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Mathf;
-import arc.util.*;
+import arc.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.content.Fx;
-import mindustry.content.Liquids;
-import mindustry.entities.Effects;
-import mindustry.entities.Effects.Effect;
-import mindustry.entities.effect.*;
-import mindustry.entities.type.TileEntity;
-import mindustry.graphics.Pal;
-import mindustry.type.Liquid;
-import mindustry.ui.Bar;
-import mindustry.world.Tile;
-import mindustry.world.meta.Attribute;
-import mindustry.world.meta.BlockStat;
+import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.entities.Effects.*;
+import mindustry.entities.type.*;
+import mindustry.game.*;
+import mindustry.graphics.*;
+import mindustry.input.*;
+import mindustry.input.InputHandler.*;
+import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -31,6 +31,10 @@ public class SolidPump extends Pump{
     public float rotateSpeed = 1f;
     /** Attribute that is checked when calculating output. */
     public @Nullable Attribute attribute;
+
+    private Array<PlaceLine> aqueduct = new Array<>();
+    private Array<Tile> linked = new Array<>();
+    private InputHandler ih = (new InputHandler());
 
     public SolidPump(String name){
         super(name);
@@ -125,6 +129,11 @@ public class SolidPump extends Pump{
         entity.pumpTime += entity.warmup * entity.delta();
 
         tryDumpLiquid(tile, result);
+    }
+
+    @Override
+    public void placed(Tile tile){
+        super.placed(tile);
 
         darwin(tile);
     }
@@ -165,17 +174,31 @@ public class SolidPump extends Pump{
     public void darwin(Tile tile){
         Tile oil = indexer.findClosestLiquid(tile.drawx(), tile.drawy(), result);
         if(oil != null){
-            float dst = oil.dst(tile);
-            if(dst < tilesize * 50){
+            Log.info("darwin");
+            Placement.points.clear();
+            Team team = tile.getTeam();
+            tile.getLinkedTiles(linked);
+            tile.remove();
+            if(Placement.astar(oil.x, oil.y, tile.x, tile.y, Blocks.conduit)){
+                tile.removeNet();
+                final int[] i = {0};
+                aqueduct.clear();
+                ih.iterateConduit(oil.x, oil.y, tile.x, tile.y, Placement.points, l -> {
+                    Tile on = world.tile(l.x, l.y);
+                    Block block = Blocks.conduit;
 
-                world.raycastEach(tile.x, tile.y, oil.x, oil.y, (wx, wy) -> {
-                    Tile on = world.tile(wx, wy);
-                    if(on.floor().liquidDrop == result) Core.app.post(tile::deconstructNet);
-                    Puddle.deposit(on, result, 2f);
-                    if(Puddle.getPuddle(on) == null) return false;
-                    return Puddle.getPuddle(on).getAmount() < 50f;
+                    if(i[0]++ == 0) block = Blocks.mechanicalPump;
+                    if(on.block == Blocks.conduit && on.rotation != l.rotation) block = Blocks.liquidRouter;
+                    if(linked.contains(on)) return;
+
+                    on.constructNet(block, team, (byte)l.rotation);
                 });
-
+                linked.each(t -> t.constructNet(Blocks.liquidRouter, team, (byte)0));
+//                (new InputHandler()).iterateConduit(oil.x, oil.y, tile.x, tile.y, Placement.points, aqueduct::add);
+//                if(world.tile(aqueduct.first().x, aqueduct.first().y).floor().liquidDrop != result) aqueduct.reverse();
+//                aqueduct.each(l -> world.tile(l.x, l.y).constructNet(i[0]++ == 0 ? Blocks.mechanicalPump : Blocks.conduit, team, (byte)l.rotation));
+            }else{
+                tile.set(this, team);
             }
         }
     }

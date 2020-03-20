@@ -88,8 +88,6 @@ public class Fracker extends SolidPump{
         }else{
             tryDumpLiquid(tile, result);
         }
-
-        darwin(tile);
     }
 
     @Override
