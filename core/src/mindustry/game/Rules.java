@@ -45,7 +45,7 @@ public class Rules{
     /** Multiplier for building speed. */
     public float buildSpeedMultiplier = 1f;
     /** Multiplier for percentage of materials refunded when deconstructing */
-    public float deconstructRefundMultiplier = 1f;
+    public float deconstructRefundMultiplier = 0.5f;
     /** No-build zone around enemy core radius. */
     public float enemyCoreBuildRadius = 400f;
     /** Radius around enemy wave drop zones.*/
