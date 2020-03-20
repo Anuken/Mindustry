@@ -319,8 +319,4 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
     public EntityGroup targetGroup(){
         return puddleGroup;
     }
-
-    public float getAmount(){
-        return amount;
-    }
 }
