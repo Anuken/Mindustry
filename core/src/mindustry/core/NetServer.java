@@ -63,6 +63,18 @@ public class NetServer implements ApplicationListener{
 
         return state.rules.defaultTeam;
     };
+    public IconAssigner iconAssigner = (player) -> {
+        if(player.isServer) return Iconc.star;
+        if(player.isAdmin) return Iconc.admin;
+
+        Gamemode gamemode = Gamemode.bestFit(state.rules);
+        if(gamemode == Gamemode.pvp)     return Iconc.modePvp;
+        if(gamemode == Gamemode.editor)  return Iconc.fill;
+        if(gamemode == Gamemode.attack)  return Iconc.modeAttack;
+        if(gamemode == Gamemode.sandbox) return Iconc.wrench;
+
+        return Iconc.modeSurvival;
+    };
 
     private boolean closing = false;
     private Interval timer = new Interval();
@@ -936,5 +948,9 @@ public class NetServer implements ApplicationListener{
 
     public interface TeamAssigner{
         Team assign(Player player, Iterable<Player> players);
+    }
+
+    public interface IconAssigner{
+        char assign(Player player);
     }
 }

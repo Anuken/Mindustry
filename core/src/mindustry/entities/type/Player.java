@@ -78,8 +78,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     public int idle = 0;
 
-    public Character icon;
-
     //endregion
 
     //region unit and event overrides, utility methods
@@ -975,29 +973,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     //endregion
 
     public String prefix(){
-        return Strings.format("[#{0}]{1} [#{2}]{3}", getTeam().color, icon(), color, name);
-    }
-
-    private char icon(){
-
-        if(icon != null){
-            try{
-                return icon;
-            }finally{
-                icon = null;
-            }
-        }
-
-        if(isServer) return Iconc.star;
-        if(isAdmin) return Iconc.admin;
-
-        Gamemode gamemode = Gamemode.bestFit(state.rules);
-        if(gamemode == Gamemode.pvp)     return Iconc.modePvp;
-        if(gamemode == Gamemode.editor)  return Iconc.fill;
-        if(gamemode == Gamemode.attack)  return Iconc.modeAttack;
-        if(gamemode == Gamemode.sandbox) return Iconc.wrench;
-
-        return Iconc.modeSurvival;
+        return Strings.format("[#{0}]{1} [#{2}]{3}", getTeam().color, netServer.iconAssigner.assign(this), color, name);
     }
 
     public int voteMultiplier(){
