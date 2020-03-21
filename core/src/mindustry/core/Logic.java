@@ -32,7 +32,7 @@ public class Logic implements ApplicationListener{
     public Logic(){
         Events.on(WorldLoadEvent.class, event -> {
             //TODO remove later
-            Weathers.snow.create();
+            //Weathers.snow.create();
         });
 
         Events.on(WaveEvent.class, event -> {

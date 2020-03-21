@@ -79,8 +79,8 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
         Vec2 v = Geometry.overlap(Tmp.r1, Tmp.r2, true);
         float tm = mass() + unit.mass();
         float s1 = mass() / tm, s2 = unit.mass() / tm;
-        impulse(v.x*s2/scale, v.y*s2/scale);
-        unit.impulse(-v.x*s1/scale, -v.y*s1/scale);
+        move(v.x*s2/scale, v.y*s2/scale);
+        unit.move(-v.x*s1/scale, -v.y*s1/scale);
     }
 
     @Override
@@ -137,6 +137,11 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
             //unit block update
             if(tile.entity != null && isGrounded()){
                 tile.entity.unitOn(this);
+            }
+
+            //kill when stuck in wall
+            if(isGrounded() && tile.solid()){
+                kill();
             }
 
             //apply damage

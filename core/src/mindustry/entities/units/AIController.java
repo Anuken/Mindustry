@@ -28,7 +28,7 @@ public class AIController implements UnitController{
     }
 
     protected boolean retarget(){
-        return timer.get(timerTarget, 20);
+        return timer.get(timerTarget, 30);
     }
 
     protected void targetClosest(){
