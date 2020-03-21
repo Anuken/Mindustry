@@ -154,3 +154,6 @@ gradle-app.setting
 .DS_Store
 Thumbs.db
 android/libs/
+
+## VSCode Personal Settings Files (per workspace)
+.vscode/settings.json
