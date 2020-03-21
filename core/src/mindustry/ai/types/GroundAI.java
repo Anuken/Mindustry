@@ -27,7 +27,6 @@ public class GroundAI extends AIController{
             targetClosest();
         }
 
-        //attack
         Tilec core = unit.closestEnemyCore();
 
         if(core == null) return;

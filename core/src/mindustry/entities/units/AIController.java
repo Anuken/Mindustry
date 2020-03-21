@@ -17,11 +17,6 @@ public class AIController implements UnitController{
     protected Teamc target;
     protected Interval timer = new Interval(4);
 
-    @Override
-    public void update(){
-
-    }
-
     protected void targetClosestAllyFlag(BlockFlag flag){
         Tile target = Geometry.findClosest(unit.x(), unit.y(), indexer.getAllied(unit.team(), flag));
         if(target != null) this.target = target.entity;
@@ -37,7 +32,7 @@ public class AIController implements UnitController{
     }
 
     protected void targetClosest(){
-        Teamc newTarget = Units.closestTarget(unit.team(), unit.x(), unit.y(), Math.max(unit.range(), unit.type().range), u -> unit.type().targetAir || !u.isFlying());
+        Teamc newTarget = Units.closestTarget(unit.team(), unit.x(), unit.y(), Math.max(unit.range(), unit.type().range), u -> (unit.type().targetAir && u.isFlying()) || (unit.type().targetGround && !u.isFlying()));
         if(newTarget != null){
             target = newTarget;
         }
