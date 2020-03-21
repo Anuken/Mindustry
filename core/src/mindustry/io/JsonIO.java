@@ -81,14 +81,14 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(Zone.class, new Serializer<Zone>(){
+        json.setSerializer(SectorPreset.class, new Serializer<SectorPreset>(){
             @Override
-            public void write(Json json, Zone object, Class knownType){
+            public void write(Json json, SectorPreset object, Class knownType){
                 json.writeValue(object.name);
             }
 
             @Override
-            public Zone read(Json json, JsonValue jsonData, Class type){
+            public SectorPreset read(Json json, JsonValue jsonData, Class type){
                 return Vars.content.getByName(ContentType.zone, jsonData.asString());
             }
         });

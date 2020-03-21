@@ -146,7 +146,7 @@ public class SStats implements SteamUserStatsCallback{
             if(e.content == Items.thorium) obtainThorium.complete();
             if(e.content == Items.titanium) obtainTitanium.complete();
 
-            if(!content.zones().contains(Zone::locked)){
+            if(!content.zones().contains(SectorPreset::locked)){
                 unlockAllZones.complete();
             }
         });

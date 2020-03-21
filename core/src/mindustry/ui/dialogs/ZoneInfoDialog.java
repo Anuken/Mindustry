@@ -25,12 +25,12 @@ public class ZoneInfoDialog extends FloatingDialog{
         addCloseButton();
     }
 
-    public void show(Zone zone){
+    public void show(SectorPreset zone){
         setup(zone);
         show();
     }
 
-    private void setup(Zone zone){
+    private void setup(SectorPreset zone){
         cont.clear();
 
         Table iteminfo = new Table();

@@ -21,11 +21,14 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
 
     /** weapon mount array, never null */
     @ReadOnly WeaponMount[] mounts = {};
+    @ReadOnly float range;
 
     void setupWeapons(UnitType def){
         mounts = new WeaponMount[def.weapons.size];
+        range = 0f;
         for(int i = 0; i < mounts.length; i++){
             mounts[i] = new WeaponMount(def.weapons.get(i));
+            range = Math.max(range, def.weapons.get(i).bullet.range());
         }
     }
 

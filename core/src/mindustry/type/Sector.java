@@ -23,6 +23,9 @@ public class Sector{
     public @Nullable SaveSlot save;
     public boolean unlocked;
 
+    /** */
+    public float hostility;
+
     //TODO implement a dynamic (?) launch period
     public int launchPeriod = 10;
 

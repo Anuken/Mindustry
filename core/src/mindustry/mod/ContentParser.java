@@ -303,7 +303,7 @@ public class ContentParser{
         },
         ContentType.item, parser(ContentType.item, Item::new),
         ContentType.liquid, parser(ContentType.liquid, Liquid::new),
-        ContentType.zone, parser(ContentType.zone, Zone::new)
+        ContentType.zone, parser(ContentType.zone, SectorPreset::new)
     );
 
     private String getString(JsonValue value, String key){

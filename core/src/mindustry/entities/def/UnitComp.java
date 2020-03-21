@@ -25,6 +25,15 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     private UnitController controller;
     private UnitType type;
 
+    public void moveAt(Vec2 vector){
+        moveAt(vector, type.accel);
+    }
+
+    public void aimLook(Position pos){
+        aim(pos);
+        lookAt(pos);
+    }
+
     @Override
     public float clipSize(){
         return type.region.getWidth() * 2f;

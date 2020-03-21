@@ -36,7 +36,7 @@ public class ZoneTests{
         if(true) return new DynamicTest[0];
         //fail("Zone validity tests need to be refactored!");
 
-        for(Zone zone : content.zones()){
+        for(SectorPreset zone : content.zones()){
             out.add(dynamicTest(zone.name, () -> {
                 logic.reset();
                 try{

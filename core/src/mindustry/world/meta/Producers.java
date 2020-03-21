@@ -1,19 +1,16 @@
 package mindustry.world.meta;
 
-import mindustry.ctype.Content;
+import arc.struct.*;
+import mindustry.gen.*;
 
 public class Producers{
-    private Content output;
+    private Array<Produce> producers = new Array<>();
 
-    public void set(Content content){
-        this.output = content;
+    public void add(Produce prod){
+        producers.add(prod);
     }
 
-    public Content get(){
-        return output;
-    }
-
-    public boolean is(Content content){
-        return content == output;
+    interface Produce{
+        void add(Tilec entity);
     }
 }

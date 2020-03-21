@@ -72,10 +72,10 @@ public class EventType{
 
     /** Called when a zone's requirements are met. */
     public static class ZoneRequireCompleteEvent{
-        public final Zone zoneMet, zoneForMet;
+        public final SectorPreset zoneMet, zoneForMet;
         public final Objective objective;
 
-        public ZoneRequireCompleteEvent(Zone zoneMet, Zone zoneForMet, Objective objective){
+        public ZoneRequireCompleteEvent(SectorPreset zoneMet, SectorPreset zoneForMet, Objective objective){
             this.zoneMet = zoneMet;
             this.zoneForMet = zoneForMet;
             this.objective = objective;
@@ -84,9 +84,9 @@ public class EventType{
 
     /** Called when a zone's requirements are met. */
     public static class ZoneConfigureCompleteEvent{
-        public final Zone zone;
+        public final SectorPreset zone;
 
-        public ZoneConfigureCompleteEvent(Zone zone){
+        public ZoneConfigureCompleteEvent(SectorPreset zone){
             this.zone = zone;
         }
     }

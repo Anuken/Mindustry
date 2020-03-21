@@ -13,7 +13,6 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -517,9 +516,9 @@ public class DesktopInput extends InputHandler{
         }
 
         if(omni){
-            unit.moveAt(movement, unit.type().accel);
+            unit.moveAt(movement);
         }else{
-            unit.moveAt(Tmp.v2.trns(unit.rotation(), movement.len()), unit.type().accel);
+            unit.moveAt(Tmp.v2.trns(unit.rotation(), movement.len()));
             if(!movement.isZero()){
                 unit.vel().rotateTo(movement.angle(), unit.type().rotateSpeed * Time.delta());
             }

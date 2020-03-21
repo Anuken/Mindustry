@@ -1,12 +1,43 @@
 package mindustry.entities.units;
 
-import arc.math.*;
+import arc.math.geom.*;
+import arc.util.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 
 public class AIController implements UnitController{
-    protected Unitc unit;
+    protected static final Vec2 vec = new Vec2();
+    protected static final int timerTarget = 0;
 
-    float rot = Mathf.random(360f);
+    protected Unitc unit;
+    protected Teamc target;
+    protected Interval timer = new Interval(4);
+
+    @Override
+    public void update(){
+        targeting();
+        behavior();
+    }
+
+    protected boolean retarget(){
+        return timer.get(timerTarget, 20);
+    }
+
+    protected void targetClosest(){
+        Teamc newTarget = Units.closestTarget(unit.team(), unit.x(), unit.y(), Math.max(unit.range(), unit.type().range), u -> unit.type().targetAir || !u.isFlying());
+        if(newTarget != null){
+            target = newTarget;
+        }
+    }
+
+
+    public void targeting(){
+
+    }
+
+    public void behavior(){
+
+    }
 
     @Override
     public void unit(Unitc unit){
@@ -16,16 +47,5 @@ public class AIController implements UnitController{
     @Override
     public Unitc unit(){
         return unit;
-    }
-
-    @Override
-    public void update(){
-        //TODO implement
-        //rot += Mathf.range(3f) * Time.delta();
-
-        //unit.moveAt(Tmp.v1.trns(rot, unit.type().speed));
-        //if(!unit.vel().isZero()){
-        //    unit.lookAt(unit.vel().angle());
-        //}
     }
 }
