@@ -23,6 +23,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     @ReadOnly WeaponMount[] mounts = {};
     @ReadOnly float range;
 
+    boolean inRange(Position other){
+        return within(other, range);
+    }
+
     void setupWeapons(UnitType def){
         mounts = new WeaponMount[def.weapons.size];
         range = 0f;

@@ -13,7 +13,20 @@ import static mindustry.Vars.pathfinder;
 public class GroundAI extends AIController{
 
     @Override
-    public void behavior(){
+    public void update(){
+        if(Units.invalidateTarget(target, unit.team(), unit.x(), unit.y(), Float.MAX_VALUE)){
+            target = null;
+
+            //TODO this is hacky, cleanup
+            if(unit instanceof Legsc){
+                unit.lookAt(((Legsc)unit).baseRotation());
+            }
+        }
+
+        if(retarget()){
+            targetClosest();
+        }
+
         //attack
         Tilec core = unit.closestEnemyCore();
 
@@ -41,23 +54,6 @@ public class GroundAI extends AIController{
         }
 
         unit.controlWeapons(rotate, shoot);
-    }
-
-    @Override
-    public void targeting(){
-
-        if(Units.invalidateTarget(target, unit.team(), unit.x(), unit.y(), Float.MAX_VALUE)){
-            target = null;
-
-            //TODO this is hacky, cleanup
-            if(unit instanceof Legsc){
-                unit.lookAt(((Legsc)unit).baseRotation());
-            }
-        }
-
-        if(retarget()){
-            targetClosest();
-        }
     }
 
     protected void moveToCore(PathTarget path){

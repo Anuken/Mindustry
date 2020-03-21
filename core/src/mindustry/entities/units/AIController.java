@@ -4,6 +4,10 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.world.*;
+import mindustry.world.meta.*;
+
+import static mindustry.Vars.indexer;
 
 public class AIController implements UnitController{
     protected static final Vec2 vec = new Vec2();
@@ -15,8 +19,17 @@ public class AIController implements UnitController{
 
     @Override
     public void update(){
-        targeting();
-        behavior();
+
+    }
+
+    protected void targetClosestAllyFlag(BlockFlag flag){
+        Tile target = Geometry.findClosest(unit.x(), unit.y(), indexer.getAllied(unit.team(), flag));
+        if(target != null) this.target = target.entity;
+    }
+
+    protected void targetClosestEnemyFlag(BlockFlag flag){
+        Tile target = Geometry.findClosest(unit.x(), unit.y(), indexer.getEnemy(unit.team(), flag));
+        if(target != null) this.target = target.entity;
     }
 
     protected boolean retarget(){
@@ -28,15 +41,6 @@ public class AIController implements UnitController{
         if(newTarget != null){
             target = newTarget;
         }
-    }
-
-
-    public void targeting(){
-
-    }
-
-    public void behavior(){
-
     }
 
     @Override
