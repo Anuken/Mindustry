@@ -79,8 +79,8 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
         Vec2 v = Geometry.overlap(Tmp.r1, Tmp.r2, true);
         float tm = mass() + unit.mass();
         float s1 = mass() / tm, s2 = unit.mass() / tm;
-        move(v.x*s2/scale, v.y*s2/scale);
-        unit.move(-v.x*s1/scale, -v.y*s1/scale);
+        impulse(v.x*s2/scale, v.y*s2/scale);
+        unit.impulse(-v.x*s1/scale, -v.y*s1/scale);
     }
 
     @Override

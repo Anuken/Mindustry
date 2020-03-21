@@ -211,7 +211,7 @@ public abstract class BulletType extends Content{
         bullet.damage(damage < 0 ? this.damage : damage);
         bullet.add();
 
-        //if(keepVelocity && owner instanceof Velc) bullet.vel().add(((Velc)owner).vel());
+        if(keepVelocity && owner instanceof Velc) bullet.vel().add(((Velc)owner).vel());
         return bullet;
 
     }

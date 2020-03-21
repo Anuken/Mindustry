@@ -28,7 +28,7 @@ public class FlyingAI extends AIController{
         boolean shoot = false;
 
         if(target != null){
-            attack(40f);
+            attack(80f);
 
             shoot = unit.inRange(target);
 
@@ -88,7 +88,7 @@ public class FlyingAI extends AIController{
         if(diff > 100f && vec.len() < circleLength){
             vec.setAngle(unit.vel().angle());
         }else{
-            vec.setAngle(Mathf.slerpDelta(unit.vel().angle(), vec.angle(), 0.44f));
+            vec.setAngle(Mathf.slerpDelta(unit.vel().angle(), vec.angle(), 0.6f));
         }
 
         vec.setLength(unit.type().speed * Time.delta());

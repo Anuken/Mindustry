@@ -9,12 +9,13 @@ import mindustry.type.*;
 public class UnitTypes implements ContentList{
     //TODO reimplement
     public static UnitType
-    wraith, ghoul, revenant, lich, reaper,
+    ghoul, revenant, lich, reaper,
     crawler, titan, fortress, eruptor, chaosArray, eradicator;
 
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType dagger;
     public static @EntityDef({Unitc.class, WaterMovec.class}) UnitType vanguard;
     public static @EntityDef({Unitc.class, Minerc.class}) UnitType draug;
+    public static @EntityDef({Unitc.class}) UnitType wraith;
     public static @EntityDef({Unitc.class}) UnitType spirit;
     public static @EntityDef({Unitc.class, Builderc.class}) UnitType phantom;
 
@@ -27,7 +28,7 @@ public class UnitTypes implements ContentList{
     public void load(){
 
         dagger = new UnitType("dagger"){{
-            speed = 1f;
+            speed = 0.5f;
             drag = 0.3f;
             hitsize = 8f;
             mass = 1.75f;
@@ -38,6 +39,25 @@ public class UnitTypes implements ContentList{
                 alternate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
+            }});
+        }};
+
+        wraith = new UnitType("wraith"){{
+            speed = 3f;
+            accel = 0.08f;
+            drag = 0f;
+            mass = 1.5f;
+            flying = true;
+            health = 75;
+            engineOffset = 5.5f;
+            range = 140f;
+            weapons.add(new Weapon(){{
+                y = 1.5f;
+                reload = 28f;
+                alternate = true;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.standardCopper;
+                shootSound = Sounds.shoot;
             }});
         }};
 
