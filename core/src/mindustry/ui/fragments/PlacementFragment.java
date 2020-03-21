@@ -42,6 +42,18 @@ public class PlacementFragment extends Fragment{
     boolean blockSelectEnd;
     int blockSelectSeq;
     long blockSelectSeqMillis;
+    Binding[] categorySelect = {
+        Binding.category_select_01,
+        Binding.category_select_02,
+        Binding.category_select_03,
+        Binding.category_select_04,
+        Binding.category_select_05,
+        Binding.category_select_06,
+        Binding.category_select_07,
+        Binding.category_select_08,
+        Binding.category_select_09,
+        Binding.category_select_10
+    };
     Binding[] blockSelect = {
         Binding.block_select_01,
         Binding.block_select_02,
@@ -110,8 +122,28 @@ public class PlacementFragment extends Fragment{
 
         if(ui.chatfrag.shown() || Core.scene.hasKeyboard()) return false;
 
+        // category select
+        if(blockSelectEnd || Time.timeSinceMillis(blockSelectSeqMillis) > Core.settings.getInt("blockselecttimeout")){ //1st number of combo, select category
+            for(int i = 0; i < categorySelect.length; i++){
+                if(Core.input.keyTap(categorySelect[i])){
+                    //select only visible categories
+                    if(!getByCategory(Category.all[i]).isEmpty()){
+                        currentCategory = Category.all[i];
+                        if(input.block != null){
+                            input.block = getSelectedBlock(currentCategory);
+                        }
+                        blockSelectEnd = false;
+                        blockSelectSeq = 0;
+                        blockSelectSeqMillis = Time.millis();
+                    }
+                    return true;
+                }
+            }
+        }
+
+        //block select
         for(int i = 0; i < blockSelect.length; i++){
-            if(Core.input.keyTap(blockSelect[i])){
+            if(!blockSelectEnd && Core.input.keyTap(blockSelect[i])){
                 if(i > 9) { //select block directionally
                     Array<Block> blocks = getByCategory(currentCategory);
                     Block currentBlock = getSelectedBlock(currentCategory);
@@ -135,17 +167,6 @@ public class PlacementFragment extends Fragment{
                             selectedBlocks.put(currentCategory, input.block);
                             break;
                         }
-                    }
-                }else if(blockSelectEnd || Time.timeSinceMillis(blockSelectSeqMillis) > Core.settings.getInt("blockselecttimeout")){ //1st number of combo, select category
-                    //select only visible categories
-                    if(!getByCategory(Category.all[i]).isEmpty()){
-                        currentCategory = Category.all[i];
-                        if(input.block != null){
-                            input.block = getSelectedBlock(currentCategory);
-                        }
-                        blockSelectEnd = false;
-                        blockSelectSeq = 0;
-                        blockSelectSeqMillis = Time.millis();
                     }
                 }else{ //select block
                     if(blockSelectSeq == 0){ //2nd number of combo
