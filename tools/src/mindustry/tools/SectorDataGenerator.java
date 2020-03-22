@@ -10,10 +10,12 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.net.Net;
 import mindustry.type.*;
 import mindustry.type.Sector.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 
@@ -50,7 +52,7 @@ public class SectorDataGenerator{
                 ObjectSet<Content> content = new ObjectSet<>();
 
                 world.loadSector(sector);
-                int waterFloors = 0, totalFloors = 0;
+                float waterFloors = 0, totalFloors = 0;
                 state.rules.sector = sector;
 
                 for(Tile tile : world.tiles){
@@ -66,13 +68,34 @@ public class SectorDataGenerator{
                     if(!tile.block().isStatic()){
                         totalFloors ++;
                         if(liquid == Liquids.water){
-                            waterFloors ++;
+                            waterFloors += tile.floor().isDeep() ? 1f : 0.5f;
                         }
                         floors.increment(tile.floor());
                         if(tile.overlay() != Blocks.air){
                             floors.increment(tile.overlay());
                         }
                     }
+                }
+
+                CoreEntity entity = Team.sharded.core();
+                int cx = entity.tileX(), cy = entity.tileY();
+
+                int nearTiles = 0;
+                int waterCheckRad = 5;
+
+                //check for water presence
+                for(int rx = -waterCheckRad; rx <= waterCheckRad; rx++){
+                    for(int ry = -waterCheckRad; ry <= waterCheckRad; ry++){
+                        Tile tile = world.tile(cx + rx, cy + ry);
+                        if(tile == null || tile.floor().liquidDrop != null){
+                            nearTiles ++;
+                        }
+                    }
+                }
+
+                //naval sector guaranteed
+                if(nearTiles >= 4){
+                    waterFloors = totalFloors;
                 }
 
                 //sort counts in descending order
@@ -91,8 +114,7 @@ public class SectorDataGenerator{
                 data.resources = content.asArray().sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id))).toArray(UnlockableContent.class);
 
                 //50% water -> naval attribute
-                //TODO also select sectors with water spawns
-                if((float)waterFloors / totalFloors >= 0.6f){
+                if(waterFloors / totalFloors >= 0.6f){
                     data.attributes |= (1 << SectorAttribute.naval.ordinal());
                 }
 
