@@ -89,7 +89,8 @@ public class Planet extends UnlockableContent{
                 }
             }
 
-            sectors.get(sectors.size/2).unlocked = true;
+            //for now
+            sectors.each(s -> s.unlocked = true);
         }else{
             sectors = new Array<>();
         }

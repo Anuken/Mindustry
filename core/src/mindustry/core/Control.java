@@ -251,7 +251,7 @@ public class Control implements ApplicationListener, Loadable{
             ui.planet.hide();
             SaveSlot slot = sector.save;
             //TODO comment for new sector states
-            //slot = null;
+            slot = null;
             if(slot != null){
                 try{
                     net.reset();

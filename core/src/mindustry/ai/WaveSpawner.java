@@ -97,7 +97,7 @@ public class WaveSpawner{
         for(Tile tile : spawns){
             float angle = Angles.angle(tile.x, tile.y, world.width()/2, world.height()/2);
 
-            float trns = (world.width() + world.height()) * tilesize;
+            float trns = Math.max(world.width(), world.height()) * Mathf.sqrt2 * tilesize;
             float spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(angle, trns), -margin, world.width() * tilesize + margin);
             float spawnY = Mathf.clamp(world.height() * tilesize / 2f + Angles.trnsy(angle, trns), -margin, world.height() * tilesize + margin);
             cons.get(spawnX, spawnY);

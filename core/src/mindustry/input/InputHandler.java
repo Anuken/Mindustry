@@ -69,26 +69,26 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemEffect(Item item, float x, float y, Itemsc to){
         if(to == null) return;
-        createItemTransfer(item, x, y, to, null);
+        createItemTransfer(item, 1, x, y, to, null);
     }
 
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemToUnit(Item item, float x, float y, Itemsc to){
         if(to == null) return;
-        createItemTransfer(item, x, y, to, () -> to.addItem(item));
+        createItemTransfer(item, 1, x, y, to, () -> to.addItem(item));
     }
 
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemTo(Item item, int amount, float x, float y, Tile tile){
         if(tile == null || tile.entity == null || tile.entity.items() == null) return;
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
-            Time.run(i * 3, () -> createItemTransfer(item, x, y, tile, () -> {}));
+            Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, tile, () -> {}));
         }
         tile.entity.items().add(item, amount);
     }
 
-    public static void createItemTransfer(Item item, float x, float y, Position to, Runnable done){
-        Fx.itemTransfer.at(x, y, 0, item.color, to);
+    public static void createItemTransfer(Item item, int amount, float x, float y, Position to, Runnable done){
+        Fx.itemTransfer.at(x, y, amount, item.color, to);
         if(done != null){
             Time.run(Fx.itemTransfer.lifetime, done);
         }
@@ -137,21 +137,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         int accepted = tile.acceptStack(item, amount, player.unit());
         player.unit().stack().amount -= accepted;
 
-        int sent = Mathf.clamp(accepted / 4, 1, 8);
-        Block block = tile.block();
-
         Core.app.post(() -> Events.fire(new DepositEvent(tile, player, item, accepted)));
 
-        for(int i = 0; i < sent; i++){
-            tile.getStackOffset(item, stackTrns);
+        tile.getStackOffset(item, stackTrns);
 
-            createItemTransfer(item, player.x() + Angles.trnsx(player.unit().rotation() + 180f, backTrns), player.y() + Angles.trnsy(player.unit().rotation() + 180f, backTrns),
-            new Vec2(tile.x() + stackTrns.x, tile.y() + stackTrns.y), () -> {
-                if(tile.block() != block || !tile.isValid() || tile.items() == null) return;
-
-                tile.handleStack(item, accepted, player.unit());
-            });
-        }
+        createItemTransfer(
+            item,
+            amount,
+            player.x() + Angles.trnsx(player.unit().rotation() + 180f, backTrns), player.y() + Angles.trnsy(player.unit().rotation() + 180f, backTrns),
+            new Vec2(tile.x() + stackTrns.x, tile.y() + stackTrns.y),
+            () -> tile.handleStack(item, accepted, player.unit())
+        );
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)

@@ -112,7 +112,8 @@ public class Blocks implements ContentList{
             {
                 variants = 0;
             }
-            public void draw(){}
+            @Override
+            public void drawBase(Tile tile){}
         };
 
         cliff = new Cliff("cliff");

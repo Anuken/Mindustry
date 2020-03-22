@@ -125,7 +125,7 @@ public class TestPlanetGenerator extends PlanetGenerator{
 
         float constraint = 1.3f;
         float radius = width / 2f / Mathf.sqrt3;
-        int rooms = rand.random(2, 5);
+        int rooms = rand.random(2, 5)/* - 1*/;
         Array<Room> array = new Array<>();
 
         for(int i = 0; i < rooms; i++){
@@ -137,12 +137,40 @@ public class TestPlanetGenerator extends PlanetGenerator{
             array.add(new Room((int)rx, (int)ry, (int)rrad));
         }
 
+        //check positions on the map to place the player spawn. this needs to be in the corner of the map
+        Room spawn = null;
+        int offset = rand.nextInt(360);
+        float length = width/2.55f - rand.random(13, 23);
+        int angleStep = 5;
+        int waterCheckRad = 5;
+        for(int i = 0; i < 360; i+= angleStep){
+            int angle = offset + i;
+            int cx = (int)(width/2 + Angles.trnsx(angle, length));
+            int cy = (int)(height/2 + Angles.trnsy(angle, length));
+
+            int waterTiles = 0;
+
+            //check for water presence
+            for(int rx = -waterCheckRad; rx <= waterCheckRad; rx++){
+                for(int ry = -waterCheckRad; ry <= waterCheckRad; ry++){
+                    Tile tile = tiles.get(cx + rx, cy + ry);
+                    if(tile == null || tile.floor().liquidDrop != null){
+                        waterTiles ++;
+                    }
+                }
+            }
+
+            if(waterTiles <= 4 || (i + angleStep >= 360)){
+                array.add(spawn = new Room(cx, cy, rand.random(8, 15)));
+                break;
+            }
+        }
+
         for(Room room : array){
             erase(room.x, room.y, room.radius);
         }
 
         int connections = rand.random(Math.max(rooms - 1, 1), rooms + 3);
-        Room spawn = array.random(rand);
         for(int i = 0; i < connections; i++){
             array.random(rand).connect(array.random(rand));
         }
@@ -158,11 +186,9 @@ public class TestPlanetGenerator extends PlanetGenerator{
 
         ores(ores);
 
-        for(Room other : array){
-            if(other != spawn){
-                // tiles.getn(other.x, other.y).setOverlay(Blocks.spawn);
-            }
-        }
+        Room target = spawn;
+        Room furthest = array.max(r -> Mathf.dst(r.x, r.y, target.x, target.y));
+        tiles.getn(furthest.x, furthest.y).setOverlay(Blocks.spawn);
 
         trimDark();
 
