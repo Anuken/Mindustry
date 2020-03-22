@@ -174,7 +174,6 @@ public class SolidPump extends Pump{
     public void darwin(Tile tile){
         Tile oil = indexer.findClosestLiquid(tile.drawx(), tile.drawy(), result);
         if(oil != null){
-            Log.info("darwin");
             Placement.points.clear();
             Team team = tile.getTeam();
             tile.getLinkedTiles(linked);
