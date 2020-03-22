@@ -51,6 +51,7 @@ public class SectorDataGenerator{
                 ObjectIntMap<Block> floors = new ObjectIntMap<>();
                 ObjectSet<Content> content = new ObjectSet<>();
 
+                logic.reset();
                 world.loadSector(sector);
                 float waterFloors = 0, totalFloors = 0;
                 state.rules.sector = sector;
@@ -68,7 +69,7 @@ public class SectorDataGenerator{
                     if(!tile.block().isStatic()){
                         totalFloors ++;
                         if(liquid == Liquids.water){
-                            waterFloors += tile.floor().isDeep() ? 1f : 0.5f;
+                            waterFloors += tile.floor().isDeep() ? 1f : 0.7f;
                         }
                         floors.increment(tile.floor());
                         if(tile.overlay() != Blocks.air){
@@ -93,8 +94,13 @@ public class SectorDataGenerator{
                     }
                 }
 
+                if(waterFloors / totalFloors >= 0.6f){
+                    Log.info("Sector {0} has {1}/{2} water -> naval", sector.id, waterFloors, totalFloors);
+                }
+
                 //naval sector guaranteed
-                if(nearTiles >= 4){
+                if(nearTiles > 4){
+                    Log.info("Sector {0} has {1} water tiles at {2} {3} -> naval", sector.id, nearTiles, cx, cy);
                     waterFloors = totalFloors;
                 }
 

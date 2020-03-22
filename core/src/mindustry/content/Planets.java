@@ -36,7 +36,7 @@ public class Planets implements ContentList{
         }};
 
         starter = new Planet("TODO", sun, 3, 1){{
-            generator = new TestPlanetGenerator();
+            generator = new TODOPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
         }};
     }

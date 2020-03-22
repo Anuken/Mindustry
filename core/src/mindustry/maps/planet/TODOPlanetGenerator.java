@@ -12,7 +12,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-public class TestPlanetGenerator extends PlanetGenerator{
+public class TODOPlanetGenerator extends PlanetGenerator{
     Simplex noise = new Simplex();
     RidgedPerlin rid = new RidgedPerlin(1, 2);
     float scl = 5f;
