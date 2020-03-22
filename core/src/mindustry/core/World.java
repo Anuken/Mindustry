@@ -26,7 +26,7 @@ import static mindustry.Vars.*;
 public class World{
     public final Context context = new Context();
 
-    private Map currentMap;
+    private Map currentMap = new Map(new StringMap());
     public @NonNull Tiles tiles = new Tiles(0, 0);
 
     private boolean generating, invalidMap;
@@ -214,6 +214,7 @@ public class World{
     }
 
     public void loadSector(Sector sector){
+        currentMap = new Map(StringMap.of("name", sector.planet.localizedName + "; Sector " + sector.id));
         state.rules.sector = sector;
         int size = sector.getSize();
         loadGenerator(size, size, tiles -> sector.planet.generator.generate(tiles, sector));

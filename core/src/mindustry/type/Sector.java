@@ -4,6 +4,7 @@ import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.util.noise.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.game.Saves.*;
@@ -36,6 +37,11 @@ public class Sector{
         this.rect = makeRect();
         this.id = tile.id;
         this.data = data;
+    }
+
+    public void generate(){
+        //TODO use simplex and a seed
+        hostility = Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 4f, 1f);
     }
 
     public boolean locked(){

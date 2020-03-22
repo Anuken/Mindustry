@@ -216,6 +216,8 @@ public class TODOPlanetGenerator extends PlanetGenerator{
         });
 
         schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
+
+        state.rules.waves = true;
     }
 
 }

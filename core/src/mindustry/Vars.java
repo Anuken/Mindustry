@@ -210,6 +210,16 @@ public class Vars implements Loadable{
 
         Version.init();
 
+        dataDirectory = Core.settings.getDataDirectory();
+        screenshotDirectory = dataDirectory.child("screenshots/");
+        customMapDirectory = dataDirectory.child("maps/");
+        mapPreviewDirectory = dataDirectory.child("previews/");
+        saveDirectory = dataDirectory.child("saves/");
+        tmpDirectory = dataDirectory.child("tmp/");
+        modDirectory = dataDirectory.child("mods/");
+        schematicDirectory = dataDirectory.child("schematics/");
+        bebuildDirectory = dataDirectory.child("be_builds/");
+
         if(tree == null) tree = new FileTree();
         if(mods == null) mods = new Mods();
 
@@ -232,16 +242,6 @@ public class Vars implements Loadable{
         mobile = Core.app.getType() == ApplicationType.Android || Core.app.getType() == ApplicationType.iOS || testMobile;
         ios = Core.app.getType() == ApplicationType.iOS;
         android = Core.app.getType() == ApplicationType.Android;
-
-        dataDirectory = Core.settings.getDataDirectory();
-        screenshotDirectory = dataDirectory.child("screenshots/");
-        customMapDirectory = dataDirectory.child("maps/");
-        mapPreviewDirectory = dataDirectory.child("previews/");
-        saveDirectory = dataDirectory.child("saves/");
-        tmpDirectory = dataDirectory.child("tmp/");
-        modDirectory = dataDirectory.child("mods/");
-        schematicDirectory = dataDirectory.child("schematics/");
-        bebuildDirectory = dataDirectory.child("be_builds/");
 
         modDirectory.mkdirs();
 

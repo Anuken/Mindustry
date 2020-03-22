@@ -61,9 +61,9 @@ public class SectorDataGenerator{
                         continue;
                     }
 
-                    Item item = tile.floor().itemDrop;
                     Liquid liquid = tile.floor().liquidDrop;
-                    if(item != null) content.add(item);
+                    if(tile.floor().itemDrop != null) content.add(tile.floor().itemDrop);
+                    if(tile.overlay().itemDrop != null) content.add(tile.overlay().itemDrop);
                     if(liquid != null) content.add(liquid);
 
                     if(!tile.block().isStatic()){
