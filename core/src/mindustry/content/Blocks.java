@@ -10,6 +10,7 @@ import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -19,6 +20,7 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.distribution.Conveyor.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.power.*;
@@ -81,6 +83,8 @@ public class Blocks implements ContentList{
 
     //upgrades
     dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+
+    Array<BuildRequest> requests = new Array<>();
 
     @Override
     public void load(){
@@ -746,7 +750,7 @@ public class Blocks implements ContentList{
             upscale = () -> copperWallLarge;
 
             flags = EnumSet.of(BlockFlag.upgradable);
-            upgrade = () -> titaniumWall;
+            upgrade = t -> titaniumWall;
         }};
 
         copperWallLarge = new Wall("copper-wall-large"){{
@@ -755,7 +759,7 @@ public class Blocks implements ContentList{
             size = 2;
 
             flags = EnumSet.of(BlockFlag.upgradable);
-            upgrade = () -> titaniumWallLarge;
+            upgrade = t -> titaniumWallLarge;
         }};
 
         titaniumWall = new Wall("titanium-wall"){{
@@ -766,7 +770,7 @@ public class Blocks implements ContentList{
             upscale = () -> titaniumWallLarge;
 
             flags = EnumSet.of(BlockFlag.upgradable);
-            upgrade = () -> thoriumWall;
+            upgrade = t -> thoriumWall;
             downgrade = () -> copperWall;
         }};
 
@@ -776,7 +780,7 @@ public class Blocks implements ContentList{
             size = 2;
 
             flags = EnumSet.of(BlockFlag.upgradable);
-            upgrade = () -> thoriumWallLarge;
+            upgrade = t -> thoriumWallLarge;
             downgrade = () -> copperWallLarge;
         }};
 
@@ -804,7 +808,7 @@ public class Blocks implements ContentList{
             upscale = () -> thoriumWallLarge;
 
             flags = EnumSet.of(BlockFlag.upgradable);
-            upgrade = () -> surgeWall;
+            upgrade = t -> surgeWall;
             downgrade = () -> titaniumWall;
         }};
 
@@ -814,7 +818,7 @@ public class Blocks implements ContentList{
             size = 2;
 
             flags = EnumSet.of(BlockFlag.upgradable);
-            upgrade = () -> surgeWallLarge;
+            upgrade = t -> surgeWallLarge;
             downgrade = () -> titaniumWallLarge;
         }};
 
@@ -954,7 +958,7 @@ public class Blocks implements ContentList{
             displayedSpeed = 4.2f;
 
             flags = EnumSet.of(BlockFlag.upgradable);
-            upgrade = () -> titaniumConveyor;
+            upgrade = t -> titaniumConveyor;
         }};
 
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
@@ -963,6 +967,21 @@ public class Blocks implements ContentList{
             speed = 0.08f;
             displayedSpeed = 10f;
             downgrade = () -> conveyor;
+
+            flags = EnumSet.of(BlockFlag.upgradable);
+            upgrade = t -> {
+                requests.clear();
+                requests.add(new BuildRequest(t.x, t.y, t.rotation, armoredConveyor));
+
+                int[] bits = ((ArmoredConveyor)armoredConveyor).getTiling(requests.first(), requests);
+                if(bits == null) return null;
+
+                if(t.<ConveyorEntity>ent().blendbits != bits[0]) return null;
+                if(t.<ConveyorEntity>ent().blendsclx != bits[1]) return null;
+                if(t.<ConveyorEntity>ent().blendscly != bits[2]) return null;
+
+                return armoredConveyor;
+            };
         }};
 
         armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
@@ -1073,7 +1092,7 @@ public class Blocks implements ContentList{
             health = 45;
 
             flags = EnumSet.of(BlockFlag.upgradable);
-            upgrade = () -> pulseConduit;
+            upgrade = t -> pulseConduit;
         }};
 
         pulseConduit = new Conduit("pulse-conduit"){{
@@ -1082,6 +1101,19 @@ public class Blocks implements ContentList{
             liquidPressure = 1.025f;
             health = 90;
             downgrade = () -> conduit;
+
+            flags = EnumSet.of(BlockFlag.upgradable);
+            upgrade = t -> {
+                requests.clear();
+                requests.add(new BuildRequest(t.x, t.y, t.rotation, platedConduit));
+
+                int[] bits = ((ArmoredConduit)platedConduit).getTiling(requests.first(), requests);
+                if(bits == null) return null;
+
+                if(t.<ConduitEntity>ent().blendbits != bits[0]) return null;
+
+                return platedConduit;
+            };
         }};
 
         platedConduit = new ArmoredConduit("plated-conduit"){{
@@ -1253,7 +1285,7 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.water, 0.05f).boost();
 
             flags = EnumSet.of(BlockFlag.upgradable);
-            upgrade = () -> pneumaticDrill;
+            upgrade = t -> pneumaticDrill;
         }};
 
         pneumaticDrill = new Drill("pneumatic-drill"){{

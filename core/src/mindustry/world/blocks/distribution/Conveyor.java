@@ -326,8 +326,9 @@ public class Conveyor extends Block implements Autotiler{
         int lastInserted, mid;
         float minitem = 1;
 
-        int blendbits;
-        int blendsclx, blendscly;
+        public int blendbits;
+        public int blendsclx;
+        public int blendscly;
 
         float clogHeat = 0f;
 

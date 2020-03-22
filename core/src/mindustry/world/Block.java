@@ -26,6 +26,7 @@ import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.plugin.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.*;
@@ -147,7 +148,7 @@ public class Block extends BlockStorage{
     public boolean alwaysUnlocked = false;
     /** What this block can merge into */
     public Prov<Block> upscale;
-    public Prov<Block> upgrade;
+    public Prov2<Block, Tile> upgrade;
     public Prov<Block> downgrade;
 
     protected TextureRegion[] cacheRegions = {};
@@ -926,8 +927,8 @@ public class Block extends BlockStorage{
     }
 
     public void upgrade(Tile tile){
-        if(upgrade == null || upgrade.get() == null) return;
+        if(upgrade == null || upgrade.get(tile) == null) return;
 
-        tile.constructNet(upgrade.get(), tile.getTeam(), tile.rotation);
+        tile.constructNet(upgrade.get(tile), tile.getTeam(), tile.rotation);
     }
 }
