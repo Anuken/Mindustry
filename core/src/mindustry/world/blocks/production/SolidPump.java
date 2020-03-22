@@ -189,6 +189,7 @@ public class SolidPump extends Pump{
 
                     if(i[0]++ == 0) block = Blocks.mechanicalPump;
                     if(on.block == Blocks.conduit && on.rotation != l.rotation) block = Blocks.liquidRouter;
+                    if(on.block == Blocks.liquidRouter) block = Blocks.liquidRouter;
                     if(linked.contains(on)) return;
 
                     on.constructNet(block, team, (byte)l.rotation);
