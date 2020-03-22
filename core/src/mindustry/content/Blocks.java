@@ -746,10 +746,8 @@ public class Blocks implements ContentList{
             requirements(Category.defense, ItemStack.with(Items.copper, 6));
             health = 80 * wallHealthMultiplier;
 
-            flags = EnumSet.of(BlockFlag.scalable);
+            flags = EnumSet.of(BlockFlag.scalable, BlockFlag.upgradable);
             upscale = () -> copperWallLarge;
-
-            flags = EnumSet.of(BlockFlag.upgradable);
             upgrade = t -> titaniumWall;
         }};
 
@@ -766,10 +764,8 @@ public class Blocks implements ContentList{
             requirements(Category.defense, ItemStack.with(Items.titanium, 6));
             health = 110 * wallHealthMultiplier;
 
-            flags = EnumSet.of(BlockFlag.scalable);
+            flags = EnumSet.of(BlockFlag.scalable, BlockFlag.upgradable);
             upscale = () -> titaniumWallLarge;
-
-            flags = EnumSet.of(BlockFlag.upgradable);
             upgrade = t -> thoriumWall;
             downgrade = () -> copperWall;
         }};
@@ -804,10 +800,8 @@ public class Blocks implements ContentList{
             requirements(Category.defense, ItemStack.with(Items.thorium, 6));
             health = 200 * wallHealthMultiplier;
 
-            flags = EnumSet.of(BlockFlag.scalable);
+            flags = EnumSet.of(BlockFlag.scalable, BlockFlag.upgradable);
             upscale = () -> thoriumWallLarge;
-
-            flags = EnumSet.of(BlockFlag.upgradable);
             upgrade = t -> surgeWall;
             downgrade = () -> titaniumWall;
         }};
