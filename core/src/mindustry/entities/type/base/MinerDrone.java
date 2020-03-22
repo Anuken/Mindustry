@@ -44,7 +44,6 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
             int transfer = 1;
             if(entity.items.get(item.item) > 50 ) transfer = 25;
             if(entity.items.get(item.item) > 100) transfer = 50;
-            if(entity.items.get(item.item) > 500) transfer = 250;
             transfer = Mathf.random(0, transfer);
 
             if(item.amount > transfer && Mathf.chance(0.5f) && entity.block.acceptStack(item.item, transfer, entity.tile, MinerDrone.this) > 0){
