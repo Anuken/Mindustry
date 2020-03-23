@@ -51,7 +51,7 @@ public class SpecialDelivery implements ApplicationListener{
             if(t == null || t.block.upgrade == null || t.block.upgrade.get(t) == null) return false;
             if(!afford(team, t.block.upgrade.get(t))) return false;
 
-            if(Units.closest(team, t.drawx(), t.drawy(), tilesize * 20, u -> u instanceof Player) != null) return false;
+            if((t.block.upgrade.get(t) == Blocks.armoredConveyor || t.block.upgrade.get(t) == Blocks.platedConduit) && Units.closest(team, t.drawx(), t.drawy(), tilesize * 20, u -> u instanceof Player) != null) return false;
 
             return true;
         }).asArray();
