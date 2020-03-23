@@ -153,9 +153,7 @@ public class CraterConveyor extends Block implements Autotiler{
         if(entity.cooldown > 0f) return;
 
         if(entity.blendbit2 == 6){
-            while(tryDump(tile)){
-                if(entity.items.total() == 0) poofOut(tile);
-            }
+            while(tryDump(tile)) if(entity.items.total() == 0) poofOut(tile);
         }
 
         /* unload */ else /* transfer */
