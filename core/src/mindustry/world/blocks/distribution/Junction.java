@@ -1,24 +1,24 @@
 package mindustry.world.blocks.distribution;
 
-import arc.util.Time;
-import mindustry.entities.type.TileEntity;
-import mindustry.entities.type.Unit;
-import mindustry.gen.BufferItem;
-import mindustry.type.Item;
-import mindustry.world.Block;
-import mindustry.world.DirectionalItemBuffer;
-import mindustry.world.Tile;
-import mindustry.world.meta.BlockGroup;
+import arc.*;
+import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.type.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.type.*;
+import mindustry.world.*;
+import mindustry.world.meta.*;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static mindustry.Vars.content;
 
 public class Junction extends Block{
     public float speed = 26; //frames taken to go through this junction
     public int capacity = 6;
+
+    public final int timerObsolete = timers++;
 
     public Junction(String name){
         super(name);
@@ -74,6 +74,20 @@ public class Junction extends Block{
         JunctionEntity entity = tile.ent();
         int relative = source.relativeTo(tile.x, tile.y);
         entity.buffer.accept(relative, item);
+
+        if(entity.timer.get(timerObsolete, 60 * 3)){
+            boolean y = tile.getNearbyLink(Compass.up).block == Blocks.air && tile.getNearbyLink(Compass.down).block == Blocks.air;
+            boolean x = tile.getNearbyLink(Compass.left).block == Blocks.air && tile.getNearbyLink(Compass.right).block == Blocks.air;
+
+            if(x && y) return;
+
+            if(x || y){
+                if(source.block instanceof Conveyor){
+                    Call.onEffect(Fx.healBlockFull, tile.drawx(), tile.drawy(), source.block.size, Pal.bar);
+                    Core.app.post(() -> tile.setNet(source.block, tile.getTeam(), source.rotation));
+                }
+            }
+        }
     }
 
     @Override
