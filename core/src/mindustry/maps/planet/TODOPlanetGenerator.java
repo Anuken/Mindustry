@@ -125,7 +125,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
         float constraint = 1.3f;
         float radius = width / 2f / Mathf.sqrt3;
-        int rooms = rand.random(2, 5)/* - 1*/;
+        int rooms = rand.random(2, 5) - 1;
         Array<Room> array = new Array<>();
 
         for(int i = 0; i < rooms; i++){
@@ -139,6 +139,8 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
         //check positions on the map to place the player spawn. this needs to be in the corner of the map
         Room spawn = null;
+        Array<Room> enemies = new Array<>();
+        int enemySpawns = rand.chance(0.3) ? 2 : 1;
         int offset = rand.nextInt(360);
         float length = width/2.55f - rand.random(13, 23);
         int angleStep = 5;
@@ -162,6 +164,15 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
             if(waterTiles <= 4 || (i + angleStep >= 360)){
                 array.add(spawn = new Room(cx, cy, rand.random(8, 15)));
+
+                for(int j = 0; j < enemySpawns; j++){
+                    float enemyOffset = rand.range(60f);
+                    Tmp.v1.set(cx - width/2, cy - height/2).rotate(180f + enemyOffset).add(width/2, height/2);
+                    Room espawn = new Room((int)Tmp.v1.x, (int)Tmp.v1.y, rand.random(8, 15));
+                    array.add(espawn);
+                    enemies.add(espawn);
+                }
+
                 break;
             }
         }
@@ -186,9 +197,9 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
         ores(ores);
 
-        Room target = spawn;
-        Room furthest = array.max(r -> Mathf.dst(r.x, r.y, target.x, target.y));
-        tiles.getn(furthest.x, furthest.y).setOverlay(Blocks.spawn);
+        for(Room espawn : enemies){
+            tiles.getn(espawn.x, espawn.y).setOverlay(Blocks.spawn);
+        }
 
         trimDark();
 

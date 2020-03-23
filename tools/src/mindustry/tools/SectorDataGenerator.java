@@ -95,12 +95,12 @@ public class SectorDataGenerator{
                 }
 
                 if(waterFloors / totalFloors >= 0.6f){
-                    Log.info("Sector {0} has {1}/{2} water -> naval", sector.id, waterFloors, totalFloors);
+                    Log.debug("Sector {0} has {1}/{2} water -> naval", sector.id, waterFloors, totalFloors);
                 }
 
                 //naval sector guaranteed
                 if(nearTiles > 4){
-                    Log.info("Sector {0} has {1} water tiles at {2} {3} -> naval", sector.id, nearTiles, cx, cy);
+                    Log.debug("Sector {0} has {1} water tiles at {2} {3} -> naval", sector.id, nearTiles, cx, cy);
                     waterFloors = totalFloors;
                 }
 
