@@ -1,6 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import arc.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.type.*;
@@ -12,7 +13,7 @@ import mindustry.world.meta.*;
 
 import java.io.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class Junction extends Block{
     public float speed = 26; //frames taken to go through this junction
@@ -64,6 +65,42 @@ public class Junction extends Block{
                     dest.block().handleItem(item, dest, tile);
                     System.arraycopy(buffer.buffers[i], 1, buffer.buffers[i], 0, buffer.indexes[i] - 1);
                     buffer.indexes[i] --;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onProximityUpdate(Tile tile){
+        super.onProximityUpdate(tile);
+
+        if(tile.entity.proximity().select(t -> t.block instanceof Conveyor).size != 4) return;
+        final int[] tripod = new int[1];
+
+        for(Point2 p : Geometry.d4){
+            tripod[0] = 0;
+            Tile neighbor = world.ltile(tile.x + p.x, tile.y + p.y);
+            if(neighbor != null){
+                tile.entity.proximity().each(t -> tripod[0] += t.rotation == neighbor.rotation ? 1 : 0);
+                if(tripod[0] == 3){
+                    Tile input = tile.entity.proximity().find(t -> t.rotation != neighbor.rotation);
+                    if(input.front() == tile){
+                        Tile air = input.getNearby(input.relativeTo(tile)).getNearby(input.relativeTo(tile)).getNearby((neighbor.rotation + 2) % 4);
+                        if(air.block == Blocks.air){
+                            Core.app.post(() -> {
+                            Call.onEffect(Fx.healBlockFull, air.drawx(), air.drawy(), tile.block.size, Pal.bar);
+                            air.setNet(neighbor.block, neighbor.getTeam(), neighbor.rotation);
+
+                            Call.onEffect(Fx.healBlockFull, tile.drawx(), tile.drawy(), tile.block.size, Pal.bar);
+                            tile.setNet(neighbor.block, neighbor.getTeam(), neighbor.rotation);
+
+                            Tile above = tile.getNearby((neighbor.rotation + 2) % 4);
+                            Call.onEffect(Fx.healBlockFull, above.drawx(), above.drawy(), tile.block.size, Pal.bar);
+                            above.setNet(neighbor.block, neighbor.getTeam(), above.relativeTo(air));
+                            });
+                            return;
+                        }
+                    }
                 }
             }
         }
