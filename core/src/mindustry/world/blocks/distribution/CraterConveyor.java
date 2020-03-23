@@ -85,13 +85,13 @@ public class CraterConveyor extends Block implements Autotiler{
 
         if(entity.from == Pos.invalid) return;
 
-        // position
+        // offset
         Tile from = world.tile(entity.from);
         Tmp.v1.set(from);
         Tmp.v2.set(tile);
         Tmp.v1.interpolate(Tmp.v2, 1f - entity.cooldown, Interpolation.linear);
 
-        // fixme, cleanup
+        // fixme
         float a = (from.rotation()%4) * 90;
         float b = (tile.rotation()%4) * 90;
         if((from.rotation()%4) == 3 && (tile.rotation()%4) == 0) a = -1 * 90;
