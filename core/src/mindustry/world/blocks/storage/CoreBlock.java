@@ -212,12 +212,21 @@ public class CoreBlock extends StorageBlock{
                 if(tile.getTeam().miners(ore).size < tile.getTeam().cores().size){
                     BaseUnit unit = UnitTypes.draug.create(tile.getTeam());
                     unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
+                    unit.setSpawner(tile);
                     unit.item().item = ore;
                     unit.add();
                 }
             }
 
+            if(tile.getTeam().spirits().size < tile.getTeam().cores().size){
+                BaseUnit unit = UnitTypes.spirit.create(tile.getTeam());
+                unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
+                unit.setSpawner(tile);
+                unit.add();
+            }
+
             tile.getTeam().draugfactories = indexer.getAllied(tile.getTeam(), BlockFlag.producer).select(t -> t.block == Blocks.draugFactory).asArray().count(t -> t.<UnitFactoryEntity>ent().spawned > 0);
+            tile.getTeam().spiritfactories = indexer.getAllied(tile.getTeam(), BlockFlag.producer).select(t -> t.block == Blocks.spiritFactory).asArray().count(t -> t.<UnitFactoryEntity>ent().spawned > 0);
         }
 
         if(entity.spawnPlayer != null){
@@ -246,7 +255,7 @@ public class CoreBlock extends StorageBlock{
         return entity.spawnPlayer != null;
     }
 
-    public class CoreEntity extends TileEntity implements SpawnerTrait{
+    public class CoreEntity extends TileEntity implements SpawnerTrait, FactoryTrait{
         protected Player spawnPlayer;
         protected float progress;
         protected float time;
