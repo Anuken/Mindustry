@@ -34,7 +34,6 @@ public class TODOPlanetGenerator extends PlanetGenerator{
     {Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.ice, Blocks.iceSnow, Blocks.iceSnow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice}
     };
 
-    Array<Block> ores = Array.with(Blocks.oreCopper, Blocks.oreLead, Blocks.oreCoal, Blocks.oreCopper);
     ObjectMap<Block, Block> dec = ObjectMap.of(
         Blocks.sporeMoss, Blocks.sporeCluster,
         Blocks.moss, Blocks.sporeCluster
@@ -195,7 +194,43 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
         inverseFloodFill(tiles.getn(spawn.x, spawn.y));
 
-        ores(ores);
+        Array<Block> ores = Array.with(Blocks.oreCopper, Blocks.oreLead);
+        float poles = Math.abs(sector.tile.v.y);
+        float nmag = 0.5f;
+        float scl = 1f;
+        float addscl = 1.3f;
+
+        if(noise.octaveNoise3D(2, 0.5, scl, sector.tile.v.x, sector.tile.v.y, sector.tile.v.z)*nmag + poles > 0.25f*addscl){
+            ores.add(Blocks.oreCoal);
+        }
+
+        if(noise.octaveNoise3D(2, 0.5, scl, sector.tile.v.x + 1, sector.tile.v.y, sector.tile.v.z)*nmag + poles > 0.5f*addscl){
+            ores.add(Blocks.oreTitanium);
+        }
+
+        if(noise.octaveNoise3D(2, 0.5, scl, sector.tile.v.x + 2, sector.tile.v.y, sector.tile.v.z)*nmag + poles > 0.7f*addscl){
+            ores.add(Blocks.oreThorium);
+        }
+
+        FloatArray frequencies = new FloatArray();
+        for(int i = 0; i < ores.size; i++){
+            frequencies.add(rand.random(-0.05f, 0.05f));
+        }
+
+        pass((x, y) -> {
+            if(floor.asFloor().isLiquid) return;
+
+            int offsetX = x - 4, offsetY = y + 23;
+            for(int i = ores.size - 1; i >= 0; i--){
+                Block entry = ores.get(i);
+                float freq = frequencies.get(i);
+                if(Math.abs(0.5f - noise(offsetX, offsetY + i*999, 2, 0.7, (40 + i * 2))) > 0.26f &&
+                    Math.abs(0.5f - noise(offsetX, offsetY - i*999, 1, 1, (30 + i * 4))) > 0.37f + freq){
+                    ore = entry;
+                    break;
+                }
+            }
+        });
 
         for(Room espawn : enemies){
             tiles.getn(espawn.x, espawn.y).setOverlay(Blocks.spawn);
