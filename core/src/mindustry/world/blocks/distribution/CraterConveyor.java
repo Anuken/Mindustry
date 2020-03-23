@@ -41,6 +41,7 @@ public class CraterConveyor extends Block implements Autotiler{
         idleSound = Sounds.conveyor;
         idleSoundVolume = 0.004f;
         unloadable = false;
+        dumpIncrement = 4;
     }
 
     @Override
@@ -91,10 +92,10 @@ public class CraterConveyor extends Block implements Autotiler{
         Tmp.v1.interpolate(Tmp.v2, 1f - entity.cooldown, Interpolation.linear);
 
         // fixme, cleanup
-        float a = from.rotation() * 90;
-        float b = tile.rotation() * 90;
-        if(from.rotation() == 3 && tile.rotation() == 0) a = -1 * 90;
-        if(from.rotation() == 0 && tile.rotation() == 3) a = 4 * 90;
+        float a = (from.rotation()%4) * 90;
+        float b = (tile.rotation()%4) * 90;
+        if((from.rotation()%4) == 3 && (tile.rotation()%4) == 0) a = -1 * 90;
+        if((from.rotation()%4) == 0 && (tile.rotation()%4) == 3) a = 4 * 90;
 
         // crater
         Draw.rect(regions[7], Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interpolation.smooth.apply(1f - Mathf.clamp(entity.cooldown * 2, 0f, 1f))));
@@ -232,14 +233,11 @@ public class CraterConveyor extends Block implements Autotiler{
         int from = Pos.invalid;
         float cooldown;
 
-        byte dump;
-
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
 
             stream.writeInt(from);
-            stream.writeByte(dump);
             stream.writeFloat(cooldown);
         }
 
@@ -248,7 +246,6 @@ public class CraterConveyor extends Block implements Autotiler{
             super.read(stream, revision);
 
             from = stream.readInt();
-            dump = stream.readByte();
             cooldown = stream.readFloat();
         }
     }
@@ -294,17 +291,5 @@ public class CraterConveyor extends Block implements Autotiler{
             ||  (entity.items.total() > 0 && !entity.items.has(item))     // incompatible items
             ||  (entity.items.total() >= getMaximumAccepted(tile, item))  // filled to capacity
             ||  (tile.front() == source));                                // fed from the front
-    }
-
-    @Override
-    protected int retrieveDump(Tile tile){
-        return tile.<CraterConveyorEntity>ent().dump;
-    }
-
-    @Override
-    protected void incrementDump(Tile tile, int prox){
-        CraterConveyorEntity entity = tile.ent();
-
-        entity.dump = (byte)((entity.dump + 1) % prox);
     }
 }

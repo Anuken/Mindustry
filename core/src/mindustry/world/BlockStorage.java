@@ -29,6 +29,7 @@ public abstract class BlockStorage extends UnlockableContent{
     public int itemCapacity = 10;
     public float liquidCapacity = 10f;
     public float liquidPressure = 1f;
+    public int dumpIncrement = 1;
 
     public final BlockStats stats = new BlockStats();
     public final BlockBars bars = new BlockBars();
@@ -109,7 +110,7 @@ public abstract class BlockStorage extends UnlockableContent{
 
     public void tryDumpLiquid(Tile tile, Liquid liquid){
         Array<Tile> proximity = tile.entity.proximity();
-        int dump = retrieveDump(tile);
+        int dump = Mathf.floor(tile.rotation() * dumpIncrement);
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(tile, proximity.size);
@@ -197,7 +198,7 @@ public abstract class BlockStorage extends UnlockableContent{
      */
     public void offloadNear(Tile tile, Item item){
         Array<Tile> proximity = tile.entity.proximity();
-        int dump = retrieveDump(tile);
+        int dump = Mathf.floor(tile.rotation() * dumpIncrement);
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(tile, proximity.size);
@@ -227,7 +228,7 @@ public abstract class BlockStorage extends UnlockableContent{
             return false;
 
         Array<Tile> proximity = entity.proximity();
-        int dump = retrieveDump(tile);
+        int dump = Mathf.floor(tile.rotation() * dumpIncrement);
 
         if(proximity.size == 0) return false;
 
@@ -263,12 +264,8 @@ public abstract class BlockStorage extends UnlockableContent{
         return false;
     }
 
-    protected int retrieveDump(Tile tile){
-        return tile.rotation();
-    }
-
     protected void incrementDump(Tile tile, int prox){
-        tile.rotation((byte)((tile.rotation() + 1) % prox));
+        tile.rotation((byte)((tile.rotation() + dumpIncrement) % (prox * dumpIncrement)));
     }
 
     /** Used for dumping items. */
