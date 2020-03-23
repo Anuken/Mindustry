@@ -58,7 +58,7 @@ public class SpecialDelivery implements ApplicationListener{
     }
 
     protected boolean afford(Team team, Block block){
-        return team.core().items.has(block.requirements, state.rules.buildCostMultiplier * 100);
+        return team.core().items.has(block.requirements, state.rules.buildCostMultiplier * 11);
     }
 
     protected void charge(Team team, Block block){
