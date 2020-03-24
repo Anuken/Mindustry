@@ -37,7 +37,7 @@ public class LiquidTurret extends Turret{
         consumes.add(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), 1f){
             @Override
             public boolean valid(Tilec entity){
-                return !((TurretEntity)entity).ammo.isEmpty();
+                return entity.liquids().total() > 0.001f;
             }
 
             @Override

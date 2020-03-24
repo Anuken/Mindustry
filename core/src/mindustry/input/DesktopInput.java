@@ -463,6 +463,10 @@ public class DesktopInput extends InputHandler{
             mode = none;
         }
 
+        if(Core.input.keyTap(Binding.toggle_block_status)){
+            Core.settings.putSave("blockstatus", !Core.settings.getBool("blockstatus"));
+        }
+
         if(Core.input.keyTap(Binding.toggle_power_lines)){
             if(Core.settings.getInt("lasersopacity") == 0){
                 Core.settings.put("lasersopacity", Core.settings.getInt("preferredlaseropacity", 100));

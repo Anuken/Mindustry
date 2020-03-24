@@ -33,8 +33,8 @@ public class BlockRenderer implements Disposable{
     private FrameBuffer shadows = new FrameBuffer(2, 2);
     private FrameBuffer fog = new FrameBuffer(2, 2);
     private Array<Tilec> outArray2 = new Array<>();
-    private Array<Tile> outArray = new Array<>();
     private Array<Tile> shadowEvents = new Array<>();
+    private boolean displayStatus = false;
 
     public BlockRenderer(){
 
@@ -177,6 +177,7 @@ public class BlockRenderer implements Disposable{
 
     /** Process all blocks to draw. */
     public void processBlocks(){
+        displayStatus = Core.settings.getBool("blockstatus");
         iterateidx = 0;
 
         int avgx = (int)(camera.position.x / tilesize);
@@ -257,6 +258,7 @@ public class BlockRenderer implements Disposable{
             }
 
             Block block = request.tile.block();
+            boolean isEnd = (request.layer == Layer.block && block.layer == null) || request.layer == block.layer;
 
             if(request.layer == Layer.block){
                 block.drawBase(request.tile);
@@ -273,6 +275,10 @@ public class BlockRenderer implements Disposable{
                 block.drawLayer(request.tile);
             }else if(request.layer == block.layer2){
                 block.drawLayer2(request.tile);
+            }
+
+            if(isEnd && request.tile.entity != null && displayStatus && block.consumes.any()){
+                request.tile.entity.drawStatus();
             }
         }
     }

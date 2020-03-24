@@ -16,6 +16,10 @@ public class Consumers{
     public final Bits itemFilters = new Bits(Vars.content.items().size);
     public final Bits liquidfilters = new Bits(Vars.content.liquids().size);
 
+    public boolean any(){
+        return results != null && results.length > 0;
+    }
+
     public void init(){
         results = Structs.filter(Consume.class, map, m -> m != null);
         optionalResults = Structs.filter(Consume.class, map, m -> m != null && m.isOptional());

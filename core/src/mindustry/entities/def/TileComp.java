@@ -324,7 +324,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     }
 
     public void dumpLiquid(Liquid liquid){
-        Array<Tilec> proximity = proximity();
         int dump = rotation();
 
         for(int i = 0; i < proximity.size; i++){
@@ -336,7 +335,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
                 float ofract = other.liquids().get(liquid) / other.block().liquidCapacity;
                 float fract = liquids().get(liquid) / block.liquidCapacity;
 
-                if(ofract < fract) moveLiquid(other, (fract - ofract) * block.liquidCapacity / 2f, liquid);
+                if(ofract < fract) transferLiquid(other, (fract - ofract) * block.liquidCapacity / 2f, liquid);
             }
         }
 
@@ -346,16 +345,14 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         return true;
     }
 
-    //TODO why does this exist?
-    /*
-    public void tryMoveLiquid(Tilec next, float amount, Liquid liquid){
+    public void transferLiquid(Tilec next, float amount, Liquid liquid){
         float flow = Math.min(next.block().liquidCapacity - next.liquids().get(liquid) - 0.001f, amount);
 
-        if(next.acceptLiquid(liquid, flow)){
-            next.handleLiquid(liquid, flow);
+        if(next.acceptLiquid(this, liquid, flow)){
+            next.handleLiquid(this, liquid, flow);
             liquids().remove(liquid, flow);
         }
-    }*/
+    }
 
     public float moveLiquid(Tilec next, boolean leak, Liquid liquid){
         return moveLiquid(next, leak ? 1.5f : 100, liquid);
@@ -560,6 +557,19 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     /** @return whether this block should play its idle sound.*/
     public boolean shouldIdleSound(){
         return shouldConsume();
+    }
+
+    public void drawStatus(){
+        if(block.consumes.any()){
+            float brcx = tile.drawx() + (block.size * tilesize / 2f) - (tilesize / 2f);
+            float brcy = tile.drawy() - (block.size * tilesize / 2f) + (tilesize / 2f);
+
+            Draw.color(Pal.gray);
+            Fill.square(brcx, brcy, 2.5f, 45);
+            Draw.color(cons.status().color);
+            Fill.square(brcx, brcy, 1.5f, 45);
+            Draw.color();
+        }
     }
 
     public void drawLayer(){

@@ -254,7 +254,6 @@ public abstract class Turret extends Block{
 
             if(alternate){
                 float i = (shotCounter % shots) - shots/2f + (((shots+1)%2) / 2f);
-                Log.info(i);
 
                 tr.trns(rotation - 90, spread * i + Mathf.range(xRand), size * tilesize / 2);
                 bullet(type, rotation + Mathf.range(inaccuracy));

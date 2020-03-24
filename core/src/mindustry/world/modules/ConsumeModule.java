@@ -2,7 +2,8 @@ package mindustry.world.modules;
 
 import arc.util.io.*;
 import mindustry.gen.*;
-import mindustry.world.consumers.Consume;
+import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
 
 public class ConsumeModule extends BlockModule{
     private boolean valid, optionalValid;
@@ -10,6 +11,18 @@ public class ConsumeModule extends BlockModule{
 
     public ConsumeModule(Tilec entity){
         this.entity = entity;
+    }
+
+    public BlockStatus status(){
+        if(!entity.shouldConsume()){
+            return BlockStatus.noOutput;
+        }
+
+        if(!valid || !entity.productionValid()){
+            return BlockStatus.noInput;
+        }
+
+        return BlockStatus.active;
     }
 
     public void update(){
