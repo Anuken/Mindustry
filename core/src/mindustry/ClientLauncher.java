@@ -50,7 +50,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
 
         tree = new FileTree();
-
         assets.setLoader(Sound.class, new SoundLoader(tree));
         assets.setLoader(Music.class, new MusicLoader(tree));
 
