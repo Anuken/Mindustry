@@ -113,6 +113,13 @@ public class Junction extends Block{
         entity.buffer.accept(relative, item);
 
         if(entity.timer.get(timerObsolete, 60 * 3)){
+
+            if(tile.getNearbyLink(Compass.up) == null
+            || tile.getNearbyLink(Compass.down) == null
+            || tile.getNearbyLink(Compass.left) == null
+            || tile.getNearbyLink(Compass.right) == null
+            ) return;
+
             boolean y = tile.getNearbyLink(Compass.up).block == Blocks.air && tile.getNearbyLink(Compass.down).block == Blocks.air;
             boolean x = tile.getNearbyLink(Compass.left).block == Blocks.air && tile.getNearbyLink(Compass.right).block == Blocks.air;
 
