@@ -48,6 +48,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     protected Team team = Team.sharded;
     protected float drownTime, hitTime;
 
+    private static final Array<Tile> deepWater = new Array<>();
+
     @Override
     public boolean collidesGrid(int x, int y){
         return !isFlying();
@@ -318,6 +320,27 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 damage(health + 1);
                 if(this == player){
                     Events.fire(Trigger.drown);
+                }
+
+                if(this instanceof Player){
+                    deepWater.clear();
+                    for(int x = 0; x < world.width(); x++){
+                        for(int y = 0; y < world.height(); y++){
+                            Tile t = world.tile(x, y);
+                            if(t.floor() == Blocks.deepwater.asFloor()) deepWater.add(t);
+                        }
+                    }
+
+                    while(item.amount-- > 0){
+                        Tile deep = Geometry.findClosest(x, y, deepWater);
+                        deepWater.remove(deep);
+                        deep.setFloor(Blocks.sandWater.asFloor());
+                    }
+
+                    kill();
+
+                    Call.onWorldDataBegin(((Player)this).con);
+                    netServer.sendWorldData(((Player)this));
                 }
             }
 
