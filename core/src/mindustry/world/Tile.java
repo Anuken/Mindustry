@@ -537,4 +537,12 @@ public class Tile implements Position, TargetTrait{
     public static void setTile(Tile tile, Block block, Team team, int rotation){
         tile.set(block, team, rotation);
     }
+
+    public boolean border(){
+        return border(3);
+    }
+
+    private boolean border(int distance){
+        return (x < distance || y < distance) || (x + distance >= world.width() || y + distance >= world.height());
+    }
 }
