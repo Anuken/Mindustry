@@ -183,14 +183,14 @@ public class LightRenderer{
         }
 
         Draw.color();
-        buffer.beginDraw(Color.clear);
+        buffer.begin(Color.clear);
         Gl.blendEquationSeparate(Gl.funcAdd, Gl.max);
 
         for(Runnable run : lights){
             run.run();
         }
         Draw.reset();
-        buffer.endDraw();
+        buffer.end();
         Gl.blendEquationSeparate(Gl.funcAdd, Gl.funcAdd);
 
         Draw.color();
