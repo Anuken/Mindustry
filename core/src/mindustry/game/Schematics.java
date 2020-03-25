@@ -191,7 +191,7 @@ public class Schematics implements Loadable{
             Tmp.m2.set(Draw.trans());
             FrameBuffer buffer = new FrameBuffer((schematic.width + padding) * resolution, (schematic.height + padding) * resolution);
 
-            shadowBuffer.beginDraw(Color.clear);
+            shadowBuffer.begin(Color.clear);
 
             Draw.trans().idt();
             Draw.proj().setOrtho(0, 0, shadowBuffer.getWidth(), shadowBuffer.getHeight());
@@ -210,9 +210,9 @@ public class Schematics implements Loadable{
                 }
             });
 
-            shadowBuffer.endDraw();
+            shadowBuffer.end();
 
-            buffer.beginDraw(Color.clear);
+            buffer.begin(Color.clear);
 
             Draw.proj().setOrtho(0, buffer.getHeight(), buffer.getWidth(), -buffer.getHeight());
 
@@ -239,7 +239,7 @@ public class Schematics implements Loadable{
             Draw.flush();
             Draw.trans().idt();
 
-            buffer.endDraw();
+            buffer.end();
 
             Draw.proj(Tmp.m1);
             Draw.trans(Tmp.m2);

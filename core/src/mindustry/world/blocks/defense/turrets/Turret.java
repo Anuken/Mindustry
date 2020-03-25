@@ -119,10 +119,7 @@ public abstract class Turret extends Block{
     public class TurretEntity extends TileEntity{
         public Array<AmmoEntry> ammo = new Array<>();
         public int totalAmmo;
-        public float reload;
-        public float rotation = 90;
-        public float recoil = 0f;
-        public float heat;
+        public float reload, rotation = 90, recoil, heat;
         public int shotCounter;
         public Posc target;
 
