@@ -914,7 +914,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         super.writeSave(buffer, !isLocal);
         TypeIO.writeStringData(buffer, netServer.statusAssigner.assign(this) + name);
         buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2) | (Pack.byteValue(isTyping) << 3)| (Pack.byteValue(isBuilding) << 4));
-        buffer.writeInt(Color.rgba8888(color));
+        buffer.writeInt(color.rgba());
         buffer.writeByte(mech.id);
         buffer.writeInt(mining == null ? noSpawner : mining.pos());
         buffer.writeInt(spawner == null || !spawner.hasUnit(this) ? noSpawner : spawner.getTile().pos());
