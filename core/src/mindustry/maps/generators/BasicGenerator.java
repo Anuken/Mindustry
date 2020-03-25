@@ -319,7 +319,7 @@ public abstract class BasicGenerator implements WorldGenerator{
         Tile end = tiles.getn(endX, endY);
         GridBits closed = new GridBits(width, height);
         IntFloatMap costs = new IntFloatMap();
-        PriorityQueue<Tile> queue = new PriorityQueue<>(tiles.width * tiles.height /4, (a, b) -> Float.compare(costs.get(a.pos(), 0f) + dh.cost(a.x, a.y, end.x, end.y), costs.get(b.pos(), 0f) + dh.cost(b.x, b.y, end.x, end.y)));
+        PriorityQueue<Tile> queue = new PriorityQueue<>(tiles.width * tiles.height / 4, Structs.comparingFloat(a -> costs.get(a.pos(), 0f) + dh.cost(a.x, a.y, end.x, end.y)));
         queue.add(start);
         boolean found = false;
         while(!queue.isEmpty()){
@@ -332,12 +332,13 @@ public abstract class BasicGenerator implements WorldGenerator{
             closed.set(next.x, next.y);
             for(Point2 point : Geometry.d4){
                 int newx = next.x + point.x, newy = next.y + point.y;
-                if(Structs.inBounds(newx, newy, width, height) && world.getDarkness(newx, newy) == 0){
+                if(Structs.inBounds(newx, newy, width, height) && world.getDarkness(newx, newy) <= 1f){
                     Tile child = tiles.getn(newx, newy);
+                    float newCost = th.cost(child) + baseCost;
                     if(!closed.get(child.x, child.y)){
                         closed.set(child.x, child.y);
                         child.rotation(child.relativeTo(next.x, next.y));
-                        costs.put(child.pos(), th.cost(child) + baseCost);
+                        costs.put(child.pos(), newCost);
                         queue.add(child);
                     }
                 }

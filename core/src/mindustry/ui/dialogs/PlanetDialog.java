@@ -216,6 +216,10 @@ public class PlanetDialog extends FloatingDialog{
             if(sec.locked()){
                 draw(sec, shadowColor, -0.001f);
             }
+
+            if(sec.hostility >= 0f){
+                //drawSelection(sec, Color.scarlet, 0.1f * sec.hostility);
+            }
         }
 
         if(hovered != null){
@@ -234,7 +238,6 @@ public class PlanetDialog extends FloatingDialog{
         Mesh mesh = outline(planet.grid.size);
         Shader shader = Shaders.planetGrid;
         Vec3 tile = planet.intersect(cam.getMouseRay(), outlineRad);
-        //Log.info(tile);
         Shaders.planetGrid.mouse.lerp(tile == null ? Vec3.Zero : tile.sub(planet.position).rotate(Vec3.Y, planet.getRotation()), 0.2f);
 
         shader.bind();
@@ -338,7 +341,10 @@ public class PlanetDialog extends FloatingDialog{
     }
 
     private void drawSelection(Sector sector){
-        float length = 0.1f;
+        drawSelection(sector, Pal.accent, 0.04f);
+    }
+
+    private void drawSelection(Sector sector, Color color, float length){
         float arad = outlineRad + 0.0001f;
 
         for(int i = 0; i < sector.tile.corners.length; i++){
@@ -349,11 +355,11 @@ public class PlanetDialog extends FloatingDialog{
             curr.v.scl(arad);
             sector.tile.v.scl(arad);
 
-            Tmp.v31.set(curr.v).sub(sector.tile.v).setLength(length).add(sector.tile.v);
-            Tmp.v32.set(next.v).sub(sector.tile.v).setLength(length).add(sector.tile.v);
+            Tmp.v31.set(curr.v).sub(sector.tile.v).setLength(curr.v.dst(sector.tile.v) - length).add(sector.tile.v);
+            Tmp.v32.set(next.v).sub(sector.tile.v).setLength(next.v.dst(sector.tile.v) - length).add(sector.tile.v);
 
-            batch.tri(curr.v, next.v, Tmp.v31, Pal.accent);
-            batch.tri(Tmp.v31, next.v, Tmp.v32, Pal.accent);
+            batch.tri(curr.v, next.v, Tmp.v31, color);
+            batch.tri(Tmp.v31, next.v, Tmp.v32, color);
 
             sector.tile.v.scl(1f / arad);
             next.v.scl(1f / arad);

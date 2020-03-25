@@ -41,7 +41,7 @@ public class Sector{
 
     public void generate(){
         //TODO use simplex and a seed
-        hostility = Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 4f, 1f);
+        hostility = Math.max(Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 1f, 0.5f), 0);
     }
 
     public boolean locked(){
