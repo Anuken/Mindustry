@@ -28,6 +28,9 @@ public class NuclearReactor extends PowerGenerator{
 
     public final Vec2 tr = new Vec2();
 
+    private static Rect rect = new Rect();
+    private static Rect hitrect = new Rect();
+
     public Color lightColor = Color.valueOf("7f19ea");
     public Color coolColor = new Color(1, 1, 1, 0f);
     public Color hotColor = Color.valueOf("ff9575a3");
@@ -137,12 +140,19 @@ public class NuclearReactor extends PowerGenerator{
 
         if(!net.server()) return;
 
-        Geometry.circle(tile.x, tile.y, explosionRadius / 2, (x, y) -> {
-            Tile tmp = world.tile(x, y);
-            if(tmp != null && tmp.block() instanceof StaticWall) Timer.schedule(() -> {
-                if(!tile.border()) tmp.deconstructNet();
-            }, tile.dst(tmp) / tilesize * 0.1f);
-        });
+        rect.setSize(explosionRadius * tilesize / 2).setCenter(tile.drawx(), tile.drawy());
+        for(int x = 0; x < world.width(); x++){
+            for(int y = 0; y < world.height(); y++){
+                Tile t = world.tile(x, y);
+                if(t != null && t.block() instanceof StaticWall){
+                    if(t.getHitbox(hitrect).overlaps(rect)){
+                        Timer.schedule(() -> {
+                            if(!tile.border()) t.deconstructNet();
+                        }, tile.dst(t) / tilesize * 0.1f);
+                    }
+                }
+            }
+        }
 
         for(int i = 0; i < 20; i++){
             Time.run(Mathf.random(50), () -> {
