@@ -46,6 +46,8 @@ public class Build{
     /** Places a BuildBlock at this location. */
     @Remote(called = Loc.server)
     public static void beginPlace(Team team, int x, int y, Block result, int rotation){
+        if(!result.rotate) rotation = 0;
+
         if(!validPlace(team, x, y, result, rotation)){
             return;
         }
