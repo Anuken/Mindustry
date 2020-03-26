@@ -172,7 +172,7 @@ public class CoreProtect extends Plugin implements ApplicationListener{
 
         // item
         if(pac.type == ActionType.configure && (pac.tile.block instanceof Sorter || pac.tile.block instanceof Unloader || pac.tile.block instanceof ItemSource)){
-            edit.icon = (char)Fonts.getUnicode(content.item(pac.config).name);
+            edit.icon = pac.config == -1 ? Iconc.cancel : (char)Fonts.getUnicode(content.item(pac.config).name);
         }
 
         // liquid
