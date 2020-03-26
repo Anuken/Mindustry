@@ -33,6 +33,8 @@ public class UnitFactory extends Block{
     public TextureRegion topRegion;
     public int maxSpawn = 4;
     public int[] capacities;
+    public Effect spawnEffect = Fx.producesmoke;
+    public Sound spawnSound = Sounds.none;
 
     public UnitFactory(String name){
         super(name);
@@ -55,7 +57,8 @@ public class UnitFactory extends Block{
         entity.spawned = spawns;
 
         Effects.shake(2f, 3f, entity);
-        Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
+        Effects.effect(factory.spawnEffect, tile.drawx(), tile.drawy());
+        factory.spawnSound.at(tile);
 
         if(!net.client()){
             BaseUnit unit = factory.unitType.create(tile.getTeam());
@@ -189,9 +192,9 @@ public class UnitFactory extends Block{
     }
 
     public static class UnitFactoryEntity extends TileEntity{
-        float buildTime;
-        float time;
-        float speedScl;
+        public float buildTime;
+        public float time;
+        public float speedScl;
         int spawned;
 
         @Override
