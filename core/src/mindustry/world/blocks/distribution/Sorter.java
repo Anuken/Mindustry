@@ -69,11 +69,15 @@ public class Sorter extends Block{
         public void draw(){
             super.draw();
 
-            if(sortItem == null) return;
+            if(sortItem == null){
+                Draw.rect("cross", x, y);
+            }else{
+                Draw.color(sortItem.color);
+                Draw.rect("center", x, y);
+                Draw.color();
+            }
 
-            Draw.color(sortItem.color);
-            Draw.rect("center", x, y);
-            Draw.color();
+
         }
 
         @Override
