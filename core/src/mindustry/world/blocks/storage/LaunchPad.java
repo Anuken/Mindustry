@@ -62,7 +62,7 @@ public class LaunchPad extends StorageBlock{
 
         @Override
         public boolean acceptItem(Tilec source, Item item){
-            return item.type == ItemType.material && items.total() < itemCapacity;
+            return item.type == ItemType.material && super.acceptItem(source, item);
         }
 
         @Override

@@ -14,6 +14,10 @@ public class FlyingAI extends AIController{
     public void update(){
         unit.rotation(unit.vel().angle());
 
+        if(unit.isFlying()){
+            unit.wobble();
+        }
+
         if(Units.invalidateTarget(target, unit.team(), unit.x(), unit.y())){
             target = null;
         }
