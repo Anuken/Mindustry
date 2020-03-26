@@ -333,8 +333,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
                     while(item.amount-- > 0){
                         Tile deep = Geometry.findClosest(x, y, deepWater);
-                        deepWater.remove(deep);
-                        deep.setFloor(Blocks.sandWater.asFloor());
+                        if(deep != null){
+                            deepWater.remove(deep);
+                            deep.setFloor(Blocks.sandWater.asFloor());
+                        }
                     }
 
                     kill();
