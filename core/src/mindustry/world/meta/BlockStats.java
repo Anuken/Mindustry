@@ -39,8 +39,8 @@ public class BlockStats{
 
     public void add(BlockStat stat, Attribute attr){
         for(Block block : Vars.content.blocks()){
-            if(!block.isFloor() || block.asFloor().attributes.get(attr) <= 0) continue;
-            add(stat, new FloorValue(block.asFloor()));
+            if(!block.isFloor() || block.asFloor().attributes.get(attr) == 0) continue;
+            add(stat, new FloorEfficiencyValue(block.asFloor(), block.asFloor().attributes.get(attr)));
         }
     }
 
