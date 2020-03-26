@@ -360,6 +360,8 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(!mobile){
             Core.settings.put("swapdiagonal", false);
         }
+
+        graphics.checkPref("flow", false);
     }
 
     private void back(){

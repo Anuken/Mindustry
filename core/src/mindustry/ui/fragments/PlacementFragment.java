@@ -454,6 +454,9 @@ public class PlacementFragment extends Fragment{
         //setup hovering tile
         if(!Core.scene.hasMouse() && topTable.hit(v.x, v.y, false) == null){
             hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            if(hoverTile != null && hoverTile.entity != null){
+                hoverTile.entity.updateFlow(true);
+            }
         }else{
             hoverTile = null;
         }

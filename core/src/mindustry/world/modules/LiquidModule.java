@@ -1,21 +1,45 @@
 package mindustry.world.modules;
 
 import arc.math.*;
+import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
-import mindustry.type.Liquid;
+import mindustry.type.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 import static mindustry.Vars.content;
 
 public class LiquidModule extends BlockModule{
+    private static final int windowSize = 60, updateInterval = 60;
+    private static Interval flowTimer = new Interval(1);
+
     private float[] liquids = new float[content.liquids().size];
     private float total;
     private Liquid current = content.liquid(0);
     private float smoothLiquid;
 
-    public void update(){
+    private @Nullable WindowedMean flow;
+    private float lastAdded, currentFlowRate;
+
+    public void update(boolean showFlow){
         smoothLiquid = Mathf.lerpDelta(smoothLiquid, currentAmount(), 0.1f);
+        if(showFlow){
+            if(flow == null) flow = new WindowedMean(windowSize);
+            flow.addValue(lastAdded);
+            lastAdded = 0;
+            if(currentFlowRate < 0 || flowTimer.get(updateInterval)){
+                currentFlowRate = flow.hasEnoughData() ? flow.getMean() : -1f;
+            }
+        }else{
+            currentFlowRate = -1f;
+            flow = null;
+        }
+    }
+
+    /** @return current liquid's flow rate in u/s; any value < 0 means 'not ready'. */
+    public float getFlowRate(){
+        return currentFlowRate;
     }
 
     public float smoothAmount(){
@@ -58,6 +82,10 @@ public class LiquidModule extends BlockModule{
         liquids[liquid.id] += amount;
         total += amount;
         current = liquid;
+
+        if(flow != null){
+            lastAdded += Math.max(amount, 0);
+        }
     }
 
     public void remove(Liquid liquid, float amount){

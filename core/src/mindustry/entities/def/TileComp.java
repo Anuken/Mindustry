@@ -27,6 +27,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
@@ -47,6 +48,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
     transient Tile tile;
     transient Block block;
     transient Array<Tilec> proximity = new Array<>(8);
+    transient boolean updateFlow;
 
     PowerModule power;
     ItemModule items;
@@ -764,9 +766,49 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
             displayBars(bars);
         }).growX();
         table.row();
-        table.table(ctable -> {
-            displayConsumption(ctable);
-        }).growX();
+        table.table(this::displayConsumption).growX();
+
+        boolean displayFlow = (block.category == Category.distribution || block.category == Category.liquid) && Core.settings.getBool("flow");
+
+        if(displayFlow){
+            String ps = " " + StatUnit.perSecond.localized();
+
+            if(items != null){
+                table.row();
+                table.table(l -> {
+                    Bits presence = new Bits(content.items().size);
+                    l.left();
+
+                    Runnable rebuild = () -> {
+                        l.clearChildren();
+                        for(Item item : content.items()){
+                            if(items.flownBits() != null && items.flownBits().get(item.id)){
+                                l.addImage(item.icon(Cicon.small)).padRight(3f);
+                                l.label(() -> items.getFlowRate(item) < 0 ? "..." : Strings.fixed(items.getFlowRate(item), 1) + ps).color(Color.lightGray);
+                                l.row();
+                            }
+                        }
+                    };
+
+                    rebuild.run();
+                    l.update(() -> {
+                        if(items.flownBits() != null && !presence.equals(items.flownBits())){
+                            presence.set(items.flownBits());
+                            rebuild.run();
+                        }
+                    });
+                });
+            }
+
+            if(liquids != null){
+                table.row();
+                table.table(l -> {
+                    l.left();
+                    l.addImage(() -> liquids.current().icon(Cicon.small)).padRight(3f);
+                    l.label(() -> liquids.getFlowRate() < 0 ? "..." : Strings.fixed(liquids.getFlowRate(), 2) + ps).color(Color.lightGray);
+                });
+            }
+        }
 
         table.marginBottom(-5);
     }
@@ -934,8 +976,12 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
 
         updateTile();
 
+        if(items != null){
+            items.update(updateFlow);
+        }
+
         if(liquids != null){
-            liquids.update();
+            liquids.update(updateFlow);
         }
 
         if(cons != null){
@@ -945,6 +991,8 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         if(power != null){
             power.graph.update();
         }
+
+        updateFlow = false;
     }
 
     //endregion
