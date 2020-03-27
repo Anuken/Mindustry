@@ -1,16 +1,16 @@
 package mindustry.desktop.steam;
 
 import arc.*;
+import arc.func.*;
+import arc.struct.*;
+import arc.util.*;
+import arc.util.pooling.*;
 import com.codedisaster.steamworks.*;
 import com.codedisaster.steamworks.SteamFriends.*;
 import com.codedisaster.steamworks.SteamMatchmaking.*;
 import com.codedisaster.steamworks.SteamNetworking.*;
-import arc.struct.*;
-import arc.func.*;
-import arc.util.*;
-import arc.util.pooling.*;
 import mindustry.core.GameState.*;
-import mindustry.core.Version;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.net.ArcNetProvider.*;
@@ -240,12 +240,9 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             return;
         }
 
-        if(net.active()){
-            net.disconnect();
-            net.closeServer();
-            logic.reset();
-            state.set(State.menu);
-        }
+        logic.reset();
+        net.reset();
+        state.set(State.menu);
 
         currentLobby = steamIDLobby;
         currentServer = smat.getLobbyOwner(steamIDLobby);

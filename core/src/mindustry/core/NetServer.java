@@ -48,6 +48,8 @@ public class NetServer implements ApplicationListener{
         if(state.rules.pvp){
             //find team with minimum amount of players and auto-assign player to that.
             TeamData re = state.teams.getActive().min(data -> {
+                if((state.rules.waveTeam == data.team && state.rules.waves) || !data.team.active()) return Integer.MAX_VALUE;
+
                 int count = 0;
                 for(Player other : players){
                     if(other.getTeam() == data.team && other != player){

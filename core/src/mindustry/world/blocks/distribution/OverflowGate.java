@@ -54,6 +54,11 @@ public class OverflowGate extends Block{
         }
 
         if(entity.lastItem != null){
+            if(entity.lastInput == null){
+                entity.lastItem = null;
+                return;
+            }
+
             entity.time += 1f / speed * Time.delta();
             Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);
 

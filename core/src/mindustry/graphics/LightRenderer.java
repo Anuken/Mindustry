@@ -24,6 +24,10 @@ public class LightRenderer{
         lights.add(run);
     }
 
+    public void add(Position pos, float radius, Color color, float opacity){
+        add(pos.getX(), pos.getY(), radius, color, opacity);
+    }
+
     public void add(float x, float y, float radius, Color color, float opacity){
         if(!enabled()) return;
 
@@ -179,14 +183,15 @@ public class LightRenderer{
         }
 
         Draw.color();
-        buffer.beginDraw(Color.clear);
-        Draw.blend(Blending.normal);
+        buffer.begin(Color.clear);
+        Gl.blendEquationSeparate(Gl.funcAdd, Gl.max);
+
         for(Runnable run : lights){
             run.run();
         }
         Draw.reset();
-        Draw.blend();
-        buffer.endDraw();
+        buffer.end();
+        Gl.blendEquationSeparate(Gl.funcAdd, Gl.funcAdd);
 
         Draw.color();
         Shaders.light.ambient.set(state.rules.ambientLight);

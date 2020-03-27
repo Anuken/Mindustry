@@ -104,7 +104,7 @@ PackrConfig.Platform.values().each{ platform ->
                     classpath = ["desktop/build/packr/desktop.jar"]
                     removePlatformLibs = ["desktop/build/packr/desktop.jar"]
 
-                    vmArgs = ["Djava.net.preferIPv4Stack=true"]
+                    vmArgs = []
                     minimizeJre = "desktop/packr_minimize.json"
                     jdk = JDK_DIR + "jdk-${platform.toString().toLowerCase()}.zip"
 

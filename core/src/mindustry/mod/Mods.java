@@ -118,7 +118,7 @@ public class Mods implements Loadable{
     private void packSprites(Array<Fi> sprites, LoadedMod mod, boolean prefix){
         for(Fi file : sprites){
             try(InputStream stream = file.read()){
-                byte[] bytes = Streams.copyStreamToByteArray(stream, Math.max((int)file.length(), 512));
+                byte[] bytes = Streams.copyBytes(stream, Math.max((int)file.length(), 512));
                 Pixmap pixmap = new Pixmap(bytes, 0, bytes.length);
                 packer.add(getPage(file), (prefix ? mod.name + "-" : "") + file.nameWithoutExtension(), new PixmapRegion(pixmap));
                 pixmap.dispose();

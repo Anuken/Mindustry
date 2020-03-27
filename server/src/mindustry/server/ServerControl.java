@@ -659,6 +659,17 @@ public class ServerControl implements ApplicationListener{
                 err("That IP/ID is not banned!");
             }
         });
+        
+        handler.register("pardon", "<ID>", "Pardons a votekicked player by ID and allows them to join again.", arg -> {
+            PlayerInfo info = netServer.admins.getInfoOptional(arg[0]);
+            
+            if(info != null){
+                info.lastKicked = 0;
+                info("Pardoned player: {0}", info.lastName);
+            }else{
+                err("That ID can't be found.");
+            }
+        });
 
         handler.register("admin", "<add/remove> <username/ID...>", "Make an online user admin", arg -> {
             if(!state.is(State.playing)){
