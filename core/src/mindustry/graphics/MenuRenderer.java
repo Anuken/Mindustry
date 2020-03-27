@@ -169,7 +169,7 @@ public class MenuRenderer implements Disposable{
 
         //draw shadows
         Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
-        shadows.beginDraw(Color.clear);
+        shadows.begin(Color.clear);
         Draw.color(Color.black);
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
@@ -179,7 +179,7 @@ public class MenuRenderer implements Disposable{
             }
         }
         Draw.color();
-        shadows.endDraw();
+        shadows.end();
 
         SpriteBatch prev = Core.batch;
 

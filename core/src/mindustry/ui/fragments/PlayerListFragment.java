@@ -21,6 +21,7 @@ public class PlayerListFragment extends Fragment{
     private boolean visible = false;
     private Table content = new Table().marginRight(13f).marginLeft(13f);
     private Interval timer = new Interval();
+    private TextField sField;
 
     @Override
     public void build(Group parent){
@@ -43,6 +44,12 @@ public class PlayerListFragment extends Fragment{
 
             cont.table(Tex.buttonTrans, pane -> {
                 pane.label(() -> Core.bundle.format(playerGroup.size() == 1 ? "players.single" : "players", playerGroup.size()));
+                pane.row();
+                sField = pane.addField(null, text -> {
+                    rebuild();
+                }).grow().pad(8).get();
+                sField.setMaxLength(maxNameLength);
+                sField.setMessageText(Core.bundle.format("players.search"));
                 pane.row();
                 pane.pane(content).grow().get().setScrollingDisabled(true, false);
                 pane.row();
@@ -71,6 +78,7 @@ public class PlayerListFragment extends Fragment{
             NetConnection connection = user.con;
 
             if(connection == null && net.server() && !user.isLocal) return;
+            if(sField.getText().length() > 0 && !user.name.toLowerCase().contains(sField.getText().toLowerCase()) && !Strings.stripColors(user.name.toLowerCase()).contains(sField.getText().toLowerCase())) return;
 
             Table button = new Table();
             button.left();
@@ -105,9 +113,9 @@ public class PlayerListFragment extends Fragment{
                     t.defaults().size(bs);
 
                     t.addImageButton(Icon.hammer, Styles.clearPartiali,
-                    () -> ui.showConfirm("$confirm", "$confirmban", () -> Call.onAdminRequest(user, AdminAction.ban)));
+                            () -> ui.showConfirm("$confirm", "$confirmban", () -> Call.onAdminRequest(user, AdminAction.ban)));
                     t.addImageButton(Icon.cancel, Styles.clearPartiali,
-                    () -> ui.showConfirm("$confirm", "$confirmkick", () -> Call.onAdminRequest(user, AdminAction.kick)));
+                            () -> ui.showConfirm("$confirm", "$confirmkick", () -> Call.onAdminRequest(user, AdminAction.kick)));
 
                     t.row();
 
@@ -122,10 +130,10 @@ public class PlayerListFragment extends Fragment{
                             ui.showConfirm("$confirm", "$confirmadmin", () -> netServer.admins.adminPlayer(id, user.usid));
                         }
                     })
-                    .update(b -> b.setChecked(user.isAdmin))
-                    .disabled(b -> net.client())
-                    .touchable(() -> net.client() ? Touchable.disabled : Touchable.enabled)
-                    .checked(user.isAdmin);
+                            .update(b -> b.setChecked(user.isAdmin))
+                            .disabled(b -> net.client())
+                            .touchable(() -> net.client() ? Touchable.disabled : Touchable.enabled)
+                            .checked(user.isAdmin);
 
                     t.addImageButton(Icon.zoom, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
 
@@ -134,7 +142,7 @@ public class PlayerListFragment extends Fragment{
                 button.add().growY();
 
                 button.addImageButton(Icon.hammer, Styles.clearPartiali,
-                () -> ui.showConfirm("$confirm", "$confirmvotekick", () -> Call.sendChatMessage("/votekick " + user.name))).size(h);
+                        () -> ui.showConfirm("$confirm", "$confirmvotekick", () -> Call.sendChatMessage("/votekick " + user.name))).size(h);
             }
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
@@ -143,6 +151,10 @@ public class PlayerListFragment extends Fragment{
             content.row();
         });
 
+        if(sField.getText().length() > 0 && !playerGroup.all().contains(user -> user.name.toLowerCase().contains(sField.getText().toLowerCase()))) {
+            content.add(Core.bundle.format("players.notfound")).padBottom(6).width(350f).maxHeight(h + 14);
+        }
+
         content.marginBottom(5);
     }
 
@@ -150,6 +162,9 @@ public class PlayerListFragment extends Fragment{
         visible = !visible;
         if(visible){
             rebuild();
+        }else{
+            Core.scene.setKeyboardFocus(null);
+            sField.clearText();
         }
     }
 
