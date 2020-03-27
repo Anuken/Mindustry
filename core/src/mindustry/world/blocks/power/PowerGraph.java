@@ -198,6 +198,8 @@ public class PowerGraph{
         lastPowerNeeded = powerNeeded;
         lastPowerProduced = powerProduced;
 
+        powerBalance.addValue((lastPowerProduced - lastPowerNeeded) / Time.delta());
+
         if(!(consumers.size == 0 && producers.size == 0 && batteries.size == 0)){
 
             if(!Mathf.equal(powerNeeded, powerProduced)){
@@ -212,8 +214,6 @@ public class PowerGraph{
 
             distributePower(powerNeeded, powerProduced);
         }
-
-        powerBalance.addValue((lastPowerProduced - lastPowerNeeded) / Time.delta());
 
         //overproducing: 10 / 20 = 0.5
         //underproducing: 20 / 10 = 2 -> clamp -> 1.0
