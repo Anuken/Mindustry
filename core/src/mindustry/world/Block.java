@@ -44,6 +44,7 @@ public class Block extends BlockStorage{
 
     /** whether this block has a tile entity that updates */
     public boolean update;
+    public boolean share;
     /** whether this block has health and can be destroyed */
     public boolean destructible;
     /** whether unloaders work on this block*/
@@ -164,6 +165,7 @@ public class Block extends BlockStorage{
 
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
+    protected final int timerShare = timers++;
     /** How often to try dumping items in ticks, e.g. 5 = 12 times/sec*/
     protected final int dumpTime = 5;
 
@@ -930,5 +932,21 @@ public class Block extends BlockStorage{
         if(upgrade == null || upgrade.get(tile) == null) return;
 
         tile.constructNet(upgrade.get(tile), tile.getTeam(), tile.rotation);
+    }
+
+    public void share(Tile tile){
+        if(!tile.entity.timer.get(timerShare, 20)) return;
+
+        tile.entity.items.forEach((item, amount) -> tile.entity.proximity().each(other -> {
+            if(other.block != tile.block) return;
+
+            if(tile.entity.items.has(item, other.entity.items.get(item) + 2)){
+                if(other.block.acceptItem(item, other, null)){
+                    tile.entity.items.remove(item, 1);
+                    netServer.titanic.add(tile);
+                    Call.transferItemTo(item, 1, tile.drawx(), tile.drawy(), other);
+                }
+            }
+        }));
     }
 }

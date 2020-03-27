@@ -326,6 +326,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         }
 
         block.update(tile);
+        if(block.share) block.share(tile);
 
         if(liquids != null){
             liquids.update();
