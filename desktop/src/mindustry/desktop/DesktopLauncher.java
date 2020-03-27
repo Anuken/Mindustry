@@ -180,16 +180,16 @@ public class DesktopLauncher extends ClientLauncher{
     static void handleCrash(Throwable e){
         Cons<Runnable> dialog = Runnable::run;
         boolean badGPU = false;
+        String finalMessage = Strings.getFinalMesage(e);
         String total = Strings.getCauses(e).toString();
 
-        if(total.contains("Couldn't create window") ||
-        total.contains("OpenGL 2.0 or higher") || total.toLowerCase().contains("pixel format") || total.contains("GLEW")){
+        if(total.contains("Couldn't create window") || total.contains("OpenGL 2.0 or higher") || total.toLowerCase().contains("pixel format") || total.contains("GLEW")){
 
             dialog.get(() -> message(
-                    e.getMessage().contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + e.getMessage() :
+                total.contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + finalMessage :
                             "Your graphics card does not support OpenGL 2.0 with the framebuffer_object extension!\n" +
                                     "Try to update your graphics drivers. If this doesn't work, your computer may not support Mindustry.\n\n" +
-                                    "Full message: " + Strings.getCauses(e).map(t -> t.getMessage() == null ? "" : t.getMessage()).toString("\n")));
+                                    "Full message: " + finalMessage));
             badGPU = true;
         }
 
