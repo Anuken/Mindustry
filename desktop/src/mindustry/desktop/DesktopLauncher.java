@@ -189,7 +189,7 @@ public class DesktopLauncher extends ClientLauncher{
                     e.getMessage().contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + e.getMessage() :
                             "Your graphics card does not support OpenGL 2.0 with the framebuffer_object extension!\n" +
                                     "Try to update your graphics drivers. If this doesn't work, your computer may not support Mindustry.\n\n" +
-                                    "Full message: " + e.getMessage()));
+                                    "Full message: " + Strings.getCauses(e).map(t -> t.getMessage() == null ? "" : t.getMessage()).toString("\n")));
             badGPU = true;
         }
 
