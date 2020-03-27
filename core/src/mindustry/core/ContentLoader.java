@@ -1,5 +1,6 @@
 package mindustry.core;
 
+import arc.files.*;
 import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -117,6 +118,7 @@ public class ContentLoader{
                     callable.get(content);
                 }catch(Throwable e){
                     if(content.minfo.mod != null){
+                        Log.err(e);
                         mods.handleContentError(content, e);
                     }else{
                         throw new RuntimeException(e);
@@ -138,7 +140,7 @@ public class ContentLoader{
                 if(color == 0) continue;
 
                 Block block = block(i);
-                Color.rgba8888ToColor(block.color, color);
+                block.color.set(color);
             }
         }
         pixmap.dispose();
@@ -182,6 +184,9 @@ public class ContentLoader{
         }
         if(currentMod != null){
             content.minfo.mod = currentMod;
+            if(content.minfo.sourceFile == null){
+                content.minfo.sourceFile = new Fi(content.name);
+            }
         }
         contentNameMap[content.getContentType().ordinal()].put(content.name, content);
     }

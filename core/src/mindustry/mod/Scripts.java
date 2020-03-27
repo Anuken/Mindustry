@@ -122,11 +122,13 @@ public class Scripts implements Disposable{
             if(matched.find()){
                 LoadedMod required = Vars.mods.locateMod(matched.group(1));
                 String script = matched.group(2);
-                if(required == null || root.equals(required.root.child("scripts"))){ // Mod not found, or already using a mod
+                if(required == null){ // Mod not found, treat it as a folder
                     Fi dir = root.child(matched.group(1));
                     if(!dir.exists()) return null; // Mod and folder not found
                     return loadSource(script, dir, validator);
                 }
+
+                currentMod = required;
                 return loadSource(script, required.root.child("scripts"), validator);
             }
 
