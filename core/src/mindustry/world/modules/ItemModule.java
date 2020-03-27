@@ -16,7 +16,6 @@ public class ItemModule extends BlockModule{
 
     protected int[] items = new int[content.items().size];
     protected int total;
-    // Make the take() loop persistent so it does not return the same item twice in a row unless there is nothing else to return.
     protected int takeRotation;
 
     private @Nullable WindowedMean[] flow;
