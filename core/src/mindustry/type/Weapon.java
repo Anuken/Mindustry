@@ -122,7 +122,7 @@ public class Weapon{
         Effects.effect(ammo.smokeEffect, x + Tmp.v1.x, y + Tmp.v1.y, rotation, shooter);
 
         //reset timer for remote players
-        shooter.getTimer().get(shooter.getShootTimer(left), (weapon.reload / shooter.reloadSpeedDivider()));
+        shooter.getTimer().get(shooter.getShootTimer(left), weapon.reload);
     }
 
     public void load(){
@@ -144,9 +144,9 @@ public class Weapon{
     }
 
     public void update(ShooterTrait shooter, float mountX, float mountY, float angle, boolean left){
-        if(shooter.getTimer().get(shooter.getShootTimer(left), (reload / shooter.reloadSpeedDivider()))){
+        if(shooter.getTimer().get(shooter.getShootTimer(left), reload)){
             if(alternate){
-                shooter.getTimer().reset(shooter.getShootTimer(!left), (reload / shooter.reloadSpeedDivider()) / 2f);
+                shooter.getTimer().reset(shooter.getShootTimer(!left), reload / 2f);
             }
 
             shoot(shooter, mountX - shooter.getX(), mountY - shooter.getY(), angle, left);
@@ -154,7 +154,7 @@ public class Weapon{
     }
 
     public float getRecoil(ShooterTrait player, boolean left){
-        return (1f - Mathf.clamp(player.getTimer().getTime(player.getShootTimer(left)) / (reload / player.reloadSpeedDivider()))) * recoil;
+        return (1f - Mathf.clamp(player.getTimer().getTime(player.getShootTimer(left)) / reload)) * recoil;
     }
 
     public void shoot(ShooterTrait p, float x, float y, float angle, boolean left){

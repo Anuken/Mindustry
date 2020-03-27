@@ -70,9 +70,4 @@ public class RepairDrone extends BaseDrone{
             target = repairing.entity;
         }
     }
-
-    @Override
-    public float reloadSpeedDivider(){
-        return 1 + team.spiritfactories;
-    }
 }

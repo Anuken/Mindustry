@@ -10,8 +10,4 @@ public interface ShooterTrait extends VelocityTrait, TeamTrait{
     int getShootTimer(boolean left);
 
     Weapon getWeapon();
-
-    default float reloadSpeedDivider(){
-        return 1f;
-    }
 }

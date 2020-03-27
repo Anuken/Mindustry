@@ -19,7 +19,6 @@ public class Team implements Comparable<Team>{
     public final Color color;
     public String name;
     public int draugfactories = 0;
-    public int spiritfactories = 0;
 
     /** All 256 registered teams. */
     private static final Team[] all = new Team[256];
@@ -107,9 +106,5 @@ public class Team implements Comparable<Team>{
 
     public Array<MinerDrone> miners(Item ore){
         return unitGroup.all().select(u -> u.getTeam() == this && u.getType() == UnitTypes.draug && u.item().item == ore).map(u -> (MinerDrone)u);
-    }
-
-    public Array<RepairDrone> spirits(){
-        return unitGroup.all().select(u -> u.getTeam() == this && u.getType() == UnitTypes.spirit).map(u -> (RepairDrone)u);
     }
 }

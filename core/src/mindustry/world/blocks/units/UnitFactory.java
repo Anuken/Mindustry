@@ -60,7 +60,6 @@ public class UnitFactory extends Block{
         Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
 
         if(factory.unitType == UnitTypes.draug) return;
-        if(factory.unitType == UnitTypes.spirit) return;
 
         if(!net.client()){
             spawn(tile, factory.unitType);
