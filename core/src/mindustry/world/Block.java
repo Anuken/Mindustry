@@ -940,12 +940,13 @@ public class Block extends BlockStorage{
         tile.entity.items.forEach((item, amount) -> tile.entity.proximity().each(other -> {
             if(other.block != tile.block) return;
 
-            if(tile.entity.items.has(item, other.entity.items.get(item) + 2)){
-                if(other.block.acceptItem(item, other, null)){
-                    tile.entity.items.remove(item, 1);
-                    netServer.titanic.add(tile);
-                    Call.transferItemTo(item, 1, tile.drawx(), tile.drawy(), other);
-                }
+            int sharable = Mathf.floor((tile.entity.items.get(item) - other.entity.items.get(item)) / 2);
+            sharable = other.block.acceptStack(item, sharable, other, null);
+            if(sharable > 0){
+                tile.entity.items.remove(item, sharable);
+                other.entity.items.add(item, sharable);
+                netServer.titanic.add(tile, other);
+                Call.transferItemTo(item, 0, tile.drawx(), tile.drawy(), other);
             }
         }));
     }
