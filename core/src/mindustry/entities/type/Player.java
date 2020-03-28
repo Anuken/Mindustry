@@ -29,8 +29,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.BuildBlock.*;
-import mindustry.world.meta.*;
 
 import java.io.*;
 
@@ -859,8 +857,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                     this.spawner = lastSpawner;
                 }else if(getClosestCore() != null){
                     this.spawner = (SpawnerTrait)getClosestCore();
-                    Tile pad = indexer.getAllied(team, BlockFlag.mechPad).asArray().select(t -> !(t.entity instanceof BuildEntity)).random();
-                    if(pad != null) this.spawner = (SpawnerTrait)pad.entity;
                 }
             }
         }else if(getClosestCore() != null){

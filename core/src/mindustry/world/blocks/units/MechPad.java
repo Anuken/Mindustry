@@ -1,6 +1,7 @@
 package mindustry.world.blocks.units;
 
 import arc.*;
+import arc.graphics.*;
 import mindustry.annotations.Annotations.*;
 import arc.struct.EnumSet;
 import arc.graphics.g2d.*;
@@ -52,8 +53,14 @@ public class MechPad extends Block{
         MechFactoryEntity entity = tile.ent();
 
         if(!entity.cons.valid()) return;
-        player.beginRespawning(entity);
-        entity.sameMech = false;
+
+        Mech mech = ((MechPad)tile.block()).mech;
+        player.mech = (player.mech == mech) ? Mechs.starter : mech;
+        player.heal();
+        Call.onEffect(Fx.spawn, player.x, player.y, 0, Color.white);
+
+//        player.beginRespawning(entity);
+//        entity.sameMech = false;
     }
 
     @Remote(called = Loc.server)
@@ -81,8 +88,7 @@ public class MechPad extends Block{
 
     protected static boolean checkValidTap(Tile tile, Player player){
         MechFactoryEntity entity = tile.ent();
-        return !player.isDead() && tile.interactable(player.getTeam()) && Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize &&
-        Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize && entity.cons.valid() && entity.player == null;
+        return !player.isDead() && tile.interactable(player.getTeam()) && entity.cons.valid() && entity.player == null;
     }
 
     @Override
@@ -100,7 +106,7 @@ public class MechPad extends Block{
         MechFactoryEntity entity = tile.ent();
 
         if(checkValidTap(tile, player)){
-            Call.onMechFactoryTap(player, tile);
+            onMechFactoryTap(player, tile);
         }else if(player.isLocal && mobile && !player.isDead() && entity.cons.valid() && entity.player == null){
             //deselect on double taps
             player.moveTarget = player.moveTarget == tile.entity ? null : tile.entity;
