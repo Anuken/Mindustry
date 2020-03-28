@@ -506,6 +506,7 @@ public class NetServer implements ApplicationListener{
                 }
 
                 player.getInfo().lastSyncTime = Time.millis();
+                player.syncbeacons.clear();
                 Call.onWorldDataBegin(player.con);
                 netServer.sendWorldData(player);
             }

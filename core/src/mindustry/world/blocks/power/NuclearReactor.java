@@ -160,10 +160,15 @@ public class NuclearReactor extends PowerGenerator{
 
         Timer.schedule(() -> {
             for(Player p : playerGroup){
-                Call.onWorldDataBegin(p.con);
-                netServer.sendWorldData(p);
+                p.syncbeacons.put(tile, explosionRadius / 2 * tilesize);
             }
         }, 2.5f);
+
+        Bullet.amnesia(() -> {
+            for(int j = 0; j < 360; ++j){
+                if((j % 10) == 0) Call.createBullet(Bullets.slagShot, tile.getTeam(), tile.drawx(), tile.drawy(), j, 0.04f * explosionRadius, 10000f);
+            }
+        });
     }
 
     @Override

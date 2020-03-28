@@ -76,6 +76,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     private Vec2 movement = new Vec2();
     private boolean moved;
 
+    public ObjectMap<Tile, Integer> syncbeacons = new ObjectMap<>();
+
     public int idle = 0;
 
     //endregion
@@ -532,6 +534,14 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         Tile tile = world.tileWorld(x, y);
 
+        syncbeacons.each((key, value) -> {
+            if(tile.dst(key) <= value){
+                syncbeacons.clear();
+                Call.onWorldDataBegin(this.con);
+                netServer.sendWorldData(this);
+            }
+        });
+
         boostHeat = Mathf.lerpDelta(boostHeat, (tile != null && tile.solid()) || (isBoosting && ((!movement.isZero() && moved) || !isLocal)) ? 1f : 0f, 0.08f);
         shootHeat = Mathf.lerpDelta(shootHeat, isShooting() ? 1f : 0f, 0.06f);
         mech.updateAlt(this); //updated regardless
@@ -828,6 +838,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         mech = Mechs.starter;
         placeQueue.clear();
         respawns = state.rules.respawns;
+        syncbeacons.clear();
     }
 
     public boolean isShooting(){

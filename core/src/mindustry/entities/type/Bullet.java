@@ -28,6 +28,8 @@ public class Bullet extends SolidEntity implements DamageTrait, Scaled, Poolable
     protected Entity owner;
     protected float time;
 
+    protected static boolean amnesia = false;
+
     /** Internal use only! */
     public Bullet(){
     }
@@ -77,9 +79,15 @@ public class Bullet extends SolidEntity implements DamageTrait, Scaled, Poolable
         return create(type, parent.owner, parent.team, x, y, angle, velocityScl);
     }
 
-    @Remote(called = Loc.server, unreliable = true)
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
     public static void createBullet(BulletType type, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
-        create(type, null, team, x, y, angle, velocityScl, lifetimeScl, null);
+        if(!amnesia) create(type, null, team, x, y, angle, velocityScl, lifetimeScl, null);
+    }
+
+    public static void amnesia(Runnable task){
+        amnesia = true;
+        task.run();
+        amnesia = false;
     }
 
     public Entity getOwner(){
