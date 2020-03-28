@@ -940,12 +940,20 @@ public class Block extends BlockStorage{
         tile.entity.items.forEach((item, amount) -> tile.entity.proximity().each(other -> {
             if(other.block != tile.block) return;
 
-            if(tile.entity.items.has(item, other.entity.items.get(item) + 2)){
+            int particles = 0;
+
+            while(tile.entity.items.has(item, other.entity.items.get(item) + 2)){
                 if(other.block.acceptItem(item, other, null)){
                     tile.entity.items.remove(item, 1);
-                    netServer.titanic.add(tile);
-                    Call.transferItemTo(item, 1, tile.drawx(), tile.drawy(), other);
+                    other.entity.items.add(item, 1);
+                    particles++;
                 }
+            }
+
+            if(particles > 0){
+                netServer.titanic.add(tile);
+                other.entity.items.remove(item, particles);
+                Call.transferItemTo(item, particles, tile.drawx(), tile.drawy(), other);
             }
         }));
     }
