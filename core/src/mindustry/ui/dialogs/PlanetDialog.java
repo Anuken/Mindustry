@@ -217,8 +217,8 @@ public class PlanetDialog extends FloatingDialog{
                 draw(sec, shadowColor, -0.001f);
             }
 
-            if(sec.hostility >= 0f){
-                drawSelection(sec, Color.scarlet, 0.1f * sec.hostility);
+            if(sec.hostility >= 0.02f){
+                drawSelection(sec, Color.scarlet, 0.11f * sec.hostility);
             }
         }
 

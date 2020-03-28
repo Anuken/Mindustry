@@ -7,16 +7,18 @@ def use = { ... names ->
     }
 }
 
-def properties = new Properties()
+def hasSdk = System.getenv("ANDROID_HOME") != null
 
-if(new File(settingsDir, 'local.properties').exists() && System.getenv("JITPACK") != "true"){
-    properties.load(new File(settingsDir, 'local.properties').newDataInputStream())
+if(new File(settingsDir, 'local.properties').exists()){
+	def properties = new Properties()
+	properties.load(new File(settingsDir, 'local.properties').newDataInputStream())
+	if(properties.containsKey("sdk.dir")) hasSdk = true
+}
 
-    if(properties.containsKey("sdk.dir")){
-        include 'android'
-    }else{
-        println("No android SDK dir found Not loading Android module.")
-    }
+if(System.getenv("JITPACK") == "true") hasSdk = false
+
+if(hasSdk){
+	include 'android'
 }else{
     println("No local.properties found. Not loading Android module.")
 }
