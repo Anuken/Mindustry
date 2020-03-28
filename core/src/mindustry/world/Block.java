@@ -935,7 +935,7 @@ public class Block extends BlockStorage{
     }
 
     public void share(Tile tile){
-        if(!tile.entity.timer.get(timerShare, 20)) return;
+        if(!tile.entity.timer.get(timerShare, 60)) return;
 
         tile.entity.items.forEach((item, amount) -> tile.entity.proximity().each(other -> {
             if(other.block != tile.block) return;
