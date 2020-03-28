@@ -1,16 +1,13 @@
 package mindustry.entities.type.base;
 
-import arc.math.Mathf;
-import arc.util.*;
-import mindustry.content.Blocks;
-import mindustry.entities.traits.MinerTrait;
-import mindustry.entities.type.TileEntity;
-import mindustry.entities.units.UnitState;
-import mindustry.gen.Call;
-import mindustry.type.Item;
-import mindustry.type.ItemType;
-import mindustry.world.Pos;
-import mindustry.world.Tile;
+import arc.math.*;
+import mindustry.content.*;
+import mindustry.entities.traits.*;
+import mindustry.entities.type.*;
+import mindustry.entities.units.*;
+import mindustry.gen.*;
+import mindustry.type.*;
+import mindustry.world.*;
 
 import java.io.*;
 
@@ -126,6 +123,8 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
         super.update();
 
         updateMining();
+
+        if(!hasEffect(StatusEffects.overdrive)) applyEffect(StatusEffects.overdrive, 999999f);
     }
 
     @Override
