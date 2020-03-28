@@ -2,11 +2,10 @@ package mindustry.game;
 
 import arc.*;
 import arc.audio.*;
-import arc.struct.*;
 import arc.math.*;
-import arc.util.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.core.GameState.*;
+import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 
@@ -104,6 +103,8 @@ public class MusicControl{
             if(current != null){
                 current.setVolume(0);
             }
+
+            fade = 0f;
             return;
         }
 
