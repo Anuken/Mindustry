@@ -256,7 +256,6 @@ public class CoreBlock extends StorageBlock{
                     for(int i = 0; i < corner.entity.power.links.size; i++){
                         Tile node = world.tile(corner.entity.power.links.get(i));
                         if(node.block instanceof PowerNode) Call.onTileConfig(player.con,null, node, corner.pos());
-                        if(node.block instanceof PowerNode) Log.info(node);
                     }
                 });
 
