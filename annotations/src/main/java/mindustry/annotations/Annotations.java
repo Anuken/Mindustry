@@ -113,17 +113,20 @@ public class Annotations{
 
     public enum Variant{
         /** Method can only be invoked targeting one player. */
-        one(true, false),
+        one(true, false, false),
         /** Method can only be invoked targeting all players. */
-        all(false, true),
+        all(false, true, false),
         /** Method targets both one player and all players. */
-        both(true, true);
+        both(true, true, false),
+        /** Same as both, but server doesn't react to it. */
+        out(true, true, true);
 
-        public final boolean isOne, isAll;
+        public final boolean isOne, isAll, isOut;
 
-        Variant(boolean isOne, boolean isAll){
+        Variant(boolean isOne, boolean isAll, boolean isOut){
             this.isOne = isOne;
             this.isAll = isAll;
+            this.isOut = isOut;
         }
     }
 

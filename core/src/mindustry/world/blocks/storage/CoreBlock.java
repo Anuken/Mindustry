@@ -249,15 +249,13 @@ public class CoreBlock extends StorageBlock{
             corner.setNet(Blocks.battery, tile.getTeam(), 0);
             corner.block.placed(corner);
         }else{
-            Tile.amnesia(() -> Call.setTile(player.con, corner, Blocks.battery, tile.getTeam(), 0));
+            Call.setTile(player, corner, Blocks.battery, tile.getTeam(), 0);
 
             Core.app.post(() -> {
-                Tile.amnesia(() -> {
-                    for(int i = 0; i < corner.entity.power.links.size; i++){
-                        Tile node = world.tile(corner.entity.power.links.get(i));
-                        if(node.block instanceof PowerNode) Call.onTileConfig(player.con,null, node, corner.pos());
-                    }
-                });
+                for(int i = 0; i < corner.entity.power.links.size; i++){
+                    Tile node = world.tile(corner.entity.power.links.get(i));
+                    if(node.block instanceof PowerNode) Call.onTileConfig(player,null, node, corner.pos());
+                }
 
                 netServer.titanic.add(corner);
             });

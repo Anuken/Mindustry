@@ -37,17 +37,21 @@ public class RemoteWriteGenerator{
             for(MethodEntry methodEntry : entry.methods){
                 //write the 'send event to all players' variant: always happens for clients, but only happens if 'all' is enabled on the server method
                 if(methodEntry.where.isClient || methodEntry.target.isAll){
-                    writeMethodVariant(classBuilder, methodEntry, true, false);
+                    writeMethodVariant(classBuilder, methodEntry, true, false, false);
                 }
 
                 //write the 'send event to one player' variant, which is only applicable on the server
                 if(methodEntry.where.isServer && methodEntry.target.isOne){
-                    writeMethodVariant(classBuilder, methodEntry, false, false);
+                    writeMethodVariant(classBuilder, methodEntry, false, false, false);
                 }
 
                 //write the forwarded method version
                 if(methodEntry.where.isServer && methodEntry.forward){
-                    writeMethodVariant(classBuilder, methodEntry, true, true);
+                    writeMethodVariant(classBuilder, methodEntry, true, true, false);
+                }
+
+                if(methodEntry.where.isServer && methodEntry.target.isOut){
+                    writeMethodVariant(classBuilder, methodEntry, false, false, true);
                 }
             }
 
@@ -58,7 +62,7 @@ public class RemoteWriteGenerator{
     }
 
     /** Creates a specific variant for a method entry. */
-    private void writeMethodVariant(TypeSpec.Builder classBuilder, MethodEntry methodEntry, boolean toAll, boolean forwarded){
+    private void writeMethodVariant(TypeSpec.Builder classBuilder, MethodEntry methodEntry, boolean toAll, boolean forwarded, boolean forget){
         ExecutableElement elem = methodEntry.element;
 
         //create builder
@@ -85,8 +89,13 @@ public class RemoteWriteGenerator{
         }
 
         //if toAll is false, it's a 'send to one player' variant, so add the player as a parameter
-        if(!toAll){
+        if(!toAll && !forget){
             method.addParameter(ClassName.bestGuess("mindustry.net.NetConnection"), "playerConnection");
+        }
+
+        //differentiate forget call with player instead of player.con
+        if(forget){
+            method.addParameter(ClassName.bestGuess("mindustry.entities.type.Player"), "playerInstance");
         }
 
         //add sender to ignore
@@ -95,7 +104,7 @@ public class RemoteWriteGenerator{
         }
 
         //call local method if applicable, shouldn't happen when forwarding method as that already happens by default
-        if(!forwarded && methodEntry.local != Loc.none){
+        if(!forwarded && methodEntry.local != Loc.none && !forget){
             //add in local checks
             if(methodEntry.local != Loc.both){
                 method.beginControlFlow("if(" + getCheckString(methodEntry.local) + " || !mindustry.Vars.net.active())");
@@ -201,6 +210,8 @@ public class RemoteWriteGenerator{
             }
         }else if(toAll){ //send to all players / to server
             sendString = "mindustry.Vars.net.send(";
+        }else if(forget){ //send via con on player
+            sendString = "playerInstance.con.send(";
         }else{ //send to specific client from server
             sendString = "playerConnection.send(";
         }

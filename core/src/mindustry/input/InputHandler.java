@@ -163,9 +163,8 @@ public class InputHandler implements InputProcessor, GestureListener{
         Core.app.post(() -> Events.fire(new TapEvent(tile, player)));
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, forward = true, variants = Variant.both)
+    @Remote(targets = Loc.both, called = Loc.both, forward = true, variants = Variant.out)
     public static void onTileConfig(Player player, Tile tile, int value){
-        if(Tile.amnesia) return;
         if(tile == null) return;
 
         if(net.server() && (!Units.canInteract(player, tile) ||

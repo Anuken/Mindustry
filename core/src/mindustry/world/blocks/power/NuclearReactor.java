@@ -164,11 +164,12 @@ public class NuclearReactor extends PowerGenerator{
             }
         }, 2.5f);
 
-        Bullet.amnesia(() -> {
+        // fixme, add all out variant so we don't have to loop playergroup
+        for(Player p : playerGroup){
             for(int j = 0; j < 360; ++j){
-                if((j % 10) == 0) Call.createBullet(Bullets.slagShot, tile.getTeam(), tile.drawx(), tile.drawy(), j, 0.04f * explosionRadius, 10000f);
+                if((j % 10) == 0) Call.createBullet(p, Bullets.slagShot, tile.getTeam(), tile.drawx(), tile.drawy(), j, 0.04f * explosionRadius, 10000f);
             }
-        });
+        }
     }
 
     @Override

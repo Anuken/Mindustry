@@ -31,8 +31,6 @@ public class Tile implements Position, TargetTrait{
     /** Team ordinal. */
     public byte team;
 
-    public static boolean amnesia = false;
-
     public Tile(int x, int y){
         this.x = (short)x;
         this.y = (short)y;
@@ -198,7 +196,6 @@ public class Tile implements Position, TargetTrait{
     }
 
     public void set(Block block, Team team, int rotation){
-        if(amnesia) return;
 
         setBlock(block, team, rotation);
         if(block.isMultiblock()){
@@ -537,7 +534,7 @@ public class Tile implements Position, TargetTrait{
         tile.remove();
     }
 
-    @Remote(called = Loc.server, variants = Variant.both)
+    @Remote(called = Loc.server, variants = Variant.out)
     public static void setTile(Tile tile, Block block, Team team, int rotation){
         tile.set(block, team, rotation);
     }
@@ -549,11 +546,4 @@ public class Tile implements Position, TargetTrait{
     private boolean border(int distance){
         return x < distance || y < distance || x + distance >= world.width() || y + distance >= world.height();
     }
-
-    public static void amnesia(Runnable task){
-        amnesia = true;
-        task.run();
-        amnesia = false;
-    }
-
 }
