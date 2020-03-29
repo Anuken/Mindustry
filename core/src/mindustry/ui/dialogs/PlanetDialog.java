@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.fx.util.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
@@ -51,7 +52,19 @@ public class PlanetDialog extends FloatingDialog{
     private Planet planet = Planets.starter;
     private float lastX, lastY;
     private @Nullable Sector selected, hovered;
-    private Table stable, infoTable;
+    private Table stable;
+    private ScreenQuad quad = new ScreenQuad();
+    private Mesh atmosphere = MeshBuilder.buildHex(new HexMesher(){
+        @Override
+        public float getHeight(Vec3 position){
+            return 0;
+        }
+
+        @Override
+        public Color getColor(Vec3 position){
+            return Color.white;
+        }
+    }, 3, false, 1.5f, 0f);
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
@@ -103,17 +116,8 @@ public class PlanetDialog extends FloatingDialog{
             }
         });
 
-        infoTable = new Table();
-
-        stable = new Table(t -> {
-            t.background(Styles.black3);
-            t.margin(12f);
-            t.add("this is some arbitrary text.");
-        });
-
-        stable.act(1f);
-        stable.pack();
-        stable.setPosition(0, 0, Align.center);
+        stable = new Table();
+        stable.background(Styles.black3);
 
         shown(this::setup);
     }
@@ -145,14 +149,11 @@ public class PlanetDialog extends FloatingDialog{
         projector.proj(cam.combined());
         batch.proj(cam.combined());
 
-        bloom.capture();
+        //bloom.capture();
 
         renderPlanet(solarSystem);
-        if(planet.isLandable()){
-            renderSectors(planet);
-        }
 
-        bloom.render();
+        //bloom.render();
 
         Gl.enable(Gl.blend);
 
@@ -189,9 +190,27 @@ public class PlanetDialog extends FloatingDialog{
     private void renderPlanet(Planet planet){
         //render planet at offsetted position in the world
 
-        planet.mesh.render(cam.combined(), planet.getTransform(mat));
+        planet.mesh.render(cam.combined, planet.getTransform(mat));
 
         renderOrbit(planet);
+
+        if(planet.isLandable() && planet == this.planet){
+            renderSectors(planet);
+        }
+
+        if(planet.parent != null){
+            Gl.blendFunc(Gl.one, Gl.one);
+            Gl.enable(Gl.blend);
+
+            Shaders.atmosphere.camera = cam;
+            Shaders.atmosphere.planet = planet;
+            Shaders.atmosphere.bind();
+            Shaders.atmosphere.apply();
+
+            atmosphere.render(Shaders.atmosphere, Gl.triangles);
+
+            Gl.blendFunc(Blending.normal.src, Blending.normal.dst);
+        }
 
         for(Planet child : planet.children){
             renderPlanet(child);
@@ -218,7 +237,7 @@ public class PlanetDialog extends FloatingDialog{
             }
 
             if(sec.hostility >= 0.02f){
-                drawSelection(sec, Color.scarlet, 0.11f * sec.hostility);
+                //drawSelection(sec, Color.scarlet, 0.11f * sec.hostility);
             }
         }
 
@@ -230,6 +249,7 @@ public class PlanetDialog extends FloatingDialog{
         if(selected != null){
             drawSelection(selected);
             drawBorders(selected, borderColor);
+
         }
 
         batch.flush(Gl.triangles);

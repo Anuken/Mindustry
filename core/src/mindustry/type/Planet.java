@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.ctype.*;
@@ -49,6 +50,8 @@ public class Planet extends UnlockableContent{
     public boolean bloom = false;
     /** For suns, this is the color that shines on other planets. Does nothing for children. */
     public Color lightColor = Color.white.cpy();
+    /** Atmosphere tint for landable planets. */
+    public Color atmosphereColor = new Color(0.3f, 0.7f, 1.0f);
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system.*/
     public @Nullable Planet parent;
     /** The root parent of the whole solar system this planet is in. */
@@ -126,6 +129,10 @@ public class Planet extends UnlockableContent{
             //max with highest outer bound planet
             totalRadius = Math.max(totalRadius, planet.orbitRadius + planet.totalRadius);
         }
+    }
+
+    public Vec3 getLightNormal(){
+        return Tmp.v31.set(solarSystem.position).sub(position).nor();
     }
 
     /** Calculates orbital rotation based on universe time.*/

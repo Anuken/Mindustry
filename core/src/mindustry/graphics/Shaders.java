@@ -3,12 +3,14 @@ package mindustry.graphics;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.type.*;
 
 public class Shaders{
     public static Shadow shadow;
@@ -22,6 +24,7 @@ public class Shaders{
     public static PlanetShader planet;
     public static PlanetGridShader planetGrid;
     public static SunShader sun;
+    public static AtmosphereShader atmosphere;
 
     public static void init(){
         shadow = new Shadow();
@@ -43,6 +46,33 @@ public class Shaders{
         planet = new PlanetShader();
         planetGrid = new PlanetGridShader();
         sun = new SunShader();
+        atmosphere = new AtmosphereShader();
+    }
+
+    public static class AtmosphereShader extends LoadShader{
+        public Camera3D camera;
+        public Planet planet;
+
+        Mat3D mat = new Mat3D();
+
+        public AtmosphereShader(){
+            super("atmosphere", "atmosphere");
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
+
+            setUniformf("u_time", Time.globalTime() / 10f);
+            setUniformf("u_campos", camera.position);
+            setUniformf("u_rcampos", Tmp.v31.set(camera.position).sub(planet.position));
+            setUniformf("u_light", planet.getLightNormal());
+            setUniformf("u_color", planet.atmosphereColor.r, planet.atmosphereColor.g, planet.atmosphereColor.b);
+
+            setUniformMatrix4("u_model", planet.getTransform(mat).val);
+            setUniformMatrix4("u_projection", camera.combined.val);
+            setUniformMatrix4("u_invproj", camera.invProjectionView.val);
+        }
     }
 
     public static class PlanetShader extends LoadShader{

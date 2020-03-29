@@ -23,7 +23,6 @@ import mindustry.type.*;
 
 import java.io.*;
 import java.net.*;
-import java.nio.charset.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
@@ -31,14 +30,8 @@ import static mindustry.Vars.*;
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 
-    boolean useDiscord = OS.is64Bit, loadError = false;
+    boolean useDiscord = OS.is64Bit && !OS.hasProp("nodiscord"), loadError = false;
     Throwable steamError;
-
-    static{
-        if(!Charset.forName("US-ASCII").newEncoder().canEncode(System.getProperty("user.name", ""))){
-            System.setProperty("com.codedisaster.steamworks.SharedLibraryExtractPath", new File("").getAbsolutePath());
-        }
-    }
 
     public static void main(String[] arg){
         try{
