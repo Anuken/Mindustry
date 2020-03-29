@@ -154,7 +154,7 @@ public class NuclearReactor extends PowerGenerator{
         Geometry.circle(tile.x, tile.y, explosionRadius / 2, (x, y) -> {
             Tile tmp = world.tile(x, y);
             if(tmp != null && tmp.block() instanceof StaticWall) Timer.schedule(() -> {
-                if(!tile.border()) tmp.deconstructNet();
+                if(!tmp.border()) tmp.deconstructNet();
             }, tile.dst(tmp) / tilesize * 0.1f);
         });
 

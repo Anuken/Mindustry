@@ -547,7 +547,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     private boolean border(int distance){
-        return (x < distance || y < distance) || (x + distance >= world.width() || y + distance >= world.height());
+        return x < distance || y < distance || x + distance >= world.width() || y + distance >= world.height();
     }
 
     public static void amnesia(Runnable task){
