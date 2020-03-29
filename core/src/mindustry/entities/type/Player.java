@@ -535,7 +535,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         syncbeacons.each((key, value) -> {
             if(key == null || value == null) return;
-            if(tile.dst(key) <= value){
+            if(dst(key) <= value){
                 Call.onWorldDataBegin(this.con);
                 netServer.sendWorldData(this);
                 postSync();
