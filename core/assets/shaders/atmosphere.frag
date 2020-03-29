@@ -6,9 +6,6 @@ const float FLARE = 0.0025;
 const float INTENSITY = 14.3;
 const float G_M = -0.85;
 
-const float INNER_RADIUS = 1.02;
-const float OUTER_RADIUS = 1.3;
-
 const int numOutScatter = 10;
 const float fNumOutScatter = 10.0;
 const int numInScatter = 10;
@@ -17,6 +14,8 @@ const float fNumInScatter = 10.0;
 varying vec4 v_position;
 varying mat4 v_model;
 
+uniform float u_innerRadius;
+uniform float u_outerRadius;
 uniform vec3 u_color;
 uniform vec2 u_resolution;
 uniform float u_time;
@@ -58,7 +57,7 @@ float rayleighPhase(float cc) {
 }
 
 float density(vec3 p) {
-    return exp(-(length(p) - INNER_RADIUS) * (4.0 / (OUTER_RADIUS - INNER_RADIUS)));
+    return exp(-(length(p) - u_innerRadius) * (4.0 / (u_outerRadius - u_innerRadius)));
 }
 
 float optic(vec3 p, vec3 q) {
@@ -70,7 +69,7 @@ float optic(vec3 p, vec3 q) {
         sum += density(v);
         v += step;
     }
-    sum *= length(step)*(1.0 / (OUTER_RADIUS - INNER_RADIUS));
+    sum *= length(step)*(1.0 / (u_outerRadius - u_innerRadius));
     return sum;
 }
 
@@ -82,14 +81,14 @@ vec3 inScatter(vec3 o, vec3 dir, vec2 e, vec3 l) {
 
     vec3 sum = vec3(0.0);
     for(int i = 0; i < numInScatter; i++){
-        vec2 f = rayIntersection(v, l, OUTER_RADIUS);
+        vec2 f = rayIntersection(v, l, u_outerRadius);
         vec3 u = v + l * f.y;
         float n = (optic(p, v) + optic(v, u))*(PI * 4.0);
 
         sum += density(v) * exp(-n * (PEAK * u_color + FLARE));
         v += step;
     }
-    sum *= len * (1.0 / (OUTER_RADIUS - INNER_RADIUS));
+    sum *= len * (1.0 / (u_outerRadius - u_innerRadius));
     float c = dot(dir, -l);
     float cc = c * c;
     return sum * (PEAK * u_color * rayleighPhase(cc) + FLARE * miePhase(G_M, c, cc)) * INTENSITY;
@@ -106,12 +105,12 @@ void main(){
 
     vec3 l = u_light;
 
-    vec2 e = rayIntersection(eye, dir, OUTER_RADIUS);
+    vec2 e = rayIntersection(eye, dir, u_outerRadius);
     if (e.x > e.y){
         gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
         return;
     }
-    vec2 f = rayIntersection(eye, dir, INNER_RADIUS);
+    vec2 f = rayIntersection(eye, dir, u_innerRadius);
     e.y = min(e.y, f.x);
 
     vec3 result = inScatter(eye, dir, e, l);

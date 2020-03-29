@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.fx.util.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
@@ -46,6 +45,7 @@ public class PlanetDialog extends FloatingDialog{
 
     private final Bloom bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false, true){{
         setClearColor(0, 0, 0, 0);
+        setThreshold(0.8f);
         blurPasses = 6;
     }};
 
@@ -53,7 +53,6 @@ public class PlanetDialog extends FloatingDialog{
     private float lastX, lastY;
     private @Nullable Sector selected, hovered;
     private Table stable;
-    private ScreenQuad quad = new ScreenQuad();
     private Mesh atmosphere = MeshBuilder.buildHex(new HexMesher(){
         @Override
         public float getHeight(Vec3 position){
@@ -149,11 +148,11 @@ public class PlanetDialog extends FloatingDialog{
         projector.proj(cam.combined());
         batch.proj(cam.combined());
 
-        //bloom.capture();
+        bloom.capture();
 
         renderPlanet(solarSystem);
 
-        //bloom.render();
+        bloom.render();
 
         Gl.enable(Gl.blend);
 

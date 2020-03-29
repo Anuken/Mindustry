@@ -18,6 +18,7 @@ public class Planets implements ContentList{
             //lightColor = Color.valueOf("f4ee8e");
             meshLoader = () -> new SunMesh(this, 3){{
                 setColors(
+                    1.1f,
                     Color.valueOf("ff7a38"),
                     Color.valueOf("ff9638"),
                     Color.valueOf("ffc64c"),

@@ -16,13 +16,17 @@ public class SunMesh extends ShaderSphereMesh{
     }
 
     public void setColors(Color... colors){
+        setColors(1f, colors);
+    }
+
+    public void setColors(float scl, Color... colors){
         colorValues = new float[colors.length*4];
 
         for(int i = 0; i < colors.length; i ++){
-            colorValues[i*4] = colors[i].r;
-            colorValues[i*4 + 1] = colors[i].g;
-            colorValues[i*4 + 2] = colors[i].b;
-            colorValues[i*4 + 3] = colors[i].a;
+            colorValues[i*4] = colors[i].r * scl;
+            colorValues[i*4 + 1] = colors[i].g * scl;
+            colorValues[i*4 + 2] = colors[i].b * scl;
+            colorValues[i*4 + 3] = colors[i].a * scl;
         }
     }
 

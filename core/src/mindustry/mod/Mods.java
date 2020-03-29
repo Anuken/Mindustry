@@ -246,8 +246,12 @@ public class Mods implements Loadable{
                 LoadedMod mod = loadMod(file);
                 mods.add(mod);
             }catch(Throwable e){
-                Log.err("Failed to load mod file {0}. Skipping.", file);
-                Log.err(e);
+                if(e instanceof ClassNotFoundException && e.getMessage().contains("mindustry.plugin.Plugin")){
+                    Log.info("Plugin {0} is outdated and needs to be ported to 6.0! Update its main class to inherit from 'mindustry.mod.Plugin'.");
+                }else{
+                    Log.err("Failed to load mod file {0}. Skipping.", file);
+                    Log.err(e);
+                }
             }
         }
 
