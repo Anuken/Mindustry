@@ -533,6 +533,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Tile tile = world.tileWorld(x, y);
 
         syncbeacons.each((key, value) -> {
+            if(key == null || value == null) return;
             if(tile.dst(key) <= value){
                 syncbeacons.clear();
                 Call.onWorldDataBegin(this.con);
