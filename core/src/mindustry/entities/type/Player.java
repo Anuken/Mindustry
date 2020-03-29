@@ -29,6 +29,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 
@@ -535,9 +536,9 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         syncbeacons.each((key, value) -> {
             if(key == null || value == null) return;
             if(tile.dst(key) <= value){
-                syncbeacons.clear();
                 Call.onWorldDataBegin(this.con);
                 netServer.sendWorldData(this);
+                postSync();
             }
         });
 
@@ -987,5 +988,12 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     // define when a player is doing nothing (useful)
     public boolean idle(){
         return velocity.isZero(0.1f) && placeQueue.isEmpty() && !isShooting && !isTyping;
+    }
+
+    public void postSync(){
+        syncbeacons.clear();
+
+        indexer.getAllied(team, BlockFlag.multipart).each(t -> t.block.multipart(t, this));
+        indexer.getEnemy(team, BlockFlag.multipart).each(t -> t.block.multipart(t, this));
     }
 }

@@ -2,9 +2,12 @@ package mindustry.world.blocks.power;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.util.*;
+import mindustry.content.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class Battery extends PowerDistributor{
     public int topRegion = reg("-top");
@@ -12,10 +15,14 @@ public class Battery extends PowerDistributor{
     public Color emptyLightColor = Color.valueOf("f8c266");
     public Color fullLightColor = Color.valueOf("fb9567");
 
+    protected final int timerRecharge = timers++;
+
     public Battery(String name){
         super(name);
+        forcePower = true;
         outputsPower = true;
         consumesPower = true;
+        update = true;
     }
 
     @Override
@@ -25,5 +32,22 @@ public class Battery extends PowerDistributor{
         Draw.color();
 
         Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
+    }
+
+    @Override
+    public boolean isMultipart(Tile tile){
+        if(tile.block != Blocks.battery) return false;
+        if(world.tile(tile.x + 1, tile.y + 1).block == Blocks.coreShard) return true;
+        if(world.tile(tile.x + 1, tile.y + 1).block == Blocks.coreFoundation) return true;
+        if(world.tile(tile.x + 2, tile.y + 2).block == Blocks.coreNucleus) return true;
+        return false;
+    }
+
+    @Override
+    public void update(Tile tile){
+        if(tile.entity.power.status < 1f && tile.entity.timer.get(timerRecharge, 60) && isMultipart(tile)){
+            tile.entity.power.status = Mathf.clamp(tile.entity.power.status += (1f / 40f));
+            netServer.titanic.add(tile);
+        }
     }
 }

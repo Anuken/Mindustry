@@ -286,6 +286,7 @@ public class NetServer implements ApplicationListener{
             player.setTeam(assignTeam(player, playerGroup.all()));
 
             sendWorldData(player);
+            player.postSync();
 
             platform.updateRPC();
 
@@ -509,6 +510,7 @@ public class NetServer implements ApplicationListener{
                 player.syncbeacons.clear();
                 Call.onWorldDataBegin(player.con);
                 netServer.sendWorldData(player);
+                player.postSync();
             }
         });
 

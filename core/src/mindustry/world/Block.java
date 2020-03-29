@@ -344,7 +344,7 @@ public class Block extends BlockStorage{
     public void placed(Tile tile){
         if(net.client()) return;
 
-        if((consumesPower && !outputsPower) || (!consumesPower && outputsPower)){
+        if((consumesPower && !outputsPower) || (!consumesPower && outputsPower) || forcePower){
             int range = 10;
             tempTiles.clear();
             Geometry.circle(tile.x, tile.y, range, (x, y) -> {
@@ -949,5 +949,13 @@ public class Block extends BlockStorage{
                 Call.transferItemTo(item, 0, tile.drawx(), tile.drawy(), other);
             }
         }));
+    }
+
+    public void multipart(Tile tile, Player player){
+        //
+    }
+
+    public boolean isMultipart(Tile tile){
+        return false;
     }
 }

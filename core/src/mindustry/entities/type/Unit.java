@@ -343,6 +343,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
                     Call.onWorldDataBegin(((Player)this).con);
                     netServer.sendWorldData(((Player)this));
+                    ((Player)this).postSync();
                 }
             }
 

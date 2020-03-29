@@ -175,6 +175,7 @@ public class ServerControl implements ApplicationListener{
                 JsonValue value = JsonIO.json().fromJson(null, Core.settings.getString("globalrules"));
                 JsonIO.json().readFields(state.rules, value);
                 state.rules.bannedBlocks.add(Blocks.duo);
+                state.rules.bannedBlocks.add(Blocks.combustionGenerator);
             }catch(Throwable t){
                 Log.err("Error applying custom rules, proceeding without them.", t);
             }
@@ -944,6 +945,7 @@ public class ServerControl implements ApplicationListener{
                     p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
                 }
                 netServer.sendWorldData(p);
+                p.postSync();
             }
             inExtraRound = false;
         };

@@ -10,6 +10,7 @@ import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
+import mindustry.net.Administration.*;
 import mindustry.net.Net;
 import mindustry.net.*;
 import mindustry.plugin.coreprotect.*;
@@ -85,6 +86,11 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(spiderweb);
         Core.app.addListener(new SiliconValley());
         Core.app.addListener(new SpecialDelivery());
+
+        netServer.admins.addActionFilter(action -> {
+            if(action.type == ActionType.breakBlock && action.tile.block.isMultipart(action.tile)) return false;
+            return true;
+        });
 
         mods.eachClass(Mod::init);
 

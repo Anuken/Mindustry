@@ -26,6 +26,7 @@ public abstract class BlockStorage extends UnlockableContent{
     public boolean outputsLiquid = false;
     public boolean consumesPower = true;
     public boolean outputsPower = false;
+    public boolean forcePower = false;
 
     public int itemCapacity = 10;
     public float liquidCapacity = 10f;
