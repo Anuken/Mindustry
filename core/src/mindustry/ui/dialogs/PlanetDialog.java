@@ -63,10 +63,15 @@ public class PlanetDialog extends FloatingDialog{
         public Color getColor(Vec3 position){
             return Color.white;
         }
-    }, 3, false, 1.5f, 0f);
+    }, 2, false, 1.5f, 0f);
+
+    //seed: 8kmfuix03fw
+    private CubemapMesh skybox;
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
+
+        skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));
 
         addCloseButton();
         buttons.addImageTextButton("$techtree", Icon.tree, () -> ui.tech.show()).size(230f, 64f);
@@ -150,6 +155,8 @@ public class PlanetDialog extends FloatingDialog{
 
         bloom.capture();
 
+        skybox.render(cam.combined);
+
         renderPlanet(solarSystem);
 
         bloom.render();
@@ -188,7 +195,6 @@ public class PlanetDialog extends FloatingDialog{
 
     private void renderPlanet(Planet planet){
         //render planet at offsetted position in the world
-
         planet.mesh.render(cam.combined, planet.getTransform(mat));
 
         renderOrbit(planet);
@@ -197,9 +203,8 @@ public class PlanetDialog extends FloatingDialog{
             renderSectors(planet);
         }
 
-        if(planet.parent != null){
-            Gl.blendFunc(Gl.one, Gl.one);
-            Gl.enable(Gl.blend);
+        if(planet.parent != null && planet.hasAtmosphere){
+            Blending.additive.apply();
 
             Shaders.atmosphere.camera = cam;
             Shaders.atmosphere.planet = planet;
@@ -208,7 +213,7 @@ public class PlanetDialog extends FloatingDialog{
 
             atmosphere.render(Shaders.atmosphere, Gl.triangles);
 
-            Gl.blendFunc(Blending.normal.src, Blending.normal.dst);
+            Blending.normal.apply();
         }
 
         for(Planet child : planet.children){

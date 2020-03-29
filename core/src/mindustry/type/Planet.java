@@ -52,6 +52,8 @@ public class Planet extends UnlockableContent{
     public Color lightColor = Color.white.cpy();
     /** Atmosphere tint for landable planets. */
     public Color atmosphereColor = new Color(0.3f, 0.7f, 1.0f);
+    /** Whether this planet has an atmosphere. */
+    public boolean hasAtmosphere = true;
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system.*/
     public @Nullable Planet parent;
     /** The root parent of the whole solar system this planet is in. */
