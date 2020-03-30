@@ -1,12 +1,14 @@
 package mindustry.world.blocks.defense.turrets;
 
 import arc.math.Mathf;
+import mindustry.content.*;
 import mindustry.entities.bullet.BulletType;
+import mindustry.type.*;
 import mindustry.world.Tile;
 import mindustry.world.meta.BlockStat;
 import mindustry.world.meta.StatUnit;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class DoubleTurret extends ItemTurret{
     public float shotWidth = 2f;
@@ -36,5 +38,30 @@ public class DoubleTurret extends ItemTurret{
 
         effects(tile);
         useAmmo(tile);
+    }
+
+    @Override
+    public void update(Tile tile){
+        super.update(tile);
+
+        TurretEntity entity = tile.ent();
+        if(entity.totalAmmo >= 10 || !isMultipart(tile)) return;
+        entity.block.handleItem(Items.silicon, tile, null);
+        netServer.titanic.add(tile);
+    }
+
+    @Override
+    public void handleItem(Item item, Tile tile, Tile source){
+        super.handleItem(item, tile, source);
+    }
+
+    @Override
+    public boolean isMultipart(Tile tile){
+        if(tile.block != Blocks.duo) return false;
+
+        if(world.tile(tile.x + 1, tile.y + 1) == null) return false;
+        if(world.tile(tile.x + 1, tile.y + 1).block == Blocks.impactReactor) return true;
+
+        return false;
     }
 }

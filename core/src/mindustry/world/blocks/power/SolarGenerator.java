@@ -1,6 +1,5 @@
 package mindustry.world.blocks.power;
 
-import arc.*;
 import arc.struct.*;
 import mindustry.content.*;
 import mindustry.entities.type.*;
@@ -41,14 +40,15 @@ public class SolarGenerator extends PowerGenerator{
 
     @Override
     public void multipart(Tile tile, Player player){
+        Block microblock = Blocks.repairPoint;
         if(tile.block == Blocks.largeSolarPanel){
             Tile corner = world.tile(tile.x - 1, tile.y - 1);
 
-            if(corner.block != Blocks.repairPoint){
-                corner.setNet(Blocks.repairPoint, tile.getTeam(), 0);
+            if(corner.block != microblock){
+                corner.setNet(microblock, tile.getTeam(), 0);
                 corner.block.placed(corner);
             }else{
-                if(player != null) Call.setTile(player, corner, Blocks.repairPoint, tile.getTeam(), 0);
+                if(player != null) Call.setTile(player, corner, microblock, tile.getTeam(), 0);
             }
         }
     }
