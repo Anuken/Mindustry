@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
@@ -16,6 +17,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -28,6 +30,8 @@ public class LaunchPad extends StorageBlock{
 
     private float velocityInaccuracy = 0f;
 
+    private Array<Item> missiles = new Array<>();
+    private Array<BulletType> bullets = new Array<>();
     private Array<TargetTrait> hydra = new Array<>();
 
     public LaunchPad(String name){
@@ -35,6 +39,13 @@ public class LaunchPad extends StorageBlock{
         update = true;
         hasItems = true;
         solid = true;
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        ((ItemTurret)Blocks.ripple).ammo.each((item, bullet) -> bullets.add(bullet));
     }
 
     @Override
@@ -46,7 +57,7 @@ public class LaunchPad extends StorageBlock{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return (item.type == ItemType.material || (item == Items.pyratite && source.block == Blocks.incinerator)) && tile.entity.items.total() < itemCapacity;
+        return (item.type == ItemType.material) && tile.entity.items.total() < itemCapacity;
     }
 
     @Override
@@ -91,29 +102,35 @@ public class LaunchPad extends StorageBlock{
 
         if(entity.timer.get(timerSilo, 60 * 2.5f) && entity.cons.valid()){
 
+            missiles.clear();
+            entity.items.forEach((item, amount) -> {
+                for(int i = 0; i < Mathf.floor(amount / 10); ++i) missiles.add(item);
+            });
+            missiles.shuffle();
+            if(missiles.size == 0) return;
+
             hydra.clear();
-            for(int i = 0; i < entity.items.get(Items.pyratite); ++i){
+            for(int i = 0; i < missiles.size; ++i){
                 hydra.add(Units.findEnemyTile(tile.getTeam(), tile.drawx(), tile.drawy(), Integer.MAX_VALUE, t -> !hydra.contains(t.entity), false));
             }
 
             hydra = hydra.select(tt -> tt != null);
-
             hydra.shuffle();
-
             if(hydra.size == 0) return;
 
-            entity.items.remove(Items.pyratite, hydra.size);
-            netServer.titanic.add(tile);
-
-            float delay = 0;
             for(TargetTrait target : hydra){
-                Vec2 predict = Predict.intercept(tile, target, Bullets.artilleryIncendiary.speed);
+                bullets.shuffle();
+                entity.items.remove(missiles.first(), 10);
+
+                Vec2 predict = Predict.intercept(tile, target, bullets.first().speed);
 
                 float dst = entity.dst(predict.x, predict.y);
-                float maxTraveled = Bullets.artilleryIncendiary.lifetime * Bullets.artilleryIncendiary.speed;
+                float maxTraveled = bullets.first().lifetime * bullets.first().speed;
 
-                for(int i = 0; i < (4 * 2); ++i) Timer.schedule(() -> Call.createBullet(Bullets.artilleryIncendiary, tile.getTeam(), tile.drawx(), tile.drawy(), tile.angleTo(target) + Mathf.range(Bullets.artilleryIncendiary.inaccuracy + Bullets.artilleryIncendiary.inaccuracy), 1f + Mathf.range(velocityInaccuracy), (dst / maxTraveled)), delay += (1f/60f));
+                for(int i = 0; i < bullets.first().ammoMultiplier; ++i) Call.createBullet(bullets.first(), tile.getTeam(), tile.drawx(), tile.drawy(), tile.angleTo(target) + Mathf.range(bullets.first().inaccuracy + bullets.first().inaccuracy), 1f + Mathf.range(velocityInaccuracy), (dst / maxTraveled));
             }
+
+            netServer.titanic.add(tile);
         }
     }
 }
