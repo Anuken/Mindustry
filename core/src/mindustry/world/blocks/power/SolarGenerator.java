@@ -33,6 +33,13 @@ public class SolarGenerator extends PowerGenerator{
     }
 
     @Override
+    public void placed(Tile tile){
+        super.placed(tile);
+
+        multipart(tile, null);
+    }
+
+    @Override
     public void multipart(Tile tile, Player player){
         if(tile.block == Blocks.largeSolarPanel){
             Tile corner = world.tile(tile.x - 1, tile.y - 1);
@@ -41,7 +48,7 @@ public class SolarGenerator extends PowerGenerator{
                 corner.setNet(Blocks.repairPoint, tile.getTeam(), 0);
                 corner.block.placed(corner);
             }else{
-                Call.setTile(player, corner, Blocks.repairPoint, tile.getTeam(), 0);
+                if(player != null) Call.setTile(player, corner, Blocks.repairPoint, tile.getTeam(), 0);
             }
         }
     }
