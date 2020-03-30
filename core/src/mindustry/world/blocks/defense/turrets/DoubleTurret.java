@@ -54,14 +54,4 @@ public class DoubleTurret extends ItemTurret{
     public void handleItem(Item item, Tile tile, Tile source){
         super.handleItem(item, tile, source);
     }
-
-    @Override
-    public boolean isMultipart(Tile tile){
-        if(tile.block != Blocks.duo) return false;
-
-        if(world.tile(tile.x + 1, tile.y + 1) == null) return false;
-        if(world.tile(tile.x + 1, tile.y + 1).block == Blocks.impactReactor) return true;
-
-        return false;
-    }
 }

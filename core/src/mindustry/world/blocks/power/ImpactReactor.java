@@ -50,8 +50,6 @@ public class ImpactReactor extends PowerGenerator{
         for(int i = 0; i < plasmas; i++){
             plasmaRegions[i] = reg("-plasma-" + i);
         }
-
-        flags = EnumSet.of(BlockFlag.producer, BlockFlag.multipart);
     }
 
     @Override
@@ -182,29 +180,6 @@ public class ImpactReactor extends PowerGenerator{
                 Tmp.v1.rnd(Mathf.random(120f));
                 Effects.effect(Fx.impactsmoke, Tmp.v1.x + tile.worldx(), Tmp.v1.y + tile.worldy());
             });
-        }
-    }
-
-    @Override
-    public void placed(Tile tile){
-        super.placed(tile);
-
-        multipart(tile, null);
-    }
-
-    @Override
-    public void multipart(Tile tile, Player player){
-        Block microblock = Blocks.duo;
-        if(tile.block == Blocks.impactReactor){
-            Tile corner = world.tile(tile.x - 1, tile.y - 1);
-
-            if(corner.block != microblock){
-                corner.setNet(microblock, tile.getTeam(), 0);
-                corner.block.placed(corner);
-            }else{
-                if(player != null) Call.setTile(player, corner, microblock, tile.getTeam(), 0);
-                if(player != null) netServer.titanic.add(corner);
-            }
         }
     }
 
