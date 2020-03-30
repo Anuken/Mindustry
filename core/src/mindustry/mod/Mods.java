@@ -369,7 +369,7 @@ public class Mods implements Loadable{
     private void checkWarnings(){
         //show 'scripts have errored' info
         if(scripts != null && scripts.hasErrored()){
-           Core.settings.getBoolOnce("scripts-errored2", () -> ui.showErrorMessage("$mod.scripts.unsupported"));
+           ui.showErrorMessage("$mod.scripts.unsupported");
         }
 
         //show list of errored content
@@ -417,7 +417,7 @@ public class Mods implements Loadable{
     }
 
     public boolean hasContentErrors(){
-        return mods.contains(LoadedMod::hasContentErrors);
+        return mods.contains(LoadedMod::hasContentErrors) || (scripts != null && scripts.hasErrored());
     }
 
     /** Reloads all mod content. How does this even work? I refuse to believe that it functions correctly.*/

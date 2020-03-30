@@ -1,3 +1,8 @@
+#ifdef GL_ES
+precision mediump float;
+precision mediump int;
+#endif
+
 const float PI = 3.14159265359;
 const float MAX = 10000.0;
 
@@ -6,10 +11,13 @@ const float FLARE = 0.0025;
 const float INTENSITY = 14.3;
 const float G_M = -0.85;
 
-const int numOutScatter = 10;
-const float fNumOutScatter = 10.0;
-const int numInScatter = 10;
-const float fNumInScatter = 10.0;
+#define SCATTER_OUT 3
+#define SCATTER_IN 3
+
+const int numOutScatter = SCATTER_OUT;
+const float fNumOutScatter = float(SCATTER_OUT);
+const int numInScatter = SCATTER_IN;
+const float fNumInScatter = float(SCATTER_IN);
 
 varying vec4 v_position;
 varying mat4 v_model;
@@ -106,10 +114,6 @@ void main(){
     vec3 l = u_light;
 
     vec2 e = rayIntersection(eye, dir, u_outerRadius);
-    if (e.x > e.y){
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
-        return;
-    }
     vec2 f = rayIntersection(eye, dir, u_innerRadius);
     e.y = min(e.y, f.x);
 
