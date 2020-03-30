@@ -10,13 +10,17 @@ import arc.math.geom.Vec2;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.entities.EntityGroup;
+import mindustry.entities.effect.*;
 import mindustry.entities.traits.HealthTrait;
 import mindustry.entities.traits.TargetTrait;
 import mindustry.game.*;
 import mindustry.game.EventType.BlockDestroyEvent;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
 import java.io.*;
@@ -338,6 +342,17 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
         if(power != null){
             power.graph.update();
+        }
+
+        float heat = block.sumAttribute(Attribute.heat, tile.x, tile.y);
+        if(heat > 0f){
+            if (Mathf.randomBoolean(heat * 0.005f)){
+                if(block instanceof ThermalGenerator || block instanceof BuildBlock){
+                    // you're good.
+                }else{
+                    Fire.create(tile);
+                }
+            }
         }
     }
 
