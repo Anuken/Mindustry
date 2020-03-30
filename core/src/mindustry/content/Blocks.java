@@ -32,6 +32,8 @@ import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
+import static mindustry.world.meta.BlockFlag.yoinkable;
+
 public class Blocks implements ContentList{
     public static Block
 
@@ -1285,6 +1287,8 @@ public class Blocks implements ContentList{
             size = 2;
             drawMineItem = true;
             consumes.liquid(Liquids.water, 0.06f).boost();
+
+            flags = EnumSet.of(yoinkable);
             downgrade = () -> mechanicalDrill;
         }};
 
