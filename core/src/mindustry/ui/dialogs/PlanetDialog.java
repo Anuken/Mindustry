@@ -14,6 +14,7 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
@@ -43,12 +44,7 @@ public class PlanetDialog extends FloatingDialog{
     private final Mat3D mat = new Mat3D();
     private final Vec3 camRelative = new Vec3();
 
-    private final Bloom bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false, true){{
-        setClearColor(0, 0, 0, 0);
-        setThreshold(0.8f);
-        blurPasses = 6;
-    }};
-
+    private Bloom bloom;
     private Planet planet = Planets.starter;
     private float lastX, lastY;
     private @Nullable Sector selected, hovered;
@@ -66,12 +62,30 @@ public class PlanetDialog extends FloatingDialog{
     }, 2, false, 1.5f, 0f);
 
     //seed: 8kmfuix03fw
-    private CubemapMesh skybox;
+    private CubemapMesh skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
 
-        skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));
+        makeBloom();
+
+        Events.on(DisposeEvent.class, () -> {
+            skybox.dispose();
+            batch.dispose();
+            projector.dispose();
+            atmosphere.dispose();
+            for(Mesh m : outlines){
+                if(m != null){
+                    m.dispose();
+                }
+            }
+        });
+
+        Events.on(ResizeEvent.class, e -> {
+            makeBloom();
+        });
+
+        cam.fov = 60f;
 
         addCloseButton();
         buttons.addImageTextButton("$techtree", Icon.tree, () -> ui.tech.show()).size(230f, 64f);
@@ -124,6 +138,19 @@ public class PlanetDialog extends FloatingDialog{
         stable.background(Styles.black3);
 
         shown(this::setup);
+    }
+
+    void makeBloom(){
+        if(bloom != null){
+            bloom.dispose();
+            bloom = null;
+        }
+
+        bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false, true){{
+            setClearColor(0, 0, 0, 0);
+            setThreshold(0.8f);
+            blurPasses = 6;
+        }};
     }
 
     void setup(){
