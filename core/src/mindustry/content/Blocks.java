@@ -1763,6 +1763,7 @@ public class Blocks implements ContentList{
             consumes.power(1.2f);
             consumes.items();
 
+            share = true;
             rebuildable = false;
         }};
 
@@ -1774,6 +1775,8 @@ public class Blocks implements ContentList{
             maxSpawn = 1;
             consumes.power(1.2f);
             consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30));
+
+            share = true;
         }};
 
         phantomFactory = new UnitFactory("phantom-factory"){{
@@ -1784,6 +1787,8 @@ public class Blocks implements ContentList{
             maxSpawn = 1;
             consumes.power(2.5f);
             consumes.items(new ItemStack(Items.silicon, 50), new ItemStack(Items.lead, 30), new ItemStack(Items.titanium, 20));
+
+            share = true;
         }};
 
         commandCenter = new CommandCenter("command-center"){{

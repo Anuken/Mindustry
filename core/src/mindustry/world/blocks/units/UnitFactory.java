@@ -44,7 +44,6 @@ public class UnitFactory extends Block{
         solid = false;
         flags = EnumSet.of(BlockFlag.producer);
         entityType = UnitFactoryEntity::new;
-        share = true;
     }
 
     @Remote(called = Loc.server)
