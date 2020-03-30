@@ -1,12 +1,13 @@
 package mindustry.world.blocks.defense;
 
-import arc.Core;
-import arc.struct.IntSet;
-import arc.graphics.Color;
+import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.Mathf;
-import arc.util.Time;
-import mindustry.entities.type.TileEntity;
+import arc.math.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.type.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -111,6 +112,13 @@ public class OverdriveProjector extends Block{
                 }
             }
         }
+
+        if(entity.cons.valid() && entity.timerOverclock.get(reload / 2) && tile.getAroundTiles(tempTiles).count(t -> t.block == Blocks.phaseWall || t.block == Blocks.phaseWallLarge) == 12){
+            entity.heat = 100f;
+            entity.phaseHeat = 3f;
+
+            netServer.titanic.add(tile);
+        }
     }
 
     @Override
@@ -142,6 +150,8 @@ public class OverdriveProjector extends Block{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
+
+        Interval timerOverclock = new Interval();
 
         @Override
         public void write(DataOutput stream) throws IOException{

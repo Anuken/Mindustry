@@ -347,6 +347,21 @@ public class Tile implements Position, TargetTrait{
         return tmpArray;
     }
 
+    public Array<Tile> getAroundTiles(Array<Tile> tmpArray){
+        tmpArray.clear();
+
+        Point2[] nearby = Edges.getAroundEdges(block.size);
+        for(Point2 point : nearby){
+            if(point == null) continue;
+            Tile other = world.ltile(x + point.x, y + point.y);
+            if(other == null) continue;
+
+            tmpArray.add(other);
+        }
+
+        return tmpArray;
+    }
+
     public Rect getHitbox(Rect rect){
         return rect.setSize(block().size * tilesize).setCenter(drawx(), drawy());
     }

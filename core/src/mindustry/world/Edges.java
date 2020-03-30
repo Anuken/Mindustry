@@ -1,9 +1,9 @@
 package mindustry.world;
 
-import arc.math.Mathf;
+import arc.math.*;
 import arc.math.geom.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 import static mindustry.Vars.world;
 
@@ -12,6 +12,7 @@ public class Edges{
     private static final int maxRadius = 12;
     private static Point2[][] edges = new Point2[maxSize][0];
     private static Point2[][] edgeInside = new Point2[maxSize][0];
+    private static Point2[][] edgesAround = new Point2[maxSize][0];
     private static Vec2[][] polygons = new Vec2[maxRadius * 2][0];
 
     static{
@@ -23,6 +24,7 @@ public class Edges{
             int bot = -(int)(i / 2f) - 1;
             int top = (int)(i / 2f + 0.5f) + 1;
             edges[i] = new Point2[(i + 1) * 4];
+            edgesAround[i] = new Point2[(i + 2) * 4];
 
             int idx = 0;
 
@@ -36,6 +38,25 @@ public class Edges{
                 //right
                 edges[i][idx++] = new Point2(top, bot + j + 1);
             }
+
+            idx = 0;
+
+            for(int j = 0; j < i + 1; j++){
+                //bottom
+                edgesAround[i][idx++] = new Point2(bot + 1 + j, bot);
+                //top
+                edgesAround[i][idx++] = new Point2(bot + 1 + j, top);
+                //left
+                edgesAround[i][idx++] = new Point2(bot, bot + j + 1);
+                //right
+                edgesAround[i][idx++] = new Point2(top, bot + j + 1);
+            }
+
+            edgesAround[i][idx++] = new Point2(bot, top);
+            edgesAround[i][idx++] = new Point2(bot + i+2, top);
+
+            edgesAround[i][idx++] = new Point2(bot, top - (i+2));
+            edgesAround[i][idx++] = new Point2(bot + i+2, top - (i+2));
 
             Arrays.sort(edges[i], (e1, e2) -> Float.compare(Mathf.angle(e1.x, e1.y), Mathf.angle(e2.x, e2.y)));
 
@@ -76,5 +97,11 @@ public class Edges{
         if(size < 0 || size > maxSize) throw new RuntimeException("Block size must be between 0 and " + maxSize);
 
         return edgeInside[size - 1];
+    }
+
+    public static Point2[] getAroundEdges(int size){
+        if(size < 0 || size > maxSize) throw new RuntimeException("Block size must be between 0 and " + maxSize);
+
+        return edgesAround[size - 1];
     }
 }
