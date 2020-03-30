@@ -1,29 +1,34 @@
 package mindustry.world.blocks.storage;
 
 import arc.*;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Lines;
-import arc.math.Mathf;
-import arc.util.Time;
-import mindustry.Vars;
-import mindustry.content.Fx;
-import mindustry.entities.Effects;
-import mindustry.entities.type.TileEntity;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.*;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.entities.traits.*;
+import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
-import mindustry.graphics.Pal;
-import mindustry.type.Item;
-import mindustry.type.ItemType;
-import mindustry.world.Tile;
-import mindustry.world.meta.BlockStat;
-import mindustry.world.meta.StatUnit;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.type.*;
+import mindustry.world.*;
+import mindustry.world.meta.*;
 
-import static mindustry.Vars.data;
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class LaunchPad extends StorageBlock{
     public final int timerLaunch = timers++;
+    public final int timerSilo = timers++;
     /** Time inbetween launches. */
     public float launchTime;
+
+    private float velocityInaccuracy = 0f;
+
+    private Array<TargetTrait> hydra = new Array<>();
 
     public LaunchPad(String name){
         super(name);
@@ -41,7 +46,7 @@ public class LaunchPad extends StorageBlock{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return item.type == ItemType.material && tile.entity.items.total() < itemCapacity;
+        return (item.type == ItemType.material || (item == Items.pyratite && source.block == Blocks.incinerator)) && tile.entity.items.total() < itemCapacity;
     }
 
     @Override
@@ -81,6 +86,33 @@ public class LaunchPad extends StorageBlock{
                 data.addItem(item, used);
                 entity.items.remove(item, used);
                 Events.fire(new LaunchItemEvent(item, used));
+            }
+        }
+
+        if(entity.timer.get(timerSilo, 60 * 2.5f) && entity.cons.valid()){
+
+            hydra.clear();
+            for(int i = 0; i < entity.items.get(Items.pyratite); ++i){
+                hydra.add(Units.findEnemyTile(tile.getTeam(), tile.drawx(), tile.drawy(), Integer.MAX_VALUE, t -> !hydra.contains(t.entity), false));
+            }
+
+            hydra = hydra.select(tt -> tt != null);
+
+            hydra.shuffle();
+
+            if(hydra.size == 0) return;
+
+            entity.items.remove(Items.pyratite, hydra.size);
+            netServer.titanic.add(tile);
+
+            float delay = 0;
+            for(TargetTrait target : hydra){
+                Vec2 predict = Predict.intercept(tile, target, Bullets.artilleryIncendiary.speed);
+
+                float dst = entity.dst(predict.x, predict.y);
+                float maxTraveled = Bullets.artilleryIncendiary.lifetime * Bullets.artilleryIncendiary.speed;
+
+                for(int i = 0; i < 2; ++i) Timer.schedule(() -> Call.createBullet(Bullets.artilleryIncendiary, tile.getTeam(), tile.drawx(), tile.drawy(), tile.angleTo(target) + Mathf.range(Bullets.artilleryIncendiary.inaccuracy + Bullets.artilleryIncendiary.inaccuracy), 1f + Mathf.range(velocityInaccuracy), (dst / maxTraveled)), delay += (1f/60f));
             }
         }
     }

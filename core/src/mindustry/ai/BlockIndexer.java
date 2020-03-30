@@ -196,10 +196,14 @@ public class BlockIndexer{
     }
 
     public TileEntity findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
+        return findEnemyTile(team, x, y, range, pred, true);
+    }
+
+    public TileEntity findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred, boolean usePriority){
         for(Team enemy : activeTeams){
             if(!team.isEnemy(enemy)) continue;
 
-            TileEntity entity = indexer.findTile(enemy, x, y, range, pred, true);
+            TileEntity entity = indexer.findTile(enemy, x, y, range, pred, usePriority);
             if(entity != null){
                 return entity;
             }

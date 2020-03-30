@@ -78,7 +78,7 @@ public class Incinerator extends Block{
                 nearby.removeAll(t -> t.block instanceof Incinerator);
                 nearby.removeAll(t -> t.block.category == Category.distribution);
                 nearby.removeAll(t -> t.block.category == Category.turret);
-                nearby.removeAll(t -> !t.block.acceptItem(Items.pyratite, t, t));
+                nearby.removeAll(t -> !t.block.acceptItem(Items.pyratite, t, tile));
 
                 Call.transferItemTo(Items.pyratite, 1, tile.drawx(), tile.drawy(), nearby.random());
             }

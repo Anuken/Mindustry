@@ -81,9 +81,14 @@ public class Units{
 
     /** Returns the neareset enemy tile in a range. */
     public static TileEntity findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
+        return findEnemyTile(team, x, y, range, pred, true);
+    }
+
+    /** Returns the neareset enemy tile in a range. */
+    public static TileEntity findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred, boolean usePriority){
         if(team == Team.derelict) return null;
 
-        return indexer.findEnemyTile(team, x, y, range, pred);
+        return indexer.findEnemyTile(team, x, y, range, pred, usePriority);
     }
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
