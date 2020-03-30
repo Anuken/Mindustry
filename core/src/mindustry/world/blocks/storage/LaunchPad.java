@@ -112,7 +112,7 @@ public class LaunchPad extends StorageBlock{
                 float dst = entity.dst(predict.x, predict.y);
                 float maxTraveled = Bullets.artilleryIncendiary.lifetime * Bullets.artilleryIncendiary.speed;
 
-                for(int i = 0; i < 2; ++i) Timer.schedule(() -> Call.createBullet(Bullets.artilleryIncendiary, tile.getTeam(), tile.drawx(), tile.drawy(), tile.angleTo(target) + Mathf.range(Bullets.artilleryIncendiary.inaccuracy + Bullets.artilleryIncendiary.inaccuracy), 1f + Mathf.range(velocityInaccuracy), (dst / maxTraveled)), delay += (1f/60f));
+                for(int i = 0; i < (4 * 2); ++i) Timer.schedule(() -> Call.createBullet(Bullets.artilleryIncendiary, tile.getTeam(), tile.drawx(), tile.drawy(), tile.angleTo(target) + Mathf.range(Bullets.artilleryIncendiary.inaccuracy + Bullets.artilleryIncendiary.inaccuracy), 1f + Mathf.range(velocityInaccuracy), (dst / maxTraveled)), delay += (1f/60f));
             }
         }
     }
