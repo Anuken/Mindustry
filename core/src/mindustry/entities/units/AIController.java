@@ -1,5 +1,6 @@
 package mindustry.entities.units;
 
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.*;
@@ -16,6 +17,10 @@ public class AIController implements UnitController{
     protected Unitc unit;
     protected Teamc target;
     protected Interval timer = new Interval(4);
+
+    {
+        timer.reset(0, Mathf.random(40f));
+    }
 
     protected void targetClosestAllyFlag(BlockFlag flag){
         Tile target = Geometry.findClosest(unit.x(), unit.y(), indexer.getAllied(unit.team(), flag));

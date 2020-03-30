@@ -77,7 +77,7 @@ def antialias = { File file ->
             suma.set(0)
 
             for(int val : p){
-                Color.argb8888ToColor(color, val)
+                color.argb8888(val)
                 suma.r += color.r * color.a
                 suma.g += color.g * color.a
                 suma.b += color.b * color.a
@@ -91,7 +91,7 @@ def antialias = { File file ->
             sum.set(0)
 
             for(int val : p){
-                Color.argb8888ToColor(color, val)
+                color.argb8888(val)
                 float a = color.a
                 color.lerp(suma, (float) (1f - a))
                 sum.r += color.r
@@ -103,8 +103,7 @@ def antialias = { File file ->
 
             fm = (float)(1f / total)
             sum.mul(fm, fm, fm, fm)
-            int result = Color.argb8888(sum)
-            out.setRGB(x, y, result)
+            out.setRGB(x, y, sum.argb8888())
             sum.set(0)
         }
     }
@@ -315,7 +314,7 @@ task pack(dependsOn: classes){
 
         //antialias everything except UI elements
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
-            if(file.isDirectory() || file.toString().replace("\\", "/").contains("zones/") || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-"))) return
+            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-"))) return
 
             executor.submit{
                 antialias(file.file)
