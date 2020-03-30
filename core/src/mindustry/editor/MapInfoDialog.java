@@ -32,7 +32,7 @@ public class MapInfoDialog extends FloatingDialog{
         ObjectMap<String, String> tags = editor.getTags();
         
         cont.pane(t -> {
-            t.add("$editor.name").padRight(8).left();
+            t.add("$editor.mapname").padRight(8).left();
             t.defaults().padTop(15);
 
             TextField name = t.addField(tags.get("name", ""), text -> {
