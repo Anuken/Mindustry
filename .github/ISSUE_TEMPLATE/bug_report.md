@@ -14,3 +14,8 @@ assignees: ''
 **Issue**: *Explain your issue in detail.*
 
 **Steps to reproduce**: *How you happened across the issue, and what you were doing at the time.*
+
+---
+
+*Place an X (no spaces) between the brackets to confirm that you have read the line below.*  
+[ ] **I have searched the closed and open issues to make sure that this problem has not already been reported.**
