@@ -110,11 +110,12 @@ public class LaunchPad extends StorageBlock{
             if(missiles.size == 0) return;
 
             hydra.clear();
-            for(int i = 0; i < missiles.size; ++i){
-                hydra.add(Units.findEnemyTile(tile.getTeam(), tile.drawx(), tile.drawy(), Integer.MAX_VALUE, t -> !hydra.contains(t.entity), false));
+            while(hydra.size < Mathf.clamp(missiles.size, 0, itemCapacity)){
+                TargetTrait target = Units.findEnemyTile(tile.getTeam(), tile.drawx(), tile.drawy(), Integer.MAX_VALUE, t -> !hydra.contains(t.entity), false);
+                if(target == null) break;
+                if(Mathf.chance(0.5f)) hydra.add(target);
             }
 
-            hydra = hydra.select(tt -> tt != null);
             hydra.shuffle();
             if(hydra.size == 0) return;
 
