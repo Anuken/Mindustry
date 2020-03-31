@@ -9,7 +9,6 @@ import com.codedisaster.steamworks.*;
 import com.codedisaster.steamworks.SteamFriends.*;
 import com.codedisaster.steamworks.SteamMatchmaking.*;
 import com.codedisaster.steamworks.SteamNetworking.*;
-import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -242,7 +241,6 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
         logic.reset();
         net.reset();
-        state.set(State.menu);
 
         currentLobby = steamIDLobby;
         currentServer = smat.getLobbyOwner(steamIDLobby);
@@ -346,7 +344,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             currentLobby = steamID;
 
             smat.setLobbyData(steamID, "name", player.name());
-            smat.setLobbyData(steamID, "mapname", world.getMap().name());
+            smat.setLobbyData(steamID, "mapname", state.map.name());
             smat.setLobbyData(steamID, "version", Version.build + "");
             smat.setLobbyData(steamID, "versionType", Version.type);
             smat.setLobbyData(steamID, "wave", state.wave + "");

@@ -1,12 +1,11 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import mindustry.core.GameState.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Stats.*;
+import mindustry.game.*;
 import mindustry.type.*;
-import mindustry.ui.Cicon;
+import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
@@ -40,7 +39,6 @@ public class GameOverDialog extends FloatingDialog{
             cont.add(Core.bundle.format("gameover.pvp", winner.localized())).pad(6);
             buttons.addButton("$menu", () -> {
                 hide();
-                state.set(State.menu);
                 logic.reset();
             }).size(130f, 60f);
         }else{
@@ -90,14 +88,12 @@ public class GameOverDialog extends FloatingDialog{
             if(state.isCampaign()){
                 buttons.addButton("$continue", () -> {
                     hide();
-                    state.set(State.menu);
                     logic.reset();
                     ui.planet.show();
                 }).size(130f, 60f);
             }else{
                 buttons.addButton("$menu", () -> {
                     hide();
-                    state.set(State.menu);
                     logic.reset();
                 }).size(130f, 60f);
             }

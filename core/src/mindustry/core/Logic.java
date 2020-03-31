@@ -120,12 +120,11 @@ public class Logic implements ApplicationListener{
     }
 
     public void reset(){
-        state.wave = 1;
-        state.wavetime = state.rules.waveSpacing;
-        state.gameOver = state.launched = false;
-        state.teams = new Teams();
-        state.rules = new Rules();
-        state.stats = new Stats();
+        State prev = state.getState();
+        //recreate gamestate - sets state to menu
+        state = new GameState();
+        //fire change event, since it was technically changed
+        Events.fire(new StateChangeEvent(prev, State.menu));
 
         Groups.all.clear();
         Time.clear();

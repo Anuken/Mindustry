@@ -171,9 +171,9 @@ def scaleImage = { File file ->
                     M = getRGB(x, y - 2)
 
                 if(B == D && B != F && D != H && (E != A || E == C || E == G || A == J || A == K)) p1 = B
-                if(B == F & B != D & F != H && (E != C || E == A || E == I || C == J || C == L)) p2 = F
-                if(D == H & B != D & F != H && (E != G || E == A || E == I || G == K || G == M)) p3 = D
-                if(F == H & B != F & D != H && (E != I || E == C || E == G || I == L || I == M)) p4 = H
+                if(B == F && B != D && F != H && (E != C || E == A || E == I || C == J || C == L)) p2 = F
+                if(D == H && B != D && F != H && (E != G || E == A || E == I || G == K || G == M)) p3 = D
+                if(F == H && B != F && D != H && (E != I || E == C || E == G || I == L || I == M)) p4 = H
 
                 scaled.setRGB(x * 2, y * 2 + 1, p1)
                 scaled.setRGB(x * 2 + 1, y * 2 + 1, p2)

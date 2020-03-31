@@ -92,7 +92,6 @@ public class NetClient implements ApplicationListener{
             if(quietReset) return;
 
             connecting = false;
-            state.set(State.menu);
             logic.reset();
             platform.updateRPC();
             player.name(Core.settings.getString("name"));
@@ -207,7 +206,6 @@ public class NetClient implements ApplicationListener{
     @Remote(called = Loc.client, variants = Variant.one)
     public static void onConnect(String ip, int port){
         netClient.disconnectQuietly();
-        state.set(State.menu);
         logic.reset();
 
         ui.join.connect(ip, port);
@@ -233,7 +231,6 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.one, priority = PacketPriority.high)
     public static void onKick(KickReason reason){
         netClient.disconnectQuietly();
-        state.set(State.menu);
         logic.reset();
 
         if(!reason.quiet){
@@ -249,7 +246,6 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.one, priority = PacketPriority.high)
     public static void onKick(String reason){
         netClient.disconnectQuietly();
-        state.set(State.menu);
         logic.reset();
         ui.showText("$disconnect", reason, Align.left);
         ui.loadfrag.hide();

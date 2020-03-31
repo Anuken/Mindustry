@@ -11,7 +11,6 @@ import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
-import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
@@ -129,13 +128,13 @@ public class ServerControl implements ApplicationListener{
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
             if(state.rules.waves){
-                info("&lcGame over! Reached wave &ly{0}&lc with &ly{1}&lc players online on map &ly{2}&lc.", state.wave, Groups.player.size(), Strings.capitalize(world.getMap().name()));
+                info("&lcGame over! Reached wave &ly{0}&lc with &ly{1}&lc players online on map &ly{2}&lc.", state.wave, Groups.player.size(), Strings.capitalize(state.map.name()));
             }else{
-                info("&lcGame over! Team &ly{0}&lc is victorious with &ly{1}&lc players online on map &ly{2}&lc.", event.winner.name, Groups.player.size(), Strings.capitalize(world.getMap().name()));
+                info("&lcGame over! Team &ly{0}&lc is victorious with &ly{1}&lc players online on map &ly{2}&lc.", event.winner.name, Groups.player.size(), Strings.capitalize(state.map.name()));
             }
 
             //set next map to be played
-            Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(world.getMap());
+            Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(state.map);
             nextMapOverride = null;
             if(map != null){
                 Call.onInfoMessage((state.rules.pvp
@@ -220,8 +219,7 @@ public class ServerControl implements ApplicationListener{
                     return;
                 }
             }else{
-                Array<Map> maps = Vars.maps.customMaps().size == 0 ? Vars.maps.defaultMaps() : Vars.maps.customMaps();
-                result = maps.random();
+                result = maps.getShuffleMode().next(state.map);
                 info("Randomized next map to be {0}.", result.name());
             }
 
@@ -280,7 +278,7 @@ public class ServerControl implements ApplicationListener{
                 info("Status: &rserver closed");
             }else{
                 info("Status:");
-                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name()), state.wave);
+                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(state.map.name()), state.wave);
 
                 if(state.rules.waves){
                     info("&ly  {0} enemies.", state.enemies);
@@ -884,7 +882,7 @@ public class ServerControl implements ApplicationListener{
 
             Call.onWorldDataBegin();
             run.run();
-            state.rules = world.getMap().applyRules(lastMode);
+            state.rules = state.map.applyRules(lastMode);
             logic.play();
 
             for(Playerc p : players){

@@ -201,7 +201,7 @@ public class ApplicationTests{
     @Test
     void load(){
         world.loadMap(testMap);
-        Map map = world.getMap();
+        Map map = state.map;
 
         SaveIO.save(saveDirectory.child("0.msav"));
         resetWorld();

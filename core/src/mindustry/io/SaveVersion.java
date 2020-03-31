@@ -62,7 +62,7 @@ public abstract class SaveVersion extends SaveFileReader{
             "saved", Time.millis(),
             "playtime", headless ? 0 : control.saves.getTotalPlaytime(),
             "build", Version.build,
-            "mapname", world.getMap() == null ? "unknown" : world.getMap().name(),
+            "mapname", state.map.name(),
             "wave", state.wave,
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
@@ -84,11 +84,12 @@ public abstract class SaveVersion extends SaveFileReader{
         lastReadBuild = map.getInt("build", -1);
 
         Map worldmap = maps.byName(map.get("mapname", "\\\\\\"));
-        world.setMap(worldmap == null ? new Map(StringMap.of(
+        Map map1 = worldmap == null ? new Map(StringMap.of(
             "name", map.get("mapname", "Unknown"),
             "width", 1,
             "height", 1
-        )) : worldmap);
+        )) : worldmap;
+        state.map = map1;
     }
 
     public void writeMap(DataOutput stream) throws IOException{

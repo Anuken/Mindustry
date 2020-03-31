@@ -18,6 +18,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.maps.*;
+import mindustry.maps.Map;
 import mindustry.mod.*;
 import mindustry.net.Net;
 import mindustry.net.*;
@@ -142,6 +143,8 @@ public class Vars implements Loadable{
     public static Fi schematicDirectory;
     /** data subdirectory used for bleeding edge build versions */
     public static Fi bebuildDirectory;
+    /** empty map, indicates no current map */
+    public static Map emptyMap;
     /** map file extension */
     public static final String mapExtension = "msav";
     /** save file extension */
@@ -219,6 +222,7 @@ public class Vars implements Loadable{
         modDirectory = dataDirectory.child("mods/");
         schematicDirectory = dataDirectory.child("schematics/");
         bebuildDirectory = dataDirectory.child("be_builds/");
+        emptyMap = new Map(new StringMap());
 
         if(tree == null) tree = new FileTree();
         if(mods == null) mods = new Mods();

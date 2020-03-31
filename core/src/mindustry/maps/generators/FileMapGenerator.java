@@ -22,6 +22,7 @@ public class FileMapGenerator implements WorldGenerator{
 
     @Override
     public void generate(Tiles tiles){
+        if(true) throw new IllegalArgumentException("no!");
         tiles.fill();
 
         SaveIO.load(map.file);
@@ -60,6 +61,6 @@ public class FileMapGenerator implements WorldGenerator{
         }
 
         world.prepareTiles(tiles);
-        world.setMap(map);
+        state.map = map;
     }
 }

@@ -58,7 +58,7 @@ public class ArcNetProvider implements NetProvider{
                 Core.app.post(() -> {
                     try{
                         net.handleClientReceived(object);
-                    }catch(Exception e){
+                    }catch(Throwable e){
                         handleException(e);
                     }
                 });
@@ -113,9 +113,7 @@ public class ArcNetProvider implements NetProvider{
                 Core.app.post(() -> {
                     try{
                         net.handleServerReceived(k, object);
-                    }catch(RuntimeException e){
-                        e.printStackTrace();
-                    }catch(Exception e){
+                    }catch(Throwable e){
                         e.printStackTrace();
                     }
                 });
@@ -267,7 +265,7 @@ public class ArcNetProvider implements NetProvider{
         return null;
     }
 
-    private void handleException(Exception e){
+    private void handleException(Throwable e){
         if(e instanceof ArcNetException){
             Core.app.post(() -> net.showError(new IOException("mismatch")));
         }else if(e instanceof ClosedChannelException){

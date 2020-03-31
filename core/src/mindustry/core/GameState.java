@@ -5,9 +5,10 @@ import arc.util.ArcAnnotate.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.maps.*;
 import mindustry.type.*;
 
-import static mindustry.Vars.net;
+import static mindustry.Vars.*;
 
 public class GameState{
     /** Current wave number, can be anything in non-wave modes. */
@@ -16,6 +17,8 @@ public class GameState{
     public float wavetime;
     /** Whether the game is in game over state. */
     public boolean gameOver = false, launched = false;
+    /** Map that is currently being played on. */
+    public @NonNull Map map = emptyMap;
     /** The current game rules. */
     public Rules rules = new Rules();
     /** Statistics for this save/game. Displayed after game over. */

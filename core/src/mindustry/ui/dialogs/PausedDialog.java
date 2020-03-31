@@ -2,7 +2,6 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.input.*;
-import mindustry.core.GameState.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
@@ -118,7 +117,6 @@ public class PausedDialog extends FloatingDialog{
         }
 
         if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave() || state.rules.tutorial || wasClient){
-            state.set(State.menu);
             logic.reset();
             return;
         }
@@ -130,7 +128,6 @@ public class PausedDialog extends FloatingDialog{
                 e.printStackTrace();
                 ui.showException("[accent]" + Core.bundle.get("savefail"), e);
             }
-            state.set(State.menu);
             logic.reset();
         });
     }

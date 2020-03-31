@@ -26,7 +26,6 @@ import static mindustry.Vars.*;
 public class World{
     public final Context context = new Context();
 
-    private Map currentMap = new Map(new StringMap());
     public @NonNull Tiles tiles = new Tiles(0, 0);
 
     private boolean generating, invalidMap;
@@ -58,14 +57,6 @@ public class World{
 
     public boolean isAccessible(int x, int y){
         return !wallSolid(x, y - 1) || !wallSolid(x, y + 1) || !wallSolid(x - 1, y) || !wallSolid(x + 1, y);
-    }
-
-    public Map getMap(){
-        return currentMap;
-    }
-
-    public void setMap(Map map){
-        this.currentMap = map;
     }
 
     public int width(){
@@ -214,7 +205,7 @@ public class World{
     }
 
     public void loadSector(Sector sector){
-        currentMap = new Map(StringMap.of("name", sector.planet.localizedName + "; Sector " + sector.id));
+        state.map = new Map(StringMap.of("name", sector.planet.localizedName + "; Sector " + sector.id));
         state.rules.sector = sector;
         int size = sector.getSize();
         loadGenerator(size, size, tiles -> sector.planet.generator.generate(tiles, sector));
@@ -238,7 +229,7 @@ public class World{
             return;
         }
 
-        this.currentMap = map;
+        state.map = map;
 
         invalidMap = false;
 

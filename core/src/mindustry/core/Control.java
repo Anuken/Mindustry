@@ -88,9 +88,9 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(WaveEvent.class, event -> {
-            if(world.getMap().getHightScore() < state.wave){
+            if(state.map.getHightScore() < state.wave){
                 hiscore = true;
-                world.getMap().setHighScore(state.wave);
+                state.map.setHighScore(state.wave);
             }
 
             Sounds.wave.play();

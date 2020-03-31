@@ -21,7 +21,7 @@ public class NetworkIO{
 
         try(DataOutputStream stream = new DataOutputStream(os)){
             stream.writeUTF(JsonIO.write(state.rules));
-            SaveIO.getSaveWriter().writeStringMap(stream, world.getMap().tags);
+            SaveIO.getSaveWriter().writeStringMap(stream, state.map.tags);
 
             stream.writeInt(state.wave);
             stream.writeFloat(state.wavetime);
@@ -41,7 +41,7 @@ public class NetworkIO{
         try(DataInputStream stream = new DataInputStream(is)){
             Time.clear();
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
-            world.setMap(new Map(SaveIO.getSaveWriter().readStringMap(stream)));
+            state.map = new Map(SaveIO.getSaveWriter().readStringMap(stream));
 
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();
@@ -65,7 +65,7 @@ public class NetworkIO{
     public static ByteBuffer writeServerData(){
         String name = (headless ? Config.name.string() : player.name());
         String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
-        String map = world.getMap() == null ? "None" : world.getMap().name();
+        String map = state.map.name();
 
         ByteBuffer buffer = ByteBuffer.allocate(512);
 

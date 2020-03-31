@@ -178,7 +178,6 @@ public class LoadDialog extends FloatingDialog{
                     state.set(State.playing);
                 }catch(SaveException e){
                     Log.err(e);
-                    state.set(State.menu);
                     logic.reset();
                     ui.showErrorMessage("$save.corrupted");
                 }

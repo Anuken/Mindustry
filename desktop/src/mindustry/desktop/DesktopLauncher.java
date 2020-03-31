@@ -248,10 +248,9 @@ public class DesktopLauncher extends ClientLauncher{
         String uiState = "";
 
         if(inGame){
-            if(world.getMap() != null){
-                //TODO implement nice name for sector
-                gameMapWithWave = Strings.capitalize(world.getMap().name());
-            }
+            //TODO implement nice name for sector
+            gameMapWithWave = Strings.capitalize(state.map.name());
+
             if(state.rules.waves){
                 gameMapWithWave += " | Wave " + state.wave;
             }
