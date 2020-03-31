@@ -18,4 +18,4 @@ assignees: ''
 ---
 
 *Place an X (no spaces) between the brackets to confirm that you have read the line below.*  
-[ ] **I have searched the closed and open issues to make sure that this problem has not already been reported.**
+- [ ] **I have searched the closed and open issues to make sure that this problem has not already been reported.**
