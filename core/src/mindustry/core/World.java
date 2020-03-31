@@ -161,7 +161,6 @@ public class World{
      * A WorldLoadEvent will be fire.
      */
     public void endMapLoad(){
-        prepareTiles(tiles);
 
         for(Tile tile : tiles){
             //remove legacy blocks; they need to stop existing
@@ -391,53 +390,6 @@ public class World{
         }
 
         return dark;
-    }
-
-    /**
-     * 'Prepares' a tile array by:<br>
-     * - setting up multiblocks<br>
-     * - updating occlusion<br>
-     * Usually used before placing structures on a tile array.
-     */
-    public void prepareTiles(Tiles tiles){
-
-        //TODO FIX
-        /*
-        //find multiblocks
-        IntArray multiblocks = new IntArray();
-        for(Tile tile : tiles){
-            if(tile.block().isMultiblock()){
-                multiblocks.add(tile.pos());
-            }
-        }
-
-        //place multiblocks now
-        for(int i = 0; i < multiblocks.size; i++){
-            int pos = multiblocks.get(i);
-
-            int x = Point2.x(pos);
-            int y = Point2.y(pos);
-            Tile tile = tiles.getn(x, y);
-
-            Block result = tile.block();
-            Team team = tile.team();
-
-            int offsetx = -(result.size - 1) / 2;
-            int offsety = -(result.size - 1) / 2;
-
-            for(int dx = 0; dx < result.size; dx++){
-                for(int dy = 0; dy < result.size; dy++){
-                    int worldx = dx + offsetx + x;
-                    int worldy = dy + offsety + y;
-                    if(!(worldx == x && worldy == y)){
-                        Tile toplace = world.tile(worldx, worldy);
-                        if(toplace != null){
-                            toplace.setBlock(BlockPart.get(dx + offsetx, dy + offsety), team);
-                        }
-                    }
-                }
-            }
-        }*/
     }
 
     public interface Raycaster{

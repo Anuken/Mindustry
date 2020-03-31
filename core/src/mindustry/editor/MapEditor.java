@@ -54,7 +54,6 @@ public class MapEditor{
             tags.put("steamid",  map.file.parent().name());
         }
         MapIO.loadMap(map, context);
-        checkLinkedTiles();
         renderer.resize(width(), height());
         loading = false;
     }
@@ -65,12 +64,6 @@ public class MapEditor{
         createTiles(pixmap.getWidth(), pixmap.getHeight());
         load(() -> MapIO.readImage(pixmap, tiles()));
         renderer.resize(width(), height());
-    }
-
-    //adds missing blockparts
-    //TODO remove, may not be necessary with blockpart refactor later
-    public void checkLinkedTiles(){
-        //TODO actually remove
     }
 
     public void load(Runnable r){

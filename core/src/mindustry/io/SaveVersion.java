@@ -84,12 +84,11 @@ public abstract class SaveVersion extends SaveFileReader{
         lastReadBuild = map.getInt("build", -1);
 
         Map worldmap = maps.byName(map.get("mapname", "\\\\\\"));
-        Map map1 = worldmap == null ? new Map(StringMap.of(
+        state.map = worldmap == null ? new Map(StringMap.of(
             "name", map.get("mapname", "Unknown"),
             "width", 1,
             "height", 1
         )) : worldmap;
-        state.map = map1;
     }
 
     public void writeMap(DataOutput stream) throws IOException{

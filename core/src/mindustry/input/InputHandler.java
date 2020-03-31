@@ -807,7 +807,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void breakBlock(int x, int y){
         Tile tile = world.tile(x, y);
         //TODO hacky
-        if(tile.entity != null) tile = tile.entity.tile();
+        if(tile != null && tile.entity != null) tile = tile.entity.tile();
         player.builder().addBuild(new BuildRequest(tile.x, tile.y));
     }
 

@@ -260,8 +260,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
             }
             player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
-            //TODO figure out how to kill player
-            //player.dead(false);
+            player.clearUnit();
             logic.play();
         });
     }
