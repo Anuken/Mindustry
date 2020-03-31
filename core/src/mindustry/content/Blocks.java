@@ -57,7 +57,7 @@ public class Blocks implements ContentList{
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //transport
-    conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, underflowGate, massDriver,
+    router, 
 
     //liquid
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
@@ -898,92 +898,12 @@ public class Blocks implements ContentList{
 
         //endregion
         //region distribution
-
-        conveyor = new Conveyor("conveyor"){{
-            requirements(Category.distribution, ItemStack.with(Items.copper, 1), true);
-            health = 45;
-            speed = 0.03f;
-            displayedSpeed = 4.2f;
-        }};
-
-        titaniumConveyor = new Conveyor("titanium-conveyor"){{
-            requirements(Category.distribution, ItemStack.with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
-            health = 65;
-            speed = 0.08f;
-            displayedSpeed = 10f;
-        }};
-
-        armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
-            requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
-            health = 180;
-            speed = 0.08f;
-            displayedSpeed = 10f;
-        }};
-
-        junction = new Junction("junction"){{
-            requirements(Category.distribution, ItemStack.with(Items.copper, 2), true);
-            speed = 26;
-            capacity = 12;
-            health = 30;
-            buildCostMultiplier = 6f;
-        }};
-
-        itemBridge = new BufferedItemBridge("bridge-conveyor"){{
-            requirements(Category.distribution, ItemStack.with(Items.lead, 4, Items.copper, 4));
-            range = 4;
-            speed = 70f;
-            bufferCapacity = 14;
-        }};
-
-        phaseConveyor = new ItemBridge("phase-conveyor"){{
-            requirements(Category.distribution, ItemStack.with(Items.phasefabric, 5, Items.silicon, 7, Items.lead, 10, Items.graphite, 10));
-            range = 12;
-            canOverdrive = false;
-            hasPower = true;
-            consumes.power(0.30f);
-        }};
-
-        sorter = new Sorter("sorter"){{
-            requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 2));
-            buildCostMultiplier = 3f;
-        }};
-
-        invertedSorter = new Sorter("inverted-sorter"){{
-            requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 2));
-            buildCostMultiplier = 3f;
-            invert = true;
-        }};
-
+        
         router = new Router("router"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 3));
             buildCostMultiplier = 2f;
         }};
-
-        distributor = new Router("distributor"){{
-            requirements(Category.distribution, ItemStack.with(Items.lead, 4, Items.copper, 4));
-            size = 2;
-        }};
-
-        overflowGate = new OverflowGate("overflow-gate"){{
-            requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 4));
-            buildCostMultiplier = 3f;
-        }};
-
-        underflowGate = new OverflowGate("underflow-gate"){{
-            requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 4));
-            buildCostMultiplier = 3f;
-            invert = true;
-        }};
-
-        massDriver = new MassDriver("mass-driver"){{
-            requirements(Category.distribution, ItemStack.with(Items.titanium, 125, Items.silicon, 75, Items.lead, 125, Items.thorium, 50));
-            size = 3;
-            itemCapacity = 120;
-            reloadTime = 200f;
-            range = 440f;
-            consumes.power(1.75f);
-        }};
-
+        
         //endregion
         //region liquid
 
