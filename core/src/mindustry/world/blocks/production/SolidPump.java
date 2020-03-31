@@ -132,13 +132,6 @@ public class SolidPump extends Pump{
     }
 
     @Override
-    public void placed(Tile tile){
-        super.placed(tile);
-
-        darwin(tile);
-    }
-
-    @Override
     public boolean canPlaceOn(Tile tile){
         if(isMultiblock()){
             for(Tile other : tile.getLinkedTilesAs(this, drawTiles)){
