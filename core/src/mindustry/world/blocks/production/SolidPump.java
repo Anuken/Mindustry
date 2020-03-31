@@ -191,9 +191,11 @@ public class SolidPump extends Pump{
                     if(on.block == Blocks.liquidRouter) block = Blocks.liquidRouter;
                     
                     if(on.block.hasLiquids){
-                        if(on.entity.liquids != null){
-                            if(on.entity.liquids.current() != result){
-                                return;
+                        if(on.entity != null){
+                            if(on.entity.liquids != null){
+                                if(on.entity.liquids.current() != result){
+                                    return;
+                                }
                             }
                         }
                     }
