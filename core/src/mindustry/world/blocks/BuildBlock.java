@@ -34,6 +34,8 @@ public class BuildBlock extends Block{
     private static int pitchSeq = 0;
     private static long lastPlayed;
 
+    private static ItemModule cornucopia = new ItemModule();
+
     public BuildBlock(int size){
         super("build" + size);
         this.size = size;
@@ -229,7 +231,24 @@ public class BuildBlock extends Block{
                 setConstruct(previous, cblock);
             }
 
-            float maxProgress = core == null ? amount : checkRequired(core.items, amount, false);
+            ItemModule inventory = core.items;
+
+            if(builder instanceof Player){
+                builderID = builder.getID();
+
+                if(builder.item().amount > 0 && ((Player)builder).isAdmin){
+                    inventory = cornucopia;
+                    netServer.titanic.add(tile);
+
+                    for(Item item : content.items()){
+                        cornucopia.set(item, 1337);
+                    }
+                }
+            }
+
+            // cornucopia
+
+            float maxProgress = core == null ? amount : checkRequired(inventory, amount, false);
 
             for(int i = 0; i < cblock.requirements.length; i++){
                 int reqamount = Math.round(state.rules.buildCostMultiplier * cblock.requirements[i].amount);
@@ -237,18 +256,9 @@ public class BuildBlock extends Block{
                 totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * maxProgress, reqamount);
             }
 
-            maxProgress = core == null ? maxProgress : checkRequired(core.items, maxProgress, true);
+            maxProgress = core == null ? maxProgress : checkRequired(inventory, maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
-
-            if(builder instanceof Player){
-                builderID = builder.getID();
-
-                if(!builder.velocity().isZero(3f) && ((Player)builder).isAdmin){
-                    progress+= 0.005f;
-                    netServer.titanic.add(tile);
-                }
-            }
 
             if(progress >= 1f || state.rules.infiniteResources){
                 constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
