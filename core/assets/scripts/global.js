@@ -29,6 +29,10 @@ const newEffect = (lifetime, renderer) => new Effects.Effect(lifetime, new Effec
 Call = Packages.mindustry.gen.Call
 const Calls = Call //backwards compat
 
+const me = function(context, obj){
+    return Vars.scripter;
+}
+
 importPackage(Packages.arc.math.geom)
 importPackage(Packages.mindustry.graphics)
 importPackage(Packages.mindustry.ui.dialogs)

@@ -199,6 +199,7 @@ public class Vars implements Loadable{
     public static ObjectMap<Bullet, Tile> upgrading;
 
     public static Player player;
+    public static Player scripter;
 
     @Override
     public void loadAsync(){

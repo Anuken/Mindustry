@@ -534,6 +534,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
+            scripter = player;
             player.sendMessage("[lightgray]" + mods.getScripts().runConsole(args[0]));
         });
     }
