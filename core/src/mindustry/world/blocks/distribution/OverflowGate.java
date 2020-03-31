@@ -12,7 +12,7 @@ import java.io.*;
 import static mindustry.Vars.world;
 
 public class OverflowGate extends Block{
-    public float speed = 1f;
+    public float speed = 6f;
     public boolean invert = false;
 
     public OverflowGate(String name){
