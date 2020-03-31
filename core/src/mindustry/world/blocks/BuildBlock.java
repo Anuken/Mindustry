@@ -256,14 +256,14 @@ public class BuildBlock extends Block{
             }
 
             // downgrade titanium conveyors
-            if(maxProgress == 0f && cblock == Blocks.titaniumConveyor){
+            if(maxProgress == 0f && (cblock == Blocks.titaniumConveyor || cblock == Blocks.conveyor)){
                 constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
                 Core.app.post(() -> tile.setNet(Blocks.conveyor, builder.getTeam(), tile.rotation));
                 return true;
             }
 
             // downgrade titanium conduits
-            if(maxProgress == 0f && cblock == Blocks.pulseConduit){
+            if(maxProgress == 0f && (cblock == Blocks.pulseConduit || cblock == Blocks.conduit)){
                 constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
                 Core.app.post(() -> tile.setNet(Blocks.conduit, builder.getTeam(), tile.rotation));
                 return true;
