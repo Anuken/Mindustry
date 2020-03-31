@@ -5,6 +5,7 @@ attribute vec4 a_color;
 uniform mat4 u_proj;
 uniform mat4 u_trans;
 uniform vec3 u_lightdir;
+//uniform vec3 u_camdir;
 uniform vec3 u_ambientColor;
 
 varying vec4 v_col;

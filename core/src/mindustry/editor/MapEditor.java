@@ -1,17 +1,15 @@
 package mindustry.editor;
 
-import arc.struct.StringMap;
-import arc.files.Fi;
-import arc.func.Cons;
-import arc.func.Boolf;
-import arc.graphics.Pixmap;
-import arc.math.Mathf;
-import arc.util.Structs;
-import mindustry.content.Blocks;
-import mindustry.game.Team;
-import mindustry.gen.TileOp;
-import mindustry.io.MapIO;
-import mindustry.maps.Map;
+import arc.files.*;
+import arc.func.*;
+import arc.graphics.*;
+import arc.math.*;
+import arc.struct.*;
+import mindustry.content.*;
+import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.io.*;
+import mindustry.maps.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -126,43 +124,12 @@ public class MapEditor{
         if(drawBlock.isMultiblock()){
             x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
             y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
-
-            int offsetx = -(drawBlock.size - 1) / 2;
-            int offsety = -(drawBlock.size - 1) / 2;
-
-            //TODO this is completely unnecessary now!
-            for(int dx = 0; dx < drawBlock.size; dx++){
-                for(int dy = 0; dy < drawBlock.size; dy++){
-                    int worldx = dx + offsetx + x;
-                    int worldy = dy + offsety + y;
-
-                    if(Structs.inBounds(worldx, worldy, width(), height())){
-                        Tile tile = tile(worldx, worldy);
-
-                        Block block = tile.block();
-
-                        //bail out if there's anything blocking the way
-                        if(block.isMultiblock()){
-                            return;
-                        }
-
-                        renderer.updatePoint(worldx, worldy);
-                    }
-                }
-            }
-
             tile(x, y).setBlock(drawBlock, drawTeam, 0);
         }else{
             boolean isFloor = drawBlock.isFloor() && drawBlock != Blocks.air;
 
             Cons<Tile> drawer = tile -> {
                 if(!tester.get(tile)) return;
-
-                //remove linked tiles blocking the way
-                //TODO also unnecessary
-                //if(!isFloor && (tile.isLinked() || tile.block().isMultiblock())){
-                //    tile.link().remove();
-                //}
 
                 if(isFloor){
                     tile.setFloor(drawBlock.asFloor());
@@ -188,7 +155,7 @@ public class MapEditor{
     public void drawCircle(int x, int y, Cons<Tile> drawer){
         for(int rx = -brushSize; rx <= brushSize; rx++){
             for(int ry = -brushSize; ry <= brushSize; ry++){
-                if(Mathf.dst2(rx, ry) <= (brushSize - 0.5f) * (brushSize - 0.5f)){
+                if(Mathf.within(rx, ry, brushSize - 0.5f + 0.0001f)){
                     int wx = x + rx, wy = y + ry;
 
                     if(wx < 0 || wy < 0 || wx >= width() || wy >= height()){

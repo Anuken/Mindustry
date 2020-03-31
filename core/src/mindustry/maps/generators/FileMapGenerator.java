@@ -60,7 +60,6 @@ public class FileMapGenerator implements WorldGenerator{
             throw new IllegalArgumentException("All zone maps must have a core.");
         }
 
-        world.prepareTiles(tiles);
         state.map = map;
     }
 }

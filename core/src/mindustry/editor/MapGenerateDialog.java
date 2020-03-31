@@ -146,7 +146,6 @@ public class MapGenerateDialog extends FloatingDialog{
         }
 
         //reset undo stack as generation... messes things up
-        editor.load(editor::checkLinkedTiles);
         editor.renderer().updateAll();
         editor.clearOp();
     }

@@ -59,7 +59,9 @@ public class TODOPlanetGenerator extends PlanetGenerator{
     public Color getColor(Vec3 position){
         Block block = getBlock(position);
         //replace salt with sand color
-        return block == Blocks.salt ? Blocks.sand.mapColor : block.mapColor;
+        if(block == Blocks.salt) return Blocks.sand.mapColor;
+        //return block.asFloor().isLiquid ? Tmp.c1.set(block.mapColor).a(0.5f) : block.mapColor;
+        return block.mapColor;
     }
 
     @Override
