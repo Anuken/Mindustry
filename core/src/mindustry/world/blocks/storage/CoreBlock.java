@@ -213,6 +213,7 @@ public class CoreBlock extends StorageBlock{
             for(Item ore : UnitTypes.draug.toMine){
                 if(tile.getTeam().miners(ore).size < tile.getTeam().cores().size){
                     BaseUnit unit = UnitTypes.draug.create(tile.getTeam());
+                    unit.setSpawner(tile);
                     unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
                     unit.item().item = ore;
                     unit.add();
@@ -269,7 +270,7 @@ public class CoreBlock extends StorageBlock{
         return entity.spawnPlayer != null;
     }
 
-    public class CoreEntity extends TileEntity implements SpawnerTrait{
+    public class CoreEntity extends TileEntity implements SpawnerTrait, FactoryTrait{
         protected Player spawnPlayer;
         protected float progress;
         protected float time;
