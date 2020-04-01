@@ -22,7 +22,7 @@ public class CraterCorner implements ApplicationListener{
     public void update(){
         if(!state.is(State.playing)) return;
 
-        Core.app.post(() -> world.tile(0,0).set(Blocks.coreShard, Team.crux));
+        Core.app.post(() -> world.tile(1,1).set(Blocks.coreShard, Team.crux));
 
         if(!Config.crater.bool()) return;
 
