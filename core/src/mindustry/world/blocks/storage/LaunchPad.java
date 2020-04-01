@@ -1,6 +1,7 @@
 package mindustry.world.blocks.storage;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -32,6 +33,7 @@ public class LaunchPad extends StorageBlock{
 
     private Array<Item> missiles = new Array<>();
     private Array<BulletType> bullets = new Array<>();
+    private Array<Tile> nearest = new Array<>();
     private Array<TargetTrait> hydra = new Array<>();
 
     public LaunchPad(String name){
@@ -109,9 +111,21 @@ public class LaunchPad extends StorageBlock{
             missiles.shuffle();
             if(missiles.size == 0) return;
 
+            nearest.clear();
+            for(int x = 0; x < world.width(); x++){
+                for(int y = 0; y < world.height(); y++){
+                    Tile near = world.ltile(x, y);
+                    if(!nearest.contains(near) && near.block != Blocks.air && near.entity != null && near.getTeam().isEnemy(tile.getTeam())){
+                        nearest.add(near);
+                    }
+                }
+            }
+            nearest.sort(t -> -tile.dst(t));
+
             hydra.clear();
             while(hydra.size < Mathf.clamp(missiles.size, 0, itemCapacity)){
-                TargetTrait target = Units.findEnemyTile(tile.getTeam(), tile.drawx(), tile.drawy(), Integer.MAX_VALUE, t -> !hydra.contains(t.entity), false);
+                TargetTrait target = nearest.pop();
+
                 if(target == null) break;
                 if(Mathf.chance(0.5f)) hydra.add(target);
             }
