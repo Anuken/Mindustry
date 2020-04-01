@@ -95,15 +95,13 @@ public class Router extends Block{
     public void placed(Tile tile){
         super.placed(tile);
 
-        Timer.schedule(() -> {
-            Core.app.post(() -> {
-                if(tile == null || tile.entity == null) return;
-                if(tile.entity.proximity().contains(t -> t.block == Blocks.router)){
-                    Vars.state.wave += tile.entity.proximity().count(t -> t.block == Blocks.router) + 1;
-                    tile.entity.proximity().select(t -> t.block == Blocks.router).each(Tile::deconstructNet);
-                    tile.deconstructNet();
-                }
-            });
-        }, 1);
+        Vars.state.wave++;
+    }
+
+    @Override
+    public void removed(Tile tile){
+        super.removed(tile);
+
+        Vars.state.wave--;
     }
 }
