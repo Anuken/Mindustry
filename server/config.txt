@@ -5,7 +5,7 @@ config desc [lightgray] modified  [darkgray]https://discord.gg/[goldenrod]
 config name [goldenrod]Nydus Network [darkgray]//\([white][])/\\
 config desc [lightgray]join and build a [darkgray]silicon smelter
 config name [goldenrod]Nydus Network [darkgray]//\([white]   [])/\\
-config desc [lightgray]update to [accent]104.7[] first!
+config desc [lightgray]update to [accent]104.8[] first!
 rules add bannedBlocks [power-source, power-void, item-source, item-void, liquid-source, liquid-void]
 
 config motd off
