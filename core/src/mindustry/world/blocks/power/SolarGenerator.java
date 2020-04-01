@@ -14,7 +14,7 @@ public class SolarGenerator extends PowerGenerator{
     public SolarGenerator(String name){
         super(name);
         // Remove the BlockFlag.producer flag to make this a lower priority target than other generators.
-        flags = EnumSet.of(BlockFlag.multipart);
+        flags = EnumSet.of();
         entityType = GeneratorEntity::new;
     }
 
@@ -36,20 +36,5 @@ public class SolarGenerator extends PowerGenerator{
         super.placed(tile);
 
         multipart(tile, null);
-    }
-
-    @Override
-    public void multipart(Tile tile, Player player){
-        Block microblock = Blocks.repairPoint;
-        if(tile.block == Blocks.largeSolarPanel){
-            Tile corner = world.tile(tile.x - 1, tile.y - 1);
-
-            if(corner.block != microblock){
-                corner.setNet(microblock, tile.getTeam(), 0);
-                corner.block.placed(corner);
-            }else{
-                if(player != null) Call.setTile(player, corner, microblock, tile.getTeam(), 0);
-            }
-        }
     }
 }

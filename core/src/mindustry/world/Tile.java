@@ -549,10 +549,12 @@ public class Tile implements Position, TargetTrait{
         tile.remove();
     }
 
-    @Remote(called = Loc.server, variants = Variant.out)
+    @Remote(called = Loc.server)
     public static void setTile(Tile tile, Block block, Team team, int rotation){
         tile.set(block, team, rotation);
     }
+
+    //nydus
 
     public boolean border(){
         return border(3);

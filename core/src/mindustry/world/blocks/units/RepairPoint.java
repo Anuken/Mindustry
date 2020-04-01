@@ -1,23 +1,19 @@
 package mindustry.world.blocks.units;
 
-import arc.Core;
-import arc.struct.EnumSet;
-import arc.graphics.Color;
+import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.Angles;
-import arc.math.Mathf;
-import arc.math.geom.Rect;
-import arc.util.Time;
-import mindustry.content.*;
-import mindustry.entities.Units;
-import mindustry.entities.type.TileEntity;
-import mindustry.entities.type.Unit;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.entities.*;
+import mindustry.entities.type.*;
 import mindustry.graphics.*;
-import mindustry.world.Block;
-import mindustry.world.Tile;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.tilesize;
 
 public class RepairPoint extends Block{
     private static Rect rect = new Rect();
@@ -132,16 +128,6 @@ public class RepairPoint extends Block{
             entity.target = Units.closest(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius,
             unit -> unit.health < unit.maxHealth());
         }
-    }
-
-    @Override
-    public boolean isMultipart(Tile tile){
-        if(tile.block != Blocks.repairPoint) return false;
-
-        if(world.tile(tile.x + 1, tile.y + 1) == null) return false;
-        if(world.tile(tile.x + 1, tile.y + 1).block == Blocks.largeSolarPanel) return true;
-
-        return false;
     }
 
     @Override

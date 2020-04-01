@@ -35,20 +35,6 @@ public class Battery extends PowerDistributor{
     }
 
     @Override
-    public boolean isMultipart(Tile tile){
-        if(tile.block != Blocks.battery) return false;
-
-        if(world.tile(tile.x + 1, tile.y + 1) == null) return false;
-        if(world.tile(tile.x + 1, tile.y + 1).block == Blocks.coreShard) return true;
-        if(world.tile(tile.x + 1, tile.y + 1).block == Blocks.coreFoundation) return true;
-
-        if(world.tile(tile.x + 2, tile.y + 2) == null) return false;
-        if(world.tile(tile.x + 2, tile.y + 2).block == Blocks.coreNucleus) return true;
-
-        return false;
-    }
-
-    @Override
     public void update(Tile tile){
         if(tile.entity.power.status < 1f && tile.entity.timer.get(timerRecharge, 60) && isMultipart(tile)){
             tile.entity.power.status = Mathf.clamp(tile.entity.power.status += (1f / 40f));

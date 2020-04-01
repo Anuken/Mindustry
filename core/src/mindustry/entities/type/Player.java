@@ -992,8 +992,5 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     public void postSync(){
         syncbeacons.clear();
-
-        indexer.getAllied(team, BlockFlag.multipart).each(t -> t.block.multipart(t, this));
-        indexer.getEnemy(team, BlockFlag.multipart).each(t -> t.block.multipart(t, this));
     }
 }

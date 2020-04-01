@@ -20,8 +20,7 @@ public enum BlockFlag{
     scalable,
     /** Upgradables. */
     upgradable,
-    /** Multipart. */
-    multipart,
+    /** Graphite. */
     yoinkable;
 
     public final static BlockFlag[] all = values();

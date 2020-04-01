@@ -88,11 +88,6 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(new SpecialDelivery());
         Core.app.addListener(new CoreSnek());
 
-        netServer.admins.addActionFilter(action -> {
-            if(action.type == ActionType.breakBlock && action.tile.block.isMultipart(action.tile)) return false;
-            return true;
-        });
-
         mods.eachClass(Mod::init);
 
         Events.fire(new ServerLoadEvent());

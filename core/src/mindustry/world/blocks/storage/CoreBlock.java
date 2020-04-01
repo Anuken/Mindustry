@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -19,7 +18,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.units.UnitFactory.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
@@ -36,7 +34,7 @@ public class CoreBlock extends StorageBlock{
         solid = true;
         update = true;
         hasItems = true;
-        flags = EnumSet.of(BlockFlag.core, BlockFlag.producer, BlockFlag.multipart);
+        flags = EnumSet.of(BlockFlag.core, BlockFlag.producer);
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
         layer = Layer.overlay;
@@ -239,27 +237,6 @@ public class CoreBlock extends StorageBlock{
             }
         }else{
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
-        }
-    }
-
-    @Override
-    public void multipart(Tile tile, Player player){
-        Tile corner = tile.block == Blocks.coreNucleus ? world.tile(tile.x - 2, tile.y - 2) : world.tile(tile.x - 1, tile.y - 1);
-
-        if(corner.block != Blocks.battery){
-            corner.setNet(Blocks.battery, tile.getTeam(), 0);
-            corner.block.placed(corner);
-        }else{
-            Call.setTile(player, corner, Blocks.battery, tile.getTeam(), 0);
-
-            Core.app.post(() -> {
-                for(int i = 0; i < corner.entity.power.links.size; i++){
-                    Tile node = world.tile(corner.entity.power.links.get(i));
-                    if(node.block instanceof PowerNode) Call.onTileConfig(player,null, node, corner.pos());
-                }
-
-                netServer.titanic.add(corner);
-            });
         }
     }
 
