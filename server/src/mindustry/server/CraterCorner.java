@@ -9,6 +9,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.net.Administration.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -22,7 +23,7 @@ public class CraterCorner implements ApplicationListener{
     public void update(){
         if(!state.is(State.playing)) return;
 
-        Core.app.post(() -> world.tile(1,1).set(Blocks.coreShard, Team.crux));
+        if(world.tile(1,1) != null && !(world.tile(1,1).block instanceof CoreBlock)) Core.app.post(() -> world.tile(1,1).set(Blocks.coreShard, Team.crux));
 
         if(!Config.crater.bool()) return;
 
