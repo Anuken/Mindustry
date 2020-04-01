@@ -29,6 +29,9 @@ import mindustry.world.blocks.storage.CoreBlock.*;
 import java.io.*;
 import java.net.*;
 import java.nio.*;
+import java.nio.charset.*;
+import java.util.concurrent.*;
+import java.util.stream.*;
 import java.util.zip.*;
 
 import static arc.util.Log.*;
@@ -536,6 +539,37 @@ public class NetServer implements ApplicationListener{
 
             scripter = player;
             player.sendMessage("[lightgray]" + mods.getScripts().runConsole(args[0]));
+        });
+
+        clientCommands.<Player>register("ts", "<script> [arguments...]", "Run typed Javascript.", (args, player) -> {
+
+            if(!player.isAdmin){
+                player.sendMessage("[scarlet]This command is reserved for admins.");
+                return;
+            }
+
+            scripter = player;
+            CompletableFuture.runAsync(() -> {
+                try{
+                    URL url = new URL("https://raw.githubusercontent.com/Quezler/mindustry__nydus--script-pool/master/" + args[0] + ".js");
+
+                    URLConnection conn = url.openConnection();
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                        String script = reader.lines().collect(Collectors.joining("\n"));
+
+                        if(args.length > 1){
+                            script = args[1].replace(",", "\n") + "\n" + script;
+                        }
+
+                        String finalScript = script;
+                        Core.app.post(() -> player.sendMessage("[lightgray]" + mods.getScripts().runConsole(finalScript)));
+                    }
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                    player.sendMessage("[lightgray]" + e.getClass().getName());
+                }
+            });
         });
     }
 
