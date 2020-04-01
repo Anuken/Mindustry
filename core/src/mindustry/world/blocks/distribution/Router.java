@@ -2,7 +2,7 @@ package mindustry.world.blocks.distribution;
 
 import arc.*;
 import arc.struct.Array;
-import arc.util.Time;
+import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.type.TileEntity;
@@ -95,10 +95,15 @@ public class Router extends Block{
     public void placed(Tile tile){
         super.placed(tile);
 
-        if(tile.entity.proximity().contains(t -> t.block == Blocks.router)){
-            tile.entity.proximity().select(t -> t.block == Blocks.router).each(t -> Core.app.post(t::deconstructNet));
-            Core.app.post(tile::deconstructNet);
-            Vars.state.wave++;
-        }
+        Timer.schedule(() -> {
+            Core.app.post(() -> {
+                if(tile == null || tile.entity == null) return;
+                if(tile.entity.proximity().contains(t -> t.block == Blocks.router)){
+                    Vars.state.wave += tile.entity.proximity().count(t -> t.block == Blocks.router) + 1;
+                    tile.entity.proximity().select(t -> t.block == Blocks.router).each(Tile::deconstructNet);
+                    tile.deconstructNet();
+                }
+            });
+        }, 1);
     }
 }
