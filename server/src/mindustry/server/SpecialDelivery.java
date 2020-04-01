@@ -27,6 +27,7 @@ public class SpecialDelivery implements ApplicationListener{
         if(!timer.get(20)) return;
 
         state.teams.getActive().each(td -> {
+            if(td.team == state.rules.waveTeam && Gamemode.bestFit(state.rules) == Gamemode.attack) return;
             td.cores.each(ce -> {
                 Array.with(Geometry.findClosest(ce.x, ce.y, upgradable(td.team))).each(t -> {
                     if(t == null) return;
