@@ -41,6 +41,7 @@ public class BlockUpscaler implements ApplicationListener{
             if(!tile.block().flags.contains(BlockFlag.scalable)) return;
 
             tile.getLinkedTilesAs(tile.block().upscale.get(), tmp);
+            if(tmp.size != tile.block().upscale.get().size * tile.block().upscale.get().size) return;
             if(tmp.select(t -> t.block() != tile.block()).size > 0) return;
 
             float healthf = tmp.sumf(t -> t.entity.healthf()) / tmp.size;
