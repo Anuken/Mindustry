@@ -124,6 +124,8 @@ public class LaunchPad extends StorageBlock{
 
             hydra.clear();
             while(hydra.size < Mathf.clamp(missiles.size, 0, itemCapacity)){
+                
+                if(nearest.isEmpty()) break;
                 TargetTrait target = nearest.pop();
 
                 if(target == null) break;
