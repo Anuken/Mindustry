@@ -86,6 +86,7 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(spiderweb);
         Core.app.addListener(new SiliconValley());
         Core.app.addListener(new SpecialDelivery());
+        Core.app.addListener(new CoreSnek());
 
         netServer.admins.addActionFilter(action -> {
             if(action.type == ActionType.breakBlock && action.tile.block.isMultipart(action.tile)) return false;
