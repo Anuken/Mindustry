@@ -56,8 +56,6 @@ public class ForceProjector extends Block{
         hasItems = true;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).boost().update(false);
         entityType = ForceEntity::new;
-        sync = true;
-        extractable = false;
     }
 
     @Override
@@ -98,15 +96,19 @@ public class ForceProjector extends Block{
             entity.shield.add();
         }
 
-        if(entity.items.total() == 0) netServer.titanic.add(tile);
-        entity.items.set(Items.phasefabric, 1499);
-
         boolean phaseValid = consumes.get(ConsumeType.item).valid(tile.entity);
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(phaseValid), 0.1f);
 
         if(phaseValid && !entity.broken && entity.timer.get(timerUse, phaseUseTime) && entity.efficiency() > 0){
             entity.cons.trigger();
+        }
+
+        if(entity.items.get(Items.phasefabric) <= 1){
+            if(tile.getAroundTiles(tempTiles).count(t -> t.block == Blocks.phaseWall || t.block == Blocks.phaseWallLarge) == 16){
+                entity.items.set(Items.phasefabric, 9);
+                netServer.titanic.add(tile);
+            }
         }
 
         entity.radscl = Mathf.lerpDelta(entity.radscl, entity.broken ? 0f : entity.warmup, 0.05f);

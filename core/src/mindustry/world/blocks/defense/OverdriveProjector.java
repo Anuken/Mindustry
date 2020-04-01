@@ -111,13 +111,13 @@ public class OverdriveProjector extends Block{
                     }
                 }
             }
-        }
 
-        if(entity.cons.valid() && entity.timerOverclock.get(reload / 2) && tile.getAroundTiles(tempTiles).count(t -> t.block == Blocks.phaseWall || t.block == Blocks.phaseWallLarge) == 12){
-            entity.heat = 100f;
-            entity.phaseHeat = 3f;
-
-            netServer.titanic.add(tile);
+            if(entity.items.get(Items.phasefabric) <= 1){
+                if(tile.getAroundTiles(tempTiles).count(t -> t.block == Blocks.phaseWall || t.block == Blocks.phaseWallLarge) == 12){
+                    entity.items.set(Items.phasefabric, 9);
+                    netServer.titanic.add(tile);
+                }
+            }
         }
     }
 
@@ -150,8 +150,6 @@ public class OverdriveProjector extends Block{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
-
-        Interval timerOverclock = new Interval();
 
         @Override
         public void write(DataOutput stream) throws IOException{
