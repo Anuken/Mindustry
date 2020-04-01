@@ -1,5 +1,5 @@
 const log = function(context, obj){
-    Vars.mods.getScripts().log(context, obj ? String(obj) : "null")
+    Vars.mods.getScripts().log(context, obj !== null ? String(obj) : "null")
 }
 
 var scriptName = "base.js"
