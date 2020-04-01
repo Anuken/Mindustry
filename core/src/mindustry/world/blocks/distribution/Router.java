@@ -1,7 +1,9 @@
 package mindustry.world.blocks.distribution;
 
+import arc.*;
 import arc.struct.Array;
 import arc.util.Time;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.type.TileEntity;
 import mindustry.type.Item;
@@ -87,5 +89,16 @@ public class Router extends Block{
         Item lastItem;
         Tile lastInput;
         float time;
+    }
+
+    @Override
+    public void placed(Tile tile){
+        super.placed(tile);
+
+        if(tile.entity.proximity().contains(t -> t.block == Blocks.router)){
+            tile.entity.proximity().select(t -> t.block == Blocks.router).each(t -> Core.app.post(t::deconstructNet));
+            Core.app.post(tile::deconstructNet);
+            Vars.state.wave++;
+        }
     }
 }

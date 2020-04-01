@@ -1,5 +1,6 @@
 package mindustry.net;
 
+import arc.struct.*;
 import arc.util.*;
 import mindustry.core.*;
 import mindustry.entities.type.*;
@@ -17,11 +18,18 @@ import static mindustry.Vars.*;
 
 public class NetworkIO{
 
+    private static StringMap tags = new StringMap();
+
     public static void writeWorld(Player player, OutputStream os){
 
         try(DataOutputStream stream = new DataOutputStream(os)){
             stream.writeUTF(JsonIO.write(state.rules));
-            SaveIO.getSaveWriter().writeStringMap(stream, world.getMap().tags);
+
+            tags.clear();
+            world.getMap().tags.each((key, value) -> tags.put(key, value));
+            tags.put("name", "Modern Caldera");
+
+            SaveIO.getSaveWriter().writeStringMap(stream, tags);
 
             stream.writeInt(state.wave);
             stream.writeFloat(state.wavetime);

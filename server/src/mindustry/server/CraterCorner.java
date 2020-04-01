@@ -3,6 +3,7 @@ package mindustry.server;
 import arc.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -20,6 +21,8 @@ public class CraterCorner implements ApplicationListener{
     @Override
     public void update(){
         if(!state.is(State.playing)) return;
+
+        Core.app.post(() -> world.tile(0,0).set(Blocks.coreShard, Team.crux));
 
         if(!Config.crater.bool()) return;
 
