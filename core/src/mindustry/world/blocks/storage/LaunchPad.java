@@ -125,7 +125,7 @@ public class LaunchPad extends StorageBlock{
                 entity.nearest.sort(t -> -tile.dst(t));
 
                 entity.hydra.clear();
-                while(entity.hydra.size < Mathf.clamp(entity.missiles.size, 0, itemCapacity)){
+                while(entity.hydra.size < Mathf.clamp(entity.missiles.size, 0, itemCapacity / 10)){
 
                     if(entity.nearest.isEmpty()) break;
                     TargetTrait target = entity.nearest.pop();
