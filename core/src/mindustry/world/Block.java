@@ -149,7 +149,7 @@ public class Block extends BlockStorage{
     public boolean alwaysUnlocked = false;
     /** What this block can merge into */
     public Prov<Block> upscale;
-    public Prov2<Block, Tile> upgrade;
+    public Func<Tile, Block> upgrade;
     public Prov<Block> downgrade;
 
     protected TextureRegion[] cacheRegions = {};
