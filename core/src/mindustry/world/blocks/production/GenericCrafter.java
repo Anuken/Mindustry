@@ -129,12 +129,6 @@ public class GenericCrafter extends Block{
         if(outputLiquid != null){
             tryDumpLiquid(tile, outputLiquid.liquid);
         }
-
-        if(tile.block == Blocks.surgeSmelter){
-            if(entity.items.total() == 0) netServer.titanic.add(tile);
-            entity.items.set(Items.copper, 1499);
-            entity.items.set(Items.lead, 1499);
-        }
     }
 
     @Override

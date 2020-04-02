@@ -568,8 +568,6 @@ public class Blocks implements ContentList{
             size = 3;
             hasPower = true;
 
-            extractable = false;
-
             consumes.power(4f);
             consumes.items(new ItemStack(Items.copper, 3), new ItemStack(Items.lead, 4), new ItemStack(Items.titanium, 2), new ItemStack(Items.silicon, 3));
         }};
