@@ -14,12 +14,10 @@ import static mindustry.Vars.*;
 public class EmojiFilter implements ApplicationListener{
 
     private Array<String> blacklist = new Array<String>(){{
-        addAll("spawn", "wave");
+        addAll("spawn", "wave", "crater", "craters");
     }};
 
     private StringMap alias = new StringMap(){{
-
-        put("core", Blocks.coreShard.name);
 
         put("laser",    Blocks.laserDrill.name);
         put("airblast", Blocks.blastDrill.name);
@@ -30,17 +28,6 @@ public class EmojiFilter implements ApplicationListener{
         put("spores", Items.sporePod.name     );
         put("surge",  Items.surgealloy.name   );
         put("phase",  Items.phasefabric.name  );
-
-        put("delta",   Blocks.deltaPad.name  );
-        put("tau",     Blocks.tauPad.name    );
-        put("omega",   Blocks.omegaPad.name  );
-        put("javelin", Blocks.javelinPad.name);
-        put("trident", Blocks.tridentPad.name);
-        put("glaive",  Blocks.glaivePad.name );
-
-        put("draug",   Blocks.draugFactory.name);
-        put("spirit",  Blocks.spiritFactory.name);
-        put("phantom", Blocks.phantomFactory.name);
     }};
 
     @Override
