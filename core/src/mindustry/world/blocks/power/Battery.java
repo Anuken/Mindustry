@@ -52,15 +52,5 @@ public class Battery extends PowerDistributor{
         if(tile.entity.power.status == 0f && tile.block == Blocks.battery && tile.entity.timer.get(timerDecay, 30)){
             Core.app.post(() -> tile.entity.damage(tile.entity.health));
         }
-
-        if(tile.entity.power.status == 1f && tile.block == Blocks.batteryLarge && tile.entity.timer.get(timerSurge, 60)){
-            tile.entity.power.status += 0.00001f;
-            netServer.titanic.add(tile);
-        }
-
-        if(tile.entity.power.status < 0f){
-            tile.entity.power.status = 0f;
-            netServer.titanic.add(tile);
-        }
     }
 }
