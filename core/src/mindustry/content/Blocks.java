@@ -1195,6 +1195,8 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.copper, 25, Items.lead, 15));
             powerProduction = 1f;
             itemDuration = 120f;
+
+            rebuildable = false;
         }};
 
         thermalGenerator = new ThermalGenerator("thermal-generator"){{

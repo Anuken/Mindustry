@@ -8,6 +8,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.Effects.*;
+import mindustry.entities.effect.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -134,6 +135,8 @@ public class ItemLiquidGenerator extends PowerGenerator{
                 entity.productionEfficiency = getItemEfficiency(item);
                 entity.explosiveness = item.explosiveness;
                 entity.generateTime = 1f;
+
+                if(tile.block == Blocks.combustionGenerator) Fire.create(tile);
             }
 
             if(entity.generateTime > 0f){
