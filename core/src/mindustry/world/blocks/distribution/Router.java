@@ -97,11 +97,4 @@ public class Router extends Block{
 
         Vars.state.wave++;
     }
-
-    @Override
-    public void removed(Tile tile){
-        super.removed(tile);
-
-        Vars.state.wave--;
-    }
 }
