@@ -21,6 +21,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.meta.*;
 
+import java.util.concurrent.*;
+
 import static mindustry.Vars.*;
 
 public class LaunchPad extends StorageBlock{
@@ -31,16 +33,15 @@ public class LaunchPad extends StorageBlock{
 
     private float velocityInaccuracy = 0f;
 
-    private Array<Item> missiles = new Array<>();
     private Array<BulletType> bullets = new Array<>();
-    private Array<Tile> nearest = new Array<>();
-    private Array<TargetTrait> hydra = new Array<>();
 
     public LaunchPad(String name){
         super(name);
         update = true;
         hasItems = true;
         solid = true;
+
+        entityType = LaunchPadEntity::new;
     }
 
     @Override
@@ -89,7 +90,7 @@ public class LaunchPad extends StorageBlock{
 
     @Override
     public void update(Tile tile){
-        TileEntity entity = tile.entity;
+        LaunchPadEntity entity = tile.ent();
 
         if(world.isZone() && entity.cons.valid() && entity.items.total() >= itemCapacity && entity.timer.get(timerLaunch, launchTime / entity.timeScale)){
             for(Item item : Vars.content.items()){
@@ -104,50 +105,58 @@ public class LaunchPad extends StorageBlock{
 
         if(entity.timer.get(timerSilo, 60 * 2.5f) && entity.cons.valid()){
 
-            missiles.clear();
-            entity.items.forEach((item, amount) -> {
-                for(int i = 0; i < Mathf.floor(amount / 10); ++i) missiles.add(item);
-            });
-            missiles.shuffle();
-            if(missiles.size == 0) return;
+            CompletableFuture.runAsync(() -> {
+                entity.missiles.clear();
+                entity.items.forEach((item, amount) -> {
+                    for(int i = 0; i < Mathf.floor(amount / 10); ++i) entity.missiles.add(item);
+                });
+                entity.missiles.shuffle();
+                if(entity.missiles.size == 0) return;
 
-            nearest.clear();
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    Tile near = world.ltile(x, y);
-                    if(!nearest.contains(near) && near.block != Blocks.air && near.entity != null && near.getTeam().isEnemy(tile.getTeam())){
-                        nearest.add(near);
+                entity.nearest.clear();
+                for(int x = 0; x < world.width(); x++){
+                    for(int y = 0; y < world.height(); y++){
+                        Tile near = world.ltile(x, y);
+                        if(!entity.nearest.contains(near) && near.block != Blocks.air && near.entity != null && near.getTeam().isEnemy(tile.getTeam())){
+                            entity.nearest.add(near);
+                        }
                     }
                 }
-            }
-            nearest.sort(t -> -tile.dst(t));
+                entity.nearest.sort(t -> -tile.dst(t));
 
-            hydra.clear();
-            while(hydra.size < Mathf.clamp(missiles.size, 0, itemCapacity)){
-                
-                if(nearest.isEmpty()) break;
-                TargetTrait target = nearest.pop();
+                entity.hydra.clear();
+                while(entity.hydra.size < Mathf.clamp(entity.missiles.size, 0, itemCapacity)){
 
-                if(target == null) break;
-                if(Mathf.chance(0.5f)) hydra.add(target);
-            }
+                    if(entity.nearest.isEmpty()) break;
+                    TargetTrait target = entity.nearest.pop();
 
-            hydra.shuffle();
-            if(hydra.size == 0) return;
+                    if(target == null) break;
+                    if(Mathf.chance(0.5f)) entity.hydra.add(target);
+                }
 
-            for(TargetTrait target : hydra){
-                bullets.shuffle();
-                entity.items.remove(missiles.first(), 10);
+                entity.hydra.shuffle();
+                if(entity.hydra.size == 0) return;
 
-                Vec2 predict = Predict.intercept(tile, target, bullets.first().speed);
+                for(TargetTrait target : entity.hydra){
+                    bullets.shuffle();
+                    entity.items.remove(entity.missiles.first(), 10);
 
-                float dst = entity.dst(predict.x, predict.y);
-                float maxTraveled = bullets.first().lifetime * bullets.first().speed;
+                    Vec2 predict = Predict.intercept(tile, target, bullets.first().speed);
 
-                for(int i = 0; i < bullets.first().ammoMultiplier; ++i) Call.createBullet(bullets.first(), tile.getTeam(), tile.drawx(), tile.drawy(), tile.angleTo(target) + Mathf.range(bullets.first().inaccuracy + bullets.first().inaccuracy), 1f + Mathf.range(velocityInaccuracy), (dst / maxTraveled));
-            }
+                    float dst = entity.dst(predict.x, predict.y);
+                    float maxTraveled = bullets.first().lifetime * bullets.first().speed;
 
-            netServer.titanic.add(tile);
+                    for(int i = 0; i < bullets.first().ammoMultiplier; ++i) Call.createBullet(bullets.first(), tile.getTeam(), tile.drawx(), tile.drawy(), tile.angleTo(target) + Mathf.range(bullets.first().inaccuracy + bullets.first().inaccuracy), 1f + Mathf.range(velocityInaccuracy), (dst / maxTraveled));
+                }
+
+                netServer.titanic.add(tile);
+            });
         }
+    }
+
+    class LaunchPadEntity extends StorageBlockEntity{
+        Array<Item> missiles = new Array<>();
+        Array<Tile> nearest = new Array<>();
+        Array<TargetTrait> hydra = new Array<>();
     }
 }
