@@ -1,14 +1,12 @@
 package mindustry.world.blocks.distribution;
 
-import arc.*;
-import arc.struct.Array;
+import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
-import mindustry.entities.type.TileEntity;
-import mindustry.type.Item;
+import mindustry.entities.type.*;
+import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.meta.BlockGroup;
+import mindustry.world.meta.*;
 
 public class Router extends Block{
     public float speed = 8f;
@@ -89,12 +87,5 @@ public class Router extends Block{
         Item lastItem;
         Tile lastInput;
         float time;
-    }
-
-    @Override
-    public void placed(Tile tile){
-        super.placed(tile);
-
-        Vars.state.wave++;
     }
 }
