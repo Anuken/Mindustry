@@ -18,7 +18,6 @@ public class Team implements Comparable<Team>{
     public final byte id;
     public final Color color;
     public String name;
-    public int draugfactories = 0;
 
     /** All 256 registered teams. */
     private static final Team[] all = new Team[256];

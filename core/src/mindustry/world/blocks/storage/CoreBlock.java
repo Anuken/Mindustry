@@ -18,7 +18,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.units.UnitFactory.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
@@ -26,8 +25,6 @@ import static mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
     public Mech mech = Mechs.starter;
-
-    public final int timerMiner = timers++;
 
     public CoreBlock(String name){
         super(name);
@@ -208,20 +205,6 @@ public class CoreBlock extends StorageBlock{
     public void update(Tile tile){
         CoreEntity entity = tile.ent();
 
-        if(entity.timer.get(timerMiner, 60)){
-            for(Item ore : UnitTypes.draug.toMine){
-                if(tile.getTeam().miners(ore).size < tile.getTeam().cores().size){
-                    BaseUnit unit = UnitTypes.draug.create(tile.getTeam());
-                    unit.setSpawner(tile);
-                    unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
-                    unit.item().item = ore;
-                    unit.add();
-                }
-            }
-
-            tile.getTeam().draugfactories = indexer.getAllied(tile.getTeam(), BlockFlag.producer).select(t -> t.block == Blocks.draugFactory).asArray().count(t -> t.<UnitFactoryEntity>ent().spawned > 0);
-        }
-
         if(entity.spawnPlayer != null){
             if(!entity.spawnPlayer.isDead() || !entity.spawnPlayer.isAdded()){
                 entity.spawnPlayer = null;
@@ -248,7 +231,7 @@ public class CoreBlock extends StorageBlock{
         return entity.spawnPlayer != null;
     }
 
-    public class CoreEntity extends TileEntity implements SpawnerTrait, FactoryTrait{
+    public class CoreEntity extends TileEntity implements SpawnerTrait{
         protected Player spawnPlayer;
         protected float progress;
         protected float time;

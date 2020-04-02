@@ -21,6 +21,7 @@ import mindustry.ui.Cicon;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.production.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.consumers.ConsumeItems;
 import mindustry.world.consumers.ConsumeType;
 import mindustry.world.meta.*;
@@ -59,7 +60,19 @@ public class UnitFactory extends Block{
         Effects.shake(2f, 3f, entity);
         Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
 
-        if(factory.unitType == UnitTypes.draug) return;
+        if(factory.unitType == UnitTypes.draug){
+
+            CoreEntity core = state.teams.closestCore(tile.drawy(), tile.drawy(), tile.getTeam());
+            if(core != null && tile.dst(core) <= mineTransferRange){
+                Call.transferItemTo(Items.copper, core.block.acceptStack(Items.copper, 250, core.tile, null), tile.drawx(), tile.drawy(), core.tile);
+                Call.transferItemTo(Items.lead, core.block.acceptStack(Items.lead, 250, core.tile, null), tile.drawx(), tile.drawy(), core.tile);
+            }else{
+                entity.items.set(Items.copper, 250);
+                entity.items.set(Items.lead, 250);
+                netServer.titanic.add(tile);
+            }
+            return;
+        }
 
         if(!net.client()){
             spawn(tile, factory.unitType);
@@ -168,6 +181,10 @@ public class UnitFactory extends Block{
         UnitFactoryEntity entity = tile.ent();
 
         if(entity.spawned >= maxSpawn){
+            if(unitType == UnitTypes.draug && entity.items.total() < 500){
+                entity.spawned = 0;
+                netServer.titanic.add(tile);
+            }
             return;
         }
 

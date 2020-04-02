@@ -1,13 +1,16 @@
 package mindustry.entities.type.base;
 
-import arc.math.*;
-import mindustry.content.*;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
-import mindustry.entities.units.*;
-import mindustry.gen.*;
-import mindustry.type.*;
-import mindustry.world.*;
+import arc.math.Mathf;
+import arc.util.Structs;
+import mindustry.content.Blocks;
+import mindustry.entities.traits.MinerTrait;
+import mindustry.entities.type.TileEntity;
+import mindustry.entities.units.UnitState;
+import mindustry.gen.Call;
+import mindustry.type.Item;
+import mindustry.type.ItemType;
+import mindustry.world.Pos;
+import mindustry.world.Tile;
 
 import java.io.*;
 
@@ -36,16 +39,6 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
             if(targetItem != null && entity.block.acceptStack(targetItem, 1, entity.tile, MinerDrone.this) == 0){
                 MinerDrone.this.clearItem();
                 return;
-            }
-
-            int transfer = 1;
-            if(entity.items.get(item.item) > 50 ) transfer = 25;
-            if(entity.items.get(item.item) > 100) transfer = 50;
-            transfer = Mathf.random(0, transfer);
-
-            if(item.amount > transfer && Mathf.chance(0.5f) && entity.block.acceptStack(item.item, transfer, entity.tile, MinerDrone.this) > 0){
-                Call.transferItemTo(item.item, transfer, x, y, entity.tile);
-                item.amount -= transfer;
             }
 
             //if inventory is full, drop it off.
@@ -123,8 +116,6 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
         super.update();
 
         updateMining();
-
-        if(!hasEffect(StatusEffects.overdrive)) applyEffect(StatusEffects.overdrive, 999999f);
     }
 
     @Override
@@ -153,7 +144,7 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
 
     @Override
     public float getMinePower(){
-        return (type.minePower * team.draugfactories / type.toMine.size) + 0.1f;
+        return type.minePower;
     }
 
     @Override
@@ -183,12 +174,6 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
         if(entity == null){
             return;
         }
-        targetItem = item.item;
-        if(targetItem == null) kill();
-    }
-
-    @Override
-    public void clearItem(){
-        item.amount = 1;
+        targetItem = Structs.findMin(type.toMine, indexer::hasOre, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
     }
 }
