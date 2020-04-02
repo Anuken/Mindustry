@@ -1,7 +1,7 @@
 //Generated class. Do not modify.
 
 const log = function(context, obj){
-    Vars.mods.getScripts().log(context, obj ? String(obj) : "null")
+    Vars.mods.getScripts().log(context, String(obj))
 }
 
 var scriptName = "base.js"
