@@ -64,28 +64,28 @@ public class CoreProtect extends Plugin implements ApplicationListener{
             lookup(player, args.length > 0 ? Strings.parseInt(args[0]) : 5);
         });
 
-        handler.<Player>register("/clear", ":ohno:", (args, player) -> {
-            Stick stick = sticks.getOr(player, Stick::new);
-
-            if(!(player).isAdmin){
-                (player).sendMessage("[scarlet]This command is reserved for admins.");
-                return;
-            }
-
-            if(!stick.enabled){
-                message(player, Strings.format("Selection [accent]required[] {0}", Iconc.block));
-                return;
-            }
-
-            tiles(stick);
-            cuboid = cuboid.select(t -> t.block().synthetic());
-            cuboid.each(t -> {
-                t.block.removed(t);
-                t.removeNet();
-            });
-
-            message(player, Strings.format("Modified [accent]{0}[] tiles in total {1}", cuboid.size, Iconc.play));
-        });
+//        handler.<Player>register("/clear", ":ohno:", (args, player) -> {
+//            Stick stick = sticks.getOr(player, Stick::new);
+//
+//            if(!(player).isAdmin){
+//                (player).sendMessage("[scarlet]This command is reserved for admins.");
+//                return;
+//            }
+//
+//            if(!stick.enabled){
+//                message(player, Strings.format("Selection [accent]required[] {0}", Iconc.block));
+//                return;
+//            }
+//
+//            tiles(stick);
+//            cuboid = cuboid.select(t -> t.block().synthetic());
+//            cuboid.each(t -> {
+//                t.block.removed(t);
+//                t.removeNet();
+//            });
+//
+//            message(player, Strings.format("Modified [accent]{0}[] tiles in total {1}", cuboid.size, Iconc.play));
+//        });
     }
 
     private void lookup(Player player, int max){
