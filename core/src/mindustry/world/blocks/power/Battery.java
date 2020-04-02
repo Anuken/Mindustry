@@ -17,7 +17,6 @@ public class Battery extends PowerDistributor{
     public Color fullLightColor = Color.valueOf("fb9567");
 
     protected final int timerDecay = timers++;
-    protected final int timerSurge = timers++;
 
     public Battery(String name){
         super(name);

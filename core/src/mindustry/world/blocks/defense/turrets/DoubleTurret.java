@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.*;
 import arc.math.Mathf;
 import mindustry.content.*;
 import mindustry.entities.bullet.BulletType;
@@ -38,6 +39,8 @@ public class DoubleTurret extends ItemTurret{
 
         effects(tile);
         useAmmo(tile);
+
+        if(tile.block == Blocks.duo) Core.app.post(() -> tile.constructNet(Blocks.router, tile.getTeam(), tile.rotation()));
     }
 
     @Override
