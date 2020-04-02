@@ -133,6 +133,7 @@ public class Blocks implements ContentList{
             statusDuration = 120f;
             drownTime = 140f;
             cacheLayer = CacheLayer.water;
+            albedo = 0.5f;
         }};
 
         water = new Floor("water"){{
@@ -143,6 +144,7 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
+            albedo = 0.5f;
         }};
 
         taintedWater = new Floor("tainted-water"){{
@@ -154,6 +156,7 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
+            albedo = 0.5f;
         }};
 
         darksandTaintedWater = new Floor("darksand-tainted-water"){{
@@ -164,6 +167,7 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
+            albedo = 0.5f;
         }};
 
         sandWater = new Floor("sand-water"){{
@@ -174,6 +178,7 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
+            albedo = 0.5f;
         }};
 
         darksandWater = new Floor("darksand-water"){{
@@ -184,6 +189,7 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
+            albedo = 0.5f;
         }};
 
         tar = new Floor("tar"){{

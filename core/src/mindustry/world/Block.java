@@ -129,6 +129,8 @@ public class Block extends UnlockableContent{
     public boolean hasShadow = true;
     /** Sounds made when this block breaks.*/
     public Sound breakSound = Sounds.boom;
+    /** How reflective this block is. */
+    public float albedo = 0f;
 
     /** The sound that this block makes while active. One sound loop. Do not overuse.*/
     public Sound activeSound = Sounds.none;

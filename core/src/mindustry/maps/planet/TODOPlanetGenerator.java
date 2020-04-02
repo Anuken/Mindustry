@@ -60,8 +60,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
         Block block = getBlock(position);
         //replace salt with sand color
         if(block == Blocks.salt) return Blocks.sand.mapColor;
-        //return block.asFloor().isLiquid ? Tmp.c1.set(block.mapColor).a(0.5f) : block.mapColor;
-        return block.mapColor;
+        return Tmp.c1.set(block.mapColor).a(1f - block.albedo);
     }
 
     @Override

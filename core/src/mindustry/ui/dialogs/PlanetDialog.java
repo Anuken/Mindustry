@@ -177,6 +177,9 @@ public class PlanetDialog extends FloatingDialog{
         cam.lookAt(planet.position);
         cam.update();
 
+        //TODO hacky
+        Shaders.planet.camDir.set(cam.direction).rotate(Vec3.Y, planet.getRotation());
+
         projector.proj(cam.combined());
         batch.proj(cam.combined());
 

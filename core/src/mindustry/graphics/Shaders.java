@@ -80,6 +80,7 @@ public class Shaders{
     public static class PlanetShader extends LoadShader{
         public Vec3 lightDir = new Vec3(1, 1, 1).nor();
         public Color ambientColor = Color.white.cpy();
+        public Vec3 camDir = new Vec3();
 
         public PlanetShader(){
             super("planet", "planet");
@@ -89,6 +90,7 @@ public class Shaders{
         public void apply(){
             setUniformf("u_lightdir", lightDir);
             setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
+            setUniformf("u_camdir", camDir);
         }
     }
 
