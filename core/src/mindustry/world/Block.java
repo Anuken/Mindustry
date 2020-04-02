@@ -950,12 +950,4 @@ public class Block extends BlockStorage{
             }
         }));
     }
-
-    public void multipart(Tile tile, Player player){
-        //
-    }
-
-    public boolean isMultipart(Tile tile){
-        return false;
-    }
 }

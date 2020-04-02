@@ -41,16 +41,6 @@ public class DoubleTurret extends ItemTurret{
     }
 
     @Override
-    public void update(Tile tile){
-        super.update(tile);
-
-        TurretEntity entity = tile.ent();
-        if(entity.totalAmmo >= 10 || !isMultipart(tile)) return;
-        entity.block.handleItem(Items.silicon, tile, null);
-        netServer.titanic.add(tile);
-    }
-
-    @Override
     public void handleItem(Item item, Tile tile, Tile source){
         super.handleItem(item, tile, source);
     }

@@ -1,9 +1,6 @@
 package mindustry.world.blocks.power;
 
 import arc.struct.*;
-import mindustry.content.*;
-import mindustry.entities.type.*;
-import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -29,12 +26,5 @@ public class SolarGenerator extends PowerGenerator{
         // Solar Generators don't really have an efficiency (yet), so for them 100% = 1.0f
         stats.remove(generationType);
         stats.add(generationType, powerProduction * 60.0f, StatUnit.powerSecond);
-    }
-
-    @Override
-    public void placed(Tile tile){
-        super.placed(tile);
-
-        multipart(tile, null);
     }
 }

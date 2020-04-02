@@ -2,16 +2,13 @@ package mindustry.world.blocks.storage;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.bullet.*;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
@@ -31,9 +28,6 @@ public class CoreBlock extends StorageBlock{
     public Mech mech = Mechs.starter;
 
     public final int timerMiner = timers++;
-    public final int timerBattery = timers++;
-
-    private Array<Tile> nearby = new Array<>();
 
     public CoreBlock(String name){
         super(name);
@@ -226,34 +220,6 @@ public class CoreBlock extends StorageBlock{
             }
 
             tile.getTeam().draugfactories = indexer.getAllied(tile.getTeam(), BlockFlag.producer).select(t -> t.block == Blocks.draugFactory).asArray().count(t -> t.<UnitFactoryEntity>ent().spawned > 0);
-        }
-
-        if(entity.timer.get(timerBattery, 30)){
-            if(entity.items.has(Items.graphite, 40)){
-                nearby.clear();
-
-                Geometry.circle(tile.x, tile.y, 8, (x, y) -> nearby.add(world.ltile(x, y)));
-                nearby.removeAll(t -> t.block != Blocks.battery);
-                nearby.removeAll(t -> t.entity.power.status != 0f);
-                Tile battery = nearby.random();
-
-                if(battery != null){
-                    battery.entity.power.status = 1f;
-
-                    BulletType graphite = Bullets.artilleryDense;
-
-                    float dst = tile.dst(battery);
-                    float maxTraveled = graphite.lifetime * graphite.speed;
-
-                    Call.createBullet(graphite, tile.getTeam(), tile.drawx(), tile.drawy(), tile.angleTo(battery), 1, (dst / maxTraveled));
-                    entity.items.remove(Items.graphite, 40);
-
-                    Timer.schedule(() -> {
-                        Call.onEffect(Fx.dooropen, battery.drawx(), battery.drawy(), 0, Color.white);
-                        netServer.titanic.add(battery);
-                    }, 0.005f * dst);
-                }
-            }
         }
 
         if(entity.spawnPlayer != null){
