@@ -86,7 +86,6 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(spiderweb);
         Core.app.addListener(new SiliconValley());
         Core.app.addListener(new SpecialDelivery());
-        Core.app.addListener(new CoreSnek());
 
         mods.eachClass(Mod::init);
 
