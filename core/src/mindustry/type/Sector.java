@@ -101,7 +101,7 @@ public class Sector{
         return new SectorRect(radius, center, planeTop, planeRight, angle);
     }
 
-    public boolean hasAttribute(SectorAttribute attribute){
+    public boolean is(SectorAttribute attribute){
         return (data.attributes & (1 << attribute.ordinal())) != 0;
     }
 

@@ -215,7 +215,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
         FloatArray frequencies = new FloatArray();
         for(int i = 0; i < ores.size; i++){
-            frequencies.add(rand.random(-0.08f, 0.02f));
+            frequencies.add(rand.random(-0.09f, 0.01f));
         }
 
         pass((x, y) -> {
@@ -225,7 +225,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
             for(int i = ores.size - 1; i >= 0; i--){
                 Block entry = ores.get(i);
                 float freq = frequencies.get(i);
-                if(Math.abs(0.5f - noise(offsetX, offsetY + i*999, 2, 0.7, (40 + i * 2))) > 0.26f &&
+                if(Math.abs(0.5f - noise(offsetX, offsetY + i*999, 2, 0.7, (40 + i * 2))) > 0.25f &&
                     Math.abs(0.5f - noise(offsetX, offsetY - i*999, 1, 1, (30 + i * 4))) > 0.37f + freq){
                     ore = entry;
                     break;

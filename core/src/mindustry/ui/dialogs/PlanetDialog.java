@@ -198,7 +198,7 @@ public class PlanetDialog extends FloatingDialog{
                 setPlane(hovered);
                 Draw.color(Color.white, Pal.accent, Mathf.absin(5f, 1f));
 
-                TextureRegion icon = hovered.locked() ? Icon.lock.getRegion() : hovered.hasAttribute(SectorAttribute.naval) ? Liquids.water.icon(Cicon.large) : null;
+                TextureRegion icon = hovered.locked() ? Icon.lock.getRegion() : hovered.is(SectorAttribute.naval) ? Liquids.water.icon(Cicon.large) : null;
 
                 if(icon != null){
                     Draw.rect(icon, 0, 0);
@@ -349,17 +349,18 @@ public class PlanetDialog extends FloatingDialog{
                 if(++idx % max == 0) t.row();
             }
 
-            for(int i = 0; i < Math.min(selected.data.floorCounts.length, 3); i++){
-                t.addImage(selected.data.floors[i].icon(Cicon.small)).padRight(3);
-                if(++idx % max == 0) t.row();
-            }
+            //TODO terrain isn't relevant
+            //for(int i = 0; i < Math.min(selected.data.floorCounts.length, 3); i++){
+            //    t.addImage(selected.data.floors[i].icon(Cicon.small)).padRight(3);
+            //    if(++idx % max == 0) t.row();
+            //}
         }).fillX().row();
 
         stable.row();
 
         stable.addButton("Launch", () -> {
             if(selected != null){
-                if(selected.hasAttribute(SectorAttribute.naval)){
+                if(selected.is(SectorAttribute.naval)){
                     ui.showInfo("You need a naval loadout to launch here.");
                     return;
                 }
