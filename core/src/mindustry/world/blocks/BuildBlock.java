@@ -311,6 +311,8 @@ public class BuildBlock extends Block{
                         }
                     }
                 }
+
+                if(cblock == Blocks.battery) progress = 0;
             }
 
             progress = Mathf.clamp(progress - amount);

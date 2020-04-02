@@ -40,8 +40,10 @@ public class Battery extends PowerDistributor{
     public void placed(Tile tile){
         super.placed(tile);
 
-        tile.entity.power.status = 0.5f;
-        netServer.titanic.add(tile);
+        if(tile.block == Blocks.battery){
+            tile.entity.power.status = 1f;
+            netServer.titanic.add(tile);
+        }
     }
 
     @Override
