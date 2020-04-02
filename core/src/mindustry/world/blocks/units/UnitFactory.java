@@ -63,7 +63,7 @@ public class UnitFactory extends Block{
         if(factory.unitType == UnitTypes.draug){
 
             CoreEntity core = state.teams.closestCore(tile.drawy(), tile.drawy(), tile.getTeam());
-            if(core != null && tile.dst(core) <= mineTransferRange){
+            if(core != null && tile.dst(core) <= mineTransferRange && (core.block.acceptStack(Items.copper, 250, core.tile, null) == 250 || core.block.acceptStack(Items.copper, 250, core.tile, null) == 250)){
                 Call.transferItemTo(Items.copper, core.block.acceptStack(Items.copper, 250, core.tile, null), tile.drawx(), tile.drawy(), core.tile);
                 Call.transferItemTo(Items.lead, core.block.acceptStack(Items.lead, 250, core.tile, null), tile.drawx(), tile.drawy(), core.tile);
             }else{
