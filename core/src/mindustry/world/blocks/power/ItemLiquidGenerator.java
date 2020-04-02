@@ -135,6 +135,8 @@ public class ItemLiquidGenerator extends PowerGenerator{
                 entity.productionEfficiency = getItemEfficiency(item);
                 entity.explosiveness = item.explosiveness;
                 entity.generateTime = 1f;
+
+                if(tile.block == Blocks.combustionGenerator) Fire.create(tile);
             }
 
             if(entity.generateTime > 0f){
