@@ -201,6 +201,7 @@ public class CoreBlock extends StorageBlock{
         }
 
         if(item.type != ItemType.material && source != null && source != tile) netServer.titanic.add(source);
+        if(item.type != ItemType.material && source != null && source != tile) Core.app.post(() -> source.entity.damage(5));
     }
 
     @Override
