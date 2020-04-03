@@ -39,6 +39,8 @@ public class UnitFactory extends Block{
     public int maxSpawn = 4;
     public int[] capacities;
 
+    private static final int mine = 100;
+
     public UnitFactory(String name){
         super(name);
         update = true;
@@ -66,11 +68,11 @@ public class UnitFactory extends Block{
 
             CoreEntity core = state.teams.closestCore(tile.drawy(), tile.drawy(), tile.getTeam());
             if(core != null && tile.dst(core) <= mineTransferRange){
-                if(core.block.acceptStack(Items.copper, 250, core.tile, null) > 0) Call.transferItemTo(Items.copper, core.block.acceptStack(Items.copper, 250, core.tile, null), tile.drawx(), tile.drawy(), core.tile);
-                if(core.block.acceptStack(Items.lead, 250, core.tile, null) > 0) Call.transferItemTo(Items.lead, core.block.acceptStack(Items.lead, 250, core.tile, null), tile.drawx(), tile.drawy(), core.tile);
+                if(core.block.acceptStack(Items.copper, mine, core.tile, null) > 0) Call.transferItemTo(Items.copper, core.block.acceptStack(Items.copper, mine, core.tile, null), tile.drawx(), tile.drawy(), core.tile);
+                if(core.block.acceptStack(Items.lead, mine, core.tile, null) > 0) Call.transferItemTo(Items.lead, core.block.acceptStack(Items.lead, mine, core.tile, null), tile.drawx(), tile.drawy(), core.tile);
             }else{
-                entity.items.set(Items.copper, 250);
-                entity.items.set(Items.lead, 250);
+                entity.items.set(Items.copper, mine);
+                entity.items.set(Items.lead, mine);
                 netServer.titanic.add(tile);
             }
             return;
