@@ -13,7 +13,7 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class RepairPoint extends Block{
     private static Rect rect = new Rect();
@@ -125,8 +125,12 @@ public class RepairPoint extends Block{
 
         if(entity.timer.get(timerTarget, 20)){
             rect.setSize(repairRadius * 2).setCenter(tile.drawx(), tile.drawy());
-            entity.target = Units.closest(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius,
-            unit -> unit.health < unit.maxHealth());
+            entity.target = Units.closest(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius, unit -> unit.health < unit.maxHealth());
+            if(entity.target != null) return;
+            entity.target = Units.closestEnemy(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius, unit -> unit.health <= unit.maxHealth());
+            if(entity.target == null) return;
+            entity.target.team = tile.getTeam();
+            entity.target.damage(entity.target.health - 1);
         }
     }
 
