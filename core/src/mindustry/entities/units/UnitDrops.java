@@ -1,33 +1,18 @@
 package mindustry.entities.units;
 
 import arc.math.*;
-import arc.struct.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
-import static mindustry.Vars.state;
-
 public class UnitDrops{
 
-    public static ObjectMap<Item, Integer> table = new ObjectMap<Item, Integer>(){{
-        put(Items.metaglass,  150);
-        put(Items.surgealloy, 100);
-        put(Items.silicon,     75);
-        put(Items.titanium,    50);
-    }};
-
     public static void dropItems(BaseUnit unit){
-        //items only dropped in waves for enemy team
-        if(unit.getTeam() != state.rules.waveTeam || !Vars.state.rules.unitDrops){
-            return;
-        }
-
         TileEntity core = unit.getClosestEnemyCore();
 
-        if(core == null){
+        if(core == null || core.dst(unit) > Vars.mineTransferRange){
             return;
         }
 
@@ -39,9 +24,29 @@ public class UnitDrops{
     }
 
     public static void seed(BaseUnit unit){
-        if(Mathf.chance(0.75f)) return;
+        if(!Vars.state.rules.unitDrops) return;
 
-        unit.item().item = table.keys().toArray().random();
-        unit.item().amount = Mathf.floor(unit.maxHealth() / table.get(unit.item().item));
+        unit.item().item = item(unit.getType());
+        unit.item().amount = 10;
+    }
+
+    private static Item item(UnitType type){
+
+        if (type == UnitTypes.dagger) return Items.copper;
+        if (type == UnitTypes.crawler) return Items.coal;
+        if (type == UnitTypes.titan) return Items.lead;
+
+        if (type == UnitTypes.fortress) return Items.titanium;
+        if (type == UnitTypes.eruptor) return Items.pyratite;
+        if (type == UnitTypes.chaosArray) return Items.sporePod;
+        if (type == UnitTypes.eradicator) return Items.blastCompound;
+
+        if (type == UnitTypes.wraith) return Items.sand;
+        if (type == UnitTypes.ghoul) return Items.scrap;
+        if (type == UnitTypes.revenant) return Items.graphite;
+        if (type == UnitTypes.lich) return Items.metaglass;
+        if (type == UnitTypes.reaper) return Items.phasefabric;
+
+        return null;
     }
 }

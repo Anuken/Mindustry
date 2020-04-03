@@ -11,6 +11,8 @@ import mindustry.content.*;
 import mindustry.entities.Effects;
 import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
+import mindustry.entities.type.base.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.Call;
 import mindustry.graphics.Pal;
@@ -85,6 +87,7 @@ public class UnitFactory extends Block{
         BaseUnit unit = type.create(tile.getTeam());
         unit.setSpawner(tile);
         unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
+        if(!(unit instanceof BaseDrone)) UnitDrops.seed(unit);
         unit.add();
         unit.velocity().y = ((UnitFactory)tile.block()).launchVelocity;
         Events.fire(new UnitCreateEvent(unit));
