@@ -25,7 +25,7 @@ public class ArmoredConduit extends Conduit{
         return otherblock.outputsLiquid && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
-    public class ArmoredConduitEntity extends TileEntity{
+    public class ArmoredConduitEntity extends ConduitEntity{
         @Override
         public void draw(){
             super.draw();
@@ -39,7 +39,7 @@ public class ArmoredConduit extends Conduit{
 
         @Override
         public boolean acceptLiquid(Tilec source, Liquid liquid, float amount){
-            return super.acceptLiquid(source, liquid, amount) && (source.block() instanceof Conduit) || Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == tile.rotation();
+            return super.acceptLiquid(source, liquid, amount) && (source.block() instanceof Conduit) || Edges.getFacingEdge(source.tile(), tile).absoluteRelativeTo(tile.x, tile.y) == tile.rotation();
         }
     }
 }

@@ -39,7 +39,7 @@ public class ItemBridge extends Block{
         hasItems = true;
         unloadable = false;
         group = BlockGroup.transportation;
-    //point2 config is relative
+        //point2 config is relative
         config(Point2.class, (tile, i) -> ((ItemBridgeEntity)tile).link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
         //integer is not
         config(Integer.class, (tile, i) -> ((ItemBridgeEntity)tile).link = i);
@@ -117,7 +117,7 @@ public class ItemBridge extends Block{
             return false;
         }
 
-        return other.block() == this && (!checkDouble || other.<ItemBridgeEntity>ent().link != tile.pos());
+        return other.block() == this && (other.team() == tile.team() || tile.block() != this) && (!checkDouble || other.<ItemBridgeEntity>ent().link != tile.pos());
     }
 
     public Tile findLink(int x, int y){

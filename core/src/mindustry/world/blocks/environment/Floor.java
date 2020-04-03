@@ -64,7 +64,6 @@ public class Floor extends Block{
     public Block decoration = Blocks.air;
 
     protected TextureRegion[][] edges;
-    protected byte eq = 0;
     protected Array<Block> blenders = new Array<>();
     protected IntSet blended = new IntSet();
     protected TextureRegion edgeRegion;
@@ -183,7 +182,6 @@ public class Floor extends Block{
     protected void drawEdges(Tile tile, boolean sameLayer){
         blenders.clear();
         blended.clear();
-        eq = 0;
 
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
@@ -192,11 +190,10 @@ public class Floor extends Block{
                 if(blended.add(other.floor().id)){
                     blenders.add(other.floor());
                 }
-                eq |= (1 << i);
             }
         }
 
-        blenders.sort((a, b) -> Integer.compare(a.id, b.id));
+        blenders.sort(a -> a.id);
 
         for(Block block : blenders){
             for(int i = 0; i < 8; i++){

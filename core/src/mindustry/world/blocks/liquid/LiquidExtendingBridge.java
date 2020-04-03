@@ -18,7 +18,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
         group = BlockGroup.liquids;
     }
 
-    public class LiquidExtendingBridgeEntity extends ItemBridgeEntity{
+    public class LiquidExtendingBridgeEntity extends ExtendingItemBridgeEntity{
         @Override
         public void updateTile(){
             time += cycleSpeed * delta();

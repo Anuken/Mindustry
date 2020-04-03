@@ -215,7 +215,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
         FloatArray frequencies = new FloatArray();
         for(int i = 0; i < ores.size; i++){
-            frequencies.add(rand.random(-0.09f, 0.01f));
+            frequencies.add(rand.random(-0.09f, 0.01f) - i * 0.01f);
         }
 
         pass((x, y) -> {

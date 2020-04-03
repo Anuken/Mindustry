@@ -9,6 +9,7 @@ import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.event.*;
+import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
@@ -85,10 +86,20 @@ public class PlanetDialog extends FloatingDialog{
             makeBloom();
         });
 
-        cam.fov = 60f;
 
-        addCloseButton();
-        buttons.addImageTextButton("$techtree", Icon.tree, () -> ui.tech.show()).size(230f, 64f);
+        buttons.defaults().size(220f, 64f).pad(0f);
+
+        TextButtonStyle style = Styles.cleart;
+        float bmargin = 6f;
+
+        //TODO names
+        buttons.addImageTextButton("$back", Icon.left, style, this::hide).margin(bmargin);
+        buttons.addImageTextButton("Tech", Icon.tree, style, () -> ui.tech.show()).margin(bmargin);
+        buttons.addImageTextButton("Launch", Icon.upOpen, style, this::hide).margin(bmargin);
+        buttons.addImageTextButton("Database", Icon.book, style, () -> ui.database.show()).margin(bmargin);
+        buttons.addImageTextButton("Resources", Icon.file, style, this::hide).margin(bmargin);
+
+        cam.fov = 60f;
 
         camRelative.set(0, 0f, camLength);
         projector.setScaling(1f / 150f);
