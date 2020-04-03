@@ -38,7 +38,7 @@ public class UnitDrops{
 
         if (type == UnitTypes.fortress) return Items.titanium;
         if (type == UnitTypes.eruptor) return Items.pyratite;
-        if (type == UnitTypes.chaosArray) return Items.sporePod;
+        if (type == UnitTypes.chaosArray) return Items.thorium;
         if (type == UnitTypes.eradicator) return Items.blastCompound;
 
         if (type == UnitTypes.wraith) return Items.sand;
