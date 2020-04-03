@@ -81,26 +81,36 @@ public class DesktopInput extends InputHandler{
         int cursorX = tileX(Core.input.mouseX());
         int cursorY = tileY(Core.input.mouseY());
 
-        //draw selection(s)
-        if(mode == placing && block != null){
-            for(int i = 0; i < lineRequests.size; i++){
-                BuildRequest req = lineRequests.get(i);
-                if(i == lineRequests.size - 1 && req.block.rotate){
-                    drawArrow(block, req.x, req.y, req.rotation);
-                }
-                drawRequest(lineRequests.get(i));
-            }
-        }else if(mode == breaking){
+        //draw break selection
+        if(mode == breaking){
             drawBreakSelection(selectX, selectY, cursorX, cursorY);
-        }else if(isPlacing()){
-            if(block.rotate){
-                drawArrow(block, cursorX, cursorY, rotation);
-            }
-            Draw.color();
-            drawRequest(cursorX, cursorY, block, rotation);
-            block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
         }
 
+        if(Core.input.keyDown(Binding.schematic_select) && !Core.scene.hasKeyboard()){
+            drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
+        }
+
+        Draw.reset();
+    }
+
+    @Override
+    public void drawBottom(){
+        int cursorX = tileX(Core.input.mouseX());
+        int cursorY = tileY(Core.input.mouseY());
+
+        //draw request being moved
+        if(sreq != null){
+            boolean valid = validPlace(sreq.x, sreq.y, sreq.block, sreq.rotation, sreq);
+            if(sreq.block.rotate){
+                drawArrow(sreq.block, sreq.x, sreq.y, sreq.rotation, valid);
+            }
+
+            sreq.block.drawRequest(sreq, allRequests(), valid);
+
+            drawSelected(sreq.x, sreq.y, sreq.block, getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
+        }
+
+        //draw hover request
         if(mode == none && !isPlacing()){
             BuildRequest req = getRequest(cursorX, cursorY);
             if(req != null){
@@ -118,19 +128,22 @@ public class DesktopInput extends InputHandler{
             drawOverRequest(request);
         }
 
-        if(sreq != null){
-            boolean valid = validPlace(sreq.x, sreq.y, sreq.block, sreq.rotation, sreq);
-            if(sreq.block.rotate){
-                drawArrow(sreq.block, sreq.x, sreq.y, sreq.rotation, valid);
+        //draw things that may be placed soon
+        if(mode == placing && block != null){
+            for(int i = 0; i < lineRequests.size; i++){
+                BuildRequest req = lineRequests.get(i);
+                if(i == lineRequests.size - 1 && req.block.rotate){
+                    drawArrow(block, req.x, req.y, req.rotation);
+                }
+                drawRequest(lineRequests.get(i));
             }
-
-            sreq.block.drawRequest(sreq, allRequests(), valid);
-
-            drawSelected(sreq.x, sreq.y, sreq.block, getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
-        }
-
-        if(Core.input.keyDown(Binding.schematic_select) && !Core.scene.hasKeyboard()){
-            drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
+        }else if(isPlacing()){
+            if(block.rotate){
+                drawArrow(block, cursorX, cursorY, rotation);
+            }
+            Draw.color();
+            drawRequest(cursorX, cursorY, block, rotation);
+            block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
         }
 
         Draw.reset();

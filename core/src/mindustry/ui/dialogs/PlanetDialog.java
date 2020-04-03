@@ -47,7 +47,6 @@ public class PlanetDialog extends FloatingDialog{
 
     private Bloom bloom;
     private Planet planet = Planets.starter;
-    private float lastX, lastY;
     private @Nullable Sector selected, hovered;
     private Table stable;
     private Mesh atmosphere = MeshBuilder.buildHex(new HexMesher(){
@@ -104,35 +103,31 @@ public class PlanetDialog extends FloatingDialog{
         camRelative.set(0, 0f, camLength);
         projector.setScaling(1f / 150f);
 
-        update(() -> {
-            Vec3 v = Tmp.v33.set(Core.input.mouseX(), Core.input.mouseY(), 0);
+        dragged((cx, cy) -> {
+            float upV = camRelative.angle(Vec3.Y);
+            float xscale = 9f, yscale = 10f;
+            float margin = 1;
 
+            //scale X speed depending on polar coordinate
+            float speed = 1f - Math.abs(upV - 90) / 90f;
+
+            camRelative.rotate(cam.up, cx / xscale * speed);
+
+            //prevent user from scrolling all the way up and glitching it out
+            float amount = cy / yscale;
+            amount = Mathf.clamp(upV + amount, margin, 180f - margin) - upV;
+
+            camRelative.rotate(Tmp.v31.set(cam.up).rotate(cam.direction, 90), amount);
+        });
+
+        update(() -> {
             if(planet.isLandable()){
                 hovered = planet.getSector(cam.getMouseRay(), outlineRad);
-
-                if(Core.input.keyDown(KeyCode.MOUSE_LEFT)){
-                    float upV = camRelative.angle(Vec3.Y);
-                    float xscale = 9f, yscale = 10f;
-                    float margin = 1;
-
-                    //scale X speed depending on polar coordinate
-                    float speed = 1f - Math.abs(upV - 90) / 90f;
-
-                    camRelative.rotate(cam.up, (v.x - lastX) / xscale * speed);
-
-                    //prevent user from scrolling all the way up and glitching it out
-                    float amount = (v.y - lastY) / yscale;
-                    amount = Mathf.clamp(upV + amount, margin, 180f - margin) - upV;
-
-                    camRelative.rotate(Tmp.v31.set(cam.up).rotate(cam.direction, 90), amount);
-                }
-
             }else{
                 hovered = selected = null;
             }
 
-            lastX = v.x;
-            lastY = v.y;
+
         });
 
         addListener(new ElementGestureListener(){
@@ -382,6 +377,17 @@ public class PlanetDialog extends FloatingDialog{
 
         stable.pack();
         stable.setPosition(x, y, Align.center);
+
+        stable.update(() -> {
+            if(selected != null){
+                //fade out UI when not facing selected sector
+                Tmp.v31.set(selected.tile.v).rotate(Vec3.Y, -planet.getRotation()).scl(-1f).nor();
+                float dot = cam.direction.dot(Tmp.v31);
+                stable.getColor().a = Math.max(dot, 0f)*2f;
+            }
+        });
+
+        stable.act(0f);
     }
 
     private void setPlane(Sector sector){

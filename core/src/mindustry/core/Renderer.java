@@ -224,10 +224,12 @@ public class Renderer implements ApplicationListener{
 
         blocks.drawBlocks(Layer.turret);
 
-        Groups.drawFlyingShadows();
-
         blocks.drawBlocks(Layer.power);
         blocks.drawBlocks(Layer.lights);
+
+        overlays.drawBottom();
+
+        Groups.drawFlyingShadows();
 
         Groups.drawFlying();
 
@@ -242,11 +244,6 @@ public class Renderer implements ApplicationListener{
         Draw.flush();
         if(bloom != null){
             bloom.render();
-        }
-
-        overlays.drawBottom();
-        if(player.isBuilder()){
-            player.builder().drawBuildRequests();
         }
 
         Groups.drawOverlays();

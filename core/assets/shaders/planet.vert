@@ -20,6 +20,6 @@ void main(){
     float shinyness = (1.0 - a_color.a) * pow(shinedot, shinefalloff);
     vec4 baseCol = vec4(a_color.rgb, 1.0);
 
-	v_col = lerp(baseCol * vec4(norc, 1.0), vec4(1.0), shinyness * norc.r);
+	v_col = mix(baseCol * vec4(norc, 1.0), vec4(1.0), shinyness * norc.r);
     gl_Position = u_proj * u_trans * a_position;
 }

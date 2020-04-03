@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
 
 @Component
 abstract class BuilderComp implements Unitc, DrawLayerFlyingc{
-    static final Vec2[] tmptr = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
+    static final Vec2[] vecs = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
     @Import float x, y, rotation;
 
@@ -67,9 +67,19 @@ abstract class BuilderComp implements Unitc, DrawLayerFlyingc{
 
         Tile tile = world.tile(current.x, current.y);
 
+        if(dst(tile) <= finalPlaceDst){
+            rotation = Mathf.slerpDelta(rotation, angleTo(tile), 0.4f);
+        }
+
         if(!(tile.block() instanceof BuildBlock)){
             if(!current.initialized && !current.breaking && Build.validPlace(team(), current.x, current.y, current.block, current.rotation)){
-                Build.beginPlace(team(), current.x, current.y, current.block, current.rotation);
+                boolean hasAll = !Structs.contains(current.block.requirements, i -> !core.items().has(i.item));
+
+                if(hasAll){
+                    Build.beginPlace(team(), current.x, current.y, current.block, current.rotation);
+                }else{
+                    current.stuck = true;
+                }
             }else if(!current.initialized && current.breaking && Build.validBreak(team(), current.x, current.y)){
                 Build.beginBreak(team(), current.x, current.y);
             }else{
@@ -93,10 +103,6 @@ abstract class BuilderComp implements Unitc, DrawLayerFlyingc{
 
         //otherwise, update it.
         BuildEntity entity = tile.ent();
-
-        if(dst(tile) <= finalPlaceDst){
-            rotation = Mathf.slerpDelta(rotation, angleTo(entity), 0.4f);
-        }
 
         if(current.breaking){
             entity.deconstruct(this, core, 1f / entity.buildCost * Time.delta() * buildSpeed * state.rules.buildSpeedMultiplier);
@@ -134,8 +140,9 @@ abstract class BuilderComp implements Unitc, DrawLayerFlyingc{
     /** @return whether this request should be skipped, in favor of the next one. */
     boolean shouldSkip(BuildRequest request, @Nullable Tilec core){
         //requests that you have at least *started* are considered
-        if(state.rules.infiniteResources || request.breaking || !request.initialized || core == null) return false;
-        return request.stuck && !core.items().has(request.block.requirements);
+        if(state.rules.infiniteResources || request.breaking || core == null) return false;
+        //TODO these are bad criteria
+        return (request.stuck && !core.items().has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items().has(i.item)) && !request.initialized);
     }
 
     void removeBuild(int x, int y, boolean breaking){
@@ -199,23 +206,26 @@ abstract class BuilderComp implements Unitc, DrawLayerFlyingc{
             return;
         }
 
+        int size = request.breaking ? tile.block().size : request.block.size;
+        float tx = request.drawx(), ty = request.drawy();
+
         Lines.stroke(1f, Pal.accent);
         float focusLen = 3.8f + Mathf.absin(Time.time(), 1.1f, 0.6f);
         float px = x + Angles.trnsx(rotation, focusLen);
         float py = y + Angles.trnsy(rotation, focusLen);
 
-        float sz = Vars.tilesize * tile.block().size / 2f;
-        float ang = angleTo(tile);
+        float sz = Vars.tilesize * size / 2f;
+        float ang = angleTo(tx, ty);
 
-        tmptr[0].set(tile.drawx() - sz, tile.drawy() - sz);
-        tmptr[1].set(tile.drawx() + sz, tile.drawy() - sz);
-        tmptr[2].set(tile.drawx() - sz, tile.drawy() + sz);
-        tmptr[3].set(tile.drawx() + sz, tile.drawy() + sz);
+        vecs[0].set(tx - sz, ty - sz);
+        vecs[1].set(tx + sz, ty - sz);
+        vecs[2].set(tx - sz, ty + sz);
+        vecs[3].set(tx + sz, ty + sz);
 
-        Arrays.sort(tmptr, Structs.comparingFloat(vec -> -Angles.angleDist(angleTo(vec), ang)));
+        Arrays.sort(vecs, Structs.comparingFloat(vec -> -Angles.angleDist(angleTo(vec), ang)));
 
-        float x1 = tmptr[0].x, y1 = tmptr[0].y,
-        x3 = tmptr[1].x, y3 = tmptr[1].y;
+        float x1 = vecs[0].x, y1 = vecs[0].y,
+        x3 = vecs[1].x, y3 = vecs[1].y;
 
         Draw.alpha(1f);
 

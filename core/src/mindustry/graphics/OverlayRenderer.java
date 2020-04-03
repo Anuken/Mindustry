@@ -25,6 +25,10 @@ public class OverlayRenderer{
 
         if(player.dead()) return;
 
+        if(player.isBuilder()){
+            player.builder().drawBuildRequests();
+        }
+
         input.drawBottom();
     }
 
@@ -54,23 +58,6 @@ public class OverlayRenderer{
                     Draw.reset();
                 }
             });
-
-            //mech pads are gone
-            /*
-            if(ui.hudfrag.blockfrag.currentCategory == Category.upgrade){
-                for(Tile mechpad : indexer.getAllied(player.team(), BlockFlag.mechPad)){
-                    if(!(mechpad.block() instanceof MechPad)) continue;
-                    if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
-                            .setCenter(Core.camera.position.x, Core.camera.position.y).contains(mechpad.drawx(), mechpad.drawy())){
-
-                        Tmp.v1.set(mechpad.drawx(), mechpad.drawy()).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
-
-                        Lines.stroke(2f, ((MechPad) mechpad.block()).mech.engineColor);
-                        Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 0.5f);
-                        Draw.reset();
-                    }
-                }
-            }*/
         }
 
         if(player.dead()) return; //dead players don't draw
