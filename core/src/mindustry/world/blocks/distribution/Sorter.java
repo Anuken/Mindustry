@@ -61,11 +61,13 @@ public class Sorter extends Block{
         super.draw(tile);
 
         SorterEntity entity = tile.ent();
-        if(entity.sortItem == null) return;
-
-        Draw.color(entity.sortItem.color);
-        Draw.rect("center", tile.worldx(), tile.worldy());
-        Draw.color();
+        if(entity.sortItem == null){
+            Draw.rect("cross", tile.worldx(), tile.worldy());
+        }else{
+            Draw.color(entity.sortItem.color);
+            Draw.rect("center", tile.worldx(), tile.worldy());
+            Draw.color();
+        }
     }
 
     @Override
