@@ -1178,9 +1178,6 @@ public class Blocks implements ContentList{
         battery = new Battery("battery"){{
             requirements(Category.power, ItemStack.with(Items.copper, 4, Items.lead, 20));
             consumes.powerBuffered(4000f);
-
-            flags = EnumSet.of(scalable);
-            upscale = () -> batteryLarge;
         }};
 
         batteryLarge = new Battery("battery-large"){{
