@@ -137,6 +137,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
                 entity.generateTime = 1f;
 
                 if(tile.block == Blocks.combustionGenerator) Fire.create(tile);
+                if(tile.block == Blocks.combustionGenerator) Core.app.post(() -> tile.entity.damage(tile.entity.maxHealth()));
             }
 
             if(entity.generateTime > 0f){
