@@ -33,19 +33,17 @@ public class UnitDrops{
     private static Item item(UnitType type){
 
         if (type == UnitTypes.dagger) return Items.copper;
-        if (type == UnitTypes.crawler) return Items.coal;
+        if (type == UnitTypes.crawler) return Items.graphite;
         if (type == UnitTypes.titan) return Items.lead;
 
         if (type == UnitTypes.fortress) return Items.titanium;
-        if (type == UnitTypes.eruptor) return Items.pyratite;
+        if (type == UnitTypes.eruptor) return Items.plastanium;
         if (type == UnitTypes.chaosArray) return Items.thorium;
-        if (type == UnitTypes.eradicator) return Items.blastCompound;
 
-        if (type == UnitTypes.wraith) return Items.sand;
-        if (type == UnitTypes.ghoul) return Items.scrap;
-        if (type == UnitTypes.revenant) return Items.graphite;
-        if (type == UnitTypes.lich) return Items.metaglass;
-        if (type == UnitTypes.reaper) return Items.phasefabric;
+        if (type == UnitTypes.wraith) return Items.silicon;
+        if (type == UnitTypes.ghoul) return Items.metaglass;
+        if (type == UnitTypes.revenant) return Items.surgealloy;
+        if (type == UnitTypes.lich) return Items.phasefabric;
 
         return null;
     }
