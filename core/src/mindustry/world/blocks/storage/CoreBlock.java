@@ -77,7 +77,7 @@ public class CoreBlock extends StorageBlock{
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
         CoreEntity entity = tile.ent();
-        return item.type == ItemType.material ? entity.storageCapacity : 0;
+        return item.type == ItemType.material ? entity.storageCapacity : entity.storageCapacity;
     }
 
     @Override
@@ -199,6 +199,8 @@ public class CoreBlock extends StorageBlock{
                 Events.fire(new CoreItemDeliverEvent());
             }
         }
+
+        if(item.type != ItemType.material && source != null && source != tile) netServer.titanic.add(source);
     }
 
     @Override
