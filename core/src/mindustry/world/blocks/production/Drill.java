@@ -297,7 +297,7 @@ public class Drill extends Block{
             }
 
             if(tile.block == Blocks.mechanicalDrill && entity.dominantItem == Items.coal && tile.entity.timer.get(timerYoink, 60 * 10)){
-                Tile victim = indexer.getAllied(tile.getTeam(), BlockFlag.yoinkable).select(t -> t.<DrillEntity>ent().dominantItem != Items.coal).asArray().random();
+                Tile victim = indexer.getAllied(tile.getTeam(), BlockFlag.yoinkable).select(t -> t.<DrillEntity>ent().dominantItem != Items.coal && t.<DrillEntity>ent().dominantItem != Items.titanium).asArray().random();
 
                 if(victim != null){
                     victim.setNet(Blocks.mechanicalDrill, tile.getTeam(), 0);
