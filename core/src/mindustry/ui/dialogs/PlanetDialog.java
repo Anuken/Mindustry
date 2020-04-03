@@ -354,12 +354,6 @@ public class PlanetDialog extends FloatingDialog{
                 t.addImage(c.icon(Cicon.small)).padRight(3);
                 if(++idx % max == 0) t.row();
             }
-
-            //TODO terrain isn't relevant
-            //for(int i = 0; i < Math.min(selected.data.floorCounts.length, 3); i++){
-            //    t.addImage(selected.data.floors[i].icon(Cicon.small)).padRight(3);
-            //    if(++idx % max == 0) t.row();
-            //}
         }).fillX().row();
 
         stable.row();
