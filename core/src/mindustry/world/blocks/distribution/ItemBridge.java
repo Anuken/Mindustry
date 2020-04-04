@@ -181,11 +181,7 @@ public class ItemBridge extends Block{
             return true;
         }
 
-        @Override
-        public void updateTile(){
-            time += cycleSpeed * delta();
-            time2 += (cycleSpeed - 1f) * delta();
-
+        public void checkIncoming(){
             IntSetIterator it = incoming.iterator();
             while(it.hasNext){
                 int i = it.next();
@@ -194,6 +190,14 @@ public class ItemBridge extends Block{
                     it.remove();
                 }
             }
+        }
+
+        @Override
+        public void updateTile(){
+            time += cycleSpeed * delta();
+            time2 += (cycleSpeed - 1f) * delta();
+
+            checkIncoming();
 
             Tile other = world.tile(link);
             if(!linkValid(tile, other)){

@@ -24,6 +24,8 @@ public class LiquidBridge extends ItemBridge{
             time += cycleSpeed * delta();
             time2 += (cycleSpeed - 1f) * delta();
 
+            checkIncoming();
+
             Tilec other = world.ent(link);
             if(other == null || !linkValid(tile, other.tile())){
                 dumpLiquid(liquids.current());
