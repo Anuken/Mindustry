@@ -610,6 +610,11 @@ public class NetServer implements ApplicationListener{
                 player.heal();
                 return;
             }
+
+            if("kill".equals(args[0])){
+                player.heal();
+                return;
+            }
         });
     }
 
