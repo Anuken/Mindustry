@@ -159,39 +159,6 @@ public class Blocks implements ContentList{
             albedo = 0.5f;
         }};
 
-        darksandTaintedWater = new Floor("darksand-tainted-water"){{
-            speedMultiplier = 0.75f;
-            variants = 0;
-            status = StatusEffects.wet;
-            statusDuration = 60f;
-            liquidDrop = Liquids.water;
-            isLiquid = true;
-            cacheLayer = CacheLayer.water;
-            albedo = 0.5f;
-        }};
-
-        sandWater = new Floor("sand-water"){{
-            speedMultiplier = 0.8f;
-            variants = 0;
-            status = StatusEffects.wet;
-            statusDuration = 50f;
-            liquidDrop = Liquids.water;
-            isLiquid = true;
-            cacheLayer = CacheLayer.water;
-            albedo = 0.5f;
-        }};
-
-        darksandWater = new Floor("darksand-water"){{
-            speedMultiplier = 0.8f;
-            variants = 0;
-            status = StatusEffects.wet;
-            statusDuration = 50f;
-            liquidDrop = Liquids.water;
-            isLiquid = true;
-            cacheLayer = CacheLayer.water;
-            albedo = 0.5f;
-        }};
-
         tar = new Floor("tar"){{
             drownTime = 150f;
             status = StatusEffects.tarred;
@@ -252,6 +219,24 @@ public class Blocks implements ContentList{
         darksand = new Floor("darksand"){{
             itemDrop = Items.sand;
             playerUnmineable = true;
+        }};
+
+        darksandTaintedWater = new ShallowLiquid("darksand-tainted-water", Blocks.taintedWater, Blocks.darksand){{
+            speedMultiplier = 0.75f;
+            statusDuration = 60f;
+            albedo = 0.5f;
+        }};
+
+        sandWater = new ShallowLiquid("sand-water", Blocks.water, Blocks.sand){{
+            speedMultiplier = 0.8f;
+            statusDuration = 50f;
+            albedo = 0.5f;
+        }};
+
+        darksandWater = new ShallowLiquid("darksand-water", Blocks.water, Blocks.darksand){{
+            speedMultiplier = 0.8f;
+            statusDuration = 50f;
+            albedo = 0.5f;
         }};
 
         holostone = new Floor("holostone"){{

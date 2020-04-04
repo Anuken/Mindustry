@@ -231,7 +231,9 @@ public class Floor extends Block{
     }
 
     protected boolean doEdge(Floor other, boolean sameLayer){
-        return (other.blendGroup.id > blendGroup.id || edges() == null) && other.edgeOnto(this) && (other.cacheLayer.ordinal() > this.cacheLayer.ordinal() || !sameLayer);
+        boolean dir = !((other instanceof ShallowLiquid && ((ShallowLiquid)other).floorBase == this) || (this instanceof ShallowLiquid && ((ShallowLiquid)this).floorBase == other));
+        return ((other.blendGroup.id > blendGroup.id == dir) || edges() == null) &&
+            other.edgeOnto(this) && (other.cacheLayer.ordinal() > this.cacheLayer.ordinal() || !sameLayer);
     }
 
     protected boolean edgeOnto(Floor other){

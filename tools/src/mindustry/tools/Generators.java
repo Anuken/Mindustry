@@ -21,6 +21,7 @@ import static mindustry.Vars.*;
 public class Generators{
 
     public static void generate(){
+        ObjectMap<Block, Image> gens = new ObjectMap<>();
 
         ImagePacker.generate("cracks", () -> {
             RidgedPerlin r = new RidgedPerlin(1, 3);
@@ -170,6 +171,29 @@ public class Generators{
             colors.save("../../../assets/sprites/block_colors");
         });
 
+        ImagePacker.generate("shallows", () -> {
+            content.blocks().<ShallowLiquid>each(b -> b instanceof ShallowLiquid, floor -> {
+                Image overlay = ImagePacker.get(floor.liquidBase.region);
+                int index = 0;
+                for(TextureRegion region : floor.floorBase.variantRegions()){
+                    Image res = new Image(32, 32);
+                    res.draw(ImagePacker.get(region));
+                    for(int x = 0; x < res.width; x++){
+                        for(int y = 0; y < res.height; y++){
+                            Color color = overlay.getColor(x, y).a(0.3f);
+                            res.draw(x, y, color);
+                        }
+                    }
+
+                    String name = floor.name + "" + (++index);
+                    res.save("../blocks/environment/" + name);
+                    res.save("../editor/editor-" + name);
+
+                    gens.put(floor, res);
+                }
+            });
+        });
+
         ImagePacker.generate("item-icons", () -> {
             for(UnlockableContent item : (Array<? extends UnlockableContent>)(Array)Array.withArrays(content.items(), content.liquids())){
                 Image base = ImagePacker.get(item.getContentType().name() + "-" + item.name);
@@ -261,7 +285,7 @@ public class Generators{
                 }
 
                 try{
-                    Image image = ImagePacker.get(floor.generateIcons()[0]);
+                    Image image = gens.get(floor, ImagePacker.get(floor.generateIcons()[0]));
                     Image edge = ImagePacker.get("edge-stencil");
                     Image result = new Image(edge.width, edge.height);
 
