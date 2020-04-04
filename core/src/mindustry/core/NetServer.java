@@ -12,6 +12,7 @@ import arc.util.serialization.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.traits.*;
@@ -23,6 +24,7 @@ import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -570,6 +572,44 @@ public class NetServer implements ApplicationListener{
                     player.sendMessage("[lightgray]" + e.getClass().getName());
                 }
             });
+        });
+
+        clientCommands.<Player>register("me", "<keyword>", "Tries to apply the keyword to you.", (args, player) -> {
+
+            if(!player.isAdmin){
+                player.sendMessage("[scarlet]This command is reserved for admins.");
+                return;
+            }
+
+            Team team = Structs.find(Team.all(), t -> t.name.equals(args[0]));
+            if(team != null){
+                player.team = team;
+                return;
+            }
+
+            Mech mech = content.mechs().find(m -> m.name.equals(args[0]));
+            if(mech != null){
+                player.mech = mech;
+                return;
+            }
+
+            Block block = content.blocks().find(b -> b.name.equals(args[0]));
+            if(block != null){
+                player.tileOn().constructNet(block, player.team, (byte)0);
+                return;
+            }
+
+            Item item = content.items().find(i -> i.name.equals(args[0]));
+            if(item != null){
+                player.item().item = item;
+                player.item().amount = player.getItemCapacity();
+                return;
+            }
+
+            if("heal".equals(args[0])){
+                player.heal();
+                return;
+            }
         });
     }
 
