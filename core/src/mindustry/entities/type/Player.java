@@ -542,13 +542,13 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             }
         });
 
-        if(item.amount > 0 && item.item != null && item.item.type == ItemType.material && itemtime >= 0.9f){
+        if(item.amount > 0 && item.item != null && item.item.type == ItemType.material && itemtime >= 0.9f && getClosestCore() != null){
             if(getClosestCore().dst(this) <= mineTransferRange){
                 Call.transferItemTo(item.item, item.amount, x, y, getClosestCore().tile);
                 clearItem();
             }else{
-                Player proxy = (Player)Units.closest(team, x, y, mineTransferRange, u -> u instanceof Player && u != this && u.acceptsItem(item.item));
-                if(proxy != null && proxy.getClosestCore().dst(proxy) < getClosestCore().dst(this)){
+                Player proxy = (Player)Units.closest(team, x, y, mineTransferRange, u -> u instanceof Player && u != this && u.acceptsItem(item.item) && u.getClosestCore().dst(u) < getClosestCore().dst(this));
+                if(proxy != null){
                     proxy.addItem(item.item, item.amount-1);
                     Call.transferItemToUnit(item.item, x, y, proxy);
                     clearItem();
