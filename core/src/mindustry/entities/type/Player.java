@@ -542,9 +542,18 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             }
         });
 
-        if(dropoff && getClosestCore().dst(this) <= mineTransferRange){
-            Call.transferItemTo(item.item, item.amount, x, y, getClosestCore().tile);
-            clearItem();
+        if(item.amount > 0 && item.item != null && item.item.type == ItemType.material && itemtime >= 0.9f){
+            if(getClosestCore().dst(this) <= mineTransferRange){
+                Call.transferItemTo(item.item, item.amount, x, y, getClosestCore().tile);
+                clearItem();
+            }else{
+                Player proxy = (Player)Units.closest(team, x, y, mineTransferRange, u -> u instanceof Player && u != this && u.acceptsItem(item.item));
+                if(proxy != null && proxy.getClosestCore().dst(proxy) < getClosestCore().dst(this)){
+                    proxy.addItem(item.item, item.amount-1);
+                    Call.transferItemToUnit(item.item, x, y, proxy);
+                    clearItem();
+                }
+            }
         }
 
         boostHeat = Mathf.lerpDelta(boostHeat, (tile != null && tile.solid()) || (isBoosting && ((!movement.isZero() && moved) || !isLocal)) ? 1f : 0f, 0.08f);
