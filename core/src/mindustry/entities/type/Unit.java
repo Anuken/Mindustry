@@ -44,6 +44,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     protected final Interpolator interpolator = new Interpolator();
     protected final Statuses status = new Statuses();
     protected final ItemStack item = new ItemStack(content.item(0), 0);
+    public boolean dropoff = false;
 
     public Team team = Team.sharded;
     protected float drownTime, hitTime;
@@ -372,6 +373,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public void clearItem(){
         item.amount = 0;
+        dropoff = false;
     }
 
     public ItemStack item(){

@@ -19,7 +19,9 @@ public class UnitDrops{
 
         if(core == null || core.dst(unit) > Vars.mineTransferRange){
             Player nearby = (Player)Units.closestEnemy(unit.getTeam(), unit.x, unit.y, Vars.mineTransferRange, u -> u instanceof Player && u.acceptsItem(unit.item().item));
-            if(nearby != null) nearby.addItem(unit.item().item, unit.item().amount);
+            if(nearby != null) nearby.addItem(unit.item().item, unit.item().amount-1);
+            if(nearby != null) Call.transferItemToUnit(unit.item().item, unit.x, unit.y, nearby);
+            if(nearby != null) nearby.dropoff = true;
         }else{
             unit.item().amount = core.tile.block().acceptStack(unit.item().item, unit.item().amount, core.tile, null);
             Call.transferItemTo(unit.item().item, unit.item().amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), core.tile);

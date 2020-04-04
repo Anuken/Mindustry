@@ -146,6 +146,7 @@ public class InputHandler implements InputProcessor, GestureListener{
 
                 if(end){
                     player.isTransferring = false;
+                    player.dropoff = false;
                 }
             });
         }
