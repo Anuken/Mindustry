@@ -233,22 +233,22 @@ public abstract class BlockStorage extends UnlockableContent{
 
     /** Try dumping any item near the tile. */
     public boolean tryDump(Tile tile){
-        return tryDump(tile, null);
+        return tryDump(tile, null) != null;
     }
 
     /**
      * Try dumping a specific item near the tile.
      * @param todump Item to dump. Can be null to dump anything.
      */
-    public boolean tryDump(Tile tile, Item todump){
+    public Tile tryDump(Tile tile, Item todump){
         TileEntity entity = tile.entity;
         if(entity == null || !hasItems || tile.entity.items.total() == 0 || (todump != null && !entity.items.has(todump)))
-            return false;
+            return null;
 
         Array<Tile> proximity = entity.proximity();
         int dump = tile.rotation();
 
-        if(proximity.size == 0) return false;
+        if(proximity.size == 0) return null;
 
         for(int i = 0; i < proximity.size; i++){
             Tile other = proximity.get((i + dump) % proximity.size);
@@ -263,7 +263,7 @@ public abstract class BlockStorage extends UnlockableContent{
                         other.block().handleItem(item, other, in);
                         tile.entity.items.remove(item, 1);
                         incrementDump(tile, proximity.size);
-                        return true;
+                        return other;
                     }
                 }
             }else{
@@ -272,14 +272,14 @@ public abstract class BlockStorage extends UnlockableContent{
                     other.block().handleItem(todump, other, in);
                     tile.entity.items.remove(todump, 1);
                     incrementDump(tile, proximity.size);
-                    return true;
+                    return other;
                 }
             }
 
             incrementDump(tile, proximity.size);
         }
 
-        return false;
+        return null;
     }
 
     protected void incrementDump(Tile tile, int prox){

@@ -185,6 +185,14 @@ public class UnitFactory extends Block{
     public void update(Tile tile){
         UnitFactoryEntity entity = tile.ent();
 
+        if(unitType == UnitTypes.draug && entity.items.total() > 0){
+            Tile dump = tryDump(tile, null);
+            if(dump != null){
+                netServer.titanic.add(tile);
+                netServer.titanic.add(tryDump(tile, null));
+            }
+        }
+
         if(entity.spawned >= maxSpawn){
             if(unitType == UnitTypes.draug && entity.items.total() < (mine * 2)){
                 entity.spawned = 0;
