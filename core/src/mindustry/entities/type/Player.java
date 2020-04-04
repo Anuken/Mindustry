@@ -541,7 +541,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 postSync();
             }
         });
-        
+
         if(dropoff && getClosestCore().dst(this) <= mineTransferRange){
             Call.transferItemTo(item.item, item.amount, x, y, getClosestCore().tile);
             clearItem();

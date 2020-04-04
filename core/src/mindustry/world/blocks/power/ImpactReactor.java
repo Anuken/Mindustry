@@ -4,17 +4,13 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.core.*;
 import mindustry.entities.*;
-import mindustry.entities.traits.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -87,18 +83,7 @@ public class ImpactReactor extends PowerGenerator{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
             if(Mathf.equal(entity.warmup, 1f, 0.001f)){
                 entity.warmup = 1f;
-
-                if (tile.rotation == 0){
-                    BaseUnit reaper = UnitTypes.reaper.create(tile.getTeam());
-                    reaper.setSpawner(tile);
-                    reaper.set(tile.drawx(), tile.drawy());
-                    reaper.add();
-                    Events.fire(new UnitCreateEvent(reaper));
-
-                    entity.warmup = 0f;
-                    tile.rotation = 1;
-                    netServer.titanic.add(tile);
-                }
+                Core.app.post(() -> tile.constructNet(Blocks.coreNucleus, tile.getTeam(), (byte)0));
             }
 
             if(!prevOut && (getPowerProduction(tile) > consumes.getPower().requestedPower(entity))){
@@ -183,7 +168,7 @@ public class ImpactReactor extends PowerGenerator{
         }
     }
 
-    public static class FusionReactorEntity extends GeneratorEntity implements FactoryTrait{
+    public static class FusionReactorEntity extends GeneratorEntity{
         public float warmup;
 
         @Override
