@@ -14,6 +14,7 @@ import mindustry.net.Administration.*;
 import mindustry.net.Net;
 import mindustry.net.*;
 import mindustry.plugin.coreprotect.*;
+import mindustry.server.nydus.*;
 
 import java.time.*;
 
@@ -86,6 +87,8 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(spiderweb);
         Core.app.addListener(new SiliconValley());
         Core.app.addListener(new SpecialDelivery());
+
+        Core.app.addListener(new JunctionYeeter());
 
         mods.eachClass(Mod::init);
 

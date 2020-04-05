@@ -18,9 +18,7 @@ import static mindustry.Vars.*;
 public class Junction extends Block{
     public float speed = 26; //frames taken to go through this junction
     public int capacity = 6;
-
-    public final int timerObsolete = timers++;
-
+    
     public Junction(String name){
         super(name);
         update = true;
@@ -111,27 +109,6 @@ public class Junction extends Block{
         JunctionEntity entity = tile.ent();
         int relative = source.relativeTo(tile.x, tile.y);
         entity.buffer.accept(relative, item);
-
-        if(entity.timer.get(timerObsolete, 60 * 3)){
-
-            if(tile.getNearbyLink(Compass.up) == null
-            || tile.getNearbyLink(Compass.down) == null
-            || tile.getNearbyLink(Compass.left) == null
-            || tile.getNearbyLink(Compass.right) == null
-            ) return;
-
-            boolean y = tile.getNearbyLink(Compass.up).block == Blocks.air && tile.getNearbyLink(Compass.down).block == Blocks.air;
-            boolean x = tile.getNearbyLink(Compass.left).block == Blocks.air && tile.getNearbyLink(Compass.right).block == Blocks.air;
-
-            if(x && y) return;
-
-            if(x || y){
-                if(source.block instanceof Conveyor){
-                    Call.onEffect(Fx.healBlockFull, tile.drawx(), tile.drawy(), source.block.size, Pal.bar);
-                    Core.app.post(() -> tile.setNet(source.block, tile.getTeam(), source.rotation));
-                }
-            }
-        }
     }
 
     @Override

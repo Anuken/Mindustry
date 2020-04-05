@@ -992,6 +992,8 @@ public class Blocks implements ContentList{
             capacity = 12;
             health = 30;
             buildCostMultiplier = 6f;
+
+            flags = EnumSet.of(BlockFlag.junction);
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{

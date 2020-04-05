@@ -21,7 +21,8 @@ public enum BlockFlag{
     /** Upgradables. */
     upgradable,
     /** Graphite. */
-    yoinkable;
+    yoinkable,
+    junction;
 
     public final static BlockFlag[] all = values();
 }
