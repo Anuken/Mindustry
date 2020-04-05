@@ -88,15 +88,15 @@ public class Junction extends Block{
                         Tile air = input.getNearby(input.relativeTo(tile)).getNearby(input.relativeTo(tile)).getNearby((neighbor.rotation + 2) % 4);
                         if(air.block == Blocks.air){
                             Core.app.post(() -> {
-                            Call.onEffect(Fx.healBlockFull, air.drawx(), air.drawy(), tile.block.size, Pal.bar);
-                            air.setNet(neighbor.block, neighbor.getTeam(), neighbor.rotation);
+                                Call.onEffect(Fx.healBlockFull, air.drawx(), air.drawy(), tile.block.size, Pal.bar);
+                                air.setNet(neighbor.block, neighbor.getTeam(), neighbor.rotation);
 
-                            Call.onEffect(Fx.healBlockFull, tile.drawx(), tile.drawy(), tile.block.size, Pal.bar);
-                            tile.setNet(neighbor.block, neighbor.getTeam(), neighbor.rotation);
+                                Call.onEffect(Fx.healBlockFull, tile.drawx(), tile.drawy(), tile.block.size, Pal.bar);
+                                tile.setNet(neighbor.block, neighbor.getTeam(), neighbor.rotation);
 
-                            Tile above = tile.getNearby((neighbor.rotation + 2) % 4);
-                            Call.onEffect(Fx.healBlockFull, above.drawx(), above.drawy(), tile.block.size, Pal.bar);
-                            above.setNet(neighbor.block, neighbor.getTeam(), above.relativeTo(air));
+                                Tile above = tile.getNearby((neighbor.rotation + 2) % 4);
+                                Call.onEffect(Fx.healBlockFull, above.drawx(), above.drawy(), tile.block.size, Pal.bar);
+                                above.setNet(neighbor.block, neighbor.getTeam(), above.relativeTo(air));
                             });
                             return;
                         }
