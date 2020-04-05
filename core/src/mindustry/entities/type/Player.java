@@ -551,6 +551,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 if(proxy != null){
                     proxy.addItem(item.item, item.amount-1);
                     Call.transferItemToUnit(item.item, x, y, proxy);
+                    proxy.itemtime = 0f;
                     clearItem();
                 }
             }
