@@ -322,7 +322,12 @@ public class BuildBlock extends Block{
             }
 
             if(progress <= 0 || state.rules.infiniteResources){
-                Call.onDeconstructFinish(tile, this.cblock == null ? previous : this.cblock, builderID);
+
+                Block block = this.cblock;
+                if(block == null) block = previous;
+                if(block == null) block = Blocks.air;
+
+                Call.onDeconstructFinish(tile, block, builderID);
             }
         }
 
