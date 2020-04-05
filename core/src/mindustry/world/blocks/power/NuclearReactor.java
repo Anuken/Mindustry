@@ -8,12 +8,14 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -133,8 +135,6 @@ public class NuclearReactor extends PowerGenerator{
             Time.run(Mathf.random(40), () -> Effects.effect(Fx.nuclearcloud, tile.worldx(), tile.worldy()));
         }
 
-        Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
-
         for(int i = 0; i < 20; i++){
             Time.run(Mathf.random(50), () -> {
                 tr.rnd(Mathf.random(40f));
@@ -147,6 +147,28 @@ public class NuclearReactor extends PowerGenerator{
                 tr.rnd(Mathf.random(120f));
                 Effects.effect(Fx.nuclearsmoke, tr.x + tile.worldx(), tr.y + tile.worldy());
             });
+        }
+
+        if(!net.server()) return;
+
+        Geometry.circle(tile.x, tile.y, explosionRadius / 2, (x, y) -> {
+            Tile tmp = world.tile(x, y);
+            if(tmp != null && tmp.block() instanceof StaticWall) Timer.schedule(() -> {
+                if(!tmp.border()) tmp.deconstructNet();
+            }, tile.dst(tmp) / tilesize * 0.1f);
+        });
+
+        Timer.schedule(() -> {
+            for(Player p : playerGroup){
+                p.syncbeacons.put(tile, explosionRadius / 2 * tilesize);
+            }
+        }, 2.5f);
+
+        // fixme, add all out variant so we don't have to loop playergroup
+        for(Player p : playerGroup){
+            for(int j = 0; j < 360; ++j){
+                if((j % 10) == 0) Call.createBullet(p, Bullets.slagShot, tile.getTeam(), tile.drawx(), tile.drawy(), j, 0.04f * explosionRadius, 10000f);
+            }
         }
     }
 

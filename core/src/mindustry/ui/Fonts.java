@@ -26,7 +26,7 @@ import mindustry.core.*;
 import java.util.*;
 
 public class Fonts{
-    private static ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
+    public static ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
 
     public static BitmapFont def;
     public static BitmapFont outline;

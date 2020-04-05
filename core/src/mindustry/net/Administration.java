@@ -13,12 +13,12 @@ import mindustry.entities.type.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.headless;
+import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
 
 public class Administration{
     /** All player info. Maps UUIDs to info. This persists throughout restarts. */
-    private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
+    public ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
     private Array<String> bannedIPs = new Array<>();
     private Array<String> whitelist = new Array<>();
     private Array<ChatFilter> chatFilters = new Array<>();
@@ -110,6 +110,8 @@ public class Administration{
                 return false;
             }
         }
+
+        coreProtect.allowedAction(act);
         Pools.free(act);
         return true;
     }
@@ -427,7 +429,9 @@ public class Administration{
         socketInputAddress("The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
         allowCustomClients("Whether custom clients are allowed to connect.", !headless, "allow-custom"),
         whitelist("Whether the whitelist is used.", false),
-        motd("The message displayed to people on connection.", "off");
+        motd("The message displayed to people on connection.", "off"),
+
+        crater("Whether the crater is repeatedly placed in the top left corner.", false);
 
         public static final Config[] all = values();
 
@@ -573,7 +577,13 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, tapTile, withdrawItem, depositItem
+        breakBlock("demolished"), placeBlock("constructed"), rotate("rotated"), configure("configured"), tapTile("tapped"), withdrawItem("added"), depositItem("removed");
+
+        public final String human;
+
+        ActionType(String human){
+            this.human = human;
+        }
     }
 
 }

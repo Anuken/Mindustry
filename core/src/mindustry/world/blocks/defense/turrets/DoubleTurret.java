@@ -1,12 +1,15 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.*;
 import arc.math.Mathf;
+import mindustry.content.*;
 import mindustry.entities.bullet.BulletType;
+import mindustry.type.*;
 import mindustry.world.Tile;
 import mindustry.world.meta.BlockStat;
 import mindustry.world.meta.StatUnit;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class DoubleTurret extends ItemTurret{
     public float shotWidth = 2f;
@@ -36,5 +39,12 @@ public class DoubleTurret extends ItemTurret{
 
         effects(tile);
         useAmmo(tile);
+
+        if(tile.block == Blocks.duo) Core.app.post(() -> tile.constructNet(Blocks.router, tile.getTeam(), tile.rotation()));
+    }
+
+    @Override
+    public void handleItem(Item item, Tile tile, Tile source){
+        super.handleItem(item, tile, source);
     }
 }

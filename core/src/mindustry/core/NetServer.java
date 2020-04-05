@@ -12,6 +12,7 @@ import arc.util.serialization.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.traits.*;
@@ -23,12 +24,16 @@ import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
 import java.net.*;
 import java.nio.*;
+import java.nio.charset.*;
+import java.util.concurrent.*;
+import java.util.stream.*;
 import java.util.zip.*;
 
 import static arc.util.Log.*;
@@ -63,6 +68,37 @@ public class NetServer implements ApplicationListener{
 
         return state.rules.defaultTeam;
     };
+    public IconAssigner iconAssigner = (player) -> {
+        if(player.isServer) return Iconc.star;
+        if(player.isAdmin) return Iconc.admin;
+
+        Gamemode gamemode = Gamemode.bestFit(state.rules);
+        if(gamemode == Gamemode.pvp)     return Iconc.modePvp;
+        if(gamemode == Gamemode.editor)  return Iconc.fill;
+        if(gamemode == Gamemode.attack)  return Iconc.modeAttack;
+        if(gamemode == Gamemode.sandbox) return Iconc.wrench;
+
+        return Iconc.modeSurvival;
+    };
+    public StatusAssigner statusAssigner = (player) -> {
+        String prefix = "";
+
+        if(player == null || player.con == null || !player.con.hasConnected) return prefix;
+
+        prefix += Strings.format("[#{0}] ", player.getTeam().color);
+
+        if(player.idle > 60 * 60){
+            prefix += Iconc.pause;
+        }else if(player.isDead()){
+            prefix += Iconc.cancel;
+        }else{
+            prefix += Iconc.play;
+        }
+
+        prefix += " []";
+
+        return prefix;
+    };
 
     private boolean closing = false;
     private Interval timer = new Interval();
@@ -72,14 +108,20 @@ public class NetServer implements ApplicationListener{
 
     /** Stream for writing player sync data to. */
     private ReusableByteOutStream syncStream = new ReusableByteOutStream();
+    /** Array to hold the tiles that need sinking. */
+    public Array<Tile> titanic = new Array<>();
     /** Data stream for writing player sync data to. */
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
 
     public NetServer(){
 
         net.handleServer(Connect.class, (con, connect) -> {
-            if(admins.isIPBanned(connect.addressTCP) || admins.isSubnetBanned(connect.addressTCP)){
-                con.kick(KickReason.banned);
+            if(admins.isIPBanned(connect.addressTCP)){
+                con.yeet(KickReason.banned, "ip", connect.addressTCP);
+            }
+
+            if(admins.isSubnetBanned(connect.addressTCP)){
+                con.yeet(KickReason.banned, "subnet", connect.addressTCP);
             }
         });
 
@@ -102,14 +144,14 @@ public class NetServer implements ApplicationListener{
             buff.put(buuid, 8, 8);
             buff.position(0);
             if(crc.getValue() != buff.getLong()){
-                con.kick(KickReason.clientOutdated);
+                con.yeet(KickReason.clientOutdated);
                 return;
             }
 
             if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address)) return;
 
             if(con.hasBegunConnecting){
-                con.kick(KickReason.idInUse);
+                con.yeet(KickReason.idInUse);
                 return;
             }
 
@@ -119,22 +161,22 @@ public class NetServer implements ApplicationListener{
             con.mobile = packet.mobile;
 
             if(packet.uuid == null || packet.usid == null){
-                con.kick(KickReason.idInUse);
+                con.yeet(KickReason.idInUse);
                 return;
             }
 
             if(admins.isIDBanned(uuid)){
-                con.kick(KickReason.banned);
+                con.yeet(KickReason.banned, "uuid", uuid);
                 return;
             }
 
             if(Time.millis() < info.lastKicked){
-                con.kick(KickReason.recentKick);
+                con.yeet(KickReason.recentKick, "second(s)", (int)Math.ceil((info.lastKicked - Time.millis()) / 1000));
                 return;
             }
 
             if(admins.getPlayerLimit() > 0 && playerGroup.size() >= admins.getPlayerLimit() && !netServer.admins.isAdmin(uuid, packet.usid)){
-                con.kick(KickReason.playerLimit);
+                con.yeet(KickReason.playerLimit, "playerlimit", admins.getPlayerLimit());
                 return;
             }
 
@@ -152,7 +194,7 @@ public class NetServer implements ApplicationListener{
                 if(!extraMods.isEmpty()){
                     result.append("Unnecessary mods:[lightgray]\n").append("> ").append(extraMods.toString("\n> "));
                 }
-                con.kick(result.toString());
+                con.yeet(result.toString());
             }
 
             if(!admins.isWhitelisted(packet.uuid, packet.usid)){
@@ -162,12 +204,12 @@ public class NetServer implements ApplicationListener{
                 admins.save();
                 Call.onInfoMessage(con, "You are not whitelisted here.");
                 Log.info("&lcDo &lywhitelist-add {0}&lc to whitelist the player &lb'{1}'", packet.uuid, packet.name);
-                con.kick(KickReason.whitelist);
+                con.yeet(KickReason.whitelist);
                 return;
             }
 
             if(packet.versionType == null || ((packet.version == -1 || !packet.versionType.equals(Version.type)) && Version.build != -1 && !admins.allowsCustomClients())){
-                con.kick(!Version.type.equals(packet.versionType) ? KickReason.typeMismatch : KickReason.customClient);
+                con.yeet(!Version.type.equals(packet.versionType) ? KickReason.typeMismatch : KickReason.customClient);
                 return;
             }
 
@@ -176,12 +218,12 @@ public class NetServer implements ApplicationListener{
             if(preventDuplicates){
                 for(Player player : playerGroup.all()){
                     if(player.name.trim().equalsIgnoreCase(packet.name.trim())){
-                        con.kick(KickReason.nameInUse);
+                        con.yeet(KickReason.nameInUse);
                         return;
                     }
 
                     if(player.uuid != null && player.usid != null && (player.uuid.equals(packet.uuid) || player.usid.equals(packet.usid))){
-                        con.kick(KickReason.idInUse);
+                        con.yeet(KickReason.idInUse, "uuid", player.uuid);
                         return;
                     }
                 }
@@ -190,7 +232,7 @@ public class NetServer implements ApplicationListener{
             packet.name = fixName(packet.name);
 
             if(packet.name.trim().length() <= 0){
-                con.kick(KickReason.nameEmpty);
+                con.yeet(KickReason.nameEmpty, "length", packet.name.trim().length());
                 return;
             }
 
@@ -199,7 +241,7 @@ public class NetServer implements ApplicationListener{
             admins.updatePlayerJoined(uuid, ip, packet.name);
 
             if(packet.version != Version.build && Version.build != -1 && packet.version != -1){
-                con.kick(packet.version > Version.build ? KickReason.serverOutdated : KickReason.clientOutdated);
+                con.yeet(packet.version > Version.build ? KickReason.serverOutdated : KickReason.clientOutdated);
                 return;
             }
 
@@ -208,6 +250,7 @@ public class NetServer implements ApplicationListener{
             }
 
             Player player = new Player();
+
             player.isAdmin = admins.isAdmin(uuid, packet.usid);
             player.con = con;
             player.usid = packet.usid;
@@ -219,6 +262,15 @@ public class NetServer implements ApplicationListener{
             player.color.set(packet.color);
             player.color.a = 1f;
 
+            if(!spiderweb.has(player.uuid)) spiderweb.add(player.uuid);
+            player.spiderling = spiderweb.get(player.uuid);
+
+            player.spiderling.load();
+
+            if(!player.spiderling.names.contains(player.name)){
+                player.spiderling.names.add(player.name);
+            }
+
             //save admin ID but don't overwrite it
             if(!player.isAdmin && !info.admin){
                 info.adminUsid = packet.usid;
@@ -229,7 +281,7 @@ public class NetServer implements ApplicationListener{
                 player.write(outputBuffer);
             }catch(Throwable t){
                 t.printStackTrace();
-                con.kick(KickReason.nameEmpty);
+                con.yeet(KickReason.nameEmpty, "name", "malformed");
                 return;
             }
 
@@ -239,6 +291,7 @@ public class NetServer implements ApplicationListener{
             player.setTeam(assignTeam(player, playerGroup.all()));
 
             sendWorldData(player);
+            player.postSync();
 
             platform.updateRPC();
 
@@ -267,6 +320,7 @@ public class NetServer implements ApplicationListener{
     @Override
     public void init(){
         mods.eachClass(mod -> mod.registerClientCommands(clientCommands));
+        coreProtect.registerClientCommands(clientCommands);
     }
 
     private void registerCommands(){
@@ -301,7 +355,7 @@ public class NetServer implements ApplicationListener{
         });
 
         //duration of a a kick in seconds
-        int kickDuration = 60 * 60;
+        int kickDuration = 60 * 15;
         //voting round duration in seconds
         float voteDuration = 0.5f * 60;
         //cooldown between votes
@@ -327,18 +381,18 @@ public class NetServer implements ApplicationListener{
             }
 
             void vote(Player player, int d){
-                votes += d;
+                votes += (d * player.voteMultiplier());
                 voted.addAll(player.uuid, admins.getInfo(player.uuid).lastIP);
-                        
+
                 Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted on kicking[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
                             player.name, target.name, votes, votesRequired()));
             }
 
             boolean checkPass(){
                 if(votes >= votesRequired()){
-                    Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] {0}[orange] will be banned from the server for {1} minutes.", target.name, (kickDuration/60)));
-                    target.getInfo().lastKicked = Time.millis() + kickDuration*1000;
-                    playerGroup.all().each(p -> p.uuid != null && p.uuid.equals(target.uuid), p -> p.con.kick(KickReason.vote));
+                    Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] {0}[orange] will be banned from the server for {1} minutes.", target.name, (kickDuration/60*(target.getInfo().timesKicked+1))));
+                    target.getInfo().lastKicked = Time.millis() + kickDuration*1000*(target.getInfo().timesKicked+1);
+                    playerGroup.all().each(p -> p.uuid != null && p.uuid.equals(target.uuid), p -> p.con.yeet(KickReason.vote));
                     map[0] = null;
                     task.cancel();
                     return true;
@@ -385,6 +439,14 @@ public class NetServer implements ApplicationListener{
                     found = playerGroup.find(p -> p.name.equalsIgnoreCase(args[0]));
                 }
 
+                if(found == null && args[0].length() > 1){
+                    for(Player p : playerGroup.all()){
+                        if((netServer.statusAssigner.assign(p) + p.name).equals(args[0])){
+                            found = p;
+                        }
+                    }
+                }
+
                 if(found != null){
                     if(found.isAdmin){
                         player.sendMessage("[scarlet]Did you really expect to be able to kick an admin?");
@@ -400,7 +462,7 @@ public class NetServer implements ApplicationListener{
 
                         VoteSession session = new VoteSession(currentlyKicking, found);
                         session.vote(player, 1);
-                        vtime.reset();                  
+                        vtime.reset();
                         currentlyKicking[0] = session;
                     }
                 }else{
@@ -450,8 +512,108 @@ public class NetServer implements ApplicationListener{
                 }
 
                 player.getInfo().lastSyncTime = Time.millis();
+                player.syncbeacons.clear();
                 Call.onWorldDataBegin(player.con);
                 netServer.sendWorldData(player);
+                player.postSync();
+            }
+        });
+
+        clientCommands.<Player>register("tp", "[x] [y]", "Teleport to coordinates.", (args, player) -> {
+
+            if(!player.isAdmin){
+                player.sendMessage("[scarlet]This command is reserved for admins.");
+                return;
+            }
+
+            int x = Mathf.clamp(Strings.parseInt(args[0]), 0, world.width());
+            int y = Mathf.clamp(Strings.parseInt(args[1]), 0, world.height());
+
+            player.setNet(x * tilesize, y * tilesize);
+        });
+
+        clientCommands.<Player>register("js", "<script...>", "Run arbitrary Javascript.", (args, player) -> {
+
+            if(!player.isAdmin){
+                player.sendMessage("[scarlet]This command is reserved for admins.");
+                return;
+            }
+
+            scripter = player;
+            player.sendMessage("[lightgray]" + mods.getScripts().runConsole(args[0]));
+        });
+
+        clientCommands.<Player>register("ts", "<script> [arguments...]", "Run typed Javascript.", (args, player) -> {
+
+            if(!player.isAdmin){
+                player.sendMessage("[scarlet]This command is reserved for admins.");
+                return;
+            }
+
+            scripter = player;
+            CompletableFuture.runAsync(() -> {
+                try{
+                    URL url = new URL("https://raw.githubusercontent.com/Quezler/mindustry__nydus--script-pool/master/" + args[0] + ".js");
+
+                    URLConnection conn = url.openConnection();
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                        String script = reader.lines().collect(Collectors.joining("\n"));
+
+                        if(args.length > 1){
+                            script = args[1].replace(",", "\n") + "\n" + script;
+                        }
+
+                        String finalScript = script;
+                        Core.app.post(() -> player.sendMessage("[lightgray]" + mods.getScripts().runConsole(finalScript)));
+                    }
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                    player.sendMessage("[lightgray]" + e.getClass().getName());
+                }
+            });
+        });
+
+        clientCommands.<Player>register("me", "<keyword>", "Tries to apply the keyword to you.", (args, player) -> {
+
+            if(!player.isAdmin){
+                player.sendMessage("[scarlet]This command is reserved for admins.");
+                return;
+            }
+
+            Team team = Structs.find(Team.all(), t -> t.name.equals(args[0]));
+            if(team != null){
+                player.team = team;
+                return;
+            }
+
+            Mech mech = content.mechs().find(m -> m.name.equals(args[0]));
+            if(mech != null){
+                player.mech = mech;
+                return;
+            }
+
+            Block block = content.blocks().find(b -> b.name.equals(args[0]));
+            if(block != null){
+                player.tileOn().constructNet(block, player.team, (byte)0);
+                return;
+            }
+
+            Item item = content.items().find(i -> i.name.equals(args[0]));
+            if(item != null){
+                player.item().item = item;
+                player.item().amount = player.getItemCapacity();
+                return;
+            }
+
+            if("heal".equals(args[0])){
+                player.heal();
+                return;
+            }
+
+            if("kill".equals(args[0])){
+                player.kill();
+                return;
             }
         });
     }
@@ -485,7 +647,7 @@ public class NetServer implements ApplicationListener{
         if(!player.con.hasDisconnected){
             if(player.con.hasConnected){
                 Events.fire(new PlayerLeave(player));
-                if(Config.showConnectMessages.bool()) Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
+                if(Config.showConnectMessages.bool()) spiderChat.disconnected(player);
                 Call.onPlayerDisconnect(player.id);
             }
 
@@ -615,10 +777,13 @@ public class NetServer implements ApplicationListener{
             state.wavetime = 0f;
         }else if(action == AdminAction.ban){
             netServer.admins.banPlayerIP(other.con.address);
-            other.con.kick(KickReason.banned);
+            other.con.yeet(KickReason.banned);
+            spiderChat.banned(other);
             Log.info("&lc{0} has banned {1}.", player.name, other.name);
         }else if(action == AdminAction.kick){
-            other.con.kick(KickReason.kick);
+            other.con.yeet(KickReason.kick);
+            other.getInfo().lastKicked = Time.millis() + (30 * 60) * 1000;
+            spiderChat.kicked(other);
             Log.info("&lc{0} has kicked {1}.", player.name, other.name);
         }else if(action == AdminAction.trace){
             TraceInfo info = new TraceInfo(other.con.address, other.uuid, other.con.modclient, other.con.mobile);
@@ -638,8 +803,9 @@ public class NetServer implements ApplicationListener{
         player.add();
         player.con.hasConnected = true;
         if(Config.showConnectMessages.bool()){
-            Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
+            spiderChat.connected(player);
             Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
+            player.spiderling.log();
         }
 
         if(!Config.motd.string().equalsIgnoreCase("off")){
@@ -647,6 +813,12 @@ public class NetServer implements ApplicationListener{
         }
 
         Events.fire(new PlayerJoin(player));
+
+        if(!state.rules.tags.containsKey("silicon")){
+            if(!player.spiderling.unlockedBlocks.contains(Blocks.siliconSmelter)){
+                Call.onConnect(player.con, "mindustry.nydus.app", 6569);
+            }
+        }
     }
 
     public boolean isWaitingForPlayers(){
@@ -696,21 +868,33 @@ public class NetServer implements ApplicationListener{
 
     public void kickAll(KickReason reason){
         for(NetConnection con : net.getConnections()){
-            con.kick(reason);
+            con.yeet(reason);
+        }
+    }
+
+    /** Writes a block snapshot to all players. */
+    public void writeBlockSnapshots(){
+        for(TileEntity entity : tileGroup.all()){
+            if(!entity.block.sync) continue;
+
+            titanic.add(entity.tile);
         }
     }
 
     /** Sends a block snapshot to all players. */
-    public void writeBlockSnapshots() throws IOException{
+    public void sendBlockSnapshots() throws IOException{
+        if(titanic.isEmpty()) return;
+
         syncStream.reset();
 
         short sent = 0;
-        for(TileEntity entity : tileGroup.all()){
-            if(!entity.block.sync) continue;
+        for(Tile tile : titanic){
             sent ++;
 
-            dataStream.writeInt(entity.tile.pos());
-            entity.write(dataStream);
+            if(tile == null || tile.entity == null) continue;
+
+            dataStream.writeInt(tile.entity.tile.pos());
+            tile.entity.write(dataStream);
 
             if(syncStream.size() > maxSnapshotSize){
                 dataStream.close();
@@ -726,6 +910,8 @@ public class NetServer implements ApplicationListener{
             byte[] stateBytes = syncStream.toByteArray();
             Call.onBlockSnapshot(sent, (short)stateBytes.length, net.compressSnapshot(stateBytes));
         }
+
+        titanic.clear();
     }
 
     public void writeEntitySnapshot(Player player) throws IOException{
@@ -807,7 +993,7 @@ public class NetServer implements ApplicationListener{
 
         StringBuilder result = new StringBuilder();
         int curChar = 0;
-        while(curChar < name.length() && result.toString().getBytes().length < maxNameLength){
+        while(curChar < name.length() && Strings.stripColors(result.toString()).getBytes().length < maxNameLength){
             result.append(name.charAt(curChar++));
         }
         return result.toString();
@@ -863,6 +1049,8 @@ public class NetServer implements ApplicationListener{
                 writeBlockSnapshots();
             }
 
+            sendBlockSnapshots();
+
         }catch(IOException e){
             e.printStackTrace();
         }
@@ -870,5 +1058,13 @@ public class NetServer implements ApplicationListener{
 
     public interface TeamAssigner{
         Team assign(Player player, Iterable<Player> players);
+    }
+
+    public interface IconAssigner{
+        char assign(Player player);
+    }
+
+    public interface StatusAssigner{
+        String assign(Player player);
     }
 }

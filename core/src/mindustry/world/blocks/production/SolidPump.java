@@ -1,22 +1,25 @@
 package mindustry.world.blocks.production;
 
-import arc.Core;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Mathf;
-import arc.util.*;
+import arc.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.content.Fx;
-import mindustry.content.Liquids;
-import mindustry.entities.Effects;
-import mindustry.entities.Effects.Effect;
-import mindustry.entities.type.TileEntity;
-import mindustry.graphics.Pal;
-import mindustry.type.Liquid;
-import mindustry.ui.Bar;
-import mindustry.world.Tile;
-import mindustry.world.meta.Attribute;
-import mindustry.world.meta.BlockStat;
+import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.entities.Effects.*;
+import mindustry.entities.type.*;
+import mindustry.game.*;
+import mindustry.graphics.*;
+import mindustry.input.*;
+import mindustry.input.InputHandler.*;
+import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.*;
+import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
 
 /**
  * Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.
@@ -28,6 +31,10 @@ public class SolidPump extends Pump{
     public float rotateSpeed = 1f;
     /** Attribute that is checked when calculating output. */
     public @Nullable Attribute attribute;
+
+    private Array<PlaceLine> aqueduct = new Array<>();
+    private Array<Tile> linked = new Array<>();
+    private InputHandler ih = (new InputHandler());
 
     public SolidPump(String name){
         super(name);
@@ -155,6 +162,46 @@ public class SolidPump extends Pump{
 
     public float typeLiquid(Tile tile){
         return tile.entity.liquids.total();
+    }
+
+    public void darwin(Tile tile){
+        Tile oil = indexer.findClosestLiquid(tile.drawx(), tile.drawy(), result);
+        if(oil != null){
+            Placement.points.clear();
+            Team team = tile.getTeam();
+            tile.getLinkedTiles(linked);
+            tile.remove();
+            if(Placement.astar(oil.x, oil.y, tile.x, tile.y, Blocks.conduit)){
+                tile.removeNet();
+                final int[] i = {0};
+                aqueduct.clear();
+                ih.iterateConduit(oil.x, oil.y, tile.x, tile.y, Placement.points, l -> {
+                    Tile on = world.tile(l.x, l.y);
+                    Block block = Blocks.conduit;
+
+                    if(i[0]++ == 0) block = Blocks.mechanicalPump;
+                    if(on.block == Blocks.conduit && on.rotation != l.rotation) block = Blocks.liquidRouter;
+                    if(on.block == Blocks.liquidRouter) block = Blocks.liquidRouter;
+                    
+                    if(on.block.hasLiquids){
+                        if(on.entity != null){
+                            if(on.entity.liquids != null){
+                                if(on.entity.liquids.current() != result){
+                                    return;
+                                }
+                            }
+                        }
+                    }
+
+                    if(linked.contains(on)) return;
+
+                    on.constructNet(block, team, (byte)l.rotation);
+                });
+                linked.each(t -> t.constructNet(Blocks.liquidRouter, team, (byte)0));
+            }else{
+                tile.set(this, team);
+            }
+        }
     }
 
     public static class SolidPumpEntity extends TileEntity{

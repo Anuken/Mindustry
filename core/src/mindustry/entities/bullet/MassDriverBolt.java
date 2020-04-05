@@ -4,13 +4,15 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.math.Angles;
 import arc.math.Mathf;
+import arc.util.*;
 import mindustry.content.Fx;
 import mindustry.entities.Effects;
 import mindustry.entities.type.Bullet;
 import mindustry.graphics.Pal;
+import mindustry.world.*;
 import mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class MassDriverBolt extends BulletType{
 
@@ -103,5 +105,13 @@ public class MassDriverBolt extends BulletType{
     public void hit(Bullet b, float hitx, float hity){
         super.hit(b, hitx, hity);
         despawned(b);
+    }
+
+    @Override
+    public void removed(Bullet b){
+        if(upgrading.containsKey(b)){
+            upgrading.get(b).block.upgrade(upgrading.get(b));
+            upgrading.remove(b);
+        }
     }
 }

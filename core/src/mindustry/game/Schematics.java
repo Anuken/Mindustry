@@ -270,6 +270,22 @@ public class Schematics implements Loadable{
         });
     }
 
+    public void placeDown(Schematic schem, int x, int y){
+        schem.tiles.each(st -> {
+            Tile tile = world.tile(st.x + x, st.y + y);
+            if(tile == null) return;
+
+            if(tile.block() == st.block && tile.entity.config() == st.config) return;
+
+            tile.setNet(st.block, Team.derelict, st.rotation);
+            if(st.block.posConfig){
+                tile.configureAny(Pos.get(tile.x - st.x + Pos.x(st.config), tile.y - st.y + Pos.y(st.config)));
+            }else{
+                tile.configureAny(st.config);
+            }
+        });
+    }
+
     /** Adds a schematic to the list, also copying it into the files.*/
     public void add(Schematic schematic){
         all.add(schematic);

@@ -26,6 +26,7 @@ import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.plugin.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.*;
@@ -43,10 +44,12 @@ public class Block extends BlockStorage{
 
     /** whether this block has a tile entity that updates */
     public boolean update;
+    public boolean share;
     /** whether this block has health and can be destroyed */
     public boolean destructible;
     /** whether unloaders work on this block*/
     public boolean unloadable = true;
+    public boolean extractable = true;
     /** whether this is solid */
     public boolean solid;
     /** whether this block CAN be solid. */
@@ -57,6 +60,8 @@ public class Block extends BlockStorage{
     public boolean breakable;
     /** whether to add this block to brokenblocks */
     public boolean rebuildable = true;
+    /** whether spirit repair drones home on on it */
+    public boolean dreamcatcher = true;
     /** whether this floor can be placed on. */
     public boolean placeableOn = true;
     /** whether this block has insulating properties. */
@@ -142,6 +147,10 @@ public class Block extends BlockStorage{
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
     public boolean alwaysUnlocked = false;
+    /** What this block can merge into */
+    public Prov<Block> upscale;
+    public Func<Tile, Block> upgrade;
+    public Prov<Block> downgrade;
 
     protected TextureRegion[] cacheRegions = {};
     protected Array<String> cacheRegionStrings = new Array<>();
@@ -156,6 +165,7 @@ public class Block extends BlockStorage{
 
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
+    protected final int timerShare = timers++;
     /** How often to try dumping items in ticks, e.g. 5 = 12 times/sec*/
     protected final int dumpTime = 5;
 
@@ -334,7 +344,7 @@ public class Block extends BlockStorage{
     public void placed(Tile tile){
         if(net.client()) return;
 
-        if((consumesPower && !outputsPower) || (!consumesPower && outputsPower)){
+        if((consumesPower && !outputsPower) || (!consumesPower && outputsPower) || forcePower){
             int range = 10;
             tempTiles.clear();
             Geometry.circle(tile.x, tile.y, range, (x, y) -> {
@@ -918,4 +928,26 @@ public class Block extends BlockStorage{
         Arrays.sort(requirements, Structs.comparingInt(i -> i.item.id));
     }
 
+    public void upgrade(Tile tile){
+        if(upgrade == null || upgrade.get(tile) == null) return;
+
+        tile.constructNet(upgrade.get(tile), tile.getTeam(), tile.rotation);
+    }
+
+    public void share(Tile tile){
+        if(!tile.entity.timer.get(timerShare, 60)) return;
+
+        tile.entity.items.forEach((item, amount) -> tile.entity.proximity().each(other -> {
+            if(other.block != tile.block) return;
+
+            int sharable = Mathf.floor((tile.entity.items.get(item) - other.entity.items.get(item)) / 2);
+            sharable = other.block.acceptStack(item, sharable, other, null);
+            if(sharable > 0){
+                tile.entity.items.remove(item, sharable);
+                other.entity.items.add(item, sharable);
+                netServer.titanic.add(tile, other);
+                Call.transferItemTo(item, 0, tile.drawx(), tile.drawy(), other);
+            }
+        }));
+    }
 }

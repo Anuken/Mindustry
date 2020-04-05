@@ -24,10 +24,12 @@ import mindustry.input.*;
 import mindustry.io.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
+import mindustry.plugin.spiderweb.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 
@@ -48,7 +50,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public float pointerX, pointerY;
     public String name = "noname";
     public @Nullable String uuid, usid;
-    public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
+    public boolean isAdmin, isServer, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
     public boolean buildWasAutoPaused = false;
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
@@ -58,6 +60,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public int respawns;
 
     public @Nullable NetConnection con;
+    public @Nullable Spiderling spiderling;
     public boolean isLocal = false;
     public Interval timer = new Interval(6);
     public TargetTrait target;
@@ -71,6 +74,10 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     private Tile mining;
     private Vec2 movement = new Vec2();
     private boolean moved;
+
+    public ObjectMap<Tile, Integer> syncbeacons = new ObjectMap<>();
+
+    public int idle = 0;
 
     //endregion
 
@@ -469,6 +476,12 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public void update(){
+        if(idle()){
+            idle++;
+        }else{
+            idle = 0;
+        }
+
         hitTime -= Time.delta();
         textFadeTime -= Time.delta() / (60 * 5);
         itemtime = Mathf.lerpDelta(itemtime, Mathf.num(item.amount > 0), 0.1f);
@@ -519,6 +532,30 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         Tile tile = world.tileWorld(x, y);
+
+        syncbeacons.each((key, value) -> {
+            if(key == null || value == null) return;
+            if(dst(key) <= value){
+                Call.onWorldDataBegin(this.con);
+                netServer.sendWorldData(this);
+                postSync();
+            }
+        });
+
+        if(item.amount > 0 && item.item != null && item.item.type == ItemType.material && itemtime >= 0.9f && getClosestCore() != null){
+            if(getClosestCore().dst(this) <= mineTransferRange){
+                Call.transferItemTo(item.item, item.amount, x, y, getClosestCore().tile);
+                clearItem();
+            }else{
+                Player proxy = (Player)Units.closest(team, x, y, mineTransferRange, u -> u instanceof Player && u != this && u.acceptsItem(item.item) && u.getClosestCore().dst(u) < getClosestCore().dst(this));
+                if(proxy != null){
+                    proxy.addItem(item.item, item.amount-1);
+                    Call.transferItemToUnit(item.item, x, y, proxy);
+                    proxy.itemtime = 0f;
+                    clearItem();
+                }
+            }
+        }
 
         boostHeat = Mathf.lerpDelta(boostHeat, (tile != null && tile.solid()) || (isBoosting && ((!movement.isZero() && moved) || !isLocal)) ? 1f : 0f, 0.08f);
         shootHeat = Mathf.lerpDelta(shootHeat, isShooting() ? 1f : 0f, 0.06f);
@@ -816,6 +853,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         mech = Mechs.starter;
         placeQueue.clear();
         respawns = state.rules.respawns;
+        syncbeacons.clear();
     }
 
     public boolean isShooting(){
@@ -898,7 +936,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     @Override
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
-        TypeIO.writeStringData(buffer, name);
+        TypeIO.writeStringData(buffer, netServer.statusAssigner.assign(this) + name);
         buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2) | (Pack.byteValue(isTyping) << 3)| (Pack.byteValue(isBuilding) << 4));
         buffer.writeInt(color.rgba());
         buffer.writeByte(mech.id);
@@ -953,4 +991,21 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     //endregion
+
+    public String prefix(){
+        return Strings.format("[#{0}]{1} [#{2}]{3}", getTeam().color, netServer.iconAssigner.assign(this), color, name);
+    }
+
+    public int voteMultiplier(){
+        return isAdmin ? 3 : 1;
+    }
+
+    // define when a player is doing nothing (useful)
+    public boolean idle(){
+        return velocity.isZero(0.1f) && placeQueue.isEmpty() && !isShooting && !isTyping;
+    }
+
+    public void postSync(){
+        syncbeacons.clear();
+    }
 }

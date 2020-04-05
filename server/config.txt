@@ -1,0 +1,14 @@
+config name [goldenrod]Nydus Network [darkgray]//\\([#C37059]0[][#F3A970]o[][#C37059]0[])//\\
+config name [goldenrod]Nydus Network [darkgray]//\([lightgray]oo[])/\\
+config desc [lightgray] modified  [darkgray]https://discord.gg/[goldenrod]uQWecPM
+
+config name [goldenrod]Nydus Network [darkgray]//\([white][])/\\
+config desc [lightgray]join and build a [darkgray]silicon smelter
+config name [goldenrod]Nydus Network [darkgray]//\([white]   [])/\\
+config desc [lightgray]update to [accent]104.8[] first!
+rules add bannedBlocks [power-source, power-void, item-source, item-void, liquid-source, liquid-void]
+
+config motd off
+config allowCustomClients true
+config startCommands load autosave
+playerlimit 11

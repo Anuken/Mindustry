@@ -12,6 +12,7 @@ import arc.util.Timer.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -33,6 +34,7 @@ import java.net.*;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
+import java.util.zip.*;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
@@ -142,15 +144,20 @@ public class ServerControl implements ApplicationListener{
             Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(world.getMap());
             nextMapOverride = null;
             if(map != null){
-                Call.onInfoMessage((state.rules.pvp
-                ? "[YELLOW]The " + event.winner.name + " team is victorious![]" : "[SCARLET]Game over![]")
-                + "\nNext selected map:[accent] " + map.name() + "[]"
-                + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
-                "\nNew game begins in " + roundExtraTime + "[] seconds.");
 
-                info("Selected next map to be {0}.", map.name());
+                if(state.rules.tags.containsKey("silicon")){
+                    play(false, () -> world.loadMap(map, map.applyRules(lastMode)));
+                }else{
+                    Call.onInfoMessage((state.rules.pvp
+                    ? "[YELLOW]The " + event.winner.name + " team is victorious![]" : "[SCARLET]Game over![]")
+                    + "\nNext selected map:[accent] " + map.name() + "[]"
+                    + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
+                    "\nNew game begins in " + roundExtraTime + "[] seconds.");
 
-                play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
+                    info("Selected next map to be {0}.", map.name());
+
+                    play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
+                }
             }else{
                 netServer.kickAll(KickReason.gameover);
                 state.set(State.menu);
@@ -341,7 +348,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Call.sendMessage("[scarlet][[Server]:[] " + arg[0]);
+            spiderChat.message(spiderChat.server, arg[0]);
 
             info("&lyServer: &lb{0}", arg[0]);
         });
@@ -588,7 +595,7 @@ public class ServerControl implements ApplicationListener{
             Player target = playerGroup.find(p -> p.name.equals(arg[0]));
 
             if(target != null){
-                Call.sendMessage("[scarlet] " + target.name + "[scarlet] has been kicked by the server.");
+                spiderChat.kicked(target);
                 target.con.kick(KickReason.kick);
                 info("It is done.");
             }else{
@@ -617,7 +624,7 @@ public class ServerControl implements ApplicationListener{
 
             for(Player player : playerGroup.all()){
                 if(netServer.admins.isIDBanned(player.uuid)){
-                    Call.sendMessage("[scarlet] " + player.name + " has been banned.");
+                    spiderChat.banned(player);
                     player.con.kick(KickReason.banned);
                 }
             }
@@ -706,6 +713,16 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        handler.register("yeet", "<uuid...>", "Removes admin status from an offline player", arg -> {
+            netServer.admins.unAdminPlayer(arg[0]);
+        });
+
+        handler.register("password", "<chat...>", "Generate password.", arg -> {
+            CRC32 crc = new CRC32();
+            crc.update(arg[0].getBytes());
+            Log.info(crc.getValue());
+        });
+
         handler.register("admins", "List all admins.", arg -> {
             Array<PlayerInfo> admins = netServer.admins.getAdmins();
 
@@ -716,6 +733,12 @@ public class ServerControl implements ApplicationListener{
                 for(PlayerInfo info : admins){
                     info(" &lm {0} /  ID: '{1}' / IP: '{2}'", info.lastName, info.id, info.lastIP);
                 }
+            }
+        });
+
+        handler.register("overthrow", "Overthrows all admins.", arg -> {
+            for(PlayerInfo info : netServer.admins.getAdmins()){
+                netServer.admins.unAdminPlayer(info.id);
             }
         });
 
@@ -844,6 +867,18 @@ public class ServerControl implements ApplicationListener{
             info("&ly{0}&lg MB collected. Memory usage now at &ly{1}&lg MB.", pre - post, post);
         });
 
+        handler.register("limbo", "Sends all player to limbo for 10 seconds.", arg -> {
+            for(Player p : playerGroup) Limbo.send(p);
+        });
+
+        handler.register("begone", "[ip] [port]", "Sends all players to a different server.", arg -> {
+            for(Player p : playerGroup) Call.onConnect(p.con, arg[0], Strings.parseInt(arg[1]));
+        });
+
+        handler.register("reload", "Reload the current map.", arg -> {
+            world.reload();
+        });
+
         mods.eachClass(p -> p.registerServerCommands(handler));
     }
 
@@ -908,6 +943,7 @@ public class ServerControl implements ApplicationListener{
                     p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
                 }
                 netServer.sendWorldData(p);
+                p.postSync();
             }
             inExtraRound = false;
         };

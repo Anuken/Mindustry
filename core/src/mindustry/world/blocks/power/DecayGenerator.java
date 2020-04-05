@@ -8,6 +8,7 @@ public class DecayGenerator extends ItemLiquidGenerator{
         super(true, false, name);
         hasItems = true;
         hasLiquids = false;
+        share = true;
     }
 
     @Override

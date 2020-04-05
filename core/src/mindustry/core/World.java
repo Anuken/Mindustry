@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -19,6 +20,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
+import static arc.util.Log.warn;
 import static mindustry.Vars.*;
 
 public class World{
@@ -476,5 +478,38 @@ public class World{
 
             super.end();
         }
+    }
+
+    public void reload(){
+        if(world.getMap().name().equals("unknown")){
+            warn("map name unknown, could not find original.");
+            return;
+        }
+
+        World tmp = new World();
+        SaveIO.load(world.getMap().file, tmp.context);
+
+        Core.app.post(() -> {
+            for(int x = 0; x < world.width(); x++){
+                for(int y = 0; y < world.height(); y++){
+                    Tile tile = world.tile(x, y);
+                    Tile orig = tmp.tile(x, y);
+
+                    if(tile.isLinked() || orig.isLinked()) continue;
+
+                    if(tile.block != orig.block || tile.team != orig.team){
+                        if(orig.block == Blocks.air){
+                            tile.removeNet();
+                        }else{
+                            tile.setNet(orig.block, orig.getTeam(), orig.rotation);
+                        }
+                    }
+
+                    if(tile.block.configurable && tile.entity.config() != orig.entity.config()){
+                        tile.configureAny(orig.entity.config());
+                    }
+                }
+            }
+        });
     }
 }

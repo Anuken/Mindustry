@@ -260,7 +260,11 @@ public class Damage{
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
                 if(tile != null && tile.entity != null && (team == null ||team.isEnemy(tile.getTeam())) && Mathf.dst(dx, dy) <= trad){
-                    tile.entity.damage(damage);
+                    if(damage == 99999999f){
+                        tile.deconstructNet();
+                    }else{
+                        tile.entity.damage(damage);
+                    }
                 }
             }
         }

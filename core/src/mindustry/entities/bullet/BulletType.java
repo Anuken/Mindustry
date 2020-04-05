@@ -172,4 +172,8 @@ public abstract class BulletType extends Content{
     public ContentType getContentType(){
         return ContentType.bullet;
     }
+
+    public void removed(Bullet bullet){
+        //
+    }
 }

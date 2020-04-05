@@ -1,5 +1,6 @@
 package mindustry.world;
 
+import arc.func.*;
 import arc.struct.Array;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
@@ -25,6 +26,7 @@ public abstract class BlockStorage extends UnlockableContent{
     public boolean outputsLiquid = false;
     public boolean consumesPower = true;
     public boolean outputsPower = false;
+    public boolean forcePower = false;
 
     public int itemCapacity = 10;
     public float liquidCapacity = 10f;
@@ -212,24 +214,41 @@ public abstract class BlockStorage extends UnlockableContent{
         handleItem(item, tile, tile);
     }
 
+    public Tile tryOffloadNear(Tile tile, Item item, Boolf<Tile> filter){
+        Array<Tile> proximity = tile.entity.proximity();
+        int dump = tile.rotation();
+
+        for(int i = 0; i < proximity.size; i++){
+            incrementDump(tile, proximity.size);
+            Tile other = proximity.get((i + dump) % proximity.size);
+            Tile in = Edges.getFacingEdge(tile, other);
+            if(other.getTeam() == tile.getTeam() && other.block().acceptItem(item, other, in) && canDump(tile, other, item) && filter.get(other)){
+                other.block().handleItem(item, other, in);
+                return other;
+            }
+        }
+
+        return null;
+    }
+
     /** Try dumping any item near the tile. */
     public boolean tryDump(Tile tile){
-        return tryDump(tile, null);
+        return tryDump(tile, null) != null;
     }
 
     /**
      * Try dumping a specific item near the tile.
      * @param todump Item to dump. Can be null to dump anything.
      */
-    public boolean tryDump(Tile tile, Item todump){
+    public Tile tryDump(Tile tile, Item todump){
         TileEntity entity = tile.entity;
         if(entity == null || !hasItems || tile.entity.items.total() == 0 || (todump != null && !entity.items.has(todump)))
-            return false;
+            return null;
 
         Array<Tile> proximity = entity.proximity();
         int dump = tile.rotation();
 
-        if(proximity.size == 0) return false;
+        if(proximity.size == 0) return null;
 
         for(int i = 0; i < proximity.size; i++){
             Tile other = proximity.get((i + dump) % proximity.size);
@@ -244,7 +263,7 @@ public abstract class BlockStorage extends UnlockableContent{
                         other.block().handleItem(item, other, in);
                         tile.entity.items.remove(item, 1);
                         incrementDump(tile, proximity.size);
-                        return true;
+                        return other;
                     }
                 }
             }else{
@@ -253,14 +272,14 @@ public abstract class BlockStorage extends UnlockableContent{
                     other.block().handleItem(todump, other, in);
                     tile.entity.items.remove(todump, 1);
                     incrementDump(tile, proximity.size);
-                    return true;
+                    return other;
                 }
             }
 
             incrementDump(tile, proximity.size);
         }
 
-        return false;
+        return null;
     }
 
     protected void incrementDump(Tile tile, int prox){

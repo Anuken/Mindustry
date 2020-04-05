@@ -1,12 +1,12 @@
 package mindustry.world.blocks.storage;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.traits.*;

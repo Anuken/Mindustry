@@ -1,6 +1,7 @@
 package mindustry.world.blocks.defense;
 
 import arc.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
@@ -86,6 +87,10 @@ public class Door extends Wall{
         if((Units.anyEntities(tile) && entity.open) || !tile.entity.timer.get(timerToggle, 30f)){
             return;
         }
+
+        Time.run(5f, () -> entity.proximity().select(t -> t.block() instanceof Door).each(t -> {
+            t.block().tapped(t, null);
+        }));
 
         Call.onDoorToggle(null, tile, !entity.open);
     }

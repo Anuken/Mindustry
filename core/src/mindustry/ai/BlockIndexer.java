@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -21,19 +22,22 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unchecked")
 public class BlockIndexer{
     /** Size of one quadrant. */
-    private final static int quadrantSize = 16;
+    private final static int quadrantSize = 4;
 
     /** Set of all ores that are being scanned. */
     private final ObjectSet<Item> scanOres = new ObjectSet<>();
+    private final ObjectSet<Liquid> scanLiquids = new ObjectSet<>();
     private final ObjectSet<Item> itemSet = new ObjectSet<>();
     /** Stores all ore quadtrants on the map. */
     private ObjectMap<Item, ObjectSet<Tile>> ores = new ObjectMap<>();
+    private ObjectMap<Liquid, ObjectSet<Tile>> liquids = new ObjectMap<>();
     /** Maps each team ID to a quarant. A quadrant is a grid of bits, where each bit is set if and only if there is a block of that team in that quadrant. */
     private GridBits[] structQuadrants;
     /** Stores all damaged tile entities by team. */
     private ObjectSet<Tile>[] damagedTiles = new ObjectSet[Team.all().length];
     /**All ores available on this map.*/
     private ObjectSet<Item> allOres = new ObjectSet<>();
+    private ObjectSet<Liquid> allLiquids = new ObjectSet<>();
     /**Stores teams that are present here as tiles.*/
     private ObjectSet<Team> activeTeams = new ObjectSet<>();
 
@@ -61,6 +65,7 @@ public class BlockIndexer{
         Events.on(WorldLoadEvent.class, event -> {
             scanOres.clear();
             scanOres.addAll(Item.getAllOres());
+            scanLiquids.addAll(content.liquids());
             damagedTiles = new ObjectSet[Team.all().length];
             flagMap = new ObjectSet[Team.all().length][BlockFlag.all.length];
 
@@ -73,6 +78,7 @@ public class BlockIndexer{
             typeMap.clear();
             allOres.clear();
             ores = null;
+            liquids = null;
 
             //create bitset for each team type that contains each quadrant
             structQuadrants = new GridBits[Team.all().length];
@@ -88,6 +94,7 @@ public class BlockIndexer{
                     }
 
                     if(tile.drop() != null) allOres.add(tile.drop());
+                    if(tile.floor().liquidDrop != null) allLiquids.add(tile.floor().liquidDrop);
                 }
             }
 
@@ -98,6 +105,7 @@ public class BlockIndexer{
             }
 
             scanOres();
+            scanLiquids();
         });
     }
 
@@ -188,10 +196,14 @@ public class BlockIndexer{
     }
 
     public TileEntity findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
+        return findEnemyTile(team, x, y, range, pred, true);
+    }
+
+    public TileEntity findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred, boolean usePriority){
         for(Team enemy : activeTeams){
             if(!team.isEnemy(enemy)) continue;
 
-            TileEntity entity = indexer.findTile(enemy, x, y, range, pred, true);
+            TileEntity entity = indexer.findTile(enemy, x, y, range, pred, usePriority);
             if(entity != null){
                 return entity;
             }
@@ -262,6 +274,27 @@ public class BlockIndexer{
             for(int y = Math.max(0, tile.y - quadrantSize / 2); y < tile.y + quadrantSize / 2 && y < world.height(); y++){
                 Tile res = world.tile(x, y);
                 if(res.block() == Blocks.air && res.drop() == item){
+                    return res;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public ObjectSet<Tile> getLiquidPositions(Liquid liquid){
+        return liquids.get(liquid, emptySet);
+    }
+
+    public Tile findClosestLiquid(float xp, float yp, Liquid liquid){
+        Tile tile = Geometry.findClosest(xp, yp, getLiquidPositions(liquid));
+
+        if(tile == null) return null;
+
+        for(int x = Math.max(0, tile.x - quadrantSize / 2); x < tile.x + quadrantSize / 2 && x < world.width(); x++){
+            for(int y = Math.max(0, tile.y - quadrantSize / 2); y < tile.y + quadrantSize / 2 && y < world.height(); y++){
+                Tile res = world.tile(x, y);
+                if(res.floor().liquidDrop == liquid){
                     return res;
                 }
             }
@@ -379,6 +412,33 @@ public class BlockIndexer{
                 //add position of quadrant to list when an ore is found
                 if(tile.drop() != null && scanOres.contains(tile.drop()) && tile.block() == Blocks.air){
                     ores.get(tile.drop()).add(world.tile(
+                    //make sure to clamp quadrant middle position, since it might go off bounds
+                    Mathf.clamp(qx * quadrantSize + quadrantSize / 2, 0, world.width() - 1),
+                    Mathf.clamp(qy * quadrantSize + quadrantSize / 2, 0, world.height() - 1)));
+                }
+            }
+        }
+    }
+
+    private void scanLiquids(){
+        liquids = new ObjectMap<>();
+
+        //initialize ore map with empty sets
+        for(Liquid liquid : scanLiquids){
+            liquids.put(liquid, new ObjectSet<>());
+        }
+
+        for(int x = 0; x < world.width(); x++){
+            for(int y = 0; y < world.height(); y++){
+                int qx = (x / quadrantSize);
+                int qy = (y / quadrantSize);
+
+                Tile tile = world.tile(x, y);
+
+                //add position of quadrant to list when an liquid is found
+//                if(tile.floor().liquidDrop != null) Log.info(tile);
+                if(tile.floor().liquidDrop != null && scanLiquids.contains(tile.floor().liquidDrop)){
+                    liquids.get(tile.floor().liquidDrop).add(world.tile(
                     //make sure to clamp quadrant middle position, since it might go off bounds
                     Mathf.clamp(qx * quadrantSize + quadrantSize / 2, 0, world.width() - 1),
                     Mathf.clamp(qy * quadrantSize + quadrantSize / 2, 0, world.height() - 1)));

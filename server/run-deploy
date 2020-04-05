@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+version=$(git describe --tags --abbrev=0 | sed 's/^.//')
+version=104.6
+
+./gradlew server:dist -Pbuildversion=$version
+scp server/build/libs/server-release.jar root@mindustry.nydus.app:/root/nydus/
+scp server/build/libs/server-release.jar root@mindustry.nydus.app:/root/limbo/
+scp server/build/libs/server-release.jar root@mindustry.nydus.app:/root/veteran/
+scp server/build/libs/server-release.jar root@mindustry.nydus.app:/root/silicon/

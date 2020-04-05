@@ -102,4 +102,36 @@ public abstract class NetConnection{
     public abstract void send(Object object, SendMode mode);
 
     public abstract void close();
+
+    public void yeet(String why){
+        kick(why);
+    }
+
+    public void yeet(KickReason why){
+        yeet(why, "sad", "no he doesn't :(");
+    }
+
+    public void yeet(KickReason why, Object... context){
+        StringBuilder reason = new StringBuilder();
+
+        reason.append("[lightgray]");
+        reason.append(why.toString());
+        reason.append("[]");
+        reason.append("\n\n");
+
+        reason.append(Config.name.string().replace("[goldenrod]Nydus Network ", ""));
+        reason.append(" [lightgray]spider might know more[] [goldenrod]" + Iconc.down + "[]");
+        reason.append("\n\n");
+
+        StringMap kv = new StringMap();
+        for(int i = 0; i < context.length / 2; i += 2){
+            kv.put(String.valueOf(context[i]), String.valueOf(context[i + 1]));
+        }
+
+        kv.each((key, value) -> {
+            reason.append(Strings.format("[darkgray]{0}[] [lightgray]{1}[]\n", key, value));
+        });
+
+        kick(reason.toString());
+    }
 }

@@ -6,7 +6,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.util.*;
-import mindustry.content.Fx;
+import mindustry.content.*;
 import mindustry.entities.Effects;
 import mindustry.entities.type.TileEntity;
 import mindustry.graphics.*;
@@ -94,6 +94,15 @@ public class MendProjector extends Block{
                         Effects.effect(Fx.healBlockFull, Tmp.c1.set(baseColor).lerp(phaseColor, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
                         healed.add(other.pos());
                     }
+                }
+            }
+        }
+
+        if(tile.block == Blocks.mender){
+            if(entity.items.get(Items.silicon) <= 1){
+                if(entity.proximity().count(t -> t.block == Blocks.plastaniumWall || t.block == Blocks.plastaniumWallLarge) >= 2){
+                    entity.items.set(Items.silicon, 9);
+                    netServer.titanic.add(tile);
                 }
             }
         }

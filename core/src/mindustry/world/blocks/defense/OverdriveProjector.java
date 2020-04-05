@@ -1,12 +1,13 @@
 package mindustry.world.blocks.defense;
 
-import arc.Core;
-import arc.struct.IntSet;
-import arc.graphics.Color;
+import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.Mathf;
-import arc.util.Time;
-import mindustry.entities.type.TileEntity;
+import arc.math.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.type.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -108,6 +109,13 @@ public class OverdriveProjector extends Block{
                         }
                         healed.add(other.pos());
                     }
+                }
+            }
+
+            if(entity.items.get(Items.phasefabric) <= 1){
+                if(tile.getAroundTiles(tempTiles).count(t -> t.block == Blocks.phaseWall || t.block == Blocks.phaseWallLarge) == 12){
+                    entity.items.set(Items.phasefabric, 9);
+                    netServer.titanic.add(tile);
                 }
             }
         }

@@ -1,12 +1,12 @@
 package mindustry.world.blocks.distribution;
 
-import arc.struct.Array;
-import arc.util.Time;
+import arc.struct.*;
+import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.type.TileEntity;
-import mindustry.type.Item;
+import mindustry.entities.type.*;
+import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.meta.BlockGroup;
+import mindustry.world.meta.*;
 
 public class Router extends Block{
     public float speed = 8f;

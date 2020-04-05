@@ -255,6 +255,9 @@ project(":core"){
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")
+
+        compile "com.oracle.ojdbc:ojdbc8:19.3.0.0"
+        compile 'mysql:mysql-connector-java:5.1.+'
     }
 }
 

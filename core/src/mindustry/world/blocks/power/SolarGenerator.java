@@ -4,7 +4,7 @@ import arc.struct.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 public class SolarGenerator extends PowerGenerator{
 

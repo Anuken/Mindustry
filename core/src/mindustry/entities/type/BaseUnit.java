@@ -1,6 +1,7 @@
 package mindustry.entities.type;
 
 import arc.*;
+import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -291,7 +292,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         avoidOthers();
 
-        if(spawner != noSpawner && (world.tile(spawner) == null || !(world.tile(spawner).entity instanceof UnitFactoryEntity))){
+        if(spawner != noSpawner && (world.tile(spawner) == null || !(world.tile(spawner).entity instanceof FactoryTrait))){
             kill();
         }
 

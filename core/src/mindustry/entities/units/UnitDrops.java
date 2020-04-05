@@ -1,48 +1,54 @@
 package mindustry.entities.units;
 
-import arc.math.Mathf;
-import mindustry.Vars;
-import mindustry.content.Items;
-import mindustry.entities.type.BaseUnit;
-import mindustry.entities.type.TileEntity;
-import mindustry.gen.Call;
-import mindustry.type.Item;
-import static mindustry.Vars.*;
+import arc.math.*;
+import mindustry.*;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.entities.type.*;
+import mindustry.gen.*;
+import mindustry.type.*;
+
+import static mindustry.content.Items.*;
 
 public class UnitDrops{
-    private static Item[] dropTable;
 
     public static void dropItems(BaseUnit unit){
-        //items only dropped in waves for enemy team
-        if(unit.getTeam() != state.rules.waveTeam || !Vars.state.rules.unitDrops){
-            return;
-        }
-
         TileEntity core = unit.getClosestEnemyCore();
 
+        if(unit.item().amount == 0 || unit.item().item == null) return;
+
         if(core == null || core.dst(unit) > Vars.mineTransferRange){
-            return;
+            Player nearby = (Player)Units.closestEnemy(unit.getTeam(), unit.x, unit.y, Vars.mineTransferRange, u -> u instanceof Player && u.acceptsItem(unit.item().item));
+            if(nearby != null) nearby.addItem(unit.item().item, unit.item().amount-1);
+            if(nearby != null) Call.transferItemToUnit(unit.item().item, unit.x, unit.y, nearby);
+        }else{
+            unit.item().amount = core.tile.block().acceptStack(unit.item().item, unit.item().amount, core.tile, null);
+            Call.transferItemTo(unit.item().item, unit.item().amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), core.tile);
         }
+    }
 
-        if(dropTable == null){
-            dropTable = new Item[]{Items.titanium, Items.silicon, Items.lead, Items.copper};
-        }
+    public static void seed(BaseUnit unit){
+        if(!Vars.state.rules.unitDrops) return;
 
-        for(int i = 0; i < 3; i++){
-            for(Item item : dropTable){
-                //only drop unlocked items
-                if(!Vars.headless && !Vars.data.isUnlocked(item)){
-                    continue;
-                }
+        unit.item().item = item(unit.getType());
+        unit.item().amount = 10;
+    }
 
-                if(Mathf.chance(0.03)){
-                    int amount = Mathf.random(20, 40);
-                    amount = core.tile.block().acceptStack(item, amount, core.tile, null);
-                    if(amount > 0){
-                        Call.transferItemTo(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), core.tile);
-                    }
-                }
-            }
-        }
+    private static Item item(UnitType type){
+
+        if (type == UnitTypes.dagger) return copper;
+        if (type == UnitTypes.crawler) return graphite;
+        if (type == UnitTypes.titan) return lead;
+
+        if (type == UnitTypes.fortress) return titanium;
+        if (type == UnitTypes.eruptor) return plastanium;
+        if (type == UnitTypes.chaosArray) return thorium;
+
+        if (type == UnitTypes.wraith) return silicon;
+        if (type == UnitTypes.ghoul) return metaglass;
+        if (type == UnitTypes.revenant) return surgealloy;
+        if (type == UnitTypes.lich) return phasefabric;
+
+        return null;
     }
 }

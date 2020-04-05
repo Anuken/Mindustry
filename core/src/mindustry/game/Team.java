@@ -5,8 +5,11 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.type.base.*;
 import mindustry.game.Teams.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
@@ -98,5 +101,9 @@ public class Team implements Comparable<Team>{
     @Override
     public String toString(){
         return name;
+    }
+
+    public Array<MinerDrone> miners(Item ore){
+        return unitGroup.all().select(u -> u.getTeam() == this && u.getType() == UnitTypes.draug && u.item().item == ore).map(u -> (MinerDrone)u);
     }
 }

@@ -39,7 +39,7 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-public abstract class InputHandler implements InputProcessor, GestureListener{
+public class InputHandler implements InputProcessor, GestureListener{
     /** Used for dropping items. */
     final static float playerSelectRange = mobile ? 17f : 11f;
     /** Maximum line length. */
@@ -154,13 +154,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void onTileTapped(Player player, Tile tile){
         if(tile == null || player == null) return;
+
+        coreProtect.onTileTapped(player, tile);
+
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.tapTile, tile, action -> {}))) throw new ValidateException(player, "Player cannot tap a tile.");
         tile.block().tapped(tile, player);
         Core.app.post(() -> Events.fire(new TapEvent(tile, player)));
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, forward = true)
+    @Remote(targets = Loc.both, called = Loc.both, forward = true, variants = Variant.out)
     public static void onTileConfig(Player player, Tile tile, int value){
         if(tile == null) return;
 
@@ -893,7 +896,44 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    class PlaceLine{
+    public void iterateConduit(int startX, int startY, int endX, int endY, Array<Point2> points, Cons<PlaceLine> cons){
+        boolean diagonal = Core.input.keyDown(Binding.diagonal_placement);
+        Block block = Blocks.conduit;
+
+        float angle = Angles.angle(startX, startY, endX, endY);
+        int baseRotation = rotation;
+        int lastrotation = baseRotation;
+        if(!overrideLineRotation || diagonal){
+            baseRotation = (startX == endX && startY == endY) ? rotation : ((int)((angle + 45) / 90f)) % 4;
+        }
+
+        Tmp.r3.set(-1, -1, 0, 0);
+
+        for(int i = 0; i < points.size; i++){
+            Point2 point = points.get(i);
+
+            if(block != null && Tmp.r2.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset(), point.y * tilesize + block.offset()).overlaps(Tmp.r3)){
+                continue;
+            }
+
+            Point2 next = i == points.size - 1 ? null : points.get(i + 1);
+            line.x = point.x;
+            line.y = point.y;
+            if(!overrideLineRotation || diagonal){
+                line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : lastrotation;
+            }else{
+                line.rotation = rotation;
+            }
+            line.last = next == null;
+            cons.get(line);
+
+            lastrotation = line.rotation;
+
+            Tmp.r3.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset(), point.y * tilesize + block.offset());
+        }
+    }
+
+    public class PlaceLine{
         public int x, y, rotation;
         public boolean last;
     }

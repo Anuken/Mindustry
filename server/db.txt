@@ -1,0 +1,19 @@
+CREATE TABLE `uuids` (
+  `uuid` char(24) NOT NULL DEFAULT '',
+  UNIQUE KEY `uuid` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `unlocked_blocks` (
+  `uuid` char(24) NOT NULL DEFAULT '',
+  `block` varchar(255) NOT NULL DEFAULT '',
+  UNIQUE KEY `uuid` (`uuid`,`block`),
+  CONSTRAINT `unlocked_blocks_uuid_foreign` FOREIGN KEY (`uuid`) REFERENCES `uuids` (`uuid`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `names` (
+  `uuid` char(24) NOT NULL DEFAULT '',
+  `name` varchar(255) NOT NULL DEFAULT '',
+  UNIQUE KEY `name` (`name`,`uuid`),
+  KEY `names_uuid_foreign` (`uuid`),
+  CONSTRAINT `names_uuid_foreign` FOREIGN KEY (`uuid`) REFERENCES `uuids` (`uuid`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

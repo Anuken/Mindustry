@@ -1,6 +1,5 @@
 package mindustry.server;
 
-
 import arc.*;
 import arc.backend.headless.*;
 import arc.files.*;
@@ -11,8 +10,11 @@ import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
+import mindustry.net.Administration.*;
 import mindustry.net.Net;
 import mindustry.net.*;
+import mindustry.plugin.coreprotect.*;
+import mindustry.server.nydus.*;
 
 import java.time.*;
 
@@ -42,7 +44,7 @@ public class ServerLauncher implements ApplicationListener{
     @Override
     public void init(){
         Core.settings.setDataDirectory(Core.files.local("config"));
-        loadLocales = false;
+        loadLocales = true;
         headless = true;
 
         Fi plugins = Core.settings.getDataDirectory().child("plugins");
@@ -76,7 +78,17 @@ public class ServerLauncher implements ApplicationListener{
 
         Core.app.addListener(logic = new Logic());
         Core.app.addListener(netServer = new NetServer());
+        Core.app.addListener(coreProtect = new CoreProtect());
         Core.app.addListener(new ServerControl(args));
+        Core.app.addListener(new BlockUpscaler());
+        Core.app.addListener(new EmojiFilter());
+        Core.app.addListener(new Limbo());
+        Core.app.addListener(new CraterCorner());
+        Core.app.addListener(spiderweb);
+        Core.app.addListener(new SiliconValley());
+        Core.app.addListener(new SpecialDelivery());
+
+        Core.app.addListener(new JunctionYeeter());
 
         mods.eachClass(Mod::init);
 

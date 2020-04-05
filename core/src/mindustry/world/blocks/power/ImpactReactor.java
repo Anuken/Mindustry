@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -68,6 +69,11 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     @Override
+    public void unitRemoved(Tile tile, Unit unit){
+        tile.rotation = 0;
+    }
+
+    @Override
     public void update(Tile tile){
         FusionReactorEntity entity = tile.ent();
 
@@ -77,6 +83,7 @@ public class ImpactReactor extends PowerGenerator{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
             if(Mathf.equal(entity.warmup, 1f, 0.001f)){
                 entity.warmup = 1f;
+                Core.app.post(() -> tile.constructNet(Blocks.coreFoundation, tile.getTeam(), (byte)0));
             }
 
             if(!prevOut && (getPowerProduction(tile) > consumes.getPower().requestedPower(entity))){

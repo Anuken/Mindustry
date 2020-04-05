@@ -23,13 +23,13 @@ public class Tile implements Position, TargetTrait{
     /** Tile entity, usually null. */
     public TileEntity entity;
     public short x, y;
-    protected Block block;
+    public Block block;
     protected Floor floor;
     protected Floor overlay;
     /** Rotation, 0-3. Also used to store offload location, in which case it can be any number.*/
-    protected byte rotation;
+    public byte rotation;
     /** Team ordinal. */
-    protected byte team;
+    public byte team;
 
     public Tile(int x, int y){
         this.x = (short)x;
@@ -196,6 +196,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public void set(Block block, Team team, int rotation){
+
         setBlock(block, team, rotation);
         if(block.isMultiblock()){
             int offsetx = -(block.size - 1) / 2;
@@ -221,9 +222,17 @@ public class Tile implements Position, TargetTrait{
         Call.removeTile(this);
     }
 
+    public void deconstructNet(){
+        Call.onDeconstructFinish(this, Blocks.air, -1);
+    }
+
     /** set()-s this tile, except it's synced across the network */
     public void setNet(Block block, Team team, int rotation){
         Call.setTile(this, block, team, rotation);
+    }
+
+    public void constructNet(Block block, Team team, byte rotation){
+        Call.onConstructFinish(this, block, -1, rotation, team, true);
     }
 
     public byte rotation(){
@@ -335,6 +344,21 @@ public class Tile implements Position, TargetTrait{
         }else{
             tmpArray.add(this);
         }
+        return tmpArray;
+    }
+
+    public Array<Tile> getAroundTiles(Array<Tile> tmpArray){
+        tmpArray.clear();
+
+        Point2[] nearby = Edges.getAroundEdges(block.size);
+        for(Point2 point : nearby){
+            if(point == null) continue;
+            Tile other = world.ltile(x + point.x, y + point.y);
+            if(other == null) continue;
+
+            tmpArray.add(other);
+        }
+
         return tmpArray;
     }
 
@@ -528,5 +552,15 @@ public class Tile implements Position, TargetTrait{
     @Remote(called = Loc.server)
     public static void setTile(Tile tile, Block block, Team team, int rotation){
         tile.set(block, team, rotation);
+    }
+
+    //nydus
+
+    public boolean border(){
+        return border(3);
+    }
+
+    private boolean border(int distance){
+        return x < distance || y < distance || x + distance >= world.width() || y + distance >= world.height();
     }
 }

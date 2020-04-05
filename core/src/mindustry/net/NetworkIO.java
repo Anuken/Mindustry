@@ -1,5 +1,6 @@
 package mindustry.net;
 
+import arc.struct.*;
 import arc.util.*;
 import mindustry.core.*;
 import mindustry.entities.type.*;
@@ -9,6 +10,7 @@ import mindustry.maps.Map;
 import mindustry.net.Administration.*;
 
 import java.io.*;
+import java.net.*;
 import java.nio.*;
 import java.util.*;
 
@@ -16,11 +18,18 @@ import static mindustry.Vars.*;
 
 public class NetworkIO{
 
+    private static StringMap tags = new StringMap();
+
     public static void writeWorld(Player player, OutputStream os){
 
         try(DataOutputStream stream = new DataOutputStream(os)){
             stream.writeUTF(JsonIO.write(state.rules));
-            SaveIO.getSaveWriter().writeStringMap(stream, world.getMap().tags);
+
+            tags.clear();
+            world.getMap().tags.each((key, value) -> tags.put(key, value));
+            tags.put("name", "Modern Caldera");
+
+            SaveIO.getSaveWriter().writeStringMap(stream, tags);
 
             stream.writeInt(state.wave);
             stream.writeFloat(state.wavetime);
@@ -61,10 +70,17 @@ public class NetworkIO{
         }
     }
 
-    public static ByteBuffer writeServerData(){
+    public static ByteBuffer writeServerData(InetAddress address){
         String name = (headless ? Config.name.string() : player.name);
+        String map = world.getMap() == null ? "None" : Strings.stripColors(world.getMap().name());
         String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
-        String map = world.getMap() == null ? "None" : world.getMap().name();
+
+        String[] greyscale = {"/127.0.0.1", "/192.99.169.18"};
+
+        if (Arrays.asList(greyscale).contains(address.toString())){
+            name = "<:surgealloy:632785242788200461> surgely a nice server to play on?";
+            description = Strings.stripColors(description);
+        }
 
         ByteBuffer buffer = ByteBuffer.allocate(512);
 

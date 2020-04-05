@@ -1,10 +1,10 @@
 package mindustry.entities;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import mindustry.entities.traits.*;
 
 import java.util.*;
@@ -19,7 +19,7 @@ public class EntityGroup<T extends Entity> implements Iterable<T>{
     private final Class<T> type;
     private final Array<T> entityArray = new Array<>(false, 32);
     private final Array<T> entitiesToRemove = new Array<>(false, 32);
-    private final Array<T> entitiesToAdd = new Array<>(false, 32);
+    public final Array<T> entitiesToAdd = new Array<>(false, 32);
     private final Array<T> intersectArray = new Array<>();
     private final Rect intersectRect = new Rect();
     private IntMap<T> map;

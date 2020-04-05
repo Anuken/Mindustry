@@ -132,6 +132,6 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public static class ConduitEntity extends TileEntity{
         public float smoothLiquid;
 
-        int blendbits;
+        public int blendbits;
     }
 }

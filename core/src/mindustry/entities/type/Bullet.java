@@ -77,7 +77,7 @@ public class Bullet extends SolidEntity implements DamageTrait, Scaled, Poolable
         return create(type, parent.owner, parent.team, x, y, angle, velocityScl);
     }
 
-    @Remote(called = Loc.server, unreliable = true)
+    @Remote(called = Loc.server, variants = Variant.out, unreliable = true)
     public static void createBullet(BulletType type, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
         create(type, null, team, x, y, angle, velocityScl, lifetimeScl, null);
     }
@@ -272,6 +272,7 @@ public class Bullet extends SolidEntity implements DamageTrait, Scaled, Poolable
 
     @Override
     public void removed(){
+        type.removed(this);
         Pools.free(this);
     }
 

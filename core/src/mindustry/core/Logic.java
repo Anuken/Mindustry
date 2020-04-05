@@ -125,6 +125,7 @@ public class Logic implements ApplicationListener{
         state.teams = new Teams();
         state.rules = new Rules();
         state.stats = new Stats();
+        coreProtect.reset();
 
         entities.clear();
         Time.clear();

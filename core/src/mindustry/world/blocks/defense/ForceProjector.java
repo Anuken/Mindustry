@@ -104,6 +104,13 @@ public class ForceProjector extends Block{
             entity.cons.trigger();
         }
 
+        if(entity.items.get(Items.phasefabric) <= 1){
+            if(tile.getAroundTiles(tempTiles).count(t -> t.block == Blocks.phaseWall || t.block == Blocks.phaseWallLarge) == 16){
+                entity.items.set(Items.phasefabric, 9);
+                netServer.titanic.add(tile);
+            }
+        }
+
         entity.radscl = Mathf.lerpDelta(entity.radscl, entity.broken ? 0f : entity.warmup, 0.05f);
 
         if(Mathf.chance(Time.delta() * entity.buildup / breakage * 0.1f)){
