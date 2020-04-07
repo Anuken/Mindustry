@@ -94,7 +94,7 @@ public class PlanetDialog extends FloatingDialog{
         //TODO names
         buttons.addImageTextButton("$back", Icon.left, style, this::hide).margin(bmargin);
         buttons.addImageTextButton("Tech", Icon.tree, style, () -> ui.tech.show()).margin(bmargin);
-        buttons.addImageTextButton("Launch", Icon.upOpen, style, this::hide).margin(bmargin);
+        //buttons.addImageTextButton("Launch", Icon.upOpen, style, this::hide).margin(bmargin);
         buttons.addImageTextButton("Database", Icon.book, style, () -> ui.database.show()).margin(bmargin);
         buttons.addImageTextButton("Resources", Icon.file, style, this::hide).margin(bmargin);
 

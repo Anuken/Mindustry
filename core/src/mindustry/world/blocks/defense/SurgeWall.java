@@ -19,7 +19,7 @@ public class SurgeWall extends Wall{
         public void collision(Bulletc bullet){
             super.collision(bullet);
             if(Mathf.chance(lightningChance)){
-                Lightning.create(team(), Pal.surge, lightningDamage, bullet.x(), bullet.y(), bullet.rotation() + 180f, lightningLength);
+                Lightning.create(team(), Pal.surge, lightningDamage, x, y, bullet.rotation() + 180f, lightningLength);
             }
         }
     }
