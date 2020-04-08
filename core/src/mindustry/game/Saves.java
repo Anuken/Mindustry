@@ -291,7 +291,7 @@ public class Saves{
         }
 
         public Gamemode mode(){
-            return Gamemode.bestFit(meta.rules);
+            return meta.rules.mode();
         }
 
         public int getBuild(){

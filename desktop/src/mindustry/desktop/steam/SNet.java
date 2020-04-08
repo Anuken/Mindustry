@@ -348,7 +348,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             smat.setLobbyData(steamID, "version", Version.build + "");
             smat.setLobbyData(steamID, "versionType", Version.type);
             smat.setLobbyData(steamID, "wave", state.wave + "");
-            smat.setLobbyData(steamID, "gamemode", Gamemode.bestFit(state.rules).name() + "");
+            smat.setLobbyData(steamID, "gamemode", state.rules.mode().name() + "");
         }
     }
 

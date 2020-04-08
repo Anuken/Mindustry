@@ -180,7 +180,7 @@ public class Generators{
                     res.draw(ImagePacker.get(region));
                     for(int x = 0; x < res.width; x++){
                         for(int y = 0; y < res.height; y++){
-                            Color color = overlay.getColor(x, y).a(0.3f);
+                            Color color = overlay.getColor(x, y).a(floor.liquidOpacity);
                             res.draw(x, y, color);
                         }
                     }

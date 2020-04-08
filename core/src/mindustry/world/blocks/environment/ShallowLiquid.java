@@ -5,6 +5,7 @@ import mindustry.world.*;
 //do not use in mods!
 public class ShallowLiquid extends Floor{
     public final Floor liquidBase, floorBase;
+    public float liquidOpacity = 0.35f;
 
     public ShallowLiquid(String name, Block liquid, Block floor){
         super(name);
@@ -13,9 +14,9 @@ public class ShallowLiquid extends Floor{
         this.floorBase = floor.asFloor();
 
         isLiquid = true;
-        variants = floor.asFloor().variants;
-        status = liquid.asFloor().status;
-        liquidDrop = liquid.asFloor().liquidDrop;
-        cacheLayer = liquid.asFloor().cacheLayer;
+        variants = floorBase.variants;
+        status = liquidBase.status;
+        liquidDrop = liquidBase.liquidDrop;
+        cacheLayer = liquidBase.cacheLayer;
     }
 }

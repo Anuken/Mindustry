@@ -77,7 +77,7 @@ public class NetworkIO{
         buffer.putInt(Version.build);
         writeString(buffer, Version.type);
 
-        buffer.put((byte)Gamemode.bestFit(state.rules).ordinal());
+        buffer.put((byte)state.rules.mode().ordinal());
         buffer.putInt(netServer.admins.getPlayerLimit());
 
         writeString(buffer, description, 100);

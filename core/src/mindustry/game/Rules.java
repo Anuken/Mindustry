@@ -61,7 +61,7 @@ public class Rules{
     public float launchWaveMultiplier = 2f;
     /** Sector for saves that have them.*/
     public @Nullable Sector sector;
-    /** Region that save is on. Indicates campaign.  */
+    /** Region that save is on. Indicates campaign. TODO not implemented. */
     public @Nullable MapRegion region;
     /** Spawn layout. */
     public Array<SpawnGroup> spawns = new Array<>();
@@ -107,6 +107,16 @@ public class Rules{
 
     /** Returns the gamemode that best fits these rules.*/
     public Gamemode mode(){
-        return Gamemode.bestFit(this);
+        if(pvp){
+            return Gamemode.pvp;
+        }else if(editor){
+            return Gamemode.editor;
+        }else if(attackMode){
+            return Gamemode.attack;
+        }else if(infiniteResources){
+            return Gamemode.sandbox;
+        }else{
+            return Gamemode.survival;
+        }
     }
 }

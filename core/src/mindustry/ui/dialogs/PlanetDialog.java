@@ -289,7 +289,6 @@ public class PlanetDialog extends FloatingDialog{
         if(selected != null){
             drawSelection(selected);
             drawBorders(selected, borderColor);
-
         }
 
         batch.flush(Gl.triangles);
