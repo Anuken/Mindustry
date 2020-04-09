@@ -166,6 +166,10 @@ public class Control implements ApplicationListener, Loadable{
 
             if(core == null) return;
 
+            //TODO this sounds pretty bad due to conflict
+            Musics.land.stop();
+            Musics.land.play();
+
             app.post(() -> ui.hudfrag.showLand());
             renderer.zoomIn(Fx.coreLand.lifetime);
             app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block()));

@@ -43,6 +43,15 @@ public class MusicControl{
         darkMusic = Array.with(Musics.game2, Musics.game5, Musics.game7);
     }
 
+    public void stop(){
+        silenced = true;
+        if(current != null){
+            current.stop();
+            current = null;
+            fade = 0f;
+        }
+    }
+
     /** Update and play the right music track.*/
     public void update(){
         if(state.isMenu()){

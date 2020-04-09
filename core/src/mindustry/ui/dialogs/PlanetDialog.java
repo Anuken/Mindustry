@@ -93,10 +93,10 @@ public class PlanetDialog extends FloatingDialog{
 
         //TODO names
         buttons.addImageTextButton("$back", Icon.left, style, this::hide).margin(bmargin);
-        buttons.addImageTextButton("Tech", Icon.tree, style, () -> ui.tech.show()).margin(bmargin);
+        //buttons.addImageTextButton("Tech", Icon.tree, style, () -> ui.tech.show()).margin(bmargin);
         //buttons.addImageTextButton("Launch", Icon.upOpen, style, this::hide).margin(bmargin);
-        buttons.addImageTextButton("Database", Icon.book, style, () -> ui.database.show()).margin(bmargin);
-        buttons.addImageTextButton("Resources", Icon.file, style, this::hide).margin(bmargin);
+        //buttons.addImageTextButton("Database", Icon.book, style, () -> ui.database.show()).margin(bmargin);
+        //buttons.addImageTextButton("Resources", Icon.file, style, this::hide).margin(bmargin);
 
         cam.fov = 60f;
 
@@ -357,7 +357,7 @@ public class PlanetDialog extends FloatingDialog{
 
         stable.row();
 
-        stable.addButton("Launch", () -> {
+        stable.addButton("Launch", Styles.transt, () -> {
             if(selected != null){
                 if(selected.is(SectorAttribute.naval)){
                     ui.showInfo("You need a naval loadout to launch here.");
@@ -366,7 +366,7 @@ public class PlanetDialog extends FloatingDialog{
                 control.playSector(selected);
                 hide();
             }
-        }).size(120f, 50f).pad(2f);
+        }).growX().padTop(2f).height(50f).minWidth(170f);
 
         stable.pack();
         stable.setPosition(x, y, Align.center);
