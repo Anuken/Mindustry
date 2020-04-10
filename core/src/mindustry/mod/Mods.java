@@ -114,6 +114,19 @@ public class Mods implements Loadable{
         Log.debug("Time to pack textures: {0}", Time.elapsed());
     }
 
+    private void loadIcons(){
+        for(LoadedMod mod : mods){
+            //try to load icon for each mod that can have one
+            if(mod.root.child("icon.png").exists()){
+                try{
+                    mod.iconTexture = new Texture(mod.root.child("icon.png"));
+                }catch(Throwable t){
+                    Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
+                }
+            }
+        }
+    }
+
     private void packSprites(Array<Fi> sprites, LoadedMod mod, boolean prefix){
         for(Fi file : sprites){
             try(InputStream stream = file.read()){
@@ -135,16 +148,7 @@ public class Mods implements Loadable{
 
     @Override
     public void loadSync(){
-        for(LoadedMod mod : mods){
-            //try to load icon for each mod that can have one
-            if(mod.root.child("icon.png").exists()){
-                try{
-                    mod.iconTexture = new Texture(mod.root.child("icon.png"));
-                }catch(Throwable t){
-                    Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
-                }
-            }
-        }
+        loadIcons();
 
         if(packer == null) return;
         Time.mark();
@@ -219,6 +223,7 @@ public class Mods implements Loadable{
             return;
         }
         mods.remove(mod);
+        mod.dispose();
         requiresReload = true;
     }
 
@@ -451,6 +456,8 @@ public class Mods implements Loadable{
         data.load();
         Core.atlas.getTextures().each(t -> t.setFilter(Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest));
         requiresReload = false;
+
+        loadIcons();
 
         Events.fire(new ContentReloadEvent());
     }
@@ -728,6 +735,7 @@ public class Mods implements Loadable{
         public void dispose(){
             if(iconTexture != null){
                 iconTexture.dispose();
+                iconTexture = null;
             }
         }
 

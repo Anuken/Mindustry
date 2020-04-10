@@ -1,18 +1,8 @@
 package mindustry.world.blocks.storage;
 
-import arc.*;
-import arc.graphics.g2d.*;
-import arc.math.*;
-import arc.util.*;
-import mindustry.*;
-import mindustry.content.*;
-import mindustry.game.EventType.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
-
-import static mindustry.Vars.*;
 
 public class LaunchPad extends StorageBlock{
     public final int timerLaunch = timers++;
@@ -37,6 +27,8 @@ public class LaunchPad extends StorageBlock{
         @Override
         public void draw(){
             super.draw();
+            //TODO
+            /*
 
             //TODO broken
             float progress = Mathf.clamp(Mathf.clamp((items.total() / (float)itemCapacity)) * ((timer().getTime(timerLaunch) / (launchTime / timeScale()))));
@@ -57,7 +49,7 @@ public class LaunchPad extends StorageBlock{
                 }
             }
 
-            Draw.reset();
+            Draw.reset();*/
         }
 
         @Override
@@ -67,6 +59,8 @@ public class LaunchPad extends StorageBlock{
 
         @Override
         public void updateTile(){
+            //TODO
+            /*
 
             if(state.isCampaign() && consValid() && items.total() >= itemCapacity && timer(timerLaunch, launchTime / timeScale())){
                 for(Item item : Vars.content.items()){
@@ -77,7 +71,7 @@ public class LaunchPad extends StorageBlock{
                     items.remove(item, used);
                     Events.fire(new LaunchItemEvent(item, used));
                 }
-            }
+            }*/
         }
     }
 }
