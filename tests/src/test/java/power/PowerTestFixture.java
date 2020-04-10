@@ -1,20 +1,20 @@
 package power;
 
-import io.anuke.arc.*;
-import io.anuke.arc.util.*;
-import io.anuke.mindustry.*;
-import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.*;
-import io.anuke.mindustry.world.blocks.power.*;
-import io.anuke.mindustry.world.modules.*;
+import arc.*;
+import arc.util.*;
+import mindustry.*;
+import mindustry.content.*;
+import mindustry.core.*;
+import mindustry.ctype.*;
+import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.blocks.power.*;
+import mindustry.world.modules.*;
 import org.junit.jupiter.api.*;
 
 import java.lang.reflect.*;
 
-import static io.anuke.mindustry.Vars.content;
+import static mindustry.Vars.content;
 
 /**
  * This class provides objects commonly used by power related unit tests.
@@ -27,13 +27,14 @@ public class PowerTestFixture{
     @BeforeAll
     static void initializeDependencies(){
         Core.graphics = new FakeGraphics();
+        Vars.state = new GameState();
         Vars.content = new ContentLoader(){
             @Override
             public void handleMappableContent(MappableContent content){
 
             }
         };
-        content.createContent();
+        content.createBaseContent();
         Log.setUseColors(false);
         Time.setDeltaProvider(() -> 0.5f);
     }
@@ -91,6 +92,13 @@ public class PowerTestFixture{
             if(block.hasLiquids) tile.entity.liquids = new LiquidModule();
             if(block.hasPower){
                 tile.entity.power = new PowerModule();
+                tile.entity.power.graph = new PowerGraph(){
+                    //assume there's always something consuming power
+                    @Override
+                    public float getUsageFraction(){
+                        return 1f;
+                    }
+                };
                 tile.entity.power.graph.add(tile);
             }
 

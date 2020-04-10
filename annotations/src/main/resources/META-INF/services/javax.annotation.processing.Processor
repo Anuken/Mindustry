@@ -1,5 +1,0 @@
-io.anuke.annotations.RemoteMethodAnnotationProcessor
-io.anuke.annotations.SerializeAnnotationProcessor
-io.anuke.annotations.StructAnnotationProcessor
-io.anuke.annotations.CallSuperAnnotationProcessor
-io.anuke.annotations.AssetsAnnotationProcessor

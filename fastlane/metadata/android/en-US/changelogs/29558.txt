@@ -1,0 +1,7 @@
+- Added safer mod loading system - errors should no longer crash, but display a log
+- Added new Cyrllic font
+- Added range display and stats for repair point
+- Whitelisted some more classes for scripting
+- Fixed scripting not working on some devices [Android]
+- Fixed power node desync
+- Fixed some blocks not showing up in drill mining list
