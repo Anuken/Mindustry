@@ -231,14 +231,7 @@ public class Floor extends Block{
     }
 
     protected boolean doEdge(Floor other, boolean sameLayer){
-        //TODO this is awful and should not exist.
-        boolean normal = ((other instanceof ShallowLiquid) == (this instanceof ShallowLiquid)) || (cacheLayer == other.cacheLayer);
-        return (((other.blendGroup.id > blendGroup.id) || edges() == null) &&
-            other.edgeOnto(this) && (other.cacheLayer.ordinal() > this.cacheLayer.ordinal() || !sameLayer)) == normal;
-    }
-
-    protected boolean edgeOnto(Floor other){
-        return true;
+        return (((other.blendGroup.id > blendGroup.id) || edges() == null) && (other.cacheLayer.ordinal() > this.cacheLayer.ordinal() || !sameLayer));
     }
 
     TextureRegion edge(Floor block, int x, int y){

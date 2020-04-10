@@ -159,6 +159,24 @@ public class Blocks implements ContentList{
             albedo = 0.5f;
         }};
 
+        darksandTaintedWater = new ShallowLiquid("darksand-tainted-water"){{
+            speedMultiplier = 0.75f;
+            statusDuration = 60f;
+            albedo = 0.5f;
+        }};
+
+        sandWater = new ShallowLiquid("sand-water"){{
+            speedMultiplier = 0.8f;
+            statusDuration = 50f;
+            albedo = 0.5f;
+        }};
+
+        darksandWater = new ShallowLiquid("darksand-water"){{
+            speedMultiplier = 0.8f;
+            statusDuration = 50f;
+            albedo = 0.5f;
+        }};
+
         tar = new Floor("tar"){{
             drownTime = 150f;
             status = StatusEffects.tarred;
@@ -221,23 +239,9 @@ public class Blocks implements ContentList{
             playerUnmineable = true;
         }};
 
-        darksandTaintedWater = new ShallowLiquid("darksand-tainted-water", Blocks.taintedWater, Blocks.darksand){{
-            speedMultiplier = 0.75f;
-            statusDuration = 60f;
-            albedo = 0.5f;
-        }};
-
-        sandWater = new ShallowLiquid("sand-water", Blocks.water, Blocks.sand){{
-            speedMultiplier = 0.8f;
-            statusDuration = 50f;
-            albedo = 0.5f;
-        }};
-
-        darksandWater = new ShallowLiquid("darksand-water", Blocks.water, Blocks.darksand){{
-            speedMultiplier = 0.8f;
-            statusDuration = 50f;
-            albedo = 0.5f;
-        }};
+        ((ShallowLiquid)darksandTaintedWater).set(Blocks.taintedWater, Blocks.darksand);
+        ((ShallowLiquid)sandWater).set(Blocks.water, Blocks.sand);
+        ((ShallowLiquid)darksandWater).set(Blocks.water, Blocks.darksand);
 
         holostone = new Floor("holostone"){{
 

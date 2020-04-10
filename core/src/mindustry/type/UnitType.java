@@ -59,7 +59,9 @@ public class UnitType extends UnlockableContent{
         if(EntityMapping.map(name) != null){
             constructor = EntityMapping.map(name);
         }else{
-            constructor = () -> Nulls.unit;
+            //TODO fix for mods
+            throw new RuntimeException("Unit has no type: " + name);
+            //constructor = () -> Nulls.unit;
         }
     }
 
