@@ -2,6 +2,7 @@ package mindustry.graphics;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
@@ -11,6 +12,8 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.type.*;
+
+import static mindustry.Vars.renderer;
 
 public class Shaders{
     public static Shadow shadow;
@@ -251,13 +254,25 @@ public class Shaders{
 
         public SurfaceShader(String frag){
             super(frag, "default");
+
+            Core.assets.load("sprites/noise.png", Texture.class).loaded = t -> {
+                ((Texture)t).setFilter(TextureFilter.Linear);
+                ((Texture)t).setWrap(TextureWrap.Repeat);
+            };
         }
 
         @Override
         public void apply(){
-            setUniformf("camerapos", Core.camera.position.x - Core.camera.width / 2, Core.camera.position.y - Core.camera.height / 2);
-            setUniformf("screensize", Core.camera.width, Core.camera.height);
-            setUniformf("time", Time.time());
+            setUniformf("u_campos", Core.camera.position.x - Core.camera.width / 2, Core.camera.position.y - Core.camera.height / 2);
+            setUniformf("u_resolution", Core.camera.width, Core.camera.height);
+            setUniformf("u_time", Time.time());
+
+            if(hasUniform("u_noise")){
+                Core.assets.get("sprites/noise.png", Texture.class).bind(1);
+                renderer.effectBuffer.getTexture().bind(0);
+
+                setUniformi("u_noise", 1);
+            }
         }
     }
 
