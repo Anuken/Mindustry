@@ -91,32 +91,7 @@ float snoise(vec4 v){
     return 49.0 * (dot(m0*m0, vec3(dot(p0, x0), dot(p1, x1), dot(p2, x2)))+ dot(m1*m1, vec2(dot(p3, x3), dot(p4, x4))));
 }
 
-float onoise(vec4 pos, int octaves, float falloff, float scl, float po){
-    float sum = 0.0;
-    float samp = 0.0;
-    float amp = 1.0;
-    float cscl = scl;
-
-    for (int i = 0; i < octaves; i ++){
-        sum += (snoise(pos / vec4(cscl, cscl, cscl, 1.0)) + 1.0) / 2.0 * amp;
-        cscl /= 2.0;
-        samp += amp;
-        amp *= falloff;
-    }
-
-    return pow(sum / samp, po);
-}
-
 void main(){
-    vec4 pos = a_position;
-
-    float height = onoise(vec4(a_position.xyz, u_time + u_seed), u_octaves, u_falloff, u_scale, u_power);
-
-    int cindex = int(height * float(u_colornum));
-
-    float dst = 1.0 - (u_magnitude/2.0) + height*u_magnitude;
-
-    v_height = (height + (onoise(vec4(a_position.xyz, u_time + u_seed*2.0), u_octaves, u_falloff, u_scale, u_power) - 0.5) / 6.0 - 0.5) * u_spread + 0.5;
-
-    gl_Position = u_proj * u_trans * a_position; //u_proj * (a_position + vec4(pos.xyz * (dst - 1.0), 0.0));
+    v_height = clamp((snoise(vec4(a_position.xyz, u_time + u_seed*2.0) / u_scale) + 0.7) / 2.0, 0.0, 1.0);
+    gl_Position = u_proj * u_trans * a_position;
 }
