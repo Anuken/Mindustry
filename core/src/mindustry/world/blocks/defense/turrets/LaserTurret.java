@@ -24,6 +24,12 @@ public class LaserTurret extends PowerTurret{
     }
 
     @Override
+    public void init(){
+        consumes.powerCond(powerUse, entity -> ((LaserTurretEntity)entity).bullet != null || ((LaserTurretEntity)entity).target != null);
+        super.init();
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
 
@@ -49,7 +55,7 @@ public class LaserTurret extends PowerTurret{
                 bullet.time(0f);
                 heat = 1f;
                 recoil = recoilAmount;
-                bulletLife -= Time.delta();
+                bulletLife -= Time.delta() / Math.max(efficiency(), 0.00001f);
                 if(bulletLife <= 0f){
                     bullet = null;
                 }
@@ -62,19 +68,19 @@ public class LaserTurret extends PowerTurret{
                 return;
             }
 
-            if(reload >= reloadTime && (consValid() || tile.isEnemyCheat())){
+            if(reload <= 0 && (consValid() || tile.isEnemyCheat())){
                 BulletType type = peekAmmo();
 
                 shoot(type);
 
-                reload = 0f;
+                reload = reloadTime;
             }else{
                 Liquid liquid = liquids().current();
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-                float used = baseReloadSpeed() * (tile.isEnemyCheat() ? maxUsed : Math.min(liquids().get(liquid), maxUsed * Time.delta())) * liquid.heatCapacity * coolantMultiplier;
-                reload += used;
-                liquids().remove(liquid, used);
+                float used = (tile.isEnemyCheat() ? maxUsed * Time.delta() : Math.min(liquids.get(liquid), maxUsed * Time.delta())) * liquid.heatCapacity * coolantMultiplier;
+                reload -= used;
+                liquids.remove(liquid, used);
 
                 if(Mathf.chance(0.06 * used)){
                     coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
@@ -84,7 +90,7 @@ public class LaserTurret extends PowerTurret{
 
         @Override
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, rotatespeed * delta() * (bulletLife > 0f ? firingMoveFract : 1f));
+            rotation = Angles.moveToward(rotation, targetRot, efficiency() * rotatespeed * delta() * (bulletLife > 0f ? firingMoveFract : 1f));
         }
 
         @Override
