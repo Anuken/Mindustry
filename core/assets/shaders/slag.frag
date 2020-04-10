@@ -6,7 +6,7 @@ precision mediump int;
 //shades of slag
 #define S2 vec3(100.0, 93.0, 49.0) / 100.0
 #define S1 vec3(100.0, 60.0, 25.0) / 100.0
-#define NSCALE 300.0 / 2.0
+#define NSCALE 280.0 / 2.0
 
 uniform sampler2D u_texture;
 uniform sampler2D u_noise;
