@@ -7,15 +7,16 @@ import mindustry.gen.*;
 import mindustry.type.*;
 
 public class UnitTypes implements ContentList{
-    //TODO reimplement
+    //TODO reimplement - DO NOT USE
     public static UnitType
-    ghoul, revenant, lich, reaper,
+    ghoul, revenant, lich,
     crawler, titan, fortress, eruptor, chaosArray, eradicator;
 
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType dagger;
     public static @EntityDef({Unitc.class, WaterMovec.class}) UnitType vanguard;
     public static @EntityDef({Unitc.class, Minerc.class}) UnitType draug;
     public static @EntityDef({Unitc.class}) UnitType wraith;
+    public static @EntityDef({Unitc.class}) UnitType reaper;
     public static @EntityDef({Unitc.class}) UnitType spirit;
     public static @EntityDef({Unitc.class, Builderc.class}) UnitType phantom;
 
@@ -60,6 +61,27 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.shoot;
             }});
         }};
+
+        reaper = new UnitType("reaper"){{
+            speed = 1f;
+            accel = 0.08f;
+            drag = 0f;
+            mass = 2f;
+            flying = true;
+            health = 75000;
+            engineOffset = 40;
+            engineSize = 7.3f;
+
+            weapons.add(new Weapon(){{
+                y = 1.5f;
+                reload = 28f;
+                alternate = true;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.standardCopper;
+                shootSound = Sounds.shoot;
+            }});
+        }};
+
 
         vanguard = new UnitType("vanguard"){{
             speed = 1.3f;

@@ -133,14 +133,14 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
         Tile tile = tileOn();
         Floor floor = floorOn();
 
-        if(tile != null){
+        if(tile != null && isGrounded()){
             //unit block update
-            if(tile.entity != null && isGrounded()){
+            if(tile.entity != null){
                 tile.entity.unitOn(this);
             }
 
             //kill when stuck in wall
-            if(isGrounded() && tile.solid()){
+            if(tile.solid()){
                 kill();
             }
 

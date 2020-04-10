@@ -52,8 +52,8 @@ public class ModsDialog extends FloatingDialog{
     }
 
     void setup(){
-        float h = 120f;
-        float w = mobile ? 430f : 500f;
+        float h = 110f;
+        float w = mobile ? 430f : 524f;
 
         cont.clear();
         cont.defaults().width(mobile ? 500 : 560f).pad(4);
@@ -273,7 +273,27 @@ public class ModsDialog extends FloatingDialog{
                 desc.row();
                 desc.add(mod.meta.description).growX().wrap().padTop(2);
             }
+
+            //TODO add this when mods work properly
+            /*
+            Array<UnlockableContent> all = Array.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent).as(UnlockableContent.class);
+            if(all.any()){
+                desc.add("$mod.content").padRight(10).color(Color.gray).top();
+                desc.row();
+                desc.pane(cs -> {
+                    int i = 0;
+                    for(UnlockableContent c : all){
+                        cs.addImageButton(new TextureRegionDrawable(c.icon(Cicon.medium)), () -> {
+                            ui.content.show(c);
+                        });
+
+                        if(++i % 8 == 0) cs.row();
+                    }
+                }).growX().minHeight(60f);
+            }*/
         }).width(400f);
+
+
 
         dialog.show();
     }
