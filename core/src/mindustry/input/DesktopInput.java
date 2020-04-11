@@ -174,13 +174,10 @@ public class DesktopInput extends InputHandler{
         }
 
         if(!scene.hasMouse()){
-            if(Core.input.keyTap(Binding.select)){
-                Unitc unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> true);
-                if(unit != null){
-                    unit.hitbox(Tmp.r1);
-                    if(Tmp.r1.contains(Core.input.mouseWorld())){
-                        Call.onUnitControl(player, unit);
-                    }
+            if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
+                Unitc on = selectedUnit();
+                if(on != null){
+                    Call.onUnitControl(player, on);
                 }
             }
 

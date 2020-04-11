@@ -18,7 +18,8 @@ public class OverlayRenderer{
     private static final float indicatorLength = 14f;
     private static final float spawnerMargin = tilesize*11f;
     private static final Rect rect = new Rect();
-    private float buildFadeTime;
+    private float buildFade, unitFade;
+    private Unitc lastSelect;
 
     public void drawBottom(){
         InputHandler input = control.input;
@@ -64,6 +65,23 @@ public class OverlayRenderer{
 
         InputHandler input = control.input;
 
+        Unitc select = input.selectedUnit();
+        if(!Core.input.keyDown(Binding.control)) select = null;
+        unitFade = Mathf.lerpDelta(unitFade, Mathf.num(select != null), 0.1f);
+
+        if(select != null) lastSelect = select;
+        if(select == null) select = lastSelect;
+        if(select != null && select.isAI()){
+            Draw.mixcol(Pal.accent, 1f);
+            Draw.alpha(unitFade);
+            Draw.rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90);
+            Lines.stroke(unitFade);
+            Lines.square(select.x(), select.y(), select.hitSize() * 1.5f, Time.time() * 2f);
+            Draw.reset();
+        }
+
+
+
         //draw config selected block
         if(input.frag.config.isShown()){
             Tilec tile = input.frag.config.getSelectedTile();
@@ -72,12 +90,12 @@ public class OverlayRenderer{
 
         input.drawTop();
 
-        buildFadeTime = Mathf.lerpDelta(buildFadeTime, input.isPlacing() ? 1f : 0f, 0.06f);
+        buildFade = Mathf.lerpDelta(buildFade, input.isPlacing() ? 1f : 0f, 0.06f);
 
         Draw.reset();
-        Lines.stroke(buildFadeTime * 2f);
+        Lines.stroke(buildFade * 2f);
 
-        if(buildFadeTime > 0.005f){
+        if(buildFade > 0.005f){
             state.teams.eachEnemyCore(player.team(), core -> {
                 float dst = core.dst(player);
                 if(dst < state.rules.enemyCoreBuildRadius * 2.2f){

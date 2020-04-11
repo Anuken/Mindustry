@@ -175,6 +175,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             //make sure it's AI controlled, so players can't overwrite each other
         }else if(unit.isAI() && unit.team() == player.team()){
             player.unit(unit);
+            Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x(), unit.y(), 0f, unit));
+            if(!player.dead()){
+                Fx.unitSpirit.at(player.x(), player.y(), 0f, unit);
+            }
         }
     }
 
@@ -704,6 +708,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public float mouseAngle(float x, float y){
         return Core.input.mouseWorld(getMouseX(), getMouseY()).sub(x, y).angle();
+    }
+
+    public @Nullable Unitc selectedUnit(){
+        Unitc unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, Unitc::isAI);
+        if(unit != null){
+            unit.hitbox(Tmp.r1);
+            Tmp.r1.grow(6f);
+            if(Tmp.r1.contains(Core.input.mouseWorld())){
+                return unit;
+            }
+        }
+        return null;
     }
 
     public void remove(){

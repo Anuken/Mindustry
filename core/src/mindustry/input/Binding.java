@@ -11,6 +11,7 @@ public enum Binding implements KeyBind{
     move_y(new Axis(KeyCode.S, KeyCode.W)),
     mouse_move(KeyCode.MOUSE_BACK),
     dash(KeyCode.SHIFT_LEFT),
+    control(KeyCode.ALT_LEFT),
     select(KeyCode.MOUSE_LEFT),
     deselect(KeyCode.MOUSE_RIGHT),
     break_block(KeyCode.MOUSE_RIGHT),

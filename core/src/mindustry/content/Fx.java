@@ -36,6 +36,39 @@ public class Fx{
 
     }),
 
+    unitControl = new Effect(30f, e -> {
+        if(!(e.data instanceof Unitc)) return;
+
+        Unitc select = (Unitc)e.data;
+
+        mixcol(Pal.accent, 1f);
+        alpha(e.fout());
+        rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90f);
+        Lines.square(select.x(), select.y(), e.fout() * select.hitSize() * 2f, 45f);
+        Lines.stroke(e.fin() * 2f);
+        Lines.square(select.x(), select.y(), e.fout() * select.hitSize() * 3f, 45f);
+        reset();
+    }),
+
+    unitSpirit = new Effect(20f, e -> {
+        if(!(e.data instanceof Position)) return;
+        Position to = e.data();
+
+        color(Pal.accent);
+
+        Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interpolation.pow2In);
+        float x = Tmp.v1.x, y = Tmp.v1.y;
+        float size = 2.5f * e.fin();
+
+        Fill.square(x, y, 1.5f * size, 45f);
+
+        Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interpolation.pow5In);
+        x = Tmp.v1.x;
+        y = Tmp.v1.y;
+
+        Fill.square(x, y, 1f * size, 45f);
+    }),
+
     itemTransfer = new Effect(30f, e -> {
         if(!(e.data instanceof Position)) return;
         Position to = e.data();

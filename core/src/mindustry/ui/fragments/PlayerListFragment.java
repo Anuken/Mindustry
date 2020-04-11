@@ -20,6 +20,7 @@ public class PlayerListFragment extends Fragment{
     private Table content = new Table().marginRight(13f).marginLeft(13f);
     private Interval timer = new Interval();
     private TextField sField;
+    private boolean found = false;
 
     @Override
     public void build(Group parent){
@@ -71,13 +72,15 @@ public class PlayerListFragment extends Fragment{
         content.clear();
 
         float h = 74f;
+        found = false;
 
         Groups.player.sort(Structs.comparing(Playerc::team));
         Groups.player.each(user -> {
+            found = true;
             NetConnection connection = user.con();
 
             if(connection == null && net.server() && !user.isLocal()) return;
-            if(sField.getText().length() > 0 && !user.name().toLowerCase().contains(sField.getText().toLowerCase()) && !Strings.stripColors(user.name.toLowerCase()).contains(sField.getText().toLowerCase())) return;
+            if(sField.getText().length() > 0 && !user.name().toLowerCase().contains(sField.getText().toLowerCase()) && !Strings.stripColors(user.name().toLowerCase()).contains(sField.getText().toLowerCase())) return;
 
             Table button = new Table();
             button.left();
@@ -150,7 +153,7 @@ public class PlayerListFragment extends Fragment{
             content.row();
         });
 
-        if(sField.getText().length() > 0 && !Groups.player.contains(user -> user.name.toLowerCase().contains(sField.getText().toLowerCase()))) {
+        if(!found){
             content.add(Core.bundle.format("players.notfound")).padBottom(6).width(350f).maxHeight(h + 14);
         }
 
