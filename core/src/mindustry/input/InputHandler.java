@@ -168,6 +168,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Core.app.post(() -> Events.fire(new TapConfigEvent(tile, player, value)));
     }
 
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    public static void onUnitControl(Playerc player, @Nullable Unitc unit){
+        if(unit == null){
+            player.clearUnit();
+            //make sure it's AI controlled, so players can't overwrite each other
+        }else if(unit.isAI() && unit.team() == player.team()){
+            player.unit(unit);
+        }
+    }
+
     public Eachable<BuildRequest> allRequests(){
         return cons -> {
             for(BuildRequest request : player.builder().requests()) cons.get(request);

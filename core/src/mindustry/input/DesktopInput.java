@@ -4,6 +4,7 @@ import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
+import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
@@ -13,6 +14,8 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.types.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -170,14 +173,24 @@ public class DesktopInput extends InputHandler{
             Core.camera.position.lerpDelta(player, 0.08f);
         }
 
-        //TODO remove: debug unit possession
-        if(Core.input.keyTap(Binding.select)){
-            Unitc unit = Units.closest(state.rules.defaultTeam, Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> true);
-            if(unit != null){
-                unit.hitbox(Tmp.r1);
-                if(Tmp.r1.contains(Core.input.mouseWorld())){
-                    player.unit(unit);
+        if(!scene.hasMouse()){
+            if(Core.input.keyTap(Binding.select)){
+                Unitc unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> true);
+                if(unit != null){
+                    unit.hitbox(Tmp.r1);
+                    if(Tmp.r1.contains(Core.input.mouseWorld())){
+                        Call.onUnitControl(player, unit);
+                    }
                 }
+            }
+
+            if(Core.input.keyTap(KeyCode.Q) && !player.dead()){
+                Fx.commandSend.at(player);
+                Units.nearby(player.team(), player.x(), player.y(), 200f, u -> {
+                    if(u.isAI()){
+                        u.controller(new MimicAI(player.unit()));
+                    }
+                });
             }
         }
 

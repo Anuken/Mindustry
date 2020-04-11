@@ -12,6 +12,8 @@ import static mindustry.Vars.net;
 
 @Component
 abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
+    private static final Vec2 tmp1 = new Vec2(), tmp2 = new Vec2();
+
     @Import float x, y, drag;
     @Import Vec2 vel;
 
@@ -37,9 +39,9 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     }
 
     void moveAt(Vec2 vector, float acceleration){
-        Vec2 t = Tmp.v3.set(vector).scl(floorSpeedMultiplier()); //target vector
-        Tmp.v1.set(t).sub(vel).limit(acceleration * vector.len()); //delta vector
-        vel.add(Tmp.v1);
+        Vec2 t = tmp1.set(vector).scl(floorSpeedMultiplier()); //target vector
+        tmp2.set(t).sub(vel).limit(acceleration * vector.len()); //delta vector
+        vel.add(tmp2);
     }
 
     float floorSpeedMultiplier(){

@@ -956,6 +956,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         Events.fire(new BlockDestroyEvent(tile));
         block.breakSound.at(tile);
         onDestroyed();
+        tile.remove();
         remove();
     }
 

@@ -21,7 +21,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
 
     /** weapon mount array, never null */
     @ReadOnly WeaponMount[] mounts = {};
-    @ReadOnly float range;
+    @ReadOnly transient float range, aimX, aimY;
+    @ReadOnly transient boolean isRotate, isShooting;
 
     boolean inRange(Position other){
         return within(other, range);
@@ -41,6 +42,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
             mount.rotate = rotate;
             mount.shoot = shoot;
         }
+        isRotate = rotate;
+        isShooting = shoot;
     }
 
     void aim(Position pos){
@@ -59,6 +62,9 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
             mount.aimX = x;
             mount.aimY = y;
         }
+
+        aimX = x;
+        aimY = y;
     }
 
     /** Update shooting and rotation for this unit. */

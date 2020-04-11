@@ -34,6 +34,11 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
         lookAt(pos);
     }
 
+    public void aimLook(float x, float y){
+        aim(x, y);
+        lookAt(x, y);
+    }
+
     @Override
     public float clipSize(){
         return type.region.getWidth() * 2f;
@@ -107,6 +112,14 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
 
     public void lookAt(Position pos){
         lookAt(angleTo(pos));
+    }
+
+    public void lookAt(float x, float y){
+        lookAt(angleTo(x, y));
+    }
+
+    public boolean isAI(){
+        return controller instanceof AIController;
     }
 
     @Override
