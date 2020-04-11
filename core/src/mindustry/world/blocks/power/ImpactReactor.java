@@ -100,8 +100,8 @@ public class ImpactReactor extends PowerGenerator{
         public void draw(){
             Draw.rect(reg(bottomRegion), x, y);
 
-            for(int i = 0; i < plasmas; i++){
-                float r = 29f + Mathf.absin(Time.time(), 2f + i * 1f, 5f - i * 0.5f);
+        for(int i = 0; i < plasmas; i++){
+            float r = size * tilesize - 3f + Mathf.absin(Time.time(), 2f + i * 1f, 5f - i * 0.5f);
 
                 Draw.color(plasma1, plasma2, (float)i / plasmas);
                 Draw.alpha((0.3f + Mathf.absin(Time.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * warmup);

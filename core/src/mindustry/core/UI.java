@@ -336,7 +336,7 @@ public class UI implements ApplicationListener, Loadable{
         new Dialog(""){{
             getCell(cont).growX();
             cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+            buttons.addButton("$ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
@@ -375,7 +375,7 @@ public class UI implements ApplicationListener, Loadable{
             Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(Strings.parseException(exc, true)).color(Color.lightGray).left()), true);
 
             cont.addButton("$details", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().right();
-            cont.addButton("$ok", this::hide).size(100, 50).fillX().left();
+            cont.addButton("$ok", this::hide).size(110, 50).fillX().left();
             cont.row();
             cont.add(col).colspan(2).pad(2);
         }}.show();
@@ -423,14 +423,14 @@ public class UI implements ApplicationListener, Loadable{
             cont.row();
             cont.add(text).width(400f).wrap().get().setAlignment(align, align);
             cont.row();
-            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+            buttons.addButton("$ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
     public void showInfoText(String titleText, String text){
         new Dialog(titleText){{
             cont.margin(15).add(text).width(400f).wrap().left().get().setAlignment(Align.left, Align.left);
-            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+            buttons.addButton("$ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
@@ -439,7 +439,7 @@ public class UI implements ApplicationListener, Loadable{
             cont.margin(10).add(text);
             titleTable.row();
             titleTable.addImage().color(Pal.accent).height(3f).growX().pad(2f);
-            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+            buttons.addButton("$ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
