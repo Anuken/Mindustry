@@ -539,7 +539,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     rotate.getImage().setRotation(editor.rotation * 90);
                     rotate.getImage().setOrigin(Align.center);
                 });
-
+                tools.row();
+                addTool.get(EditorTool.rectangle);
+                addTool.get(EditorTool.copy);
                 tools.row();
 
                 tools.table(Tex.underline, t -> t.add("$editor.teams"))

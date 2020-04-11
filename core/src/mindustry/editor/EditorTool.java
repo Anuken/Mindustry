@@ -1,14 +1,21 @@
 package mindustry.editor;
 
 import arc.func.*;
+import arc.maps.TileSet;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.entities.type.TileEntity;
 import mindustry.game.*;
+import mindustry.maps.Map;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+
+import java.util.ArrayList;
+
+import static mindustry.Vars.world;
 
 public enum EditorTool{
     zoom,
@@ -42,6 +49,100 @@ public enum EditorTool{
                     editor.drawBlocks(x, y);
                 }
             });
+        }
+    },
+    rectangle("fill"){
+
+        @Override
+        public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2){
+            if (x1>x2){
+                int help=x1;
+                x1=x2;
+                x2=help;
+            }
+            if (y1>y2){
+                int help=y1;
+                y1=y2;
+                y2=help;
+            }
+            for(int y=y1;y<=y2;y++){
+                for(int x=x1;x<=x2;x++){
+                    if(mode==-1 && (x!=x1 && x!=x2 && y!=y1 && y!=y2)) continue;
+                    editor.drawBlocks(x,y);
+
+                }
+            }
+        }
+    },
+    copy("paste"){
+        {
+            draggable=true;
+        }
+        @Override
+        public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2){
+
+            if(mode==0 && !editor.tileCopy.inSelection(x2,y2)){
+                int Y=0;
+                TileCopy tileCopy=editor.tileCopy;
+                for(ArrayList<Tile> row:tileCopy.data){
+                    int X=0;
+                    int y=Y+tileCopy.y;
+                    for(Tile t:row){
+                        int x=X+tileCopy.x;
+                        Tile wTile=world.tile(x,y);
+                        if(wTile!=null) {
+                            //removes any intersecting multiblock.
+                            // It would cut from multiblocks and leave some fragments.
+                            wTile.removeNet();
+                            wTile.setFloor(t.floor());
+                            wTile.setOverlay(t.overlay());
+                            wTile.setBlock(t.block());
+                        }
+                        X++;
+                    }
+                    Y++;
+                }
+            }
+            if(mode==0) return;
+
+            if (x1>x2){
+                int help=x1;
+                x1=x2;
+                x2=help;
+            }
+            if (y1>y2){
+                int help=y1;
+                y1=y2;
+                y2=help;
+            }
+            //so you cannot select nothing
+            x1= Mathf.clamp(x1,0,editor.width());
+            y1= Mathf.clamp(y1,0,editor.height());
+            x2= Mathf.clamp(x2,0,editor.width()-1);
+            y2= Mathf.clamp(y2,0,editor.height()-1);
+            TileCopy tileCopy=editor.tileCopy;
+            tileCopy.x=x1;
+            tileCopy.y=y1;
+            tileCopy.data.clear();
+
+            for(int y=0;y<=y2-y1;y++){
+                int Y=y+y1;
+                tileCopy.data.add(new ArrayList<>());
+                for(int x=0;x<=x2-x1;x++){
+                    int X=x+x1;
+                    Tile tile=world.ltile(X,Y);
+                    if(tile==null) continue;
+                    Tile copy=new Tile(X,Y);
+                    copy.setFloor(tile.floor());
+                    copy.setOverlay(tile.overlay());
+                    //this is just my solution: ignoring all multiBlocks.
+                    // Player can use in game schematics after all.
+                    if(!tile.breakable()){
+                        copy.setBlock(tile.block());
+                    }
+                    tileCopy.data.get(y).add(copy);
+                }
+            }
         }
     },
     pencil("replace", "square", "drawteams"){

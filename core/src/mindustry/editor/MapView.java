@@ -17,8 +17,7 @@ import mindustry.graphics.Pal;
 import mindustry.input.Binding;
 import mindustry.ui.GridImage;
 
-import static mindustry.Vars.mobile;
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 
 public class MapView extends Element implements GestureListener{
     private MapEditor editor;
@@ -39,6 +38,7 @@ public class MapView extends Element implements GestureListener{
 
     public MapView(MapEditor editor){
         this.editor = editor;
+        editor.tileCopy=new TileCopy(this,editor);
 
         for(int i = 0; i < MapEditor.brushSizes.length; i++){
             float size = MapEditor.brushSizes[i];
@@ -110,7 +110,7 @@ public class MapView extends Element implements GestureListener{
 
                 Point2 p = project(x, y);
 
-                if(tool == EditorTool.line){
+                if(tool == EditorTool.line || tool==EditorTool.rectangle || tool==EditorTool.copy){
                     ui.editor.resetSaved();
                     tool.touchedLine(editor, startx, starty, p.x, p.y);
                 }
@@ -134,6 +134,10 @@ public class MapView extends Element implements GestureListener{
                 if(drawing && tool.draggable && !(p.x == lastx && p.y == lasty)){
                     ui.editor.resetSaved();
                     Bresenham2.line(lastx, lasty, p.x, p.y, (cx, cy) -> tool.touched(editor, cx, cy));
+                    if(tool==EditorTool.copy && editor.tileCopy.inSelection(lastx,lasty) && tool.mode==0){
+                        editor.tileCopy.x+=p.x-lastx;
+                        editor.tileCopy.y+=p.y-lasty;
+                    }
                 }
 
                 if(tool == EditorTool.line && tool.mode == 1){
@@ -266,14 +270,24 @@ public class MapView extends Element implements GestureListener{
         Draw.color(Pal.accent);
         Lines.stroke(Scl.scl(2f));
 
+        if(tool== EditorTool.copy && drawing && tool.mode==-1){
+            drawRect(startx,starty,lastx,lasty,scaling,false);
+        }else if(tool== EditorTool.copy){
+            drawRect(editor.tileCopy.x,editor.tileCopy.y,
+                    editor.tileCopy.x+editor.tileCopy.getSizeX()-1,
+                    editor.tileCopy.y+editor.tileCopy.getSizeY()-1,scaling,false);
+
         if((!editor.drawBlock.isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
-            if(tool == EditorTool.line && drawing){
+            if(tool == EditorTool.line  && drawing){
                 Vec2 v1 = unproject(startx, starty).add(x, y);
                 float sx = v1.x, sy = v1.y;
                 Vec2 v2 = unproject(lastx, lasty).add(x, y);
 
                 Lines.poly(brushPolygons[index], sx, sy, scaling);
                 Lines.poly(brushPolygons[index], v2.x, v2.y, scaling);
+            }
+            if(tool== EditorTool.rectangle && drawing){
+                drawRect(startx,starty,lastx,lasty,scaling,tool.mode==-1);
             }
 
             if((tool.edit || (tool == EditorTool.line && !drawing)) && (!mobile || drawing)){
@@ -297,6 +311,8 @@ public class MapView extends Element implements GestureListener{
                 v.y + scaling / 2f + offset,
                 scaling * editor.drawBlock.size / 2f);
             }
+
+            }
         }
 
         Draw.color(Pal.accent);
@@ -305,6 +321,25 @@ public class MapView extends Element implements GestureListener{
         Draw.reset();
 
         ScissorStack.popScissors();
+    }
+
+    private void drawRect(int sx,int sy,int ex,int ey,float scaling,boolean inner){
+        if(sx>ex){
+            int temp=sx;
+            sx=ex;
+            ex=temp;
+        }
+        if(sy>ey){
+            int temp=sy;
+            sy=ey;
+            ey=temp;
+        }
+        Vec2 v1 = unproject(sx, sy).add(x, y);
+        Lines.rect(v1.x,v1.y,(ex-sx+1)*scaling,(ey-sy+1)*scaling);
+        if(inner){
+            v1 = unproject(sx+1, sy+1).add(x, y);
+            Lines.rect(v1.x,v1.y,(ex-sx-1)*scaling,(ey-sy-1)*scaling);
+        }
     }
 
     private boolean active(){
