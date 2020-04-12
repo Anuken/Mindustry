@@ -80,8 +80,6 @@ public class OverlayRenderer{
             Draw.reset();
         }
 
-
-
         //draw config selected block
         if(input.frag.config.isShown()){
             Tilec tile = input.frag.config.getSelectedTile();

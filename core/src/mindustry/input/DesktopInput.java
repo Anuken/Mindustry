@@ -181,6 +181,7 @@ public class DesktopInput extends InputHandler{
                 }
             }
 
+            //TODO this is for debugging, remove later
             if(Core.input.keyTap(KeyCode.Q) && !player.dead()){
                 Fx.commandSend.at(player);
                 Units.nearby(player.team(), player.x(), player.y(), 200f, u -> {

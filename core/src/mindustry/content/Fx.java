@@ -44,8 +44,10 @@ public class Fx{
         mixcol(Pal.accent, 1f);
         alpha(e.fout());
         rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90f);
-        Lines.square(select.x(), select.y(), e.fout() * select.hitSize() * 2f, 45f);
-        Lines.stroke(e.fin() * 2f);
+        alpha(1f);
+        Lines.stroke(e.fslope() * 1f);
+        Lines.square(select.x(), select.y(), e.fout() * select.hitSize() * 2f, 45);
+        Lines.stroke(e.fslope() * 2f);
         Lines.square(select.x(), select.y(), e.fout() * select.hitSize() * 3f, 45f);
         reset();
     }),
