@@ -6,16 +6,16 @@ import mindustry.world.Tile;
 import arc.struct.Array;
 
 public class TileCopy{
-    public Array<Array<Tile>> data=new Array<>();
-    public Array<KeyCode> supported=new Array<>();
+    public Array<Array<Tile>> data = new Array<>();
+    public Array<KeyCode> supported = new Array<>();
     int x,y;
 
     MapEditor editor;
     MapView view;
 
     public TileCopy(MapView view,MapEditor editor){
-        this.view=view;
-        this.editor=editor;
+        this.view = view;
+        this.editor = editor;
         supported.add(
                 KeyCode.R,
                 KeyCode.X,
@@ -24,7 +24,7 @@ public class TileCopy{
     }
 
     public int getSizeX(){
-        if(getSizeY()==0) return 0;
+        if(getSizeY() == 0) return 0;
 
         return data.get(0).size;
     }
