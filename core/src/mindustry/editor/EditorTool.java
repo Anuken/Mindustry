@@ -84,6 +84,22 @@ public enum EditorTool{
             if(mode==0 && !editor.tileCopy.inSelection(x2,y2)){
                 int Y=0;
                 TileCopy tileCopy=editor.tileCopy;
+                for(ArrayList<Tile> row:tileCopy.data) {
+                    int X = 0;
+                    int y = Y + tileCopy.y;
+                    for (Tile t : row) {
+                        int x = X + tileCopy.x;
+                        Tile wTile = world.tile(x, y);
+                        if (wTile != null) {
+                            wTile.removeNet();
+                            wTile.setFloor(t.floor());
+                            wTile.setOverlay(t.overlay());
+                        }
+                        X++;
+                    }
+                    Y++;
+                }
+                Y=0;
                 for(ArrayList<Tile> row:tileCopy.data){
                     int X=0;
                     int y=Y+tileCopy.y;
@@ -91,12 +107,9 @@ public enum EditorTool{
                         int x=X+tileCopy.x;
                         Tile wTile=world.tile(x,y);
                         if(wTile!=null) {
-                            //removes any intersecting multiblock.
-                            // It would cut from multiblocks and leave some fragments.
-                            wTile.removeNet();
-                            wTile.setFloor(t.floor());
-                            wTile.setOverlay(t.overlay());
-                            wTile.setBlock(t.block());
+                            if(!t.isLinked()) {
+                                editor.placeSafely(x, y, t.block(), t.getTeam(), t.rotation());
+                            }
                         }
                         X++;
                     }
@@ -130,16 +143,17 @@ public enum EditorTool{
                 tileCopy.data.add(new ArrayList<>());
                 for(int x=0;x<=x2-x1;x++){
                     int X=x+x1;
-                    Tile tile=world.ltile(X,Y);
-                    if(tile==null) continue;
+                    Tile t=world.tile(X,Y);
+                    if(t==null) continue;
                     Tile copy=new Tile(X,Y);
-                    copy.setFloor(tile.floor());
-                    copy.setOverlay(tile.overlay());
+                    copy.setFloor(t.floor());
+                    copy.setOverlay(t.overlay());
                     //this is just my solution: ignoring all multiBlocks.
                     // Player can use in game schematics after all.
-                    if(!tile.breakable()){
-                        copy.setBlock(tile.block());
-                    }
+                    copy.setBlock(t.block(), t.getTeam());
+                    copy.rotation(t.rotation());
+
+
                     tileCopy.data.get(y).add(copy);
                 }
             }

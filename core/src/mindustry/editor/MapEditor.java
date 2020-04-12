@@ -207,7 +207,42 @@ public class MapEditor{
             }
         }
     }
+    public void placeSafely(int x, int y,Block drawBlock,Team drawTeam,byte rotation){
+        if(drawBlock.isMultiblock()){
+            x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
+            y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
 
+            int offsetx = -(drawBlock.size - 1) / 2;
+            int offsety = -(drawBlock.size - 1) / 2;
+
+            for(int dx = 0; dx < drawBlock.size; dx++){
+                for(int dy = 0; dy < drawBlock.size; dy++){
+                    int worldx = dx + offsetx + x;
+                    int worldy = dy + offsety + y;
+
+                    if(Structs.inBounds(worldx, worldy, width(), height())){
+                        Tile tile = tile(worldx, worldy);
+
+                        Block block = tile.block();
+
+                        //bail out if there's anything blocking the way
+                        if(block.isMultiblock() || block instanceof BlockPart){
+                            return;
+                        }
+
+                        renderer.updatePoint(worldx, worldy);
+                    }
+                }
+            }
+        }else {
+            if(drawBlock.rotate){
+                tile(x,y).rotation(rotation);
+            }
+
+        }
+        tile(x, y).set(drawBlock, drawTeam);
+
+    }
     public void drawCircle(int x, int y, Cons<Tile> drawer){
         for(int rx = -brushSize; rx <= brushSize; rx++){
             for(int ry = -brushSize; ry <= brushSize; ry++){
