@@ -8,6 +8,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.math.geom.QuadTree.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -34,7 +35,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Tilec.class}, isFinal = false, genio = false, serialize = false)
 @Component
-abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
+abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTreeObject{
     //region vars and initialization
     static final float timeToSleep = 60f * 1;
     static final ObjectSet<Tilec> tmpTiles = new ObjectSet<>();
@@ -994,6 +995,11 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc{
         }
 
         updateFlow = false;
+    }
+
+    @Override
+    public void hitbox(Rect out){
+        out.setCentered(x, y, block.size * tilesize, block.size * tilesize);
     }
 
     //endregion

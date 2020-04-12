@@ -3,6 +3,7 @@ package mindustry.world;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.math.geom.QuadTree.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
@@ -15,7 +16,7 @@ import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
-public class Tile implements Position{
+public class Tile implements Position, QuadTreeObject{
     /** Tile traversal cost. */
     public byte cost = 1;
     /** Tile entity, usually null. */
@@ -377,7 +378,12 @@ public class Tile implements Position{
     }
 
     public Rect getHitbox(Rect rect){
-        return rect.setSize(block().size * tilesize).setCenter(drawx(), drawy());
+        return rect.setCentered(drawx(), drawy(), block.size * tilesize, block.size * tilesize);
+    }
+
+    @Override
+    public void hitbox(Rect rect){
+        getHitbox(rect);
     }
 
     public Tile getNearby(Point2 relative){

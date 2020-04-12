@@ -9,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.ai.BlockIndexer.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -94,9 +95,9 @@ public class CommandCenter extends Block{
         @Override
         public void placed(){
             super.placed();
-            ObjectSet<Tile> set = indexer.getAllied(team, BlockFlag.comandCenter);
+            TileArray set = indexer.getAllied(team, BlockFlag.comandCenter);
 
-            if(set.size > 0){
+            if(set.size() > 0){
                 CommandCenterEntity oe = set.first().ent();
                 command = oe.command;
             }
@@ -106,9 +107,9 @@ public class CommandCenter extends Block{
         public void onRemoved(){
             super.onRemoved();
 
-            ObjectSet<Tile> set = indexer.getAllied(team, BlockFlag.comandCenter);
+            TileArray set = indexer.getAllied(team, BlockFlag.comandCenter);
 
-            if(set.size == 1){
+            if(set.size() == 1){
                 Groups.unit.each(t -> t.team() == team, u -> u.controller().command(UnitCommand.all[0]));
             }
         }

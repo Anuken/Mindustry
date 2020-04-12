@@ -1,5 +1,7 @@
 import arc.*;
 import arc.backend.headless.*;
+import arc.func.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -275,6 +277,72 @@ public class ApplicationTests{
         world.tile(0, 0).setBlock(Blocks.conveyor);
         world.tile(0, 0).rotation(0);
         world.tile(0, 0).entity.acceptStack(Items.copper, 1000, null);
+    }
+
+    @Test
+    void indexingBasic(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("77.msav"));
+
+        //test basic method.
+        Rand r = new Rand(0);
+        Tilec[] res = {null};
+
+        Cons<Tilec> assigner = t -> res[0] = t;
+
+        int iterations = 100;
+
+        r.setSeed(0);
+
+        //warmup.
+        for(int i = 0; i < iterations; i++){
+            int x = r.random(0, world.width()), y = r.random(0, world.height());
+            float range = r.random(tilesize * 30);
+
+            indexer.eachBlock(Team.sharded, x * tilesize, y * tilesize, range, t -> true, assigner);
+        }
+
+        //TODO impl
+        /*
+        r.setSeed(0);
+
+        for(int i = 0; i < iterations; i++){
+            int x = r.random(0, world.width()), y = r.random(0, world.height());
+            float range = r.random(tilesize * 30);
+
+            indexer.eachBlock2(Team.sharded, x * tilesize, y * tilesize, range, t -> true, assigner);
+        }*/
+
+        //benchmark.
+
+        r.setSeed(0);
+
+        Time.mark();
+
+        for(int i = 0; i < iterations; i++){
+            int x = r.random(0, world.width()), y = r.random(0, world.height());
+            float range = r.random(tilesize * 30);
+
+            indexer.eachBlock(Team.sharded, x * tilesize, y * tilesize, range, t -> true, assigner);
+        }
+
+        Log.info("Time for basic indexing: {0}", Time.elapsed());
+
+        r.setSeed(0);
+
+        /*
+        Time.mark();
+
+        for(int i = 0; i < iterations; i++){
+            int x = r.random(0, world.width()), y = r.random(0, world.height());
+            float range = r.random(tilesize * 30);
+
+            indexer.eachBlock2(Team.sharded, x * tilesize, y * tilesize, range, t -> true, assigner);
+        }
+
+        Log.info("Time for quad: {0}", Time.elapsed());
+        */
+
     }
 
     @Test
