@@ -98,7 +98,7 @@ public class MapsDialog extends FloatingDialog{
                         if(conflict != null && !conflict.custom){
                             ui.showInfo(Core.bundle.format("editor.import.exists", name));
                         }else if(conflict != null){
-                            ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
+                            ui.showConfirm("$confirm", Core.bundle.format("editor.overwrite.confirm", map.name()), () -> {
                                 maps.tryCatchMapError(() -> {
                                     maps.removeMap(conflict);
                                     maps.importMap(map.file);
