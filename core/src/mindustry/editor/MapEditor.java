@@ -208,6 +208,7 @@ public class MapEditor{
         }
     }
     public void placeSafely(int x, int y,Block drawBlock,Team drawTeam,byte rotation){
+
         if(drawBlock.isMultiblock()){
             x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
             y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
@@ -227,7 +228,7 @@ public class MapEditor{
 
                         //bail out if there's anything blocking the way
                         if(block.isMultiblock() || block instanceof BlockPart){
-                            return;
+                            tile.link().remove();
                         }
 
                         renderer.updatePoint(worldx, worldy);
@@ -235,12 +236,13 @@ public class MapEditor{
                 }
             }
         }else {
-            if(drawBlock.rotate){
-                tile(x,y).rotation(rotation);
+            Tile tile=tile(x, y);
+            if(tile.isLinked() || tile.block().isMultiblock()){
+                tile.link().remove();
             }
 
         }
-        tile(x, y).set(drawBlock, drawTeam);
+        tile(x, y).set(drawBlock, drawTeam,rotation);
 
     }
     public void drawCircle(int x, int y, Cons<Tile> drawer){

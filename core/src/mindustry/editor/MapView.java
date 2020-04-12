@@ -134,7 +134,7 @@ public class MapView extends Element implements GestureListener{
                 if(drawing && tool.draggable && !(p.x == lastx && p.y == lasty)){
                     ui.editor.resetSaved();
                     Bresenham2.line(lastx, lasty, p.x, p.y, (cx, cy) -> tool.touched(editor, cx, cy));
-                    if(tool==EditorTool.copy && editor.tileCopy.inSelection(lastx,lasty) && tool.mode==0){
+                    if(tool==EditorTool.copy && editor.tileCopy.inSelection(lastx,lasty) && tool.mode!=-1){
                         editor.tileCopy.x+=p.x-lastx;
                         editor.tileCopy.y+=p.y-lasty;
                     }
@@ -275,7 +275,12 @@ public class MapView extends Element implements GestureListener{
         }else if(tool== EditorTool.copy){
             drawRect(editor.tileCopy.x,editor.tileCopy.y,
                     editor.tileCopy.x+editor.tileCopy.getSizeX()-1,
-                    editor.tileCopy.y+editor.tileCopy.getSizeY()-1,scaling,false);
+                    editor.tileCopy.y+editor.tileCopy.getSizeY()-1,
+                    scaling,false);
+        }
+        if(tool== EditorTool.rectangle && drawing){
+            drawRect(startx,starty,lastx,lasty,scaling,tool.mode==-1);
+        }
 
         if((!editor.drawBlock.isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
             if(tool == EditorTool.line  && drawing){
@@ -286,9 +291,7 @@ public class MapView extends Element implements GestureListener{
                 Lines.poly(brushPolygons[index], sx, sy, scaling);
                 Lines.poly(brushPolygons[index], v2.x, v2.y, scaling);
             }
-            if(tool== EditorTool.rectangle && drawing){
-                drawRect(startx,starty,lastx,lasty,scaling,tool.mode==-1);
-            }
+
 
             if((tool.edit || (tool == EditorTool.line && !drawing)) && (!mobile || drawing)){
                 Point2 p = project(mousex, mousey);
@@ -311,10 +314,7 @@ public class MapView extends Element implements GestureListener{
                 v.y + scaling / 2f + offset,
                 scaling * editor.drawBlock.size / 2f);
             }
-
-            }
         }
-
         Draw.color(Pal.accent);
         Lines.stroke(Scl.scl(3f));
         Lines.rect(x, y, width, height);

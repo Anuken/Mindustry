@@ -74,32 +74,33 @@ public enum EditorTool{
             }
         }
     },
-    copy("paste"){
+    copy("all","paste"){
         {
             draggable=true;
         }
         @Override
         public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2){
-
-            if(mode==0 && !editor.tileCopy.inSelection(x2,y2)){
+            TileCopy tileCopy=editor.tileCopy;
+            if(mode!=-1 && !editor.tileCopy.inSelection(x2,y2)){
                 int Y=0;
-                TileCopy tileCopy=editor.tileCopy;
-                for(ArrayList<Tile> row:tileCopy.data) {
-                    int X = 0;
-                    int y = Y + tileCopy.y;
-                    for (Tile t : row) {
-                        int x = X + tileCopy.x;
-                        Tile wTile = world.tile(x, y);
-                        if (wTile != null) {
-                            wTile.removeNet();
-                            wTile.setFloor(t.floor());
-                            wTile.setOverlay(t.overlay());
+                if(mode==0){
+                    for(ArrayList<Tile> row:tileCopy.data) {
+                        int X = 0;
+                        int y = Y + tileCopy.y;
+                        for (Tile t : row) {
+                            int x = X + tileCopy.x;
+                            Tile wTile = world.tile(x, y);
+                            if (wTile != null) {
+                                if(mode==1){
+                                    wTile.remove();
+                                }
+                            }
+                            X++;
                         }
-                        X++;
+                        Y++;
                     }
-                    Y++;
+                    Y=0;
                 }
-                Y=0;
                 for(ArrayList<Tile> row:tileCopy.data){
                     int X=0;
                     int y=Y+tileCopy.y;
@@ -107,7 +108,9 @@ public enum EditorTool{
                         int x=X+tileCopy.x;
                         Tile wTile=world.tile(x,y);
                         if(wTile!=null) {
-                            if(!t.isLinked()) {
+                            wTile.setFloor(t.floor());
+                            wTile.setOverlay(t.overlay());
+                            if(!t.isLinked() && t.block()!=Blocks.air) {
                                 editor.placeSafely(x, y, t.block(), t.getTeam(), t.rotation());
                             }
                         }
@@ -116,7 +119,7 @@ public enum EditorTool{
                     Y++;
                 }
             }
-            if(mode==0) return;
+            if(mode!=-1) return;
 
             if (x1>x2){
                 int help=x1;
@@ -133,7 +136,7 @@ public enum EditorTool{
             y1= Mathf.clamp(y1,0,editor.height());
             x2= Mathf.clamp(x2,0,editor.width()-1);
             y2= Mathf.clamp(y2,0,editor.height()-1);
-            TileCopy tileCopy=editor.tileCopy;
+
             tileCopy.x=x1;
             tileCopy.y=y1;
             tileCopy.data.clear();
@@ -145,14 +148,12 @@ public enum EditorTool{
                     int X=x+x1;
                     Tile t=world.tile(X,Y);
                     if(t==null) continue;
+
                     Tile copy=new Tile(X,Y);
                     copy.setFloor(t.floor());
                     copy.setOverlay(t.overlay());
-                    //this is just my solution: ignoring all multiBlocks.
-                    // Player can use in game schematics after all.
                     copy.setBlock(t.block(), t.getTeam());
                     copy.rotation(t.rotation());
-
 
                     tileCopy.data.get(y).add(copy);
                 }
