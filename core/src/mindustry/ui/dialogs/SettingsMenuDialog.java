@@ -325,7 +325,10 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(!mobile){
             graphics.checkPref("blockselectkeys", true);
         }
-        graphics.checkPref("indicators", true);
+        graphics.checkPref("allyindicators", true);
+        graphics.checkPref("enemyindicators", true);
+        graphics.checkPref("mechindicators", true);
+        graphics.checkPref("showmechindicators", true);
         graphics.checkPref("animatedwater", !mobile);
         if(Shaders.shield != null){
             graphics.checkPref("animatedshields", !mobile);

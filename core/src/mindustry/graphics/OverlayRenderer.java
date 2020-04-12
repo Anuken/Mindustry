@@ -35,7 +35,7 @@ public class OverlayRenderer{
 
     public void drawTop(){
 
-        if(Core.settings.getBool("indicators")){
+        if(Core.settings.getBool("allyindicators")){
             for(Player player : playerGroup.all()){
                 if(Vars.player != player && Vars.player.getTeam() == player.getTeam()){
                     if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
@@ -49,7 +49,9 @@ public class OverlayRenderer{
                     }
                 }
             }
+		}
 
+        if(Core.settings.getBool("enemyindicators")){
             Units.all(unit -> {
                 if(unit != player && unit.getTeam() != player.getTeam() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f).setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x, unit.y)){
                     Tmp.v1.set(unit.x, unit.y).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
@@ -60,7 +62,8 @@ public class OverlayRenderer{
                 }
             });
 
-            if(ui.hudfrag.blockfrag.currentCategory == Category.upgrade){
+        if(Core.settings.getBool("mechindicators")){
+            if(Core.settings.getBool("showmechindicators") || ui.hudfrag.blockfrag.currentCategory == Category.upgrade){
                 for(Tile mechpad : indexer.getAllied(player.getTeam(), BlockFlag.mechPad)){
                     if(!(mechpad.block() instanceof MechPad)) continue;
                     if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
