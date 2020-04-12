@@ -76,6 +76,7 @@ public class MapView extends Element implements GestureListener{
                     return true;
                 }
 
+
                 if(button == KeyCode.MOUSE_MIDDLE){
                     lastTool = tool;
                     tool = EditorTool.zoom;
@@ -134,9 +135,9 @@ public class MapView extends Element implements GestureListener{
                 if(drawing && tool.draggable && !(p.x == lastx && p.y == lasty)){
                     ui.editor.resetSaved();
                     Bresenham2.line(lastx, lasty, p.x, p.y, (cx, cy) -> tool.touched(editor, cx, cy));
-                    if(tool==EditorTool.copy && editor.tileCopy.inSelection(lastx,lasty) && tool.mode!=-1){
-                        editor.tileCopy.x+=p.x-lastx;
-                        editor.tileCopy.y+=p.y-lasty;
+                    if(tool == EditorTool.copy && editor.tileCopy.inSelection(lastx,lasty) && tool.mode != -1){
+                        editor.tileCopy.x += p.x - lastx;
+                        editor.tileCopy.y += p.y - lasty;
                     }
                 }
 
@@ -171,6 +172,7 @@ public class MapView extends Element implements GestureListener{
     public void setGrid(boolean grid){
         this.grid = grid;
     }
+
 
     @Override
     public void act(float delta){
@@ -270,16 +272,16 @@ public class MapView extends Element implements GestureListener{
         Draw.color(Pal.accent);
         Lines.stroke(Scl.scl(2f));
 
-        if(tool== EditorTool.copy && drawing && tool.mode==-1){
+        if(tool == EditorTool.copy && drawing && tool.mode == -1){
             drawRect(startx,starty,lastx,lasty,scaling,false);
-        }else if(tool== EditorTool.copy){
-            drawRect(editor.tileCopy.x,editor.tileCopy.y,
-                    editor.tileCopy.x+editor.tileCopy.getSizeX()-1,
-                    editor.tileCopy.y+editor.tileCopy.getSizeY()-1,
-                    scaling,false);
+        }else if(tool == EditorTool.copy){
+            drawRect(editor.tileCopy.x, editor.tileCopy.y,
+                    editor.tileCopy.x+editor.tileCopy.getSizeX() - 1,
+                    editor.tileCopy.y+editor.tileCopy.getSizeY() - 1,
+                    scaling, false);
         }
-        if(tool== EditorTool.rectangle && drawing){
-            drawRect(startx,starty,lastx,lasty,scaling,tool.mode==-1);
+        if(tool == EditorTool.rectangle && drawing){
+            drawRect(startx, starty, lastx, lasty, scaling, tool.mode == -1);
         }
 
         if((!editor.drawBlock.isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
@@ -323,22 +325,22 @@ public class MapView extends Element implements GestureListener{
         ScissorStack.popScissors();
     }
 
-    private void drawRect(int sx,int sy,int ex,int ey,float scaling,boolean inner){
-        if(sx>ex){
-            int temp=sx;
-            sx=ex;
-            ex=temp;
+    private void drawRect(int sx, int sy, int ex, int ey, float scaling, boolean inner){
+        if(sx > ex){
+            int temp = sx;
+            sx = ex;
+            ex = temp;
         }
-        if(sy>ey){
-            int temp=sy;
-            sy=ey;
-            ey=temp;
+        if(sy > ey){
+            int temp = sy;
+            sy = ey;
+            ey = temp;
         }
         Vec2 v1 = unproject(sx, sy).add(x, y);
-        Lines.rect(v1.x,v1.y,(ex-sx+1)*scaling,(ey-sy+1)*scaling);
+        Lines.rect(v1.x,v1.y,(ex - sx + 1)*scaling,(ey - sy + 1)*scaling);
         if(inner){
-            v1 = unproject(sx+1, sy+1).add(x, y);
-            Lines.rect(v1.x,v1.y,(ex-sx-1)*scaling,(ey-sy-1)*scaling);
+            v1 = unproject(sx + 1, sy + 1).add(x, y);
+            Lines.rect(v1.x,v1.y,(ex - sx - 1)*scaling,(ey - sy - 1)*scaling);
         }
     }
 

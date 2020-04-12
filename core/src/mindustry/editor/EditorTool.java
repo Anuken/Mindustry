@@ -17,31 +17,30 @@ import java.util.ArrayList;
 
 import static mindustry.Vars.world;
 
-public enum EditorTool{
+public enum EditorTool {
     zoom,
-    pick{
-        public void touched(MapEditor editor, int x, int y){
-            if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
+    pick {
+        public void touched(MapEditor editor, int x, int y) {
+            if (!Structs.inBounds(x, y, editor.width(), editor.height())) return;
 
             Tile tile = editor.tile(x, y).link();
             editor.drawBlock = tile.block() == Blocks.air ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
         }
     },
-    line("replace", "orthogonal"){
-
+    line("replace", "orthogonal") {
         @Override
-        public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2){
+        public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2) {
             //straight
-            if(mode == 1){
-                if(Math.abs(x2 - x1) > Math.abs(y2 - y1)){
+            if(mode == 1) {
+                if(Math.abs(x2 - x1) > Math.abs(y2 - y1)) {
                     y2 = y1;
-                }else{
+                }else {
                     x2 = x1;
                 }
             }
 
             Bresenham2.line(x1, y1, x2, y2, (x, y) -> {
-                if(mode == 0){
+                if(mode == 0) {
                     //replace
                     editor.drawBlocksReplace(x, y);
                 }else{
@@ -51,47 +50,47 @@ public enum EditorTool{
             });
         }
     },
-    rectangle("fill"){
-
+    rectangle("fill") {
         @Override
-        public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2){
-            if (x1>x2){
-                int help=x1;
-                x1=x2;
-                x2=help;
+        public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2) {
+            if(x1 > x2) {
+                int help = x1;
+                x1 = x2;
+                x2 = help;
             }
-            if (y1>y2){
-                int help=y1;
-                y1=y2;
-                y2=help;
+            if(y1 > y2) {
+                int help = y1;
+                y1 = y2;
+                y2 = help;
             }
-            for(int y=y1;y<=y2;y++){
-                for(int x=x1;x<=x2;x++){
-                    if(mode==-1 && (x!=x1 && x!=x2 && y!=y1 && y!=y2)) continue;
-                    editor.drawBlocks(x,y);
+            for(int y = y1; y <= y2; y++) {
+                for(int x = x1; x <= x2; x++) {
+                    if(mode == -1 && (x != x1 && x != x2 && y != y1 && y != y2)) continue;
+                    editor.drawBlocks(x, y);
 
                 }
             }
         }
     },
-    copy("all","paste"){
+    copy("all", "paste") {
         {
-            draggable=true;
+            draggable = true;
         }
+
         @Override
-        public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2){
-            TileCopy tileCopy=editor.tileCopy;
-            if(mode!=-1 && !editor.tileCopy.inSelection(x2,y2)){
-                int Y=0;
-                if(mode==0){
-                    for(ArrayList<Tile> row:tileCopy.data) {
+        public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2) {
+            TileCopy tileCopy = editor.tileCopy;
+            if(mode != -1 && !editor.tileCopy.inSelection(x2, y2)) {
+                int Y = 0;
+                if(mode == 0) {
+                    for(Array<Tile> row : tileCopy.data) {
                         int X = 0;
                         int y = Y + tileCopy.y;
-                        for (Tile t : row) {
+                        for(Tile t : row) {
                             int x = X + tileCopy.x;
                             Tile wTile = world.tile(x, y);
                             if (wTile != null) {
-                                if(mode==1){
+                                if (mode == 1) {
                                     wTile.remove();
                                 }
                             }
@@ -99,18 +98,18 @@ public enum EditorTool{
                         }
                         Y++;
                     }
-                    Y=0;
+                    Y = 0;
                 }
-                for(ArrayList<Tile> row:tileCopy.data){
-                    int X=0;
-                    int y=Y+tileCopy.y;
-                    for(Tile t:row){
-                        int x=X+tileCopy.x;
-                        Tile wTile=world.tile(x,y);
-                        if(wTile!=null) {
+                for(Array<Tile> row : tileCopy.data) {
+                    int X = 0;
+                    int y = Y + tileCopy.y;
+                    for(Tile t : row) {
+                        int x = X + tileCopy.x;
+                        Tile wTile = world.tile(x, y);
+                        if(wTile != null) {
                             wTile.setFloor(t.floor());
                             wTile.setOverlay(t.overlay());
-                            if(!t.isLinked() && t.block()!=Blocks.air) {
+                            if(!t.isLinked() && t.block() != Blocks.air) {
                                 editor.placeSafely(x, y, t.block(), t.getTeam(), t.rotation());
                             }
                         }
@@ -119,157 +118,160 @@ public enum EditorTool{
                     Y++;
                 }
             }
-            if(mode!=-1) return;
+            if(mode != -1) return;
 
-            if (x1>x2){
-                int help=x1;
-                x1=x2;
-                x2=help;
+            if(x1 > x2) {
+                int help = x1;
+                x1 = x2;
+                x2 = help;
             }
-            if (y1>y2){
-                int help=y1;
-                y1=y2;
-                y2=help;
+            if(y1 > y2) {
+                int help = y1;
+                y1 = y2;
+                y2 = help;
             }
             //so you cannot select nothing
-            x1= Mathf.clamp(x1,0,editor.width());
-            y1= Mathf.clamp(y1,0,editor.height());
-            x2= Mathf.clamp(x2,0,editor.width()-1);
-            y2= Mathf.clamp(y2,0,editor.height()-1);
+            x1 = Mathf.clamp(x1, 0, editor.width());
+            y1 = Mathf.clamp(y1, 0, editor.height());
+            x2 = Mathf.clamp(x2, 0, editor.width() - 1);
+            y2 = Mathf.clamp(y2, 0, editor.height() - 1);
 
-            tileCopy.x=x1;
-            tileCopy.y=y1;
+            tileCopy.x = x1;
+            tileCopy.y = y1;
             tileCopy.data.clear();
 
-            for(int y=0;y<=y2-y1;y++){
-                int Y=y+y1;
-                tileCopy.data.add(new ArrayList<>());
-                for(int x=0;x<=x2-x1;x++){
-                    int X=x+x1;
-                    Tile t=world.tile(X,Y);
-                    if(t==null) continue;
+            for(int y = 0; y <= y2 - y1; y++) {
+                int Y = y + y1;
+                tileCopy.data.add(new Array<>());
+                for(int x = 0; x <= x2 - x1; x++) {
+                    int X = x + x1;
+                    Tile t = world.tile(X, Y);
+                    if (t == null) continue;
 
-                    Tile copy=new Tile(X,Y);
+                    Tile copy = new Tile(X, Y);
                     copy.setFloor(t.floor());
                     copy.setOverlay(t.overlay());
-                    copy.setBlock(t.block(), t.getTeam());
-                    copy.rotation(t.rotation());
-
+                    if(t.isLinked()){
+                        copy.setBlock(Blocks.air);
+                    }else {
+                        copy.setBlock(t.block(), t.getTeam());
+                        copy.rotation(t.rotation());
+                    }
                     tileCopy.data.get(y).add(copy);
                 }
             }
         }
     },
-    pencil("replace", "square", "drawteams"){
+    pencil("replace", "square", "drawteams") {
         {
             edit = true;
             draggable = true;
         }
 
         @Override
-        public void touched(MapEditor editor, int x, int y){
-            if(mode == -1){
+        public void touched(MapEditor editor, int x, int y) {
+            if(mode == -1) {
                 //normal mode
                 editor.drawBlocks(x, y);
-            }else if(mode == 0){
+            }else if(mode == 0) {
                 //replace mode
                 editor.drawBlocksReplace(x, y);
-            }else if(mode == 1){
+            }else if(mode == 1) {
                 //square mode
                 editor.drawBlocks(x, y, true, tile -> true);
-            }else if(mode == 2){
+            }else if(mode == 2) {
                 //draw teams
                 editor.drawCircle(x, y, tile -> tile.link().setTeam(editor.drawTeam));
             }
 
         }
     },
-    eraser("eraseores"){
+    eraser("eraseores") {
         {
             edit = true;
             draggable = true;
         }
 
         @Override
-        public void touched(MapEditor editor, int x, int y){
+        public void touched(MapEditor editor, int x, int y) {
             editor.drawCircle(x, y, tile -> {
-                if(mode == -1){
+                if(mode == -1) {
                     //erase block
                     tile.remove();
-                }else if(mode == 0){
+                }else if(mode == 0) {
                     //erase ore
                     tile.clearOverlay();
                 }
             });
         }
     },
-    fill("replaceall", "fillteams"){
+    fill("replaceall", "fillteams") {
         {
             edit = true;
         }
 
-        IntArray stack = new IntArray();
+        final IntArray stack = new IntArray();
 
         @Override
-        public void touched(MapEditor editor, int x, int y){
+        public void touched(MapEditor editor, int x, int y) {
             if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
             Tile tile = editor.tile(x, y);
 
-            if(editor.drawBlock.isMultiblock()){
+            if(editor.drawBlock.isMultiblock()) {
                 //don't fill multiblocks, thanks
                 pencil.touched(editor, x, y);
                 return;
             }
 
             //mode 0 or 1, fill everything with the floor/tile or replace it
-            if(mode == 0 || mode == -1){
+            if(mode == 0 || mode == -1) {
                 //can't fill parts or multiblocks
-                if(tile.block() instanceof BlockPart || tile.block().isMultiblock()){
+                if(tile.block() instanceof BlockPart || tile.block().isMultiblock()) {
                     return;
                 }
 
                 Boolf<Tile> tester;
                 Cons<Tile> setter;
 
-                if(editor.drawBlock.isOverlay()){
+                if(editor.drawBlock.isOverlay()) {
                     Block dest = tile.overlay();
-                    if(dest == editor.drawBlock) return;
+                    if (dest == editor.drawBlock) return;
                     tester = t -> t.overlay() == dest && !t.floor().isLiquid;
                     setter = t -> t.setOverlay(editor.drawBlock);
-                }else if(editor.drawBlock.isFloor()){
+                }else if(editor.drawBlock.isFloor()) {
                     Block dest = tile.floor();
-                    if(dest == editor.drawBlock) return;
+                    if (dest == editor.drawBlock) return;
                     tester = t -> t.floor() == dest;
                     setter = t -> t.setFloorUnder(editor.drawBlock.asFloor());
                 }else{
                     Block dest = tile.block();
-                    if(dest == editor.drawBlock) return;
+                    if (dest == editor.drawBlock) return;
                     tester = t -> t.block() == dest;
                     setter = t -> t.setBlock(editor.drawBlock, editor.drawTeam);
                 }
 
                 //replace only when the mode is 0 using the specified functions
                 fill(editor, x, y, mode == 0, tester, setter);
-            }else if(mode == 1){ //mode 1 is team fill
+            }else if(mode == 1) { //mode 1 is team fill
 
                 //only fill synthetic blocks, it's meaningless otherwise
-                if(tile.link().synthetic()){
+                if(tile.link().synthetic()) {
                     Team dest = tile.getTeam();
                     if(dest == editor.drawTeam) return;
-                    fill(editor, x, y, false, t -> t.getTeamID() == (int)dest.id && t.link().synthetic(), t -> t.setTeam(editor.drawTeam));
+                    fill(editor, x, y, false, t -> t.getTeamID() == (int) dest.id && t.link().synthetic(), t -> t.setTeam(editor.drawTeam));
                 }
             }
         }
 
-        void fill(MapEditor editor, int x, int y, boolean replace, Boolf<Tile> tester, Cons<Tile> filler){
+        void fill(MapEditor editor, int x, int y, boolean replace, Boolf<Tile> tester, Cons<Tile> filler) {
             int width = editor.width(), height = editor.height();
 
-            if(replace){
+            if(replace) {
                 //just do it on everything
-                for(int cx = 0; cx < width; cx++){
-                    for(int cy = 0; cy < height; cy++){
+                for(int cx = 0; cx < width; cx++) {
+                    for(int cy = 0; cy < height; cy++) {
                         Tile tile = editor.tile(cx, cy);
-                        if(tester.get(tile)){
+                        if(tester.get(tile)) {
                             filler.get(tile);
                         }
                     }
@@ -282,7 +284,7 @@ public enum EditorTool{
                 stack.clear();
                 stack.add(Pos.get(x, y));
 
-                while(stack.size > 0){
+                while(stack.size > 0) {
                     int popped = stack.pop();
                     x = Pos.x(popped);
                     y = Pos.y(popped);
@@ -291,20 +293,20 @@ public enum EditorTool{
                     while(x1 >= 0 && tester.get(editor.tile(x1, y))) x1--;
                     x1++;
                     boolean spanAbove = false, spanBelow = false;
-                    while(x1 < width && tester.get(editor.tile(x1, y))){
+                    while(x1 < width && tester.get(editor.tile(x1, y))) {
                         filler.get(editor.tile(x1, y));
 
-                        if(!spanAbove && y > 0 && tester.get(editor.tile(x1, y - 1))){
+                        if(!spanAbove && y > 0 && tester.get(editor.tile(x1, y - 1))) {
                             stack.add(Pos.get(x1, y - 1));
                             spanAbove = true;
-                        }else if(spanAbove && !tester.get(editor.tile(x1, y - 1))){
+                        }else if(spanAbove && !tester.get(editor.tile(x1, y - 1))) {
                             spanAbove = false;
                         }
 
-                        if(!spanBelow && y < height - 1 && tester.get(editor.tile(x1, y + 1))){
+                        if(!spanBelow && y < height - 1 && tester.get(editor.tile(x1, y + 1))) {
                             stack.add(Pos.get(x1, y + 1));
                             spanBelow = true;
-                        }else if(spanBelow && y < height - 1 && !tester.get(editor.tile(x1, y + 1))){
+                        }else if(spanBelow && y < height - 1 && !tester.get(editor.tile(x1, y + 1))) {
                             spanBelow = false;
                         }
                         x1++;
@@ -313,7 +315,7 @@ public enum EditorTool{
             }
         }
     },
-    spray("replace"){
+    spray("replace") {
         final double chance = 0.012;
 
         {
@@ -322,16 +324,16 @@ public enum EditorTool{
         }
 
         @Override
-        public void touched(MapEditor editor, int x, int y){
+        public void touched(MapEditor editor, int x, int y) {
 
             //floor spray
-            if(editor.drawBlock.isFloor()){
+            if(editor.drawBlock.isFloor()) {
                 editor.drawCircle(x, y, tile -> {
-                    if(Mathf.chance(chance)){
+                    if (Mathf.chance(chance)) {
                         tile.setFloor(editor.drawBlock.asFloor());
                     }
                 });
-            }else if(mode == 0){ //replace-only mode, doesn't affect air
+            }else if(mode == 0) { //replace-only mode, doesn't affect air
                 editor.drawBlocks(x, y, tile -> Mathf.chance(chance) && tile.block() != Blocks.air);
             }else{
                 editor.drawBlocks(x, y, tile -> Mathf.chance(chance));
@@ -339,24 +341,34 @@ public enum EditorTool{
         }
     };
 
-    /** All the internal alternate placement modes of this tool. */
+    /**
+     * All the internal alternate placement modes of this tool.
+     */
     public final String[] altModes;
-    /** The current alternate placement mode. -1 is the standard mode, no changes.*/
+    /**
+     * The current alternate placement mode. -1 is the standard mode, no changes.
+     */
     public int mode = -1;
-    /** Whether this tool causes canvas changes when touched.*/
+    /**
+     * Whether this tool causes canvas changes when touched.
+     */
     public boolean edit;
-    /** Whether this tool should be dragged across the canvas when the mouse moves.*/
+    /**
+     * Whether this tool should be dragged across the canvas when the mouse moves.
+     */
     public boolean draggable;
 
-    EditorTool(){
+    EditorTool() {
         this(new String[]{});
     }
 
-    EditorTool(String... altModes){
+    EditorTool(String... altModes) {
         this.altModes = altModes;
     }
 
-    public void touched(MapEditor editor, int x, int y){}
+    public void touched(MapEditor editor, int x, int y) {
+    }
 
-    public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2){}
+    public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2) {
+    }
 }
