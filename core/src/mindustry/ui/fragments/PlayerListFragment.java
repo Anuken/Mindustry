@@ -113,9 +113,9 @@ public class PlayerListFragment extends Fragment{
                     t.defaults().size(bs);
 
                     t.addImageButton(Icon.hammer, Styles.clearPartiali,
-                            () -> ui.showConfirm("$confirm", "$confirmban", () -> Call.onAdminRequest(user, AdminAction.ban)));
+                            () -> ui.showConfirm("$confirm", Core.bundle.format("confirmban",  user.name), () -> Call.onAdminRequest(user, AdminAction.ban)));
                     t.addImageButton(Icon.cancel, Styles.clearPartiali,
-                            () -> ui.showConfirm("$confirm", "$confirmkick", () -> Call.onAdminRequest(user, AdminAction.kick)));
+                            () -> ui.showConfirm("$confirm", Core.bundle.format("confirmkick",  user.name), () -> Call.onAdminRequest(user, AdminAction.kick)));
 
                     t.row();
 
@@ -125,9 +125,9 @@ public class PlayerListFragment extends Fragment{
                         String id = user.uuid;
 
                         if(netServer.admins.isAdmin(id, connection.address)){
-                            ui.showConfirm("$confirm", "$confirmunadmin", () -> netServer.admins.unAdminPlayer(id));
+                            ui.showConfirm("$confirm", Core.bundle.format("confirmunadmin",  user.name), () -> netServer.admins.unAdminPlayer(id));
                         }else{
-                            ui.showConfirm("$confirm", "$confirmadmin", () -> netServer.admins.adminPlayer(id, user.usid));
+                            ui.showConfirm("$confirm", Core.bundle.format("confirmadmin",  user.name), () -> netServer.admins.adminPlayer(id, user.usid));
                         }
                     })
                             .update(b -> b.setChecked(user.isAdmin))
@@ -142,7 +142,7 @@ public class PlayerListFragment extends Fragment{
                 button.add().growY();
 
                 button.addImageButton(Icon.hammer, Styles.clearPartiali,
-                        () -> ui.showConfirm("$confirm", "$confirmvotekick", () -> Call.sendChatMessage("/votekick " + user.name))).size(h);
+                        () -> ui.showConfirm("$confirm", Core.bundle.format("confirmvotekick",  user.name), () -> Call.sendChatMessage("/votekick " + user.name))).size(h);
             }
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
