@@ -919,6 +919,12 @@
       "css": "zoom",
       "code": 59415,
       "src": "fontawesome"
+    },
+    {
+      "uid": "d6fcb9886485b0bdb41b94521e7a3311",
+      "css": "ticket",
+      "code": 59420,
+      "src": "fontawesome"
     }
   ]
 }

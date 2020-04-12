@@ -141,7 +141,7 @@ public class PlayerListFragment extends Fragment{
             }else if(!user.isLocal && !user.isAdmin && net.client() && playerGroup.size() >= 3 && player.getTeam() == user.getTeam()){ //votekick
                 button.add().growY();
 
-                button.addImageButton(Icon.hammer, Styles.clearPartiali,
+                button.addImageButton(Icon.ticket, Styles.clearPartiali,
                         () -> ui.showConfirm("$confirm", "$confirmvotekick", () -> Call.sendChatMessage("/votekick " + user.name))).size(h);
             }
 
