@@ -90,9 +90,8 @@ public enum EditorTool {
                             int x = X + tileCopy.x;
                             Tile wTile = world.tile(x, y);
                             if (wTile != null) {
-                                if (mode == 1) {
-                                    wTile.remove();
-                                }
+                                wTile.remove();
+
                             }
                             X++;
                         }
