@@ -1,6 +1,8 @@
 package mindustry.editor;
 
 import arc.input.KeyCode;
+import mindustry.content.Blocks;
+import mindustry.world.Block;
 import mindustry.world.Tile;
 
 import arc.struct.Array;
@@ -35,7 +37,105 @@ public class TileCopy{
     public boolean inSelection(int sx,int sy){
         return sx >= x && sx <= x + getSizeX() && sy >= y && sy <= y + getSizeY();
     }
+    private void swapTerrain(Tile t, Tile other) {
+        Block temp = other.floor();
+        other.setFloor(t.floor());
+        t.setFloor(temp.asFloor());
+        temp = other.overlay();
+        other.setOverlay(t.overlay());
+        t.setOverlay(temp);
+    }
 
+    public void flipVertical() {
+        for(int y = 0; y < getSizeY() / 2; y++){
+            for(int x = 0; x < getSizeX(); x++){
+                Tile temp = data.get(y).get(x);
+                int opposite = getSizeY()-1-y;
+                data.get(y).set(x, data.get(opposite).get(x));
+                data.get(opposite).set(x, temp);
+
+            }
+        }
+        for(int y = 0; y < getSizeY(); y++){
+            for(int x = 0; x < getSizeX(); x++){
+                Tile t = data.get(y).get(x);
+                if(t.block().size % 2 == 0){
+                    if(y == 0) {
+                        t.setBlock(Blocks.air);
+                        continue;
+                    }
+                    Tile other = data.get(y - 1).get(x);
+                    //it has to be done this wey,just swapping blocks is unstable
+                    swapTerrain(t, other);
+
+                    data.get(y - 1).set(x, t);
+                    data.get(y).set(x, other);
+
+                }
+            }
+        }
+        rotateAllTiles(2,false,false);
+    }
+
+
+
+    public void flipHorizontal() {
+        for(int y = 0; y < getSizeY(); y++){
+            for(int x = 0; x < getSizeX() / 2; x++){
+                int opposite = getSizeX()-1-x;
+                Tile temp = data.get(y).get(x);
+                data.get(y).set(x,data.get(y).get(opposite));
+                data.get(y).set(opposite,temp);
+            }
+        }
+        for(int y = 0; y < getSizeY(); y++){
+            for(int x = 0; x < getSizeX(); x++){
+                Tile t = data.get(y).get(x);
+                if(t.block().size % 2 == 0){
+                    if(x == 0) {
+                        t.setBlock(Blocks.air);
+                        continue;
+                    }
+                    Tile other = data.get(y).get(x - 1);
+                    swapTerrain(t, other);
+                    data.get(y).set(x - 1,t);
+                    data.get(y).set(x,other);
+                }
+            }
+        }
+        rotateAllTiles(2,true,false);
+    }
+
+    private void flipDiagonal(){
+        Array<Array<Tile>> newData = new Array<>();
+        for(int x = 0 ;x < getSizeX();x++) {
+            newData.add(new Array<>());
+            for (int y = 0; y < getSizeY(); y++) {
+                newData.get(x).add(data.get(y).get(x));
+            }
+        }
+        data = newData;
+
+    }
+
+    private void rotateAllTiles(int add,boolean h,boolean d) {
+        for(int y = 0; y < getSizeY(); y++){
+            for(int x = 0; x < getSizeX(); x++){
+                Tile tile = data.get(y).get(x);
+                if(d || (h && tile.rotation() % 2 == 0) || (!h && !(tile.rotation() % 2 == 0))) {
+                    tile.rotation(tile.rotation() + add);
+                }
+
+            }
+        }
+    }
+
+    public void rotate() {
+        flipHorizontal();
+        flipDiagonal();
+        rotateAllTiles(2, false, false);
+        rotateAllTiles(1, false, true);
+    }
 
 
 

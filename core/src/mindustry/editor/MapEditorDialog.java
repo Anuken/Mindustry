@@ -629,6 +629,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
             editor.rotation = Mathf.mod(editor.rotation - 1, 4);
         }
 
+        if(view.getTool() == EditorTool.copy && view.getTool().mode != -1){
+            if(Core.input.keyTap(KeyCode.X)){
+                editor.tileCopy.flipVertical();
+            }else if(Core.input.keyTap(KeyCode.Z)){
+                editor.tileCopy.flipHorizontal();
+            }else if(Core.input.keyTap(KeyCode.R)){
+                editor.tileCopy.rotate();
+            }
+        }
 
         //ctrl keys (undo, redo, save)
         if(Core.input.ctrl()){
