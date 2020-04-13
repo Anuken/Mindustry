@@ -276,6 +276,7 @@ public class TechTree implements ContentList{
                         });
                     });
 
+                    /*
                     node(draugFactory, () -> {
                         node(spiritFactory, () -> {
                             node(phantomFactory);

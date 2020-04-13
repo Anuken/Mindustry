@@ -573,7 +573,7 @@ public class Tile implements Position, QuadTreeObject{
 
     @Override
     public String toString(){
-        return floor.name + ":" + block.name + ":" + overlay + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) + ":" + team();
+        return floor.name + ":" + block.name + ":" + overlay + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass().getSimpleName())) + ":" + team();
     }
 
     //remote utility methods

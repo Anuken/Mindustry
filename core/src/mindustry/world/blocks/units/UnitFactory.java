@@ -3,6 +3,7 @@ package mindustry.world.blocks.units;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -15,17 +16,18 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.net;
+import static mindustry.Vars.*;
 
 public class UnitFactory extends Block{
-    public UnitType unitType;
-    public float produceTime = 1000f;
     public float launchVelocity = 0f;
     public TextureRegion topRegion;
     public int[] capacities;
+
+    public UnitPlan[] plans = new UnitPlan[0];
 
     public UnitFactory(String name){
         super(name);
@@ -34,27 +36,15 @@ public class UnitFactory extends Block{
         hasItems = true;
         solid = false;
         flags = EnumSet.of(BlockFlag.producer);
+        configurable = true;
+
+        config(Integer.class, (tile, i) -> ((UnitFactoryEntity)tile).currentPlan = i < 0 || i >= plans.length ? -1 : i);
     }
 
     @Remote(called = Loc.server)
     public static void onUnitFactorySpawn(Tile tile){
-        if(!(tile.entity instanceof UnitFactoryEntity) || !(tile.block() instanceof UnitFactory)) return;
-
-        UnitFactory factory = (UnitFactory)tile.block();
-        UnitFactoryEntity entity = tile.ent();
-
-        entity.buildTime = 0f;
-
-        Effects.shake(2f, 3f, entity);
-        Fx.producesmoke.at(entity);
-
-        if(!net.client()){
-            Unitc unit = factory.unitType.create(entity.team());
-            unit.set(entity.x() + Mathf.range(4), entity.y() + Mathf.range(4));
-            unit.add();
-            unit.vel().y = factory.launchVelocity;
-            Events.fire(new UnitCreateEvent(unit));
-        }
+        if(!(tile.entity instanceof UnitFactoryEntity)) return;
+        tile.<UnitFactoryEntity>ent().spawned();
     }
 
     @Override
@@ -80,7 +70,7 @@ public class UnitFactory extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, () -> ((UnitFactoryEntity)entity).buildTime / produceTime));
+        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, ((UnitFactoryEntity)entity)::fraction));
     }
 
     @Override
@@ -93,7 +83,8 @@ public class UnitFactory extends Block{
         super.setStats();
 
         stats.remove(BlockStat.itemCapacity);
-        stats.add(BlockStat.productionTime, produceTime / 60f, StatUnit.seconds);
+        //TODO
+        //stats.add(BlockStat.productionTime, produceTime / 60f, StatUnit.seconds);
     }
 
     @Override
@@ -101,59 +92,113 @@ public class UnitFactory extends Block{
         return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top")};
     }
 
+    public static class UnitPlan{
+        public UnitType unit;
+        public ItemStack[] requirements;
+        public float time;
+
+        public UnitPlan(UnitType unit, float time, ItemStack[] requirements){
+            this.unit = unit;
+            this.time = time;
+            this.requirements = requirements;
+        }
+
+        UnitPlan(){}
+    }
+
     public class UnitFactoryEntity extends TileEntity{
-        float buildTime;
-        float time;
-        float speedScl;
-        //int spawned;
+        public int currentPlan = -1;
+
+        public float progress, time, speedScl;
+
+        public float fraction(){
+            return currentPlan == -1 ? 0 : progress / plans[currentPlan].time;
+        }
+
+        public void spawned(){
+            progress = 0f;
+
+            Effects.shake(2f, 3f, this);
+            Fx.producesmoke.at(this);
+
+            if(!net.client() && currentPlan != -1){
+                UnitPlan plan = plans[currentPlan];
+                Unitc unit = plan.unit.create(team);
+                unit.set(x + Mathf.range(4), y + Mathf.range(4));
+                unit.add();
+                unit.vel().y = launchVelocity;
+                Events.fire(new UnitCreateEvent(unit));
+            }
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            Array<UnitType> units = Array.with(plans).map(u -> u.unit);
+
+            ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans[currentPlan].unit, unit -> tile.configure(units.indexOf(unit)));
+        }
+
+        @Override
+        public Object config(){
+            return currentPlan;
+        }
 
         @Override
         public void draw(){
-            TextureRegion region = unitType.icon(Cicon.full);
+            super.draw();
 
-            Draw.rect(name, x, y);
+            if(currentPlan != -1){
+                UnitPlan plan = plans[currentPlan];
 
-            Shaders.build.region = region;
-            Shaders.build.progress = buildTime / produceTime;
-            Shaders.build.color.set(Pal.accent);
-            Shaders.build.color.a = speedScl;
-            Shaders.build.time = -time / 20f;
+                TextureRegion region = plan.unit.icon(Cicon.full);
 
-            Draw.shader(Shaders.build);
-            Draw.rect(region, x, y);
-            Draw.shader();
+                Shaders.build.region = region;
+                Shaders.build.progress = progress / plan.time;
+                Shaders.build.color.set(Pal.accent);
+                Shaders.build.color.a = speedScl;
+                Shaders.build.time = -time / 20f;
 
-            Draw.color(Pal.accent);
-            Draw.alpha(speedScl);
+                Draw.shader(Shaders.build);
+                Draw.rect(region, x, y);
+                Draw.shader();
 
-            Lines.lineAngleCenter(
-            x + Mathf.sin(time, 20f, Vars.tilesize / 2f * size - 2f),
-            y,
-            90,
-            size * Vars.tilesize - 4f);
+                Draw.color(Pal.accent);
+                Draw.alpha(speedScl);
 
-            Draw.reset();
+                Lines.lineAngleCenter(x + Mathf.sin(time, 20f, Vars.tilesize / 2f * size - 2f), y, 90, size * Vars.tilesize - 4f);
+
+                Draw.reset();
+            }
 
             Draw.rect(topRegion, x, y);
         }
 
         @Override
         public void updateTile(){
+            if(currentPlan < 0 || currentPlan >= plans.length){
+                currentPlan = -1;
+            }
 
-            if(consValid() || tile.isEnemyCheat()){
-                time += delta() * speedScl * Vars.state.rules.unitBuildSpeedMultiplier * efficiency();
-                buildTime += delta() * efficiency() * Vars.state.rules.unitBuildSpeedMultiplier;
+            if((consValid() || tile.isEnemyCheat()) && currentPlan != -1){
+                time += delta() * efficiency() * speedScl * Vars.state.rules.unitBuildSpeedMultiplier;
+                progress += delta() * efficiency() * Vars.state.rules.unitBuildSpeedMultiplier;
                 speedScl = Mathf.lerpDelta(speedScl, 1f, 0.05f);
             }else{
                 speedScl = Mathf.lerpDelta(speedScl, 0f, 0.05f);
             }
 
-            if(buildTime >= produceTime){
-                buildTime = 0f;
+            if(currentPlan != -1){
+                UnitPlan plan = plans[currentPlan];
 
-                Call.onUnitFactorySpawn(tile);
-                useContent(unitType);
-                consume();
+                if(progress >= plan.time){
+                    progress = 0f;
+
+                    Call.onUnitFactorySpawn(tile);
+                    useContent(plan.unit);
+                    consume();
+                }
+            }else{
+                progress = 0f;
             }
         }
 
@@ -170,18 +215,13 @@ public class UnitFactory extends Block{
         @Override
         public void write(Writes write){
             super.write(write);
-            write.f(buildTime);
+            write.f(progress);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            buildTime = read.f();
-
-            if(revision == 0){
-                //spawn count
-                read.i();
-            }
+            progress = read.f();
         }
     }
 }

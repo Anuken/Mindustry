@@ -21,7 +21,18 @@ public abstract class SaveFileReader{
     "alpha-mech-pad", "legacy-mech-pad",
     "tau-mech-pad", "legacy-mech-pad",
     "omega-mech-pad", "legacy-mech-pad",
-    "delta-mech-pad", "legacy-mech-pad"
+    "delta-mech-pad", "legacy-mech-pad",
+
+    "draug-factory", "legacy-unit-factory",
+    "spirit-factory", "legacy-unit-factory",
+    "phantom-factory", "legacy-unit-factory",
+    "wraith-factory", "legacy-unit-factory",
+    "ghoul-factory", "legacy-unit-factory",
+    "revenant-factory", "legacy-unit-factory",
+    "dagger-factory", "legacy-unit-factory",
+    "crawler-factory", "legacy-unit-factory",
+    "titan-factory", "legacy-unit-factory",
+    "fortress-factory", "legacy-unit-factory"
     );
 
     protected void region(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{

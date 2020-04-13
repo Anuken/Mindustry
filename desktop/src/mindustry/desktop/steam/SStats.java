@@ -112,9 +112,10 @@ public class SStats implements SteamUserStatsCallback{
                     chainRouters.complete();
                 }
 
-                if(e.tile.block() == Blocks.daggerFactory){
-                    buildDaggerFactory.complete();
-                }
+                //TODO implement
+                //if(e.tile.block() == Blocks.daggerFactory){
+                //    buildDaggerFactory.complete();
+                //}
 
                 if(e.tile.block() == Blocks.meltdown || e.tile.block() == Blocks.spectre){
                     if(e.tile.block() == Blocks.meltdown && !Core.settings.getBool("meltdownp", false)){

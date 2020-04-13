@@ -91,8 +91,8 @@ public class Zones implements ContentList{
             resources = with(copper, scrap, lead, coal, sand, titanium);
             requirements = with(
             new ZoneWave(desertWastes, 60),
-            new Unlock(Blocks.daggerFactory),
-            new Unlock(Blocks.draugFactory),
+            //new Unlock(Blocks.daggerFactory),
+            //new Unlock(Blocks.draugFactory),
             new Unlock(Blocks.door),
             new Unlock(Blocks.waterExtractor)
             );
@@ -157,8 +157,8 @@ public class Zones implements ContentList{
             configureObjective = new Launched(this);
             requirements = with(
             new ZoneWave(stainedMountains, 15),
-            new Unlock(Blocks.daggerFactory),
-            new Unlock(Blocks.crawlerFactory),
+            //new Unlock(Blocks.daggerFactory),
+            //new Unlock(Blocks.crawlerFactory),
             new Unlock(Blocks.door),
             new Unlock(Blocks.siliconSmelter)
             );
@@ -175,9 +175,9 @@ public class Zones implements ContentList{
             new ZoneWave(craters, 40),
             new Launched(fungalPass),
             new Unlock(Blocks.cultivator),
-            new Unlock(Blocks.sporePress),
-            new Unlock(Blocks.titanFactory),
-            new Unlock(Blocks.wraithFactory)
+            new Unlock(Blocks.sporePress)
+            //new Unlock(Blocks.titanFactory),
+            //new Unlock(Blocks.wraithFactory)
             );
         }};
 

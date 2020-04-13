@@ -4,7 +4,6 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
@@ -76,8 +75,7 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
-    commandCenter, draugFactory, spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
-    fortressFactory, repairPoint
+    groundFactory, repairPoint
 
     //upgrades
     //dartPad, alphaPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
@@ -1655,6 +1653,19 @@ public class Blocks implements ContentList{
         //endregion
         //region units
 
+        //for testing only.
+        groundFactory = new UnitFactory("ground-factory"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
+            plans = new UnitPlan[]{
+                new UnitPlan(UnitTypes.dagger, 60f, ItemStack.with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.wraith, 60f, ItemStack.with(Items.silicon, 10)),
+            };
+            size = 3;
+            consumes.power(1.2f);
+            consumes.items(new ItemStack(Items.silicon, 10));
+        }};
+
+        /*
         draugFactory = new UnitFactory("draug-factory"){{
             requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
             unitType = UnitTypes.draug;
@@ -1750,7 +1761,7 @@ public class Blocks implements ContentList{
             size = 3;
             consumes.power(1.4f);
             consumes.items(new ItemStack(Items.silicon, 20), new ItemStack(Items.graphite, 10));
-        }};
+        }};*/
 
         repairPoint = new RepairPoint("repair-point"){{
             requirements(Category.units, ItemStack.with(Items.lead, 15, Items.copper, 15, Items.silicon, 15));
@@ -1869,6 +1880,7 @@ public class Blocks implements ContentList{
 
         //looked up by name, no ref needed
         new LegacyMechPad("legacy-mech-pad");
+        new LegacyUnitFactory("legacy-unit-factory");
 
         //endregion
     }
