@@ -12,6 +12,7 @@ import mindustry.game.*;
 import mindustry.maps.Map;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.sandbox.ItemSource;
 
 import java.util.ArrayList;
 
@@ -110,6 +111,7 @@ public enum EditorTool {
                             wTile.setOverlay(t.overlay());
                             if(!t.isLinked() && t.block() != Blocks.air) {
                                 editor.placeSafely(x, y, t.block(), t.getTeam(), t.rotation());
+                                wTile.configureAny(t.entity.config());
                             }
                         }
                         X++;
@@ -155,6 +157,10 @@ public enum EditorTool {
                     }else {
                         copy.setBlock(t.block(), t.getTeam());
                         copy.rotation(t.rotation());
+                        if(t.entity!=null){
+                            copy.configureAny(t.entity.config());
+                        }
+
                     }
                     tileCopy.data.get(y).add(copy);
                 }
