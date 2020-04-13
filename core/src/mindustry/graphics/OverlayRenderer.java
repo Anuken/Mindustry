@@ -61,6 +61,7 @@ public class OverlayRenderer{
                     Draw.reset();
                 }
             });
+		}
 
         if(Core.settings.getBool("mechindicators")){
             if(Core.settings.getBool("showmechindicators") || ui.hudfrag.blockfrag.currentCategory == Category.upgrade){
