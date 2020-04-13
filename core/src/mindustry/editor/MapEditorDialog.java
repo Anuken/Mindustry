@@ -505,7 +505,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.addImageButton(Icon.menu, Styles.cleari, menu::show);
 
-                ImageButton grid = tools.addImageButton(Icon.grid, Styles.clearTogglei, () -> view.setGrid(!view.isGrid())).get();
+                ImageButton grid = tools.addImageButton(Icon.grid, Styles.clearTogglei, () -> view.changeGridDensity()).get();
 
                 addTool.get(EditorTool.zoom);
 
@@ -676,7 +676,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
 
             if(Core.input.keyTap(KeyCode.G)){
-                view.setGrid(!view.isGrid());
+                view.changeGridDensity();
             }
         }
     }

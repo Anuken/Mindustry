@@ -24,7 +24,8 @@ public class MapView extends Element implements GestureListener{
     private EditorTool tool = EditorTool.pencil;
     private float offsetx, offsety;
     private float zoom = 1f;
-    private boolean grid = false;
+    private int gridDensityIdx = 0;
+    private final int[] gridDensities={0,1,2,4,8};
     private GridImage image = new GridImage(0, 0);
     private Vec2 vec = new Vec2();
     private Rect rect = new Rect();
@@ -166,11 +167,14 @@ public class MapView extends Element implements GestureListener{
     }
 
     public boolean isGrid(){
-        return grid;
+        return gridDensityIdx != 0;
     }
 
-    public void setGrid(boolean grid){
-        this.grid = grid;
+
+
+    public void changeGridDensity() {
+        gridDensityIdx++;
+        gridDensityIdx%=gridDensities.length;
     }
 
 
@@ -240,7 +244,7 @@ public class MapView extends Element implements GestureListener{
         float centerx = x + width / 2 + offsetx * zoom;
         float centery = y + height / 2 + offsety * zoom;
 
-        image.setImageSize(editor.width(), editor.height());
+
 
         if(!ScissorStack.pushScissors(rect.set(x, y, width, height))){
             return;
@@ -252,8 +256,10 @@ public class MapView extends Element implements GestureListener{
         editor.renderer().draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
         Draw.reset();
 
-        if(grid){
+        if(gridDensityIdx != 0){
             Draw.color(Color.gray);
+            int gridDensity =gridDensities[gridDensityIdx];
+            image.setImageSize(editor.width()/gridDensity, editor.height()/gridDensity);
             image.setBounds(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
             image.draw();
             Draw.color();
@@ -377,4 +383,6 @@ public class MapView extends Element implements GestureListener{
     public void pinchStop(){
 
     }
+
+
 }
