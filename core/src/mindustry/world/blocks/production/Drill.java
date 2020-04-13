@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.Effects.*;
+import mindustry.entities.traits.BuilderTrait.*;
 import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -174,6 +175,16 @@ public class Drill extends Block{
     }
 
     @Override
+    public void drawRequest(BuildRequest req, Eachable<BuildRequest> list, boolean valid){
+
+        Draw.alpha((0.4f + Mathf.absin(Time.globalTime(), 6f, 0.28f)) / 5);
+        Draw.rect("blank", req.drawx(), req.drawy(), (size + 2) * tilesize, (size + 2) * tilesize);
+        Draw.color();
+
+        super.drawRequest(req, list, valid);
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
 
@@ -210,7 +221,7 @@ public class Drill extends Block{
         oreCount.clear();
         itemArray.clear();
 
-        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+        for(Tile other : tile.getLinkedTilesAs(size + 2, tempTiles)){
             if(isValid(other)){
                 oreCount.getAndIncrement(getDrop(other), 0, 1);
             }
@@ -293,7 +304,7 @@ public class Drill extends Block{
     @Override
     public boolean canPlaceOn(Tile tile){
         if(isMultiblock()){
-            for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+            for(Tile other : tile.getLinkedTilesAs(size + 2, tempTiles)){
                 if(isValid(other)){
                     return true;
                 }
