@@ -127,7 +127,9 @@ public class SchematicsDialog extends FloatingDialog{
                                 label.setEllipsis(true);
                                 label.setAlignment(Align.center);
                             }).growX().margin(1).pad(4).maxWidth(Scl.scl(200f - 8f)).padBottom(0);
-                        })).size(200f);
+                        }), new Table(n -> {
+                            n.table(Styles.black6).growX().growY().pad(4);
+                        }).visible(() -> state.is(State.menu) || !(state.rules.infiniteResources || (player.getClosestCore() != null && player.getClosestCore().items.has(s.requirements().toArray(ItemStack.class), state.rules.buildCostMultiplier))))).size(200f);
                     }, () -> {
                         if(sel[0].childrenPressed()) return;
                         if(state.is(State.menu)){
