@@ -32,7 +32,9 @@ public abstract class SaveFileReader{
     "dagger-factory", "legacy-unit-factory",
     "crawler-factory", "legacy-unit-factory",
     "titan-factory", "legacy-unit-factory",
-    "fortress-factory", "legacy-unit-factory"
+    "fortress-factory", "legacy-unit-factory",
+
+    "command-center", "legacy-command-center"
     );
 
     protected void region(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{

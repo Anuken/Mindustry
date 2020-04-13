@@ -77,8 +77,6 @@ public class Blocks implements ContentList{
     //units
     groundFactory, repairPoint
 
-    //upgrades
-    //dartPad, alphaPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
     ;
 
     @Override
@@ -1665,171 +1663,12 @@ public class Blocks implements ContentList{
             consumes.items(new ItemStack(Items.silicon, 10));
         }};
 
-        /*
-        draugFactory = new UnitFactory("draug-factory"){{
-            requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
-            unitType = UnitTypes.draug;
-            produceTime = 2500;
-            size = 2;
-            consumes.power(1.2f);
-            consumes.items();
-        }};
-
-        spiritFactory = new UnitFactory("spirit-factory"){{
-            requirements(Category.units, ItemStack.with(Items.metaglass, 45, Items.lead, 55, Items.silicon, 45));
-            unitType = UnitTypes.spirit;
-            produceTime = 4000;
-            size = 2;
-            consumes.power(1.2f);
-            consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30));
-        }};
-
-        phantomFactory = new UnitFactory("phantom-factory"){{
-            requirements(Category.units, ItemStack.with(Items.titanium, 50, Items.thorium, 60, Items.lead, 65, Items.silicon, 105));
-            unitType = UnitTypes.phantom;
-            produceTime = 4400;
-            size = 2;
-            consumes.power(2.5f);
-            consumes.items(new ItemStack(Items.silicon, 50), new ItemStack(Items.lead, 30), new ItemStack(Items.titanium, 20));
-        }};
-
-        commandCenter = new CommandCenter("command-center"){{
-            requirements(Category.units, ItemStack.with(Items.copper, 200, Items.lead, 250, Items.silicon, 250, Items.graphite, 100));
-            flags = EnumSet.of(BlockFlag.rally, BlockFlag.comandCenter);
-            size = 2;
-            health = size * size * 55;
-        }};
-
-        wraithFactory = new UnitFactory("wraith-factory"){{
-            requirements(Category.units, ItemStack.with(Items.titanium, 30, Items.lead, 40, Items.silicon, 45));
-            unitType = UnitTypes.wraith;
-            produceTime = 700;
-            size = 2;
-            consumes.power(0.5f);
-            consumes.items(new ItemStack(Items.silicon, 10), new ItemStack(Items.titanium, 5));
-        }};
-
-        ghoulFactory = new UnitFactory("ghoul-factory"){{
-            requirements(Category.units, ItemStack.with(Items.titanium, 75, Items.lead, 65, Items.silicon, 110));
-            unitType = UnitTypes.ghoul;
-            produceTime = 1150;
-            size = 3;
-            consumes.power(1.2f);
-            consumes.items(new ItemStack(Items.silicon, 15), new ItemStack(Items.titanium, 10));
-        }};
-
-        revenantFactory = new UnitFactory("revenant-factory"){{
-            requirements(Category.units, ItemStack.with(Items.plastanium, 50, Items.titanium, 150, Items.lead, 150, Items.silicon, 200));
-            unitType = UnitTypes.revenant;
-            produceTime = 2000;
-            size = 4;
-            consumes.power(3f);
-            consumes.items(new ItemStack(Items.silicon, 40), new ItemStack(Items.titanium, 30));
-        }};
-
-        daggerFactory = new UnitFactory("dagger-factory"){{
-            requirements(Category.units, ItemStack.with(Items.lead, 55, Items.silicon, 35));
-            unitType = UnitTypes.dagger;
-            produceTime = 850;
-            size = 2;
-            consumes.power(0.5f);
-            consumes.items(new ItemStack(Items.silicon, 6));
-        }};
-
-        crawlerFactory = new UnitFactory("crawler-factory"){{
-            requirements(Category.units, ItemStack.with(Items.lead, 45, Items.silicon, 30));
-            unitType = UnitTypes.crawler;
-            produceTime = 300;
-            size = 2;
-            consumes.power(0.5f);
-            consumes.items(new ItemStack(Items.coal, 10));
-        }};
-
-        titanFactory = new UnitFactory("titan-factory"){{
-            requirements(Category.units, ItemStack.with(Items.graphite, 50, Items.lead, 50, Items.silicon, 45));
-            unitType = UnitTypes.titan;
-            produceTime = 1050;
-            size = 3;
-            consumes.power(0.60f);
-            consumes.items(new ItemStack(Items.silicon, 12));
-        }};
-
-        fortressFactory = new UnitFactory("fortress-factory"){{
-            requirements(Category.units, ItemStack.with(Items.thorium, 40, Items.lead, 110, Items.silicon, 75));
-            unitType = UnitTypes.fortress;
-            produceTime = 2000;
-            size = 3;
-            consumes.power(1.4f);
-            consumes.items(new ItemStack(Items.silicon, 20), new ItemStack(Items.graphite, 10));
-        }};*/
-
         repairPoint = new RepairPoint("repair-point"){{
             requirements(Category.units, ItemStack.with(Items.lead, 15, Items.copper, 15, Items.silicon, 15));
             repairSpeed = 0.5f;
             repairRadius = 65f;
             powerUse = 1f;
         }};
-
-        //endregion
-        //region upgrades
-
-        //mechs are dead for now
-        /*
-        dartPad = new MechPad("dart-ship-pad"){{
-            requirements(Category.upgrade, ItemStack.with(Items.lead, 100, Items.graphite, 50, Items.copper, 75));
-            mech = UnitTypes.dart;
-            size = 2;
-            consumes.power(0.5f);
-        }};
-
-        alphaPad = new MechPad("alpha-mech-pad"){{
-            requirements(Category.upgrade, ItemStack.with(Items.lead, 100, Items.graphite, 50, Items.copper, 75));
-            mech = UnitTypes.alpha;
-            size = 2;
-            consumes.power(0.5f);
-        }};
-
-        deltaPad = new MechPad("delta-mech-pad"){{
-            requirements(Category.upgrade, ItemStack.with(Items.lead, 175, Items.titanium, 175, Items.copper, 200, Items.silicon, 225, Items.thorium, 150));
-            mech = UnitTypes.delta;
-            size = 2;
-            consumes.power(0.7f);
-        }};
-
-        tauPad = new MechPad("tau-mech-pad"){{
-            requirements(Category.upgrade, ItemStack.with(Items.lead, 125, Items.titanium, 125, Items.copper, 125, Items.silicon, 125));
-            mech = UnitTypes.tau;
-            size = 2;
-            consumes.power(1f);
-        }};
-
-        omegaPad = new MechPad("omega-mech-pad"){{
-            requirements(Category.upgrade, ItemStack.with(Items.lead, 225, Items.graphite, 275, Items.silicon, 325, Items.thorium, 300, Items.surgealloy, 120));
-            mech = UnitTypes.omega;
-            size = 3;
-            consumes.power(1.2f);
-        }};
-
-        javelinPad = new MechPad("javelin-ship-pad"){{
-            requirements(Category.upgrade, ItemStack.with(Items.lead, 175, Items.silicon, 225, Items.titanium, 250, Items.plastanium, 200, Items.phasefabric, 100));
-            mech = UnitTypes.javelin;
-            size = 2;
-            consumes.power(0.8f);
-        }};
-
-        tridentPad = new MechPad("trident-ship-pad"){{
-            requirements(Category.upgrade, ItemStack.with(Items.lead, 125, Items.copper, 125, Items.silicon, 125, Items.titanium, 150, Items.plastanium, 100));
-            mech = UnitTypes.trident;
-            size = 2;
-            consumes.power(1f);
-        }};
-
-        glaivePad = new MechPad("glaive-ship-pad"){{
-            requirements(Category.upgrade, ItemStack.with(Items.lead, 225, Items.silicon, 325, Items.titanium, 350, Items.plastanium, 300, Items.surgealloy, 100));
-            mech = UnitTypes.glaive;
-            size = 3;
-            consumes.power(1.2f);
-        }};*/
 
         //endregion
         //region sandbox
@@ -1881,6 +1720,7 @@ public class Blocks implements ContentList{
         //looked up by name, no ref needed
         new LegacyMechPad("legacy-mech-pad");
         new LegacyUnitFactory("legacy-unit-factory");
+        new LegacyCommandCenter("legacy-command-center");
 
         //endregion
     }
