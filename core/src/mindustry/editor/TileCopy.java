@@ -1,6 +1,8 @@
 package mindustry.editor;
 
 import arc.input.KeyCode;
+import arc.struct.IntArray;
+import arc.util.Log;
 import mindustry.content.Blocks;
 import mindustry.world.Block;
 import mindustry.world.Pos;
@@ -8,6 +10,7 @@ import mindustry.world.Tile;
 
 
 import arc.struct.Array;
+import mindustry.world.blocks.power.PowerNode;
 
 
 public class TileCopy{
@@ -62,10 +65,6 @@ public class TileCopy{
         for(int y = 0; y < getSizeY(); y++){
             for(int x = 0; x < getSizeX(); x++){
                 Tile t = data.get(y).get(x);
-                if(t.block().posConfig){
-                    int conf = t.entity.config();
-                    t.configure(Pos.get(Pos.x(conf),t.y - Pos.y(conf) + t.y));
-                }
                 if(t.block().size % 2 == 0){
                     if(y == 0) {
                         t.setBlock(Blocks.air);
@@ -98,11 +97,6 @@ public class TileCopy{
         for(int y = 0; y < getSizeY(); y++){
             for(int x = 0; x < getSizeX(); x++){
                 Tile t = data.get(y).get(x);
-                if(t.block().posConfig){
-                    int conf = t.entity.config();
-                    t.configure(Pos.get(t.x - Pos.x(conf) + t.x,Pos.y(conf)));
-
-                }
                 if(t.block().size % 2 == 0){
                     if(x == 0) {
                         t.setBlock(Blocks.air);
@@ -124,12 +118,6 @@ public class TileCopy{
             newData.add(new Array<>());
             for (int y = 0; y < getSizeY(); y++) {
                 Tile t=data.get(y).get(x);
-                if(t.block().posConfig){
-                    int conf = t.entity.config();
-                    t.configure(Pos.get(Pos.y(conf) - t.y + t.x, Pos.x(conf) - t.x + t.y));
-
-
-                }
                 newData.get(x).add(t);
             }
         }
