@@ -10,7 +10,7 @@ script:
 - git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
 - cd ../MindustryBuilds
 - echo ${TRAVIS_TAG}
-- if [ -n "$TRAVIS_TAG" ]; then echo versionName=4-fdroid-${TRAVIS_TAG:1}$'\n'versionCode=${TRAVIS_TAG:1} > version_fdroid.txt; git add .; git commit -m "Updating to build ${TRAVIS_TAG}"; fi
+- if [ -n "$TRAVIS_TAG" ]; then echo versionName=5-fdroid-${TRAVIS_TAG:1}$'\n'versionCode=${TRAVIS_TAG:1} > version_fdroid.txt; git add .; git commit -m "Updating to build ${TRAVIS_TAG}"; fi
 - git tag ${TRAVIS_BUILD_NUMBER}
 - git config --global user.name "Build Uploader"
 - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/MindustryBuilds ${TRAVIS_BUILD_NUMBER}; git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/MindustryBuilds; fi

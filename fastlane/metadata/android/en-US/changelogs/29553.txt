@@ -1,0 +1,7 @@
+- Added various new features for modding - see documentation
+- Added server block state autosync
+- Added support for Thai font
+- Added JS scripting - unstable, not well tested
+- Fixed liquid junction to item bridge crash
+- Fixed launch items not saving
+- General maintenance bugfixes and translation updates
