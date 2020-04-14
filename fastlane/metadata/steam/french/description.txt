@@ -27,6 +27,7 @@ Créez des chaînes d'approvisionnement complexes pour alimenter vos tourelles e
 
 [h2]Modes de jeu[/h2]
 
+[list]
 [*] [b]Survie[/b]: Construisez des tourelles pour défendre votre base des ennemis dans un style de jeu inspiré des tower-defense. Survivez aussi longtemps que possible, avant de faire décoller votre noyau. Utiliser les ressources récoltées pour débloquer de nouvelles technologies. Préparez votre base pour les attaques de puissants boss aériens.
 [*] [b]Attaque[/b]: Construisez des usines et produisez des unités pour détruire les noyaux ennemis, tout en défendant votre base contre les vagues d'attaque. Créez une grande variété d'unités offensives et de support pour vous aider dans vos objectifs.
 [*] [b]PvP[/b]: Affrontez d'autres joueurs. Constituez jusqu'à 4 équipes différentes et tentez de détruire les noyaux adverses. Créez des unités d'assaut ou attaquez directement les autres bases avec vos mechs.
