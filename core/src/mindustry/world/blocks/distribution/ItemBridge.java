@@ -156,17 +156,17 @@ public class ItemBridge extends Block{
         for(int i = 1; i <= range; i++){
             for(int j = 0; j < 4; j++){
                 Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
-				if(linkValid(tile,other,false)){
-					boolean linked = other.pos() == entity.link;
-					boolean rlinked = other.<ItemBridgeEntity>ent().link == tile.pos();
-					if(!linked && !rlinked) continue;
-					Draw.color(linked ? Pal.accent : Pal.place);
-					Lines.stroke(1f);
-					Lines.line(tile.drawx(), tile.drawy(), other.drawx(), other.drawy());
-					Lines.circle(other.drawx(),other.drawy(),1f);
+                if(linkValid(tile,other,false)){
+                    boolean linked = other.pos() == entity.link;
+                    boolean rlinked = other.<ItemBridgeEntity>ent().link == tile.pos();
+                    if(!linked && !rlinked) continue;
+                    Draw.color(linked ? Pal.accent : Pal.place);
+                    Lines.stroke(1f);
+                    Lines.line(tile.drawx(), tile.drawy(), other.drawx(), other.drawy());
+                    Lines.circle(other.drawx(),other.drawy(),1f);
 
-					Draw.reset();
-				}
+                    Draw.reset();
+                }
             }
         }
     }
