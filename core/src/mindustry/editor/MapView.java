@@ -25,7 +25,7 @@ public class MapView extends Element implements GestureListener{
     private float offsetx, offsety;
     private float zoom = 1f;
     private int gridDensityIdx = 0;
-    private final int[] gridDensities={0,1,4,16};
+    private final int[] gridDensities={0,1,5,10};
     private GridImage image = new GridImage(0, 0);
     private Vec2 vec = new Vec2();
     private Rect rect = new Rect();
