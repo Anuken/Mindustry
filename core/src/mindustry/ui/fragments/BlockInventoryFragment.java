@@ -29,11 +29,13 @@ import static mindustry.Vars.*;
 
 public class BlockInventoryFragment extends Fragment{
     private final static float holdWithdraw = 20f;
+    private final static float holdShrink = 120f;
 
     private Table table = new Table();
     private Tile tile;
     private float holdTime = 0f;
     private boolean holding;
+    private float[] shrinkHoldTimes = new float[content.items().size];
     private Item lastItem;
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
@@ -116,12 +118,19 @@ public class BlockInventoryFragment extends Fragment{
 
                 updateTablePosition();
                 if(tile.block().hasItems){
+                    boolean dirty = false;
                     for(int i = 0; i < content.items().size; i++){
                         boolean has = tile.entity.items.has(content.item(i));
-                        if(has != container.contains(i)){
-                            rebuild(false);
+                        boolean had = container.contains(i);
+                        if(has){
+                            shrinkHoldTimes[i] = 0f;
+                            dirty |= !had;
+                        }else if(had && !has){
+                            shrinkHoldTimes[i] += Time.delta();
+                            dirty |= shrinkHoldTimes[i] >= holdShrink;
                         }
                     }
+                    if(dirty) rebuild(false);
                 }
             }
         });
