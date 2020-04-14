@@ -1,20 +1,14 @@
 package mindustry.editor;
 
 import arc.func.*;
-import arc.maps.TileSet;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.type.TileEntity;
 import mindustry.game.*;
-import mindustry.maps.Map;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.sandbox.ItemSource;
-
-import java.util.ArrayList;
 
 import static mindustry.Vars.world;
 
@@ -111,7 +105,13 @@ public enum EditorTool {
                             wTile.setOverlay(t.overlay());
                             if(!t.isLinked() && t.block() != Blocks.air) {
                                 editor.placeSafely(x, y, t.block(), t.getTeam(), t.rotation());
-                                wTile.configureAny(t.entity.config());
+                                if(t.block().posConfig){
+                                    int conf = t.entity.config();
+                                    wTile.configureAny(Pos.get(Pos.x(conf) - t.x + x,Pos.y(conf) - t.y + y));
+
+                                }else{
+                                    wTile.configureAny(t.entity.config());
+                                }
                             }
                         }
                         X++;
@@ -159,6 +159,7 @@ public enum EditorTool {
                         copy.rotation(t.rotation());
                         if(t.entity!=null){
                             copy.configureAny(t.entity.config());
+
                         }
 
                     }
