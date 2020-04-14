@@ -150,6 +150,28 @@ public class ItemBridge extends Block{
     }
 
     @Override
+    public void drawSelect(Tile tile){
+        ItemBridgeEntity entity = tile.ent();
+
+        for(int i = 1; i <= range; i++){
+            for(int j = 0; j < 4; j++){
+                Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
+				if(linkValid(tile,other,false)){
+					boolean linked = other.pos() == entity.link;
+					boolean rlinked = other.<ItemBridgeEntity>ent().link == tile.pos();
+					if(!linked && !rlinked) continue;
+					Draw.color(linked ? Pal.accent : Pal.place);
+					Lines.stroke(1f);
+					Lines.line(tile.drawx(), tile.drawy(), other.drawx(), other.drawy());
+					Lines.circle(other.drawx(),other.drawy(),1f);
+
+					Draw.reset();
+				}
+            }
+        }
+    }
+
+    @Override
     public boolean onConfigureTileTapped(Tile tile, Tile other){
         ItemBridgeEntity entity = tile.ent();
 
