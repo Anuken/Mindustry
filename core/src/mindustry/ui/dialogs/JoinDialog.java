@@ -434,7 +434,7 @@ public class JoinDialog extends FloatingDialog{
                     try{
                         defaultServers.clear();
                         val.asArray().each(child -> {
-                            if (child.getString("locale", "en") == locale) {
+                            if(child.getString("locale", "en") == locale){
                                 defaultServers.add(child.getString("address", "<invalid>"));
                             }
                         });
