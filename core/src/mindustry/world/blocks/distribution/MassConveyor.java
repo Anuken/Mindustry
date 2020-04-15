@@ -20,6 +20,7 @@ import static mindustry.Vars.*;
 public class MassConveyor extends Block{
     public float moveTime = 70f;
     public TextureRegion topRegion, edgeRegion;
+    public Interpolation interp = Interpolation.pow5;
 
     public MassConveyor(String name){
         super(name);
@@ -40,7 +41,7 @@ public class MassConveyor extends Block{
 
     public class MassConveyorEntity extends TileEntity implements MassAcceptor{
         public @Nullable Payload item;
-        public float progress, itemRotation;
+        public float progress, itemRotation, animation;
         public @Nullable MassAcceptor next;
         public boolean blocked;
         public int step = -1, stepAccepted = -1;
@@ -58,7 +59,7 @@ public class MassConveyor extends Block{
 
             int ntrns = 1 + size/2;
             Tile next = tile.getNearby(Geometry.d4[rotation()].x * ntrns, Geometry.d4[rotation()].y * ntrns);
-            blocked = next != null && next.solid();
+            blocked = (next != null && next.solid()) || (this.next != null && (this.next.rotation() + 2)%4 == rotation());
         }
 
         @Override
@@ -66,32 +67,37 @@ public class MassConveyor extends Block{
             progress = Time.time() % moveTime;
 
             //TODO DEBUG
-            if(Core.input.keyTap(KeyCode.G) && world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y) == tile){
-                item = new UnitPayload(UnitTypes.dagger.create(Team.sharded));
+            if(Core.input.keyTap(KeyCode.G) && world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y) == this){
+                item = new UnitPayload((Mathf.chance(0.5) ? UnitTypes.wraith : UnitTypes.dagger).create(Team.sharded));
                 itemRotation = rotation() * 90;
+                animation = 0f;
             }
 
             int curStep = curStep();
             if(curStep > step){
-                if(step != -1 && stepAccepted != curStep){
-                    if(canMove()){
-                        //move forward.
-                        next.handleMass(item, this);
+                boolean valid = step != -1;
+                step = curStep;
+
+                if(valid && stepAccepted != curStep && item != null){
+                    if(next != null){
+                        //trigger update forward
+                        next.updateTile();
+
+                        if(next.acceptMass(item, this)){
+                            //move forward.
+                            next.handleMass(item, this);
+                            item = null;
+                        }
+                    }else if(!blocked){
+                        //dump item forward
+                        float trnext = size * tilesize / 2f, cx = Geometry.d4[rotation()].x, cy = Geometry.d4[rotation()].y, rot = rotation() * 90;
+
+                        item.dump(x + cx * trnext, y + cy * trnext, rotation() * 90);
                         item = null;
                     }
                 }
-
-                step = curStep;
             }
 
-
-            //dumping item forward.
-            if(fract() >= 0.5f && item != null && !blocked && next == null){
-                float trnext = fract() * size * tilesize, cx = Geometry.d4[rotation()].x, cy = Geometry.d4[rotation()].y, rot = rotation() * 90;
-
-                item.dump(x + cx * trnext, y + cy * trnext, rotation() * 90);
-                item = null;
-            }
         }
 
         @Override 
@@ -138,16 +144,36 @@ public class MassConveyor extends Block{
 
         @Override
         public void drawLayer(){
-            float fract = !blocked ? fract() : fract() > 0.5f ? 1f - fract() : fract();
-            float trnext = fract * size * tilesize, cx = Geometry.d4[rotation()].x, cy = Geometry.d4[rotation()].y, rot = Mathf.slerp(itemRotation, rotation() * 90, fract);
+            //fract:
+            //0: arriving
+            //0.5: middle
+            //1: leaving
+
+            if(animation > fract()){
+                animation = Mathf.lerp(animation, 0.8f, 0.15f);
+            }
+
+            animation = Math.max(animation, fract());
+
+            float fract = animation;
+            float rot = Mathf.slerp(itemRotation, rotation() * 90, fract);
+
+            if(fract < 0.5f){
+                Tmp.v1.trns(itemRotation + 180, (0.5f - fract) * tilesize * size);
+            }else{
+                Tmp.v1.trns(rotation() * 90, (fract - 0.5f) * tilesize * size);
+            }
+
+            float vx = Tmp.v1.x, vy = Tmp.v1.y;
 
             if(item != null){
                 Draw.color(0, 0, 0, 0.4f);
-                float size = 21;
-                Draw.rect("circle-shadow", x + cx * trnext, y + cy * trnext, size, size);
+                float size = 24;
+                Draw.rect("circle-shadow", x + vx, y + vy, size, size);
                 Draw.color();
+                Draw.rect("pneumatic-drill", x + vx, y + vy, rot);
 
-                item.draw(x + cx * trnext, y + cy * trnext, rot);
+                item.draw(x + vx, y + vy, rot);
             }
         }
 
@@ -161,20 +187,17 @@ public class MassConveyor extends Block{
             this.item = item;
             this.stepAccepted = curStep();
             this.itemRotation = source.rotation() * 90;
+            this.animation = 0;
         }
 
         boolean blends(int direction){
             if(direction == rotation()){
-                return !blocked;
+                return !blocked || next != null;
             }else{
                 Tilec accept = nearby(Geometry.d4[direction].x * size, Geometry.d4[direction].y * size);
                 return accept instanceof MassAcceptor && accept.block().size == size &&
                     accept.tileX() + Geometry.d4[accept.rotation()].x * size == tileX() && accept.tileY() + Geometry.d4[accept.rotation()].y * size == tileY();
             }
-        }
-
-        boolean canMove(){
-            return item != null && next != null && next.acceptMass(item, this);
         }
 
         TextureRegion clipRegion(Rect bounds, Rect sprite, TextureRegion region){
@@ -206,7 +229,7 @@ public class MassConveyor extends Block{
         }
 
         float fract(){
-            return Interpolation.pow5.apply(progress / moveTime);
+            return interp.apply(progress / moveTime);
         }
     }
 
