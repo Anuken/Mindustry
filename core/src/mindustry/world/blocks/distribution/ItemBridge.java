@@ -156,17 +156,37 @@ public class ItemBridge extends Block{
         for(int i = 1; i <= range; i++){
             for(int j = 0; j < 4; j++){
                 Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
-                if(linkValid(tile,other,false)){
-                    boolean linked = other.pos() == entity.link;
-                    boolean rlinked = other.<ItemBridgeEntity>ent().link == tile.pos();
-                    if(!linked && !rlinked) continue;
-                    Draw.color(linked ? Pal.accent : Pal.place);
-                    Lines.stroke(1f);
-                    Lines.line(tile.drawx(), tile.drawy(), other.drawx(), other.drawy());
-                    Lines.circle(other.drawx(),other.drawy(),1f);
+                if(!linkValid(tile,other,false)) continue;
+                boolean linked = other.pos() == entity.link;
+                boolean rlinked = other.<ItemBridgeEntity>ent().link == tile.pos();
+                if(!linked && !rlinked) continue;
 
-                    Draw.reset();
+                float x1 = tile.drawx(), y1 = tile.drawy(), x2 = other.drawx(), y2 = other.drawy();
+                float percentage = ((Time.time()*2)%100f);
+                percentage = linked ? 100 - percentage : percentage;
+                float min = Math.min(y1 == y2 ? x1 : y1, y1 == y2 ? x2: y2), max = Math.max(y1 == y2 ? x1 : y1, y1 == y2 ? x2: y2);
+                float x,y;
+                if(y1 == y2){
+                    x = (percentage * (x1 - x2) / 100) + x2;
+                    y = (y1*(x2-x)+y2*(x-x1))/(x2-x1);
+                }else{
+                    y = (percentage * (y1 - y2) / 100) + y2;
+                    x = (x1*(y2-y)+x2*(y-y1))/(y2-y1);
                 }
+
+                Tile link = world.tile(linked ? tile.pos() : other.pos());
+                Tile otherLink = linked ? other : tile;
+
+                Draw.color(Color.valueOf("444444"));
+                Lines.stroke(2.5f);
+                Lines.circle(x2, y2, 2f);
+
+                Draw.color(linked ? Pal.place : Pal.accent);
+                Lines.stroke(1f);
+                Lines.line(x1, y1, x2, y2);
+                Lines.circle(x2, y2, 2f);
+                Draw.rect("bridge-arrow", x, y, link.absoluteRelativeTo((int) otherLink.x, (int) otherLink.y) * 90);
+                Draw.reset();
             }
         }
     }
