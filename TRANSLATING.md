@@ -24,6 +24,7 @@ Once you are done, press the *propose new file* button at the bottom, then 'crea
 - `{0}` means an argument that will be replaced when the text is displayed. For example, `Wave: {0}` will replace the `{0}` with whatever wave you are in.
 - Empty lines are fine, and it doesn't matter in what order you place the text.
 - `\n` means "new line". If you want to split text into multiple lines, use `\n` to do it.
+- Your language might have a character that is missing from the font. To fix this, use a program to modify fonts, and add the character in yourself.
 
 #### Testing your translation bundle
 
