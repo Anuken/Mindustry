@@ -118,6 +118,15 @@ public class MassConveyor extends Block{
             Tmp.v1.set(- s/2f + clipped.getWidth()/2f*Draw.scl,  - s/2f + clipped.getHeight()/2f*Draw.scl).rotate(rot);
             Draw.rect(clipped, x + Tmp.v1.x, y + Tmp.v1.y, rot);
 
+            for(int i = 0; i < 4; i++){
+                if(blends(i) && i != rotation()){
+                    Draw.alpha(1f - Interpolation.pow5In.apply(fract()));
+                    //prev from back
+                    Tmp.v1.set(- s/2f + clipped.getWidth()/2f*Draw.scl,  - s/2f + clipped.getHeight()/2f*Draw.scl).rotate(i * 90 + 180);
+                    Draw.rect(clipped, x + Tmp.v1.x, y + Tmp.v1.y, i * 90 + 180);
+                }
+            }
+
             Draw.reset();
 
             for(int i = 0; i < 4; i++){
