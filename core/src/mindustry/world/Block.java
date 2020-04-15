@@ -542,7 +542,7 @@ public class Block extends UnlockableContent{
 
                 while(entityType == null && Block.class.isAssignableFrom(current)){
                     //first class that is subclass of Tilec
-                    Class<?> type = Structs.find(current.getDeclaredClasses(), Tilec.class::isAssignableFrom);
+                    Class<?> type = Structs.find(current.getDeclaredClasses(), t -> Tilec.class.isAssignableFrom(t) && !t.isInterface());
                     if(type != null){
                         //these are inner classes, so they have an implicit parameter generated
                         Constructor<? extends Tilec> cons = (Constructor<? extends Tilec>)type.getDeclaredConstructor(type.getDeclaringClass());
