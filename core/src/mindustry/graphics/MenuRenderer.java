@@ -180,7 +180,7 @@ public class MenuRenderer implements Disposable{
         Draw.color();
         shadows.end();
 
-        SpriteBatch prev = Core.batch;
+        Batch prev = Core.batch;
 
         Core.batch = batch = new CacheBatch(new SpriteCache(width * height * 6, false));
         batch.beginCache();
@@ -214,8 +214,8 @@ public class MenuRenderer implements Disposable{
 
         mat.set(Draw.proj());
         Draw.flush();
-        Draw.proj(camera.projection());
-        batch.setProjection(camera.projection());
+        Draw.proj(camera);
+        batch.setProjection(camera.mat);
         batch.beginDraw();
         batch.drawCache(cacheFloor);
         batch.endDraw();

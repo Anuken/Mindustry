@@ -185,7 +185,7 @@ public class Renderer implements ApplicationListener{
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
-        Draw.proj(camera.projection());
+        Draw.proj(camera);
 
         beginFx();
 

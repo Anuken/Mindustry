@@ -157,7 +157,7 @@ public class BlockRenderer implements Disposable{
             shadows.end();
             shadowEvents.clear();
 
-            Draw.proj(camera.projection());
+            Draw.proj(camera);
         }
 
         float ww = world.width() * tilesize, wh = world.height() * tilesize;

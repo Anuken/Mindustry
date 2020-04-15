@@ -228,6 +228,11 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         return Time.delta() * timeScale;
     }
 
+    /** Efficiency * delta. */
+    public float edelta(){
+        return efficiency() * delta();
+    }
+
     /** Base efficiency. If this entity has non-buffered power, returns the power %, otherwise returns 1. */
     public float efficiency(){
         return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;

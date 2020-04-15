@@ -119,7 +119,7 @@ public class FloorRenderer implements Disposable{
             return;
         }
 
-        cbatch.setProjection(Core.camera.projection());
+        cbatch.setProjection(Core.camera.mat);
         cbatch.beginDraw();
 
         Gl.enable(Gl.blend);
@@ -185,7 +185,7 @@ public class FloorRenderer implements Disposable{
     }
 
     private void cacheChunkLayer(int cx, int cy, Chunk chunk, CacheLayer layer){
-        SpriteBatch current = Core.batch;
+        Batch current = Core.batch;
         Core.batch = cbatch;
 
         //begin a new cache
