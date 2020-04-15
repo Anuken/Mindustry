@@ -21,10 +21,12 @@
     "address": "mindustry.ecansol.com:6599"
   },
   {
-    "address": "mindustry.ru"
+    "address": "mindustry.ru",
+	"locale": "ru"
   },
   {
-    "address": "mindustry.ru:7000"
+    "address": "mindustry.ru:7000",
+	"locale": "ru"
   },
   {
     "address": "mindustry.io"

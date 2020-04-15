@@ -17,10 +17,12 @@ You'll need to either hire some moderators, or make use of (currently non-existe
 4. **Check your server configuration.** *(optional)* I would recommend adding a message rate limit of 1 second (`config messageRateLimit 1`), and disabling connect/disconnect messages to reduce spam (`config showConnectMessages false`).
 5. Finally, **submit a pull request** to add your server's IP to the list. 
 This should be fairly straightforward: Press the edit button on the [server file](https://github.com/Anuken/Mindustry/blob/master/servers.json), then add a JSON object with a single key, indicating your server address.
-For example, if your server address is `google.com`, you would add a comma after the last entry and insert:
+For example, if your server address is `google.ru`, you would add a comma after the last entry and insert:
 ```json
   {
-    "address": "google.com"
+    "address": "google.ru",
+	"locale": "ru"
   }
 ```
+("locale" is the language code that your server uses, default is "en" for English.)
 Then, press the *'submit pull request'* button and I'll take a look at your server. If I have any issues with it, I'll let you know in the PR comments.

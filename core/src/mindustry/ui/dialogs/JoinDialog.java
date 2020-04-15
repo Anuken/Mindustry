@@ -424,6 +424,7 @@ public class JoinDialog extends FloatingDialog{
     @SuppressWarnings("unchecked")
     private void loadServers(){
         servers = Core.settings.getObject("server-list", Array.class, Array::new);
+        final String locale = ui.language.getLocale().getCountry().toLowerCase();
 
         //get servers
         Core.net.httpGet(becontrol.active() ? serverJsonBeURL : serverJsonURL, result -> {
@@ -432,7 +433,11 @@ public class JoinDialog extends FloatingDialog{
                 Core.app.post(() -> {
                     try{
                         defaultServers.clear();
-                        val.asArray().each(child -> defaultServers.add(child.getString("address", "<invalid>")));
+                        val.asArray().each(child -> {
+                            if (child.getString("locale", "en") == locale) {
+                                defaultServers.add(child.getString("address", "<invalid>"));
+                            }
+                        });
                         Log.info("Fetched {0} global servers.", defaultServers.size);
                     }catch(Throwable ignored){}
                 });
