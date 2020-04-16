@@ -26,6 +26,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -313,6 +314,40 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     public void onProximityUpdate(){
         noSleep();
+    }
+
+    public boolean acceptPayload(Tilec source, Payload payload){
+        return false;
+    }
+
+    public void handlePayload(Tilec source, Payload payload){
+
+    }
+
+    /**
+     * Tries dumping a payload.
+     * @param todump payload to dump.
+     * @return whether the payload was moved successfully
+     */
+    public boolean dumpPayload(@NonNull Payload todump){
+        Array<Tilec> proximity = proximity();
+        int dump = rotation();
+
+        if(proximity.size == 0) return false;
+
+        for(int i = 0; i < proximity.size; i++){
+            Tilec other = proximity.get((i + dump) % proximity.size);
+
+            if(other.team() == team() && other.acceptPayload(this, todump)){
+                other.handlePayload(this, todump);
+                incrementDump(proximity.size);
+                return true;
+            }
+
+            incrementDump(proximity.size);
+        }
+
+        return false;
     }
 
     public void handleItem(Tilec source, Item item){
