@@ -51,7 +51,7 @@ public class MapsDialog extends FloatingDialog{
         }
 
         buttons.addImageTextButton("$editor.newmap", Icon.add, () -> {
-            ui.showTextInput("$editor.newmap", "$name", "", text -> {
+            ui.showTextInput("$editor.newmap", "$editor.mapname", "", text -> {
                 Runnable show = () -> ui.loadAnd(() -> {
                     hide();
                     ui.editor.show();
@@ -98,7 +98,7 @@ public class MapsDialog extends FloatingDialog{
                         if(conflict != null && !conflict.custom){
                             ui.showInfo(Core.bundle.format("editor.import.exists", name));
                         }else if(conflict != null){
-                            ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
+                            ui.showConfirm("$confirm", Core.bundle.format("editor.overwrite.confirm", map.name()), () -> {
                                 maps.tryCatchMapError(() -> {
                                     maps.removeMap(conflict);
                                     maps.importMap(map.file);
@@ -177,7 +177,7 @@ public class MapsDialog extends FloatingDialog{
             t.top();
             t.defaults().padTop(10).left();
 
-            t.add("$editor.name").padRight(10).color(Color.gray).padTop(0);
+            t.add("$editor.mapname").padRight(10).color(Color.gray).padTop(0);
             t.row();
             t.add(map.name()).growX().wrap().padTop(2);
             t.row();

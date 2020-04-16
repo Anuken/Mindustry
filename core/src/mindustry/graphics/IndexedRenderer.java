@@ -60,16 +60,13 @@ public class IndexedRenderer implements Disposable{
 
         updateMatrix();
 
-        program.begin();
-
+        program.bind();
         texture.bind();
 
         program.setUniformMatrix4("u_projTrans", BatchShader.copyTransform(combined));
         program.setUniformi("u_texture", 0);
 
         mesh.render(program, Gl.triangles, 0, vertices.length / vsize);
-
-        program.end();
     }
 
     public void setColor(Color color){

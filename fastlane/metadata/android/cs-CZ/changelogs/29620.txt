@@ -1,0 +1,4 @@
+- Aktualizován link pro navržení nové funkce
+- Aktualizovány překlady
+- Opraveno uložen upraveného jména hráče poté, co byl ukončen server
+- Přidán násobek sluneční energie

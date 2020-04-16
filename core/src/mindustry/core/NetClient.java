@@ -81,7 +81,7 @@ public class NetClient implements ApplicationListener{
             c.mods = mods.getModStrings();
             c.mobile = mobile;
             c.versionType = Version.type;
-            c.color = Color.rgba8888(player.color);
+            c.color = player.color.rgba();
             c.usid = getUsid(packet.addressTCP);
             c.uuid = platform.getUUID();
 
@@ -103,6 +103,7 @@ public class NetClient implements ApplicationListener{
             logic.reset();
             platform.updateRPC();
             player.name = Core.settings.getString("name");
+            player.color.set(Core.settings.getInt("color-0"));
 
             if(quiet) return;
 

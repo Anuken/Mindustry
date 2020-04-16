@@ -244,7 +244,7 @@ public class TypeIO{
 
     @WriteClass(Color.class)
     public static void writeColor(ByteBuffer buffer, Color color){
-        buffer.putInt(Color.rgba8888(color));
+        buffer.putInt(color.rgba());
     }
 
     @ReadClass(Color.class)

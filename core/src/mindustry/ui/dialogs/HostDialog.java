@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.graphics.*;
 import arc.scene.ui.*;
 import arc.util.*;
 import mindustry.*;
@@ -33,7 +32,7 @@ public class HostDialog extends FloatingDialog{
             ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new PaletteDialog().show(color -> {
                     player.color.set(color);
-                    Core.settings.put("color-0", Color.rgba8888(color));
+                    Core.settings.put("color-0", color.rgba());
                     Core.settings.save();
                 });
             }).size(54f).get();
