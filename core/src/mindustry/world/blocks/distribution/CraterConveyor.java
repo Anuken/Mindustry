@@ -149,7 +149,7 @@ public class CraterConveyor extends Block implements Autotiler{
 
                             e.cooldown = cooldown = 1;
                             e.noSleep();
-                            bump(this);
+                            bump();
                         }
                     }
                 }
@@ -199,7 +199,7 @@ public class CraterConveyor extends Block implements Autotiler{
         private void poofOut(){
             Fx.plasticburn.at(this);
             link = -1;
-            bump(this);
+            bump();
         }
 
         @Override
@@ -224,34 +224,34 @@ public class CraterConveyor extends Block implements Autotiler{
         }
 
         // crater conveyor tiles that input into this one
-        private void upstream(CraterConveyorEntity tile, Cons<CraterConveyorEntity> cons){
+        private void upstream(Cons<CraterConveyorEntity> cons){
 
-            if(tile.blendbit1 == 0 && !(back() instanceof CraterConveyorEntity)) return;
+            if(blendbit1 == 0 && !(back() instanceof CraterConveyorEntity)) return;
 
-            if(    tile.blendbit1 == 0 // 1 input from the back, 0 from the sides
-                || tile.blendbit1 == 2 // 1 input from the back, 1 from the sides
-                || tile.blendbit1 == 3 // 1 input from the back, 2 from the sides
+            if(    blendbit1 == 0 // 1 input from the back, 0 from the sides
+                || blendbit1 == 2 // 1 input from the back, 1 from the sides
+                || blendbit1 == 3 // 1 input from the back, 2 from the sides
             ) cons.get((CraterConveyorEntity)back());
 
-            if(    tile.blendbit1 == 3 // 1 input from the back, 2 from the sides
-                || tile.blendbit1 == 4 // 0 input from the back, 2 from the sides
-                ||(tile.blendbit1 == 1 &&   tile.blendscly == -1) // side is open
-                ||(tile.blendbit1 == 2 &&   tile.blendscly == +1) // side is open
+            if(    blendbit1 == 3 // 1 input from the back, 2 from the sides
+                || blendbit1 == 4 // 0 input from the back, 2 from the sides
+                ||(blendbit1 == 1 &&   blendscly == -1) // side is open
+                ||(blendbit1 == 2 &&   blendscly == +1) // side is open
             ) cons.get((CraterConveyorEntity)right());
 
-            if(    tile.blendbit1 == 3 // 1 input from the back, 2 from the sides
-                || tile.blendbit1 == 4 // 0 input from the back, 2 from the sides
-                ||(tile.blendbit1 == 1 &&   tile.blendscly == +1) // side is open
-                ||(tile.blendbit1 == 2 &&   tile.blendscly == -1) // side is open
+            if(    blendbit1 == 3 // 1 input from the back, 2 from the sides
+                || blendbit1 == 4 // 0 input from the back, 2 from the sides
+                ||(blendbit1 == 1 &&   blendscly == +1) // side is open
+                ||(blendbit1 == 2 &&   blendscly == -1) // side is open
             ) cons.get((CraterConveyorEntity)left());
         }
 
         // awaken inputting conveyors
-        private void bump(CraterConveyorEntity tile){
-            upstream(tile, t -> {
+        private void bump(){
+            upstream(t -> {
                 if(t == null || !t.sleeping || t.items().total() <= 0) return;
                 t.noSleep();
-                bump(t);
+                t.bump();
             });
         }
 
