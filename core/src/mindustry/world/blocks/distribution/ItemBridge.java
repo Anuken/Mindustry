@@ -162,15 +162,14 @@ public class ItemBridge extends Block{
                 if(!linked && !rlinked) continue;
 
                 float x1 = tile.drawx(), y1 = tile.drawy(), x2 = other.drawx(), y2 = other.drawy();
-                float percentage = ((Time.time()*2)%100f);
-                percentage = linked ? 100 - percentage : percentage;
+                float percentage = Math.abs((linked ? 100 : 0)-(Time.time()*2)%100f)/100;
                 float min = Math.min(y1 == y2 ? x1 : y1, y1 == y2 ? x2: y2), max = Math.max(y1 == y2 ? x1 : y1, y1 == y2 ? x2: y2);
                 float x,y;
                 if(y1 == y2){
-                    x = (percentage * (x1 - x2) / 100) + x2;
+                    x = percentage * (x1 - x2) + x2;
                     y = (y1*(x2-x)+y2*(x-x1))/(x2-x1);
                 }else{
-                    y = (percentage * (y1 - y2) / 100) + y2;
+                    y = percentage * (y1 - y2) + y2;
                     x = (x1*(y2-y)+x2*(y-y1))/(y2-y1);
                 }
 
