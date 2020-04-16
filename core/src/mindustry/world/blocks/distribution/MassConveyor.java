@@ -167,12 +167,6 @@ public class MassConveyor extends Block{
             float vx = Tmp.v1.x, vy = Tmp.v1.y;
 
             if(item != null){
-                Draw.color(0, 0, 0, 0.4f);
-                float size = 24;
-                Draw.rect("circle-shadow", x + vx, y + vy, size, size);
-                Draw.color();
-                Draw.rect("pneumatic-drill", x + vx, y + vy, rot);
-
                 item.draw(x + vx, y + vy, rot);
             }
         }
@@ -244,7 +238,7 @@ public class MassConveyor extends Block{
     }
 
     public static class UnitPayload implements Payload{
-        Unitc unit;
+        public Unitc unit;
 
         public UnitPayload(Unitc unit){
             this.unit = unit;
@@ -259,6 +253,9 @@ public class MassConveyor extends Block{
 
         @Override
         public void draw(float x, float y, float rotation){
+            Drawf.shadow(x, y, 24);
+            Draw.rect("pneumatic-drill", x, y, rotation);
+            Drawf.shadow(x, y, 20);
             Draw.rect(unit.type().icon(Cicon.full), x, y, rotation - 90);
         }
     }

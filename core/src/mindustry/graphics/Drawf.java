@@ -15,6 +15,12 @@ import static mindustry.Vars.renderer;
 
 public class Drawf{
 
+    public static void shadow(float x, float y, float rad){
+        Draw.color(0, 0, 0, 0.4f);
+        Draw.rect("circle-shadow", x, y, rad, rad);
+        Draw.color();
+    }
+
     public static void dashCircle(float x, float y, float rad, Color color){
         Lines.stroke(3f, Pal.gray);
         Lines.dashCircle(x, y, rad);
