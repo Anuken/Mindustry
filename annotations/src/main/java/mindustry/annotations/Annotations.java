@@ -26,6 +26,12 @@ public class Annotations{
     public @interface Replace{
     }
 
+    /** Indicates that a method should be final in all implementing classes. */
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Final{
+    }
+
     /** Indicates that a component field is imported from other components. */
     @Target({ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)

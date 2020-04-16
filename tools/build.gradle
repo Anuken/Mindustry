@@ -209,7 +209,7 @@ def tileImage = { File file ->
 
                 if(index != -1){
                     int resultIndex = (x == y ? 1 : index == 2 ? 0 : index == 0 ? 2 : 1);
-                    result.setRGB(x, y, Color.argb8888(list[resultIndex]))
+                    result.setRGB(x, y, list[resultIndex].argb8888())
                 }
             }
         }

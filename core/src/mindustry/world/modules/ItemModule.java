@@ -161,6 +161,10 @@ public class ItemModule extends BlockModule{
         total -= amount;
     }
 
+    public void remove(ItemStack[] stacks){
+        for(ItemStack stack : stacks) remove(stack.item, stack.amount);
+    }
+
     public void remove(ItemStack stack){
         remove(stack.item, stack.amount);
     }

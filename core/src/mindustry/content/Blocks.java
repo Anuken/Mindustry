@@ -18,6 +18,7 @@ import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.experimental.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.logic.*;
@@ -76,7 +77,11 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
-    groundFactory, repairPoint
+    groundFactory, repairPoint,
+
+    //misc experimental
+
+    blockForge, blockLauncher;
 
     ;
 
@@ -1726,6 +1731,23 @@ public class Blocks implements ContentList{
         new LegacyMechPad("legacy-mech-pad");
         new LegacyUnitFactory("legacy-unit-factory");
         new LegacyCommandCenter("legacy-command-center");
+
+        //endregion
+        //region experimental
+
+        blockForge = new BlockForge("block-forge"){{
+            requirements(Category.production, ItemStack.with(Items.thorium, 100));
+            hasPower = true;
+            consumes.power(2f);
+            size = 3;
+        }};
+
+        blockLauncher = new BlockLauncher("block-launcher"){{
+            requirements(Category.production, ItemStack.with(Items.thorium, 100));
+            size = 3;
+            hasPower = true;
+            consumes.power(2f);
+        }};
 
         //endregion
     }
