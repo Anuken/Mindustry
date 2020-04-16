@@ -151,7 +151,7 @@ public class ItemBridge extends Block{
 
     @Override
     public void drawSelect(Tile tile){
-		if(!Core.settings.getBool("bridgeindicator")) return;
+        if(!Core.settings.getBool("bridgeindicator")) return;
         ItemBridgeEntity entity = tile.ent();
 
         for(int i = 1; i <= range; i++){
