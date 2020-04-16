@@ -990,6 +990,12 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         return null;
     }
 
+    @Replace
+    @Override
+    public boolean isValid(){
+        return tile.entity == this && !dead();
+    }
+
     @Override
     public void remove(){
         if(sound != null){
