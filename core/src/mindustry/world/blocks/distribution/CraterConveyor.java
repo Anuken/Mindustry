@@ -19,7 +19,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class CraterConveyor extends Block implements Autotiler{
-    private TextureRegion[] regions = new TextureRegion[8];
+    private TextureRegion[] regions = new TextureRegion[9];
 
     public float speed = 0f;
 
