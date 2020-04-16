@@ -73,7 +73,7 @@ abstract class BuilderComp implements Unitc, DrawLayerFlyingc{
 
         if(!(tile.block() instanceof BuildBlock)){
             if(!current.initialized && !current.breaking && Build.validPlace(team(), current.x, current.y, current.block, current.rotation)){
-                boolean hasAll = !Structs.contains(current.block.requirements, i -> !core.items().has(i.item));
+                boolean hasAll = !Structs.contains(current.block.requirements, i -> !core.items().has(i.item)) || state.rules.infiniteResources;
 
                 if(hasAll){
                     Build.beginPlace(team(), current.x, current.y, current.block, current.rotation);
