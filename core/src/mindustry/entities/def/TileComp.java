@@ -249,10 +249,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         }
     }
 
-    public boolean isSleeping(){
-        return sleeping;
-    }
-
     /** Call when this entity is updating. This wakes it up. */
     public void noSleep(){
         sleepTime = 0f;

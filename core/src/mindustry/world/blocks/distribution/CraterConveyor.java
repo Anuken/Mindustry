@@ -224,31 +224,32 @@ public class CraterConveyor extends Block implements Autotiler{
         }
 
         // crater conveyor tiles that input into this one
-        private void upstream(Tilec tile, Cons<Tilec> cons){
-            CraterConveyorEntity entity = (CraterConveyorEntity)tile;
+        private void upstream(CraterConveyorEntity tile, Cons<CraterConveyorEntity> cons){
 
-            if(    entity.blendbit1 == 0 // 1 input from the back, 0 from the sides
-                || entity.blendbit1 == 2 // 1 input from the back, 1 from the sides
-                || entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
-            ) cons.get(back());          // fixme, fires for 0 while nothing behind
+            if(tile.blendbit1 == 0 && !(back() instanceof CraterConveyorEntity)) return;
 
-            if(    entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
-                || entity.blendbit1 == 4 // 0 input from the back, 2 from the sides
-                ||(entity.blendbit1 == 1 && entity.blendscly == -1) // side is open
-                ||(entity.blendbit1 == 2 && entity.blendscly == +1) // side is open
-            ) cons.get(right());
+            if(    tile.blendbit1 == 0 // 1 input from the back, 0 from the sides
+                || tile.blendbit1 == 2 // 1 input from the back, 1 from the sides
+                || tile.blendbit1 == 3 // 1 input from the back, 2 from the sides
+            ) cons.get((CraterConveyorEntity)back());
 
-            if(    entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
-                || entity.blendbit1 == 4 // 0 input from the back, 2 from the sides
-                ||(entity.blendbit1 == 1 && entity.blendscly == +1) // side is open
-                ||(entity.blendbit1 == 2 && entity.blendscly == -1) // side is open
-            ) cons.get(left());
+            if(    tile.blendbit1 == 3 // 1 input from the back, 2 from the sides
+                || tile.blendbit1 == 4 // 0 input from the back, 2 from the sides
+                ||(tile.blendbit1 == 1 &&   tile.blendscly == -1) // side is open
+                ||(tile.blendbit1 == 2 &&   tile.blendscly == +1) // side is open
+            ) cons.get((CraterConveyorEntity)right());
+
+            if(    tile.blendbit1 == 3 // 1 input from the back, 2 from the sides
+                || tile.blendbit1 == 4 // 0 input from the back, 2 from the sides
+                ||(tile.blendbit1 == 1 &&   tile.blendscly == +1) // side is open
+                ||(tile.blendbit1 == 2 &&   tile.blendscly == -1) // side is open
+            ) cons.get((CraterConveyorEntity)left());
         }
 
         // awaken inputting conveyors
-        private void bump(Tilec tile){
+        private void bump(CraterConveyorEntity tile){
             upstream(tile, t -> {
-                if(t == null || !t.isSleeping() || t.items().total() <= 0) return;
+                if(t == null || !t.sleeping || t.items().total() <= 0) return;
                 t.noSleep();
                 bump(t);
             });
