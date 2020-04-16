@@ -17,6 +17,8 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class Tile implements Position, QuadTreeObject{
+    static final ObjectSet<Tilec> tileSet = new ObjectSet<>();
+
     /** Tile traversal cost. */
     public byte cost = 1;
     /** Tile entity, usually null. */
@@ -27,6 +29,7 @@ public class Tile implements Position, QuadTreeObject{
     protected @NonNull Floor overlay;
     /** Rotation, 0-3. Also used to store offload location, in which case it can be any number.*/
     protected byte rotation;
+    protected boolean changing = false;
 
     public Tile(int x, int y){
         this.x = (short)x;
@@ -42,7 +45,8 @@ public class Tile implements Position, QuadTreeObject{
         this.block = wall;
 
         //update entity and create it if needed
-        changed(Team.derelict);
+        changeEntity(Team.derelict);
+        changed();
     }
 
     public Tile(int x, int y, int floor, int overlay, int wall){
@@ -161,10 +165,12 @@ public class Tile implements Position, QuadTreeObject{
     }
 
     public void setBlock(@NonNull Block type, Team team, int rotation){
-        preChanged();
+        changing = true;
+
         this.block = type;
         this.rotation = rotation == 0 ? 0 : (byte)Mathf.mod(rotation, 4);
-        changed(team);
+        preChanged();
+        changeEntity(team);
 
         if(entity != null){
             entity.team(team);
@@ -205,6 +211,9 @@ public class Tile implements Position, QuadTreeObject{
             this.entity = entity;
             this.block = block;
         }
+
+        changed();
+        changing = false;
     }
 
     public void setBlock(@NonNull Block type, Team team){
@@ -501,12 +510,12 @@ public class Tile implements Position, QuadTreeObject{
                             //reset entity and block *manually* - thus, preChanged() will not be called anywhere else, for multiblocks
                             if(other != this){ //do not remove own entity so it can be processed in changed()
                                 other.entity = null;
-                            }
-                            other.block = Blocks.air;
+                                other.block = Blocks.air;
 
-                            //manually call changed event
-                            other.updateOcclusion();
-                            world.notifyChanged(other);
+                                //manually call changed event
+                                other.updateOcclusion();
+                                world.notifyChanged(other);
+                            }
                         }
                     }
                 }
@@ -520,13 +529,27 @@ public class Tile implements Position, QuadTreeObject{
         }
     }
 
-    protected void changed(Team team){
+    protected void changeEntity(Team team){
         if(entity != null){
+            int size = entity.block().size;
             entity.remove();
             entity = null;
-        }
 
-        Block block = block();
+            //update edge entities
+            tileSet.clear();
+
+            for(Point2 edge : Edges.getEdges(size)){
+                Tilec other = world.ent(x + edge.x, y + edge.y);
+                if(other != null){
+                    tileSet.add(other);
+                }
+            }
+
+            //update proximity, since multiblock was just removed
+            for(Tilec t : tileSet){
+                t.updateProximity();
+            }
+        }
 
         if(block.hasEntity()){
             entity = block.newEntity().init(this, team, block.update);
@@ -537,16 +560,20 @@ public class Tile implements Position, QuadTreeObject{
                 entity.power(new PowerModule());
                 entity.power().graph.add(entity);
             }
+        }
+    }
 
-            if(!world.isGenerating()){
+    protected void changed(){
+        if(!world.isGenerating()){
+            if(entity != null){
                 entity.updateProximity();
-            }
-        }else if(!world.isGenerating()){
-            //since the entity won't update proximity for us, update proximity for all nearby tiles manually
-            for(Point2 p : Geometry.d4){
-                Tilec tile = world.ent(x + p.x, y + p.y);
-                if(tile != null){
-                    tile.onProximityUpdate();
+            }else{
+                //since the entity won't update proximity for us, update proximity for all nearby tiles manually
+                for(Point2 p : Geometry.d4){
+                    Tilec tile = world.ent(x + p.x, y + p.y);
+                    if(tile != null && !tile.tile().changing){
+                        tile.onProximityUpdate();
+                    }
                 }
             }
         }

@@ -52,7 +52,7 @@ public class MapGenerateDialog extends FloatingDialog{
     private CachedTile ctile = new CachedTile(){
         //nothing.
         @Override
-        protected void changed(Team team){
+        protected void changeEntity(Team team){
 
         }
     };

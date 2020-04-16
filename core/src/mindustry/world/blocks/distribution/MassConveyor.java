@@ -68,15 +68,17 @@ public class MassConveyor extends Block{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            Tilec accept = nearby(Geometry.d4[rotation()].x * size, Geometry.d4[rotation()].y * size);
+            Tilec accept = nearby(Geometry.d4(rotation()).x * size, Geometry.d4(rotation()).y * size);
             //next block must be aligned and of the same size
             if(accept != null && accept.block().size == size &&
-                tileX() + Geometry.d4[rotation()].x * size == accept.tileX() && tileY() + Geometry.d4[rotation()].y * size == accept.tileY()){
+                tileX() + Geometry.d4(rotation()).x * size == accept.tileX() && tileY() + Geometry.d4(rotation()).y * size == accept.tileY()){
                 next = accept;
+            }else{
+                next = null;
             }
 
             int ntrns = 1 + size/2;
-            Tile next = tile.getNearby(Geometry.d4[rotation()].x * ntrns, Geometry.d4[rotation()].y * ntrns);
+            Tile next = tile.getNearby(Geometry.d4(rotation()).x * ntrns, Geometry.d4(rotation()).y * ntrns);
             blocked = (next != null && next.solid()) || (this.next != null && (this.next.rotation() + 2)%4 == rotation());
         }
 
@@ -109,7 +111,7 @@ public class MassConveyor extends Block{
                         }
                     }else if(!blocked){
                         //dump item forward
-                        float trnext = size * tilesize / 2f, cx = Geometry.d4[rotation()].x, cy = Geometry.d4[rotation()].y, rot = rotation() * 90;
+                        float trnext = size * tilesize / 2f, cx = Geometry.d4(rotation()).x, cy = Geometry.d4(rotation()).y, rot = rotation() * 90;
 
                         if(item.dump(x + cx * trnext, y + cy * trnext, rotation() * 90)){
                             item = null;
@@ -192,14 +194,14 @@ public class MassConveyor extends Block{
 
         @Override
         public boolean acceptPayload(Tilec source, Payload payload){
-            return this.item == null;
+            return this.item == null && progress <= 5f;
         }
 
         @Override
         public void handlePayload(Tilec source, Payload payload){
             this.item = payload;
             this.stepAccepted = curStep();
-            this.itemRotation = source.rotation() * 90;
+            this.itemRotation = source.angleTo(this);
             this.animation = 0;
         }
 
@@ -207,10 +209,10 @@ public class MassConveyor extends Block{
             if(direction == rotation()){
                 return !blocked || next != null;
             }else{
-                Tilec accept = nearby(Geometry.d4[direction].x * size, Geometry.d4[direction].y * size);
+                Tilec accept = nearby(Geometry.d4(direction).x * size, Geometry.d4(direction).y * size);
                 return accept != null && accept.block().size == size && accept.block().outputsPayload &&
                     //block must either be facing this one, or not be rotating
-                    ((accept.tileX() + Geometry.d4[accept.rotation()].x * size == tileX() && accept.tileY() + Geometry.d4[accept.rotation()].y * size == tileY()) || !accept.block().rotate);
+                    ((accept.tileX() + Geometry.d4(accept.rotation()).x * size == tileX() && accept.tileY() + Geometry.d4(accept.rotation()).y * size == tileY()) || !accept.block().rotate);
             }
         }
 

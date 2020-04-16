@@ -20,7 +20,7 @@ public class CachedTile extends Tile{
     }
 
     @Override
-    protected void changed(Team team){
+    protected void changeEntity(Team team){
         entity = null;
 
         Block block = block();
