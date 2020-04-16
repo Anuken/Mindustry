@@ -313,7 +313,11 @@ public class SchematicsDialog extends FloatingDialog{
                 int i = 0;
                 for(ItemStack s : arr){
                     r.addImage(s.item.icon(Cicon.small)).left();
-                    r.add(s.amount + "").padLeft(2).left().color(Color.lightGray).padRight(4);
+                    r.label(() -> {
+                        Tilec core = player.closestCore();
+                        if(core == null || state.rules.infiniteResources || core.items().has(s.item, s.amount)) return "[lightgray]" + s.amount + "";
+                        return (core.items().has(s.item, s.amount) ? "[lightgray]" : "[scarlet]") + Math.min(core.items().get(s.item), s.amount) + "[lightgray]/" + s.amount;
+                    }).padLeft(2).left().padRight(4);
 
                     if(++i % 4 == 0){
                         r.row();

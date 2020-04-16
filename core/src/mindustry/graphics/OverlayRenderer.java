@@ -35,7 +35,7 @@ public class OverlayRenderer{
 
     public void drawTop(){
 
-        if(Core.settings.getBool("indicators")){
+        if(Core.settings.getBool("playerindicators")){
             for(Playerc player : Groups.player){
                 if(Vars.player != player && Vars.player.team() == player.team()){
                     if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
@@ -49,7 +49,9 @@ public class OverlayRenderer{
                     }
                 }
             }
+        }
 
+        if(Core.settings.getBool("indicators")){
             Groups.unit.each(unit -> {
                 if(!unit.isLocal() && unit.team() != player.team() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f).setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x(), unit.y())){
                     Tmp.v1.set(unit.x(), unit.y()).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
