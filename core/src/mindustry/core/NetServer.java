@@ -300,13 +300,25 @@ public class NetServer implements ApplicationListener{
             playerGroup.all().each(p -> p.getTeam() == player.getTeam(), o -> o.sendMessage(args[0], player, "[#" + player.getTeam().color.toString() + "]<T>" + NetClient.colorizeName(player.id, player.name)));
         });
 
-        clientCommands.<Player>register("whisper", "<player> <content...>", "Send a message to a specific player.", (args, player) -> {
+        ObjectMap<String, String> whisperUuid = new ObjectMap<>();
+
+        clientCommands.<Player>register("w", "<player> <content...>", "Send a message to a specific player.", (args, player) -> {
             Player receiverPlayer = playerGroup.find(p -> p.name.equalsIgnoreCase(args[0]));
             if(receiverPlayer == null){
-                player.sendMessage("[Scarlet]No player has that name.");
+                player.sendMessage("[scarlet]No player has that name.");
                 return;
             }
-            receiverPlayer.sendMessage(Strings.format("[lightgray]Whisper from {0}:[] {1}", player.name, args[1]));
+            receiverPlayer.sendMessage(Strings.format("[lightgray]{0}<W>:[] {1}", player.name, args[1]));
+            whisperUuid.put(receiverPlayer.uuid, player.uuid);
+        });
+
+        clientCommands.<Player>register("r", "<content...>", "Reply to the most recent whisper", (args, player) -> {
+            Player receiverPlayer = playerGroup.find(p -> p.uuid.equals(whisperUuid.get(player.uuid)));
+            if(receiverPlayer == null){
+                player.sendMessage("[scarlet]That player left the game.");
+                return;
+            }
+            receiverPlayer.sendMessage(Strings.format("[lightgray]{0}<W>:[] {1}", player.name, args[0]));
         });
 
         //duration of a a kick in seconds
