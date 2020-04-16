@@ -129,11 +129,9 @@ public class CraterConveyor extends Block implements Autotiler{
             // crater
             Draw.rect(regions[7], Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interpolation.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
 
-            // shadow
-            Drawf.shadow(Tmp.v1.x, Tmp.v1.y, 5f);
-
             // item
-            float size = (itemSize / 2f) + items.total() * 0.1f / (itemCapacity / 8f);
+            float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);
+            Drawf.shadow(Tmp.v1.x, Tmp.v1.y, size * 1.2f);
             Draw.rect(items.first().icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
         }
 
