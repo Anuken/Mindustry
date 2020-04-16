@@ -5,31 +5,31 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.*;
-
-public class UnitFactory extends Block{
+//TODO remove
+public class PayloadUnitFactory extends Block{
     public float launchVelocity = 0f;
     public TextureRegion topRegion;
     public int[] capacities;
 
     public UnitPlan[] plans = new UnitPlan[0];
 
-    public UnitFactory(String name){
+    public PayloadUnitFactory(String name){
         super(name);
         update = true;
         hasPower = true;
@@ -37,6 +37,7 @@ public class UnitFactory extends Block{
         solid = false;
         flags = EnumSet.of(BlockFlag.producer);
         configurable = true;
+        outputsPayload = true;
 
         config(Integer.class, (tile, i) -> ((UnitFactoryEntity)tile).currentPlan = i < 0 || i >= plans.length ? -1 : i);
     }
@@ -108,7 +109,9 @@ public class UnitFactory extends Block{
 
     public class UnitFactoryEntity extends TileEntity{
         public int currentPlan = -1;
+
         public float progress, time, speedScl;
+        public @Nullable UnitPayload payload;
 
         public float fraction(){
             return currentPlan == -1 ? 0 : progress / plans[currentPlan].time;
@@ -120,13 +123,11 @@ public class UnitFactory extends Block{
             Effects.shake(2f, 3f, this);
             Fx.producesmoke.at(this);
 
-            if(!net.client() && currentPlan != -1){
+            if(currentPlan != -1){
                 UnitPlan plan = plans[currentPlan];
                 Unitc unit = plan.unit.create(team);
-                unit.set(x + Mathf.range(4), y + Mathf.range(4));
-                unit.add();
-                unit.vel().y = launchVelocity;
-                Events.fire(new UnitCreateEvent(unit));
+
+                payload = new UnitPayload(unit);
             }
         }
 
@@ -178,12 +179,16 @@ public class UnitFactory extends Block{
                 currentPlan = -1;
             }
 
-            if((consValid() || tile.isEnemyCheat()) && currentPlan != -1){
+            if((consValid() || tile.isEnemyCheat()) && currentPlan != -1 && payload == null){
                 time += delta() * efficiency() * speedScl * Vars.state.rules.unitBuildSpeedMultiplier;
                 progress += delta() * efficiency() * Vars.state.rules.unitBuildSpeedMultiplier;
                 speedScl = Mathf.lerpDelta(speedScl, 1f, 0.05f);
             }else{
                 speedScl = Mathf.lerpDelta(speedScl, 0f, 0.05f);
+            }
+
+            if(payload != null && dumpPayload(payload)){
+                payload = null;
             }
 
             if(currentPlan != -1){

@@ -929,15 +929,20 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     public void removeFromProximity(){
         onProximityRemoved();
+        tmpTiles.clear();
 
         Point2[] nearby = Edges.getEdges(block.size);
         for(Point2 point : nearby){
             Tilec other = world.ent(tile.x + point.x, tile.y + point.y);
             //remove this tile from all nearby tile's proximities
             if(other != null){
-                other.onProximityUpdate();
-                other.proximity().remove(this, true);
+                tmpTiles.add(other);
             }
+        }
+
+        for(Tilec other : tmpTiles){
+            other.proximity().remove(this, true);
+            other.onProximityUpdate();
         }
     }
 
