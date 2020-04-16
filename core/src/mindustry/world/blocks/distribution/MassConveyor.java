@@ -40,6 +40,23 @@ public class MassConveyor extends Block{
         edgeRegion = Core.atlas.find(name + "-edge");
     }
 
+    @Override
+    protected TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name + "-icon")};
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
+        for(int i = 0; i < 4; i++){
+            Tilec other = world.ent(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
+            if(other != null && other.block().outputsPayload && other.block().size == size){
+                Drawf.selected(other.tileX(), other.tileY(), other.block(), Pal.accent);
+            }
+        }
+    }
+
     public class MassConveyorEntity extends TileEntity{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;
@@ -53,7 +70,7 @@ public class MassConveyor extends Block{
 
             Tilec accept = nearby(Geometry.d4[rotation()].x * size, Geometry.d4[rotation()].y * size);
             //next block must be aligned and of the same size
-            if(accept.block().size == size &&
+            if(accept != null && accept.block().size == size &&
                 tileX() + Geometry.d4[rotation()].x * size == accept.tileX() && tileY() + Geometry.d4[rotation()].y * size == accept.tileY()){
                 next = accept;
             }
@@ -191,7 +208,7 @@ public class MassConveyor extends Block{
                 return !blocked || next != null;
             }else{
                 Tilec accept = nearby(Geometry.d4[direction].x * size, Geometry.d4[direction].y * size);
-                return accept.block().size == size && accept.block().outputsPayload &&
+                return accept != null && accept.block().size == size && accept.block().outputsPayload &&
                     //block must either be facing this one, or not be rotating
                     ((accept.tileX() + Geometry.d4[accept.rotation()].x * size == tileX() && accept.tileY() + Geometry.d4[accept.rotation()].y * size == tileY()) || !accept.block().rotate);
             }
