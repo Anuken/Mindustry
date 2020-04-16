@@ -43,7 +43,7 @@ public class PayloadUnitFactory extends Block{
     }
 
     @Remote(called = Loc.server)
-    public static void onUnitFactorySpawn(Tile tile){
+    public static void onUnitFactorySpawn2(Tile tile){
         if(!(tile.entity instanceof UnitFactoryEntity)) return;
         tile.<UnitFactoryEntity>ent().spawned();
     }
@@ -197,7 +197,7 @@ public class PayloadUnitFactory extends Block{
                 if(progress >= plan.time){
                     progress = 0f;
 
-                    Call.onUnitFactorySpawn(tile);
+                    Call.onUnitFactorySpawn2(tile);
                     useContent(plan.unit);
                     consume();
                 }
