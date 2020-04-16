@@ -266,11 +266,6 @@ public class CraterConveyor extends Block implements Autotiler{
         }
 
         @Override
-        public boolean isValid(){
-            return !dead && (added || sleeping);
-        }
-
-        @Override
         public void write(Writes write){
             super.write(write);
 
