@@ -13,7 +13,9 @@ import static mindustry.Vars.state;
 
 /** Renders overlay lights. Client only. */
 public class LightRenderer{
+    public static boolean enable = true;
     private static final int scaling = 4;
+
     private float[] vertices = new float[24];
     private FrameBuffer buffer = new FrameBuffer(2, 2);
     private Array<Runnable> lights = new Array<>();
@@ -178,6 +180,11 @@ public class LightRenderer{
     }
 
     public void draw(){
+        if(!enable){
+            lights.clear();
+            return;
+        }
+
         if(buffer.getWidth() != Core.graphics.getWidth()/scaling || buffer.getHeight() != Core.graphics.getHeight()/scaling){
             buffer.resize(Core.graphics.getWidth()/scaling, Core.graphics.getHeight()/scaling);
         }

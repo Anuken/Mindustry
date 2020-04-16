@@ -1012,6 +1012,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         remove();
     }
 
+    @Final
     @Override
     public void update(){
         timeScaleDuration -= Time.delta();

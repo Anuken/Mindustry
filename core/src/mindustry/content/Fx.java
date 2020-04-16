@@ -12,6 +12,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
+import mindustry.world.blocks.experimental.BlockLauncher.*;
 
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.*;
@@ -84,6 +86,20 @@ public class Fx{
 
         color(e.color);
         Fill.circle(x, y, e.fslope() * 1.5f * size);
+    }),
+
+    blockTransfer = new Effect(25f, e -> {
+        if(!(e.data instanceof LaunchedBlock)) return;
+
+        LaunchedBlock l = e.data();
+
+        Block block = l.block;
+        Position to = Tmp.v3.set(l.x * tilesize, l.y * tilesize).add(block.offset(), block.offset());
+
+        Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interpolation.linear);
+        float x = Tmp.v1.x, y = Tmp.v1.y;
+
+        Draw.rect(block.icon(Cicon.full), x, y);
     }),
 
     lightning = new Effect(10f, 500f, e -> {
