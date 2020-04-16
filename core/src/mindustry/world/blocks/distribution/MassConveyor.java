@@ -11,8 +11,8 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.*;
 
 import static mindustry.Vars.*;
 
@@ -29,6 +29,7 @@ public class MassConveyor extends Block{
         size = 3;
         rotate = true;
         update = true;
+        outputsPayload = true;
     }
 
     @Override
@@ -39,10 +40,27 @@ public class MassConveyor extends Block{
         edgeRegion = Core.atlas.find(name + "-edge");
     }
 
-    public class MassConveyorEntity extends TileEntity implements MassAcceptor{
+    @Override
+    protected TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name + "-icon")};
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
+        for(int i = 0; i < 4; i++){
+            Tilec other = world.ent(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
+            if(other != null && other.block().outputsPayload && other.block().size == size){
+                Drawf.selected(other.tileX(), other.tileY(), other.block(), Pal.accent);
+            }
+        }
+    }
+
+    public class MassConveyorEntity extends TileEntity{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;
-        public @Nullable MassAcceptor next;
+        public @Nullable Tilec next;
         public boolean blocked;
         public int step = -1, stepAccepted = -1;
 
@@ -52,9 +70,9 @@ public class MassConveyor extends Block{
 
             Tilec accept = nearby(Geometry.d4[rotation()].x * size, Geometry.d4[rotation()].y * size);
             //next block must be aligned and of the same size
-            if(accept instanceof MassAcceptor && accept.block().size == size &&
+            if(accept != null && accept.block().size == size &&
                 tileX() + Geometry.d4[rotation()].x * size == accept.tileX() && tileY() + Geometry.d4[rotation()].y * size == accept.tileY()){
-                next = (MassAcceptor)accept;
+                next = accept;
             }
 
             int ntrns = 1 + size/2;
@@ -73,6 +91,7 @@ public class MassConveyor extends Block{
                 animation = 0f;
             }
 
+            //TODO nondeterministic input priority
             int curStep = curStep();
             if(curStep > step){
                 boolean valid = step != -1;
@@ -83,21 +102,21 @@ public class MassConveyor extends Block{
                         //trigger update forward
                         next.updateTile();
 
-                        if(next.acceptMass(item, this)){
+                        if(next.acceptPayload(this, item)){
                             //move forward.
-                            next.handleMass(item, this);
+                            next.handlePayload(this, item);
                             item = null;
                         }
                     }else if(!blocked){
                         //dump item forward
                         float trnext = size * tilesize / 2f, cx = Geometry.d4[rotation()].x, cy = Geometry.d4[rotation()].y, rot = rotation() * 90;
 
-                        item.dump(x + cx * trnext, y + cy * trnext, rotation() * 90);
-                        item = null;
+                        if(item.dump(x + cx * trnext, y + cy * trnext, rotation() * 90)){
+                            item = null;
+                        }
                     }
                 }
             }
-
         }
 
         @Override 
@@ -172,13 +191,13 @@ public class MassConveyor extends Block{
         }
 
         @Override
-        public boolean acceptMass(Payload item, Tilec source){
+        public boolean acceptPayload(Tilec source, Payload payload){
             return this.item == null;
         }
 
         @Override
-        public void handleMass(Payload item, Tilec source){
-            this.item = item;
+        public void handlePayload(Tilec source, Payload payload){
+            this.item = payload;
             this.stepAccepted = curStep();
             this.itemRotation = source.rotation() * 90;
             this.animation = 0;
@@ -189,8 +208,9 @@ public class MassConveyor extends Block{
                 return !blocked || next != null;
             }else{
                 Tilec accept = nearby(Geometry.d4[direction].x * size, Geometry.d4[direction].y * size);
-                return accept instanceof MassAcceptor && accept.block().size == size &&
-                    accept.tileX() + Geometry.d4[accept.rotation()].x * size == tileX() && accept.tileY() + Geometry.d4[accept.rotation()].y * size == tileY();
+                return accept != null && accept.block().size == size && accept.block().outputsPayload &&
+                    //block must either be facing this one, or not be rotating
+                    ((accept.tileX() + Geometry.d4[accept.rotation()].x * size == tileX() && accept.tileY() + Geometry.d4[accept.rotation()].y * size == tileY()) || !accept.block().rotate);
             }
         }
 
@@ -219,7 +239,7 @@ public class MassConveyor extends Block{
         }
 
         int curStep(){
-            return (int)(Time.time() / moveTime);
+            return (int)((Time.time()) / moveTime);
         }
 
         float fract(){
@@ -227,36 +247,4 @@ public class MassConveyor extends Block{
         }
     }
 
-    public interface MassAcceptor extends Tilec{
-        boolean acceptMass(Payload item, Tilec source);
-        void handleMass(Payload item, Tilec source);
-    }
-
-    public interface Payload{
-        void draw(float x, float y, float rotation);
-        void dump(float x, float y, float rotation);
-    }
-
-    public static class UnitPayload implements Payload{
-        public Unitc unit;
-
-        public UnitPayload(Unitc unit){
-            this.unit = unit;
-        }
-
-        @Override
-        public void dump(float x, float y, float rotation){
-            unit.set(x, y);
-            unit.rotation(rotation);
-            unit.add();
-        }
-
-        @Override
-        public void draw(float x, float y, float rotation){
-            Drawf.shadow(x, y, 24);
-            Draw.rect("pneumatic-drill", x, y, rotation);
-            Drawf.shadow(x, y, 20);
-            Draw.rect(unit.type().icon(Cicon.full), x, y, rotation - 90);
-        }
-    }
 }

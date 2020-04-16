@@ -4,16 +4,30 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 
-import static mindustry.Vars.renderer;
+import static mindustry.Vars.*;
 
 public class Drawf{
+
+    public static void selected(int x, int y, Block block, Color color){
+        Draw.color(color);
+        for(int i = 0; i < 4; i++){
+            Point2 p = Geometry.d8edge[i];
+            float offset = -Math.max(block.size - 1, 0) / 2f * tilesize;
+            Draw.rect("block-select",
+            x*tilesize + block.offset() + offset * p.x,
+            y*tilesize + block.offset() + offset * p.y, i * 90);
+        }
+        Draw.reset();
+    }
 
     public static void shadow(float x, float y, float rad){
         Draw.color(0, 0, 0, 0.4f);
