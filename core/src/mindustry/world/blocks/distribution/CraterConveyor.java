@@ -110,6 +110,51 @@ public class CraterConveyor extends Block implements Autotiler{
             blendscly = bits[2];
         }
 
+
+        @Override
+        public void updateTile(){
+            // reel in crater
+            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed, 0f, 1f);
+
+            // sleep when idle
+            if(link == -1){
+                if(cooldown == 0f) sleep();
+                return;
+            }
+
+            // crater needs to be centered
+            if(cooldown > 0f) return;
+
+            if(blendbit2 == 6){
+                while(dump()) if(items.total() == 0) poofOut();
+            }
+
+            /* unload */ else /* transfer */
+
+                if(blendbit2 != 5 || (items.total() >= getMaximumAccepted(items.first()))){
+                    if(front() != null
+                    && front().team() == team()
+                    && front().block() instanceof CraterConveyor){
+                        CraterConveyorEntity e = (CraterConveyorEntity)tile.front();
+
+                        // sleep if its occupied
+                        if(e.link != -1){
+                            sleep();
+                        }else{
+                            e.items.addAll(items);
+                            e.link = tile.pos();
+                            // ▲ new | old ▼
+                            link = -1;
+                            items.clear();
+
+                            e.cooldown = cooldown = 1;
+                            e.noSleep();
+                            bump(this);
+                        }
+                    }
+                }
+        }
+
         @Override
         public void drawLayer(){
             if(link == -1) return;
@@ -233,50 +278,6 @@ public class CraterConveyor extends Block implements Autotiler{
 
             link = read.i();
             cooldown = read.f();
-        }
-
-        @Override
-        public void updateTile(){
-            // reel in crater
-            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed, 0f, 1f);
-
-            // sleep when idle
-            if(link == -1){
-                if(cooldown == 0f) sleep();
-                return;
-            }
-
-            // crater needs to be centered
-            if(cooldown > 0f) return;
-
-            if(blendbit2 == 6){
-                while(dump()) if(items.total() == 0) poofOut();
-            }
-
-            /* unload */ else /* transfer */
-
-            if(blendbit2 != 5 || (items.total() >= getMaximumAccepted(items.first()))){
-                if(front() != null
-                && front().team() == team()
-                && front().block() instanceof CraterConveyor){
-                    CraterConveyorEntity e = (CraterConveyorEntity)tile.front();
-
-                    // sleep if its occupied
-                    if(e.link != -1){
-                        sleep();
-                    }else{
-                        e.items.addAll(items);
-                        e.link = tile.pos();
-                        // ▲ new | old ▼
-                        link = -1;
-                        items.clear();
-
-                        e.cooldown = cooldown = 1;
-                        e.noSleep();
-                        bump(this);
-                    }
-                }
-            }
         }
     }
 }
