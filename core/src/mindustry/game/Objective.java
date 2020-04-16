@@ -21,7 +21,7 @@ public interface Objective{
 
     }
 
-    default Zone zone(){
+    default SectorPreset zone(){
         return this instanceof ZoneObjective ? ((ZoneObjective)this).zone : null;
     }
 }

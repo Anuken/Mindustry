@@ -1,13 +1,12 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.struct.*;
-import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.game.Saves.*;
@@ -15,7 +14,6 @@ import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
 import mindustry.ui.*;
-import mindustry.ui.Styles;
 
 import java.io.*;
 
@@ -70,6 +68,7 @@ public class LoadDialog extends FloatingDialog{
 
                 title.table(t -> {
                     t.right();
+                    t.defaults().size(40f);
 
                     t.addImageButton(Icon.save, Styles.emptytogglei, () -> {
                         slot.setAutosave(!slot.isAutosave());
@@ -89,26 +88,7 @@ public class LoadDialog extends FloatingDialog{
                         });
                     }).right();
 
-                    t.addImageButton(Icon.save, Styles.emptyi, () -> {
-                        if(!ios){
-                            platform.showFileChooser(false, saveExtension, file -> {
-                                try{
-                                    slot.exportFile(file);
-                                    setup();
-                                }catch(IOException e){
-                                    ui.showException("save.export.fail", e);
-                                }
-                            });
-                        }else{
-                            try{
-                                Fi file = Core.files.local("save-" + slot.getName() + "." + saveExtension);
-                                slot.exportFile(file);
-                                platform.shareFile(file);
-                            }catch(Exception e){
-                                ui.showException("save.export.fail", e);
-                            }
-                        }
-                    }).right();
+                    t.addImageButton(Icon.export, Styles.emptyi, () -> platform.export("save-" + slot.getName(), saveExtension, slot::exportFile)).right();
 
                 }).padRight(-10).growX();
             }).growX().colspan(2);
@@ -194,11 +174,10 @@ public class LoadDialog extends FloatingDialog{
                     net.reset();
                     slot.load();
                     state.rules.editor = false;
-                    state.rules.zone = null;
+                    state.rules.sector = null;
                     state.set(State.playing);
                 }catch(SaveException e){
                     Log.err(e);
-                    state.set(State.menu);
                     logic.reset();
                     ui.showErrorMessage("$save.corrupted");
                 }

@@ -23,7 +23,7 @@ public class HostDialog extends FloatingDialog{
         cont.table(t -> {
             t.add("$name").padRight(10);
             t.addField(Core.settings.getString("name"), text -> {
-                player.name = text;
+                player.name(text);
                 Core.settings.put("name", text);
                 Core.settings.save();
                 ui.listfrag.rebuild();
@@ -31,12 +31,12 @@ public class HostDialog extends FloatingDialog{
 
             ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new PaletteDialog().show(color -> {
-                    player.color.set(color);
+                    player.color().set(color);
                     Core.settings.put("color-0", color.rgba());
                     Core.settings.save();
                 });
             }).size(54f).get();
-            button.update(() -> button.getStyle().imageUpColor = player.color);
+            button.update(() -> button.getStyle().imageUpColor = player.color());
         }).width(w).height(70f).pad(4).colspan(3);
 
         cont.row();
@@ -66,7 +66,7 @@ public class HostDialog extends FloatingDialog{
         Time.runTask(5f, () -> {
             try{
                 net.host(Vars.port);
-                player.isAdmin = true;
+                player.admin(true);
 
                 if(steam){
                     Core.app.post(() -> Core.settings.getBoolOnce("steampublic2", () -> {

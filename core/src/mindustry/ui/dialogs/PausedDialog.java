@@ -2,7 +2,6 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.input.*;
-import mindustry.core.GameState.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
@@ -29,7 +28,7 @@ public class PausedDialog extends FloatingDialog{
         cont.clear();
 
         update(() -> {
-            if(state.is(State.menu) && isShown()){
+            if(state.isMenu() && isShown()){
                 hide();
             }
         });
@@ -41,7 +40,7 @@ public class PausedDialog extends FloatingDialog{
             cont.addImageTextButton("$back", Icon.left, this::hide).colspan(2).width(dw * 2 + 20f);
 
             cont.row();
-            if(world.isZone()){
+            if(state.isCampaign()){
                 cont.addImageTextButton("$techtree", Icon.tree, ui.tech::show);
             }else{
                 cont.addImageTextButton("$database", Icon.book, ui.database::show);
@@ -49,7 +48,7 @@ public class PausedDialog extends FloatingDialog{
             cont.addImageTextButton("$settings", Icon.settings, ui.settings::show);
 
             if(!state.rules.tutorial){
-                if(!world.isZone() && !state.isEditor()){
+                if(!state.isCampaign() && !state.isEditor()){
                     cont.row();
                     cont.addImageTextButton("$savegame", Icon.save, save::show);
                     cont.addImageTextButton("$loadgame", Icon.upload, load::show).disabled(b -> net.active());
@@ -79,7 +78,7 @@ public class PausedDialog extends FloatingDialog{
             cont.addRowImageTextButton("$back", Icon.play, this::hide);
             cont.addRowImageTextButton("$settings", Icon.settings, ui.settings::show);
 
-            if(!world.isZone() && !state.isEditor()){
+            if(!state.isCampaign() && !state.isEditor()){
                 cont.addRowImageTextButton("$save", Icon.save, save::show);
 
                 cont.row();
@@ -118,7 +117,6 @@ public class PausedDialog extends FloatingDialog{
         }
 
         if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave() || state.rules.tutorial || wasClient){
-            state.set(State.menu);
             logic.reset();
             return;
         }
@@ -130,7 +128,6 @@ public class PausedDialog extends FloatingDialog{
                 e.printStackTrace();
                 ui.showException("[accent]" + Core.bundle.get("savefail"), e);
             }
-            state.set(State.menu);
             logic.reset();
         });
     }

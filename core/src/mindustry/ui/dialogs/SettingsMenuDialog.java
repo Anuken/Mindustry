@@ -37,7 +37,7 @@ public class SettingsMenuDialog extends SettingsDialog{
     public SettingsMenuDialog(){
         hidden(() -> {
             Sounds.back.play();
-            if(!state.is(State.menu)){
+            if(state.isGame()){
                 if(!wasPaused || net.active())
                     state.set(State.playing);
             }
@@ -45,7 +45,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         shown(() -> {
             back();
-            if(!state.is(State.menu)){
+            if(state.isGame()){
                 wasPaused = state.is(State.paused);
                 state.set(State.paused);
             }
@@ -318,6 +318,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         graphics.checkPref("effects", true);
         graphics.checkPref("destroyedblocks", true);
+        graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("position", false);
@@ -326,7 +327,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             graphics.checkPref("blockselectkeys", true);
         }
         graphics.checkPref("indicators", true);
-        graphics.checkPref("animatedwater", !mobile);
+        graphics.checkPref("animatedwater", true);
         if(Shaders.shield != null){
             graphics.checkPref("animatedshields", !mobile);
         }
@@ -359,6 +360,8 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(!mobile){
             Core.settings.put("swapdiagonal", false);
         }
+
+        graphics.checkPref("flow", false);
     }
 
     private void back(){

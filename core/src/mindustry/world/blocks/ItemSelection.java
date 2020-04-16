@@ -24,7 +24,7 @@ public class ItemSelection{
         int i = 0;
 
         for(T item : items){
-            if(!data.isUnlocked(item) && world.isZone()) continue;
+            if(!data.isUnlocked(item) && state.isCampaign()) continue;
 
             ImageButton button = cont.addImageButton(Tex.whiteui, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).group(group).get();
             button.changed(() -> consumer.get(button.isChecked() ? item : null));

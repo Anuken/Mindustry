@@ -1,20 +1,53 @@
 package mindustry.world.modules;
 
+import arc.math.*;
+import arc.struct.*;
+import arc.util.*;
+import arc.util.ArcAnnotate.*;
+import arc.util.io.*;
 import mindustry.type.*;
 
-import java.io.*;
 import java.util.*;
 
 import static mindustry.Vars.content;
 
 public class ItemModule extends BlockModule{
-    private int[] items = new int[content.items().size];
-    private int total;
+    private static final int windowSize = 10;
 
-    // Make the take() loop persistent so it does not return the same item twice in a row unless there is nothing else to return.
+    protected int[] items = new int[content.items().size];
+    protected int total;
     protected int takeRotation;
 
-    public void forEach(ItemConsumer cons){
+    private @Nullable WindowedMean[] flow;
+    private @Nullable Bits flownIds;
+
+    public void update(boolean showFlow){
+        if(showFlow){
+            if(flow == null){
+                flow = new WindowedMean[items.length];
+                flownIds = new Bits(items.length);
+            }
+        }else{
+            flow = null;
+            flownIds = null;
+        }
+    }
+
+    /** @return a specific item's flow rate in items/s; any value < 0 means not ready.*/
+    public float getFlowRate(Item item){
+        if(flow == null || flow[item.id] == null || flow[item.id].getValueCount() <= 2){
+            return  - 1f;
+        }
+
+        //TODO this isn't very accurate
+        return 60f / ((flow[item.id].getLatest() - flow[item.id].getOldest()) / (flow[item.id].getValueCount() - 1));
+    }
+
+    public @Nullable Bits flownBits(){
+        return flownIds;
+    }
+
+    public void each(ItemConsumer cons){
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
                 cons.accept(content.item(i), items[i]);
@@ -91,6 +124,10 @@ public class ItemModule extends BlockModule{
         return null;
     }
 
+    public int get(int id){
+        return items[id];
+    }
+
     public int get(Item item){
         return items[item.id];
     }
@@ -103,6 +140,11 @@ public class ItemModule extends BlockModule{
     public void add(Item item, int amount){
         items[item.id] += amount;
         total += amount;
+        if(flow != null){
+            if(flow[item.id] == null) flow[item.id] = new WindowedMean(windowSize);
+            flow[item.id].addValue(Time.time());
+            flownIds.set(item.id);
+        }
     }
 
     public void addAll(ItemModule items){
@@ -129,32 +171,32 @@ public class ItemModule extends BlockModule{
     }
 
     @Override
-    public void write(DataOutput stream) throws IOException{
+    public void write(Writes write){
         byte amount = 0;
         for(int item : items){
             if(item > 0) amount++;
         }
 
-        stream.writeByte(amount); //amount of items
+        write.b(amount); //amount of items
 
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
-                stream.writeByte(i); //item ID
-                stream.writeInt(items[i]); //item amount
+                write.b(i); //item ID
+                write.i(items[i]); //item amount
             }
         }
     }
 
     @Override
-    public void read(DataInput stream) throws IOException{
+    public void read(Reads read){
         //just in case, reset items
         Arrays.fill(items, 0);
-        byte count = stream.readByte();
+        byte count = read.b();
         total = 0;
 
         for(int j = 0; j < count; j++){
-            int itemid = stream.readByte();
-            int itemamount = stream.readInt();
+            int itemid = read.b();
+            int itemamount = read.i();
             items[content.item(itemid).id] = itemamount;
             total += itemamount;
         }

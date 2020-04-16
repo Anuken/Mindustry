@@ -5,10 +5,9 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.content.*;
-import mindustry.entities.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -16,8 +15,6 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -65,44 +62,8 @@ public class CraterConveyor extends Block implements Autotiler{
     }
 
     @Override
-    public void draw(Tile tile){
-        CraterConveyorEntity entity = tile.ent();
-
-        draw(tile, entity.blendbit1);
-        if(entity.blendbit2 == 0) return;
-        draw(tile, entity.blendbit2);
-    }
-
-    private void draw(Tile tile, int bit){
-        CraterConveyorEntity entity = tile.ent();
-
-        Draw.rect(regions[Mathf.clamp(bit, 0, regions.length - 1)], tile.drawx(), tile.drawy(), tilesize * entity.blendsclx, tilesize * entity.blendscly, tile.rotation() * 90);
-    }
-
-    @Override
-    public void drawLayer(Tile tile){
-        CraterConveyorEntity entity = tile.ent();
-
-        if(entity.from == Pos.invalid) return;
-
-        // offset
-        Tile from = world.tile(entity.from);
-        Tmp.v1.set(from);
-        Tmp.v2.set(tile);
-        Tmp.v1.interpolate(Tmp.v2, 1f - entity.cooldown, Interpolation.linear);
-
-        // fixme
-        float a = (from.rotation()%4) * 90;
-        float b = (tile.rotation()%4) * 90;
-        if((from.rotation()%4) == 3 && (tile.rotation()%4) == 0) a = -1 * 90;
-        if((from.rotation()%4) == 0 && (tile.rotation()%4) == 3) a = 4 * 90;
-
-        // crater
-        Draw.rect(regions[7], Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interpolation.smooth.apply(1f - Mathf.clamp(entity.cooldown * 2, 0f, 1f))));
-
-        // item
-        float size = (itemSize / 2f) + entity.items.total() * 0.1f / (itemCapacity / 8f);
-        Draw.rect(entity.items.first().icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
+    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock) {
+        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof CraterConveyor; // blend with nothing but crater conveyors
     }
 
     @Override
@@ -115,179 +76,206 @@ public class CraterConveyor extends Block implements Autotiler{
         Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl * req.animScale, region.getHeight() * bits[2] * Draw.scl * req.animScale, req.rotation * 90);
     }
 
-    @Override
-    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock) {
-        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof CraterConveyor; // blend with nothing but crater conveyors
-    }
-
-    @Override
-    public void onProximityUpdate(Tile tile){
-        super.onProximityUpdate(tile);
-
-        CraterConveyorEntity entity = tile.ent();
-        int[] bits = buildBlending(tile, tile.rotation(), null, true);
-
-        entity.blendbit2 = 0;
-        if(bits[0] == 0 && blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) entity.blendbit2 = 5; // a 0 that faces into a crater conveyor with none behind it
-        if(bits[0] == 0 && !blends(tile, tile.rotation(), 0) && blends(tile, tile.rotation(), 2)) entity.blendbit2 = 6; // a 0 that faces into none with a crater conveyor behind it
-
-        entity.blendbit1 = bits[0];
-        entity.blendsclx = bits[1];
-        entity.blendscly = bits[2];
-    }
-
-    @Override
-    public void update(Tile tile){
-        CraterConveyorEntity entity = tile.ent();
-
-        // reel in crater
-        if(entity.cooldown > 0f) entity.cooldown = Mathf.clamp(entity.cooldown - speed, 0f, 1f);
-
-        // sleep when idle
-        if(entity.from == Pos.invalid){
-            if(entity.cooldown == 0f) tile.entity.sleep();
-            return;
-        }
-
-        // crater needs to be centered
-        if(entity.cooldown > 0f) return;
-
-        if(entity.blendbit2 == 6){
-            while(tryDump(tile)) if(entity.items.total() == 0) poofOut(tile);
-        }
-
-        /* unload */ else /* transfer */
-
-        if(entity.blendbit2 != 5 || (entity.items.total() >= getMaximumAccepted(tile, entity.items.first()))){
-            if(tile.front() != null
-            && tile.front().getTeam() == tile.getTeam()
-            && tile.front().block() instanceof CraterConveyor){
-                CraterConveyorEntity e = tile.front().ent();
-
-                // sleep if its occupied
-                if(e.from != Pos.invalid){
-                    entity.sleep();
-                }else{
-                    e.items.addAll(entity.items);
-                    e.from = tile.pos();
-                    // ▲ new | old ▼
-                    entity.from = Pos.invalid;
-                    entity.items.clear();
-
-                    e.cooldown = entity.cooldown = 1;
-                    e.noSleep();
-                    bump(tile);
-                }
-            }
-        }
-    }
-
-    private void poofIn(Tile tile){
-        tile.<CraterConveyorEntity>ent().from = tile.pos();
-        Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
-        tile.entity.noSleep();
-    }
-
-    private void poofOut(Tile tile){
-        Effects.effect(Fx.plasticburn, tile.drawx(), tile.drawy());
-        tile.<CraterConveyorEntity>ent().from = Pos.invalid;
-        bump(tile);
-    }
-
-    @Override
-    public void handleItem(Item item, Tile tile, Tile source){
-        if(tile.entity.items.total() == 0) poofIn(tile);
-        super.handleItem(item, tile, source);
-    }
-
-    @Override
-    public void handleStack(Item item, int amount, Tile tile, Unit source){
-        if(tile.entity.items.total() == 0) poofIn(tile);
-        super.handleStack(item, amount, tile, source);
-    }
-
-    @Override
-    public int removeStack(Tile tile, Item item, int amount){
-        try{return super.removeStack(tile, item, amount);
-        }finally{
-            if(tile.entity.items.total() == 0) poofOut(tile);
-        }
-    }
-
-    @Override
-    public int getMaximumAccepted(Tile tile, Item item){
-        return Mathf.round(super.getMaximumAccepted(tile, item) * tile.entity.timeScale); // increased item capacity while boosted
-    }
-
-    @Override
-    public boolean shouldIdleSound(Tile tile){
-        return false; // has no moving parts
-    }
-
     class CraterConveyorEntity extends TileEntity{
+
         int blendbit1, blendbit2;
         int blendsclx, blendscly;
 
-        int from = Pos.invalid;
+        int link = -1;
         float cooldown;
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
+        public void draw(){
+            draw(blendbit1);
+            if(blendbit2 == 0) return;
+            draw(blendbit2);
+        }
 
-            stream.writeInt(from);
-            stream.writeFloat(cooldown);
+        private void draw(int bit){
+            Draw.rect(regions[Mathf.clamp(bit, 0, regions.length - 1)], x, y, tilesize * blendsclx, tilesize * blendscly, rotation() * 90);
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
 
-            from = stream.readInt();
-            cooldown = stream.readFloat();
+            int[] bits = buildBlending(tile, tile.rotation(), null, true);
+
+            blendbit2 = 0;
+            if(bits[0] == 0 && blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) blendbit2 = 5; // a 0 that faces into a crater conveyor with none behind it
+            if(bits[0] == 0 && !blends(tile, tile.rotation(), 0) && blends(tile, tile.rotation(), 2)) blendbit2 = 6; // a 0 that faces into none with a crater conveyor behind it
+
+            blendbit1 = bits[0];
+            blendsclx = bits[1];
+            blendscly = bits[2];
         }
-    }
 
-    // crater conveyor tiles that input into this one
-    private void upstream(Tile tile, Cons<Tile> cons){
-        CraterConveyorEntity entity = tile.ent();
+        @Override
+        public void drawLayer(){
+            if(link == -1) return;
 
-        if(    entity.blendbit1 == 0 // 1 input from the back, 0 from the sides
-            || entity.blendbit1 == 2 // 1 input from the back, 1 from the sides
-            || entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
-        ) cons.get(tile.back());     // fixme, fires for 0 while nothing behind
+            // offset
+            Tile from = world.tile(link);
+            Tmp.v1.set(from);
+            Tmp.v2.set(tile);
+            Tmp.v1.interpolate(Tmp.v2, 1f - cooldown, Interpolation.linear);
 
-        if(    entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
-            || entity.blendbit1 == 4 // 0 input from the back, 2 from the sides
-            ||(entity.blendbit1 == 1 && entity.blendscly == -1) // side is open
-            ||(entity.blendbit1 == 2 && entity.blendscly == +1) // side is open
-        ) cons.get(tile.right());
+            // fixme
+            float a = (from.rotation()%4) * 90;
+            float b = (tile.rotation()%4) * 90;
+            if((from.rotation()%4) == 3 && (tile.rotation()%4) == 0) a = -1 * 90;
+            if((from.rotation()%4) == 0 && (tile.rotation()%4) == 3) a = 4 * 90;
 
-        if(    entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
-            || entity.blendbit1 == 4 // 0 input from the back, 2 from the sides
-            ||(entity.blendbit1 == 1 && entity.blendscly == +1) // side is open
-            ||(entity.blendbit1 == 2 && entity.blendscly == -1) // side is open
-        ) cons.get(tile.left());
-    }
+            // crater
+            Draw.rect(regions[7], Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interpolation.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
 
-    // awaken inputting conveyors
-    private void bump(Tile tile){
-        upstream(tile, t -> {
-            if(t == null || t.entity == null || !t.entity.isSleeping() || t.entity.items.total() <= 0) return;
-            t.entity.noSleep();
-            bump(t);
-        });
-    }
+            // item
+            float size = (itemSize / 2f) + items.total() * 0.1f / (itemCapacity / 8f);
+            Draw.rect(items.first().icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
+        }
 
-    @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        CraterConveyorEntity entity = tile.ent();
+        @Override
+        public int getMaximumAccepted(Item item){
+            return Mathf.round(super.getMaximumAccepted(item) * timeScale); // increased item capacity while boosted
+        }
 
-        if (tile == source) return true;                                  // player threw items
-        if (entity.cooldown > 0f) return false;                           // still cooling down
-        return!((entity.blendbit2 != 5)                                   // not a loading dock
-            ||  (entity.items.total() > 0 && !entity.items.has(item))     // incompatible items
-            ||  (entity.items.total() >= getMaximumAccepted(tile, item))  // filled to capacity
-            ||  (tile.front() == source));                                // fed from the front
+        @Override
+        public boolean shouldIdleSound(){
+            return false; // has no moving parts;
+        }
+
+        private void poofIn(){
+            link = tile.pos();
+            Fx.plasticburn.at(this);
+            tile.entity.noSleep();
+        }
+
+        private void poofOut(){
+            Fx.plasticburn.at(this);
+            link = -1;
+            bump(this);
+        }
+
+        @Override
+        public void handleItem(Tilec source, Item item){
+            if(items.total() == 0) poofIn();
+            super.handleItem(source, item);
+        }
+
+        @Override
+        public void handleStack(Item item, int amount, Teamc source){
+            if(items.total() == 0) poofIn();
+            super.handleStack(item, amount, source);
+        }
+
+        @Override
+        public int removeStack(Item item, int amount){
+            try{
+                return super.removeStack(item, amount);
+            }finally{
+                if(items.total() == 0) poofOut();
+            }
+        }
+
+        // crater conveyor tiles that input into this one
+        private void upstream(Tilec tile, Cons<Tilec> cons){
+            CraterConveyorEntity entity = (CraterConveyorEntity)tile;
+
+            if(    entity.blendbit1 == 0 // 1 input from the back, 0 from the sides
+                || entity.blendbit1 == 2 // 1 input from the back, 1 from the sides
+                || entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
+            ) cons.get(back());          // fixme, fires for 0 while nothing behind
+
+            if(    entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
+                || entity.blendbit1 == 4 // 0 input from the back, 2 from the sides
+                ||(entity.blendbit1 == 1 && entity.blendscly == -1) // side is open
+                ||(entity.blendbit1 == 2 && entity.blendscly == +1) // side is open
+            ) cons.get(right());
+
+            if(    entity.blendbit1 == 3 // 1 input from the back, 2 from the sides
+                || entity.blendbit1 == 4 // 0 input from the back, 2 from the sides
+                ||(entity.blendbit1 == 1 && entity.blendscly == +1) // side is open
+                ||(entity.blendbit1 == 2 && entity.blendscly == -1) // side is open
+            ) cons.get(left());
+        }
+
+        // awaken inputting conveyors
+        private void bump(Tilec tile){
+            upstream(tile, t -> {
+                if(t == null || !t.isSleeping() || t.items().total() <= 0) return;
+                t.noSleep();
+                bump(t);
+            });
+        }
+
+        @Override
+        public boolean acceptItem(Tilec source, Item item){
+            if (this == source) return true;                // player threw items
+            if (cooldown > 0f) return false;                // still cooling down
+            return!((blendbit2 != 5)                        // not a loading dock
+            ||  (items.total() > 0 && !items.has(item))     // incompatible items
+            ||  (items.total() >= getMaximumAccepted(item)) // filled to capacity
+            ||  (tile.front() == source));
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+
+            write.i(link);
+            write.f(cooldown);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+
+            link = read.i();
+            cooldown = read.f();
+        }
+
+        @Override
+        public void updateTile(){
+            // reel in crater
+            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed, 0f, 1f);
+
+            // sleep when idle
+            if(link == -1){
+                if(cooldown == 0f) sleep();
+                return;
+            }
+
+            // crater needs to be centered
+            if(cooldown > 0f) return;
+
+            if(blendbit2 == 6){
+                while(dump()) if(items.total() == 0) poofOut();
+            }
+
+            /* unload */ else /* transfer */
+
+            if(blendbit2 != 5 || (items.total() >= getMaximumAccepted(items.first()))){
+                if(front() != null
+                && front().team() == team()
+                && front().block() instanceof CraterConveyor){
+                    CraterConveyorEntity e = (CraterConveyorEntity)tile.front();
+
+                    // sleep if its occupied
+                    if(e.link != -1){
+                        sleep();
+                    }else{
+                        e.items.addAll(items);
+                        e.link = tile.pos();
+                        // ▲ new | old ▼
+                        link = -1;
+                        items.clear();
+
+                        e.cooldown = cooldown = 1;
+                        e.noSleep();
+                        bump(this);
+                    }
+                }
+            }
+        }
     }
 }

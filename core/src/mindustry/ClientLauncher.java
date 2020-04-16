@@ -92,10 +92,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets.load(mods);
         assets.load(schematics);
 
-        assets.loadRun("contentinit", ContentLoader.class, () -> {
-            content.init();
-            content.load();
-        });
+        assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> content.load());
     }
 
     @Override

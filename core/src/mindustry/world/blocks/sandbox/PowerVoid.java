@@ -1,6 +1,6 @@
 package mindustry.world.blocks.sandbox;
 
-import mindustry.world.blocks.PowerBlock;
+import mindustry.world.blocks.power.PowerBlock;
 import mindustry.world.meta.BlockStat;
 
 public class PowerVoid extends PowerBlock{

@@ -14,6 +14,7 @@ import mindustry.ui.Cicon;
 
 import static mindustry.Vars.*;
 
+//TODO remove
 public class ZoneInfoDialog extends FloatingDialog{
     private LoadoutDialog loadout = new LoadoutDialog();
 
@@ -24,12 +25,12 @@ public class ZoneInfoDialog extends FloatingDialog{
         addCloseButton();
     }
 
-    public void show(Zone zone){
+    public void show(SectorPreset zone){
         setup(zone);
         show();
     }
 
-    private void setup(Zone zone){
+    private void setup(SectorPreset zone){
         cont.clear();
 
         Table iteminfo = new Table();
@@ -152,13 +153,13 @@ public class ZoneInfoDialog extends FloatingDialog{
             if(!data.isUnlocked(zone)){
                 Sounds.unlock.play();
                 data.unlockContent(zone);
-                ui.deploy.setup();
+                ui.planet.setup();
                 setup(zone);
             }else{
-                ui.deploy.hide();
+                ui.planet.hide();
                 data.removeItems(zone.getLaunchCost());
                 hide();
-                control.playZone(zone);
+                //control.playZone(zone);
             }
         }).minWidth(200f).margin(13f).padTop(5).disabled(b -> zone.locked() ? !zone.canUnlock() : !data.hasItems(zone.getLaunchCost())).uniformY().get();
 

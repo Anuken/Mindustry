@@ -91,6 +91,6 @@ public class DatabaseDialog extends FloatingDialog{
     }
 
     boolean unlocked(UnlockableContent content){
-        return (!Vars.world.isZone() && !Vars.state.is(State.menu)) || content.unlocked();
+        return (!Vars.state.isCampaign() && !Vars.state.isMenu()) || content.unlocked();
     }
 }

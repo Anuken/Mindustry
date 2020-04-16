@@ -21,7 +21,6 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
-import mindustry.plugin.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
@@ -78,7 +77,7 @@ public class Mods implements Loadable{
     public void importMod(Fi file) throws IOException{
         Fi dest = modDirectory.child(file.name());
         if(dest.exists()){
-            throw new IOException("A mod with the same filename already exists!");
+            throw new IOException("A file with the same name already exists in the mod folder!");
         }
 
         file.copyTo(dest);
@@ -115,6 +114,19 @@ public class Mods implements Loadable{
         Log.debug("Time to pack textures: {0}", Time.elapsed());
     }
 
+    private void loadIcons(){
+        for(LoadedMod mod : mods){
+            //try to load icon for each mod that can have one
+            if(mod.root.child("icon.png").exists()){
+                try{
+                    mod.iconTexture = new Texture(mod.root.child("icon.png"));
+                }catch(Throwable t){
+                    Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
+                }
+            }
+        }
+    }
+
     private void packSprites(Array<Fi> sprites, LoadedMod mod, boolean prefix){
         for(Fi file : sprites){
             try(InputStream stream = file.read()){
@@ -136,16 +148,7 @@ public class Mods implements Loadable{
 
     @Override
     public void loadSync(){
-        for(LoadedMod mod : mods){
-            //try to load icon for each mod that can have one
-            if(mod.root.child("icon.png").exists()){
-                try{
-                    mod.iconTexture = new Texture(mod.root.child("icon.png"));
-                }catch(Throwable t){
-                    Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
-                }
-            }
-        }
+        loadIcons();
 
         if(packer == null) return;
         Time.mark();
@@ -220,6 +223,7 @@ public class Mods implements Loadable{
             return;
         }
         mods.remove(mod);
+        mod.dispose();
         requiresReload = true;
     }
 
@@ -247,8 +251,12 @@ public class Mods implements Loadable{
                 LoadedMod mod = loadMod(file);
                 mods.add(mod);
             }catch(Throwable e){
-                Log.err("Failed to load mod file {0}. Skipping.", file);
-                Log.err(e);
+                if(e instanceof ClassNotFoundException && e.getMessage().contains("mindustry.plugin.Plugin")){
+                    Log.info("Plugin {0} is outdated and needs to be ported to 6.0! Update its main class to inherit from 'mindustry.mod.Plugin'.");
+                }else{
+                    Log.err("Failed to load mod file {0}. Skipping.", file);
+                    Log.err(e);
+                }
             }
         }
 
@@ -366,7 +374,7 @@ public class Mods implements Loadable{
     private void checkWarnings(){
         //show 'scripts have errored' info
         if(scripts != null && scripts.hasErrored()){
-           Core.settings.getBoolOnce("scripts-errored2", () -> ui.showErrorMessage("$mod.scripts.unsupported"));
+           ui.showErrorMessage("$mod.scripts.unsupported");
         }
 
         //show list of errored content
@@ -414,7 +422,7 @@ public class Mods implements Loadable{
     }
 
     public boolean hasContentErrors(){
-        return mods.contains(LoadedMod::hasContentErrors);
+        return mods.contains(LoadedMod::hasContentErrors) || (scripts != null && scripts.hasErrored());
     }
 
     /** Reloads all mod content. How does this even work? I refuse to believe that it functions correctly.*/
@@ -448,6 +456,8 @@ public class Mods implements Loadable{
         data.load();
         Core.atlas.getTextures().each(t -> t.setFilter(Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest));
         requiresReload = false;
+
+        loadIcons();
 
         Events.fire(new ContentReloadEvent());
     }
@@ -725,6 +735,7 @@ public class Mods implements Loadable{
         public void dispose(){
             if(iconTexture != null){
                 iconTexture.dispose();
+                iconTexture = null;
             }
         }
 

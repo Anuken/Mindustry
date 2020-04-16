@@ -20,7 +20,6 @@ import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.core.GameState.*;
 import mindustry.editor.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -63,7 +62,7 @@ public class UI implements ApplicationListener, Loadable{
     public TraceDialog traces;
     public DatabaseDialog database;
     public ContentInfoDialog content;
-    public DeployDialog deploy;
+    public PlanetDialog planet;
     public TechTreeDialog tech;
     //public MinimapDialog minimap;
     public SchematicsDialog schematics;
@@ -176,7 +175,7 @@ public class UI implements ApplicationListener, Loadable{
         traces = new TraceDialog();
         maps = new MapsDialog();
         content = new ContentInfoDialog();
-        deploy = new DeployDialog();
+        planet = new PlanetDialog();
         tech = new TechTreeDialog();
         mods = new ModsDialog();
         schematics = new SchematicsDialog();
@@ -185,10 +184,10 @@ public class UI implements ApplicationListener, Loadable{
 
         menuGroup.setFillParent(true);
         menuGroup.touchable(Touchable.childrenOnly);
-        menuGroup.visible(() -> state.is(State.menu));
+        menuGroup.visible(() -> state.isMenu());
         hudGroup.setFillParent(true);
         hudGroup.touchable(Touchable.childrenOnly);
-        hudGroup.visible(() -> !state.is(State.menu));
+        hudGroup.visible(() -> state.isGame());
 
         Core.scene.add(menuGroup);
         Core.scene.add(hudGroup);
@@ -296,7 +295,7 @@ public class UI implements ApplicationListener, Loadable{
         table.setFillParent(true);
         table.touchable(Touchable.disabled);
         table.update(() -> {
-            if(state.is(State.menu)) table.remove();
+            if(state.isMenu()) table.remove();
         });
         table.actions(Actions.delay(duration * 0.9f), Actions.fadeOut(duration * 0.1f, Interpolation.fade), Actions.remove());
         table.top().table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).padTop(10);
@@ -309,7 +308,7 @@ public class UI implements ApplicationListener, Loadable{
         table.setFillParent(true);
         table.touchable(Touchable.disabled);
         table.update(() -> {
-            if(state.is(State.menu)) table.remove();
+            if(state.isMenu()) table.remove();
         });
         table.actions(Actions.delay(duration), Actions.remove());
         table.align(align).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).pad(top, left, bottom, right);
@@ -322,7 +321,7 @@ public class UI implements ApplicationListener, Loadable{
         table.setFillParent(true);
         table.touchable(Touchable.disabled);
         table.update(() -> {
-            if(state.is(State.menu)) table.remove();
+            if(state.isMenu()) table.remove();
         });
         table.actions(Actions.delay(duration), Actions.remove());
         table.align(Align.center).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).update(t -> {

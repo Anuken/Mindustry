@@ -39,7 +39,7 @@ public class Team implements Comparable<Team>{
     }
 
     public static Team get(int id){
-        return all[Pack.u((byte)id)];
+        return all[((byte)id) & 0xff];
     }
 
     /** @return the 6 base team colors. */

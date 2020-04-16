@@ -1,6 +1,5 @@
 package mindustry.world.meta;
 
-import arc.math.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import mindustry.*;
@@ -40,8 +39,8 @@ public class BlockStats{
 
     public void add(BlockStat stat, Attribute attr){
         for(Block block : Vars.content.blocks()){
-            if(!block.isFloor() || Mathf.zero(block.asFloor().attributes.get(attr))) continue;
-            add(stat, new FloorValue(block.asFloor()));
+            if(!block.isFloor() || block.asFloor().attributes.get(attr) == 0) continue;
+            add(stat, new FloorEfficiencyValue(block.asFloor(), block.asFloor().attributes.get(attr)));
         }
     }
 

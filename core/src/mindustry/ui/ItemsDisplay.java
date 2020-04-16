@@ -41,7 +41,7 @@ public class ItemsDisplay extends Table{
             }).get().setScrollingDisabled(true, false), false).setDuration(0.3f);
 
             c.addImageTextButton("$launcheditems", Icon.downOpen, Styles.clearTogglet, col::toggle).update(t -> {
-                t.setText(state.is(State.menu) ? "$launcheditems" : "$launchinfo");
+                t.setText(state.isMenu() ? "$launcheditems" : "$launchinfo");
                 t.setChecked(col.isCollapsed());
                 ((Image)t.getChildren().get(1)).setDrawable(col.isCollapsed() ? Icon.upOpen : Icon.downOpen);
             }).padBottom(4).left().fillX().margin(12f).minWidth(200f);
@@ -53,9 +53,9 @@ public class ItemsDisplay extends Table{
     private String format(Item item){
         builder.setLength(0);
         builder.append(ui.formatAmount(data.items().get(item, 0)));
-        if(!state.is(State.menu) && player.getTeam().data().hasCore() && player.getTeam().core().items.get(item) > 0){
+        if(state.isGame() && player.team().data().hasCore() && player.team().core().items().get(item) > 0){
             builder.append(" [unlaunched]+ ");
-            builder.append(ui.formatAmount(state.teams.get(player.getTeam()).core().items.get(item)));
+            builder.append(ui.formatAmount(state.teams.get(player.team()).core().items().get(item)));
         }
         return builder.toString();
     }

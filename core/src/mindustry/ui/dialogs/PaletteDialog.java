@@ -29,7 +29,7 @@ public class PaletteDialog extends Dialog{
                 cons.get(color);
                 hide();
             }).size(48).get();
-            button.setChecked(player.color.equals(color));
+            button.setChecked(player.color().equals(color));
             button.getStyle().imageUpColor = color;
 
             if(i % 4 == 3){

@@ -4,11 +4,10 @@ import arc.struct.*;
 import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.Cicon;
-import mindustry.world.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
@@ -33,9 +32,10 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void build(Tile tile, Table table){
+    public void build(Tilec tile, Table table){
         MultiReqImage image = new MultiReqImage();
-        content.items().each(i -> filter.get(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), 1), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(item))));
+        content.items().each(i -> filter.get(i) && (!state.isCampaign() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), 1),
+            () -> tile.items() != null && tile.items().has(item))));
 
         table.add(image).size(8 * 4);
     }
@@ -46,26 +46,26 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void update(TileEntity entity){
+    public void update(Tilec entity){
 
     }
 
     @Override
-    public void trigger(TileEntity entity){
+    public void trigger(Tilec entity){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
-            if(entity.items != null && entity.items.has(item) && this.filter.get(item)){
-                entity.items.remove(item, 1);
+            if(entity.items() != null && entity.items().has(item) && this.filter.get(item)){
+                entity.items().remove(item, 1);
                 break;
             }
         }
     }
 
     @Override
-    public boolean valid(TileEntity entity){
+    public boolean valid(Tilec entity){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
-            if(entity.items != null && entity.items.has(item) && this.filter.get(item)){
+            if(entity.items() != null && entity.items().has(item) && this.filter.get(item)){
                 return true;
             }
         }
