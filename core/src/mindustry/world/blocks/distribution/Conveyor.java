@@ -17,7 +17,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.liquid.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -38,7 +37,6 @@ public class Conveyor extends Block implements Autotiler{
         rotate = true;
         update = true;
         layer = Layer.overlay;
-        layer2 = Layer.lawn;
         group = BlockGroup.transportation;
         hasItems = true;
         itemCapacity = 4;
@@ -165,11 +163,6 @@ public class Conveyor extends Block implements Autotiler{
                 (tile.x * tilesize + tr1.x * ys[i] + tr2.x),
                 (tile.y * tilesize + tr1.y * ys[i] + tr2.y), itemSize, itemSize);
             }
-        }
-
-        @Override
-        public void drawLayer2(){
-            // todo
         }
 
         @Override
