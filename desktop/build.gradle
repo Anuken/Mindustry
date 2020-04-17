@@ -6,7 +6,7 @@ apply plugin: "java"
 sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
 
-project.ext.mainClassName = "io.anuke.mindustry.desktop.DesktopLauncher"
+project.ext.mainClassName = "mindustry.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
 def enableTemplates = true
@@ -28,8 +28,12 @@ task run(dependsOn: classes, type: JavaExec){
         args Eval.me(project.getProperties()["args"])
     }
 
+    if(project.hasProperty("jvmArgs")){
+        jvmArgs((List<String>)Eval.me(project.getProperties()["jvmArgs"]))
+    }
+
     if(args.contains("debug")){
-        main = "io.anuke.mindustry.DebugLauncher"
+        main = "mindustry.debug.DebugLauncher"
     }
 }
 
@@ -37,7 +41,7 @@ task run(dependsOn: classes, type: JavaExec){
 task dist(type: Jar, dependsOn: classes){
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
-    from {configurations.compile.collect {zipTree(it)}}
+    from {configurations.compile.collect{ it.isDirectory() ? it : zipTree(it) }}
     from files(project.assetsDir)
 
     archiveFileName = "${appName}.jar"
@@ -100,7 +104,7 @@ PackrConfig.Platform.values().each{ platform ->
                     classpath = ["desktop/build/packr/desktop.jar"]
                     removePlatformLibs = ["desktop/build/packr/desktop.jar"]
 
-                    vmArgs = ["Djava.net.preferIPv4Stack=true"]
+                    vmArgs = []
                     minimizeJre = "desktop/packr_minimize.json"
                     jdk = JDK_DIR + "jdk-${platform.toString().toLowerCase()}.zip"
 

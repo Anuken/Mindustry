@@ -1,11 +1,13 @@
 package power;
 
-import io.anuke.arc.*;
-import io.anuke.arc.math.*;
-import io.anuke.arc.util.*;
-import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.power.*;
-import io.anuke.mindustry.world.consumers.*;
+import arc.*;
+import arc.math.*;
+import arc.util.*;
+import mindustry.*;
+import mindustry.core.*;
+import mindustry.world.*;
+import mindustry.world.blocks.power.*;
+import mindustry.world.consumers.*;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,6 +25,7 @@ public class PowerTests extends PowerTestFixture{
     @BeforeAll
     static void init(){
         Core.graphics = new FakeGraphics();
+        Vars.state = new GameState();
     }
 
     @Nested
@@ -51,19 +54,19 @@ public class PowerTests extends PowerTestFixture{
 
         void simulateDirectConsumption(float producedPower, float requiredPower, float expectedSatisfaction, String parameterDescription){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
-            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1f;
+            producerTile.<PowerGenerator.GeneratorEntity>ent().productionEfficiency = 1f;
             Tile directConsumerTile = createFakeTile(0, 1, createFakeDirectConsumer(requiredPower));
 
             PowerGraph powerGraph = new PowerGraph();
-            powerGraph.add(producerTile);
-            powerGraph.add(directConsumerTile);
+            powerGraph.add(producerTile.entity);
+            powerGraph.add(directConsumerTile.entity);
 
             assertEquals(producedPower * Time.delta(), powerGraph.getPowerProduced(), Mathf.FLOAT_ROUNDING_ERROR);
             assertEquals(requiredPower * Time.delta(), powerGraph.getPowerNeeded(), Mathf.FLOAT_ROUNDING_ERROR);
 
             // Update and check for the expected power status of the consumer
             powerGraph.update();
-            assertEquals(expectedSatisfaction, directConsumerTile.entity.power.status, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of direct consumer did not match");
+            assertEquals(expectedSatisfaction, directConsumerTile.entity.power().status, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of direct consumer did not match");
         }
 
         /**
@@ -91,24 +94,24 @@ public class PowerTests extends PowerTestFixture{
 
             if(producedPower > 0.0f){
                 Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
-                producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1f;
-                powerGraph.add(producerTile);
+                producerTile.<PowerGenerator.GeneratorEntity>ent().productionEfficiency = 1f;
+                powerGraph.add(producerTile.entity);
             }
             Tile directConsumerTile = null;
             if(requestedPower > 0.0f){
                 directConsumerTile = createFakeTile(0, 1, createFakeDirectConsumer(requestedPower));
-                powerGraph.add(directConsumerTile);
+                powerGraph.add(directConsumerTile.entity);
             }
             float maxCapacity = 100f;
             Tile batteryTile = createFakeTile(0, 2, createFakeBattery(maxCapacity));
-            batteryTile.entity.power.status = initialBatteryCapacity / maxCapacity;
+            batteryTile.entity.power().status = initialBatteryCapacity / maxCapacity;
 
-            powerGraph.add(batteryTile);
+            powerGraph.add(batteryTile.entity);
 
             powerGraph.update();
-            assertEquals(expectedBatteryCapacity / maxCapacity, batteryTile.entity.power.status, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Expected battery status did not match");
+            assertEquals(expectedBatteryCapacity / maxCapacity, batteryTile.entity.power().status, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Expected battery status did not match");
             if(directConsumerTile != null){
-                assertEquals(expectedSatisfaction, directConsumerTile.entity.power.status, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of direct consumer did not match");
+                assertEquals(expectedSatisfaction, directConsumerTile.entity.power().status, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of direct consumer did not match");
             }
         }
 
@@ -116,24 +119,24 @@ public class PowerTests extends PowerTestFixture{
         @Test
         void directConsumptionStopsWithNoPower(){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(10.0f));
-            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1.0f;
+            producerTile.<PowerGenerator.GeneratorEntity>ent().productionEfficiency = 1.0f;
             Tile consumerTile = createFakeTile(0, 1, createFakeDirectConsumer(5.0f));
 
             PowerGraph powerGraph = new PowerGraph();
-            powerGraph.add(producerTile);
-            powerGraph.add(consumerTile);
+            powerGraph.add(producerTile.entity);
+            powerGraph.add(consumerTile.entity);
             powerGraph.update();
 
-            assertEquals(1.0f, consumerTile.entity.power.status, Mathf.FLOAT_ROUNDING_ERROR);
+            assertEquals(1.0f, consumerTile.entity.power().status, Mathf.FLOAT_ROUNDING_ERROR);
 
-            powerGraph.remove(producerTile);
-            powerGraph.add(consumerTile);
+            powerGraph.remove(producerTile.entity);
+            powerGraph.add(consumerTile.entity);
             powerGraph.update();
 
-            assertEquals(0.0f, consumerTile.entity.power.status, Mathf.FLOAT_ROUNDING_ERROR);
+            assertEquals(0.0f, consumerTile.entity.power().status, Mathf.FLOAT_ROUNDING_ERROR);
             if(consumerTile.block().consumes.hasPower()){
                 ConsumePower consumePower = consumerTile.block().consumes.getPower();
-                assertFalse(consumePower.valid(consumerTile.entity()));
+                assertFalse(consumePower.valid(consumerTile.ent()));
             }
         }
     }

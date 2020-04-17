@@ -17,17 +17,19 @@ See [CONTRIBUTING](CONTRIBUTING.md).
 Bleeding-edge live builds are generated automatically for every commit. You can see them [here](https://github.com/Anuken/MindustryBuilds/releases). Old builds might still be on [jenkins](https://jenkins.hellomouse.net/job/mindustry/).
 
 If you'd rather compile on your own, follow these instructions.
-First, make sure you have [Java 8](https://www.java.com/en/download/) and [JDK 8](https://adoptopenjdk.net/) installed. Open a terminal in the root directory, `cd` to the Mindustry folder and run the following commands:
+First, make sure you have [JDK 8](https://adoptopenjdk.net/) installed. Open a terminal in the root directory, `cd` to the Mindustry folder and run the following commands:
 
 #### Windows
 
-_Running:_ `gradlew desktop:run`  
-_Building:_ `gradlew desktop:dist`
+_Running:_ `gradlew.bat desktop:run`  
+_Building:_ `gradlew.bat desktop:dist`  
+_Sprite Packing:_ `gradlew.bat tools:pack`
 
 #### Linux/Mac OS
 
 _Running:_ `./gradlew desktop:run`  
-_Building:_ `./gradlew desktop:dist`
+_Building:_ `./gradlew desktop:dist`  
+_Sprite Packing:_ `./gradlew tools:pack`
 
 #### Server
 
@@ -51,8 +53,7 @@ After building, the output .JAR file should be in `/desktop/build/libs/Mindustry
 
 ### Feature Requests
 
-[![Feature Requests](https://feathub.com/Anuken/Mindustry?format=svg)](https://feathub.com/Anuken/Mindustry)
-
+Post feature requests and feedback [here](https://github.com/Anuken/Mindustry-Suggestions/issues/new/choose).
 
 ### Downloads
 

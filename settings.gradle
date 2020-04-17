@@ -1,39 +1,50 @@
-include 'desktop', 'core', 'server', 'ios', 'annotations', 'tools', 'tests'
-
-def use = { String name ->
-    include(name)
-    project(name).projectDir = new File(settingsDir, "../${name.substring(1).replace(":", "/")}")
+if(JavaVersion.current() != JavaVersion.VERSION_1_8){
+    throw new GradleException("!!! YOU MUST USE JAVA 8 TO COMPILE AND RUN MINDUSTRY !!! Read the README. Your version: ${System.properties["java.version"]}")
 }
 
-def properties = new Properties()
+include 'desktop', 'core', 'server', 'ios', 'annotations', 'tools', 'tests'
 
-if(new File(settingsDir, 'local.properties').exists() && System.getenv("JITPACK") != "true"){
-    properties.load(new File(settingsDir, 'local.properties').newDataInputStream())
-
-    if(properties.containsKey("sdk.dir")){
-        include 'android'
-    }else{
-        println("No android SDK dir found Not loading Android module.")
+def use = { ... names ->
+    for(String name : names){
+        include(name)
+        project(name).projectDir = new File(settingsDir, "../${name.substring(1).replace(":", "/")}")
     }
+}
+
+def hasSdk = System.getenv("ANDROID_HOME") != null
+
+if(new File(settingsDir, 'local.properties').exists()){
+	def properties = new Properties()
+	properties.load(new File(settingsDir, 'local.properties').newDataInputStream())
+	if(properties.containsKey("sdk.dir")) hasSdk = true
+}
+
+if(System.getenv("JITPACK") == "true") hasSdk = false
+
+if(hasSdk){
+	include 'android'
 }else{
     println("No local.properties found. Not loading Android module.")
 }
 
 if(!hasProperty("release")){
     if(new File(settingsDir, '../Arc').exists()){
-        use(':Arc')
-        use(':Arc:arc-core')
-        use(':Arc:extensions')
-        use(':Arc:extensions:freetype')
-        use(':Arc:extensions:recorder')
-        use(':Arc:extensions:arcnet')
-        use(':Arc:extensions:packer')
-        use(':Arc:backends')
-        use(':Arc:backends:backend-sdl')
-        use(':Arc:backends:backend-lwjgl3')
-        use(':Arc:backends:backend-android')
-        use(':Arc:backends:backend-robovm')
-        use(':Arc:backends:backend-headless')
+        use(
+        ':Arc', 
+        ':Arc:arc-core', 
+        ':Arc:extensions', 
+        ':Arc:extensions:freetype', 
+        ':Arc:extensions:recorder', 
+        ':Arc:extensions:arcnet', 
+        ':Arc:extensions:packer',
+        ':Arc:extensions:g3d',
+        ':Arc:extensions:fx', 
+        ':Arc:backends', 
+        ':Arc:backends:backend-sdl', 
+        ':Arc:backends:backend-android',
+        ':Arc:backends:backend-robovm',
+        ':Arc:backends:backend-headless'
+        )
     }
     
     if(new File(settingsDir, '../Mindustry-Debug').exists()){

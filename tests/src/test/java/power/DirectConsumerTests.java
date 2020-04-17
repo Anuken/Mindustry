@@ -1,12 +1,12 @@
 package power;
 
-import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.power.PowerGenerator;
-import io.anuke.mindustry.world.blocks.power.PowerGraph;
-import io.anuke.mindustry.world.blocks.units.UnitFactory;
+import mindustry.content.Items;
+import mindustry.content.UnitTypes;
+import mindustry.type.ItemStack;
+import mindustry.world.Tile;
+import mindustry.world.blocks.power.PowerGenerator;
+import mindustry.world.blocks.power.PowerGraph;
+import mindustry.world.blocks.units.UnitFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,24 +32,25 @@ public class DirectConsumerTests extends PowerTestFixture{
 
     void testUnitFactory(int siliconAmount, int leadAmount, float producedPower, float requestedPower, float expectedSatisfaction){
         Tile consumerTile = createFakeTile(0, 0, new UnitFactory("fakefactory"){{
+            entityType = UnitFactoryEntity::new;
             unitType = UnitTypes.spirit;
             produceTime = 60;
             consumes.power(requestedPower);
             consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30));
         }});
-        consumerTile.entity.items.add(Items.silicon, siliconAmount);
-        consumerTile.entity.items.add(Items.lead, leadAmount);
+        consumerTile.entity.items().add(Items.silicon, siliconAmount);
+        consumerTile.entity.items().add(Items.lead, leadAmount);
 
         Tile producerTile = createFakeTile(2, 0, createFakeProducerBlock(producedPower));
-        producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1f;
+        producerTile.<PowerGenerator.GeneratorEntity>ent().productionEfficiency = 1f;
 
         PowerGraph graph = new PowerGraph();
-        graph.add(producerTile);
-        graph.add(consumerTile);
+        graph.add(producerTile.entity);
+        graph.add(consumerTile.entity);
 
         consumerTile.entity.update();
         graph.update();
 
-        assertEquals(expectedSatisfaction, consumerTile.entity.power.status);
+        assertEquals(expectedSatisfaction, consumerTile.entity.power().status);
     }
 }
