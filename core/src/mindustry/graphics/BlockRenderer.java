@@ -14,8 +14,6 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.distribution.*;
-import mindustry.world.blocks.liquid.*;
 
 import static arc.Core.camera;
 import static mindustry.Vars.*;
@@ -278,9 +276,6 @@ public class BlockRenderer implements Disposable{
             }else if(request.layer == block.layer2){
                 block.drawLayer2(request.tile);
             }
-//            }else if(request.layer == Layer.lawn){
-//                block.drawLayer2(request.tile);
-//            }
 
             if(isEnd && request.tile.entity != null && displayStatus && block.consumes.any()){
                 request.tile.entity.drawStatus();
