@@ -302,17 +302,36 @@ public class NetServer implements ApplicationListener{
 
         ObjectMap<String, String> whisperUuid = new ObjectMap<>();
 
-        clientCommands.<Player>register("w", "<player> <content...>", "Send a message to a specific player.", (args, player) -> {
-            Player receiverPlayer = playerGroup.find(p -> p.name.equalsIgnoreCase(args[0]));
-            if(receiverPlayer == null){
-                player.sendMessage("[scarlet]No player has that name.");
-                return;
+        clientCommands.<Player>register("w", "<player> <message...>", "Send a message to a specific player.", (args, player) -> {
+            if(args.length == 0){
+                StringBuilder builder = new StringBuilder();
+                builder.append("[orange]Online Players: \n");
+                for(Player p : playerGroup.all()){
+                    if(p.con == null || p == player) continue;
+                    builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.id).append(")\n");
+                }
+                player.sendMessage(builder.toString());
+            }else if(args.length == 2){
+                Player receiverPlayer;
+                if(args[0].length() > 1 && args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))){
+                    int id = Strings.parseInt(args[0].substring(1));
+                    receiverPlayer = playerGroup.find(p -> p.id == id);
+                }else{
+                    receiverPlayer = playerGroup.find(p -> p.name.equalsIgnoreCase(args[0]));
+                }
+
+                if(receiverPlayer == null) {
+                    player.sendMessage("[scarlet]No Player has that name or id.");
+                    return;
+                }
+                receiverPlayer.sendMessage(Strings.format("[lightgray]{0}<W>:[] {1}"));
+                whisperUuid.put(receiverPlayer.uuid, player.uuid);
+            }else{
+                player.sendMessage("[scarlet]You forgot the receiver or message.");
             }
-            receiverPlayer.sendMessage(Strings.format("[lightgray]{0}<W>:[] {1}", player.name, args[1]));
-            whisperUuid.put(receiverPlayer.uuid, player.uuid);
         });
 
-        clientCommands.<Player>register("r", "<content...>", "Reply to the most recent whisper", (args, player) -> {
+        clientCommands.<Player>register("r", "<message...>", "Reply to the most recent whisper", (args, player) -> {
             Player receiverPlayer = playerGroup.find(p -> p.uuid.equals(whisperUuid.get(player.uuid)));
             if(receiverPlayer == null){
                 player.sendMessage("[scarlet]That player left the game.");
