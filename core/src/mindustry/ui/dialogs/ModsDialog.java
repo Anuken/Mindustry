@@ -23,7 +23,7 @@ public class ModsDialog extends FloatingDialog{
         super("$mods");
         addCloseButton();
 
-        buttons.addImageTextButton("$mods.guide", Icon.link, () -> Core.net.openURI(modGuideURL)).size(210, 64f);
+        buttons.button("$mods.guide", Icon.link, () -> Core.net.openURI(modGuideURL)).size(210, 64f);
 
 
         shown(this::setup);
@@ -66,7 +66,7 @@ public class ModsDialog extends FloatingDialog{
             TextButtonStyle style = Styles.clearPartialt;
             float margin = 12f;
 
-            buttons.addImageTextButton("$mod.import", Icon.add, style, () -> {
+            buttons.button("$mod.import", Icon.add, style, () -> {
                 FloatingDialog dialog = new FloatingDialog("$mod.import");
 
                 TextButtonStyle bstyle = Styles.cleart;
@@ -75,7 +75,7 @@ public class ModsDialog extends FloatingDialog{
                     t.defaults().size(300f, 70f);
                     t.margin(12f);
 
-                    t.addImageTextButton("$mod.import.file", Icon.file, bstyle, () -> {
+                    t.button("$mod.import.file", Icon.file, bstyle, () -> {
                         dialog.hide();
 
                         platform.showFileChooser(true, "zip", file -> {
@@ -91,7 +91,7 @@ public class ModsDialog extends FloatingDialog{
 
                     t.row();
 
-                    t.addImageTextButton("$mod.import.github", Icon.github, bstyle, () -> {
+                    t.button("$mod.import.github", Icon.github, bstyle, () -> {
                         dialog.hide();
 
                         ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
@@ -131,10 +131,10 @@ public class ModsDialog extends FloatingDialog{
                 dialog.show();
             }).margin(margin);
 
-            buttons.addImageTextButton("$mods.reload", Icon.refresh, style, this::reload).margin(margin);
+            buttons.button("$mods.reload", Icon.refresh, style, this::reload).margin(margin);
 
             if(!mobile){
-                buttons.addImageTextButton("$mods.openfolder", Icon.link, style, () -> Core.app.openFolder(modDirectory.absolutePath())).margin(margin);
+                buttons.button("$mods.openfolder", Icon.link, style, () -> Core.app.openFolder(modDirectory.absolutePath())).margin(margin);
             }
         }).width(w);
 
@@ -151,11 +151,11 @@ public class ModsDialog extends FloatingDialog{
                     if(!mod.enabled() && !anyDisabled && mods.list().size > 0){
                         anyDisabled = true;
                         table.row();
-                        table.addImage().growX().height(4f).pad(6f).color(Pal.gray);
+                        table.image().growX().height(4f).pad(6f).color(Pal.gray);
                         table.row();
                     }
 
-                    table.addButton(t -> {
+                    table.button(t -> {
                         t.top().left();
                         t.margin(12f);
 
@@ -176,26 +176,26 @@ public class ModsDialog extends FloatingDialog{
                                     Fonts.def.draw(letter, x + width/2f, y + height/2f, Align.center);
                                 }
                             }
-                        }.border(Pal.accent)).size(h - 8f).padTop(-8f).padLeft(-8f).padRight(6f);
+                        }.border(Pal.accent)).size(h - 8f).padTop(-8f).padLeft(-8f).padRight(2f);
 
                         t.defaults().left().top();
                         t.table(title -> {
                             title.left();
-                            title.add("" + mod.meta.displayName() + "\n[lightgray]v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + "")).growX();
+                            title.add("" + mod.meta.displayName() + "\n[lightgray]v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + "")).wrap().width(170f).growX();
                             title.add().growX();
 
-                            title.addImageTextButton(mod.enabled() ? "$mod.disable" : "$mod.enable", mod.enabled() ? Icon.downOpen : Icon.upOpen, Styles.transt, () -> {
+                            title.button(mod.enabled() ? "$mod.disable" : "$mod.enable", mod.enabled() ? Icon.downOpen : Icon.upOpen, Styles.transt, () -> {
                                 mods.setEnabled(mod, !mod.enabled());
                                 setup();
                             }).height(50f).margin(8f).width(130f).disabled(!mod.isSupported());
 
                             if(steam && !mod.hasSteamID()){
-                                title.addImageButton(Icon.download, Styles.clearTransi, () -> {
+                                title.button(Icon.download, Styles.clearTransi, () -> {
                                     platform.publish(mod);
                                 }).size(50f);
                             }
 
-                            title.addImageButton(mod.hasSteamID() ? Icon.link : Icon.trash, Styles.clearPartiali, () -> {
+                            title.button(mod.hasSteamID() ? Icon.link : Icon.trash, Styles.clearPartiali, () -> {
                                 if(!mod.hasSteamID()){
                                     ui.showConfirm("$confirm", "$mod.remove.confirm", () -> {
                                         mods.removeMod(mod);
@@ -250,7 +250,7 @@ public class ModsDialog extends FloatingDialog{
         dialog.addCloseButton();
 
         if(!mobile){
-            dialog.buttons.addImageTextButton("$mods.openfolder", Icon.link, () -> Core.app.openFolder(mod.file.absolutePath()));
+            dialog.buttons.button("$mods.openfolder", Icon.link, () -> Core.app.openFolder(mod.file.absolutePath()));
         }
 
         //TODO improve this menu later

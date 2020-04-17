@@ -386,7 +386,7 @@ public class Mods implements Loadable{
                 cont.margin(15);
                 cont.add("$error.title");
                 cont.row();
-                cont.addImage().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
+                cont.image().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
                 cont.row();
                 cont.add("$mod.errors").wrap().growX().center().get().setAlignment(Align.center);
                 cont.row();
@@ -394,18 +394,18 @@ public class Mods implements Loadable{
                     mods.each(m -> m.enabled() && m.hasContentErrors(), m -> {
                         p.add(m.name).color(Pal.accent).left();
                         p.row();
-                        p.addImage().fillX().pad(4).color(Pal.accent);
+                        p.image().fillX().pad(4).color(Pal.accent);
                         p.row();
                         p.table(d -> {
                             d.left().marginLeft(15f);
                             for(Content c : m.erroredContent){
                                 d.add(c.minfo.sourceFile.nameWithoutExtension()).left().padRight(10);
-                                d.addImageTextButton("$details", Icon.downOpen, Styles.transt, () -> {
+                                d.button("$details", Icon.downOpen, Styles.transt, () -> {
                                     new Dialog(""){{
                                         setFillParent(true);
                                         cont.pane(e -> e.add(c.minfo.error)).grow();
                                         cont.row();
-                                        cont.addImageTextButton("$ok", Icon.left, this::hide).size(240f, 60f);
+                                        cont.button("$ok", Icon.left, this::hide).size(240f, 60f);
                                     }}.show();
                                 }).size(190f, 50f).left().marginLeft(6);
                                 d.row();
@@ -416,7 +416,7 @@ public class Mods implements Loadable{
                 });
 
                 cont.row();
-                cont.addButton("$ok", this::hide).size(300, 50);
+                cont.button("$ok", this::hide).size(300, 50);
             }}.show();
         }
     }

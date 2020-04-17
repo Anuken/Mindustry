@@ -28,7 +28,7 @@ public class MapLoadDialog extends FloatingDialog{
         });
 
         buttons.defaults().size(200f, 50f);
-        buttons.addButton("$cancel", this::hide);
+        buttons.button("$cancel", this::hide);
         buttons.add(button);
     }
 

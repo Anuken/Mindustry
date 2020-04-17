@@ -3,7 +3,6 @@ package mindustry.ui;
 import arc.graphics.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import mindustry.core.GameState.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
@@ -33,14 +32,14 @@ public class ItemsDisplay extends Table{
                 for(Item item : content.items()){
                     if(item.type == ItemType.material && data.isUnlocked(item)){
                         t.label(() -> format(item)).left();
-                        t.addImage(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
+                        t.image(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
                         t.add(item.localizedName).color(Color.lightGray).left();
                         t.row();
                     }
                 }
             }).get().setScrollingDisabled(true, false), false).setDuration(0.3f);
 
-            c.addImageTextButton("$launcheditems", Icon.downOpen, Styles.clearTogglet, col::toggle).update(t -> {
+            c.button("$launcheditems", Icon.downOpen, Styles.clearTogglet, col::toggle).update(t -> {
                 t.setText(state.isMenu() ? "$launcheditems" : "$launchinfo");
                 t.setChecked(col.isCollapsed());
                 ((Image)t.getChildren().get(1)).setDrawable(col.isCollapsed() ? Icon.upOpen : Icon.downOpen);

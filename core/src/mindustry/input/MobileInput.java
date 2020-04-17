@@ -14,7 +14,6 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.entities.units.*;
@@ -175,23 +174,23 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void buildPlacementUI(Table table){
-        table.addImage().color(Pal.gray).height(4f).colspan(4).growX();
+        table.image().color(Pal.gray).height(4f).colspan(4).growX();
         table.row();
         table.left().margin(0f).defaults().size(48f);
 
-        table.addImageButton(Icon.hammer, Styles.clearTogglePartiali, () -> {
+        table.button(Icon.hammer, Styles.clearTogglePartiali, () -> {
             mode = mode == breaking ? block == null ? none : placing : breaking;
             lastBlock = block;
         }).update(l -> l.setChecked(mode == breaking)).name("breakmode");
 
         //diagonal swap button
-        table.addImageButton(Icon.diagonal, Styles.clearTogglePartiali, () -> {
+        table.button(Icon.diagonal, Styles.clearTogglePartiali, () -> {
             Core.settings.put("swapdiagonal", !Core.settings.getBool("swapdiagonal"));
             Core.settings.save();
         }).update(l -> l.setChecked(Core.settings.getBool("swapdiagonal")));
 
         //rotate button
-        table.addImageButton(Icon.right, Styles.clearTogglePartiali, () -> {
+        table.button(Icon.right, Styles.clearTogglePartiali, () -> {
             if(block != null && block.rotate){
                 rotation = Mathf.mod(rotation + 1, 4);
             }else{
@@ -210,7 +209,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         //confirm button
-        table.addImageButton(Icon.ok, Styles.clearPartiali, () -> {
+        table.button(Icon.ok, Styles.clearPartiali, () -> {
             for(BuildRequest request : selectRequests){
                 Tile tile = request.tile();
 
@@ -249,7 +248,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         group.fill(t -> {
             t.bottom().left().visible(() -> (player.builder().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
-            t.addImageTextButton("$cancel", Icon.cancel, () -> {
+            t.button("$cancel", Icon.cancel, () -> {
                 player.builder().clearBuilding();
                 selectRequests.clear();
                 mode = none;
@@ -265,15 +264,15 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                 ImageButtonStyle style = Styles.clearPartiali;
 
-                b.addImageButton(Icon.save, style, this::showSchematicSave).disabled(f -> lastSchematic == null || lastSchematic.file != null);
-                b.addImageButton(Icon.cancel, style, () -> {
+                b.button(Icon.save, style, this::showSchematicSave).disabled(f -> lastSchematic == null || lastSchematic.file != null);
+                b.button(Icon.cancel, style, () -> {
                     selectRequests.clear();
                 });
                 b.row();
-                b.addImageButton(Icon.flipX, style, () -> flipRequests(selectRequests, true));
-                b.addImageButton(Icon.flipY, style, () -> flipRequests(selectRequests, false));
+                b.button(Icon.flipX, style, () -> flipRequests(selectRequests, true));
+                b.button(Icon.flipY, style, () -> flipRequests(selectRequests, false));
                 b.row();
-                b.addImageButton(Icon.rotate, style, () -> rotateRequests(selectRequests, 1));
+                b.button(Icon.rotate, style, () -> rotateRequests(selectRequests, 1));
 
             }).margin(4f);
         });

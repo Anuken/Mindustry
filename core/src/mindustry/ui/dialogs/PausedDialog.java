@@ -18,7 +18,7 @@ public class PausedDialog extends FloatingDialog{
         shown(this::rebuild);
 
         keyDown(key -> {
-            if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
+            if(key == KeyCode.escape || key == KeyCode.back){
                 hide();
             }
         });
@@ -37,26 +37,26 @@ public class PausedDialog extends FloatingDialog{
             float dw = 220f;
             cont.defaults().width(dw).height(55).pad(5f);
 
-            cont.addImageTextButton("$back", Icon.left, this::hide).colspan(2).width(dw * 2 + 20f);
+            cont.button("$back", Icon.left, this::hide).colspan(2).width(dw * 2 + 20f);
 
             cont.row();
             if(state.isCampaign()){
-                cont.addImageTextButton("$techtree", Icon.tree, ui.tech::show);
+                cont.button("$techtree", Icon.tree, ui.tech::show);
             }else{
-                cont.addImageTextButton("$database", Icon.book, ui.database::show);
+                cont.button("$database", Icon.book, ui.database::show);
             }
-            cont.addImageTextButton("$settings", Icon.settings, ui.settings::show);
+            cont.button("$settings", Icon.settings, ui.settings::show);
 
             if(!state.rules.tutorial){
                 if(!state.isCampaign() && !state.isEditor()){
                     cont.row();
-                    cont.addImageTextButton("$savegame", Icon.save, save::show);
-                    cont.addImageTextButton("$loadgame", Icon.upload, load::show).disabled(b -> net.active());
+                    cont.button("$savegame", Icon.save, save::show);
+                    cont.button("$loadgame", Icon.upload, load::show).disabled(b -> net.active());
                 }
 
                 cont.row();
 
-                cont.addImageTextButton("$hostserver", Icon.host, () -> {
+                cont.button("$hostserver", Icon.host, () -> {
                     if(net.server() && steam){
                         platform.inviteFriends();
                     }else{
@@ -71,26 +71,26 @@ public class PausedDialog extends FloatingDialog{
 
             cont.row();
 
-            cont.addImageTextButton("$quit", Icon.exit, this::showQuitConfirm).colspan(2).width(dw + 20f).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit"));
+            cont.button("$quit", Icon.exit, this::showQuitConfirm).colspan(2).width(dw + 20f).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit"));
 
         }else{
             cont.defaults().size(130f).pad(5);
-            cont.addRowImageTextButton("$back", Icon.play, this::hide);
-            cont.addRowImageTextButton("$settings", Icon.settings, ui.settings::show);
+            cont.buttonRow("$back", Icon.play, this::hide);
+            cont.buttonRow("$settings", Icon.settings, ui.settings::show);
 
             if(!state.isCampaign() && !state.isEditor()){
-                cont.addRowImageTextButton("$save", Icon.save, save::show);
+                cont.buttonRow("$save", Icon.save, save::show);
 
                 cont.row();
 
-                cont.addRowImageTextButton("$load", Icon.download, load::show).disabled(b -> net.active());
+                cont.buttonRow("$load", Icon.download, load::show).disabled(b -> net.active());
             }else{
                 cont.row();
             }
 
-            cont.addRowImageTextButton("$hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
+            cont.buttonRow("$hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
 
-            cont.addRowImageTextButton("$quit", Icon.exit, this::showQuitConfirm).update(s -> {
+            cont.buttonRow("$quit", Icon.exit, this::showQuitConfirm).update(s -> {
                 s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit");
                 s.getLabelCell().growX().wrap();
             });

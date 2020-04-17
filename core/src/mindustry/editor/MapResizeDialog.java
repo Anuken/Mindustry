@@ -22,7 +22,7 @@ public class MapResizeDialog extends FloatingDialog{
             for(boolean w : Mathf.booleans){
                 table.add(w ? "$width" : "$height").padRight(8f);
                 table.defaults().height(60f).padTop(8);
-                table.addButton("<", () -> {
+                table.button("<", () -> {
                     if(w)
                         width = move(width, -1);
                     else
@@ -31,7 +31,7 @@ public class MapResizeDialog extends FloatingDialog{
 
                 table.table(Tex.button, t -> t.label(() -> (w ? width : height) + "")).width(200);
 
-                table.addButton(">", () -> {
+                table.button(">", () -> {
                     if(w)
                         width = move(width, 1);
                     else
@@ -45,8 +45,8 @@ public class MapResizeDialog extends FloatingDialog{
         });
 
         buttons.defaults().size(200f, 50f);
-        buttons.addButton("$cancel", this::hide);
-        buttons.addButton("$ok", () -> {
+        buttons.button("$cancel", this::hide);
+        buttons.button("$ok", () -> {
             cons.get(width, height);
             hide();
         });

@@ -824,7 +824,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
                         l.clearChildren();
                         for(Item item : content.items()){
                             if(items.flownBits() != null && items.flownBits().get(item.id)){
-                                l.addImage(item.icon(Cicon.small)).padRight(3f);
+                                l.image(item.icon(Cicon.small)).padRight(3f);
                                 l.label(() -> items.getFlowRate(item) < 0 ? "..." : Strings.fixed(items.getFlowRate(item), 1) + ps).color(Color.lightGray);
                                 l.row();
                             }
@@ -845,7 +845,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
                 table.row();
                 table.table(l -> {
                     l.left();
-                    l.addImage(() -> liquids.current().icon(Cicon.small)).padRight(3f);
+                    l.image(() -> liquids.current().icon(Cicon.small)).padRight(3f);
                     l.label(() -> liquids.getFlowRate() < 0 ? "..." : Strings.fixed(liquids.getFlowRate(), 2) + ps).color(Color.lightGray);
                 });
             }

@@ -87,7 +87,7 @@ public class MassConveyor extends Block{
             progress = Time.time() % moveTime;
 
             //TODO DEBUG
-            if(Core.input.keyTap(KeyCode.G) && world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y) == this){
+            if(Core.input.keyTap(KeyCode.g) && world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y) == this){
                 item = new UnitPayload((Mathf.chance(0.5) ? UnitTypes.wraith : UnitTypes.dagger).create(Team.sharded));
                 itemRotation = rotation() * 90;
                 animation = 0f;

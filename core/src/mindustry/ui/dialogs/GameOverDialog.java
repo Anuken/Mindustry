@@ -37,7 +37,7 @@ public class GameOverDialog extends FloatingDialog{
 
         if(state.rules.pvp){
             cont.add(Core.bundle.format("gameover.pvp", winner.localized())).pad(6);
-            buttons.addButton("$menu", () -> {
+            buttons.button("$menu", () -> {
                 hide();
                 logic.reset();
             }).size(130f, 60f);
@@ -71,7 +71,7 @@ public class GameOverDialog extends FloatingDialog{
                         if(state.stats.itemsDelivered.get(item, 0) > 0){
                             t.table(items -> {
                                 items.add("    [LIGHT_GRAY]" + state.stats.itemsDelivered.get(item, 0));
-                                items.addImage(item.icon(Cicon.small)).size(8 * 3).pad(4);
+                                items.image(item.icon(Cicon.small)).size(8 * 3).pad(4);
                             }).left();
                             t.row();
                         }
@@ -86,13 +86,13 @@ public class GameOverDialog extends FloatingDialog{
             }).pad(12);
 
             if(state.isCampaign()){
-                buttons.addButton("$continue", () -> {
+                buttons.button("$continue", () -> {
                     hide();
                     logic.reset();
                     ui.planet.show();
                 }).size(130f, 60f);
             }else{
-                buttons.addButton("$menu", () -> {
+                buttons.button("$menu", () -> {
                     hide();
                     logic.reset();
                 }).size(130f, 60f);

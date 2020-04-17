@@ -63,7 +63,7 @@ public abstract class FilterOption{
                 table.label(() -> Core.bundle.get("filter.option." + name) + ": " + (int)getter.get());
             }
             table.row();
-            Slider slider = table.addSlider(min, max, step, setter).growX().get();
+            Slider slider = table.slider(min, max, step, setter).growX().get();
             slider.setValue(getter.get());
             if(updateEditorOnChange){
                 slider.changed(changed);
@@ -88,7 +88,7 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
-            table.addButton(b -> b.addImage(supplier.get().icon(Cicon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable())
+            table.button(b -> b.image(supplier.get().icon(Cicon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable())
                 .setRegion(supplier.get() == Blocks.air ? Icon.block.getRegion() : supplier.get().icon(Cicon.small))).size(8 * 3), () -> {
                 FloatingDialog dialog = new FloatingDialog("");
                 dialog.setFillParent(false);
@@ -96,7 +96,7 @@ public abstract class FilterOption{
                 for(Block block : Vars.content.blocks()){
                     if(!filter.get(block)) continue;
 
-                    dialog.cont.addImage(block == Blocks.air ? Icon.block.getRegion() : block.icon(Cicon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
+                    dialog.cont.image(block == Blocks.air ? Icon.block.getRegion() : block.icon(Cicon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
                         consumer.get(block);
                         dialog.hide();
                         changed.run();
