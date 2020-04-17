@@ -150,6 +150,41 @@ public class ItemBridge extends Block{
     }
 
     @Override
+    public void drawSelect(Tile tile){
+        if(!Core.settings.getBool("bridgeindicator")) return;
+        ItemBridgeEntity entity = tile.ent();
+
+        for(int i = 1; i <= range; i++){
+            for(int j = 0; j < 4; j++){
+                Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
+                if(!linkValid(tile,other,false)) continue;
+                boolean linked = other.pos() == entity.link;
+                boolean rlinked = other.<ItemBridgeEntity>ent().link == tile.pos();
+                if(!linked && !rlinked) continue;
+
+                float x1 = tile.drawx(), y1 = tile.drawy(), x2 = other.drawx(), y2 = other.drawy();
+                float alpha = Math.abs((linked ? 100 : 0)-(Time.time()*2)%100f)/100;
+                float x = Interpolation.linear.apply(x2, x1, alpha);
+                float y = Interpolation.linear.apply(y2, y1, alpha);
+
+                Tile link = world.tile(linked ? tile.pos() : other.pos());
+                Tile otherLink = linked ? other : tile;
+
+                Draw.color(Color.valueOf("444444"));
+                Lines.stroke(2.5f);
+                Lines.circle(x2, y2, 2f);
+
+                Draw.color(linked ? Pal.place : Pal.accent);
+                Lines.stroke(1f);
+                Lines.line(x1, y1, x2, y2);
+                Lines.circle(x2, y2, 2f);
+                Draw.rect("bridge-arrow", x, y, link.absoluteRelativeTo((int) otherLink.x, (int) otherLink.y) * 90);
+                Draw.reset();
+            }
+        }
+    }
+
+    @Override
     public boolean onConfigureTileTapped(Tile tile, Tile other){
         ItemBridgeEntity entity = tile.ent();
 

@@ -316,6 +316,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         }
 
+        graphics.checkPref("bridgeindicator", true);
         graphics.checkPref("effects", true);
         graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("playerchat", true);
