@@ -1,5 +1,6 @@
 package mindustry.world.blocks;
 
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
@@ -99,4 +100,19 @@ public interface Autotiler{
     }
 
     boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock);
+
+    default void top50(TextureRegion region, Runnable runnable){
+        region.setWidth(region.getWidth() / 2);
+        runnable.run();
+        region.setWidth(region.getWidth() * 2);
+    }
+
+    default void bot50(TextureRegion region, Runnable runnable){
+        int width = region.getWidth();
+        region.setWidth(region.getWidth() / 2);
+        region.setX(region.getX() + width);
+        runnable.run();
+        region.setX(region.getX() - width);
+        region.setWidth(region.getWidth() * 2);
+    }
 }

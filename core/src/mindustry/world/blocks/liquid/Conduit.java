@@ -119,13 +119,11 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
                 x += x2;
                 y += y2;
-                botRegions[blendbits].setWidth(botRegions[blendbits].getWidth() / 2);
-                topRegions[blendbits].setWidth(topRegions[blendbits].getWidth() / 2);
-                draw();
+
+                top50(botRegions[blendbits], () -> top50(topRegions[blendbits], this::draw));
+
                 x -= x2;
                 y -= y2;
-                botRegions[blendbits].setWidth(botRegions[blendbits].getWidth() * 2);
-                topRegions[blendbits].setWidth(topRegions[blendbits].getWidth() * 2);
             }
 
             if(back() != null && back().block().hasLiquids && !(back().block() instanceof Conduit)){
@@ -140,18 +138,12 @@ public class Conduit extends LiquidBlock implements Autotiler{
                 x += x2;
                 y += y2;
                 rotation(rotation() + 2);
-                botRegions[blendbits].setWidth(botRegions[blendbits].getWidth() / 2);
-                botRegions[blendbits].setX(botRegions[blendbits].getX() + 32);
-                topRegions[blendbits].setWidth(topRegions[blendbits].getWidth() / 2);
-                topRegions[blendbits].setX(topRegions[blendbits].getX() + 32);
-                draw();
+
+                bot50(botRegions[blendbits], () -> bot50(topRegions[blendbits], this::draw));
+
                 x -= x2;
                 y -= y2;
                 rotation(rotation() - 2);
-                botRegions[blendbits].setX(botRegions[blendbits].getX() - 32);
-                botRegions[blendbits].setWidth(botRegions[blendbits].getWidth() * 2);
-                topRegions[blendbits].setX(topRegions[blendbits].getX() - 32);
-                topRegions[blendbits].setWidth(topRegions[blendbits].getWidth() * 2);
             }
         }
 
