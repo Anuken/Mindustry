@@ -15,8 +15,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
-import static mindustry.Vars.tilesize;
-
 public class Conduit extends LiquidBlock implements Autotiler{
     public final int timerFlow = timers++;
 
