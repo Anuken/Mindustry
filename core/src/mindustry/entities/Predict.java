@@ -3,7 +3,7 @@ package mindustry.entities;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
-import mindustry.entities.traits.*;
+import mindustry.gen.*;
 
 /**
  * Class for predicting shoot angles based on velocities of targets.
@@ -51,11 +51,24 @@ public class Predict{
         return sol;
     }
 
+    public static Vec2 intercept(Position src, Hitboxc dst, float v){
+        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dst.deltaX(), dst.deltaY(), v);
+    }
+
+    public static Vec2 intercept(Position src, Position dst, float v){
+        float ddx = 0, ddy = 0;
+        if(dst instanceof Hitboxc){
+            ddx = ((Hitboxc)dst).deltaX();
+            ddy = ((Hitboxc)dst).deltaY();
+        }
+        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), ddx, ddy, v);
+    }
+
     /**
      * See {@link #intercept(float, float, float, float, float, float, float)}.
      */
-    public static Vec2 intercept(TargetTrait src, TargetTrait dst, float v){
-        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dst.getTargetVelocityX() - src.getTargetVelocityX()/2f, dst.getTargetVelocityY() - src.getTargetVelocityY()/2f, v);
+    public static Vec2 intercept(Hitboxc src, Hitboxc dst, float v){
+        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dst.deltaX() - src.deltaX()/(2f*Time.delta()), dst.deltaY() - src.deltaX()/(2f*Time.delta()), v);
     }
 
     private static Vec2 quad(float a, float b, float c){

@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
@@ -10,8 +9,8 @@ import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
-import mindustry.core.GameState.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -32,7 +31,7 @@ public class SchematicsDialog extends FloatingDialog{
 
         shouldPause = true;
         addCloseButton();
-        buttons.addImageTextButton("$schematic.import", Icon.loadMapSmall, this::showImport);
+        buttons.addImageTextButton("$schematic.import", Icon.download, this::showImport);
         shown(this::setup);
         onResize(this::setup);
     }
@@ -79,16 +78,23 @@ public class SchematicsDialog extends FloatingDialog{
 
                             ImageButtonStyle style = Styles.clearPartiali;
 
-                            buttons.addImageButton(Icon.infoSmall, style, () -> {
+                            buttons.addImageButton(Icon.info, style, () -> {
                                 showInfo(s);
                             });
 
-                            buttons.addImageButton(Icon.loadMapSmall, style, () -> {
+                            buttons.addImageButton(Icon.download, style, () -> {
                                 showExport(s);
                             });
 
-                            buttons.addImageButton(Icon.pencilSmall, style, () -> {
+                            buttons.addImageButton(Icon.pencil, style, () -> {
                                 ui.showTextInput("$schematic.rename", "$name", s.name(), res -> {
+                                    Schematic replacement = schematics.all().find(other -> other.name().equals(res) && other != s);
+                                    if(replacement != null){
+                                        //renaming to an existing schematic is not allowed, as it is not clear how the tags would be merged, and which one should be removed
+                                        ui.showErrorMessage("$schematic.exists");
+                                        return;
+                                    }
+
                                     s.tags.put("name", res);
                                     s.save();
                                     rebuildPane[0].run();
@@ -96,9 +102,9 @@ public class SchematicsDialog extends FloatingDialog{
                             });
 
                             if(s.hasSteamID()){
-                                buttons.addImageButton(Icon.linkSmall, style, () -> platform.viewListing(s));
+                                buttons.addImageButton(Icon.link, style, () -> platform.viewListing(s));
                             }else{
-                                buttons.addImageButton(Icon.trash16Small, style, () -> {
+                                buttons.addImageButton(Icon.trash, style, () -> {
                                     if(s.mod != null){
                                         ui.showInfo(Core.bundle.format("mod.item.remove", s.mod.meta.displayName()));
                                     }else{
@@ -122,7 +128,7 @@ public class SchematicsDialog extends FloatingDialog{
                         })).size(200f);
                     }, () -> {
                         if(sel[0].childrenPressed()) return;
-                        if(state.is(State.menu)){
+                        if(state.isMenu()){
                             showInfo(s);
                         }else{
                             control.input.useSchematic(s);
@@ -154,7 +160,7 @@ public class SchematicsDialog extends FloatingDialog{
                 TextButtonStyle style = Styles.cleart;
                 t.defaults().size(280f, 60f).left();
                 t.row();
-                t.addImageTextButton("$schematic.copy.import", Icon.copySmall, style, () -> {
+                t.addImageTextButton("$schematic.copy.import", Icon.copy, style, () -> {
                     dialog.hide();
                     try{
                         Schematic s = Schematics.readBase64(Core.app.getClipboardText());
@@ -168,7 +174,7 @@ public class SchematicsDialog extends FloatingDialog{
                     }
                 }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith(schematicBaseStart));
                 t.row();
-                t.addImageTextButton("$schematic.importfile", Icon.saveMapSmall, style, () -> platform.showFileChooser(true, schematicExtension, file -> {
+                t.addImageTextButton("$schematic.importfile", Icon.download, style, () -> platform.showFileChooser(true, schematicExtension, file -> {
                     dialog.hide();
 
                     try{
@@ -183,7 +189,7 @@ public class SchematicsDialog extends FloatingDialog{
                 })).marginLeft(12f);
                 t.row();
                 if(steam){
-                    t.addImageTextButton("$schematic.browseworkshop", Icon.wikiSmall, style, () -> {
+                    t.addImageTextButton("$schematic.browseworkshop", Icon.book, style, () -> {
                         dialog.hide();
                         platform.openWorkshop();
                     }).marginLeft(12f);
@@ -203,25 +209,21 @@ public class SchematicsDialog extends FloatingDialog{
                TextButtonStyle style = Styles.cleart;
                 t.defaults().size(280f, 60f).left();
                 if(steam && !s.hasSteamID()){
-                    t.addImageTextButton("$schematic.shareworkshop", Icon.wikiSmall, style,
+                    t.addImageTextButton("$schematic.shareworkshop", Icon.book, style,
                         () -> platform.publish(s)).marginLeft(12f);
                     t.row();
                     dialog.hide();
                 }
-                t.addImageTextButton("$schematic.copy", Icon.copySmall, style, () -> {
+                t.addImageTextButton("$schematic.copy", Icon.copy, style, () -> {
                     dialog.hide();
                     ui.showInfoFade("$copied");
                     Core.app.setClipboardText(schematics.writeBase64(s));
                 }).marginLeft(12f);
                 t.row();
-                t.addImageTextButton("$schematic.exportfile", Icon.saveMapSmall, style, () -> platform.showFileChooser(false, schematicExtension, file -> {
+                t.addImageTextButton("$schematic.exportfile", Icon.export, style, () -> {
                     dialog.hide();
-                    try{
-                        Schematics.write(s, file);
-                    }catch(Exception e){
-                        ui.showException(e);
-                    }
-                })).marginLeft(12f);
+                    platform.export(s.name(), schematicExtension, file -> Schematics.write(s, file));
+                }).marginLeft(12f);
             });
         });
 
@@ -272,7 +274,7 @@ public class SchematicsDialog extends FloatingDialog{
             if(wasSet){
                 super.draw();
             }else{
-                Draw.rect(Icon.loading.getRegion(), x + width/2f, y + height/2f, width/4f, height/4f);
+                Draw.rect(Icon.refresh.getRegion(), x + width/2f, y + height/2f, width/4f, height/4f);
             }
 
             Draw.color(checked ? Pal.accent : borderColor);
@@ -311,7 +313,11 @@ public class SchematicsDialog extends FloatingDialog{
                 int i = 0;
                 for(ItemStack s : arr){
                     r.addImage(s.item.icon(Cicon.small)).left();
-                    r.add(s.amount + "").padLeft(2).left().color(Color.lightGray).padRight(4);
+                    r.label(() -> {
+                        Tilec core = player.closestCore();
+                        if(core == null || state.rules.infiniteResources || core.items().has(s.item, s.amount)) return "[lightgray]" + s.amount + "";
+                        return (core.items().has(s.item, s.amount) ? "[lightgray]" : "[scarlet]") + Math.min(core.items().get(s.item), s.amount) + "[lightgray]/" + s.amount;
+                    }).padLeft(2).left().padRight(4);
 
                     if(++i % 4 == 0){
                         r.row();

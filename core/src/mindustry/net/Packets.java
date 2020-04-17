@@ -2,10 +2,12 @@ package mindustry.net;
 
 import arc.*;
 import arc.struct.*;
+import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.core.*;
 import mindustry.io.*;
 
+import java.io.*;
 import java.nio.*;
 
 /**
@@ -65,31 +67,29 @@ public class Packets{
     }
 
     public static class InvokePacket implements Packet{
+        private static ReusableByteInStream bin;
+        private static Reads read = new Reads(new DataInputStream(bin = new ReusableByteInStream()));
+
         public byte type, priority;
 
-        public ByteBuffer writeBuffer;
-        public int writeLength;
+        public byte[] bytes;
+        public int length;
 
         @Override
         public void read(ByteBuffer buffer){
             type = buffer.get();
             priority = buffer.get();
-            writeLength = buffer.getShort();
-            byte[] bytes = new byte[writeLength];
+            short writeLength = buffer.getShort();
+            bytes = new byte[writeLength];
             buffer.get(bytes);
-            writeBuffer = ByteBuffer.wrap(bytes);
         }
 
         @Override
         public void write(ByteBuffer buffer){
             buffer.put(type);
             buffer.put(priority);
-            buffer.putShort((short)writeLength);
-
-            writeBuffer.position(0);
-            for(int i = 0; i < writeLength; i++){
-                buffer.put(writeBuffer.get());
-            }
+            buffer.putShort((short)length);
+            buffer.put(bytes, 0, length);
         }
 
         @Override
@@ -105,6 +105,11 @@ public class Packets{
         @Override
         public boolean isUnimportant(){
             return priority == 2;
+        }
+
+        public Reads reader(){
+            bin.setBytes(bytes);
+            return read;
         }
     }
 
@@ -181,7 +186,7 @@ public class Packets{
             usid = TypeIO.readString(buffer);
             mobile = buffer.get() == 1;
             color = buffer.getInt();
-            byte[] idbytes = new byte[8];
+            byte[] idbytes = new byte[16];
             buffer.get(idbytes);
             uuid = new String(Base64Coder.encode(idbytes));
             int totalMods = buffer.get();

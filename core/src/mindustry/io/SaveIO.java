@@ -5,6 +5,7 @@ import arc.files.Fi;
 import arc.util.io.CounterInputStream;
 import arc.util.io.FastDeflaterOutputStream;
 import mindustry.Vars;
+import mindustry.io.legacy.*;
 import mindustry.io.versions.*;
 import mindustry.world.WorldContext;
 
@@ -18,7 +19,7 @@ public class SaveIO{
     /** Format header. This is the string 'MSAV' in ASCII. */
     public static final byte[] header = {77, 83, 65, 86};
     public static final IntMap<SaveVersion> versions = new IntMap<>();
-    public static final Array<SaveVersion> versionArray = Array.with(new Save1(), new Save2(), new Save3());
+    public static final Array<SaveVersion> versionArray = Array.with(new Save1(), new Save2(), new Save3(), new Save4());
 
     static{
         for(SaveVersion version : versionArray){

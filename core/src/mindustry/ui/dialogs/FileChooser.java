@@ -92,15 +92,15 @@ public class FileChooser extends FloatingDialog{
 
         Table icontable = new Table();
 
-        ImageButton up = new ImageButton(Icon.folderParent);
+        ImageButton up = new ImageButton(Icon.upOpen);
         up.clicked(() -> {
             directory = directory.parent();
             updateFiles(true);
         });
 
 
-        ImageButton back = new ImageButton(Icon.arrowLeft);
-        ImageButton forward = new ImageButton(Icon.arrowRight);
+        ImageButton back = new ImageButton(Icon.left);
+        ImageButton forward = new ImageButton(Icon.right);
 
         forward.clicked(() -> stack.forward());
         back.clicked(() -> stack.back());
@@ -185,7 +185,7 @@ public class FileChooser extends FloatingDialog{
         files.top().left();
         Fi[] names = getFileNames();
 
-        Image upimage = new Image(Icon.folderParentSmall);
+        Image upimage = new Image(Icon.upOpen);
         TextButton upbutton = new TextButton(".." + directory.toString(), Styles.clearTogglet);
         upbutton.clicked(() -> {
             directory = directory.parent();
@@ -199,7 +199,6 @@ public class FileChooser extends FloatingDialog{
 
         files.add(upbutton).align(Align.topLeft).fillX().expandX().height(50).pad(2).colspan(2);
         files.row();
-
 
         ButtonGroup<TextButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
@@ -229,7 +228,7 @@ public class FileChooser extends FloatingDialog{
                 button.setChecked(filename.equals(filefield.getText()));
             });
 
-            Image image = new Image(file.isDirectory() ? Icon.folderSmall : Icon.fileTextSmall);
+            Image image = new Image(file.isDirectory() ? Icon.folder : Icon.fileText);
 
             button.add(image).padRight(4f).padLeft(4);
             button.getCells().reverse();

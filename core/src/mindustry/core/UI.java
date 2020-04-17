@@ -2,31 +2,24 @@ package mindustry.core;
 
 import arc.*;
 import arc.Graphics.*;
-import arc.Graphics.Cursor.*;
 import arc.Input.*;
 import arc.assets.*;
-import arc.assets.loaders.*;
-import arc.assets.loaders.resolvers.*;
-import arc.struct.*;
-import arc.files.*;
-import arc.freetype.*;
-import arc.freetype.FreeTypeFontGenerator.*;
-import arc.freetype.FreetypeFontLoader.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.TextField.*;
 import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
-import mindustry.core.GameState.*;
 import mindustry.editor.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -39,6 +32,8 @@ import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
 
 public class UI implements ApplicationListener, Loadable{
+    public static PixmapPacker packer;
+
     public MenuFragment menufrag;
     public HudFragment hudfrag;
     public ChatFragment chatfrag;
@@ -67,7 +62,7 @@ public class UI implements ApplicationListener, Loadable{
     public TraceDialog traces;
     public DatabaseDialog database;
     public ContentInfoDialog content;
-    public DeployDialog deploy;
+    public PlanetDialog planet;
     public TechTreeDialog tech;
     //public MinimapDialog minimap;
     public SchematicsDialog schematics;
@@ -77,7 +72,7 @@ public class UI implements ApplicationListener, Loadable{
     public Cursor drillCursor, unloadCursor;
 
     public UI(){
-        setupFonts();
+        Fonts.loadFonts();
     }
 
     @Override
@@ -99,6 +94,7 @@ public class UI implements ApplicationListener, Loadable{
         Icon.load();
         Styles.load();
         Tex.loadStyles();
+        Fonts.loadContentIcons();
 
         Dialog.setShowAction(() -> sequence(alpha(0f), fadeIn(0.1f)));
         Dialog.setHideAction(() -> sequence(fadeOut(0.1f)));
@@ -116,70 +112,14 @@ public class UI implements ApplicationListener, Loadable{
         Colors.put("unlaunched", Color.valueOf("8982ed"));
         Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
         Colors.put("stat", Pal.stat);
-        loadExtraCursors();
+
+        drillCursor = Core.graphics.newCursor("drill");
+        unloadCursor = Core.graphics.newCursor("unload");
     }
 
     @Override
     public Array<AssetDescriptor> getDependencies(){
         return Array.with(new AssetDescriptor<>(Control.class), new AssetDescriptor<>("outline", BitmapFont.class), new AssetDescriptor<>("default", BitmapFont.class), new AssetDescriptor<>("chat", BitmapFont.class));
-    }
-
-    /** Called from a static context to make the cursor appear immediately upon startup.*/
-    public static void loadSystemCursors(){
-        SystemCursor.arrow.set(Core.graphics.newCursor("cursor"));
-        SystemCursor.hand.set(Core.graphics.newCursor("hand"));
-        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam"));
-
-        Core.graphics.restoreCursor();
-    }
-
-    /** Called from a static context for use in the loading screen.*/
-    public static void loadDefaultFont(){
-        FileHandleResolver resolver = new InternalFileHandleResolver();
-        Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
-        Core.assets.setLoader(BitmapFont.class, null, new FreetypeFontLoader(resolver){
-            @Override
-            public BitmapFont loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
-                if(fileName.equals("outline")){
-                    parameter.fontParameters.borderWidth = Scl.scl(2f);
-                    parameter.fontParameters.spaceX -= parameter.fontParameters.borderWidth;
-                }
-                parameter.fontParameters.magFilter = TextureFilter.Linear;
-                parameter.fontParameters.minFilter = TextureFilter.Linear;
-                parameter.fontParameters.size = fontParameter().size;
-                return super.loadSync(manager, fileName, file, parameter);
-            }
-        });
-
-        FreeTypeFontParameter param = new FreeTypeFontParameter(){{
-            borderColor = Color.darkGray;
-            incremental = true;
-        }};
-
-        Core.assets.load("outline", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/font.ttf", param)).loaded = t -> Fonts.outline = (BitmapFont)t;
-    }
-
-    void loadExtraCursors(){
-        drillCursor = Core.graphics.newCursor("drill");
-        unloadCursor = Core.graphics.newCursor("unload");
-    }
-
-    public void setupFonts(){
-        String fontName = "fonts/font.ttf";
-
-        FreeTypeFontParameter param = fontParameter();
-
-        Core.assets.load("default", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.def = (BitmapFont)f;
-        Core.assets.load("chat", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.chat = (BitmapFont)f;
-    }
-
-    static FreeTypeFontParameter fontParameter(){
-        return new FreeTypeFontParameter(){{
-            size = (int)(Scl.scl(18f));
-            shadowColor = Color.darkGray;
-            shadowOffsetY = 2;
-            incremental = true;
-        }};
     }
 
     @Override
@@ -235,7 +175,7 @@ public class UI implements ApplicationListener, Loadable{
         traces = new TraceDialog();
         maps = new MapsDialog();
         content = new ContentInfoDialog();
-        deploy = new DeployDialog();
+        planet = new PlanetDialog();
         tech = new TechTreeDialog();
         mods = new ModsDialog();
         schematics = new SchematicsDialog();
@@ -244,10 +184,10 @@ public class UI implements ApplicationListener, Loadable{
 
         menuGroup.setFillParent(true);
         menuGroup.touchable(Touchable.childrenOnly);
-        menuGroup.visible(() -> state.is(State.menu));
+        menuGroup.visible(() -> state.isMenu());
         hudGroup.setFillParent(true);
         hudGroup.touchable(Touchable.childrenOnly);
-        hudGroup.visible(() -> !state.is(State.menu));
+        hudGroup.visible(() -> state.isGame());
 
         Core.scene.add(menuGroup);
         Core.scene.add(hudGroup);
@@ -271,7 +211,17 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void dispose(){
-        //generator.dispose();
+        if(packer != null){
+            packer.dispose();
+            packer = null;
+        }
+    }
+
+    public TextureRegionDrawable getIcon(String name){
+        if(Icon.icons.containsKey(name)){
+            return Icon.icons.get(name);
+        }
+        return Core.atlas.getDrawable("error");
     }
 
     public void loadAnd(Runnable call){
@@ -339,11 +289,54 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.add(table);
     }
 
+    /** Shows a fading label at the top of the screen. */
+    public void showInfoToast(String info, float duration){
+        Table table = new Table();
+        table.setFillParent(true);
+        table.touchable(Touchable.disabled);
+        table.update(() -> {
+            if(state.isMenu()) table.remove();
+        });
+        table.actions(Actions.delay(duration * 0.9f), Actions.fadeOut(duration * 0.1f, Interpolation.fade), Actions.remove());
+        table.top().table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).padTop(10);
+        Core.scene.add(table);
+    }
+
+    /** Shows a label at some position on the screen. Does not fade. */
+    public void showInfoPopup(String info, float duration, int align, int top, int left, int bottom, int right){
+        Table table = new Table();
+        table.setFillParent(true);
+        table.touchable(Touchable.disabled);
+        table.update(() -> {
+            if(state.isMenu()) table.remove();
+        });
+        table.actions(Actions.delay(duration), Actions.remove());
+        table.align(align).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).pad(top, left, bottom, right);
+        Core.scene.add(table);
+    }
+
+    /** Shows a label in the world. This label is behind everything. Does not fade. */
+    public void showLabel(String info, float duration, float worldx, float worldy){
+        Table table = new Table();
+        table.setFillParent(true);
+        table.touchable(Touchable.disabled);
+        table.update(() -> {
+            if(state.isMenu()) table.remove();
+        });
+        table.actions(Actions.delay(duration), Actions.remove());
+        table.align(Align.center).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).update(t -> {
+            Vec2 v = Core.camera.project(worldx, worldy);
+            t.setPosition(v.x, v.y, Align.center);
+        });
+        //make sure it's at the back
+        Core.scene.root.addChildAt(0, table);
+    }
+
     public void showInfo(String info){
         new Dialog(""){{
             getCell(cont).growX();
             cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+            buttons.addButton("$ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
@@ -382,7 +375,7 @@ public class UI implements ApplicationListener, Loadable{
             Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(Strings.parseException(exc, true)).color(Color.lightGray).left()), true);
 
             cont.addButton("$details", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().right();
-            cont.addButton("$ok", this::hide).size(100, 50).fillX().left();
+            cont.addButton("$ok", this::hide).size(110, 50).fillX().left();
             cont.row();
             cont.add(col).colspan(2).pad(2);
         }}.show();
@@ -430,14 +423,14 @@ public class UI implements ApplicationListener, Loadable{
             cont.row();
             cont.add(text).width(400f).wrap().get().setAlignment(align, align);
             cont.row();
-            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+            buttons.addButton("$ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
     public void showInfoText(String titleText, String text){
         new Dialog(titleText){{
             cont.margin(15).add(text).width(400f).wrap().left().get().setAlignment(Align.left, Align.left);
-            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+            buttons.addButton("$ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
@@ -446,7 +439,7 @@ public class UI implements ApplicationListener, Loadable{
             cont.margin(10).add(text);
             titleTable.row();
             titleTable.addImage().color(Pal.accent).height(3f).growX().pad(2f);
-            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+            buttons.addButton("$ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
@@ -475,7 +468,6 @@ public class UI implements ApplicationListener, Loadable{
         dialog.keyDown(KeyCode.BACK, dialog::hide);
         dialog.show();
     }
-
 
     public void showCustomConfirm(String title, String text, String yes, String no, Runnable confirmed, Runnable denied){
         FloatingDialog dialog = new FloatingDialog(title);
@@ -509,11 +501,11 @@ public class UI implements ApplicationListener, Loadable{
 
     public String formatAmount(int number){
         if(number >= 1000000){
-            return Strings.fixed(number / 1000000f, 1) + "[gray]" + Core.bundle.getOrNull("unit.millions") + "[]";
+            return Strings.fixed(number / 1000000f, 1) + "[gray]" + Core.bundle.get("unit.millions") + "[]";
         }else if(number >= 10000){
-            return number / 1000 + "[gray]k[]";
+            return number / 1000 + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
         }else if(number >= 1000){
-            return Strings.fixed(number / 1000f, 1) + "[gray]" + Core.bundle.getOrNull("unit.thousands") + "[]";
+            return Strings.fixed(number / 1000f, 1) + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
         }else{
             return number + "";
         }

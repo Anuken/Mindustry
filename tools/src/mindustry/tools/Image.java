@@ -50,7 +50,7 @@ class Image{
     Color getColor(int x, int y){
         if(!Structs.inBounds(x, y, width, height)) return color.set(0, 0, 0, 0);
         int i = image.getRGB(x, y);
-        Color.argb8888ToColor(color, i);
+        color.argb8888(i);
         return color;
     }
 

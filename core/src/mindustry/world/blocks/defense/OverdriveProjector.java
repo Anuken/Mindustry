@@ -1,17 +1,16 @@
 package mindustry.world.blocks.defense;
 
-import arc.Core;
-import arc.struct.IntSet;
-import arc.graphics.Color;
+import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.Mathf;
-import arc.util.Time;
-import mindustry.entities.type.TileEntity;
+import arc.math.*;
+import arc.struct.*;
+import arc.util.*;
+import arc.util.io.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -37,7 +36,6 @@ public class OverdriveProjector extends Block{
         hasPower = true;
         hasItems = true;
         canOverdrive = false;
-        entityType = OverdriveEntity::new;
     }
 
     @Override
@@ -67,94 +65,71 @@ public class OverdriveProjector extends Block{
         stats.add(BlockStat.boostEffect, (int)((speedBoost + speedBoostPhase) * 100f), StatUnit.percent);
     }
 
-    @Override
-    public void drawLight(Tile tile){
-        renderer.lights.add(tile.drawx(), tile.drawy(), 50f * tile.entity.efficiency(), baseColor, 0.7f * tile.entity.efficiency());
-    }
-
-    @Override
-    public void update(Tile tile){
-        OverdriveEntity entity = tile.ent();
-        entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() ? 1f : 0f, 0.08f);
-        entity.charge += entity.heat * Time.delta();
-
-        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
-
-        if(entity.timer.get(timerUse, useTime) && entity.efficiency() > 0){
-            entity.cons.trigger();
-        }
-
-        if(entity.charge >= reload){
-            float realRange = range + entity.phaseHeat * phaseRangeBoost;
-            float realBoost = (speedBoost + entity.phaseHeat * speedBoostPhase) * entity.efficiency();
-
-            entity.charge = 0f;
-
-            int tileRange = (int)(realRange / tilesize + 1);
-            healed.clear();
-
-            for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
-                for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    if(!Mathf.within(x * tilesize, y * tilesize, tile.drawx(), tile.drawy(), realRange)) continue;
-
-                    Tile other = world.ltile(x, y);
-
-                    if(other == null) continue;
-
-                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null){
-                        if(other.entity.timeScale <= realBoost){
-                            other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
-                            other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
-                        }
-                        healed.add(other.pos());
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void drawSelect(Tile tile){
-        OverdriveEntity entity = tile.ent();
-        float realRange = range + entity.phaseHeat * phaseRangeBoost;
-
-        Drawf.dashCircle(tile.drawx(), tile.drawy(), realRange, baseColor);
-    }
-
-    @Override
-    public void draw(Tile tile){
-        super.draw(tile);
-
-        OverdriveEntity entity = tile.ent();
-        float f = 1f - (Time.time() / 100f) % 1f;
-
-        Draw.color(baseColor, phaseColor, entity.phaseHeat);
-        Draw.alpha(entity.heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
-        Draw.rect(topRegion, tile.drawx(), tile.drawy());
-        Draw.alpha(1f);
-        Lines.stroke((2f * f + 0.2f) * entity.heat);
-        Lines.square(tile.drawx(), tile.drawy(), (1f - f) * 8f);
-
-        Draw.reset();
-    }
-
-    class OverdriveEntity extends TileEntity{
+    public class OverdriveEntity extends TileEntity{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeFloat(heat);
-            stream.writeFloat(phaseHeat);
+        public void drawLight(){
+            renderer.lights.add(x, y, 50f * efficiency(), baseColor, 0.7f * efficiency());
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            heat = stream.readFloat();
-            phaseHeat = stream.readFloat();
+        public void updateTile(){
+            heat = Mathf.lerpDelta(heat, consValid() ? 1f : 0f, 0.08f);
+            charge += heat * Time.delta();
+
+            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons().optionalValid()), 0.1f);
+
+            if(timer(timerUse, useTime) && efficiency() > 0){
+                consume();
+            }
+
+            if(charge >= reload){
+                float realRange = range + phaseHeat * phaseRangeBoost;
+                float realBoost = (speedBoost + phaseHeat * speedBoostPhase) * efficiency();
+
+                charge = 0f;
+                indexer.eachBlock(this, realRange, other -> other.timeScale() < realBoost, other -> other.applyBoost(realBoost, reload + 1f));
+            }
+        }
+
+        @Override
+        public void drawSelect(){
+            float realRange = range + phaseHeat * phaseRangeBoost;
+
+            Drawf.dashCircle(x, y, realRange, baseColor);
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            float f = 1f - (Time.time() / 100f) % 1f;
+
+            Draw.color(baseColor, phaseColor, phaseHeat);
+            Draw.alpha(heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
+            Draw.rect(topRegion, x, y);
+            Draw.alpha(1f);
+            Lines.stroke((2f * f + 0.2f) * heat);
+            Lines.square(x, y, (1f - f) * 8f);
+
+            Draw.reset();
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.f(heat);
+            write.f(phaseHeat);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            heat = read.f();
+            phaseHeat = read.f();
         }
     }
 }

@@ -32,24 +32,25 @@ public class DirectConsumerTests extends PowerTestFixture{
 
     void testUnitFactory(int siliconAmount, int leadAmount, float producedPower, float requestedPower, float expectedSatisfaction){
         Tile consumerTile = createFakeTile(0, 0, new UnitFactory("fakefactory"){{
+            entityType = UnitFactoryEntity::new;
             unitType = UnitTypes.spirit;
             produceTime = 60;
             consumes.power(requestedPower);
             consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30));
         }});
-        consumerTile.entity.items.add(Items.silicon, siliconAmount);
-        consumerTile.entity.items.add(Items.lead, leadAmount);
+        consumerTile.entity.items().add(Items.silicon, siliconAmount);
+        consumerTile.entity.items().add(Items.lead, leadAmount);
 
         Tile producerTile = createFakeTile(2, 0, createFakeProducerBlock(producedPower));
         producerTile.<PowerGenerator.GeneratorEntity>ent().productionEfficiency = 1f;
 
         PowerGraph graph = new PowerGraph();
-        graph.add(producerTile);
-        graph.add(consumerTile);
+        graph.add(producerTile.entity);
+        graph.add(consumerTile.entity);
 
         consumerTile.entity.update();
         graph.update();
 
-        assertEquals(expectedSatisfaction, consumerTile.entity.power.status);
+        assertEquals(expectedSatisfaction, consumerTile.entity.power().status);
     }
 }

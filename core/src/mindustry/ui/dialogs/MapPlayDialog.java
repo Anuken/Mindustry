@@ -15,8 +15,7 @@ import static mindustry.Vars.*;
 public class MapPlayDialog extends FloatingDialog{
     CustomRulesDialog dialog = new CustomRulesDialog();
     Rules rules;
-    @NonNull
-    Gamemode selectedGamemode = Gamemode.survival;
+    @NonNull Gamemode selectedGamemode = Gamemode.survival;
     Map lastMap;
 
     public MapPlayDialog(){
@@ -68,7 +67,7 @@ public class MapPlayDialog extends FloatingDialog{
 
         cont.add(selmode);
         cont.row();
-        cont.addImageTextButton("$customize", Icon.toolsSmall, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).width(230);
+        cont.addImageTextButton("$customize", Icon.settings, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).width(230);
         cont.row();
         cont.add(new BorderImage(map.safeTexture(), 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
         //only maps with survival are valid for high scores

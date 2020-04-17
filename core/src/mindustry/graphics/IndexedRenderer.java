@@ -1,15 +1,11 @@
 package mindustry.graphics;
 
-import arc.Core;
 import arc.graphics.*;
-import arc.graphics.VertexAttributes.Usage;
-import arc.graphics.g2d.BatchShader;
-import arc.graphics.g2d.TextureRegion;
-import arc.graphics.gl.Shader;
-import arc.math.Mathf;
-import arc.math.Matrix3;
-import arc.util.Disposable;
-import arc.util.Strings;
+import arc.graphics.VertexAttributes.*;
+import arc.graphics.g2d.*;
+import arc.graphics.gl.*;
+import arc.math.*;
+import arc.util.*;
 
 //TODO this class is a trainwreck, remove it
 public class IndexedRenderer implements Disposable{
@@ -17,18 +13,18 @@ public class IndexedRenderer implements Disposable{
 
     private Shader program = new Shader(
     Strings.join("\n",
-    "attribute vec4 " + Shader.POSITION_ATTRIBUTE + ";",
-    "attribute vec4 " + Shader.COLOR_ATTRIBUTE + ";",
-    "attribute vec2 " + Shader.TEXCOORD_ATTRIBUTE + "0;",
+    "attribute vec4 " + Shader.positionAttribute + ";",
+    "attribute vec4 " + Shader.colorAttribute + ";",
+    "attribute vec2 " + Shader.texcoordAttribute + "0;",
     "uniform mat4 u_projTrans;",
     "varying vec4 v_color;",
     "varying vec2 v_texCoords;",
     "",
     "void main(){",
-    "   v_color = " + Shader.COLOR_ATTRIBUTE + ";",
+    "   v_color = " + Shader.colorAttribute + ";",
     "   v_color.a = v_color.a * (255.0/254.0);",
-    "   v_texCoords = " + Shader.TEXCOORD_ATTRIBUTE + "0;",
-    "   gl_Position = u_projTrans * " + Shader.POSITION_ATTRIBUTE + ";",
+    "   v_texCoords = " + Shader.texcoordAttribute + "0;",
+    "   gl_Position = u_projTrans * " + Shader.positionAttribute + ";",
     "}"),
     Strings.join("\n",
     "#ifdef GL_ES",
@@ -50,9 +46,9 @@ public class IndexedRenderer implements Disposable{
     private float[] tmpVerts = new float[vsize * 6];
     private float[] vertices;
 
-    private Matrix3 projMatrix = new Matrix3();
-    private Matrix3 transMatrix = new Matrix3();
-    private Matrix3 combined = new Matrix3();
+    private Mat projMatrix = new Mat();
+    private Mat transMatrix = new Mat();
+    private Mat combined = new Mat();
     private float color = Color.white.toFloatBits();
 
     public IndexedRenderer(int sprites){
@@ -60,20 +56,17 @@ public class IndexedRenderer implements Disposable{
     }
 
     public void render(Texture texture){
-        Core.gl.glEnable(GL20.GL_BLEND);
+        Gl.enable(Gl.blend);
 
         updateMatrix();
 
-        program.begin();
-
+        program.bind();
         texture.bind();
 
         program.setUniformMatrix4("u_projTrans", BatchShader.copyTransform(combined));
         program.setUniformi("u_texture", 0);
 
-        mesh.render(program, GL20.GL_TRIANGLES, 0, vertices.length / vsize);
-
-        program.end();
+        mesh.render(program, Gl.triangles, 0, vertices.length / vsize);
     }
 
     public void setColor(Color color){
@@ -214,11 +207,11 @@ public class IndexedRenderer implements Disposable{
         mesh.updateVertices(index * vsize * 6, vertices);
     }
 
-    public Matrix3 getTransformMatrix(){
+    public Mat getTransformMatrix(){
         return transMatrix;
     }
 
-    public void setProjectionMatrix(Matrix3 matrix){
+    public void setProjectionMatrix(Mat matrix){
         projMatrix = matrix;
     }
 
@@ -226,9 +219,9 @@ public class IndexedRenderer implements Disposable{
         if(mesh != null) mesh.dispose();
 
         mesh = new Mesh(true, 6 * sprites, 0,
-        new VertexAttribute(Usage.Position, 2, "a_position"),
-        new VertexAttribute(Usage.ColorPacked, 4, "a_color"),
-        new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"));
+        new VertexAttribute(Usage.position, 2, "a_position"),
+        new VertexAttribute(Usage.colorPacked, 4, "a_color"),
+        new VertexAttribute(Usage.textureCoordinates, 2, "a_texCoord0"));
         vertices = new float[6 * sprites * vsize];
         mesh.setVertices(vertices);
     }

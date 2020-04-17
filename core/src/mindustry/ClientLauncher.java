@@ -11,13 +11,14 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.async.*;
 import mindustry.core.*;
-import mindustry.ctype.Content;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.Net;
+import mindustry.ui.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -32,7 +33,10 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void setup(){
+        Events.fire(new ClientCreateEvent());
+
         Vars.loadLogger();
+        Vars.loadFileLogger();
         Vars.platform = this;
         beginTime = Time.millis();
 
@@ -54,14 +58,15 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Vars.net = new Net(platform.getNet());
         mods = new Mods();
 
-        UI.loadSystemCursors();
+        Fonts.loadSystemCursors();
 
         assets.load(new Vars());
 
-        UI.loadDefaultFont();
+        Fonts.loadDefaultFont();
 
         assets.load(new AssetDescriptor<>("sprites/sprites.atlas", TextureAtlas.class)).loaded = t -> {
             atlas = (TextureAtlas)t;
+            Fonts.mergeFontAtlas(atlas);
         };
 
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());
@@ -87,10 +92,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets.load(mods);
         assets.load(schematics);
 
-        assets.loadRun("contentinit", ContentLoader.class, () -> {
-            content.init();
-            content.load();
-        });
+        assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> content.load());
     }
 
     @Override

@@ -4,16 +4,19 @@ import arc.*;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.EnumSet;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -25,24 +28,24 @@ public class BlockIndexer{
 
     /** Set of all ores that are being scanned. */
     private final ObjectSet<Item> scanOres = new ObjectSet<>();
+    private final IntSet intSet = new IntSet();
     private final ObjectSet<Item> itemSet = new ObjectSet<>();
     /** Stores all ore quadtrants on the map. */
-    private ObjectMap<Item, ObjectSet<Tile>> ores = new ObjectMap<>();
+    private ObjectMap<Item, TileArray> ores = new ObjectMap<>();
     /** Maps each team ID to a quarant. A quadrant is a grid of bits, where each bit is set if and only if there is a block of that team in that quadrant. */
     private GridBits[] structQuadrants;
     /** Stores all damaged tile entities by team. */
-    private ObjectSet<Tile>[] damagedTiles = new ObjectSet[Team.all().length];
+    private TileArray[] damagedTiles = new TileArray[Team.all().length];
     /**All ores available on this map.*/
     private ObjectSet<Item> allOres = new ObjectSet<>();
     /**Stores teams that are present here as tiles.*/
-    private ObjectSet<Team> activeTeams = new ObjectSet<>();
-
+    private Array<Team> activeTeams = new Array<>();
     /** Maps teams to a map of flagged tiles by type. */
-    private ObjectSet<Tile>[][] flagMap = new ObjectSet[Team.all().length][BlockFlag.all.length];
+    private TileArray[][] flagMap = new TileArray[Team.all().length][BlockFlag.all.length];
     /** Maps tile positions to their last known tile index data. */
     private IntMap<TileIndex> typeMap = new IntMap<>();
     /** Empty set used for returning. */
-    private ObjectSet<Tile> emptySet = new ObjectSet<>();
+    private TileArray emptySet = new TileArray();
     /** Array used for returning and reusing. */
     private Array<Tile> returnArray = new Array<>();
 
@@ -61,12 +64,12 @@ public class BlockIndexer{
         Events.on(WorldLoadEvent.class, event -> {
             scanOres.clear();
             scanOres.addAll(Item.getAllOres());
-            damagedTiles = new ObjectSet[Team.all().length];
-            flagMap = new ObjectSet[Team.all().length][BlockFlag.all.length];
+            damagedTiles = new TileArray[Team.all().length];
+            flagMap = new TileArray[Team.all().length][BlockFlag.all.length];
 
             for(int i = 0; i < flagMap.length; i++){
                 for(int j = 0; j < BlockFlag.all.length; j++){
-                    flagMap[i][j] = new ObjectSet<>();
+                    flagMap[i][j] = new TileArray();
                 }
             }
 
@@ -77,18 +80,14 @@ public class BlockIndexer{
             //create bitset for each team type that contains each quadrant
             structQuadrants = new GridBits[Team.all().length];
 
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    Tile tile = world.tile(x, y);
+            for(Tile tile : world.tiles){
+                process(tile);
 
-                    process(tile);
-
-                    if(tile.entity != null && tile.entity.damaged()){
-                        notifyTileDamaged(tile.entity);
-                    }
-
-                    if(tile.drop() != null) allOres.add(tile.drop());
+                if(tile.entity != null && tile.entity.damaged()){
+                    notifyTileDamaged(tile.entity);
                 }
+
+                if(tile.drop() != null) allOres.add(tile.drop());
             }
 
             for(int x = 0; x < quadWidth(); x++){
@@ -101,7 +100,7 @@ public class BlockIndexer{
         });
     }
 
-    private ObjectSet<Tile>[] getFlagged(Team team){
+    private TileArray[] getFlagged(Team team){
         return flagMap[team.id];
     }
 
@@ -118,14 +117,11 @@ public class BlockIndexer{
         if(structQuadrants == null) return;
 
         //go through every tile... ouch
-        for(int x = 0; x < world.width(); x++){
-            for(int y = 0; y < world.height(); y++){
-                Tile tile = world.tile(x, y);
-                if(tile.getTeam() == team){
-                    int quadrantX = tile.x / quadrantSize;
-                    int quadrantY = tile.y / quadrantSize;
-                    structQuadrant(team).set(quadrantX, quadrantY);
-                }
+        for(Tile tile : world.tiles){
+            if(tile.team() == team){
+                int quadrantX = tile.x / quadrantSize;
+                int quadrantY = tile.y / quadrantSize;
+                structQuadrant(team).set(quadrantX, quadrantY);
             }
         }
     }
@@ -136,16 +132,16 @@ public class BlockIndexer{
     }
 
     /** Returns all damaged tiles by team. */
-    public ObjectSet<Tile> getDamaged(Team team){
+    public TileArray getDamaged(Team team){
         returnArray.clear();
 
         if(damagedTiles[team.id] == null){
-            damagedTiles[team.id] = new ObjectSet<>();
+            damagedTiles[team.id] = new TileArray();
         }
 
-        ObjectSet<Tile> set = damagedTiles[team.id];
+        TileArray set = damagedTiles[team.id];
         for(Tile tile : set){
-            if((tile.entity == null || tile.entity.getTeam() != team || !tile.entity.damaged()) || tile.block() instanceof BuildBlock){
+            if((tile.entity == null || tile.entity.team() != team || !tile.entity.damaged()) || tile.block() instanceof BuildBlock){
                 returnArray.add(tile);
             }
         }
@@ -158,8 +154,41 @@ public class BlockIndexer{
     }
 
     /** Get all allied blocks with a flag. */
-    public ObjectSet<Tile> getAllied(Team team, BlockFlag type){
+    public TileArray getAllied(Team team, BlockFlag type){
         return flagMap[team.id][type.ordinal()];
+    }
+
+    public boolean eachBlock(Teamc team, float range, Boolf<Tilec> pred, Cons<Tilec> cons){
+        return eachBlock(team.team(), team.getX(), team.getY(), range, pred, cons);
+    }
+
+    public boolean eachBlock(Team team, float wx, float wy, float range, Boolf<Tilec> pred, Cons<Tilec> cons){
+        intSet.clear();
+
+        int tx = world.toTile(wx);
+        int ty = world.toTile(wy);
+
+        int tileRange = (int)(range / tilesize + 1);
+        intSet.clear();
+        boolean any = false;
+
+        for(int x = -tileRange + tx; x <= tileRange + tx; x++){
+            for(int y = -tileRange + ty; y <= tileRange + ty; y++){
+                if(!Mathf.within(x * tilesize, y * tilesize, wx, wy, range)) continue;
+
+                Tilec other = world.ent(x, y);
+
+                if(other == null) continue;
+
+                if(other.team() == team && !intSet.contains(other.pos()) && pred.get(other)){
+                    cons.get(other);
+                    any = true;
+                    intSet.add(other.pos());
+                }
+            }
+        }
+
+        return any;
     }
 
     /** Get all enemy blocks with a flag. */
@@ -167,7 +196,7 @@ public class BlockIndexer{
         returnArray.clear();
         for(Team enemy : team.enemies()){
             if(state.teams.isActive(enemy)){
-                ObjectSet<Tile> set = getFlagged(enemy)[type.ordinal()];
+                TileArray set = getFlagged(enemy)[type.ordinal()];
                 if(set != null){
                     for(Tile tile : set){
                         returnArray.add(tile);
@@ -178,20 +207,20 @@ public class BlockIndexer{
         return returnArray;
     }
 
-    public void notifyTileDamaged(TileEntity entity){
-        if(damagedTiles[(int)entity.getTeam().id] == null){
-            damagedTiles[(int)entity.getTeam().id] = new ObjectSet<>();
+    public void notifyTileDamaged(Tilec entity){
+        if(damagedTiles[(int)entity.team().id] == null){
+            damagedTiles[(int)entity.team().id] = new TileArray();
         }
 
-        ObjectSet<Tile> set = damagedTiles[(int)entity.getTeam().id];
-        set.add(entity.tile);
+        TileArray set = damagedTiles[(int)entity.team().id];
+        set.add(entity.tile());
     }
 
-    public TileEntity findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
+    public Tilec findEnemyTile(Team team, float x, float y, float range, Boolf<Tilec> pred){
         for(Team enemy : activeTeams){
             if(!team.isEnemy(enemy)) continue;
 
-            TileEntity entity = indexer.findTile(enemy, x, y, range, pred, true);
+            Tilec entity = indexer.findTile(enemy, x, y, range, pred, true);
             if(entity != null){
                 return entity;
             }
@@ -200,13 +229,14 @@ public class BlockIndexer{
         return null;
     }
 
-    public TileEntity findTile(Team team, float x, float y, float range, Boolf<Tile> pred){
+    public Tilec findTile(Team team, float x, float y, float range, Boolf<Tilec> pred){
         return findTile(team, x, y, range, pred, false);
     }
 
-    public TileEntity findTile(Team team, float x, float y, float range, Boolf<Tile> pred, boolean usePriority){
-        TileEntity closest = null;
+    public Tilec findTile(Team team, float x, float y, float range, Boolf<Tilec> pred, boolean usePriority){
+        Tilec closest = null;
         float dst = 0;
+        float range2 = range*range;
 
         for(int rx = Math.max((int)((x - range) / tilesize / quadrantSize), 0); rx <= (int)((x + range) / tilesize / quadrantSize) && rx < quadWidth(); rx++){
             for(int ry = Math.max((int)((y - range) / tilesize / quadrantSize), 0); ry <= (int)((y + range) / tilesize / quadrantSize) && ry < quadHeight(); ry++){
@@ -215,17 +245,19 @@ public class BlockIndexer{
 
                 for(int tx = rx * quadrantSize; tx < (rx + 1) * quadrantSize && tx < world.width(); tx++){
                     for(int ty = ry * quadrantSize; ty < (ry + 1) * quadrantSize && ty < world.height(); ty++){
-                        Tile other = world.ltile(tx, ty);
+                        Tilec e = world.ent(tx, ty);
 
-                        if(other == null) continue;
+                        if(e == null) continue;
 
-                        if(other.entity == null || other.getTeam() != team || !pred.get(other) || !other.block().targetable)
+                        if(e.team() != team || !pred.get(e) || !e.block().targetable)
                             continue;
 
-                        TileEntity e = other.entity;
-
-                        float ndst = Mathf.dst(x, y, e.x, e.y);
-                        if(ndst < range && (closest == null || ndst < dst || (usePriority && closest.block.priority.ordinal() <= e.block.priority.ordinal()))){
+                        float ndst = e.dst2(x, y);
+                        if(ndst < range2 && (closest == null ||
+                                //this one is closer, and it is at least of equal priority
+                                (ndst < dst && (!usePriority || closest.block().priority.ordinal() <= e.block().priority.ordinal())) ||
+                                //priority is used, and new block has higher priority regardless of range
+                                (usePriority && closest.block().priority.ordinal() < e.block().priority.ordinal()))){
                             dst = ndst;
                             closest = e;
                         }
@@ -243,7 +275,7 @@ public class BlockIndexer{
      * each tile will at least have an ore within {@link #quadrantSize} / 2 blocks of it.
      * Only specific ore types are scanned. See {@link #scanOres}.
      */
-    public ObjectSet<Tile> getOrePositions(Item item){
+    public TileArray getOrePositions(Item item){
         return ores.get(item, emptySet);
     }
 
@@ -266,20 +298,22 @@ public class BlockIndexer{
     }
 
     private void process(Tile tile){
-        if(tile.block().flags.size() > 0 && tile.getTeam() != Team.derelict){
-            ObjectSet<Tile>[] map = getFlagged(tile.getTeam());
+        if(tile.block().flags.size() > 0 && tile.team() != Team.derelict){
+            TileArray[] map = getFlagged(tile.team());
 
             for(BlockFlag flag : tile.block().flags){
 
-                ObjectSet<Tile> arr = map[flag.ordinal()];
+                TileArray arr = map[flag.ordinal()];
 
                 arr.add(tile);
 
                 map[flag.ordinal()] = arr;
             }
-            typeMap.put(tile.pos(), new TileIndex(tile.block().flags, tile.getTeam()));
+            typeMap.put(tile.pos(), new TileIndex(tile.block().flags, tile.team()));
         }
-        activeTeams.add(tile.getTeam());
+        if(!activeTeams.contains(tile.team())){
+            activeTeams.add(tile.team());
+        }
 
         if(ores == null) return;
 
@@ -301,7 +335,7 @@ public class BlockIndexer{
 
         //update quadrant at this position
         for(Item item : scanOres){
-            ObjectSet<Tile> set = ores.get(item);
+            TileArray set = ores.get(item);
 
             //update quadrant status depending on whether the item is in it
             if(!itemSet.contains(item)){
@@ -323,7 +357,7 @@ public class BlockIndexer{
             GridBits bits = structQuadrant(team);
 
             //fast-set this quadrant to 'occupied' if the tile just placed is already of this team
-            if(tile.getTeam() == team && tile.entity != null && tile.block().targetable){
+            if(tile.team() == team && tile.entity != null && tile.block().targetable){
                 bits.set(quadrantX, quadrantY);
                 continue; //no need to process futher
             }
@@ -333,9 +367,9 @@ public class BlockIndexer{
             outer:
             for(int x = quadrantX * quadrantSize; x < world.width() && x < (quadrantX + 1) * quadrantSize; x++){
                 for(int y = quadrantY * quadrantSize; y < world.height() && y < (quadrantY + 1) * quadrantSize; y++){
-                    Tile result = world.ltile(x, y);
+                    Tilec result = world.ent(x, y);
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
-                    if(result.entity != null && result.getTeam() == team){
+                    if(result!= null && result.team() == team){
                         bits.set(quadrantX, quadrantY);
                         break outer;
                     }
@@ -361,23 +395,19 @@ public class BlockIndexer{
 
         //initialize ore map with empty sets
         for(Item item : scanOres){
-            ores.put(item, new ObjectSet<>());
+            ores.put(item, new TileArray());
         }
 
-        for(int x = 0; x < world.width(); x++){
-            for(int y = 0; y < world.height(); y++){
-                int qx = (x / quadrantSize);
-                int qy = (y / quadrantSize);
+        for(Tile tile : world.tiles){
+            int qx = (tile.x / quadrantSize);
+            int qy = (tile.y / quadrantSize);
 
-                Tile tile = world.tile(x, y);
-
-                //add position of quadrant to list when an ore is found
-                if(tile.drop() != null && scanOres.contains(tile.drop()) && tile.block() == Blocks.air){
-                    ores.get(tile.drop()).add(world.tile(
-                    //make sure to clamp quadrant middle position, since it might go off bounds
-                    Mathf.clamp(qx * quadrantSize + quadrantSize / 2, 0, world.width() - 1),
-                    Mathf.clamp(qy * quadrantSize + quadrantSize / 2, 0, world.height() - 1)));
-                }
+            //add position of quadrant to list when an ore is found
+            if(tile.drop() != null && scanOres.contains(tile.drop()) && tile.block() == Blocks.air){
+                ores.get(tile.drop()).add(world.tile(
+                //make sure to clamp quadrant middle position, since it might go off bounds
+                Mathf.clamp(qx * quadrantSize + quadrantSize / 2, 0, world.width() - 1),
+                Mathf.clamp(qy * quadrantSize + quadrantSize / 2, 0, world.height() - 1)));
             }
         }
     }
@@ -389,6 +419,36 @@ public class BlockIndexer{
         public TileIndex(EnumSet<BlockFlag> flags, Team team){
             this.flags = flags;
             this.team = team;
+        }
+    }
+
+    public static class TileArray implements Iterable<Tile>{
+        private Array<Tile> tiles = new Array<>(false, 16);
+        private IntSet contained = new IntSet();
+
+        public void add(Tile tile){
+            if(contained.add(tile.pos())){
+                tiles.add(tile);
+            }
+        }
+
+        public void remove(Tile tile){
+            if(contained.remove(tile.pos())){
+                tiles.remove(tile);
+            }
+        }
+
+        public int size(){
+            return tiles.size;
+        }
+
+        public Tile first(){
+            return tiles.first();
+        }
+
+        @Override
+        public Iterator<Tile> iterator(){
+            return tiles.iterator();
         }
     }
 }

@@ -24,7 +24,7 @@ public class FloatingDialog extends Dialog{
         .growX().height(3f).pad(4f);
 
         hidden(() -> {
-            if(shouldPause && !state.is(State.menu)){
+            if(shouldPause && state.isGame()){
                 if(!wasPaused || net.active()){
                     state.set(State.playing);
                 }
@@ -33,7 +33,7 @@ public class FloatingDialog extends Dialog{
         });
 
         shown(() -> {
-            if(shouldPause && !state.is(State.menu)){
+            if(shouldPause && state.isGame()){
                 wasPaused = state.is(State.paused);
                 state.set(State.paused);
             }
@@ -56,7 +56,7 @@ public class FloatingDialog extends Dialog{
     @Override
     public void addCloseButton(){
         buttons.defaults().size(210f, 64f);
-        buttons.addImageTextButton("$back", Icon.arrowLeft, this::hide).size(210f, 64f);
+        buttons.addImageTextButton("$back", Icon.left, this::hide).size(210f, 64f);
 
         keyDown(key -> {
             if(key == KeyCode.ESCAPE || key == KeyCode.BACK){

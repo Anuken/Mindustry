@@ -53,7 +53,7 @@ public class Objectives{
     public static class ZoneWave extends ZoneObjective{
         public int wave;
 
-        public ZoneWave(Zone zone, int wave){
+        public ZoneWave(SectorPreset zone, int wave){
             this.zone = zone;
             this.wave = wave;
         }
@@ -73,7 +73,7 @@ public class Objectives{
 
     public static class Launched extends ZoneObjective{
 
-        public Launched(Zone zone){
+        public Launched(SectorPreset zone){
             this.zone = zone;
         }
 
@@ -91,6 +91,6 @@ public class Objectives{
     }
 
     public abstract static class ZoneObjective implements Objective{
-        public @NonNull Zone zone;
+        public @NonNull SectorPreset zone;
     }
 }

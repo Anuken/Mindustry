@@ -60,7 +60,7 @@ public class MenuFragment extends Fragment{
             parent.fill(c -> c.bottom().left().addButton("", Styles.infot, ui.about::show).size(84, 45));
             parent.fill(c -> c.bottom().right().addButton("", Styles.discordt, ui.discord::show).size(84, 45));
         }else if(becontrol.active()){
-            parent.fill(c -> c.bottom().right().addImageTextButton("$be.check", Icon.refreshSmall, () -> {
+            parent.fill(c -> c.bottom().right().addImageTextButton("$be.check", Icon.refresh, () -> {
                 ui.loadfrag.show();
                 becontrol.checkUpdate(result -> {
                     ui.loadfrag.hide();
@@ -100,13 +100,13 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-            play = new MobileButton(Icon.play2, "$campaign", () -> checkPlay(ui.deploy::show)),
-            custom = new MobileButton(Icon.playCustom, "$customgame", () -> checkPlay(ui.custom::show)),
-            maps = new MobileButton(Icon.load, "$loadgame", () -> checkPlay(ui.load::show)),
+            play = new MobileButton(Icon.play, "$campaign", () -> checkPlay(ui.planet::show)),
+            custom = new MobileButton(Icon.rightOpenOut, "$customgame", () -> checkPlay(ui.custom::show)),
+            maps = new MobileButton(Icon.download, "$loadgame", () -> checkPlay(ui.load::show)),
             join = new MobileButton(Icon.add, "$joingame", () -> checkPlay(ui.join::show)),
-            editor = new MobileButton(Icon.editor, "$editor", () -> checkPlay(ui.maps::show)),
-            tools = new MobileButton(Icon.tools, "$settings", ui.settings::show),
-            mods = new MobileButton(Icon.wiki, "$mods", ui.mods::show),
+            editor = new MobileButton(Icon.terrain, "$editor", () -> checkPlay(ui.maps::show)),
+            tools = new MobileButton(Icon.settings, "$settings", ui.settings::show),
+            mods = new MobileButton(Icon.book, "$mods", ui.mods::show),
             donate = new MobileButton(Icon.link, "$website", () -> Core.net.openURI("https://anuke.itch.io/mindustry")),
             exit = new MobileButton(Icon.exit, "$quit", () -> Core.app.exit());
 
@@ -164,20 +164,20 @@ public class MenuFragment extends Fragment{
             t.defaults().width(width).height(70f);
 
             buttons(t,
-                new Buttoni("$play", Icon.play2Small,
-                    new Buttoni("$campaign", Icon.play2Small, () -> checkPlay(ui.deploy::show)),
-                    new Buttoni("$joingame", Icon.addSmall, () -> checkPlay(ui.join::show)),
-                    new Buttoni("$customgame", Icon.editorSmall, () -> checkPlay(ui.custom::show)),
-                    new Buttoni("$loadgame", Icon.loadSmall, () -> checkPlay(ui.load::show)),
-                    new Buttoni("$tutorial", Icon.infoSmall, () -> checkPlay(control::playTutorial))
+                new Buttoni("$play", Icon.play,
+                    new Buttoni("$campaign", Icon.play, () -> checkPlay(ui.planet::show)),
+                    new Buttoni("$joingame", Icon.add, () -> checkPlay(ui.join::show)),
+                    new Buttoni("$customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
+                    new Buttoni("$loadgame", Icon.download, () -> checkPlay(ui.load::show)),
+                    new Buttoni("$tutorial", Icon.info, () -> checkPlay(control::playTutorial))
                 ),
-                new Buttoni("$editor", Icon.editorSmall, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("$workshop", Icon.saveSmall, platform::openWorkshop) : null,
-                new Buttoni(Core.bundle.get("mods") + "\n" + Core.bundle.get("mods.alpha"), Icon.wikiSmall, ui.mods::show),
+                new Buttoni("$editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("$workshop", Icon.book, platform::openWorkshop) : null,
+                new Buttoni(Core.bundle.get("mods"), Icon.bookOpen, ui.mods::show),
                 //not enough space for this button
-                //new Buttoni("$schematics", Icon.pasteSmall, ui.schematics::show),
-                new Buttoni("$settings", Icon.toolsSmall, ui.settings::show),
-                new Buttoni("$about.button", Icon.infoSmall, ui.about::show),
-                new Buttoni("$quit", Icon.exitSmall, Core.app::exit)
+                //new Buttoni("$schematics", Icon.paste, ui.schematics::show),
+                new Buttoni("$settings", Icon.settings, ui.settings::show),
+                new Buttoni("$about.button", Icon.info, ui.about::show),
+                new Buttoni("$quit", Icon.exit, Core.app::exit)
             );
 
         }).width(width).growY();

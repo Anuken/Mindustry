@@ -55,7 +55,7 @@ public class ColorPicker extends FloatingDialog{
 
         buttons.clear();
         addCloseButton();
-        buttons.addImageTextButton("$ok", Icon.checkSmall, () -> {
+        buttons.addImageTextButton("$ok", Icon.ok, () -> {
             cons.get(current);
             hide();
         });

@@ -189,7 +189,7 @@ public class MapView extends Element implements GestureListener{
             lastTool = null;
         }
 
-        if(ui.editor.hasPane()) return;
+        if(Core.scene.getScrollFocus() != this) return;
 
         zoom += Core.input.axis(KeyCode.SCROLL) / 10f * zoom;
         clampZoom();
@@ -236,7 +236,7 @@ public class MapView extends Element implements GestureListener{
 
         image.setImageSize(editor.width(), editor.height());
 
-        if(!ScissorStack.pushScissors(rect.set(x, y, width, height))){
+        if(!ScissorStack.push(rect.set(x, y, width, height))){
             return;
         }
 
@@ -304,7 +304,7 @@ public class MapView extends Element implements GestureListener{
         Lines.rect(x, y, width, height);
         Draw.reset();
 
-        ScissorStack.popScissors();
+        ScissorStack.pop();
     }
 
     private boolean active(){

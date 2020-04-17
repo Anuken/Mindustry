@@ -1,0 +1,14 @@
+Crea elaborate catene di nastri trasportatori per rifornire di ammonizioni le tue torrette, produci materiali per la costruzione e difendi le tue strutture contro le ondate nemiche. Gioca con i tuoi amici con la modalità multigiocatore cross-platform o sfidali in partite PvP a squadre.
+
+Funzionalità:
+- 24 mappe incluse
+- Modalità campagna, completa con albero delle scoperte e aree sbloccabili
+- 4 potenti ondate con boss da sconfiggere
+- Sistemi di trasporto di energia, liquidi e oggetti
+- 19 tipi di droni, mechs e navi
+- 120+ blocchi tecnologici da padroneggiare
+- 75+ blocchi ambientali
+- Modalità multigiocatore cross-platform attraverso la rete locale o i server dedicati
+- Regole di gioco personalizzate: modifica i costi dei blocchi, le statistiche nemiche, gli oggetti di partenza, i tempi tra le ondate e molto altro
+- Un editor potente, con strumenti che permettono di generare i minerali in modo casuale, il terreno, le decorazioni e applicare simmetria alle mappe 
+- Ondate delle mappe completamente personalizzabili

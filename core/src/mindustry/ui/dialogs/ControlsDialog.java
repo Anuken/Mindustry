@@ -17,7 +17,7 @@ public class ControlsDialog extends KeybindDialog{
 
     @Override
     public void addCloseButton(){
-        buttons.addImageTextButton("$back", Icon.arrowLeftSmall, this::hide).size(230f, 64f);
+        buttons.addImageTextButton("$back", Icon.left, this::hide).size(230f, 64f);
 
         keyDown(key -> {
             if(key == KeyCode.ESCAPE || key == KeyCode.BACK)

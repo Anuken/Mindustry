@@ -1,16 +1,14 @@
 package mindustry.type;
 
-import arc.struct.*;
 import arc.graphics.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
-import mindustry.entities.type.*;
-import mindustry.entities.units.Statuses.*;
+import mindustry.entities.units.*;
+import mindustry.gen.*;
 
 public class StatusEffect extends MappableContent{
     /** Damage dealt by the unit with the effect. */
@@ -44,15 +42,15 @@ public class StatusEffect extends MappableContent{
     }
 
     /** Runs every tick on the affected unit while time is greater than 0. */
-    public void update(Unit unit, float time){
+    public void update(Unitc unit, float time){
         if(damage > 0){
-            unit.damagePeriodic(damage);
+            unit.damageContinuous(damage);
         }else if(damage < 0){ //heal unit
-            unit.healBy(damage * Time.delta());
+            unit.heal(damage * Time.delta());
         }
 
         if(effect != Fx.none && Mathf.chance(Time.delta() * 0.15f)){
-            Effects.effect(effect, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
+            effect.at(unit.getX() + Mathf.range(unit.bounds() / 2f), unit.getY() + Mathf.range(unit.bounds() / 2f));
         }
     }
 
@@ -83,7 +81,7 @@ public class StatusEffect extends MappableContent{
      * @param time The current status effect time
      * @param newTime The time that the new status effect will last
      */
-    public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
+    public StatusEntry getTransition(Unitc unit, StatusEffect to, float time, float newTime, StatusEntry result){
         if(transitions.containsKey(to)){
             transitions.get(to).handle(unit, time, newTime, result);
             return result;
@@ -98,6 +96,6 @@ public class StatusEffect extends MappableContent{
     }
 
     public interface TransitionHandler{
-        void handle(Unit unit, float time, float newTime, StatusEntry result);
+        void handle(Unitc unit, float time, float newTime, StatusEntry result);
     }
 }

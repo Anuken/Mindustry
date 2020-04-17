@@ -55,7 +55,7 @@ public class AboutDialog extends FloatingDialog{
 
             table.table(i -> {
                 i.background(Tex.buttonEdge3);
-                i.addImage(Core.atlas.drawable("icon-" + link.name));
+                i.addImage(link.icon);
             }).size(h - 5, h);
 
             table.table(inset -> {
@@ -95,7 +95,7 @@ public class AboutDialog extends FloatingDialog{
     public void showCredits(){
         FloatingDialog dialog = new FloatingDialog("$credits");
         dialog.addCloseButton();
-        dialog.cont.add("$credits.text");
+        dialog.cont.add("$credits.text").fillX().wrap().get().setAlignment(Align.center);
         dialog.cont.row();
         if(!contributors.isEmpty()){
             dialog.cont.addImage().color(Pal.accent).fillX().height(3f).pad(3f);

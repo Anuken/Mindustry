@@ -1,0 +1,6 @@
+- Optimalizovány a vyčištěny dopravníky
+- Odbavovače vykládají položky z bloků rovnoměrně
+- Přidány kategorie serverů (s přispěním uživatele @Quezler)
+- Přidána funkce require() pro skripty (s přispěním uživatele @DeltaNedas)
+- Přidán barevný přechod pro stav baterie (s přispěním uživatele @Arkanic
+- Změněno načítání skriptu: Pro modifikace s více než jedním souborem skriptu musí být hlavní soubor pojmenován "main.js" a musí odkazovat na další skripty pomocí funkce require()

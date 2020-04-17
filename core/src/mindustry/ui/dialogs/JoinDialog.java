@@ -1,18 +1,18 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
-import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import mindustry.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
@@ -25,6 +25,7 @@ public class JoinDialog extends FloatingDialog{
     Server renaming;
     Table local = new Table();
     Table remote = new Table();
+    Table global = new Table();
     Table hosts = new Table();
     int totalHosts;
 
@@ -80,26 +81,32 @@ public class JoinDialog extends FloatingDialog{
             }
         });
 
-        keyDown(KeyCode.F5, () -> {
-            refreshLocal();
-            refreshRemote();
-        });
+        keyDown(KeyCode.F5, this::refreshAll);
 
         shown(() -> {
             setup();
-            refreshLocal();
-            refreshRemote();
+            refreshAll();
 
             if(!steam){
                 Core.app.post(() -> Core.settings.getBoolOnce("joininfo", () -> ui.showInfo("$join.info")));
             }
         });
 
-        onResize(this::setup);
+        onResize(() -> {
+            setup();
+            refreshAll();
+        });
+    }
+
+    void refreshAll(){
+        refreshLocal();
+        refreshRemote();
+        refreshGlobal();
     }
 
     void setupRemote(){
         remote.clear();
+
         for(Server server : servers){
             //why are java lambdas this bad
             TextButton[] buttons = {null};
@@ -122,48 +129,59 @@ public class JoinDialog extends FloatingDialog{
 
             inner.add(button.getLabel()).growX();
 
-            inner.addImageButton(Icon.arrowUpSmall, Styles.emptyi, () -> {
-                int index = servers.indexOf(server);
-                if(index > 0){
-                    servers.remove(index);
-                    servers.insert(0, server);
-
-                    saveServers();
-                    setupRemote();
-                    for(Server other : servers){
-                        if(other.lastHost != null){
-                            setupServer(other, other.lastHost);
-                        }else{
-                            refreshServer(other);
-                        }
-                    }
-                }
+            inner.addImageButton(Icon.upOpen, Styles.emptyi, () -> {
+                moveRemote(server, -1);
 
             }).margin(3f).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.loadingSmall, Styles.emptyi, () -> {
+            inner.addImageButton(Icon.downOpen, Styles.emptyi, () -> {
+                moveRemote(server, +1);
+
+            }).margin(3f).pad(2).padTop(6f).top().right();
+
+            inner.addImageButton(Icon.refresh, Styles.emptyi, () -> {
                 refreshServer(server);
-            }).margin(3f).padTop(6f).top().right();
+            }).margin(3f).pad(2).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.pencilSmall, Styles.emptyi, () -> {
+            inner.addImageButton(Icon.pencil, Styles.emptyi, () -> {
                 renaming = server;
                 add.show();
-            }).margin(3f).padTop(6f).top().right();
+            }).margin(3f).pad(2).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.trash16Small, Styles.emptyi, () -> {
+            inner.addImageButton(Icon.trash, Styles.emptyi, () -> {
                 ui.showConfirm("$confirm", "$server.delete", () -> {
-                    servers.removeValue(server, true);
+                    servers.remove(server, true);
                     saveServers();
                     setupRemote();
                     refreshRemote();
                 });
-            }).margin(3f).pad(6).top().right();
+            }).margin(3f).pad(2).pad(6).top().right();
 
             button.row();
 
             server.content = button.table(t -> {}).grow().get();
 
             remote.row();
+        }
+    }
+
+    void moveRemote(Server server, int sign){
+        int index = servers.indexOf(server);
+
+        if(index + sign < 0) return;
+        if(index + sign > servers.size - 1) return;
+
+        servers.remove(index);
+        servers.insert(index + sign, server);
+
+        saveServers();
+        setupRemote();
+        for(Server other : servers){
+            if(other.lastHost != null){
+                setupServer(other, other.lastHost);
+            }else{
+                refreshServer(other);
+            }
         }
     }
 
@@ -179,7 +197,7 @@ public class JoinDialog extends FloatingDialog{
 
         net.pingHost(server.ip, server.port, host -> setupServer(server, host), e -> {
             server.content.clear();
-            server.content.add("$host.invalid");
+            server.content.add("$host.invalid").padBottom(4);
         });
     }
 
@@ -212,6 +230,10 @@ public class JoinDialog extends FloatingDialog{
         content.table(t -> {
             t.add("[lightgray]" + host.name + "   " + versionString).width(targetWidth() - 10f).left().get().setEllipsis(true);
             t.row();
+            if(!host.description.isEmpty()){
+                t.add("[gray]" + host.description).width(targetWidth() - 10f).left().wrap();
+                t.row();
+            }
             t.add("[lightgray]" + (Core.bundle.format("players" + (host.players == 1 && host.playerLimit <= 0 ? ".single" : ""), (host.players == 0 ? "[lightgray]" : "[accent]") + host.players + (host.playerLimit > 0 ? "[lightgray]/[accent]" + host.playerLimit : "")+ "[lightgray]"))).left();
             t.row();
             t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + host.mode.toString()).width(targetWidth() - 10f).left().get().setEllipsis(true);
@@ -219,42 +241,44 @@ public class JoinDialog extends FloatingDialog{
     }
 
     void setup(){
+        local.clear();
+        remote.clear();
+        global.clear();
         float w = targetWidth();
 
         hosts.clear();
 
-        hosts.add(remote).growX();
-        hosts.row();
-        hosts.add(local).width(w);
+        section("$servers.local", local);
+        section("$servers.remote", remote);
+        section("$servers.global", global);
 
         ScrollPane pane = new ScrollPane(hosts);
         pane.setFadeScrollBars(false);
         pane.setScrollingDisabled(true, false);
 
         setupRemote();
-        refreshRemote();
 
         cont.clear();
         cont.table(t -> {
             t.add("$name").padRight(10);
             if(!steam){
                 t.addField(Core.settings.getString("name"), text -> {
-                    player.name = text;
+                    player.name(text);
                     Core.settings.put("name", text);
                     Core.settings.save();
                 }).grow().pad(8).get().setMaxLength(maxNameLength);
             }else{
-                t.add(player.name).update(l -> l.setColor(player.color)).grow().pad(8);
+                t.add(player.name()).update(l -> l.setColor(player.color())).grow().pad(8);
             }
 
             ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new PaletteDialog().show(color -> {
-                    player.color.set(color);
-                    Core.settings.put("color-0", Color.rgba8888(color));
+                    player.color().set(color);
+                    Core.settings.put("color-0", color.rgba8888());
                     Core.settings.save();
                 });
             }).size(54f).get();
-            button.update(() -> button.getStyle().imageUpColor = player.color);
+            button.update(() -> button.getStyle().imageUpColor = player.color());
         }).width(w).height(70f).pad(4);
         cont.row();
         cont.add(pane).width(w + 38).pad(0);
@@ -262,7 +286,7 @@ public class JoinDialog extends FloatingDialog{
         cont.addCenteredImageTextButton("$server.add", Icon.add, () -> {
             renaming = null;
             add.show();
-        }).marginLeft(6).width(w).height(80f).update(button -> {
+        }).marginLeft(10).width(w).height(80f).update(button -> {
             float pw = w;
             float pad = 0f;
             if(pane.getChildren().first().getPrefHeight() > pane.getHeight()){
@@ -280,6 +304,24 @@ public class JoinDialog extends FloatingDialog{
         });
     }
 
+    void section(String label, Table servers){
+        Collapser coll = new Collapser(servers, Core.settings.getBool("collapsed-" + label, false));
+        coll.setDuration(0.1f);
+
+        hosts.table(name -> {
+            name.add(label).pad(10).growX().left().color(Pal.accent);
+            name.addImageButton(Icon.downOpen, Styles.emptyi, () -> {
+                coll.toggle(false);
+                Core.settings.putSave("collapsed-" + label, coll.isCollapsed());
+            }).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(40f).right().padRight(10f);
+        }).growX();
+        hosts.row();
+        hosts.addImage().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
+        hosts.row();
+        hosts.add(coll).width(targetWidth());
+        hosts.row();
+    }
+
     void refreshLocal(){
         totalHosts = 0;
 
@@ -287,12 +329,17 @@ public class JoinDialog extends FloatingDialog{
         local.background(null);
         local.table(Tex.button, t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering.any") + Strings.animated(Time.time(), 4, 10f, ".")).pad(10f)).growX();
         net.discoverServers(this::addLocalHost, this::finishLocalHosts);
+    }
+
+    void refreshGlobal(){
+        global.clear();
+        global.background(null);
         for(String host : defaultServers){
             String resaddress = host.contains(":") ? host.split(":")[0] : host;
             int resport = host.contains(":") ? Strings.parseInt(host.split(":")[1]) : port;
             net.pingHost(resaddress, resport, res -> {
                 res.port = resport;
-                addLocalHost(res);
+                addGlobalHost(res);
             }, e -> {});
         }
     }
@@ -303,7 +350,7 @@ public class JoinDialog extends FloatingDialog{
             local.background(Tex.button);
             local.add("$hosts.none").pad(10f);
             local.add().growX();
-            local.addImageButton(Icon.loading, this::refreshLocal).pad(-12f).padLeft(0).size(70f);
+            local.addImageButton(Icon.refresh, this::refreshLocal).pad(-12f).padLeft(0).size(70f);
         }else{
             local.background(null);
         }
@@ -325,8 +372,20 @@ public class JoinDialog extends FloatingDialog{
         buildServer(host, button);
     }
 
+    void addGlobalHost(Host host){
+        global.background(null);
+        float w = targetWidth();
+
+        global.row();
+
+        TextButton button = global.addButton("", Styles.cleart, () -> safeConnect(host.address, host.port, host.version))
+        .width(w).pad(5f).get();
+        button.clearChildren();
+        buildServer(host, button);
+    }
+
     public void connect(String ip, int port){
-        if(player.name.trim().isEmpty()){
+        if(player.name().trim().isEmpty()){
             ui.showInfo("$noname");
             return;
         }
@@ -359,7 +418,7 @@ public class JoinDialog extends FloatingDialog{
     }
 
     float targetWidth(){
-        return Core.graphics.isPortrait() ? 350f : 500f;
+        return Math.min(Core.graphics.getWidth() / Scl.scl() * 0.9f, 500f);//Core.graphics.isPortrait() ? 350f : 500f;
     }
 
     @SuppressWarnings("unchecked")

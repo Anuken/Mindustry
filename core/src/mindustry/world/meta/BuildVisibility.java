@@ -8,7 +8,7 @@ public enum BuildVisibility{
     shown(() -> true),
     debugOnly(() -> false),
     sandboxOnly(() -> Vars.state.rules.infiniteResources),
-    campaignOnly(() -> Vars.world.isZone()),
+    campaignOnly(() -> Vars.state.isCampaign()),
     lightingOnly(() -> Vars.state.rules.lighting);
 
     private final Boolp visible;

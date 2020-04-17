@@ -1,9 +1,10 @@
 package mindustry.content;
 
-import arc.struct.Array;
-import mindustry.ctype.ContentList;
-import mindustry.type.ItemStack;
-import mindustry.world.Block;
+import arc.math.*;
+import arc.struct.*;
+import mindustry.ctype.*;
+import mindustry.type.*;
+import mindustry.world.*;
 
 import static mindustry.content.Blocks.*;
 
@@ -21,7 +22,6 @@ public class TechTree implements ContentList{
             node(conveyor, () -> {
 
                 node(junction, () -> {
-                    node(itemBridge);
                     node(router, () -> {
                         node(launchPad, () -> {
                             node(launchPadLarge, () -> {
@@ -33,7 +33,9 @@ public class TechTree implements ContentList{
                         node(sorter, () -> {
                             node(invertedSorter);
                             node(message);
-                            node(overflowGate);
+                            node(overflowGate, () -> {
+                                node(underflowGate);
+                            });
                         });
                         node(container, () -> {
                             node(unloader);
@@ -42,15 +44,17 @@ public class TechTree implements ContentList{
                             });
                         });
 
-                        node(titaniumConveyor, () -> {
-                            node(phaseConveyor, () -> {
-                                node(massDriver, () -> {
+                        node(itemBridge, () -> {
+                            node(titaniumConveyor, () -> {
+                                node(phaseConveyor, () -> {
+                                    node(massDriver, () -> {
+
+                                    });
+                                });
+
+                                node(armoredConveyor, () -> {
 
                                 });
-                            });
-
-                            node(armoredConveyor, () -> {
-
                             });
                         });
                     });
@@ -99,23 +103,25 @@ public class TechTree implements ContentList{
 
 
                 node(copperWall, () -> {
-                    node(copperWallLarge);
-                    node(titaniumWall, () -> {
-                        node(door, () -> {
-                            node(doorLarge);
-                        });
-                        node(plastaniumWall, () -> {
-                            node(plastaniumWallLarge, () -> {
+                    node(copperWallLarge, () -> {
+                        node(titaniumWall, () -> {
+                            node(titaniumWallLarge);
 
+                            node(door, () -> {
+                                node(doorLarge);
                             });
-                        });
-                        node(titaniumWallLarge);
-                        node(thoriumWall, () -> {
-                            node(thoriumWallLarge);
-                            node(surgeWall, () -> {
-                                node(surgeWallLarge);
-                                node(phaseWall, () -> {
-                                    node(phaseWallLarge);
+                            node(plastaniumWall, () -> {
+                                node(plastaniumWallLarge, () -> {
+
+                                });
+                            });
+                            node(thoriumWall, () -> {
+                                node(thoriumWallLarge);
+                                node(surgeWall, () -> {
+                                    node(surgeWallLarge);
+                                    node(phaseWall, () -> {
+                                        node(phaseWallLarge);
+                                    });
                                 });
                             });
                         });
@@ -195,6 +201,8 @@ public class TechTree implements ContentList{
                             node(liquidRouter, () -> {
                                 node(liquidTank);
 
+                                node(bridgeConduit);
+
                                 node(pulseConduit, () -> {
                                     node(phaseConduit, () -> {
 
@@ -211,7 +219,6 @@ public class TechTree implements ContentList{
                                     });
                                 });
                             });
-                            node(bridgeConduit);
                         });
                     });
                 });
@@ -269,6 +276,7 @@ public class TechTree implements ContentList{
                         });
                     });
 
+                    /*
                     node(draugFactory, () -> {
                         node(spiritFactory, () -> {
                             node(phantomFactory);
@@ -294,6 +302,7 @@ public class TechTree implements ContentList{
                         });
                     });
 
+                    /*
                     node(dartPad, () -> {
                         node(deltaPad, () -> {
 
@@ -309,7 +318,7 @@ public class TechTree implements ContentList{
                                 });
                             });
                         });
-                    });
+                    });*/
                 });
             });
         });
@@ -318,7 +327,7 @@ public class TechTree implements ContentList{
     private static TechNode node(Block block, Runnable children){
         ItemStack[] requirements = new ItemStack[block.requirements.length];
         for(int i = 0; i < requirements.length; i++){
-            requirements[i] = new ItemStack(block.requirements[i].item, 30 + block.requirements[i].amount * 6);
+            requirements[i] = new ItemStack(block.requirements[i].item, 40 + Mathf.round(Mathf.pow(block.requirements[i].amount, 1.25f) * 6, 10));
         }
 
         return new TechNode(block, requirements, children);
@@ -336,6 +345,7 @@ public class TechTree implements ContentList{
     public static class TechNode{
         static TechNode context;
 
+        public TechNode parent;
         public final Block block;
         public final ItemStack[] requirements;
         public final Array<TechNode> children = new Array<>();
@@ -345,6 +355,7 @@ public class TechTree implements ContentList{
                 ccontext.children.add(this);
             }
 
+            this.parent = ccontext;
             this.block = block;
             this.requirements = requirements;
 

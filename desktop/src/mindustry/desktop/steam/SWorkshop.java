@@ -101,12 +101,12 @@ public class SWorkshop implements SteamUGCCallback{
                         dialog.cont.add("$workshop.menu").pad(20f);
                         dialog.addCloseButton();
 
-                        dialog.buttons.addImageTextButton("$view.workshop", Icon.linkSmall, () -> {
+                        dialog.buttons.addImageTextButton("$view.workshop", Icon.link, () -> {
                             viewListingID(id);
                             dialog.hide();
                         }).size(210f, 64f);
 
-                        dialog.buttons.addImageTextButton("$workshop.update", Icon.upgradeSmall, () -> {
+                        dialog.buttons.addImageTextButton("$workshop.update", Icon.up, () -> {
                             new FloatingDialog("$workshop.update"){{
                                 setFillParent(false);
                                 cont.margin(10).add("$changelog").padRight(6f);
@@ -181,11 +181,11 @@ public class SWorkshop implements SteamUGCCallback{
         dialog.setFillParent(false);
         dialog.cont.add("$publish.confirm").width(600f).wrap();
         dialog.addCloseButton();
-        dialog.buttons.addImageTextButton("$eula", Icon.linkSmall,
+        dialog.buttons.addImageTextButton("$eula", Icon.link,
             () -> SVars.net.friends.activateGameOverlayToWebPage("https://steamcommunity.com/sharedfiles/workshoplegalagreement"))
             .size(210f, 64f);
 
-        dialog.buttons.addImageTextButton("$ok", Icon.checkSmall, () -> {
+        dialog.buttons.addImageTextButton("$ok", Icon.ok, () -> {
             Log.info("Accepted, publishing item...");
             itemHandlers.add(published);
             ugc.createItem(SVars.steamID, WorkshopFileType.Community);

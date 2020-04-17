@@ -2,11 +2,12 @@ package mindustry.core;
 
 import arc.*;
 import arc.Input.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.func.*;
 import arc.math.*;
 import arc.scene.ui.*;
+import arc.struct.*;
+import arc.util.*;
 import arc.util.serialization.*;
 import mindustry.mod.*;
 import mindustry.net.*;
@@ -15,7 +16,7 @@ import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import org.mozilla.javascript.*;
 
-import static mindustry.Vars.mobile;
+import static mindustry.Vars.*;
 
 public interface Platform{
 
@@ -90,7 +91,7 @@ public interface Platform{
         String uuid = Core.settings.getString("uuid", "");
         if(uuid.isEmpty()){
             byte[] result = new byte[8];
-            new RandomXS128().nextBytes(result);
+            new Rand().nextBytes(result);
             uuid = new String(Base64Coder.encode(result));
             Core.settings.put("uuid", uuid);
             Core.settings.save();
@@ -101,6 +102,32 @@ public interface Platform{
 
     /** Only used for iOS or android: open the share menu for a map or save. */
     default void shareFile(Fi file){
+    }
+
+    default void export(String name, String extension, FileWriter writer){
+        if(!ios){
+            platform.showFileChooser(false, extension, file -> {
+                ui.loadAnd(() -> {
+                    try{
+                        writer.write(file);
+                    }catch(Throwable e){
+                        ui.showException(e);
+                        Log.err(e);
+                    }
+                });
+            });
+        }else{
+            ui.loadAnd(() -> {
+                try{
+                    Fi result = Core.files.local(name+ "." + extension);
+                    writer.write(result);
+                    platform.shareFile(result);
+                }catch(Throwable e){
+                    ui.showException(e);
+                    Log.err(e);
+                }
+            });
+        }
     }
 
     /**
@@ -129,5 +156,9 @@ public interface Platform{
 
     /** Stops forcing the app into landscape orientation.*/
     default void endForceLandscape(){
+    }
+
+    interface FileWriter{
+        void write(Fi file) throws Throwable;
     }
 }

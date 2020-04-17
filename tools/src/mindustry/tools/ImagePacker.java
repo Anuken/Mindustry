@@ -1,14 +1,19 @@
 package mindustry.tools;
 
 import arc.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
+import arc.util.io.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
+import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import javax.imageio.*;
 import java.awt.image.*;
@@ -18,8 +23,9 @@ public class ImagePacker{
     static ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
     static ObjectMap<TextureRegion, BufferedImage> imageCache = new ObjectMap<>();
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception{
         Vars.headless = true;
+        ArcNativesLoader.load();
 
         Log.setLogger(new NoopLogHandler());
         Vars.content = new ContentLoader();
@@ -93,6 +99,42 @@ public class ImagePacker{
         Log.info("&ly[Generator]&lc Total time to generate: &lg{0}&lcms", Time.elapsed());
         Log.info("&ly[Generator]&lc Total images created: &lg{0}", Image.total());
         Image.dispose();
+
+        //format:
+        //character-ID=contentname:texture-name
+        Fi iconfile = Fi.get("../../../assets/icons/icons.properties");
+        OrderedMap<String, String> map = new OrderedMap<>();
+        PropertiesUtils.load(map, iconfile.reader(256));
+
+        ObjectMap<String, String> content2id = new ObjectMap<>();
+        map.each((key, val) -> content2id.put(val.split("\\|")[0], key));
+
+        Array<UnlockableContent> cont = Array.withArrays(Vars.content.blocks(), Vars.content.items(), Vars.content.liquids());
+        cont.removeAll(u -> u instanceof BuildBlock || u == Blocks.air);
+
+        int minid = 0xF8FF;
+        for(String key : map.keys()){
+            minid = Math.min(Integer.parseInt(key) - 1, minid);
+        }
+
+        for(UnlockableContent c : cont){
+            if(!content2id.containsKey(c.name)){
+                map.put(minid + "", c.name + "|" + texname(c));
+                minid --;
+            }
+        }
+
+        Writer writer = iconfile.writer(false);
+        for(String key : map.keys()){
+            writer.write(key + "=" + map.get(key) + "\n");
+        }
+
+        writer.close();
+    }
+
+    static String texname(UnlockableContent c){
+        if(c instanceof Block) return "block-" + c.name + "-medium";
+        return c.getContentType() + "-" + c.name + "-icon";
     }
 
     static void generate(String name, Runnable run){

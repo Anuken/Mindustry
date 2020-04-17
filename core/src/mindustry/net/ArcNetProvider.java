@@ -21,7 +21,7 @@ import static mindustry.Vars.*;
 
 public class ArcNetProvider implements NetProvider{
     final Client client;
-    final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[256], 256);
+    final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[512], 512);
 
     final Server server;
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();
@@ -58,7 +58,7 @@ public class ArcNetProvider implements NetProvider{
                 Core.app.post(() -> {
                     try{
                         net.handleClientReceived(object);
-                    }catch(Exception e){
+                    }catch(Throwable e){
                         handleException(e);
                     }
                 });
@@ -113,14 +113,7 @@ public class ArcNetProvider implements NetProvider{
                 Core.app.post(() -> {
                     try{
                         net.handleServerReceived(k, object);
-                    }catch(RuntimeException e){
-                        if(e.getCause() instanceof ValidateException){
-                            ValidateException v = (ValidateException)e.getCause();
-                            Log.err("Validation failed: {0} ({1})", v.player.name, v.getMessage());
-                        }else{
-                            e.printStackTrace();
-                        }
-                    }catch(Exception e){
+                    }catch(Throwable e){
                         e.printStackTrace();
                     }
                 });
@@ -272,7 +265,7 @@ public class ArcNetProvider implements NetProvider{
         return null;
     }
 
-    private void handleException(Exception e){
+    private void handleException(Throwable e){
         if(e instanceof ArcNetException){
             Core.app.post(() -> net.showError(new IOException("mismatch")));
         }else if(e instanceof ClosedChannelException){

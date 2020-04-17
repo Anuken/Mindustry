@@ -19,6 +19,7 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.io.*;
+import mindustry.net.*;
 import mindustry.ui.dialogs.*;
 
 import java.io.*;
@@ -80,7 +81,7 @@ public class AndroidLauncher extends AndroidApplication{
                 if(VERSION.SDK_INT >= VERSION_CODES.Q){
                     Intent intent = new Intent(open ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType(extension.equals("zip") ? "application/zip" : "*/*");
+                    intent.setType(extension.equals("zip") && !open ? "application/zip" : "*/*");
                     addResultListener(i -> startActivityForResult(intent, i), (code, in) -> {
                         if(code == Activity.RESULT_OK && in != null && in.getData() != null){
                             Uri uri = in.getData();
@@ -143,11 +144,35 @@ public class AndroidLauncher extends AndroidApplication{
 
         }, new AndroidApplicationConfiguration(){{
             useImmersiveMode = true;
-            depth = 0;
             hideStatusBar = true;
-            //errorHandler = ModCrashHandler::handle;
+            errorHandler = CrashSender::log;
         }});
         checkFiles(getIntent());
+
+
+        //new external folder
+        Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
+        Core.settings.setDataDirectory(data);
+
+        //move to internal storage if there's no file indicating that it moved
+        if(!Core.files.local("files_moved").exists()){
+            Log.info("Moving files to external storage...");
+
+            try{
+                //current local storage folder
+                Fi src = Core.files.absolute(Core.files.getLocalStoragePath());
+                for(Fi fi : src.list()){
+                    fi.copyTo(data);
+                }
+                //create marker
+                Core.files.local("files_moved").writeString("files moved to " + data);
+                Core.files.local("files_moved_103").writeString("files moved again");
+                Log.info("Files moved.");
+            }catch(Throwable t){
+                Log.err("Failed to move files!");
+                t.printStackTrace();
+            }
+        }
     }
 
     @Override

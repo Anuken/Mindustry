@@ -42,9 +42,9 @@ public class LoadoutDialog extends FloatingDialog{
             }
         });
 
-        buttons.addImageTextButton("$back", Icon.arrowLeft, this::hide).size(210f, 64f);
+        buttons.addImageTextButton("$back", Icon.left, this::hide).size(210f, 64f);
 
-        buttons.addImageTextButton("$settings.reset", Icon.refreshSmall, () -> {
+        buttons.addImageTextButton("$settings.reset", Icon.refresh, () -> {
             resetter.run();
             reseed();
             updater.run();
@@ -83,7 +83,7 @@ public class LoadoutDialog extends FloatingDialog{
                     updater.run();
                 }).size(bsize);
 
-                t.addImageButton(Icon.pencilSmaller, Styles.cleari, () -> ui.showTextInput("$configure", stack.item.localizedName, 10, stack.amount + "", true, str -> {
+                t.addImageButton(Icon.pencil, Styles.cleari, () -> ui.showTextInput("$configure", stack.item.localizedName, 10, stack.amount + "", true, str -> {
                     if(Strings.canParsePostiveInt(str)){
                         int amount = Strings.parseInt(str);
                         if(amount >= 0 && amount <= capacity){

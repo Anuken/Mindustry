@@ -14,6 +14,7 @@ import mindustry.ui.Cicon;
 
 import static mindustry.Vars.*;
 
+//TODO remove
 public class ZoneInfoDialog extends FloatingDialog{
     private LoadoutDialog loadout = new LoadoutDialog();
 
@@ -24,12 +25,12 @@ public class ZoneInfoDialog extends FloatingDialog{
         addCloseButton();
     }
 
-    public void show(Zone zone){
+    public void show(SectorPreset zone){
         setup(zone);
         show();
     }
 
-    private void setup(Zone zone){
+    private void setup(SectorPreset zone){
         cont.clear();
 
         Table iteminfo = new Table();
@@ -45,7 +46,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                 if(i++ % 2 == 0){
                     iteminfo.row();
                 }
-                iteminfo.addImage(stack.item.icon(mindustry.ui.Cicon.small)).size(8 * 3).padRight(1);
+                iteminfo.addImage(stack.item.icon(Cicon.small)).size(8 * 3).padRight(1);
                 iteminfo.add(stack.amount + "").color(Color.lightGray).padRight(5);
             }
         };
@@ -54,7 +55,7 @@ public class ZoneInfoDialog extends FloatingDialog{
 
         cont.pane(cont -> {
             if(zone.locked()){
-                cont.addImage(Icon.locked);
+                cont.addImage(Icon.lock);
                 cont.row();
                 cont.add("$locked").padBottom(6);
                 cont.row();
@@ -71,7 +72,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                             for(Objective o : zones){
                                 r.addImage(Icon.terrain).padRight(4);
                                 r.add(o.display()).color(Color.lightGray);
-                                r.addImage(o.complete() ? Icon.checkSmall : Icon.cancelSmall, o.complete() ? Color.lightGray : Color.scarlet).padLeft(3);
+                                r.addImage(o.complete() ? Icon.ok : Icon.cancel, o.complete() ? Color.lightGray : Color.scarlet).padLeft(3);
                                 r.row();
                             }
                         });
@@ -85,9 +86,9 @@ public class ZoneInfoDialog extends FloatingDialog{
                             r.add("$research.list").colspan(2).left();
                             r.row();
                             for(Unlock blocko : blocks){
-                                r.addImage(blocko.block.icon(mindustry.ui.Cicon.small)).size(8 * 3).padRight(5);
+                                r.addImage(blocko.block.icon(Cicon.small)).size(8 * 3).padRight(5);
                                 r.add(blocko.block.localizedName).color(Color.lightGray).left();
-                                r.addImage(blocko.block.unlocked() ? Icon.checkSmall : Icon.cancelSmall, blocko.block.unlocked() ? Color.lightGray : Color.scarlet).padLeft(3);
+                                r.addImage(blocko.block.unlocked() ? Icon.ok : Icon.cancel, blocko.block.unlocked() ? Color.lightGray : Color.scarlet).padLeft(3);
                                 r.row();
                             }
 
@@ -152,13 +153,13 @@ public class ZoneInfoDialog extends FloatingDialog{
             if(!data.isUnlocked(zone)){
                 Sounds.unlock.play();
                 data.unlockContent(zone);
-                ui.deploy.setup();
+                ui.planet.setup();
                 setup(zone);
             }else{
-                ui.deploy.hide();
+                ui.planet.hide();
                 data.removeItems(zone.getLaunchCost());
                 hide();
-                control.playZone(zone);
+                //control.playZone(zone);
             }
         }).minWidth(200f).margin(13f).padTop(5).disabled(b -> zone.locked() ? !zone.canUnlock() : !data.hasItems(zone.getLaunchCost())).uniformY().get();
 

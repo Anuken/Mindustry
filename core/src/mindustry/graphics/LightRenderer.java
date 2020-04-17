@@ -13,7 +13,9 @@ import static mindustry.Vars.state;
 
 /** Renders overlay lights. Client only. */
 public class LightRenderer{
+    public static boolean enable = true;
     private static final int scaling = 4;
+
     private float[] vertices = new float[24];
     private FrameBuffer buffer = new FrameBuffer(2, 2);
     private Array<Runnable> lights = new Array<>();
@@ -22,6 +24,10 @@ public class LightRenderer{
         if(!enabled()) return;
 
         lights.add(run);
+    }
+
+    public void add(Position pos, float radius, Color color, float opacity){
+        add(pos.getX(), pos.getY(), radius, color, opacity);
     }
 
     public void add(float x, float y, float radius, Color color, float opacity){
@@ -174,19 +180,25 @@ public class LightRenderer{
     }
 
     public void draw(){
+        if(!enable){
+            lights.clear();
+            return;
+        }
+
         if(buffer.getWidth() != Core.graphics.getWidth()/scaling || buffer.getHeight() != Core.graphics.getHeight()/scaling){
             buffer.resize(Core.graphics.getWidth()/scaling, Core.graphics.getHeight()/scaling);
         }
 
         Draw.color();
-        buffer.beginDraw(Color.clear);
-        Draw.blend(Blending.normal);
+        buffer.begin(Color.clear);
+        Gl.blendEquationSeparate(Gl.funcAdd, Gl.max);
+
         for(Runnable run : lights){
             run.run();
         }
         Draw.reset();
-        Draw.blend();
-        buffer.endDraw();
+        buffer.end();
+        Gl.blendEquationSeparate(Gl.funcAdd, Gl.funcAdd);
 
         Draw.color();
         Shaders.light.ambient.set(state.rules.ambientLight);

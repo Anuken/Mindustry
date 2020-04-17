@@ -12,7 +12,7 @@ public class RadialTreeLayout implements TreeLayout{
     @Override
     public void layout(TreeNode root){
         startRadius = root.height * 2.4f;
-        delta = root.height * 2.4f;
+        delta = root.height * 20.4f;
 
         bfs(root, true);
 
