@@ -32,6 +32,8 @@ public class Conveyor extends Block implements Autotiler{
     public float speed = 0f;
     public float displayedSpeed = 0f;
 
+    public int cornerpieceRegion;
+
     protected Conveyor(String name){
         super(name);
         rotate = true;
@@ -45,6 +47,8 @@ public class Conveyor extends Block implements Autotiler{
         idleSound = Sounds.conveyor;
         idleSoundVolume = 0.004f;
         unloadable = false;
+
+        cornerpieceRegion = reg("-cornerpiece");
     }
 
     @Override
@@ -118,6 +122,7 @@ public class Conveyor extends Block implements Autotiler{
 
         int blendbits;
         int blendsclx, blendscly;
+        boolean cornerpiece;
 
         float clogHeat = 0f;
 
@@ -127,6 +132,8 @@ public class Conveyor extends Block implements Autotiler{
             int frame = clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * timeScale())) % 4) : 0;
             Draw.rect(regions[Mathf.clamp(blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], x, y,
             tilesize * blendsclx, tilesize * blendscly, rotation * 90);
+
+            if(cornerpiece && Core.atlas.isFound(reg(cornerpieceRegion))) Draw.rect(reg(cornerpieceRegion), x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
         }
 
         @Override
@@ -142,6 +149,9 @@ public class Conveyor extends Block implements Autotiler{
             blendbits = bits[0];
             blendsclx = bits[1];
             blendscly = bits[2];
+
+            cornerpiece = (blendbits == +1 && back() != null && back().block() == block && back().back() != this &&
+                         ((blendscly == -1 && left() != null && left().block() == block && left().back() != this) || (blendscly == +1 && right() != null && right().block() == block && right().back() != this)));
 
             if(tile.front() != null && tile.front() != null){
                 next = tile.front();

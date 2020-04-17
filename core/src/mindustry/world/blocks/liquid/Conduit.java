@@ -22,12 +22,16 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     public float leakResistance = 1.5f;
 
+    public int cornerpieceRegion;
+
     public Conduit(String name){
         super(name);
         rotate = true;
         solid = false;
         floating = true;
         conveyorPlacement = true;
+
+        cornerpieceRegion = reg("-cornerpiece");
     }
 
     @Override
@@ -87,9 +91,13 @@ public class Conduit extends LiquidBlock implements Autotiler{
         public float smoothLiquid;
         int blendbits;
 
+        boolean cornerpiece;
+
         @Override
         public void draw(){
             int rotation = rotation() * 90;
+
+            if(cornerpiece && Core.atlas.isFound(reg(cornerpieceRegion))) Draw.rect(reg(cornerpieceRegion), x, y, blendbits == 1 ? rotation : rotation - 90);
 
             Draw.colorl(0.34f);
             Draw.rect(botRegions[blendbits], x, y, rotation);
@@ -105,6 +113,9 @@ public class Conduit extends LiquidBlock implements Autotiler{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
+
+            cornerpiece = (blendbits == 1 && back() != null && back().block() instanceof Conduit && back().back() != this && ((right() != null && right().block() instanceof Conduit && right().back() != this)))
+                        ||(blendbits == 5 && back() != null && back().block() instanceof Conduit && back().back() != this && ((left()  != null && left().block()  instanceof Conduit && left().back()  != this)));
 
             blendbits = buildBlending(tile, rotation(), null, true)[0];
         }
