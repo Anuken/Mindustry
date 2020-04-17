@@ -126,7 +126,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
                 y -= y2;
             }
 
-            inputs(t -> {
+            upstream(t -> {
                 if(t != null && t.block().hasLiquids && !(t.block() instanceof Conduit)){
                     float x2 = 0;
                     float y2 = 0;
@@ -172,32 +172,10 @@ public class Conduit extends LiquidBlock implements Autotiler{
             });
         }
 
-        private void inputs(Cons<Tilec> cons){
-            if(blendbits == 0) cons.get(back());
-            if(blendbits == 1) cons.get(left());
-
-            if(blendbits == 2){
-                cons.get(back());
-                cons.get(right());
-            }
-
-            if(blendbits == 3){
-                cons.get(left());
-                cons.get(back());
-                cons.get(right());
-            }
-
-            if(blendbits == 4){
-                cons.get(back());
-                cons.get(left());
-            }
-
-            if(blendbits == 5) cons.get(right());
-
-            if(blendbits == 6){
-                cons.get(left());
-                cons.get(right());
-            }
+        private void upstream(Cons<Tilec> cons){
+            if(blendbits == 0 || blendbits == 2 || blendbits == 4) cons.get(back());
+            if(blendbits == 1 || blendbits == 3 || blendbits == 4 || blendbits == 6) cons.get(left());
+            if(blendbits == 2 || blendbits == 3 || blendbits == 5 || blendbits == 6) cons.get(right());
         }
 
         @Override
