@@ -4,7 +4,7 @@ sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 ext{
-    mainClassName = "io.anuke.mindustry.IOSLauncher"
+    mainClassName = "mindustry.ios.IOSLauncher"
 }
 
 task copyAssets(){

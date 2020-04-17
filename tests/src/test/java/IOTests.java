@@ -1,11 +1,11 @@
-import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.io.TypeIO;
-import org.junit.jupiter.api.Test;
+import arc.util.*;
+import mindustry.game.*;
+import mindustry.io.*;
+import org.junit.jupiter.api.*;
 
-import java.nio.ByteBuffer;
+import java.nio.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IOTests{
 
@@ -49,5 +49,23 @@ public class IOTests{
         assertEquals(rules.attackMode, res.attackMode);
     }
 
+    @Test
+    void writeRules2(){
+        Rules rules = new Rules();
+        rules.attackMode = true;
+        rules.tags.put("blah", "bleh");
+        rules.buildSpeedMultiplier = 99.1f;
 
+        String str = JsonIO.write(rules);
+        Rules res = JsonIO.read(Rules.class, str);
+
+        assertEquals(rules.buildSpeedMultiplier, res.buildSpeedMultiplier);
+        assertEquals(rules.attackMode, res.attackMode);
+        assertEquals(rules.tags.get("blah"), res.tags.get("blah"));
+
+        String str2 = JsonIO.write(new Rules(){{
+            attackMode = true;
+        }});
+        Log.info(str2);
+    }
 }
