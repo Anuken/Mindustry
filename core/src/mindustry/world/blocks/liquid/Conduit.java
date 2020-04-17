@@ -126,24 +126,77 @@ public class Conduit extends LiquidBlock implements Autotiler{
                 y -= y2;
             }
 
-            if(back() != null && back().block().hasLiquids && !(back().block() instanceof Conduit)){
-                float x2 = 0;
-                float y2 = 0;
+            inputs(t -> {
+                if(t != null && t.block().hasLiquids && !(t.block() instanceof Conduit)){
+                    float x2 = 0;
+                    float y2 = 0;
 
-                if(rotation() == 0) x2 -= 6;
-                if(rotation() == 1) y2 -= 6;
-                if(rotation() == 2) x2 += 6;
-                if(rotation() == 3) y2 += 6;
+                    int rotation = 0;
 
-                x += x2;
-                y += y2;
-                rotation(rotation() + 2);
+                    if(t == back()){
+                        if(rotation() == 0) x2 -= 6;
+                        if(rotation() == 1) y2 -= 6;
+                        if(rotation() == 2) x2 += 6;
+                        if(rotation() == 3) y2 += 6;
+                        rotation = 2;
+                    }
 
-                bot50(botRegions[blendbits], () -> bot50(topRegions[blendbits], this::draw));
+                    if(t == left()){
+                        if(rotation() == 0) y2 += 6;
+                        if(rotation() == 1) x2 -= 6;
+                        if(rotation() == 2) y2 -= 6;
+                        if(rotation() == 3) x2 += 6;
+                        rotation = 1;
+                    }
 
-                x -= x2;
-                y -= y2;
-                rotation(rotation() - 2);
+                    if(t == right()){
+                        if(rotation() == 0) y2 -= 6;
+                        if(rotation() == 1) x2 += 6;
+                        if(rotation() == 2) y2 += 6;
+                        if(rotation() == 3) x2 -= 6;
+                        rotation = 3;
+                    }
+
+                    x += x2;
+                    y += y2;
+                    rotation(rotation() + rotation);
+
+                    int bit = blendbits;
+                    bot50(botRegions[blendbits = 0], () -> bot50(topRegions[blendbits = 0], this::draw));
+                    blendbits = bit;
+
+                    rotation(rotation() - rotation);
+                    y -= y2;
+                    x -= x2;
+                }
+            });
+        }
+
+        private void inputs(Cons<Tilec> cons){
+            if(blendbits == 0) cons.get(back());
+            if(blendbits == 1) cons.get(left());
+
+            if(blendbits == 2){
+                cons.get(back());
+                cons.get(right());
+            }
+
+            if(blendbits == 3){
+                cons.get(left());
+                cons.get(back());
+                cons.get(right());
+            }
+
+            if(blendbits == 4){
+                cons.get(back());
+                cons.get(left());
+            }
+
+            if(blendbits == 5) cons.get(right());
+
+            if(blendbits == 6){
+                cons.get(left());
+                cons.get(right());
             }
         }
 

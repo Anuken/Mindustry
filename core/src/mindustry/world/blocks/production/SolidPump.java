@@ -96,7 +96,7 @@ public class SolidPump extends Pump{
 
         @Override
         public void draw(){
-            Draw.alpha(0.1f);
+            Draw.alpha(0.1f); // todo, remove
             Draw.rect(region, x, y);
             Draw.color(liquids.current().color);
             Draw.alpha(liquids.total() / liquidCapacity);

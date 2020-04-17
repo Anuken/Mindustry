@@ -93,6 +93,7 @@ public class Pump extends LiquidBlock{
 
         @Override
         public void draw(){
+            Draw.alpha(0.5f); // todo, remove
             Draw.rect(name, x, y);
 
             Draw.color(liquids.current().color);
