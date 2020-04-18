@@ -22,6 +22,7 @@ public class CraterConveyor extends Block implements Autotiler{
     private TextureRegion[] regions = new TextureRegion[8];
 
     public float speed = 0f;
+    public float recharge = 4f;
 
     public CraterConveyor(String name){
         super(name);
@@ -114,7 +115,7 @@ public class CraterConveyor extends Block implements Autotiler{
         @Override
         public void updateTile(){
             // reel in crater
-            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed, 0f, 1f);
+            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed, 0f, recharge);
 
             // sleep when idle
             if(link == -1){
@@ -147,7 +148,8 @@ public class CraterConveyor extends Block implements Autotiler{
                             link = -1;
                             items.clear();
 
-                            e.cooldown = cooldown = 1;
+                            cooldown = recharge;
+                            e.cooldown = 1;
                             e.noSleep();
                             bump();
                         }
@@ -258,7 +260,7 @@ public class CraterConveyor extends Block implements Autotiler{
         @Override
         public boolean acceptItem(Tilec source, Item item){
             if (this == source) return true;                // player threw items
-            if (cooldown > 0f) return false;                // still cooling down
+            if (cooldown > recharge - 1f) return false;     // still cooling down
             return!((blendbit2 != 5)                        // not a loading dock
             ||  (items.total() > 0 && !items.has(item))     // incompatible items
             ||  (items.total() >= getMaximumAccepted(item)) // filled to capacity

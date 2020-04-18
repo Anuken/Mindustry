@@ -914,6 +914,7 @@ public class Blocks implements ContentList{
             requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.silicon, 1, Items.graphite, 1));
             health = 75;
             speed = 0.04f;
+            recharge = 4f;
         }};
 
         armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
