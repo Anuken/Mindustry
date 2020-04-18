@@ -367,7 +367,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     }
 
     public void dumpLiquid(Liquid liquid){
-        int dump = rotation() * block.dumpIncrement;
+        int dump = rotation() / block.dumpIncrement;
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -455,7 +455,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
      */
     public void offloadNear(Item item){
         Array<Tilec> proximity = proximity();
-        int dump = rotation() * block.dumpIncrement;
+        int dump = rotation() / block.dumpIncrement;
         useContent(item);
 
         for(int i = 0; i < proximity.size; i++){
@@ -483,7 +483,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         if(!block.hasItems || items.total() == 0 || (todump != null && !items.has(todump))) return false;
 
         Array<Tilec> proximity = proximity();
-        int dump = rotation() * block.dumpIncrement;
+        int dump = rotation() / block.dumpIncrement;
 
         if(proximity.size == 0) return false;
 
