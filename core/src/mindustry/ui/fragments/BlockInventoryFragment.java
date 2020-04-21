@@ -14,7 +14,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -27,11 +26,13 @@ import static mindustry.Vars.*;
 
 public class BlockInventoryFragment extends Fragment{
     private final static float holdWithdraw = 20f;
+    private final static float holdShrink = 120f;
 
     private Table table = new Table();
     private Tilec tile;
-    private float holdTime = 0f;
+    private float holdTime = 0f, emptyTime;
     private boolean holding;
+    private float[] shrinkHoldTimes = new float[content.items().size];
     private Item lastItem;
 
     {
@@ -99,9 +100,15 @@ public class BlockInventoryFragment extends Fragment{
         table.touchable(Touchable.enabled);
         table.update(() -> {
 
-            if(state.isMenu() || tile == null || !tile.isValid() || !tile.block().isAccessible() || tile.items().total() == 0){
+            if(state.isMenu() || tile == null || !tile.isValid() || !tile.block().isAccessible() || emptyTime >= holdShrink){
                 hide();
             }else{
+                if(tile.items().total() == 0){
+                    emptyTime += Time.delta();
+                }else{
+                    emptyTime = 0f;
+                }
+
                 if(holding && lastItem != null){
                     holdTime += Time.delta();
 
@@ -117,12 +124,21 @@ public class BlockInventoryFragment extends Fragment{
 
                 updateTablePosition();
                 if(tile.block().hasItems){
+                    boolean dirty = false;
+                    if(shrinkHoldTimes.length != content.items().size) shrinkHoldTimes = new float[content.items().size];
+
                     for(int i = 0; i < content.items().size; i++){
                         boolean has = tile.items().has(content.item(i));
-                        if(has != container.contains(i)){
-                            rebuild(false);
+                        boolean had = container.contains(i);
+                        if(has){
+                            shrinkHoldTimes[i] = 0f;
+                            dirty |= !had;
+                        }else if(had){
+                            shrinkHoldTimes[i] += Time.delta();
+                            dirty |= shrinkHoldTimes[i] >= holdShrink;
                         }
                     }
+                    if(dirty) rebuild(false);
                 }
             }
         });
