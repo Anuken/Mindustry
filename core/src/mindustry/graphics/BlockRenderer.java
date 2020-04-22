@@ -26,6 +26,7 @@ public class BlockRenderer implements Disposable{
     public final FloorRenderer floor = new FloorRenderer();
 
     private Array<BlockRequest> requests = new Array<>(true, initialRequests, BlockRequest.class);
+
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private int requestidx = 0;
     private int iterateidx = 0;

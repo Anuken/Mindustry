@@ -205,6 +205,15 @@ public class Renderer implements ApplicationListener{
         blocks.floor.drawLayer(CacheLayer.walls);
         blocks.floor.endDraw();
 
+        Draw.sort(true);
+
+
+
+        Draw.reset();
+        Draw.flush();
+        Draw.sort(false);
+        /*
+
         blocks.drawBlocks(Layer.block);
         if(state.rules.drawFog){
             blocks.drawFog();
@@ -265,7 +274,8 @@ public class Renderer implements ApplicationListener{
         drawLanding();
 
         Draw.color();
-        Draw.flush();
+        Draw.flush();*/
+
     }
 
     private void drawBackground(){
