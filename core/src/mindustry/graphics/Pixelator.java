@@ -43,7 +43,7 @@ public class Pixelator implements Disposable{
         buffer.end();
 
         Draw.blend(Blending.disabled);
-        Draw.rect(Draw.wrap(buffer.getTexture()), Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
+        Draw.rect(buffer);
         Draw.blend();
 
         Groups.drawNames();
