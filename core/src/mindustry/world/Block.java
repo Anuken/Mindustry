@@ -89,10 +89,6 @@ public class Block extends UnlockableContent{
     public CacheLayer cacheLayer = CacheLayer.normal;
     /** Special flag; if false, floor will be drawn under this block even if it is cached. */
     public boolean fillsTile = true;
-    /** Layer to draw extra stuff on. */
-    public Layer layer = null;
-    /** Extra layer to draw extra extra stuff on. */
-    public Layer layer2 = null;
     /** whether this block can be replaced in all cases */
     public boolean alwaysReplace = false;
     /** The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other. */

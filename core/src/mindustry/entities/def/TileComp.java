@@ -615,12 +615,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         }
     }
 
-    public void drawLayer(){
-    }
-
-    public void drawLayer2(){
-    }
-
     public void drawCracks(){
         if(!damaged() || block.size > Block.maxCrackSize) return;
         int id = pos();
