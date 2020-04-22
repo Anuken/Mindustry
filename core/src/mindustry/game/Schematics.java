@@ -51,7 +51,9 @@ public class Schematics implements Loadable{
     private OptimizedByteArrayOutputStream out = new OptimizedByteArrayOutputStream(1024);
     private Array<Schematic> all = new Array<>();
     private OrderedMap<Schematic, FrameBuffer> previews = new OrderedMap<>();
+    private ObjectSet<Schematic> errored = new ObjectSet<>();
     private FrameBuffer shadowBuffer;
+    private Texture errorTexture;
     private long lastClearTime;
 
     public Schematics(){
@@ -59,12 +61,21 @@ public class Schematics implements Loadable{
             previews.each((schem, m) -> m.dispose());
             previews.clear();
             shadowBuffer.dispose();
+            if(errorTexture != null){
+                errorTexture.dispose();
+            }
         });
 
         Events.on(ContentReloadEvent.class, event -> {
             previews.each((schem, m) -> m.dispose());
             previews.clear();
             load();
+        });
+
+        Events.on(ClientLoadEvent.class, event -> {
+            Pixmap pixmap = Core.atlas.getPixmap("error").crop();
+            errorTexture = new Texture(pixmap);
+            pixmap.dispose();
         });
     }
 
@@ -163,7 +174,15 @@ public class Schematics implements Loadable{
     }
 
     public Texture getPreview(Schematic schematic){
-        return getBuffer(schematic).getTexture();
+        if(errored.contains(schematic)) return errorTexture;
+
+        try{
+            return getBuffer(schematic).getTexture();
+        }catch(Throwable t){
+            Log.err(t);
+            errored.add(schematic);
+            return errorTexture;
+        }
     }
 
     public boolean hasPreview(Schematic schematic){
