@@ -17,7 +17,7 @@ public class LightRenderer{
     private static final int scaling = 4;
 
     private float[] vertices = new float[24];
-    private FrameBuffer buffer = new FrameBuffer(2, 2);
+    private FrameBuffer buffer = new FrameBuffer();
     private Array<Runnable> lights = new Array<>();
 
     public void add(Runnable run){
@@ -185,9 +185,7 @@ public class LightRenderer{
             return;
         }
 
-        if(buffer.getWidth() != Core.graphics.getWidth()/scaling || buffer.getHeight() != Core.graphics.getHeight()/scaling){
-            buffer.resize(Core.graphics.getWidth()/scaling, Core.graphics.getHeight()/scaling);
-        }
+        buffer.resize(Core.graphics.getWidth()/scaling, Core.graphics.getHeight()/scaling);
 
         Draw.color();
         buffer.begin(Color.clear);

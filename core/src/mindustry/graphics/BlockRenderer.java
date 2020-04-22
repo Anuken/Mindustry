@@ -29,8 +29,8 @@ public class BlockRenderer implements Disposable{
 
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private float brokenFade = 0f;
-    private FrameBuffer shadows = new FrameBuffer(2, 2);
-    private FrameBuffer fog = new FrameBuffer(2, 2);
+    private FrameBuffer shadows = new FrameBuffer();
+    private FrameBuffer fog = new FrameBuffer();
     private Array<Tilec> outArray2 = new Array<>();
     private Array<Tile> shadowEvents = new Array<>();
     private boolean displayStatus = false;

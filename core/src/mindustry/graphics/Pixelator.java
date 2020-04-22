@@ -12,7 +12,7 @@ import static arc.Core.*;
 import static mindustry.Vars.renderer;
 
 public class Pixelator implements Disposable{
-    private FrameBuffer buffer = new FrameBuffer(2, 2);
+    private FrameBuffer buffer = new FrameBuffer();
 
     {
         buffer.getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
@@ -34,9 +34,7 @@ public class Pixelator implements Disposable{
         int w = (int)(Core.camera.width * renderer.landScale());
         int h = (int)(Core.camera.height * renderer.landScale());
 
-        if(!graphics.isHidden() && (buffer.getWidth() != w || buffer.getHeight() != h)){
-            buffer.resize(w, h);
-        }
+        buffer.resize(w, h);
 
         buffer.begin();
         renderer.draw();

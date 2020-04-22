@@ -25,7 +25,7 @@ public class Renderer implements ApplicationListener{
     public final LightRenderer lights = new LightRenderer();
     public final Pixelator pixelator = new Pixelator();
 
-    public FrameBuffer effectBuffer = new FrameBuffer(2, 2);
+    public FrameBuffer effectBuffer = new FrameBuffer();
     private Bloom bloom;
     private FxProcessor fx = new FxProcessor();
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
@@ -181,21 +181,22 @@ public class Renderer implements ApplicationListener{
 
         graphics.clear(clearColor);
 
-        if(!graphics.isHidden() && (Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")) && (effectBuffer.getWidth() != graphics.getWidth() || effectBuffer.getHeight() != graphics.getHeight())){
+        //TODO 'animated water' is a bad name for this etting
+        if(Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")){
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
         Draw.proj(camera);
 
-        beginFx();
+        //beginFx();
 
         drawBackground();
 
         blocks.floor.checkChanges();
         blocks.floor.drawFloor();
 
-        Groups.drawFloor();
-        Groups.drawFloorOver();
+        //Groups.drawFloor();
+        //Groups.drawFloorOver();
 
         blocks.processBlocks();
         blocks.drawShadows();
@@ -334,8 +335,6 @@ public class Renderer implements ApplicationListener{
     }
 
     public void takeMapScreenshot(){
-        Groups.drawGroundShadows();
-
         int w = world.width() * tilesize, h = world.height() * tilesize;
         int memory = w * h * 4 / 1024 / 1024;
 

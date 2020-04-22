@@ -114,6 +114,21 @@ public class UnitType extends UnlockableContent{
 
     //region drawing
 
+    public void draw(Unitc unit){
+        //TODO set Z for these things
+
+        drawShadow(unit);
+        drawOcclusion(unit);
+
+        if(unit instanceof Legsc) drawLegs((Legsc)unit);
+        drawEngine(unit);
+        drawBody(unit);
+        drawWeapons(unit);
+        if(drawCell) drawCell(unit);
+        if(drawItems) drawItems(unit);
+        drawLight(unit);
+    }
+
     public void drawShadow(Unitc unit){
         Draw.color(shadowColor);
         Draw.rect(region, unit.x() + shadowTX * unit.elevation(), unit.y() + shadowTY * unit.elevation(), unit.rotation() - 90);
