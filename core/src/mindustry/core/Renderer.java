@@ -188,6 +188,8 @@ public class Renderer implements ApplicationListener{
 
         Draw.proj(camera);
 
+        Draw.sort(true);
+
         //beginFx();
 
         drawBackground();
@@ -206,7 +208,7 @@ public class Renderer implements ApplicationListener{
         blocks.floor.drawLayer(CacheLayer.walls);
         blocks.floor.endDraw();
 
-        Draw.sort(true);
+
 
         blocks.drawBlocks();
 

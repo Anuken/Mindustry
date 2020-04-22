@@ -14,6 +14,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.power.*;
 
 import static arc.Core.camera;
 import static mindustry.Vars.*;
@@ -202,7 +203,7 @@ public class BlockRenderer implements Disposable{
 
                     if(tile.entity != null && tile.entity.power() != null && tile.entity.power().links.size > 0){
                         for(Tilec other : tile.entity.getPowerConnections(outArray2)){
-                            if(other.block().layer == Layer.power){
+                            if(other.block() instanceof PowerNode){ //TODO need a generic way to render connections!
                                 requests.add(other.tile());
                             }
                         }
