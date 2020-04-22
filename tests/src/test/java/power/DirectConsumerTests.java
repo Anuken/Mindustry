@@ -1,19 +1,10 @@
 package power;
 
-import mindustry.content.Items;
-import mindustry.content.UnitTypes;
-import mindustry.type.ItemStack;
-import mindustry.world.Tile;
-import mindustry.world.blocks.power.PowerGenerator;
-import mindustry.world.blocks.power.PowerGraph;
-import mindustry.world.blocks.units.UnitFactory;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 /** Tests for direct power consumers. */
 public class DirectConsumerTests extends PowerTestFixture{
 
+    //TODO implement with new unit factories
+    /*
     @Test
     void noPowerRequestedWithNoItems(){
         testUnitFactory(0, 0, 0.08f, 0.08f, 1f);
@@ -51,5 +42,5 @@ public class DirectConsumerTests extends PowerTestFixture{
         graph.update();
 
         assertEquals(expectedSatisfaction, consumerTile.entity.power.status);
-    }
+    }*/
 }
