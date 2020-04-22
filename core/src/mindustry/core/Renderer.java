@@ -207,7 +207,9 @@ public class Renderer implements ApplicationListener{
 
         Draw.sort(true);
 
+        blocks.drawBlocks();
 
+        //draw stuff
 
         Draw.reset();
         Draw.flush();

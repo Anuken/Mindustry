@@ -25,11 +25,9 @@ public class BlockRenderer implements Disposable{
 
     public final FloorRenderer floor = new FloorRenderer();
 
-    private Array<BlockRequest> requests = new Array<>(true, initialRequests, BlockRequest.class);
+    private Array<Tile> requests = new Array<>(initialRequests);
 
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
-    private int requestidx = 0;
-    private int iterateidx = 0;
     private float brokenFade = 0f;
     private FrameBuffer shadows = new FrameBuffer(2, 2);
     private FrameBuffer fog = new FrameBuffer(2, 2);
@@ -38,10 +36,6 @@ public class BlockRenderer implements Disposable{
     private boolean displayStatus = false;
 
     public BlockRenderer(){
-
-        for(int i = 0; i < requests.size; i++){
-            requests.set(i, new BlockRequest());
-        }
 
         Events.on(WorldLoadEvent.class, event -> {
             shadowEvents.clear();
@@ -179,7 +173,6 @@ public class BlockRenderer implements Disposable{
     /** Process all blocks to draw. */
     public void processBlocks(){
         displayStatus = Core.settings.getBool("blockstatus");
-        iterateidx = 0;
 
         int avgx = (int)(camera.position.x / tilesize);
         int avgy = (int)(camera.position.y / tilesize);
@@ -190,8 +183,6 @@ public class BlockRenderer implements Disposable{
         if(avgx == lastCamX && avgy == lastCamY && lastRangeX == rangex && lastRangeY == rangey){
             return;
         }
-
-        requestidx = 0;
 
         int minx = Math.max(avgx - rangex - expandr, 0);
         int miny = Math.max(avgy - rangey - expandr, 0);
@@ -205,29 +196,14 @@ public class BlockRenderer implements Disposable{
                 Block block = tile.block();
 
                 if(block != Blocks.air && tile.isCenter() && block.cacheLayer == CacheLayer.normal){
-                    if(!expanded){
-                        addRequest(tile, Layer.block);
-                    }
-
-                    if(state.rules.lighting && tile.block().synthetic()){
-                        addRequest(tile, Layer.lights);
-                    }
-
                     if(block.expanded || !expanded){
+                        requests.add(tile);
+                    }
 
-                        if(block.layer != null){
-                            addRequest(tile, block.layer);
-                        }
-
-                        if(block.layer2 != null){
-                            addRequest(tile, block.layer2);
-                        }
-
-                        if(tile.entity != null && tile.entity.power() != null && tile.entity.power().links.size > 0){
-                            for(Tilec other : tile.entity.getPowerConnections(outArray2)){
-                                if(other.block().layer == Layer.power){
-                                    addRequest(other.tile(), Layer.power);
-                                }
+                    if(tile.entity != null && tile.entity.power() != null && tile.entity.power().links.size > 0){
+                        for(Tilec other : tile.entity.getPowerConnections(outArray2)){
+                            if(other.block().layer == Layer.power){
+                                requests.add(other.tile());
                             }
                         }
                     }
@@ -235,14 +211,40 @@ public class BlockRenderer implements Disposable{
             }
         }
 
-        Sort.instance().sort(requests.items, 0, requestidx);
-
         lastCamX = avgx;
         lastCamY = avgy;
         lastRangeX = rangex;
         lastRangeY = rangey;
     }
 
+    public void drawBlocks(){
+        drawDestroyed();
+
+        for(int i = 0; i < requests.size; i++){
+            Tile tile = requests.items[i];
+            Block block = tile.block();
+            Tilec entity = tile.entity;
+
+            block.drawBase(tile);
+            if(entity != null){
+                if(entity.damaged()){
+                    entity.drawCracks();
+                }
+
+                if(entity.team() != player.team()){
+                    entity.drawTeam();
+                }
+
+                entity.drawLight();
+
+                if(displayStatus && block.consumes.any()){
+                    entity.drawStatus();
+                }
+            }
+        }
+    }
+
+    /*
     public void drawBlocks(Layer stopAt){
         int startIdx = iterateidx;
         for(; iterateidx < requestidx; iterateidx++){
@@ -295,7 +297,7 @@ public class BlockRenderer implements Disposable{
         r.tile = tile;
         r.layer = layer;
         requestidx++;
-    }
+    }*/
 
     @Override
     public void dispose(){
@@ -303,22 +305,5 @@ public class BlockRenderer implements Disposable{
         fog.dispose();
         shadows = fog = null;
         floor.dispose();
-    }
-
-    private class BlockRequest implements Comparable<BlockRequest>{
-        Tile tile;
-        Layer layer;
-
-        @Override
-        public int compareTo(BlockRequest other){
-            int compare = layer.compareTo(other.layer);
-
-            return (compare != 0) ? compare : Integer.compare(tile.pos(), other.tile.pos());
-        }
-
-        @Override
-        public String toString(){
-            return tile.block().name + ":" + layer.toString();
-        }
     }
 }
