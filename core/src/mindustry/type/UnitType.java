@@ -115,12 +115,19 @@ public class UnitType extends UnlockableContent{
     //region drawing
 
     public void draw(Unitc unit){
-        //TODO set Z for these things
+        if(unit.isFlying()){
+            Draw.z(Layer.darkness);
+            drawShadow(unit);
+        }
 
-        drawShadow(unit);
+        Draw.z(Mathf.lerp(Layer.groundUnit, Layer.flyingUnit, unit.elevation()));
+
+        if(unit instanceof Legsc){
+            drawLegs((Legsc)unit);
+        }
+
+
         drawOcclusion(unit);
-
-        if(unit instanceof Legsc) drawLegs((Legsc)unit);
         drawEngine(unit);
         drawBody(unit);
         drawWeapons(unit);
