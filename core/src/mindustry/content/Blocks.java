@@ -981,7 +981,7 @@ public class Blocks implements ContentList{
             consumes.power(1.75f);
         }};
 
-        massConveyor = new MassConveyor("mass-conveyor"){{
+        massConveyor = new PayloadConveyor("mass-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1));
         }};
 

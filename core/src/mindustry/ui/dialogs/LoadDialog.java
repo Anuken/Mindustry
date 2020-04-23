@@ -70,25 +70,25 @@ public class LoadDialog extends FloatingDialog{
                     t.right();
                     t.defaults().size(40f);
 
-                    t.addImageButton(Icon.save, Styles.emptytogglei, () -> {
+                    t.button(Icon.save, Styles.emptytogglei, () -> {
                         slot.setAutosave(!slot.isAutosave());
                     }).checked(slot.isAutosave()).right();
 
-                    t.addImageButton(Icon.trash, Styles.emptyi, () -> {
+                    t.button(Icon.trash, Styles.emptyi, () -> {
                         ui.showConfirm("$confirm", "$save.delete.confirm", () -> {
                             slot.delete();
                             setup();
                         });
                     }).right();
 
-                    t.addImageButton(Icon.pencil, Styles.emptyi, () -> {
+                    t.button(Icon.pencil, Styles.emptyi, () -> {
                         ui.showTextInput("$save.rename", "$save.rename.text", slot.getName(), text -> {
                             slot.setName(text);
                             setup();
                         });
                     }).right();
 
-                    t.addImageButton(Icon.export, Styles.emptyi, () -> platform.export("save-" + slot.getName(), saveExtension, slot::exportFile)).right();
+                    t.button(Icon.export, Styles.emptyi, () -> platform.export("save-" + slot.getName(), saveExtension, slot::exportFile)).right();
 
                 }).padRight(-10).growX();
             }).growX().colspan(2);
@@ -142,13 +142,13 @@ public class LoadDialog extends FloatingDialog{
 
         if(!valids){
             slots.row();
-            slots.addButton("$save.none", () -> {
+            slots.button("$save.none", () -> {
             }).disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
         }
 
         slots.row();
 
-        slots.addImageTextButton("$save.import", Icon.add, () -> {
+        slots.button("$save.import", Icon.add, () -> {
             platform.showFileChooser(true, saveExtension, file -> {
                 if(SaveIO.isSaveValid(file)){
                     try{

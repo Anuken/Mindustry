@@ -28,7 +28,6 @@ public class Conduit extends LiquidBlock implements Autotiler{
         rotate = true;
         solid = false;
         floating = true;
-        layer2 = Layer.lawn;
         conveyorPlacement = true;
     }
 
@@ -91,21 +90,25 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
         @Override
         public void draw(){
-            int rotation = rotation() * 90;
 
-            Draw.colorl(0.34f);
-            Draw.rect(botRegions[blendbits], x, y, rotation);
+            Runnable recursive = () -> { // todo, differently
+                int rotation = rotation() * 90;
 
-            Draw.color(liquids.current().color);
-            Draw.alpha(smoothLiquid);
-            Draw.rect(botRegions[blendbits], x, y, rotation);
-            Draw.color();
+                Draw.colorl(0.34f);
+                Draw.rect(botRegions[blendbits], x, y, rotation);
 
-            Draw.rect(topRegions[blendbits], x, y, rotation);
-        }
+                Draw.color(liquids.current().color);
+                Draw.alpha(smoothLiquid);
+                Draw.rect(botRegions[blendbits], x, y, rotation);
+                Draw.color();
 
-        @Override
-        public void drawLayer2(){
+                Draw.rect(topRegions[blendbits], x, y, rotation);
+            };
+
+            recursive.run();
+
+            Draw.z(Layer.lawn);
+
             if(front() != null && front().block().hasLiquids && !(front().block() instanceof Conduit)){
                 float x2 = 0;
                 float y2 = 0;
@@ -129,14 +132,14 @@ public class Conduit extends LiquidBlock implements Autotiler{
                     float x2 = 0;
                     float y2 = 0;
 
-                    int rotation = 0;
+                    int rotation2 = 0;
 
                     if(t == back()){
                         if(rotation() == 0) x2 -= 6;
                         if(rotation() == 1) y2 -= 6;
                         if(rotation() == 2) x2 += 6;
                         if(rotation() == 3) y2 += 6;
-                        rotation = 2;
+                        rotation2 = 2;
                     }
 
                     if(t == left()){
@@ -144,7 +147,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
                         if(rotation() == 1) x2 -= 6;
                         if(rotation() == 2) y2 -= 6;
                         if(rotation() == 3) x2 += 6;
-                        rotation = 1;
+                        rotation2 = 1;
                     }
 
                     if(t == right()){
@@ -152,18 +155,18 @@ public class Conduit extends LiquidBlock implements Autotiler{
                         if(rotation() == 1) x2 += 6;
                         if(rotation() == 2) y2 += 6;
                         if(rotation() == 3) x2 -= 6;
-                        rotation = 3;
+                        rotation2 = 3;
                     }
 
                     x += x2;
                     y += y2;
-                    rotation(rotation() + rotation);
+                    rotation(rotation() + rotation2);
 
                     int bit = blendbits;
-                    bot50(botRegions[blendbits = 0], () -> bot50(topRegions[blendbits = 0], this::draw));
+                    bot50(botRegions[blendbits = 0], () -> bot50(topRegions[blendbits = 0], recursive));
                     blendbits = bit;
 
-                    rotation(rotation() - rotation);
+                    rotation(rotation() - rotation2);
                     y -= y2;
                     x -= x2;
                 }

@@ -84,7 +84,7 @@ public class CommandCenter extends Block{
             Table buttons = new Table();
 
             for(UnitCommand cmd : UnitCommand.all){
-                buttons.addImageButton(commandRegions[cmd.ordinal()], Styles.clearToggleTransi, () -> tile.configure(cmd.ordinal()))
+                buttons.button(commandRegions[cmd.ordinal()], Styles.clearToggleTransi, () -> tile.configure(cmd.ordinal()))
                 .size(44).group(group).update(b -> b.setChecked(command == cmd));
             }
             table.add(buttons);

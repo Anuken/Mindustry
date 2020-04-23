@@ -193,7 +193,7 @@ public class Control implements ApplicationListener, Loadable{
     public void loadAsync(){
         Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
 
-        Core.input.setCatch(KeyCode.BACK, true);
+        Core.input.setCatch(KeyCode.back, true);
 
         data.load();
 
@@ -400,9 +400,9 @@ public class Control implements ApplicationListener, Loadable{
                 }).pad(10f).expand().center();
 
                 dialog.buttons.defaults().size(200f, 60f);
-                dialog.buttons.addButton("$uiscale.cancel", exit);
+                dialog.buttons.button("$uiscale.cancel", exit);
 
-                dialog.buttons.addButton("$ok", () -> {
+                dialog.buttons.button("$ok", () -> {
                     Core.settings.put("uiscalechanged", false);
                     settings.save();
                     dialog.hide();
@@ -494,7 +494,7 @@ public class Control implements ApplicationListener, Loadable{
                 Time.update();
             }
 
-            if(!scene.hasDialog() && !scene.root.getChildren().isEmpty() && !(scene.root.getChildren().peek() instanceof Dialog) && Core.input.keyTap(KeyCode.BACK)){
+            if(!scene.hasDialog() && !scene.root.getChildren().isEmpty() && !(scene.root.getChildren().peek() instanceof Dialog) && Core.input.keyTap(KeyCode.back)){
                 platform.hide();
             }
         }

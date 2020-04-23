@@ -33,7 +33,6 @@ public class PowerNode extends PowerBlock{
     public PowerNode(String name){
         super(name);
         expanded = true;
-        layer = Layer.power;
         configurable = true;
         consumesPower = false;
         outputsPower = false;
@@ -372,10 +371,12 @@ public class PowerNode extends PowerBlock{
         }
 
         @Override
-        public void drawLayer(){
+        public void draw(){
+            super.draw();
+
             if(Core.settings.getInt("lasersopacity") == 0) return;
 
-            Tilec entity = tile.ent();
+            Draw.z(Layer.power);
 
             for(int i = 0; i < power.links.size; i++){
                 Tilec link = world.ent(power.links.get(i));

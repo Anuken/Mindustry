@@ -26,7 +26,7 @@ public class ItemSelection{
         for(T item : items){
             if(!data.isUnlocked(item) && state.isCampaign()) continue;
 
-            ImageButton button = cont.addImageButton(Tex.whiteui, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).group(group).get();
+            ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).group(group).get();
             button.changed(() -> consumer.get(button.isChecked() ? item : null));
             button.getStyle().imageUp = new TextureRegionDrawable(item.icon(Cicon.small));
             button.update(() -> button.setChecked(holder.get() == item));
@@ -40,7 +40,7 @@ public class ItemSelection{
         if(i % 4 != 0){
             int remaining = 4 - (i % 4);
             for(int j = 0; j < remaining; j++){
-                cont.addImage(Styles.black6);
+                cont.image(Styles.black6);
             }
         }
 

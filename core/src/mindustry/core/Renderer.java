@@ -25,7 +25,7 @@ public class Renderer implements ApplicationListener{
     public final LightRenderer lights = new LightRenderer();
     public final Pixelator pixelator = new Pixelator();
 
-    public FrameBuffer effectBuffer = new FrameBuffer(2, 2);
+    public FrameBuffer effectBuffer = new FrameBuffer();
     private Bloom bloom;
     private FxProcessor fx = new FxProcessor();
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
@@ -180,93 +180,58 @@ public class Renderer implements ApplicationListener{
         }
 
         graphics.clear(clearColor);
+        Draw.reset();
 
-        if(!graphics.isHidden() && (Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")) && (effectBuffer.getWidth() != graphics.getWidth() || effectBuffer.getHeight() != graphics.getHeight())){
+        //TODO 'animated water' is a bad name for this setting
+        if(Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")){
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
         Draw.proj(camera);
 
-        beginFx();
-
-        drawBackground();
-
         blocks.floor.checkChanges();
-        blocks.floor.drawFloor();
-
-        Groups.drawFloor();
-        Groups.drawFloorOver();
-
         blocks.processBlocks();
-        blocks.drawShadows();
-        Draw.color();
 
-        blocks.floor.beginDraw();
-        blocks.floor.drawLayer(CacheLayer.walls);
-        blocks.floor.endDraw();
+        Draw.sort(true);
 
-        blocks.drawBlocks(Layer.lawn);
-        blocks.drawBlocks(Layer.block);
-        if(state.rules.drawFog){
-            blocks.drawFog();
-        }
+        //TODO fx
 
-        blocks.drawDestroyed();
+        Draw.draw(Layer.background, this::drawBackground);
+        Draw.draw(Layer.floor, blocks.floor::drawFloor);
+        Draw.draw(Layer.block - 1, blocks::drawShadows);
+        Draw.draw(Layer.block, () -> {
+            blocks.floor.beginDraw();
+            blocks.floor.drawLayer(CacheLayer.walls);
+            blocks.floor.endDraw();
+        });
 
-        Draw.shader(Shaders.blockbuild, true);
-        blocks.drawBlocks(Layer.placement);
-        Draw.shader();
-
-        blocks.drawBlocks(Layer.overlay);
-
-        Groups.drawGroundShadows();
-        Groups.drawGroundUnder();
-        Groups.drawGround();
-
-        blocks.drawBlocks(Layer.turret);
-
-        blocks.drawBlocks(Layer.power);
-        blocks.drawBlocks(Layer.lights);
-
-        overlays.drawBottom();
-
-        Groups.drawFlyingShadows();
-
-        Groups.drawFlying();
-
-        Draw.flush();
-        if(bloom != null){
-            bloom.capture();
-        }
-
-        Groups.drawBullets();
-        Groups.drawEffects();
-
-        Draw.flush();
-        if(bloom != null){
-            bloom.render();
-        }
-
-        Groups.drawOverlays();
-
-        overlays.drawTop();
-
-        Groups.drawWeather();
-
-        endFx();
-
-        if(!pixelator.enabled()){
-            Groups.drawNames();
-        }
+        Draw.drawRange(Layer.blockBuilding, () -> Draw.shader(Shaders.blockbuild, true), Draw::shader);
 
         if(state.rules.lighting){
-            lights.draw();
+            Draw.draw(Layer.light, lights::draw);
         }
 
-        drawLanding();
+        if(state.rules.drawDarkness){
+            Draw.draw(Layer.darkness, blocks::drawDarkness);
+        }
 
-        Draw.color();
+        if(bloom != null){
+            Draw.draw(Layer.bullet - 0.001f, bloom::capture);
+            Draw.draw(Layer.effect + 0.001f, bloom::render);
+        }
+
+        Draw.draw(Layer.plans, overlays::drawBottom);
+        Draw.draw(Layer.overlayUI, overlays::drawTop);
+        Draw.draw(Layer.space, this::drawLanding);
+
+        blocks.drawBlocks();
+
+        Groups.draw.draw(Drawc::draw);
+
+        Draw.reset();
         Draw.flush();
+        Draw.sort(false);
+
     }
 
     private void drawBackground(){
@@ -323,8 +288,6 @@ public class Renderer implements ApplicationListener{
     }
 
     public void takeMapScreenshot(){
-        Groups.drawGroundShadows();
-
         int w = world.width() * tilesize, h = world.height() * tilesize;
         int memory = w * h * 4 / 1024 / 1024;
 

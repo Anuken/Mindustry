@@ -87,7 +87,7 @@ public class MessageBlock extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            table.addImageButton(Icon.pencil, () -> {
+            table.button(Icon.pencil, () -> {
                 if(mobile){
                     Core.input.getTextInput(new TextInput(){{
                         text = message;
@@ -112,7 +112,7 @@ public class MessageBlock extends Block{
                         return true;
                     });
                     a.setMaxLength(maxTextLength);
-                    dialog.buttons.addButton("$ok", () -> {
+                    dialog.buttons.button("$ok", () -> {
                         tile.configure(a.getText());
                         dialog.hide();
                     }).size(130f, 60f);

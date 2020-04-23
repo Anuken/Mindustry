@@ -57,12 +57,12 @@ public class HudFragment extends Fragment{
 
                     ImageButtonStyle style = Styles.clearTransi;
 
-                    select.addImageButton(Icon.menu, style, ui.paused::show);
-                    flip = select.addImageButton(Icon.upOpen, style, this::toggleMenus).get();
+                    select.button(Icon.menu, style, ui.paused::show);
+                    flip = select.button(Icon.upOpen, style, this::toggleMenus).get();
 
-                    select.addImageButton(Icon.paste, style, ui.schematics::show);
+                    select.button(Icon.paste, style, ui.schematics::show);
 
-                    select.addImageButton(Icon.pause, style, () -> {
+                    select.button(Icon.pause, style, () -> {
                         if(net.active()){
                             ui.listfrag.toggle();
                         }else{
@@ -77,7 +77,7 @@ public class HudFragment extends Fragment{
                         }
                     });
 
-                    select.addImageButton(Icon.chat, style,() -> {
+                    select.button(Icon.chat, style,() -> {
                         if(net.active() && mobile){
                             if(ui.chatfrag.shown()){
                                 ui.chatfrag.hide();
@@ -97,7 +97,7 @@ public class HudFragment extends Fragment{
                         }
                     });
 
-                    select.addImage().color(Pal.gray).width(4f).fillY();
+                    select.image().color(Pal.gray).width(4f).fillY();
 
                     float size = Scl.scl(dsize);
                     Array<Element> children = new Array<>(select.getChildren());
@@ -122,7 +122,7 @@ public class HudFragment extends Fragment{
                 }
 
                 cont.row();
-                cont.addImage().height(4f).color(Pal.gray).fillX();
+                cont.image().height(4f).color(Pal.gray).fillX();
                 cont.row();
             }
 
@@ -164,7 +164,7 @@ public class HudFragment extends Fragment{
                         teams.left();
                         int i = 0;
                         for(Team team : Team.base()){
-                            ImageButton button = teams.addImageButton(Tex.whiteui, Styles.clearTogglePartiali, 40f, () -> Call.setPlayerTeamEditor(player, team))
+                            ImageButton button = teams.button(Tex.whiteui, Styles.clearTogglePartiali, 40f, () -> Call.setPlayerTeamEditor(player, team))
                                 .size(50f).margin(6f).get();
                             button.getImageCell().grow();
                             button.getStyle().imageUpColor = team.color;
@@ -261,7 +261,7 @@ public class HudFragment extends Fragment{
                     setDisabled(() -> !control.tutorial.canNext());
                 }},
                 new Table(f -> {
-                    f.left().addImageButton(Icon.left, Styles.emptyi, () -> {
+                    f.left().button(Icon.left, Styles.emptyi, () -> {
                         control.tutorial.prevSentence();
                     }).width(44f).growY().visible(() -> control.tutorial.canPrev());
                 }));
@@ -340,7 +340,7 @@ public class HudFragment extends Fragment{
                 }
             });
             table.margin(12);
-            table.addImage(Icon.ok).pad(3);
+            table.image(Icon.ok).pad(3);
             table.add(text).wrap().width(280f).get().setAlignment(Align.center, Align.center);
             table.pack();
 
@@ -441,7 +441,7 @@ public class HudFragment extends Fragment{
 
                 lastUnlockLayout.add(image);
             }else{ //else, add a specific icon to denote no more space
-                lastUnlockLayout.addImage(Icon.add);
+                lastUnlockLayout.image(Icon.add);
             }
 
             lastUnlockLayout.pack();
@@ -486,13 +486,13 @@ public class HudFragment extends Fragment{
         dialog.cont.add("$launch.confirm").width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
-        dialog.buttons.addButton("$cancel", dialog::hide);
-        dialog.buttons.addButton("$ok", () -> {
+        dialog.buttons.button("$cancel", dialog::hide);
+        dialog.buttons.button("$ok", () -> {
             dialog.hide();
             Call.launchZone();
         });
-        dialog.keyDown(KeyCode.ESCAPE, dialog::hide);
-        dialog.keyDown(KeyCode.BACK, dialog::hide);
+        dialog.keyDown(KeyCode.escape, dialog::hide);
+        dialog.keyDown(KeyCode.back, dialog::hide);
         dialog.show();
     }
 
@@ -597,7 +597,7 @@ public class HudFragment extends Fragment{
     }
 
     private void addPlayButton(Table table){
-        table.right().addImageButton(Icon.play, Styles.righti, 30f, () -> {
+        table.right().button(Icon.play, Styles.righti, 30f, () -> {
             if(net.client() && player.admin()){
                 Call.onAdminRequest(player, AdminAction.wave);
             }else if(inLaunchWave()){

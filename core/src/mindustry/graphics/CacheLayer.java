@@ -1,11 +1,10 @@
 package mindustry.graphics;
 
-import arc.Core;
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.gl.Shader;
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.graphics.gl.*;
 
-import static arc.Core.camera;
 import static mindustry.Vars.renderer;
 
 public enum CacheLayer{
@@ -81,7 +80,7 @@ public enum CacheLayer{
         renderer.effectBuffer.end();
 
         Draw.shader(shader);
-        Draw.rect(Draw.wrap(renderer.effectBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
+        Draw.rect(renderer.effectBuffer);
         Draw.shader();
 
         renderer.blocks.floor.beginc();

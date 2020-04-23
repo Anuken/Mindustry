@@ -72,7 +72,7 @@ public class DesktopInput extends InputHandler{
                 Core.keybinds.get(Binding.schematic_flip_y).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.table(a -> {
-                    a.addImageTextButton("$schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
+                    a.button("$schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
             }).margin(6f);
         });
@@ -182,7 +182,7 @@ public class DesktopInput extends InputHandler{
             }
 
             //TODO this is for debugging, remove later
-            if(Core.input.keyTap(KeyCode.Q) && !player.dead()){
+            if(Core.input.keyTap(KeyCode.q) && !player.dead()){
                 Fx.commandSend.at(player);
                 Units.nearby(player.team(), player.x(), player.y(), 200f, u -> {
                     if(u.isAI()){
@@ -302,11 +302,11 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void buildPlacementUI(Table table){
-        table.addImage().color(Pal.gray).height(4f).colspan(4).growX();
+        table.image().color(Pal.gray).height(4f).colspan(4).growX();
         table.row();
         table.left().margin(0f).defaults().size(48f).left();
 
-        table.addImageButton(Icon.paste, Styles.clearPartiali, () -> {
+        table.button(Icon.paste, Styles.clearPartiali, () -> {
             ui.schematics.show();
         });
     }

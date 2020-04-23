@@ -89,10 +89,6 @@ public class Block extends UnlockableContent{
     public CacheLayer cacheLayer = CacheLayer.normal;
     /** Special flag; if false, floor will be drawn under this block even if it is cached. */
     public boolean fillsTile = true;
-    /** Layer to draw extra stuff on. */
-    public Layer layer = null;
-    /** Extra layer to draw extra extra stuff on. */
-    public Layer layer2 = null;
     /** whether this block can be replaced in all cases */
     public boolean alwaysReplace = false;
     /** The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other. */
@@ -201,14 +197,6 @@ public class Block extends UnlockableContent{
             sum += !other.floor().isLiquid ? 1f : 0f;
         }
         return sum / size / size;
-    }
-
-    public void drawLayer(Tile tile){
-        if(tile.entity != null) tile.entity.drawLayer();
-    }
-
-    public void drawLayer2(Tile tile){
-        if(tile.entity != null) tile.entity.drawLayer2();
     }
 
     /** Drawn when you are placing a block. */

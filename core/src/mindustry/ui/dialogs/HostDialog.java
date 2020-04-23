@@ -22,14 +22,14 @@ public class HostDialog extends FloatingDialog{
 
         cont.table(t -> {
             t.add("$name").padRight(10);
-            t.addField(Core.settings.getString("name"), text -> {
+            t.field(Core.settings.getString("name"), text -> {
                 player.name(text);
                 Core.settings.put("name", text);
                 Core.settings.save();
                 ui.listfrag.rebuild();
             }).grow().pad(8).get().setMaxLength(40);
 
-            ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
+            ImageButton button = t.button(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new PaletteDialog().show(color -> {
                     player.color().set(color);
                     Core.settings.put("color-0", color.rgba());
@@ -43,7 +43,7 @@ public class HostDialog extends FloatingDialog{
 
         cont.add().width(65f);
 
-        cont.addButton("$host", () -> {
+        cont.button("$host", () -> {
             if(Core.settings.getString("name").trim().isEmpty()){
                 ui.showInfo("$noname");
                 return;
@@ -52,7 +52,7 @@ public class HostDialog extends FloatingDialog{
             runHost();
         }).width(w).height(70f);
 
-        cont.addButton("?", () -> ui.showInfo("$host.info")).size(65f, 70f).padLeft(6f);
+        cont.button("?", () -> ui.showInfo("$host.info")).size(65f, 70f).padLeft(6f);
 
         shown(() -> {
             if(!steam){

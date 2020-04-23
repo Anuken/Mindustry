@@ -17,15 +17,14 @@ import mindustry.world.blocks.payloads.*;
 import static mindustry.Vars.*;
 
 //TODO rename
-public class MassConveyor extends Block{
+public class PayloadConveyor extends Block{
     public float moveTime = 70f;
     public TextureRegion topRegion, edgeRegion;
     public Interpolation interp = Interpolation.pow5;
 
-    public MassConveyor(String name){
+    public PayloadConveyor(String name){
         super(name);
 
-        layer = Layer.overlay;
         size = 3;
         rotate = true;
         update = true;
@@ -57,7 +56,7 @@ public class MassConveyor extends Block{
         }
     }
 
-    public class MassConveyorEntity extends TileEntity{
+    public class PayloadConveyorEntity extends TileEntity{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;
         public @Nullable Tilec next;
@@ -87,7 +86,7 @@ public class MassConveyor extends Block{
             progress = Time.time() % moveTime;
 
             //TODO DEBUG
-            if(Core.input.keyTap(KeyCode.G) && world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y) == this){
+            if(Core.input.keyTap(KeyCode.g) && world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y) == this){
                 item = new UnitPayload((Mathf.chance(0.5) ? UnitTypes.wraith : UnitTypes.dagger).create(Team.sharded));
                 itemRotation = rotation() * 90;
                 animation = 0f;
@@ -161,14 +160,8 @@ public class MassConveyor extends Block{
                     Draw.rect(edgeRegion, x, y, i * 90);
                 }
             }
-        }
 
-        @Override
-        public void drawLayer(){
-            //fract:
-            //0: arriving
-            //0.5: middle
-            //1: leaving
+            Draw.z(Layer.blockOver);
 
             if(animation > fract()){
                 animation = Mathf.lerp(animation, 0.8f, 0.15f);
@@ -177,7 +170,7 @@ public class MassConveyor extends Block{
             animation = Math.max(animation, fract());
 
             float fract = animation;
-            float rot = Mathf.slerp(itemRotation, rotation() * 90, fract);
+            rot = Mathf.slerp(itemRotation, rotation() * 90, fract);
 
             if(fract < 0.5f){
                 Tmp.v1.trns(itemRotation + 180, (0.5f - fract) * tilesize * size);

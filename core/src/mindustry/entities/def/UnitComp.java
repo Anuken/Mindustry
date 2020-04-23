@@ -18,8 +18,7 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, Drawc, Boundedc,
-        DrawLayerGroundc, DrawLayerFlyingc, DrawLayerGroundShadowsc, DrawLayerFlyingShadowsc, Syncc{
+abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, Drawc, Boundedc, Syncc{
     @Import float x, y, rotation, elevation;
 
     private UnitController controller;
@@ -172,32 +171,7 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
 
     @Override
     public void draw(){
-        type.drawEngine(this);
-        type.drawBody(this);
-        type.drawWeapons(this);
-        if(type.drawCell) type.drawCell(this);
-        if(type.drawItems) type.drawItems(this);
-        type.drawLight(this);
-    }
-
-    @Override
-    public void drawFlyingShadows(){
-        if(isFlying()) type.drawShadow(this);
-    }
-
-    @Override
-    public void drawGroundShadows(){
-        type.drawOcclusion(this);
-    }
-
-    @Override
-    public void drawFlying(){
-        if(isFlying()) draw();
-    }
-
-    @Override
-    public void drawGround(){
-        if(isGrounded()) draw();
+        type.draw(this);
     }
 
     @Override

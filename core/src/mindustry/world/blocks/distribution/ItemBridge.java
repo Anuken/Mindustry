@@ -32,7 +32,6 @@ public class ItemBridge extends Block{
         update = true;
         solid = true;
         hasPower = true;
-        layer = Layer.power;
         expanded = true;
         itemCapacity = 10;
         configurable = true;
@@ -230,7 +229,11 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public void drawLayer(){
+        public void draw(){
+            super.draw();
+
+            Draw.z(Layer.power);
+
             Tile other = world.tile(link);
             if(!linkValid(tile, other)) return;
 

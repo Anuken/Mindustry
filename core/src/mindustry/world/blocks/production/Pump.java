@@ -3,7 +3,6 @@ package mindustry.world.blocks.production;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -20,7 +19,6 @@ public class Pump extends LiquidBlock{
 
     public Pump(String name){
         super(name);
-        layer = Layer.overlay;
         group = BlockGroup.liquids;
         floating = true;
     }

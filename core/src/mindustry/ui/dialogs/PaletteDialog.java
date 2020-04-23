@@ -25,7 +25,7 @@ public class PaletteDialog extends Dialog{
         for(int i = 0; i < playerColors.length; i++){
             Color color = playerColors[i];
 
-            ImageButton button = table.addImageButton(Tex.whiteui, Styles.clearTogglei, 34, () -> {
+            ImageButton button = table.button(Tex.whiteui, Styles.clearTogglei, 34, () -> {
                 cons.get(color);
                 hide();
             }).size(48).get();
@@ -38,7 +38,7 @@ public class PaletteDialog extends Dialog{
         }
 
         keyDown(key -> {
-            if(key == KeyCode.ESCAPE || key == KeyCode.BACK)
+            if(key == KeyCode.escape || key == KeyCode.back)
                 hide();
         });
 

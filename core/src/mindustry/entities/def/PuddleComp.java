@@ -10,6 +10,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -18,7 +19,7 @@ import static mindustry.entities.Puddles.maxLiquid;
 
 @EntityDef(value = {Puddlec.class}, pooled = true)
 @Component
-abstract class PuddleComp implements Posc, DrawLayerFloorOverc, Puddlec{
+abstract class PuddleComp implements Posc, Puddlec{
     private static final int maxGeneration = 2;
     private static final Color tmp = new Color();
     private static final Rect rect = new Rect();
@@ -89,7 +90,9 @@ abstract class PuddleComp implements Posc, DrawLayerFloorOverc, Puddlec{
     }
 
     @Override
-    public void drawFloorOver(){
+    public void draw(){
+        Draw.z(Layer.debris - 1);
+
         seeds = id();
         boolean onLiquid = tile.floor().isLiquid;
         float f = Mathf.clamp(amount / (maxLiquid / 1.5f));
