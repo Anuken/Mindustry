@@ -181,7 +181,7 @@ public class Renderer implements ApplicationListener{
 
         graphics.clear(clearColor);
 
-        //TODO 'animated water' is a bad name for this etting
+        //TODO 'animated water' is a bad name for this setting
         if(Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")){
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
@@ -193,7 +193,7 @@ public class Renderer implements ApplicationListener{
 
         Draw.sort(true);
 
-        //beginFx();
+        //TODO fx
 
         Draw.draw(Layer.background, this::drawBackground);
         Draw.draw(Layer.floor, blocks.floor::drawFloor);
@@ -230,69 +230,6 @@ public class Renderer implements ApplicationListener{
         Draw.reset();
         Draw.flush();
         Draw.sort(false);
-
-        /*
-        blocks.drawBlocks(Layer.block);
-        if(state.rules.drawFog){
-            blocks.drawFog();
-        }
-
-        blocks.drawDestroyed();
-
-        Draw.shader(Shaders.blockbuild, true);
-        blocks.drawBlocks(Layer.placement);
-        Draw.shader();
-
-        blocks.drawBlocks(Layer.overlay);
-
-        Groups.drawGroundShadows();
-        Groups.drawGroundUnder();
-        Groups.drawGround();
-
-        blocks.drawBlocks(Layer.turret);
-
-        blocks.drawBlocks(Layer.power);
-        blocks.drawBlocks(Layer.lights);
-
-        overlays.drawBottom();
-
-        Groups.drawFlyingShadows();
-
-        Groups.drawFlying();
-
-        Draw.flush();
-        if(bloom != null){
-            bloom.capture();
-        }
-
-        Groups.drawBullets();
-        Groups.drawEffects();
-
-        Draw.flush();
-        if(bloom != null){
-            bloom.render();
-        }
-
-        Groups.drawOverlays();
-
-        overlays.drawTop();
-
-        Groups.drawWeather();
-
-        endFx();
-
-        if(!pixelator.enabled()){
-            Groups.drawNames();
-        }
-
-        if(state.rules.lighting){
-            lights.draw();
-        }
-
-        drawLanding();
-
-        Draw.color();
-        Draw.flush();*/
 
     }
 
