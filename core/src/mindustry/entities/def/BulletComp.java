@@ -1,5 +1,6 @@
 package mindustry.entities.def;
 
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
@@ -109,6 +110,8 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public void draw(){
+        Draw.z(Layer.bullet);
+
         type.draw(this);
         //TODO refactor
         renderer.lights.add(x(), y(), 16f, Pal.powerLight, 0.3f);

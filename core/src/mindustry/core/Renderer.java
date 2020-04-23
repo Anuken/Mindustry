@@ -217,6 +217,10 @@ public class Renderer implements ApplicationListener{
             Draw.draw(Layer.effect + 0.001f, bloom::render);
         }
 
+        Draw.draw(Layer.plans, overlays::drawBottom);
+        Draw.draw(Layer.overlayUI, overlays::drawTop);
+        Draw.draw(Layer.space, this::drawLanding);
+
         blocks.drawBlocks();
 
         Groups.draw.draw(Drawc::draw);
@@ -224,8 +228,8 @@ public class Renderer implements ApplicationListener{
         Draw.reset();
         Draw.flush();
         Draw.sort(false);
-        /*
 
+        /*
         blocks.drawBlocks(Layer.block);
         if(state.rules.drawFog){
             blocks.drawFog();
