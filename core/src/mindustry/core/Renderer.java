@@ -180,6 +180,7 @@ public class Renderer implements ApplicationListener{
         }
 
         graphics.clear(clearColor);
+        Draw.reset();
 
         //TODO 'animated water' is a bad name for this setting
         if(Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")){
@@ -204,7 +205,7 @@ public class Renderer implements ApplicationListener{
             blocks.floor.endDraw();
         });
 
-        Draw.drawRange(Layer.blockBuilding, () -> Draw.shader(Shaders.blockbuild, false), Draw::shader);
+        Draw.drawRange(Layer.blockBuilding, () -> Draw.shader(Shaders.blockbuild, true), Draw::shader);
 
         if(state.rules.lighting){
             Draw.draw(Layer.light, lights::draw);
