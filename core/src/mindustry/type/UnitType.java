@@ -126,7 +126,6 @@ public class UnitType extends UnlockableContent{
             drawLegs((Legsc)unit);
         }
 
-
         drawOcclusion(unit);
         drawEngine(unit);
         drawBody(unit);
