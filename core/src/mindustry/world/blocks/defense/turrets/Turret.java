@@ -68,7 +68,6 @@ public abstract class Turret extends Block{
         priority = TargetPriority.turret;
         update = true;
         solid = true;
-        layer = Layer.turret;
         group = BlockGroup.turrets;
         flags = EnumSet.of(BlockFlag.turret);
         outlineIcon = true;
@@ -127,10 +126,9 @@ public abstract class Turret extends Block{
         public void draw(){
             Draw.rect(baseRegion, x, y);
             Draw.color();
-        }
 
-        @Override
-        public void drawLayer(){
+            Draw.z(Layer.turret);
+
             tr2.trns(rotation, -recoil);
 
             drawer.get(this);

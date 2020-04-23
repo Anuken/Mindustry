@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -17,7 +18,11 @@ public class ExtendingItemBridge extends ItemBridge{
     
     public class ExtendingItemBridgeEntity extends ItemBridgeEntity{
         @Override
-        public void drawLayer(){
+        public void draw(){
+            super.draw();
+
+            Draw.z(Layer.power);
+
             Tile other = world.tile(link);
             if(!linkValid(tile, other)) return;
 

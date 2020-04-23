@@ -57,7 +57,6 @@ public class Drill extends Block{
         super(name);
         update = true;
         solid = true;
-        layer = Layer.overlay;
         group = BlockGroup.drills;
         hasLiquids = true;
         liquidCapacity = 5f;
@@ -139,7 +138,7 @@ public class Drill extends Block{
                 for(int i = 0; i < list.size; i++){
                     Block item = list.get(i);
 
-                    l.addImage(item.icon(Cicon.small)).size(8 * 3).padRight(2).padLeft(2).padTop(3).padBottom(3);
+                    l.image(item.icon(Cicon.small)).size(8 * 3).padRight(2).padLeft(2).padTop(3).padBottom(3);
                     l.add(item.localizedName).left().padLeft(1).padRight(4);
                     if(i % 5 == 4){
                         l.row();

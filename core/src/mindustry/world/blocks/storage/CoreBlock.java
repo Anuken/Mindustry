@@ -31,7 +31,6 @@ public class CoreBlock extends StorageBlock{
         flags = EnumSet.of(BlockFlag.core, BlockFlag.producer);
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
-        layer = Layer.overlay;
     }
 
     @Remote(called = Loc.server)
@@ -194,9 +193,13 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public void drawLayer(){
+        public void draw(){
+            super.draw();
+
             if(heat > 0.001f){
-                Drawf.drawRespawn(this, heat, progress, time, unitType, lastRequested);
+                Draw.draw(Layer.blockOver, () -> {
+                    Drawf.drawRespawn(this, heat, progress, time, unitType, lastRequested);
+                });
             }
         }
 

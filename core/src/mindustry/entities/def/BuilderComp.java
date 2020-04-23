@@ -23,7 +23,7 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class BuilderComp implements Unitc, DrawLayerFlyingc{
+abstract class BuilderComp implements Unitc{
     static final Vec2[] vecs = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
     @Import float x, y, rotation;
@@ -197,8 +197,12 @@ abstract class BuilderComp implements Unitc, DrawLayerFlyingc{
     }
 
     @Override
-    public void drawFlying(){
+    public void draw(){
         if(!isBuilding()) return;
+
+        //TODO check correctness
+        Draw.z(Layer.flyingUnit);
+
         BuildRequest request = buildRequest();
         Tile tile = world.tile(request.x, request.y);
 

@@ -6,13 +6,12 @@ import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.util.*;
-import mindustry.gen.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.renderer;
 
 public class Pixelator implements Disposable{
-    private FrameBuffer buffer = new FrameBuffer(2, 2);
+    private FrameBuffer buffer = new FrameBuffer();
 
     {
         buffer.getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
@@ -34,19 +33,18 @@ public class Pixelator implements Disposable{
         int w = (int)(Core.camera.width * renderer.landScale());
         int h = (int)(Core.camera.height * renderer.landScale());
 
-        if(!graphics.isHidden() && (buffer.getWidth() != w || buffer.getHeight() != h)){
-            buffer.resize(w, h);
-        }
+        buffer.resize(w, h);
 
         buffer.begin();
         renderer.draw();
         buffer.end();
 
         Draw.blend(Blending.disabled);
-        Draw.rect(Draw.wrap(buffer.getTexture()), Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
+        Draw.rect(buffer);
         Draw.blend();
 
-        Groups.drawNames();
+        //TODO set all of this up
+        //Groups.drawNames();
 
         Core.camera.position.set(px, py);
         renderer.setScale(pre);

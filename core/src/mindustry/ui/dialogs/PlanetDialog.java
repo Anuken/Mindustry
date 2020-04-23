@@ -92,7 +92,7 @@ public class PlanetDialog extends FloatingDialog{
         float bmargin = 6f;
 
         //TODO names
-        buttons.addImageTextButton("$back", Icon.left, style, this::hide).margin(bmargin);
+        buttons.button("$back", Icon.left, style, this::hide).margin(bmargin);
         //buttons.addImageTextButton("Tech", Icon.tree, style, () -> ui.tech.show()).margin(bmargin);
         //buttons.addImageTextButton("Launch", Icon.upOpen, style, this::hide).margin(bmargin);
         //buttons.addImageTextButton("Database", Icon.book, style, () -> ui.database.show()).margin(bmargin);
@@ -163,7 +163,7 @@ public class PlanetDialog extends FloatingDialog{
         cont.clear();
         titleTable.remove();
 
-        cont.addRect((x, y, w, h) -> render()).grow();
+        cont.rect((x, y, w, h) -> render()).grow();
     }
 
     private void render(){
@@ -341,7 +341,7 @@ public class PlanetDialog extends FloatingDialog{
         //TODO add strings to bundle after prototyping is done
 
         stable.add("[accent]" + selected.id).row();
-        stable.addImage().color(Pal.accent).fillX().height(3f).pad(3f).row();
+        stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();
         stable.add(selected.save != null ? selected.save.getPlayTime() : "[lightgray]Unexplored").row();
 
         stable.add("Resources:").row();
@@ -350,14 +350,14 @@ public class PlanetDialog extends FloatingDialog{
             int idx = 0;
             int max = 5;
             for(UnlockableContent c : selected.data.resources){
-                t.addImage(c.icon(Cicon.small)).padRight(3);
+                t.image(c.icon(Cicon.small)).padRight(3);
                 if(++idx % max == 0) t.row();
             }
         }).fillX().row();
 
         stable.row();
 
-        stable.addButton("Launch", Styles.transt, () -> {
+        stable.button("Launch", Styles.transt, () -> {
             if(selected != null){
                 if(selected.is(SectorAttribute.naval)){
                     ui.showInfo("You need a naval loadout to launch here.");

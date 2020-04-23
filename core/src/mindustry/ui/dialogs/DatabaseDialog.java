@@ -9,7 +9,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.ctype.ContentType;
 import mindustry.gen.*;
@@ -46,7 +45,7 @@ public class DatabaseDialog extends FloatingDialog{
 
             table.add("$content." + type.name() + ".name").growX().left().color(Pal.accent);
             table.row();
-            table.addImage().growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
+            table.image().growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
             table.row();
             table.table(list -> {
                 list.left();
@@ -69,7 +68,7 @@ public class DatabaseDialog extends FloatingDialog{
 
                     if(unlocked(unlock)){
                         image.clicked(() -> {
-                            if(Core.input.keyDown(KeyCode.SHIFT_LEFT) && Fonts.getUnicode(unlock.name) != 0){
+                            if(Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(unlock.name) != 0){
                                 Core.app.setClipboardText((char)Fonts.getUnicode(unlock.name) + "");
                                 ui.showInfoFade("$copied");
                             }else{

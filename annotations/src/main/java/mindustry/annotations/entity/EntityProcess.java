@@ -161,6 +161,7 @@ public class EntityProcess extends BaseProcessor{
                 Log.debug("");
             }
 
+            /*
             //generate special render layer interfaces
             for(DrawLayer layer : DrawLayer.values()){
                 //create the DrawLayer interface that entities need to implement
@@ -171,7 +172,7 @@ public class EntityProcess extends BaseProcessor{
                 .addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
                 inter.addMethod(MethodSpec.methodBuilder("draw" + Strings.capitalize(layer.name())).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
                 write(inter);
-            }
+            }*/
         }else if(round == 2){ //round 2: get component classes and generate interfaces for them
 
             //parse groups
@@ -182,6 +183,7 @@ public class EntityProcess extends BaseProcessor{
                 groupDefs.add(new GroupDefinition(group.name(), ClassName.bestGuess(packageName + "." + interfaceName(types.first())), types, an.spatial(), an.mapping(), collides));
             }
 
+            /*
             //add special generated groups
             for(DrawLayer layer : DrawLayer.values()){
                 String name = "DrawLayer" + Strings.capitalize(layer.name()) + "c";
@@ -190,7 +192,7 @@ public class EntityProcess extends BaseProcessor{
                 //add manual inclusions of entities to be added to this group
                 def.manualInclusions.addAll(allDefs.select(s -> allComponents(s).contains(comp -> comp.interfaces().contains(in -> in.name().equals(name)))));
                 groupDefs.add(def);
-            }
+            }*/
 
             ObjectMap<String, Selement> usedNames = new ObjectMap<>();
             ObjectMap<Selement, ObjectSet<String>> extraNames = new ObjectMap<>();
@@ -457,12 +459,13 @@ public class EntityProcess extends BaseProcessor{
                 }
             }
 
+            /*
             for(DrawLayer layer : DrawLayer.values()){
                 MethodSpec.Builder groupDraw = MethodSpec.methodBuilder("draw" + Strings.capitalize(layer.name()))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
                 groupDraw.addStatement("$L.draw($L::$L)", layer.name(), "DrawLayer" + Strings.capitalize(layer.name()) + "c", "draw" + Strings.capitalize(layer.name()));
                 groupsBuilder.addMethod(groupDraw.build());
-            }
+            }*/
 
             groupsBuilder.addMethod(groupResize.build());
             groupsBuilder.addMethod(groupUpdate.build());

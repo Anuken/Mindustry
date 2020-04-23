@@ -37,10 +37,9 @@ public class MassDriver extends Block{
         solid = true;
         configurable = true;
         hasItems = true;
-        layer = Layer.turret;
         hasPower = true;
         outlineIcon = true;
-    //point2 is relative
+        //point2 is relative
         config(Point2.class, (tile, point) -> ((MassDriverEntity)tile).link = Point2.pack(point.x + tile.tileX(), point.y + tile.tileY()));
         config(Integer.class, (tile, point) -> ((MassDriverEntity)tile).link = point);
     }
@@ -187,10 +186,9 @@ public class MassDriver extends Block{
         @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
-        }
 
-        @Override
-        public void drawLayer(){
+            Draw.z(Layer.turret);
+
             Draw.rect(region,
             x + Angles.trnsx(rotation + 180f, reload * knockback),
             y + Angles.trnsy(rotation + 180f, reload * knockback), rotation - 90);

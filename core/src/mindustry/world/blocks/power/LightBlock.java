@@ -49,7 +49,7 @@ public class LightBlock extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            table.addImageButton(Icon.pencil, () -> {
+            table.button(Icon.pencil, () -> {
                 ui.picker.show(Tmp.c1.set(color).a(0.5f), false, res -> {
                     color = res.rgba();
                     lastColor = color;

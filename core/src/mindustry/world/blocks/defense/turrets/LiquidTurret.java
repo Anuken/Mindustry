@@ -50,8 +50,8 @@ public class LiquidTurret extends Turret{
     public class LiquidTurretEntity extends TurretEntity{
 
         @Override
-        public void drawLayer(){
-            super.drawLayer();
+        public void draw(){
+            super.draw();
             
             if(Core.atlas.isFound(reg(liquidRegion))){
                 Draw.color(liquids.current().color);

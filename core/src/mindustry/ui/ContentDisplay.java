@@ -17,13 +17,13 @@ public class ContentDisplay{
         table.table(title -> {
             int size = 8 * 6;
 
-            title.addImage(block.icon(Cicon.xlarge)).size(size);
+            title.image(block.icon(Cicon.xlarge)).size(size);
             title.add("[accent]" + block.localizedName).padLeft(5);
         });
 
         table.row();
 
-        table.addImage().height(3).color(Color.lightGray).pad(8).padLeft(0).padRight(0).fillX();
+        table.image().height(3).color(Color.lightGray).pad(8).padLeft(0).padRight(0).fillX();
 
         table.row();
 
@@ -31,7 +31,7 @@ public class ContentDisplay{
             table.add(block.displayDescription()).padLeft(5).padRight(5).width(400f).wrap().fillX();
             table.row();
 
-            table.addImage().height(3).color(Color.lightGray).pad(8).padLeft(0).padRight(0).fillX();
+            table.image().height(3).color(Color.lightGray).pad(8).padLeft(0).padRight(0).fillX();
             table.row();
         }
 
@@ -65,13 +65,13 @@ public class ContentDisplay{
     public static void displayItem(Table table, Item item){
 
         table.table(title -> {
-            title.addImage(item.icon(Cicon.xlarge)).size(8 * 6);
+            title.image(item.icon(Cicon.xlarge)).size(8 * 6);
             title.add("[accent]" + item.localizedName).padLeft(5);
         });
 
         table.row();
 
-        table.addImage().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
+        table.image().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
 
         table.row();
 
@@ -79,7 +79,7 @@ public class ContentDisplay{
             table.add(item.displayDescription()).padLeft(5).padRight(5).width(400f).wrap().fillX();
             table.row();
 
-            table.addImage().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
+            table.image().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
             table.row();
         }
 
@@ -99,13 +99,13 @@ public class ContentDisplay{
     public static void displayLiquid(Table table, Liquid liquid){
 
         table.table(title -> {
-            title.addImage(liquid.icon(Cicon.xlarge)).size(8 * 6);
+            title.image(liquid.icon(Cicon.xlarge)).size(8 * 6);
             title.add("[accent]" + liquid.localizedName).padLeft(5);
         });
 
         table.row();
 
-        table.addImage().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
+        table.image().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
 
         table.row();
 
@@ -113,7 +113,7 @@ public class ContentDisplay{
             table.add(liquid.displayDescription()).padLeft(5).padRight(5).width(400f).wrap().fillX();
             table.row();
 
-            table.addImage().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
+            table.image().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
             table.row();
         }
 
@@ -133,13 +133,13 @@ public class ContentDisplay{
 
     public static void displayUnit(Table table, UnitType unit){
         table.table(title -> {
-            title.addImage(unit.icon(Cicon.xlarge)).size(8 * 6);
+            title.image(unit.icon(Cicon.xlarge)).size(8 * 6);
             title.add("[accent]" + unit.localizedName).padLeft(5);
         });
 
         table.row();
 
-        table.addImage().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
+        table.image().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
 
         table.row();
 
@@ -147,7 +147,7 @@ public class ContentDisplay{
             table.add(unit.displayDescription()).padLeft(5).padRight(5).width(400f).wrap().fillX();
             table.row();
 
-            table.addImage().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
+            table.image().height(3).color(Color.lightGray).pad(15).padLeft(0).padRight(0).fillX();
             table.row();
         }
 

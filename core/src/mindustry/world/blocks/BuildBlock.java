@@ -36,7 +36,6 @@ public class BuildBlock extends Block{
         this.size = size;
         update = true;
         health = 20;
-        layer = Layer.placement;
         consumesTap = true;
         solidifes = true;
         buildBlocks[size - 1] = this;
@@ -170,33 +169,25 @@ public class BuildBlock extends Block{
 
         @Override
         public void draw(){
-            //When breaking, don't draw the previous block... since it's the thing you were breaking
-            if(cblock != null && previous == cblock){
-                return;
-            }
-
-            if(previous == null || cblock == null) return;
-
-            if(Core.atlas.isFound(previous.icon(Cicon.full))){
+            if(!(previous == null || cblock == null || previous == cblock) && Core.atlas.isFound(previous.icon(Cicon.full))){
                 Draw.rect(previous.icon(Cicon.full), x, y, previous.rotate ? tile.rotation() * 90 : 0);
             }
-        }
 
-        @Override
-        public void drawLayer(){
-            Shaders.blockbuild.color = Pal.accent;
+            Draw.draw(Layer.blockBuilding, () -> {
+                Shaders.blockbuild.color = Pal.accent;
 
-            Block target = cblock == null ? previous : cblock;
+                Block target = cblock == null ? previous : cblock;
 
-            if(target == null) return;
+                if(target != null){
+                    for(TextureRegion region : target.getGeneratedIcons()){
+                        Shaders.blockbuild.region = region;
+                        Shaders.blockbuild.progress = progress;
 
-            for(TextureRegion region : target.getGeneratedIcons()){
-                Shaders.blockbuild.region = region;
-                Shaders.blockbuild.progress = progress;
-
-                Draw.rect(region, x, y, target.rotate ? tile.rotation() * 90 : 0);
-                Draw.flush();
-            }
+                        Draw.rect(region, x, y, target.rotate ? tile.rotation() * 90 : 0);
+                        Draw.flush();
+                    }
+                }
+            });
         }
 
         public boolean construct(Unitc builder, @Nullable Tilec core, float amount, boolean configured){
