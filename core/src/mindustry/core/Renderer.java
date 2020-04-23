@@ -204,6 +204,8 @@ public class Renderer implements ApplicationListener{
             blocks.floor.endDraw();
         });
 
+        Draw.drawRange(Layer.blockBuilding, () -> Draw.shader(Shaders.blockbuild, false), () -> Draw.shader());
+
         if(state.rules.lighting){
             Draw.draw(Layer.light, lights::draw);
         }
