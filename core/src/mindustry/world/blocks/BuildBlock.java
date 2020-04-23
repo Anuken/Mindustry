@@ -169,14 +169,7 @@ public class BuildBlock extends Block{
 
         @Override
         public void draw(){
-            //When breaking, don't draw the previous block... since it's the thing you were breaking
-            if(cblock != null && previous == cblock){
-                return;
-            }
-
-            if(previous == null || cblock == null) return;
-
-            if(Core.atlas.isFound(previous.icon(Cicon.full))){
+            if(!(previous == null || cblock == null || previous == cblock) && Core.atlas.isFound(previous.icon(Cicon.full))){
                 Draw.rect(previous.icon(Cicon.full), x, y, previous.rotate ? tile.rotation() * 90 : 0);
             }
 
