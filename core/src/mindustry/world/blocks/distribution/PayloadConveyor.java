@@ -56,7 +56,7 @@ public class PayloadConveyor extends Block{
         }
     }
 
-    public class MassConveyorEntity extends TileEntity{
+    public class PayloadConveyorEntity extends TileEntity{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;
         public @Nullable Tilec next;

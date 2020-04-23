@@ -185,6 +185,8 @@ public class BlockRenderer implements Disposable{
             return;
         }
 
+        requests.clear();
+
         int minx = Math.max(avgx - rangex - expandr, 0);
         int miny = Math.max(avgy - rangey - expandr, 0);
         int maxx = Math.min(world.width() - 1, avgx + rangex + expandr);
