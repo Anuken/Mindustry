@@ -230,80 +230,27 @@ public class BlockRenderer implements Disposable{
 
             Draw.z(Layer.block);
 
-            block.drawBase(tile);
+            if(block != Blocks.air){
+                block.drawBase(tile);
 
-            if(entity != null){
-                if(entity.damaged()){
-                    entity.drawCracks();
-                }
+                if(entity != null){
+                    if(entity.damaged()){
+                        entity.drawCracks();
+                    }
 
-                if(entity.team() != player.team()){
-                    entity.drawTeam();
-                }
+                    if(entity.team() != player.team()){
+                        entity.drawTeam();
+                    }
 
-                entity.drawLight();
+                    entity.drawLight();
 
-                if(displayStatus && block.consumes.any()){
-                    entity.drawStatus();
+                    if(displayStatus && block.consumes.any()){
+                        entity.drawStatus();
+                    }
                 }
             }
         }
     }
-
-    /*
-    public void drawBlocks(Layer stopAt){
-        int startIdx = iterateidx;
-        for(; iterateidx < requestidx; iterateidx++){
-            BlockRequest request = requests.get(iterateidx);
-
-            if(request.layer.ordinal() > stopAt.ordinal()){
-                break;
-            }
-
-            if(request.layer == Layer.power){
-                if(iterateidx - startIdx > 0 && request.tile.pos() == requests.get(iterateidx - 1).tile.pos()){
-                    continue;
-                }
-            }
-
-            Block block = request.tile.block();
-            boolean isEnd = (request.layer == Layer.block && block.layer == null) || request.layer == block.layer;
-
-            if(request.layer == Layer.block){
-                block.drawBase(request.tile);
-                if(request.tile.entity != null && request.tile.entity.damaged()){
-                    request.tile.entity.drawCracks();
-                }
-                if(block.synthetic() && request.tile.entity != null && request.tile.team() != player.team()){
-                    request.tile.entity.drawTeam();
-                }
-
-            }else if(request.layer == Layer.lights && request.tile.entity != null){
-                request.tile.entity.drawLight();
-            }else if(request.layer == block.layer){
-                block.drawLayer(request.tile);
-            }else if(request.layer == block.layer2){
-                block.drawLayer2(request.tile);
-            }
-
-            if(isEnd && request.tile.entity != null && displayStatus && block.consumes.any()){
-                request.tile.entity.drawStatus();
-            }
-        }
-    }
-
-    private void addRequest(Tile tile, Layer layer){
-        if(requestidx >= requests.size){
-            requests.add(new BlockRequest());
-        }
-        BlockRequest r = requests.get(requestidx);
-        if(r == null){
-            requests.set(requestidx, r = new BlockRequest());
-        }
-        r.tile = tile;
-        r.layer = layer;
-        requestidx++;
-    }*/
 
     @Override
     public void dispose(){
