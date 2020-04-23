@@ -188,29 +188,38 @@ public class Renderer implements ApplicationListener{
 
         Draw.proj(camera);
 
+        blocks.floor.checkChanges();
+        blocks.processBlocks();
+
         Draw.sort(true);
 
         //beginFx();
 
-        drawBackground();
+        Draw.draw(Layer.background, this::drawBackground);
+        Draw.draw(Layer.floor, blocks.floor::drawFloor);
+        Draw.draw(Layer.block - 1, blocks::drawShadows);
+        Draw.draw(Layer.block, () -> {
+            blocks.floor.beginDraw();
+            blocks.floor.drawLayer(CacheLayer.walls);
+            blocks.floor.endDraw();
+        });
 
-        blocks.floor.checkChanges();
-        blocks.floor.drawFloor();
+        if(state.rules.lighting){
+            Draw.draw(Layer.light, lights::draw);
+        }
 
-        //Groups.drawFloor();
-        //Groups.drawFloorOver();
+        if(state.rules.drawDarkness){
+            Draw.draw(Layer.darkness, blocks::drawDarkness);
+        }
 
-        blocks.processBlocks();
-        blocks.drawShadows();
-        Draw.color();
-
-        blocks.floor.beginDraw();
-        blocks.floor.drawLayer(CacheLayer.walls);
-        blocks.floor.endDraw();
+        if(bloom != null){
+            Draw.draw(Layer.bullet - 0.001f, bloom::capture);
+            Draw.draw(Layer.effect + 0.001f, bloom::render);
+        }
 
         blocks.drawBlocks();
 
-        //draw stuff
+        Groups.draw.draw(Drawc::draw);
 
         Draw.reset();
         Draw.flush();

@@ -26,7 +26,7 @@ public class BlockRenderer implements Disposable{
 
     public final FloorRenderer floor = new FloorRenderer();
 
-    private Array<Tile> requests = new Array<>(initialRequests);
+    private Array<Tile> requests = new Array<>(false, initialRequests, Tile.class);
 
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private float brokenFade = 0f;
@@ -94,7 +94,7 @@ public class BlockRenderer implements Disposable{
         });
     }
 
-    public void drawFog(){
+    public void drawDarkness(){
         float ww = world.width() * tilesize, wh = world.height() * tilesize;
         float x = camera.position.x + tilesize / 2f, y = camera.position.y + tilesize / 2f;
         float u = (x - camera.width / 2f) / ww,
@@ -226,7 +226,10 @@ public class BlockRenderer implements Disposable{
             Block block = tile.block();
             Tilec entity = tile.entity;
 
+            Draw.z(Layer.block);
+
             block.drawBase(tile);
+
             if(entity != null){
                 if(entity.damaged()){
                     entity.drawCracks();

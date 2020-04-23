@@ -38,6 +38,9 @@ public class Layer{
     //building plans
     plans = 80,
 
+    //darkness over block clusters
+    darkness = 85,
+
     //flying units
     flyingUnit = 90,
 
