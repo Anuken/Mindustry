@@ -31,7 +31,6 @@ public class CoreBlock extends StorageBlock{
         flags = EnumSet.of(BlockFlag.core, BlockFlag.producer);
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
-        layer = Layer.overlay;
     }
 
     @Remote(called = Loc.server)

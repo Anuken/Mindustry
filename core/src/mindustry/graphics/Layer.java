@@ -20,6 +20,9 @@ public class Layer{
     //base block layer - most blocks go here
     block = 30,
 
+    //things drawn over blocks (intermediate layer)
+    blockOver = 35,
+
     //blocks currently in progress *shaders used* TODO perhaps put shaders into their own category
     blockBuilding = 40,
 

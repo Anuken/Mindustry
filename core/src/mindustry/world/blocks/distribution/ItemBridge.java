@@ -32,7 +32,6 @@ public class ItemBridge extends Block{
         update = true;
         solid = true;
         hasPower = true;
-        layer = Layer.power;
         expanded = true;
         itemCapacity = 10;
         configurable = true;

@@ -199,14 +199,6 @@ public class Block extends UnlockableContent{
         return sum / size / size;
     }
 
-    public void drawLayer(Tile tile){
-        if(tile.entity != null) tile.entity.drawLayer();
-    }
-
-    public void drawLayer2(Tile tile){
-        if(tile.entity != null) tile.entity.drawLayer2();
-    }
-
     /** Drawn when you are placing a block. */
     public void drawPlace(int x, int y, int rotation, boolean valid){
     }

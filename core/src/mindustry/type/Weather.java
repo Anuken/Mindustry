@@ -1,9 +1,11 @@
 package mindustry.type;
 
 import arc.func.*;
+import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 
 public abstract class Weather extends MappableContent{
     protected float duration = 100f;
@@ -39,7 +41,7 @@ public abstract class Weather extends MappableContent{
 
     @EntityDef(value = {Weatherc.class}, pooled = true, isFinal = false)
     @Component
-    abstract class WeatherComp implements Posc, DrawLayerWeatherc{
+    abstract class WeatherComp implements Posc, Drawc{
         Weather weather;
 
         void init(Weather weather){
@@ -47,7 +49,8 @@ public abstract class Weather extends MappableContent{
         }
 
         @Override
-        public void drawWeather(){
+        public void draw(){
+            Draw.z(Layer.weather);
             weather.draw();
         }
 

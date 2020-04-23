@@ -375,8 +375,6 @@ public class PowerNode extends PowerBlock{
         public void drawLayer(){
             if(Core.settings.getInt("lasersopacity") == 0) return;
 
-            Tilec entity = tile.ent();
-
             for(int i = 0; i < power.links.size; i++){
                 Tilec link = world.ent(power.links.get(i));
 
