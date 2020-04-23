@@ -6,7 +6,7 @@ precision mediump int;
 //shades of slag
 #define S2 vec3(100.0, 93.0, 49.0) / 100.0
 #define S1 vec3(100.0, 60.0, 25.0) / 100.0
-#define NSCALE 280.0 / 2.0
+#define NSCALE 200.0 / 2.0
 
 uniform sampler2D u_texture;
 uniform sampler2D u_noise;
@@ -24,13 +24,15 @@ void main(){
 
     float btime = u_time / 4000.0;
     float noise = (texture2D(u_noise, (coords) / NSCALE + vec2(btime) * vec2(-0.9, 0.8)).r + texture2D(u_noise, (coords) / NSCALE + vec2(btime * 1.1) * vec2(0.8, -1.0)).r) / 2.0;
-    vec3 color = texture2D(u_texture, c).rgb;
+    vec4 color = texture2D(u_texture, c);
 
-    if(noise > 0.6){
-        color = S2;
-    }else if(noise > 0.54){
-        color = S1;
+    if(color.a > 0.1){
+        if(noise > 0.6){
+            color.rgb = S2;
+        }else if (noise > 0.54){
+            color.rgb = S1;
+        }
     }
 
-    gl_FragColor = vec4(color.rgb, 1.0);
+    gl_FragColor = color;
 }

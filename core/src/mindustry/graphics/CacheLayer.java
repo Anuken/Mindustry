@@ -8,7 +8,6 @@ import arc.graphics.gl.*;
 import static mindustry.Vars.renderer;
 
 public enum CacheLayer{
-    //TODO water animation breaks when tar/slag is present
     water{
         @Override
         public void begin(){

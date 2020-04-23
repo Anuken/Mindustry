@@ -23,7 +23,7 @@ public class Layer{
     //things drawn over blocks (intermediate layer)
     blockOver = 35,
 
-    //blocks currently in progress *shaders used* TODO perhaps put shaders into their own category
+    //blocks currently in progress *shaders used*
     blockBuilding = 40,
 
     //ground units
