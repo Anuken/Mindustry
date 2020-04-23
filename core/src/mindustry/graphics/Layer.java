@@ -35,11 +35,11 @@ public class Layer{
     //power lines
     power = 70,
 
-    //building plans
-    plans = 80,
-
     //darkness over block clusters
-    darkness = 85,
+    darkness = 80,
+
+    //building plans
+    plans = 85,
 
     //flying units
     flyingUnit = 90,
