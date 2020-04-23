@@ -66,27 +66,27 @@ public class MapGenerateDialog extends FloatingDialog{
         shown(this::setup);
         addCloseButton();
         if(applied){
-            buttons.addButton("$editor.apply", () -> {
+            buttons.button("$editor.apply", () -> {
                 ui.loadAnd(() -> {
                     apply();
                     hide();
                 });
             }).size(160f, 64f);
         }else{
-            buttons.addButton("$settings.reset", () -> {
+            buttons.button("$settings.reset", () -> {
                 filters.set(maps.readFilters(""));
                 rebuildFilters();
                 update();
             }).size(160f, 64f);
         }
-        buttons.addButton("$editor.randomize", () -> {
+        buttons.button("$editor.randomize", () -> {
             for(GenerateFilter filter : filters){
                 filter.randomize();
             }
             update();
         }).size(160f, 64f);
 
-        buttons.addImageTextButton("$add", Icon.add, this::showAdd).height(64f).width(140f);
+        buttons.button("$add", Icon.add, this::showAdd).height(64f).width(140f);
 
         if(!applied){
             hidden(this::apply);
@@ -234,24 +234,24 @@ public class MapGenerateDialog extends FloatingDialog{
                     t.table(b -> {
                         ImageButtonStyle style = Styles.cleari;
                         b.defaults().size(50f);
-                        b.addImageButton(Icon.refresh, style, () -> {
+                        b.button(Icon.refresh, style, () -> {
                             filter.randomize();
                             update();
                         });
 
-                        b.addImageButton(Icon.upOpen, style, () -> {
+                        b.button(Icon.upOpen, style, () -> {
                             int idx = filters.indexOf(filter);
                             filters.swap(idx, Math.max(0, idx - 1));
                             rebuildFilters();
                             update();
                         });
-                        b.addImageButton(Icon.downOpen, style, () -> {
+                        b.button(Icon.downOpen, style, () -> {
                             int idx = filters.indexOf(filter);
                             filters.swap(idx, Math.min(filters.size - 1, idx + 1));
                             rebuildFilters();
                             update();
                         });
-                        b.addImageButton(Icon.trash, style, () -> {
+                        b.button(Icon.trash, style, () -> {
                             filters.remove(filter);
                             rebuildFilters();
                             update();
@@ -293,7 +293,7 @@ public class MapGenerateDialog extends FloatingDialog{
 
             if((!applied && filter.isBuffered()) || (filter.isPost() && applied)) continue;
 
-            selection.cont.addButton(filter.name(), () -> {
+            selection.cont.button(filter.name(), () -> {
                 filters.add(filter);
                 rebuildFilters();
                 update();
@@ -302,7 +302,7 @@ public class MapGenerateDialog extends FloatingDialog{
             if(++i % 2 == 0) selection.cont.row();
         }
 
-        selection.cont.addButton("$filter.defaultores", () -> {
+        selection.cont.button("$filter.defaultores", () -> {
             maps.addDefaultOres(filters);
             rebuildFilters();
             update();

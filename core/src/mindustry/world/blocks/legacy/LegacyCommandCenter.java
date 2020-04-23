@@ -2,9 +2,8 @@ package mindustry.world.blocks.legacy;
 
 import arc.util.io.*;
 import mindustry.gen.*;
-import mindustry.world.*;
 
-public class LegacyCommandCenter extends Block{
+public class LegacyCommandCenter extends LegacyBlock{
 
     public LegacyCommandCenter(String name){
         super(name);

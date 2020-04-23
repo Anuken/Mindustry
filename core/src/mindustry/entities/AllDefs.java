@@ -34,4 +34,9 @@ class AllDefs{
     class sync{
 
     }
+
+    @GroupDef(Drawc.class)
+    class draw{
+
+    }
 }

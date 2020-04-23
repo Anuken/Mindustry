@@ -29,7 +29,6 @@ public class CraterConveyor extends Block implements Autotiler{
 
         rotate = true;
         update = true;
-        layer = Layer.overlay;
         group = BlockGroup.transportation;
         hasItems = true;
         itemCapacity = 8;
@@ -87,13 +86,32 @@ public class CraterConveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
-            draw(blendbit1);
-            if(blendbit2 == 0) return;
-            draw(blendbit2);
-        }
+                               Draw.rect(regions[Mathf.clamp(blendbit1, 0, regions.length - 1)], x, y, tilesize * blendsclx, tilesize * blendscly, rotation() * 90);
+            if(blendbit2 != 0) Draw.rect(regions[Mathf.clamp(blendbit2, 0, regions.length - 1)], x, y, tilesize * blendsclx, tilesize * blendscly, rotation() * 90);;
 
-        private void draw(int bit){
-            Draw.rect(regions[Mathf.clamp(bit, 0, regions.length - 1)], x, y, tilesize * blendsclx, tilesize * blendscly, rotation() * 90);
+            Draw.z(Layer.blockOver);
+
+            if(link == -1) return;
+
+            // offset
+            Tile from = world.tile(link);
+            Tmp.v1.set(from);
+            Tmp.v2.set(tile);
+            Tmp.v1.interpolate(Tmp.v2, 1f - cooldown, Interpolation.linear);
+
+            // fixme
+            float a = (from.rotation()%4) * 90;
+            float b = (tile.rotation()%4) * 90;
+            if((from.rotation()%4) == 3 && (tile.rotation()%4) == 0) a = -1 * 90;
+            if((from.rotation()%4) == 0 && (tile.rotation()%4) == 3) a = 4 * 90;
+
+            // crater
+            Draw.rect(regions[7], Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interpolation.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
+
+            // item
+            float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);
+            Drawf.shadow(Tmp.v1.x, Tmp.v1.y, size * 1.2f);
+            Draw.rect(items.first().icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
         }
 
         @Override
@@ -155,31 +173,6 @@ public class CraterConveyor extends Block implements Autotiler{
                         }
                     }
                 }
-        }
-
-        @Override
-        public void drawLayer(){
-            if(link == -1) return;
-
-            // offset
-            Tile from = world.tile(link);
-            Tmp.v1.set(from);
-            Tmp.v2.set(tile);
-            Tmp.v1.interpolate(Tmp.v2, 1f - cooldown, Interpolation.linear);
-
-            // fixme
-            float a = (from.rotation()%4) * 90;
-            float b = (tile.rotation()%4) * 90;
-            if((from.rotation()%4) == 3 && (tile.rotation()%4) == 0) a = -1 * 90;
-            if((from.rotation()%4) == 0 && (tile.rotation()%4) == 3) a = 4 * 90;
-
-            // crater
-            Draw.rect(regions[7], Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interpolation.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
-
-            // item
-            float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);
-            Drawf.shadow(Tmp.v1.x, Tmp.v1.y, size * 1.2f);
-            Draw.rect(items.first().icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
         }
 
         @Override

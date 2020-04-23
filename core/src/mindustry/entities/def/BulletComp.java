@@ -1,5 +1,6 @@
 package mindustry.entities.def;
 
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
@@ -11,7 +12,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Bulletc.class}, pooled = true)
 @Component
-abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc, DrawLayerBulletsc{
+abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
     Object data;
     BulletType type;
     float damage;
@@ -109,6 +110,8 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public void draw(){
+        Draw.z(Layer.bullet);
+
         type.draw(this);
         //TODO refactor
         renderer.lights.add(x(), y(), 16f, Pal.powerLight, 0.3f);

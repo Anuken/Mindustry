@@ -205,9 +205,9 @@ public class PlacementFragment extends Fragment{
                             blockTable.row();
                         }
 
-                        ImageButton button = blockTable.addImageButton(new TextureRegionDrawable(block.icon(Cicon.medium)), Styles.selecti, () -> {
+                        ImageButton button = blockTable.button(new TextureRegionDrawable(block.icon(Cicon.medium)), Styles.selecti, () -> {
                             if(unlocked(block)){
-                                if(Core.input.keyDown(KeyCode.SHIFT_LEFT) && Fonts.getUnicode(block.name) != 0){
+                                if(Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(block.name) != 0){
                                     Core.app.setClipboardText((char)Fonts.getUnicode(block.name) + "");
                                     ui.showInfoFade("$copied");
                                 }else{
@@ -290,7 +290,7 @@ public class PlacementFragment extends Fragment{
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(unlocked(lastDisplay)){
-                                    header.addButton("?", Styles.clearPartialt, () -> {
+                                    header.button("?", Styles.clearPartialt, () -> {
                                         ui.content.show(lastDisplay);
                                         Events.fire(new BlockInfoEvent());
                                     }).size(8 * 5).padTop(-5).padRight(-5).right().grow().name("blockinfo");
@@ -304,7 +304,7 @@ public class PlacementFragment extends Fragment{
                                 for(ItemStack stack : lastDisplay.requirements){
                                     req.table(line -> {
                                         line.left();
-                                        line.addImage(stack.item.icon(Cicon.small)).size(8 * 2);
+                                        line.image(stack.item.icon(Cicon.small)).size(8 * 2);
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
                                         line.labelWrap(() -> {
                                             Tilec core = player.closestCore();
@@ -324,7 +324,7 @@ public class PlacementFragment extends Fragment{
                             if(state.rules.bannedBlocks.contains(lastDisplay) || !player.isBuilder()){
                                 topTable.row();
                                 topTable.table(b -> {
-                                    b.addImage(Icon.cancel).padRight(2).color(Color.scarlet);
+                                    b.image(Icon.cancel).padRight(2).color(Color.scarlet);
                                     b.add(!player.isBuilder() ? "$unit.nobuild" : "$banned");
                                     b.left();
                                 }).padTop(2).left();
@@ -350,7 +350,7 @@ public class PlacementFragment extends Fragment{
                     });
                 }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);
                 frame.row();
-                frame.addImage().color(Pal.gray).colspan(3).height(4).growX();
+                frame.image().color(Pal.gray).colspan(3).height(4).growX();
                 frame.row();
                 frame.table(Tex.pane2, blocksSelect -> {
                     blocksSelect.margin(4).marginTop(0);
@@ -390,11 +390,11 @@ public class PlacementFragment extends Fragment{
                         if(f++ % 2 == 0) categories.row();
 
                         if(categoryEmpty[cat.ordinal()]){
-                            categories.addImage(Styles.black6);
+                            categories.image(Styles.black6);
                             continue;
                         }
 
-                        categories.addImageButton(ui.getIcon(cat.name()), Styles.clearToggleTransi, () -> {
+                        categories.button(ui.getIcon(cat.name()), Styles.clearToggleTransi, () -> {
                             currentCategory = cat;
                             if(control.input.block != null){
                                 control.input.block = getSelectedBlock(currentCategory);

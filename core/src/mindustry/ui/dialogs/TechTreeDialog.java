@@ -63,7 +63,7 @@ public class TechTreeDialog extends FloatingDialog{
 
         addCloseButton();
 
-        buttons.addImageTextButton("$database", Icon.book, () -> {
+        buttons.button("$database", Icon.book, () -> {
             hide();
             ui.database.show();
         }).size(210f, 64f);
@@ -343,7 +343,7 @@ public class TechTreeDialog extends FloatingDialog{
             infoTable.table(b -> {
                 b.margin(0).left().defaults().left();
 
-                b.addImageButton(Icon.info, Styles.cleari, () -> ui.content.show(node.block)).growY().width(50f);
+                b.button(Icon.info, Styles.cleari, () -> ui.content.show(node.block)).growY().width(50f);
                 b.add().grow();
                 b.table(desc -> {
                     desc.left().defaults().left();
@@ -355,7 +355,7 @@ public class TechTreeDialog extends FloatingDialog{
                             for(ItemStack req : node.requirements){
                                 t.table(list -> {
                                     list.left();
-                                    list.addImage(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
+                                    list.image(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
                                     list.add(req.item.localizedName).color(Color.lightGray);
                                     list.label(() -> " " + Math.min(data.getItem(req.item), req.amount) + " / " + req.amount)
                                     .update(l -> l.setColor(data.has(req.item, req.amount) ? Color.lightGray : Color.scarlet));
@@ -370,7 +370,7 @@ public class TechTreeDialog extends FloatingDialog{
 
                 if(mobile && locked(node)){
                     b.row();
-                    b.addImageTextButton("$research", Icon.ok, Styles.nodet, () -> unlock(node))
+                    b.button("$research", Icon.ok, Styles.nodet, () -> unlock(node))
                     .disabled(i -> !data.hasItems(node.requirements)).growX().height(44f).colspan(3);
                 }
             });

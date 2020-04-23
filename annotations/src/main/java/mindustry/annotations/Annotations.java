@@ -5,21 +5,6 @@ import java.lang.annotation.*;
 public class Annotations{
     //region entity interfaces
 
-    public enum DrawLayer{
-        floor,
-        floorOver,
-        groundShadows,
-        groundUnder,
-        ground,
-        flyingShadows,
-        flying,
-        bullets,
-        effects,
-        overlays,
-        names,
-        weather
-    }
-
     /** Indicates that a method overrides other methods. */
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.SOURCE)

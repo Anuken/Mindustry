@@ -10,8 +10,8 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
-import mindustry.gen.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -36,7 +36,6 @@ public class Conveyor extends Block implements Autotiler{
         super(name);
         rotate = true;
         update = true;
-        layer = Layer.overlay;
         group = BlockGroup.transportation;
         hasItems = true;
         itemCapacity = 4;
@@ -129,6 +128,19 @@ public class Conveyor extends Block implements Autotiler{
             int frame = clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * timeScale())) % 4) : 0;
             Draw.rect(regions[Mathf.clamp(blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], x, y,
             tilesize * blendsclx, tilesize * blendscly, rotation * 90);
+
+            //TODO is clustering necessary? does it create garbage?
+            Draw.z(Layer.blockOver);
+
+            for(int i = 0; i < len; i++){
+                Item item = ids[i];
+                tr1.trns(rotation * 90, tilesize, 0);
+                tr2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
+
+                Draw.rect(item.icon(Cicon.medium),
+                (tile.x * tilesize + tr1.x * ys[i] + tr2.x),
+                (tile.y * tilesize + tr1.y * ys[i] + tr2.y), itemSize, itemSize);
+            }
         }
 
         @Override
@@ -149,21 +161,6 @@ public class Conveyor extends Block implements Autotiler{
                 next = tile.front();
                 nextc = next instanceof ConveyorEntity && next.team() == team ? (ConveyorEntity)next : null;
                 aligned = nextc != null && tile.rotation() == next.tile().rotation();
-            }
-        }
-
-        @Override
-        public void drawLayer(){
-            byte rotation = tile.rotation();
-
-            for(int i = 0; i < len; i++){
-                Item item = ids[i];
-                tr1.trns(rotation * 90, tilesize, 0);
-                tr2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
-
-                Draw.rect(item.icon(Cicon.medium),
-                (tile.x * tilesize + tr1.x * ys[i] + tr2.x),
-                (tile.y * tilesize + tr1.y * ys[i] + tr2.y), itemSize, itemSize);
             }
         }
 

@@ -13,6 +13,7 @@ import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
@@ -23,7 +24,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Playerc.class}, serialize = false)
 @Component
-abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
+abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Drawc{
     @NonNull @ReadOnly Unitc unit = Nulls.unit;
 
     @ReadOnly Team team = Team.sharded;
@@ -58,6 +59,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
         }
     }
 
+    @Override
+    public float clipSize(){
+        return 20;
+    }
+
+    @Override
     public void update(){
         if(unit.dead()){
             clearUnit();
@@ -130,7 +137,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc{
         con.kick(reason);
     }
 
-    void drawName(){
+    @Override
+    public void draw(){
+        Draw.z(Layer.playerName);
+
         BitmapFont font = Fonts.def;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         final float nameHeight = 11;

@@ -22,20 +22,10 @@ public class ShockMine extends Block{
         destructible = true;
         solid = false;
         targetable = false;
-        layer = Layer.overlay;
         rebuildable = false;
     }
 
     public class ShockMineEntity extends TileEntity{
-
-        @Override
-        public void drawLayer(){
-            super.draw();
-            Draw.color(team.color);
-            Draw.alpha(0.22f);
-            Fill.rect(x, y, 2f, 2f);
-            Draw.color();
-        }
 
         @Override
         public void drawTeam(){
@@ -44,7 +34,11 @@ public class ShockMine extends Block{
 
         @Override
         public void draw(){
-            //nope
+            super.draw();
+            Draw.color(team.color);
+            Draw.alpha(0.22f);
+            Fill.rect(x, y, 2f, 2f);
+            Draw.color();
         }
 
         @Override
