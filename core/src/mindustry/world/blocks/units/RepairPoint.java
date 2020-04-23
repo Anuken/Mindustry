@@ -31,8 +31,6 @@ public class RepairPoint extends Block{
         update = true;
         solid = true;
         flags = EnumSet.of(BlockFlag.repair);
-        layer = Layer.turret;
-        layer2 = Layer.power;
         hasPower = true;
         outlineIcon = true;
     }
@@ -75,17 +73,12 @@ public class RepairPoint extends Block{
         @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
-        }
 
-        @Override
-        public void drawLayer(){
+            Draw.z(Layer.turret);
             Draw.rect(region, x, y, rotation - 90);
-        }
 
-        @Override
-        public void drawLayer2(){
-            if(target != null &&
-            Angles.angleDist(angleTo(target), rotation) < 30f){
+            if(target != null && Angles.angleDist(angleTo(target), rotation) < 30f){
+                Draw.z(Layer.power);
                 float ang = angleTo(target);
                 float len = 5f;
 

@@ -36,7 +36,6 @@ public class BuildBlock extends Block{
         this.size = size;
         update = true;
         health = 20;
-        layer = Layer.placement;
         consumesTap = true;
         solidifes = true;
         buildBlocks[size - 1] = this;
@@ -180,23 +179,23 @@ public class BuildBlock extends Block{
             if(Core.atlas.isFound(previous.icon(Cicon.full))){
                 Draw.rect(previous.icon(Cicon.full), x, y, previous.rotate ? tile.rotation() * 90 : 0);
             }
-        }
 
-        @Override
-        public void drawLayer(){
-            Shaders.blockbuild.color = Pal.accent;
+            Draw.draw(Layer.blockBuilding, () -> {
+                Draw.shader(Shaders.blockbuild);
+                Shaders.blockbuild.color = Pal.accent;
 
-            Block target = cblock == null ? previous : cblock;
+                Block target = cblock == null ? previous : cblock;
 
-            if(target == null) return;
+                if(target == null) return;
 
-            for(TextureRegion region : target.getGeneratedIcons()){
-                Shaders.blockbuild.region = region;
-                Shaders.blockbuild.progress = progress;
+                for(TextureRegion region : target.getGeneratedIcons()){
+                    Shaders.blockbuild.region = region;
+                    Shaders.blockbuild.progress = progress;
 
-                Draw.rect(region, x, y, target.rotate ? tile.rotation() * 90 : 0);
-                Draw.flush();
-            }
+                    Draw.rect(region, x, y, target.rotate ? tile.rotation() * 90 : 0);
+                    Draw.flush();
+                }
+            });
         }
 
         public boolean construct(Unitc builder, @Nullable Tilec core, float amount, boolean configured){

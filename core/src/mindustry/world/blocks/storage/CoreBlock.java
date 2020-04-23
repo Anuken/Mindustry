@@ -193,8 +193,11 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public void drawLayer(){
+        public void draw(){
+            super.draw();
+
             if(heat > 0.001f){
+                Draw.z(Layer.blockOver);
                 Drawf.drawRespawn(this, heat, progress, time, unitType, lastRequested);
             }
         }

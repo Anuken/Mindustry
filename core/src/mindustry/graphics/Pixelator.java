@@ -6,7 +6,6 @@ import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.util.*;
-import mindustry.gen.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.renderer;
@@ -44,7 +43,8 @@ public class Pixelator implements Disposable{
         Draw.rect(buffer);
         Draw.blend();
 
-        Groups.drawNames();
+        //TODO set all of this up
+        //Groups.drawNames();
 
         Core.camera.position.set(px, py);
         renderer.setScale(pre);
