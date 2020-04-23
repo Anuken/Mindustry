@@ -248,6 +248,7 @@ public class BlockRenderer implements Disposable{
                         entity.drawStatus();
                     }
                 }
+                Draw.reset();
             }
         }
     }
