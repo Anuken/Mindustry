@@ -60,7 +60,7 @@ public class LightBlock extends Block{
 
         @Override
         public void drawLight(){
-            renderer.lights.add(x, y, radius, Tmp.c1.set(color), brightness * efficiency());
+            Drawf.light(x, y, radius, Tmp.c1.set(color), brightness * efficiency());
         }
 
         @Override

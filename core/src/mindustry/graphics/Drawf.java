@@ -17,6 +17,26 @@ import static mindustry.Vars.*;
 
 public class Drawf{
 
+    public static void light(float x, float y, float radius, Color color, float opacity){
+        renderer.lights.add(x, y, radius, color, opacity);
+    }
+
+    public static void light(Position pos, float radius, Color color, float opacity){
+       light(pos.getX(), pos.getY(), radius, color, opacity);
+    }
+
+    public static void light(float x, float y, TextureRegion region, Color color, float opacity){
+        renderer.lights.add(x, y, region, color, opacity);
+    }
+
+    public static void light(float x, float y, float x2, float y2){
+        renderer.lights.line(x, y, x2, y2, 30, Color.orange, 0.3f);
+    }
+
+    public static void light(float x, float y, float x2, float y2, float stroke, Color tint, float alpha){
+        renderer.lights.line(x, y, x2, y2, stroke, tint, alpha);
+    }
+
     public static void selected(int x, int y, Block block, Color color){
         Draw.color(color);
         for(int i = 0; i < 4; i++){
@@ -104,7 +124,7 @@ public class Drawf{
         Lines.precise(false);
         Lines.stroke(1f);
 
-        renderer.lights.line(x, y, x2, y2);
+        Drawf.light(x, y, x2, y2);
     }
 
     public static void tri(float x, float y, float width, float length, float rotation){

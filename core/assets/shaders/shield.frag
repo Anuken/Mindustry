@@ -29,7 +29,7 @@ void main() {
 	vec4 color = texture2D(u_texture, T);
 	vec2 v = vec2(1.0/u_texsize.x, 1.0/u_texsize.y);
 
-	if(texture2D(u_texture, T).a < 0.2 &&
+	if(texture2D(u_texture, T).a < 0.9 &&
        		(texture2D(u_texture, T + vec2(0, step) * v).a > 0.0 || texture2D(u_texture, T + vec2(0, -step) * v).a > 0.0 ||
        		texture2D(u_texture, T + vec2(step, 0) * v).a > 0.0 || texture2D(u_texture, T + vec2(-step, 0) * v).a > 0.0)){
 

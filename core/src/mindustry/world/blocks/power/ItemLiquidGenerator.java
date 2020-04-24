@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -180,7 +181,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
         @Override
         public void drawLight(){
-            renderer.lights.add(x, y, (60f + Mathf.absin(10f, 5f)) * productionEfficiency * size, Color.orange, 0.5f);
+            Drawf.light(x, y, (60f + Mathf.absin(10f, 5f)) * productionEfficiency * size, Color.orange, 0.5f);
         }
     }
 }

@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -111,7 +110,7 @@ abstract class PuddleComp implements Posc, Puddlec{
         if(liquid.lightColor.a > 0.001f && f > 0){
             Color color = liquid.lightColor;
             float opacity = color.a * f;
-            Vars.renderer.lights.add(tile.drawx(), tile.drawy(),  30f * f, color, opacity * 0.8f);
+            Drawf.light(tile.drawx(), tile.drawy(),  30f * f, color, opacity * 0.8f);
         }
     }
 

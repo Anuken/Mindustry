@@ -114,7 +114,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
         type.draw(this);
         //TODO refactor
-        renderer.lights.add(x(), y(), 16f, Pal.powerLight, 0.3f);
+        Drawf.light(x(), y(), 16f, Pal.powerLight, 0.3f);
     }
 
     /** Sets the bullet's rotation in degrees. */

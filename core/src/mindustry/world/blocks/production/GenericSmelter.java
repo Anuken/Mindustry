@@ -5,8 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-
-import static mindustry.Vars.renderer;
+import mindustry.graphics.*;
 
 /** A GenericCrafter with a new glowing region drawn on top. */
 public class GenericSmelter extends GenericCrafter{
@@ -48,7 +47,7 @@ public class GenericSmelter extends GenericCrafter{
 
         @Override
         public void drawLight(){
-            renderer.lights.add(x, y, (60f + Mathf.absin(10f, 5f)) * warmup * size, flameColor, 0.65f);
+            Drawf.light(x, y, (60f + Mathf.absin(10f, 5f)) * warmup * size, flameColor, 0.65f);
         }
     }
 }

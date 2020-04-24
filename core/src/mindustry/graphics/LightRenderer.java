@@ -26,10 +26,6 @@ public class LightRenderer{
         lights.add(run);
     }
 
-    public void add(Position pos, float radius, Color color, float opacity){
-        add(pos.getX(), pos.getY(), radius, color, opacity);
-    }
-
     public void add(float x, float y, float radius, Color color, float opacity){
         if(!enabled()) return;
 
@@ -50,10 +46,6 @@ public class LightRenderer{
             Draw.alpha(opacity);
             Draw.rect(region, x, y);
         });
-    }
-
-    public void line(float x, float y, float x2, float y2){
-        line(x, y, x2, y2, 30, Color.orange, 0.3f);
     }
 
     public void line(float x, float y, float x2, float y2, float stroke, Color tint, float alpha){

@@ -72,7 +72,7 @@ public class OverdriveProjector extends Block{
 
         @Override
         public void drawLight(){
-            renderer.lights.add(x, y, 50f * efficiency(), baseColor, 0.7f * efficiency());
+            Drawf.light(x, y, 50f * efficiency(), baseColor, 0.7f * efficiency());
         }
 
         @Override

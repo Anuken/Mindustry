@@ -490,7 +490,7 @@ public class Fx{
 
         color();
 
-        renderer.lights.add(e.x, e.y, 20f * e.fslope(), Pal.lightFlame, 0.5f);
+        Drawf.light(e.x, e.y, 20f * e.fslope(), Pal.lightFlame, 0.5f);
     }),
 
     fireSmoke = new Effect(35f, e -> {
