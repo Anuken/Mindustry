@@ -36,19 +36,7 @@ import java.lang.reflect.*;
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     private ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
-    private StringMap legacyUnitMap = StringMap.of(
-    "Dagger", "GroundUnit",
-    "Eruptor", "GroundUnit",
-    "Titan", "GroundUnit",
-    "Fortress", "GroundUnit",
-    "Crawler", "GroundUnit",
-    "Revenant", "HoverUnit",
-    "Draug", "MinerDrone",
-    "Phantom", "BuilderDrone",
-    "Spirit", "RepairDrone",
-    "Wraith", "FlyingUnit",
-    "Ghoul", "FlyingUnit"
-    );
+
     private ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
         put(Effect.class, (type, data) -> field(Fx.class, data));
         put(Schematic.class, (type, data) -> {
@@ -289,11 +277,10 @@ public class ContentParser{
         ContentType.unit, (TypeParser<UnitType>)(mod, name, value) -> {
             readBundle(ContentType.unit, name, value);
 
-            //TODO fix
             UnitType unit;
             if(locate(ContentType.unit, name) == null){
-                Class<Unitc> type = resolve(legacyUnitMap.get(Strings.capitalize(getType(value)), getType(value)), "mindustry.entities.type.base");
                 unit = new UnitType(mod + "-" + name);
+                unit.constructor = Reflect.cons(resolve(Strings.capitalize(getType(value)), "mindustry.gen"));
             }else{
                 unit = locate(ContentType.unit, name);
             }
