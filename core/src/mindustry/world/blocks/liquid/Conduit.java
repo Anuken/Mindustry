@@ -88,28 +88,26 @@ public class Conduit extends LiquidBlock implements Autotiler{
         public float smoothLiquid;
         int blendbits;
 
+        protected void drawer(int blendbits2, float x2, float y2, float rotation2){
+            Draw.colorl(0.34f);
+            Draw.rect(botRegions[blendbits2], x2, y2, rotation2);
+
+            Draw.color(liquids.current().color);
+            Draw.alpha(smoothLiquid);
+            Draw.rect(botRegions[blendbits2], x2, y2, rotation2);
+            Draw.color();
+
+            Draw.rect(topRegions[blendbits2], x2, y2, rotation2);
+        }
+
         @Override
         public void draw(){
-
-            Runnable recursive = () -> { // todo, differently
-                int rotation = rotation() * 90;
-
-                Draw.colorl(0.34f);
-                Draw.rect(botRegions[blendbits], x, y, rotation);
-
-                Draw.color(liquids.current().color);
-                Draw.alpha(smoothLiquid);
-                Draw.rect(botRegions[blendbits], x, y, rotation);
-                Draw.color();
-
-                Draw.rect(topRegions[blendbits], x, y, rotation);
-            };
-
-            recursive.run();
+            drawer(blendbits, x, y, rotation() * 90);
 
             Draw.z(Layer.lawn);
 
             if(front() != null && front().block().hasLiquids && !(front().block() instanceof Conduit)){
+
                 float x2 = 0;
                 float y2 = 0;
 
@@ -118,13 +116,11 @@ public class Conduit extends LiquidBlock implements Autotiler{
                 if(rotation() == 2) x2 -= 6;
                 if(rotation() == 3) y2 -= 6;
 
-                x += x2;
-                y += y2;
-
-                top50(botRegions[blendbits], () -> top50(topRegions[blendbits], this::draw));
-
-                x -= x2;
-                y -= y2;
+                float finalX = x2;
+                float finalY = y2;
+                top50(botRegions[blendbits], () -> top50(topRegions[blendbits], () -> {
+                    drawer(0, x + finalX, y + finalY, rotation() * 90);
+                }));
             }
 
             upstream(t -> {
@@ -158,17 +154,12 @@ public class Conduit extends LiquidBlock implements Autotiler{
                         rotation2 = 3;
                     }
 
-                    x += x2;
-                    y += y2;
-                    rotation(rotation() + rotation2);
-
-                    int bit = blendbits;
-                    bot50(botRegions[blendbits = 0], () -> bot50(topRegions[blendbits = 0], recursive));
-                    blendbits = bit;
-
-                    rotation(rotation() - rotation2);
-                    y -= y2;
-                    x -= x2;
+                    float finalX = x2;
+                    float finalY = y2;
+                    int finalRotation = rotation2;
+                    bot50(botRegions[blendbits], () -> bot50(topRegions[blendbits], () -> {
+                        drawer(0, x + finalX, y + finalY, (rotation() + finalRotation) * 90);
+                    }));
                 }
             });
         }
