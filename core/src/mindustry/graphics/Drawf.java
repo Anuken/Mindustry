@@ -17,6 +17,15 @@ import static mindustry.Vars.*;
 
 public class Drawf{
 
+    public static float text(){
+        float z = Draw.z();
+        if(renderer.pixelator.enabled()){
+            Draw.z(Layer.endPixeled);
+        }
+
+        return z;
+    }
+
     public static void light(float x, float y, float radius, Color color, float opacity){
         renderer.lights.add(x, y, radius, color, opacity);
     }

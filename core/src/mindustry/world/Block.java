@@ -230,6 +230,7 @@ public class Block extends UnlockableContent{
         font.getData().setScale(1f);
         Draw.reset();
         Pools.free(layout);
+
         return width;
     }
 

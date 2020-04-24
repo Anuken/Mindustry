@@ -140,6 +140,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     @Override
     public void draw(){
         Draw.z(Layer.playerName);
+        float z = Drawf.text();
 
         BitmapFont font = Fonts.def;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
@@ -185,6 +186,8 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         font.getData().setScale(1f);
         font.setColor(Color.white);
         font.setUseIntegerPositions(ints);
+
+        Draw.z(z);
     }
 
     void sendMessage(String text){

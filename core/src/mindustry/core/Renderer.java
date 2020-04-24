@@ -194,6 +194,10 @@ public class Renderer implements ApplicationListener{
 
         Draw.sort(true);
 
+        if(pixelator.enabled()){
+            pixelator.register();
+        }
+
         //TODO fx
 
         Draw.draw(Layer.background, this::drawBackground);
@@ -220,6 +224,7 @@ public class Renderer implements ApplicationListener{
             Draw.draw(Layer.effect + 0.001f, bloom::render);
         }
 
+        Draw.z(Layer.plans);
         Draw.draw(Layer.plans, overlays::drawBottom);
 
         if(settings.getBool("animatedshields")){
@@ -244,7 +249,6 @@ public class Renderer implements ApplicationListener{
         Draw.reset();
         Draw.flush();
         Draw.sort(false);
-
     }
 
     private void drawBackground(){

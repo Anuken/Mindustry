@@ -96,12 +96,10 @@ public class MinimapRenderer implements Disposable{
             Draw.rect(unit.type().region, x + rx, y + ry, scale, scale, unit.rotation() - 90);
             Draw.reset();
 
-            if(withLabels && unit instanceof Playerc){
-                Playerc pl = (Playerc) unit;
-                if(!pl.isLocal()){
-                    // Only display names for other players.
-                    drawLabel(x + rx, y + ry, pl.name(), unit.team().color);
-                }
+            //only disable player names in multiplayer
+            if(withLabels && unit instanceof Playerc && net.active()){
+                Playerc pl = (Playerc)unit;
+                drawLabel(x + rx, y + ry, pl.name(), unit.team().color);
             }
         }
 

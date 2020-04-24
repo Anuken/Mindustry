@@ -66,7 +66,13 @@ public class Layer{
     playerName = 150,
 
     //space effects, currently only the land and launch effects
-    space = 160
+    space = 160,
+
+    //the end of all layers
+    end = 200,
+
+    //things after pixelation - used for text
+    endPixeled = 210
 
     ;
 }

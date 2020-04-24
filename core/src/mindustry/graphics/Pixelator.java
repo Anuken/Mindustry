@@ -12,13 +12,14 @@ import static mindustry.Vars.renderer;
 
 public class Pixelator implements Disposable{
     private FrameBuffer buffer = new FrameBuffer();
+    private float px, py, pre;
 
     {
         buffer.getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
     }
 
     public void drawPixelate(){
-        float pre = renderer.getScale();
+        pre = renderer.getScale();
         float scale = renderer.getScale();
         scale = (int)scale;
         renderer.setScale(scale);
@@ -27,7 +28,8 @@ public class Pixelator implements Disposable{
 
         graphics.clear(0f, 0f, 0f, 1f);
 
-        float px = Core.camera.position.x, py = Core.camera.position.y;
+        px = Core.camera.position.x;
+        py = Core.camera.position.y;
         Core.camera.position.set((int)px + ((int)(camera.width) % 2 == 0 ? 0 : 0.5f), (int)py + ((int)(camera.height) % 2 == 0 ? 0 : 0.5f));
 
         int w = (int)(Core.camera.width * renderer.landScale());
@@ -37,17 +39,19 @@ public class Pixelator implements Disposable{
 
         buffer.begin();
         renderer.draw();
-        buffer.end();
+    }
 
-        Draw.blend(Blending.disabled);
-        Draw.rect(buffer);
-        Draw.blend();
+    public void register(){
+        Draw.draw(Layer.end, () -> {
+            buffer.end();
 
-        //TODO set all of this up
-        //Groups.drawNames();
+            Draw.blend(Blending.disabled);
+            Draw.rect(buffer);
+            Draw.blend();
 
-        Core.camera.position.set(px, py);
-        renderer.setScale(pre);
+            Core.camera.position.set(px, py);
+            renderer.setScale(pre);
+        });
     }
 
     public boolean enabled(){
