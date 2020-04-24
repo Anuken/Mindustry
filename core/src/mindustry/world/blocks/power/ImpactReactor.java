@@ -38,6 +38,12 @@ public class ImpactReactor extends PowerGenerator{
         outputsPower = consumesPower = true;
         bottomRegion = reg("-bottom");
         plasmaRegions = new int[plasmas];
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
         for(int i = 0; i < plasmas; i++){
             plasmaRegions[i] = reg("-plasma-" + i);
         }

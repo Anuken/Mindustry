@@ -1,9 +1,11 @@
 package mindustry.world.blocks.production;
 
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
@@ -46,6 +48,7 @@ public class PayloadAcceptor extends Block{
 
         public void drawPayload(){
             if(payload != null){
+                Draw.z(Layer.blockOver);
                 payload.draw(x + inputVector.x, y + inputVector.y, inputRotation);
             }
         }

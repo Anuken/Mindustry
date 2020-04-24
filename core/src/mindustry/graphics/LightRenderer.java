@@ -53,12 +53,15 @@ public class LightRenderer{
     }
 
     public void line(float x, float y, float x2, float y2){
+        line(x, y, x2, y2, 30, Color.orange, 0.3f);
+    }
+
+    public void line(float x, float y, float x2, float y2, float stroke, Color tint, float alpha){
         if(!enabled()) return;
 
         add(() -> {
-            Draw.color(Color.orange, 0.3f);
+            Draw.color(tint, alpha);
 
-            float stroke = 30f;
             float rot = Mathf.angleExact(x2 - x, y2 - y);
             TextureRegion ledge = Core.atlas.find("circle-end"), lmid = Core.atlas.find("circle-mid");
 

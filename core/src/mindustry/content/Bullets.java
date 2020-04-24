@@ -537,6 +537,10 @@ public class Bullets implements ContentList{
                         Lines.lineAngle(b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], CapStyle.none);
                     }
                 }
+
+                Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
+
+                renderer.lights.line(b.x(), b.y(), b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 40, Color.orange, 0.7f);
                 Draw.reset();
             }
         };
