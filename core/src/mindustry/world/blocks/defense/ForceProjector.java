@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
@@ -29,18 +30,14 @@ public class ForceProjector extends Block{
     public float basePowerDraw = 0.2f;
     public TextureRegion topRegion;
 
-    private static Tile paramTile;
-    private static ForceProjector paramBlock;
     private static ForceProjectorEntity paramEntity;
     private static Cons<Shielderc> shieldConsumer = trait -> {
-        //TODO implement
-        /*
-        if(trait.team() != paramteam && Intersector.isInsideHexagon(trait.x(), trait.y(), paramEntity.realRadius() * 2f, paramx, paramy)){
+        if(trait.team() != paramEntity.team() && Intersector.isInsideHexagon(paramEntity.x(), paramEntity.y(), paramEntity.realRadius() * 2f, trait.x(), trait.y())){
             trait.absorb();
             Fx.absorb.at(trait);
-            paramhit = 1f;
-            parambuildup += trait.damage() * paramwarmup;
-        }*/
+            paramEntity.hit = 1f;
+            paramEntity.buildup += trait.damage() * paramEntity.warmup;
+        }
     };
 
     public ForceProjector(String name){
@@ -84,7 +81,6 @@ public class ForceProjector extends Block{
     }
 
     public class ForceProjectorEntity extends TileEntity{
-        ShieldEntity shield;
         boolean broken = true;
         float buildup = 0f;
         float radscl = 0f;
@@ -94,12 +90,6 @@ public class ForceProjector extends Block{
 
         @Override
         public void updateTile(){
-            if(shield == null){
-                //TODO implement
-                //shield = new ShieldEntity(tile);
-                //shield.add();
-            }
-
             boolean phaseValid = consumes.get(ConsumeType.item).valid(tile.entity);
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
@@ -143,10 +133,10 @@ public class ForceProjector extends Block{
 
             float realRadius = realRadius();
 
-            paramTile = tile;
-            paramEntity = this;
-            paramBlock = ForceProjector.this;
-            Groups.bullet.intersect(x - realRadius, y - realRadius, realRadius*2f, realRadius * 2f, shieldConsumer);
+            if(realRadius > 0 && !broken){
+                paramEntity = this;
+                Groups.bullet.intersect(x - realRadius, y - realRadius, realRadius * 2f, realRadius * 2f, shieldConsumer);
+            }
         }
 
         float realRadius(){
@@ -157,11 +147,40 @@ public class ForceProjector extends Block{
         public void draw(){
             super.draw();
 
-            if(buildup <= 0f) return;
-            Draw.alpha(buildup / breakage * 0.75f);
-            Draw.blend(Blending.additive);
-            Draw.rect(topRegion, x, y);
-            Draw.blend();
+            if(buildup > 0f){
+                Draw.alpha(buildup / breakage * 0.75f);
+                Draw.blend(Blending.additive);
+                Draw.rect(topRegion, x, y);
+                Draw.blend();
+                Draw.reset();
+            }
+
+            if(!broken){
+                float radius = realRadius();
+
+                Draw.z(Layer.shields);
+
+                Draw.color(Pal.accent);
+
+                if(Core.settings.getBool("animatedshields")){
+                    Fill.poly(x, y, 6, radius);
+
+                    Draw.z(Layer.shields + 0.1f);
+
+                    Draw.color(Color.white);
+                    Draw.alpha(hit);
+                    Fill.poly(x, y, 6, radius);
+                    Draw.color();
+                }else{
+                    Lines.stroke(1.5f);
+                    Draw.alpha(0.09f + 0.08f * hit);
+                    Fill.poly(x, y, 6, radius);
+                    Draw.alpha(1f);
+                    Lines.poly(x, y, 6, radius);
+                    Draw.reset();
+                }
+            }
+
             Draw.reset();
         }
 
@@ -185,68 +204,4 @@ public class ForceProjector extends Block{
             phaseHeat = read.f();
         }
     }
-
-    //TODO fix
-    class ShieldEntity{
-
-    }
-    /*
-    //@EntityDef({Drawc.class})
-    //class ShieldDef{}
-
-    public class ShieldEntity extends BaseEntity implements DrawTrait{
-        final ForceEntity entity;
-
-        public ShieldEntity(){
-            this.entity = tile.ent();
-            set(x, y);
-        }
-
-        @Override
-        public void update(){
-            if(isDead() || !isAdded()){
-                remove();
-            }
-        }
-
-        @Override
-        public float drawSize(){
-            return realRadius(entity) * 2f + 2f;
-        }
-
-        @Override
-        public void draw(){
-            Draw.color(Pal.accent);
-            Fill.poly(x, y, 6, realRadius(entity));
-            Draw.color();
-        }
-
-        public void drawOver(){
-            if(hit <= 0f) return;
-
-            Draw.color(Color.white);
-            Draw.alpha(hit);
-            Fill.poly(x, y, 6, realRadius(entity));
-            Draw.color();
-        }
-
-        public void drawSimple(){
-            if(realRadius(entity) < 0.5f) return;
-
-            float rad = realRadius(entity);
-
-            Draw.color(Pal.accent);
-            Lines.stroke(1.5f);
-            Draw.alpha(0.09f + 0.08f * hit);
-            Fill.poly(x, y, 6, rad);
-            Draw.alpha(1f);
-            Lines.poly(x, y, 6, rad);
-            Draw.reset();
-        }
-
-        @Override
-        public EntityGroup targetGroup(){
-            return shieldGroup;
-        }
-    }*/
 }

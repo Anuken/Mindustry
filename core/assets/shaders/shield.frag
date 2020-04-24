@@ -29,14 +29,14 @@ void main() {
 	vec4 color = texture2D(u_texture, T);
 	vec2 v = vec2(1.0/u_texsize.x, 1.0/u_texsize.y);
 
-	if(texture2D(u_texture, T).a < 0.1 &&
-       		(texture2D(u_texture, T + vec2(0, step) * v).a > 0.1 || texture2D(u_texture, T + vec2(0, -step) * v).a > 0.1 ||
-       		texture2D(u_texture, T + vec2(step, 0) * v).a > 0.1 || texture2D(u_texture, T + vec2(-step, 0) * v).a > 0.1)){
+	if(texture2D(u_texture, T).a < 0.2 &&
+       		(texture2D(u_texture, T + vec2(0, step) * v).a > 0.0 || texture2D(u_texture, T + vec2(0, -step) * v).a > 0.0 ||
+       		texture2D(u_texture, T + vec2(step, 0) * v).a > 0.0 || texture2D(u_texture, T + vec2(-step, 0) * v).a > 0.0)){
 
 		gl_FragColor = mix(v_color, vec4(1.0), si);
 	}else{
 
-	    if(color.a > 0.1){
+	    if(color.a > 0.0){
 	        if(mod(coords.x / u_dp + coords.y / u_dp + sin(floor(coords.x / u_dp) / 5.0) * 3.0 + sin(floor(coords.y / u_dp) / 5.0) * 3.0  + u_time / 4.0, 10.0) < 2.0){
 	            color *= 1.65;
 	        }

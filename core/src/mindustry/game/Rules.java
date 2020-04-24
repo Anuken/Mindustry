@@ -25,8 +25,6 @@ public class Rules{
     public boolean enemyCheat;
     /** Whether the game objective is PvP. Note that this enables automatic hosting. */
     public boolean pvp;
-    /** Whether enemy units drop random items on death. */
-    public boolean unitDrops = true;
     /** Whether reactors can explode and damage other blocks. */
     public boolean reactorExplosions = true;
     /** How fast unit pads build units. */

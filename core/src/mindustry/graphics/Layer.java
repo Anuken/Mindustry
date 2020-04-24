@@ -53,6 +53,9 @@ public class Layer{
     //overlaied UI, like block config guides
     overlayUI = 120,
 
+    //shield effects
+    shields = 125,
+
     //weather effects, e.g. rain and snow TODO draw before overlay UI?
     weather = 130,
 
