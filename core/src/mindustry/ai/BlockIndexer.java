@@ -321,7 +321,7 @@ public class BlockIndexer{
         int quadrantY = tile.y / quadrantSize;
         itemSet.clear();
 
-        Tile rounded = world.tile(Mathf.clamp(quadrantX * quadrantSize + quadrantSize / 2, 0, world.width() - 1), Mathf.clamp(quadrantY * quadrantSize + quadrantSize / 2, 0, world.height() - 1));
+        Tile rounded = world.rawTile(Mathf.clamp(quadrantX * quadrantSize + quadrantSize / 2, 0, world.width() - 1), Mathf.clamp(quadrantY * quadrantSize + quadrantSize / 2, 0, world.height() - 1));
 
         //find all items that this quadrant contains
         for(int x = Math.max(0, rounded.x - quadrantSize / 2); x < rounded.x + quadrantSize / 2 && x < world.width(); x++){

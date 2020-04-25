@@ -287,7 +287,7 @@ public class Control implements ApplicationListener, Loadable{
 
     public void playTutorial(){
         //TODO implement
-        ui.showInfo("death");
+        //ui.showInfo("death");
         /*
         Zone zone = Zones.groundZero;
         ui.loadAnd(() -> {

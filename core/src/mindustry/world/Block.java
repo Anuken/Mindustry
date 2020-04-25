@@ -179,6 +179,7 @@ public class Block extends UnlockableContent{
     public Block(String name){
         super(name);
         this.solid = false;
+        initEntity();
     }
 
     //TODO rename to draw() once class refactoring is done.
@@ -507,25 +508,7 @@ public class Block extends UnlockableContent{
         Arrays.sort(requirements, Structs.comparingInt(i -> i.item.id));
     }
 
-    @Override
-    public void displayInfo(Table table){
-        ContentDisplay.displayBlock(table, this);
-    }
-
-    @Override
-    public ContentType getContentType(){
-        return ContentType.block;
-    }
-
-    /** Called after all blocks are created. */
-    @Override
-    @CallSuper
-    public void init(){
-        //initialize default health based on size
-        if(health == -1){
-            health = size * size * 40;
-        }
-
+    protected void initEntity(){
         if(entityType == null){
 
             //attempt to find the first declared class and use it as the entity type
@@ -562,6 +545,26 @@ public class Block extends UnlockableContent{
                 //assign default value
                 entityType = TileEntity::create;
             }
+        }
+    }
+
+    @Override
+    public void displayInfo(Table table){
+        ContentDisplay.displayBlock(table, this);
+    }
+
+    @Override
+    public ContentType getContentType(){
+        return ContentType.block;
+    }
+
+    /** Called after all blocks are created. */
+    @Override
+    @CallSuper
+    public void init(){
+        //initialize default health based on size
+        if(health == -1){
+            health = size * size * 40;
         }
 
         buildCost = 0f;
