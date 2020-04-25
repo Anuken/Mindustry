@@ -149,26 +149,29 @@ public class UnitFactory extends Block{
             if(currentPlan != -1){
                 UnitPlan plan = plans[currentPlan];
 
-                TextureRegion region = plan.unit.icon(Cicon.full);
+                Draw.draw(Layer.blockOver, () -> {
+                    TextureRegion region = plan.unit.icon(Cicon.full);
 
-                Shaders.build.region = region;
-                Shaders.build.progress = progress / plan.time;
-                Shaders.build.color.set(Pal.accent);
-                Shaders.build.color.a = speedScl;
-                Shaders.build.time = -time / 20f;
+                    Shaders.build.region = region;
+                    Shaders.build.progress = progress / plan.time;
+                    Shaders.build.color.set(Pal.accent);
+                    Shaders.build.color.a = speedScl;
+                    Shaders.build.time = -time / 20f;
 
-                Draw.shader(Shaders.build);
-                Draw.rect(region, x, y);
-                Draw.shader();
+                    Draw.shader(Shaders.build);
+                    Draw.rect(region, x, y);
+                    Draw.shader();
 
-                Draw.color(Pal.accent);
-                Draw.alpha(speedScl);
+                    Draw.color(Pal.accent);
+                    Draw.alpha(speedScl);
 
-                Lines.lineAngleCenter(x + Mathf.sin(time, 20f, Vars.tilesize / 2f * size - 2f), y, 90, size * Vars.tilesize - 4f);
+                    Lines.lineAngleCenter(x + Mathf.sin(time, 20f, Vars.tilesize / 2f * size - 2f), y, 90, size * Vars.tilesize - 4f);
 
-                Draw.reset();
+                    Draw.reset();
+                });
             }
 
+            Draw.z(Layer.blockOver);
             Draw.rect(topRegion, x, y);
         }
 
