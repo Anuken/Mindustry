@@ -13,6 +13,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -119,6 +120,42 @@ public class ItemBridge extends Block{
         return other.block() == this && (other.team() == tile.team() || tile.block() != this) && (!checkDouble || other.<ItemBridgeEntity>ent().link != tile.pos());
     }
 
+//    public int linkLength(Tile tile){
+//        Tile other = world.tile(tile.<ItemBridgeEntity>ent().link);
+//        return linkValid(tile, other) ? 1 + linkLength(other) : 0;
+//    }
+
+//    public int linkCoining(Tile tile){
+//        Tile other = world.tile(tile.<ItemBridgeEntity>ent().link);
+//
+//        if(linkValid(tile, other) && other.<ItemBridgeEntity>ent().powerCoins < 2){
+//            other.<ItemBridgeEntity>ent().powerCoins = 2;
+//            return linkCoining(other) + 1;
+//        }
+//
+//        return 0;
+//    }
+
+//    public Array<Tilec> linkChain(Tile tile){
+//        tempTileEnts.clear();
+//        Tile other = tile;
+//
+//        while(linkValid(other, world.tile(other.<ItemBridgeEntity>ent().link))){
+//            ItemBridgeEntity ent = other.ent();
+//
+//            if(ent.powerCoins < 2) tempTileEnts.add(ent);
+//
+//            other = world.tile(ent.link);
+//        }
+//        return tempTileEnts;
+//    }
+
+    public int linkLength(Tile tile){
+        Tile other = world.tile(tile.<ItemBridgeEntity>ent().link);
+        return linkValid(tile, other) ? 1 + linkLength(other) : 0;
+    }
+
+
     public Tile findLink(int x, int y){
         if(world.tiles.in(x, y) && linkValid(world.tile(x, y), world.tile(lastPlaced)) && lastPlaced != Point2.pack(x, y)){
             return world.tile(lastPlaced);
@@ -133,6 +170,7 @@ public class ItemBridge extends Block{
         public float time;
         public float time2;
         public float cycleSpeed = 1f;
+//        public int powerCoins = 0;
 
         @Override
         public void playerPlaced(){
@@ -193,8 +231,8 @@ public class ItemBridge extends Block{
 
         @Override
         public void updateTile(){
-            time += cycleSpeed * delta();
-            time2 += (cycleSpeed - 1f) * delta();
+            time += cycleSpeed * Time.delta();
+            time2 += (cycleSpeed - 1f) * Time.delta();
 
             checkIncoming();
 
@@ -205,10 +243,29 @@ public class ItemBridge extends Block{
             }else{
                 ((ItemBridgeEntity)other.entity).incoming.add(tile.pos());
 
+                // increases power usage
+                if(incoming.size == 0) timeScale = linkLength(tile);
+//                timeScale = linkChain(tile).size;
+//                if(incoming.size == 0) timeScale = linkChain(tile).size;
+//                if(incoming.size == 0) linkChain(tile).each(e -> ((ItemBridgeEntity)e).powerCoins = 2);
+//                if(incoming.size == 0) timeScale = linkLength(tile) + 1;
+
+//                if(powerCoins > 0){
+//                    powerCoins--;
+//                    power.status = 1f;
+//                }
+
                 if(consValid() && Mathf.zero(1f - efficiency())){
                     uptime = Mathf.lerpDelta(uptime, 1f, 0.04f);
+//                    linkChain(tile).each(e -> ((ItemBridgeEntity)e).powerCoins = 2);
+//                    if(power.status == 1f) linkChain(tile).each(e -> ((ItemBridgeEntity)e).powerCoins = 2);
+//                    if(timeScale == linkChain(tile).size) linkChain(tile).each(e -> ((ItemBridgeEntity)e).powerCoins = 2);
                 }else{
                     uptime = Mathf.lerpDelta(uptime, 0f, 0.02f);
+                }
+
+                if(uptime > 0.5f){
+                    other.<ItemBridgeEntity>ent().uptime = Mathf.lerpDelta(other.<ItemBridgeEntity>ent().uptime, 1f, 0.06f);
                 }
 
                 updateTransport(other.entity);
@@ -269,6 +326,8 @@ public class ItemBridge extends Block{
                 y + Geometry.d4[i].y * (tilesize / 2f + a * 4f + time % 4f), i * 90f);
             }
             Draw.reset();
+
+            Fonts.outline.draw(timeScale + "", x, y);
         }
 
         @Override
