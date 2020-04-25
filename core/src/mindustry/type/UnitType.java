@@ -209,16 +209,18 @@ public class UnitType extends UnlockableContent{
             for(int i : (weapon.mirror ? Mathf.signs : Mathf.one)){
                 i *= Mathf.sign(weapon.flipped);
 
-                float rotation = unit.rotation() - 90 + (weapon.rotate ? mount.rotation : 0);
-                float trY = weapon.y - (mount.reload / weapon.reload * weapon.recoil) * (weapon.alternate ? Mathf.num(i == Mathf.sign(mount.side)) : 1);
+                float rotation = unit.rotation() - 90;
+                float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
+                float trY = weapon.y;
                 float width = i > 0 ? -weapon.region.getWidth() : weapon.region.getWidth();
+                float recoil = -(mount.reload / weapon.reload * weapon.recoil) * (weapon.alternate ? Mathf.num(i == Mathf.sign(mount.side)) : 1);
 
                 Draw.rect(weapon.region,
-                unit.x() + Angles.trnsx(rotation, weapon.x * i, trY),
-                unit.y() + Angles.trnsy(rotation, weapon.x * i, trY),
+                unit.x() + Angles.trnsx(rotation, weapon.x * i, trY) + Angles.trnsx(weaponRotation, 0, recoil),
+                unit.y() + Angles.trnsy(rotation, weapon.x * i, trY) + Angles.trnsy(weaponRotation, 0, recoil),
                 width * Draw.scl,
                 weapon.region.getHeight() * Draw.scl,
-                rotation);
+                weaponRotation);
             }
         }
 

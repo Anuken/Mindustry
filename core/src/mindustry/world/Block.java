@@ -271,6 +271,10 @@ public class Block extends UnlockableContent{
         return true;
     }
 
+    public boolean rotatedOutput(int x, int y){
+        return rotate;
+    }
+
     /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #reg(int)}. */
     protected int reg(String suffix){
         cacheRegionStrings.add(name + suffix);

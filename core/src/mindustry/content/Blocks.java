@@ -910,7 +910,7 @@ public class Blocks implements ContentList{
             displayedSpeed = 10f;
         }};
 
-        plastaniumConveyor = new CraterConveyor("plastanium-conveyor"){{
+        plastaniumConveyor = new StackConveyor("plastanium-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.silicon, 1, Items.graphite, 1));
             health = 75;
             speed = 0.04f;
@@ -1743,14 +1743,14 @@ public class Blocks implements ContentList{
         //region experimental
 
         blockForge = new BlockForge("block-forge"){{
-            requirements(Category.production, ItemStack.with(Items.thorium, 100));
+            requirements(Category.production, BuildVisibility.debugOnly, ItemStack.with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
         blockLauncher = new BlockLauncher("block-launcher"){{
-            requirements(Category.production, ItemStack.with(Items.thorium, 100));
+            requirements(Category.production, BuildVisibility.debugOnly, ItemStack.with(Items.thorium, 100));
             size = 3;
             hasPower = true;
             consumes.power(2f);

@@ -97,6 +97,10 @@ public class ItemModule extends BlockModule{
         return true;
     }
 
+    public boolean empty(){
+        return total == 0;
+    }
+
     public int total(){
         return total;
     }

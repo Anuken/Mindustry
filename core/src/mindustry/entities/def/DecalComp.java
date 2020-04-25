@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 
 @EntityDef(value = {Decalc.class}, pooled = true)
 @Component
@@ -16,6 +17,8 @@ abstract class DecalComp implements Drawc, Timedc, Rotc, Posc{
 
     @Override
     public void draw(){
+        Draw.z(Layer.scorch);
+
         Draw.color(color);
         Draw.alpha(1f - Mathf.curve(fin(), 0.98f));
         Draw.rect(region, x, y, rotation);

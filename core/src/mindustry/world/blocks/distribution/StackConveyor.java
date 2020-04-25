@@ -1,7 +1,6 @@
 package mindustry.world.blocks.distribution;
 
 import arc.*;
-import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -18,13 +17,17 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class CraterConveyor extends Block implements Autotiler{
-    private TextureRegion[] regions = new TextureRegion[8];
+public class StackConveyor extends Block implements Autotiler{
+    protected static final int stateMove = 0, stateLoad = 1, stateUnload = 2;
+
+    protected TextureRegion[] regions = new TextureRegion[3];
+    protected TextureRegion edgeRegion, stackRegion;
 
     public float speed = 0f;
     public float recharge = 4f;
+    public boolean splitOut = true;
 
-    public CraterConveyor(String name){
+    public StackConveyor(String name){
         super(name);
 
         rotate = true;
@@ -33,7 +36,6 @@ public class CraterConveyor extends Block implements Autotiler{
         hasItems = true;
         itemCapacity = 8;
         conveyorPlacement = true;
-        entityType = CraterConveyorEntity::new;
 
         idleSound = Sounds.conveyor;
         idleSoundVolume = 0.004f;
@@ -44,8 +46,11 @@ public class CraterConveyor extends Block implements Autotiler{
     @Override
     public void load(){
         for(int i = 0; i < regions.length; i++){
-            regions[i] = Core.atlas.find(name + "-" + i + "-" + 0);
+            regions[i] = Core.atlas.find(name + "-" + i);
         }
+        
+        edgeRegion = Core.atlas.find(name + "-edge");
+        stackRegion = Core.atlas.find(name + "-stack");
     }
 
     @Override
@@ -62,8 +67,17 @@ public class CraterConveyor extends Block implements Autotiler{
     }
 
     @Override
-    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock) {
-        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof CraterConveyor; // blend with nothing but crater conveyors
+    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        if(tile.entity instanceof StackConveyorEntity){
+            int state = ((StackConveyorEntity)tile.entity).state;
+            if(state == stateLoad){ //standard conveyor mode
+                return otherblock.outputsItems() && lookingAt(tile, rotation, otherx, othery, otherrot, otherblock);
+            }else if(state == stateUnload){ //router mode
+                return (otherblock.hasItems || otherblock.outputsItems()) &&
+                    (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) || otherblock instanceof StackConveyor);
+            }
+        }
+        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof StackConveyor;
     }
 
     @Override
@@ -72,43 +86,62 @@ public class CraterConveyor extends Block implements Autotiler{
 
         if(bits == null) return;
 
-        TextureRegion region = regions[bits[0]];
-        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl * req.animScale, region.getHeight() * bits[2] * Draw.scl * req.animScale, req.rotation * 90);
+        TextureRegion region = regions[0];
+        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * Draw.scl * req.animScale, region.getHeight() * Draw.scl * req.animScale, req.rotation * 90);
+
+        for(int i = 0; i < 4; i++){
+            if((bits[3] & (1 << i)) == 0){
+                Draw.rect(edgeRegion, req.drawx(), req.drawy(), (req.rotation - i) * 90);
+            }
+        }
     }
 
-    class CraterConveyorEntity extends TileEntity{
+    @Override
+    public boolean rotatedOutput(int x, int y){
+        Tilec tile = world.ent(x, y);
+        if(tile instanceof StackConveyorEntity){
+            return ((StackConveyorEntity)tile).state != stateUnload;
+        }
+        return super.rotatedOutput(x, y);
+    }
 
-        int blendbit1, blendbit2;
-        int blendsclx, blendscly;
+    public class StackConveyorEntity extends TileEntity{
+        public int state, blendprox;
 
-        int link = -1;
-        float cooldown;
+        public int link = -1;
+        public float cooldown;
+        public Item lastItem;
 
         @Override
         public void draw(){
-                               Draw.rect(regions[Mathf.clamp(blendbit1, 0, regions.length - 1)], x, y, tilesize * blendsclx, tilesize * blendscly, rotation() * 90);
-            if(blendbit2 != 0) Draw.rect(regions[Mathf.clamp(blendbit2, 0, regions.length - 1)], x, y, tilesize * blendsclx, tilesize * blendscly, rotation() * 90);;
+            Draw.rect(regions[state], x, y, rotation() * 90);
+
+            for(int i = 0; i < 4; i++){
+                if((blendprox & (1 << i)) == 0){
+                    Draw.rect(edgeRegion, x, y, (rotation() - i) * 90);
+                }
+            }
 
             Draw.z(Layer.blockOver);
 
             if(link == -1) return;
 
-            // offset
+            //offset
             Tile from = world.tile(link);
             Tmp.v1.set(from);
             Tmp.v2.set(tile);
             Tmp.v1.interpolate(Tmp.v2, 1f - cooldown, Interpolation.linear);
 
-            // fixme
+            //fixme
             float a = (from.rotation()%4) * 90;
             float b = (tile.rotation()%4) * 90;
             if((from.rotation()%4) == 3 && (tile.rotation()%4) == 0) a = -1 * 90;
             if((from.rotation()%4) == 0 && (tile.rotation()%4) == 3) a = 4 * 90;
 
-            // crater
-            Draw.rect(regions[7], Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interpolation.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
+            //stack
+            Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interpolation.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
 
-            // item
+            //item
             float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);
             Drawf.shadow(Tmp.v1.x, Tmp.v1.y, size * 1.2f);
             Draw.rect(items.first().icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
@@ -118,49 +151,60 @@ public class CraterConveyor extends Block implements Autotiler{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
+            Fx.healBlockFull.at(tile, 1);
+
+            state = stateMove;
+
             int[] bits = buildBlending(tile, tile.rotation(), null, true);
-
-            blendbit2 = 0;
-            if(bits[0] == 0 && blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) blendbit2 = 5; // a 0 that faces into a crater conveyor with none behind it
-            if(bits[0] == 0 && !blends(tile, tile.rotation(), 0) && blends(tile, tile.rotation(), 2)) blendbit2 = 6; // a 0 that faces into none with a crater conveyor behind it
-
-            blendbit1 = bits[0];
-            blendsclx = bits[1];
-            blendscly = bits[2];
+            if(bits[0] == 0 && blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) state = stateLoad; // a 0 that faces into a conveyor with none behind it
+            if(bits[0] == 0 && !blends(tile, tile.rotation(), 0) && blends(tile, tile.rotation(), 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
+            
+            blendprox = 0;
+            for(int i = 0; i < 4; i++){
+                if(blends(tile, rotation(), i)){
+                    blendprox |= (1 << i);
+                }
+            }
         }
-
 
         @Override
         public void updateTile(){
             // reel in crater
             if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed, 0f, recharge);
 
-            // sleep when idle
+            //no items -> sleep
+            if(items.empty()){
+                sleep();
+                return;
+            }
+
             if(link == -1){
-                if(cooldown == 0f) sleep();
                 return;
             }
 
             // crater needs to be centered
             if(cooldown > 0f) return;
 
-            if(blendbit2 == 6){
-                while(dump()) if(items.total() == 0) poofOut();
+            // get current item
+            if(lastItem == null){
+                lastItem = items.first();
             }
 
-            /* unload */ else /* transfer */
-
-                if(blendbit2 != 5 || (items.total() >= getMaximumAccepted(items.first()))){
+            if(state == stateUnload){ //unload
+                while(lastItem != null && (!splitOut ? moveForward(lastItem) : dump(lastItem))){
+                    if(items.empty()) poofOut();
+                }
+            }else{ //transfer
+                if(state != stateLoad || (items.total() >= getMaximumAccepted(items.first()))){
                     if(front() != null
                     && front().team() == team()
-                    && front().block() instanceof CraterConveyor){
-                        CraterConveyorEntity e = (CraterConveyorEntity)tile.front();
+                    && front().block() instanceof StackConveyor){
+                        StackConveyorEntity e = (StackConveyorEntity)front();
 
                         // sleep if its occupied
-                        if(e.link != -1){
-                            sleep();
-                        }else{
+                        if(e.link == -1){
                             e.items.addAll(items);
+                            e.noSleep();
                             e.link = tile.pos();
                             // ▲ new | old ▼
                             link = -1;
@@ -168,11 +212,10 @@ public class CraterConveyor extends Block implements Autotiler{
 
                             cooldown = recharge;
                             e.cooldown = 1;
-                            e.noSleep();
-                            bump();
                         }
                     }
                 }
+            }
         }
 
         @Override
@@ -188,25 +231,28 @@ public class CraterConveyor extends Block implements Autotiler{
         private void poofIn(){
             link = tile.pos();
             Fx.plasticburn.at(this);
-            tile.entity.noSleep();
+            noSleep();
         }
 
         private void poofOut(){
             Fx.plasticburn.at(this);
             link = -1;
-            bump();
         }
 
         @Override
         public void handleItem(Tilec source, Item item){
-            if(items.total() == 0) poofIn();
+            if(items.empty()) poofIn();
             super.handleItem(source, item);
+            lastItem = item;
+            noSleep();
         }
 
         @Override
         public void handleStack(Item item, int amount, Teamc source){
-            if(items.total() == 0) poofIn();
+            if(items.empty()) poofIn();
             super.handleStack(item, amount, source);
+            lastItem = item;
+            noSleep();
         }
 
         @Override
@@ -214,47 +260,15 @@ public class CraterConveyor extends Block implements Autotiler{
             try{
                 return super.removeStack(item, amount);
             }finally{
-                if(items.total() == 0) poofOut();
+                if(items.empty()) poofOut();
             }
-        }
-
-        // crater conveyor tiles that input into this one
-        private void upstream(Cons<CraterConveyorEntity> cons){
-
-            if(blendbit1 == 0 && !(back() instanceof CraterConveyorEntity)) return;
-
-            if(    blendbit1 == 0 // 1 input from the back, 0 from the sides
-                || blendbit1 == 2 // 1 input from the back, 1 from the sides
-                || blendbit1 == 3 // 1 input from the back, 2 from the sides
-            ) cons.get((CraterConveyorEntity)back());
-
-            if(    blendbit1 == 3 // 1 input from the back, 2 from the sides
-                || blendbit1 == 4 // 0 input from the back, 2 from the sides
-                ||(blendbit1 == 1 &&   blendscly == -1) // side is open
-                ||(blendbit1 == 2 &&   blendscly == +1) // side is open
-            ) cons.get((CraterConveyorEntity)right());
-
-            if(    blendbit1 == 3 // 1 input from the back, 2 from the sides
-                || blendbit1 == 4 // 0 input from the back, 2 from the sides
-                ||(blendbit1 == 1 &&   blendscly == +1) // side is open
-                ||(blendbit1 == 2 &&   blendscly == -1) // side is open
-            ) cons.get((CraterConveyorEntity)left());
-        }
-
-        // awaken inputting conveyors
-        private void bump(){
-            upstream(t -> {
-                if(t == null || !t.sleeping || t.items().total() <= 0) return;
-                t.noSleep();
-                t.bump();
-            });
         }
 
         @Override
         public boolean acceptItem(Tilec source, Item item){
-            if (this == source) return true;                // player threw items
-            if (cooldown > recharge - 1f) return false;     // still cooling down
-            return!((blendbit2 != 5)                        // not a loading dock
+            if(this == source) return true;                 // player threw items
+            if(cooldown > recharge - 1f) return false;      // still cooling down
+            return !((state != stateLoad)                   // not a loading dock
             ||  (items.total() > 0 && !items.has(item))     // incompatible items
             ||  (items.total() >= getMaximumAccepted(item)) // filled to capacity
             ||  (tile.front() == source));

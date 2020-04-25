@@ -86,6 +86,18 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         return this;
     }
 
+    @Override
+    @Replace
+    public int tileX(){
+        return tile.x;
+    }
+
+    @Override
+    @Replace
+    public int tileY(){
+        return tile.y;
+    }
+
     //endregion
     //region io
 
@@ -961,6 +973,10 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         //using a set to prevent duplicates
         for(Tilec tile : tmpTiles){
             proximity.add(tile);
+        }
+
+        for(Tilec other : tmpTiles){
+            other.onProximityUpdate();
         }
 
         onProximityAdded();

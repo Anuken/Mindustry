@@ -12,7 +12,7 @@ import java.util.*;
 
 public interface Autotiler{
     class AutotilerHolder{
-        static final int[] blendresult = new int[3];
+        static final int[] blendresult = new int[4];
         static final BuildRequest[] directionals = new BuildRequest[4];
     }
 
@@ -50,6 +50,15 @@ public interface Autotiler{
         blends(tile, rotation, directional, 3, world) ? 5 :
         -1;
         transformCase(num, blendresult);
+
+        blendresult[3] = 0;
+
+        for(int i = 0; i < 4; i++){
+            if(blends(tile, rotation, directional, i, world)){
+                blendresult[3] |= (1 << i);
+            }
+        }
+
         return blendresult;
     }
 
@@ -88,14 +97,21 @@ public interface Autotiler{
     }
 
     default boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
-                || ((!otherblock.rotate && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
-                Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) || (otherblock.rotate && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y))));
+        return Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
+                || ((!otherblock.rotatedOutput(otherx, othery) && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
+                Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) || (otherblock.rotatedOutput(otherx, othery) && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
     }
 
+    /** @return whether this other block is *not* looking at this one. */
+    default boolean notLookingAt(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return !(otherblock.rotatedOutput(otherx, othery) && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y));
+    }
+
+    /** @return whether this tile is looking at the other tile, or the other tile is looking at this one.
+     * If the other tile does not rotate, it is always considered to be facing this one. */
     default boolean lookingAt(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
-        || (!otherblock.rotate || Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
+        || (!otherblock.rotatedOutput(otherx, othery) || Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
     }
 
     boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock);

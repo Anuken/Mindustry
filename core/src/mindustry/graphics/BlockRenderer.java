@@ -232,14 +232,17 @@ public class BlockRenderer implements Disposable{
 
             if(block != Blocks.air){
                 block.drawBase(tile);
+                Draw.z(Layer.block);
 
                 if(entity != null){
                     if(entity.damaged()){
                         entity.drawCracks();
+                        Draw.z(Layer.block);
                     }
 
                     if(entity.team() != player.team()){
                         entity.drawTeam();
+                        Draw.z(Layer.block);
                     }
 
                     entity.drawLight();
