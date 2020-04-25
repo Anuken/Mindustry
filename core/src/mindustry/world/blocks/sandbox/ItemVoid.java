@@ -8,7 +8,7 @@ public class ItemVoid extends Block{
 
     public ItemVoid(String name){
         super(name);
-        update = solid = true;
+        update = solid = acceptsItems = true;
     }
 
     public class ItemVoidEntity extends TileEntity{

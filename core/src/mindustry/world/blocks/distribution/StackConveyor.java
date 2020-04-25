@@ -73,8 +73,10 @@ public class StackConveyor extends Block implements Autotiler{
             if(state == stateLoad){ //standard conveyor mode
                 return otherblock.outputsItems() && lookingAt(tile, rotation, otherx, othery, otherrot, otherblock);
             }else if(state == stateUnload){ //router mode
-                return (otherblock.hasItems || otherblock.outputsItems()) &&
-                    (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) || otherblock instanceof StackConveyor);
+                return (otherblock.hasItems || otherblock.outputsItems() || otherblock.acceptsItems) &&
+                    (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||
+                    (otherblock instanceof StackConveyor && facing(otherx, othery, otherrot, tile.x, tile.y))) &&
+                    !(world.ent(otherx, othery) instanceof StackConveyorEntity && ((StackConveyorEntity)world.ent(otherx, othery)).state == stateUnload);
             }
         }
         return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof StackConveyor;
@@ -151,8 +153,6 @@ public class StackConveyor extends Block implements Autotiler{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            Fx.healBlockFull.at(tile, 1);
-
             state = stateMove;
 
             int[] bits = buildBlending(tile, tile.rotation(), null, true);
@@ -160,6 +160,7 @@ public class StackConveyor extends Block implements Autotiler{
             if(bits[0] == 0 && !blends(tile, tile.rotation(), 0) && blends(tile, tile.rotation(), 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
             
             blendprox = 0;
+
             for(int i = 0; i < 4; i++){
                 if(blends(tile, rotation(), i)){
                     blendprox |= (1 << i);

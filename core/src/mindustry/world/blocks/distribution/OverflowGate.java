@@ -87,7 +87,7 @@ public class OverflowGate extends Block{
         }
 
         public Tilec getTileTarget(Item item, Tile src, boolean flip){
-            int from = relativeTo(src.x, src.y);
+            int from = absoluteRelativeTo(src.x, src.y);
             if(from == -1) return null;
             Tilec to = nearby((from + 2) % 4);
             if(to == null) return null;

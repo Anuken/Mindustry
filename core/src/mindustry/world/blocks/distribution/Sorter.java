@@ -100,7 +100,7 @@ public class Sorter extends Block{
         }
 
         Tilec getTileTarget(Item item, Tilec source, boolean flip){
-            int dir = source.relativeTo(tile.x, tile.y);
+            int dir = source.absoluteRelativeTo(tile.x, tile.y);
             if(dir == -1) return null;
             Tilec to;
 

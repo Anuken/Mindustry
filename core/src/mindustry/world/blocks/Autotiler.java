@@ -80,6 +80,10 @@ public interface Autotiler{
         }
     }
 
+    default boolean facing(int x, int y, int rotation, int x2, int y2){
+        return Point2.equals(x + Geometry.d4(rotation).x,y + Geometry.d4(rotation).y, x2, y2);
+    }
+
     default boolean blends(Tile tile, int rotation, @Nullable BuildRequest[] directional, int direction, boolean checkWorld){
         int realDir = Mathf.mod(rotation - direction, 4);
         if(directional != null && directional[realDir] != null){
