@@ -173,12 +173,6 @@ public class StackConveyor extends Block implements Autotiler{
             // reel in crater
             if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed, 0f, recharge);
 
-            //no items -> sleep
-            if(items.empty()){
-                sleep();
-                return;
-            }
-
             if(link == -1){
                 return;
             }
@@ -205,7 +199,6 @@ public class StackConveyor extends Block implements Autotiler{
                         // sleep if its occupied
                         if(e.link == -1){
                             e.items.addAll(items);
-                            e.noSleep();
                             e.link = tile.pos();
                             // ▲ new | old ▼
                             link = -1;
@@ -232,7 +225,6 @@ public class StackConveyor extends Block implements Autotiler{
         private void poofIn(){
             link = tile.pos();
             Fx.plasticburn.at(this);
-            noSleep();
         }
 
         private void poofOut(){
@@ -245,7 +237,6 @@ public class StackConveyor extends Block implements Autotiler{
             if(items.empty()) poofIn();
             super.handleItem(source, item);
             lastItem = item;
-            noSleep();
         }
 
         @Override
@@ -253,7 +244,6 @@ public class StackConveyor extends Block implements Autotiler{
             if(items.empty()) poofIn();
             super.handleStack(item, amount, source);
             lastItem = item;
-            noSleep();
         }
 
         @Override
