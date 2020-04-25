@@ -509,42 +509,39 @@ public class Block extends UnlockableContent{
     }
 
     protected void initEntity(){
+        //attempt to find the first declared class and use it as the entity type
+        try{
+            Class<?> current = getClass();
+
+            if(current.isAnonymousClass()){
+                current = current.getSuperclass();
+            }
+
+            while(entityType == null && Block.class.isAssignableFrom(current)){
+                //first class that is subclass of Tilec
+                Class<?> type = Structs.find(current.getDeclaredClasses(), t -> Tilec.class.isAssignableFrom(t) && !t.isInterface());
+                if(type != null){
+                    //these are inner classes, so they have an implicit parameter generated
+                    Constructor<? extends Tilec> cons = (Constructor<? extends Tilec>)type.getDeclaredConstructor(type.getDeclaringClass());
+                    entityType = () -> {
+                        try{
+                            return cons.newInstance(this);
+                        }catch(Exception e){
+                            throw new RuntimeException(e);
+                        }
+                    };
+                }
+
+                //scan through every superclass looking for it
+                current = current.getSuperclass();
+            }
+
+        }catch(Throwable ignored){
+        }
+
         if(entityType == null){
-
-            //attempt to find the first declared class and use it as the entity type
-            try{
-                Class<?> current = getClass();
-
-                if(current.isAnonymousClass()){
-                    current = current.getSuperclass();
-                }
-
-                while(entityType == null && Block.class.isAssignableFrom(current)){
-                    //first class that is subclass of Tilec
-                    Class<?> type = Structs.find(current.getDeclaredClasses(), t -> Tilec.class.isAssignableFrom(t) && !t.isInterface());
-                    if(type != null){
-                        //these are inner classes, so they have an implicit parameter generated
-                        Constructor<? extends Tilec> cons = (Constructor<? extends Tilec>)type.getDeclaredConstructor(type.getDeclaringClass());
-                        entityType = () -> {
-                            try{
-                                return cons.newInstance(this);
-                            }catch(Exception e){
-                                throw new RuntimeException(e);
-                            }
-                        };
-                    }
-
-                    //scan through every superclass looking for it
-                    current = current.getSuperclass();
-                }
-
-            }catch(Throwable ignored){
-            }
-
-            if(entityType == null){
-                //assign default value
-                entityType = TileEntity::create;
-            }
+            //assign default value
+            entityType = TileEntity::create;
         }
     }
 

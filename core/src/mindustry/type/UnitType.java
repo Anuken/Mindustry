@@ -185,7 +185,7 @@ public class UnitType extends UnlockableContent{
     public void drawEngine(Unitc unit){
         if(!unit.isFlying()) return;
 
-        Draw.color(engineColor);
+        Draw.color(unit.team().color, Color.white, 0f);
         Fill.circle(
             unit.x() + Angles.trnsx(unit.rotation() + 180, engineOffset),
             unit.y() + Angles.trnsy(unit.rotation() + 180, engineOffset),

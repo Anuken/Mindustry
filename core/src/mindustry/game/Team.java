@@ -24,7 +24,7 @@ public class Team implements Comparable<Team>{
     public final static Team
         derelict = new Team(0, "derelict", Color.valueOf("4d4e58")),
         sharded = new Team(1, "sharded", Pal.accent.cpy()),
-        crux = new Team(2, "crux", Color.valueOf("e82d2d")),
+        crux = new Team(2, "crux", Color.valueOf("f25555")),
         green = new Team(3, "green", Color.valueOf("4dd98b")),
         purple = new Team(4, "purple", Color.valueOf("9a4bdf")),
         blue = new Team(5, "blue", Color.royal.cpy());
