@@ -357,6 +357,11 @@ public class ItemBridge extends Block{
         }
 
         @Override
+        public boolean shouldConsume(){
+            return linkValid(tile, world.tile(link));
+        }
+
+        @Override
         public Point2 config(){
             return Point2.unpack(link).sub(tile.x, tile.y);
         }
