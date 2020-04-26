@@ -37,7 +37,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         liquidRegion = Core.atlas.find("conduit-liquid");
         for(int i = 0; i < topRegions.length; i++){
             topRegions[i] = Core.atlas.find(name + "-top-" + i);
-            botRegions[i] = Core.atlas.find("conduit-bottom-" + i);
+            botRegions[i] = Core.atlas.find(name + "-bottom-" + i, Core.atlas.find("conduit-bottom-" + i));
         }
     }
 
