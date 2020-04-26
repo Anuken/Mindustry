@@ -120,13 +120,17 @@ public class UnitType extends UnlockableContent{
             drawShadow(unit);
         }
 
-        Draw.z(Mathf.lerp(Layer.groundUnit, Layer.flyingUnit, unit.elevation()));
+        float z = Mathf.lerp(Layer.groundUnit, Layer.flyingUnit, unit.elevation());
 
+        Draw.z(z - 0.02f);
         if(unit instanceof Legsc){
             drawLegs((Legsc)unit);
         }
 
+        Draw.z(z - 0.01f);
         drawOcclusion(unit);
+
+        Draw.z(z);
         drawEngine(unit);
         drawBody(unit);
         drawWeapons(unit);
@@ -185,7 +189,7 @@ public class UnitType extends UnlockableContent{
     public void drawEngine(Unitc unit){
         if(!unit.isFlying()) return;
 
-        Draw.color(unit.team().color, Color.white, 0f);
+        Draw.color(unit.team().color);
         Fill.circle(
             unit.x() + Angles.trnsx(unit.rotation() + 180, engineOffset),
             unit.y() + Angles.trnsy(unit.rotation() + 180, engineOffset),
@@ -211,13 +215,14 @@ public class UnitType extends UnlockableContent{
 
                 float rotation = unit.rotation() - 90;
                 float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
-                float trY = weapon.y;
                 float width = i > 0 ? -weapon.region.getWidth() : weapon.region.getWidth();
                 float recoil = -(mount.reload / weapon.reload * weapon.recoil) * (weapon.alternate ? Mathf.num(i == Mathf.sign(mount.side)) : 1);
 
+                if(weapon.mirror) rotation = weaponRotation;
+
                 Draw.rect(weapon.region,
-                unit.x() + Angles.trnsx(rotation, weapon.x * i, trY) + Angles.trnsx(weaponRotation, 0, recoil),
-                unit.y() + Angles.trnsy(rotation, weapon.x * i, trY) + Angles.trnsy(weaponRotation, 0, recoil),
+                unit.x() + Angles.trnsx(rotation, weapon.x * i, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
+                unit.y() + Angles.trnsy(rotation, weapon.x * i, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil),
                 width * Draw.scl,
                 weapon.region.getHeight() * Draw.scl,
                 weaponRotation);

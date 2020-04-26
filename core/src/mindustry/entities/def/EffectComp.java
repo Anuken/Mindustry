@@ -16,7 +16,6 @@ abstract class EffectComp implements Posc, Drawc, Timedc, Rotc, Childc{
 
     @Override
     public void draw(){
-        Draw.z(Layer.effect);
         effect.render(id(), color, time(), rotation(), x(), y(), data);
     }
 
