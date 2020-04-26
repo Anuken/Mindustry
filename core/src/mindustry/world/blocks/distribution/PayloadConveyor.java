@@ -16,7 +16,6 @@ import mindustry.world.blocks.payloads.*;
 
 import static mindustry.Vars.*;
 
-//TODO rename
 public class PayloadConveyor extends Block{
     public float moveTime = 70f;
     public TextureRegion topRegion, edgeRegion;
@@ -103,6 +102,7 @@ public class PayloadConveyor extends Block{
                         //trigger update forward
                         next.updateTile();
 
+                        //TODO add self to queue of next conveyor, then check if this conveyor was selected next frame - selection happens deterministically
                         if(next.acceptPayload(this, item)){
                             //move forward.
                             next.handlePayload(this, item);
@@ -110,7 +110,7 @@ public class PayloadConveyor extends Block{
                         }
                     }else if(!blocked){
                         //dump item forward
-                        float trnext = size * tilesize / 2f, cx = Geometry.d4(rotation()).x, cy = Geometry.d4(rotation()).y, rot = rotation() * 90;
+                        float trnext = size * tilesize / 2f, cx = Geometry.d4(rotation()).x, cy = Geometry.d4(rotation()).y;
 
                         if(item.dump(x + cx * trnext, y + cy * trnext, rotation() * 90)){
                             item = null;

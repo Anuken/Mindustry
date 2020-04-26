@@ -179,6 +179,7 @@ public class Block extends UnlockableContent{
     public Block(String name){
         super(name);
         this.solid = false;
+        initEntity();
     }
 
     //TODO rename to draw() once class refactoring is done.
@@ -507,6 +508,43 @@ public class Block extends UnlockableContent{
         Arrays.sort(requirements, Structs.comparingInt(i -> i.item.id));
     }
 
+    protected void initEntity(){
+        //attempt to find the first declared class and use it as the entity type
+        try{
+            Class<?> current = getClass();
+
+            if(current.isAnonymousClass()){
+                current = current.getSuperclass();
+            }
+
+            while(entityType == null && Block.class.isAssignableFrom(current)){
+                //first class that is subclass of Tilec
+                Class<?> type = Structs.find(current.getDeclaredClasses(), t -> Tilec.class.isAssignableFrom(t) && !t.isInterface());
+                if(type != null){
+                    //these are inner classes, so they have an implicit parameter generated
+                    Constructor<? extends Tilec> cons = (Constructor<? extends Tilec>)type.getDeclaredConstructor(type.getDeclaringClass());
+                    entityType = () -> {
+                        try{
+                            return cons.newInstance(this);
+                        }catch(Exception e){
+                            throw new RuntimeException(e);
+                        }
+                    };
+                }
+
+                //scan through every superclass looking for it
+                current = current.getSuperclass();
+            }
+
+        }catch(Throwable ignored){
+        }
+
+        if(entityType == null){
+            //assign default value
+            entityType = TileEntity::create;
+        }
+    }
+
     @Override
     public void displayInfo(Table table){
         ContentDisplay.displayBlock(table, this);
@@ -524,44 +562,6 @@ public class Block extends UnlockableContent{
         //initialize default health based on size
         if(health == -1){
             health = size * size * 40;
-        }
-
-        if(entityType == null){
-
-            //attempt to find the first declared class and use it as the entity type
-            try{
-                Class<?> current = getClass();
-
-                if(current.isAnonymousClass()){
-                    current = current.getSuperclass();
-                }
-
-                while(entityType == null && Block.class.isAssignableFrom(current)){
-                    //first class that is subclass of Tilec
-                    Class<?> type = Structs.find(current.getDeclaredClasses(), t -> Tilec.class.isAssignableFrom(t) && !t.isInterface());
-                    if(type != null){
-                        //these are inner classes, so they have an implicit parameter generated
-                        Constructor<? extends Tilec> cons = (Constructor<? extends Tilec>)type.getDeclaredConstructor(type.getDeclaringClass());
-                        entityType = () -> {
-                            try{
-                                return cons.newInstance(this);
-                            }catch(Exception e){
-                                throw new RuntimeException(e);
-                            }
-                        };
-                    }
-
-                    //scan through every superclass looking for it
-                    current = current.getSuperclass();
-                }
-
-            }catch(Throwable ignored){
-            }
-
-            if(entityType == null){
-                //assign default value
-                entityType = TileEntity::create;
-            }
         }
 
         buildCost = 0f;

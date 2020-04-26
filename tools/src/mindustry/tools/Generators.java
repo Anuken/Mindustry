@@ -1,5 +1,6 @@
 package mindustry.tools;
 
+import arc.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -134,7 +135,9 @@ public class Generators{
                         }
                     }
 
-                    image.save("block-" + block.name + "-full");
+                    if(!(regions.length == 1 && regions[0] == Core.atlas.find(block.name))){
+                        image.save("block-" + block.name + "-full");
+                    }
 
                     image.save("../editor/" + block.name + "-icon-editor");
 
@@ -211,7 +214,7 @@ public class Generators{
         });
 
         ImagePacker.generate("unit-icons", () -> {
-            content.units().each(type -> !type.flying, type -> {
+            content.units().each(type -> {
                 type.load();
 
                 Image image = ImagePacker.get(type.region);
@@ -222,6 +225,12 @@ public class Generators{
                     image.draw(type.legRegion, true, false);
                 }
                 image.draw(type.region);
+
+                Image baseCell = ImagePacker.get(type.cellRegion);
+                Image cell = new Image(type.cellRegion.getWidth(), type.cellRegion.getHeight());
+                cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.gray)));
+
+                image.draw(cell, image.width/2 - cell.width/2, image.height/2 - cell.height/2);
 
                 for(Weapon weapon : type.weapons){
                     weapon.load();

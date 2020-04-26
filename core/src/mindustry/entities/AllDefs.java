@@ -5,7 +5,7 @@ import mindustry.gen.*;
 
 class AllDefs{
 
-    @GroupDef(Entityc.class)
+    @GroupDef(value = Entityc.class, mapping = true)
     class all{
 
     }

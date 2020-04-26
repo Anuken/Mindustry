@@ -1,5 +1,6 @@
 package mindustry.tools;
 
+import arc.func.*;
 import arc.graphics.Color;
 import arc.graphics.g2d.TextureRegion;
 import arc.util.Structs;
@@ -52,6 +53,14 @@ class Image{
         int i = image.getRGB(x, y);
         color.argb8888(i);
         return color;
+    }
+
+    void each(Intc2 cons){
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                cons.get(x, y);
+            }
+        }
     }
 
     void draw(int x, int y, Color color){

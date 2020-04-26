@@ -100,8 +100,12 @@ public class MapIO{
             ver.region("preview_map", stream, counter, in -> ver.readMap(in, new WorldContext(){
                 @Override public void resize(int width, int height){}
                 @Override public boolean isGenerating(){return false;}
-                @Override public void begin(){}
-                @Override public void end(){}
+                @Override public void begin(){
+                    world.setGenerating(true);
+                }
+                @Override public void end(){
+                    world.setGenerating(false);
+                }
 
                 @Override
                 public Tile tile(int index){
