@@ -5,11 +5,11 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import arc.util.pooling.*;
 import arc.util.pooling.Pool.*;
+import arc.util.pooling.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -31,7 +31,7 @@ public class Administration{
         //anti-spam
         addChatFilter((player, message) -> {
             long resetTime = Config.messageRateLimit.num() * 1000;
-            if(Config.antiSpam.bool() && !player.isLocal && !player.isAdmin){
+            if(Config.antiSpam.bool() && !player.isLocal() && !player.admin()){
                 //prevent people from spamming messages quickly
                 if(resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime){
                     //supress message
@@ -39,7 +39,7 @@ public class Administration{
                     player.getInfo().messageInfractions ++;
                     //kick player for spamming and prevent connection if they've done this several times
                     if(player.getInfo().messageInfractions >= Config.messageSpamKick.num() && Config.messageSpamKick.num() != 0){
-                        player.con.kick("You have been kicked for spamming.", 1000 * 60 * 2);
+                        player.con().kick("You have been kicked for spamming.", 1000 * 60 * 2);
                     }
                     return null;
                 }else{
@@ -86,7 +86,7 @@ public class Administration{
     }
 
     /** Filters out a chat message. */
-    public @Nullable String filterMessage(Player player, String message){
+    public @Nullable String filterMessage(Playerc player, String message){
         String current = message;
         for(ChatFilter f : chatFilters){
             current = f.filter(player, message);
@@ -101,7 +101,7 @@ public class Administration{
     }
 
     /** @return whether this action is allowed by the action filters. */
-    public boolean allowAction(Player player, ActionType type, Tile tile, Cons<PlayerAction> setter){
+    public boolean allowAction(Playerc player, ActionType type, Tile tile, Cons<PlayerAction> setter){
         PlayerAction act = Pools.obtain(PlayerAction.class, PlayerAction::new);
         setter.get(act.set(player, type, tile));
         for(ActionFilter filter : actionFilters){
@@ -172,7 +172,7 @@ public class Administration{
         getCreateInfo(id).banned = true;
 
         save();
-        Events.fire(new PlayerBanEvent(Vars.playerGroup.find(p -> id.equals(p.uuid))));
+        Events.fire(new PlayerBanEvent(Groups.player.find(p -> id.equals(p.uuid()))));
         return true;
     }
 
@@ -212,7 +212,7 @@ public class Administration{
         info.banned = false;
         bannedIPs.removeAll(info.ips, false);
         save();
-        Events.fire(new PlayerUnbanEvent(Vars.playerGroup.find(p -> id.equals(p.uuid))));
+        Events.fire(new PlayerUnbanEvent(Groups.player.find(p -> id.equals(p.uuid()))));
         return true;
     }
 
@@ -515,7 +515,7 @@ public class Administration{
     /** Handles chat messages from players and changes their contents. */
     public interface ChatFilter{
         /** @return the filtered message; a null string signals that the message should not be sent. */
-        @Nullable String filter(Player player, String message);
+        @Nullable String filter(Playerc player, String message);
     }
 
     /** Allows or disallows player actions. */
@@ -539,7 +539,7 @@ public class Administration{
     /** Defines a (potentially dangerous) action that a player has done in the world.
      * These objects are pooled; do not cache them! */
     public static class PlayerAction implements Poolable{
-        public @NonNull Player player;
+        public @NonNull Playerc player;
         public @NonNull ActionType type;
         public @NonNull Tile tile;
 
@@ -548,13 +548,13 @@ public class Administration{
         public int rotation;
 
         /** valid for configure and rotation-type events only. */
-        public int config;
+        public Object config;
 
         /** valid for item-type events only. */
         public @Nullable Item item;
         public int itemAmount;
 
-        public PlayerAction set(Player player, ActionType type, Tile tile){
+        public PlayerAction set(Playerc player, ActionType type, Tile tile){
             this.player = player;
             this.type = type;
             this.tile = tile;
@@ -564,7 +564,8 @@ public class Administration{
         @Override
         public void reset(){
             item = null;
-            itemAmount = config = 0;
+            itemAmount = 0;
+            config = null;
             player = null;
             type = null;
             tile = null;

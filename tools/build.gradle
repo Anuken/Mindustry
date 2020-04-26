@@ -77,7 +77,7 @@ def antialias = { File file ->
             suma.set(0)
 
             for(int val : p){
-                Color.argb8888ToColor(color, val)
+                color.argb8888(val)
                 suma.r += color.r * color.a
                 suma.g += color.g * color.a
                 suma.b += color.b * color.a
@@ -91,7 +91,7 @@ def antialias = { File file ->
             sum.set(0)
 
             for(int val : p){
-                Color.argb8888ToColor(color, val)
+                color.argb8888(val)
                 float a = color.a
                 color.lerp(suma, (float) (1f - a))
                 sum.r += color.r
@@ -103,8 +103,7 @@ def antialias = { File file ->
 
             fm = (float)(1f / total)
             sum.mul(fm, fm, fm, fm)
-            int result = Color.argb8888(sum)
-            out.setRGB(x, y, result)
+            out.setRGB(x, y, sum.argb8888())
             sum.set(0)
         }
     }
@@ -172,9 +171,9 @@ def scaleImage = { File file ->
                     M = getRGB(x, y - 2)
 
                 if(B == D && B != F && D != H && (E != A || E == C || E == G || A == J || A == K)) p1 = B
-                if(B == F & B != D & F != H && (E != C || E == A || E == I || C == J || C == L)) p2 = F
-                if(D == H & B != D & F != H && (E != G || E == A || E == I || G == K || G == M)) p3 = D
-                if(F == H & B != F & D != H && (E != I || E == C || E == G || I == L || I == M)) p4 = H
+                if(B == F && B != D && F != H && (E != C || E == A || E == I || C == J || C == L)) p2 = F
+                if(D == H && B != D && F != H && (E != G || E == A || E == I || G == K || G == M)) p3 = D
+                if(F == H && B != F && D != H && (E != I || E == C || E == G || I == L || I == M)) p4 = H
 
                 scaled.setRGB(x * 2, y * 2 + 1, p1)
                 scaled.setRGB(x * 2 + 1, y * 2 + 1, p2)
@@ -210,7 +209,7 @@ def tileImage = { File file ->
 
                 if(index != -1){
                     int resultIndex = (x == y ? 1 : index == 2 ? 0 : index == 0 ? 2 : 1);
-                    result.setRGB(x, y, Color.argb8888(list[resultIndex]))
+                    result.setRGB(x, y, list[resultIndex].argb8888())
                 }
             }
         }
@@ -315,7 +314,7 @@ task pack(dependsOn: classes){
 
         //antialias everything except UI elements
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
-            if(file.isDirectory() || file.toString().replace("\\", "/").contains("zones/") || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-"))) return
+            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-"))) return
 
             executor.submit{
                 antialias(file.file)
@@ -342,6 +341,16 @@ task genSprites(dependsOn: classes, type: JavaExec){
     jvmArgs("-Djava.awt.headless=true")
     standardInput = System.in
     workingDir = genFolder
+}
+
+task genSectorData(dependsOn: classes, type: JavaExec){
+    main = "mindustry.tools.SectorDataGenerator"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = "../core/assets/"
+}
+
+task updateCache(dependsOn: [genSectorData]){
 }
 
 task updateBundles(dependsOn: classes, type: JavaExec){

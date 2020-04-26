@@ -2,27 +2,35 @@ package mindustry.game;
 
 import arc.*;
 import arc.assets.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
-import arc.util.*;
+import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
+import arc.util.io.*;
 import arc.util.io.Streams.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.ContentType;
-import mindustry.entities.traits.BuilderTrait.*;
+import mindustry.ctype.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Schematic.*;
+import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.input.Placement.*;
+import mindustry.io.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
+import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.units.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -34,7 +42,7 @@ public class Schematics implements Loadable{
     public static final String base64Header = "bXNjaAB";
 
     private static final byte[] header = {'m', 's', 'c', 'h'};
-    private static final byte version = 0;
+    private static final byte version = 1;
 
     private static final int padding = 2;
     private static final int maxPreviewsMobile = 32;
@@ -43,7 +51,9 @@ public class Schematics implements Loadable{
     private OptimizedByteArrayOutputStream out = new OptimizedByteArrayOutputStream(1024);
     private Array<Schematic> all = new Array<>();
     private OrderedMap<Schematic, FrameBuffer> previews = new OrderedMap<>();
+    private ObjectSet<Schematic> errored = new ObjectSet<>();
     private FrameBuffer shadowBuffer;
+    private Texture errorTexture;
     private long lastClearTime;
 
     public Schematics(){
@@ -51,12 +61,21 @@ public class Schematics implements Loadable{
             previews.each((schem, m) -> m.dispose());
             previews.clear();
             shadowBuffer.dispose();
+            if(errorTexture != null){
+                errorTexture.dispose();
+            }
         });
 
         Events.on(ContentReloadEvent.class, event -> {
             previews.each((schem, m) -> m.dispose());
             previews.clear();
             load();
+        });
+
+        Events.on(ClientLoadEvent.class, event -> {
+            Pixmap pixmap = Core.atlas.getPixmap("error").crop();
+            errorTexture = new Texture(pixmap);
+            pixmap.dispose();
         });
     }
 
@@ -124,7 +143,7 @@ public class Schematics implements Loadable{
             }
 
             return s;
-        }catch(IOException e){
+        }catch(Throwable e){
             Log.err(e);
         }
         return null;
@@ -155,7 +174,15 @@ public class Schematics implements Loadable{
     }
 
     public Texture getPreview(Schematic schematic){
-        return getBuffer(schematic).getTexture();
+        if(errored.contains(schematic)) return errorTexture;
+
+        try{
+            return getBuffer(schematic).getTexture();
+        }catch(Throwable t){
+            Log.err(t);
+            errored.add(schematic);
+            return errorTexture;
+        }
     }
 
     public boolean hasPreview(Schematic schematic){
@@ -256,13 +283,11 @@ public class Schematics implements Loadable{
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
-            tile.set(st.block, state.rules.defaultTeam);
+            tile.setBlock(st.block, state.rules.defaultTeam, 0);
             tile.rotation(st.rotation);
-            if(st.block.posConfig){
-                tile.configureAny(Pos.get(tile.x - st.x + Pos.x(st.config), tile.y - st.y + Pos.y(st.config)));
-            }else{
-                tile.configureAny(st.config);
-            }
+
+            Object config = st.config;
+            tile.configureAny(config);
 
             if(st.block instanceof Drill){
                 tile.getLinkedTiles(t -> t.setOverlay(Blocks.oreCopper));
@@ -313,15 +338,15 @@ public class Schematics implements Loadable{
         boolean found = false;
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
-                Tile linked = world.ltile(cx, cy);
+                Tilec linked = world.ent(cx, cy);
 
-                if(linked != null && linked.entity != null && linked.entity.block.isVisible() && !(linked.block() instanceof BuildBlock)){
+                if(linked != null &&linked.block().isVisible() && !(linked.block() instanceof BuildBlock)){
                     int top = linked.block().size/2;
                     int bot = linked.block().size % 2 == 1 ? -linked.block().size/2 : -(linked.block().size - 1)/2;
-                    minx = Math.min(linked.x + bot, minx);
-                    miny = Math.min(linked.y + bot, miny);
-                    maxx = Math.max(linked.x + top, maxx);
-                    maxy = Math.max(linked.y + top, maxy);
+                    minx = Math.min(linked.tileX() + bot, minx);
+                    miny = Math.min(linked.tileY() + bot, miny);
+                    maxx = Math.max(linked.tileX() + top, maxx);
+                    maxy = Math.max(linked.tileY() + top, maxy);
                     found = true;
                 }
             }
@@ -341,16 +366,13 @@ public class Schematics implements Loadable{
         IntSet counted = new IntSet();
         for(int cx = ox; cx <= ox2; cx++){
             for(int cy = oy; cy <= oy2; cy++){
-                Tile tile = world.ltile(cx, cy);
+                Tilec tile = world.ent(cx, cy);
 
-                if(tile != null && tile.entity != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
-                    && (tile.entity.block.isVisible() || (tile.entity.block instanceof CoreBlock && Core.settings.getBool("coreselect")))){
-                    int config = tile.entity.config();
-                    if(tile.block().posConfig){
-                        config = Pos.get(Pos.x(config) + offsetX, Pos.y(config) + offsetY);
-                    }
+                if(tile != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
+                    && (tile.block().isVisible() || (tile.block() instanceof CoreBlock && Core.settings.getBool("coreselect")))){
+                    Object config = tile.config();
 
-                    tiles.add(new Stile(tile.block(), tile.x + offsetX, tile.y + offsetY, config, tile.rotation()));
+                    tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation()));
                     counted.add(tile.pos());
                 }
             }
@@ -397,10 +419,7 @@ public class Schematics implements Loadable{
             }
         }
 
-        int ver;
-        if((ver = input.read()) != version){
-            throw new IOException("Unknown version: " + ver);
-        }
+        int ver = input.read();
 
         try(DataInputStream stream = new DataInputStream(new InflaterInputStream(input))){
             short width = stream.readShort(), height = stream.readShort();
@@ -423,10 +442,10 @@ public class Schematics implements Loadable{
             for(int i = 0; i < total; i++){
                 Block block = blocks.get(stream.readByte());
                 int position = stream.readInt();
-                int config = stream.readInt();
+                Object config = ver == 0 ? mapConfig(block, stream.readInt(), position) : TypeIO.readObject(Reads.get(stream));
                 byte rotation = stream.readByte();
                 if(block != Blocks.air){
-                    tiles.add(new Stile(block, Pos.x(position), Pos.y(position), config, rotation));
+                    tiles.add(new Stile(block, Point2.x(position), Point2.y(position), config, rotation));
                 }
             }
 
@@ -466,11 +485,21 @@ public class Schematics implements Loadable{
             //write each tile
             for(Stile tile : schematic.tiles){
                 stream.writeByte(blocks.orderedItems().indexOf(tile.block));
-                stream.writeInt(Pos.get(tile.x, tile.y));
-                stream.writeInt(tile.config);
+                stream.writeInt(Point2.pack((int)tile.x, (int)tile.y));
+                TypeIO.writeObject(Writes.get(stream), tile.config);
                 stream.writeByte(tile.rotation);
             }
         }
+    }
+
+    /** Maps legacy int configs to new config objects. */
+    private static Object mapConfig(Block block, int value, int position){
+        if(block instanceof Sorter || block instanceof Unloader || block instanceof ItemSource) return content.item(value);
+        if(block instanceof LiquidSource) return content.liquid(value);
+        if(block instanceof MassDriver || block instanceof ItemBridge) return Point2.unpack(value).sub(Point2.x(position), Point2.y(position));
+        if(block instanceof LightBlock || block instanceof CommandCenter) return value;
+
+        return null;
     }
 
     //endregion

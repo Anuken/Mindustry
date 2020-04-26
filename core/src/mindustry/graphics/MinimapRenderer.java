@@ -1,19 +1,19 @@
 package mindustry.graphics;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.Pixmap.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class MinimapRenderer implements Disposable{
     private static final float baseSize = 16f;
-    private final Array<Unit> units = new Array<>();
+    private final Array<Unitc> units = new Array<>();
     private Pixmap pixmap;
     private Texture texture;
     private TextureRegion region;
@@ -76,7 +76,7 @@ public class MinimapRenderer implements Disposable{
             updateUnitArray();
         }else{
             units.clear();
-            Units.all(units::add);
+            Groups.unit.each(units::add);
         }
 
         float sz = baseSize * zoom;
@@ -87,22 +87,19 @@ public class MinimapRenderer implements Disposable{
 
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
 
-        for(Unit unit : units){
-            if(unit.isDead()) continue;
-            float rx = !withLabels ? (unit.x - rect.x) / rect.width * w : unit.x / (world.width() * tilesize) * w;
-            float ry = !withLabels ? (unit.y - rect.y) / rect.width * h : unit.y / (world.height() * tilesize) * h;
+        for(Unitc unit : units){
+            float rx = !withLabels ? (unit.x() - rect.x) / rect.width * w : unit.x() / (world.width() * tilesize) * w;
+            float ry = !withLabels ? (unit.y() - rect.y) / rect.width * h : unit.y() / (world.height() * tilesize) * h;
 
-            Draw.mixcol(unit.getTeam().color, 1f);
+            Draw.mixcol(unit.team().color, 1f);
             float scale = Scl.scl(1f) / 2f * scaling * 32f;
-            Draw.rect(unit.getIconRegion(), x + rx, y + ry, scale, scale, unit.rotation - 90);
+            Draw.rect(unit.type().icon(Cicon.full), x + rx, y + ry, scale, scale, unit.rotation() - 90);
             Draw.reset();
 
-            if(withLabels && unit instanceof Player){
-                Player pl = (Player) unit;
-                if(!pl.isLocal){
-                    // Only display names for other players.
-                    drawLabel(x + rx, y + ry, pl.name, unit.getTeam().color);
-                }
+            //only disable player names in multiplayer
+            if(withLabels && unit instanceof Playerc && net.active()){
+                Playerc pl = (Playerc)unit;
+                drawLabel(x + rx, y + ry, pl.name(), unit.team().color);
             }
         }
 
@@ -129,15 +126,15 @@ public class MinimapRenderer implements Disposable{
     }
 
     public void updateAll(){
-        for(int x = 0; x < world.width(); x++){
-            for(int y = 0; y < world.height(); y++){
-                pixmap.draw(x, pixmap.getHeight() - 1 - y, colorFor(world.tile(x, y)));
-            }
+        for(Tile tile : world.tiles){
+            pixmap.draw(tile.x, pixmap.getHeight() - 1 - tile.y, colorFor(tile));
         }
         texture.draw(pixmap, 0, 0);
     }
 
     public void update(Tile tile){
+        if(world.isGenerating()) return;
+
         int color = colorFor(world.tile(tile.x, tile.y));
         pixmap.draw(tile.x, pixmap.getHeight() - 1 - tile.y, color);
 
@@ -157,12 +154,11 @@ public class MinimapRenderer implements Disposable{
 
     private int colorFor(Tile tile){
         if(tile == null) return 0;
-        tile = tile.link();
         int bc = tile.block().minimapColor(tile);
-        if(bc != 0){
-            return bc;
-        }
-        return Tmp.c1.set(MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.getTeam())).mul(tile.block().cacheLayer == CacheLayer.walls ? 1f - tile.rotation() / 4f : 1f).rgba();
+        Color color = Tmp.c1.set(bc == 0 ? MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.team()) : bc);
+        color.mul(1f - Mathf.clamp(world.getDarkness(tile.x, tile.y) / 4f));
+
+        return color.rgba();
     }
 
     @Override

@@ -163,6 +163,9 @@ allprojects{
 project(":desktop"){
     apply plugin: "java"
 
+    compileJava.options.fork = true
+    compileJava.options.compilerArgs += ["-XDignore.symbol.file"]
+
     dependencies{
         compile project(":core")
 
@@ -249,8 +252,10 @@ project(":core"){
         compile "org.lz4:lz4-java:1.4.1"
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
+        compile arcModule("extensions:g3d")
+        compile arcModule("extensions:fx")
         compile arcModule("extensions:arcnet")
-        compile "org.mozilla:rhino:1.7.11"
+        compile "org.mozilla:rhino-runtime:1.7.12"
         if(localArc() && debugged()) compile arcModule("extensions:recorder")
 
         compileOnly project(":annotations")
@@ -294,7 +299,7 @@ project(":tools"){
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
         compile "org.reflections:reflections:0.9.12"
 
-        compile arcModule("backends:backend-sdl")
+        compile arcModule("backends:backend-headless")
     }
 }
 

@@ -101,20 +101,20 @@ public class SWorkshop implements SteamUGCCallback{
                         dialog.cont.add("$workshop.menu").pad(20f);
                         dialog.addCloseButton();
 
-                        dialog.buttons.addImageTextButton("$view.workshop", Icon.link, () -> {
+                        dialog.buttons.button("$view.workshop", Icon.link, () -> {
                             viewListingID(id);
                             dialog.hide();
                         }).size(210f, 64f);
 
-                        dialog.buttons.addImageTextButton("$workshop.update", Icon.up, () -> {
+                        dialog.buttons.button("$workshop.update", Icon.up, () -> {
                             new FloatingDialog("$workshop.update"){{
                                 setFillParent(false);
                                 cont.margin(10).add("$changelog").padRight(6f);
                                 cont.row();
-                                TextArea field = cont.addArea("", t -> {}).size(500f, 160f).get();
+                                TextArea field = cont.area("", t -> {}).size(500f, 160f).get();
                                 field.setMaxLength(400);
                                 buttons.defaults().size(120, 54).pad(4);
-                                buttons.addButton("$ok", () -> {
+                                buttons.button("$ok", () -> {
                                     if(!p.prePublish()){
                                         Log.info("Rejecting due to pre-publish.");
                                         return;
@@ -125,7 +125,7 @@ public class SWorkshop implements SteamUGCCallback{
                                     dialog.hide();
                                     hide();
                                 });
-                                buttons.addButton("$cancel", this::hide);
+                                buttons.button("$cancel", this::hide);
                             }}.show();
 
                         }).size(210f, 64f);
@@ -181,11 +181,11 @@ public class SWorkshop implements SteamUGCCallback{
         dialog.setFillParent(false);
         dialog.cont.add("$publish.confirm").width(600f).wrap();
         dialog.addCloseButton();
-        dialog.buttons.addImageTextButton("$eula", Icon.link,
+        dialog.buttons.button("$eula", Icon.link,
             () -> SVars.net.friends.activateGameOverlayToWebPage("https://steamcommunity.com/sharedfiles/workshoplegalagreement"))
             .size(210f, 64f);
 
-        dialog.buttons.addImageTextButton("$ok", Icon.ok, () -> {
+        dialog.buttons.button("$ok", Icon.ok, () -> {
             Log.info("Accepted, publishing item...");
             itemHandlers.add(published);
             ugc.createItem(SVars.steamID, WorkshopFileType.Community);

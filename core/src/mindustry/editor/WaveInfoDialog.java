@@ -42,24 +42,24 @@ public class WaveInfoDialog extends FloatingDialog{
         });
 
         keyDown(key -> {
-            if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
+            if(key == KeyCode.escape || key == KeyCode.back){
                 Core.app.post(this::hide);
             }
         });
 
         addCloseButton();
-        buttons.addButton("$waves.edit", () -> {
+        buttons.button("$waves.edit", () -> {
             FloatingDialog dialog = new FloatingDialog("$waves.edit");
             dialog.addCloseButton();
             dialog.setFillParent(false);
             dialog.cont.defaults().size(210f, 64f);
-            dialog.cont.addButton("$waves.copy", () -> {
+            dialog.cont.button("$waves.copy", () -> {
                 ui.showInfoFade("$waves.copied");
                 Core.app.setClipboardText(maps.writeWaves(groups));
                 dialog.hide();
             }).disabled(b -> groups == null);
             dialog.cont.row();
-            dialog.cont.addButton("$waves.load", () -> {
+            dialog.cont.button("$waves.load", () -> {
                 try{
                     groups = maps.readWaves(Core.app.getClipboardText());
                     buildGroups();
@@ -70,7 +70,7 @@ public class WaveInfoDialog extends FloatingDialog{
                 dialog.hide();
             }).disabled(b -> Core.app.getClipboardText() == null || Core.app.getClipboardText().isEmpty());
             dialog.cont.row();
-            dialog.cont.addButton("$settings.reset", () -> ui.showConfirm("$confirm", "$settings.clear.confirm", () -> {
+            dialog.cont.button("$settings.reset", () -> ui.showConfirm("$confirm", "$settings.clear.confirm", () -> {
                 groups = JsonIO.copy(defaultWaves.get());
                 buildGroups();
                 dialog.hide();
@@ -86,7 +86,7 @@ public class WaveInfoDialog extends FloatingDialog{
         cont.stack(new Table(Tex.clear, main -> {
             main.pane(t -> table = t).growX().growY().padRight(8f).get().setScrollingDisabled(true, false);
             main.row();
-            main.addButton("$add", () -> {
+            main.button("$add", () -> {
                 if(groups == null) groups = new Array<>();
                 groups.add(new SpawnGroup(lastType));
                 buildGroups();
@@ -101,7 +101,7 @@ public class WaveInfoDialog extends FloatingDialog{
         cont.table(Tex.clear, m -> {
             m.add("$waves.preview").color(Color.lightGray).growX().center().get().setAlignment(Align.center, Align.center);
             m.row();
-            m.addButton("-", () -> {
+            m.button("-", () -> {
             }).update(t -> {
                 if(t.getClickListener().isPressed()){
                     updateTimer += Time.delta();
@@ -115,7 +115,7 @@ public class WaveInfoDialog extends FloatingDialog{
             m.row();
             m.pane(t -> preview = t).grow().get().setScrollingDisabled(true, true);
             m.row();
-            m.addButton("+", () -> {
+            m.button("+", () -> {
             }).update(t -> {
                 if(t.getClickListener().isPressed()){
                     updateTimer += Time.delta();
@@ -140,22 +140,22 @@ public class WaveInfoDialog extends FloatingDialog{
             for(SpawnGroup group : groups){
                 table.table(Tex.button, t -> {
                     t.margin(0).defaults().pad(3).padLeft(5f).growX().left();
-                    t.addButton(b -> {
+                    t.button(b -> {
                         b.left();
-                        b.addImage(group.type.icon(mindustry.ui.Cicon.medium)).size(32f).padRight(3);
+                        b.image(group.type.icon(mindustry.ui.Cicon.medium)).size(32f).padRight(3);
                         b.add(group.type.localizedName).color(Pal.accent);
                     }, () -> showUpdate(group)).pad(-6f).padBottom(0f);
 
                     t.row();
                     t.table(spawns -> {
-                        spawns.addField("" + (group.begin + 1), TextFieldFilter.digitsOnly, text -> {
+                        spawns.field("" + (group.begin + 1), TextFieldFilter.digitsOnly, text -> {
                             if(Strings.canParsePostiveInt(text)){
                                 group.begin = Strings.parseInt(text) - 1;
                                 updateWaves();
                             }
                         }).width(100f);
                         spawns.add("$waves.to").padLeft(4).padRight(4);
-                        spawns.addField(group.end == never ? "" : (group.end + 1) + "", TextFieldFilter.digitsOnly, text -> {
+                        spawns.field(group.end == never ? "" : (group.end + 1) + "", TextFieldFilter.digitsOnly, text -> {
                             if(Strings.canParsePostiveInt(text)){
                                 group.end = Strings.parseInt(text) - 1;
                                 updateWaves();
@@ -168,7 +168,7 @@ public class WaveInfoDialog extends FloatingDialog{
                     t.row();
                     t.table(p -> {
                         p.add("$waves.every").padRight(4);
-                        p.addField(group.spacing + "", TextFieldFilter.digitsOnly, text -> {
+                        p.field(group.spacing + "", TextFieldFilter.digitsOnly, text -> {
                             if(Strings.canParsePostiveInt(text) && Strings.parseInt(text) > 0){
                                 group.spacing = Strings.parseInt(text);
                                 updateWaves();
@@ -179,7 +179,7 @@ public class WaveInfoDialog extends FloatingDialog{
 
                     t.row();
                     t.table(a -> {
-                        a.addField(group.unitAmount + "", TextFieldFilter.digitsOnly, text -> {
+                        a.field(group.unitAmount + "", TextFieldFilter.digitsOnly, text -> {
                             if(Strings.canParsePostiveInt(text)){
                                 group.unitAmount = Strings.parseInt(text);
                                 updateWaves();
@@ -187,7 +187,7 @@ public class WaveInfoDialog extends FloatingDialog{
                         }).width(80f);
 
                         a.add(" + ");
-                        a.addField(Strings.fixed(Math.max((Mathf.zero(group.unitScaling) ? 0 : 1f / group.unitScaling), 0), 2), TextFieldFilter.floatsOnly, text -> {
+                        a.field(Strings.fixed(Math.max((Mathf.zero(group.unitScaling) ? 0 : 1f / group.unitScaling), 0), 2), TextFieldFilter.floatsOnly, text -> {
                             if(Strings.canParsePositiveFloat(text)){
                                 group.unitScaling = 1f / Strings.parseFloat(text);
                                 updateWaves();
@@ -197,10 +197,10 @@ public class WaveInfoDialog extends FloatingDialog{
                     });
 
                     t.row();
-                    t.addCheck("$waves.boss", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss));
+                    t.check("$waves.boss", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss));
 
                     t.row();
-                    t.addButton("$waves.remove", () -> {
+                    t.button("$waves.remove", () -> {
                         groups.remove(group);
                         table.getCell(t).pad(0f);
                         t.remove();
@@ -222,9 +222,9 @@ public class WaveInfoDialog extends FloatingDialog{
         dialog.cont.pane(p -> {
             int i = 0;
             for(UnitType type : content.units()){
-                p.addButton(t -> {
+                p.button(t -> {
                     t.left();
-                    t.addImage(type.icon(mindustry.ui.Cicon.medium)).size(40f).padRight(2f);
+                    t.image(type.icon(mindustry.ui.Cicon.medium)).size(40f).padRight(2f);
                     t.add(type.localizedName);
                 }, () -> {
                     lastType = type;
@@ -257,7 +257,7 @@ public class WaveInfoDialog extends FloatingDialog{
                 for(int j = 0; j < spawned.length; j++){
                     if(spawned[j] > 0){
                         UnitType type = content.getByID(ContentType.unit, j);
-                        table.addImage(type.icon(Cicon.medium)).size(8f * 4f).padRight(4);
+                        table.image(type.icon(Cicon.medium)).size(8f * 4f).padRight(4);
                         table.add(spawned[j] + "x").color(Color.lightGray).padRight(6);
                         table.row();
                     }

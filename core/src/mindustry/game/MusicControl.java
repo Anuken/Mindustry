@@ -2,11 +2,10 @@ package mindustry.game;
 
 import arc.*;
 import arc.audio.*;
-import arc.struct.*;
 import arc.math.*;
-import arc.util.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.core.GameState.*;
+import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 
@@ -44,11 +43,20 @@ public class MusicControl{
         darkMusic = Array.with(Musics.game2, Musics.game5, Musics.game7);
     }
 
+    public void stop(){
+        silenced = true;
+        if(current != null){
+            current.stop();
+            current = null;
+            fade = 0f;
+        }
+    }
+
     /** Update and play the right music track.*/
     public void update(){
-        if(state.is(State.menu)){
+        if(state.isMenu()){
             silenced = false;
-            if(ui.deploy.isShown()){
+            if(ui.planet.isShown()){
                 play(Musics.launch);
             }else if(ui.editor.isShown()){
                 play(Musics.editor);
@@ -83,7 +91,7 @@ public class MusicControl{
 
     /** Whether to play dark music.*/
     private boolean isDark(){
-        if(state.teams.get(player.getTeam()).hasCore() && state.teams.get(player.getTeam()).core().healthf() < 0.85f){
+        if(state.teams.get(player.team()).hasCore() && state.teams.get(player.team()).core().healthf() < 0.85f){
             //core damaged -> dark
             return true;
         }
@@ -100,7 +108,14 @@ public class MusicControl{
     /** Plays and fades in a music track. This must be called every frame.
      * If something is already playing, fades out that track and fades in this new music.*/
     private void play(@Nullable Music music){
-        if(!shouldPlay()) return;
+        if(!shouldPlay()){
+            if(current != null){
+                current.setVolume(0);
+            }
+
+            fade = 0f;
+            return;
+        }
 
         //update volume of current track
         if(current != null){

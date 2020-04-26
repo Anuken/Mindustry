@@ -25,6 +25,7 @@ public class ImagePacker{
 
     public static void main(String[] args) throws Exception{
         Vars.headless = true;
+        ArcNativesLoader.load();
 
         Log.setLogger(new NoopLogHandler());
         Vars.content = new ContentLoader();
@@ -109,7 +110,7 @@ public class ImagePacker{
         map.each((key, val) -> content2id.put(val.split("\\|")[0], key));
 
         Array<UnlockableContent> cont = Array.withArrays(Vars.content.blocks(), Vars.content.items(), Vars.content.liquids());
-        cont.removeAll(u -> u instanceof BlockPart || u instanceof BuildBlock || u == Blocks.air);
+        cont.removeAll(u -> u instanceof BuildBlock || u == Blocks.air);
 
         int minid = 0xF8FF;
         for(String key : map.keys()){

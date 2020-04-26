@@ -26,7 +26,7 @@ public class MapsDialog extends FloatingDialog{
         buttons.remove();
 
         keyDown(key -> {
-            if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
+            if(key == KeyCode.escape || key == KeyCode.back){
                 Core.app.post(this::hide);
             }
         });
@@ -44,13 +44,13 @@ public class MapsDialog extends FloatingDialog{
         buttons.clearChildren();
 
         if(Core.graphics.isPortrait()){
-            buttons.addImageTextButton("$back", Icon.left, this::hide).size(210f*2f, 64f).colspan(2);
+            buttons.button("$back", Icon.left, this::hide).size(210f*2f, 64f).colspan(2);
             buttons.row();
         }else{
-            buttons.addImageTextButton("$back", Icon.left, this::hide).size(210f, 64f);
+            buttons.button("$back", Icon.left, this::hide).size(210f, 64f);
         }
 
-        buttons.addImageTextButton("$editor.newmap", Icon.add, () -> {
+        buttons.button("$editor.newmap", Icon.add, () -> {
             ui.showTextInput("$editor.newmap", "$editor.mapname", "", text -> {
                 Runnable show = () -> ui.loadAnd(() -> {
                     hide();
@@ -67,7 +67,7 @@ public class MapsDialog extends FloatingDialog{
             });
         }).size(210f, 64f);
 
-        buttons.addImageTextButton("$editor.importmap", Icon.upload, () -> {
+        buttons.button("$editor.importmap", Icon.upload, () -> {
             platform.showFileChooser(true, mapExtension, file -> {
                 ui.loadAnd(() -> {
                     maps.tryCatchMapError(() -> {
@@ -134,12 +134,12 @@ public class MapsDialog extends FloatingDialog{
                 maps.row();
             }
 
-            TextButton button = maps.addButton("", Styles.cleart, () -> showMapInfo(map)).width(mapsize).pad(8).get();
+            TextButton button = maps.button("", Styles.cleart, () -> showMapInfo(map)).width(mapsize).pad(8).get();
             button.clearChildren();
             button.margin(9);
             button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
             button.row();
-            button.addImage().growX().pad(4).color(Pal.gray);
+            button.image().growX().pad(4).color(Pal.gray);
             button.row();
             button.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize - 20f);
             button.row();
@@ -183,7 +183,7 @@ public class MapsDialog extends FloatingDialog{
             t.row();
             t.add("$editor.author").padRight(10).color(Color.gray);
             t.row();
-            t.add(map.custom && map.author().isEmpty() ? "Anuke" : map.author()).growX().wrap().padTop(2);
+            t.add(!map.custom && map.author().isEmpty() ? "Anuke" : map.author()).growX().wrap().padTop(2);
             t.row();
             t.add("$editor.description").padRight(10).color(Color.gray).top();
             t.row();
@@ -192,7 +192,7 @@ public class MapsDialog extends FloatingDialog{
 
         table.row();
 
-        table.addImageTextButton("$editor.openin", Icon.export, () -> {
+        table.button("$editor.openin", Icon.export, () -> {
             try{
                 Vars.ui.editor.beginEditMap(map.file);
                 dialog.hide();
@@ -203,7 +203,7 @@ public class MapsDialog extends FloatingDialog{
             }
         }).fillX().height(54f).marginLeft(10);
 
-        table.addImageTextButton(map.workshop && steam ? "$view.workshop" : "$delete", map.workshop && steam ? Icon.link : Icon.trash, () -> {
+        table.button(map.workshop && steam ? "$view.workshop" : "$delete", map.workshop && steam ? Icon.link : Icon.trash, () -> {
             if(map.workshop && steam){
                 platform.viewListing(map);
             }else{

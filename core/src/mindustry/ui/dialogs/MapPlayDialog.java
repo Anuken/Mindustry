@@ -15,8 +15,7 @@ import static mindustry.Vars.*;
 public class MapPlayDialog extends FloatingDialog{
     CustomRulesDialog dialog = new CustomRulesDialog();
     Rules rules;
-    @NonNull
-    Gamemode selectedGamemode = Gamemode.survival;
+    @NonNull Gamemode selectedGamemode = Gamemode.survival;
     Map lastMap;
 
     public MapPlayDialog(){
@@ -57,18 +56,18 @@ public class MapPlayDialog extends FloatingDialog{
         for(Gamemode mode : Gamemode.values()){
             if(mode.hidden) continue;
 
-            modes.addButton(mode.toString(), Styles.togglet, () -> {
+            modes.button(mode.toString(), Styles.togglet, () -> {
                 selectedGamemode = mode;
                 rules = map.applyRules(mode);
             }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, 54f).disabled(!mode.valid(map));
             if(i++ % 2 == 1) modes.row();
         }
         selmode.add(modes);
-        selmode.addButton("?", this::displayGameModeHelp).width(50f).fillY().padLeft(18f);
+        selmode.button("?", this::displayGameModeHelp).width(50f).fillY().padLeft(18f);
 
         cont.add(selmode);
         cont.row();
-        cont.addImageTextButton("$customize", Icon.settings, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).width(230);
+        cont.button("$customize", Icon.settings, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).width(230);
         cont.row();
         cont.add(new BorderImage(map.safeTexture(), 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
         //only maps with survival are valid for high scores
@@ -80,7 +79,7 @@ public class MapPlayDialog extends FloatingDialog{
         buttons.clearChildren();
         addCloseButton();
 
-        buttons.addImageTextButton("$play", Icon.play, () -> {
+        buttons.button("$play", Icon.play, () -> {
             control.playMap(map, rules);
             hide();
             ui.custom.hide();
@@ -104,7 +103,7 @@ public class MapPlayDialog extends FloatingDialog{
         }
 
         d.cont.add(pane);
-        d.buttons.addButton("$ok", d::hide).size(110, 50).pad(10f);
+        d.buttons.button("$ok", d::hide).size(110, 50).pad(10f);
         d.show();
     }
 }

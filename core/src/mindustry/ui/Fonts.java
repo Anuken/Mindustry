@@ -74,7 +74,10 @@ public class Fonts{
                 int ch = Integer.parseInt(character);
                 TextureRegion region = Core.atlas.find(texture);
 
-                if(region.getTexture() != uitex) throw new IllegalArgumentException("Font icon '" + texture + "' is not in the UI texture.");
+                if(region.getTexture() != uitex){
+                    continue;
+                    //throw new IllegalArgumentException("Font icon '" + texture + "' is not in the UI texture.");
+                }
 
                 unicodeIcons.put(nametex[0], ch);
 

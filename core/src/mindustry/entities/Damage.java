@@ -1,17 +1,14 @@
 package mindustry.entities;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.entities.Effects.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -33,12 +30,11 @@ public class Damage{
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
         for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
             int branches = 5 + Mathf.clamp((int)(power / 30), 1, 20);
-            Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3,
-            x, y, Mathf.random(360f), branches + Mathf.range(2)));
+            Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2)));
         }
 
         for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
-            Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), 1, 1));
+            Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, -1f, Mathf.random(360f), 1, 1));
         }
 
         int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
@@ -47,21 +43,21 @@ public class Damage{
             int f = i;
             Time.run(i * 2f, () -> {
                 Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f);
-                Effects.effect(Fx.blockExplosionSmoke, x + Mathf.range(radius), y + Mathf.range(radius));
+                Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
             });
         }
 
         if(explosiveness > 15f){
-            Effects.effect(Fx.shockwave, x, y);
+            Fx.shockwave.at(x, y);
         }
 
         if(explosiveness > 30f){
-            Effects.effect(Fx.bigShockwave, x, y);
+            Fx.bigShockwave.at(x, y);
         }
 
         float shake = Math.min(explosiveness / 4f + 3f, 9f);
         Effects.shake(shake, shake, x, y);
-        Effects.effect(Fx.dynamicExplosion, x, y, radius / 8f);
+        Fx.dynamicExplosion.at(x, y, radius / 8f);
     }
 
     public static void createIncend(float x, float y, float range, int amount){
@@ -70,12 +66,12 @@ public class Damage{
             float cy = y + Mathf.range(range);
             Tile tile = world.tileWorld(cx, cy);
             if(tile != null){
-                Fire.create(tile);
+                Fires.create(tile);
             }
         }
     }
 
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length){
+    public static void collideLine(Bulletc hitter, Team team, Effect effect, float x, float y, float angle, float length){
         collideLine(hitter, team, effect, x, y, angle, length, false);
     }
 
@@ -83,15 +79,15 @@ public class Damage{
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
+    public static void collideLine(Bulletc hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
         collidedBlocks.clear();
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {
-            Tile tile = world.ltile(cx, cy);
-            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.entity != null && tile.getTeamID() != team.id && tile.entity.collide(hitter)){
-                tile.entity.collision(hitter);
+            Tilec tile = world.ent(cx, cy);
+            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.team() != team && tile.collide(hitter)){
+                tile.collision(hitter);
                 collidedBlocks.add(tile.pos());
-                hitter.getBulletType().hit(hitter, tile.worldx(), tile.worldy());
+                hitter.type().hit(hitter, tile.x(), tile.y());
             }
         };
 
@@ -125,7 +121,7 @@ public class Damage{
         rect.width += expand * 2;
         rect.height += expand * 2;
 
-        Cons<Unit> cons = e -> {
+        Cons<Unitc> cons = e -> {
             e.hitbox(hitrect);
             Rect other = hitrect;
             other.y -= expand;
@@ -136,7 +132,7 @@ public class Damage{
             Vec2 vec = Geometry.raycastRect(x, y, x2, y2, other);
 
             if(vec != null){
-                Effects.effect(effect, vec.x, vec.y);
+                effect.at(vec.x, vec.y);
                 e.collision(hitter, vec.x, vec.y);
                 hitter.collision(e, vec.x, vec.y);
             }
@@ -146,8 +142,8 @@ public class Damage{
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
-    public static void damageUnits(Team team, float x, float y, float size, float damage, Boolf<Unit> predicate, Cons<Unit> acceptor){
-        Cons<Unit> cons = entity -> {
+    public static void damageUnits(Team team, float x, float y, float size, float damage, Boolf<Unitc> predicate, Cons<Unitc> acceptor){
+        Cons<Unitc> cons = entity -> {
             if(!predicate.get(entity)) return;
 
             entity.hitbox(hitrect);
@@ -178,15 +174,15 @@ public class Damage{
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete){
-        Cons<Unit> cons = entity -> {
-            if(entity.getTeam() == team || entity.dst(x, y) > radius){
+        Cons<Unitc> cons = entity -> {
+            if(entity.team() == team || entity.dst(x, y) > radius){
                 return;
             }
-            float amount = calculateDamage(x, y, entity.x, entity.y, radius, damage);
+            float amount = calculateDamage(x, y, entity.getX(), entity.getY(), radius, damage);
             entity.damage(amount);
             //TODO better velocity displacement
-            float dst = tr.set(entity.x - x, entity.y - y).len();
-            entity.velocity().add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
+            float dst = tr.set(entity.getX() - x, entity.getY() - y).len();
+            entity.vel().add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
 
             if(complete && damage >= 9999999f && entity == player){
                 Events.fire(Trigger.exclusionDeath);
@@ -231,15 +227,15 @@ public class Damage{
             int scaledDamage = (int)(damage * (1f - (float)dst / radius));
 
             bits.set(bitOffset + x, bitOffset + y);
-            Tile tile = world.ltile(startx + x, starty + y);
+            Tilec tile = world.ent(startx + x, starty + y);
 
             if(scaledDamage <= 0 || tile == null) continue;
 
             //apply damage to entity if needed
-            if(tile.entity != null && tile.getTeam() != team){
-                int health = (int)tile.entity.health;
-                if(tile.entity.health > 0){
-                    tile.entity.damage(scaledDamage);
+            if(tile.team() != team){
+                int health = (int)tile.health();
+                if(tile.health() > 0){
+                    tile.damage(scaledDamage);
                     scaledDamage -= health;
 
                     if(scaledDamage <= 0) continue;
@@ -259,7 +255,7 @@ public class Damage{
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
-                if(tile != null && tile.entity != null && (team == null ||team.isEnemy(tile.getTeam())) && Mathf.dst(dx, dy) <= trad){
+                if(tile != null && tile.entity != null && (team == null ||team.isEnemy(tile.team())) && Mathf.dst(dx, dy) <= trad){
                     tile.entity.damage(damage);
                 }
             }

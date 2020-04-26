@@ -21,9 +21,9 @@ public class FadeInFragment extends Fragment{
 
              @Override
              public void draw(){
-                Draw.color(0f, 0f, 0f, Mathf.clamp(1f - time));
-                Fill.crect(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
-                Draw.color();
+                 Draw.color(0f, 0f, 0f, Mathf.clamp(1f - time));
+                 Fill.crect(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
+                 Draw.color();
              }
 
             @Override

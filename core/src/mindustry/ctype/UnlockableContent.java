@@ -11,7 +11,7 @@ import mindustry.ui.Cicon;
 
 /** Base interface for an unlockable content type. */
 public abstract class UnlockableContent extends MappableContent{
-    /** Localized, formal name. Never null. Set to block name if not found in bundle. */
+    /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
     /** Localized description. May be null. */
     public @Nullable String description;
@@ -54,7 +54,7 @@ public abstract class UnlockableContent extends MappableContent{
     public void onUnlock(){
     }
 
-    /** Whether this content is always hidden in the content info dialog. */
+    /** Whether this content is always hidden in the content database dialog. */
     public boolean isHidden(){
         return false;
     }
@@ -70,7 +70,7 @@ public abstract class UnlockableContent extends MappableContent{
 
     /** @return whether this content is unlocked, or the player is in a custom game. */
     public final boolean unlockedCur(){
-        return Vars.data.isUnlocked(this) || !Vars.world.isZone();
+        return Vars.data.isUnlocked(this) || !Vars.state.isCampaign();
     }
 
     public final boolean locked(){

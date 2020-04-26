@@ -1,24 +1,17 @@
 package mindustry.world.blocks.production;
 
-import arc.Core;
-import arc.struct.Array;
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import mindustry.graphics.Layer;
-import mindustry.type.Liquid;
-import mindustry.ui.Cicon;
-import mindustry.world.Tile;
-import mindustry.world.blocks.LiquidBlock;
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.*;
+import mindustry.world.blocks.liquid.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.tilesize;
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class Pump extends LiquidBlock{
-    protected final Array<Tile> drawTiles = new Array<>();
-    protected final Array<Tile> updateTiles = new Array<>();
-
     public final int timerContentCheck = timers++;
 
     /** Pump amount, total. */
@@ -26,7 +19,6 @@ public class Pump extends LiquidBlock{
 
     public Pump(String name){
         super(name);
-        layer = Layer.overlay;
         group = BlockGroup.liquids;
         floating = true;
     }
@@ -45,16 +37,6 @@ public class Pump extends LiquidBlock{
     }
 
     @Override
-    public void draw(Tile tile){
-        Draw.rect(name, tile.drawx(), tile.drawy());
-
-        Draw.color(tile.entity.liquids.current().color);
-        Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
-        Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
-        Draw.color();
-    }
-
-    @Override
     public void drawPlace(int x, int y, int rotation, boolean valid) {
         Tile tile = world.tile(x, y);
         if(tile == null) return;
@@ -63,7 +45,7 @@ public class Pump extends LiquidBlock{
         Liquid liquidDrop = null;
 
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-            if(isValid(other)){
+            if(canPump(other)){
                 liquidDrop = other.floor().liquidDrop;
                 tiles++;
             }
@@ -88,7 +70,7 @@ public class Pump extends LiquidBlock{
     public boolean canPlaceOn(Tile tile){
         if(isMultiblock()){
             Liquid last = null;
-            for(Tile other : tile.getLinkedTilesAs(this, drawTiles)){
+            for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
                 if(other.floor().liquidDrop == null)
                     continue;
                 if(other.floor().liquidDrop != last && last != null)
@@ -97,41 +79,54 @@ public class Pump extends LiquidBlock{
             }
             return last != null;
         }else{
-            return isValid(tile);
+            return canPump(tile);
         }
     }
 
-    @Override
-    public void update(Tile tile){
-        float tiles = 0f;
-        Liquid liquidDrop = null;
-
-        if(isMultiblock()){
-            for(Tile other : tile.getLinkedTiles(updateTiles)){
-                if(isValid(other)){
-                    liquidDrop = other.floor().liquidDrop;
-                    tiles++;
-                }
-            }
-        }else{
-            tiles = 1f;
-            liquidDrop = tile.floor().liquidDrop;
-        }
-
-        if(tile.entity.cons.valid() && liquidDrop != null){
-            float maxPump = Math.min(liquidCapacity - tile.entity.liquids.total(), tiles * pumpAmount * tile.entity.delta() / size / size) * tile.entity.efficiency();
-            tile.entity.liquids.add(liquidDrop, maxPump);
-        }
-
-        if(tile.entity.liquids.currentAmount() > 0f && tile.entity.timer.get(timerContentCheck, 10)){
-            useContent(tile, tile.entity.liquids.current());
-        }
-
-        tryDumpLiquid(tile, tile.entity.liquids.current());
-    }
-
-    protected boolean isValid(Tile tile){
+    protected boolean canPump(Tile tile){
         return tile != null && tile.floor().liquidDrop != null;
+    }
+
+    public class PumpEntity extends LiquidBlockEntity{
+
+        @Override
+        public void draw(){
+            Draw.rect(name, x, y);
+
+            Draw.color(liquids.current().color);
+            Draw.alpha(liquids.total() / liquidCapacity);
+            Draw.rect(liquidRegion, x, y);
+            Draw.color();
+        }
+
+        @Override
+        public void updateTile(){
+            float tiles = 0f;
+            Liquid liquidDrop = null;
+
+            if(isMultiblock()){
+                for(Tile other : tile.getLinkedTiles(tempTiles)){
+                    if(canPump(other)){
+                        liquidDrop = other.floor().liquidDrop;
+                        tiles++;
+                    }
+                }
+            }else{
+                tiles = 1f;
+                liquidDrop = tile.floor().liquidDrop;
+            }
+
+            if(cons.valid() && liquidDrop != null){
+                float maxPump = Math.min(liquidCapacity - liquids.total(), tiles * pumpAmount * delta() / size / size) * efficiency();
+                liquids.add(liquidDrop, maxPump);
+            }
+
+            if(liquids.currentAmount() > 0f && timer(timerContentCheck, 10)){
+                useContent(liquids.current());
+            }
+
+            dumpLiquid(liquids.current());
+        }
     }
 
 }

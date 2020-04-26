@@ -1,21 +1,20 @@
 package mindustry.world.blocks.distribution;
 
 import arc.*;
-import arc.struct.*;
-import arc.struct.IntSet.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
+import arc.struct.IntSet.*;
 import arc.util.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import arc.util.io.*;
+import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -26,27 +25,23 @@ public class ItemBridge extends Block{
     public TextureRegion endRegion, bridgeRegion, arrowRegion;
 
     private static BuildRequest otherReq;
-    private static int lastPlaced = Pos.invalid;
+    private static int lastPlaced = -1;
 
     public ItemBridge(String name){
         super(name);
         update = true;
         solid = true;
         hasPower = true;
-        layer = Layer.power;
         expanded = true;
         itemCapacity = 10;
-        posConfig = true;
         configurable = true;
         hasItems = true;
         unloadable = false;
         group = BlockGroup.transportation;
-        entityType = ItemBridgeEntity::new;
-    }
-
-    @Override
-    public void configured(Tile tile, Player player, int value){
-        tile.<ItemBridgeEntity>ent().link = value;
+        //point2 config is relative
+        config(Point2.class, (tile, i) -> ((ItemBridgeEntity)tile).link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
+        //integer is not
+        config(Integer.class, (tile, i) -> ((ItemBridgeEntity)tile).link = i);
     }
 
     @Override
@@ -62,7 +57,7 @@ public class ItemBridge extends Block{
     public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
         otherReq = null;
         list.each(other -> {
-            if(other.block == this && req.config == Pos.get(other.x, other.y)){
+            if(other.block == this && req != other && req.config instanceof Point2 && ((Point2)req.config).equals(other.x - req.x, other.y - req.y)){
                 otherReq = other;
             }
         });
@@ -77,23 +72,6 @@ public class ItemBridge extends Block{
         otherReq.drawy(), CapStyle.none, -tilesize / 2f);
         Draw.rect(arrowRegion, (req.drawx() + otherReq.drawx()) / 2f, (req.drawy() + otherReq.drawy()) / 2f,
             Angles.angle(req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy()));
-    }
-
-    @Override
-    public void playerPlaced(Tile tile){
-        Tile link = findLink(tile.x, tile.y);
-        if(linkValid(tile, link)){
-            link.configure(tile.pos());
-        }
-
-        lastPlaced = tile.pos();
-    }
-
-    public Tile findLink(int x, int y){
-        if(world.tile(x, y) != null && linkValid(world.tile(x, y), world.tile(lastPlaced)) && lastPlaced != Pos.get(x, y)){
-            return world.tile(lastPlaced);
-        }
-        return null;
     }
 
     @Override
@@ -124,226 +102,6 @@ public class ItemBridge extends Block{
         Draw.reset();
     }
 
-    @Override
-    public void drawConfigure(Tile tile){
-        ItemBridgeEntity entity = tile.ent();
-
-        Draw.color(Pal.accent);
-        Lines.stroke(1f);
-        Lines.square(tile.drawx(), tile.drawy(),
-        tile.block().size * tilesize / 2f + 1f);
-
-        for(int i = 1; i <= range; i++){
-            for(int j = 0; j < 4; j++){
-                Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
-                if(linkValid(tile, other)){
-                    boolean linked = other.pos() == entity.link;
-                    Draw.color(linked ? Pal.place : Pal.breakInvalid);
-
-                    Lines.square(other.drawx(), other.drawy(),
-                    other.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
-                }
-            }
-        }
-
-        Draw.reset();
-    }
-
-    @Override
-    public boolean onConfigureTileTapped(Tile tile, Tile other){
-        ItemBridgeEntity entity = tile.ent();
-
-        if(linkValid(tile, other)){
-            if(entity.link == other.pos()){
-                tile.configure(Pos.invalid);
-            }else{
-                tile.configure(other.pos());
-            }
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void update(Tile tile){
-        ItemBridgeEntity entity = tile.ent();
-
-        entity.time += entity.cycleSpeed * entity.delta();
-        entity.time2 += (entity.cycleSpeed - 1f) * entity.delta();
-
-        IntSetIterator it = entity.incoming.iterator();
-        while(it.hasNext){
-            int i = it.next();
-            Tile other = world.tile(i);
-            if(!linkValid(tile, other, false) || other.<ItemBridgeEntity>ent().link != tile.pos()){
-                it.remove();
-            }
-        }
-
-        Tile other = world.tile(entity.link);
-        if(!linkValid(tile, other)){
-            tryDump(tile);
-            entity.uptime = 0f;
-        }else{
-            ((ItemBridgeEntity)world.tile(entity.link).entity).incoming.add(tile.pos());
-
-            if(entity.cons.valid() && Mathf.zero(1f - entity.efficiency())){
-                entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
-            }else{
-                entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
-            }
-
-            updateTransport(tile, other);
-        }
-    }
-
-    public void updateTransport(Tile tile, Tile other){
-        ItemBridgeEntity entity = tile.ent();
-
-        if(entity.uptime >= 0.5f && entity.timer.get(timerTransport, transportTime)){
-            Item item = entity.items.take();
-            if(item != null && other.block().acceptItem(item, other, tile)){
-                other.block().handleItem(item, other, tile);
-                entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
-            }else{
-                entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 1f, 0.01f);
-                if(item != null) entity.items.add(item, 1);
-            }
-        }
-    }
-
-    @Override
-    public void drawLayer(Tile tile){
-        ItemBridgeEntity entity = tile.ent();
-
-        Tile other = world.tile(entity.link);
-        if(!linkValid(tile, other)) return;
-
-        float opacity = Core.settings.getInt("bridgeopacity") / 100f;
-        if(Mathf.zero(opacity)) return;
-
-        int i = tile.absoluteRelativeTo(other.x, other.y);
-
-        Draw.color(Color.white, Color.black, Mathf.absin(Time.time(), 6f, 0.07f));
-        Draw.alpha(Math.max(entity.uptime, 0.25f) * opacity);
-
-        Draw.rect(endRegion, tile.drawx(), tile.drawy(), i * 90 + 90);
-        Draw.rect(endRegion, other.drawx(), other.drawy(), i * 90 + 270);
-
-        Lines.stroke(8f);
-        Lines.line(bridgeRegion,
-        tile.worldx(),
-        tile.worldy(),
-        other.worldx(),
-        other.worldy(), CapStyle.none, -tilesize / 2f);
-
-        int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y));
-
-        float time = entity.time2 / 1.7f;
-        int arrows = (dist) * tilesize / 4 - 2;
-
-        Draw.color();
-
-        for(int a = 0; a < arrows; a++){
-            Draw.alpha(Mathf.absin(a / (float)arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime * opacity);
-            Draw.rect(arrowRegion,
-            tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 4f + time % 4f),
-            tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 4f + time % 4f), i * 90f);
-        }
-        Draw.reset();
-    }
-
-    @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        if(tile.getTeam() != source.getTeam()) return false;
-
-        ItemBridgeEntity entity = tile.ent();
-        Tile other = world.tile(entity.link);
-
-        if(linkValid(tile, other)){
-            int rel = tile.absoluteRelativeTo(other.x, other.y);
-            int rel2 = tile.relativeTo(source.x, source.y);
-
-            if(rel == rel2) return false;
-        }else{
-            return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>ent().link == tile.pos() && tile.entity.items.total() < itemCapacity;
-        }
-
-        return tile.entity.items.total() < itemCapacity;
-    }
-
-
-    @Override
-    public boolean canDumpLiquid(Tile tile, Tile to, Liquid liquid){
-        ItemBridgeEntity entity = tile.ent();
-
-        Tile other = world.tile(entity.link);
-        if(!linkValid(tile, other)){
-            Tile edge = Edges.getFacingEdge(to, tile);
-            int i = tile.absoluteRelativeTo(edge.x, edge.y);
-
-            IntSetIterator it = entity.incoming.iterator();
-
-            while(it.hasNext){
-                int v = it.next();
-                if(tile.absoluteRelativeTo(Pos.x(v), Pos.y(v)) == i){
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        int rel = tile.absoluteRelativeTo(other.x, other.y);
-        int rel2 = tile.relativeTo(to.x, to.y);
-
-        return rel != rel2;
-    }
-
-    @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        if(tile.getTeam() != source.getTeam() || !hasLiquids) return false;
-
-        ItemBridgeEntity entity = tile.ent();
-        Tile other = world.tile(entity.link);
-
-        if(linkValid(tile, other)){
-            int rel = tile.absoluteRelativeTo(other.x, other.y);
-            int rel2 = tile.relativeTo(source.x, source.y);
-
-            if(rel == rel2) return false;
-        }else if(!(source.block() instanceof ItemBridge && source.<ItemBridgeEntity>ent().link == tile.pos())){
-            return false;
-        }
-
-        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f);
-    }
-
-    @Override
-    public boolean canDump(Tile tile, Tile to, Item item){
-        ItemBridgeEntity entity = tile.ent();
-
-        Tile other = world.tile(entity.link);
-        if(!linkValid(tile, other)){
-            Tile edge = Edges.getFacingEdge(to, tile);
-            int i = tile.absoluteRelativeTo(edge.x, edge.y);
-
-            IntSetIterator it = entity.incoming.iterator();
-
-            while(it.hasNext){
-                int v = it.next();
-                if(tile.absoluteRelativeTo(Pos.x(v), Pos.y(v)) == i){
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        int rel = tile.absoluteRelativeTo(other.x, other.y);
-        int rel2 = tile.relativeTo(to.x, to.y);
-
-        return rel != rel2;
-    }
-
     public boolean linkValid(Tile tile, Tile other){
         return linkValid(tile, other, true);
     }
@@ -358,11 +116,18 @@ public class ItemBridge extends Block{
             return false;
         }
 
-        return other.block() == this && (!checkDouble || other.<ItemBridgeEntity>ent().link != tile.pos());
+        return other.block() == this && (other.team() == tile.team() || tile.block() != this) && (!checkDouble || other.<ItemBridgeEntity>ent().link != tile.pos());
     }
 
-    public static class ItemBridgeEntity extends TileEntity{
-        public int link = Pos.invalid;
+    public Tile findLink(int x, int y){
+        if(world.tiles.in(x, y) && linkValid(world.tile(x, y), world.tile(lastPlaced)) && lastPlaced != Point2.pack(x, y)){
+            return world.tile(lastPlaced);
+        }
+        return null;
+    }
+
+    public class ItemBridgeEntity extends TileEntity{
+        public int link = -1;
         public IntSet incoming = new IntSet();
         public float uptime;
         public float time;
@@ -370,32 +135,259 @@ public class ItemBridge extends Block{
         public float cycleSpeed = 1f;
 
         @Override
-        public int config(){
-            return link;
+        public void playerPlaced(){
+            Tile link = findLink(tile.x, tile.y);
+            if(linkValid(tile, link)){
+                link.configure(tile.pos());
+            }
+
+            lastPlaced = tile.pos();
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeInt(link);
-            stream.writeFloat(uptime);
-            stream.writeByte(incoming.size);
+        public void drawConfigure(){
+            Draw.color(Pal.accent);
+            Lines.stroke(1f);
+            Lines.square(x, y,
+            tile.block().size * tilesize / 2f + 1f);
 
+            for(int i = 1; i <= range; i++){
+                for(int j = 0; j < 4; j++){
+                    Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
+                    if(linkValid(tile, other)){
+                        boolean linked = other.pos() == link;
+                        Draw.color(linked ? Pal.place : Pal.breakInvalid);
+
+                        Lines.square(other.drawx(), other.drawy(),
+                        other.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
+                    }
+                }
+            }
+
+            Draw.reset();
+        }
+
+        @Override
+        public boolean onConfigureTileTapped(Tilec other){
+            if(linkValid(tile, other.tile())){
+                if(link == other.pos()){
+                    tile.configure(-1);
+                }else{
+                    tile.configure(other.pos());
+                }
+                return false;
+            }
+            return true;
+        }
+
+        public void checkIncoming(){
             IntSetIterator it = incoming.iterator();
-
             while(it.hasNext){
-                stream.writeInt(it.next());
+                int i = it.next();
+                Tile other = world.tile(i);
+                if(!linkValid(tile, other, false) || other.<ItemBridgeEntity>ent().link != tile.pos()){
+                    it.remove();
+                }
             }
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            link = stream.readInt();
-            uptime = stream.readFloat();
-            byte links = stream.readByte();
+        public void updateTile(){
+            time += cycleSpeed * delta();
+            time2 += (cycleSpeed - 1f) * delta();
+
+            checkIncoming();
+
+            Tile other = world.tile(link);
+            if(!linkValid(tile, other)){
+                dump();
+                uptime = 0f;
+            }else{
+                ((ItemBridgeEntity)other.entity).incoming.add(tile.pos());
+
+                if(consValid() && Mathf.zero(1f - efficiency())){
+                    uptime = Mathf.lerpDelta(uptime, 1f, 0.04f);
+                }else{
+                    uptime = Mathf.lerpDelta(uptime, 0f, 0.02f);
+                }
+
+                updateTransport(other.entity);
+            }
+        }
+
+        public void updateTransport(Tilec other){
+            if(uptime >= 0.5f && timer(timerTransport, transportTime)){
+                Item item = items.take();
+                if(item != null && other.acceptItem(this, item)){
+                    other.handleItem(this, item);
+                    cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f);
+                }else{
+                    cycleSpeed = Mathf.lerpDelta(cycleSpeed, 1f, 0.01f);
+                    if(item != null) items.add(item, 1);
+                }
+            }
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            Draw.z(Layer.power);
+
+            Tile other = world.tile(link);
+            if(!linkValid(tile, other)) return;
+
+            float opacity = Core.settings.getInt("bridgeopacity") / 100f;
+            if(Mathf.zero(opacity)) return;
+
+            int i = tile.absoluteRelativeTo(other.x, other.y);
+
+            Draw.color(Color.white, Color.black, Mathf.absin(Time.time(), 6f, 0.07f));
+            Draw.alpha(Math.max(uptime, 0.25f) * opacity);
+
+            Draw.rect(endRegion, x, y, i * 90 + 90);
+            Draw.rect(endRegion, other.drawx(), other.drawy(), i * 90 + 270);
+
+            Lines.stroke(8f);
+            Lines.line(bridgeRegion,
+            x,
+            y,
+            other.worldx(),
+            other.worldy(), CapStyle.none, -tilesize / 2f);
+
+            int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y));
+
+            float time = time2 / 1.7f;
+            int arrows = (dist) * tilesize / 4 - 2;
+
+            Draw.color();
+
+            for(int a = 0; a < arrows; a++){
+                Draw.alpha(Mathf.absin(a / (float)arrows - time / 100f, 0.1f, 1f) * uptime * opacity);
+                Draw.rect(arrowRegion,
+                x + Geometry.d4[i].x * (tilesize / 2f + a * 4f + time % 4f),
+                y + Geometry.d4[i].y * (tilesize / 2f + a * 4f + time % 4f), i * 90f);
+            }
+            Draw.reset();
+        }
+
+        @Override
+        public boolean acceptItem(Tilec source, Item item){
+            if(team != source.team()) return false;
+
+            Tile other = world.tile(link);
+
+            if(linkValid(tile, other)){
+                int rel = tile.absoluteRelativeTo(other.x, other.y);
+                int rel2 = tile.relativeTo(source.tileX(), source.tileY());
+
+                if(rel == rel2) return false;
+            }else{
+                return source.block() instanceof ItemBridge && ((ItemBridgeEntity)source).link == tile.pos() && items.total() < itemCapacity;
+            }
+
+            return items.total() < itemCapacity;
+        }
+
+
+        @Override
+        public boolean canDumpLiquid(Tilec to, Liquid liquid){
+            Tile other = world.tile(link);
+            if(!linkValid(tile, other)){
+                Tile edge = Edges.getFacingEdge(to.tile(), tile);
+                int i = tile.absoluteRelativeTo(edge.x, edge.y);
+
+                IntSetIterator it = incoming.iterator();
+
+                while(it.hasNext){
+                    int v = it.next();
+                    if(tile.absoluteRelativeTo(Point2.x(v), Point2.y(v)) == i){
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            int rel = tile.absoluteRelativeTo(other.x, other.y);
+            int rel2 = tile.relativeTo(to.tileX(), to.tileY());
+
+            return rel != rel2;
+        }
+
+        @Override
+        public boolean acceptLiquid(Tilec source, Liquid liquid, float amount){
+            if(team != source.team() || !hasLiquids) return false;
+
+            Tile other = world.tile(link);
+
+            if(linkValid(tile, other)){
+                int rel = tile.absoluteRelativeTo(other.x, other.y);
+                int rel2 = tile.relativeTo(source.tileX(), source.tileY());
+
+                if(rel == rel2) return false;
+            }else if(!(source.block() instanceof ItemBridge && ((ItemBridgeEntity)source).link == tile.pos())){
+                return false;
+            }
+
+            return liquids.get(liquid) + amount < liquidCapacity && (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f);
+        }
+
+        @Override
+        public boolean canDump(Tilec to, Item item){
+            Tile other = world.tile(link);
+            if(!linkValid(tile, other)){
+                Tile edge = Edges.getFacingEdge(to.tile(), tile);
+                int i = tile.absoluteRelativeTo(edge.x, edge.y);
+
+                IntSetIterator it = incoming.iterator();
+
+                while(it.hasNext){
+                    int v = it.next();
+                    if(tile.absoluteRelativeTo(Point2.x(v), Point2.y(v)) == i){
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            int rel = tile.absoluteRelativeTo(other.x, other.y);
+            int rel2 = tile.relativeTo(to.tileX(), to.tileY());
+
+            return rel != rel2;
+        }
+
+        @Override
+        public boolean shouldConsume(){
+            return linkValid(tile, world.tile(link));
+        }
+
+        @Override
+        public Point2 config(){
+            return Point2.unpack(link).sub(tile.x, tile.y);
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.i(link);
+            write.f(uptime);
+            write.b(incoming.size);
+
+            IntSetIterator it = incoming.iterator();
+
+            while(it.hasNext){
+                write.i(it.next());
+            }
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            link = read.i();
+            uptime = read.f();
+            byte links = read.b();
             for(int i = 0; i < links; i++){
-                incoming.add(stream.readInt());
+                incoming.add(read.i());
             }
         }
     }
