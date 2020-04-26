@@ -438,13 +438,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength){
+        drawSelection(x1, y1, x2, y2, maxLength, Pal.accent, Pal.accentBack);
+    }
+
+    protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength, Color front, Color back){
         NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
 
         Lines.stroke(2f);
 
-        Draw.color(Pal.accentBack);
+        Draw.color(back);
         Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
-        Draw.color(Pal.accent);
+        Draw.color(front);
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
     }
 

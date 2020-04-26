@@ -7,9 +7,11 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
@@ -238,4 +240,10 @@ public class Floor extends Block{
         return block.edges()[x][2 - y];
     }
 
+    public void drawRequest(BuildRequest req, Eachable<BuildRequest> list, boolean valid){
+        Draw.reset();
+        Draw.alpha(0.5f);
+        drawRequestRegion(req, list);
+        Draw.reset();
+    }
 }

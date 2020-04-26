@@ -271,8 +271,12 @@ public class Schematics implements Loadable{
 
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
     public Array<BuildRequest> toRequests(Schematic schem, int x, int y){
-        return schem.tiles.map(t -> new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y, schem.width, schem.height).configure(t.config))
+        if(enableBlueprint){
+            return schem.tiles.map(t -> new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y, schem.width, schem.height).configure(t.config));
+        }else{
+            return schem.tiles.map(t -> new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y, schem.width, schem.height).configure(t.config))
             .removeAll(s -> !s.block.isVisible() || !s.block.unlockedCur());
+        }
     }
 
     public void placeLoadout(Schematic schem, int x, int y){
@@ -369,11 +373,17 @@ public class Schematics implements Loadable{
                 Tilec tile = world.ent(cx, cy);
 
                 if(tile != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
-                    && (tile.block().isVisible() || (tile.block() instanceof CoreBlock && Core.settings.getBool("coreselect")))){
+                    && (tile.block().isVisible() || enableBlueprint || (tile.block() instanceof CoreBlock && Core.settings.getBool("coreselect")))){
                     Object config = tile.config();
 
                     tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation()));
                     counted.add(tile.pos());
+                }
+
+                Tile under = world.tile(cx, cy);
+                if(under != null && enableBlueprint){
+                    tiles.add(new Stile(under.floor(), under.x + offsetX, under.y + offsetY, null, (byte)0));
+                    tiles.add(new Stile(under.overlay(), under.x + offsetX, under.y + offsetY, null, (byte)0));
                 }
             }
         }

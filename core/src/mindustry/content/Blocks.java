@@ -9,6 +9,7 @@ import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -107,6 +108,11 @@ public class Blocks implements ContentList{
                     variantRegions = new TextureRegion[]{Core.atlas.find("clear")};
                 }
                 return variantRegions;
+            }
+            
+            @Override
+            public TextureRegion getRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+                return Core.atlas.find("cross");
             }
         };
 

@@ -81,5 +81,8 @@ public class Pal{
     redDust = Color.valueOf("ffa480"),
     redderDust = Color.valueOf("ff7b69"),
 
-    plasticSmoke = Color.valueOf("f1e479");
+    plasticSmoke = Color.valueOf("f1e479"),
+
+    blueprint = Color.valueOf("#549de5"),
+    blueprintBack = Color.valueOf("#3e73a7");
 }

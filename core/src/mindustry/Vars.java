@@ -125,6 +125,8 @@ public class Vars implements Loadable{
     public static boolean steam;
     /** whether typing into the console is enabled - developers only */
     public static boolean enableConsole = false;
+    /** whether schematics can be used as blueprints - developers only */
+    public static boolean enableBlueprint = true;
     /** application data directory, equivalent to {@link Settings#getDataDirectory()} */
     public static Fi dataDirectory;
     /** data subdirectory used for screenshots */

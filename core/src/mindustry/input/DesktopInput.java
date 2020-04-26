@@ -24,6 +24,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 import static arc.Core.scene;
 import static mindustry.Vars.*;
@@ -129,6 +130,18 @@ public class DesktopInput extends InputHandler{
 
         for(BuildRequest request : selectRequests){
             drawOverRequest(request);
+        }
+
+        if(enableBlueprint && !selectRequests.isEmpty()){
+            BuildRequest min = selectRequests.first();
+            BuildRequest max = selectRequests.first();
+
+            for(BuildRequest request : selectRequests){
+                if(request.x < min.x || request.y < min.y) min = request;
+                if(request.x > max.x || request.y > max.y) max = request;
+            }
+
+            drawSelection(min.x, min.y, max.x, max.y, maxSchematicSize, Pal.blueprint, Pal.blueprintBack);
         }
 
         //draw things that may be placed soon
