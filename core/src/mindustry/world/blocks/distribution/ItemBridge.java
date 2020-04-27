@@ -178,7 +178,7 @@ public class ItemBridge extends Block{
                     if(!linked && !rlinked) continue;
                     float tx = tile.drawx(), ty = tile.drawy(), ox = other.drawx(), oy = other.drawy();
                     float alpha = Math.abs((linked ? 100 : 0)-(Time.time() * 2) % 100f) / 100;
-					float x = Interpolation.linear.apply(ox, tx, alpha);
+                    float x = Interpolation.linear.apply(ox, tx, alpha);
                     float y = Interpolation.linear.apply(oy, ty, alpha);
 
                     Tile link = world.tile(linked ? tile.pos() : other.pos());
