@@ -168,6 +168,38 @@ public class ItemBridge extends Block{
         }
 
         @Override
+        public void drawSelect(){
+            for(int i = 1; i <= range; i++){
+                for(int j = 0; j < 4; j++){
+                    Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
+                    if(!linkValid(tile,other,false)) continue;
+                    boolean linked = other.pos() == link;
+                    boolean rlinked = other.<ItemBridgeEntity>ent().link == tile.pos();
+                    if(!linked && !rlinked) continue;
+                    float tx = tile.drawx(), ty = tile.drawy(), ox = other.drawx(), oy = other.drawy();
+                    float alpha = Math.abs((linked ? 100 : 0)-(Time.time() * 2) % 100f) / 100;
+					float x = Interpolation.linear.apply(ox, tx, alpha);
+                    float y = Interpolation.linear.apply(oy, ty, alpha);
+
+                    Tile link = world.tile(linked ? tile.pos() : other.pos());
+                    Tile otherLink = linked ? other : tile;
+
+                    Draw.color(Color.valueOf("444444"));
+                    Lines.stroke(2.5f);
+                    Lines.circle(ox, oy, 2f);
+
+                    Draw.color(linked ? Pal.place : Pal.accent);
+                    Lines.stroke(1f);
+                    Lines.line(tx, ty, ox, oy);
+                    Lines.circle(ox, oy, 2f);
+                    Draw.rect("bridge-arrow", x, y, link.absoluteRelativeTo((int) otherLink.x, (int) otherLink.y) * 90);
+                }
+            }
+
+            Draw.reset();
+        }
+
+        @Override
         public boolean onConfigureTileTapped(Tilec other){
             if(linkValid(tile, other.tile())){
                 if(link == other.pos()){
