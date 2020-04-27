@@ -174,8 +174,7 @@ public class ItemBridge extends Block{
                     Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
                     if(!linkValid(tile,other,false)) continue;
                     boolean linked = other.pos() == link;
-                    boolean rlinked = other.<ItemBridgeEntity>ent().link == tile.pos();
-                    if(!linked && !rlinked) continue;
+                    if(!linked && !(other.<ItemBridgeEntity>ent().link == tile.pos())) continue;
                     float tx = tile.drawx(), ty = tile.drawy(), ox = other.drawx(), oy = other.drawy();
                     float alpha = Math.abs((linked ? 100 : 0)-(Time.time() * 2) % 100f) / 100;
                     float x = Interpolation.linear.apply(ox, tx, alpha);
@@ -192,7 +191,7 @@ public class ItemBridge extends Block{
                     Lines.stroke(1f);
                     Lines.line(tx, ty, ox, oy);
                     Lines.circle(ox, oy, 2f);
-                    Draw.rect("bridge-arrow", x, y, link.absoluteRelativeTo((int) otherLink.x, (int) otherLink.y) * 90);
+                    Draw.rect("bridge-arrow", x, y, (linked ? tile : other).absoluteRelativeTo((int) otherLink.x, (int) otherLink.y) * 90);
                 }
             }
 
