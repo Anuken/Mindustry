@@ -85,6 +85,7 @@ public class StatusEffects implements ContentList{
             damageMultiplier = 1.4f;
             damage = -0.01f;
             effect = Fx.overdriven;
+            permanent = true;
         }};
 
         shielded = new StatusEffect("shielded"){{
@@ -92,9 +93,7 @@ public class StatusEffects implements ContentList{
         }};
 
         boss = new StatusEffect("boss"){{
-            armorMultiplier = 3f;
-            damageMultiplier = 3f;
-            speedMultiplier = 1.1f;
+            permanent = true;
         }};
 
         shocked = new StatusEffect("shocked");

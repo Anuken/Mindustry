@@ -18,7 +18,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     @Import Vec2 vel;
 
     float elevation;
-    float drownTime;
+    transient float drownTime;
     transient float splashTimer;
 
     boolean isGrounded(){

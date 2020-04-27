@@ -19,6 +19,8 @@ public class StatusEffect extends MappableContent{
     public float speedMultiplier = 1f;
     /** Damage per frame. */
     public float damage;
+    /** If true, the effect never disappears. */
+    public boolean permanent;
     /** Tint color of effect. */
     public Color color = Color.white.cpy();
     /** Effect that happens randomly on top of the affected unit. */
@@ -69,6 +71,10 @@ public class StatusEffect extends MappableContent{
                 result.set(sup, newTime);
             });
         }
+    }
+
+    public void draw(Unitc unit){
+
     }
 
     public boolean reactsWith(StatusEffect effect){

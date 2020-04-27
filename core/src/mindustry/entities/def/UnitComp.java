@@ -18,13 +18,11 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, Drawc, Boundedc, Syncc{
-    @Import float x, y, rotation, elevation;
+abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc{
+    @Import float x, y, rotation, elevation, maxHealth;
 
     private UnitController controller;
     private UnitType type;
-
-    int level;
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
@@ -92,7 +90,7 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     @Override
     public void type(UnitType type){
         this.type = type;
-        maxHealth(type.health);
+        this.maxHealth = type.health;
         heal();
         drag(type.drag);
         hitSize(type.hitsize);
