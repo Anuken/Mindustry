@@ -1,5 +1,7 @@
 package mindustry.io;
 
+import arc.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -69,7 +71,9 @@ public abstract class SaveVersion extends SaveFileReader{
             "rules", JsonIO.write(state.rules),
             "mods", JsonIO.write(mods.getModStrings().toArray(String.class)),
             "width", world.width(),
-            "height", world.height()
+            "height", world.height(),
+            "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
+            "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name
         ).merge(tags));
     }
 
@@ -82,6 +86,14 @@ public abstract class SaveVersion extends SaveFileReader{
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
         if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
         lastReadBuild = map.getInt("build", -1);
+
+        if(!headless){
+            Tmp.v1.tryFromString(map.get("viewpos"));
+            Core.camera.position.set(Tmp.v1);
+            player.set(Tmp.v1);
+
+            control.input.controlledType = content.getByName(ContentType.unit, map.get("controlledType"));
+        }
 
         Map worldmap = maps.byName(map.get("mapname", "\\\\\\"));
         state.map = worldmap == null ? new Map(StringMap.of(
@@ -184,7 +196,6 @@ public abstract class SaveVersion extends SaveFileReader{
 
             //read blocks
             for(int i = 0; i < width * height; i++){
-                int x = i % width, y = i / width;
                 Block block = content.block(stream.readShort());
                 Tile tile = context.tile(i);
                 if(block == null) block = Blocks.air;

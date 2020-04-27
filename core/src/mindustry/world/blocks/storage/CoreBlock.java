@@ -67,7 +67,6 @@ public class CoreBlock extends StorageBlock{
     }
 
     public class CoreEntity extends TileEntity{
-       // protected Playerc spawnPlayer;
         protected float time, heat, progress;
         protected int storageCapacity;
         protected boolean shouldBuild;

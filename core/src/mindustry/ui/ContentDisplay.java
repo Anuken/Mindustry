@@ -55,7 +55,6 @@ public class ContentDisplay{
                         inset.add().size(10f);
                     }
 
-                    //map.get(stat).display(inset);
                 }).fillX().padLeft(10);
                 table.row();
             }

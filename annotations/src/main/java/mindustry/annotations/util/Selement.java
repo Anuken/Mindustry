@@ -1,6 +1,7 @@
 package mindustry.annotations.util;
 
 import arc.struct.Array;
+import arc.util.ArcAnnotate.*;
 import com.squareup.javapoet.*;
 import com.sun.tools.javac.code.Attribute.*;
 import mindustry.annotations.*;
@@ -16,6 +17,10 @@ public class Selement<T extends Element>{
 
     public Selement(T e){
         this.e = e;
+    }
+
+    public @Nullable String doc(){
+        return BaseProcessor.elementu.getDocComment(e);
     }
 
     public Array<Selement<?>> enclosed(){

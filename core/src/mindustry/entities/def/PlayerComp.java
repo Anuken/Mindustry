@@ -25,6 +25,8 @@ import static mindustry.Vars.*;
 @EntityDef(value = {Playerc.class}, serialize = false)
 @Component
 abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Drawc{
+    static final float deathDelay = 30f;
+
     @NonNull @ReadOnly Unitc unit = Nulls.unit;
 
     @ReadOnly Team team = Team.sharded;
@@ -33,6 +35,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     boolean admin, typing;
     Color color = new Color();
     float mouseX, mouseY;
+    float deathTimer;
 
     String lastText = "";
     float textFadeTime;
@@ -76,8 +79,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             x(unit.x());
             y(unit.y());
             unit.team(team);
+            deathTimer = 0;
         }else if(core != null){
-            core.requestSpawn((Playerc)this);
+            deathTimer += Time.delta();
+            if(deathTimer >= deathDelay){
+                core.requestSpawn((Playerc)this);
+            }
         }
 
         textFadeTime -= Time.delta() / (60 * 5);

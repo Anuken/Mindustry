@@ -29,6 +29,12 @@ abstract class StatusComp implements Posc, Flyingc{
         return amount * Mathf.clamp(1f - armorMultiplier / 100f);
     }
 
+    /** Apply a status effect for 1 tick (for permanent effects) **/
+    void apply(StatusEffect effect){
+        apply(effect, 1);
+    }
+
+    /** Adds a status effect to this unit. */
     void apply(StatusEffect effect, float duration){
         if(effect == StatusEffects.none || effect == null || isImmune(effect)) return; //don't apply empty or immune effects
 
@@ -61,6 +67,17 @@ abstract class StatusComp implements Posc, Flyingc{
         statuses.add(entry);
     }
 
+    /** Removes a status effect. */
+    void unapply(StatusEffect effect){
+        statuses.remove(e -> {
+            if(e.effect == effect){
+                Pools.free(e);
+                return true;
+            }
+            return false;
+        });
+    }
+
     boolean isBoss(){
         return hasEffect(StatusEffects.boss);
     }
@@ -87,7 +104,7 @@ abstract class StatusComp implements Posc, Flyingc{
     @Override
     public void update(){
         Floor floor = floorOn();
-        if(isGrounded() && floor.status != null){
+        if(isGrounded()){
             //apply effect
             apply(floor.status, floor.statusDuration);
         }
@@ -105,7 +122,7 @@ abstract class StatusComp implements Posc, Flyingc{
             entry.time = Math.max(entry.time - Time.delta(), 0);
             applied.set(entry.effect.id);
 
-            if(entry.time <= 0){
+            if(entry.time <= 0 && !entry.effect.permanent){
                 Pools.free(entry);
                 index --;
                 statuses.remove(index);
@@ -116,6 +133,12 @@ abstract class StatusComp implements Posc, Flyingc{
                 //TODO ugly casting
                 entry.effect.update((Unitc)this, entry.time);
             }
+        }
+    }
+
+    public void draw(){
+        for(StatusEntry e : statuses){
+            e.effect.draw((Unitc)this);
         }
     }
 

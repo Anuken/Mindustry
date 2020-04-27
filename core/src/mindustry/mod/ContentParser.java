@@ -331,22 +331,25 @@ public class ContentParser{
     }
 
     private void readBundle(ContentType type, String name, JsonValue value){
-        UnlockableContent cont = locate(type, name) instanceof UnlockableContent ?
-            locate(type, name) : null;
+        UnlockableContent cont = locate(type, name) instanceof UnlockableContent ? locate(type, name) : null;
 
         String entryName = cont == null ? type + "." + currentMod.name + "-" + name + "." : type + "." + cont.name + ".";
         I18NBundle bundle = Core.bundle;
         while(bundle.getParent() != null) bundle = bundle.getParent();
 
         if(value.has("name")){
-            bundle.getProperties().put(entryName + "name", value.getString("name"));
-            if(cont != null) cont.localizedName = value.getString("name");
+            if(!Core.bundle.has(entryName + "name")){
+                bundle.getProperties().put(entryName + "name", value.getString("name"));
+                if(cont != null) cont.localizedName = value.getString("name");
+            }
             value.remove("name");
         }
 
         if(value.has("description")){
-            bundle.getProperties().put(entryName + "description", value.getString("description"));
-            if(cont != null) cont.description = value.getString("description");
+            if(!Core.bundle.has(entryName + "description")){
+                bundle.getProperties().put(entryName + "description", value.getString("description"));
+                if(cont != null) cont.description = value.getString("description");
+            }
             value.remove("description");
         }
     }

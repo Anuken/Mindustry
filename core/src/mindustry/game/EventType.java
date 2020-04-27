@@ -91,6 +91,10 @@ public class EventType{
         }
     }
 
+    public static class SaveLoadEvent{
+
+    }
+
     public static class ClientCreateEvent{
 
     }

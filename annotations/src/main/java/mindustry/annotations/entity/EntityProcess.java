@@ -93,6 +93,8 @@ public class EntityProcess extends BaseProcessor{
                 TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(component))
                 .addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
 
+                inter.addJavadoc("Interface for {@link $L}", component.fullName());
+
                 //implement extra interfaces these components may have, e.g. position
                 for(Stype extraInterface : component.interfaces().select(i -> !isCompInterface(i))){
                     //javapoet completely chokes on this if I add `addSuperInterface` or create the type name with TypeName.get
@@ -116,6 +118,7 @@ public class EntityProcess extends BaseProcessor{
                     signatures.add(method.e.toString());
 
                     inter.addMethod(MethodSpec.methodBuilder(method.name())
+                    .addJavadoc(method.doc() == null ? "" : method.doc())
                     .addExceptions(method.thrownt())
                     .addTypeVariables(method.typeVariables().map(TypeVariableName::get))
                     .returns(method.ret().toString().equals("void") ? TypeName.VOID : method.retn())
@@ -130,6 +133,7 @@ public class EntityProcess extends BaseProcessor{
                     if(!signatures.contains(cname + "()")){
                         inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
                         .addAnnotations(Array.with(field.annotations()).select(a -> a.toString().contains("Null")).map(AnnotationSpec::get))
+                        .addJavadoc(field.doc() == null ? "" : field.doc())
                         .returns(field.tname()).build());
                     }
 
@@ -137,6 +141,7 @@ public class EntityProcess extends BaseProcessor{
                     if(!field.is(Modifier.FINAL) && !signatures.contains(cname + "(" + field.mirror().toString() + ")") &&
                     !field.annotations().contains(f -> f.toString().equals("@mindustry.annotations.Annotations.ReadOnly"))){
                         inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
+                        .addJavadoc(field.doc() == null ? "" : field.doc())
                         .addParameter(ParameterSpec.builder(field.tname(), field.name())
                         .addAnnotations(Array.with(field.annotations())
                         .select(a -> a.toString().contains("Null")).map(AnnotationSpec::get)).build()).build());
@@ -161,18 +166,6 @@ public class EntityProcess extends BaseProcessor{
                 Log.debug("");
             }
 
-            /*
-            //generate special render layer interfaces
-            for(DrawLayer layer : DrawLayer.values()){
-                //create the DrawLayer interface that entities need to implement
-                String name = "DrawLayer" + Strings.capitalize(layer.name()) + "c";
-                TypeSpec.Builder inter = TypeSpec.interfaceBuilder(name)
-                .addSuperinterface(tname(packageName + ".Entityc"))
-                .addSuperinterface(tname(packageName + ".Drawc"))
-                .addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
-                inter.addMethod(MethodSpec.methodBuilder("draw" + Strings.capitalize(layer.name())).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
-                write(inter);
-            }*/
         }else if(round == 2){ //round 2: get component classes and generate interfaces for them
 
             //parse groups
@@ -180,19 +173,9 @@ public class EntityProcess extends BaseProcessor{
                 GroupDef an = group.annotation(GroupDef.class);
                 Array<Stype> types = types(an, GroupDef::value).map(this::interfaceToComp);
                 Array<Stype> collides = types(an, GroupDef::collide);
-                groupDefs.add(new GroupDefinition(group.name(), ClassName.bestGuess(packageName + "." + interfaceName(types.first())), types, an.spatial(), an.mapping(), collides));
+                groupDefs.add(new GroupDefinition(group.name().startsWith("g") ? group.name().substring(1) : group.name(),
+                    ClassName.bestGuess(packageName + "." + interfaceName(types.first())), types, an.spatial(), an.mapping(), collides));
             }
-
-            /*
-            //add special generated groups
-            for(DrawLayer layer : DrawLayer.values()){
-                String name = "DrawLayer" + Strings.capitalize(layer.name()) + "c";
-                //create group definition with no components directly
-                GroupDefinition def = new GroupDefinition(layer.name(), ClassName.bestGuess(packageName + "." + name), Array.with(), false, false, new Array<>(0));
-                //add manual inclusions of entities to be added to this group
-                def.manualInclusions.addAll(allDefs.select(s -> allComponents(s).contains(comp -> comp.interfaces().contains(in -> in.name().equals(name)))));
-                groupDefs.add(def);
-            }*/
 
             ObjectMap<String, Selement> usedNames = new ObjectMap<>();
             ObjectMap<Selement, ObjectSet<String>> extraNames = new ObjectMap<>();
@@ -420,7 +403,6 @@ public class EntityProcess extends BaseProcessor{
             TypeSpec.Builder groupsBuilder = TypeSpec.classBuilder("Groups").addModifiers(Modifier.PUBLIC);
             MethodSpec.Builder groupInit = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
             for(GroupDefinition group : groupDefs){
-                //Stype ctype = group.components.first();
                 //class names for interface/group
                 ClassName itype =  group.baseType;
                 ClassName groupc = ClassName.bestGuess("mindustry.entities.EntityGroup");
@@ -455,17 +437,9 @@ public class EntityProcess extends BaseProcessor{
 
             for(GroupDefinition group : groupDefs){
                 for(Stype collide : group.collides){
-                    groupUpdate.addStatement("$L.collide($L)", group.name, collide.name());
+                    groupUpdate.addStatement("$L.collide($L)", group.name, collide.name().startsWith("g") ? collide.name().substring(1) : collide.name());
                 }
             }
-
-            /*
-            for(DrawLayer layer : DrawLayer.values()){
-                MethodSpec.Builder groupDraw = MethodSpec.methodBuilder("draw" + Strings.capitalize(layer.name()))
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-                groupDraw.addStatement("$L.draw($L::$L)", layer.name(), "DrawLayer" + Strings.capitalize(layer.name()) + "c", "draw" + Strings.capitalize(layer.name()));
-                groupsBuilder.addMethod(groupDraw.build());
-            }*/
 
             groupsBuilder.addMethod(groupResize.build());
             groupsBuilder.addMethod(groupUpdate.build());

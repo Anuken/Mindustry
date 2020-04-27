@@ -54,11 +54,6 @@ public class StackConveyor extends Block implements Autotiler{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-0-0")};
-    }
-
-    @Override
     public void setStats(){
         super.setStats();
 

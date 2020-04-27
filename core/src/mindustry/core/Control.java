@@ -5,6 +5,7 @@ import arc.assets.*;
 import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
+import arc.math.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
@@ -68,14 +69,19 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            //TODO test this
-            app.post(() -> app.post(() -> {
-                //TODO 0,0 seems like a bad choice?
+            if(Mathf.zero(player.x()) && Mathf.zero(player.y())){
                 Tilec core = state.teams.closestCore(0, 0, player.team());
                 if(core != null){
+                    player.set(core);
                     camera.position.set(core);
                 }
-            }));
+            }else{
+                camera.position.set(player);
+            }
+        });
+
+        Events.on(SaveLoadEvent.class, event -> {
+            input.checkUnit();
         });
 
         Events.on(ResetEvent.class, event -> {
