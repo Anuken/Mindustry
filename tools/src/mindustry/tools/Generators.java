@@ -228,7 +228,7 @@ public class Generators{
 
                 Image baseCell = ImagePacker.get(type.cellRegion);
                 Image cell = new Image(type.cellRegion.getWidth(), type.cellRegion.getHeight());
-                cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.gray)));
+                cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
 
                 image.draw(cell, image.width/2 - cell.width/2, image.height/2 - cell.height/2);
 

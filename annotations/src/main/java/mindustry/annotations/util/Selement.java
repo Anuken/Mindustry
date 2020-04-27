@@ -18,6 +18,10 @@ public class Selement<T extends Element>{
         this.e = e;
     }
 
+    public String doc(){
+        return BaseProcessor.elementu.getDocComment(e);
+    }
+
     public Array<Selement<?>> enclosed(){
         return Array.with(e.getEnclosedElements()).map(Selement::new);
     }

@@ -93,6 +93,8 @@ public class EntityProcess extends BaseProcessor{
                 TypeSpec.Builder inter = TypeSpec.interfaceBuilder(interfaceName(component))
                 .addModifiers(Modifier.PUBLIC).addAnnotation(EntityInterface.class);
 
+                inter.addJavadoc("Interface for {@link $L}", component.fullName());
+
                 //implement extra interfaces these components may have, e.g. position
                 for(Stype extraInterface : component.interfaces().select(i -> !isCompInterface(i))){
                     //javapoet completely chokes on this if I add `addSuperInterface` or create the type name with TypeName.get
@@ -130,6 +132,7 @@ public class EntityProcess extends BaseProcessor{
                     if(!signatures.contains(cname + "()")){
                         inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
                         .addAnnotations(Array.with(field.annotations()).select(a -> a.toString().contains("Null")).map(AnnotationSpec::get))
+                        .addJavadoc(field.doc() == null ? "" : field.doc())
                         .returns(field.tname()).build());
                     }
 
@@ -137,6 +140,7 @@ public class EntityProcess extends BaseProcessor{
                     if(!field.is(Modifier.FINAL) && !signatures.contains(cname + "(" + field.mirror().toString() + ")") &&
                     !field.annotations().contains(f -> f.toString().equals("@mindustry.annotations.Annotations.ReadOnly"))){
                         inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
+                        .addJavadoc(field.doc() == null ? "" : field.doc())
                         .addParameter(ParameterSpec.builder(field.tname(), field.name())
                         .addAnnotations(Array.with(field.annotations())
                         .select(a -> a.toString().contains("Null")).map(AnnotationSpec::get)).build()).build());
