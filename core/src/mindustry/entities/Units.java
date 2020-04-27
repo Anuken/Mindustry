@@ -126,6 +126,24 @@ public class Units{
         return result;
     }
 
+    /** Returns the closest ally of this team. Filter by predicate. No range. */
+    public static Unitc closest(Team team, float x, float y, Boolf<Unitc> predicate){
+        result = null;
+        cdist = 0f;
+
+        for(Unitc e : Groups.unit){
+            if(!predicate.get(e) || e.team() != team) continue;
+
+            float dist = e.dst2(x, y);
+            if(result == null || dist < cdist){
+                result = e;
+                cdist = dist;
+            }
+        }
+
+        return result;
+    }
+
     /** Returns the closest ally of this team. Filter by predicate. */
     public static Unitc closest(Team team, float x, float y, float range, Boolf<Unitc> predicate){
         result = null;

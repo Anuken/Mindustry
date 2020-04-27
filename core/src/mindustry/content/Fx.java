@@ -54,7 +54,7 @@ public class Fx{
         reset();
     }),
 
-    unitSpirit = new Effect(20f, e -> {
+    unitSpirit = new Effect(17f, e -> {
         if(!(e.data instanceof Position)) return;
         Position to = e.data();
 

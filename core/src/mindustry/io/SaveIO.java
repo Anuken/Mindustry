@@ -1,17 +1,18 @@
 package mindustry.io;
 
+import arc.*;
+import arc.files.*;
 import arc.struct.*;
-import arc.files.Fi;
-import arc.util.io.CounterInputStream;
-import arc.util.io.FastDeflaterOutputStream;
-import mindustry.Vars;
+import arc.util.io.*;
+import mindustry.*;
+import mindustry.game.EventType.*;
 import mindustry.io.legacy.*;
 import mindustry.io.versions.*;
-import mindustry.world.WorldContext;
+import mindustry.world.*;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.zip.InflaterInputStream;
+import java.util.*;
+import java.util.zip.*;
 
 import static mindustry.Vars.*;
 
@@ -151,6 +152,7 @@ public class SaveIO{
             SaveVersion ver = versions.get(version);
 
             ver.read(stream, counter, context);
+            Events.fire(new SaveLoadEvent());
         }catch(Exception e){
             throw new SaveException(e);
         }finally{

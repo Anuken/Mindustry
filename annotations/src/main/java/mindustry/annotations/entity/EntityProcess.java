@@ -173,7 +173,8 @@ public class EntityProcess extends BaseProcessor{
                 GroupDef an = group.annotation(GroupDef.class);
                 Array<Stype> types = types(an, GroupDef::value).map(this::interfaceToComp);
                 Array<Stype> collides = types(an, GroupDef::collide);
-                groupDefs.add(new GroupDefinition(group.name(), ClassName.bestGuess(packageName + "." + interfaceName(types.first())), types, an.spatial(), an.mapping(), collides));
+                groupDefs.add(new GroupDefinition(group.name().startsWith("g") ? group.name().substring(1) : group.name(),
+                    ClassName.bestGuess(packageName + "." + interfaceName(types.first())), types, an.spatial(), an.mapping(), collides));
             }
 
             ObjectMap<String, Selement> usedNames = new ObjectMap<>();
@@ -436,7 +437,7 @@ public class EntityProcess extends BaseProcessor{
 
             for(GroupDefinition group : groupDefs){
                 for(Stype collide : group.collides){
-                    groupUpdate.addStatement("$L.collide($L)", group.name, collide.name());
+                    groupUpdate.addStatement("$L.collide($L)", group.name, collide.name().startsWith("g") ? collide.name().substring(1) : collide.name());
                 }
             }
 

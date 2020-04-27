@@ -6,37 +6,37 @@ import mindustry.gen.*;
 class AllDefs{
 
     @GroupDef(value = Entityc.class, mapping = true)
-    class all{
+    class gall{
 
     }
 
     @GroupDef(value = Playerc.class, mapping = true)
-    class player{
+    class gplayer{
 
     }
 
-    @GroupDef(value = Bulletc.class, spatial = true, collide = {unit.class})
-    class bullet{
+    @GroupDef(value = Bulletc.class, spatial = true, collide = {gunit.class})
+    class gbullet{
 
     }
 
-    @GroupDef(value = Unitc.class, spatial = true, collide = {unit.class}, mapping = true)
-    class unit{
+    @GroupDef(value = Unitc.class, spatial = true, collide = {gunit.class}, mapping = true)
+    class gunit{
 
     }
 
     @GroupDef(Tilec.class)
-    class tile{
+    class gtile{
 
     }
 
     @GroupDef(value = Syncc.class, mapping = true)
-    class sync{
+    class gsync{
 
     }
 
     @GroupDef(Drawc.class)
-    class draw{
+    class gdraw{
 
     }
 }

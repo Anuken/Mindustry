@@ -55,6 +55,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public boolean droppingItem;
     public Group uiGroup;
     public boolean isShooting, isBuilding = true, buildWasAutoPaused = false;
+    public UnitType controlledType;
 
     protected @Nullable Schematic lastSchematic;
     protected GestureDetector detector;
@@ -174,9 +175,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
         }else if(unit.isAI() && unit.team() == player.team()){
-            Time.runTask(Fx.unitSpirit.lifetime * 0.87f, () -> {
-                player.unit(unit);
-            });
+            player.unit(unit);
             Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x(), unit.y(), 0f, unit));
             if(!player.dead()){
                 Fx.unitSpirit.at(player.x(), player.y(), 0f, unit);
@@ -198,6 +197,30 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void update(){
         player.typing(ui.chatfrag.shown());
+
+        if(!player.dead()){
+            controlledType = player.unit().type();
+        }
+
+        if(controlledType != null && player.dead()){
+            Unitc unit = Units.closest(player.team(), player.x(), player.y(), u -> !u.isPlayer() && u.type() == controlledType);
+            if(unit != null){
+                Call.onUnitControl(player, unit);
+            }
+        }
+    }
+
+    public void checkUnit(){
+        if(controlledType != null){
+            Unitc unit = Units.closest(player.team(), player.x(), player.y(), u -> !u.isPlayer() && u.type() == controlledType);
+            if(unit != null){
+                if(net.client()){
+                    Call.onUnitControl(player, unit);
+                }else{
+                    unit.controller(player);
+                }
+            }
+        }
     }
 
     public float getMouseX(){
