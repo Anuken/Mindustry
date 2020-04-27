@@ -181,7 +181,7 @@ public class ItemBridge extends Block{
                     float x = Interpolation.linear.apply(ox, tx, alpha);
                     float y = Interpolation.linear.apply(oy, ty, alpha);
 
-                    Tile link = world.tile(linked ? tile.pos() : other.pos());
+                    Tile link = linked ? tile : other;
                     Tile otherLink = linked ? other : tile;
 
                     Draw.color(Color.valueOf("444444"));
