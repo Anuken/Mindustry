@@ -1,25 +1,24 @@
 package mindustry.ui.fragments;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
+import arc.input.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
-import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -31,11 +30,13 @@ public class PlacementFragment extends Fragment{
     Array<Block> returnArray = new Array<>();
     Array<Category> returnCatArray = new Array<>();
     boolean[] categoryEmpty = new boolean[Category.all.length];
-    ObjectMap<Category,Block> selectedBlocks = new ObjectMap<Category,Block>();
+    ObjectMap<Category,Block> selectedBlocks = new ObjectMap<>();
+    ObjectFloatMap<Category> scrollPositions = new ObjectFloatMap<>();
     Block hovered, lastDisplay;
     Tile lastHover;
     Tile hoverTile;
     Table blockTable, toggler, topTable;
+    ScrollPane blockPane;
     boolean lastGround;
     boolean blockSelectEnd;
     int blockSelectSeq;
@@ -86,11 +87,13 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean gridUpdate(InputHandler input){
-        if(Core.input.keyDown(Binding.pick)){ //mouse eyedropper select
-            Tile tile = world.ltileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+        scrollPositions.put(currentCategory, blockPane.getScrollY());
+
+        if(Core.input.keyDown(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
+            Tilec tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             Block tryRecipe = tile == null ? null : tile.block();
 
-            for(BuildRequest req : player.buildQueue()){
+            for(BuildRequest req : player.builder().requests()){
                 if(!req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).contains(Core.input.mouseWorld())){
                     tryRecipe = req.block;
                     break;
@@ -202,18 +205,22 @@ public class PlacementFragment extends Fragment{
                             blockTable.row();
                         }
 
-                        ImageButton button = blockTable.addImageButton(Icon.lockedSmall, Styles.selecti, () -> {
+                        ImageButton button = blockTable.button(new TextureRegionDrawable(block.icon(Cicon.medium)), Styles.selecti, () -> {
                             if(unlocked(block)){
-                                control.input.block = control.input.block == block ? null : block;
-                                selectedBlocks.put(currentCategory, control.input.block);
+                                if(Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(block.name) != 0){
+                                    Core.app.setClipboardText((char)Fonts.getUnicode(block.name) + "");
+                                    ui.showInfoFade("$copied");
+                                }else{
+                                    control.input.block = control.input.block == block ? null : block;
+                                    selectedBlocks.put(currentCategory, control.input.block);
+                                }
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
-
-                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Cicon.medium));
+                        button.resizeImage(Cicon.medium.size);
 
                         button.update(() -> { //color unplacable things gray
-                            TileEntity core = player.getClosestCore();
-                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
+                            Tilec core = player.closestCore();
+                            Color color = (state.rules.infiniteResources || (core != null && (core.items().has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
 
@@ -236,6 +243,12 @@ public class PlacementFragment extends Fragment{
                         }
                     }
                     blockTable.act(0f);
+                    blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0));
+                    Core.app.post(() -> {
+                        blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0));
+                        blockPane.act(0f);
+                        blockPane.layout();
+                    });
                 };
 
                 //top table with hover info
@@ -277,7 +290,7 @@ public class PlacementFragment extends Fragment{
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(unlocked(lastDisplay)){
-                                    header.addButton("?", Styles.clearPartialt, () -> {
+                                    header.button("?", Styles.clearPartialt, () -> {
                                         ui.content.show(lastDisplay);
                                         Events.fire(new BlockInfoEvent());
                                     }).size(8 * 5).padTop(-5).padRight(-5).right().grow().name("blockinfo");
@@ -291,13 +304,13 @@ public class PlacementFragment extends Fragment{
                                 for(ItemStack stack : lastDisplay.requirements){
                                     req.table(line -> {
                                         line.left();
-                                        line.addImage(stack.item.icon(Cicon.small)).size(8 * 2);
+                                        line.image(stack.item.icon(Cicon.small)).size(8 * 2);
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
                                         line.labelWrap(() -> {
-                                            TileEntity core = player.getClosestCore();
+                                            Tilec core = player.closestCore();
                                             if(core == null || state.rules.infiniteResources) return "*/*";
 
-                                            int amount = core.items.get(stack.item);
+                                            int amount = core.items().get(stack.item);
                                             int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
                                             String color = (amount < stackamount / 2f ? "[red]" : amount < stackamount ? "[accent]" : "[white]");
 
@@ -308,11 +321,11 @@ public class PlacementFragment extends Fragment{
                                 }
                             }).growX().left().margin(3);
 
-                            if(state.rules.bannedBlocks.contains(lastDisplay)){
+                            if(state.rules.bannedBlocks.contains(lastDisplay) || !player.isBuilder()){
                                 topTable.row();
                                 topTable.table(b -> {
-                                    b.addImage(Icon.cancelSmall).padRight(2).color(Color.scarlet);
-                                    b.add("$banned");
+                                    b.image(Icon.cancel).padRight(2).color(Color.scarlet);
+                                    b.add(!player.isBuilder() ? "$unit.nobuild" : "$banned");
                                     b.left();
                                 }).padTop(2).left();
                             }
@@ -324,29 +337,32 @@ public class PlacementFragment extends Fragment{
                                 t.add(new Image(lastDisplay.getDisplayIcon(hoverTile))).size(8 * 4);
                                 t.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(190f).padLeft(5);
                             }).growX().left();
-                            if(hoverTile.getTeam() == player.getTeam()){
+                            if(hoverTile.team() == player.team()){
                                 topTable.row();
                                 topTable.table(t -> {
                                     t.left().defaults().left();
-                                    lastDisplay.display(hoverTile, t);
+                                    if(hoverTile.entity != null){
+                                        hoverTile.entity.display(t);
+                                    }
                                 }).left().growX();
                             }
                         }
                     });
                 }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);
                 frame.row();
-                frame.addImage().color(Pal.gray).colspan(3).height(4).growX();
+                frame.image().color(Pal.gray).colspan(3).height(4).growX();
                 frame.row();
                 frame.table(Tex.pane2, blocksSelect -> {
                     blocksSelect.margin(4).marginTop(0);
-                    blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
+                    blockPane = blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
                         if(pane.hasScroll()){
                             Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
                             if(result == null || !result.isDescendantOf(pane)){
                                 Core.scene.setScrollFocus(null);
                             }
                         }
-                    }).grow().get().setStyle(Styles.smallPane);
+                    }).grow().get();
+                    blockPane.setStyle(Styles.smallPane);
                     blocksSelect.row();
                     blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
                 }).fillY().bottom().touchable(Touchable.enabled);
@@ -374,11 +390,11 @@ public class PlacementFragment extends Fragment{
                         if(f++ % 2 == 0) categories.row();
 
                         if(categoryEmpty[cat.ordinal()]){
-                            categories.addImage(Styles.black6);
+                            categories.image(Styles.black6);
                             continue;
                         }
 
-                        categories.addImageButton(Core.atlas.drawable("icon-" + cat.name() + "-smaller"), Styles.clearToggleTransi, () -> {
+                        categories.button(ui.getIcon(cat.name()), Styles.clearToggleTransi, () -> {
                             currentCategory = cat;
                             if(control.input.block != null){
                                 control.input.block = getSelectedBlock(currentCategory);
@@ -426,7 +442,7 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean unlocked(Block block){
-        return !world.isZone() || data.isUnlocked(block);
+        return !state.isCampaign() || data.isUnlocked(block);
     }
 
     /** Returns the currently displayed block in the top box. */
@@ -437,11 +453,9 @@ public class PlacementFragment extends Fragment{
 
         //setup hovering tile
         if(!Core.scene.hasMouse() && topTable.hit(v.x, v.y, false) == null){
-            Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-            if(tile != null){
-                hoverTile = tile.link();
-            }else{
-                hoverTile = null;
+            hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            if(hoverTile != null && hoverTile.entity != null){
+                hoverTile.entity.updateFlow(true);
             }
         }else{
             hoverTile = null;

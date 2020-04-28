@@ -21,13 +21,15 @@ First, make sure you have [JDK 8](https://adoptopenjdk.net/) installed. Open a t
 
 #### Windows
 
-_Running:_ `gradlew desktop:run`  
-_Building:_ `gradlew desktop:dist`
+_Running:_ `gradlew.bat desktop:run`  
+_Building:_ `gradlew.bat desktop:dist`  
+_Sprite Packing:_ `gradlew.bat tools:pack`
 
 #### Linux/Mac OS
 
 _Running:_ `./gradlew desktop:run`  
-_Building:_ `./gradlew desktop:dist`
+_Building:_ `./gradlew desktop:dist`  
+_Sprite Packing:_ `./gradlew tools:pack`
 
 #### Server
 
@@ -49,6 +51,10 @@ If the terminal returns `Permission denied` or `Command not found` on Mac/Linux,
 Gradle may take up to several minutes to download files. Be patient. <br>
 After building, the output .JAR file should be in `/desktop/build/libs/Mindustry.jar` for desktop builds, and in `/server/build/libs/server-release.jar` for server builds.
 
+### Feature Requests
+
+Post feature requests and feedback [here](https://github.com/Anuken/Mindustry-Suggestions/issues/new/choose).
+
 ### Downloads
 
 [<img src="https://static.itch.io/images/badge.svg"
@@ -62,7 +68,3 @@ After building, the output .JAR file should be in `/desktop/build/libs/Mindustry
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
      alt="Get it on F-Droid"
      height="80">](https://f-droid.org/packages/io.anuke.mindustry/)
-
-### Feature Requests
-
-[![Feature Requests](https://feathub.com/Anuken/Mindustry?format=svg)](https://feathub.com/Anuken/Mindustry)

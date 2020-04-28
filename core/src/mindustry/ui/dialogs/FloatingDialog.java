@@ -20,11 +20,11 @@ public class FloatingDialog extends Dialog{
         setFillParent(true);
         this.title.setAlignment(Align.center);
         titleTable.row();
-        titleTable.addImage(Tex.whiteui, Pal.accent)
+        titleTable.image(Tex.whiteui, Pal.accent)
         .growX().height(3f).pad(4f);
 
         hidden(() -> {
-            if(shouldPause && !state.is(State.menu)){
+            if(shouldPause && state.isGame()){
                 if(!wasPaused || net.active()){
                     state.set(State.playing);
                 }
@@ -33,7 +33,7 @@ public class FloatingDialog extends Dialog{
         });
 
         shown(() -> {
-            if(shouldPause && !state.is(State.menu)){
+            if(shouldPause && state.isGame()){
                 wasPaused = state.is(State.paused);
                 state.set(State.paused);
             }
@@ -56,10 +56,10 @@ public class FloatingDialog extends Dialog{
     @Override
     public void addCloseButton(){
         buttons.defaults().size(210f, 64f);
-        buttons.addImageTextButton("$back", Icon.arrowLeft, this::hide).size(210f, 64f);
+        buttons.button("$back", Icon.left, this::hide).size(210f, 64f);
 
         keyDown(key -> {
-            if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
+            if(key == KeyCode.escape || key == KeyCode.back){
                 Core.app.post(this::hide);
             }
         });

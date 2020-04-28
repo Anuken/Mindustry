@@ -1,9 +1,8 @@
 package mindustry.world.blocks.defense.turrets;
 
-import arc.math.Mathf;
-import arc.util.Time;
-import mindustry.entities.bullet.BulletType;
-import mindustry.world.Tile;
+import arc.math.*;
+import arc.util.*;
+import mindustry.entities.bullet.*;
 
 import static mindustry.Vars.tilesize;
 
@@ -14,24 +13,24 @@ public class BurstTurret extends ItemTurret{
         super(name);
     }
 
-    @Override
-    protected void shoot(Tile tile, BulletType ammo){
-        TurretEntity entity = tile.ent();
+    public class BurstTurretEntity extends ItemTurretEntity{
 
-        entity.heat = 1f;
+        @Override
+        protected void shoot(BulletType ammo){
+            heat = 1f;
 
-        for(int i = 0; i < shots; i++){
-            Time.run(burstSpacing * i, () -> {
-                if(!(tile.entity instanceof TurretEntity) ||
-                !hasAmmo(tile)) return;
+            for(int i = 0; i < shots; i++){
+                Time.run(burstSpacing * i, () -> {
+                    if(!(tile.entity instanceof TurretEntity) || !hasAmmo()) return;
 
-                entity.recoil = recoil;
+                    recoil = recoilAmount;
 
-                tr.trns(entity.rotation, size * tilesize / 2, Mathf.range(xRand));
-                bullet(tile, ammo, entity.rotation + Mathf.range(inaccuracy));
-                effects(tile);
-                useAmmo(tile);
-            });
+                    tr.trns(rotation, size * tilesize / 2, Mathf.range(xRand));
+                    bullet(ammo, rotation + Mathf.range(inaccuracy));
+                    effects();
+                    useAmmo();
+                });
+            }
         }
     }
 }

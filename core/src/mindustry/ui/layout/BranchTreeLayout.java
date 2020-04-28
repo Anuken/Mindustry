@@ -148,8 +148,7 @@ public class BranchTreeLayout implements TreeLayout{
         wPlus.mode = wPlus.mode + shift;
     }
 
-    private TreeNode apportion(TreeNode v, TreeNode defaultAncestor,
-                               TreeNode leftSibling, TreeNode parentOfV){
+    private TreeNode apportion(TreeNode v, TreeNode defaultAncestor, TreeNode leftSibling, TreeNode parentOfV){
         if(leftSibling == null){
             return defaultAncestor;
         }

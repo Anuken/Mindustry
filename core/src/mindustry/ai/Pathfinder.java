@@ -1,13 +1,13 @@
 package mindustry.ai;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.math.geom.*;
-import arc.util.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.async.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -33,8 +33,7 @@ public class Pathfinder implements Runnable{
     /** handles task scheduling on the update thread. */
     private TaskQueue queue = new TaskQueue();
     /** current pathfinding thread */
-    private @Nullable
-    Thread thread;
+    private @Nullable Thread thread;
 
     public Pathfinder(){
         Events.on(WorldLoadEvent.class, event -> {
@@ -46,10 +45,8 @@ public class Pathfinder implements Runnable{
             created = new GridBits(Team.all().length, PathTarget.all.length);
             list = new Array<>();
 
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    tiles[x][y] = packTile(world.rawTile(x, y));
-                }
+            for(Tile tile : world.tiles){
+                tiles[tile.x][tile.y] = packTile(tile);
             }
 
             //special preset which may help speed things up; this is optional
@@ -219,7 +216,7 @@ public class Pathfinder implements Runnable{
             //add targets
             for(int i = 0; i < path.targets.size; i++){
                 int pos = path.targets.get(i);
-                int tx = Pos.x(pos), ty = Pos.y(pos);
+                int tx = Point2.x(pos), ty = Point2.y(pos);
 
                 path.weights[tx][ty] = 0;
                 path.searches[tx][ty] = (short)path.search;
@@ -256,7 +253,7 @@ public class Pathfinder implements Runnable{
         //add targets
         for(int i = 0; i < path.targets.size; i++){
             int pos = path.targets.get(i);
-            path.weights[Pos.x(pos)][Pos.y(pos)] = 0;
+            path.weights[Point2.x(pos)][Point2.y(pos)] = 0;
             path.frontier.addFirst(pos);
         }
 
@@ -286,7 +283,7 @@ public class Pathfinder implements Runnable{
 
                     if(other != null && (path.weights[dx][dy] > cost + other.cost || path.searches[dx][dy] < path.search) && passable(dx, dy, path.team)){
                         if(other.cost < 0) throw new IllegalArgumentException("Tile cost cannot be negative! " + other);
-                        path.frontier.addFirst(Pos.get(dx, dy));
+                        path.frontier.addFirst(Point2.pack(dx, dy));
                         path.weights[dx][dy] = cost + other.cost;
                         path.searches[dx][dy] = (short)path.search;
                     }
@@ -304,7 +301,7 @@ public class Pathfinder implements Runnable{
 
             //spawn points are also enemies.
             if(state.rules.waves && team == state.rules.defaultTeam){
-                for(Tile other : spawner.getGroundSpawns()){
+                for(Tile other : spawner.getSpawns()){
                     out.add(other.pos());
                 }
             }

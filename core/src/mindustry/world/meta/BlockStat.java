@@ -24,6 +24,7 @@ public enum BlockStat{
     powerConnections(StatCategory.power),
     basePowerGeneration(StatCategory.power),
 
+    tiles(StatCategory.crafting),
     input(StatCategory.crafting),
     output(StatCategory.crafting),
     productionTime(StatCategory.crafting),
@@ -45,7 +46,8 @@ public enum BlockStat{
     ammo(StatCategory.shooting),
 
     booster(StatCategory.optional),
-    boostEffect(StatCategory.optional);
+    boostEffect(StatCategory.optional),
+    affinities(StatCategory.optional);
 
     public final StatCategory category;
 

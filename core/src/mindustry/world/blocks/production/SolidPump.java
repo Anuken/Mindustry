@@ -1,21 +1,17 @@
 package mindustry.world.blocks.production;
 
-import arc.Core;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Mathf;
+import arc.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import mindustry.content.Fx;
-import mindustry.content.Liquids;
-import mindustry.entities.Effects;
-import mindustry.entities.Effects.Effect;
-import mindustry.entities.type.TileEntity;
-import mindustry.graphics.Pal;
-import mindustry.type.Liquid;
-import mindustry.ui.Bar;
-import mindustry.world.Tile;
-import mindustry.world.meta.Attribute;
-import mindustry.world.meta.BlockStat;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.graphics.*;
+import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.*;
+import mindustry.world.meta.*;
 
 /**
  * Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.
@@ -26,12 +22,11 @@ public class SolidPump extends Pump{
     public float updateEffectChance = 0.02f;
     public float rotateSpeed = 1f;
     /** Attribute that is checked when calculating output. */
-    public Attribute attribute;
+    public @Nullable Attribute attribute;
 
     public SolidPump(String name){
         super(name);
         hasPower = true;
-        entityType = SolidPumpEntity::new;
     }
 
     @Override
@@ -44,7 +39,7 @@ public class SolidPump extends Pump{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         if(attribute != null){
-            drawPlaceText(Core.bundle.formatFloat("bar.efficiency", (sumAttribute(attribute, x, y) + 1f) * 100 * percentSolid(x, y), 1), x, y, valid);
+            drawPlaceText(Core.bundle.formatFloat("bar.efficiency", Math.max(sumAttribute(attribute, x, y) + 1f, 0f) * 100 * percentSolid(x, y), 1), x, y, valid);
         }
     }
 
@@ -64,19 +59,28 @@ public class SolidPump extends Pump{
 
         stats.remove(BlockStat.output);
         stats.add(BlockStat.output, result, 60f * pumpAmount, true);
+        if(attribute != null){
+            stats.add(BlockStat.affinities, attribute);
+        }
     }
 
     @Override
-    public void draw(Tile tile){
-        SolidPumpEntity entity = tile.ent();
+    public boolean canPlaceOn(Tile tile){
+        if(isMultiblock()){
+            for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+                if(canPump(other)){
+                    return true;
+                }
+            }
+            return false;
+        }else{
+            return canPump(tile);
+        }
+    }
 
-        Draw.rect(region, tile.drawx(), tile.drawy());
-        Draw.color(tile.entity.liquids.current().color);
-        Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
-        Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
-        Draw.color();
-        Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), entity.pumpTime * rotateSpeed);
-        Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+    @Override
+    protected boolean canPump(Tile tile){
+        return tile != null && !tile.floor().isLiquid;
     }
 
     @Override
@@ -84,78 +88,69 @@ public class SolidPump extends Pump{
         return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
     }
 
-    @Override
-    public void update(Tile tile){
-        SolidPumpEntity entity = tile.ent();
-
-        float fraction = 0f;
-
-        if(isMultiblock()){
-            for(Tile other : tile.getLinkedTiles(tempTiles)){
-                if(isValid(other)){
-                    fraction += 1f / (size * size);
-                }
-            }
-        }else{
-            if(isValid(tile)) fraction = 1f;
-        }
-
-        fraction += entity.boost;
-
-        if(tile.entity.cons.valid() && typeLiquid(tile) < liquidCapacity - 0.001f){
-            float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction * entity.efficiency());
-            tile.entity.liquids.add(result, maxPump);
-            entity.lastPump = maxPump;
-            entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
-            if(Mathf.chance(entity.delta() * updateEffectChance))
-                Effects.effect(updateEffect, entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
-        }else{
-            entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
-            entity.lastPump = 0f;
-        }
-
-        entity.pumpTime += entity.warmup * entity.delta();
-
-        tryDumpLiquid(tile, result);
-    }
-
-    @Override
-    public boolean canPlaceOn(Tile tile){
-        if(isMultiblock()){
-            for(Tile other : tile.getLinkedTilesAs(this, drawTiles)){
-                if(isValid(other)){
-                    return true;
-                }
-            }
-            return false;
-        }else{
-            return isValid(tile);
-        }
-    }
-
-    @Override
-    protected boolean isValid(Tile tile){
-        return tile != null && !tile.floor().isLiquid;
-    }
-
-    @Override
-    public void onProximityAdded(Tile tile){
-        super.onProximityAdded(tile);
-
-        if(attribute != null){
-            SolidPumpEntity entity = tile.ent();
-            entity.boost = sumAttribute(attribute, tile.x, tile.y);
-        }
-    }
-
-    public float typeLiquid(Tile tile){
-        return tile.entity.liquids.total();
-    }
-
-    public static class SolidPumpEntity extends TileEntity{
+    public class SolidPumpEntity extends PumpEntity{
         public float warmup;
         public float pumpTime;
         public float boost;
         public float lastPump;
+
+        @Override
+        public void draw(){
+            Draw.rect(region, x, y);
+            Draw.color(liquids.current().color);
+            Draw.alpha(liquids.total() / liquidCapacity);
+            Draw.rect(liquidRegion, x, y);
+            Draw.color();
+            Draw.rect(name + "-rotator", x, y, pumpTime * rotateSpeed);
+            Draw.rect(name + "-top", x, y);
+        }
+
+        @Override
+        public void updateTile(){
+            float fraction = 0f;
+
+            if(isMultiblock()){
+                for(Tile other : tile.getLinkedTiles(tempTiles)){
+                    if(canPump(other)){
+                        fraction += 1f / (size * size);
+                    }
+                }
+            }else{
+                if(canPump(tile)) fraction = 1f;
+            }
+
+            fraction += boost;
+            fraction = Math.max(fraction, 0);
+
+            if(cons.valid() && typeLiquid() < liquidCapacity - 0.001f){
+                float maxPump = Math.min(liquidCapacity - typeLiquid(), pumpAmount * delta() * fraction * efficiency());
+                liquids.add(result, maxPump);
+                lastPump = maxPump;
+                warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
+                if(timer(timerContentCheck, 10)) useContent(result);
+                if(Mathf.chance(delta() * updateEffectChance))
+                    updateEffect.at(getX() + Mathf.range(size * 2f), getY() + Mathf.range(size * 2f));
+            }else{
+                warmup = Mathf.lerpDelta(warmup, 0f, 0.02f);
+                lastPump = 0f;
+            }
+
+            pumpTime += warmup * delta();
+
+            dumpLiquid(result);
+        }
+
+        @Override
+        public void onProximityUpdate(){
+            super.onProximityAdded();
+
+            if(attribute != null){
+                boost = sumAttribute(attribute, tile.x, tile.y);
+            }
+        }
+
+        public float typeLiquid(){
+            return liquids.total();
+        }
     }
 }

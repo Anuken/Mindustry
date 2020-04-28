@@ -1,9 +1,8 @@
 package mindustry.game;
 
-import mindustry.annotations.Annotations.Serialize;
-import arc.struct.Array;
-import arc.struct.ObjectIntMap;
-import arc.math.Mathf;
+import arc.math.*;
+import arc.struct.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.type.*;
 
 @Serialize
@@ -23,21 +22,24 @@ public class Stats{
     /** Friendly buildings destroyed. */
     public int buildingsDestroyed;
 
-    public RankResult calculateRank(Zone zone, boolean launched){
+    public RankResult calculateRank(Sector zone, boolean launched){
         float score = 0;
 
+        //TODO implement wave/attack mode based score
+        /*
         if(launched && zone.getRules().attackMode){
             score += 3f;
         }else if(wavesLasted >= zone.conditionWave){
             //each new launch period adds onto the rank 'points'
             score += (float)((wavesLasted - zone.conditionWave) / zone.launchPeriod + 1) * 1.2f;
-        }
+        }*/
 
-        int capacity = zone.loadout.findCore().itemCapacity;
+        //TODO implement
+        int capacity = 3000;//zone.loadout.findCore().itemCapacity;
 
         //weigh used fractions
         float frac = 0f;
-        Array<Item> obtainable = Array.with(zone.resources).select(i -> i.type == ItemType.material);
+        Array<Item> obtainable = Array.with(zone.data.resources).select(i -> i instanceof Item && ((Item)i).type == ItemType.material).as(Item.class);
         for(Item item : obtainable){
             frac += Mathf.clamp((float)itemsDelivered.get(item, 0) / capacity) / (float)obtainable.size;
         }

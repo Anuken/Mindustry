@@ -1,34 +1,32 @@
 package mindustry.world.blocks;
 
-import arc.struct.*;
 import arc.func.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
-import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 
 import static mindustry.Vars.*;
 
 public class ItemSelection{
+    private static float scrollPos = 0f;
 
-    public static void buildItemTable(Table table, Prov<Item> holder, Cons<Item> consumer){
-
-        Array<Item> items = content.items();
+    public static <T extends UnlockableContent> void buildTable(Table table, Array<T> items, Prov<T> holder, Cons<T> consumer){
 
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
         Table cont = new Table();
-        cont.defaults().size(38);
+        cont.defaults().size(40);
 
         int i = 0;
 
-        for(Item item : items){
-            if(!data.isUnlocked(item) && world.isZone()) continue;
+        for(T item : items){
+            if(!data.isUnlocked(item) && state.isCampaign()) continue;
 
-            ImageButton button = cont.addImageButton(Tex.whiteui, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).group(group).get();
+            ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).group(group).get();
             button.changed(() -> consumer.get(button.isChecked() ? item : null));
             button.getStyle().imageUp = new TextureRegionDrawable(item.icon(Cicon.small));
             button.update(() -> button.setChecked(holder.get() == item));
@@ -38,6 +36,22 @@ public class ItemSelection{
             }
         }
 
-        table.add(cont);
+        //add extra blank spaces so it looks nice
+        if(i % 4 != 0){
+            int remaining = 4 - (i % 4);
+            for(int j = 0; j < remaining; j++){
+                cont.image(Styles.black6);
+            }
+        }
+
+        ScrollPane pane = new ScrollPane(cont, Styles.smallPane);
+        pane.setScrollingDisabled(true, false);
+        pane.setScrollYForce(scrollPos);
+        pane.update(() -> {
+            scrollPos = pane.getScrollY();
+        });
+
+        pane.setOverscroll(false, false);
+        table.add(pane).maxHeight(Scl.scl(40 * 5));
     }
 }

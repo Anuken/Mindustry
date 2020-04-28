@@ -3,11 +3,10 @@ package mindustry.world.consumers;
 import arc.struct.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.Cicon;
-import mindustry.world.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
@@ -36,9 +35,10 @@ public class ConsumeItems extends Consume{
     }
 
     @Override
-    public void build(Tile tile, Table table){
+    public void build(Tilec tile, Table table){
         for(ItemStack stack : items){
-            table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(stack.item, stack.amount))).size(8 * 4).padRight(5);
+            table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
+                () -> tile.items() != null && tile.items().has(stack.item, stack.amount))).size(8 * 4).padRight(5);
         }
     }
 
@@ -48,20 +48,20 @@ public class ConsumeItems extends Consume{
     }
 
     @Override
-    public void update(TileEntity entity){
+    public void update(Tilec entity){
 
     }
 
     @Override
-    public void trigger(TileEntity entity){
+    public void trigger(Tilec entity){
         for(ItemStack stack : items){
-            entity.items.remove(stack);
+            entity.items().remove(stack);
         }
     }
 
     @Override
-    public boolean valid(TileEntity entity){
-        return entity.items != null && entity.items.has(items);
+    public boolean valid(Tilec entity){
+        return entity.items() != null && entity.items().has(items);
     }
 
     @Override

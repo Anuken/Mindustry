@@ -1,13 +1,12 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.struct.*;
-import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.game.Saves.*;
@@ -15,7 +14,6 @@ import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
 import mindustry.ui.*;
-import mindustry.ui.Styles;
 
 import java.io.*;
 
@@ -70,45 +68,27 @@ public class LoadDialog extends FloatingDialog{
 
                 title.table(t -> {
                     t.right();
+                    t.defaults().size(40f);
 
-                    t.addImageButton(Icon.floppy, Styles.emptytogglei, () -> {
+                    t.button(Icon.save, Styles.emptytogglei, () -> {
                         slot.setAutosave(!slot.isAutosave());
                     }).checked(slot.isAutosave()).right();
 
-                    t.addImageButton(Icon.trash, Styles.emptyi, () -> {
+                    t.button(Icon.trash, Styles.emptyi, () -> {
                         ui.showConfirm("$confirm", "$save.delete.confirm", () -> {
                             slot.delete();
                             setup();
                         });
                     }).right();
 
-                    t.addImageButton(Icon.pencil, Styles.emptyi, () -> {
+                    t.button(Icon.pencil, Styles.emptyi, () -> {
                         ui.showTextInput("$save.rename", "$save.rename.text", slot.getName(), text -> {
                             slot.setName(text);
                             setup();
                         });
                     }).right();
 
-                    t.addImageButton(Icon.save, Styles.emptyi, () -> {
-                        if(!ios){
-                            platform.showFileChooser(false, saveExtension, file -> {
-                                try{
-                                    slot.exportFile(file);
-                                    setup();
-                                }catch(IOException e){
-                                    ui.showException("save.export.fail", e);
-                                }
-                            });
-                        }else{
-                            try{
-                                Fi file = Core.files.local("save-" + slot.getName() + "." + saveExtension);
-                                slot.exportFile(file);
-                                platform.shareFile(file);
-                            }catch(Exception e){
-                                ui.showException("save.export.fail", e);
-                            }
-                        }
-                    }).right();
+                    t.button(Icon.export, Styles.emptyi, () -> platform.export("save-" + slot.getName(), saveExtension, slot::exportFile)).right();
 
                 }).padRight(-10).growX();
             }).growX().colspan(2);
@@ -162,13 +142,13 @@ public class LoadDialog extends FloatingDialog{
 
         if(!valids){
             slots.row();
-            slots.addButton("$save.none", () -> {
+            slots.button("$save.none", () -> {
             }).disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
         }
 
         slots.row();
 
-        slots.addImageTextButton("$save.import", Icon.add, () -> {
+        slots.button("$save.import", Icon.add, () -> {
             platform.showFileChooser(true, saveExtension, file -> {
                 if(SaveIO.isSaveValid(file)){
                     try{
@@ -194,11 +174,10 @@ public class LoadDialog extends FloatingDialog{
                     net.reset();
                     slot.load();
                     state.rules.editor = false;
-                    state.rules.zone = null;
+                    state.rules.sector = null;
                     state.set(State.playing);
                 }catch(SaveException e){
                     Log.err(e);
-                    state.set(State.menu);
                     logic.reset();
                     ui.showErrorMessage("$save.corrupted");
                 }

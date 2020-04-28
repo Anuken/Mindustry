@@ -1,16 +1,15 @@
 package mindustry.desktop.steam;
 
 import arc.*;
+import arc.func.*;
+import arc.struct.*;
+import arc.util.*;
+import arc.util.pooling.*;
 import com.codedisaster.steamworks.*;
 import com.codedisaster.steamworks.SteamFriends.*;
 import com.codedisaster.steamworks.SteamMatchmaking.*;
 import com.codedisaster.steamworks.SteamNetworking.*;
-import arc.struct.*;
-import arc.func.*;
-import arc.util.*;
-import arc.util.pooling.*;
-import mindustry.core.GameState.*;
-import mindustry.core.Version;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.net.ArcNetProvider.*;
@@ -172,7 +171,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     @Override
     public void hostServer(int port) throws IOException{
         provider.hostServer(port);
-        smat.createLobby(Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly, 16);
+        smat.createLobby(Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly, Core.settings.getInt("playerlimit"));
 
         Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: {0}\nClient: {1}\nActive: {2}", net.server(), net.client(), net.active()))));
     }
@@ -180,6 +179,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     public void updateLobby(){
         if(currentLobby != null && net.server()){
             smat.setLobbyType(currentLobby, Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly);
+            smat.setLobbyMemberLimit(currentLobby, Core.settings.getInt("playerlimit"));
         }
     }
 
@@ -239,12 +239,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             return;
         }
 
-        if(net.active()){
-            net.disconnect();
-            net.closeServer();
-            logic.reset();
-            state.set(State.menu);
-        }
+        logic.reset();
+        net.reset();
 
         currentLobby = steamIDLobby;
         currentServer = smat.getLobbyOwner(steamIDLobby);
@@ -315,7 +311,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                         Strings.parseInt(smat.getLobbyData(lobby, "version"), -1),
                         smat.getLobbyData(lobby, "versionType"),
                         Gamemode.valueOf(smat.getLobbyData(lobby, "gamemode")),
-                        smat.getLobbyMemberLimit(lobby)
+                        smat.getLobbyMemberLimit(lobby),
+                        ""
                     );
                     hosts.add(out);
                 }catch(Exception e){
@@ -346,12 +343,12 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         if(result == SteamResult.OK){
             currentLobby = steamID;
 
-            smat.setLobbyData(steamID, "name", player.name);
-            smat.setLobbyData(steamID, "mapname", world.getMap() == null ? "Unknown" : state.rules.zone == null ? world.getMap().name() : state.rules.zone.localizedName);
+            smat.setLobbyData(steamID, "name", player.name());
+            smat.setLobbyData(steamID, "mapname", state.map.name());
             smat.setLobbyData(steamID, "version", Version.build + "");
             smat.setLobbyData(steamID, "versionType", Version.type);
             smat.setLobbyData(steamID, "wave", state.wave + "");
-            smat.setLobbyData(steamID, "gamemode", Gamemode.bestFit(state.rules).name() + "");
+            smat.setLobbyData(steamID, "gamemode", state.rules.mode().name() + "");
         }
     }
 

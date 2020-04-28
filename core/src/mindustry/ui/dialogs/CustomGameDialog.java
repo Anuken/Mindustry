@@ -3,6 +3,7 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
@@ -59,18 +60,18 @@ public class CustomGameDialog extends FloatingDialog{
             image.table(t -> {
                 t.left();
                 for(Gamemode mode : Gamemode.all){
-                    if(mode.valid(map) && Core.atlas.has("icon-mode-" + mode.name())){
-                        t.addImage(Core.atlas.drawable("icon-mode-" + mode.name())).size(16f).pad(4f);
+                    TextureRegionDrawable icon = Vars.ui.getIcon("mode" + Strings.capitalize(mode.name()) + "Small");
+                    if(mode.valid(map) && Core.atlas.isFound(icon.getRegion())){
+                        t.image(icon).size(16f).pad(4f);
                     }
                 }
             }).left();
             image.row();
             image.add(map.name()).pad(1f).growX().wrap().left().get().setEllipsis(true);
             image.row();
-            image.addImage(Tex.whiteui, Pal.gray).growX().pad(3).height(4f);
+            image.image(Tex.whiteui, Pal.gray).growX().pad(3).height(4f);
             image.row();
             image.add(img).size(images);
-
 
             BorderImage border = new BorderImage(map.safeTexture(), 3f);
             border.setScaling(Scaling.fit);

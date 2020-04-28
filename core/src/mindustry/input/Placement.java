@@ -107,7 +107,7 @@ public class Placement{
                 found = true;
                 break;
             }
-            closed.add(Pos.get(next.x, next.y));
+            closed.add(Point2.pack((int)next.x, (int)next.y));
             for(Point2 point : Geometry.d4){
                 int newx = next.x + point.x, newy = next.y + point.y;
                 Tile child = world.tile(newx, newy);
@@ -129,11 +129,11 @@ public class Placement{
         Tile current = end;
         while(current != start && total++ < nodeLimit){
             if(current == null) return false;
-            int newPos = parents.get(current.pos(), Pos.invalid);
+            int newPos = parents.get(current.pos(), -1);
 
-            if(newPos == Pos.invalid) return false;
+            if(newPos == -1) return false;
 
-            points.add(Pools.obtain(Point2.class, Point2::new).set(Pos.x(newPos),  Pos.y(newPos)));
+            points.add(Pools.obtain(Point2.class, Point2::new).set(Point2.x(newPos), Point2.y(newPos)));
             current = world.tile(newPos);
         }
 

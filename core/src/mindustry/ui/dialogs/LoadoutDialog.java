@@ -26,7 +26,7 @@ public class LoadoutDialog extends FloatingDialog{
         setFillParent(true);
 
         keyDown(key -> {
-            if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
+            if(key == KeyCode.escape || key == KeyCode.back){
                 Core.app.post(this::hide);
             }
         });
@@ -42,9 +42,9 @@ public class LoadoutDialog extends FloatingDialog{
             }
         });
 
-        buttons.addImageTextButton("$back", Icon.arrowLeft, this::hide).size(210f, 64f);
+        buttons.button("$back", Icon.left, this::hide).size(210f, 64f);
 
-        buttons.addImageTextButton("$settings.reset", Icon.refreshSmall, () -> {
+        buttons.button("$settings.reset", Icon.refresh, () -> {
             resetter.run();
             reseed();
             updater.run();
@@ -73,17 +73,17 @@ public class LoadoutDialog extends FloatingDialog{
         for(ItemStack stack : stacks){
             items.table(Tex.pane, t -> {
                 t.margin(4).marginRight(8).left();
-                t.addButton("-", Styles.cleart, () -> {
+                t.button("-", Styles.cleart, () -> {
                     stack.amount = Math.max(stack.amount - step(stack.amount), 0);
                     updater.run();
                 }).size(bsize);
 
-                t.addButton("+", Styles.cleart, () -> {
+                t.button("+", Styles.cleart, () -> {
                     stack.amount = Math.min(stack.amount + step(stack.amount), capacity);
                     updater.run();
                 }).size(bsize);
 
-                t.addImageButton(Icon.pencilSmaller, Styles.cleari, () -> ui.showTextInput("$configure", stack.item.localizedName, 10, stack.amount + "", true, str -> {
+                t.button(Icon.pencil, Styles.cleari, () -> ui.showTextInput("$configure", stack.item.localizedName, 10, stack.amount + "", true, str -> {
                     if(Strings.canParsePostiveInt(str)){
                         int amount = Strings.parseInt(str);
                         if(amount >= 0 && amount <= capacity){
@@ -95,7 +95,7 @@ public class LoadoutDialog extends FloatingDialog{
                     ui.showInfo(Core.bundle.format("configure.invalid", capacity));
                 })).size(bsize);
 
-                t.addImage(stack.item.icon(Cicon.small)).size(8 * 3).padRight(4).padLeft(4);
+                t.image(stack.item.icon(Cicon.small)).size(8 * 3).padRight(4).padLeft(4);
                 t.label(() -> stack.amount + "").left().width(90f);
             }).pad(2).left().fillX();
 

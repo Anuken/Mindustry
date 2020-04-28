@@ -4,11 +4,10 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.ctype.ContentList;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
@@ -384,7 +383,7 @@ public class Bullets implements ContentList{
         }};
 
         damageLightning = new BulletType(0.0001f, 0f){{
-            lifetime = Lightning.lifetime;
+            lifetime = Fx.lightning.lifetime;
             hitEffect = Fx.hitLancer;
             despawnEffect = Fx.none;
             status = StatusEffects.shocked;
@@ -410,32 +409,32 @@ public class Bullets implements ContentList{
             }
 
             @Override
-            public void init(Bullet b){
-                b.velocity().setLength(0.6f + Mathf.random(2f));
+            public void init(Bulletc b){
+                b.vel().setLength(0.6f + Mathf.random(2f));
             }
 
             @Override
-            public void draw(Bullet b){
+            public void draw(Bulletc b){
                 Draw.color(Pal.lightFlame, Pal.darkFlame, Color.gray, b.fin());
-                Fill.circle(b.x, b.y, 3f * b.fout());
+                Fill.circle(b.x(), b.y(), 3f * b.fout());
                 Draw.reset();
             }
 
             @Override
-            public void update(Bullet b){
+            public void update(Bulletc b){
                 if(Mathf.chance(0.04 * Time.delta())){
-                    Tile tile = world.tileWorld(b.x, b.y);
+                    Tile tile = world.tileWorld(b.x(), b.y());
                     if(tile != null){
-                        Fire.create(tile);
+                        Fires.create(tile);
                     }
                 }
 
                 if(Mathf.chance(0.1 * Time.delta())){
-                    Effects.effect(Fx.fireballsmoke, b.x, b.y);
+                    Fx.fireballsmoke.at(b.x(), b.y());
                 }
 
                 if(Mathf.chance(0.1 * Time.delta())){
-                    Effects.effect(Fx.ballfire, b.x, b.y);
+                    Fx.ballfire.at(b.x(), b.y());
                 }
             }
         };
@@ -452,6 +451,7 @@ public class Bullets implements ContentList{
                 hitEffect = Fx.hitFlameSmall;
                 despawnEffect = Fx.none;
                 status = StatusEffects.burning;
+                keepVelocity = false;
             }
 
             @Override
@@ -460,7 +460,7 @@ public class Bullets implements ContentList{
             }
 
             @Override
-            public void draw(Bullet b){
+            public void draw(Bulletc b){
             }
         };
 
@@ -479,50 +479,17 @@ public class Bullets implements ContentList{
             }
 
             @Override
-            public void draw(Bullet b){
+            public void draw(Bulletc b){
             }
         };
 
-        lancerLaser = new BulletType(0.001f, 140){
-            Color[] colors = {Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white};
-            float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
-            float[] lenscales = {1f, 1.1f, 1.13f, 1.14f};
-            float length = 160f;
-
-            {
-                hitEffect = Fx.hitLancer;
-                despawnEffect = Fx.none;
-                hitSize = 4;
-                lifetime = 16f;
-                pierce = true;
-            }
-
-            @Override
-            public float range(){
-                return length;
-            }
-
-            @Override
-            public void init(Bullet b){
-                Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), length);
-            }
-
-            @Override
-            public void draw(Bullet b){
-                float f = Mathf.curve(b.fin(), 0f, 0.2f);
-                float baseLen = length * f;
-
-                Lines.lineAngle(b.x, b.y, b.rot(), baseLen);
-                for(int s = 0; s < 3; s++){
-                    Draw.color(colors[s]);
-                    for(int i = 0; i < tscales.length; i++){
-                        Lines.stroke(7f * b.fout() * (s == 0 ? 1.5f : s == 1 ? 1f : 0.3f) * tscales[i]);
-                        Lines.lineAngle(b.x, b.y, b.rot(), baseLen * lenscales[i]);
-                    }
-                }
-                Draw.reset();
-            }
-        };
+        lancerLaser = new LaserBulletType(140){{
+            colors = new Color[]{Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white};
+            hitEffect = Fx.hitLancer;
+            despawnEffect = Fx.none;
+            hitSize = 4;
+            lifetime = 16f;
+        }};
 
         meltdownLaser = new BulletType(0.001f, 70){
             Color tmpColor = new Color();
@@ -542,34 +509,38 @@ public class Bullets implements ContentList{
             }
 
             @Override
-            public void update(Bullet b){
-                if(b.timer.get(1, 5f)){
-                    Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), length, true);
+            public void update(Bulletc b){
+                if(b.timer(1, 5f)){
+                    Damage.collideLine(b, b.team(), hitEffect, b.x(), b.y(), b.rotation(), length, true);
                 }
-                Effects.shake(1f, 1f, b.x, b.y);
+                Effects.shake(1f, 1f, b.x(), b.y());
             }
 
             @Override
-            public void hit(Bullet b, float hitx, float hity){
-                Effects.effect(hitEffect, colors[2], hitx, hity);
+            public void hit(Bulletc b, float hitx, float hity){
+                hitEffect.at(hitx, hity, colors[2]);
                 if(Mathf.chance(0.4)){
-                    Fire.create(world.tileWorld(hitx + Mathf.range(5f), hity + Mathf.range(5f)));
+                    Fires.create(world.tileWorld(hitx + Mathf.range(5f), hity + Mathf.range(5f)));
                 }
             }
 
             @Override
-            public void draw(Bullet b){
+            public void draw(Bulletc b){
                 float baseLen = (length) * b.fout();
 
-                Lines.lineAngle(b.x, b.y, b.rot(), baseLen);
+                Lines.lineAngle(b.x(), b.y(), b.rotation(), baseLen);
                 for(int s = 0; s < colors.length; s++){
                     Draw.color(tmpColor.set(colors[s]).mul(1f + Mathf.absin(Time.time(), 1f, 0.1f)));
                     for(int i = 0; i < tscales.length; i++){
-                        Tmp.v1.trns(b.rot() + 180f, (lenscales[i] - 1f) * 35f);
+                        Tmp.v1.trns(b.rotation() + 180f, (lenscales[i] - 1f) * 35f);
                         Lines.stroke((9f + Mathf.absin(Time.time(), 0.8f, 1.5f)) * b.fout() * strokes[s] * tscales[i]);
-                        Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rot(), baseLen * lenscales[i], CapStyle.none);
+                        Lines.lineAngle(b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], CapStyle.none);
                     }
                 }
+
+                Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
+
+                Drawf.light(b.x(), b.y(), b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 40, Color.orange, 0.7f);
                 Draw.reset();
             }
         };
@@ -613,31 +584,20 @@ public class Bullets implements ContentList{
             }
 
             @Override
-            public void draw(Bullet b){
+            public void draw(Bulletc b){
             }
 
             @Override
-            public void init(Bullet b){
-                Lightning.create(b.getTeam(), Pal.lancerLaser, damage * (b.getOwner() instanceof Player ? state.rules.playerDamageMultiplier : 1f), b.x, b.y, b.rot(), 30);
+            public void init(Bulletc b){
+                //TODO owners are never players...
+                Lightning.create(b.team(), Pal.lancerLaser, damage * (b.owner() instanceof Playerc ? state.rules.playerDamageMultiplier : 1f), b.x(), b.y(), b.rotation(), 30);
             }
         };
 
-        arc = new BulletType(0.001f, 21){
-            {
-                lifetime = 1;
-                despawnEffect = Fx.none;
-                hitEffect = Fx.hitLancer;
-            }
-
-            @Override
-            public void draw(Bullet b){
-            }
-
-            @Override
-            public void init(Bullet b){
-                Lightning.create(b.getTeam(), Pal.lancerLaser, damage, b.x, b.y, b.rot(), 25);
-            }
-        };
+        arc = new LightningBulletType(){{
+            damage = 21;
+            lightningLength = 25;
+        }};
 
         driverBolt = new MassDriverBolt();
 
@@ -678,12 +638,12 @@ public class Bullets implements ContentList{
             }
 
             @Override
-            public void hit(Bullet b, float x, float y){
+            public void hit(Bulletc b, float x, float y){
                 super.hit(b, x, y);
 
                 for(int i = 0; i < 3; i++){
                     Tile tile = world.tileWorld(x + Mathf.range(8f), y + Mathf.range(8f));
-                    Puddle.deposit(tile, Liquids.oil, 5f);
+                    Puddles.deposit(tile, Liquids.oil, 5f);
                 }
             }
         };

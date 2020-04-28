@@ -1,34 +1,31 @@
 package mindustry.type;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.audio.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
-import mindustry.entities.type.Bullet;
 import mindustry.gen.*;
 
-import static mindustry.Vars.net;
-
 public class Weapon{
+    /** displayed weapon region */
     public String name;
-
-    /** minimum cursor distance from player, fixes 'cross-eyed' shooting. */
-    protected static float minPlayerDist = 20f;
-    protected static int sequenceNum = 0;
     /** bullet shot */
     public @NonNull BulletType bullet;
     /** shell ejection effect */
     public Effect ejectEffect = Fx.none;
+    /** whether to mirror the weapon (draw two of them, which is the default) */
+    public boolean mirror = true;
+    /** whether to flip the weapon's position/side on the ship (only valid when mirror is false) */
+    public boolean flipped = false;
+    /** whether to shoot the weapons in different arms one after another, rather than all at once; only valid when mirror = true */
+    public boolean alternate = false;
+    /** whether to rotate toward the target independently of unit */
+    public boolean rotate = false;
+    /** rotation speed of weapon when rotation is enabled, in degrees/t*/
+    public float rotateSpeed = 20f;
     /** weapon reload in frames */
     public float reload;
     /** amount of shots per fire */
@@ -41,14 +38,12 @@ public class Weapon{
     public float shake = 0f;
     /** visual weapon knockback. */
     public float recoil = 1.5f;
-    /** shoot barrel y offset */
-    public float length = 3f;
-    /** shoot barrel x offset. */
-    public float width = 4f;
+    /** projectile/effect offsets from center of weapon */
+    public float shootX = 0f, shootY = 3f;
+    /** offsets of weapon position on unit */
+    public float x = 5f, y = 0f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
-    /** whether to shoot the weapons in different arms one after another, rather than all at once */
-    public boolean alternate = false;
     /** randomization of shot length */
     public float lengthRand = 0f;
     /** delay in ticks between shots */
@@ -57,124 +52,21 @@ public class Weapon{
     public boolean ignoreRotation = false;
     /** if turnCursor is false for a mech, how far away will the weapon target. */
     public float targetDistance = 1f;
-
+    /** sound used for shooting */
     public Sound shootSound = Sounds.pew;
-
+    /** displayed region (autoloaded) */
     public TextureRegion region;
 
-    protected Weapon(String name){
+    public Weapon(String name){
         this.name = name;
     }
 
     public Weapon(){
-        //no region
-        this.name = "";
-    }
-
-    @Remote(targets = Loc.server, called = Loc.both, unreliable = true)
-    public static void onPlayerShootWeapon(Player player, float x, float y, float rotation, boolean left){
-
-        if(player == null) return;
-        //clients do not see their own shoot events: they are simulated completely clientside to prevent laggy visuals
-        //messing with the firerate or any other stats does not affect the server (take that, script kiddies!)
-        if(net.client() && player == Vars.player){
-            return;
-        }
-
-        shootDirect(player, x, y, rotation, left);
-    }
-
-    @Remote(targets = Loc.server, called = Loc.both, unreliable = true)
-    public static void onGenericShootWeapon(ShooterTrait shooter, float x, float y, float rotation, boolean left){
-        if(shooter == null) return;
-        shootDirect(shooter, x, y, rotation, left);
-    }
-
-    public static void shootDirect(ShooterTrait shooter, float offsetX, float offsetY, float rotation, boolean left){
-        float x = shooter.getX() + offsetX;
-        float y = shooter.getY() + offsetY;
-        float baseX = shooter.getX(), baseY = shooter.getY();
-
-        Weapon weapon = shooter.getWeapon();
-        weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
-
-        sequenceNum = 0;
-        if(weapon.shotDelay > 0.01f){
-            Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
-                Time.run(sequenceNum * weapon.shotDelay, () -> weapon.bullet(shooter, x + shooter.getX() - baseX, y + shooter.getY() - baseY, f + Mathf.range(weapon.inaccuracy)));
-                sequenceNum++;
-            });
-        }else{
-            Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> weapon.bullet(shooter, x, y, f + Mathf.range(weapon.inaccuracy)));
-        }
-
-        BulletType ammo = weapon.bullet;
-
-        Tmp.v1.trns(rotation + 180f, ammo.recoil);
-
-        shooter.velocity().add(Tmp.v1);
-
-        Tmp.v1.trns(rotation, 3f);
-
-        Effects.shake(weapon.shake, weapon.shake, x, y);
-        Effects.effect(weapon.ejectEffect, x, y, rotation * -Mathf.sign(left));
-        Effects.effect(ammo.shootEffect, x + Tmp.v1.x, y + Tmp.v1.y, rotation, shooter);
-        Effects.effect(ammo.smokeEffect, x + Tmp.v1.x, y + Tmp.v1.y, rotation, shooter);
-
-        //reset timer for remote players
-        shooter.getTimer().get(shooter.getShootTimer(left), weapon.reload);
+        this("");
     }
 
     public void load(){
         region = Core.atlas.find(name + "-equip", Core.atlas.find(name, Core.atlas.find("clear")));
     }
 
-    public void update(ShooterTrait shooter, float pointerX, float pointerY){
-        for(boolean left : Mathf.booleans){
-            Tmp.v1.set(pointerX, pointerY).sub(shooter.getX(), shooter.getY());
-            if(Tmp.v1.len() < minPlayerDist) Tmp.v1.setLength(minPlayerDist);
-
-            float cx = Tmp.v1.x + shooter.getX(), cy = Tmp.v1.y + shooter.getY();
-
-            float ang = Tmp.v1.angle();
-            Tmp.v1.trns(ang - 90, width * Mathf.sign(left), length + Mathf.range(lengthRand));
-
-            update(shooter, shooter.getX() + Tmp.v1.x, shooter.getY() + Tmp.v1.y, Angles.angle(shooter.getX() + Tmp.v1.x, shooter.getY() + Tmp.v1.y, cx, cy), left);
-        }
-    }
-
-    public void update(ShooterTrait shooter, float mountX, float mountY, float angle, boolean left){
-        if(shooter.getTimer().get(shooter.getShootTimer(left), reload)){
-            if(alternate){
-                shooter.getTimer().reset(shooter.getShootTimer(!left), reload / 2f);
-            }
-
-            shoot(shooter, mountX - shooter.getX(), mountY - shooter.getY(), angle, left);
-        }
-    }
-
-    public float getRecoil(ShooterTrait player, boolean left){
-        return (1f - Mathf.clamp(player.getTimer().getTime(player.getShootTimer(left)) / reload)) * recoil;
-    }
-
-    public void shoot(ShooterTrait p, float x, float y, float angle, boolean left){
-        if(net.client()){
-            //call it directly, don't invoke on server
-            shootDirect(p, x, y, angle, left);
-        }else{
-            if(p instanceof Player){ //players need special weapon handling logic
-                Call.onPlayerShootWeapon((Player)p, x, y, angle, left);
-            }else{
-                Call.onGenericShootWeapon(p, x, y, angle, left);
-            }
-        }
-    }
-
-    void bullet(ShooterTrait owner, float x, float y, float angle){
-        if(owner == null) return;
-
-        Tmp.v1.trns(angle, 3f);
-        Bullet.create(bullet,
-        owner, owner.getTeam(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd));
-    }
 }

@@ -27,7 +27,7 @@ public class ItemImage extends Stack{
 
         if(stack.amount != 0){
             Table t = new Table().left().bottom();
-            t.add(stack.amount + "").name("item-label");
+            t.add(stack.amount + "").name("item-label").style(Styles.outlineLabel);
             add(t);
         }
     }

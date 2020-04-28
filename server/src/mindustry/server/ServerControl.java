@@ -11,13 +11,10 @@ import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
-import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
-import mindustry.entities.*;
-import mindustry.entities.type.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.maps.Map;
@@ -84,8 +81,6 @@ public class ServerControl implements ApplicationListener{
         });
 
         Time.setDeltaProvider(() -> Core.graphics.getDeltaTime() * 60f);
-        Effects.setScreenShakeProvider((a, b) -> {});
-        Effects.setEffectProvider((a, b, c, d, e, f) -> {});
 
         registerCommands();
 
@@ -133,20 +128,20 @@ public class ServerControl implements ApplicationListener{
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
             if(state.rules.waves){
-                info("&lcGame over! Reached wave &ly{0}&lc with &ly{1}&lc players online on map &ly{2}&lc.", state.wave, playerGroup.size(), Strings.capitalize(world.getMap().name()));
+                info("&lcGame over! Reached wave &ly{0}&lc with &ly{1}&lc players online on map &ly{2}&lc.", state.wave, Groups.player.size(), Strings.capitalize(state.map.name()));
             }else{
-                info("&lcGame over! Team &ly{0}&lc is victorious with &ly{1}&lc players online on map &ly{2}&lc.", event.winner.name, playerGroup.size(), Strings.capitalize(world.getMap().name()));
+                info("&lcGame over! Team &ly{0}&lc is victorious with &ly{1}&lc players online on map &ly{2}&lc.", event.winner.name, Groups.player.size(), Strings.capitalize(state.map.name()));
             }
 
             //set next map to be played
-            Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(world.getMap());
+            Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(state.map);
             nextMapOverride = null;
             if(map != null){
                 Call.onInfoMessage((state.rules.pvp
                 ? "[YELLOW]The " + event.winner.name + " team is victorious![]" : "[SCARLET]Game over![]")
                 + "\nNext selected map:[accent] " + map.name() + "[]"
-                + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
-                "\nNew game begins in " + roundExtraTime + "[] seconds.");
+                + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
+                "\nNew game begins in " + roundExtraTime + " seconds.");
 
                 info("Selected next map to be {0}.", map.name());
 
@@ -224,8 +219,7 @@ public class ServerControl implements ApplicationListener{
                     return;
                 }
             }else{
-                Array<Map> maps = Vars.maps.customMaps().size == 0 ? Vars.maps.defaultMaps() : Vars.maps.customMaps();
-                result = maps.random();
+                result = maps.getShuffleMode().next(state.map);
                 info("Randomized next map to be {0}.", result.name());
             }
 
@@ -280,11 +274,11 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("status", "Display server status.", arg -> {
-            if(state.is(State.menu)){
+            if(state.isMenu()){
                 info("Status: &rserver closed");
             }else{
                 info("Status:");
-                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name()), state.wave);
+                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(state.map.name()), state.wave);
 
                 if(state.rules.waves){
                     info("&ly  {0} enemies.", state.enemies);
@@ -294,10 +288,10 @@ public class ServerControl implements ApplicationListener{
 
                 info("  &ly{0} FPS, {1} MB used.", Core.graphics.getFramesPerSecond(), Core.app.getJavaHeap() / 1024 / 1024);
 
-                if(playerGroup.size() > 0){
-                    info("  &lyPlayers: {0}", playerGroup.size());
-                    for(Player p : playerGroup.all()){
-                        info("    &y{0} / {1}", p.name, p.uuid);
+                if(Groups.player.size() > 0){
+                    info("  &lyPlayers: {0}", Groups.player.size());
+                    for(Playerc p : Groups.player){
+                        info("    &y{0} / {1}", p.name(), p.uuid());
                     }
                 }else{
                     info("  &lyNo players connected.");
@@ -344,15 +338,6 @@ public class ServerControl implements ApplicationListener{
             Call.sendMessage("[scarlet][[Server]:[] " + arg[0]);
 
             info("&lyServer: &lb{0}", arg[0]);
-        });
-
-        handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
-            try{
-                state.rules.waveSpacing = Difficulty.valueOf(arg[0]).waveTime * 60 * 60 * 2;
-                info("Difficulty set to '{0}'.", arg[0]);
-            }catch(IllegalArgumentException e){
-                err("No difficulty with name '{0}' found.", arg[0]);
-            }
         });
 
         handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
@@ -427,7 +412,7 @@ public class ServerControl implements ApplicationListener{
 
             for(Item item : content.items()){
                 if(item.type == ItemType.material){
-                    state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().block.itemCapacity);
+                    state.teams.cores(team).first().items().set(item, state.teams.cores(team).first().block().itemCapacity);
                 }
             }
 
@@ -585,11 +570,11 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Player target = playerGroup.find(p -> p.name.equals(arg[0]));
+            Playerc target = Groups.player.find(p -> p.name().equals(arg[0]));
 
             if(target != null){
-                Call.sendMessage("[scarlet] " + target.name + "[scarlet] has been kicked by the server.");
-                target.con.kick(KickReason.kick);
+                Call.sendMessage("[scarlet] " + target.name() + "[scarlet] has been kicked by the server.");
+                target.kick(KickReason.kick);
                 info("It is done.");
             }else{
                 info("Nobody with that name could be found...");
@@ -601,9 +586,9 @@ public class ServerControl implements ApplicationListener{
                 netServer.admins.banPlayerID(arg[1]);
                 info("Banned.");
             }else if(arg[0].equals("name")){
-                Player target = playerGroup.find(p -> p.name.equalsIgnoreCase(arg[1]));
+                Playerc target = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
                 if(target != null){
-                    netServer.admins.banPlayer(target.uuid);
+                    netServer.admins.banPlayer(target.uuid());
                     info("Banned.");
                 }else{
                     err("No matches found.");
@@ -615,10 +600,10 @@ public class ServerControl implements ApplicationListener{
                 err("Invalid type.");
             }
 
-            for(Player player : playerGroup.all()){
-                if(netServer.admins.isIDBanned(player.uuid)){
-                    Call.sendMessage("[scarlet] " + player.name + " has been banned.");
-                    player.con.kick(KickReason.banned);
+            for(Playerc player : Groups.player){
+                if(netServer.admins.isIDBanned(player.uuid())){
+                    Call.sendMessage("[scarlet] " + player.name() + " has been banned.");
+                    player.con().kick(KickReason.banned);
                 }
             }
         });
@@ -653,52 +638,56 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("unban", "<ip/ID>", "Completely unban a person by IP or ID.", arg -> {
-            if(arg[0].contains(".")){
-                if(netServer.admins.unbanPlayerIP(arg[0])){
-                    info("Unbanned player by IP: {0}.", arg[0]);
-                }else{
-                    err("That IP is not banned!");
-                }
+            if(netServer.admins.unbanPlayerIP(arg[0]) || netServer.admins.unbanPlayerID(arg[0])){
+                info("Unbanned player.", arg[0]);
             }else{
-                if(netServer.admins.unbanPlayerID(arg[0])){
-                    info("Unbanned player by ID: {0}.", arg[0]);
-                }else{
-                    err("That ID is not banned!");
-                }
+                err("That IP/ID is not banned!");
+            }
+        });
+        
+        handler.register("pardon", "<ID>", "Pardons a votekicked player by ID and allows them to join again.", arg -> {
+            PlayerInfo info = netServer.admins.getInfoOptional(arg[0]);
+            
+            if(info != null){
+                info.lastKicked = 0;
+                info("Pardoned player: {0}", info.lastName);
+            }else{
+                err("That ID can't be found.");
             }
         });
 
-        handler.register("admin", "<username...>", "Make an online user admin", arg -> {
+        handler.register("admin", "<add/remove> <username/ID...>", "Make an online user admin", arg -> {
             if(!state.is(State.playing)){
                 err("Open the server first.");
                 return;
             }
 
-            Player target = playerGroup.find(p -> p.name.equals(arg[0]));
-
-            if(target != null){
-                netServer.admins.adminPlayer(target.uuid, target.usid);
-                target.isAdmin = true;
-                info("Admin-ed player: {0}", arg[0]);
-            }else{
-                info("Nobody with that name could be found.");
-            }
-        });
-
-        handler.register("unadmin", "<username...>", "Removes admin status from an online player", arg -> {
-            if(!state.is(State.playing)){
-                err("Open the server first.");
+            if(!(arg[0].equals("add") || arg[0].equals("remove"))){
+                err("Second parameter must be either 'add' or 'remove'.");
                 return;
             }
 
-            Player target = playerGroup.find(p -> p.name.equals(arg[0]));
+            boolean add = arg[0].equals("add");
+
+            PlayerInfo target;
+            Playerc playert = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
+            if(playert != null){
+                target = playert.getInfo();
+            }else{
+                target = netServer.admins.getInfoOptional(arg[1]);
+                playert = Groups.player.find(p -> p.getInfo() == target);
+            }
 
             if(target != null){
-                netServer.admins.unAdminPlayer(target.uuid);
-                target.isAdmin = false;
-                info("Un-admin-ed player: {0}", arg[0]);
+                if(add){
+                    netServer.admins.adminPlayer(target.id, target.adminUsid);
+                }else{
+                    netServer.admins.unAdminPlayer(target.id);
+                }
+                if(playert != null) playert.admin(add);
+                info("Changed admin status of player: &ly{0}", target.lastName);
             }else{
-                info("Nobody with that name could be found.");
+                err("Nobody with that name or ID could be found. If adding an admin by name, make sure they're online; otherwise, use their UUID.");
             }
         });
 
@@ -711,6 +700,18 @@ public class ServerControl implements ApplicationListener{
                 info("&lyAdmins:");
                 for(PlayerInfo info : admins){
                     info(" &lm {0} /  ID: '{1}' / IP: '{2}'", info.lastName, info.id, info.lastIP);
+                }
+            }
+        });
+
+        handler.register("players", "List all players currently in game.", arg -> {
+            if(Groups.player.size() == 0){
+                info("No players are currently in the server.");
+            }else{
+                info("&lyPlayers: {0}", Groups.player.size());
+                for(Playerc user : Groups.player){
+                    PlayerInfo userInfo = user.getInfo();
+                    info(" &lm {0} /  ID: '{1}' / IP: '{2}' / Admin: '{3}'", userInfo.lastName, userInfo.id, userInfo.lastIP, userInfo.admin);
                 }
             }
         });
@@ -740,7 +741,7 @@ public class ServerControl implements ApplicationListener{
             Core.app.post(() -> {
                 try{
                     SaveIO.load(file);
-                    state.rules.zone = null;
+                    state.rules.sector = null;
                     info("Save loaded.");
                     state.set(State.playing);
                     netServer.openServer();
@@ -774,7 +775,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("gameover", "Force a game over.", arg -> {
-            if(state.is(State.menu)){
+            if(state.isMenu()){
                 err("Not playing a map.");
                 return;
             }
@@ -805,6 +806,22 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        handler.register("search", "<name...>", "Search players who have used part of a name.", arg -> {
+
+            ObjectSet<PlayerInfo> infos = netServer.admins.searchNames(arg[0]);
+
+            if(infos.size > 0){
+                info("&lgPlayers found: {0}", infos.size);
+
+                int i = 0;
+                for(PlayerInfo info : infos){
+                    info("- &lc[{0}] &ly'{1}'&lc / &lm{2}", i++, info.lastName, info.id);
+                }
+            }else{
+                info("Nobody with that name could be found.");
+            }
+        });
+
         handler.register("gc", "Trigger a grabage struct. Testing only.", arg -> {
             int pre = (int)(Core.app.getJavaHeap() / 1024 / 1024);
             System.gc();
@@ -813,7 +830,6 @@ public class ServerControl implements ApplicationListener{
         });
 
         mods.eachClass(p -> p.registerServerCommands(handler));
-        mods.eachClass(p -> p.registerClientCommands(netServer.clientCommands));
     }
 
     private void readCommands(){
@@ -856,25 +872,25 @@ public class ServerControl implements ApplicationListener{
     private void play(boolean wait, Runnable run){
         inExtraRound = true;
         Runnable r = () -> {
-            Array<Player> players = new Array<>();
-            for(Player p : playerGroup.all()){
+            Array<Playerc> players = new Array<>();
+            for(Playerc p : Groups.player){
                 players.add(p);
-                p.setDead(true);
+                p.clearUnit();
             }
             
             logic.reset();
 
             Call.onWorldDataBegin();
             run.run();
-            state.rules = world.getMap().applyRules(lastMode);
+            state.rules = state.map.applyRules(lastMode);
             logic.play();
 
-            for(Player p : players){
-                if(p.con == null) continue;
+            for(Playerc p : players){
+                if(p.con() == null) continue;
 
                 p.reset();
                 if(state.rules.pvp){
-                    p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
+                    p.team(netServer.assignTeam(p, new ArrayIterable<>(players)));
                 }
                 netServer.sendWorldData(p);
             }

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg2"
+   width="11.875"
+   height="11.875"
+   viewBox="0 0 11.875 11.875"
+   sodipodi:docname="line.svg"
+   inkscape:version="0.92.4 (f8dce91, 2019-08-02)">
+  <metadata
+     id="metadata8">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs6" />
+  <sodipodi:namedview
+     pagecolor="#000000"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2560"
+     inkscape:window-height="1318"
+     id="namedview4"
+     showgrid="false"
+     inkscape:zoom="14.75"
+     inkscape:cx="-19.350636"
+     inkscape:cy="7.9036017"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g16" />
+  <g
+     id="g16"
+     transform="translate(-2.0625,-2.0625)">
+    <path
+       style="fill:#ffffff;fill-opacity:1"
+       d="M 12,2.5 Q 12.25,2.25 12.625,2.125 13,2 13.375,2.125 13.75,2.25 13.875,2.625 14,3 13.875,3.375 13.75,3.75 13.5,4 13.25,4.25 13,4.5 12.75,4.75 12.5,5 12.25,5.25 12,5.5 11.75,5.75 11.5,6 11.25,6.25 11,6.5 10.75,6.75 10.5,7 10.25,7.25 10,7.5 9.75,7.75 9.5,8 9.25,8.25 9,8.5 8.75,8.75 8.5,9 8.25,9.25 8,9.5 7.75,9.75 7.5,10 7.25,10.25 7,10.5 6.75,10.75 6.5,11 6.25,11.25 6,11.5 5.75,11.75 5.5,12 5.25,12.25 5,12.5 4.75,12.75 4.5,13 4.25,13.25 4,13.5 3.75,13.75 3.375,13.875 3,14 2.625,13.875 2.25,13.75 2.125,13.375 2,13 2.125,12.625 2.25,12.25 2.5,12 2.75,11.75 3,11.5 3.25,11.25 3.5,11 3.75,10.75 4,10.5 4.25,10.25 4.5,10 4.75,9.75 5,9.5 5.25,9.25 5.5,9 5.75,8.75 6,8.5 6.25,8.25 6.5,8 6.75,7.75 7,7.5 7.25,7.25 7.5,7 7.75,6.75 8,6.5 8.25,6.25 8.5,6 8.75,5.75 9,5.5 9.25,5.25 9.5,5 9.75,4.75 10,4.5 10.25,4.25 10.5,4 10.75,3.75 11,3.5 11.25,3.25 11.5,3 11.75,2.75 12,2.5"
+       id="path14"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

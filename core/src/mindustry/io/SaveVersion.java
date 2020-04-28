@@ -1,18 +1,17 @@
 package mindustry.io;
 
+import arc.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
-import mindustry.entities.*;
-import mindustry.entities.traits.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
+import mindustry.gen.*;
 import mindustry.maps.*;
-import mindustry.type.*;
 import mindustry.world.*;
 
 import java.io.*;
@@ -65,14 +64,16 @@ public abstract class SaveVersion extends SaveFileReader{
             "saved", Time.millis(),
             "playtime", headless ? 0 : control.saves.getTotalPlaytime(),
             "build", Version.build,
-            "mapname", world.getMap() == null ? "unknown" : world.getMap().name(),
+            "mapname", state.map.name(),
             "wave", state.wave,
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
             "rules", JsonIO.write(state.rules),
             "mods", JsonIO.write(mods.getModStrings().toArray(String.class)),
             "width", world.width(),
-            "height", world.height()
+            "height", world.height(),
+            "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
+            "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name
         ).merge(tags));
     }
 
@@ -86,12 +87,20 @@ public abstract class SaveVersion extends SaveFileReader{
         if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
         lastReadBuild = map.getInt("build", -1);
 
+        if(!headless){
+            Tmp.v1.tryFromString(map.get("viewpos"));
+            Core.camera.position.set(Tmp.v1);
+            player.set(Tmp.v1);
+
+            control.input.controlledType = content.getByName(ContentType.unit, map.get("controlledType"));
+        }
+
         Map worldmap = maps.byName(map.get("mapname", "\\\\\\"));
-        world.setMap(worldmap == null ? new Map(StringMap.of(
+        state.map = worldmap == null ? new Map(StringMap.of(
             "name", map.get("mapname", "Unknown"),
             "width", 1,
             "height", 1
-        )) : worldmap);
+        )) : worldmap;
     }
 
     public void writeMap(DataOutput stream) throws IOException{
@@ -125,11 +134,17 @@ public abstract class SaveVersion extends SaveFileReader{
             Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.blockID());
 
+            //only write the entity for multiblocks once - in the center
             if(tile.entity != null){
-                writeChunk(stream, true, out -> {
-                    out.writeByte(tile.entity.version());
-                    tile.entity.write(out);
-                });
+                if(tile.isCenter()){
+                    stream.writeBoolean(true);
+                    writeChunk(stream, true, out -> {
+                        out.writeByte(tile.entity.version());
+                        tile.entity.writeAll(Writes.get(out));
+                    });
+                }else{
+                    stream.writeBoolean(false);
+                }
             }else{
                 //write consecutive non-entity blocks
                 int consecutives = 0;
@@ -181,27 +196,36 @@ public abstract class SaveVersion extends SaveFileReader{
 
             //read blocks
             for(int i = 0; i < width * height; i++){
-                int x = i % width, y = i / width;
                 Block block = content.block(stream.readShort());
-                Tile tile = context.tile(x, y);
+                Tile tile = context.tile(i);
                 if(block == null) block = Blocks.air;
-                tile.setBlock(block);
+                boolean isCenter = true;
 
-                if(tile.entity != null){
-                    try{
-                        readChunk(stream, true, in -> {
-                            byte version = in.readByte();
-                            tile.entity.read(in, version);
-                        });
-                    }catch(Exception e){
-                        throw new IOException("Failed to read tile entity of block: " + block, e);
+                if(block.hasEntity()){
+                    isCenter = stream.readBoolean();
+                }
+
+                //set block only if this is the center; otherwise, it's handled elsewhere
+                if(isCenter){
+                    tile.setBlock(block);
+                }
+
+                if(block.hasEntity()){
+                    if(isCenter){ //only read entity for center blocks
+                        try{
+                            readChunk(stream, true, in -> {
+                                byte revision = in.readByte();
+                                tile.entity.readAll(Reads.get(in), revision);
+                            });
+                        }catch(Throwable e){
+                            throw new IOException("Failed to read tile entity of block: " + block, e);
+                        }
                     }
                 }else{
                     int consecutives = stream.readUnsignedByte();
 
                     for(int j = i + 1; j < i + 1 + consecutives; j++){
-                        int newx = j % width, newy = j / width;
-                        context.tile(newx, newy).setBlock(block);
+                        context.tile(j).setBlock(block);
                     }
 
                     i += consecutives;
@@ -224,34 +248,18 @@ public abstract class SaveVersion extends SaveFileReader{
                 stream.writeShort(block.y);
                 stream.writeShort(block.rotation);
                 stream.writeShort(block.block);
-                stream.writeInt(block.config);
+                TypeIO.writeObject(Writes.get(stream), block.config);
             }
         }
 
-        //write entity chunk
-        int groups = 0;
+        stream.writeInt(Groups.sync.count(Entityc::serialize));
+        for(Syncc entity : Groups.sync){
+            if(!entity.serialize()) continue;
 
-        for(EntityGroup<?> group : entities.all()){
-            if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
-                groups++;
-            }
-        }
-
-        stream.writeByte(groups);
-
-        for(EntityGroup<?> group : entities.all()){
-            if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
-                stream.writeInt(group.size());
-                for(Entity entity : group.all()){
-                    SaveTrait save = (SaveTrait)entity;
-                    //each entity is a separate chunk.
-                    writeChunk(stream, true, out -> {
-                        out.writeByte(save.getTypeID().id);
-                        out.writeByte(save.version());
-                        save.writeSave(out);
-                    });
-                }
-            }
+            writeChunk(stream, true, out -> {
+                out.writeByte(entity.classId());
+                entity.write(Writes.get(out));
+            });
         }
     }
 
@@ -262,23 +270,18 @@ public abstract class SaveVersion extends SaveFileReader{
             TeamData data = team.data();
             int blocks = stream.readInt();
             for(int j = 0; j < blocks; j++){
-                data.brokenBlocks.addLast(new BrokenBlock(stream.readShort(), stream.readShort(), stream.readShort(), content.block(stream.readShort()).id, stream.readInt()));
+                data.brokenBlocks.addLast(new BrokenBlock(stream.readShort(), stream.readShort(), stream.readShort(), content.block(stream.readShort()).id, TypeIO.readObject(Reads.get(stream))));
             }
         }
 
-        byte groups = stream.readByte();
-
-        for(int i = 0; i < groups; i++){
-            int amount = stream.readInt();
-            for(int j = 0; j < amount; j++){
-                //TODO throw exception on read fail
-                readChunk(stream, true, in -> {
-                    byte typeid = in.readByte();
-                    byte version = in.readByte();
-                    SaveTrait trait = (SaveTrait)content.<TypeID>getByID(ContentType.typeid, typeid).constructor.get();
-                    trait.readSave(in, version);
-                });
-            }
+        int amount = stream.readInt();
+        for(int j = 0; j < amount; j++){
+            readChunk(stream, true, in -> {
+                byte typeid = in.readByte();
+                Syncc sync = (Syncc)EntityMapping.map(typeid).get();
+                sync.read(Reads.get(in));
+                sync.add();
+            });
         }
     }
 
