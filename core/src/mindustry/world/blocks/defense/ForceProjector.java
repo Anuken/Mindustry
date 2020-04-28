@@ -75,6 +75,9 @@ public class ForceProjector extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
+        Draw.color(Pal.gray);
+        Lines.stroke(3f);
+        Lines.poly(x * tilesize, y * tilesize, 6, radius);
         Draw.color(Pal.accent);
         Lines.stroke(1f);
         Lines.poly(x * tilesize, y * tilesize, 6, radius);
