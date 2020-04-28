@@ -95,6 +95,14 @@ public class MendProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
+            indexer.eachBlock(this, realRange, other -> !other.isNull(), other -> {
+                Draw.reset();
+                Draw.color(baseColor, Mathf.absin(Time.time(), 6f, 0.28f));
+
+                Fill.square(other.x(), other.y(), tilesize * other.block().size / 2);
+
+                Draw.reset();
+            });
             Drawf.dashCircle(x, y, realRange, baseColor);
         }
 
