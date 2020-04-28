@@ -24,7 +24,6 @@ public class UnitTypes implements ContentList{
     public static UnitType alpha, delta, tau, omega, dart, javelin, trident, glaive;
     public static UnitType starter;
 
-
     @Override
     public void load(){
 
