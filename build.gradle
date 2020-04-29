@@ -34,8 +34,6 @@ allprojects{
         if(!project.hasProperty("versionModifier")) versionModifier = 'release'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
-        gdxVersion = '1.9.10'
-        roboVMVersion = '2.3.8'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
 
         loadVersionProps = {

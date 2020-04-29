@@ -2,12 +2,12 @@ package mindustry.ios;
 
 import arc.*;
 import arc.Input.*;
+import arc.backend.robovm.*;
 import arc.files.*;
 import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
-import com.badlogic.gdx.backends.iosrobovm.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Saves.*;
