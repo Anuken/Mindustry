@@ -168,11 +168,10 @@ project(":desktop"){
 
     dependencies{
         compile project(":core")
+        compile arcModule("natives:natives-desktop")
+        compile arcModule("natives:natives-freetype-desktop")
 
         if(debugged()) compile project(":debug")
-
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
         compile "com.github.Anuken:steamworks4j:$steamworksVersion"
 
@@ -204,14 +203,12 @@ project(":ios"){
 
     dependencies{
         compile project(":core")
-        compileOnly project(":annotations")
 
+        compile arcModule("natives:natives-ios")
+        compile arcModule("natives:natives-freetype-ios")
         compile arcModule("backends:backend-robovm")
 
-        compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
-        compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
+        compileOnly project(":annotations")
     }
 }
 
@@ -295,11 +292,11 @@ project(":tools"){
     dependencies{
         compile project(":core")
 
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-        compile "org.reflections:reflections:0.9.12"
-
+        compile arcModule("natives:natives-desktop")
+        compile arcModule("natives:natives-freetype-desktop")
         compile arcModule("backends:backend-headless")
+
+        compile "org.reflections:reflections:0.9.12"
     }
 }
 
