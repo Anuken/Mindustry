@@ -93,7 +93,8 @@ public class Build{
                 return true;
             }
 
-            if(!contactsGround(tile.x, tile.y, type)){
+            //TODO should water blocks be placeable here?
+            if(/*!type.requiresWater && */!contactsGround(tile.x, tile.y, type)){
                 return false;
             }
 
