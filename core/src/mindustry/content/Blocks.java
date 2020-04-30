@@ -77,7 +77,7 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
-    groundFactory, repairPoint,
+    groundFactory, airFactory, navalFactory, repairPoint,
 
     //misc experimental
 
@@ -1669,14 +1669,40 @@ public class Blocks implements ContentList{
         //region units
 
         //for testing only.
+
         groundFactory = new UnitFactory("ground-factory"){{
             requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.dagger, 60f, ItemStack.with(Items.silicon, 10)),
-                new UnitPlan(UnitTypes.wraith, 60f, ItemStack.with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.dagger, 200f, ItemStack.with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.titan, 400f, ItemStack.with(Items.silicon, 10)),
             };
             size = 3;
             consumes.power(1.2f);
+            //TODO this is incorrect
+            consumes.items(new ItemStack(Items.silicon, 10));
+        }};
+
+        airFactory = new UnitFactory("air-factory"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
+            plans = new UnitPlan[]{
+                new UnitPlan(UnitTypes.wraith, 200f, ItemStack.with(Items.silicon, 10)),
+                //new UnitPlan(UnitTypes.ghoul, 200f, ItemStack.with(Items.silicon, 10)),
+            };
+            size = 3;
+            consumes.power(1.2f);
+            //TODO
+            consumes.items(new ItemStack(Items.silicon, 10));
+        }};
+
+        navalFactory = new UnitFactory("naval-factory"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
+            plans = new UnitPlan[]{
+                new UnitPlan(UnitTypes.vanguard, 200f, ItemStack.with(Items.silicon, 10)),
+            };
+            size = 3;
+            requiresWater = true;
+            consumes.power(1.2f);
+            //TODO
             consumes.items(new ItemStack(Items.silicon, 10));
         }};
 

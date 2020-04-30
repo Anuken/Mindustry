@@ -71,6 +71,8 @@ public class Block extends UnlockableContent{
     public boolean breakable;
     /** whether to add this block to brokenblocks */
     public boolean rebuildable = true;
+    /** whether this water can only be placed on water */
+    public boolean requiresWater = false;
     /** whether this floor can be placed on. */
     public boolean placeableOn = true;
     /** whether this block has insulating properties. */

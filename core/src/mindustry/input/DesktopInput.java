@@ -529,6 +529,7 @@ public class DesktopInput extends InputHandler{
 
     protected void updateMovement(Unitc unit){
         boolean omni = !(unit instanceof WaterMovec);
+        boolean legs = unit.isGrounded();
         float speed = unit.type().speed;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
@@ -540,14 +541,16 @@ public class DesktopInput extends InputHandler{
         if(aimCursor){
             unit.lookAt(mouseAngle);
         }else{
-            if(!unit.vel().isZero(0.01f)) unit.lookAt(unit.vel().angle());
+            if(!unit.vel().isZero(0.01f)){
+                unit.lookAt(unit.vel().angle());
+            }
         }
 
         if(omni){
             unit.moveAt(movement);
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation(), movement.len()));
-            if(!movement.isZero()){
+            if(!movement.isZero() && legs){
                 unit.vel().rotateTo(movement.angle(), unit.type().rotateSpeed * Time.delta());
             }
         }

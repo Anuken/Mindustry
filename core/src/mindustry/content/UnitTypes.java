@@ -10,8 +10,10 @@ public class UnitTypes implements ContentList{
     //TODO reimplement - DO NOT USE
     public static UnitType
     ghoul, revenant, lich,
-    crawler, titan, fortress, eruptor, chaosArray, eradicator;
+    crawler, fortress, eruptor, chaosArray, eradicator;
 
+    //TODO this is awful
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType titan;
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType dagger;
     public static @EntityDef({Unitc.class, WaterMovec.class}) UnitType vanguard;
     public static @EntityDef({Unitc.class, Minerc.class}) UnitType draug;
@@ -42,10 +44,32 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        titan = new UnitType("titan"){{
+            speed = 0.4f;
+            drag = 0.3f;
+            mass = 3.5f;
+            hitsize = 9f;
+            range = 10f;
+            health = 460;
+
+            immunities.add(StatusEffects.burning);
+
+            weapons.add(new Weapon("flamethrower"){{
+                shootSound = Sounds.flame;
+                shootY = 2f;
+                reload = 14f;
+                alternate = true;
+                recoil = 1f;
+                ejectEffect = Fx.none;
+                bullet = Bullets.basicFlame;
+            }});
+
+        }};
+
         wraith = new UnitType("wraith"){{
             speed = 3f;
             accel = 0.08f;
-            drag = 0f;
+            drag = 0.01f;
             mass = 1.5f;
             flying = true;
             health = 75;
@@ -137,8 +161,8 @@ public class UnitTypes implements ContentList{
             flying = true;
             drag = 0.05f;
             mass = 2f;
-            speed = 4f;
-            rotateSpeed = 12f;
+            speed = 3f;
+            rotateSpeed = 15f;
             accel = 0.3f;
             range = 70f;
             itemCapacity = 70;

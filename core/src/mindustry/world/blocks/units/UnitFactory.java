@@ -23,7 +23,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class UnitFactory extends Block{
-    public float launchVelocity = 0f;
+    public float launchVelocity = 5f;
     public TextureRegion topRegion;
     public int[] capacities;
 
@@ -123,9 +123,11 @@ public class UnitFactory extends Block{
             if(!net.client() && currentPlan != -1){
                 UnitPlan plan = plans[currentPlan];
                 Unitc unit = plan.unit.create(team);
-                unit.set(x + Mathf.range(4), y + Mathf.range(4));
+                unit.set(x, y );
                 unit.add();
-                unit.vel().y = launchVelocity;
+                unit.rotation(90);
+                unit.vel().y = launchVelocity + Mathf.range(1f);
+                unit.vel().x = Mathf.range(1f);
                 Events.fire(new UnitCreateEvent(unit));
             }
         }

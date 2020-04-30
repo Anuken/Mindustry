@@ -3,7 +3,6 @@ package mindustry.ai.types;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.world.meta.*;
@@ -33,7 +32,7 @@ public class FlyingAI extends AIController{
 
         boolean shoot = false;
 
-        if(target != null){
+        if(target != null && unit.hasWeapons()){
             attack(80f);
 
             shoot = unit.inRange(target);
@@ -42,9 +41,6 @@ public class FlyingAI extends AIController{
                 Vec2 to = Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed);
                 unit.aim(to);
             }
-        }else{
-            target = unit.closestCore();
-            moveTo(Vars.state.rules.dropZoneRadius + 120f);
         }
 
         unit.controlWeapons(shoot, shoot);

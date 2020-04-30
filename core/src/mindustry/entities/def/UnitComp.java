@@ -38,6 +38,10 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
         lookAt(x, y);
     }
 
+    public boolean hasWeapons(){
+        return type.hasWeapons();
+    }
+
     @Override
     public float clipSize(){
         return type.region.getWidth() * 2f;

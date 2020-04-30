@@ -34,7 +34,7 @@ public class StackConveyor extends Block implements Autotiler{
         update = true;
         group = BlockGroup.transportation;
         hasItems = true;
-        itemCapacity = 8;
+        itemCapacity = 10;
         conveyorPlacement = true;
 
         idleSound = Sounds.conveyor;
@@ -166,7 +166,7 @@ public class StackConveyor extends Block implements Autotiler{
         @Override
         public void updateTile(){
             // reel in crater
-            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed, 0f, recharge);
+            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * edelta(), 0f, recharge);
 
             if(link == -1){
                 return;
@@ -205,11 +205,6 @@ public class StackConveyor extends Block implements Autotiler{
                     }
                 }
             }
-        }
-
-        @Override
-        public int getMaximumAccepted(Item item){
-            return Mathf.round(super.getMaximumAccepted(item) * timeScale); // increased item capacity while boosted
         }
 
         @Override
