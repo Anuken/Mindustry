@@ -184,7 +184,7 @@ public class StackConveyor extends Block implements Autotiler{
                     if(items.empty()) poofOut();
                 }
             }else{ //transfer
-                if(state != stateLoad || (items.total() >= getMaximumAccepted(items.first()))){
+                if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){
                     if(front() != null
                     && front().team() == team()
                     && front().block() instanceof StackConveyor){
@@ -193,6 +193,7 @@ public class StackConveyor extends Block implements Autotiler{
                         // sleep if its occupied
                         if(e.link == -1){
                             e.items.addAll(items);
+                            e.lastItem = lastItem;
                             e.link = tile.pos();
                             // ▲ to | from ▼
                             link = -1;
