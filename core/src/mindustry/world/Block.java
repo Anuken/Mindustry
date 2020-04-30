@@ -277,6 +277,10 @@ public class Block extends UnlockableContent{
         return rotate;
     }
 
+    public boolean shouldOverdrive(Tile tile){
+        return canOverdrive;
+    }
+
     /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #reg(int)}. */
     protected int reg(String suffix){
         cacheRegionStrings.add(name + suffix);

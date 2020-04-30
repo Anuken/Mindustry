@@ -102,6 +102,11 @@ public class StackConveyor extends Block implements Autotiler{
         return super.rotatedOutput(x, y);
     }
 
+    @Override
+    public boolean shouldOverdrive(Tile tile){
+        return tile.<StackConveyorEntity>ent().state == stateLoad;
+    }
+
     public class StackConveyorEntity extends TileEntity{
         public int state, blendprox;
 
