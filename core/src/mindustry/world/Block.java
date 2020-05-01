@@ -39,6 +39,7 @@ public class Block extends UnlockableContent{
     public boolean hasItems;
     public boolean hasLiquids;
     public boolean hasPower;
+    public boolean hasThroughput;
 
     public boolean outputsLiquid = false;
     public boolean consumesPower = true;
@@ -335,6 +336,14 @@ public class Block extends UnlockableContent{
 
         if(hasItems && configurable){
             bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items().total()), () -> Pal.items, () -> (float)entity.items().total() / itemCapacity));
+        }
+
+        if(hasThroughput){
+            bars.add("throughput", entity -> new Bar(() ->
+            Core.bundle.format("bar.throughput",
+            Strings.fixed(entity.throughput().window.getMean() * 60, 2)),
+            () -> Pal.items,
+            () -> (float)entity.throughput().window.getValueCount() / (float)entity.throughput().window.getWindowSize()));
         }
     }
 

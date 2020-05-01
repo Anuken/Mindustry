@@ -55,6 +55,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     PowerModule power;
     ItemModule items;
     LiquidModule liquids;
+    ThroughputModule throughput;
     ConsumeModule cons;
 
     private transient float timeScale = 1f, timeScaleDuration;
@@ -1054,6 +1055,10 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
         if(power != null){
             power.graph.update();
+        }
+
+        if(throughput != null){
+            throughput.update();
         }
 
         updateFlow = false;

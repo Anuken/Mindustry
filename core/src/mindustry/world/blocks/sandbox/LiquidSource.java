@@ -26,6 +26,7 @@ public class LiquidSource extends Block{
         liquidCapacity = 100f;
         configurable = true;
         outputsLiquid = true;
+        hasThroughput = true;
         config(Liquid.class, (tile, l) -> ((LiquidSourceEntity)tile).source = l);
         configClear(tile -> ((LiquidSourceEntity)tile).source = null);
     }
@@ -51,7 +52,9 @@ public class LiquidSource extends Block{
                 liquids.clear();
             }else{
                 liquids.add(source, liquidCapacity);
+                throughput.i += liquids().currentAmount();
                 dumpLiquid(source);
+                throughput.i -= liquids().currentAmount();
             }
         }
 

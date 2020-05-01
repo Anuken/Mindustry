@@ -11,6 +11,7 @@ public class LiquidVoid extends Block{
         hasLiquids = true;
         solid = true;
         update = true;
+        hasThroughput = true;
     }
 
     @Override
@@ -27,6 +28,7 @@ public class LiquidVoid extends Block{
 
         @Override
         public void handleLiquid(Tilec source, Liquid liquid, float amount){
+            throughput.i += amount;
         }
     }
 

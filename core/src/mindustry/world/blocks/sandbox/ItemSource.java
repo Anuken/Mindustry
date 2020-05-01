@@ -24,6 +24,7 @@ public class ItemSource extends Block{
         solid = true;
         group = BlockGroup.transportation;
         configurable = true;
+        hasThroughput = true;
         config(Item.class, (tile, item) -> ((ItemSourceEntity)tile).outputItem = item);
         configClear(tile -> ((ItemSourceEntity)tile).outputItem = null);
     }
@@ -70,7 +71,7 @@ public class ItemSource extends Block{
             if(outputItem == null) return;
 
             items.set(outputItem, 1);
-            dump(outputItem);
+            if(dump(outputItem)) throughput.i++;
             items.set(outputItem, 0);
         }
 

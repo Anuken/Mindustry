@@ -560,6 +560,7 @@ public class Tile implements Position, QuadTreeObject{
                 entity.power(new PowerModule());
                 entity.power().graph.add(entity);
             }
+            if(block.hasThroughput) entity.throughput(new ThroughputModule());
         }
     }
 

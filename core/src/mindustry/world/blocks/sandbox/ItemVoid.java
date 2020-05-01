@@ -8,12 +8,15 @@ public class ItemVoid extends Block{
 
     public ItemVoid(String name){
         super(name);
-        update = solid = acceptsItems = true;
+        update = solid = acceptsItems = hasThroughput = true;
     }
 
     public class ItemVoidEntity extends TileEntity{
+
         @Override
-        public void handleItem(Tilec source, Item item){}
+        public void handleItem(Tilec source, Item item){
+            throughput.i++;
+        }
 
         @Override
         public boolean acceptItem(Tilec source, Item item){
