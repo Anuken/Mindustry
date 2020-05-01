@@ -82,9 +82,8 @@ public class ItemSource extends Block{
         @Override
         public boolean onConfigureTileTapped(Tilec other){
             if(this == other){
-                lastItem = null;
                 control.input.frag.config.hideConfig();
-                tile.configure(null);
+                tile.configure(lastItem = null);
                 return false;
             }
 
