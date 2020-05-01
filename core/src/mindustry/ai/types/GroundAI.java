@@ -15,14 +15,6 @@ public class GroundAI extends AIController{
     @Override
     public void update(){
 
-        //TODO test
-        if(true){
-            unit.controlWeapons(true, true);
-            unit.aimLook(unit.x(), unit.y() + 10);
-
-            return;
-        }
-
         if(Units.invalidateTarget(target, unit.team(), unit.x(), unit.y(), Float.MAX_VALUE)){
             target = null;
 

@@ -29,6 +29,7 @@ public class EntityCollisions{
     }
 
     public void move(Hitboxc entity, float deltax, float deltay, SolidPred solidCheck){
+        if(Math.abs(deltax) < 0.0001f & Math.abs(deltay)  < 0.0001f) return;
 
         boolean movedx = false;
 
