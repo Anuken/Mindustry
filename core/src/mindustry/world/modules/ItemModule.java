@@ -12,7 +12,7 @@ import java.util.*;
 import static mindustry.Vars.content;
 
 public class ItemModule extends BlockModule{
-    private static final int windowSize = 60 * 5;
+    private static final int windowSize = 60 * 4;
     private static WindowedMean[] cacheFlow;
     private static float[] cacheSums;
     private static float[] displayFlow;
