@@ -92,7 +92,7 @@ public abstract class SaveVersion extends SaveFileReader{
             Core.camera.position.set(Tmp.v1);
             player.set(Tmp.v1);
 
-            control.input.controlledType = content.getByName(ContentType.unit, map.get("controlledType"));
+            control.input.controlledType = content.getByName(ContentType.unit, map.get("controlledType", "<none>"));
         }
 
         Map worldmap = maps.byName(map.get("mapname", "\\\\\\"));

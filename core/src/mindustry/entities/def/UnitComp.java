@@ -75,23 +75,6 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     }
 
     @Override
-    public void collision(Hitboxc other, float x, float y){
-        if(!(other instanceof Unitc)) return;
-        Unitc unit = (Unitc)other;
-
-        if(isGrounded() != unit.isGrounded()) return;
-
-        float scale = 2f;
-        hitbox(Tmp.r1);
-        other.hitbox(Tmp.r2);
-        Vec2 v = Geometry.overlap(Tmp.r1, Tmp.r2, true);
-        float tm = mass() + unit.mass();
-        float s1 = mass() / tm, s2 = unit.mass() / tm;
-        move(v.x*s2/scale, v.y*s2/scale);
-        unit.move(-v.x*s1/scale, -v.y*s1/scale);
-    }
-
-    @Override
     public void type(UnitType type){
         this.type = type;
         this.maxHealth = type.health;
