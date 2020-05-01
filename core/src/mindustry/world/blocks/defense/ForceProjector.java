@@ -45,7 +45,6 @@ public class ForceProjector extends Block{
         update = true;
         solid = true;
         hasPower = true;
-        canOverdrive = false;
         hasLiquids = true;
         hasItems = true;
         expanded = true;
@@ -118,7 +117,7 @@ public class ForceProjector extends Block{
                     scale *= (cooldownLiquid * (1f + (liquids.current().heatCapacity - 0.4f) * 0.9f));
                 }
 
-                buildup -= Time.delta() * scale;
+                buildup -= delta() * scale;
             }
 
             if(broken && buildup <= 0){

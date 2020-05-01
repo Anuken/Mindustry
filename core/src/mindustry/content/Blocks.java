@@ -1674,12 +1674,10 @@ public class Blocks implements ContentList{
             requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.dagger, 200f, ItemStack.with(Items.silicon, 10)),
-                new UnitPlan(UnitTypes.titan, 400f, ItemStack.with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.titan, 400f, ItemStack.with(Items.silicon, 20, Items.thorium, 20)),
             };
             size = 3;
             consumes.power(1.2f);
-            //TODO this is incorrect
-            consumes.items(new ItemStack(Items.silicon, 10));
         }};
 
         airFactory = new UnitFactory("air-factory"){{
@@ -1690,8 +1688,6 @@ public class Blocks implements ContentList{
             };
             size = 3;
             consumes.power(1.2f);
-            //TODO
-            consumes.items(new ItemStack(Items.silicon, 10));
         }};
 
         navalFactory = new UnitFactory("naval-factory"){{
@@ -1702,8 +1698,6 @@ public class Blocks implements ContentList{
             size = 3;
             requiresWater = true;
             consumes.power(1.2f);
-            //TODO
-            consumes.items(new ItemStack(Items.silicon, 10));
         }};
 
         repairPoint = new RepairPoint("repair-point"){{

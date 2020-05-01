@@ -9,7 +9,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
-//TODO
 public class ConsumeItemDynamic extends Consume{
     public final @NonNull Func<Tilec, ItemStack[]> items;
 
@@ -29,6 +28,19 @@ public class ConsumeItemDynamic extends Consume{
 
     @Override
     public void build(Tilec tile, Table table){
+        ItemStack[][] current = {items.get(tile)};
+
+        table.update(() -> {
+            if(current[0] != items.get(tile)){
+                rebuild(tile, table);
+                current[0] = items.get(tile);
+            }
+        });
+
+        rebuild(tile, table);
+    }
+
+    private void rebuild(Tilec tile, Table table){
         for(ItemStack stack : items.get(tile)){
             table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
             () -> tile.items() != null && tile.items().has(stack.item, stack.amount))).size(8 * 4).padRight(5);
@@ -59,7 +71,6 @@ public class ConsumeItemDynamic extends Consume{
 
     @Override
     public void display(BlockStats stats){
-        //TODO
-        //stats.add(booster ? BlockStat.booster : BlockStat.input, new ItemListValue(items));
+        //should be handled by the block
     }
 }

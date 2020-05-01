@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -23,6 +24,8 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class UnitFactory extends Block{
+
+
     public float launchVelocity = 5f;
     public TextureRegion topRegion;
     public int[] capacities;
@@ -39,6 +42,15 @@ public class UnitFactory extends Block{
         configurable = true;
 
         config(Integer.class, (tile, i) -> ((UnitFactoryEntity)tile).currentPlan = i < 0 || i >= plans.length ? -1 : i);
+        consumes.add(new ConsumeItemDynamic(e -> {
+            UnitFactoryEntity entity = (UnitFactoryEntity)e;
+
+            if(entity.currentPlan != -1){
+                return plans[entity.currentPlan].requirements;
+            }
+
+            return ItemStack.empty;
+        }));
     }
 
     @Remote(called = Loc.server)
@@ -52,10 +64,9 @@ public class UnitFactory extends Block{
         super.init();
 
         capacities = new int[Vars.content.items().size];
-        if(consumes.has(ConsumeType.item)){
-            ConsumeItems cons = consumes.get(ConsumeType.item);
-            for(ItemStack stack : cons.items){
-                capacities[stack.item.id] = stack.amount * 2;
+        for(UnitPlan plan : plans){
+            for(ItemStack stack : plan.requirements){
+                capacities[stack.item.id] = Math.max(capacities[stack.item.id], stack.amount * 2);
             }
         }
     }
@@ -209,6 +220,12 @@ public class UnitFactory extends Block{
         @Override
         public int getMaximumAccepted(Item item){
             return capacities[item.id];
+        }
+
+        @Override
+        public boolean acceptItem(Tilec source, Item item){
+            return currentPlan != -1 && items.get(item) < getMaximumAccepted(item) &&
+                Structs.contains(plans[currentPlan].requirements, stack -> stack.item == item);
         }
 
         @Override
