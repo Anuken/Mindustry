@@ -823,13 +823,13 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
             if(items != null){
                 table.row();
                 table.table(l -> {
-                    Bits presence = new Bits(content.items().size);
+                    Bits current = new Bits();
                     l.left();
 
                     Runnable rebuild = () -> {
                         l.clearChildren();
                         for(Item item : content.items()){
-                            if(items.flownBits() != null && items.flownBits().get(item.id)){
+                            if(items.hasFlowItem(item)){
                                 l.image(item.icon(Cicon.small)).padRight(3f);
                                 l.label(() -> items.getFlowRate(item) < 0 ? "..." : Strings.fixed(items.getFlowRate(item), 1) + ps).color(Color.lightGray);
                                 l.row();
@@ -839,9 +839,11 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
                     rebuild.run();
                     l.update(() -> {
-                        if(items.flownBits() != null && !presence.equals(items.flownBits())){
-                            presence.set(items.flownBits());
-                            rebuild.run();
+                        for(Item item : content.items()){
+                            if(items.hasFlowItem(item) && !current.get(item.id)){
+                                current.set(item.id);
+                                rebuild.run();
+                            }
                         }
                     });
                 });

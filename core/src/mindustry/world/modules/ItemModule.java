@@ -2,8 +2,8 @@ package mindustry.world.modules;
 
 import arc.math.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.type.*;
 
@@ -12,39 +12,71 @@ import java.util.*;
 import static mindustry.Vars.content;
 
 public class ItemModule extends BlockModule{
-    private static final int windowSize = 10;
+    private static final int windowSize = 60 * 5;
+    private static WindowedMean[] cacheFlow;
+    private static float[] cacheSums;
+    private static float[] displayFlow;
+    private static Bits cacheBits = new Bits();
+    private static Interval flowTimer = new Interval(1);
 
     protected int[] items = new int[content.items().size];
     protected int total;
     protected int takeRotation;
 
     private @Nullable WindowedMean[] flow;
-    private @Nullable Bits flownIds;
 
     public void update(boolean showFlow){
         if(showFlow){
             if(flow == null){
-                flow = new WindowedMean[items.length];
-                flownIds = new Bits(items.length);
+                if(cacheFlow == null || cacheFlow.length != items.length){
+                    cacheFlow = new WindowedMean[items.length];
+                    for(int i = 0; i < items.length; i++){
+                        cacheFlow[i] = new WindowedMean(windowSize);
+                    }
+                    cacheSums = new float[items.length];
+                    displayFlow = new float[items.length];
+                }else{
+                    for(int i = 0; i < items.length; i++){
+                        cacheFlow[i].reset();
+                    }
+                    Arrays.fill(cacheSums, 0);
+                    cacheBits.clear();
+                }
+
+                Arrays.fill(displayFlow, -1);
+
+                flow = cacheFlow;
+            }
+
+            boolean updateFlow = flowTimer.get(30);
+
+            for(int i = 0; i < items.length; i++){
+                flow[i].addValue(cacheSums[i]);
+                if(cacheSums[i] > 0){
+                    cacheBits.set(i);
+                }
+                cacheSums[i] = 0;
+
+                if(updateFlow){
+                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].getMean() : -1;
+                }
             }
         }else{
             flow = null;
-            flownIds = null;
         }
     }
 
     /** @return a specific item's flow rate in items/s; any value < 0 means not ready.*/
     public float getFlowRate(Item item){
-        if(flow == null || flow[item.id] == null || flow[item.id].getValueCount() <= 2){
-            return  - 1f;
-        }
+        if(flow == null) return -1f;
 
-        //TODO this isn't very accurate
-        return 60f / ((flow[item.id].getLatest() - flow[item.id].getOldest()) / (flow[item.id].getValueCount() - 1));
+        return displayFlow[item.id] * 60;
     }
 
-    public @Nullable Bits flownBits(){
-        return flownIds;
+    public boolean hasFlowItem(Item item){
+        if(flow == null) return false;
+
+        return cacheBits.get(item.id);
     }
 
     public void each(ItemConsumer cons){
@@ -142,19 +174,20 @@ public class ItemModule extends BlockModule{
     }
 
     public void add(Item item, int amount){
-        items[item.id] += amount;
+        add(item.id, amount);
+    }
+
+    private void add(int item, int amount){
+        items[item] += amount;
         total += amount;
         if(flow != null){
-            if(flow[item.id] == null) flow[item.id] = new WindowedMean(windowSize);
-            flow[item.id].addValue(Time.time());
-            flownIds.set(item.id);
+            cacheSums[item] += amount;
         }
     }
 
     public void addAll(ItemModule items){
         for(int i = 0; i < items.items.length; i++){
-            this.items[i] += items.items[i];
-            total += items.items[i];
+            add(i, items.items[i]);
         }
     }
 

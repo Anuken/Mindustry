@@ -907,7 +907,7 @@ public class Blocks implements ContentList{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
             health = 65;
             speed = 0.08f;
-            displayedSpeed = 10f;
+            displayedSpeed = 11f;
         }};
 
         plastaniumConveyor = new StackConveyor("plastanium-conveyor"){{

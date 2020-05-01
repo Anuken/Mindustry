@@ -267,6 +267,7 @@ project(":server"){
 
     dependencies{
         compile project(":core")
+        compile arcModule("natives:natives-box2d-desktop")
         compile arcModule("backends:backend-headless")
     }
 }

@@ -45,9 +45,6 @@ task dist(type: Jar){
     exclude("zones/**")
     exclude("icons/**")
     exclude("bundles/**")
-    if(!versionModifier.contains("steam")){
-        exclude("**.dll", "**.so", "**.dylib")
-    }
 
     manifest{
         attributes 'Main-Class': project.mainClassName
