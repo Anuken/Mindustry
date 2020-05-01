@@ -57,7 +57,7 @@ public class StackConveyor extends Block implements Autotiler{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.itemsMoved, speed * 60, StatUnit.perSecond);
+        stats.add(BlockStat.itemsMoved, Mathf.round(itemCapacity * speed * 60), StatUnit.itemsSecond);
     }
 
     @Override
