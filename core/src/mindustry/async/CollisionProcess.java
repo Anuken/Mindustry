@@ -1,8 +1,6 @@
 package mindustry.async;
 
-import arc.*;
 import arc.box2d.*;
-import arc.box2d.BodyDef.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -10,6 +8,8 @@ import arc.util.pooling.*;
 import arc.util.pooling.Pool.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+
+import static mindustry.Vars.*;
 
 /**
  * Processes collisions.
@@ -21,89 +21,81 @@ import mindustry.gen.*;
  * Collisions are resolved and stored in a list, then processed synchronously.
  *
  */
-public class CollisionProcess implements AsyncProcess, ContactListener, ContactFilter{
+public class CollisionProcess implements AsyncProcess{
     private Pool<CollisionRef> pool = Pools.get(CollisionRef.class, CollisionRef::new);
 
-    private Physics physics;
-    private Array<CollisionRef> refs = new Array<>(false);
-    private BodyDef def;
-    private FixtureDef fdef;
+    //private Physics physics;
+    private QuadTree<Collisionc> tree;
+    private Array<Collisionc> insertEntities = new Array<>();
+    private Array<Collisionc> checkEntities = new Array<>();
 
-    private EntityGroup<? extends Collisionc> group = Groups.collision;
+    private Array<Collisionc> arrOut = new Array<>();
+
+    private Vec2 l1 = new Vec2();
+    private Rect r1 = new Rect();
+    private Rect r2 = new Rect();
+    //private Array<CollisionRef> refs = new Array<>(false);
+    //private BodyDef def;
+    //private FixtureDef fdef;
+
+    private EntityGroup<? extends Collisionc> inserted = Groups.unit;
+    private EntityGroup<? extends Collisionc> checked = Groups.bullet;
     private Array<Collisionc> collisions = new Array<>(Collisionc.class);
-
-    public CollisionProcess(){
-        def = new BodyDef();
-        def.type = BodyType.DynamicBody;
-
-        fdef = new FixtureDef();
-        fdef.density = 1;
-        fdef.isSensor = true;
-    }
 
     @Override
     public void begin(){
-        if(physics == null) return;
-
-        //remove stale entities
-        refs.removeAll(ref -> {
-            if(!ref.entity.isAdded()){
-                physics.destroyBody(ref.body);
-                pool.free(ref);
-                return true;
-            }
-            return false;
-        });
+        if(tree == null) return;
 
         collisions.clear();
 
-        //find entities without bodies and assign them
-        for(Collisionc entity : group){
-            if(entity.colref() == null){
-                //add bodies to entities that have none
-                fdef.shape = new CircleShape(entity.hitSize() / 2f);
+        insertEntities.size = 0;
+        checkEntities.size = 0;
 
-                def.position.set(entity);
-
-                Body body = physics.createBody(def);
-                body.createFixture(fdef);
-
-                CollisionRef ref = pool.obtain().set(entity, body);
-                refs.add(ref);
-
-                body.setUserData(ref);
-                entity.colref(ref);
-            }
-
-            //save last position
-            CollisionRef ref = entity.colref();
-            ref.position.set(entity);
-        }
+        inserted.copy(insertEntities);
+        checked.copy(checkEntities);
     }
 
     @Override
     public void process(){
-        if(physics == null) return;
+        if(tree == null) return;
 
         collisions.clear();
 
         Time.mark();
 
-        //get last position vectors before step
-        for(CollisionRef ref : refs){
-            //force set target position
-            ref.body.setPosition(ref.position.x, ref.position.y);
-
-            //write velocity
-            ref.body.setLinearVelocity(ref.velocity);
+        tree.clear();
+        //insert targets
+        for(Collisionc ins : insertEntities){
+            tree.insert(ins);
         }
 
-        physics.step(Core.graphics.getDeltaTime(), 2, 2);
+        for(Collisionc solid : checked){
+            solid.hitbox(r1);
+            r1.x += (solid.lastX() - solid.getX());
+            r1.y += (solid.lastY() - solid.getY());
+
+            solid.hitbox(r2);
+            r2.merge(r1);
+
+            arrOut.clear();
+            tree.getIntersect(arrOut, r2);
+
+            for(Collisionc sc : arrOut){
+                sc.hitbox(r1);
+                if(r2.overlaps(r1)){
+                    checkCollide(solid, sc);
+                    //break out of loop when this object hits something
+                    if(!solid.isAdded()) return;
+                }
+            }
+        }
+
+        Log.info(Time.elapsed());
     }
 
     @Override
     public void end(){
-        if(physics == null) return;
+        if(tree == null) return;
 
         //processes anything that happened
         for(int i = 0; i < collisions.size; i += 2){
@@ -116,63 +108,98 @@ public class CollisionProcess implements AsyncProcess, ContactListener, ContactF
             a.collision(b, cx, cy);
             b.collision(a, cx, cy);
         }
-
-        //update velocity state based on frame movement
-        for(CollisionRef ref : refs){
-            ref.velocity.set(ref.entity).sub(ref.position);
-        }
     }
 
     @Override
     public void reset(){
-        if(physics != null){
-            pool.freeAll(refs);
-            refs.clear();
-            physics.dispose();
-            physics = null;
-        }
+        tree = null;
+        insertEntities.clear();
+        checkEntities.clear();
     }
 
     @Override
     public void init(){
         reset();
 
-        physics = new Physics(new Vec2(), true);
-        physics.setContactListener(this);
-        physics.setContactFilter(this);
+        tree = new QuadTree<>(new Rect(-finalWorldBounds, -finalWorldBounds, world.width() * tilesize + finalWorldBounds * 2, world.height() * tilesize + finalWorldBounds * 2));
     }
 
-    @Override
-    public void beginContact(Contact contact){
-        CollisionRef a = contact.getFixtureA().getBody().getUserData();
-        CollisionRef b = contact.getFixtureB().getBody().getUserData();
+    private void checkCollide(Collisionc a, Collisionc b){
 
-        //save collision
-        collisions.add(a.entity, b.entity);
+        a.hitbox(this.r1);
+        b.hitbox(this.r2);
+
+        r1.x += (a.lastX() - a.getX());
+        r1.y += (a.lastY() - a.getY());
+        r2.x += (b.lastX() - b.getX());
+        r2.y += (b.lastY() - b.getY());
+
+        float vax = a.getX() - a.lastX();
+        float vay = a.getY() - a.lastY();
+        float vbx = b.getX() - b.lastX();
+        float vby = b.getY() - b.lastY();
+
+        if(a != b && a.collides(b)){
+            l1.set(a.getX(), a.getY());
+            boolean collide = r1.overlaps(r2) || collide(r1.x, r1.y, r1.width, r1.height, vax, vay,
+            r2.x, r2.y, r2.width, r2.height, vbx, vby, l1);
+            if(collide){
+                collisions.add(a);
+                collisions.add(b);
+                //a.collision(b, l1.x, l1.y);
+                //b.collision(a, l1.x, l1.y);
+            }
+        }
     }
 
-    @Override
-    public void endContact(Contact contact){
+    private boolean collide(float x1, float y1, float w1, float h1, float vx1, float vy1,
+                            float x2, float y2, float w2, float h2, float vx2, float vy2, Vec2 out){
+        float px = vx1, py = vy1;
 
-    }
+        vx1 -= vx2;
+        vy1 -= vy2;
 
-    @Override
-    public void preSolve(Contact contact, Manifold oldManifold){
+        float xInvEntry, yInvEntry;
+        float xInvExit, yInvExit;
 
-    }
+        if(vx1 > 0.0f){
+            xInvEntry = x2 - (x1 + w1);
+            xInvExit = (x2 + w2) - x1;
+        }else{
+            xInvEntry = (x2 + w2) - x1;
+            xInvExit = x2 - (x1 + w1);
+        }
 
-    @Override
-    public void postSolve(Contact contact, ContactImpulse impulse){
+        if(vy1 > 0.0f){
+            yInvEntry = y2 - (y1 + h1);
+            yInvExit = (y2 + h2) - y1;
+        }else{
+            yInvEntry = (y2 + h2) - y1;
+            yInvExit = y2 - (y1 + h1);
+        }
 
-    }
+        float xEntry, yEntry;
+        float xExit, yExit;
 
-    @Override
-    public boolean shouldCollide(Fixture fixtureA, Fixture fixtureB){
-        CollisionRef a = fixtureA.getBody().getUserData();
-        CollisionRef b = fixtureB.getBody().getUserData();
+        xEntry = xInvEntry / vx1;
+        xExit = xInvExit / vx1;
 
-        //note that this method is called in a different thread, but for simple collision checks state doesn't matter too much
-        return a != b && a.entity.collides(b.entity) && b.entity.collides(a.entity);
+        yEntry = yInvEntry / vy1;
+        yExit = yInvExit / vy1;
+
+        float entryTime = Math.max(xEntry, yEntry);
+        float exitTime = Math.min(xExit, yExit);
+
+        if(entryTime > exitTime || xExit < 0.0f || yExit < 0.0f || xEntry > 1.0f || yEntry > 1.0f){
+            return false;
+        }else{
+            float dx = x1 + w1 / 2f + px * entryTime;
+            float dy = y1 + h1 / 2f + py * entryTime;
+
+            out.set(dx, dy);
+
+            return true;
+        }
     }
 
     public static class CollisionRef implements Poolable{

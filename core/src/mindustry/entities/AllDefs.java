@@ -20,11 +20,6 @@ class AllDefs{
 
     }
 
-    @GroupDef(value = Collisionc.class)
-    class gcollision{
-
-    }
-
     @GroupDef(value = Unitc.class, spatial = true, mapping = true)
     class gunit{
 
