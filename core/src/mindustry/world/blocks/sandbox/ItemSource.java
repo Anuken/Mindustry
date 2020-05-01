@@ -12,7 +12,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class ItemSource extends Block{
     private static Item lastItem;
@@ -77,6 +77,18 @@ public class ItemSource extends Block{
         @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(table, content.items(), () -> outputItem, item -> tile.configure(lastItem = item));
+        }
+
+        @Override
+        public boolean onConfigureTileTapped(Tilec other){
+            if(this == other){
+                lastItem = null;
+                control.input.frag.config.hideConfig();
+                tile.configure(null);
+                return false;
+            }
+
+            return true;
         }
 
         @Override

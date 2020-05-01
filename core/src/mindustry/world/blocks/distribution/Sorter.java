@@ -144,6 +144,18 @@ public class Sorter extends Block{
         }
 
         @Override
+        public boolean onConfigureTileTapped(Tilec other){
+            if(this == other){
+                lastItem = null;
+                control.input.frag.config.hideConfig();
+                tile.configure(null);
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
         public Item config(){
             return sortItem;
         }

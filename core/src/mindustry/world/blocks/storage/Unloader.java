@@ -11,7 +11,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class Unloader extends Block{
     public float speed = 1f;
@@ -102,6 +102,18 @@ public class Unloader extends Block{
         @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(table, content.items(), () -> tile.<UnloaderEntity>ent().sortItem, item -> tile.configure(lastItem = item));
+        }
+
+        @Override
+        public boolean onConfigureTileTapped(Tilec other){
+            if(this == other){
+                lastItem = null;
+                control.input.frag.config.hideConfig();
+                tile.configure(null);
+                return false;
+            }
+
+            return true;
         }
 
         @Override
