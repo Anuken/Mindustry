@@ -167,6 +167,7 @@ project(":desktop"){
 
     dependencies{
         compile project(":core")
+        compile arcModule("natives:natives-box2d-desktop")
         compile arcModule("natives:natives-desktop")
         compile arcModule("natives:natives-freetype-desktop")
 
@@ -248,6 +249,7 @@ project(":core"){
         compile "org.lz4:lz4-java:1.4.1"
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
+        compile arcModule("extensions:box2d")
         compile arcModule("extensions:g3d")
         compile arcModule("extensions:fx")
         compile arcModule("extensions:arcnet")
