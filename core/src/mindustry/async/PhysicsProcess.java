@@ -13,7 +13,7 @@ public class PhysicsProcess implements AsyncProcess{
     private Array<PhysicRef> refs = new Array<>(false);
     private BodyDef def;
 
-    private EntityGroup<Unitc> group;
+    private EntityGroup<? extends Physicsc> group;
     private Filter flying = new Filter(){{
         maskBits = categoryBits = 2;
     }}, ground = new Filter(){{
@@ -22,8 +22,6 @@ public class PhysicsProcess implements AsyncProcess{
 
     public PhysicsProcess(){
         def = new BodyDef();
-        def.allowSleep = true;
-        def.bullet = false;
         def.type = BodyType.DynamicBody;
 
         //currently only enabled for units
@@ -44,17 +42,15 @@ public class PhysicsProcess implements AsyncProcess{
         });
 
         //find entities without bodies and assign them
-        for(Unitc entity : group){
+        for(Physicsc entity : group){
             boolean grounded = entity.isGrounded();
 
-            if(entity.body() == null){
+            if(entity.physref() == null){
                 //add bodies to entities that have none
-                CircleShape shape = new CircleShape();
-                shape.setRadius(entity.hitSize() / 2f);
-
                 FixtureDef fd = new FixtureDef();
-                fd.shape = shape;
-                fd.density = 5.0f * entity.mass();
+                fd.shape = new CircleShape(entity.hitSize() / 2f);
+                //TODO does this scale well?
+                fd.density = 5f; //5.0f * entity.mass();
                 fd.restitution = 0.05f;
                 fd.filter.maskBits = fd.filter.categoryBits = (grounded ? ground : flying).maskBits;
 
@@ -62,16 +58,15 @@ public class PhysicsProcess implements AsyncProcess{
 
                 Body body = physics.createBody(def);
                 body.createFixture(fd);
-                body.setUserData(entity);
 
                 PhysicRef ref = new PhysicRef(entity, body);
                 refs.add(ref);
 
-                entity.body(ref);
+                entity.physref(ref);
             }
 
             //save last position
-            PhysicRef ref = entity.body();
+            PhysicRef ref = entity.physref();
 
             if(ref.wasGround != grounded){
                 //set correct filter
@@ -115,15 +110,9 @@ public class PhysicsProcess implements AsyncProcess{
 
         //move entities
         for(PhysicRef ref : refs){
-            Hitboxc entity = ref.entity;
+            Physicsc entity = ref.entity;
 
-            if(entity instanceof Velc){
-                //move using velocity component move method TODO hack
-                ((Velc)entity).move(ref.delta.x, ref.delta.y);
-            }else{
-                //move directly
-                entity.trns(ref.delta.x, ref.delta.y);
-            }
+            entity.move(ref.delta.x, ref.delta.y);
 
             //save last position
             ref.position.set(entity);
@@ -147,12 +136,12 @@ public class PhysicsProcess implements AsyncProcess{
     }
 
     public static class PhysicRef{
-        Hitboxc entity;
+        Physicsc entity;
         Body body;
         boolean wasGround = true;
         Vec2 lastPosition = new Vec2(), delta = new Vec2(), velocity = new Vec2(), position = new Vec2();
 
-        public PhysicRef(Hitboxc entity, Body body){
+        public PhysicRef(Physicsc entity, Body body){
             this.entity = entity;
             this.body = body;
         }

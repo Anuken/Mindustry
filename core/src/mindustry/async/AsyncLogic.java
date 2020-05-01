@@ -8,7 +8,7 @@ import java.util.concurrent.*;
 
 public class AsyncLogic{
     //all processes to be executed each frame
-    private Array<AsyncProcess> processes = Array.with(new PhysicsProcess());
+    private Array<AsyncProcess> processes = Array.with(new PhysicsProcess(), new CollisionProcess());
 
     //futures to be awaited
     private Array<Future<?>> futures = new Array<>();

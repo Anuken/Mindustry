@@ -114,7 +114,7 @@ public class EntityCollisions{
 
         group.each(s -> {
             s.updateLastPosition();
-            tree.insert(s);
+            //tree.insert(s);
         });
     }
 

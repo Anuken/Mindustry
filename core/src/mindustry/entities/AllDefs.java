@@ -15,8 +15,13 @@ class AllDefs{
 
     }
 
-    @GroupDef(value = Bulletc.class, spatial = true, collide = {gunit.class})
+    @GroupDef(value = Bulletc.class, spatial = true)
     class gbullet{
+
+    }
+
+    @GroupDef(value = Collisionc.class)
+    class gcollision{
 
     }
 

@@ -18,7 +18,7 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc{
+abstract class UnitComp implements Healthc, Physicsc, Collisionc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc{
     @Import float x, y, rotation, elevation, maxHealth;
 
     private UnitController controller;
