@@ -1,19 +1,20 @@
 package mindustry.graphics;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
+import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.power.*;
 
 import static arc.Core.camera;
 import static mindustry.Vars.*;
@@ -25,21 +26,17 @@ public class BlockRenderer implements Disposable{
 
     public final FloorRenderer floor = new FloorRenderer();
 
-    private Array<BlockRequest> requests = new Array<>(true, initialRequests, BlockRequest.class);
+    private Array<Tile> requests = new Array<>(false, initialRequests, Tile.class);
+
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
-    private int requestidx = 0;
-    private int iterateidx = 0;
     private float brokenFade = 0f;
-    private FrameBuffer shadows = new FrameBuffer(2, 2);
-    private FrameBuffer fog = new FrameBuffer(2, 2);
-    private Array<Tile> outArray = new Array<>();
+    private FrameBuffer shadows = new FrameBuffer();
+    private FrameBuffer fog = new FrameBuffer();
+    private Array<Tilec> outArray2 = new Array<>();
     private Array<Tile> shadowEvents = new Array<>();
+    private boolean displayStatus = false;
 
     public BlockRenderer(){
-
-        for(int i = 0; i < requests.size; i++){
-            requests.set(i, new BlockRequest());
-        }
 
         Events.on(WorldLoadEvent.class, event -> {
             shadowEvents.clear();
@@ -53,12 +50,9 @@ public class BlockRenderer implements Disposable{
 
             Draw.color(shadowColor);
 
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    Tile tile = world.rawTile(x, y);
-                    if(tile.block().hasShadow){
-                        Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
-                    }
+            for(Tile tile : world.tiles){
+                if(tile.block().hasShadow){
+                    Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                 }
             }
 
@@ -72,20 +66,12 @@ public class BlockRenderer implements Disposable{
             Core.graphics.clear(Color.white);
             Draw.proj().setOrtho(0, 0, fog.getWidth(), fog.getHeight());
 
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    Tile tile = world.rawTile(x, y);
-                    int edgeBlend = 2;
-                    float rot = tile.rotation();
-                    boolean fillable = (tile.block().solid && tile.block().fillsTile && !tile.block().synthetic());
-                    int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (world.width() - 1)), Math.abs(y - (world.height() - 1)))));
-                    if(edgeDst <= edgeBlend){
-                        rot = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), fillable ? rot : 0);
-                    }
-                    if(rot > 0 && (fillable || edgeDst <= edgeBlend)){
-                        Draw.color(0f, 0f, 0f, Math.min((rot + 0.5f) / 4f, 1f));
-                        Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
-                    }
+            for(Tile tile : world.tiles){
+                float darkness = world.getDarkness(tile.x, tile.y);
+
+                if(darkness > 0){
+                    Draw.color(0f, 0f, 0f, Math.min((darkness + 0.5f) / 4f, 1f));
+                    Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                 }
             }
 
@@ -108,7 +94,7 @@ public class BlockRenderer implements Disposable{
         });
     }
 
-    public void drawFog(){
+    public void drawDarkness(){
         float ww = world.width() * tilesize, wh = world.height() * tilesize;
         float x = camera.position.x + tilesize / 2f, y = camera.position.y + tilesize / 2f;
         float u = (x - camera.width / 2f) / ww,
@@ -134,7 +120,7 @@ public class BlockRenderer implements Disposable{
         }
 
         if(brokenFade > 0.001f){
-            for(BrokenBlock block : state.teams.get(player.getTeam()).brokenBlocks){
+            for(BrokenBlock block : state.teams.get(player.team()).brokenBlocks){
                 Block b = content.block(block.block);
                 if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset(), block.y * tilesize + b.offset()))) continue;
 
@@ -167,7 +153,7 @@ public class BlockRenderer implements Disposable{
             shadows.end();
             shadowEvents.clear();
 
-            Draw.proj(camera.projection());
+            Draw.proj(camera);
         }
 
         float ww = world.width() * tilesize, wh = world.height() * tilesize;
@@ -187,7 +173,7 @@ public class BlockRenderer implements Disposable{
 
     /** Process all blocks to draw. */
     public void processBlocks(){
-        iterateidx = 0;
+        displayStatus = Core.settings.getBool("blockstatus");
 
         int avgx = (int)(camera.position.x / tilesize);
         int avgy = (int)(camera.position.y / tilesize);
@@ -199,7 +185,7 @@ public class BlockRenderer implements Disposable{
             return;
         }
 
-        requestidx = 0;
+        requests.clear();
 
         int minx = Math.max(avgx - rangex - expandr, 0);
         int miny = Math.max(avgy - rangey - expandr, 0);
@@ -210,33 +196,17 @@ public class BlockRenderer implements Disposable{
             for(int y = miny; y <= maxy; y++){
                 boolean expanded = (Math.abs(x - avgx) > rangex || Math.abs(y - avgy) > rangey);
                 Tile tile = world.rawTile(x, y);
-                if(tile == null) continue; //how is this possible?
                 Block block = tile.block();
 
-                if(block != Blocks.air && block.cacheLayer == CacheLayer.normal){
-                    if(!expanded){
-                        addRequest(tile, Layer.block);
-                    }
-
-                    if(state.rules.lighting && tile.block().synthetic() && !(tile.block() instanceof BlockPart)){
-                        addRequest(tile, Layer.lights);
-                    }
-
+                if(block != Blocks.air && tile.isCenter() && block.cacheLayer == CacheLayer.normal){
                     if(block.expanded || !expanded){
+                        requests.add(tile);
+                    }
 
-                        if(block.layer != null){
-                            addRequest(tile, block.layer);
-                        }
-
-                        if(block.layer2 != null){
-                            addRequest(tile, block.layer2);
-                        }
-
-                        if(tile.entity != null && tile.entity.power != null && tile.entity.power.links.size > 0){
-                            for(Tile other : block.getPowerConnections(tile, outArray)){
-                                if(other.block().layer == Layer.power){
-                                    addRequest(other, Layer.power);
-                                }
+                    if(tile.entity != null && tile.entity.power() != null && tile.entity.power().links.size > 0){
+                        for(Tilec other : tile.entity.getPowerConnections(outArray2)){
+                            if(other.block() instanceof PowerNode){ //TODO need a generic way to render connections!
+                                requests.add(other.tile());
                             }
                         }
                     }
@@ -244,61 +214,46 @@ public class BlockRenderer implements Disposable{
             }
         }
 
-        Sort.instance().sort(requests.items, 0, requestidx);
-
         lastCamX = avgx;
         lastCamY = avgy;
         lastRangeX = rangex;
         lastRangeY = rangey;
     }
 
-    public void drawBlocks(Layer stopAt){
-        int startIdx = iterateidx;
-        for(; iterateidx < requestidx; iterateidx++){
-            BlockRequest request = requests.get(iterateidx);
+    public void drawBlocks(){
+        drawDestroyed();
 
-            if(request.layer.ordinal() > stopAt.ordinal()){
-                break;
-            }
+        for(int i = 0; i < requests.size; i++){
+            Tile tile = requests.items[i];
+            Block block = tile.block();
+            Tilec entity = tile.entity;
 
-            if(request.layer == Layer.power){
-                if(iterateidx - startIdx > 0 && request.tile.pos() == requests.get(iterateidx - 1).tile.pos()){
-                    continue;
+            Draw.z(Layer.block);
+
+            if(block != Blocks.air){
+                block.drawBase(tile);
+                Draw.z(Layer.block);
+
+                if(entity != null){
+                    if(entity.damaged()){
+                        entity.drawCracks();
+                        Draw.z(Layer.block);
+                    }
+
+                    if(entity.team() != player.team()){
+                        entity.drawTeam();
+                        Draw.z(Layer.block);
+                    }
+
+                    entity.drawLight();
+
+                    if(displayStatus && block.consumes.any()){
+                        entity.drawStatus();
+                    }
                 }
-            }
-
-            Block block = request.tile.block();
-
-            if(request.layer == Layer.block){
-                block.draw(request.tile);
-                if(request.tile.entity != null && request.tile.entity.damaged()){
-                    block.drawCracks(request.tile);
-                }
-                if(block.synthetic() && request.tile.getTeam() != player.getTeam()){
-                    block.drawTeam(request.tile);
-                }
-
-            }else if(request.layer == Layer.lights){
-                block.drawLight(request.tile);
-            }else if(request.layer == block.layer){
-                block.drawLayer(request.tile);
-            }else if(request.layer == block.layer2){
-                block.drawLayer2(request.tile);
+                Draw.reset();
             }
         }
-    }
-
-    private void addRequest(Tile tile, Layer layer){
-        if(requestidx >= requests.size){
-            requests.add(new BlockRequest());
-        }
-        BlockRequest r = requests.get(requestidx);
-        if(r == null){
-            requests.set(requestidx, r = new BlockRequest());
-        }
-        r.tile = tile;
-        r.layer = layer;
-        requestidx++;
     }
 
     @Override
@@ -307,22 +262,5 @@ public class BlockRenderer implements Disposable{
         fog.dispose();
         shadows = fog = null;
         floor.dispose();
-    }
-
-    private class BlockRequest implements Comparable<BlockRequest>{
-        Tile tile;
-        Layer layer;
-
-        @Override
-        public int compareTo(BlockRequest other){
-            int compare = layer.compareTo(other.layer);
-
-            return (compare != 0) ? compare : Integer.compare(tile.pos(), other.tile.pos());
-        }
-
-        @Override
-        public String toString(){
-            return tile.block().name + ":" + layer.toString();
-        }
     }
 }

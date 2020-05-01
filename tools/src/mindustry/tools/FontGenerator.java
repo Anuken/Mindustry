@@ -31,7 +31,7 @@ public class FontGenerator{
         String session = folder.child("session").readString();
         net.httpGet("http://fontello.com/" + session + "/get", result -> {
             try{
-                Streams.copyStream(result.getResultAsStream(), folder.child("font.zip").write());
+                Streams.copy(result.getResultAsStream(), folder.child("font.zip").write());
             }catch(IOException e){
                 throw new RuntimeException(e);
             }

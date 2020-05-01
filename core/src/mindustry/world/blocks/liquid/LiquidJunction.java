@@ -2,9 +2,8 @@ package mindustry.world.blocks.liquid;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 public class LiquidJunction extends LiquidBlock{
@@ -26,23 +25,27 @@ public class LiquidJunction extends LiquidBlock{
     }
 
     @Override
-    public void draw(Tile tile){
-        Draw.rect(name, tile.worldx(), tile.worldy());
-    }
-
-    @Override
     public TextureRegion[] generateIcons(){
         return new TextureRegion[]{Core.atlas.find(name)};
     }
 
-    @Override
-    public Tile getLiquidDestination(Tile tile, Tile source, Liquid liquid){
-        int dir = source.relativeTo(tile.x, tile.y);
-        dir = (dir + 4) % 4;
-        Tile next = tile.getNearbyLink(dir);
-        if(next == null || !next.block().acceptLiquid(next, tile, liquid, 0f) && !(next.block() instanceof LiquidJunction)){
-            return tile;
+    public class LiquidJunctionEntity extends TileEntity{
+        @Override
+        public void draw(){
+            Draw.rect(region, x, y);
         }
-        return next.block().getLiquidDestination(next, tile, liquid);
+
+        @Override
+        public Tilec getLiquidDestination(Tilec source, Liquid liquid){
+            int dir = source.absoluteRelativeTo(tile.x, tile.y);
+            dir = (dir + 4) % 4;
+            Tilec next = nearby(dir);
+            if(next == null || (!next.acceptLiquid(this, liquid, 0f) && !(next.block() instanceof LiquidJunction))){
+                return this;
+            }
+            return next.getLiquidDestination(this, liquid);
+        }
     }
+
+
 }

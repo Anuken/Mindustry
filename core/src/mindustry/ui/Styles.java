@@ -103,9 +103,9 @@ public class Styles{
             up = infoBanner;
         }};
         clearPartialt = new TextButtonStyle(){{
-            down = whiteui;
+            down = flatOver;
             up = pane;
-            over = flatDown;
+            over = flatDownBase;
             font = Fonts.def;
             fontColor = Color.white;
             disabledFontColor = Color.gray;

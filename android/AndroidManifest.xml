@@ -3,6 +3,7 @@
           package="io.anuke.mindustry">
 
     <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
+    <uses-feature android:name="android.hardware.type.pc" android:required="false" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -16,7 +17,7 @@
             android:usesCleartextTraffic="true"
             android:appCategory="game"
             android:label="@string/app_name"
-            android:theme="@style/GdxTheme" android:fullBackupContent="@xml/backup_rules">
+            android:theme="@style/ArcTheme" android:fullBackupContent="@xml/backup_rules">
         <meta-data android:name="android.max_aspect" android:value="2.1"/>
         <activity
                 android:name="mindustry.android.AndroidLauncher"

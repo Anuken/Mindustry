@@ -22,16 +22,16 @@ public class LoadingFragment extends Fragment{
             t.visible(false);
             t.touchable(Touchable.enabled);
             t.add().height(133f).row();
-            t.addImage().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
+            t.image().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
             t.row();
             t.add("$loading").name("namelabel").pad(10f);
             t.row();
-            t.addImage().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
+            t.image().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
             t.row();
 
             bar = t.add(new Bar()).pad(3).size(500f, 40f).visible(false).get();
             t.row();
-            button = t.addButton("$cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
+            button = t.button("$cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
             table = t;
         });
     }

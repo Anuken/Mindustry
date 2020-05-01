@@ -38,7 +38,7 @@ public class MapSaveDialog extends FloatingDialog{
         });
 
         buttons.defaults().size(200f, 50f).pad(2f);
-        buttons.addButton("$cancel", this::hide);
+        buttons.button("$cancel", this::hide);
 
         TextButton button = new TextButton("$save");
         button.clicked(() -> {

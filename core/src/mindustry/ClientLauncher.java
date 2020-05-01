@@ -45,7 +45,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             return (Float.isNaN(result) || Float.isInfinite(result)) ? 1f : Mathf.clamp(result, 0.0001f, 60f / 10f);
         });
 
-        batch = new SpriteBatch();
+        batch = new SortedSpriteBatch();
         assets = new AssetManager();
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
 
@@ -92,10 +92,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets.load(mods);
         assets.load(schematics);
 
-        assets.loadRun("contentinit", ContentLoader.class, () -> {
-            content.init();
-            content.load();
-        });
+        assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> content.load());
     }
 
     @Override
@@ -135,7 +132,11 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 app.post(() -> app.post(() -> app.post(() -> app.post(() -> super.resize(graphics.getWidth(), graphics.getHeight())))));
             }
         }else{
+            asyncLogic.begin();
+
             super.update();
+
+            asyncLogic.end();
         }
 
         int targetfps = Core.settings.getInt("fpscap", 120);

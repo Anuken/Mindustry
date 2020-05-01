@@ -8,15 +8,17 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
 public class Conduit extends LiquidBlock implements Autotiler{
     public final int timerFlow = timers++;
-
+    
+    public Color botColor = Color.valueOf("565656");
+    
     public TextureRegion[] topRegions = new TextureRegion[7];
     public TextureRegion[] botRegions = new TextureRegion[7];
 
@@ -28,7 +30,6 @@ public class Conduit extends LiquidBlock implements Autotiler{
         solid = false;
         floating = true;
         conveyorPlacement = true;
-        entityType = ConduitEntity::new;
     }
 
     @Override
@@ -38,17 +39,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
         liquidRegion = Core.atlas.find("conduit-liquid");
         for(int i = 0; i < topRegions.length; i++){
             topRegions[i] = Core.atlas.find(name + "-top-" + i);
-            botRegions[i] = Core.atlas.find("conduit-bottom-" + i);
+            botRegions[i] = Core.atlas.find(name + "-bottom-" + i, Core.atlas.find("conduit-bottom-" + i));
         }
-    }
-
-    @Override
-    public void onProximityUpdate(Tile tile){
-        super.onProximityUpdate(tile);
-
-        ConduitEntity entity = tile.ent();
-        int[] bits = buildBlending(tile, tile.rotation(), null, true);
-        entity.blendbits = bits[0];
     }
 
     @Override
@@ -57,7 +49,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
         if(bits == null) return;
 
-        Draw.colorl(0.34f);
+        Draw.color(botColor);
         Draw.alpha(0.5f);
         Draw.rect(botRegions[bits[0]], req.drawx(), req.drawy(),
             botRegions[bits[0]].getWidth() * Draw.scl * req.animScale, botRegions[bits[0]].getHeight() * Draw.scl * req.animScale,
@@ -89,49 +81,53 @@ public class Conduit extends LiquidBlock implements Autotiler{
     }
 
     @Override
-    public void draw(Tile tile){
-        ConduitEntity entity = tile.ent();
-        int rotation = tile.rotation() * 90;
-
-        Draw.colorl(0.34f);
-        Draw.rect(botRegions[entity.blendbits], tile.drawx(), tile.drawy(), rotation);
-
-        Draw.color(tile.entity.liquids.current().color);
-        Draw.alpha(entity.smoothLiquid);
-        Draw.rect(botRegions[entity.blendbits], tile.drawx(), tile.drawy(), rotation);
-        Draw.color();
-
-        Draw.rect(topRegions[entity.blendbits], tile.drawx(), tile.drawy(), rotation);
-    }
-
-    @Override
-    public void update(Tile tile){
-        ConduitEntity entity = tile.ent();
-        entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.liquids.currentAmount() / liquidCapacity, 0.05f);
-
-        if(tile.entity.liquids.total() > 0.001f && tile.entity.timer.get(timerFlow, 1)){
-            tryMoveLiquid(tile, tile.getNearby(tile.rotation()), leakResistance, tile.entity.liquids.current());
-            entity.noSleep();
-        }else{
-            entity.sleep();
-        }
-    }
-
-    @Override
     public TextureRegion[] generateIcons(){
         return new TextureRegion[]{Core.atlas.find("conduit-bottom"), Core.atlas.find(name + "-top-0")};
     }
 
-    @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        tile.entity.noSleep();
-        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f)
-            && ((source.absoluteRelativeTo(tile.x, tile.y) + 2) % 4 != tile.rotation());
-    }
-
-    public static class ConduitEntity extends TileEntity{
+    public class ConduitEntity extends LiquidBlockEntity{
         public float smoothLiquid;
-
         int blendbits;
+
+        @Override
+        public void draw(){
+            int rotation = rotation() * 90;
+
+            Draw.color(botColor);
+            Draw.rect(botRegions[blendbits], x, y, rotation);
+
+            Draw.color(liquids.current().color);
+            Draw.alpha(smoothLiquid);
+            Draw.rect(botRegions[blendbits], x, y, rotation);
+            Draw.color();
+
+            Draw.rect(topRegions[blendbits], x, y, rotation);
+        }
+
+        @Override
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
+
+            blendbits = buildBlending(tile, rotation(), null, true)[0];
+        }
+
+        @Override
+        public boolean acceptLiquid(Tilec source, Liquid liquid, float amount){
+            noSleep();
+            return liquids.get(liquid) + amount < liquidCapacity && (liquids.current() == liquid || liquids.currentAmount() < 0.2f)
+                && ((source.absoluteRelativeTo(tile.x, tile.y) + 2) % 4 != tile.rotation());
+        }
+
+        @Override
+        public void updateTile(){
+            smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / liquidCapacity, 0.05f);
+
+            if(liquids.total() > 0.001f && timer(timerFlow, 1)){
+                moveLiquid(tile.getNearbyEntity(rotation()), leakResistance, liquids.current());
+                noSleep();
+            }else{
+                sleep();
+            }
+        }
     }
 }

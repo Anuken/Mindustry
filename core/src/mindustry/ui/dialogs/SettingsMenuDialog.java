@@ -37,7 +37,7 @@ public class SettingsMenuDialog extends SettingsDialog{
     public SettingsMenuDialog(){
         hidden(() -> {
             Sounds.back.play();
-            if(!state.is(State.menu)){
+            if(state.isGame()){
                 if(!wasPaused || net.active())
                     state.set(State.playing);
             }
@@ -45,7 +45,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         shown(() -> {
             back();
-            if(!state.is(State.menu)){
+            if(state.isGame()){
                 wasPaused = state.is(State.paused);
                 state.set(State.paused);
             }
@@ -84,7 +84,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             t.defaults().size(270f, 60f).left();
             TextButtonStyle style = Styles.cleart;
 
-            t.addImageTextButton("$settings.cleardata", Icon.trash, style, () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
+            t.button("$settings.cleardata", Icon.trash, style, () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
                 ObjectMap<String, Object> map = new ObjectMap<>();
                 for(String value : Core.settings.keys()){
                     if(value.contains("usid") || value.contains("uuid")){
@@ -104,7 +104,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.row();
 
-            t.addImageTextButton("$data.export", Icon.download, style, () -> {
+            t.button("$data.export", Icon.download, style, () -> {
                 if(ios){
                     Fi file = Core.files.local("mindustry-data-export.zip");
                     try{
@@ -128,7 +128,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.row();
 
-            t.addImageTextButton("$data.import", Icon.download, style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
+            t.button("$data.import", Icon.download, style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
                 try{
                     data.importData(file);
                     Core.app.exit();
@@ -146,7 +146,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             if(!mobile){
                 t.row();
-                t.addImageTextButton("$data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath()));
+                t.button("$data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath()));
             }
         });
 
@@ -185,20 +185,20 @@ public class SettingsMenuDialog extends SettingsDialog{
         TextButtonStyle style = Styles.cleart;
 
         menu.defaults().size(300f, 60f);
-        menu.addButton("$settings.game", style, () -> visible(0));
+        menu.button("$settings.game", style, () -> visible(0));
         menu.row();
-        menu.addButton("$settings.graphics", style, () -> visible(1));
+        menu.button("$settings.graphics", style, () -> visible(1));
         menu.row();
-        menu.addButton("$settings.sound", style, () -> visible(2));
+        menu.button("$settings.sound", style, () -> visible(2));
         menu.row();
-        menu.addButton("$settings.language", style, ui.language::show);
+        menu.button("$settings.language", style, ui.language::show);
         if(!mobile || Core.settings.getBool("keyboard")){
             menu.row();
-            menu.addButton("$settings.controls", style, ui.controls::show);
+            menu.button("$settings.controls", style, ui.controls::show);
         }
 
         menu.row();
-        menu.addButton("$settings.data", style, () -> dataDialog.show());
+        menu.button("$settings.data", style, () -> dataDialog.show());
     }
 
     void addSettings(){
@@ -256,7 +256,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.pref(new Setting(){
             @Override
             public void add(SettingsTable table){
-                table.addButton("$tutorial.retake", () -> {
+                table.button("$tutorial.retake", () -> {
                     hide();
                     control.playTutorial();
                 }).size(220f, 60f).pad(6).left();
@@ -318,6 +318,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         graphics.checkPref("effects", true);
         graphics.checkPref("destroyedblocks", true);
+        graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("position", false);
@@ -325,8 +326,9 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(!mobile){
             graphics.checkPref("blockselectkeys", true);
         }
+        graphics.checkPref("playerindicators", true);
         graphics.checkPref("indicators", true);
-        graphics.checkPref("animatedwater", !mobile);
+        graphics.checkPref("animatedwater", true);
         if(Shaders.shield != null){
             graphics.checkPref("animatedshields", !mobile);
         }
@@ -359,6 +361,8 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(!mobile){
             Core.settings.put("swapdiagonal", false);
         }
+
+        graphics.checkPref("flow", false);
     }
 
     private void back(){
@@ -374,7 +378,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     @Override
     public void addCloseButton(){
-        buttons.addImageTextButton("$back", Icon.leftOpen, () -> {
+        buttons.button("$back", Icon.leftOpen, () -> {
             if(prefs.getChildren().first() != menu){
                 back();
             }else{
@@ -383,7 +387,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         }).size(230f, 64f);
 
         keyDown(key -> {
-            if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
+            if(key == KeyCode.escape || key == KeyCode.back){
                 if(prefs.getChildren().first() != menu){
                     back();
                 }else{

@@ -62,17 +62,16 @@ public class CustomGameDialog extends FloatingDialog{
                 for(Gamemode mode : Gamemode.all){
                     TextureRegionDrawable icon = Vars.ui.getIcon("mode" + Strings.capitalize(mode.name()) + "Small");
                     if(mode.valid(map) && Core.atlas.isFound(icon.getRegion())){
-                        t.addImage(icon).size(16f).pad(4f);
+                        t.image(icon).size(16f).pad(4f);
                     }
                 }
             }).left();
             image.row();
             image.add(map.name()).pad(1f).growX().wrap().left().get().setEllipsis(true);
             image.row();
-            image.addImage(Tex.whiteui, Pal.gray).growX().pad(3).height(4f);
+            image.image(Tex.whiteui, Pal.gray).growX().pad(3).height(4f);
             image.row();
             image.add(img).size(images);
-
 
             BorderImage border = new BorderImage(map.safeTexture(), 3f);
             border.setScaling(Scaling.fit);

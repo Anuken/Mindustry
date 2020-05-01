@@ -3,7 +3,6 @@ package mindustry.ui.dialogs;
 import arc.Core;
 import arc.scene.ui.TextButton;
 import arc.util.Time;
-import mindustry.core.GameState.State;
 import mindustry.game.Saves.SaveSlot;
 import mindustry.gen.*;
 
@@ -15,7 +14,7 @@ public class SaveDialog extends LoadDialog{
         super("$savegame");
 
         update(() -> {
-            if(state.is(State.menu) && isShown()){
+            if(state.isMenu() && isShown()){
                 hide();
             }
         });
@@ -23,7 +22,7 @@ public class SaveDialog extends LoadDialog{
 
     public void addSetup(){
         slots.row();
-        slots.addImageTextButton("$save.new", Icon.add, () ->
+        slots.button("$save.new", Icon.add, () ->
         ui.showTextInput("$save", "$save.newslot", 30, "", text -> {
             ui.loadAnd("$saving", () -> {
                 control.saves.addSave(text);

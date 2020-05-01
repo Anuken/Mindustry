@@ -7,32 +7,37 @@ import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 
 public abstract class GenerateFilter{
     protected transient float o = (float)(Math.random() * 10000000.0);
     protected transient long seed;
     protected transient GenerateInput in;
 
-    public transient boolean buffered = false;
-    public transient FilterOption[] options;
+    public void apply(Tiles tiles, GenerateInput in){
+        this.in = in;
+        for(Tile tile : tiles){
+            in.apply(tile.x, tile.y, tile.floor(), tile.block(), tile.overlay());
+            apply();
+
+            tile.setFloor(in.floor.asFloor());
+            tile.setOverlay(in.floor.asFloor().isLiquid ? Blocks.air : in.ore);
+
+            if(!tile.block().synthetic() && !in.block.synthetic()){
+                tile.setBlock(in.block);
+            }
+        }
+    }
 
     public final void apply(GenerateInput in){
         this.in = in;
         apply();
-        //remove extra ores on liquids
-        if(((Floor)in.floor).isLiquid){
-            in.ore = Blocks.air;
-        }
     }
 
-    /** sets up the options; this is necessary since the constructor can't access subclass variables. */
-    protected void options(FilterOption... options){
-        this.options = options;
-    }
+    /** @return a new array of options for configuring this filter */
+    public abstract FilterOption[] options();
 
     /** apply the actual filter on the input */
-    protected abstract void apply();
+    protected void apply(){}
 
     /** draw any additional guides */
     public void draw(Image image){}
@@ -45,6 +50,16 @@ public abstract class GenerateFilter{
     /** set the seed to a random number */
     public void randomize(){
         seed = Mathf.random(99999999);
+    }
+
+    /** @return whether this filter needs a read/write buffer (e.g. not a 1:1 tile mapping). */
+    public boolean isBuffered(){
+        return false;
+    }
+
+    /** @return whether this filter can *only* be used while generating the map, e.g. is not undoable. */
+    public boolean isPost(){
+        return false;
     }
 
     //utility generation functions

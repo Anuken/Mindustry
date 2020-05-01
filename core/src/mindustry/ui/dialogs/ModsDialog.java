@@ -3,6 +3,9 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.Net.*;
 import arc.files.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.scene.ui.TextButton.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
@@ -20,60 +23,14 @@ public class ModsDialog extends FloatingDialog{
         super("$mods");
         addCloseButton();
 
-        buttons.addImageTextButton("$mods.openfolder", Icon.link,
-        () -> Core.app.openFolder(modDirectory.absolutePath())).size(250f, 64f);
-
-        buttons.row();
-
-        buttons.addImageTextButton("$mods.guide", Icon.link,
-        () -> Core.net.openURI(modGuideURL))
-        .size(210, 64f);
-
-        buttons.addImageTextButton("$mod.import.github", Icon.github, () -> {
-            ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
-                ui.loadfrag.show();
-                Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
-                    Core.net.httpGet(loc.getHeader("Location"), result -> {
-                        if(result.getStatus() != HttpStatus.OK){
-                            ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
-                            ui.loadfrag.hide();
-                        }else{
-                            try{
-                                Fi file = tmpDirectory.child(text.replace("/", "") + ".zip");
-                                Streams.copyStream(result.getResultAsStream(), file.write(false));
-                                mods.importMod(file);
-                                file.delete();
-                                Core.app.post(() -> {
-                                    try{
-                                        mods.reloadContent();
-                                        setup();
-                                        ui.loadfrag.hide();
-                                    }catch(Throwable e){
-                                        ui.showException(e);
-                                    }
-                                });
-                            }catch(Throwable e){
-                                modError(e);
-                            }
-                        }
-                    }, t -> Core.app.post(() -> modError(t)));
-                }, t -> Core.app.post(() -> modError(t)));
-            });
-        }).size(250f, 64f);
+        buttons.button("$mods.guide", Icon.link, () -> Core.net.openURI(modGuideURL)).size(210, 64f);
 
 
         shown(this::setup);
 
         hidden(() -> {
             if(mods.requiresReload()){
-                ui.loadAnd("$reloading", () -> {
-                    mods.eachEnabled(mod -> {
-                        if(mod.hasUnmetDependencies()){
-                            ui.showErrorMessage(Core.bundle.format("mod.nowdisabled", mod.name, mod.missingDependencies.toString(", ")));
-                        }
-                    });
-                    mods.reloadContent();
-                });
+                reload();
             }
         });
 
@@ -95,43 +52,150 @@ public class ModsDialog extends FloatingDialog{
     }
 
     void setup(){
+        float h = 110f;
+        float w = mobile ? 430f : 524f;
+
         cont.clear();
         cont.defaults().width(mobile ? 500 : 560f).pad(4);
         cont.add("$mod.reloadrequired").visible(mods::requiresReload).center().get().setAlignment(Align.center);
         cont.row();
+
+        cont.table(buttons -> {
+            buttons.left().defaults().growX().height(60f).uniformX();
+
+            TextButtonStyle style = Styles.clearPartialt;
+            float margin = 12f;
+
+            buttons.button("$mod.import", Icon.add, style, () -> {
+                FloatingDialog dialog = new FloatingDialog("$mod.import");
+
+                TextButtonStyle bstyle = Styles.cleart;
+
+                dialog.cont.table(Tex.button, t -> {
+                    t.defaults().size(300f, 70f);
+                    t.margin(12f);
+
+                    t.button("$mod.import.file", Icon.file, bstyle, () -> {
+                        dialog.hide();
+
+                        platform.showFileChooser(true, "zip", file -> {
+                            try{
+                                mods.importMod(file);
+                                setup();
+                            }catch(IOException e){
+                                ui.showException(e);
+                                e.printStackTrace();
+                            }
+                        });
+                    }).margin(12f);
+
+                    t.row();
+
+                    t.button("$mod.import.github", Icon.github, bstyle, () -> {
+                        dialog.hide();
+
+                        ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
+                            ui.loadfrag.show();
+                            Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
+                                Core.net.httpGet(loc.getHeader("Location"), result -> {
+                                    if(result.getStatus() != HttpStatus.OK){
+                                        ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
+                                        ui.loadfrag.hide();
+                                    }else{
+                                        try{
+                                            Fi file = tmpDirectory.child(text.replace("/", "") + ".zip");
+                                            Streams.copy(result.getResultAsStream(), file.write(false));
+                                            mods.importMod(file);
+                                            file.delete();
+                                            Core.app.post(() -> {
+                                                try{
+                                                    mods.reloadContent();
+                                                    setup();
+                                                    ui.loadfrag.hide();
+                                                }catch(Throwable e){
+                                                    ui.showException(e);
+                                                }
+                                            });
+                                        }catch(Throwable e){
+                                            modError(e);
+                                        }
+                                    }
+                                }, t2 -> Core.app.post(() -> modError(t2)));
+                            }, t2 -> Core.app.post(() -> modError(t2)));
+                        });
+                    }).margin(12f);
+                });
+
+                dialog.addCloseButton();
+
+                dialog.show();
+            }).margin(margin);
+
+            buttons.button("$mods.reload", Icon.refresh, style, this::reload).margin(margin);
+
+            if(!mobile){
+                buttons.button("$mods.openfolder", Icon.link, style, () -> Core.app.openFolder(modDirectory.absolutePath())).margin(margin);
+            }
+        }).width(w);
+
+        cont.row();
+
         if(!mods.list().isEmpty()){
             cont.pane(table -> {
                 table.margin(10f).top();
 
                 boolean anyDisabled = false;
                 for(LoadedMod mod : mods.list()){
+                    String letter = (Strings.stripColors(mod.name).charAt(0) + "").toUpperCase();
+
                     if(!mod.enabled() && !anyDisabled && mods.list().size > 0){
                         anyDisabled = true;
                         table.row();
-                        table.addImage().growX().height(4f).pad(6f).color(Pal.gray);
+                        table.image().growX().height(4f).pad(6f).color(Pal.gray);
                         table.row();
                     }
 
-                    table.table(Styles.black6, t -> {
-                        t.defaults().pad(2).left().top();
-                        t.margin(14f).left();
+                    table.button(t -> {
+                        t.top().left();
+                        t.margin(12f);
+
+                        t.add(new BorderImage(){
+                            {
+                                if(mod.iconTexture != null){
+                                    setDrawable(new TextureRegion(mod.iconTexture));
+                                }else{
+                                    setDrawable(Tex.clear);
+                                }
+                            }
+
+                            @Override
+                            public void draw(){
+                                super.draw();
+
+                                if(mod.iconTexture == null){
+                                    Fonts.def.draw(letter, x + width/2f, y + height/2f, Align.center);
+                                }
+                            }
+                        }.border(Pal.accent)).size(h - 8f).padTop(-8f).padLeft(-8f).padRight(2f);
+
+                        t.defaults().left().top();
                         t.table(title -> {
                             title.left();
-                            title.add("[accent]" + mod.meta.displayName() + "[lightgray] v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + "")).width(200f).wrap();
+                            title.add("" + mod.meta.displayName() + "\n[lightgray]v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + "")).wrap().width(170f).growX();
                             title.add().growX();
 
-                            title.addImageTextButton(mod.enabled() ? "$mod.disable" : "$mod.enable", mod.enabled() ? Icon.downOpen : Icon.upOpen, Styles.cleart, () -> {
+                            title.button(mod.enabled() ? "$mod.disable" : "$mod.enable", mod.enabled() ? Icon.downOpen : Icon.upOpen, Styles.transt, () -> {
                                 mods.setEnabled(mod, !mod.enabled());
                                 setup();
                             }).height(50f).margin(8f).width(130f).disabled(!mod.isSupported());
 
                             if(steam && !mod.hasSteamID()){
-                                title.addImageButton(Icon.download, Styles.cleari, () -> {
+                                title.button(Icon.download, Styles.clearTransi, () -> {
                                     platform.publish(mod);
                                 }).size(50f);
                             }
 
-                            title.addImageButton(mod.hasSteamID() ? Icon.link : Icon.trash, Styles.cleari, () -> {
+                            title.button(mod.hasSteamID() ? Icon.link : Icon.trash, Styles.clearPartiali, () -> {
                                 if(!mod.hasSteamID()){
                                     ui.showConfirm("$confirm", "$mod.remove.confirm", () -> {
                                         mods.removeMod(mod);
@@ -141,17 +205,9 @@ public class ModsDialog extends FloatingDialog{
                                     platform.viewListing(mod);
                                 }
                             }).size(50f);
-                        }).growX().left().padTop(-14f).padRight(-14f);
+                        }).growX().left();
 
                         t.row();
-                        if(mod.meta.author != null){
-                            t.add(Core.bundle.format("mod.author", mod.meta.author));
-                            t.row();
-                        }
-                        if(mod.meta.description != null){
-                            t.labelWrap("[lightgray]" + mod.meta.description).growX();
-                            t.row();
-                        }
                         if(!mod.isSupported()){
                             t.labelWrap(Core.bundle.format("mod.requiresversion", mod.meta.minGameVersion)).growX();
                             t.row();
@@ -162,7 +218,7 @@ public class ModsDialog extends FloatingDialog{
                             t.labelWrap("$mod.erroredcontent").growX();
                             t.row();
                         }
-                    }).width(mobile ? 430f : 500f);
+                    }, Styles.clearPartialt, () -> showMod(mod)).size(w, h);
                     table.row();
                 }
             });
@@ -173,16 +229,72 @@ public class ModsDialog extends FloatingDialog{
 
         cont.row();
 
-        cont.addImageTextButton("$mod.import", Icon.add, () -> {
-            platform.showFileChooser(true, "zip", file -> {
-                try{
-                    mods.importMod(file);
-                    setup();
-                }catch(IOException e){
-                    ui.showException(e);
-                    e.printStackTrace();
+
+    }
+
+    private void reload(){
+        ui.loadAnd("$reloading", () -> {
+            mods.eachEnabled(mod -> {
+                if(mod.hasUnmetDependencies()){
+                    ui.showErrorMessage(Core.bundle.format("mod.nowdisabled", mod.name, mod.missingDependencies.toString(", ")));
                 }
             });
-        }).margin(12f).width(400f);
+            mods.reloadContent();
+            setup();
+        });
+    }
+
+    private void showMod(LoadedMod mod){
+        FloatingDialog dialog = new FloatingDialog(mod.meta.displayName());
+
+        dialog.addCloseButton();
+
+        if(!mobile){
+            dialog.buttons.button("$mods.openfolder", Icon.link, () -> Core.app.openFolder(mod.file.absolutePath()));
+        }
+
+        //TODO improve this menu later
+        dialog.cont.pane(desc -> {
+            desc.center();
+            desc.defaults().padTop(10).left();
+
+            desc.add("$editor.name").padRight(10).color(Color.gray).padTop(0);
+            desc.row();
+            desc.add(mod.meta.displayName()).growX().wrap().padTop(2);
+            desc.row();
+            if(mod.meta.author != null){
+                desc.add("$editor.author").padRight(10).color(Color.gray);
+                desc.row();
+                desc.add(mod.meta.author).growX().wrap().padTop(2);
+                desc.row();
+            }
+            if(mod.meta.description != null){
+                desc.add("$editor.description").padRight(10).color(Color.gray).top();
+                desc.row();
+                desc.add(mod.meta.description).growX().wrap().padTop(2);
+            }
+
+            //TODO add this when mods work properly
+            /*
+            Array<UnlockableContent> all = Array.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent).as(UnlockableContent.class);
+            if(all.any()){
+                desc.add("$mod.content").padRight(10).color(Color.gray).top();
+                desc.row();
+                desc.pane(cs -> {
+                    int i = 0;
+                    for(UnlockableContent c : all){
+                        cs.addImageButton(new TextureRegionDrawable(c.icon(Cicon.medium)), () -> {
+                            ui.content.show(c);
+                        });
+
+                        if(++i % 8 == 0) cs.row();
+                    }
+                }).growX().minHeight(60f);
+            }*/
+        }).width(400f);
+
+
+
+        dialog.show();
     }
 }

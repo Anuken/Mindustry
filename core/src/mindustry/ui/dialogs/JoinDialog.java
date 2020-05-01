@@ -1,16 +1,15 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
-import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import mindustry.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -42,13 +41,13 @@ public class JoinDialog extends FloatingDialog{
 
         buttons.add().growX().width(-1);
         if(!steam){
-            buttons.addButton("?", () -> ui.showInfo("$join.info")).size(60f, 64f).width(-1);
+            buttons.button("?", () -> ui.showInfo("$join.info")).size(60f, 64f).width(-1);
         }
 
         add = new FloatingDialog("$joingame.title");
         add.cont.add("$joingame.ip").padRight(5f).left();
 
-        TextField field = add.cont.addField(Core.settings.getString("ip"), text -> {
+        TextField field = add.cont.field(Core.settings.getString("ip"), text -> {
             Core.settings.put("ip", text);
             Core.settings.save();
         }).size(320f, 54f).get();
@@ -57,8 +56,8 @@ public class JoinDialog extends FloatingDialog{
 
         add.cont.row();
         add.buttons.defaults().size(140f, 60f).pad(4f);
-        add.buttons.addButton("$cancel", add::hide);
-        add.buttons.addButton("$ok", () -> {
+        add.buttons.button("$cancel", add::hide);
+        add.buttons.button("$ok", () -> {
             if(renaming == null){
                 Server server = new Server();
                 server.setIP(Core.settings.getString("ip"));
@@ -82,7 +81,7 @@ public class JoinDialog extends FloatingDialog{
             }
         });
 
-        keyDown(KeyCode.F5, this::refreshAll);
+        keyDown(KeyCode.f5, this::refreshAll);
 
         shown(() -> {
             setup();
@@ -112,7 +111,7 @@ public class JoinDialog extends FloatingDialog{
             //why are java lambdas this bad
             TextButton[] buttons = {null};
 
-            TextButton button = buttons[0] = remote.addButton("[accent]" + server.displayIP(), Styles.cleart, () -> {
+            TextButton button = buttons[0] = remote.button("[accent]" + server.displayIP(), Styles.cleart, () -> {
                 if(!buttons[0].childrenPressed()){
                     if(server.lastHost != null){
                         safeConnect(server.ip, server.port, server.lastHost.version);
@@ -130,33 +129,33 @@ public class JoinDialog extends FloatingDialog{
 
             inner.add(button.getLabel()).growX();
 
-            inner.addImageButton(Icon.upOpen, Styles.emptyi, () -> {
+            inner.button(Icon.upOpen, Styles.emptyi, () -> {
                 moveRemote(server, -1);
 
             }).margin(3f).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.downOpen, Styles.emptyi, () -> {
+            inner.button(Icon.downOpen, Styles.emptyi, () -> {
                 moveRemote(server, +1);
 
-            }).margin(3f).padTop(6f).top().right();
+            }).margin(3f).pad(2).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.refresh, Styles.emptyi, () -> {
+            inner.button(Icon.refresh, Styles.emptyi, () -> {
                 refreshServer(server);
-            }).margin(3f).padTop(6f).top().right();
+            }).margin(3f).pad(2).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.pencil, Styles.emptyi, () -> {
+            inner.button(Icon.pencil, Styles.emptyi, () -> {
                 renaming = server;
                 add.show();
-            }).margin(3f).padTop(6f).top().right();
+            }).margin(3f).pad(2).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.trash, Styles.emptyi, () -> {
+            inner.button(Icon.trash, Styles.emptyi, () -> {
                 ui.showConfirm("$confirm", "$server.delete", () -> {
                     servers.remove(server, true);
                     saveServers();
                     setupRemote();
                     refreshRemote();
                 });
-            }).margin(3f).pad(6).top().right();
+            }).margin(3f).pad(2).pad(6).top().right();
 
             button.row();
 
@@ -263,28 +262,28 @@ public class JoinDialog extends FloatingDialog{
         cont.table(t -> {
             t.add("$name").padRight(10);
             if(!steam){
-                t.addField(Core.settings.getString("name"), text -> {
-                    player.name = text;
+                t.field(Core.settings.getString("name"), text -> {
+                    player.name(text);
                     Core.settings.put("name", text);
                     Core.settings.save();
                 }).grow().pad(8).get().setMaxLength(maxNameLength);
             }else{
-                t.add(player.name).update(l -> l.setColor(player.color)).grow().pad(8);
+                t.add(player.name()).update(l -> l.setColor(player.color())).grow().pad(8);
             }
 
-            ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
+            ImageButton button = t.button(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new PaletteDialog().show(color -> {
-                    player.color.set(color);
-                    Core.settings.put("color-0", Color.rgba8888(color));
+                    player.color().set(color);
+                    Core.settings.put("color-0", color.rgba8888());
                     Core.settings.save();
                 });
             }).size(54f).get();
-            button.update(() -> button.getStyle().imageUpColor = player.color);
+            button.update(() -> button.getStyle().imageUpColor = player.color());
         }).width(w).height(70f).pad(4);
         cont.row();
         cont.add(pane).width(w + 38).pad(0);
         cont.row();
-        cont.addCenteredImageTextButton("$server.add", Icon.add, () -> {
+        cont.buttonCenter("$server.add", Icon.add, () -> {
             renaming = null;
             add.show();
         }).marginLeft(10).width(w).height(80f).update(button -> {
@@ -311,13 +310,13 @@ public class JoinDialog extends FloatingDialog{
 
         hosts.table(name -> {
             name.add(label).pad(10).growX().left().color(Pal.accent);
-            name.addImageButton(Icon.downOpen, Styles.emptyi, () -> {
+            name.button(Icon.downOpen, Styles.emptyi, () -> {
                 coll.toggle(false);
                 Core.settings.putSave("collapsed-" + label, coll.isCollapsed());
             }).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(40f).right().padRight(10f);
         }).growX();
         hosts.row();
-        hosts.addImage().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
+        hosts.image().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
         hosts.row();
         hosts.add(coll).width(targetWidth());
         hosts.row();
@@ -351,7 +350,7 @@ public class JoinDialog extends FloatingDialog{
             local.background(Tex.button);
             local.add("$hosts.none").pad(10f);
             local.add().growX();
-            local.addImageButton(Icon.refresh, this::refreshLocal).pad(-12f).padLeft(0).size(70f);
+            local.button(Icon.refresh, this::refreshLocal).pad(-12f).padLeft(0).size(70f);
         }else{
             local.background(null);
         }
@@ -367,7 +366,7 @@ public class JoinDialog extends FloatingDialog{
 
         local.row();
 
-        TextButton button = local.addButton("", Styles.cleart, () -> safeConnect(host.address, host.port, host.version))
+        TextButton button = local.button("", Styles.cleart, () -> safeConnect(host.address, host.port, host.version))
         .width(w).pad(5f).get();
         button.clearChildren();
         buildServer(host, button);
@@ -379,14 +378,14 @@ public class JoinDialog extends FloatingDialog{
 
         global.row();
 
-        TextButton button = global.addButton("", Styles.cleart, () -> safeConnect(host.address, host.port, host.version))
+        TextButton button = global.button("", Styles.cleart, () -> safeConnect(host.address, host.port, host.version))
         .width(w).pad(5f).get();
         button.clearChildren();
         buildServer(host, button);
     }
 
     public void connect(String ip, int port){
-        if(player.name.trim().isEmpty()){
+        if(player.name().trim().isEmpty()){
             ui.showInfo("$noname");
             return;
         }

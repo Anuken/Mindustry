@@ -2,16 +2,17 @@ package mindustry.world.blocks;
 
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.entities.traits.BuilderTrait.*;
+import arc.util.*;
+import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 import java.util.*;
 
 public interface Autotiler{
     class AutotilerHolder{
-        static final int[] blendresult = new int[3];
+        static final int[] blendresult = new int[4];
         static final BuildRequest[] directionals = new BuildRequest[4];
     }
 
@@ -49,6 +50,15 @@ public interface Autotiler{
         blends(tile, rotation, directional, 3, world) ? 5 :
         -1;
         transformCase(num, blendresult);
+
+        blendresult[3] = 0;
+
+        for(int i = 0; i < 4; i++){
+            if(blends(tile, rotation, directional, i, world)){
+                blendresult[3] |= (1 << i);
+            }
+        }
+
         return blendresult;
     }
 
@@ -70,6 +80,10 @@ public interface Autotiler{
         }
     }
 
+    default boolean facing(int x, int y, int rotation, int x2, int y2){
+        return Point2.equals(x + Geometry.d4(rotation).x,y + Geometry.d4(rotation).y, x2, y2);
+    }
+
     default boolean blends(Tile tile, int rotation, @Nullable BuildRequest[] directional, int direction, boolean checkWorld){
         int realDir = Mathf.mod(rotation - direction, 4);
         if(directional != null && directional[realDir] != null){
@@ -82,20 +96,26 @@ public interface Autotiler{
     }
 
     default boolean blends(Tile tile, int rotation, int direction){
-        Tile other = tile.getNearby(Mathf.mod(rotation - direction, 4));
-        if(other != null) other = other.link();
-        return other != null && other.getTeam() == tile.getTeam() && blends(tile, rotation, other.x, other.y, other.rotation(), other.block());
+        Tilec other = tile.getNearbyEntity(Mathf.mod(rotation - direction, 4));
+        return other != null && other.team() == tile.team() && blends(tile, rotation, other.tileX(), other.tileY(), other.rotation(), other.block());
     }
 
     default boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
-                || ((!otherblock.rotate && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
-                Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) || (otherblock.rotate && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y))));
+        return Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
+                || ((!otherblock.rotatedOutput(otherx, othery) && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
+                Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) || (otherblock.rotatedOutput(otherx, othery) && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
     }
 
+    /** @return whether this other block is *not* looking at this one. */
+    default boolean notLookingAt(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return !(otherblock.rotatedOutput(otherx, othery) && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y));
+    }
+
+    /** @return whether this tile is looking at the other tile, or the other tile is looking at this one.
+     * If the other tile does not rotate, it is always considered to be facing this one. */
     default boolean lookingAt(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
-        || (!otherblock.rotate || Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
+        || (!otherblock.rotatedOutput(otherx, othery) || Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
     }
 
     boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock);

@@ -21,7 +21,6 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
-import mindustry.plugin.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
@@ -78,7 +77,7 @@ public class Mods implements Loadable{
     public void importMod(Fi file) throws IOException{
         Fi dest = modDirectory.child(file.name());
         if(dest.exists()){
-            throw new IOException("A mod with the same filename already exists!");
+            throw new IOException("A file with the same name already exists in the mod folder!");
         }
 
         file.copyTo(dest);
@@ -115,10 +114,23 @@ public class Mods implements Loadable{
         Log.debug("Time to pack textures: {0}", Time.elapsed());
     }
 
+    private void loadIcons(){
+        for(LoadedMod mod : mods){
+            //try to load icon for each mod that can have one
+            if(mod.root.child("icon.png").exists()){
+                try{
+                    mod.iconTexture = new Texture(mod.root.child("icon.png"));
+                }catch(Throwable t){
+                    Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
+                }
+            }
+        }
+    }
+
     private void packSprites(Array<Fi> sprites, LoadedMod mod, boolean prefix){
         for(Fi file : sprites){
             try(InputStream stream = file.read()){
-                byte[] bytes = Streams.copyStreamToByteArray(stream, Math.max((int)file.length(), 512));
+                byte[] bytes = Streams.copyBytes(stream, Math.max((int)file.length(), 512));
                 Pixmap pixmap = new Pixmap(bytes, 0, bytes.length);
                 packer.add(getPage(file), (prefix ? mod.name + "-" : "") + file.nameWithoutExtension(), new PixmapRegion(pixmap));
                 pixmap.dispose();
@@ -136,16 +148,7 @@ public class Mods implements Loadable{
 
     @Override
     public void loadSync(){
-        for(LoadedMod mod : mods){
-            //try to load icon for each mod that can have one
-            if(mod.root.child("icon.png").exists()){
-                try{
-                    mod.iconTexture = new Texture(mod.root.child("icon.png"));
-                }catch(Throwable t){
-                    Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
-                }
-            }
-        }
+        loadIcons();
 
         if(packer == null) return;
         Time.mark();
@@ -220,6 +223,7 @@ public class Mods implements Loadable{
             return;
         }
         mods.remove(mod);
+        mod.dispose();
         requiresReload = true;
     }
 
@@ -247,8 +251,12 @@ public class Mods implements Loadable{
                 LoadedMod mod = loadMod(file);
                 mods.add(mod);
             }catch(Throwable e){
-                Log.err("Failed to load mod file {0}. Skipping.", file);
-                Log.err(e);
+                if(e instanceof ClassNotFoundException && e.getMessage().contains("mindustry.plugin.Plugin")){
+                    Log.info("Plugin {0} is outdated and needs to be ported to 6.0! Update its main class to inherit from 'mindustry.mod.Plugin'.");
+                }else{
+                    Log.err("Failed to load mod file {0}. Skipping.", file);
+                    Log.err(e);
+                }
             }
         }
 
@@ -366,7 +374,7 @@ public class Mods implements Loadable{
     private void checkWarnings(){
         //show 'scripts have errored' info
         if(scripts != null && scripts.hasErrored()){
-           Core.settings.getBoolOnce("scripts-errored2", () -> ui.showErrorMessage("$mod.scripts.unsupported"));
+           ui.showErrorMessage("$mod.scripts.unsupported");
         }
 
         //show list of errored content
@@ -378,7 +386,7 @@ public class Mods implements Loadable{
                 cont.margin(15);
                 cont.add("$error.title");
                 cont.row();
-                cont.addImage().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
+                cont.image().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
                 cont.row();
                 cont.add("$mod.errors").wrap().growX().center().get().setAlignment(Align.center);
                 cont.row();
@@ -386,18 +394,18 @@ public class Mods implements Loadable{
                     mods.each(m -> m.enabled() && m.hasContentErrors(), m -> {
                         p.add(m.name).color(Pal.accent).left();
                         p.row();
-                        p.addImage().fillX().pad(4).color(Pal.accent);
+                        p.image().fillX().pad(4).color(Pal.accent);
                         p.row();
                         p.table(d -> {
                             d.left().marginLeft(15f);
                             for(Content c : m.erroredContent){
                                 d.add(c.minfo.sourceFile.nameWithoutExtension()).left().padRight(10);
-                                d.addImageTextButton("$details", Icon.downOpen, Styles.transt, () -> {
+                                d.button("$details", Icon.downOpen, Styles.transt, () -> {
                                     new Dialog(""){{
                                         setFillParent(true);
                                         cont.pane(e -> e.add(c.minfo.error)).grow();
                                         cont.row();
-                                        cont.addImageTextButton("$ok", Icon.left, this::hide).size(240f, 60f);
+                                        cont.button("$ok", Icon.left, this::hide).size(240f, 60f);
                                     }}.show();
                                 }).size(190f, 50f).left().marginLeft(6);
                                 d.row();
@@ -408,13 +416,13 @@ public class Mods implements Loadable{
                 });
 
                 cont.row();
-                cont.addButton("$ok", this::hide).size(300, 50);
+                cont.button("$ok", this::hide).size(300, 50);
             }}.show();
         }
     }
 
     public boolean hasContentErrors(){
-        return mods.contains(LoadedMod::hasContentErrors);
+        return mods.contains(LoadedMod::hasContentErrors) || (scripts != null && scripts.hasErrored());
     }
 
     /** Reloads all mod content. How does this even work? I refuse to believe that it functions correctly.*/
@@ -448,6 +456,8 @@ public class Mods implements Loadable{
         data.load();
         Core.atlas.getTextures().each(t -> t.setFilter(Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest));
         requiresReload = false;
+
+        loadIcons();
 
         Events.fire(new ContentReloadEvent());
     }
@@ -725,6 +735,7 @@ public class Mods implements Loadable{
         public void dispose(){
             if(iconTexture != null){
                 iconTexture.dispose();
+                iconTexture = null;
             }
         }
 

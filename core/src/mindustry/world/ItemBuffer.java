@@ -1,9 +1,8 @@
 package mindustry.world;
 
 import arc.util.*;
-import mindustry.type.Item;
-
-import java.io.*;
+import arc.util.io.*;
+import mindustry.type.*;
 
 import static mindustry.Vars.content;
 
@@ -60,19 +59,19 @@ public class ItemBuffer{
         index--;
     }
 
-    public void write(DataOutput stream) throws IOException{
-        stream.writeByte((byte)index);
-        stream.writeByte((byte)buffer.length);
+    public void write(Writes write){
+        write.b((byte)index);
+        write.b((byte)buffer.length);
         for(long l : buffer){
-            stream.writeLong(l);
+            write.l(l);
         }
     }
 
-    public void read(DataInput stream) throws IOException{
-        index = stream.readByte();
-        byte length = stream.readByte();
+    public void read(Reads read){
+        index = read.b();
+        byte length = read.b();
         for(int i = 0; i < length; i++){
-            long l = stream.readLong();
+            long l = read.l();
             if(i < buffer.length){
                 buffer[i] = l;
             }

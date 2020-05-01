@@ -13,9 +13,11 @@ import static mindustry.Vars.state;
 
 /** Renders overlay lights. Client only. */
 public class LightRenderer{
+    public static boolean enable = true;
     private static final int scaling = 4;
+
     private float[] vertices = new float[24];
-    private FrameBuffer buffer = new FrameBuffer(2, 2);
+    private FrameBuffer buffer = new FrameBuffer();
     private Array<Runnable> lights = new Array<>();
 
     public void add(Runnable run){
@@ -46,13 +48,12 @@ public class LightRenderer{
         });
     }
 
-    public void line(float x, float y, float x2, float y2){
+    public void line(float x, float y, float x2, float y2, float stroke, Color tint, float alpha){
         if(!enabled()) return;
 
         add(() -> {
-            Draw.color(Color.orange, 0.3f);
+            Draw.color(tint, alpha);
 
-            float stroke = 30f;
             float rot = Mathf.angleExact(x2 - x, y2 - y);
             TextureRegion ledge = Core.atlas.find("circle-end"), lmid = Core.atlas.find("circle-mid");
 
@@ -174,24 +175,28 @@ public class LightRenderer{
     }
 
     public void draw(){
-        if(buffer.getWidth() != Core.graphics.getWidth()/scaling || buffer.getHeight() != Core.graphics.getHeight()/scaling){
-            buffer.resize(Core.graphics.getWidth()/scaling, Core.graphics.getHeight()/scaling);
+        if(!enable){
+            lights.clear();
+            return;
         }
 
+        buffer.resize(Core.graphics.getWidth()/scaling, Core.graphics.getHeight()/scaling);
+
         Draw.color();
-        buffer.beginDraw(Color.clear);
-        Draw.blend(Blending.normal);
+        buffer.begin(Color.clear);
+        Gl.blendEquationSeparate(Gl.funcAdd, Gl.max);
+
         for(Runnable run : lights){
             run.run();
         }
         Draw.reset();
-        Draw.blend();
-        buffer.endDraw();
+        buffer.end();
+        Gl.blendEquationSeparate(Gl.funcAdd, Gl.funcAdd);
 
         Draw.color();
         Shaders.light.ambient.set(state.rules.ambientLight);
         Draw.shader(Shaders.light);
-        Draw.rect(Draw.wrap(buffer.getTexture()), Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
+        Draw.rect(buffer);
         Draw.shader();
 
         lights.clear();

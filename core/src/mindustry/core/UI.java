@@ -20,7 +20,6 @@ import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.core.GameState.*;
 import mindustry.editor.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -63,7 +62,7 @@ public class UI implements ApplicationListener, Loadable{
     public TraceDialog traces;
     public DatabaseDialog database;
     public ContentInfoDialog content;
-    public DeployDialog deploy;
+    public PlanetDialog planet;
     public TechTreeDialog tech;
     //public MinimapDialog minimap;
     public SchematicsDialog schematics;
@@ -131,7 +130,7 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.act();
         Core.scene.draw();
 
-        if(Core.input.keyTap(KeyCode.MOUSE_LEFT) && Core.scene.getKeyboardFocus() instanceof TextField){
+        if(Core.input.keyTap(KeyCode.mouseLeft) && Core.scene.getKeyboardFocus() instanceof TextField){
             Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
             if(!(e instanceof TextField)){
                 Core.scene.setKeyboardFocus(null);
@@ -177,7 +176,7 @@ public class UI implements ApplicationListener, Loadable{
         traces = new TraceDialog();
         maps = new MapsDialog();
         content = new ContentInfoDialog();
-        deploy = new DeployDialog();
+        planet = new PlanetDialog();
         tech = new TechTreeDialog();
         mods = new ModsDialog();
         schematics = new SchematicsDialog();
@@ -187,10 +186,10 @@ public class UI implements ApplicationListener, Loadable{
 
         menuGroup.setFillParent(true);
         menuGroup.touchable(Touchable.childrenOnly);
-        menuGroup.visible(() -> state.is(State.menu));
+        menuGroup.visible(() -> state.isMenu());
         hudGroup.setFillParent(true);
         hudGroup.touchable(Touchable.childrenOnly);
-        hudGroup.visible(() -> !state.is(State.menu));
+        hudGroup.visible(() -> state.isGame());
 
         Core.scene.add(menuGroup);
         Core.scene.add(hudGroup);
@@ -252,23 +251,23 @@ public class UI implements ApplicationListener, Loadable{
             new Dialog(titleText){{
                 cont.margin(30).add(dtext).padRight(6f);
                 TextFieldFilter filter = inumeric ? TextFieldFilter.digitsOnly : (f, c) -> true;
-                TextField field = cont.addField(def, t -> {}).size(330f, 50f).get();
+                TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
                 field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
                 buttons.defaults().size(120, 54).pad(4);
-                buttons.addButton("$ok", () -> {
+                buttons.button("$ok", () -> {
                     confirmed.get(field.getText());
                     hide();
                 }).disabled(b -> field.getText().isEmpty());
-                buttons.addButton("$cancel", this::hide);
-                keyDown(KeyCode.ENTER, () -> {
+                buttons.button("$cancel", this::hide);
+                keyDown(KeyCode.enter, () -> {
                     String text = field.getText();
                     if(!text.isEmpty()){
                         confirmed.get(text);
                         hide();
                     }
                 });
-                keyDown(KeyCode.ESCAPE, this::hide);
-                keyDown(KeyCode.BACK, this::hide);
+                keyDown(KeyCode.escape, this::hide);
+                keyDown(KeyCode.back, this::hide);
                 show();
                 Core.scene.setKeyboardFocus(field);
                 field.setCursorPosition(def.length());
@@ -298,7 +297,7 @@ public class UI implements ApplicationListener, Loadable{
         table.setFillParent(true);
         table.touchable(Touchable.disabled);
         table.update(() -> {
-            if(state.is(State.menu)) table.remove();
+            if(state.isMenu()) table.remove();
         });
         table.actions(Actions.delay(duration * 0.9f), Actions.fadeOut(duration * 0.1f, Interpolation.fade), Actions.remove());
         table.top().table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).padTop(10);
@@ -311,7 +310,7 @@ public class UI implements ApplicationListener, Loadable{
         table.setFillParent(true);
         table.touchable(Touchable.disabled);
         table.update(() -> {
-            if(state.is(State.menu)) table.remove();
+            if(state.isMenu()) table.remove();
         });
         table.actions(Actions.delay(duration), Actions.remove());
         table.align(align).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).pad(top, left, bottom, right);
@@ -324,13 +323,14 @@ public class UI implements ApplicationListener, Loadable{
         table.setFillParent(true);
         table.touchable(Touchable.disabled);
         table.update(() -> {
-            if(state.is(State.menu)) table.remove();
+            if(state.isMenu()) table.remove();
         });
         table.actions(Actions.delay(duration), Actions.remove());
         table.align(Align.center).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).update(t -> {
             Vec2 v = Core.camera.project(worldx, worldy);
             t.setPosition(v.x, v.y, Align.center);
         });
+        table.act(0f);
         //make sure it's at the back
         Core.scene.root.addChildAt(0, table);
     }
@@ -339,7 +339,7 @@ public class UI implements ApplicationListener, Loadable{
         new Dialog(""){{
             getCell(cont).growX();
             cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+            buttons.button("$ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
@@ -349,11 +349,11 @@ public class UI implements ApplicationListener, Loadable{
             cont.margin(15f);
             cont.add("$error.title");
             cont.row();
-            cont.addImage().width(300f).pad(2).height(4f).color(Color.scarlet);
+            cont.image().width(300f).pad(2).height(4f).color(Color.scarlet);
             cont.row();
             cont.add(text).pad(2f).growX().wrap().get().setAlignment(Align.center);
             cont.row();
-            cont.addButton("$ok", this::hide).size(120, 50).pad(4);
+            cont.button("$ok", this::hide).size(120, 50).pad(4);
         }}.show();
     }
 
@@ -370,15 +370,15 @@ public class UI implements ApplicationListener, Loadable{
             cont.margin(15);
             cont.add("$error.title").colspan(2);
             cont.row();
-            cont.addImage().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
+            cont.image().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
             cont.row();
             cont.add((text.startsWith("$") ? Core.bundle.get(text.substring(1)) : text) + (message == null ? "" : "\n[lightgray](" + message + ")")).colspan(2).wrap().growX().center().get().setAlignment(Align.center);
             cont.row();
 
             Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(Strings.parseException(exc, true)).color(Color.lightGray).left()), true);
 
-            cont.addButton("$details", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().right();
-            cont.addButton("$ok", this::hide).size(100, 50).fillX().left();
+            cont.button("$details", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().right();
+            cont.button("$ok", this::hide).size(110, 50).fillX().left();
             cont.row();
             cont.add(col).colspan(2).pad(2);
         }}.show();
@@ -392,7 +392,7 @@ public class UI implements ApplicationListener, Loadable{
             cont.margin(15);
             cont.add("$error.title").colspan(2);
             cont.row();
-            cont.addImage().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
+            cont.image().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
             cont.row();
             cont.add(text).colspan(2).wrap().growX().center().get().setAlignment(Align.center);
             cont.row();
@@ -404,14 +404,14 @@ public class UI implements ApplicationListener, Loadable{
                     Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(details).color(Color.lightGray).left()), true);
 
                     cont.add(btext).right();
-                    cont.addButton("$details", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().left();
+                    cont.button("$details", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().left();
                     cont.row();
                     cont.add(col).colspan(2).pad(2);
                     cont.row();
                 }
             //}).colspan(2);
 
-            cont.addButton("$ok", this::hide).size(300, 50).fillX().colspan(2);
+            cont.button("$ok", this::hide).size(300, 50).fillX().colspan(2);
         }}.show();
     }
 
@@ -422,18 +422,18 @@ public class UI implements ApplicationListener, Loadable{
     public void showText(String titleText, String text, int align){
         new Dialog(titleText){{
             cont.row();
-            cont.addImage().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent);
+            cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent);
             cont.row();
             cont.add(text).width(400f).wrap().get().setAlignment(align, align);
             cont.row();
-            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+            buttons.button("$ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
     public void showInfoText(String titleText, String text){
         new Dialog(titleText){{
             cont.margin(15).add(text).width(400f).wrap().left().get().setAlignment(Align.left, Align.left);
-            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+            buttons.button("$ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
@@ -441,8 +441,8 @@ public class UI implements ApplicationListener, Loadable{
         new Dialog(titleText){{
             cont.margin(10).add(text);
             titleTable.row();
-            titleTable.addImage().color(Pal.accent).height(3f).growX().pad(2f);
-            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+            titleTable.image().color(Pal.accent).height(3f).growX().pad(2f);
+            buttons.button("$ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
@@ -455,8 +455,8 @@ public class UI implements ApplicationListener, Loadable{
         dialog.cont.add(text).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
-        dialog.buttons.addButton("$cancel", dialog::hide);
-        dialog.buttons.addButton("$ok", () -> {
+        dialog.buttons.button("$cancel", dialog::hide);
+        dialog.buttons.button("$ok", () -> {
             dialog.hide();
             confirmed.run();
         });
@@ -467,8 +467,12 @@ public class UI implements ApplicationListener, Loadable{
                 }
             });
         }
-        dialog.keyDown(KeyCode.ESCAPE, dialog::hide);
-        dialog.keyDown(KeyCode.BACK, dialog::hide);
+        dialog.keyDown(KeyCode.enter, () -> {
+            dialog.hide();
+            confirmed.run();
+        });
+        dialog.keyDown(KeyCode.escape, dialog::hide);
+        dialog.keyDown(KeyCode.back, dialog::hide);
         dialog.show();
     }
 
@@ -477,16 +481,16 @@ public class UI implements ApplicationListener, Loadable{
         dialog.cont.add(text).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
-        dialog.buttons.addButton(no, () -> {
+        dialog.buttons.button(no, () -> {
             dialog.hide();
             denied.run();
         });
-        dialog.buttons.addButton(yes, () -> {
+        dialog.buttons.button(yes, () -> {
             dialog.hide();
             confirmed.run();
         });
-        dialog.keyDown(KeyCode.ESCAPE, dialog::hide);
-        dialog.keyDown(KeyCode.BACK, dialog::hide);
+        dialog.keyDown(KeyCode.escape, dialog::hide);
+        dialog.keyDown(KeyCode.back, dialog::hide);
         dialog.show();
     }
 
@@ -495,7 +499,7 @@ public class UI implements ApplicationListener, Loadable{
         dialog.cont.add(text).width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
-        dialog.buttons.addButton("$ok", () -> {
+        dialog.buttons.button("$ok", () -> {
             dialog.hide();
             confirmed.run();
         });

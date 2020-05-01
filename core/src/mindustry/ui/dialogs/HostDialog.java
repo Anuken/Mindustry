@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.graphics.*;
 import arc.scene.ui.*;
 import arc.util.*;
 import mindustry.*;
@@ -23,28 +22,28 @@ public class HostDialog extends FloatingDialog{
 
         cont.table(t -> {
             t.add("$name").padRight(10);
-            t.addField(Core.settings.getString("name"), text -> {
-                player.name = text;
+            t.field(Core.settings.getString("name"), text -> {
+                player.name(text);
                 Core.settings.put("name", text);
                 Core.settings.save();
                 ui.listfrag.rebuild();
             }).grow().pad(8).get().setMaxLength(40);
 
-            ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
+            ImageButton button = t.button(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new PaletteDialog().show(color -> {
-                    player.color.set(color);
-                    Core.settings.put("color-0", Color.rgba8888(color));
+                    player.color().set(color);
+                    Core.settings.put("color-0", color.rgba());
                     Core.settings.save();
                 });
             }).size(54f).get();
-            button.update(() -> button.getStyle().imageUpColor = player.color);
+            button.update(() -> button.getStyle().imageUpColor = player.color());
         }).width(w).height(70f).pad(4).colspan(3);
 
         cont.row();
 
         cont.add().width(65f);
 
-        cont.addButton("$host", () -> {
+        cont.button("$host", () -> {
             if(Core.settings.getString("name").trim().isEmpty()){
                 ui.showInfo("$noname");
                 return;
@@ -53,7 +52,7 @@ public class HostDialog extends FloatingDialog{
             runHost();
         }).width(w).height(70f);
 
-        cont.addButton("?", () -> ui.showInfo("$host.info")).size(65f, 70f).padLeft(6f);
+        cont.button("?", () -> ui.showInfo("$host.info")).size(65f, 70f).padLeft(6f);
 
         shown(() -> {
             if(!steam){
@@ -67,7 +66,7 @@ public class HostDialog extends FloatingDialog{
         Time.runTask(5f, () -> {
             try{
                 net.host(Vars.port);
-                player.isAdmin = true;
+                player.admin(true);
 
                 if(steam){
                     Core.app.post(() -> Core.settings.getBoolOnce("steampublic2", () -> {

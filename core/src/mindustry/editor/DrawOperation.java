@@ -6,7 +6,7 @@ import mindustry.game.Team;
 import mindustry.gen.TileOp;
 import mindustry.world.Block;
 import mindustry.world.Tile;
-import mindustry.world.blocks.Floor;
+import mindustry.world.blocks.environment.Floor;
 
 import static mindustry.Vars.content;
 
@@ -65,7 +65,7 @@ public class DrawOperation{
                 tile.setFloor((Floor)content.block(to));
             }else if(type == OpType.block.ordinal()){
                 Block block = content.block(to);
-                tile.setBlock(block, tile.getTeam(), tile.rotation());
+                tile.setBlock(block, tile.team(), tile.rotation());
             }else if(type == OpType.rotation.ordinal()){
                 tile.rotation(to);
             }else if(type == OpType.team.ordinal()){
