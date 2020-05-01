@@ -175,23 +175,25 @@ public class ItemBridge extends Block{
                     if(!linkValid(tile,other,false)) continue;
                     boolean linked = other.pos() == link;
                     if(!linked && !(other.<ItemBridgeEntity>ent().link == tile.pos())) continue;
-                    float tx = tile.drawx(), ty = tile.drawy(), ox = other.drawx(), oy = other.drawy();
-                    float alpha = Math.abs((linked ? 100 : 0)-(Time.time() * 2) % 100f) / 100;
+
+                    float tx = tile.drawx(), ty = tile.drawy();
+					float ox = other.drawx(), oy = other.drawy();
+                    float alpha = Math.abs((linked ? 100 : 0)-(Time.time() * 2f) % 100f) / 100f;
                     float x = Interpolation.linear.apply(ox, tx, alpha);
                     float y = Interpolation.linear.apply(oy, ty, alpha);
 
-                    Tile link = linked ? tile : other;
                     Tile otherLink = linked ? other : tile;
+					int rel = (linked ? tile : other).absoluteRelativeTo(otherLink.x, otherLink.y);
 
-                    Draw.color(Color.valueOf("444444"));
+                    Draw.color(Pal.gray);
                     Lines.stroke(2.5f);
-                    Lines.circle(ox, oy, 2f);
+                    Lines.square(ox, oy, 2f, 45f);
 
                     Draw.color(linked ? Pal.place : Pal.accent);
                     Lines.stroke(1f);
                     Lines.line(tx, ty, ox, oy);
-                    Lines.circle(ox, oy, 2f);
-                    Draw.rect("bridge-arrow", x, y, (linked ? tile : other).absoluteRelativeTo((int) otherLink.x, (int) otherLink.y) * 90);
+                    Lines.square(ox, oy, 2f, 45f);
+                    Draw.rect("bridge-arrow", x, y, rel * 90);
                 }
             }
 
