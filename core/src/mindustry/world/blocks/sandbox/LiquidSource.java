@@ -74,9 +74,8 @@ public class LiquidSource extends Block{
         @Override
         public boolean onConfigureTileTapped(Tilec other){
             if(this == other){
-                lastLiquid = null;
                 control.input.frag.config.hideConfig();
-                tile.configure(null);
+                tile.configure(lastLiquid = null);
                 return false;
             }
 
