@@ -13,7 +13,7 @@ public class PhysicsProcess implements AsyncProcess{
     private Array<PhysicRef> refs = new Array<>(false);
     private BodyDef def;
 
-    private EntityGroup<? extends Hitboxc> group;
+    private EntityGroup<Unitc> group;
     private Filter flying = new Filter(){{
         maskBits = categoryBits = 2;
     }}, ground = new Filter(){{
@@ -44,17 +44,17 @@ public class PhysicsProcess implements AsyncProcess{
         });
 
         //find entities without bodies and assign them
-        for(Hitboxc entity : group){
-            boolean grounded = ((Flyingc)entity).isGrounded();
+        for(Unitc entity : group){
+            boolean grounded = entity.isGrounded();
 
             if(entity.body() == null){
                 //add bodies to entities that have none
                 CircleShape shape = new CircleShape();
-                shape.setRadius(entity.hitSize() * 0.46f);
+                shape.setRadius(entity.hitSize() / 2f);
 
                 FixtureDef fd = new FixtureDef();
                 fd.shape = shape;
-                fd.density = 10.0f;
+                fd.density = 5.0f * entity.mass();
                 fd.restitution = 0.05f;
                 fd.filter.maskBits = fd.filter.categoryBits = (grounded ? ground : flying).maskBits;
 
@@ -62,7 +62,6 @@ public class PhysicsProcess implements AsyncProcess{
 
                 Body body = physics.createBody(def);
                 body.createFixture(fd);
-
                 body.setUserData(entity);
 
                 PhysicRef ref = new PhysicRef(entity, body);
@@ -101,7 +100,7 @@ public class PhysicsProcess implements AsyncProcess{
             ref.body.setLinearVelocity(ref.velocity);
         }
 
-        physics.step(Core.graphics.getDeltaTime(), 3, 3);
+        physics.step(Core.graphics.getDeltaTime(), 8, 8);
 
         //get delta vectors
         for(PhysicRef ref : refs){

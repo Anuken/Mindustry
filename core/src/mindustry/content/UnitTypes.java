@@ -89,11 +89,12 @@ public class UnitTypes implements ContentList{
             speed = 1f;
             accel = 0.08f;
             drag = 0f;
-            mass = 2f;
+            mass = 30f;
             flying = true;
             health = 75000;
             engineOffset = 40;
             engineSize = 7.3f;
+            hitsize = 58f;
 
             weapons.add(new Weapon(){{
                 y = 1.5f;
