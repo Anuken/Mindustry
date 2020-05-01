@@ -177,13 +177,13 @@ public class ItemBridge extends Block{
                     if(!linked && !(other.<ItemBridgeEntity>ent().link == tile.pos())) continue;
 
                     float tx = tile.drawx(), ty = tile.drawy();
-					float ox = other.drawx(), oy = other.drawy();
+                    float ox = other.drawx(), oy = other.drawy();
                     float alpha = Math.abs((linked ? 100 : 0)-(Time.time() * 2f) % 100f) / 100f;
                     float x = Interpolation.linear.apply(ox, tx, alpha);
                     float y = Interpolation.linear.apply(oy, ty, alpha);
 
                     Tile otherLink = linked ? other : tile;
-					int rel = (linked ? tile : other).absoluteRelativeTo(otherLink.x, otherLink.y);
+                    int rel = (linked ? tile : other).absoluteRelativeTo(otherLink.x, otherLink.y);
 
                     Draw.color(Pal.gray);
                     Lines.stroke(2.5f);
