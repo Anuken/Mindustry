@@ -206,6 +206,7 @@ project(":ios"){
 
         compile arcModule("natives:natives-ios")
         compile arcModule("natives:natives-freetype-ios")
+        compile arcModule("natives:natives-box2d-ios")
         compile arcModule("backends:backend-robovm")
 
         compileOnly project(":annotations")

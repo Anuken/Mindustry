@@ -30,6 +30,7 @@ dependencies{
 
     natives "com.github.Anuken.Arc:natives-android:${getArcHash()}"
     natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
+    natives "com.github.Anuken.Arc:natives-box2d-android:${getArcHash()}"
 }
 
 task deploy(type: Copy){

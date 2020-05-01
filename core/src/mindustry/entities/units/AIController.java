@@ -3,6 +3,7 @@ package mindustry.entities.units;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -36,10 +37,11 @@ public class AIController implements UnitController{
     }
 
     protected void targetClosest(){
-        //Teamc newTarget = Units.closestTarget(unit.team(), unit.x(), unit.y(), Math.max(unit.range(), unit.type().range), u -> (unit.type().targetAir && u.isFlying()) || (unit.type().targetGround && !u.isFlying()));
-        //if(newTarget != null){
-         //   target = newTarget;
-        //}
+        //TODO optimize!
+        Teamc newTarget = Units.closestTarget(unit.team(), unit.x(), unit.y(), Math.max(unit.range(), unit.type().range), u -> (unit.type().targetAir && u.isFlying()) || (unit.type().targetGround && !u.isFlying()));
+        if(newTarget != null){
+            target = newTarget;
+        }
     }
 
     @Override

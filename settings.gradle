@@ -49,7 +49,7 @@ if(!hasProperty("release")){
         ':Arc:natives:natives-freetype-ios',
         ':Arc:natives:natives-box2d-desktop',
         ':Arc:natives:natives-box2d-android',
-        //':Arc:natives:natives-box2d-ios', TODO
+        ':Arc:natives:natives-box2d-ios',
         ':Arc:backends',
         ':Arc:backends:backend-sdl',
         ':Arc:backends:backend-android',
