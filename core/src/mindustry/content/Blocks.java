@@ -913,7 +913,7 @@ public class Blocks implements ContentList{
         plastaniumConveyor = new StackConveyor("plastanium-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.silicon, 1, Items.graphite, 1));
             health = 75;
-            speed = 0.04f;
+            speed = 2.5f / 60f;
             recharge = 2f;
         }};
 
