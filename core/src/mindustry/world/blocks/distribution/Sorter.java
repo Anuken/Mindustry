@@ -1,5 +1,6 @@
 package mindustry.world.blocks.distribution;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
@@ -17,6 +18,7 @@ import static mindustry.Vars.*;
 
 public class Sorter extends Block{
     private static Item lastItem;
+    private static float lastTime;
     public boolean invert;
 
     public Sorter(String name){
@@ -52,6 +54,11 @@ public class Sorter extends Block{
         @Override
         public void playerPlaced(){
             if(lastItem != null){
+                float timeout = Core.settings.getFloat("filtertimeout", 0f);
+                if(timeout > 0f && Time.time() - lastTime > timeout){
+                    lastItem = null;
+                    return;
+                }
                 tile.configure(lastItem);
             }
         }
@@ -60,6 +67,7 @@ public class Sorter extends Block{
         public void configured(Playerc player, Object value){
             super.configured(player, value);
 
+            lastTime = Time.time();
             if(!headless){
                 renderer.minimap.update(tile);
             }
@@ -76,8 +84,6 @@ public class Sorter extends Block{
                 Draw.rect("center", x, y);
                 Draw.color();
             }
-
-
         }
 
         @Override

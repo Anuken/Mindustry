@@ -231,6 +231,8 @@ public class SettingsMenuDialog extends SettingsDialog{
             game.checkPref("crashreport", true);
         }
 
+        game.sliderPref("filtertimeout", 0, 0, 60 * 60 * 24, 10, i -> Core.bundle.format("setting.seconds", i));
+
         game.checkPref("savecreate", true);
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
