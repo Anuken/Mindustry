@@ -13,6 +13,7 @@ import static mindustry.Vars.*;
 
 public class Team implements Comparable<Team>{
     public final byte id;
+    public final int uid;
     public final Color color;
     public String name;
 
@@ -58,6 +59,7 @@ public class Team implements Comparable<Team>{
         this.id = (byte)id;
 
         int us = Pack.u(this.id);
+        uid = us;
         if(us < 6) baseTeams[us] = this;
         all[us] = this;
     }

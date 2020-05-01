@@ -114,7 +114,7 @@ public class EntityCollisions{
 
         group.each(s -> {
             s.updateLastPosition();
-            //tree.insert(s);
+            tree.insert(s);
         });
     }
 
@@ -205,7 +205,7 @@ public class EntityCollisions{
     }
 
     @SuppressWarnings("unchecked")
-    public void collideGroups(EntityGroup<? extends Hitboxc> groupa, EntityGroup<? extends Hitboxc> groupb){
+    public <T extends Hitboxc> void collide(EntityGroup<T> groupa){
 
         groupa.each(solid -> {
             solid.hitbox(r1);
@@ -216,7 +216,9 @@ public class EntityCollisions{
             r2.merge(r1);
 
             arrOut.clear();
-            groupb.tree().getIntersect(arrOut, r2);
+
+            //get all targets based on what entity wants to collide with
+            solid.getCollisions(tree -> tree.intersect(r2, arrOut));
 
             for(Hitboxc sc : arrOut){
                 sc.hitbox(r1);

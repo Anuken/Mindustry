@@ -169,6 +169,7 @@ public class Vars implements Loadable{
     public static Schematics schematics = new Schematics();
     public static BeControl becontrol;
     public static AsyncLogic asyncLogic;
+    public static TeamIndexProcess teamIndex;
 
     public static Universe universe;
     public static World world;

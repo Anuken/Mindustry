@@ -1,5 +1,6 @@
 package mindustry.entities.def;
 
+import arc.func.*;
 import arc.math.geom.QuadTree.*;
 import arc.math.geom.*;
 import mindustry.annotations.Annotations.*;
@@ -24,6 +25,10 @@ abstract class HitboxComp implements Posc, QuadTreeObject{
     @Override
     public void afterRead(){
         updateLastPosition();
+    }
+
+    void getCollisions(Cons<QuadTree> consumer){
+
     }
 
     void updateLastPosition(){

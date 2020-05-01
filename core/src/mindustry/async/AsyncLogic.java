@@ -2,13 +2,17 @@ package mindustry.async;
 
 import arc.*;
 import arc.struct.*;
+import mindustry.*;
 import mindustry.game.EventType.*;
 
 import java.util.concurrent.*;
 
 public class AsyncLogic{
     //all processes to be executed each frame
-    private Array<AsyncProcess> processes = Array.with(new PhysicsProcess(), new CollisionProcess());
+    private Array<AsyncProcess> processes = Array.with(
+        new PhysicsProcess(),
+        Vars.teamIndex = new TeamIndexProcess()
+    );
 
     //futures to be awaited
     private Array<Future<?>> futures = new Array<>();
@@ -46,7 +50,9 @@ public class AsyncLogic{
 
         //submit all tasks
         for(AsyncProcess p : processes){
-            futures.add(executor.submit(p::process));
+            if(p.shouldProcess()){
+                futures.add(executor.submit(p::process));
+            }
         }
     }
 

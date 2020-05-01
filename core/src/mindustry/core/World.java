@@ -186,6 +186,10 @@ public class World{
         Events.fire(new WorldLoadEvent());
     }
 
+    public Rect getQuadBounds(Rect in){
+        return in.set(-finalWorldBounds, -finalWorldBounds, world.width() * tilesize + finalWorldBounds * 2, world.height() * tilesize + finalWorldBounds * 2);
+    }
+
     public void setGenerating(boolean gen){
         this.generating = gen;
     }

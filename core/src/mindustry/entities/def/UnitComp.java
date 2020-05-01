@@ -18,7 +18,7 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class UnitComp implements Healthc, Physicsc, Collisionc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc{
     @Import float x, y, rotation, elevation, maxHealth;
 
     private UnitController controller;
@@ -122,7 +122,7 @@ abstract class UnitComp implements Healthc, Physicsc, Collisionc, Statusc, Teamc
         if(team() != state.rules.waveTeam){
             float relativeSize = state.rules.dropZoneRadius + bounds()/2f + 1f;
             for(Tile spawn : spawner.getSpawns()){
-                if(withinDst(spawn.worldx(), spawn.worldy(), relativeSize)){
+                if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
                     vel().add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta()));
                 }
             }

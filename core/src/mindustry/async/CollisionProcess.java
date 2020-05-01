@@ -1,35 +1,21 @@
 package mindustry.async;
 
-import arc.box2d.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.pooling.*;
-import arc.util.pooling.Pool.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
-/**
- * Processes collisions.
- *
- * Each entity is assigned a final filter layer, then given a body and inserted into a physics world.
- *
- * Async:
- * The body's position is set to its entity position, and the body velocity is set to the entity delta.
- * Collisions are resolved and stored in a list, then processed synchronously.
- *
- */
+//TODO remove
 public class CollisionProcess implements AsyncProcess{
-    private Pool<CollisionRef> pool = Pools.get(CollisionRef.class, CollisionRef::new);
-
     //private Physics physics;
-    private QuadTree<Collisionc> tree;
-    private Array<Collisionc> insertEntities = new Array<>();
-    private Array<Collisionc> checkEntities = new Array<>();
+    private QuadTree<Hitboxc> tree;
+    private Array<Hitboxc> insertEntities = new Array<>();
+    private Array<Hitboxc> checkEntities = new Array<>();
 
-    private Array<Collisionc> arrOut = new Array<>();
+    private Array<Hitboxc> arrOut = new Array<>();
 
     private Vec2 l1 = new Vec2();
     private Rect r1 = new Rect();
@@ -38,9 +24,9 @@ public class CollisionProcess implements AsyncProcess{
     //private BodyDef def;
     //private FixtureDef fdef;
 
-    private EntityGroup<? extends Collisionc> inserted = Groups.unit;
-    private EntityGroup<? extends Collisionc> checked = Groups.bullet;
-    private Array<Collisionc> collisions = new Array<>(Collisionc.class);
+    private EntityGroup<? extends Hitboxc> inserted = Groups.unit;
+    private EntityGroup<? extends Hitboxc> checked = Groups.bullet;
+    private Array<Hitboxc> collisions = new Array<>(Hitboxc.class);
 
     @Override
     public void begin(){
@@ -65,11 +51,11 @@ public class CollisionProcess implements AsyncProcess{
 
         tree.clear();
         //insert targets
-        for(Collisionc ins : insertEntities){
+        for(Hitboxc ins : insertEntities){
             tree.insert(ins);
         }
 
-        for(Collisionc solid : checked){
+        for(Hitboxc solid : checked){
             solid.hitbox(r1);
             r1.x += (solid.lastX() - solid.getX());
             r1.y += (solid.lastY() - solid.getY());
@@ -78,9 +64,9 @@ public class CollisionProcess implements AsyncProcess{
             r2.merge(r1);
 
             arrOut.clear();
-            tree.getIntersect(arrOut, r2);
+            tree.intersect(r2, arrOut);
 
-            for(Collisionc sc : arrOut){
+            for(Hitboxc sc : arrOut){
                 sc.hitbox(r1);
                 if(r2.overlaps(r1)){
                     checkCollide(solid, sc);
@@ -99,8 +85,8 @@ public class CollisionProcess implements AsyncProcess{
 
         //processes anything that happened
         for(int i = 0; i < collisions.size; i += 2){
-            Collisionc a = collisions.items[i];
-            Collisionc b = collisions.items[i + 1];
+            Hitboxc a = collisions.items[i];
+            Hitboxc b = collisions.items[i + 1];
 
             //TODO incorrect
             float cx = (a.x() + b.x())/2f, cy = (a.y() + b.y())/2f;
@@ -124,7 +110,7 @@ public class CollisionProcess implements AsyncProcess{
         tree = new QuadTree<>(new Rect(-finalWorldBounds, -finalWorldBounds, world.width() * tilesize + finalWorldBounds * 2, world.height() * tilesize + finalWorldBounds * 2));
     }
 
-    private void checkCollide(Collisionc a, Collisionc b){
+    private void checkCollide(Hitboxc a, Hitboxc b){
 
         a.hitbox(this.r1);
         b.hitbox(this.r2);
@@ -199,29 +185,6 @@ public class CollisionProcess implements AsyncProcess{
             out.set(dx, dy);
 
             return true;
-        }
-    }
-
-    public static class CollisionRef implements Poolable{
-        Collisionc entity;
-        Body body;
-        Vec2 velocity = new Vec2(), position = new Vec2();
-
-        public CollisionRef set(Collisionc entity, Body body){
-            this.entity = entity;
-            this.body = body;
-
-            position.set(entity);
-            return this;
-        }
-
-        @Override
-        public void reset(){
-            entity = null;
-            body = null;
-
-            velocity.setZero();
-            position.setZero();
         }
     }
 }
