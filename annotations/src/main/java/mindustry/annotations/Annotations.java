@@ -87,6 +87,14 @@ public class Annotations{
     //endregion
     //region misc. utility
 
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface LoadRegion{
+        String value();
+        int length() default 1;
+        int[] lengths() default {};
+    }
+
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
     public @interface StyleDefaults{

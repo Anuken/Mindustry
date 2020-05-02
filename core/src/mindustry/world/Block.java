@@ -586,6 +586,7 @@ public class Block extends UnlockableContent{
         }
     }
 
+    @CallSuper
     @Override
     public void load(){
         region = Core.atlas.find(name);
@@ -603,6 +604,8 @@ public class Block extends UnlockableContent{
                 }
             }
         }
+
+        ContentRegions.loadRegions(this);
     }
 
     @Override
