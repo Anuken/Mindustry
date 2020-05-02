@@ -147,6 +147,8 @@ public class StackConveyor extends Block implements Autotiler{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
+            int lastState = state;
+
             state = stateMove;
 
             int[] bits = buildBlending(tile, tile.rotation(), null, true);
@@ -158,6 +160,15 @@ public class StackConveyor extends Block implements Autotiler{
             for(int i = 0; i < 4; i++){
                 if(blends(tile, rotation(), i)){
                     blendprox |= (1 << i);
+                }
+            }
+
+            //update other conveyor state when this conveyor's state changes
+            if(state != lastState){
+                for(Tilec near : proximity){
+                    if(near instanceof StackConveyorEntity){
+                        near.onProximityUpdate();
+                    }
                 }
             }
         }

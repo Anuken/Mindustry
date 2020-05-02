@@ -43,7 +43,11 @@ public class UnitFactory extends Block{
         flags = EnumSet.of(BlockFlag.producer);
         configurable = true;
 
-        config(Integer.class, (tile, i) -> ((UnitFactoryEntity)tile).currentPlan = i < 0 || i >= plans.length ? -1 : i);
+        config(Integer.class, (tile, i) -> {
+            ((UnitFactoryEntity)tile).currentPlan = i < 0 || i >= plans.length ? -1 : i;
+            ((UnitFactoryEntity)tile).progress = 0;
+        });
+
         consumes.add(new ConsumeItemDynamic(e -> {
             UnitFactoryEntity entity = (UnitFactoryEntity)e;
 

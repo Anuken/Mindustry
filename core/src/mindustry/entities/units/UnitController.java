@@ -14,4 +14,8 @@ public interface UnitController{
     default void update(){
 
     }
+
+    default boolean isFollowing(Playerc player){
+        return false;
+    }
 }

@@ -27,7 +27,6 @@ public class UnitTypes implements ContentList{
     public void load(){
 
         dagger = new UnitType("dagger"){{
-
             speed = 0.5f;
             drag = 0.3f;
             hitsize = 8f;
@@ -168,6 +167,7 @@ public class UnitTypes implements ContentList{
             health = 400;
             buildSpeed = 0.4f;
             engineOffset = 6.5f;
+            hitsize = 7f;
         }};
         
         /*

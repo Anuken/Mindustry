@@ -28,4 +28,9 @@ public class MimicAI extends AIController{
             }
         }
     }
+
+    @Override
+    public boolean isFollowing(Playerc player){
+        return control == player.unit();
+    }
 }
