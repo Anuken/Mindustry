@@ -3,9 +3,14 @@ package mindustry.annotations;
 import arc.files.*;
 import arc.struct.Array;
 import arc.util.*;
+import arc.util.Log;
 import arc.util.Log.*;
 import com.squareup.javapoet.*;
 import com.sun.source.util.*;
+import com.sun.tools.javac.model.*;
+import com.sun.tools.javac.processing.*;
+import com.sun.tools.javac.tree.*;
+import com.sun.tools.javac.util.*;
 import mindustry.annotations.util.*;
 
 import javax.annotation.processing.*;
@@ -19,6 +24,7 @@ import java.io.*;
 import java.lang.annotation.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.List;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public abstract class BaseProcessor extends AbstractProcessor{
@@ -35,6 +41,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
     protected int rounds = 1;
     protected RoundEnvironment env;
     protected Fi rootDirectory;
+
+    protected Context context;
+    protected JavacElements elementUtils;
+    protected TreeMaker maker;
 
     public static String getMethodName(Element element){
         return ((TypeElement)element.getEnclosingElement()).getQualifiedName().toString() + "." + element.getSimpleName();
@@ -185,6 +195,11 @@ public abstract class BaseProcessor extends AbstractProcessor{
         elementu = env.getElementUtils();
         filer = env.getFiler();
         messager = env.getMessager();
+        context = ((JavacProcessingEnvironment)env).getContext();
+
+        JavacProcessingEnvironment javacProcessingEnv = (JavacProcessingEnvironment)env;
+        this.elementUtils = javacProcessingEnv.getElementUtils();
+        this.maker = TreeMaker.instance(javacProcessingEnv.getContext());
 
         Log.setLogLevel(LogLevel.info);
 
