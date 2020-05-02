@@ -44,9 +44,14 @@ public class AIController implements UnitController{
         }
     }
 
+    protected void init(){
+
+    }
+
     @Override
     public void unit(Unitc unit){
         this.unit = unit;
+        init();
     }
 
     @Override

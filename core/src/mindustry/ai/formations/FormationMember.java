@@ -1,6 +1,6 @@
-package mindustry.ai.ai.fma;
+package mindustry.ai.formations;
 
-import mindustry.ai.ai.utils.*;
+import arc.math.geom.*;
 
 /**
  * Game characters coordinated by a {@link Formation} must implement this interface. Any {@code FormationMember} has a target
@@ -9,7 +9,6 @@ import mindustry.ai.ai.utils.*;
  * @author davebaol
  */
 public interface FormationMember{
-
     /** Returns the target location of this formation member. */
-    Location getTargetLocation();
+    Vec3 formationPos();
 }

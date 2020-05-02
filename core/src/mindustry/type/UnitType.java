@@ -277,6 +277,8 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawLegs(Legsc unit){
+        Draw.reset();
+
         Draw.mixcol(Color.white, unit.hitTime());
 
         float ft = Mathf.sin(unit.walkTime(), 6f, 2f + unit.hitSize() / 15f);

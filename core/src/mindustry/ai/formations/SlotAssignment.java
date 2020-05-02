@@ -1,4 +1,4 @@
-package mindustry.ai.ai.fma;
+package mindustry.ai.formations;
 
 
 /**

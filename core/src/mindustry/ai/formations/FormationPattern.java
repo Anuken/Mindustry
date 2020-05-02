@@ -1,6 +1,6 @@
-package mindustry.ai.ai.fma;
+package mindustry.ai.formations;
 
-import mindustry.ai.ai.utils.*;
+import arc.math.geom.*;
 
 /**
  * The {@code FormationPattern} interface represents the shape of a formation and generates the slot offsets, relative to its
@@ -10,21 +10,18 @@ import mindustry.ai.ai.utils.*;
  * {@code FormationPattern} interface.
  * @author davebaol
  */
-public interface FormationPattern{
-
-    /**
-     * Sets the number of slots.
-     * @param numberOfSlots the number of slots to set
-     */
-    void setNumberOfSlots(int numberOfSlots);
+public abstract class FormationPattern{
+    public int slots;
 
     /** Returns the location of the given slot index. */
-    Location calculateSlotLocation(Location outLocation, int slotNumber);
+    public abstract Vec3 calculateSlotLocation(Vec3 out, int slot);
 
     /**
      * Returns true if the pattern can support the given number of slots
      * @param slotCount the number of slots
      * @return {@code true} if this pattern can support the given number of slots; {@code false} othervwise.
      */
-    boolean supportsSlots(int slotCount);
+    public boolean supportsSlots(int slotCount){
+        return true;
+    }
 }
