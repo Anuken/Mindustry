@@ -9,9 +9,8 @@ import mindustry.ai.ai.utils.*;
  * @author davebaol
  */
 public class Seek extends SteeringBehavior{
-
     /** The target to seek */
-    protected Location target;
+    public Location target;
 
     /**
      * Creates a {@code Seek} behavior for the specified owner.
@@ -43,45 +42,4 @@ public class Seek extends SteeringBehavior{
         // Output steering acceleration
         return steering;
     }
-
-    /** Returns the target to seek. */
-    public Location getTarget(){
-        return target;
-    }
-
-    /**
-     * Sets the target to seek.
-     * @return this behavior for chaining.
-     */
-    public Seek setTarget(Location target){
-        this.target = target;
-        return this;
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public Seek setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public Seek setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public Seek setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
-    }
-
 }

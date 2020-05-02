@@ -108,7 +108,7 @@ public class FieldOfViewProximity extends ProximityBase{
                         // If the current agent is within the field of view of the owner,
                         // report it to the callback and tag it for further consideration.
                         if(ownerOrientation.dot(toAgent) > coneThreshold){
-                            if(callback.reportNeighbor(currentAgent)){
+                            if(callback.report(currentAgent)){
                                 currentAgent.setTagged(true);
                                 neighborCount++;
                                 continue;
@@ -128,7 +128,7 @@ public class FieldOfViewProximity extends ProximityBase{
                 // it's tagged.
                 if(currentAgent != owner && currentAgent.isTagged()){
 
-                    if(callback.reportNeighbor(currentAgent)){
+                    if(callback.report(currentAgent)){
                         neighborCount++;
                     }
                 }

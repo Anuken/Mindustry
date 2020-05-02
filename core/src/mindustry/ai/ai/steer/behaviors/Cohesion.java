@@ -48,35 +48,9 @@ public class Cohesion extends GroupBehavior implements ProximityCallback{
     }
 
     @Override
-    public boolean reportNeighbor(Steerable neighbor){
+    public boolean report(Steerable neighbor){
         // Accumulate neighbor position
         centerOfMass.add(neighbor.getPosition());
         return true;
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public Cohesion setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public Cohesion setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public Cohesion setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
     }
 }

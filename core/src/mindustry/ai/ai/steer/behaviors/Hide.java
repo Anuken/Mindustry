@@ -38,12 +38,10 @@ import mindustry.ai.ai.utils.*;
  * @author davebaol
  */
 public class Hide extends Arrive implements ProximityCallback{
-
     /** The proximity to find nearby obstacles. */
-    protected Proximity proximity;
-
+    public Proximity proximity;
     /** The distance from the boundary of the obstacle behind which to hide. */
-    protected float distanceFromBoundary;
+    public float distanceFromBoundary;
 
     private Vec2 toObstacle;
     private Vec2 bestHidingSpot;
@@ -94,7 +92,7 @@ public class Hide extends Arrive implements ProximityCallback{
     }
 
     @Override
-    public boolean reportNeighbor(Steerable neighbor){
+    public boolean report(Steerable neighbor){
         // Calculate the position of the hiding spot for this obstacle
         Vec2 hidingSpot = getHidingPosition(neighbor.getPosition(), neighbor.getBoundingRadius(), target.getPosition());
 
@@ -108,36 +106,6 @@ public class Hide extends Arrive implements ProximityCallback{
         }
 
         return false;
-    }
-
-    /** Returns the proximity used to find nearby obstacles. */
-    public Proximity getProximity(){
-        return proximity;
-    }
-
-    /**
-     * Sets the proximity used to find nearby obstacles.
-     * @param proximity the proximity to set
-     * @return this behavior for chaining.
-     */
-    public Hide setProximity(Proximity proximity){
-        this.proximity = proximity;
-        return this;
-    }
-
-    /** Returns the distance from the boundary of the obstacle behind which to hide. */
-    public float getDistanceFromBoundary(){
-        return distanceFromBoundary;
-    }
-
-    /**
-     * Sets the distance from the boundary of the obstacle behind which to hide.
-     * @param distanceFromBoundary the distance to set
-     * @return this behavior for chaining.
-     */
-    public Hide setDistanceFromBoundary(float distanceFromBoundary){
-        this.distanceFromBoundary = distanceFromBoundary;
-        return this;
     }
 
     /**
@@ -158,52 +126,6 @@ public class Hide extends Arrive implements ProximityCallback{
         // Scale it to size and add to the obstacle's position to get
         // the hiding spot.
         return toObstacle.scl(distanceAway).add(obstaclePosition);
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public Hide setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public Hide setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    @Override
-    public Hide setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
-    }
-
-    @Override
-    public Hide setTarget(Location target){
-        this.target = target;
-        return this;
-    }
-
-    @Override
-    public Hide setArrivalTolerance(float arrivalTolerance){
-        this.arrivalTolerance = arrivalTolerance;
-        return this;
-    }
-
-    @Override
-    public Hide setDecelerationRadius(float decelerationRadius){
-        this.decelerationRadius = decelerationRadius;
-        return this;
-    }
-
-    @Override
-    public Hide setTimeToTarget(float timeToTarget){
-        this.timeToTarget = timeToTarget;
-        return this;
     }
 
 }

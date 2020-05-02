@@ -1,7 +1,6 @@
 package mindustry.ai.ai.steer.behaviors;
 
 import mindustry.ai.ai.steer.*;
-import mindustry.ai.ai.utils.*;
 
 /**
  * The entire steering framework assumes that the direction a character is facing does not have to be its direction of motion. In
@@ -38,62 +37,6 @@ public class LookWhereYouAreGoing extends ReachOrientation{
 
         // Delegate to ReachOrientation
         return reachOrientation(steering, orientation);
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public LookWhereYouAreGoing setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public LookWhereYouAreGoing setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum angular speed and
-     * acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public LookWhereYouAreGoing setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
-    }
-
-    /**
-     * Sets the target to align to. Notice that this method is inherited from {@link ReachOrientation}, but is completely useless
-     * for {@code LookWhereYouAreGoing} because the target orientation is determined by the velocity of the owner itself.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public LookWhereYouAreGoing setTarget(Location target){
-        this.target = target;
-        return this;
-    }
-
-    @Override
-    public LookWhereYouAreGoing setAlignTolerance(float alignTolerance){
-        this.alignTolerance = alignTolerance;
-        return this;
-    }
-
-    @Override
-    public LookWhereYouAreGoing setDecelerationRadius(float decelerationRadius){
-        this.decelerationRadius = decelerationRadius;
-        return this;
-    }
-
-    @Override
-    public LookWhereYouAreGoing setTimeToTarget(float timeToTarget){
-        this.timeToTarget = timeToTarget;
-        return this;
     }
 
 }

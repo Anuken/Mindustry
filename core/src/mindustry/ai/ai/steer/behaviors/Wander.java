@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import mindustry.ai.ai.steer.*;
 import mindustry.ai.ai.utils.*;
-import mindustry.ai.ai.utils.Timepiece;
 
 /**
  * {@code Wander} behavior is designed to produce a steering acceleration that will give the impression of a random walk through
@@ -42,27 +41,21 @@ import mindustry.ai.ai.utils.Timepiece;
  * @author davebaol
  */
 public class Wander extends Face{
-
     /** The forward offset of the wander circle */
-    protected float wanderOffset;
-
+    public float wanderOffset;
     /** The radius of the wander circle */
-    protected float wanderRadius;
-
+    public float wanderRadius;
     /** The rate, expressed in radian per second, at which the wander orientation can change */
-    protected float wanderRate;
-
+    public float wanderRate;
     /** The last time the orientation of the wander target has been updated */
-    protected float lastTime;
-
+    public float lastTime;
     /** The current orientation of the wander target */
-    protected float wanderOrientation;
-
+    public float wanderOrientation;
     /**
      * The flag indicating whether to use {@link Face} behavior or not. This should be set to {@code true} when independent facing
      * is used.
      */
-    protected boolean faceEnabled;
+    public boolean faceEnabled;
 
     private Vec2 internalTargetPosition;
     private Vec2 wanderCenter;
@@ -118,142 +111,4 @@ public class Wander extends Face{
 
         return steering;
     }
-
-    /** Returns the forward offset of the wander circle. */
-    public float getWanderOffset(){
-        return wanderOffset;
-    }
-
-    /**
-     * Sets the forward offset of the wander circle.
-     * @return this behavior for chaining.
-     */
-    public Wander setWanderOffset(float wanderOffset){
-        this.wanderOffset = wanderOffset;
-        return this;
-    }
-
-    /** Returns the radius of the wander circle. */
-    public float getWanderRadius(){
-        return wanderRadius;
-    }
-
-    /**
-     * Sets the radius of the wander circle.
-     * @return this behavior for chaining.
-     */
-    public Wander setWanderRadius(float wanderRadius){
-        this.wanderRadius = wanderRadius;
-        return this;
-    }
-
-    /** Returns the rate, expressed in radian per second, at which the wander orientation can change. */
-    public float getWanderRate(){
-        return wanderRate;
-    }
-
-    /**
-     * Sets the rate, expressed in radian per second, at which the wander orientation can change.
-     * @return this behavior for chaining.
-     */
-    public Wander setWanderRate(float wanderRate){
-        this.wanderRate = wanderRate;
-        return this;
-    }
-
-    /** Returns the current orientation of the wander target. */
-    public float getWanderOrientation(){
-        return wanderOrientation;
-    }
-
-    /**
-     * Sets the current orientation of the wander target.
-     * @return this behavior for chaining.
-     */
-    public Wander setWanderOrientation(float wanderOrientation){
-        this.wanderOrientation = wanderOrientation;
-        return this;
-    }
-
-    /** Returns the flag indicating whether to use {@link Face} behavior or not. */
-    public boolean isFaceEnabled(){
-        return faceEnabled;
-    }
-
-    /**
-     * Sets the flag indicating whether to use {@link Face} behavior or not. This should be set to {@code true} when independent
-     * facing is used.
-     * @return this behavior for chaining.
-     */
-    public Wander setFaceEnabled(boolean faceEnabled){
-        this.faceEnabled = faceEnabled;
-        return this;
-    }
-
-    /** Returns the current position of the wander target. This method is useful for debug purpose. */
-    public Vec2 getInternalTargetPosition(){
-        return internalTargetPosition;
-    }
-
-    /** Returns the current center of the wander circle. This method is useful for debug purpose. */
-    public Vec2 getWanderCenter(){
-        return wanderCenter;
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public Wander setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public Wander setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear acceleration;
-     * additionally, if the flag {@code faceEnabled} is true, it must take care of the maximum angular speed and acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public Wander setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
-    }
-
-    /**
-     * Sets the target to align to. Notice that this method is inherited from {@link ReachOrientation}, but is completely useless
-     * for {@code Wander} because owner's orientation is determined by the internal target, which is moving on the wander circle.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public Wander setTarget(Location target){
-        this.target = target;
-        return this;
-    }
-
-    @Override
-    public Wander setAlignTolerance(float alignTolerance){
-        this.alignTolerance = alignTolerance;
-        return this;
-    }
-
-    @Override
-    public Wander setDecelerationRadius(float decelerationRadius){
-        this.decelerationRadius = decelerationRadius;
-        return this;
-    }
-
-    @Override
-    public Wander setTimeToTarget(float timeToTarget){
-        this.timeToTarget = timeToTarget;
-        return this;
-    }
-
 }

@@ -35,7 +35,7 @@ public abstract class FormationMotionModerator{
         float centerOfMassOrientation = 0;
 
         // Make sure tempLocation is instantiated
-        if(tempLocation == null) tempLocation = centerOfMass.newLocation();
+        if(tempLocation == null) tempLocation = new VecLocation();
 
         Vec2 centerOfMassPos = centerOfMass.getPosition();
         Vec2 tempLocationPos = tempLocation.getPosition();

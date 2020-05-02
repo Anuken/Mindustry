@@ -4,7 +4,6 @@ import arc.math.geom.*;
 import mindustry.ai.ai.steer.*;
 import mindustry.ai.ai.steer.utils.Path;
 import mindustry.ai.ai.steer.utils.Path.*;
-import mindustry.ai.ai.utils.*;
 
 /**
  * {@code FollowPath} behavior produces a linear acceleration that moves the agent along the given path. First it calculates the
@@ -22,21 +21,16 @@ import mindustry.ai.ai.utils.*;
  * @author davebaol
  */
 public class FollowPath<P extends PathParam> extends Arrive{
-
     /** The path to follow */
-    protected Path<P> path;
-
+    public Path<P> path;
     /** The distance along the path to generate the target. Can be negative if the owner has to move along the reverse direction. */
-    protected float pathOffset;
-
+    public float pathOffset;
     /** The current position on the path */
-    protected P pathParam;
-
+    public P pathParam;
     /** The flag indicating whether to use {@link Arrive} behavior to approach the end of an open path. It defaults to {@code true}. */
-    protected boolean arriveEnabled;
-
+    public boolean arriveEnabled;
     /** The time in the future to predict the owner's position. Set it to 0 for non-predictive path following. */
-    protected float predictionTime;
+    public float predictionTime;
 
     private Vec2 internalTargetPosition;
 
@@ -122,126 +116,9 @@ public class FollowPath<P extends PathParam> extends Arrive{
         return steering;
     }
 
-    /** Returns the path to follow */
-    public Path<P> getPath(){
-        return path;
-    }
-
-    /**
-     * Sets the path followed by this behavior.
-     * @param path the path to set
-     * @return this behavior for chaining.
-     */
-    public FollowPath<P> setPath(Path<P> path){
-        this.path = path;
-        return this;
-    }
-
-    /** Returns the path offset. */
-    public float getPathOffset(){
-        return pathOffset;
-    }
-
-    /** Returns the flag indicating whether to use {@link Arrive} behavior to approach the end of an open path. */
-    public boolean isArriveEnabled(){
-        return arriveEnabled;
-    }
-
-    /** Returns the prediction time. */
-    public float getPredictionTime(){
-        return predictionTime;
-    }
-
-    /**
-     * Sets the prediction time. Set it to 0 for non-predictive path following.
-     * @param predictionTime the predictionTime to set
-     * @return this behavior for chaining.
-     */
-    public FollowPath<P> setPredictionTime(float predictionTime){
-        this.predictionTime = predictionTime;
-        return this;
-    }
-
-    /**
-     * Sets the flag indicating whether to use {@link Arrive} behavior to approach the end of an open path. It defaults to
-     * {@code true}.
-     * @param arriveEnabled the flag value to set
-     * @return this behavior for chaining.
-     */
-    public FollowPath<P> setArriveEnabled(boolean arriveEnabled){
-        this.arriveEnabled = arriveEnabled;
-        return this;
-    }
-
-    /**
-     * Sets the path offset to generate the target. Can be negative if the owner has to move along the reverse direction.
-     * @param pathOffset the pathOffset to set
-     * @return this behavior for chaining.
-     */
-    public FollowPath<P> setPathOffset(float pathOffset){
-        this.pathOffset = pathOffset;
-        return this;
-    }
-
-    /** Returns the current path parameter. */
-    public P getPathParam(){
-        return pathParam;
-    }
-
     /** Returns the current position of the internal target. This method is useful for debug purpose. */
     public Vec2 getInternalTargetPosition(){
         return internalTargetPosition;
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public FollowPath<P> setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public FollowPath<P> setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear speed and
-     * acceleration. However the maximum linear speed is not required for a closed path.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public FollowPath<P> setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
-    }
-
-    @Override
-    public FollowPath<P> setTarget(Location target){
-        this.target = target;
-        return this;
-    }
-
-    @Override
-    public FollowPath<P> setArrivalTolerance(float arrivalTolerance){
-        this.arrivalTolerance = arrivalTolerance;
-        return this;
-    }
-
-    @Override
-    public FollowPath<P> setDecelerationRadius(float decelerationRadius){
-        this.decelerationRadius = decelerationRadius;
-        return this;
-    }
-
-    @Override
-    public FollowPath<P> setTimeToTarget(float timeToTarget){
-        this.timeToTarget = timeToTarget;
-        return this;
     }
 
 }

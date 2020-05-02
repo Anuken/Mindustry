@@ -8,12 +8,10 @@ import mindustry.ai.ai.steer.*;
  * @author davebaol
  */
 public class MatchVelocity extends SteeringBehavior{
-
     /** The target of this behavior */
-    protected Steerable target;
-
+    public Steerable target;
     /** The time over which to achieve target speed */
-    protected float timeToTarget;
+    public float timeToTarget;
 
     /**
      * Creates a {@code MatchVelocity} behavior for the given owner. No target is set. The maxLinearAcceleration is set to 100. The
@@ -57,61 +55,4 @@ public class MatchVelocity extends SteeringBehavior{
         // Output steering acceleration
         return steering;
     }
-
-    /** Returns the target whose velocity should be matched. */
-    public Steerable getTarget(){
-        return target;
-    }
-
-    /**
-     * Sets the target whose velocity should be matched.
-     * @param target the target to set
-     * @return this behavior for chaining.
-     */
-    public MatchVelocity setTarget(Steerable target){
-        this.target = target;
-        return this;
-    }
-
-    /** Returns the time over which to achieve target speed. */
-    public float getTimeToTarget(){
-        return timeToTarget;
-    }
-
-    /**
-     * Sets the time over which to achieve target speed.
-     * @param timeToTarget the time to set
-     * @return this behavior for chaining.
-     */
-    public MatchVelocity setTimeToTarget(float timeToTarget){
-        this.timeToTarget = timeToTarget;
-        return this;
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public MatchVelocity setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public MatchVelocity setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public MatchVelocity setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
-    }
-
 }

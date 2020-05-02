@@ -48,15 +48,12 @@ import mindustry.ai.ai.utils.*;
  * @author davebaol
  */
 public class RaycastObstacleAvoidance extends SteeringBehavior{
-
     /** The inputRay configuration */
-    protected RayConfiguration rayConfiguration;
-
+    public RayConfiguration rayConfiguration;
     /** The collision detector */
-    protected RaycastCollisionDetector raycastCollisionDetector;
-
+    public RaycastCollisionDetector raycastCollisionDetector;
     /** The minimum distance to a wall, i.e. how far to avoid collision. */
-    protected float distanceFromBoundary;
+    public float distanceFromBoundary;
 
     private Collision outputCollision;
     private Collision minOutputCollision;
@@ -145,77 +142,6 @@ public class RaycastObstacleAvoidance extends SteeringBehavior{
 
         // Output steering acceleration
         return steering;
-    }
-
-    /** Returns the ray configuration of this behavior. */
-    public RayConfiguration getRayConfiguration(){
-        return rayConfiguration;
-    }
-
-    /**
-     * Sets the ray configuration of this behavior.
-     * @param rayConfiguration the ray configuration to set
-     * @return this behavior for chaining.
-     */
-    public RaycastObstacleAvoidance setRayConfiguration(RayConfiguration rayConfiguration){
-        this.rayConfiguration = rayConfiguration;
-        return this;
-    }
-
-    /** Returns the raycast collision detector of this behavior. */
-    public RaycastCollisionDetector getRaycastCollisionDetector(){
-        return raycastCollisionDetector;
-    }
-
-    /**
-     * Sets the raycast collision detector of this behavior.
-     * @param raycastCollisionDetector the raycast collision detector to set
-     * @return this behavior for chaining.
-     */
-    public RaycastObstacleAvoidance setRaycastCollisionDetector(RaycastCollisionDetector raycastCollisionDetector){
-        this.raycastCollisionDetector = raycastCollisionDetector;
-        return this;
-    }
-
-    /** Returns the distance from boundary, i.e. the minimum distance to an obstacle. */
-    public float getDistanceFromBoundary(){
-        return distanceFromBoundary;
-    }
-
-    /**
-     * Sets the distance from boundary, i.e. the minimum distance to an obstacle.
-     * @param distanceFromBoundary the distanceFromBoundary to set
-     * @return this behavior for chaining.
-     */
-    public RaycastObstacleAvoidance setDistanceFromBoundary(float distanceFromBoundary){
-        this.distanceFromBoundary = distanceFromBoundary;
-        return this;
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public RaycastObstacleAvoidance setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public RaycastObstacleAvoidance setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public RaycastObstacleAvoidance setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
     }
 
 }

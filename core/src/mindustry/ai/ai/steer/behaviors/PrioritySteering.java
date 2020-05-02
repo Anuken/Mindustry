@@ -39,18 +39,15 @@ import mindustry.ai.ai.steer.*;
  * @author davebaol
  */
 public class PrioritySteering extends SteeringBehavior{
-
     /** The threshold of the steering acceleration magnitude below which a steering behavior is considered to have given no output. */
-    protected float epsilon;
-
+    public float epsilon;
     /**
      * The list of steering behaviors in priority order. The first item in the list is tried first, the subsequent entries are only
      * considered if the first one does not return a result.
      */
-    protected Array<SteeringBehavior> behaviors = new Array<>();
-
+    public Array<SteeringBehavior> behaviors = new Array<>();
     /** The index of the behavior whose acceleration has been returned by the last evaluation of this priority steering. */
-    protected int selectedBehaviorIndex;
+    public int selectedBehaviorIndex;
 
     /**
      * Creates a {@code PrioritySteering} behavior for the specified owner. The threshold is set to 0.001.
@@ -107,57 +104,4 @@ public class PrioritySteering extends SteeringBehavior{
         return n > 0 ? steering : steering.setZero();
     }
 
-    /**
-     * Returns the index of the behavior whose acceleration has been returned by the last evaluation of this priority steering; -1
-     * otherwise.
-     */
-    public int getSelectedBehaviorIndex(){
-        return selectedBehaviorIndex;
-    }
-
-    /**
-     * Returns the threshold of the steering acceleration magnitude below which a steering behavior is considered to have given no
-     * output.
-     */
-    public float getEpsilon(){
-        return epsilon;
-    }
-
-    /**
-     * Sets the threshold of the steering acceleration magnitude below which a steering behavior is considered to have given no
-     * output.
-     * @param epsilon the epsilon to set
-     * @return this behavior for chaining.
-     */
-    public PrioritySteering setEpsilon(float epsilon){
-        this.epsilon = epsilon;
-        return this;
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public PrioritySteering setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public PrioritySteering setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. However, {@code PrioritySteering} needs no limiter at all as it simply returns
-     * the first non zero steering acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public PrioritySteering setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
-    }
 }

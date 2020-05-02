@@ -2,7 +2,6 @@ package mindustry.ai.ai.steer.behaviors;
 
 import arc.math.geom.*;
 import mindustry.ai.ai.steer.*;
-import mindustry.ai.ai.utils.*;
 
 /**
  * {@code Interpose} behavior produces a steering force that moves the owner to a point along the imaginary line connecting two
@@ -24,10 +23,9 @@ import mindustry.ai.ai.utils.*;
  * @author davebaol
  */
 public class Interpose extends Arrive{
-
-    protected Steerable agentA;
-    protected Steerable agentB;
-    protected float interpositionRatio;
+    public Steerable agentA;
+    public Steerable agentB;
+    public float interpositionRatio;
 
     private Vec2 internalTargetPosition;
 
@@ -56,50 +54,6 @@ public class Interpose extends Arrive{
         this.interpositionRatio = interpositionRatio;
 
         this.internalTargetPosition = newVector(owner);
-    }
-
-    /** Returns the first agent. */
-    public Steerable getAgentA(){
-        return agentA;
-    }
-
-    /**
-     * Sets the first agent.
-     * @return this behavior for chaining.
-     */
-    public Interpose setAgentA(Steerable agentA){
-        this.agentA = agentA;
-        return this;
-    }
-
-    /** Returns the second agent. */
-    public Steerable getAgentB(){
-        return agentB;
-    }
-
-    /**
-     * Sets the second agent.
-     * @return this behavior for chaining.
-     */
-    public Interpose setAgentB(Steerable agentB){
-        this.agentB = agentB;
-        return this;
-    }
-
-    /** Returns the interposition ratio. */
-    public float getInterpositionRatio(){
-        return interpositionRatio;
-    }
-
-    /**
-     * Sets the interposition ratio.
-     * @param interpositionRatio a number between 0 and 1 indicating the percentage of the distance between the 2 agents that the
-     * owner should reach. Especially, 0 is the position of agentA and 1 is the position of agentB.
-     * @return this behavior for chaining.
-     */
-    public Interpose setInterpositionRatio(float interpositionRatio){
-        this.interpositionRatio = interpositionRatio;
-        return this;
     }
 
     @Override
@@ -132,51 +86,4 @@ public class Interpose extends Arrive{
     public Vec2 getInternalTargetPosition(){
         return internalTargetPosition;
     }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public Interpose setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public Interpose setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    @Override
-    public Interpose setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
-    }
-
-    @Override
-    public Interpose setTarget(Location target){
-        this.target = target;
-        return this;
-    }
-
-    @Override
-    public Interpose setArrivalTolerance(float arrivalTolerance){
-        this.arrivalTolerance = arrivalTolerance;
-        return this;
-    }
-
-    @Override
-    public Interpose setDecelerationRadius(float decelerationRadius){
-        this.decelerationRadius = decelerationRadius;
-        return this;
-    }
-
-    @Override
-    public Interpose setTimeToTarget(float timeToTarget){
-        this.timeToTarget = timeToTarget;
-        return this;
-    }
-
 }

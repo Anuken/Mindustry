@@ -22,21 +22,17 @@ import mindustry.ai.ai.utils.*;
  * @author davebaol
  */
 public class Arrive extends SteeringBehavior{
-
     /** The target to arrive to. */
-    protected Location target;
-
+    public Location target;
     /**
      * The tolerance for arriving at the target. It lets the owner get near enough to the target without letting small errors keep
      * it in motion.
      */
-    protected float arrivalTolerance;
-
+    public float arrivalTolerance;
     /** The radius for beginning to slow down */
-    protected float decelerationRadius;
-
+    public float decelerationRadius;
     /** The time over which to achieve target speed */
-    protected float timeToTarget = 0.1f;
+    public float timeToTarget = 0.1f;
 
     /**
      * Creates an {@code Arrive} behavior for the specified owner.
@@ -89,92 +85,4 @@ public class Arrive extends SteeringBehavior{
         // Output the steering
         return steering;
     }
-
-    /** Returns the target to arrive to. */
-    public Location getTarget(){
-        return target;
-    }
-
-    /**
-     * Sets the target to arrive to.
-     * @return this behavior for chaining.
-     */
-    public Arrive setTarget(Location target){
-        this.target = target;
-        return this;
-    }
-
-    /**
-     * Returns the tolerance for arriving at the target. It lets the owner get near enough to the target without letting small
-     * errors keep it in motion.
-     */
-    public float getArrivalTolerance(){
-        return arrivalTolerance;
-    }
-
-    /**
-     * Sets the tolerance for arriving at the target. It lets the owner get near enough to the target without letting small errors
-     * keep it in motion.
-     * @return this behavior for chaining.
-     */
-    public Arrive setArrivalTolerance(float arrivalTolerance){
-        this.arrivalTolerance = arrivalTolerance;
-        return this;
-    }
-
-    /** Returns the radius for beginning to slow down. */
-    public float getDecelerationRadius(){
-        return decelerationRadius;
-    }
-
-    /**
-     * Sets the radius for beginning to slow down.
-     * @return this behavior for chaining.
-     */
-    public Arrive setDecelerationRadius(float decelerationRadius){
-        this.decelerationRadius = decelerationRadius;
-        return this;
-    }
-
-    /** Returns the time over which to achieve target speed. */
-    public float getTimeToTarget(){
-        return timeToTarget;
-    }
-
-    /**
-     * Sets the time over which to achieve target speed.
-     * @return this behavior for chaining.
-     */
-    public Arrive setTimeToTarget(float timeToTarget){
-        this.timeToTarget = timeToTarget;
-        return this;
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public Arrive setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public Arrive setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear speed and
-     * acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public Arrive setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
-    }
-
 }

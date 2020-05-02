@@ -35,36 +35,4 @@ public class Evade extends Pursue{
         return -getActualLimiter().getMaxLinearAcceleration();
     }
 
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public Evade setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public Evade setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public Evade setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
-    }
-
-    @Override
-    public Evade setTarget(Steerable target){
-        this.target = target;
-        return this;
-    }
-
 }

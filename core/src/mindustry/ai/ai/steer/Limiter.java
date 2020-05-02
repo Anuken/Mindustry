@@ -10,35 +10,27 @@ public interface Limiter{
      * Returns the threshold below which the linear speed can be considered zero. It must be a small positive value near to zero.
      * Usually it is used to avoid updating the orientation when the velocity vector has a negligible length.
      */
-    float getZeroLinearSpeedThreshold();
-
-    /**
-     * Sets the threshold below which the linear speed can be considered zero. It must be a small positive value near to zero.
-     * Usually it is used to avoid updating the orientation when the velocity vector has a negligible length.
-     */
-    void setZeroLinearSpeedThreshold(float value);
+    default float getZeroLinearSpeedThreshold(){
+        return 0.001f;
+    }
 
     /** Returns the maximum linear speed. */
-    float getMaxLinearSpeed();
-
-    /** Sets the maximum linear speed. */
-    void setMaxLinearSpeed(float maxLinearSpeed);
+    default float getMaxLinearSpeed(){
+        return Float.MAX_VALUE;
+    }
 
     /** Returns the maximum linear acceleration. */
-    float getMaxLinearAcceleration();
-
-    /** Sets the maximum linear acceleration. */
-    void setMaxLinearAcceleration(float maxLinearAcceleration);
+    default float getMaxLinearAcceleration(){
+        return Float.MAX_VALUE;
+    }
 
     /** Returns the maximum angular speed. */
-    float getMaxAngularSpeed();
-
-    /** Sets the maximum angular speed. */
-    void setMaxAngularSpeed(float maxAngularSpeed);
+    default float getMaxAngularSpeed(){
+        return Float.MAX_VALUE;
+    }
 
     /** Returns the maximum angular acceleration. */
-    float getMaxAngularAcceleration();
-
-    /** Sets the maximum angular acceleration. */
-    void setMaxAngularAcceleration(float maxAngularAcceleration);
+    default float getMaxAngularAcceleration(){
+        return Float.MAX_VALUE;
+    }
 }

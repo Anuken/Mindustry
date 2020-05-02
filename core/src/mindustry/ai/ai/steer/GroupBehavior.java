@@ -9,7 +9,6 @@ import mindustry.ai.ai.steer.Proximity.*;
  * @author davebaol
  */
 public abstract class GroupBehavior extends SteeringBehavior{
-
     /** The proximity decides which agents are considered neighbors. */
     protected Proximity proximity;
 

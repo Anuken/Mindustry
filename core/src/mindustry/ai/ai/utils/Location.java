@@ -1,6 +1,7 @@
 package mindustry.ai.ai.utils;
 
 
+import arc.math.*;
 import arc.math.geom.*;
 
 /**
@@ -28,7 +29,9 @@ public interface Location{
      * Returns the angle in radians pointing along the specified vector.
      * @param vector the vector
      */
-    float vectorToAngle(Vec2 vector);
+    default float vectorToAngle(Vec2 vector){
+        return Mathf.atan2(-vector.x, vector.y);
+    }
 
     /**
      * Returns the unit vector in the direction of the specified angle expressed in radians.
@@ -36,14 +39,7 @@ public interface Location{
      * @param angle the angle in radians.
      * @return the output vector for chaining.
      */
-    Vec2 angleToVector(Vec2 outVector, float angle);
-
-    /**
-     * Creates a new location.
-     * <p>
-     * This method is used internally to instantiate locations of the correct type parameter {@code T}. This technique keeps the API
-     * simple and makes the API easier to use with the GWVec2 backend because avoids the use of reflection.
-     * @return the newly created location.
-     */
-    Location newLocation();
+    default Vec2 angleToVector(Vec2 outVector, float angle){
+        return outVector.set(-Mathf.sin(angle), Mathf.cos(angle));
+    }
 }

@@ -233,55 +233,6 @@ public class Jump extends MatchVelocity{
         return this;
     }
 
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public Jump setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public Jump setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear acceleration and
-     * speed.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public Jump setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
-    }
-
-    /**
-     * Sets the target whose velocity should be matched. Notice that this method is inherited from {@link MatchVelocity}. Usually
-     * with {@code Jump} you should never call it because a specialized internal target has already been created implicitly.
-     * @param target the target to set
-     * @return this behavior for chaining.
-     */
-    @Override
-    public Jump setTarget(Steerable target){
-        this.target = target;
-        return this;
-    }
-
-    @Override
-    public Jump setTimeToTarget(float timeToTarget){
-        this.timeToTarget = timeToTarget;
-        return this;
-    }
-
-    //
-    // Nested classes and interfaces
-    //
-
     private static class JumpTarget extends SteerableAdapter{
 
         Vec2 position;

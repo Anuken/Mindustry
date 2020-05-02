@@ -15,7 +15,6 @@ import mindustry.ai.ai.steer.Proximity.*;
  * @author davebaol
  */
 public class Alignment extends GroupBehavior implements ProximityCallback{
-
     private Vec2 averageVelocity;
 
     /**
@@ -48,36 +47,9 @@ public class Alignment extends GroupBehavior implements ProximityCallback{
     }
 
     @Override
-    public boolean reportNeighbor(Steerable neighbor){
+    public boolean report(Steerable neighbor){
         // Accumulate neighbor velocity
         averageVelocity.add(neighbor.getLinearVelocity());
         return true;
     }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public Alignment setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public Alignment setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public Alignment setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
-    }
-
 }

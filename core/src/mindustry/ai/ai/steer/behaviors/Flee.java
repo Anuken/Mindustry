@@ -40,36 +40,4 @@ public class Flee extends Seek{
         return steering;
     }
 
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public Flee setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public Flee setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public Flee setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
-    }
-
-    @Override
-    public Flee setTarget(Location target){
-        this.target = target;
-        return this;
-    }
-
 }

@@ -1,7 +1,6 @@
 package mindustry.ai.ai.steer;
 
 import arc.math.geom.*;
-import mindustry.ai.ai.utils.*;
 
 /**
  * An adapter class for {@link Steerable}. You can derive from this and only override what you are interested in. For example,
@@ -9,15 +8,6 @@ import mindustry.ai.ai.utils.*;
  * @author davebaol
  */
 public class SteerableAdapter implements Steerable{
-
-    @Override
-    public float getZeroLinearSpeedThreshold(){
-        return 0.001f;
-    }
-
-    @Override
-    public void setZeroLinearSpeedThreshold(float value){
-    }
 
     @Override
     public float getMaxLinearSpeed(){
@@ -91,21 +81,6 @@ public class SteerableAdapter implements Steerable{
 
     @Override
     public void setTagged(boolean tagged){
-    }
-
-    @Override
-    public Location newLocation(){
-        return null;
-    }
-
-    @Override
-    public float vectorToAngle(Vec2 vector){
-        return 0;
-    }
-
-    @Override
-    public Vec2 angleToVector(Vec2 outVector, float angle){
-        return null;
     }
 
 }

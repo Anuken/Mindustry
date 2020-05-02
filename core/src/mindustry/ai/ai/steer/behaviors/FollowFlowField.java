@@ -16,12 +16,10 @@ import mindustry.ai.ai.steer.*;
  * @author davebaol
  */
 public class FollowFlowField extends SteeringBehavior{
-
     /** The flow field to follow. */
-    protected FlowField flowField;
-
+    public FlowField flowField;
     /** The time in the future to predict the owner's position. Set it to 0 for non-predictive flow field following. */
-    protected float predictionTime;
+    public float predictionTime;
 
     /**
      * Creates a non-predictive {@code FollowFlowField} for the specified owner.
@@ -79,63 +77,6 @@ public class FollowFlowField extends SteeringBehavior{
 
         // Output steering
         return steering;
-    }
-
-    /** Returns the flow field of this behavior */
-    public FlowField getFlowField(){
-        return flowField;
-    }
-
-    /**
-     * Sets the flow field of this behavior
-     * @param flowField the flow field to set
-     * @return this behavior for chaining
-     */
-    public FollowFlowField setFlowField(FlowField flowField){
-        this.flowField = flowField;
-        return this;
-    }
-
-    /** Returns the prediction time. */
-    public float getPredictionTime(){
-        return predictionTime;
-    }
-
-    /**
-     * Sets the prediction time. Set it to 0 for non-predictive flow field following.
-     * @param predictionTime the predictionTime to set
-     * @return this behavior for chaining.
-     */
-    public FollowFlowField setPredictionTime(float predictionTime){
-        this.predictionTime = predictionTime;
-        return this;
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public FollowFlowField setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public FollowFlowField setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear speed and
-     * acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public FollowFlowField setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
     }
 
     /**

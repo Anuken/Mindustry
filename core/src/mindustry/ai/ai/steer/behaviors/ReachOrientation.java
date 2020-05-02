@@ -17,18 +17,14 @@ import mindustry.ai.ai.utils.*;
  * @author davebaol
  */
 public class ReachOrientation extends SteeringBehavior{
-
     /** The target to align to. */
-    protected Location target;
-
+    public Location target;
     /** The tolerance for aligning to the target without letting small errors keep the owner swinging. */
-    protected float alignTolerance;
-
+    public float alignTolerance;
     /** The radius for beginning to slow down */
-    protected float decelerationRadius;
-
+    public float decelerationRadius;
     /** The time over which to achieve target rotation speed */
-    protected float timeToTarget = 0.1f;
+    public float timeToTarget = 0.1f;
 
     /**
      * Creates a {@code ReachOrientation} behavior for the specified owner.
@@ -95,89 +91,6 @@ public class ReachOrientation extends SteeringBehavior{
 
         // Output the steering
         return steering;
-    }
-
-    /** Returns the target to align to. */
-    public Location getTarget(){
-        return target;
-    }
-
-    /**
-     * Sets the target to align to.
-     * @return this behavior for chaining.
-     */
-    public ReachOrientation setTarget(Location target){
-        this.target = target;
-        return this;
-    }
-
-    /** Returns the tolerance for aligning to the target without letting small errors keep the owner swinging. */
-    public float getAlignTolerance(){
-        return alignTolerance;
-    }
-
-    /**
-     * Sets the tolerance for aligning to the target without letting small errors keep the owner swinging.
-     * @return this behavior for chaining.
-     */
-    public ReachOrientation setAlignTolerance(float alignTolerance){
-        this.alignTolerance = alignTolerance;
-        return this;
-    }
-
-    /** Returns the radius for beginning to slow down */
-    public float getDecelerationRadius(){
-        return decelerationRadius;
-    }
-
-    /**
-     * Sets the radius for beginning to slow down
-     * @return this behavior for chaining.
-     */
-    public ReachOrientation setDecelerationRadius(float decelerationRadius){
-        this.decelerationRadius = decelerationRadius;
-        return this;
-    }
-
-    /** Returns the time over which to achieve target rotation speed */
-    public float getTimeToTarget(){
-        return timeToTarget;
-    }
-
-    /**
-     * Sets the time over which to achieve target rotation speed
-     * @return this behavior for chaining.
-     */
-    public ReachOrientation setTimeToTarget(float timeToTarget){
-        this.timeToTarget = timeToTarget;
-        return this;
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public ReachOrientation setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public ReachOrientation setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum angular speed and
-     * acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public ReachOrientation setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
     }
 
 }

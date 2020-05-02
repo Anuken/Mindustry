@@ -2,7 +2,6 @@ package mindustry.ai.ai.steer.behaviors;
 
 import arc.struct.*;
 import mindustry.ai.ai.steer.*;
-import mindustry.ai.ai.steer.limiters.*;
 
 /**
  * This combination behavior simply sums up all the behaviors, applies their weights, and truncates the result before returning.
@@ -27,7 +26,7 @@ import mindustry.ai.ai.steer.limiters.*;
 public class BlendedSteering extends SteeringBehavior{
 
     /** The list of behaviors and their corresponding blending weights. */
-    protected Array<BehaviorAndWeight> list;
+    protected Array<BehaviorAndWeight> list = new Array<>();
 
     private SteeringAcceleration steering;
 
@@ -118,33 +117,6 @@ public class BlendedSteering extends SteeringBehavior{
             blendedSteering.angular = actualLimiter.getMaxAngularAcceleration();
 
         return blendedSteering;
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public BlendedSteering setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public BlendedSteering setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear and angular
-     * accelerations. You can use {@link NullLimiter#NEUTRAL_LIMITER} to avoid all truncations.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public BlendedSteering setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
     }
 
     //

@@ -20,12 +20,10 @@ import mindustry.ai.ai.steer.*;
  * @author davebaol
  */
 public class Pursue extends SteeringBehavior{
-
     /** The target */
-    protected Steerable target;
-
+    public Steerable target;
     /** The maximum prediction time */
-    protected float maxPredictionTime;
+    public float maxPredictionTime;
 
     /**
      * Creates a {@code Pursue} behavior for the specified owner and target. Maximum prediction time defaults to 1 second.
@@ -85,60 +83,6 @@ public class Pursue extends SteeringBehavior{
 
         // Output steering acceleration
         return steering;
-    }
-
-    /** Returns the target. */
-    public Steerable getTarget(){
-        return target;
-    }
-
-    /**
-     * Sets the target.
-     * @return this behavior for chaining.
-     */
-    public Pursue setTarget(Steerable target){
-        this.target = target;
-        return this;
-    }
-
-    /** Returns the maximum prediction time. */
-    public float getMaxPredictionTime(){
-        return maxPredictionTime;
-    }
-
-    /**
-     * Sets the maximum prediction time.
-     * @return this behavior for chaining.
-     */
-    public Pursue setMaxPredictionTime(float maxPredictionTime){
-        this.maxPredictionTime = maxPredictionTime;
-        return this;
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public Pursue setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public Pursue setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public Pursue setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
     }
 
 }

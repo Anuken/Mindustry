@@ -24,7 +24,7 @@ public class InfiniteProximity extends ProximityBase{
         for(Steerable currentAgent : agents){
             // Make sure the agent being examined isn't the owner
             if(currentAgent != owner){
-                if(callback.reportNeighbor(currentAgent)){
+                if(callback.report(currentAgent)){
                     neighborCount++;
                 }
             }

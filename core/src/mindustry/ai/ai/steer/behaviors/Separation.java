@@ -12,12 +12,11 @@ import mindustry.ai.ai.steer.Proximity.*;
  * @author davebaol
  */
 public class Separation extends GroupBehavior implements ProximityCallback{
-
     /**
      * The constant coefficient of decay for the inverse square law force. It controls how fast the separation strength decays with
      * distance.
      */
-    float decayCoefficient = 1f;
+    public float decayCoefficient = 1f;
 
     private Vec2 toAgent;
     private Vec2 linear;
@@ -45,7 +44,7 @@ public class Separation extends GroupBehavior implements ProximityCallback{
     }
 
     @Override
-    public boolean reportNeighbor(Steerable neighbor){
+    public boolean report(Steerable neighbor){
 
         toAgent.set(owner.getPosition()).sub(neighbor.getPosition());
         float distanceSqr = toAgent.len2();
@@ -55,7 +54,7 @@ public class Separation extends GroupBehavior implements ProximityCallback{
         float maxAcceleration = getActualLimiter().getMaxLinearAcceleration();
 
         // Calculate the strength of repulsion through inverse square law decay
-        float strength = getDecayCoefficient() / distanceSqr;
+        float strength = decayCoefficient / distanceSqr;
         if(strength > maxAcceleration) strength = maxAcceleration;
 
         // Add the acceleration
@@ -63,46 +62,5 @@ public class Separation extends GroupBehavior implements ProximityCallback{
         linear.mulAdd(toAgent, strength / (float)Math.sqrt(distanceSqr));
 
         return true;
-    }
-
-    /** Returns the coefficient of decay for the inverse square law force. */
-    public float getDecayCoefficient(){
-        return decayCoefficient;
-    }
-
-    /**
-     * Sets the coefficient of decay for the inverse square law force. It controls how fast the separation strength decays with
-     * distance.
-     * @param decayCoefficient the coefficient of decay to set
-     */
-    public Separation setDecayCoefficient(float decayCoefficient){
-        this.decayCoefficient = decayCoefficient;
-        return this;
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public Separation setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public Separation setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public Separation setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
     }
 }

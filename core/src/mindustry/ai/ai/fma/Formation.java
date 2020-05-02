@@ -80,7 +80,7 @@ public class Formation{
         this.motionModerator = motionModerator;
 
         this.slotAssignments = new Array<>();
-        this.driftOffset = anchor.newLocation();
+        this.driftOffset = new VecLocation();
         this.positionOffset = anchor.getPosition().cpy();
     }
 

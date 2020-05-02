@@ -36,7 +36,7 @@ import mindustry.ai.ai.utils.Timepiece;
  * </li>
  * <li>If you want to make sure a Proximity doesn't use as a neighbor a given agent from the list, for example the evader or the
  * owner itself, you have to implement a callback that prevents it from being considered by returning {@code false} from the method
- * {@link ProximityCallback#reportNeighbor(Steerable) reportNeighbor}.</li>
+ * {@link ProximityCallback#report(Steerable) reportNeighbor}.</li>
  * <li>If there is some efficient way of pruning potential neighbors before they are processed, the overall performance in time
  * will improve. Spatial data structures such as multi-resolution maps, quad-trees, oct-trees, and binary space partition (BSP)
  * trees can be used to get potential neighbors more efficiently. Spatial partitioning techniques are crucial when you have to
@@ -55,7 +55,7 @@ public interface Proximity{
 
     /**
      * Finds the agents that are within the immediate area of the owner. Each of those agents is passed to the
-     * {@link ProximityCallback#reportNeighbor(Steerable) reportNeighbor} method of the specified callback.
+     * {@link ProximityCallback#report(Steerable) reportNeighbor} method of the specified callback.
      * @return the number of neighbors found.
      */
     int findNeighbors(ProximityCallback callback);
@@ -71,7 +71,7 @@ public interface Proximity{
          * @param neighbor the reported neighbor.
          * @return {@code true} if the given neighbor is valid; {@code false} otherwise.
          */
-        boolean reportNeighbor(Steerable neighbor);
+        boolean report(Steerable neighbor);
 
     }
 }

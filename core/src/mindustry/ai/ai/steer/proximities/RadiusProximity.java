@@ -19,7 +19,6 @@ import mindustry.ai.ai.utils.Timepiece;
  * @author davebaol
  */
 public class RadiusProximity extends ProximityBase{
-
     /** The radius of this proximity. */
     protected float radius;
 
@@ -73,7 +72,7 @@ public class RadiusProximity extends ProximityBase{
                     // If the current agent is within the range, report it to the callback
                     // and tag it for further consideration.
                     if(squareDistance < range * range){
-                        if(callback.reportNeighbor(currentAgent)){
+                        if(callback.report(currentAgent)){
                             currentAgent.setTagged(true);
                             neighborCount++;
                             continue;
@@ -91,7 +90,7 @@ public class RadiusProximity extends ProximityBase{
                 // it's tagged.
                 if(currentAgent != owner && currentAgent.isTagged()){
 
-                    if(callback.reportNeighbor(currentAgent)){
+                    if(callback.report(currentAgent)){
                         neighborCount++;
                     }
                 }

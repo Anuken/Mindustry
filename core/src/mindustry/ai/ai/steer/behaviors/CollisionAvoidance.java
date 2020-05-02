@@ -19,7 +19,6 @@ import mindustry.ai.ai.steer.Proximity.*;
  * @author davebaol
  */
 public class CollisionAvoidance extends GroupBehavior implements ProximityCallback{
-
     private float shortestTime;
     private Steerable firstNeighbor;
     private float firstMinSeparation;
@@ -83,7 +82,7 @@ public class CollisionAvoidance extends GroupBehavior implements ProximityCallba
     }
 
     @Override
-    public boolean reportNeighbor(Steerable neighbor){
+    public boolean report(Steerable neighbor){
         // Calculate the time to collision
         relativePosition.set(neighbor.getPosition()).sub(owner.getPosition());
         relativeVelocity.set(neighbor.getLinearVelocity()).sub(owner.getLinearVelocity());
@@ -115,32 +114,6 @@ public class CollisionAvoidance extends GroupBehavior implements ProximityCallba
         firstRelativeVelocity.set(relativeVelocity);
 
         return true;
-    }
-
-    //
-    // Setters overridden in order to fix the correct return type for chaining
-    //
-
-    @Override
-    public CollisionAvoidance setOwner(Steerable owner){
-        this.owner = owner;
-        return this;
-    }
-
-    @Override
-    public CollisionAvoidance setEnabled(boolean enabled){
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * Sets the limiter of this steering behavior. The given limiter must at least take care of the maximum linear acceleration.
-     * @return this behavior for chaining.
-     */
-    @Override
-    public CollisionAvoidance setLimiter(Limiter limiter){
-        this.limiter = limiter;
-        return this;
     }
 
 }
