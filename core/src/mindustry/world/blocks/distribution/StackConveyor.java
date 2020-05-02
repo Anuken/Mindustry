@@ -45,6 +45,8 @@ public class StackConveyor extends Block implements Autotiler{
 
     @Override
     public void load(){
+        super.load();
+        
         for(int i = 0; i < regions.length; i++){
             regions[i] = Core.atlas.find(name + "-" + i);
         }
