@@ -1,6 +1,7 @@
 package mindustry.world.blocks.liquid;
 
 import arc.*;
+import arc.graphics.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
