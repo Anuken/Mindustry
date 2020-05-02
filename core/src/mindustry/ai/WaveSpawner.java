@@ -87,7 +87,7 @@ public class WaveSpawner{
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam) && !state.teams.playerCores().isEmpty()){
             Tilec firstCore = state.teams.playerCores().first();
             for(Tilec core : state.rules.waveTeam.cores()){
-                Tmp.v1.set(firstCore).sub(core).limit(coreMargin + core.block().size*tilesize);
+                Tmp.v1.set(firstCore).sub(core).limit(coreMargin + core.block().size * tilesize);
                 cons.accept(core.x() + Tmp.v1.x, core.y() + Tmp.v1.y, false);
             }
         }
@@ -95,7 +95,7 @@ public class WaveSpawner{
 
     private void eachFlyerSpawn(Floatc2 cons){
         for(Tile tile : spawns){
-            float angle = Angles.angle(tile.x, tile.y, world.width()/2, world.height()/2);
+            float angle = Angles.angle(tile.x, tile.y, world.width() / 2, world.height() / 2);
 
             float trns = Math.max(world.width(), world.height()) * Mathf.sqrt2 * tilesize;
             float spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(angle, trns), -margin, world.width() * tilesize + margin);

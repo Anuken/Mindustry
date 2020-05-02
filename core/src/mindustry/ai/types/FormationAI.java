@@ -19,7 +19,7 @@ public class FormationAI extends AIController{
         if(control != null){
 
             unit.controlWeapons(control.isRotate(), control.isShooting());
-           // unit.moveAt(Tmp.v1.set(deltaX, deltaY).limit(unit.type().speed));
+            // unit.moveAt(Tmp.v1.set(deltaX, deltaY).limit(unit.type().speed));
             if(control.isShooting()){
                 unit.aimLook(control.aimX(), control.aimY());
             }else{
