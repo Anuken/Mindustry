@@ -17,7 +17,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType dagger;
     public static @EntityDef({Unitc.class, WaterMovec.class}) UnitType vanguard;
     public static @EntityDef({Unitc.class, Minerc.class}) UnitType draug;
-    public static @EntityDef({Unitc.class}) UnitType wraith;
+    public static @EntityDef({Unitc.class, Trailc.class}) UnitType wraith;
     public static @EntityDef({Unitc.class}) UnitType reaper;
     public static @EntityDef({Unitc.class}) UnitType spirit;
     public static @EntityDef({Unitc.class, Builderc.class}) UnitType phantom;
@@ -86,9 +86,9 @@ public class UnitTypes implements ContentList{
         }};
 
         reaper = new UnitType("reaper"){{
-            speed = 1f;
+            speed = 1.1f;
             accel = 0.08f;
-            drag = 0f;
+            drag = 0.05f;
             mass = 30f;
             flying = true;
             health = 75000;

@@ -49,9 +49,8 @@ public class PhysicsProcess implements AsyncProcess{
                 //add bodies to entities that have none
                 FixtureDef fd = new FixtureDef();
                 fd.shape = new CircleShape(entity.hitSize() / 2f);
-                //TODO does this scale well?
-                fd.density = 5f; //5.0f * entity.mass();
-                fd.restitution = 0.05f;
+                fd.density = 5f;
+                fd.restitution = 0.0f;
                 fd.filter.maskBits = fd.filter.categoryBits = (grounded ? ground : flying).maskBits;
 
                 def.position.set(entity);
@@ -93,6 +92,8 @@ public class PhysicsProcess implements AsyncProcess{
 
             //write velocity
             ref.body.setLinearVelocity(ref.velocity);
+
+            ref.lastVelocity.set(ref.velocity);
         }
 
         physics.step(Core.graphics.getDeltaTime(), 8, 8);
@@ -101,6 +102,8 @@ public class PhysicsProcess implements AsyncProcess{
         for(PhysicRef ref : refs){
             //get delta vector
             ref.delta.set(ref.body.getPosition()).sub(ref.lastPosition);
+
+            ref.velocity.set(ref.body.getLinearVelocity());
         }
     }
 
@@ -116,6 +119,8 @@ public class PhysicsProcess implements AsyncProcess{
 
             //save last position
             ref.position.set(entity);
+
+            entity.vel().add(ref.velocity).sub(ref.lastVelocity);
         }
     }
 
@@ -139,7 +144,7 @@ public class PhysicsProcess implements AsyncProcess{
         Physicsc entity;
         Body body;
         boolean wasGround = true;
-        Vec2 lastPosition = new Vec2(), delta = new Vec2(), velocity = new Vec2(), position = new Vec2();
+        Vec2 lastPosition = new Vec2(), delta = new Vec2(), velocity = new Vec2(), lastVelocity = new Vec2(), position = new Vec2();
 
         public PhysicRef(Physicsc entity, Body body){
             this.entity = entity;

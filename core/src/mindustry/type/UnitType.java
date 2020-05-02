@@ -189,6 +189,15 @@ public class UnitType extends UnlockableContent{
     public void drawEngine(Unitc unit){
         if(!unit.isFlying()) return;
 
+        if(unit instanceof Trailc){
+            Trail trail = ((Trailc)unit).trail();
+
+            float cx = unit.x() + Angles.trnsx(unit.rotation() + 180, engineOffset),
+            cy = unit.y() + Angles.trnsy(unit.rotation() + 180, engineOffset);
+            trail.update(cx, cy);
+            trail.draw(unit.team().color, (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * unit.elevation()));
+        }
+
         Draw.color(unit.team().color);
         Fill.circle(
             unit.x() + Angles.trnsx(unit.rotation() + 180, engineOffset),

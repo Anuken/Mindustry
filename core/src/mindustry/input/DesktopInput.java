@@ -542,7 +542,11 @@ public class DesktopInput extends InputHandler{
             unit.lookAt(mouseAngle);
         }else{
             if(!unit.vel().isZero(0.01f)){
-                unit.lookAt(unit.vel().angle());
+                if(unit.type().flying){
+                    unit.rotation(unit.vel().angle());
+                }else{
+                    unit.lookAt(unit.vel().angle());
+                }
             }
         }
 
