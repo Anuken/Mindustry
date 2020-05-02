@@ -186,7 +186,7 @@ public class DesktopInput extends InputHandler{
                 Fx.commandSend.at(player);
                 Units.nearby(player.team(), player.x(), player.y(), 200f, u -> {
                     if(u.isAI()){
-                        u.controller(new MimicAI(player.unit()));
+                        u.controller(new FormationAI(player.unit()));
                     }
                 });
             }
