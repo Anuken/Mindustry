@@ -1,6 +1,9 @@
 import com.badlogicgames.packr.Packr
 import com.badlogicgames.packr.PackrConfig
 
+import java.nio.ByteBuffer
+import java.security.MessageDigest
+
 apply plugin: "java"
 
 sourceCompatibility = 1.8
@@ -12,6 +15,27 @@ project.ext.assetsDir = new File("../core/assets")
 def enableTemplates = true
 def JDK_DIR = "$System.env.JDK_DIR"
 def ICON_DIR = new File("core/assets/icons/icon.icns")
+def spriteHashFile = new File(project.rootDir, "build/spritehash")
+
+def hashDirectory = {
+    def root = new File(project.rootDir, "core/assets-raw/sprites/")
+    MessageDigest digest = MessageDigest.getInstance("MD5")
+    ByteBuffer buffer = ByteBuffer.allocate(16)
+    def files = []
+    root.eachFileRecurse{ file ->
+        files += file
+    }
+
+    files.sort()
+
+    for(File file : files){
+        buffer.position(0)
+        buffer.putLong(file.lastModified())
+        digest.update(buffer.array())
+    }
+
+    return digest.digest().encodeHex()
+}
 
 task run(dependsOn: classes, type: JavaExec){
     main = project.mainClassName
@@ -23,6 +47,14 @@ task run(dependsOn: classes, type: JavaExec){
     if(System.getProperty("os.name").toLowerCase().contains("mac")){
         jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
     }
+
+    spriteHashFile.parentFile.mkdirs()
+
+    String spriteHash = hashDirectory()
+    if(spriteHashFile.exists() && spriteHashFile.text != spriteHash){
+        dependsOn ":tools:pack"
+    }
+    spriteHashFile.text = spriteHash
 
     if(project.hasProperty("args")){
         args Eval.me(project.getProperties()["args"])

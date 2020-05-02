@@ -74,9 +74,11 @@ public class ServerLauncher implements ApplicationListener{
             System.exit(1);
         }
 
+        Core.app.addListener(new ApplicationListener(){public void update(){ asyncLogic.begin(); }});
         Core.app.addListener(logic = new Logic());
         Core.app.addListener(netServer = new NetServer());
         Core.app.addListener(new ServerControl(args));
+        Core.app.addListener(new ApplicationListener(){public void update(){ asyncLogic.end(); }});
 
         mods.eachClass(Mod::init);
 

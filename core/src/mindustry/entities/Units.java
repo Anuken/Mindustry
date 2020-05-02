@@ -30,7 +30,7 @@ public class Units{
      * @return whether the target is invalid
      */
     public static boolean invalidateTarget(Posc target, Team team, float x, float y, float range){
-        return target == null || !target.isAdded() || (range != Float.MAX_VALUE && !target.withinDst(x, y, range)) || (target instanceof Teamc && ((Teamc)target).team() == team) || (target instanceof Healthc && !((Healthc)target).isValid());
+        return target == null || !target.isAdded() || (range != Float.MAX_VALUE && !target.within(x, y, range)) || (target instanceof Teamc && ((Teamc)target).team() == team) || (target instanceof Healthc && !((Healthc)target).isValid());
     }
 
     /** See {@link #invalidateTarget(Posc, Team, float, float, float)} */
@@ -131,6 +131,7 @@ public class Units{
         result = null;
         cdist = 0f;
 
+        //TODO optimize
         for(Unitc e : Groups.unit){
             if(!predicate.get(e) || e.team() != team) continue;
 
@@ -164,17 +165,13 @@ public class Units{
 
     /** Iterates over all units in a rectangle. */
     public static void nearby(Team team, float x, float y, float width, float height, Cons<Unitc> cons){
-        Groups.unit.intersect(x, y, width, height, u -> {
-            if(u.team() == team){
-                cons.get(u);
-            }
-        });
+        teamIndex.tree(team).intersect(height, x, y, width, cons);
     }
 
     /** Iterates over all units in a circle around this position. */
     public static void nearby(Team team, float x, float y, float radius, Cons<Unitc> cons){
-        Groups.unit.intersect(x - radius, y - radius, radius*2f, radius*2f, unit -> {
-            if(unit.team() == team && unit.withinDst(x, y, radius)){
+        nearby(team, x - radius, y - radius, radius*2f, radius*2f, unit -> {
+            if(unit.within(x, y, radius)){
                 cons.get(unit);
             }
         });
@@ -192,11 +189,9 @@ public class Units{
 
     /** Iterates over all units that are enemies of this team. */
     public static void nearbyEnemies(Team team, float x, float y, float width, float height, Cons<Unitc> cons){
-        Groups.unit.intersect(x, y, width, height, u -> {
-            if(team.isEnemy(u.team())){
-                cons.get(u);
-            }
-        });
+        for(Team enemy : state.teams.enemiesOf(team)){
+            nearby(enemy, x, y, width, height, cons);
+        }
     }
 
     /** Iterates over all units that are enemies of this team. */

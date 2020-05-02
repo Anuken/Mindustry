@@ -77,7 +77,7 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
-    groundFactory, repairPoint,
+    groundFactory, airFactory, navalFactory, repairPoint,
 
     //misc experimental
 
@@ -907,13 +907,13 @@ public class Blocks implements ContentList{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
             health = 65;
             speed = 0.08f;
-            displayedSpeed = 10f;
+            displayedSpeed = 11f;
         }};
 
         plastaniumConveyor = new StackConveyor("plastanium-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.silicon, 1, Items.graphite, 1));
             health = 75;
-            speed = 0.04f;
+            speed = 2.5f / 60f;
             recharge = 2f;
         }};
 
@@ -1669,15 +1669,35 @@ public class Blocks implements ContentList{
         //region units
 
         //for testing only.
+
         groundFactory = new UnitFactory("ground-factory"){{
             requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.dagger, 60f, ItemStack.with(Items.silicon, 10)),
-                new UnitPlan(UnitTypes.wraith, 60f, ItemStack.with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.dagger, 500f, ItemStack.with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.titan, 800f, ItemStack.with(Items.silicon, 20, Items.titanium, 10)),
             };
             size = 3;
             consumes.power(1.2f);
-            consumes.items(new ItemStack(Items.silicon, 10));
+        }};
+
+        airFactory = new UnitFactory("air-factory"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
+            plans = new UnitPlan[]{
+                new UnitPlan(UnitTypes.wraith, 200f, ItemStack.with(Items.silicon, 10)),
+                //new UnitPlan(UnitTypes.ghoul, 200f, ItemStack.with(Items.silicon, 10)),
+            };
+            size = 3;
+            consumes.power(1.2f);
+        }};
+
+        navalFactory = new UnitFactory("naval-factory"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
+            plans = new UnitPlan[]{
+                new UnitPlan(UnitTypes.vanguard, 200f, ItemStack.with(Items.silicon, 10)),
+            };
+            size = 3;
+            requiresWater = true;
+            consumes.power(1.2f);
         }};
 
         repairPoint = new RepairPoint("repair-point"){{

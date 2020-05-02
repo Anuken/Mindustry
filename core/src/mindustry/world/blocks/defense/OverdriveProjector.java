@@ -91,13 +91,15 @@ public class OverdriveProjector extends Block{
                 float realBoost = (speedBoost + phaseHeat * speedBoostPhase) * efficiency();
 
                 charge = 0f;
-                indexer.eachBlock(this, realRange, other -> other.timeScale() < realBoost, other -> other.applyBoost(realBoost, reload + 1f));
+                indexer.eachBlock(this, realRange, other -> true, other -> other.applyBoost(realBoost, reload + 1f));
             }
         }
 
         @Override
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
+
+            indexer.eachBlock(this, realRange, other -> other.block().canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
 
             Drawf.dashCircle(x, y, realRange, baseColor);
         }

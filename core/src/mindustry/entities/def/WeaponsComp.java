@@ -24,6 +24,12 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     @ReadOnly transient float range, aimX, aimY;
     @ReadOnly transient boolean isRotate, isShooting;
 
+    void setWeaponRotation(float rotation){
+        for(WeaponMount mount : mounts){
+            mount.rotation = rotation;
+        }
+    }
+
     boolean inRange(Position other){
         return within(other, range);
     }
@@ -83,7 +89,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                 mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation();
                 mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed * Time.delta());
             }else{
-                mount.rotation = this.rotation;
+                mount.rotation = 0;
                 mount.targetRotation = angleTo(mount.aimX, mount.aimY);
             }
 
@@ -91,7 +97,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                 float rotation = this.rotation - 90;
 
                 //shoot if applicable
-                if(mount.reload <= 0.0001f && Angles.within(mount.rotation, mount.targetRotation, 1.5f)){
+                if(mount.reload <= 0.0001f && Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, 1.5f)){
                     for(int i : (weapon.mirror && !weapon.alternate ? Mathf.signs : Mathf.one)){
                         i *= Mathf.sign(weapon.flipped) * (mount.weapon.mirror ? Mathf.sign(mount.side) : 1);
 

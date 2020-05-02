@@ -3,7 +3,7 @@ package mindustry.entities;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 
-class AllDefs{
+class GroupDefs{
 
     @GroupDef(value = Entityc.class, mapping = true)
     class gall{
@@ -15,12 +15,12 @@ class AllDefs{
 
     }
 
-    @GroupDef(value = Bulletc.class, spatial = true, collide = {gunit.class})
+    @GroupDef(value = Bulletc.class, spatial = true, collide = true)
     class gbullet{
 
     }
 
-    @GroupDef(value = Unitc.class, spatial = true, collide = {gunit.class}, mapping = true)
+    @GroupDef(value = Unitc.class, spatial = true, mapping = true)
     class gunit{
 
     }

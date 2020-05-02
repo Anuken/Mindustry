@@ -13,17 +13,17 @@ import static mindustry.Vars.*;
 
 /** Controls playback of multiple music tracks.*/
 public class MusicControl{
-    private static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.6f, musicWaveChance = 0.5f;
+    protected static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.6f, musicWaveChance = 0.5f;
 
     /** normal, ambient music, plays at any time */
     public Array<Music> ambientMusic = Array.with();
     /** darker music, used in times of conflict  */
     public Array<Music> darkMusic = Array.with();
-    private Music lastRandomPlayed;
-    private Interval timer = new Interval();
-    private @Nullable Music current;
-    private float fade;
-    private boolean silenced;
+    protected Music lastRandomPlayed;
+    protected Interval timer = new Interval();
+    protected @Nullable Music current;
+    protected float fade;
+    protected boolean silenced;
 
     public MusicControl(){
         Events.on(ClientLoadEvent.class, e -> reload());
@@ -36,7 +36,7 @@ public class MusicControl{
         }));
     }
 
-    private void reload(){
+    protected void reload(){
         current = null;
         fade = 0f;
         ambientMusic = Array.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
@@ -81,7 +81,7 @@ public class MusicControl{
     }
 
     /** Plays a random track.*/
-    private void playRandom(){
+    protected void playRandom(){
         if(isDark()){
             playOnce(darkMusic.random(lastRandomPlayed));
         }else{
@@ -90,7 +90,7 @@ public class MusicControl{
     }
 
     /** Whether to play dark music.*/
-    private boolean isDark(){
+    protected boolean isDark(){
         if(state.teams.get(player.team()).hasCore() && state.teams.get(player.team()).core().healthf() < 0.85f){
             //core damaged -> dark
             return true;
@@ -107,7 +107,7 @@ public class MusicControl{
 
     /** Plays and fades in a music track. This must be called every frame.
      * If something is already playing, fades out that track and fades in this new music.*/
-    private void play(@Nullable Music music){
+    protected void play(@Nullable Music music){
         if(!shouldPlay()){
             if(current != null){
                 current.setVolume(0);
@@ -159,7 +159,7 @@ public class MusicControl{
     }
 
     /** Plays a music track once and only once. If something is already playing, does nothing.*/
-    private void playOnce(Music music){
+    protected void playOnce(Music music){
         if(current != null || music == null || !shouldPlay()) return; //do not interrupt already-playing tracks
 
         //save last random track played to prevent duplicates
@@ -179,12 +179,12 @@ public class MusicControl{
         current.play();
     }
 
-    private boolean shouldPlay(){
+    protected boolean shouldPlay(){
         return Core.settings.getInt("musicvol") > 0;
     }
 
     /** Fades out the current track, unless it has already been silenced. */
-    private void silence(){
+    protected void silence(){
         play(null);
     }
 }

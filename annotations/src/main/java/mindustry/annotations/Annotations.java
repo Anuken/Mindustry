@@ -58,7 +58,7 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface GroupDef{
         Class[] value();
-        Class[] collide() default {};
+        boolean collide() default false;
         boolean spatial() default false;
         boolean mapping() default false;
     }

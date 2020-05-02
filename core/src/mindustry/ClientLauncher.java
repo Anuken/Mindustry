@@ -132,7 +132,11 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 app.post(() -> app.post(() -> app.post(() -> app.post(() -> super.resize(graphics.getWidth(), graphics.getHeight())))));
             }
         }else{
+            asyncLogic.begin();
+
             super.update();
+
+            asyncLogic.end();
         }
 
         int targetfps = Core.settings.getInt("fpscap", 120);

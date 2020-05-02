@@ -172,7 +172,7 @@ public class EntityProcess extends BaseProcessor{
             for(Selement<?> group : allGroups){
                 GroupDef an = group.annotation(GroupDef.class);
                 Array<Stype> types = types(an, GroupDef::value).map(this::interfaceToComp);
-                Array<Stype> collides = types(an, GroupDef::collide);
+                boolean collides = an.collide();
                 groupDefs.add(new GroupDefinition(group.name().startsWith("g") ? group.name().substring(1) : group.name(),
                     ClassName.bestGuess(packageName + "." + interfaceName(types.first())), types, an.spatial(), an.mapping(), collides));
             }
@@ -436,8 +436,8 @@ public class EntityProcess extends BaseProcessor{
             groupUpdate.addStatement("all.update()");
 
             for(GroupDefinition group : groupDefs){
-                for(Stype collide : group.collides){
-                    groupUpdate.addStatement("$L.collide($L)", group.name, collide.name().startsWith("g") ? collide.name().substring(1) : collide.name());
+                if(group.collides){
+                    groupUpdate.addStatement("$L.collide()", group.name);
                 }
             }
 
@@ -692,11 +692,10 @@ public class EntityProcess extends BaseProcessor{
         final String name;
         final ClassName baseType;
         final Array<Stype> components;
-        final Array<Stype> collides;
-        final boolean spatial, mapping;
+        final boolean spatial, mapping, collides;
         final ObjectSet<Selement> manualInclusions = new ObjectSet<>();
 
-        public GroupDefinition(String name, ClassName bestType, Array<Stype> components, boolean spatial, boolean mapping, Array<Stype> collides){
+        public GroupDefinition(String name, ClassName bestType, Array<Stype> components, boolean spatial, boolean mapping, boolean collides){
             this.baseType = bestType;
             this.components = components;
             this.name = name;

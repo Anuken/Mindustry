@@ -46,6 +46,14 @@ public class Drawf{
         renderer.lights.line(x, y, x2, y2, stroke, tint, alpha);
     }
 
+    public static void selected(Tilec tile, Color color){
+        selected(tile.tile(), color);
+    }
+
+    public static void selected(Tile tile, Color color){
+        selected(tile.x, tile.y, tile.block(), color);
+    }
+
     public static void selected(int x, int y, Block block, Color color){
         Draw.color(color);
         for(int i = 0; i < 4; i++){

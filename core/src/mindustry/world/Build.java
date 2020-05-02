@@ -93,7 +93,8 @@ public class Build{
                 return true;
             }
 
-            if(!contactsGround(tile.x, tile.y, type)){
+            //TODO should water blocks be placeable here?
+            if(/*!type.requiresWater && */!contactsGround(tile.x, tile.y, type)){
                 return false;
             }
 
@@ -106,9 +107,13 @@ public class Build{
             for(int dx = 0; dx < type.size; dx++){
                 for(int dy = 0; dy < type.size; dy++){
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) ||
-                    !other.floor().placeableOn ||
-                    (other.floor().isDeep() && !type.floating)){
+                    if(
+                        other == null ||
+                        (other.block() != Blocks.air && !other.block().alwaysReplace) ||
+                        !other.floor().placeableOn ||
+                        (other.floor().isDeep() && !type.floating && !type.requiresWater) ||
+                        (type.requiresWater && tile.floor().liquidDrop != Liquids.water)
+                    ){
                         return false;
                     }
                 }
@@ -116,12 +121,13 @@ public class Build{
             return true;
         }else{
             return tile.interactable(team)
-            && contactsGround(tile.x, tile.y, type)
-            && (!tile.floor().isDeep() || type.floating)
-            && tile.floor().placeableOn
-            && (((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>ent().cblock == type))
-            && !(type == tile.block() && rotation == tile.rotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
-            && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);
+                && contactsGround(tile.x, tile.y, type)
+                && (!tile.floor().isDeep() || type.floating || type.requiresWater)
+                && tile.floor().placeableOn
+                && (!type.requiresWater || tile.floor().liquidDrop == Liquids.water)
+                && (((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>ent().cblock == type))
+                && !(type == tile.block() && rotation == tile.rotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
+                && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);
         }
     }
 

@@ -34,7 +34,7 @@ public class StackConveyor extends Block implements Autotiler{
         update = true;
         group = BlockGroup.transportation;
         hasItems = true;
-        itemCapacity = 8;
+        itemCapacity = 10;
         conveyorPlacement = true;
 
         idleSound = Sounds.conveyor;
@@ -57,8 +57,7 @@ public class StackConveyor extends Block implements Autotiler{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.itemsMoved, speed * 60, StatUnit.perSecond);
-        stats.add(BlockStat.boostEffect, "$blocks.itemcapacity");
+        stats.add(BlockStat.itemsMoved, Mathf.round(itemCapacity * speed * 60), StatUnit.itemsSecond);
     }
 
     @Override
@@ -129,11 +128,11 @@ public class StackConveyor extends Block implements Autotiler{
             Tmp.v2.set(tile);
             Tmp.v1.interpolate(Tmp.v2, 1f - cooldown, Interpolation.linear);
 
-            //fixme
+            //rotation
             float a = (from.rotation()%4) * 90;
             float b = (tile.rotation()%4) * 90;
             if((from.rotation()%4) == 3 && (tile.rotation()%4) == 0) a = -1 * 90;
-            if((from.rotation()%4) == 0 && (tile.rotation()%4) == 3) a = 4 * 90;
+            if((from.rotation()%4) == 0 && (tile.rotation()%4) == 3) a =  4 * 90;
 
             //stack
             Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interpolation.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
@@ -151,7 +150,7 @@ public class StackConveyor extends Block implements Autotiler{
             state = stateMove;
 
             int[] bits = buildBlending(tile, tile.rotation(), null, true);
-            if(bits[0] == 0 && blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) state = stateLoad; // a 0 that faces into a conveyor with none behind it
+            if(bits[0] == 0 &&  blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
             if(bits[0] == 0 && !blends(tile, tile.rotation(), 0) && blends(tile, tile.rotation(), 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
             
             blendprox = 0;
@@ -166,7 +165,7 @@ public class StackConveyor extends Block implements Autotiler{
         @Override
         public void updateTile(){
             // reel in crater
-            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed, 0f, recharge);
+            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * edelta(), 0f, recharge);
 
             if(link == -1){
                 return;
@@ -185,7 +184,7 @@ public class StackConveyor extends Block implements Autotiler{
                     if(items.empty()) poofOut();
                 }
             }else{ //transfer
-                if(state != stateLoad || (items.total() >= getMaximumAccepted(items.first()))){
+                if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){
                     if(front() != null
                     && front().team() == team()
                     && front().block() instanceof StackConveyor){
@@ -194,8 +193,9 @@ public class StackConveyor extends Block implements Autotiler{
                         // sleep if its occupied
                         if(e.link == -1){
                             e.items.addAll(items);
+                            e.lastItem = lastItem;
                             e.link = tile.pos();
-                            // ▲ new | old ▼
+                            // ▲ to | from ▼
                             link = -1;
                             items.clear();
 
@@ -205,11 +205,6 @@ public class StackConveyor extends Block implements Autotiler{
                     }
                 }
             }
-        }
-
-        @Override
-        public int getMaximumAccepted(Item item){
-            return Mathf.round(super.getMaximumAccepted(item) * timeScale); // increased item capacity while boosted
         }
 
         @Override
@@ -257,7 +252,7 @@ public class StackConveyor extends Block implements Autotiler{
             return !((state != stateLoad)                   // not a loading dock
             ||  (items.total() > 0 && !items.has(item))     // incompatible items
             ||  (items.total() >= getMaximumAccepted(item)) // filled to capacity
-            ||  (tile.front() == source));
+            ||  (tile.front()  == source));
         }
 
         @Override

@@ -32,12 +32,15 @@ public class Minimap extends Table{
             @Override
             public void draw(){
                 if(renderer.minimap.getRegion() == null) return;
+                if(!clipBegin()) return;
 
                 Draw.rect(renderer.minimap.getRegion(), x + width / 2f, y + height / 2f, width, height);
 
                 if(renderer.minimap.getTexture() != null){
                     renderer.minimap.drawEntities(x, y, width, height, 0.75f, false);
                 }
+
+                clipEnd();
             }
         }).size(140f);
 

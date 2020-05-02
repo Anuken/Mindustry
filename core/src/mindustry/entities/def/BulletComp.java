@@ -1,10 +1,13 @@
 package mindustry.entities.def;
 
+import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.bullet.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -13,9 +16,18 @@ import static mindustry.Vars.*;
 @EntityDef(value = {Bulletc.class}, pooled = true)
 @Component
 abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
+    @Import Team team;
+
     Object data;
     BulletType type;
     float damage;
+
+    @Override
+    public void getCollisions(Cons<QuadTree> consumer){
+        for(Team team : state.teams.enemiesOf(team)){
+            consumer.get(teamIndex.tree(team));
+        }
+    }
 
     @Override
     public void drawBullets(){

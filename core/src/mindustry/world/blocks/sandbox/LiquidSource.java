@@ -13,7 +13,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class LiquidSource extends Block{
     public static Liquid lastLiquid;
@@ -69,6 +69,17 @@ public class LiquidSource extends Block{
         @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(table, content.liquids(), () -> source, liquid -> tile.configure(lastLiquid = liquid));
+        }
+
+        @Override
+        public boolean onConfigureTileTapped(Tilec other){
+            if(this == other){
+                control.input.frag.config.hideConfig();
+                tile.configure(lastLiquid = null);
+                return false;
+            }
+
+            return true;
         }
 
         @Override

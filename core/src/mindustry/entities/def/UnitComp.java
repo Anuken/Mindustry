@@ -18,7 +18,7 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitboxc, Rotc, Massc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc{
     @Import float x, y, rotation, elevation, maxHealth;
 
     private UnitController controller;
@@ -36,6 +36,10 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     public void aimLook(float x, float y){
         aim(x, y);
         lookAt(x, y);
+    }
+
+    public boolean hasWeapons(){
+        return type.hasWeapons();
     }
 
     @Override
@@ -68,23 +72,6 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
     public void set(UnitType def, UnitController controller){
         type(type);
         controller(controller);
-    }
-
-    @Override
-    public void collision(Hitboxc other, float x, float y){
-        if(!(other instanceof Unitc)) return;
-        Unitc unit = (Unitc)other;
-
-        if(isGrounded() != unit.isGrounded()) return;
-
-        float scale = 2f;
-        hitbox(Tmp.r1);
-        other.hitbox(Tmp.r2);
-        Vec2 v = Geometry.overlap(Tmp.r1, Tmp.r2, true);
-        float tm = mass() + unit.mass();
-        float s1 = mass() / tm, s2 = unit.mass() / tm;
-        move(v.x*s2/scale, v.y*s2/scale);
-        unit.move(-v.x*s1/scale, -v.y*s1/scale);
     }
 
     @Override
@@ -135,7 +122,7 @@ abstract class UnitComp implements Healthc, Velc, Statusc, Teamc, Itemsc, Hitbox
         if(team() != state.rules.waveTeam){
             float relativeSize = state.rules.dropZoneRadius + bounds()/2f + 1f;
             for(Tile spawn : spawner.getSpawns()){
-                if(withinDst(spawn.worldx(), spawn.worldy(), relativeSize)){
+                if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
                     vel().add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta()));
                 }
             }

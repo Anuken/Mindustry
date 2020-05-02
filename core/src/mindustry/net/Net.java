@@ -168,7 +168,7 @@ public class Net{
 
     /**
      * Starts discovering servers on a different thread.
-     * Callback is run on the main libGDX thread.
+     * Callback is run on the main Arc thread.
      */
     public void discoverServers(Cons<Host> cons, Runnable done){
         provider.discoverServers(cons, done);

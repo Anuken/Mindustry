@@ -4,6 +4,8 @@ import arc.struct.Array;
 import mindustry.content.Items;
 
 public class ItemStack implements Comparable<ItemStack>{
+    public static final ItemStack[] empty = {};
+
     public Item item;
     public int amount = 0;
 
