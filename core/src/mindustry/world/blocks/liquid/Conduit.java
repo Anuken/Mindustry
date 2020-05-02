@@ -1,6 +1,7 @@
 package mindustry.world.blocks.liquid;
 
 import arc.*;
+import arc.graphics.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -16,7 +17,9 @@ import mindustry.world.blocks.*;
 
 public class Conduit extends LiquidBlock implements Autotiler{
     public final int timerFlow = timers++;
-
+    
+    public Color botColor = Color.valueOf("565656");
+    
     public TextureRegion[] topRegions = new TextureRegion[7];
     public TextureRegion[] botRegions = new TextureRegion[7];
 
@@ -47,7 +50,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
         if(bits == null) return;
 
-        Draw.colorl(0.34f);
+        Draw.color(botColor);
         Draw.alpha(0.5f);
         Draw.rect(botRegions[bits[0]], req.drawx(), req.drawy(),
             botRegions[bits[0]].getWidth() * Draw.scl * req.animScale, botRegions[bits[0]].getHeight() * Draw.scl * req.animScale,
@@ -91,7 +94,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         public void draw(){
             int rotation = rotation() * 90;
 
-            Draw.colorl(0.34f);
+            Draw.color(botColor);
             Draw.rect(botRegions[blendbits], x, y, rotation);
 
             Draw.color(liquids.current().color);
