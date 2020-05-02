@@ -29,7 +29,7 @@ public class Conveyor extends Block implements Autotiler{
     private final Vec2 tr1 = new Vec2();
     private final Vec2 tr2 = new Vec2();
 
-    public @LoadRegion(value = "@-#1-#2", lengths = {7, 4}) TextureRegion[][] regions;
+    public @Load(value = "@-#1-#2", lengths = {7, 4}) TextureRegion[][] regions;
 
     public float speed = 0f;
     public float displayedSpeed = 0f;

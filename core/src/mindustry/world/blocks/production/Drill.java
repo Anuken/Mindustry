@@ -50,9 +50,9 @@ public class Drill extends Block{
 
     public boolean drawRim = false;
     public Color heatColor = Color.valueOf("ff5512");
-    public @LoadRegion("@-rim") TextureRegion rimRegion;
-    public @LoadRegion("@-rotator") TextureRegion rotatorRegion;
-    public @LoadRegion("@-top") TextureRegion topRegion;
+    public @Load("@-rim") TextureRegion rimRegion;
+    public @Load("@-rotator") TextureRegion rotatorRegion;
+    public @Load("@-top") TextureRegion topRegion;
 
     public Drill(String name){
         super(name);

@@ -20,8 +20,8 @@ public class Separator extends Block{
     public @NonNull ItemStack[] results;
     public float craftTime;
 
-    public @LoadRegion("@-liquid") TextureRegion liquidRegion;
-    public @LoadRegion("@-spinner") TextureRegion spinnerRegion;
+    public @Load("@-liquid") TextureRegion liquidRegion;
+    public @Load("@-spinner") TextureRegion spinnerRegion;
     public float spinnerSpeed = 3f;
 
     public Separator(String name){

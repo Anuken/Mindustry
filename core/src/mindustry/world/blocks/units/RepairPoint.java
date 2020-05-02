@@ -25,9 +25,9 @@ public class RepairPoint extends Block{
     public float repairSpeed = 0.3f;
     public float powerUse;
 
-    public @LoadRegion("@-base") TextureRegion baseRegion;
-    public @LoadRegion("laser") TextureRegion laser;
-    public @LoadRegion("laser-end") TextureRegion laserEnd;
+    public @Load("@-base") TextureRegion baseRegion;
+    public @Load("laser") TextureRegion laser;
+    public @Load("laser-end") TextureRegion laserEnd;
 
     public RepairPoint(String name){
         super(name);

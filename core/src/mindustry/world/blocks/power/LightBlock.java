@@ -17,7 +17,7 @@ public class LightBlock extends Block{
 
     public float brightness = 0.9f;
     public float radius = 200f;
-    public @LoadRegion("@-top") TextureRegion topRegion;
+    public @Load("@-top") TextureRegion topRegion;
 
     public LightBlock(String name){
         super(name);

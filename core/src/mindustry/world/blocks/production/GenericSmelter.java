@@ -10,7 +10,7 @@ import mindustry.graphics.*;
 /** A GenericCrafter with a new glowing region drawn on top. */
 public class GenericSmelter extends GenericCrafter{
     public Color flameColor = Color.valueOf("ffc999");
-    public @LoadRegion("@-top") TextureRegion topRegion;
+    public @Load("@-top") TextureRegion topRegion;
 
     public GenericSmelter(String name){
         super(name);

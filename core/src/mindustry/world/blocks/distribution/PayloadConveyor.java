@@ -19,8 +19,8 @@ import static mindustry.Vars.*;
 
 public class PayloadConveyor extends Block{
     public float moveTime = 70f;
-    public @LoadRegion("@-top") TextureRegion topRegion;
-    public @LoadRegion("@-edge") TextureRegion edgeRegion;
+    public @Load("@-top") TextureRegion topRegion;
+    public @Load("@-edge") TextureRegion edgeRegion;
     public Interpolation interp = Interpolation.pow5;
 
     public PayloadConveyor(String name){

@@ -29,7 +29,7 @@ public class UnitFactory extends Block{
 
 
     public float launchVelocity = 5f;
-    public @LoadRegion("@-top") TextureRegion topRegion;
+    public @Load("@-top") TextureRegion topRegion;
     public int[] capacities;
 
     public UnitPlan[] plans = new UnitPlan[0];

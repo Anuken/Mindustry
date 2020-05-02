@@ -30,7 +30,7 @@ public class MassDriver extends Block{
     public Effect smokeEffect = Fx.shootBigSmoke2;
     public Effect recieveEffect = Fx.mineBig;
     public float shake = 3f;
-    public @LoadRegion("@-base") TextureRegion baseRegion;
+    public @Load("@-base") TextureRegion baseRegion;
 
     public MassDriver(String name){
         super(name);

@@ -20,7 +20,7 @@ public class Door extends Wall{
     public final int timerToggle = timers++;
     public Effect openfx = Fx.dooropen;
     public Effect closefx = Fx.doorclose;
-    public @LoadRegion("@-open") TextureRegion openRegion;
+    public @Load("@-open") TextureRegion openRegion;
 
     public Door(String name){
         super(name);

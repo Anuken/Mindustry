@@ -23,9 +23,9 @@ public class ItemBridge extends Block{
     public final int timerTransport = timers++;
     public int range;
     public float transportTime = 2f;
-    public @LoadRegion("@-end") TextureRegion endRegion;
-    public @LoadRegion("@-bridge") TextureRegion bridgeRegion;
-    public @LoadRegion("@-arrow") TextureRegion arrowRegion;
+    public @Load("@-end") TextureRegion endRegion;
+    public @Load("@-bridge") TextureRegion bridgeRegion;
+    public @Load("@-arrow") TextureRegion arrowRegion;
 
     private static BuildRequest otherReq;
     private static int lastPlaced = -1;

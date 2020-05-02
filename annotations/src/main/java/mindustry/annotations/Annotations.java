@@ -89,11 +89,11 @@ public class Annotations{
 
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface LoadRegion{
+    public @interface Load{
         String value();
         int length() default 1;
         int[] lengths() default {};
-        String fallback() default "error"; //TODO
+        String fallback() default "error";
     }
 
     @Target(ElementType.TYPE)

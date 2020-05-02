@@ -29,7 +29,7 @@ public class ForceProjector extends Block{
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
     public float basePowerDraw = 0.2f;
-    public @LoadRegion("@-top") TextureRegion topRegion;
+    public @Load("@-top") TextureRegion topRegion;
 
     private static ForceProjectorEntity paramEntity;
     private static Cons<Shielderc> shieldConsumer = trait -> {

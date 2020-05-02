@@ -27,8 +27,8 @@ public class ImpactReactor extends PowerGenerator{
 
     public Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
 
-    public @LoadRegion("@-bottom") TextureRegion bottomRegion;
-    public @LoadRegion(value = "@-plasma-#", length = 4) TextureRegion[] plasmaRegions;
+    public @Load("@-bottom") TextureRegion bottomRegion;
+    public @Load(value = "@-plasma-#", length = 4) TextureRegion[] plasmaRegions;
 
     public ImpactReactor(String name){
         super(name);

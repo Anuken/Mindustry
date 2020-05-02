@@ -16,7 +16,7 @@ import static mindustry.Vars.tilesize;
 
 public class LiquidTurret extends Turret{
     public ObjectMap<Liquid, BulletType> ammoTypes = new ObjectMap<>();
-    public @LoadRegion("@-liquid") TextureRegion liquidRegion;
+    public @Load("@-liquid") TextureRegion liquidRegion;
 
     public LiquidTurret(String name){
         super(name);

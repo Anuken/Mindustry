@@ -31,8 +31,8 @@ public class ItemLiquidGenerator extends PowerGenerator{
     public Effect generateEffect = Fx.generatespark;
     public Effect explodeEffect = Fx.generatespark;
     public Color heatColor = Color.valueOf("ff9b59");
-    public @LoadRegion("@-top") TextureRegion topRegion;
-    public @LoadRegion("@-liquid") TextureRegion liquidRegion;
+    public @Load("@-top") TextureRegion topRegion;
+    public @Load("@-liquid") TextureRegion liquidRegion;
     public boolean randomlyExplode = true;
     public boolean defaults = false;
 

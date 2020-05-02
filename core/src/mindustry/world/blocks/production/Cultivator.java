@@ -17,8 +17,8 @@ public class Cultivator extends GenericCrafter{
     public Color plantColorLight = Color.valueOf("7457ce");
     public Color bottomColor = Color.valueOf("474747");
 
-    public @LoadRegion("@-middle") TextureRegion middleRegion;
-    public @LoadRegion("@-top") TextureRegion topRegion;
+    public @Load("@-middle") TextureRegion middleRegion;
+    public @Load("@-top") TextureRegion topRegion;
     public Rand random = new Rand(0);
     public float recurrence = 6f;
     public Attribute attribute = Attribute.spores;

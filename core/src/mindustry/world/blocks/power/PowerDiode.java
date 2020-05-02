@@ -12,7 +12,7 @@ import mindustry.world.*;
 import mindustry.world.meta.*;
 
 public class PowerDiode extends Block{
-    public @LoadRegion("@-arrow") TextureRegion arrow;
+    public @Load("@-arrow") TextureRegion arrow;
 
     public PowerDiode(String name){
         super(name);

@@ -8,7 +8,7 @@ import mindustry.gen.*;
 import static mindustry.Vars.tilesize;
 
 public class Battery extends PowerDistributor{
-    public @LoadRegion("@-top") TextureRegion topRegion;
+    public @Load("@-top") TextureRegion topRegion;
 
     public Color emptyLightColor = Color.valueOf("f8c266");
     public Color fullLightColor = Color.valueOf("fb9567");

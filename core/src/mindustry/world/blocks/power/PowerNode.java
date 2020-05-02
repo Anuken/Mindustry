@@ -27,8 +27,8 @@ public class PowerNode extends PowerBlock{
     protected final ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     protected final Vec2 t1 = new Vec2(), t2 = new Vec2();
 
-    public @LoadRegion("laser") TextureRegion laser;
-    public @LoadRegion("laser-end") TextureRegion laserEnd;
+    public @Load("laser") TextureRegion laser;
+    public @Load("laser-end") TextureRegion laserEnd;
     public float laserRange = 6;
     public int maxNodes = 3;
 

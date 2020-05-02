@@ -36,8 +36,8 @@ public class NuclearReactor extends PowerGenerator{
     public float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
     public float coolantPower = 0.5f;
 
-    public @LoadRegion("@-top") TextureRegion topRegion;
-    public @LoadRegion("@-lights") TextureRegion lightsRegion;
+    public @Load("@-top") TextureRegion topRegion;
+    public @Load("@-lights") TextureRegion lightsRegion;
 
     public NuclearReactor(String name){
         super(name);

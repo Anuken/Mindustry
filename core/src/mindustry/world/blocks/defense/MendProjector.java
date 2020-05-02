@@ -18,7 +18,7 @@ public class MendProjector extends Block{
     public final int timerUse = timers++;
     public Color baseColor = Color.valueOf("84f491");
     public Color phaseColor = Color.valueOf("ffd59e");
-    public @LoadRegion("@-top") TextureRegion topRegion;
+    public @Load("@-top") TextureRegion topRegion;
     public float reload = 250f;
     public float range = 60f;
     public float healPercent = 12f;

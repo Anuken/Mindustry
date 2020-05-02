@@ -7,7 +7,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 
 public class ArmoredConduit extends Conduit{
-    public @LoadRegion("@-cap") TextureRegion capRegion;
+    public @Load("@-cap") TextureRegion capRegion;
 
     public ArmoredConduit(String name){
         super(name);

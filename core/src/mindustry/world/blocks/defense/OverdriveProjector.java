@@ -16,7 +16,7 @@ import static mindustry.Vars.*;
 public class OverdriveProjector extends Block{
     public final int timerUse = timers++;
 
-    public @LoadRegion("@-top") TextureRegion topRegion;
+    public @Load("@-top") TextureRegion topRegion;
     public float reload = 60f;
     public float range = 80f;
     public float speedBoost = 1.5f;

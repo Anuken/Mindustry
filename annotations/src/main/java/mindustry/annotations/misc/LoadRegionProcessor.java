@@ -12,7 +12,7 @@ import mindustry.annotations.util.*;
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
 
-@SupportedAnnotationTypes({"mindustry.annotations.Annotations.LoadRegion",})
+@SupportedAnnotationTypes("mindustry.annotations.Annotations.Load")
 public class LoadRegionProcessor extends BaseProcessor{
 
     @Override
@@ -25,7 +25,7 @@ public class LoadRegionProcessor extends BaseProcessor{
 
         ObjectMap<Stype, Array<Svar>> fieldMap = new ObjectMap<>();
 
-        for(Svar field : fields(LoadRegion.class)){
+        for(Svar field : fields(Load.class)){
             if(!field.is(Modifier.PUBLIC)){
                 err("@LoadRegion field must be public", field);
             }
@@ -37,7 +37,7 @@ public class LoadRegionProcessor extends BaseProcessor{
             method.beginControlFlow("if(content instanceof $T)", entry.key.tname());
 
             for(Svar field : entry.value){
-                LoadRegion an = field.annotation(LoadRegion.class);
+                Load an = field.annotation(Load.class);
                 //get # of array dimensions
                 int dims = count(field.mirror().toString(), "[]");
                 boolean doFallback = !an.fallback().equals("error");

@@ -8,9 +8,9 @@ import mindustry.world.meta.*;
 public class Fracker extends SolidPump{
     public float itemUseTime = 100f;
 
-    public @LoadRegion("@-liquid") TextureRegion liquidRegion;
-    public @LoadRegion("@-rotator") TextureRegion rotatorRegion;
-    public @LoadRegion("@-top") TextureRegion topRegion;
+    public @Load("@-liquid") TextureRegion liquidRegion;
+    public @Load("@-rotator") TextureRegion rotatorRegion;
+    public @Load("@-top") TextureRegion topRegion;
 
     public Fracker(String name){
         super(name);

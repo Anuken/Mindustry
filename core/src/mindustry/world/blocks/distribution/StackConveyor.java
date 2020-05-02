@@ -20,9 +20,9 @@ import static mindustry.Vars.*;
 public class StackConveyor extends Block implements Autotiler{
     protected static final int stateMove = 0, stateLoad = 1, stateUnload = 2;
 
-    public @LoadRegion(value = "@-#", length = 3) TextureRegion[] regions;
-    public @LoadRegion("@-edge") TextureRegion edgeRegion;
-    public @LoadRegion("@-stack") TextureRegion stackRegion;
+    public @Load(value = "@-#", length = 3) TextureRegion[] regions;
+    public @Load("@-edge") TextureRegion edgeRegion;
+    public @Load("@-stack") TextureRegion stackRegion;
 
     public float speed = 0f;
     public float recharge = 4f;
