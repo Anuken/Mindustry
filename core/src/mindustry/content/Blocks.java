@@ -512,12 +512,12 @@ public class Blocks implements ContentList{
             consumes.power(3f);
             consumes.item(Items.titanium, 2);
 
-            int topRegion = reg("-top");
+            int topRegion = re("-top");
 
             drawer = entity -> {
                 Draw.rect(region, entity.x(), entity.y());
                 Draw.alpha(Mathf.absin(entity.totalProgress, 3f, 0.9f) * entity.warmup);
-                Draw.rect(reg(topRegion), entity.x(), entity.y());
+                Draw.rect(re(topRegion), entity.x(), entity.y());
                 Draw.reset();
             };
         }};
@@ -534,13 +534,13 @@ public class Blocks implements ContentList{
             consumes.power(5f);
             itemCapacity = 20;
 
-            int bottomRegion = reg("-bottom"), weaveRegion = reg("-weave");
+            int bottomRegion = re("-bottom"), weaveRegion = re("-weave");
 
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name), Core.atlas.find(name + "-weave")};
 
             drawer = entity -> {
-                Draw.rect(reg(bottomRegion), entity.x(), entity.y());
-                Draw.rect(reg(weaveRegion), entity.x(), entity.y(), entity.totalProgress);
+                Draw.rect(re(bottomRegion), entity.x(), entity.y());
+                Draw.rect(re(weaveRegion), entity.x(), entity.y(), entity.totalProgress);
 
                 Draw.color(Pal.accent);
                 Draw.alpha(entity.warmup);
@@ -585,23 +585,23 @@ public class Blocks implements ContentList{
             consumes.item(Items.titanium);
             consumes.liquid(Liquids.water, 0.2f);
 
-            int liquidRegion = reg("-liquid"), topRegion = reg("-top"), bottomRegion = reg("-bottom");
+            int liquidRegion = re("-liquid"), topRegion = re("-top"), bottomRegion = re("-bottom");
 
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name + "-top")};
 
             drawer = entity -> {
                 int rotation = rotate ? entity.rotation() * 90 : 0;
 
-                Draw.rect(reg(bottomRegion), entity.x(), entity.y(), rotation);
+                Draw.rect(re(bottomRegion), entity.x(), entity.y(), rotation);
 
                 if(entity.liquids().total() > 0.001f){
                     Draw.color(outputLiquid.liquid.color);
                     Draw.alpha(entity.liquids().get(outputLiquid.liquid) / liquidCapacity);
-                    Draw.rect(reg(liquidRegion), entity.x(), entity.y(), rotation);
+                    Draw.rect(re(liquidRegion), entity.x(), entity.y(), rotation);
                     Draw.color();
                 }
 
-                Draw.rect(reg(topRegion), entity.x(), entity.y(), rotation);
+                Draw.rect(re(topRegion), entity.x(), entity.y(), rotation);
             };
         }};
 
@@ -672,20 +672,20 @@ public class Blocks implements ContentList{
 
             int[] frameRegions = new int[3];
             for(int i = 0; i < 3; i++){
-                frameRegions[i] = reg("-frame" + i);
+                frameRegions[i] = re("-frame" + i);
             }
 
-            int liquidRegion = reg("-liquid");
-            int topRegion = reg("-top");
+            int liquidRegion = re("-liquid");
+            int topRegion = re("-top");
 
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top")};
             drawer = entity -> {
                 Draw.rect(region, entity.x(), entity.y());
-                Draw.rect(reg(frameRegions[(int)Mathf.absin(entity.totalProgress, 5f, 2.999f)]), entity.x(), entity.y());
+                Draw.rect(re(frameRegions[(int)Mathf.absin(entity.totalProgress, 5f, 2.999f)]), entity.x(), entity.y());
                 Draw.color(Color.clear, entity.liquids().current().color, entity.liquids().total() / liquidCapacity);
-                Draw.rect(reg(liquidRegion), entity.x(), entity.y());
+                Draw.rect(re(liquidRegion), entity.x(), entity.y());
                 Draw.color();
-                Draw.rect(reg(topRegion), entity.x(), entity.y());
+                Draw.rect(re(topRegion), entity.x(), entity.y());
             };
         }};
 
@@ -700,13 +700,13 @@ public class Blocks implements ContentList{
             consumes.item(Items.scrap, 1);
             consumes.power(0.50f);
 
-            int rotatorRegion = reg("-rotator");
+            int rotatorRegion = re("-rotator");
 
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator")};
 
             drawer = entity -> {
                 Draw.rect(region, entity.x(), entity.y());
-                Draw.rect(reg(rotatorRegion), entity.x(), entity.y(), entity.totalProgress * 2f);
+                Draw.rect(re(rotatorRegion), entity.x(), entity.y(), entity.totalProgress * 2f);
             };
         }};
 

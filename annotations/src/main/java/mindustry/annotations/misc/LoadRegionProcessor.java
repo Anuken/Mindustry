@@ -33,65 +33,50 @@ public class LoadRegionProcessor extends BaseProcessor{
             fieldMap.getOr(field.enclosingType(), Array::new).add(field);
         }
 
-        int index = 0;
-
         for(Entry<Stype, Array<Svar>> entry : fieldMap){
-            if(index == 0){
-                method.beginControlFlow("if(content instanceof $T)", entry.key.tname());
-            }else{
-                method.nextControlFlow("else if(content instanceof $T)", entry.key.tname());
-            }
+            method.beginControlFlow("if(content instanceof $T)", entry.key.tname());
 
-            //go through each supertype
-            for(Stype stype : entry.key.superclasses().and(entry.key)){
-                if(fieldMap.containsKey(stype)){
-                    for(Svar field : fieldMap.get(stype)){
-                        LoadRegion an = field.annotation(LoadRegion.class);
-                        //get # of array dimensions
-                        int dims = count(field.mirror().toString(), "[]");
+            for(Svar field : entry.value){
+                LoadRegion an = field.annotation(LoadRegion.class);
+                //get # of array dimensions
+                int dims = count(field.mirror().toString(), "[]");
+                boolean doFallback = !an.fallback().equals("error");
+                String fallbackString = doFallback ? ", " + parse(an.value()).replace("content.name", '"' + an.fallback() + '"') : "";
 
-                        //not an array
-                        if(dims == 0){
-                            method.addStatement("(($T)content).$L = $T.atlas.find($L)", entry.key.tname(), field.name(), Core.class, parse(an.value()));
-                        }else{
-                            //is an array, create length string
-                            int[] lengths = an.lengths();
-                            if(lengths.length == 0) lengths = new int[]{an.length()};
+                //not an array
+                if(dims == 0){
+                    method.addStatement("(($T)content).$L = $T.atlas.find($L$L)", entry.key.tname(), field.name(), Core.class, parse(an.value()), fallbackString);
+                }else{
+                    //is an array, create length string
+                    int[] lengths = an.lengths();
+                    if(lengths.length == 0) lengths = new int[]{an.length()};
 
-                            if(dims != lengths.length){
-                                err("Length dimensions must match array dimensions: " + dims + " != " + lengths.length, field);
-                            }
+                    if(dims != lengths.length){
+                        err("Length dimensions must match array dimensions: " + dims + " != " + lengths.length, field);
+                    }
 
-                            StringBuilder lengthString = new StringBuilder();
-                            for(int value : lengths) lengthString.append("[").append(value).append("]");
+                    StringBuilder lengthString = new StringBuilder();
+                    for(int value : lengths) lengthString.append("[").append(value).append("]");
 
-                            method.addStatement("(($T)content).$L = new $T$L", entry.key.tname(), field.name(), TextureRegion.class, lengthString.toString());
+                    method.addStatement("(($T)content).$L = new $T$L", entry.key.tname(), field.name(), TextureRegion.class, lengthString.toString());
 
-                            for(int i = 0; i < dims; i++){
-                                int length = lengths[0];
+                    for(int i = 0; i < dims; i++){
+                        method.beginControlFlow("for(int INDEX$L = 0; INDEX$L < $L; INDEX$L ++)", i, i, lengths[i], i);
+                    }
 
-                                method.beginControlFlow("for(int INDEX$L = 0; INDEX$L < $L; INDEX$L ++)", i, i, length, i);
-                            }
+                    StringBuilder indexString = new StringBuilder();
+                    for(int i = 0; i < dims; i++){
+                        indexString.append("[INDEX").append(i).append("]");
+                    }
 
-                            StringBuilder indexString = new StringBuilder();
-                            for(int i = 0; i < dims; i++){
-                                indexString.append("[INDEX").append(i).append("]");
-                            }
+                    method.addStatement("(($T)content).$L$L = $T.atlas.find($L$L)", entry.key.tname(), field.name(), indexString.toString(), Core.class, parse(an.value()), fallbackString);
 
-                            method.addStatement("(($T)content).$L$L = $T.atlas.find($L)", entry.key.tname(), field.name(), indexString.toString(), Core.class, parse(an.value()));
-
-                            for(int i = 0; i < dims; i++){
-                                method.endControlFlow();
-                            }
-                        }
+                    for(int i = 0; i < dims; i++){
+                        method.endControlFlow();
                     }
                 }
             }
 
-            index ++;
-        }
-
-        if(index > 0){
             method.endControlFlow();
         }
 
@@ -122,6 +107,7 @@ public class LoadRegionProcessor extends BaseProcessor{
         value = value.replace("#1", "\" + INDEX0 + \"");
         value = value.replace("#2", "\" + INDEX1 + \"");
         value = value.replace("#", "\" + INDEX0 + \"");
+        value = value.replace("$size", "\" + ((mindustry.world.Block)content).size + \"");
         return value;
     }
 

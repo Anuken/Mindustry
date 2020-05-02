@@ -1,25 +1,19 @@
 package mindustry.world.blocks.production;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
 
 /** A GenericCrafter with a new glowing region drawn on top. */
 public class GenericSmelter extends GenericCrafter{
     public Color flameColor = Color.valueOf("ffc999");
-    public TextureRegion topRegion;
+    public @LoadRegion("@-top") TextureRegion topRegion;
 
     public GenericSmelter(String name){
         super(name);
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        topRegion = Core.atlas.find(name + "-top");
     }
 
     public class SmelterEntity extends GenericCrafterEntity{

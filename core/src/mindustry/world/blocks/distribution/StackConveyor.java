@@ -1,10 +1,10 @@
 package mindustry.world.blocks.distribution;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -20,8 +20,9 @@ import static mindustry.Vars.*;
 public class StackConveyor extends Block implements Autotiler{
     protected static final int stateMove = 0, stateLoad = 1, stateUnload = 2;
 
-    protected TextureRegion[] regions = new TextureRegion[3];
-    protected TextureRegion edgeRegion, stackRegion;
+    public @LoadRegion(value = "@-#", length = 3) TextureRegion[] regions;
+    public @LoadRegion("@-edge") TextureRegion edgeRegion;
+    public @LoadRegion("@-stack") TextureRegion stackRegion;
 
     public float speed = 0f;
     public float recharge = 4f;
@@ -41,18 +42,6 @@ public class StackConveyor extends Block implements Autotiler{
         idleSoundVolume = 0.004f;
         unloadable = false;
         dumpIncrement = 4;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        
-        for(int i = 0; i < regions.length; i++){
-            regions[i] = Core.atlas.find(name + "-" + i);
-        }
-        
-        edgeRegion = Core.atlas.find(name + "-edge");
-        stackRegion = Core.atlas.find(name + "-stack");
     }
 
     @Override

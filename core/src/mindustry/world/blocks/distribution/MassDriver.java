@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -29,7 +30,7 @@ public class MassDriver extends Block{
     public Effect smokeEffect = Fx.shootBigSmoke2;
     public Effect recieveEffect = Fx.mineBig;
     public float shake = 3f;
-    public TextureRegion baseRegion;
+    public @LoadRegion("@-base") TextureRegion baseRegion;
 
     public MassDriver(String name){
         super(name);
@@ -47,13 +48,6 @@ public class MassDriver extends Block{
     @Override
     public TextureRegion[] generateIcons(){
         return new TextureRegion[]{Core.atlas.find(name + "-base"), Core.atlas.find(name)};
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        baseRegion = Core.atlas.find(name + "-base");
     }
 
     @Override

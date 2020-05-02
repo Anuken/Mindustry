@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.struct.IntSet.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -22,7 +23,9 @@ public class ItemBridge extends Block{
     public final int timerTransport = timers++;
     public int range;
     public float transportTime = 2f;
-    public TextureRegion endRegion, bridgeRegion, arrowRegion;
+    public @LoadRegion("@-end") TextureRegion endRegion;
+    public @LoadRegion("@-bridge") TextureRegion bridgeRegion;
+    public @LoadRegion("@-arrow") TextureRegion arrowRegion;
 
     private static BuildRequest otherReq;
     private static int lastPlaced = -1;
@@ -42,15 +45,6 @@ public class ItemBridge extends Block{
         config(Point2.class, (tile, i) -> ((ItemBridgeEntity)tile).link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
         //integer is not
         config(Integer.class, (tile, i) -> ((ItemBridgeEntity)tile).link = i);
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        endRegion = Core.atlas.find(name + "-end");
-        bridgeRegion = Core.atlas.find(name + "-bridge");
-        arrowRegion = Core.atlas.find(name + "-arrow");
     }
 
     @Override

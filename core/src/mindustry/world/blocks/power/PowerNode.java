@@ -9,6 +9,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -26,7 +27,8 @@ public class PowerNode extends PowerBlock{
     protected final ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     protected final Vec2 t1 = new Vec2(), t2 = new Vec2();
 
-    public TextureRegion laser, laserEnd;
+    public @LoadRegion("laser") TextureRegion laser;
+    public @LoadRegion("laser-end") TextureRegion laserEnd;
     public float laserRange = 6;
     public int maxNodes = 3;
 
@@ -82,14 +84,6 @@ public class PowerNode extends PowerBlock{
                 }
             }
         });
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        laser = Core.atlas.find("laser");
-        laserEnd = Core.atlas.find("laser-end");
     }
 
     @Override

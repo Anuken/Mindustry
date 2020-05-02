@@ -1,23 +1,17 @@
 package mindustry.world.blocks.liquid;
 
-import arc.*;
 import arc.graphics.g2d.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
 public class ArmoredConduit extends Conduit{
-    public TextureRegion capRegion;
+    public @LoadRegion("@-cap") TextureRegion capRegion;
 
     public ArmoredConduit(String name){
         super(name);
         leakResistance = 10f;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        capRegion = Core.atlas.find(name + "-cap");
     }
 
     @Override

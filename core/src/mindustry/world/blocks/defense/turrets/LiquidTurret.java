@@ -3,6 +3,7 @@ package mindustry.world.blocks.defense.turrets;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -15,13 +16,12 @@ import static mindustry.Vars.tilesize;
 
 public class LiquidTurret extends Turret{
     public ObjectMap<Liquid, BulletType> ammoTypes = new ObjectMap<>();
-    public int liquidRegion;
+    public @LoadRegion("@-liquid") TextureRegion liquidRegion;
 
     public LiquidTurret(String name){
         super(name);
         hasLiquids = true;
         activeSound = Sounds.spray;
-        liquidRegion = reg("-liquid");
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */
@@ -53,10 +53,10 @@ public class LiquidTurret extends Turret{
         public void draw(){
             super.draw();
             
-            if(Core.atlas.isFound(reg(liquidRegion))){
+            if(Core.atlas.isFound(liquidRegion)){
                 Draw.color(liquids.current().color);
                 Draw.alpha(liquids.total() / liquidCapacity);
-                Draw.rect(reg(liquidRegion), x + tr2.x, y + tr2.y, rotation - 90);
+                Draw.rect(liquidRegion, x + tr2.x, y + tr2.y, rotation - 90);
                 Draw.color();
             }
         }

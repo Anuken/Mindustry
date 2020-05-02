@@ -4,14 +4,15 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.world;
 
 public class StaticWall extends Rock{
-    TextureRegion large;
-    TextureRegion[][] split;
+    public @LoadRegion("@-large") TextureRegion large;
+    public TextureRegion[][] split;
 
     public StaticWall(String name){
         super(name);
@@ -38,7 +39,6 @@ public class StaticWall extends Rock{
     @Override
     public void load(){
         super.load();
-        large = Core.atlas.find(name + "-large");
         split = large.split(32, 32);
     }
 

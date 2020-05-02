@@ -93,6 +93,7 @@ public class Annotations{
         String value();
         int length() default 1;
         int[] lengths() default {};
+        String fallback() default "error"; //TODO
     }
 
     @Target(ElementType.TYPE)

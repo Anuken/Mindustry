@@ -24,13 +24,6 @@ public class Pump extends LiquidBlock{
     }
 
     @Override
-    public void load(){
-        super.load();
-
-        liquidRegion = Core.atlas.find("pump-liquid");
-    }
-
-    @Override
     public void setStats(){
         super.setStats();
         stats.add(BlockStat.output, 60f * pumpAmount, StatUnit.liquidSecond);

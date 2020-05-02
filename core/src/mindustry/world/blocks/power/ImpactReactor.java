@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -19,15 +20,15 @@ import static mindustry.Vars.*;
 public class ImpactReactor extends PowerGenerator{
     public final int timerUse = timers++;
 
-    public int plasmas = 4;
     public float warmupSpeed = 0.001f;
     public float itemDuration = 60f;
     public int explosionRadius = 50;
     public int explosionDamage = 2000;
 
     public Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
-    public int bottomRegion;
-    public int[] plasmaRegions;
+
+    public @LoadRegion("@-bottom") TextureRegion bottomRegion;
+    public @LoadRegion(value = "@-plasma-#", length = 4) TextureRegion[] plasmaRegions;
 
     public ImpactReactor(String name){
         super(name);
@@ -36,17 +37,6 @@ public class ImpactReactor extends PowerGenerator{
         liquidCapacity = 30f;
         hasItems = true;
         outputsPower = consumesPower = true;
-        bottomRegion = reg("-bottom");
-        plasmaRegions = new int[plasmas];
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        for(int i = 0; i < plasmas; i++){
-            plasmaRegions[i] = reg("-plasma-" + i);
-        }
     }
 
     @Override
@@ -104,15 +94,15 @@ public class ImpactReactor extends PowerGenerator{
 
         @Override
         public void draw(){
-            Draw.rect(reg(bottomRegion), x, y);
+            Draw.rect(bottomRegion, x, y);
 
-            for(int i = 0; i < plasmas; i++){
+            for(int i = 0; i < plasmaRegions.length; i++){
                 float r = size * tilesize - 3f + Mathf.absin(Time.time(), 2f + i * 1f, 5f - i * 0.5f);
 
-                Draw.color(plasma1, plasma2, (float)i / plasmas);
+                Draw.color(plasma1, plasma2, (float)i / plasmaRegions.length);
                 Draw.alpha((0.3f + Mathf.absin(Time.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * warmup);
                 Draw.blend(Blending.additive);
-                Draw.rect(reg(plasmaRegions[i]), x, y, r, r, Time.time() * (12 + i * 6f) * warmup);
+                Draw.rect(plasmaRegions[i], x, y, r, r, Time.time() * (12 + i * 6f) * warmup);
                 Draw.blend();
             }
 

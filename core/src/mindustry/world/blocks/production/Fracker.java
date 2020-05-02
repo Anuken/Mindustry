@@ -2,14 +2,15 @@ package mindustry.world.blocks.production;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.world.meta.*;
 
 public class Fracker extends SolidPump{
     public float itemUseTime = 100f;
 
-    public TextureRegion liquidRegion;
-    public TextureRegion rotatorRegion;
-    public TextureRegion topRegion;
+    public @LoadRegion("@-liquid") TextureRegion liquidRegion;
+    public @LoadRegion("@-rotator") TextureRegion rotatorRegion;
+    public @LoadRegion("@-top") TextureRegion topRegion;
 
     public Fracker(String name){
         super(name);
@@ -21,15 +22,6 @@ public class Fracker extends SolidPump{
         super.setStats();
 
         stats.add(BlockStat.productionTime, itemUseTime / 60f, StatUnit.seconds);
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        liquidRegion = Core.atlas.find(name + "-liquid");
-        rotatorRegion = Core.atlas.find(name + "-rotator");
-        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override

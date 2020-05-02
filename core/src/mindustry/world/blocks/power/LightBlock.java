@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -16,13 +17,12 @@ public class LightBlock extends Block{
 
     public float brightness = 0.9f;
     public float radius = 200f;
-    public int topRegion;
+    public @LoadRegion("@-top") TextureRegion topRegion;
 
     public LightBlock(String name){
         super(name);
         hasPower = true;
         update = true;
-        topRegion = reg("-top");
         configurable = true;
         config(Integer.class, (tile, value) -> ((LightEntity)tile).color = value);
     }
@@ -42,7 +42,7 @@ public class LightBlock extends Block{
             super.draw();
             Draw.blend(Blending.additive);
             Draw.color(Tmp.c1.set(color), efficiency() * 0.3f);
-            Draw.rect(reg(topRegion), x, y);
+            Draw.rect(topRegion, x, y);
             Draw.color();
             Draw.blend();
         }

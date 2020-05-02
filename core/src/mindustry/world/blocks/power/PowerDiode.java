@@ -1,21 +1,18 @@
 package mindustry.world.blocks.power;
 
-import arc.Core;
-import arc.math.Mathf;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.ui.Bar;
-import arc.util.Eachable;
-import mindustry.ui.Cicon;
-import mindustry.world.Tile;
-import mindustry.world.Block;
-import arc.graphics.g2d.Draw;
-import mindustry.graphics.Pal;
-import arc.graphics.g2d.TextureRegion;
+import mindustry.graphics.*;
+import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 public class PowerDiode extends Block{
-    public TextureRegion arrow;
+    public @LoadRegion("@-arrow") TextureRegion arrow;
 
     public PowerDiode(String name){
         super(name);
@@ -32,12 +29,6 @@ public class PowerDiode extends Block{
 
         bars.add("back", entity -> new Bar("bar.input", Pal.powerBar, () -> bar(entity.back())));
         bars.add("front", entity -> new Bar("bar.output", Pal.powerBar, () -> bar(entity.front())));
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        arrow = Core.atlas.find(name + "-arrow");
     }
 
     @Override

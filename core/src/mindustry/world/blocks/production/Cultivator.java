@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -16,7 +17,8 @@ public class Cultivator extends GenericCrafter{
     public Color plantColorLight = Color.valueOf("7457ce");
     public Color bottomColor = Color.valueOf("474747");
 
-    public TextureRegion middleRegion, topRegion;
+    public @LoadRegion("@-middle") TextureRegion middleRegion;
+    public @LoadRegion("@-top") TextureRegion topRegion;
     public Rand random = new Rand(0);
     public float recurrence = 6f;
     public Attribute attribute = Attribute.spores;
@@ -24,14 +26,6 @@ public class Cultivator extends GenericCrafter{
     public Cultivator(String name){
         super(name);
         craftEffect = Fx.none;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        middleRegion = Core.atlas.find(name + "-middle");
-        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override

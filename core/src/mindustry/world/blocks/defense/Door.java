@@ -1,12 +1,12 @@
 package mindustry.world.blocks.defense;
 
-import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -20,8 +20,7 @@ public class Door extends Wall{
     public final int timerToggle = timers++;
     public Effect openfx = Fx.dooropen;
     public Effect closefx = Fx.doorclose;
-
-    protected TextureRegion openRegion;
+    public @LoadRegion("@-open") TextureRegion openRegion;
 
     public Door(String name){
         super(name);
@@ -35,12 +34,6 @@ public class Door extends Wall{
             (open ? closefx : openfx).at(door);
             Sounds.door.at(door);
         });
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        openRegion = Core.atlas.find(name + "-open");
     }
 
     @Override

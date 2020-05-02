@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -27,7 +28,8 @@ public class Conveyor extends Block implements Autotiler{
 
     private final Vec2 tr1 = new Vec2();
     private final Vec2 tr2 = new Vec2();
-    private TextureRegion[][] regions = new TextureRegion[7][4];
+
+    public @LoadRegion(value = "@-#1-#2", lengths = {7, 4}) TextureRegion[][] regions;
 
     public float speed = 0f;
     public float displayedSpeed = 0f;
@@ -52,17 +54,6 @@ public class Conveyor extends Block implements Autotiler{
         
         //have to add a custom calculated speed, since the actual movement speed is apparently not linear
         stats.add(BlockStat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        for(int i = 0; i < regions.length; i++){
-            for(int j = 0; j < 4; j++){
-                regions[i][j] = Core.atlas.find(name + "-" + i + "-" + j);
-            }
-        }
     }
 
     @Override

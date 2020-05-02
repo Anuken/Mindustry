@@ -158,8 +158,6 @@ public class Block extends UnlockableContent{
     public boolean alwaysUnlocked = false;
 
     protected Prov<Tilec> entityType = null; //initialized later
-    protected TextureRegion[] cacheRegions = {};
-    protected Array<String> cacheRegionStrings = new Array<>();
     //TODO move
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
@@ -167,6 +165,10 @@ public class Block extends UnlockableContent{
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] variantRegions, editorVariantRegions;
     public TextureRegion region, editorIcon;
+
+    //TODO remove completely
+    protected TextureRegion[] cacheRegions = {};
+    protected Array<String> cacheRegionStrings = new Array<>();
 
     //TODO move
     public static TextureRegion[][] cracks;
@@ -277,17 +279,6 @@ public class Block extends UnlockableContent{
 
     public boolean rotatedOutput(int x, int y){
         return rotate;
-    }
-
-    /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #reg(int)}. */
-    protected int reg(String suffix){
-        cacheRegionStrings.add(name + suffix);
-        return cacheRegionStrings.size - 1;
-    }
-
-    /** Returns an internally cached region by ID. */
-    protected TextureRegion reg(int id){
-        return cacheRegions[id];
     }
 
     public boolean synthetic(){
@@ -545,6 +536,19 @@ public class Block extends UnlockableContent{
             //assign default value
             entityType = TileEntity::create;
         }
+    }
+
+    /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #re(int)}.
+     * DO NOT USE. This will eventually be removed. */
+    protected int re(String suffix){
+        cacheRegionStrings.add(name + suffix);
+        return cacheRegionStrings.size - 1;
+    }
+
+    /** Returns an internally cached region by ID.
+     * DO NOT USE. This will eventually be removed*/
+    protected TextureRegion re(int id){
+        return cacheRegions[id];
     }
 
     @Override

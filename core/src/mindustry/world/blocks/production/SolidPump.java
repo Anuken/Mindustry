@@ -30,13 +30,6 @@ public class SolidPump extends Pump{
     }
 
     @Override
-    public void load(){
-        super.load();
-
-        liquidRegion = Core.atlas.find(name + "-liquid");
-    }
-
-    @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         if(attribute != null){
             drawPlaceText(Core.bundle.formatFloat("bar.efficiency", Math.max(sumAttribute(attribute, x, y) + 1f, 0f) * 100 * percentSolid(x, y), 1), x, y, valid);

@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -28,7 +29,7 @@ public class ForceProjector extends Block{
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
     public float basePowerDraw = 0.2f;
-    public TextureRegion topRegion;
+    public @LoadRegion("@-top") TextureRegion topRegion;
 
     private static ForceProjectorEntity paramEntity;
     private static Cons<Shielderc> shieldConsumer = trait -> {
@@ -54,12 +55,6 @@ public class ForceProjector extends Block{
     @Override
     public boolean outputsItems(){
         return false;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
