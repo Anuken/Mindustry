@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.struct.IntSet.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
@@ -124,6 +125,23 @@ public class ItemBridge extends Block{
             return world.tile(lastPlaced);
         }
         return null;
+    }
+
+    protected boolean overlaps(float srcx, float srcy, Tile other, float range){
+        return Intersector.overlaps(Tmp.cr1.set(srcx, srcy, range), other.getHitbox(Tmp.r1));
+    }
+
+    protected boolean overlaps(Tilec src, Tilec other, float range){
+        return overlaps(src.x(), src.y(), other.tile(), range);
+    }
+
+    protected boolean overlaps(Tile src, Tile other, float range){
+        return overlaps(src.drawx(), src.drawy(), other, range);
+    }
+
+    public boolean overlaps(@Nullable Tile src, @Nullable Tile other){
+        if(src == null || other == null) return true;
+        return Intersector.overlaps(Tmp.cr1.set(src.worldx() + offset(), src.worldy() + offset(), range * tilesize), Tmp.r1.setSize(size * tilesize).setCenter(other.worldx() + offset(), other.worldy() + offset()));
     }
 
     public class ItemBridgeEntity extends TileEntity{

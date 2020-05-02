@@ -32,6 +32,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
 import mindustry.world.blocks.power.*;
+import mindustry.world.blocks.distribution.*;
 
 import java.util.*;
 
@@ -882,6 +883,29 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 //check with how many powernodes the *next* tile will overlap
                 for(int j = 0; j < i; j++){
                     if(!skip.contains(points.get(j)) && ((PowerNode)block).overlaps(world.tile(point.x, point.y), world.tile(points.get(j).x, points.get(j).y))){
+                        overlaps++;
+                    }
+                }
+
+                //if it's more than one, it can bridge the gap
+                if(overlaps > 1){
+                    skip.add(points.get(i-1));
+                }
+            }
+            //remove skipped points
+            points.removeAll(skip);
+        }
+
+        if(block instanceof ItemBridge){
+            Array<Point2> skip = new Array<>();
+
+            for(int i = 1; i < points.size; i++){
+                int overlaps = 0;
+                Point2 point = points.get(i);
+
+                //check with how many itembridges the *next* tile will overlap
+                for(int j = 0; j < i; j++){
+                    if(!skip.contains(points.get(j)) && ((ItemBridge)block).overlaps(world.tile(point.x, point.y), world.tile(points.get(j).x, points.get(j).y))){
                         overlaps++;
                     }
                 }
