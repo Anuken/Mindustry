@@ -1,8 +1,10 @@
 package mindustry.world.blocks.units;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.style.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -94,6 +96,7 @@ public class UnitFactory extends Block{
         super.setStats();
 
         stats.remove(BlockStat.itemCapacity);
+
         //TODO
         //stats.add(BlockStat.productionTime, produceTime / 60f, StatUnit.seconds);
     }
@@ -148,6 +151,23 @@ public class UnitFactory extends Block{
             Array<UnitType> units = Array.with(plans).map(u -> u.unit);
 
             ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans[currentPlan].unit, unit -> tile.configure(units.indexOf(unit)));
+        }
+
+        @Override
+        public void display(Table table){
+            super.display(table);
+
+            TextureRegionDrawable reg = new TextureRegionDrawable();
+
+            table.row();
+            table.table(t -> {
+                t.image().update(i -> {
+                    i.setDrawable(currentPlan == -1 ? Icon.cancel : reg.set(plans[currentPlan].unit.icon(Cicon.medium)));
+                    i.setScaling(Scaling.fit);
+                    i.setColor(currentPlan == -1 ? Color.lightGray : Color.white);
+                }).size(32).padBottom(-4).padRight(2);
+                t.label(() -> currentPlan == -1 ? "$none" : plans[currentPlan].unit.localizedName).color(Color.lightGray);
+            });
         }
 
         @Override

@@ -1673,8 +1673,8 @@ public class Blocks implements ContentList{
         groundFactory = new UnitFactory("ground-factory"){{
             requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.dagger, 200f, ItemStack.with(Items.silicon, 10)),
-                new UnitPlan(UnitTypes.titan, 400f, ItemStack.with(Items.silicon, 20, Items.thorium, 20)),
+                new UnitPlan(UnitTypes.dagger, 500f, ItemStack.with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.titan, 800f, ItemStack.with(Items.silicon, 20, Items.titanium, 10)),
             };
             size = 3;
             consumes.power(1.2f);
