@@ -31,6 +31,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @ReadOnly Team team = Team.sharded;
     String name = "noname";
+    String username = null;
     @Nullable NetConnection con;
     boolean admin, typing;
     Color color = new Color();

@@ -492,7 +492,7 @@ public class NetServer implements ApplicationListener{
         player.con().hasDisconnected = true;
     }
 
-    public void finalizeConnect(Player player){
+    public void finalizeConnect(Playerc player){
         sendWorldData(player);
         platform.updateRPC();
         Events.fire(new PlayerConnect(player));
@@ -648,7 +648,7 @@ public class NetServer implements ApplicationListener{
     @Remote(targets = Loc.client)
     public static void connectConfirm(Playerc player){
         if(player.con() == null || player.con().hasConnected) return;
-        if(auth.enabled() && !player.con().authenticatied) return;
+        if(auth.enabled() && !player.con().authenticated) return;
 
         player.add();
         player.con().hasConnected = true;

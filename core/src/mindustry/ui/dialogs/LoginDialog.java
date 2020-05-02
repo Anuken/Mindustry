@@ -16,7 +16,7 @@ public class LoginDialog extends FloatingDialog {
         super("$login.title");
 
         keyDown(key -> {
-            if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
+            if(key == KeyCode.escape || key == KeyCode.back){
                 cancel();
             }
         });
@@ -80,12 +80,12 @@ public class LoginDialog extends FloatingDialog {
         cont.row();
         cont.table(t -> {
             t.add("$login.username").padRight(10);
-            TextField usernameField = t.addField("", text -> auth.loginInfo.username = text).size(320f, 54f).get();
+            TextField usernameField = t.field("", text -> auth.loginInfo.username = text).size(320f, 54f).get();
             usernameField.next(false);
             platform.addDialog(usernameField, 50);
             t.row();
             t.add("$login.password").padRight(10);
-            TextField passwordField = t.addField("", text -> auth.loginInfo.password = text).size(320f, 54f).get();
+            TextField passwordField = t.field("", text -> auth.loginInfo.password = text).size(320f, 54f).get();
             passwordField.setPasswordMode(true);
             passwordField.setPasswordCharacter('•');
             platform.addDialog(passwordField, 50);
@@ -94,15 +94,15 @@ public class LoginDialog extends FloatingDialog {
         cont.table(t -> {
             t.defaults().size(140f, 60f).pad(4f);
             if(info.showRegister){
-                t.addButton("$login.register", () -> {
+                t.button("$login.register", () -> {
                     if(!Core.net.openURI(info.authServer)){
                         ui.showErrorMessage("$linkfail");
                         Core.app.setClipboardText(info.authServer);
                     }
                 });
             }
-            t.addButton("$cancel", this::cancel);
-            t.addButton("$login.submit", this::submit);
+            t.button("$cancel", this::cancel);
+            t.button("$login.submit", this::submit);
         });
     }
 }

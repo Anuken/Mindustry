@@ -12,8 +12,8 @@ import arc.util.NetJavaImpl;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.ValueType;
 import arc.util.serialization.JsonWriter.OutputType;
-import mindustry.entities.type.Player;
 import mindustry.gen.Call;
+import mindustry.gen.Playerc;
 import mindustry.net.Administration.Config;
 import mindustry.net.Packets.KickReason;
 
@@ -192,29 +192,29 @@ public class Authentication{
     }
 
     @Remote(targets = Loc.client, priority = PacketPriority.high)
-    public static void sendAuthenticationResponse(Player player, String username, String token){
-        if(player.con == null) return;
-        if(!player.con.authenticationRequested) return;
-        player.con.authenticationRequested = false;
+    public static void sendAuthenticationResponse(Playerc player, String username, String token){
+        if(player.con() == null) return;
+        if(!player.con().authenticationRequested) return;
+        player.con().authenticationRequested = false;
         if(username == null || token == null){
-            player.con.kick(KickReason.authenticationFailed);
+            player.con().kick(KickReason.authenticationFailed);
             return;
         }
 
-        String address = Config.authVerifyIP.bool() ? player.con.address : null;
+        String address = Config.authVerifyIP.bool() ? player.con().address : null;
         auth.verifyConnect(username, token, address).done(response -> {
             if(response.success) {
-                player.con.authenticated = true;
-                player.username = username;
-                Call.sendAuthenticationResult(player.con, AuthResult.succeeded);
+                player.con().authenticated = true;
+                player.username(username);
+                Call.sendAuthenticationResult(player.con(), AuthResult.succeeded);
                 netServer.finalizeConnect(player);
-                Log.info("Authentication succeeded for player &lc{0}&lg (username &lc{1}&lg)", player.name, username);
+                Log.info("Authentication succeeded for player &lc{0}&lg (username &lc{1}&lg)", player.name(), username);
             }else{
                 if(response.exception != null){
                     Log.err("Unexpected error in authentication", response.exception);
-                    Call.sendAuthenticationResult(player.con, AuthResult.serverFail);
+                    Call.sendAuthenticationResult(player.con(), AuthResult.serverFail);
                 }else{
-                    Log.info("Player &lc{0}&lg failed authentication: {1} ({2})", player.name, response.errorCode, response.errorDescription);
+                    Log.info("Player &lc{0}&lg failed authentication: {1} ({2})", player.name(), response.errorCode, response.errorDescription);
                     AuthResult result = AuthResult.serverFail;
                     switch(response.errorCode){
                         case "NO_SUCH_TOKEN":
@@ -231,9 +231,9 @@ public class Authentication{
                             result = AuthResult.serverMismatch;
                             break;
                     }
-                    Call.sendAuthenticationResult(player.con, result);
+                    Call.sendAuthenticationResult(player.con(), result);
                 }
-                player.con.kick(KickReason.authenticationFailed);
+                player.con().kick(KickReason.authenticationFailed);
             }
         });
     }
@@ -326,16 +326,16 @@ public class Authentication{
         sessions = Core.settings.getObject("authentication-sessions", ObjectMap.class, ObjectMap::new);
     }
 
-    public void handleConnect(Player player){
+    public void handleConnect(Playerc player){
         String authServer = Config.authServer.string();
         if(authServer == null){
             Log.err("Authentication was enabled but no authentication server was specified!");
-            player.con.kick(KickReason.authenticationFailed);
+            player.con().kick(KickReason.authenticationFailed);
             return;
         }
 
-        player.con.authenticationRequested = true;
-        Call.authenticationRequired(player.con, authServer, getServerIdHash());
+        player.con().authenticationRequested = true;
+        Call.authenticationRequired(player.con(), authServer, getServerIdHash());
     }
 
     public String buildUrl(String base, String endpoint) {

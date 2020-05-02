@@ -6,7 +6,7 @@ buildscript{
 
         arcHash = getArcHash()
     }
-    
+
     repositories{
         mavenLocal()
         mavenCentral()
@@ -26,7 +26,7 @@ buildscript{
 
 allprojects{
     apply plugin: 'maven'
-    
+
     version = 'release'
     group = 'com.github.Anuken'
 
@@ -196,7 +196,7 @@ project(":ios"){
             props['app.executable'] = 'IOSLauncher'
             props['app.name'] = 'Mindustry'
         }
-        
+
         props['app.build'] = (!props.containsKey("app.build") ? 40 : props['app.build'].toInteger() + 1) + ""
         props.store(vfile.newWriter(), null)
     }
