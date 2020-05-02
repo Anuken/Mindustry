@@ -87,14 +87,6 @@ public class Annotations{
     //endregion
     //region misc. utility
 
-    @Target(ElementType.FIELD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Multiline {
-        boolean trim() default true;
-        boolean merge() default false;
-        char mergeChar() default ' ';
-    }
-
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
     public @interface StyleDefaults{
