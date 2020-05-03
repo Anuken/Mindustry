@@ -237,7 +237,7 @@ public class ApplicationTests{
         state.set(State.playing);
 
         world.tile(0, 0).setBlock(Blocks.liquidSource);
-        world.tile(0, 0).configureAny(Liquids.water);
+        world.tile(0, 0).entity.configureAny(Liquids.water);
 
         world.tile(2, 1).setBlock(Blocks.liquidTank);
 
@@ -255,7 +255,7 @@ public class ApplicationTests{
         Tile source = world.rawTile(0, 0), tank = world.rawTile(1, 4), junction = world.rawTile(0, 1), conduit = world.rawTile(0, 2);
 
         source.setBlock(Blocks.liquidSource);
-        source.configureAny(Liquids.water);
+        source.entity.configureAny(Liquids.water);
 
         junction.setBlock(Blocks.liquidJunction);
 
@@ -353,7 +353,7 @@ public class ApplicationTests{
         state.set(State.playing);
         int length = 128;
         world.tile(0, 0).setBlock(Blocks.itemSource);
-        world.tile(0, 0).configureAny(Items.copper);
+        world.tile(0, 0).entity.configureAny(Items.copper);
 
         Array<Tilec> entities = Array.with(world.tile(0, 0).entity);
 
