@@ -148,6 +148,14 @@ public class DesktopInput extends InputHandler{
             Draw.color();
             drawRequest(cursorX, cursorY, block, rotation);
             block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
+
+            if(block.saveConfig && block.lastConfig != null){
+                brequest.set(cursorX, cursorY, rotation, block);
+                brequest.config = block.lastConfig;
+
+                block.drawRequestConfig(brequest, allRequests());
+            }
+
         }
 
         Draw.reset();
