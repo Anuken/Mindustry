@@ -44,6 +44,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     final static int maxLength = 100;
     final static Vec2 stackTrns = new Vec2();
     final static Rect r1 = new Rect(), r2 = new Rect();
+    final static Array<Unitc> units = new Array<>();
     /** Distance on the back from where items originate. */
     final static float backTrns = 3f;
 

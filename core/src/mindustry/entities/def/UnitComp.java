@@ -59,8 +59,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public void controller(UnitController controller){
-        this.controller = controller;
+    public void controller(UnitController next){
+        this.controller = next;
         if(controller.unit() != this) controller.unit(this);
     }
 

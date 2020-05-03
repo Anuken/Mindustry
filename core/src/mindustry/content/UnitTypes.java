@@ -21,7 +21,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Builderc.class}) UnitType phantom, spirit;
 
     //water
-    public static @EntityDef({Unitc.class, WaterMovec.class}) UnitType vanguard;
+    public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType vanguard;
 
     @Override
     public void load(){

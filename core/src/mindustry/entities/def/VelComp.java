@@ -20,6 +20,10 @@ abstract class VelComp implements Posc{
         vel.scl(1f - drag * Time.delta());
     }
 
+    boolean moving(){
+        return !vel.isZero(0.001f);
+    }
+
     void move(float cx, float cy){
         x += cx;
         y += cy;

@@ -15,7 +15,7 @@ public interface UnitController{
 
     }
 
-    default boolean isFollowing(Playerc player){
+    default boolean isBeingControlled(Unitc player){
         return false;
     }
 }

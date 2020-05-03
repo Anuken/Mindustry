@@ -19,7 +19,7 @@ import arc.struct.*;
 public class Formation{
 
     /** A list of slots assignments. */
-    Array<SlotAssignment> slotAssignments;
+    public Array<SlotAssignment> slotAssignments;
 
     /** The anchor point of this formation. */
     public Vec3 anchor;
@@ -81,6 +81,8 @@ public class Formation{
 
     /** Updates the assignment of members to slots */
     public void updateSlotAssignments(){
+        pattern.slots = slotAssignments.size;
+
         // Apply the strategy to update slot assignments
         slotAssignmentStrategy.updateSlotAssignments(slotAssignments);
 
@@ -114,6 +116,21 @@ public class Formation{
         return false;
     }
 
+    /** Much more efficient than adding a single member.
+     * @return number of members added. */
+    public int addMembers(Iterable<? extends FormationMember> members){
+        int added = 0;
+        for(FormationMember member : members){
+            if(pattern.supportsSlots(slotAssignments.size + 1)){
+                slotAssignments.add(new SlotAssignment(member, slotAssignments.size));
+                added ++;
+            }
+        }
+
+        updateSlotAssignments();
+        return added;
+    }
+
     /**
      * Adds a new member to the first available slot and updates slot assignments if the number of member is supported by the
      * current pattern.
@@ -121,13 +138,11 @@ public class Formation{
      * @return {@code false} if no more slots are available; {@code true} otherwise.
      */
     public boolean addMember(FormationMember member){
-        // Find out how many slots we have occupied
-        int occupiedSlots = slotAssignments.size;
 
         // Check if the pattern supports one more slot
-        if(pattern.supportsSlots(occupiedSlots + 1)){
+        if(pattern.supportsSlots(slotAssignments.size + 1)){
             // Add a new slot assignment
-            slotAssignments.add(new SlotAssignment(member, occupiedSlots));
+            slotAssignments.add(new SlotAssignment(member, slotAssignments.size));
 
             // Update the slot assignments and return success
             updateSlotAssignments();

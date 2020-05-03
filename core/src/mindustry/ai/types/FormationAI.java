@@ -1,68 +1,46 @@
 package mindustry.ai.types;
 
-import arc.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.ai.formations.*;
-import mindustry.ai.formations.patterns.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 
 public class FormationAI extends AIController implements FormationMember{
-    public @Nullable Unitc leader;
+    public Unitc leader;
 
-    private transient Vec3 target = new Vec3();
+    private Vec3 target = new Vec3();
+    private Formation formation;
 
-    public FormationAI(@Nullable Unitc leader){
+    public FormationAI(Unitc leader, Formation formation){
         this.leader = leader;
+        this.formation = formation;
     }
-
-    static Formation formation;
-    static Vec2 vec = new Vec2();
 
     @Override
     public void init(){
-        if(formation == null){
-            Vec3 vec = new Vec3();
-
-            formation = new Formation(vec, new SquareFormation());
-            Core.app.addListener(new ApplicationListener(){
-                @Override
-                public void update(){
-                    formation.updateSlots();
-                    vec.set(leader.x(), leader.y(), leader.rotation());
-                }
-            });
-        }
-
-        formation.addMember(this);
+        target.set(unit.x(), unit.y(), 0);
     }
 
     @Override
     public void update(){
-        if(leader != null){
+        unit.controlWeapons(leader.isRotate(), leader.isShooting());
+        // unit.moveAt(Tmp.v1.set(deltaX, deltaY).limit(unit.type().speed));
+        if(leader.isShooting()){
+            unit.aimLook(leader.aimX(), leader.aimY());
+        }else{
 
-            unit.controlWeapons(leader.isRotate(), leader.isShooting());
-            // unit.moveAt(Tmp.v1.set(deltaX, deltaY).limit(unit.type().speed));
-            if(leader.isShooting()){
-                unit.aimLook(leader.aimX(), leader.aimY());
-            }else{
-
-                unit.lookAt(leader.rotation());
-                if(!unit.vel().isZero(0.001f)){
-                //    unit.lookAt(unit.vel().angle());
-                }
+            unit.lookAt(leader.rotation());
+            if(!unit.vel().isZero(0.001f)){
+            //    unit.lookAt(unit.vel().angle());
             }
-
-
-
-            unit.moveAt(vec.set(target).sub(unit).limit2(unit.type().speed));
         }
+
+        unit.moveAt(vec.set(target).sub(unit).limit2(unit.type().speed));
     }
 
     @Override
-    public boolean isFollowing(Playerc player){
-        return leader == player.unit();
+    public boolean isBeingControlled(Unitc player){
+        return leader == player;
     }
 
     @Override

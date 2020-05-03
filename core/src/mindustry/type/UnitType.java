@@ -115,7 +115,7 @@ public class UnitType extends UnlockableContent{
     //region drawing
 
     public void draw(Unitc unit){
-        if(unit.controller().isFollowing(player)){
+        if(unit.controller().isBeingControlled(player.unit())){
             drawControl(unit);
         }
 
