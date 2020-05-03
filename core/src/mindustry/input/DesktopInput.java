@@ -518,6 +518,8 @@ public class DesktopInput extends InputHandler{
 
         if(Core.input.keyTap(Binding.reset_filters)){
             Events.fire(Trigger.resetFilters);
+            ui.showInfoToast(Core.bundle.get("resetfilters"), 5);
+            Sounds.click.play();
         }
     }
 
