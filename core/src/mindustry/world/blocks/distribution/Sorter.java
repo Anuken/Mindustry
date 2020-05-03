@@ -1,5 +1,6 @@
 package mindustry.world.blocks.distribution;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
@@ -7,6 +8,7 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -16,7 +18,8 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Sorter extends Block{
-    private static Item lastItem;
+    protected static Item lastItem;
+
     public boolean invert;
 
     public Sorter(String name){
@@ -25,10 +28,15 @@ public class Sorter extends Block{
         solid = true;
         instantTransfer = true;
         group = BlockGroup.transportation;
-        configurable = true;
         unloadable = false;
+
+        configurable = true;
         config(Item.class, (tile, item) -> ((SorterEntity)tile).sortItem = item);
         configClear(tile -> ((SorterEntity)tile).sortItem = null);
+
+        Events.on(Trigger.resetFilters, () -> {
+            lastItem = null;
+        });
     }
 
     @Override

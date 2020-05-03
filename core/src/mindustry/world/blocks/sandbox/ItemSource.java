@@ -6,6 +6,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -15,7 +16,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ItemSource extends Block{
-    private static Item lastItem;
+    protected static Item lastItem;
 
     public ItemSource(String name){
         super(name);
@@ -23,9 +24,14 @@ public class ItemSource extends Block{
         update = true;
         solid = true;
         group = BlockGroup.transportation;
+
         configurable = true;
         config(Item.class, (tile, item) -> ((ItemSourceEntity)tile).outputItem = item);
         configClear(tile -> ((ItemSourceEntity)tile).outputItem = null);
+
+        Events.on(Trigger.resetFilters, () -> {
+            lastItem = null;
+        });
     }
 
     @Override

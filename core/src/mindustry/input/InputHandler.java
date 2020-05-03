@@ -898,7 +898,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(block instanceof PowerNode){
             Array<Point2> skip = new Array<>();
-            
+
             for(int i = 1; i < points.size; i++){
                 int overlaps = 0;
                 Point2 point = points.get(i);

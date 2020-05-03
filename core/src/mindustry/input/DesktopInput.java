@@ -515,6 +515,10 @@ public class DesktopInput extends InputHandler{
                 Core.settings.put("lasersopacity", 0);
             }
         }
+
+        if(Core.input.keyTap(Binding.reset_filters)){
+            Events.fire(Trigger.resetFilters);
+        }
     }
 
     @Override

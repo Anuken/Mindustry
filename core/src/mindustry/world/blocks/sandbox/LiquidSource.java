@@ -8,6 +8,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -16,7 +17,7 @@ import mindustry.world.blocks.*;
 import static mindustry.Vars.*;
 
 public class LiquidSource extends Block{
-    public static Liquid lastLiquid;
+    protected static Liquid lastLiquid;
 
     public LiquidSource(String name){
         super(name);
@@ -24,10 +25,15 @@ public class LiquidSource extends Block{
         solid = true;
         hasLiquids = true;
         liquidCapacity = 100f;
-        configurable = true;
         outputsLiquid = true;
+
+        configurable = true;
         config(Liquid.class, (tile, l) -> ((LiquidSourceEntity)tile).source = l);
         configClear(tile -> ((LiquidSourceEntity)tile).source = null);
+
+        Events.on(Trigger.resetFilters, () -> {
+            lastLiquid = null;
+        });
     }
 
     @Override

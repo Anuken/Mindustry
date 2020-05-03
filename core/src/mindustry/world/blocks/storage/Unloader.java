@@ -1,11 +1,13 @@
 package mindustry.world.blocks.storage;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -14,10 +16,10 @@ import mindustry.world.blocks.*;
 import static mindustry.Vars.*;
 
 public class Unloader extends Block{
+    protected static Item lastItem;
+
     public float speed = 1f;
     public final int timerUnload = timers++;
-
-    private static Item lastItem;
 
     public Unloader(String name){
         super(name);
@@ -25,13 +27,17 @@ public class Unloader extends Block{
         solid = true;
         health = 70;
         hasItems = true;
+
         configurable = true;
         config(Item.class, (tile, item) -> {
             tile.items().clear();
             ((UnloaderEntity)tile).sortItem = item;
         });
-
         configClear(tile -> ((UnloaderEntity)tile).sortItem = null);
+
+        Events.on(Trigger.resetFilters, () -> {
+            lastItem = null;
+        });
     }
 
     @Override

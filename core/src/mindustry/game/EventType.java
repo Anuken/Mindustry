@@ -29,7 +29,8 @@ public class EventType{
         openWiki,
         teamCoreDamage,
         socketConfigChanged,
-        update
+        update,
+        resetFilters
     }
 
     public static class WinEvent{}
