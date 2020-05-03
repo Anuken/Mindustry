@@ -213,15 +213,15 @@ public class MassDriver extends Block{
         @Override
         public boolean onConfigureTileTapped(Tilec other){
             if(this == other){
-                tile.configure(-1);
+                configure(-1);
                 return false;
             }
 
             if(link == other.pos()){
-                tile.configure(-1);
+                configure(-1);
                 return false;
             }else if(other.block() instanceof MassDriver && other.dst(tile) <= range && other.team() == team){
-                tile.configure(other.pos());
+                configure(other.pos());
                 return false;
             }
 

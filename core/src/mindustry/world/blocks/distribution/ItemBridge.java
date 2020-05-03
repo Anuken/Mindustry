@@ -20,15 +20,15 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ItemBridge extends Block{
+    private static BuildRequest otherReq;
+
     public final int timerTransport = timers++;
     public int range;
     public float transportTime = 2f;
     public @Load("@-end") TextureRegion endRegion;
     public @Load("@-bridge") TextureRegion bridgeRegion;
     public @Load("@-arrow") TextureRegion arrowRegion;
-
-    private static BuildRequest otherReq;
-    private static int lastPlaced = -1;
+    public int lastPlaced = -1;
 
     public ItemBridge(String name){
         super(name);
@@ -132,7 +132,7 @@ public class ItemBridge extends Block{
         public void playerPlaced(){
             Tile link = findLink(tile.x, tile.y);
             if(linkValid(tile, link)){
-                link.configure(tile.pos());
+                configure(tile.pos());
             }
 
             lastPlaced = tile.pos();
@@ -165,9 +165,9 @@ public class ItemBridge extends Block{
         public boolean onConfigureTileTapped(Tilec other){
             if(linkValid(tile, other.tile())){
                 if(link == other.pos()){
-                    tile.configure(-1);
+                    configure(-1);
                 }else{
-                    tile.configure(other.pos());
+                    configure(other.pos());
                 }
                 return false;
             }

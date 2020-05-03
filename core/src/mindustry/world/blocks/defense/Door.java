@@ -65,7 +65,7 @@ public class Door extends Wall{
                 return;
             }
 
-            tile.configure(!open);
+            configure(!open);
         }
 
         @Override

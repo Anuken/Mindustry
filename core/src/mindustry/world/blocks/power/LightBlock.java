@@ -13,8 +13,6 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class LightBlock extends Block{
-    private static int lastColor = 0;
-
     public float brightness = 0.9f;
     public float radius = 200f;
     public @Load("@-top") TextureRegion topRegion;
@@ -24,18 +22,13 @@ public class LightBlock extends Block{
         hasPower = true;
         update = true;
         configurable = true;
+        saveConfig = true;
+
         config(Integer.class, (tile, value) -> ((LightEntity)tile).color = value);
     }
 
     public class LightEntity extends TileEntity{
         public int color = Pal.accent.rgba();
-
-        @Override
-        public void playerPlaced(){
-            if(lastColor != 0){
-                tile.configure(lastColor);
-            }
-        }
 
         @Override
         public void draw(){
@@ -50,10 +43,7 @@ public class LightBlock extends Block{
         @Override
         public void buildConfiguration(Table table){
             table.button(Icon.pencil, () -> {
-                ui.picker.show(Tmp.c1.set(color).a(0.5f), false, res -> {
-                    color = res.rgba();
-                    lastColor = color;
-                });
+                ui.picker.show(Tmp.c1.set(color).a(0.5f), false, res -> configure(res.rgba()));
                 control.input.frag.config.hideConfig();
             }).size(40f);
         }

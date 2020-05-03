@@ -95,15 +95,6 @@ public class Tile implements Position, QuadTreeObject{
         return -1;
     }
 
-    /** Configure a tile with the current, local player. */
-    public void configure(Object value){
-        if(entity != null) Call.onTileConfig(player, entity, value);
-    }
-
-    public void configureAny(Object value){
-        if(entity != null) Call.onTileConfig(null, entity, value);
-    }
-
     @SuppressWarnings("unchecked")
     public <T extends TileEntity> T ent(){
         return (T)entity;

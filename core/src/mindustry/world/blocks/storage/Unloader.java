@@ -17,8 +17,6 @@ public class Unloader extends Block{
     public float speed = 1f;
     public final int timerUnload = timers++;
 
-    private static Item lastItem;
-
     public Unloader(String name){
         super(name);
         update = true;
@@ -26,6 +24,8 @@ public class Unloader extends Block{
         health = 70;
         hasItems = true;
         configurable = true;
+        saveConfig = true;
+
         config(Item.class, (tile, item) -> {
             tile.items().clear();
             ((UnloaderEntity)tile).sortItem = item;
@@ -70,13 +70,6 @@ public class Unloader extends Block{
         }
 
         @Override
-        public void playerPlaced(){
-            if(lastItem != null){
-                tile.configure(lastItem);
-            }
-        }
-
-        @Override
         public void updateTile(){
             if(timer(timerUnload, speed / timeScale()) && items.total() == 0){
                 for(Tilec other : proximity){
@@ -101,14 +94,14 @@ public class Unloader extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> tile.<UnloaderEntity>ent().sortItem, item -> tile.configure(lastItem = item));
+            ItemSelection.buildTable(table, content.items(), () -> tile.<UnloaderEntity>ent().sortItem, item -> configure(item));
         }
 
         @Override
         public boolean onConfigureTileTapped(Tilec other){
             if(this == other){
                 control.input.frag.config.hideConfig();
-                tile.configure(lastItem = null);
+                configure(null);
                 return false;
             }
 

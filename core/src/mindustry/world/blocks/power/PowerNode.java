@@ -285,7 +285,7 @@ public class PowerNode extends PowerBlock{
             });
             tempTileEnts.each(valid, other -> {
                 if(!power.links.contains(other.pos())){
-                    tile.configureAny(other.pos());
+                    configureAny(other.pos());
                 }
             });
 
@@ -300,7 +300,7 @@ public class PowerNode extends PowerBlock{
         @Override
         public boolean onConfigureTileTapped(Tilec other){
             if(linkValid(this, other)){
-                tile.configure(other.pos());
+                configure(other.pos());
                 return false;
             }
 
@@ -309,12 +309,12 @@ public class PowerNode extends PowerBlock{
                     int[] total = {0};
                     getPotentialLinks(tile, link -> {
                         if(!insulated(this, link) && total[0]++ < maxNodes){
-                            tile.configure(link.pos());
+                            configure(link.pos());
                         }
                     });
                 }else{
                     while(power.links.size > 0){
-                        tile.configure(power.links.get(0));
+                        configure(power.links.get(0));
                     }
                 }
                 return false;

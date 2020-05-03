@@ -121,7 +121,7 @@ public class PhysicsProcess implements AsyncProcess{
             ref.position.set(entity);
 
             //add delta velocity - this doesn't work very well yet
-            entity.vel().add(ref.velocity).sub(ref.lastVelocity);
+            //entity.vel().add(ref.velocity).sub(ref.lastVelocity);
         }
     }
 

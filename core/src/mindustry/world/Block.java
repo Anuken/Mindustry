@@ -13,6 +13,7 @@ import arc.struct.Array;
 import arc.struct.EnumSet;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
@@ -55,6 +56,10 @@ public class Block extends UnlockableContent{
     public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();
 
+    /** the last configuration value applied to this block. */
+    public @Nullable Object lastConfig;
+    /** whether to save the last config and apply it to newly placed blocks */
+    public boolean saveConfig = false;
     /** whether this block has a tile entity that updates */
     public boolean update;
     /** whether this block has health and can be destroyed */
