@@ -132,7 +132,7 @@ public class ItemBridge extends Block{
         public void playerPlaced(){
             Tile link = findLink(tile.x, tile.y);
             if(linkValid(tile, link)){
-                configure(tile.pos());
+                link.entity.configure(tile.pos());
             }
 
             lastPlaced = tile.pos();
