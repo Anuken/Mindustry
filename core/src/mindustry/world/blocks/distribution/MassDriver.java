@@ -212,7 +212,10 @@ public class MassDriver extends Block{
 
         @Override
         public boolean onConfigureTileTapped(Tilec other){
-            if(this == other) return false;
+            if(this == other){
+                tile.configure(-1);
+                return false;
+            }
 
             if(link == other.pos()){
                 tile.configure(-1);
