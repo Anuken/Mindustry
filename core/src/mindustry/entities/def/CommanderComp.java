@@ -39,7 +39,7 @@ abstract class CommanderComp implements Unitc{
 
     //make sure to reset command state when the controller is switched
     @Override
-    public void controller(UnitController unitController){
+    public void controller(UnitController next){
         clearCommand();
     }
 

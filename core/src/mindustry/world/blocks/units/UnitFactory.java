@@ -222,13 +222,15 @@ public class UnitFactory extends Block{
             if(currentPlan != -1){
                 UnitPlan plan = plans[currentPlan];
 
-                if(progress >= plan.time){
+                if(progress >= plan.time/* && !Units.anyEntities(tile, !plan.unit.flying)*/){
                     progress = 0f;
 
                     Call.onUnitFactorySpawn(tile);
                     useContent(plan.unit);
                     consume();
                 }
+
+                progress = Mathf.clamp(progress, 0, plan.time);
             }else{
                 progress = 0f;
             }

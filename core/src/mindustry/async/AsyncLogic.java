@@ -41,27 +41,31 @@ public class AsyncLogic{
     }
 
     public void begin(){
-        //sync begin
-        for(AsyncProcess p : processes){
-            p.begin();
-        }
+        if(Vars.state.isPlaying()){
+            //sync begin
+            for(AsyncProcess p : processes){
+                p.begin();
+            }
 
-        futures.clear();
+            futures.clear();
 
-        //submit all tasks
-        for(AsyncProcess p : processes){
-            if(p.shouldProcess()){
-                futures.add(executor.submit(p::process));
+            //submit all tasks
+            for(AsyncProcess p : processes){
+                if(p.shouldProcess()){
+                    futures.add(executor.submit(p::process));
+                }
             }
         }
     }
 
     public void end(){
-        complete();
+        if(Vars.state.isPlaying()){
+            complete();
 
-        //sync end (flush data)
-        for(AsyncProcess p : processes){
-            p.end();
+            //sync end (flush data)
+            for(AsyncProcess p : processes){
+                p.end();
+            }
         }
     }
 

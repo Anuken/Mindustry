@@ -96,7 +96,7 @@ public class PhysicsProcess implements AsyncProcess{
             ref.lastVelocity.set(ref.velocity);
         }
 
-        physics.step(Core.graphics.getDeltaTime(), 8, 8);
+        physics.step(Core.graphics.getDeltaTime(), 5, 8);
 
         //get delta vectors
         for(PhysicRef ref : refs){
@@ -121,7 +121,7 @@ public class PhysicsProcess implements AsyncProcess{
             ref.position.set(entity);
 
             //add delta velocity - this doesn't work very well yet
-            //entity.vel().add(ref.velocity).sub(ref.lastVelocity);
+            entity.vel().add(ref.velocity).sub(ref.lastVelocity);
         }
     }
 
