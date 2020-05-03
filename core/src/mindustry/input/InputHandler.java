@@ -32,6 +32,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
 import mindustry.world.blocks.power.*;
+import mindustry.world.blocks.distribution.*;
 
 import java.util.*;
 
@@ -606,7 +607,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //check if tapped block is configurable
         if(tile.block().configurable && tile.interactable(player.team())){
             consumed = true;
-            if(((!frag.config.isShown() && tile.shouldShowConfigure(player)) //if the config fragment is hidden, show
+            if(tile.block() instanceof ItemBridge && Core.input.keyDown(Binding.diagonal_placement)){
+				((ItemBridge)tile.block()).reverseLink(tile.tile());
+            }
+            else if(((!frag.config.isShown() && tile.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
             || (frag.config.isShown() && frag.config.getSelectedTile().onConfigureTileTapped(tile)))){
                 Sounds.click.at(tile);

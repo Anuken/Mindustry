@@ -120,6 +120,14 @@ public class ItemBridge extends Block{
         return null;
     }
 
+	public void reverseLink(Tile other){
+		if(!(other.ent() instanceof ItemBridgeEntity)) return;
+		int link = other.<ItemBridgeEntity>ent().link;
+		if(link == -1) return;
+		other.configure(-1);
+		world.tile(link).configure(other.pos());
+	}
+
     public class ItemBridgeEntity extends TileEntity{
         public int link = -1;
         public IntSet incoming = new IntSet();
