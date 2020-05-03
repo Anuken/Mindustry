@@ -26,8 +26,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class UnitFactory extends Block{
-
-
     public float launchVelocity = 5f;
     public @Load("@-top") TextureRegion topRegion;
     public int[] capacities;
