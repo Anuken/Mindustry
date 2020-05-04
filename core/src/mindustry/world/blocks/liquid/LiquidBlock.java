@@ -9,8 +9,8 @@ import mindustry.world.meta.*;
 
 public class LiquidBlock extends Block{
     public @Load("@-liquid") TextureRegion liquidRegion;
-    public @Load("@-top") TextureRegion bottomRegion;
-    public @Load("@-bottom") TextureRegion topRegion;
+    public @Load("@-top") TextureRegion topRegion;
+    public @Load("@-bottom") TextureRegion bottomRegion;
 
     public LiquidBlock(String name){
         super(name);
