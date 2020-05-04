@@ -96,8 +96,8 @@ public class ImagePacker{
 
         Time.mark();
         Generators.generate();
-        Log.info("&ly[Generator]&lc Total time to generate: &lg{0}&lcms", Time.elapsed());
-        Log.info("&ly[Generator]&lc Total images created: &lg{0}", Image.total());
+        Log.info("&ly[Generator]&lc Total time to generate: &lg@&lcms", Time.elapsed());
+        Log.info("&ly[Generator]&lc Total images created: &lg@", Image.total());
         Image.dispose();
 
         //format:
@@ -140,7 +140,7 @@ public class ImagePacker{
     static void generate(String name, Runnable run){
         Time.mark();
         run.run();
-        Log.info("&ly[Generator]&lc Time to generate &lm{0}&lc: &lg{1}&lcms", name, Time.elapsed());
+        Log.info("&ly[Generator]&lc Time to generate &lm@&lc: &lg@&lcms", name, Time.elapsed());
     }
 
     static BufferedImage buf(TextureRegion region){
@@ -181,7 +181,7 @@ public class ImagePacker{
 
         static void validate(TextureRegion region){
             if(((GenRegion)region).invalid){
-                ImagePacker.err("Region does not exist: {0}", ((GenRegion)region).name);
+                ImagePacker.err("Region does not exist: @", ((GenRegion)region).name);
             }
         }
     }

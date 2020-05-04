@@ -113,7 +113,7 @@ public class BeControl{
                 dialog.show();
             }, () -> checkUpdates = false);
         }else{
-            Log.info("&lcA new update is available: &lyBleeding Edge build {0}", updateBuild);
+            Log.info("&lcA new update is available: &lyBleeding Edge build @", updateBuild);
             if(Config.autoUpdate.bool()){
                 Log.info("&lcAuto-downloading next version...");
 
@@ -123,7 +123,7 @@ public class BeControl{
                     Fi dest = source.sibling("server-be-" + updateBuild + ".jar");
 
                     download(updateUrl, dest,
-                    len -> Core.app.post(() -> Log.info("&ly| Size: {0} MB.", Strings.fixed((float)len / 1024 / 1024, 2))),
+                    len -> Core.app.post(() -> Log.info("&ly| Size: @ MB.", Strings.fixed((float)len / 1024 / 1024, 2))),
                     progress -> {},
                     () -> false,
                     () -> Core.app.post(() -> {

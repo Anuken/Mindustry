@@ -75,7 +75,7 @@ public class ServerControl implements ApplicationListener{
                 try{
                     socketOutput.println(formatColors(text + "&fr", false));
                 }catch(Throwable e){
-                    err("Error occurred logging to socket: {0}", e.getClass().getSimpleName());
+                    err("Error occurred logging to socket: @", e.getClass().getSimpleName());
                 }
             }
         });
@@ -89,19 +89,19 @@ public class ServerControl implements ApplicationListener{
 
             if(args.length > 0){
                 commands.addAll(Strings.join(" ", args).split(","));
-                info("&lmFound {0} command-line arguments to parse.", commands.size);
+                info("&lmFound @ command-line arguments to parse.", commands.size);
             }
 
             if(!Config.startCommands.string().isEmpty()){
                 String[] startup = Strings.join(" ", Config.startCommands.string()).split(",");
-                info("&lmFound {0} startup commands.", startup.length);
+                info("&lmFound @ startup commands.", startup.length);
                 commands.addAll(startup);
             }
 
             for(String s : commands){
                 CommandResponse response = handler.handleMessage(s);
                 if(response.type != ResponseType.valid){
-                    err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
+                    err("Invalid command argument sent: '@': @", s, response.type.name());
                     err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
                 }
             }
@@ -128,9 +128,9 @@ public class ServerControl implements ApplicationListener{
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
             if(state.rules.waves){
-                info("&lcGame over! Reached wave &ly{0}&lc with &ly{1}&lc players online on map &ly{2}&lc.", state.wave, Groups.player.size(), Strings.capitalize(state.map.name()));
+                info("&lcGame over! Reached wave &ly@&lc with &ly@&lc players online on map &ly@&lc.", state.wave, Groups.player.size(), Strings.capitalize(state.map.name()));
             }else{
-                info("&lcGame over! Team &ly{0}&lc is victorious with &ly{1}&lc players online on map &ly{2}&lc.", event.winner.name, Groups.player.size(), Strings.capitalize(state.map.name()));
+                info("&lcGame over! Team &ly@&lc is victorious with &ly@&lc players online on map &ly@&lc.", event.winner.name, Groups.player.size(), Strings.capitalize(state.map.name()));
             }
 
             //set next map to be played
@@ -143,7 +143,7 @@ public class ServerControl implements ApplicationListener{
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
                 "\nNew game begins in " + roundExtraTime + " seconds.");
 
-                info("Selected next map to be {0}.", map.name());
+                info("Selected next map to be @.", map.name());
 
                 play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
             }else{
@@ -168,7 +168,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         if(!mods.list().isEmpty()){
-            info("&lc{0} mods loaded.", mods.list().size);
+            info("&lc@ mods loaded.", mods.list().size);
         }
 
         toggleSocket(Config.socketInput.bool());
@@ -185,8 +185,8 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("version", "Displays server version info.", arg -> {
-            info("&lmVersion: &lyMindustry {0}-{1} {2} / build {3}", Version.number, Version.modifier, Version.type, Version.build + (Version.revision == 0 ? "" : "." + Version.revision));
-            info("&lmJava Version: &ly{0}", System.getProperty("java.version"));
+            info("&lmVersion: &lyMindustry @-@ @ / build @", Version.number, Version.modifier, Version.type, Version.build + (Version.revision == 0 ? "" : "." + Version.revision));
+            info("&lmJava Version: &ly@", System.getProperty("java.version"));
         });
 
         handler.register("exit", "Exit the server application.", arg -> {
@@ -215,12 +215,12 @@ public class ServerControl implements ApplicationListener{
                 result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
 
                 if(result == null){
-                    err("No map with name &y'{0}'&lr found.", arg[0]);
+                    err("No map with name &y'@'&lr found.", arg[0]);
                     return;
                 }
             }else{
                 result = maps.getShuffleMode().next(state.map);
-                info("Randomized next map to be {0}.", result.name());
+                info("Randomized next map to be @.", result.name());
             }
 
             Gamemode preset = Gamemode.survival;
@@ -229,7 +229,7 @@ public class ServerControl implements ApplicationListener{
                 try{
                     preset = Gamemode.valueOf(arg[1]);
                 }catch(IllegalArgumentException e){
-                    err("No gamemode '{0}' found.", arg[1]);
+                    err("No gamemode '@' found.", arg[1]);
                     return;
                 }
             }
@@ -255,19 +255,19 @@ public class ServerControl implements ApplicationListener{
             if(!maps.all().isEmpty()){
                 info("Maps:");
                 for(Map map : maps.all()){
-                    info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name(), map.custom ? "Custom" : "Default", map.width, map.height);
+                    info("  &ly@: &lb&fi@ / @x@", map.name(), map.custom ? "Custom" : "Default", map.width, map.height);
                 }
             }else{
                 info("No maps found.");
             }
-            info("&lyMap directory: &lb&fi{0}", customMapDirectory.file().getAbsoluteFile().toString());
+            info("&lyMap directory: &lb&fi@", customMapDirectory.file().getAbsoluteFile().toString());
         });
 
         handler.register("reloadmaps", "Reload all maps from disk.", arg -> {
             int beforeMaps = maps.all().size;
             maps.reload();
             if(maps.all().size > beforeMaps){
-                info("&lc{0}&ly new map(s) found and reloaded.", maps.all().size - beforeMaps);
+                info("&lc@&ly new map(s) found and reloaded.", maps.all().size - beforeMaps);
             }else{
                 info("&lyMaps reloaded.");
             }
@@ -278,20 +278,20 @@ public class ServerControl implements ApplicationListener{
                 info("Status: &rserver closed");
             }else{
                 info("Status:");
-                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(state.map.name()), state.wave);
+                info("  &lyPlaying on map &fi@&fb &lb/&ly Wave @", Strings.capitalize(state.map.name()), state.wave);
 
                 if(state.rules.waves){
-                    info("&ly  {0} enemies.", state.enemies);
+                    info("&ly  @ enemies.", state.enemies);
                 }else{
-                    info("&ly  {0} seconds until next wave.", (int)(state.wavetime / 60));
+                    info("&ly  @ seconds until next wave.", (int)(state.wavetime / 60));
                 }
 
-                info("  &ly{0} FPS, {1} MB used.", Core.graphics.getFramesPerSecond(), Core.app.getJavaHeap() / 1024 / 1024);
+                info("  &ly@ FPS, @ MB used.", Core.graphics.getFramesPerSecond(), Core.app.getJavaHeap() / 1024 / 1024);
 
                 if(Groups.player.size() > 0){
-                    info("  &lyPlayers: {0}", Groups.player.size());
+                    info("  &lyPlayers: @", Groups.player.size());
                     for(Playerc p : Groups.player){
-                        info("    &y{0} / {1}", p.name(), p.uuid());
+                        info("    &y@ / @", p.name(), p.uuid());
                     }
                 }else{
                     info("  &lyNo players connected.");
@@ -303,25 +303,25 @@ public class ServerControl implements ApplicationListener{
             if(!mods.list().isEmpty()){
                 info("Mods:");
                 for(LoadedMod mod : mods.list()){
-                    info("  &ly{0} &lcv{1}", mod.meta.displayName(), mod.meta.version);
+                    info("  &ly@ &lcv@", mod.meta.displayName(), mod.meta.version);
                 }
             }else{
                 info("No mods found.");
             }
-            info("&lyMod directory: &lb&fi{0}", modDirectory.file().getAbsoluteFile().toString());
+            info("&lyMod directory: &lb&fi@", modDirectory.file().getAbsoluteFile().toString());
         });
 
         handler.register("mod", "<name...>", "Display information about a loaded plugin.", arg -> {
             LoadedMod mod = mods.list().find(p -> p.meta.name.equalsIgnoreCase(arg[0]));
             if(mod != null){
-                info("Name: &ly{0}", mod.meta.displayName());
-                info("Internal Name: &ly{0}", mod.name);
-                info("Version: &ly{0}", mod.meta.version);
-                info("Author: &ly{0}", mod.meta.author);
-                info("Path: &ly{0}", mod.file.path());
-                info("Description: &ly{0}", mod.meta.description);
+                info("Name: &ly@", mod.meta.displayName());
+                info("Internal Name: &ly@", mod.name);
+                info("Version: &ly@", mod.meta.version);
+                info("Author: &ly@", mod.meta.author);
+                info("Path: &ly@", mod.file.path());
+                info("Description: &ly@", mod.meta.description);
             }else{
-                info("No mod with name &ly'{0}'&lg found.");
+                info("No mod with name &ly'@'&lg found.");
             }
         });
 
@@ -337,7 +337,7 @@ public class ServerControl implements ApplicationListener{
 
             Call.sendMessage("[scarlet][[Server]:[] " + arg[0]);
 
-            info("&lyServer: &lb{0}", arg[0]);
+            info("&lyServer: &lb@", arg[0]);
         });
 
         handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
@@ -345,7 +345,7 @@ public class ServerControl implements ApplicationListener{
             JsonValue base = JsonIO.json().fromJson(null, rules);
 
             if(arg.length == 0){
-                Log.info("&lyRules:\n{0}", JsonIO.print(rules));
+                Log.info("&lyRules:\n@", JsonIO.print(rules));
             }else if(arg.length == 1){
                 Log.err("Invalid usage. Specify which rule to remove or add.");
             }else{
@@ -357,7 +357,7 @@ public class ServerControl implements ApplicationListener{
                 boolean remove = arg[0].equals("remove");
                 if(remove){
                     if(base.has(arg[1])){
-                        Log.info("Rule &lc'{0}'&lg removed.", arg[1]);
+                        Log.info("Rule &lc'@'&lg removed.", arg[1]);
                         base.remove(arg[1]);
                     }else{
                         Log.err("Rule not defined, so not removed.");
@@ -381,9 +381,9 @@ public class ServerControl implements ApplicationListener{
                             base.remove(value.name);
                         }
                         base.addChild(arg[1], value);
-                        Log.info("Changed rule: &ly{0}", value.toString().replace("\n", " "));
+                        Log.info("Changed rule: &ly@", value.toString().replace("\n", " "));
                     }catch(Throwable e){
-                        Log.err("Error parsing rule JSON: {0}", e.getMessage());
+                        Log.err("Error parsing rule JSON: @", e.getMessage());
                     }
                 }
 
@@ -422,7 +422,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("playerlimit", "[off/somenumber]", "Set the server player limit.", arg -> {
             if(arg.length == 0){
-                info("Player limit is currently &lc{0}.", netServer.admins.getPlayerLimit() == 0 ? "off" : netServer.admins.getPlayerLimit());
+                info("Player limit is currently &lc@.", netServer.admins.getPlayerLimit() == 0 ? "off" : netServer.admins.getPlayerLimit());
                 return;
             }
             if(arg[0].equals("off")){
@@ -434,7 +434,7 @@ public class ServerControl implements ApplicationListener{
             if(Strings.canParsePostiveInt(arg[0]) && Strings.parseInt(arg[0]) > 0){
                 int lim = Strings.parseInt(arg[0]);
                 netServer.admins.setPlayerLimit(lim);
-                info("Player limit is now &lc{0}.", lim);
+                info("Player limit is now &lc@.", lim);
             }else{
                 err("Limit must be a number above 0.");
             }
@@ -444,8 +444,8 @@ public class ServerControl implements ApplicationListener{
             if(arg.length == 0){
                 info("&lyAll config values:");
                 for(Config c : Config.all){
-                    Log.info("&ly| &lc{0}:&lm {1}", c.name(), c.get());
-                    Log.info("&ly| | {0}", c.description);
+                    Log.info("&ly| &lc@:&lm @", c.name(), c.get());
+                    Log.info("&ly| | @", c.description);
                     Log.info("&ly|");
                 }
                 return;
@@ -454,7 +454,7 @@ public class ServerControl implements ApplicationListener{
             try{
                 Config c = Config.valueOf(arg[0]);
                 if(arg.length == 1){
-                    Log.info("&lc'{0}'&lg is currently &lc{1}.", c.name(), c.get());
+                    Log.info("&lc'@'&lg is currently &lc@.", c.name(), c.get());
                 }else{
                     if(c.isBool()){
                         c.set(arg[1].equals("on") || arg[1].equals("true"));
@@ -462,23 +462,23 @@ public class ServerControl implements ApplicationListener{
                         try{
                             c.set(Integer.parseInt(arg[1]));
                         }catch(NumberFormatException e){
-                            Log.err("Not a valid number: {0}", arg[1]);
+                            Log.err("Not a valid number: @", arg[1]);
                             return;
                         }
                     }else if(c.isString()){
                         c.set(arg[1]);
                     }
 
-                    Log.info("&lc{0}&lg set to &lc{1}.", c.name(), c.get());
+                    Log.info("&lc@&lg set to &lc@.", c.name(), c.get());
                 }
             }catch(IllegalArgumentException e){
-                err("Unknown config: '{0}'. Run the command with no arguments to get a list of valid configs.", arg[0]);
+                err("Unknown config: '@'. Run the command with no arguments to get a list of valid configs.", arg[0]);
             }
         });
 
         handler.register("subnet-ban", "[add/remove] [address]", "Ban a subnet. This simply rejects all connections with IPs starting with some string.", arg -> {
             if(arg.length == 0){
-                Log.info("Subnets banned: &lc{0}", netServer.admins.getSubnetBans().isEmpty() ? "<none>" : "");
+                Log.info("Subnets banned: &lc@", netServer.admins.getSubnetBans().isEmpty() ? "<none>" : "");
                 for(String subnet : netServer.admins.getSubnetBans()){
                     Log.info("&ly  " + subnet + "");
                 }
@@ -492,7 +492,7 @@ public class ServerControl implements ApplicationListener{
                     }
 
                     netServer.admins.addSubnetBan(arg[1]);
-                    Log.info("Banned &ly{0}&lc**", arg[1]);
+                    Log.info("Banned &ly@&lc**", arg[1]);
                 }else if(arg[0].equals("remove")){
                     if(!netServer.admins.getSubnetBans().contains(arg[1])){
                         err("That subnet isn't banned.");
@@ -500,7 +500,7 @@ public class ServerControl implements ApplicationListener{
                     }
 
                     netServer.admins.removeSubnetBan(arg[1]);
-                    Log.info("Unbanned &ly{0}&lc**", arg[1]);
+                    Log.info("Unbanned &ly@&lc**", arg[1]);
                 }else{
                     err("Incorrect usage. You must provide add/remove as the second argument.");
                 }
@@ -514,7 +514,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             info("&lyWhitelist:");
-            netServer.admins.getWhitelisted().each(p -> Log.info("- &ly{0}", p.lastName));
+            netServer.admins.getWhitelisted().each(p -> Log.info("- &ly@", p.lastName));
         });
 
         handler.register("whitelist-add", "<ID>", "Add a player to the whitelist by ID.", arg -> {
@@ -525,7 +525,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             netServer.admins.whitelist(arg[0]);
-            info("Player &ly'{0}'&lg has been whitelisted.", info.lastName);
+            info("Player &ly'@'&lg has been whitelisted.", info.lastName);
         });
 
         handler.register("whitelist-remove", "<ID>", "Remove a player to the whitelist by ID.", arg -> {
@@ -536,18 +536,18 @@ public class ServerControl implements ApplicationListener{
             }
 
             netServer.admins.unwhitelist(arg[0]);
-            info("Player &ly'{0}'&lg has been un-whitelisted.", info.lastName);
+            info("Player &ly'@'&lg has been un-whitelisted.", info.lastName);
         });
 
         handler.register("shuffle", "[none/all/custom/builtin]", "Set map shuffling mode.", arg -> {
             if(arg.length == 0){
-                info("Shuffle mode current set to &ly'{0}'&lg.", maps.getShuffleMode());
+                info("Shuffle mode current set to &ly'@'&lg.", maps.getShuffleMode());
             }else{
                 try{
                     ShuffleMode mode = ShuffleMode.valueOf(arg[0]);
                     Core.settings.putSave("shufflemode", mode.name());
                     maps.setShuffleMode(mode);
-                    info("Shuffle mode set to &ly'{0}'&lg.", arg[0]);
+                    info("Shuffle mode set to &ly'@'&lg.", arg[0]);
                 }catch(Exception e){
                     err("Invalid shuffle mode.");
                 }
@@ -558,9 +558,9 @@ public class ServerControl implements ApplicationListener{
             Map res = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
             if(res != null){
                 nextMapOverride = res;
-                Log.info("Next map set to &ly'{0}'.", res.name());
+                Log.info("Next map set to &ly'@'.", res.name());
             }else{
-                Log.err("No map '{0}' found.", arg[0]);
+                Log.err("No map '@' found.", arg[0]);
             }
         });
 
@@ -616,7 +616,7 @@ public class ServerControl implements ApplicationListener{
             }else{
                 info("&lyBanned players [ID]:");
                 for(PlayerInfo info : bans){
-                    info(" &ly {0} / Last known name: '{1}'", info.id, info.lastName);
+                    info(" &ly @ / Last known name: '@'", info.id, info.lastName);
                 }
             }
 
@@ -629,9 +629,9 @@ public class ServerControl implements ApplicationListener{
                 for(String string : ipbans){
                     PlayerInfo info = netServer.admins.findByIP(string);
                     if(info != null){
-                        info(" &lm '{0}' / Last known name: '{1}' / ID: '{2}'", string, info.lastName, info.id);
+                        info(" &lm '@' / Last known name: '@' / ID: '@'", string, info.lastName, info.id);
                     }else{
-                        info(" &lm '{0}' (No known name or info)", string);
+                        info(" &lm '@' (No known name or info)", string);
                     }
                 }
             }
@@ -650,7 +650,7 @@ public class ServerControl implements ApplicationListener{
             
             if(info != null){
                 info.lastKicked = 0;
-                info("Pardoned player: {0}", info.lastName);
+                info("Pardoned player: @", info.lastName);
             }else{
                 err("That ID can't be found.");
             }
@@ -685,7 +685,7 @@ public class ServerControl implements ApplicationListener{
                     netServer.admins.unAdminPlayer(target.id);
                 }
                 if(playert != null) playert.admin(add);
-                info("Changed admin status of player: &ly{0}", target.lastName);
+                info("Changed admin status of player: &ly@", target.lastName);
             }else{
                 err("Nobody with that name or ID could be found. If adding an admin by name, make sure they're online; otherwise, use their UUID.");
             }
@@ -699,7 +699,7 @@ public class ServerControl implements ApplicationListener{
             }else{
                 info("&lyAdmins:");
                 for(PlayerInfo info : admins){
-                    info(" &lm {0} /  ID: '{1}' / IP: '{2}'", info.lastName, info.id, info.lastIP);
+                    info(" &lm @ /  ID: '@' / IP: '@'", info.lastName, info.id, info.lastIP);
                 }
             }
         });
@@ -708,10 +708,10 @@ public class ServerControl implements ApplicationListener{
             if(Groups.player.size() == 0){
                 info("No players are currently in the server.");
             }else{
-                info("&lyPlayers: {0}", Groups.player.size());
+                info("&lyPlayers: @", Groups.player.size());
                 for(Playerc user : Groups.player){
                     PlayerInfo userInfo = user.getInfo();
-                    info(" &lm {0} /  ID: '{1}' / IP: '{2}' / Admin: '{3}'", userInfo.lastName, userInfo.id, userInfo.lastIP, userInfo.admin);
+                    info(" &lm @ /  ID: '@' / IP: '@' / Admin: '@'", userInfo.lastName, userInfo.id, userInfo.lastIP, userInfo.admin);
                 }
             }
         });
@@ -761,7 +761,7 @@ public class ServerControl implements ApplicationListener{
 
             Core.app.post(() -> {
                 SaveIO.save(file);
-                info("Saved to {0}.", file);
+                info("Saved to @.", file);
             });
         });
 
@@ -769,7 +769,7 @@ public class ServerControl implements ApplicationListener{
             info("Save files: ");
             for(Fi file : saveDirectory.list()){
                 if(file.extension().equals(saveExtension)){
-                    info("| &ly{0}", file.nameWithoutExtension());
+                    info("| &ly@", file.nameWithoutExtension());
                 }
             }
         });
@@ -790,16 +790,16 @@ public class ServerControl implements ApplicationListener{
             ObjectSet<PlayerInfo> infos = netServer.admins.findByName(arg[0]);
 
             if(infos.size > 0){
-                info("&lgPlayers found: {0}", infos.size);
+                info("&lgPlayers found: @", infos.size);
 
                 int i = 0;
                 for(PlayerInfo info : infos){
-                    info("&lc[{0}] Trace info for player '{1}' / UUID {2}", i++, info.lastName, info.id);
-                    info("  &lyall names used: {0}", info.names);
-                    info("  &lyIP: {0}", info.lastIP);
-                    info("  &lyall IPs used: {0}", info.ips);
-                    info("  &lytimes joined: {0}", info.timesJoined);
-                    info("  &lytimes kicked: {0}", info.timesKicked);
+                    info("&lc[@] Trace info for player '@' / UUID @", i++, info.lastName, info.id);
+                    info("  &lyall names used: @", info.names);
+                    info("  &lyIP: @", info.lastIP);
+                    info("  &lyall IPs used: @", info.ips);
+                    info("  &lytimes joined: @", info.timesJoined);
+                    info("  &lytimes kicked: @", info.timesKicked);
                 }
             }else{
                 info("Nobody with that name could be found.");
@@ -811,11 +811,11 @@ public class ServerControl implements ApplicationListener{
             ObjectSet<PlayerInfo> infos = netServer.admins.searchNames(arg[0]);
 
             if(infos.size > 0){
-                info("&lgPlayers found: {0}", infos.size);
+                info("&lgPlayers found: @", infos.size);
 
                 int i = 0;
                 for(PlayerInfo info : infos){
-                    info("- &lc[{0}] &ly'{1}'&lc / &lm{2}", i++, info.lastName, info.id);
+                    info("- &lc[@] &ly'@'&lc / &lm@", i++, info.lastName, info.id);
                 }
             }else{
                 info("Nobody with that name could be found.");
@@ -826,7 +826,7 @@ public class ServerControl implements ApplicationListener{
             int pre = (int)(Core.app.getJavaHeap() / 1024 / 1024);
             System.gc();
             int post = (int)(Core.app.getJavaHeap() / 1024 / 1024);
-            info("&ly{0}&lg MB collected. Memory usage now at &ly{1}&lg MB.", pre - post, post);
+            info("&ly@&lg MB collected. Memory usage now at &ly@&lg MB.", pre - post, post);
         });
 
         mods.eachClass(p -> p.registerServerCommands(handler));
@@ -943,7 +943,7 @@ public class ServerControl implements ApplicationListener{
                     serverSocket.bind(new InetSocketAddress(Config.socketInputAddress.string(), Config.socketInputPort.num()));
                     while(true){
                         Socket client = serverSocket.accept();
-                        info("&lmRecieved command socket connection: &lb{0}", serverSocket.getLocalSocketAddress());
+                        info("&lmRecieved command socket connection: &lb@", serverSocket.getLocalSocketAddress());
                         BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
                         socketOutput = new PrintWriter(client.getOutputStream(), true);
                         String line;
@@ -951,7 +951,7 @@ public class ServerControl implements ApplicationListener{
                             String result = line;
                             Core.app.post(() -> handleCommandString(result));
                         }
-                        info("&lmLost command socket connection: &lb{0}", serverSocket.getLocalSocketAddress());
+                        info("&lmLost command socket connection: &lb@", serverSocket.getLocalSocketAddress());
                         socketOutput = null;
                     }
                 }catch(BindException b){

@@ -88,9 +88,9 @@ public class ContentLoader{
 
         Log.debug("--- CONTENT INFO ---");
         for(int k = 0; k < contentMap.length; k++){
-            Log.debug("[{0}]: loaded {1}", ContentType.values()[k].name(), contentMap[k].size);
+            Log.debug("[@]: loaded @", ContentType.values()[k].name(), contentMap[k].size);
         }
-        Log.debug("Total content loaded: {0}", Array.with(ContentType.values()).mapInt(c -> contentMap[c.ordinal()].size).sum());
+        Log.debug("Total content loaded: @", Array.with(ContentType.values()).mapInt(c -> contentMap[c.ordinal()].size).sum());
         Log.debug("-------------------");
     }
 

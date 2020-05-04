@@ -150,7 +150,7 @@ public class DesktopLauncher extends ClientLauncher{
                         long id = Long.parseLong(args[1]);
                         ui.join.connect("steam:" + id, port);
                     }catch(Exception e){
-                        Log.err("Failed to parse steam lobby ID: {0}", e.getMessage());
+                        Log.err("Failed to parse steam lobby ID: @", e.getMessage());
                         e.printStackTrace();
                     }
                 }

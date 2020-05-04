@@ -155,12 +155,12 @@ public class EntityProcess extends BaseProcessor{
                 Log.debug("&gGenerating interface for " + component.name());
 
                 for(TypeName tn : inter.superinterfaces){
-                    Log.debug("&g> &lbextends {0}", simpleName(tn.toString()));
+                    Log.debug("&g> &lbextends @", simpleName(tn.toString()));
                 }
 
                 //log methods generated
                 for(MethodSpec spec : inter.methodSpecs){
-                    Log.debug("&g> > &c{0} {1}({2})", simpleName(spec.returnType.toString()), spec.name, Array.with(spec.parameters).toString(", ", p -> simpleName(p.type.toString()) + " " + p.name));
+                    Log.debug("&g> > &c@ @(@)", simpleName(spec.returnType.toString()), spec.name, Array.with(spec.parameters).toString(", ", p -> simpleName(p.type.toString()) + " " + p.name));
                 }
 
                 Log.debug("");

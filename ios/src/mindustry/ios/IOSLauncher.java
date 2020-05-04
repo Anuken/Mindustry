@@ -154,7 +154,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                         pop.setSourceRect(targetRect);
                         pop.setPermittedArrowDirections(UIPopoverArrowDirection.None);
                     }
-                    rootVc.presentViewController(p, true, () -> Log.info("Success! Presented {0}", to));
+                    rootVc.presentViewController(p, true, () -> Log.info("Success! Presented @", to));
                 }catch(Throwable t){
                     ui.showException(t);
                 }

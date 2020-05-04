@@ -326,7 +326,7 @@ public class ApplicationTests{
             indexer.eachBlock(Team.sharded, x * tilesize, y * tilesize, range, t -> true, assigner);
         }
 
-        Log.info("Time for basic indexing: {0}", Time.elapsed());
+        Log.info("Time for basic indexing: @", Time.elapsed());
 
         r.setSeed(0);
 

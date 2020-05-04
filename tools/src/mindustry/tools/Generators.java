@@ -165,9 +165,9 @@ public class Generators{
                     average.a = 1f;
                     colors.draw(block.id, 0, average);
                 }catch(IllegalArgumentException e){
-                    Log.info("Skipping &ly'{0}'", block.name);
+                    Log.info("Skipping &ly'@'", block.name);
                 }catch(NullPointerException e){
-                    Log.err("Block &ly'{0}'&lr has an null region!");
+                    Log.err("Block &ly'@'&lr has an null region!");
                 }
             }
 

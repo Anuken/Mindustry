@@ -53,7 +53,7 @@ public class NetClient implements ApplicationListener{
     public NetClient(){
 
         net.handleClient(Connect.class, packet -> {
-            Log.info("Connecting to server: {0}", packet.addressTCP);
+            Log.info("Connecting to server: @", packet.addressTCP);
 
             player.admin(false);
 
@@ -115,7 +115,7 @@ public class NetClient implements ApplicationListener{
         });
 
         net.handleClient(WorldStream.class, data -> {
-            Log.info("Recieved world data: {0} bytes.", data.stream.available());
+            Log.info("Recieved world data: @ bytes.", data.stream.available());
             NetworkIO.loadWorld(new InflaterInputStream(data.stream));
 
             finishConnecting();
@@ -171,14 +171,14 @@ public class NetClient implements ApplicationListener{
             }
 
             //server console logging
-            Log.info("&y{0}: &lb{1}", player.name(), message);
+            Log.info("&y@: &lb@", player.name(), message);
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
             Call.sendMessage(message, colorizeName(player.id(), player.name()), player);
         }else{
             //log command to console but with brackets
-            Log.info("<&y{0}: &lm{1}&lg>", player.name(), message);
+            Log.info("<&y@: &lm@&lg>", player.name(), message);
 
             //a command was sent, now get the output
             if(response.type != ResponseType.valid){
@@ -401,7 +401,7 @@ public class NetClient implements ApplicationListener{
                 int pos = input.readInt();
                 Tile tile = world.tile(pos);
                 if(tile == null || tile.entity == null){
-                    Log.warn("Missing entity at {0}. Skipping block snapshot.", tile);
+                    Log.warn("Missing entity at @. Skipping block snapshot.", tile);
                     break;
                 }
                 tile.entity.readAll(Reads.get(input), tile.entity.version());

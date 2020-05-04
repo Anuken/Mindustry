@@ -291,7 +291,7 @@ public class Block extends UnlockableContent{
     }
 
     public void setStats(){
-        stats.add(BlockStat.size, "{0}x{0}", size);
+        stats.add(BlockStat.size, "@x@", size, size);
         stats.add(BlockStat.health, health, StatUnit.none);
         if(isBuildable()){
             stats.add(BlockStat.buildTime, buildCost / 60, StatUnit.seconds);

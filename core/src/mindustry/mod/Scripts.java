@@ -41,7 +41,7 @@ public class Scripts implements Disposable{
         if(!run(Core.files.internal("scripts/global.js").readString(), "global.js")){
             errored = true;
         }
-        Log.debug("Time to load script engine: {0}", Time.elapsed());
+        Log.debug("Time to load script engine: @", Time.elapsed());
     }
 
     public boolean hasErrored(){
@@ -73,7 +73,7 @@ public class Scripts implements Disposable{
     }
 
     public void log(LogLevel level, String source, String message){
-        Log.log(level, "[{0}]: {1}", source, message);
+        Log.log(level, "[@]: @", source, message);
     }
 
     public void run(LoadedMod mod, Fi file){

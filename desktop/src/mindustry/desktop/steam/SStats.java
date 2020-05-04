@@ -283,7 +283,7 @@ public class SStats implements SteamUserStatsCallback{
         registerEvents();
 
         if(result != SteamResult.OK){
-            Log.err("Failed to recieve steam stats: {0}", result);
+            Log.err("Failed to recieve steam stats: @", result);
         }else{
             Log.info("Recieved steam stats.");
         }
@@ -291,7 +291,7 @@ public class SStats implements SteamUserStatsCallback{
 
     @Override
     public void onUserStatsStored(long gameID, SteamResult result){
-        Log.info("Stored stats: {0}", result);
+        Log.info("Stored stats: @", result);
 
         if(result == SteamResult.OK){
             updated = true;

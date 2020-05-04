@@ -35,7 +35,7 @@ public abstract class NetConnection{
 
     /** Kick with a special, localized reason. Use this if possible. */
     public void kick(KickReason reason){
-        Log.info("Kicking connection {0}; Reason: {1}", address, reason.name());
+        Log.info("Kicking connection @; Reason: @", address, reason.name());
 
         if((reason == KickReason.kick || reason == KickReason.banned || reason == KickReason.vote)){
             PlayerInfo info = netServer.admins.getInfo(uuid);
@@ -57,7 +57,7 @@ public abstract class NetConnection{
 
     /** Kick with an arbitrary reason, and a kick duration in milliseconds. */
     public void kick(String reason, int kickDuration){
-        Log.info("Kicking connection {0}; Reason: {1}", address, reason.replace("\n", " "));
+        Log.info("Kicking connection @; Reason: @", address, reason.replace("\n", " "));
 
         PlayerInfo info = netServer.admins.getInfo(uuid);
         info.timesKicked++;
