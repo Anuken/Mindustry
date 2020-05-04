@@ -65,7 +65,7 @@ public class Blocks implements ContentList{
 
     //power
     combustionGenerator, thermalGenerator, turbineGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
-    impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
+    impactReactor, battery, batteryLarge, surgeCapacitor, powerNode, powerNodeLarge, surgeTower, diode,
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
@@ -1103,6 +1103,12 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.titanium, 20, Items.lead, 40, Items.silicon, 20));
             size = 3;
             consumes.powerBuffered(50000f);
+        }};
+
+        surgeCapacitor = new Battery("surge-capacitor"){{
+            requirements(Category.power, ItemStack.with(Items.surgealloy, 100, Items.lead, 150, Items.silicon, 75));
+            size = 4;
+            consumes.powerBuffered(300000f);
         }};
 
         combustionGenerator = new BurnerGenerator("combustion-generator"){{

@@ -239,7 +239,9 @@ public class TechTree implements ContentList{
 
                         node(battery, () -> {
                             node(batteryLarge, () -> {
+                                node(surgeCapacitor, () -> {
 
+                                });
                             });
                         });
 
