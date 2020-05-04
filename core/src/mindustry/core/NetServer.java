@@ -1,12 +1,13 @@
 package mindustry.core;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
@@ -72,6 +73,8 @@ public class NetServer implements ApplicationListener{
     private ReusableByteOutStream syncStream = new ReusableByteOutStream();
     /** Data stream for writing player sync data to. */
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
+    /** Packet handlers for custom types of messages. */
+    private ObjectMap<String, Array<Cons<String>>> customPacketHandlers = new ObjectMap<>();
 
     public NetServer(){
 
@@ -471,6 +474,14 @@ public class NetServer implements ApplicationListener{
         Log.debug("Packed @ compressed bytes of world data.", stream.size());
     }
 
+    public void addPacketHandler(String type, Cons<String> handler){
+        customPacketHandlers.getOr(type, Array::new).add(handler);
+    }
+
+    public Array<Cons<String>> getPacketHandlers(String type){
+        return customPacketHandlers.getOr(type, Array::new);
+    }
+
     public static void onDisconnect(Playerc player, String reason){
         //singleplayer multiplayer wierdness
         if(player.con() == null){
@@ -490,6 +501,20 @@ public class NetServer implements ApplicationListener{
 
         player.remove();
         player.con().hasDisconnected = true;
+    }
+
+    @Remote(targets = Loc.both, variants = Variant.both)
+    public static void packetReliable(String type, String contents){
+        if(netServer.customPacketHandlers.containsKey(type)){
+            for(Cons<String> c : netServer.customPacketHandlers.get(type)){
+                c.get(contents);
+            }
+        }
+    }
+
+    @Remote(targets = Loc.both, variants = Variant.both, unreliable = true)
+    public static void packetUnreliable(String type, String contents){
+        packetReliable(type, contents);
     }
 
     @Remote(targets = Loc.client, unreliable = true)
