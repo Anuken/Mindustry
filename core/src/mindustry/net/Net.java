@@ -21,8 +21,7 @@ public class Net{
     private boolean server;
     private boolean active;
     private boolean clientLoaded;
-    private @Nullable
-    StreamBuilder currentStream;
+    private @Nullable StreamBuilder currentStream;
 
     private final Array<Object> packetQueue = new Array<>();
     private final ObjectMap<Class<?>, Cons> clientListeners = new ObjectMap<>();
