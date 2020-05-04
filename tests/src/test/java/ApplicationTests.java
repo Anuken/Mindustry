@@ -270,6 +270,20 @@ public class ApplicationTests{
     }
 
     @Test
+    void blockOverlapRemoved(){
+        world.loadMap(testMap);
+        state.set(State.playing);
+
+        //edge block
+        world.tile(1, 1).setBlock(Blocks.coreShard);
+        assertEquals(Blocks.coreShard, world.tile(0, 0).block());
+
+        //this should overwrite the block
+        world.tile(2, 2).setBlock(Blocks.coreShard);
+        assertEquals(Blocks.air, world.tile(0, 0).block());
+    }
+
+    @Test
     void conveyorCrash(){
         world.loadMap(testMap);
         state.set(State.playing);
