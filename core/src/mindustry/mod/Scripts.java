@@ -2,6 +2,7 @@ package mindustry.mod;
 
 import arc.*;
 import arc.files.*;
+import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -18,12 +19,13 @@ import java.util.regex.*;
 public class Scripts implements Disposable{
     private final Array<String> blacklist = Array.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
-        ".awt", "socket", "classloader", "oracle", "invoke");
+        ".awt", "socket", "classloader", "oracle", "invoke", "arc.events");
     private final Array<String> whitelist = Array.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy");
     private final Context context;
     private Scriptable scope;
     private boolean errored;
     private LoadedMod currentMod = null;
+    private Array<EventHandle> events = new Array<>();
 
     public Scripts(){
         Time.mark();
@@ -76,6 +78,11 @@ public class Scripts implements Disposable{
         Log.log(level, "[@]: @", source, message);
     }
 
+    public <T> void onEvent(Class<T> type, Cons<T> listener){
+        Events.on(type, listener);
+        events.add(new EventHandle(type, listener));
+    }
+
     public void run(LoadedMod mod, Fi file){
         currentMod = mod;
         run(file.readString(), file.name());
@@ -101,7 +108,21 @@ public class Scripts implements Disposable{
 
     @Override
     public void dispose(){
+        for(EventHandle e : events){
+            Events.remove(e.type, e.listener);
+        }
+        events.clear();
         Context.exit();
+    }
+
+    private static class EventHandle{
+        Class type;
+        Cons listener;
+
+        public EventHandle(Class type, Cons listener){
+            this.type = type;
+            this.listener = listener;
+        }
     }
 
     private class ScriptModuleProvider extends UrlModuleSourceProvider{

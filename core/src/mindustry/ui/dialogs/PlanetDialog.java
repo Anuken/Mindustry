@@ -81,9 +81,7 @@ public class PlanetDialog extends FloatingDialog{
             }
         });
 
-        Events.on(ResizeEvent.class, e -> {
-            makeBloom();
-        });
+        Events.on(ResizeEvent.class, e -> makeBloom());
 
 
         buttons.defaults().size(220f, 64f).pad(0f);

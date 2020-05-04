@@ -2,6 +2,10 @@ const log = function(context, obj){
     Vars.mods.getScripts().log(context, String(obj))
 }
 
+const onEvent = function(event, handler){
+    Vars.mods.getScripts().onEvent(EventType[event], handler)
+}
+
 var scriptName = "base.js"
 var modName = "none"
 
