@@ -78,7 +78,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         for(int i = 0; i < 4; i++){
             if((bits[3] & (1 << i)) == 0){
-                Draw.rect(edgeRegion, req.drawx(), req.drawy(), (req.rotation - i) * 90);
+                Draw.rect(edgeRegion, req.drawx(), req.drawy(), region.getWidth() * Draw.scl * req.animScale, region.getHeight() * Draw.scl * req.animScale, (req.rotation - i) * 90);
             }
         }
     }
