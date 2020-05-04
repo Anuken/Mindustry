@@ -32,10 +32,11 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public static final String packageName = "mindustry.gen";
 
     public static Types typeu;
-    public static Elements elementu;
+    public static JavacElements elementu;
     public static Filer filer;
     public static Messager messager;
     public static Trees trees;
+    public static TreeMaker maker;
 
     protected int round;
     protected int rounds = 1;
@@ -43,8 +44,6 @@ public abstract class BaseProcessor extends AbstractProcessor{
     protected Fi rootDirectory;
 
     protected Context context;
-    protected JavacElements elementUtils;
-    protected TreeMaker maker;
 
     public static String getMethodName(Element element){
         return ((TypeElement)element.getEnclosingElement()).getQualifiedName().toString() + "." + element.getSimpleName();
@@ -190,16 +189,15 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public synchronized void init(ProcessingEnvironment env){
         super.init(env);
 
+        JavacProcessingEnvironment javacProcessingEnv = (JavacProcessingEnvironment)env;
+
         trees = Trees.instance(env);
         typeu = env.getTypeUtils();
-        elementu = env.getElementUtils();
+        elementu = javacProcessingEnv.getElementUtils();
         filer = env.getFiler();
         messager = env.getMessager();
         context = ((JavacProcessingEnvironment)env).getContext();
-
-        JavacProcessingEnvironment javacProcessingEnv = (JavacProcessingEnvironment)env;
-        this.elementUtils = javacProcessingEnv.getElementUtils();
-        this.maker = TreeMaker.instance(javacProcessingEnv.getContext());
+        maker = TreeMaker.instance(javacProcessingEnv.getContext());
 
         Log.setLogLevel(LogLevel.info);
 
