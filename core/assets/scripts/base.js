@@ -3,7 +3,7 @@ const log = function(context, obj){
 }
 
 const onEvent = function(event, handler){
-    Vars.mods.getScripts().onEvent(EventType[event], handler)
+    Vars.mods.getScripts().onEvent(event, handler)
 }
 
 var scriptName = "base.js"

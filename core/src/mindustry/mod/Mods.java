@@ -374,7 +374,7 @@ public class Mods implements Loadable{
     private void checkWarnings(){
         //show 'scripts have errored' info
         if(scripts != null && scripts.hasErrored()){
-           ui.showErrorMessage("$mod.scripts.unsupported");
+           ui.showErrorMessage("$mod.scripts.disable");
         }
 
         //show list of errored content
