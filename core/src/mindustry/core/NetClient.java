@@ -1,6 +1,7 @@
 package mindustry.core;
 
 import arc.*;
+import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -49,6 +50,8 @@ public class NetClient implements ApplicationListener{
     /** Byte stream for reading in snapshots. */
     private ReusableByteInStream byteStream = new ReusableByteInStream();
     private DataInputStream dataStream = new DataInputStream(byteStream);
+    /** Packet handlers for custom types of messages. */
+    private ObjectMap<String, Array<Cons<String>>> customPacketHandlers = new ObjectMap<>();
 
     public NetClient(){
 
@@ -124,6 +127,28 @@ public class NetClient implements ApplicationListener{
         net.handleClient(InvokePacket.class, packet -> {
             RemoteReadClient.readPacket(packet.reader(), packet.type);
         });
+    }
+
+    public void addPacketHandler(String type, Cons<String> handler){
+        customPacketHandlers.getOr(type, Array::new).add(handler);
+    }
+
+    public Array<Cons<String>> getPacketHandlers(String type){
+        return customPacketHandlers.getOr(type, Array::new);
+    }
+
+    @Remote(targets = Loc.server, variants = Variant.both)
+    public static void clientPacketReliable(String type, String contents){
+        if(netClient.customPacketHandlers.containsKey(type)){
+            for(Cons<String> c : netClient.customPacketHandlers.get(type)){
+                c.get(contents);
+            }
+        }
+    }
+
+    @Remote(targets = Loc.server, variants = Variant.both, unreliable = true)
+    public static void clientPacketUnreliable(String type, String contents){
+        clientPacketReliable(type, contents);
     }
 
     //called on all clients

@@ -74,7 +74,7 @@ public class NetServer implements ApplicationListener{
     /** Data stream for writing player sync data to. */
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
     /** Packet handlers for custom types of messages. */
-    private ObjectMap<String, Array<Cons<String>>> customPacketHandlers = new ObjectMap<>();
+    private ObjectMap<String, Array<Cons2<Playerc, String>>> customPacketHandlers = new ObjectMap<>();
 
     public NetServer(){
 
@@ -474,11 +474,11 @@ public class NetServer implements ApplicationListener{
         Log.debug("Packed @ compressed bytes of world data.", stream.size());
     }
 
-    public void addPacketHandler(String type, Cons<String> handler){
+    public void addPacketHandler(String type, Cons2<Playerc, String> handler){
         customPacketHandlers.getOr(type, Array::new).add(handler);
     }
 
-    public Array<Cons<String>> getPacketHandlers(String type){
+    public Array<Cons2<Playerc, String>> getPacketHandlers(String type){
         return customPacketHandlers.getOr(type, Array::new);
     }
 
@@ -503,18 +503,18 @@ public class NetServer implements ApplicationListener{
         player.con().hasDisconnected = true;
     }
 
-    @Remote(targets = Loc.both, variants = Variant.both)
-    public static void packetReliable(String type, String contents){
+    @Remote(targets = Loc.client)
+    public static void serverPacketReliable(Playerc player, String type, String contents){
         if(netServer.customPacketHandlers.containsKey(type)){
-            for(Cons<String> c : netServer.customPacketHandlers.get(type)){
-                c.get(contents);
+            for(Cons2<Playerc, String> c : netServer.customPacketHandlers.get(type)){
+                c.get(player, contents);
             }
         }
     }
 
-    @Remote(targets = Loc.both, variants = Variant.both, unreliable = true)
-    public static void packetUnreliable(String type, String contents){
-        packetReliable(type, contents);
+    @Remote(targets = Loc.client, unreliable = true)
+    public static void serverPacketUnreliable(Playerc player, String type, String contents){
+        serverPacketReliable(player, type, contents);
     }
 
     @Remote(targets = Loc.client, unreliable = true)

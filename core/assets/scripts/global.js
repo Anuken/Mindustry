@@ -23,6 +23,7 @@ const boolp = method => new Boolp(){get: method}
 const floatf = method => new Floatf(){get: method}
 const floatp = method => new Floatp(){get: method}
 const cons = method => new Cons(){get: method}
+const cons2 = method => new Cons2(){get: method}
 const prov = method => new Prov(){get: method}
 const func = method => new Func(){get: method}
 const newEffect = (lifetime, renderer) => new Effects.Effect(lifetime, new Effects.EffectRenderer({render: renderer}))
