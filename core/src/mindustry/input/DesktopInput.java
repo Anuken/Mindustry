@@ -269,7 +269,7 @@ public class DesktopInput extends InputHandler{
             if(isPlacing() && mode == placing){
                 updateLine(selectX, selectY);
             }else if(!selectRequests.isEmpty()){
-                rotateRequests(selectRequests, (int)Core.input.axisTap(Binding.rotate));
+                rotateRequests(selectRequests, Mathf.sign(Core.input.axisTap(Binding.rotate)));
             }
         }
 
