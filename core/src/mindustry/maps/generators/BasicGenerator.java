@@ -9,8 +9,6 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.world.*;
 
-import java.util.*;
-
 import static mindustry.Vars.*;
 
 public abstract class BasicGenerator implements WorldGenerator{
@@ -319,10 +317,10 @@ public abstract class BasicGenerator implements WorldGenerator{
         Tile end = tiles.getn(endX, endY);
         GridBits closed = new GridBits(width, height);
         IntFloatMap costs = new IntFloatMap();
-        PriorityQueue<Tile> queue = new PriorityQueue<>(tiles.width * tiles.height / 4, Structs.comparingFloat(a -> costs.get(a.pos(), 0f) + dh.cost(a.x, a.y, end.x, end.y)));
+        PQueue<Tile> queue = new PQueue<>(tiles.width * tiles.height / 4, Structs.comparingFloat(a -> costs.get(a.pos(), 0f) + dh.cost(a.x, a.y, end.x, end.y)));
         queue.add(start);
         boolean found = false;
-        while(!queue.isEmpty()){
+        while(!queue.empty()){
             Tile next = queue.poll();
             float baseCost = costs.get(next.pos(), 0f);
             if(next == end){

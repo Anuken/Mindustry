@@ -33,10 +33,31 @@ public class EventType{
     }
 
     public static class WinEvent{}
-
     public static class LoseEvent{}
-
     public static class LaunchEvent{}
+    public static class ResizeEvent{}
+    public static class MapMakeEvent{}
+    public static class MapPublishEvent{}
+    public static class SaveLoadEvent{}
+    public static class ClientCreateEvent{}
+    public static class ServerLoadEvent{}
+    public static class ContentReloadEvent{}
+    public static class DisposeEvent{}
+    public static class PlayEvent{}
+    public static class ResetEvent{}
+    public static class WaveEvent{}
+    /** Called when the player places a line, mobile or desktop.*/
+    public static class LineConfirmEvent{}
+    /** Called when a turret recieves ammo, but only when the tutorial is active! */
+    public static class TurretAmmoDeliverEvent{}
+    /** Called when a core recieves ammo, but only when the tutorial is active! */
+    public static class CoreItemDeliverEvent{}
+    /** Called when the player opens info for a specific block.*/
+    public static class BlockInfoEvent{}
+    /** Called when the client game is first loaded. */
+    public static class ClientLoadEvent{}
+    /** Called when a game begins and the world is loaded. */
+    public static class WorldLoadEvent{}
 
     public static class LaunchItemEvent{
         public final ItemStack stack;
@@ -45,10 +66,6 @@ public class EventType{
             this.stack = new ItemStack(item, amount);
         }
     }
-
-    public static class MapMakeEvent{}
-
-    public static class MapPublishEvent{}
 
     public static class CommandIssueEvent{
         public final Tilec tile;
@@ -89,63 +106,6 @@ public class EventType{
         public ZoneConfigureCompleteEvent(SectorPreset zone){
             this.zone = zone;
         }
-    }
-
-    public static class SaveLoadEvent{
-
-    }
-
-    public static class ClientCreateEvent{
-
-    }
-
-    /** Called when the client game is first loaded. */
-    public static class ClientLoadEvent{
-
-    }
-
-    public static class ServerLoadEvent{
-
-    }
-
-    public static class ContentReloadEvent{
-
-    }
-
-    public static class DisposeEvent{
-
-    }
-
-    public static class PlayEvent{
-
-    }
-
-    public static class ResetEvent{
-
-    }
-
-    public static class WaveEvent{
-
-    }
-
-    /** Called when the player places a line, mobile or desktop.*/
-    public static class LineConfirmEvent{
-
-    }
-
-    /** Called when a turret recieves ammo, but only when the tutorial is active! */
-    public static class TurretAmmoDeliverEvent{
-
-    }
-
-    /** Called when a core recieves ammo, but only when the tutorial is active! */
-    public static class CoreItemDeliverEvent{
-
-    }
-
-    /** Called when the player opens info for a specific block.*/
-    public static class BlockInfoEvent{
-
     }
 
     /** Called when the player withdraws items from a block. */
@@ -208,11 +168,6 @@ public class EventType{
         public GameOverEvent(Team winner){
             this.winner = winner;
         }
-    }
-
-    /** Called when a game begins and the world is loaded. */
-    public static class WorldLoadEvent{
-
     }
 
     /** Called from the logic thread. Do not access graphics here! */
@@ -323,10 +278,6 @@ public class EventType{
         }
     }
 
-    public static class ResizeEvent{
-
-    }
-
     //TODO rename
     public static class MechChangeEvent{
         public final Playerc player;
@@ -383,7 +334,6 @@ public class EventType{
     public static class PlayerIpBanEvent{
         public final String ip;
 
-
         public PlayerIpBanEvent(String ip){
             this.ip = ip;
         }
@@ -391,7 +341,6 @@ public class EventType{
     
     public static class PlayerIpUnbanEvent{
         public final String ip;
-
 
         public PlayerIpUnbanEvent(String ip){
             this.ip = ip;
