@@ -14,6 +14,8 @@ public enum BlockFlag{
     comandCenter,
     /** Repair point. */
     repair,
+	/** Overdrive. */
+	overdrive,
     /** Upgrade pad. */
     mechPad;
 

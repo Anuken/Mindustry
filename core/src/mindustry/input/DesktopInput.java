@@ -25,6 +25,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.defense.*;
 
 import static arc.Core.scene;
 import static mindustry.Vars.*;
@@ -147,7 +148,10 @@ public class DesktopInput extends InputHandler{
             }
             Draw.color();
             drawRequest(cursorX, cursorY, block, rotation);
-            block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
+			if(!(block instanceof OverdriveProjector))
+            	block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
+			else
+            	block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation), player.team());
 
             if(block.saveConfig && block.lastConfig != null){
                 brequest.set(cursorX, cursorY, rotation, block);

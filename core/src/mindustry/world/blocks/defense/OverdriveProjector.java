@@ -3,9 +3,11 @@ package mindustry.world.blocks.defense;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -29,6 +31,7 @@ public class OverdriveProjector extends Block{
     public OverdriveProjector(String name){
         super(name);
         solid = true;
+		flags = EnumSet.of(BlockFlag.overdrive);
         update = true;
         hasPower = true;
         hasItems = true;
@@ -41,8 +44,11 @@ public class OverdriveProjector extends Block{
     }
 
     @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid){
+    public void drawPlace(int x, int y, int rotation, boolean valid, Team team){
         Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.accent);
+        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range + phaseRangeBoost, phaseColor);
+		for(Tile other : indexer.getAllied(team, BlockFlag.overdrive))
+        	Drawf.dashCircle(other.x * tilesize + offset(), other.y * tilesize + offset(), range, Pal.accent);
     }
 
     @Override

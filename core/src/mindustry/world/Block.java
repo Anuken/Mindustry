@@ -19,6 +19,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
@@ -213,6 +214,9 @@ public class Block extends UnlockableContent{
 
     /** Drawn when you are placing a block. */
     public void drawPlace(int x, int y, int rotation, boolean valid){
+    }
+
+    public void drawPlace(int x, int y, int rotation, boolean valid, Team team){
     }
 
     public float drawPlaceText(String text, int x, int y, boolean valid){
