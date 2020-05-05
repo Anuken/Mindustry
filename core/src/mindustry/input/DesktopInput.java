@@ -148,10 +148,10 @@ public class DesktopInput extends InputHandler{
             }
             Draw.color();
             drawRequest(cursorX, cursorY, block, rotation);
-			if(!(block instanceof OverdriveProjector))
-            	block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
-			else
-            	block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation), player.team());
+            if(!(block instanceof OverdriveProjector))
+                block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
+            else
+                block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation), player.team());
 
             if(block.saveConfig && block.lastConfig != null){
                 brequest.set(cursorX, cursorY, rotation, block);

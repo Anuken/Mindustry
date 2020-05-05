@@ -31,7 +31,7 @@ public class OverdriveProjector extends Block{
     public OverdriveProjector(String name){
         super(name);
         solid = true;
-		flags = EnumSet.of(BlockFlag.overdrive);
+        flags = EnumSet.of(BlockFlag.overdrive);
         update = true;
         hasPower = true;
         hasItems = true;
@@ -45,10 +45,10 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid, Team team){
-        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.accent);
-        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range + phaseRangeBoost, phaseColor);
-		for(Tile other : indexer.getAllied(team, BlockFlag.overdrive))
-        	Drawf.dashCircle(other.x * tilesize + offset(), other.y * tilesize + offset(), range, Pal.accent);
+        float showRange = Interpolation.linear.apply(range, range + phaseRangeBoost, Mathf.absin(Time.time(), 10f, 1f));
+        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), showRange, Pal.accent);
+        //for(Tile other : indexer.getAllied(team, BlockFlag.overdrive))
+        //	Drawf.dashCircle(other.x * tilesize + offset(), other.y * tilesize + offset(), range, Pal.accent);
     }
 
     @Override
