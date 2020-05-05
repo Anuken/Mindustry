@@ -36,7 +36,7 @@ public class MenuRenderer implements Disposable{
         Time.mark();
         generate();
         cache();
-        Log.info("Time to generate menu: {0}", Time.elapsed());
+        Log.info("Time to generate menu: @", Time.elapsed());
     }
 
     private void generate(){

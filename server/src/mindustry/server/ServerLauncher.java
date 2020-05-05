@@ -64,9 +64,9 @@ public class ServerLauncher implements ApplicationListener{
             Log.err("Error occurred loading mod content:");
             for(LoadedMod mod : mods.list()){
                 if(mod.hasContentErrors()){
-                    Log.err("| &ly[{0}]", mod.name);
+                    Log.err("| &ly[@]", mod.name);
                     for(Content cont : mod.erroredContent){
-                        Log.err("| | &y{0}: &c{1}", cont.minfo.sourceFile.name(), Strings.getSimpleMessage(cont.minfo.baseError).replace("\n", " "));
+                        Log.err("| | &y@: &c@", cont.minfo.sourceFile.name(), Strings.getSimpleMessage(cont.minfo.baseError).replace("\n", " "));
                     }
                 }
             }

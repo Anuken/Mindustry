@@ -2,6 +2,7 @@ package mindustry.world.blocks.distribution;
 
 import arc.math.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -86,12 +87,12 @@ public class OverflowGate extends Block{
             updateTile();
         }
 
-        public Tilec getTileTarget(Item item, Tile src, boolean flip){
-            int from = absoluteRelativeTo(src.x, src.y);
+        public @Nullable Tilec getTileTarget(Item item, Tile src, boolean flip){
+            int from = relativeTo(src.x, src.y);
             if(from == -1) return null;
             Tilec to = nearby((from + 2) % 4);
-            if(to == null) return null;
-            boolean canForward = to.acceptItem(this, item) && to.team() == team && !(to.block() instanceof OverflowGate);
+            boolean canForward = to != null && to.acceptItem(this, item) && to.team() == team && !(to.block() instanceof OverflowGate);
+
 
             if(!canForward || invert){
                 Tilec a = nearby(Mathf.mod(from - 1, 4));

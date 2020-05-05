@@ -9,6 +9,7 @@ import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import org.reflections.*;
 import org.reflections.scanners.*;
@@ -20,7 +21,7 @@ import java.util.*;
 
 public class ScriptStubGenerator{
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception{
         String base = "mindustry";
         Array<String> blacklist = Array.with("plugin", "mod", "net", "io", "tools");
         Array<String> nameBlacklist = Array.with("ClassAccess");
@@ -61,6 +62,10 @@ public class ScriptStubGenerator{
             if(used.contains(type.getPackage().getName()) || nopackage.contains(s -> type.getName().startsWith(s))) continue;
             result.append("importPackage(Packages.").append(type.getPackage().getName()).append(")\n");
             used.add(type.getPackage().getName());
+        }
+
+        for(Class type : EventType.class.getClasses()){
+            result.append("const ").append(type.getSimpleName()).append(" = ").append("Packages.").append(type.getName().replace('$', '.')).append("\n");
         }
 
         //Log.info(result);

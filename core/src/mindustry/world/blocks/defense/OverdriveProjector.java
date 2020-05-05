@@ -1,12 +1,11 @@
 package mindustry.world.blocks.defense;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -15,11 +14,9 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class OverdriveProjector extends Block{
-    private static final IntSet healed = new IntSet();
-
     public final int timerUse = timers++;
 
-    public TextureRegion topRegion;
+    public @Load("@-top") TextureRegion topRegion;
     public float reload = 60f;
     public float range = 80f;
     public float speedBoost = 1.5f;
@@ -41,12 +38,6 @@ public class OverdriveProjector extends Block{
     @Override
     public boolean outputsItems(){
         return false;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override

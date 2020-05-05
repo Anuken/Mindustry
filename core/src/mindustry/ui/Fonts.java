@@ -32,6 +32,7 @@ public class Fonts{
     public static BitmapFont outline;
     public static BitmapFont chat;
     public static BitmapFont icon;
+    public static BitmapFont tech;
 
     public static int getUnicode(String content){
         return unicodeIcons.get(content, 0);
@@ -135,6 +136,10 @@ public class Fonts{
         }};
 
         Core.assets.load("outline", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/font.ttf", param)).loaded = t -> Fonts.outline = (BitmapFont)t;
+
+        Core.assets.load("tech", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/tech.ttf", new FreeTypeFontParameter(){{
+            size = 18;
+        }})).loaded = f -> Fonts.tech = (BitmapFont)f;
     }
 
     /** Merges the UI and font atlas together for better performance. */

@@ -287,7 +287,9 @@ public class Schematics implements Loadable{
             tile.rotation(st.rotation);
 
             Object config = st.config;
-            tile.configureAny(config);
+            if(tile.entity != null){
+                tile.entity.configureAny(config);
+            }
 
             if(st.block instanceof Drill){
                 tile.getLinkedTiles(t -> t.setOverlay(Blocks.oreCopper));

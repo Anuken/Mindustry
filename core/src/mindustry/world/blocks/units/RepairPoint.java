@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -23,8 +24,10 @@ public class RepairPoint extends Block{
     public float repairRadius = 50f;
     public float repairSpeed = 0.3f;
     public float powerUse;
-    public TextureRegion baseRegion;
-    public TextureRegion laser, laserEnd;
+
+    public @Load("@-base") TextureRegion baseRegion;
+    public @Load("laser") TextureRegion laser;
+    public @Load("laser-end") TextureRegion laserEnd;
 
     public RepairPoint(String name){
         super(name);
@@ -33,15 +36,6 @@ public class RepairPoint extends Block{
         flags = EnumSet.of(BlockFlag.repair);
         hasPower = true;
         outlineIcon = true;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        baseRegion = Core.atlas.find(name + "-base");
-        laser = Core.atlas.find("laser");
-        laserEnd = Core.atlas.find("laser-end");
     }
 
     @Override

@@ -7,17 +7,19 @@ import mindustry.game.EventType.*;
 
 import java.util.concurrent.*;
 
+import static mindustry.Vars.state;
+
 public class AsyncLogic{
     //all processes to be executed each frame
-    private Array<AsyncProcess> processes = Array.with(
+    private final Array<AsyncProcess> processes = Array.with(
         new PhysicsProcess(),
         Vars.teamIndex = new TeamIndexProcess()
     );
 
     //futures to be awaited
-    private Array<Future<?>> futures = new Array<>();
+    private final Array<Future<?>> futures = new Array<>();
 
-    private ExecutorService executor = Executors.newFixedThreadPool(processes.size, r -> {
+    private final ExecutorService executor = Executors.newFixedThreadPool(processes.size, r -> {
         Thread thread = new Thread(r, "AsyncLogic-Thread");
         thread.setDaemon(true);
         thread.setUncaughtExceptionHandler((t, e) -> Core.app.post(() -> { throw new RuntimeException(e); }));
@@ -41,27 +43,31 @@ public class AsyncLogic{
     }
 
     public void begin(){
-        //sync begin
-        for(AsyncProcess p : processes){
-            p.begin();
-        }
+        if(state.isPlaying()){
+            //sync begin
+            for(AsyncProcess p : processes){
+                p.begin();
+            }
 
-        futures.clear();
+            futures.clear();
 
-        //submit all tasks
-        for(AsyncProcess p : processes){
-            if(p.shouldProcess()){
-                futures.add(executor.submit(p::process));
+            //submit all tasks
+            for(AsyncProcess p : processes){
+                if(p.shouldProcess()){
+                    futures.add(executor.submit(p::process));
+                }
             }
         }
     }
 
     public void end(){
-        complete();
+        if(state.isPlaying()){
+            complete();
 
-        //sync end (flush data)
-        for(AsyncProcess p : processes){
-            p.end();
+            //sync end (flush data)
+            for(AsyncProcess p : processes){
+                p.end();
+            }
         }
     }
 

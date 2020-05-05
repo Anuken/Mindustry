@@ -14,4 +14,8 @@ public interface UnitController{
     default void update(){
 
     }
+
+    default boolean isBeingControlled(Unitc player){
+        return false;
+    }
 }

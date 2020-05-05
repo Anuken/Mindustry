@@ -17,6 +17,29 @@ import static mindustry.Vars.*;
 
 public class Drawf{
 
+    //an experiment, to be removed
+    public static void runes(float x, float y, int[] text){
+        int height = 6, width = 5;
+        float scale = 3;
+        float th = height * scale, tw = width * scale;
+        float skewx = width * scale, skewy = 0;
+
+        Draw.color(Pal.accent);
+
+        for(int i = 0; i < text.length; i++){
+            float ox = x + i*tw*width;
+
+            for(int j = 0; j < width * height; j++){
+                int cx = j % width, cy = j / width;
+                float rx = ox + cx * tw + skewx * cy, ry = y + cy * th;
+
+                if((text[i] & (1 << j)) != 0){
+                    Fill.quad(rx, ry, rx + tw, ry, rx + tw + skewx, ry + th + skewy, rx + skewx, ry + th + skewy);
+                }
+            }
+        }
+    }
+
     public static float text(){
         float z = Draw.z();
         if(renderer.pixelator.enabled()){

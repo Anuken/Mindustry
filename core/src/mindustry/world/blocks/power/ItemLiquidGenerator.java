@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
@@ -30,7 +31,8 @@ public class ItemLiquidGenerator extends PowerGenerator{
     public Effect generateEffect = Fx.generatespark;
     public Effect explodeEffect = Fx.generatespark;
     public Color heatColor = Color.valueOf("ff9b59");
-    public TextureRegion topRegion, liquidRegion;
+    public @Load("@-top") TextureRegion topRegion;
+    public @Load("@-liquid") TextureRegion liquidRegion;
     public boolean randomlyExplode = true;
     public boolean defaults = false;
 
@@ -64,15 +66,6 @@ public class ItemLiquidGenerator extends PowerGenerator{
             setDefaults();
         }
         super.init();
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        if(hasItems){
-            topRegion = Core.atlas.find(name + "-top");
-        }
-        liquidRegion = Core.atlas.find(name + "-liquid");
     }
 
     @Override

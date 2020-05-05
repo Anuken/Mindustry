@@ -19,7 +19,7 @@ public class ExtendingItemBridge extends ItemBridge{
     public class ExtendingItemBridgeEntity extends ItemBridgeEntity{
         @Override
         public void draw(){
-            super.draw();
+            Draw.rect(region, x, y);
 
             Draw.z(Layer.power);
 
@@ -29,7 +29,7 @@ public class ExtendingItemBridge extends ItemBridge{
             int i = tile.absoluteRelativeTo(other.x, other.y);
 
             float ex = other.worldx() - x - Geometry.d4[i].x * tilesize / 2f,
-            ey = other.worldy() - y - Geometry.d4[i].y * tilesize / 2f;
+                ey = other.worldy() - y - Geometry.d4[i].y * tilesize / 2f;
 
             float uptime = state.isEditor() ? 1f : this.uptime;
 
@@ -62,7 +62,8 @@ public class ExtendingItemBridge extends ItemBridge{
                 Draw.alpha(Mathf.absin(a / (float)arrows - time / 100f, 0.1f, 1f) * uptime * opacity);
                 Draw.rect(arrowRegion,
                 x + Geometry.d4[i].x * (tilesize / 2f + a * 6f + 2) * uptime,
-                y + Geometry.d4[i].y * (tilesize / 2f + a * 6f + 2) * uptime, i * 90f);
+                y + Geometry.d4[i].y * (tilesize / 2f + a * 6f + 2) * uptime,
+                    i * 90f);
             }
             Draw.reset();
         }

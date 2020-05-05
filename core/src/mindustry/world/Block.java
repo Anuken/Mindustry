@@ -13,6 +13,7 @@ import arc.struct.Array;
 import arc.struct.EnumSet;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
@@ -55,6 +56,10 @@ public class Block extends UnlockableContent{
     public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();
 
+    /** the last configuration value applied to this block. */
+    public @Nullable Object lastConfig;
+    /** whether to save the last config and apply it to newly placed blocks */
+    public boolean saveConfig = false;
     /** whether this block has a tile entity that updates */
     public boolean update;
     /** whether this block has health and can be destroyed */
@@ -158,8 +163,6 @@ public class Block extends UnlockableContent{
     public boolean alwaysUnlocked = false;
 
     protected Prov<Tilec> entityType = null; //initialized later
-    protected TextureRegion[] cacheRegions = {};
-    protected Array<String> cacheRegionStrings = new Array<>();
     //TODO move
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
@@ -167,6 +170,10 @@ public class Block extends UnlockableContent{
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] variantRegions, editorVariantRegions;
     public TextureRegion region, editorIcon;
+
+    //TODO remove completely
+    protected TextureRegion[] cacheRegions = {};
+    protected Array<String> cacheRegionStrings = new Array<>();
 
     //TODO move
     public static TextureRegion[][] cracks;
@@ -279,23 +286,12 @@ public class Block extends UnlockableContent{
         return rotate;
     }
 
-    /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #reg(int)}. */
-    protected int reg(String suffix){
-        cacheRegionStrings.add(name + suffix);
-        return cacheRegionStrings.size - 1;
-    }
-
-    /** Returns an internally cached region by ID. */
-    protected TextureRegion reg(int id){
-        return cacheRegions[id];
-    }
-
     public boolean synthetic(){
         return update || destructible;
     }
 
     public void setStats(){
-        stats.add(BlockStat.size, "{0}x{0}", size);
+        stats.add(BlockStat.size, "@x@", size, size);
         stats.add(BlockStat.health, health, StatUnit.none);
         if(isBuildable()){
             stats.add(BlockStat.buildTime, buildCost / 60, StatUnit.seconds);
@@ -547,6 +543,19 @@ public class Block extends UnlockableContent{
         }
     }
 
+    /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #re(int)}.
+     * DO NOT USE. This will eventually be removed. */
+    protected int re(String suffix){
+        cacheRegionStrings.add(name + suffix);
+        return cacheRegionStrings.size - 1;
+    }
+
+    /** Returns an internally cached region by ID.
+     * DO NOT USE. This will eventually be removed*/
+    protected TextureRegion re(int id){
+        return cacheRegions[id];
+    }
+
     @Override
     public void displayInfo(Table table){
         ContentDisplay.displayBlock(table, this);
@@ -586,6 +595,7 @@ public class Block extends UnlockableContent{
         }
     }
 
+    @CallSuper
     @Override
     public void load(){
         region = Core.atlas.find(name);
@@ -603,6 +613,8 @@ public class Block extends UnlockableContent{
                 }
             }
         }
+
+        ContentRegions.loadRegions(this);
     }
 
     @Override

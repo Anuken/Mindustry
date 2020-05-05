@@ -1,13 +1,14 @@
 package mindustry.world.blocks.liquid;
 
 import arc.*;
-import arc.graphics.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -19,9 +20,9 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public final int timerFlow = timers++;
     
     public Color botColor = Color.valueOf("565656");
-    
-    public TextureRegion[] topRegions = new TextureRegion[7];
-    public TextureRegion[] botRegions = new TextureRegion[7];
+
+    public @Load(value = "@-top-#", length = 7) TextureRegion[] topRegions;
+    public @Load(value = "@-bottom-#", length = 7, fallback = "conduit") TextureRegion[] botRegions;
 
     public float leakResistance = 1.5f;
 
@@ -31,17 +32,6 @@ public class Conduit extends LiquidBlock implements Autotiler{
         solid = false;
         floating = true;
         conveyorPlacement = true;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        liquidRegion = Core.atlas.find("conduit-liquid");
-        for(int i = 0; i < topRegions.length; i++){
-            topRegions[i] = Core.atlas.find(name + "-top-" + i);
-            botRegions[i] = Core.atlas.find(name + "-bottom-" + i, Core.atlas.find("conduit-bottom-" + i));
-        }
     }
 
     @Override

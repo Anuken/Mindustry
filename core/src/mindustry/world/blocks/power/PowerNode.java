@@ -9,6 +9,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -26,7 +27,8 @@ public class PowerNode extends PowerBlock{
     protected final ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     protected final Vec2 t1 = new Vec2(), t2 = new Vec2();
 
-    public TextureRegion laser, laserEnd;
+    public @Load("laser") TextureRegion laser;
+    public @Load("laser-end") TextureRegion laserEnd;
     public float laserRange = 6;
     public int maxNodes = 3;
 
@@ -82,14 +84,6 @@ public class PowerNode extends PowerBlock{
                 }
             }
         });
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        laser = Core.atlas.find("laser");
-        laserEnd = Core.atlas.find("laser-end");
     }
 
     @Override
@@ -291,7 +285,7 @@ public class PowerNode extends PowerBlock{
             });
             tempTileEnts.each(valid, other -> {
                 if(!power.links.contains(other.pos())){
-                    tile.configureAny(other.pos());
+                    configureAny(other.pos());
                 }
             });
 
@@ -306,7 +300,7 @@ public class PowerNode extends PowerBlock{
         @Override
         public boolean onConfigureTileTapped(Tilec other){
             if(linkValid(this, other)){
-                tile.configure(other.pos());
+                configure(other.pos());
                 return false;
             }
 
@@ -315,12 +309,12 @@ public class PowerNode extends PowerBlock{
                     int[] total = {0};
                     getPotentialLinks(tile, link -> {
                         if(!insulated(this, link) && total[0]++ < maxNodes){
-                            tile.configure(link.pos());
+                            configure(link.pos());
                         }
                     });
                 }else{
                     while(power.links.size > 0){
-                        tile.configure(power.links.get(0));
+                        configure(power.links.get(0));
                     }
                 }
                 return false;

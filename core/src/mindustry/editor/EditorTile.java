@@ -39,6 +39,13 @@ public class EditorTile extends Tile{
     }
 
     @Override
+    public void updateOcclusion(){
+        super.updateOcclusion();
+
+        ui.editor.editor.renderer().updatePoint(x, y);
+    }
+
+    @Override
     public void setBlock(Block type, Team team, int rotation){
         if(state.isGame()){
             super.setBlock(type, team, rotation);

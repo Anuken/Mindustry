@@ -26,10 +26,8 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class UnitFactory extends Block{
-
-
     public float launchVelocity = 5f;
-    public TextureRegion topRegion;
+    public @Load("@-top") TextureRegion topRegion;
     public int[] capacities;
 
     public UnitPlan[] plans = new UnitPlan[0];
@@ -43,7 +41,11 @@ public class UnitFactory extends Block{
         flags = EnumSet.of(BlockFlag.producer);
         configurable = true;
 
-        config(Integer.class, (tile, i) -> ((UnitFactoryEntity)tile).currentPlan = i < 0 || i >= plans.length ? -1 : i);
+        config(Integer.class, (tile, i) -> {
+            ((UnitFactoryEntity)tile).currentPlan = i < 0 || i >= plans.length ? -1 : i;
+            ((UnitFactoryEntity)tile).progress = 0;
+        });
+
         consumes.add(new ConsumeItemDynamic(e -> {
             UnitFactoryEntity entity = (UnitFactoryEntity)e;
 
@@ -71,13 +73,6 @@ public class UnitFactory extends Block{
                 capacities[stack.item.id] = Math.max(capacities[stack.item.id], stack.amount * 2);
             }
         }
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
@@ -150,7 +145,7 @@ public class UnitFactory extends Block{
         public void buildConfiguration(Table table){
             Array<UnitType> units = Array.with(plans).map(u -> u.unit);
 
-            ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans[currentPlan].unit, unit -> tile.configure(units.indexOf(unit)));
+            ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans[currentPlan].unit, unit -> configure(units.indexOf(unit)));
         }
 
         @Override
@@ -225,13 +220,15 @@ public class UnitFactory extends Block{
             if(currentPlan != -1){
                 UnitPlan plan = plans[currentPlan];
 
-                if(progress >= plan.time){
+                if(progress >= plan.time/* && !Units.anyEntities(tile, !plan.unit.flying)*/){
                     progress = 0f;
 
                     Call.onUnitFactorySpawn(tile);
                     useContent(plan.unit);
                     consume();
                 }
+
+                progress = Mathf.clamp(progress, 0, plan.time);
             }else{
                 progress = 0f;
             }

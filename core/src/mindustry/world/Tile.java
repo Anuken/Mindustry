@@ -95,15 +95,6 @@ public class Tile implements Position, QuadTreeObject{
         return -1;
     }
 
-    /** Configure a tile with the current, local player. */
-    public void configure(Object value){
-        if(entity != null) Call.onTileConfig(player, entity, value);
-    }
-
-    public void configureAny(Object value){
-        if(entity != null) Call.onTileConfig(null, entity, value);
-    }
-
     @SuppressWarnings("unchecked")
     public <T extends TileEntity> T ent(){
         return (T)entity;
@@ -500,12 +491,13 @@ public class Tile implements Position, QuadTreeObject{
 
             //remove this tile's dangling entities
             if(entity.block().isMultiblock()){
+                int cx = entity.tileX(), cy = entity.tileY();
                 int size = entity.block().size;
                 int offsetx = -(size - 1) / 2;
                 int offsety = -(size - 1) / 2;
                 for(int dx = 0; dx < size; dx++){
                     for(int dy = 0; dy < size; dy++){
-                        Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
+                        Tile other = world.tile(cx + dx + offsetx, cy + dy + offsety);
                         if(other != null){
                             //reset entity and block *manually* - thus, preChanged() will not be called anywhere else, for multiblocks
                             if(other != this){ //do not remove own entity so it can be processed in changed()

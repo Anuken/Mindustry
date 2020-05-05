@@ -1,10 +1,10 @@
 package mindustry.world.blocks.distribution;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -20,8 +20,9 @@ import static mindustry.Vars.*;
 public class StackConveyor extends Block implements Autotiler{
     protected static final int stateMove = 0, stateLoad = 1, stateUnload = 2;
 
-    protected TextureRegion[] regions = new TextureRegion[3];
-    protected TextureRegion edgeRegion, stackRegion;
+    public @Load(value = "@-#", length = 3) TextureRegion[] regions;
+    public @Load("@-edge") TextureRegion edgeRegion;
+    public @Load("@-stack") TextureRegion stackRegion;
 
     public float speed = 0f;
     public float recharge = 4f;
@@ -41,16 +42,6 @@ public class StackConveyor extends Block implements Autotiler{
         idleSoundVolume = 0.004f;
         unloadable = false;
         dumpIncrement = 4;
-    }
-
-    @Override
-    public void load(){
-        for(int i = 0; i < regions.length; i++){
-            regions[i] = Core.atlas.find(name + "-" + i);
-        }
-        
-        edgeRegion = Core.atlas.find(name + "-edge");
-        stackRegion = Core.atlas.find(name + "-stack");
     }
 
     @Override
@@ -87,7 +78,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         for(int i = 0; i < 4; i++){
             if((bits[3] & (1 << i)) == 0){
-                Draw.rect(edgeRegion, req.drawx(), req.drawy(), (req.rotation - i) * 90);
+                Draw.rect(edgeRegion, req.drawx(), req.drawy(), region.getWidth() * Draw.scl * req.animScale, region.getHeight() * Draw.scl * req.animScale, (req.rotation - i) * 90);
             }
         }
     }
@@ -147,6 +138,8 @@ public class StackConveyor extends Block implements Autotiler{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
+            int lastState = state;
+
             state = stateMove;
 
             int[] bits = buildBlending(tile, tile.rotation(), null, true);
@@ -158,6 +151,15 @@ public class StackConveyor extends Block implements Autotiler{
             for(int i = 0; i < 4; i++){
                 if(blends(tile, rotation(), i)){
                     blendprox |= (1 << i);
+                }
+            }
+
+            //update other conveyor state when this conveyor's state changes
+            if(state != lastState){
+                for(Tilec near : proximity){
+                    if(near instanceof StackConveyorEntity){
+                        near.onProximityUpdate();
+                    }
                 }
             }
         }

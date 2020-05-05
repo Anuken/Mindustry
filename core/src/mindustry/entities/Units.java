@@ -44,17 +44,26 @@ public class Units{
     }
 
     /** Returns whether there are any entities on this tile. */
-    public static boolean anyEntities(Tile tile){
+    public static boolean anyEntities(Tile tile, boolean ground){
         float size = tile.block().size * tilesize;
-        return anyEntities(tile.drawx() - size/2f, tile.drawy() - size/2f, size, size);
+        return anyEntities(tile.drawx() - size/2f, tile.drawy() - size/2f, size, size, ground);
+    }
+
+    /** Returns whether there are any entities on this tile. */
+    public static boolean anyEntities(Tile tile){
+        return anyEntities(tile, true);
     }
 
     public static boolean anyEntities(float x, float y, float width, float height){
+        return anyEntities(x, y, width, height, true);
+    }
+
+    public static boolean anyEntities(float x, float y, float width, float height, boolean ground){
         boolResult = false;
 
         nearby(x, y, width, height, unit -> {
             if(boolResult) return;
-            if(unit.isGrounded()){
+            if(unit.isGrounded() == ground){
                 unit.hitbox(hitrect);
 
                 if(hitrect.overlaps(x, y, width, height)){

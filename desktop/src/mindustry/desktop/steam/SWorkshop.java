@@ -46,7 +46,7 @@ public class SWorkshop implements SteamUGCCallback{
         }
 
         workshopFiles.each((type, list) -> {
-            Log.info("Fetched content ({0}): {1}", type.getSimpleName(), list.size);
+            Log.info("Fetched content (@): @", type.getSimpleName(), list.size);
         });
     }
 
@@ -150,7 +150,7 @@ public class SWorkshop implements SteamUGCCallback{
     }
 
     void update(Publishable p, SteamPublishedFileID id, String changelog){
-        Log.info("Calling update({0}) {1}", p.steamTitle(), id.handle());
+        Log.info("Calling update(@) @", p.steamTitle(), id.handle());
         String sid = id.handle() + "";
 
         updateItem(id, h -> {
@@ -204,7 +204,7 @@ public class SWorkshop implements SteamUGCCallback{
     void updateItem(SteamPublishedFileID publishedFileID, Cons<SteamUGCUpdateHandle> tagger, Runnable updated){
         try{
             SteamUGCUpdateHandle h = ugc.startItemUpdate(SVars.steamID, publishedFileID);
-            Log.info("begin updateItem({0})", publishedFileID.handle());
+            Log.info("begin updateItem(@)", publishedFileID.handle());
 
             tagger.get(h);
             Log.info("Tagged.");
@@ -240,7 +240,7 @@ public class SWorkshop implements SteamUGCCallback{
         if(detailHandlers.containsKey(query)){
             Log.info("Query being handled...");
             if(numResultsReturned > 0){
-                Log.info("{0} q results", numResultsReturned);
+                Log.info("@ q results", numResultsReturned);
                 Array<SteamUGCDetails> details = new Array<>();
                 for(int i = 0; i < numResultsReturned; i++){
                     details.add(new SteamUGCDetails());
@@ -262,7 +262,7 @@ public class SWorkshop implements SteamUGCCallback{
     public void onSubscribeItem(SteamPublishedFileID publishedFileID, SteamResult result){
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getItemInstallInfo(publishedFileID, info);
-        Log.info("Item subscribed from {0}", info.getFolder());
+        Log.info("Item subscribed from @", info.getFolder());
         SAchievement.downloadMapWorkshop.complete();
     }
 
@@ -270,7 +270,7 @@ public class SWorkshop implements SteamUGCCallback{
     public void onUnsubscribeItem(SteamPublishedFileID publishedFileID, SteamResult result){
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getItemInstallInfo(publishedFileID, info);
-        Log.info("Item unsubscribed from {0}", info.getFolder());
+        Log.info("Item unsubscribed from @", info.getFolder());
     }
 
     @Override
@@ -293,7 +293,7 @@ public class SWorkshop implements SteamUGCCallback{
     @Override
     public void onSubmitItemUpdate(SteamPublishedFileID publishedFileID, boolean needsToAcceptWLA, SteamResult result){
         ui.loadfrag.hide();
-        Log.info("onsubmititemupdate {0} {1} {2}", publishedFileID.handle(), needsToAcceptWLA, result);
+        Log.info("onsubmititemupdate @ @ @", publishedFileID.handle(), needsToAcceptWLA, result);
         if(result == SteamResult.OK){
             //redirect user to page for further updates
             SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + publishedFileID.handle());
@@ -314,7 +314,7 @@ public class SWorkshop implements SteamUGCCallback{
         SAchievement.downloadMapWorkshop.complete();
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getItemInstallInfo(publishedFileID, info);
-        Log.info("Item downloaded to {0}", info.getFolder());
+        Log.info("Item downloaded to @", info.getFolder());
     }
 
     @Override
@@ -351,6 +351,6 @@ public class SWorkshop implements SteamUGCCallback{
     public void onDeleteItem(SteamPublishedFileID publishedFileID, SteamResult result){
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getItemInstallInfo(publishedFileID, info);
-        Log.info("Item removed from {0}", info.getFolder());
+        Log.info("Item removed from @", info.getFolder());
     }
 }

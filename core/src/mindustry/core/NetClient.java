@@ -1,6 +1,7 @@
 package mindustry.core;
 
 import arc.*;
+import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -49,11 +50,13 @@ public class NetClient implements ApplicationListener{
     /** Byte stream for reading in snapshots. */
     private ReusableByteInStream byteStream = new ReusableByteInStream();
     private DataInputStream dataStream = new DataInputStream(byteStream);
+    /** Packet handlers for custom types of messages. */
+    private ObjectMap<String, Array<Cons<String>>> customPacketHandlers = new ObjectMap<>();
 
     public NetClient(){
 
         net.handleClient(Connect.class, packet -> {
-            Log.info("Connecting to server: {0}", packet.addressTCP);
+            Log.info("Connecting to server: @", packet.addressTCP);
 
             player.admin(false);
 
@@ -115,7 +118,7 @@ public class NetClient implements ApplicationListener{
         });
 
         net.handleClient(WorldStream.class, data -> {
-            Log.info("Recieved world data: {0} bytes.", data.stream.available());
+            Log.info("Recieved world data: @ bytes.", data.stream.available());
             NetworkIO.loadWorld(new InflaterInputStream(data.stream));
 
             finishConnecting();
@@ -124,6 +127,28 @@ public class NetClient implements ApplicationListener{
         net.handleClient(InvokePacket.class, packet -> {
             RemoteReadClient.readPacket(packet.reader(), packet.type);
         });
+    }
+
+    public void addPacketHandler(String type, Cons<String> handler){
+        customPacketHandlers.getOr(type, Array::new).add(handler);
+    }
+
+    public Array<Cons<String>> getPacketHandlers(String type){
+        return customPacketHandlers.getOr(type, Array::new);
+    }
+
+    @Remote(targets = Loc.server, variants = Variant.both)
+    public static void clientPacketReliable(String type, String contents){
+        if(netClient.customPacketHandlers.containsKey(type)){
+            for(Cons<String> c : netClient.customPacketHandlers.get(type)){
+                c.get(contents);
+            }
+        }
+    }
+
+    @Remote(targets = Loc.server, variants = Variant.both, unreliable = true)
+    public static void clientPacketUnreliable(String type, String contents){
+        clientPacketReliable(type, contents);
     }
 
     //called on all clients
@@ -171,14 +196,14 @@ public class NetClient implements ApplicationListener{
             }
 
             //server console logging
-            Log.info("&y{0}: &lb{1}", player.name(), message);
+            Log.info("&y@: &lb@", player.name(), message);
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
             Call.sendMessage(message, colorizeName(player.id(), player.name()), player);
         }else{
             //log command to console but with brackets
-            Log.info("<&y{0}: &lm{1}&lg>", player.name(), message);
+            Log.info("<&y@: &lm@&lg>", player.name(), message);
 
             //a command was sent, now get the output
             if(response.type != ResponseType.valid){
@@ -401,7 +426,7 @@ public class NetClient implements ApplicationListener{
                 int pos = input.readInt();
                 Tile tile = world.tile(pos);
                 if(tile == null || tile.entity == null){
-                    Log.warn("Missing entity at {0}. Skipping block snapshot.", tile);
+                    Log.warn("Missing entity at @. Skipping block snapshot.", tile);
                     break;
                 }
                 tile.entity.readAll(Reads.get(input), tile.entity.version());

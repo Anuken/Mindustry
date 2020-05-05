@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -18,7 +19,8 @@ import static mindustry.Vars.*;
 
 public class PayloadConveyor extends Block{
     public float moveTime = 70f;
-    public TextureRegion topRegion, edgeRegion;
+    public @Load("@-top") TextureRegion topRegion;
+    public @Load("@-edge") TextureRegion edgeRegion;
     public Interpolation interp = Interpolation.pow5;
 
     public PayloadConveyor(String name){
@@ -28,14 +30,6 @@ public class PayloadConveyor extends Block{
         rotate = true;
         update = true;
         outputsPayload = true;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        topRegion = Core.atlas.find(name + "-top");
-        edgeRegion = Core.atlas.find(name + "-edge");
     }
 
     @Override

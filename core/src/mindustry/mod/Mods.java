@@ -107,11 +107,11 @@ public class Mods implements Loadable{
             Array<Fi> overrides = mod.root.child("sprites-override").findAll(f -> f.extension().equals("png"));
             packSprites(sprites, mod, true);
             packSprites(overrides, mod, false);
-            Log.debug("Packed {0} images for mod '{1}'.", sprites.size + overrides.size, mod.meta.name);
+            Log.debug("Packed @ images for mod '@'.", sprites.size + overrides.size, mod.meta.name);
             totalSprites += sprites.size + overrides.size;
         });
 
-        Log.debug("Time to pack textures: {0}", Time.elapsed());
+        Log.debug("Time to pack textures: @", Time.elapsed());
     }
 
     private void loadIcons(){
@@ -136,7 +136,7 @@ public class Mods implements Loadable{
                 pixmap.dispose();
             }catch(IOException e){
                 Core.app.post(() -> {
-                    Log.err("Error packing images for mod: {0}", mod.meta.name);
+                    Log.err("Error packing images for mod: @", mod.meta.name);
                     e.printStackTrace();
                     if(!headless) ui.showException(e);
                 });
@@ -182,12 +182,12 @@ public class Mods implements Loadable{
 
             Core.atlas = packer.flush(filter, new TextureAtlas());
             Core.atlas.setErrorRegion("error");
-            Log.debug("Total pages: {0}", Core.atlas.getTextures().size);
+            Log.debug("Total pages: @", Core.atlas.getTextures().size);
         }
 
         packer.dispose();
         packer = null;
-        Log.debug("Time to update textures: {0}", Time.elapsed());
+        Log.debug("Time to update textures: @", Time.elapsed());
     }
 
     private PageType getPage(AtlasRegion region){
@@ -246,15 +246,15 @@ public class Mods implements Loadable{
         for(Fi file : modDirectory.list()){
             if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && (file.child("mod.json").exists() || file.child("mod.hjson").exists()))) continue;
 
-            Log.debug("[Mods] Loading mod {0}", file);
+            Log.debug("[Mods] Loading mod @", file);
             try{
                 LoadedMod mod = loadMod(file);
                 mods.add(mod);
             }catch(Throwable e){
                 if(e instanceof ClassNotFoundException && e.getMessage().contains("mindustry.plugin.Plugin")){
-                    Log.info("Plugin {0} is outdated and needs to be ported to 6.0! Update its main class to inherit from 'mindustry.mod.Plugin'.");
+                    Log.info("Plugin @ is outdated and needs to be ported to 6.0! Update its main class to inherit from 'mindustry.mod.Plugin'.");
                 }else{
-                    Log.err("Failed to load mod file {0}. Skipping.", file);
+                    Log.err("Failed to load mod file @. Skipping.", file);
                     Log.err(e);
                 }
             }
@@ -267,7 +267,7 @@ public class Mods implements Loadable{
                 mods.add(mod);
                 mod.addSteamID(file.name());
             }catch(Throwable e){
-                Log.err("Failed to load mod workshop file {0}. Skipping.", file);
+                Log.err("Failed to load mod workshop file @. Skipping.", file);
                 Log.err(e);
             }
         }
@@ -374,7 +374,7 @@ public class Mods implements Loadable{
     private void checkWarnings(){
         //show 'scripts have errored' info
         if(scripts != null && scripts.hasErrored()){
-           ui.showErrorMessage("$mod.scripts.unsupported");
+           ui.showErrorMessage("$mod.scripts.disable");
         }
 
         //show list of errored content
@@ -481,13 +481,13 @@ public class Mods implements Loadable{
                             scripts.run(mod, main);
                         }catch(Throwable e){
                             Core.app.post(() -> {
-                                Log.err("Error loading main script {0} for mod {1}.", main.name(), mod.meta.name);
+                                Log.err("Error loading main script @ for mod @.", main.name(), mod.meta.name);
                                 e.printStackTrace();
                             });
                         }
                     }else{
                         Core.app.post(() -> {
-                            Log.err("No main.js found for mod {0}.", mod.meta.name);
+                            Log.err("No main.js found for mod @.", mod.meta.name);
                         });
                     }
                 }
@@ -496,7 +496,7 @@ public class Mods implements Loadable{
             content.setCurrentMod(null);
         }
 
-        Log.debug("Time to initialize modded scripts: {0}", Time.elapsed());
+        Log.debug("Time to initialize modded scripts: @", Time.elapsed());
     }
 
     /** Creates all the content found in mod files. */
@@ -544,7 +544,7 @@ public class Mods implements Loadable{
             try{
                 //this binds the content but does not load it entirely
                 Content loaded = parser.parse(l.mod, l.file.nameWithoutExtension(), l.file.readString("UTF-8"), l.file, l.type);
-                Log.debug("[{0}] Loaded '{1}'.", l.mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
+                Log.debug("[@] Loaded '@'.", l.mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
             }catch(Throwable e){
                 if(current != content.getLastAdded() && content.getLastAdded() != null){
                     parser.markError(content.getLastAdded(), l.mod, l.file, e);
@@ -624,7 +624,7 @@ public class Mods implements Loadable{
 
         Fi metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("mod.hjson").exists() ? zip.child("mod.hjson") : zip.child("plugin.json");
         if(!metaf.exists()){
-            Log.warn("Mod {0} doesn't have a 'mod.json'/'mod.hjson'/'plugin.json' file, skipping.", sourceFile);
+            Log.warn("Mod @ doesn't have a 'mod.json'/'mod.hjson'/'plugin.json' file, skipping.", sourceFile);
             throw new IllegalArgumentException("No mod.json found.");
         }
 

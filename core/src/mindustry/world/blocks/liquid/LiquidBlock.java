@@ -2,12 +2,15 @@ package mindustry.world.blocks.liquid;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
 public class LiquidBlock extends Block{
-    protected TextureRegion liquidRegion, bottomRegion, topRegion;
+    public @Load("@-liquid") TextureRegion liquidRegion;
+    public @Load("@-top") TextureRegion topRegion;
+    public @Load("@-bottom") TextureRegion bottomRegion;
 
     public LiquidBlock(String name){
         super(name);
@@ -16,15 +19,6 @@ public class LiquidBlock extends Block{
         hasLiquids = true;
         group = BlockGroup.liquids;
         outputsLiquid = true;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        liquidRegion = Core.atlas.find(name + "-liquid");
-        topRegion = Core.atlas.find(name + "-top");
-        bottomRegion = Core.atlas.find(name + "-bottom");
     }
 
     @Override

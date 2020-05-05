@@ -102,6 +102,7 @@ public class PlacementFragment extends Fragment{
 
             if(tryRecipe != null && tryRecipe.isVisible() && unlocked(tryRecipe)){
                 input.block = tryRecipe;
+                tryRecipe.lastConfig = tile.config();
                 currentCategory = input.block.category;
                 return true;
             }

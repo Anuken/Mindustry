@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -49,9 +50,9 @@ public class Drill extends Block{
 
     public boolean drawRim = false;
     public Color heatColor = Color.valueOf("ff5512");
-    public TextureRegion rimRegion;
-    public TextureRegion rotatorRegion;
-    public TextureRegion topRegion;
+    public @Load("@-rim") TextureRegion rimRegion;
+    public @Load("@-rotator") TextureRegion rotatorRegion;
+    public @Load("@-top") TextureRegion topRegion;
 
     public Drill(String name){
         super(name);
@@ -74,14 +75,6 @@ public class Drill extends Block{
 
             return new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(entity.lastDrillSpeed * 60 * entity.timeScale(), 2)), () -> Pal.ammo, () -> entity.warmup);
         });
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        rimRegion = Core.atlas.find(name + "-rim");
-        rotatorRegion = Core.atlas.find(name + "-rotator");
-        topRegion = Core.atlas.find(name + "-top");
     }
 
     public Item getDrop(Tile tile){

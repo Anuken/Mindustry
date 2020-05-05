@@ -7,24 +7,21 @@ import mindustry.gen.*;
 import mindustry.type.*;
 
 public class UnitTypes implements ContentList{
-    //TODO reimplement - DO NOT USE
-    public static UnitType
-    ghoul, revenant, lich,
-    crawler, fortress, eruptor, chaosArray, eradicator;
 
-    //TODO this is awful
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType titan;
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType dagger;
-    public static @EntityDef({Unitc.class, WaterMovec.class}) UnitType vanguard;
+    //ground
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType titan, dagger, crawler, fortress, eruptor, chaosArray, eradicator;
+
+    //air
+    public static @EntityDef({Unitc.class}) UnitType wraith, reaper, ghoul, revenant, lich;
+
+    //mining
     public static @EntityDef({Unitc.class, Minerc.class}) UnitType draug;
-    public static @EntityDef({Unitc.class, Trailc.class}) UnitType wraith;
-    public static @EntityDef({Unitc.class}) UnitType reaper;
-    public static @EntityDef({Unitc.class}) UnitType spirit;
-    public static @EntityDef({Unitc.class, Builderc.class}) UnitType phantom;
 
-    //TODO remove
-    public static UnitType alpha, delta, tau, omega, dart, javelin, trident, glaive;
-    public static UnitType starter;
+    //building
+    public static @EntityDef({Unitc.class, Builderc.class}) UnitType phantom, spirit;
+
+    //water
+    public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType vanguard;
 
     @Override
     public void load(){
@@ -170,6 +167,7 @@ public class UnitTypes implements ContentList{
             health = 400;
             buildSpeed = 0.4f;
             engineOffset = 6.5f;
+            hitsize = 7f;
         }};
         
         /*

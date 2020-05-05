@@ -16,7 +16,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Sorter extends Block{
-    private static Item lastItem;
     public boolean invert;
 
     public Sorter(String name){
@@ -27,6 +26,8 @@ public class Sorter extends Block{
         group = BlockGroup.transportation;
         configurable = true;
         unloadable = false;
+        saveConfig = true;
+
         config(Item.class, (tile, item) -> ((SorterEntity)tile).sortItem = item);
         configClear(tile -> ((SorterEntity)tile).sortItem = null);
     }
@@ -48,13 +49,6 @@ public class Sorter extends Block{
 
     public class SorterEntity extends TileEntity{
         @Nullable Item sortItem;
-
-        @Override
-        public void playerPlaced(){
-            if(lastItem != null){
-                tile.configure(lastItem);
-            }
-        }
 
         @Override
         public void configured(Playerc player, Object value){
@@ -140,14 +134,14 @@ public class Sorter extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> sortItem, item -> tile.configure(lastItem = item));
+            ItemSelection.buildTable(table, content.items(), () -> sortItem, item -> configure(item));
         }
 
         @Override
         public boolean onConfigureTileTapped(Tilec other){
             if(this == other){
                 control.input.frag.config.hideConfig();
-                tile.configure(lastItem = null);
+                configure(null);
                 return false;
             }
 

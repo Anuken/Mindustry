@@ -3,9 +3,14 @@ package mindustry.annotations;
 import arc.files.*;
 import arc.struct.Array;
 import arc.util.*;
+import arc.util.Log;
 import arc.util.Log.*;
 import com.squareup.javapoet.*;
 import com.sun.source.util.*;
+import com.sun.tools.javac.model.*;
+import com.sun.tools.javac.processing.*;
+import com.sun.tools.javac.tree.*;
+import com.sun.tools.javac.util.*;
 import mindustry.annotations.util.*;
 
 import javax.annotation.processing.*;
@@ -19,6 +24,7 @@ import java.io.*;
 import java.lang.annotation.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.List;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public abstract class BaseProcessor extends AbstractProcessor{
@@ -26,15 +32,18 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public static final String packageName = "mindustry.gen";
 
     public static Types typeu;
-    public static Elements elementu;
+    public static JavacElements elementu;
     public static Filer filer;
     public static Messager messager;
     public static Trees trees;
+    public static TreeMaker maker;
 
     protected int round;
     protected int rounds = 1;
     protected RoundEnvironment env;
     protected Fi rootDirectory;
+
+    protected Context context;
 
     public static String getMethodName(Element element){
         return ((TypeElement)element.getEnclosingElement()).getQualifiedName().toString() + "." + element.getSimpleName();
@@ -180,11 +189,15 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public synchronized void init(ProcessingEnvironment env){
         super.init(env);
 
+        JavacProcessingEnvironment javacProcessingEnv = (JavacProcessingEnvironment)env;
+
         trees = Trees.instance(env);
         typeu = env.getTypeUtils();
-        elementu = env.getElementUtils();
+        elementu = javacProcessingEnv.getElementUtils();
         filer = env.getFiler();
         messager = env.getMessager();
+        context = ((JavacProcessingEnvironment)env).getContext();
+        maker = TreeMaker.instance(javacProcessingEnv.getContext());
 
         Log.setLogLevel(LogLevel.info);
 

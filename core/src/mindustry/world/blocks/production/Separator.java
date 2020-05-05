@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -19,7 +20,8 @@ public class Separator extends Block{
     public @NonNull ItemStack[] results;
     public float craftTime;
 
-    public int liquidRegion, spinnerRegion;
+    public @Load("@-liquid") TextureRegion liquidRegion;
+    public @Load("@-spinner") TextureRegion spinnerRegion;
     public float spinnerSpeed = 3f;
 
     public Separator(String name){
@@ -28,9 +30,6 @@ public class Separator extends Block{
         solid = true;
         hasItems = true;
         hasLiquids = true;
-
-        liquidRegion = reg("-liquid");
-        spinnerRegion = reg("-spinner");
     }
 
     @Override
@@ -73,11 +72,11 @@ public class Separator extends Block{
 
             Draw.color(liquids.current().color);
             Draw.alpha(liquids.total() / liquidCapacity);
-            Draw.rect(reg(liquidRegion), x, y);
+            Draw.rect(liquidRegion, x, y);
 
             Draw.reset();
-            if(Core.atlas.isFound(reg(spinnerRegion))){
-                Draw.rect(reg(spinnerRegion), x, y, totalProgress * spinnerSpeed);
+            if(Core.atlas.isFound(spinnerRegion)){
+                Draw.rect(spinnerRegion, x, y, totalProgress * spinnerSpeed);
             }
         }
 

@@ -14,7 +14,8 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ai.types.*;
+import mindustry.ai.formations.*;
+import mindustry.ai.formations.patterns.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -147,6 +148,14 @@ public class DesktopInput extends InputHandler{
             Draw.color();
             drawRequest(cursorX, cursorY, block, rotation);
             block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
+
+            if(block.saveConfig && block.lastConfig != null){
+                brequest.set(cursorX, cursorY, rotation, block);
+                brequest.config = block.lastConfig;
+
+                block.drawRequestConfig(brequest, allRequests());
+            }
+
         }
 
         Draw.reset();
@@ -182,13 +191,28 @@ public class DesktopInput extends InputHandler{
             }
 
             //TODO this is for debugging, remove later
-            if(Core.input.keyTap(KeyCode.q) && !player.dead()){
-                Fx.commandSend.at(player);
-                Units.nearby(player.team(), player.x(), player.y(), 200f, u -> {
-                    if(u.isAI()){
-                        u.controller(new MimicAI(player.unit()));
-                    }
-                });
+            if(Core.input.keyTap(KeyCode.g) && !player.dead() && player.unit() instanceof Commanderc){
+                Commanderc commander = (Commanderc)player.unit();
+
+                if(commander.isCommanding()){
+                    commander.clearCommand();
+                }else{
+
+                    FormationPattern pattern = new SquareFormation();
+                    Formation formation = new Formation(new Vec3(player.x(), player.y(), player.unit().rotation()), pattern);
+                    formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
+
+                    units.clear();
+
+                    Fx.commandSend.at(player);
+                    Units.nearby(player.team(), player.x(), player.y(), 200f, u -> {
+                        if(u.isAI()){
+                            units.add(u);
+                        }
+                    });
+
+                    commander.command(formation, units);
+                }
             }
         }
 
@@ -245,7 +269,7 @@ public class DesktopInput extends InputHandler{
             if(isPlacing() && mode == placing){
                 updateLine(selectX, selectY);
             }else if(!selectRequests.isEmpty()){
-                rotateRequests(selectRequests, (int)Core.input.axisTap(Binding.rotate));
+                rotateRequests(selectRequests, Mathf.sign(Core.input.axisTap(Binding.rotate)));
             }
         }
 

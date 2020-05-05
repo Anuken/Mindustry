@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -35,7 +36,8 @@ public class NuclearReactor extends PowerGenerator{
     public float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
     public float coolantPower = 0.5f;
 
-    public TextureRegion topRegion, lightsRegion;
+    public @Load("@-top") TextureRegion topRegion;
+    public @Load("@-lights") TextureRegion lightsRegion;
 
     public NuclearReactor(String name){
         super(name);
@@ -53,14 +55,6 @@ public class NuclearReactor extends PowerGenerator{
         if(hasItems){
             stats.add(BlockStat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        topRegion = Core.atlas.find(name + "-center");
-        lightsRegion = Core.atlas.find(name + "-lights");
     }
 
     @Override

@@ -134,7 +134,7 @@ public class Maps{
                     loadMap(file, true);
                 }
             }catch(Exception e){
-                Log.err("Failed to load custom map file '{0}'!", file);
+                Log.err("Failed to load custom map file '@'!", file);
                 Log.err(e);
             }
         }
@@ -146,7 +146,7 @@ public class Maps{
                 map.workshop = true;
                 map.tags.put("steamid", file.parent().name());
             }catch(Exception e){
-                Log.err("Failed to load workshop map file '{0}'!", file);
+                Log.err("Failed to load workshop map file '@'!", file);
                 Log.err(e);
             }
         }
@@ -157,7 +157,7 @@ public class Maps{
                 Map map = loadMap(file, false);
                 map.mod = mod;
             }catch(Exception e){
-                Log.err("Failed to load mod map file '{0}'!", file);
+                Log.err("Failed to load mod map file '@'!", file);
                 Log.err(e);
             }
         });

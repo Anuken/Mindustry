@@ -21,7 +21,6 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 /** Class used for indexing special target blocks for AI. */
-@SuppressWarnings("unchecked")
 public class BlockIndexer{
     /** Size of one quadrant. */
     private final static int quadrantSize = 16;
@@ -36,9 +35,9 @@ public class BlockIndexer{
     private GridBits[] structQuadrants;
     /** Stores all damaged tile entities by team. */
     private TileArray[] damagedTiles = new TileArray[Team.all().length];
-    /**All ores available on this map.*/
+    /** All ores available on this map. */
     private ObjectSet<Item> allOres = new ObjectSet<>();
-    /**Stores teams that are present here as tiles.*/
+    /** Stores teams that are present here as tiles. */
     private Array<Team> activeTeams = new Array<>();
     /** Maps teams to a map of flagged tiles by type. */
     private TileArray[][] flagMap = new TileArray[Team.all().length][BlockFlag.all.length];
@@ -126,7 +125,7 @@ public class BlockIndexer{
         }
     }
 
-    /** @return whether this item is present on this map.*/
+    /** @return whether this item is present on this map. */
     public boolean hasOre(Item item){
         return allOres.contains(item);
     }
@@ -236,7 +235,7 @@ public class BlockIndexer{
     public Tilec findTile(Team team, float x, float y, float range, Boolf<Tilec> pred, boolean usePriority){
         Tilec closest = null;
         float dst = 0;
-        float range2 = range*range;
+        float range2 = range * range;
 
         for(int rx = Math.max((int)((x - range) / tilesize / quadrantSize), 0); rx <= (int)((x + range) / tilesize / quadrantSize) && rx < quadWidth(); rx++){
             for(int ry = Math.max((int)((y - range) / tilesize / quadrantSize), 0); ry <= (int)((y + range) / tilesize / quadrantSize) && ry < quadHeight(); ry++){
@@ -254,10 +253,10 @@ public class BlockIndexer{
 
                         float ndst = e.dst2(x, y);
                         if(ndst < range2 && (closest == null ||
-                                //this one is closer, and it is at least of equal priority
-                                (ndst < dst && (!usePriority || closest.block().priority.ordinal() <= e.block().priority.ordinal())) ||
-                                //priority is used, and new block has higher priority regardless of range
-                                (usePriority && closest.block().priority.ordinal() < e.block().priority.ordinal()))){
+                        //this one is closer, and it is at least of equal priority
+                        (ndst < dst && (!usePriority || closest.block().priority.ordinal() <= e.block().priority.ordinal())) ||
+                        //priority is used, and new block has higher priority regardless of range
+                        (usePriority && closest.block().priority.ordinal() < e.block().priority.ordinal()))){
                             dst = ndst;
                             closest = e;
                         }
@@ -369,7 +368,7 @@ public class BlockIndexer{
                 for(int y = quadrantY * quadrantSize; y < world.height() && y < (quadrantY + 1) * quadrantSize; y++){
                     Tilec result = world.ent(x, y);
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
-                    if(result!= null && result.team() == team){
+                    if(result != null && result.team() == team){
                         bits.set(quadrantX, quadrantY);
                         break outer;
                     }

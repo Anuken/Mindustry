@@ -144,6 +144,18 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     //endregion
     //region utility methods
 
+    /** Configure with the current, local player. */
+    public void configure(Object value){
+        //save last used config
+        block.lastConfig = value;
+        Call.onTileConfig(player, this, value);
+    }
+
+    /** Configure from a server. */
+    public void configureAny(Object value){
+        Call.onTileConfig(null, this, value);
+    }
+
     public void applyBoost(float intensity, float  duration){
         timeScale = Math.max(timeScale, intensity);
         timeScaleDuration = Math.max(timeScaleDuration, duration);
@@ -670,7 +682,9 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     /** Called after the block is placed by this client. */
     @CallSuper
     public void playerPlaced(){
-
+        if(block.saveConfig && block.lastConfig != null){
+            configure(block.lastConfig);
+        }
     }
 
     /** Called after the block is placed by anyone. */
@@ -692,7 +706,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
             if(!tempTiles.isEmpty()){
                 Tile toLink = tempTiles.first();
                 if(!toLink.entity.power().links.contains(pos())){
-                    toLink.configureAny(pos());
+                    toLink.entity.configureAny(pos());
                 }
             }
         }

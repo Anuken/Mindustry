@@ -10,6 +10,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -51,7 +52,8 @@ public abstract class Turret extends Block{
     protected Vec2 tr = new Vec2();
     protected Vec2 tr2 = new Vec2();
 
-    public TextureRegion baseRegion, heatRegion;
+    public @Load("block-$size") TextureRegion baseRegion;
+    public @Load("@-heat") TextureRegion heatRegion;
 
     public Cons<TurretEntity> drawer = tile -> Draw.rect(region, tile.x() + tr2.x, tile.y() + tr2.y, tile.rotation - 90);
     public Cons<TurretEntity> heatDrawer = tile -> {
@@ -76,15 +78,6 @@ public abstract class Turret extends Block{
     @Override
     public boolean outputsItems(){
         return false;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        region = Core.atlas.find(name);
-        baseRegion = Core.atlas.find("block-" + size);
-        heatRegion = Core.atlas.find(name + "-heat");
     }
 
     @Override

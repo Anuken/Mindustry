@@ -237,7 +237,7 @@ public class ApplicationTests{
         state.set(State.playing);
 
         world.tile(0, 0).setBlock(Blocks.liquidSource);
-        world.tile(0, 0).configureAny(Liquids.water);
+        world.tile(0, 0).entity.configureAny(Liquids.water);
 
         world.tile(2, 1).setBlock(Blocks.liquidTank);
 
@@ -255,7 +255,7 @@ public class ApplicationTests{
         Tile source = world.rawTile(0, 0), tank = world.rawTile(1, 4), junction = world.rawTile(0, 1), conduit = world.rawTile(0, 2);
 
         source.setBlock(Blocks.liquidSource);
-        source.configureAny(Liquids.water);
+        source.entity.configureAny(Liquids.water);
 
         junction.setBlock(Blocks.liquidJunction);
 
@@ -267,6 +267,20 @@ public class ApplicationTests{
 
         assertTrue(tank.entity.liquids().currentAmount() >= 1, "Liquid not moved through junction");
         assertTrue(tank.entity.liquids().current() == Liquids.water, "Tank has no water");
+    }
+
+    @Test
+    void blockOverlapRemoved(){
+        world.loadMap(testMap);
+        state.set(State.playing);
+
+        //edge block
+        world.tile(1, 1).setBlock(Blocks.coreShard);
+        assertEquals(Blocks.coreShard, world.tile(0, 0).block());
+
+        //this should overwrite the block
+        world.tile(2, 2).setBlock(Blocks.coreShard);
+        assertEquals(Blocks.air, world.tile(0, 0).block());
     }
 
     @Test
@@ -326,7 +340,7 @@ public class ApplicationTests{
             indexer.eachBlock(Team.sharded, x * tilesize, y * tilesize, range, t -> true, assigner);
         }
 
-        Log.info("Time for basic indexing: {0}", Time.elapsed());
+        Log.info("Time for basic indexing: @", Time.elapsed());
 
         r.setSeed(0);
 
@@ -353,7 +367,7 @@ public class ApplicationTests{
         state.set(State.playing);
         int length = 128;
         world.tile(0, 0).setBlock(Blocks.itemSource);
-        world.tile(0, 0).configureAny(Items.copper);
+        world.tile(0, 0).entity.configureAny(Items.copper);
 
         Array<Tilec> entities = Array.with(world.tile(0, 0).entity);
 

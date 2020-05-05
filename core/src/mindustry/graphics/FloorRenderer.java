@@ -241,7 +241,7 @@ public class FloorRenderer implements Disposable{
             }
         }
 
-        Log.debug("Time to cache: {0}", Time.elapsed());
+        Log.debug("Time to cache: @", Time.elapsed());
     }
 
     @Override

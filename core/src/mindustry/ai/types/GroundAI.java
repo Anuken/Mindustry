@@ -19,7 +19,7 @@ public class GroundAI extends AIController{
             target = null;
 
             //TODO this is hacky, cleanup
-            if(unit instanceof Legsc){
+            if(unit instanceof Legsc && unit.moving()){
                 unit.lookAt(((Legsc)unit).baseRotation());
             }
         }

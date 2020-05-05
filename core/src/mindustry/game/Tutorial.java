@@ -105,7 +105,7 @@ public class Tutorial{
 
     public enum TutorialStage{
         intro(
-        line -> Strings.format(line, item(Items.copper), mineCopper),
+        line -> Core.bundle.format(line, item(Items.copper), mineCopper),
         () -> item(Items.copper) >= mineCopper
         ),
         drill(() -> placed(Blocks.mechanicalDrill, 1)){

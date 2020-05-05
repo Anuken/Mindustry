@@ -1,6 +1,5 @@
 package mindustry.world.blocks.sandbox;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
@@ -16,7 +15,6 @@ import mindustry.world.blocks.*;
 import static mindustry.Vars.*;
 
 public class LiquidSource extends Block{
-    public static Liquid lastLiquid;
 
     public LiquidSource(String name){
         super(name);
@@ -68,25 +66,18 @@ public class LiquidSource extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.liquids(), () -> source, liquid -> tile.configure(lastLiquid = liquid));
+            ItemSelection.buildTable(table, content.liquids(), () -> source, liquid -> configure(liquid));
         }
 
         @Override
         public boolean onConfigureTileTapped(Tilec other){
             if(this == other){
                 control.input.frag.config.hideConfig();
-                tile.configure(lastLiquid = null);
+                configure(null);
                 return false;
             }
 
             return true;
-        }
-
-        @Override
-        public void playerPlaced(){
-            if(lastLiquid != null){
-                Core.app.post(() -> tile.configure(lastLiquid));
-            }
         }
 
         @Override

@@ -155,12 +155,12 @@ public class EntityProcess extends BaseProcessor{
                 Log.debug("&gGenerating interface for " + component.name());
 
                 for(TypeName tn : inter.superinterfaces){
-                    Log.debug("&g> &lbextends {0}", simpleName(tn.toString()));
+                    Log.debug("&g> &lbextends @", simpleName(tn.toString()));
                 }
 
                 //log methods generated
                 for(MethodSpec spec : inter.methodSpecs){
-                    Log.debug("&g> > &c{0} {1}({2})", simpleName(spec.returnType.toString()), spec.name, Array.with(spec.parameters).toString(", ", p -> simpleName(p.type.toString()) + " " + p.name));
+                    Log.debug("&g> > &c@ @(@)", simpleName(spec.returnType.toString()), spec.name, Array.with(spec.parameters).toString(", ", p -> simpleName(p.type.toString()) + " " + p.name));
                 }
 
                 Log.debug("");
@@ -294,6 +294,7 @@ public class EntityProcess extends BaseProcessor{
                     //build method using same params/returns
                     MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(first.name()).addModifiers(first.is(Modifier.PRIVATE) ? Modifier.PRIVATE : Modifier.PUBLIC);
                     if(isFinal || entry.value.contains(s -> s.has(Final.class))) mbuilder.addModifiers(Modifier.FINAL);
+                    if(entry.value.contains(s -> s.has(CallSuper.class))) mbuilder.addAnnotation(CallSuper.class); //add callSuper here if necessary
                     if(first.is(Modifier.STATIC)) mbuilder.addModifiers(Modifier.STATIC);
                     mbuilder.addTypeVariables(first.typeVariables().map(TypeVariableName::get));
                     mbuilder.returns(first.retn());

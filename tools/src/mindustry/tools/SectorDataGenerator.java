@@ -95,12 +95,12 @@ public class SectorDataGenerator{
                 }
 
                 if(waterFloors / totalFloors >= 0.6f){
-                    Log.debug("Sector {0} has {1}/{2} water -> naval", sector.id, waterFloors, totalFloors);
+                    Log.debug("Sector @ has @/@ water -> naval", sector.id, waterFloors, totalFloors);
                 }
 
                 //naval sector guaranteed
                 if(nearTiles > 4){
-                    Log.debug("Sector {0} has {1} water tiles at {2} {3} -> naval", sector.id, nearTiles, cx, cy);
+                    Log.debug("Sector @ has @ water tiles at @ @ -> naval", sector.id, nearTiles, cx, cy);
                     waterFloors = totalFloors;
                 }
 
@@ -125,7 +125,7 @@ public class SectorDataGenerator{
                 }
 
                 if(count[0]++ % 10 == 0){
-                    Log.info("&lyDone with sector &lm{0}/{1}", count[0], planet.sectors.size);
+                    Log.info("&lyDone with sector &lm@/@", count[0], planet.sectors.size);
                 }
 
                 return data;

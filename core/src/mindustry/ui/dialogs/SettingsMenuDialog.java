@@ -362,7 +362,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             Core.settings.put("swapdiagonal", false);
         }
 
-        graphics.checkPref("flow", false);
+        graphics.checkPref("flow", true);
     }
 
     private void back(){

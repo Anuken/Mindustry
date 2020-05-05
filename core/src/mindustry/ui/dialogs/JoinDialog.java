@@ -433,7 +433,7 @@ public class JoinDialog extends FloatingDialog{
                     try{
                         defaultServers.clear();
                         val.asArray().each(child -> defaultServers.add(child.getString("address", "<invalid>")));
-                        Log.info("Fetched {0} global servers.", defaultServers.size);
+                        Log.info("Fetched @ global servers.", defaultServers.size);
                     }catch(Throwable ignored){}
                 });
             }catch(Throwable ignored){}
