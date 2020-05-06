@@ -45,11 +45,10 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid, Team team){
-        float showRange = Interpolation.linear.apply(range, range + phaseRangeBoost, Mathf.absin(Time.time(), 10f, 1f));
-        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), showRange, Pal.accent);
+        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.accent);
 
         for(Tile overdrive : indexer.getAllied(team, BlockFlag.overdrive))
-            Drawf.dashCircle(overdrive.ent().x(), overdrive.ent().y(), range, Pal.accent);
+            Drawf.dashCircle(overdrive.ent().x(), overdrive.ent().y(), range + overdrive.<OverdriveEntity>ent().phaseHeat * phaseRangeBoost, Pal.accent);
     }
 
     @Override
