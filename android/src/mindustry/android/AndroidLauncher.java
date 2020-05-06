@@ -146,6 +146,7 @@ public class AndroidLauncher extends AndroidApplication{
             useImmersiveMode = true;
             hideStatusBar = true;
             errorHandler = CrashSender::log;
+            stencil = 8;
         }});
         checkFiles(getIntent());
 

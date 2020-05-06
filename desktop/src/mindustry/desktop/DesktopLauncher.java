@@ -40,7 +40,7 @@ public class DesktopLauncher extends ClientLauncher{
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
                 title = "Mindustry";
                 maximized = true;
-                stencil = 0;
+                stencil = 8;
                 width = 900;
                 height = 700;
                 setWindowIcon(FileType.internal, "icons/icon_64.png");
