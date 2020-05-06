@@ -12,7 +12,7 @@ public class MeshBuilder{
     private static final float[] floats = new float[3 + 3 + 1];
     private static Mesh mesh;
 
-    public static Mesh buildIcosphere(int divisions, float radius){
+    public static Mesh buildIcosphere(int divisions, float radius, Color color){
         begin(20 * (2 << (2 * divisions - 1)) * 7 * 3);
 
         MeshResult result = Icosphere.create(divisions);
@@ -21,10 +21,28 @@ public class MeshBuilder{
             v2.set(result.vertices.items, result.indices.items[i + 1] * 3).setLength(radius);
             v3.set(result.vertices.items, result.indices.items[i + 2] * 3).setLength(radius);
 
-            verts(v1, v3, v2, normal(v1, v2, v3).scl(-1f), Color.white);
+            verts(v1, v3, v2, normal(v1, v2, v3).scl(-1f), color);
         }
 
         return end();
+    }
+
+    public static Mesh buildIcosphere(int divisions, float radius){
+        return buildIcosphere(divisions, radius, Color.white);
+    }
+
+    public static Mesh buildHex(Color color, int divisions, boolean lines, float radius){
+        return buildHex(new HexMesher(){
+            @Override
+            public float getHeight(Vec3 position){
+                return 0;
+            }
+
+            @Override
+            public Color getColor(Vec3 position){
+                return color;
+            }
+        }, divisions, lines, radius, 0);
     }
 
     public static Mesh buildHex(HexMesher mesher, int divisions, boolean lines, float radius, float intensity){

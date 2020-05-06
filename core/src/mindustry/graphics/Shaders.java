@@ -28,6 +28,7 @@ public class Shaders{
     public static PlanetGridShader planetGrid;
     public static SunShader sun;
     public static AtmosphereShader atmosphere;
+    public static MeshShader mesh = new MeshShader();
 
     public static void init(){
         shadow = new Shadow();
@@ -94,6 +95,13 @@ public class Shaders{
             setUniformf("u_lightdir", lightDir);
             setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
             setUniformf("u_camdir", camDir);
+        }
+    }
+
+    public static class MeshShader extends LoadShader{
+
+        public MeshShader(){
+            super("planet", "mesh");
         }
     }
 
