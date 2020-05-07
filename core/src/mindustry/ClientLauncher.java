@@ -120,7 +120,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
     public void update(){
         if(!finished){
             loader.draw();
-            if(assets.update(1000 / loadingFPS) && false){
+            if(assets.update(1000 / loadingFPS)){
                 Log.info("Total time to load: @", Time.timeSinceMillis(beginTime));
                 for(ApplicationListener listener : modules){
                     listener.init();

@@ -34,7 +34,7 @@ public class LoadRenderer{
 
     private StringBuilder assetText = new StringBuilder();
     private Bar[] bars;
-    private Mesh mesh = MeshBuilder.buildHex(colorRed, 2, true, 1f);//MeshBuilder.buildIcosphere(2, 1f, colorRed);
+    private Mesh mesh = MeshBuilder.buildHex(colorRed, 2, true, 1f);
     private Camera3D cam = new Camera3D();
     private int lastLength = -1;
     private FxProcessor fx = new FxProcessor(Format.RGBA8888, 2, 2, false, true);
@@ -99,6 +99,7 @@ public class LoadRenderer{
         Core.graphics.clear(Color.black);
 
         float w = Core.graphics.getWidth(), h = Core.graphics.getHeight(), s = Scl.scl();
+        //s = 2f;
         Lines.precise(true);
 
         Draw.proj().setOrtho(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
@@ -108,16 +109,14 @@ public class LoadRenderer{
         float stroke = 5f * s;
 
         //light
-        if(true){
-            Fill.light(w/2, h/2, lightVerts, lightRad, Tmp.c1.set(color).a(0.15f), Color.clear);
-        }
+        Fill.light(w/2, h/2, lightVerts, lightRad, Tmp.c1.set(color).a(0.15f), Color.clear);
 
-        float space = Scl.scl(60);
+        float space = s*(60);
         float progress = assets.getProgress();
         int dotw = (int)(w / space)/2 + 1;
         int doth = (int)(h / space)/2 + 1;
 
-        //TODO remove
+        //preview : no frametime
         if(preview){
             testprogress += Time.delta() / (60f * 3);
             progress = testprogress;
@@ -126,94 +125,66 @@ public class LoadRenderer{
             }
         }
 
-        //dot matrix
-        if(false){
-
-            Draw.color(Pal.accent);
-
-            Draw.alpha(0.3f);
-
-            for(int cx = -dotw; cx <= dotw; cx++){
-                for(int cy = -doth; cy <= doth; cy++){
-                    float dx = cx * space + w/2f, dy = cy * space + h/2f;
-
-                    Fill.square(dx, dy, 1.5f*s, 45);
-                }
-            }
-
-            Draw.reset();
-        }
 
         //square matrix
-        if(true){
-            if(true){
-                //solid color
-                Draw.color(Pal.accent, Color.black, 0.9f);
-            }else{
-                //alpha color
-                Draw.color(Pal.accent, 0.1f);
-            }
+        Draw.color(Pal.accent, Color.black, 0.9f);
 
+        Lines.stroke(stroke);
 
-            Lines.stroke(stroke);
+        for(int cx = -dotw; cx <= dotw; cx++){
+            for(int cy = -doth; cy <= doth; cy++){
+                float dx = cx * space + w/2f, dy = cy * space + h/2f;
 
-            for(int cx = -dotw; cx <= dotw; cx++){
-                for(int cy = -doth; cy <= doth; cy++){
-                    float dx = cx * space + w/2f, dy = cy * space + h/2f;
-
-                    Lines.poly(dx, dy, 4, space/2f);
-                }
+                Lines.poly(dx, dy, 4, space/2f);
             }
         }
+
 
         float aspect = 1.94f;
         Draw.flush();
         //portrait
         if(graphics.getHeight() > graphics.getWidth()){
-            aspect = 1f/aspect;
+            //aspect = 1f/2;
         }
 
         Vec2 size = Scaling.fit.apply(graphics.getWidth(), graphics.getWidth() / aspect, graphics.getWidth(), graphics.getHeight());
 
         int viewportWidth = (int)size.x, viewportHeight = (int)size.y, viewportX = (int)(graphics.getWidth()/2f - size.x/2f), viewportY = (int)(graphics.getHeight()/2f - size.y/2f);
+        if(graphics.getHeight() > graphics.getWidth()){
+            viewportHeight = graphics.getHeight();
+            viewportWidth = graphics.getWidth();
+            viewportX = viewportY = 0;
+        }
+
         w = viewportWidth;
         h = viewportHeight;
+
         Gl.viewport(viewportX, viewportY, viewportWidth, viewportHeight);
         Draw.proj().setOrtho(0, 0, viewportWidth, viewportHeight);
 
-        //bars
-        if(false){
-            Draw.color(Pal.accent, Color.black, 0.7f);
-
-            for(int cx = -dotw; cx <= dotw; cx++){
-                float height = 400f * s * Mathf.randomSeed(cx);
-
-                float dx = cx * space + w/2f, dy = 0;
-                Lines.rect(dx - space/2f, dy, space, height, 1*s, 2*s);
-            }
-
-            Draw.reset();
-        }
-
         //background text and indicator
-        if(true){
-            float rads = 110*s;
-            float rad = Math.min(Math.min(w, h) / 3.1f, Math.min(w, h)/2f - rads);
-            float rad2 = rad + rads;
-            float epad = 60f * s;
-            float mpad = 100f*s;
+        float rads = 110 * s;
+        float rad = Math.min(Math.min(w, h) / 3.1f, Math.min(w, h)/2f - rads);
+        float rad2 = rad + rads;
+        float epad = 60f * s;
+        float mpad = 100f * s;
 
-            Draw.color(color);
-            Lines.stroke(stroke);
+        Draw.color(color);
+        Lines.stroke(stroke);
 
-            Lines.poly(w/2, h/2, 4, rad);
-            Lines.poly(w/2, h/2, 4, rad2);
+        Lines.poly(w/2, h/2, 4, rad);
+        Lines.poly(w/2, h/2, 4, rad2);
+
+        if(assets.isLoaded("tech")){
+            BitmapFont font = assets.get("tech");
+            font.getData().markupEnabled = true;
 
             int panei = 0;
 
             for(int sx : Mathf.signs){
                 for(int sy : Mathf.signs){
                     float y1 = h/2f + sy*rad2, y2 = h/2f + sy*120f;
+                    //if(sy < 0) y1 = Math.min(y2, y1);
                     floats.clear();
 
                     if(w > h){ //non-portrait
@@ -222,10 +193,17 @@ public class LoadRenderer{
                         floats.add(w/2f + (w/2f-epad)*sx, y2);
                         floats.add(w/2f + sx*mpad + sx*Math.abs(y2-y1), y2);
                     }else{ //portrait
+                        float py2 = h/2f + (h/2f-epad)*sy;
+                        float testval = sy < 0 ? Math.min(y2, y1) : Math.max(y2, y1);
+
+                        if(py2*sy < testval*sy){
+                            continue;
+                        }
+
                         floats.add(w/2f + sx*mpad, y1);
-                        floats.add(w/2f + sx*mpad, h/2f + (h/2f-epad)*sy);
-                        floats.add(w/2f + sx*mpad + sx*Math.abs(y2-y1), h/2f + (h/2f-epad)*sy);
-                        floats.add(w/2f + sx*mpad + sx*Math.abs(y2-y1), y2);
+                        floats.add(w/2f + sx*mpad, py2);
+                        floats.add(Mathf.clamp(w/2f + sx*(mpad + Math.abs(y2-y1)), stroke/2f, w - stroke/2f), py2);
+                        floats.add(Mathf.clamp(w/2f + sx*(mpad + Math.abs(y2-y1)), stroke/2f, w - stroke/2f), y2);
                     }
 
                     float minx = Float.MAX_VALUE, miny = Float.MAX_VALUE, maxx = 0, maxy = 0;
@@ -246,96 +224,98 @@ public class LoadRenderer{
 
                     Draw.beginStenciled();
 
-                    if(assets.isLoaded("tech")){
-                        BitmapFont font = assets.get("tech");
-                        font.getData().markupEnabled = true;
+                    GlyphLayout layout = GlyphLayout.obtain();
+                    float pad = 4;
 
-                        GlyphLayout layout = GlyphLayout.obtain();
-                        float pad = 4;
+                    if(panei == 0){
+                        layout.setText(font, assetText);
+                        font.draw(assetText, minx + pad, maxy - pad + Math.max(0, layout.height - (maxy - miny)));
+                    }else if(panei == 1){
+                        float height = maxy - miny;
+                        float barpad = s * 8f;
+                        float barspace = (height - barpad) / bars.length;
+                        float barheight = barspace * 0.8f;
 
-                        if(panei == 0){
-                            layout.setText(font, assetText);
-                            font.draw(assetText, minx + pad, maxy - pad + Math.max(0, layout.height - (maxy - miny)));
-                        }else if(panei == 1){
-                            float height = maxy - miny;
-                            float barpad = s * 8f;
-                            float barspace = (height - barpad) / bars.length;
-                            float barheight = barspace * 0.8f;
+                        for(int i = 0; i < bars.length; i++){
+                            Bar bar = bars[i];
+                            if(bar.valid()){
+                                Draw.color(bar.red() ? colorRed : color);
+                                float y = maxy - i * barspace - barpad - barheight;
+                                float width = Mathf.clamp(bar.value());
+                                float baseWidth = Core.graphics.isPortrait() ? maxx - minx : (maxx - minx) - (maxy - y) - barpad * 2f - s * 4;
+                                float cx = minx + barpad, cy = y, topY = cy + barheight, botY = cy;
 
-                            for(int i = 0; i < bars.length; i++){
-                                Bar bar = bars[i];
-                                if(bar.valid()){
-                                    Draw.color(bar.red() ? colorRed : color);
-                                    float y = maxy - i * barspace - barpad - barheight;
-                                    float width = Mathf.clamp(bar.value());
-                                    float baseWidth = Core.graphics.isPortrait() ? maxx - minx : (maxx - minx) - (maxy - y) - barpad * 2f - s * 4;
-                                    float cx = minx + barpad, cy = y, topY = cy + barheight, botY = cy;
+                                Lines.square(cx + barheight / 2f, botY + barheight / 2f, barheight / 2f);
 
-                                    Lines.square(cx + barheight / 2f, botY + barheight / 2f, barheight / 2f);
+                                Fill.quad(
+                                cx + barheight, cy,
+                                cx + barheight, topY,
+                                cx + width * baseWidth + barheight, topY,
+                                cx + width * baseWidth, botY
+                                );
 
-                                    Fill.quad(
-                                    cx + barheight, cy,
-                                    cx + barheight, topY,
-                                    cx + width * baseWidth + barheight, topY,
-                                    cx + width * baseWidth, botY
-                                    );
+                                Draw.color(Color.black);
 
-                                    Draw.color(Color.black);
+                                Fill.quad(
+                                cx + width * baseWidth + barheight, topY,
+                                cx + width * baseWidth, botY,
+                                cx + baseWidth, botY,
+                                cx + baseWidth + barheight, topY);
 
-                                    Fill.quad(
-                                    cx + width * baseWidth + barheight, topY,
-                                    cx + width * baseWidth, botY,
-                                    cx + baseWidth, botY,
-                                    cx + baseWidth + barheight, topY);
-
-                                    font.setColor(Color.black);
-                                    layout.setText(font, bar.text);
-                                    font.draw(bar.text, cx + barheight * 1.5f, botY + barheight / 2f + layout.height / 2f);
-                                }
+                                font.setColor(Color.black);
+                                layout.setText(font, bar.text);
+                                font.draw(bar.text, cx + barheight * 1.5f, botY + barheight / 2f + layout.height / 2f);
                             }
+                        }
 
-                            Draw.color(color);
-                        }else if(panei == 2){
+                        Draw.color(color);
+                    }else if(panei == 2){
 
-                            float barw = 30f*s;
-                            float barspace = 40f*s;
-                            float barpad = 10f*s;
-                            int bars = (int)(maxx - minx / barspace) + 1;
-                            int barmax = (int)((maxy - miny) / barspace);
+                        float barw = 30f*s;
+                        float barspace = 40f*s;
+                        float barpad = 10f*s;
+                        int bars = (int)(maxx - minx / barspace) + 1;
+                        int barmax = (int)((maxy - miny) / barspace);
 
-                            for(int i = 0; i < bars; i++){
-                                int index = i % renderTimes.getWindowSize();
-                                float val = renderTimes.getValue(index);
-                                float scale = Mathf.clamp(!renderTimes.hasEnoughData() ? Mathf.randomSeed(i) : (val / renderTimes.getMean() - 0.5f));
+                        for(int i = 0; i < bars; i++){
+                            int index = i % renderTimes.getWindowSize();
+                            float val = renderTimes.getValue(index);
+                            float scale = Mathf.clamp(!renderTimes.hasEnoughData() ? Mathf.randomSeed(i) : (val / renderTimes.getMean() - 0.5f));
 
-                                Color dst = scale > 0.8f ? colorRed : color;
-                                Draw.color(dst);
-                                int height = Math.max((int)(scale * barmax), 1);
-                                float cx = maxx - barw/2f - barpad - i*barspace;
-                                for(int j = 0; j < barmax; j++){
-                                    if(j >= height){
-                                        Draw.color(color, Color.black, 0.7f);
-                                    }else{
-                                        Draw.color(dst);
-                                    }
-                                    Fill.square(cx, miny + j * barspace + barw/2f + barpad, barw/2f);
+                            Color dst = scale > 0.8f ? colorRed : color;
+                            Draw.color(dst);
+                            int height = Math.max((int)(scale * barmax), 1);
+                            float cx = maxx - barw/2f - barpad - i*barspace;
+                            for(int j = 0; j < barmax; j++){
+                                if(j >= height){
+                                    Draw.color(color, Color.black, 0.7f);
+                                }else{
+                                    Draw.color(dst);
                                 }
+                                Fill.square(cx, miny + j * barspace + barw/2f + barpad, barw/2f);
                             }
-                            Draw.color(color);
+                        }
+                        Draw.color(color);
 
-                        }else if(panei == 3){
-                            Draw.flush();
+                    }else if(panei == 3){
+                        Draw.flush();
 
-                            float vx = floats.get(6), vy = floats.get(7), vw = (maxx - vx), vh = (maxy - vy), cx = vx + vw/2f, cy = vy + vh/2f;
-                            float vpad = 30*s;
-                            float vcont = Math.min(vw, vh);
-                            float vsize = vcont - vpad*2;
-                            int rx = (int)(vx + vw/2f - vsize/2f), ry = (int)(vy + vh/2f - vsize/2f), rw = (int)vsize, rh = (int)vsize;
+                        float vx = floats.get(6), vy = floats.get(7), vw = (maxx - vx), vh = (maxy - vy), cx = vx + vw/2f, cy = vy + vh/2f;
+                        float vpad = 30*s;
+                        float vcont = Math.min(vw, vh);
+                        float vsize = vcont - vpad*2;
+                        int rx = (int)(vx + vw/2f - vsize/2f), ry = (int)(vy + vh/2f - vsize/2f), rw = (int)vsize, rh = (int)vsize;
 
-                            float vrad = vsize/2f + vpad / 1f;
+                        float vrad = vsize/2f + vpad / 1f;
 
-                            //planet + bars
-                            if(!graphics.isPortrait()){
+                        //planet + bars
+                        if(!graphics.isPortrait()){
+
+                            String text = "<<ready>>";
+                            layout.setText(font, text);
+
+                            //draw only when text fits
+                            if(layout.width * 1.5f < vw){
                                 Lines.circle(cx, cy, vsize/2f);
 
                                 if(rw > 0 && rh > 0){
@@ -356,39 +336,36 @@ public class LoadRenderer{
 
                                 int points = 4;
                                 for(int i = 0; i < points; i++){
-                                    float ang = i * 360f/points + 45;
-                                    Fill.poly(cx + Angles.trnsx(ang, vrad), cy + Angles.trnsy(ang, vrad), 3, 20*s, ang);
+                                    float ang = i * 360f / points + 45;
+                                    Fill.poly(cx + Angles.trnsx(ang, vrad), cy + Angles.trnsy(ang, vrad), 3, 20 * s, ang);
                                 }
 
-                                String text = "<<ready>>";
                                 Draw.color(Color.black);
-
-                                layout.setText(font, text);
-                                Fill.rect(cx, cy, layout.width + 14f*s, layout.height + 14f*s);
+                                Fill.rect(cx, cy, layout.width + 14f * s, layout.height + 14f * s);
 
                                 font.setColor(color);
-                                font.draw(text, cx - layout.width/2f, cy + layout.height/2f);
+                                font.draw(text, cx - layout.width / 2f, cy + layout.height / 2f);
 
                                 Draw.color(color);
 
-                                Lines.square(cx, cy, vcont/2f);
+                                Lines.square(cx, cy, vcont / 2f);
 
                                 Lines.line(vx, vy, vx, vy + vh);
 
 
-                                float pspace = 70f*s;
+                                float pspace = 70f * s;
                                 int pcount = (int)(vh / pspace / 2) + 2;
-                                float pw = (vw - vcont)/2f;
-                                float slope = pw/2f;
+                                float pw = (vw - vcont) / 2f;
+                                float slope = pw / 2f;
 
                                 //side bars for planet
                                 for(int i : Mathf.signs){
 
-                                    float px = cx + i*(vcont/2f + pw/2f);
-                                    float xleft = px - pw/2f, xright = px + pw/2f;
+                                    float px = cx + i * (vcont / 2f + pw / 2f);
+                                    float xleft = px - pw / 2f, xright = px + pw / 2f;
 
-                                    for(int j = -2; j < pcount*2; j++){
-                                        float py = vy + j*pspace*2, ybot = py - slope, ytop = py + slope;
+                                    for(int j = -2; j < pcount * 2; j++){
+                                        float py = vy + j * pspace * 2, ybot = py - slope, ytop = py + slope;
                                         Fill.quad(
                                         xleft, ybot,
                                         xleft, ybot + pspace,
@@ -397,28 +374,32 @@ public class LoadRenderer{
                                         );
                                     }
                                 }
+                            }else{
+                                //X
+                                Lines.line(vx, vy, vx + vw, vy + vh);
+                                Lines.line(vx, vy + vh, vx + vw, vy);
                             }
 
-                            //fill the triangle with some stuff
-                            float trispace = 70f*s, tpad = 5f*s;
-                            int tris = (int)(vh / trispace) + 1;
-                            for(int tx = 0; tx < tris; tx++){
-                                for(int ty = 0; ty < tris; ty++){
-                                    float trix = vx - trispace/2f - trispace*tx - tpad, triy = vy + vh - trispace/2f - trispace*ty -tpad;
-
-                                    Draw.color(Mathf.randomSeed(Pack.longInt(tx + 91, ty + 55)) < 0.5 * (preview ? 1f : 1f - progress) ? colorRed : color);
-                                    Fill.square(trix, triy, trispace/2.5f, 0);
-                                    Draw.color(Color.black);
-                                    Fill.square(trix, triy, trispace/2.5f / Mathf.sqrt2, 0);
-                                }
-                            }
-                            Draw.color(color);
                         }
 
-                        layout.free();
-                    }else{
-                        Core.assets.finishLoadingAsset("tech");
+                        //fill the triangle with some stuff
+                        float trispace = 70f*s, tpad = 5f*s;
+                        int tris = (int)(vh / trispace) + 1;
+                        for(int tx = 0; tx < tris; tx++){
+                            for(int ty = 0; ty < tris; ty++){
+                                float trix = vx - trispace/2f - trispace*tx - tpad, triy = vy + vh - trispace/2f - trispace*ty -tpad;
+
+                                Draw.color(Mathf.randomSeed(Pack.longInt(tx + 91, ty + 55)) < 0.5 * (preview ? 1f : 1f - progress) ? colorRed : color);
+                                Fill.square(trix, triy, trispace/2.5f, 0);
+                                Draw.color(Color.black);
+                                Fill.square(trix, triy, trispace/2.5f / Mathf.sqrt2, 0);
+                            }
+                        }
+                        Draw.color(color);
                     }
+
+                    layout.free();
+
 
                     Draw.endStencil();
 
@@ -428,7 +409,6 @@ public class LoadRenderer{
 
                 }
             }
-
         }
 
         //middle display always has correct ratio, ignores viewport
@@ -439,80 +419,55 @@ public class LoadRenderer{
         h = graphics.getHeight();
 
         //middle display
-        if(true){
-            float bspace = s * 100f;
-            float bsize = s * 80f;
-            int bars = (int)(w / bspace / 2) + 1;
-            float pscale = 1f / bars;
-            float barScale = 1.5f;
 
-            Draw.color(Color.black);
-            Fill.rect(w/2, h/2, w, bsize * barScale);
-            Lines.stroke(stroke);
-            Draw.color(color);
-            Lines.rect(0, h/2 - bsize * barScale/2f, w, bsize * barScale, 10, 0);
+        float bspace = s * 100f;
+        float bsize = s * 80f;
+        int bars = (int)(w / bspace / 2) + 1;
+        float pscale = 1f / bars;
+        float barScale = 1.5f;
 
-            for(int i = 1; i < bars; i++){
-                float cx = i * bspace;
-                float fract = 1f - (i - 1) / (float)(bars - 1);
-                float alpha = progress >= fract ? 1f : Mathf.clamp((pscale - (fract - progress)) / pscale);
-                Draw.color(Color.black, color, alpha);
+        Draw.color(Color.black);
+        Fill.rect(w/2, h/2, w, bsize * barScale);
+        Lines.stroke(stroke);
+        Draw.color(color);
+        Lines.rect(0, h/2 - bsize * barScale/2f, w, bsize * barScale, 10, 0);
 
-                for(int dir : Mathf.signs){
-                    float width = bsize/1.7f;
-                    float skew = bsize/2f;
+        for(int i = 1; i < bars; i++){
+            float cx = i * bspace;
+            float fract = 1f - (i - 1) / (float)(bars - 1);
+            float alpha = progress >= fract ? 1f : Mathf.clamp((pscale - (fract - progress)) / pscale);
+            Draw.color(Color.black, color, alpha);
 
-                    Fill.rects(w/2 + cx*dir - width/2f + dir*skew, h/2f - bsize/2f + bsize/2f, width, bsize/2f, -dir*skew);
-                    Fill.rects(w/2 + cx*dir - width/2f, h/2f - bsize/2f, width, bsize/2f, dir*skew);
-                    //Lines.poly(w/2 + cx*dir, h/2f, 3, bsize, 90 + dir*90);
-                }
+            for(int dir : Mathf.signs){
+                float width = bsize/1.7f;
+                float skew = bsize/2f;
 
+                float v = w / 2 + cx * dir - width / 2f;
+                Fill.rects(v + dir*skew, h/2f - bsize/2f + bsize/2f, width, bsize/2f, -dir*skew);
+                Fill.rects(v, h/2f - bsize/2f, width, bsize/2f, dir*skew);
             }
+
         }
 
+        //centerpiece has different rendering
+        float fract = 1f - (-1) / (float)(bars - 1);
+        float alpha = progress >= fract ? 1f : Mathf.clamp((pscale - (fract - progress)) / pscale);
+        Draw.color(Color.black, color, alpha);
+        Fill.square(w/2f, h/2f, bsize/3f, 45);
 
+        //note for translators: this text is unreadable and for debugging/show anyway, so it's not translated
         if(assets.isLoaded("tech")){
+            String name = assets.getCurrentLoading() != null ? assets.getCurrentLoading().fileName.toLowerCase() : "system";
+
+            String key = name.contains("script") ? "scripts" : name.contains("content") ? "content" : name.contains("mod") ? "mods" : name.contains("msav") ||
+            name.contains("maps") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
+
             BitmapFont font = assets.get("tech");
             font.setColor(Pal.accent);
             Draw.color(Color.black);
-            font.draw(System.getProperty("java.version") + "\n\n[scarlet][[ready]", w/2f, h/2f + 120, Align.center);
-        }else{
-
+            font.draw(red + "[[[[ " +key + " ]]\n\n"+orange+"<" + Version.modifier + " " + (Version.build == 0 ? " [init]" : Version.build == -1 ? " custom" : " " + Version.build) + ">", w/2f, h/2f + 110*s, Align.center);
         }
 
-        /*
-
-        float height = Scl.scl(50f);
-
-        Draw.color(Color.black);
-        Fill.poly(graphics.getWidth()/2f, graphics.getHeight()/2f, 6, Mathf.dst(graphics.getWidth()/2f, graphics.getHeight()/2f) * smoothProgress);
-        Draw.reset();
-
-        float w = graphics.getWidth()*0.6f;
-
-        Draw.color(Color.black);
-        Fill.rect(graphics.getWidth()/2f, graphics.getHeight()/2f, w, height);
-
-        Draw.color(Pal.accent);
-        Fill.crect(graphics.getWidth()/2f-w/2f, graphics.getHeight()/2f - height/2f, w * smoothProgress, height);
-
-        for(int i : Mathf.signs){
-            Fill.tri(graphics.getWidth()/2f + w/2f*i, graphics.getHeight()/2f + height/2f, graphics.getWidth()/2f + w/2f*i, graphics.getHeight()/2f - height/2f, graphics.getWidth()/2f + w/2f*i + height/2f*i, graphics.getHeight()/2f);
-        }
-
-        if(assets.isLoaded("outline")){
-            BitmapFont font = assets.get("outline");
-            font.draw((int)(assets.getProgress() * 100) + "%", graphics.getWidth() / 2f, graphics.getHeight() / 2f + Scl.scl(10f), Align.center);
-            font.draw(bundle.get("loading", "").replace("[accent]", ""), graphics.getWidth() / 2f, graphics.getHeight() / 2f + height / 2f + Scl.scl(20), Align.center);
-
-            if(assets.getCurrentLoading() != null){
-                String name = assets.getCurrentLoading().fileName.toLowerCase();
-                String key = name.contains("script") ? "scripts" : name.contains("content") ? "content" : name.contains("mod") ? "mods" : name.contains("msav") ||
-                    name.contains("maps") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
-                font.draw(bundle.get("load." + key, ""), graphics.getWidth() / 2f, graphics.getHeight() / 2f - height / 2f - Scl.scl(10f), Align.center);
-            }
-        }
-         */
         Lines.precise(false);
         Draw.flush();
 
