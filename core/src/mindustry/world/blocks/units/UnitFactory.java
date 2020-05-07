@@ -29,6 +29,7 @@ public class UnitFactory extends Block{
     public float launchVelocity = 5f;
     public @Load("@-top") TextureRegion topRegion;
     public int[] capacities;
+    public Color buildColor = Pal.accent;
 
     public UnitPlan[] plans = new UnitPlan[0];
 
@@ -182,7 +183,7 @@ public class UnitFactory extends Block{
 
                     Shaders.build.region = region;
                     Shaders.build.progress = progress / plan.time;
-                    Shaders.build.color.set(Pal.accent);
+                    Shaders.build.color.set(buildColor);
                     Shaders.build.color.a = speedScl;
                     Shaders.build.time = -time / 20f;
 
