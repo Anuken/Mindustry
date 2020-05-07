@@ -30,8 +30,6 @@ public class LoadRenderer implements Disposable{
     private static final boolean preview = true;
 
     private float testprogress = 0f;
-    private float smoothProgress;
-
     private StringBuilder assetText = new StringBuilder();
     private Bar[] bars;
     private Mesh mesh = MeshBuilder.buildHex(colorRed, 2, true, 1f);
@@ -94,8 +92,6 @@ public class LoadRenderer implements Disposable{
 
             lastLength = assets.getLoadedAssets();
         }
-
-        smoothProgress = Mathf.lerpDelta(smoothProgress, assets.getProgress(), 0.1f);
 
         Core.graphics.clear(Color.black);
 

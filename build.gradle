@@ -287,6 +287,7 @@ project(":tests"){
     test{
         useJUnitPlatform()
         workingDir = new File("../core/assets")
+        exceptionFormat = 'full'
     }
 }
 
