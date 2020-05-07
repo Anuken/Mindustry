@@ -21,7 +21,7 @@ import mindustry.graphics.g3d.*;
 
 import static arc.Core.*;
 
-public class LoadRenderer{
+public class LoadRenderer implements Disposable{
     private static final Color color = new Color(Pal.accent).lerp(Color.black, 0.5f);
     private static final Color colorRed = Pal.breakInvalid.lerp(Color.black, 0.3f);
     private static final String red = "[#" + colorRed + "]";
@@ -42,14 +42,9 @@ public class LoadRenderer{
     private long lastFrameTime;
 
     {
-        //fx.addEffect(new CrtFilter());
-
         fx.addEffect(new VignettingFilter(false));
-        //fx.addEffect(new NoiseFilter(0.1f, 1f));
         fx.addEffect(new BloomFilter());
-    }
 
-    {
         bars = new Bar[]{
             new Bar("s_proc#", OS.cores / 16f, OS.cores < 4),
             new Bar("c_aprog", () -> assets != null, () -> assets.getProgress(), () -> false),
@@ -62,6 +57,12 @@ public class LoadRenderer{
             new Bar("v_alterc", () -> Vars.mods != null, () -> (Vars.mods.list().size + 1) / 6f, () -> Vars.mods.list().size > 0),
             new Bar("g_vcomp#", (graphics.getGLVersion().getMajorVersion() + graphics.getGLVersion().getMinorVersion() / 10f) / 4.6f, !graphics.getGLVersion().isVersionEqualToOrHigher(3, 2)),
         };
+    }
+
+    @Override
+    public void dispose(){
+        mesh.dispose();
+        fx.dispose();
     }
 
     public void draw(){
