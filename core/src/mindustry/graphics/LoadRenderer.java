@@ -2,12 +2,16 @@ package mindustry.graphics;
 
 import arc.*;
 import arc.func.*;
+import arc.fx.*;
+import arc.fx.filters.*;
 import arc.graphics.*;
+import arc.graphics.Pixmap.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
 import arc.graphics.gl.GLVersion.*;
 import arc.input.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -23,6 +27,7 @@ public class LoadRenderer{
     private static final String red = "[#" + colorRed + "]";
     private static final String orange = "[#" + color + "]";
     private static final FloatArray floats = new FloatArray();
+    private static final boolean preview = true;
 
     private float testprogress = 0f;
     private float smoothProgress;
@@ -32,6 +37,17 @@ public class LoadRenderer{
     private Mesh mesh = MeshBuilder.buildHex(colorRed, 2, true, 1f);//MeshBuilder.buildIcosphere(2, 1f, colorRed);
     private Camera3D cam = new Camera3D();
     private int lastLength = -1;
+    private FxProcessor fx = new FxProcessor(Format.RGBA8888, 2, 2, false, true);
+    private WindowedMean renderTimes = new WindowedMean(20);
+    private long lastFrameTime;
+
+    {
+        //fx.addEffect(new CrtFilter());
+
+        fx.addEffect(new VignettingFilter(false));
+        //fx.addEffect(new NoiseFilter(0.1f, 1f));
+        fx.addEffect(new BloomFilter());
+    }
 
     {
         bars = new Bar[]{
@@ -49,6 +65,22 @@ public class LoadRenderer{
     }
 
     public void draw(){
+        if(!preview){
+            if(lastFrameTime == 0){
+                lastFrameTime = Time.millis();
+            }
+
+            float timespace = Time.timeSinceMillis(lastFrameTime) / 1000f;
+            renderTimes.addValue(timespace);
+            lastFrameTime = Time.millis();
+        }
+
+        if(fx.getWidth() != graphics.getWidth() || fx.getHeight() != graphics.getHeight()){
+            fx.resize(graphics.getWidth(), graphics.getHeight());
+        }
+
+        fx.begin();
+
         if(assets.getLoadedAssets() != lastLength){
             assetText.setLength(0);
             for(String name : assets.getAssetNames()){
@@ -76,8 +108,8 @@ public class LoadRenderer{
         float stroke = 5f * s;
 
         //light
-        if(false){
-            Fill.light(w/2, h/2, lightVerts, lightRad, Tmp.c1.set(colorRed).a(0.5f), Color.clear);
+        if(true){
+            Fill.light(w/2, h/2, lightVerts, lightRad, Tmp.c1.set(color).a(0.15f), Color.clear);
         }
 
         float space = Scl.scl(60);
@@ -86,7 +118,7 @@ public class LoadRenderer{
         int doth = (int)(h / space)/2 + 1;
 
         //TODO remove
-        if(true){
+        if(preview){
             testprogress += Time.delta() / (60f * 3);
             progress = testprogress;
             if(input.keyTap(KeyCode.space)){
@@ -134,6 +166,21 @@ public class LoadRenderer{
             }
         }
 
+        float aspect = 1.94f;
+        Draw.flush();
+        //portrait
+        if(graphics.getHeight() > graphics.getWidth()){
+            aspect = 1f/aspect;
+        }
+
+        Vec2 size = Scaling.fit.apply(graphics.getWidth(), graphics.getWidth() / aspect, graphics.getWidth(), graphics.getHeight());
+
+        int viewportWidth = (int)size.x, viewportHeight = (int)size.y, viewportX = (int)(graphics.getWidth()/2f - size.x/2f), viewportY = (int)(graphics.getHeight()/2f - size.y/2f);
+        w = viewportWidth;
+        h = viewportHeight;
+        Gl.viewport(viewportX, viewportY, viewportWidth, viewportHeight);
+        Draw.proj().setOrtho(0, 0, viewportWidth, viewportHeight);
+
         //bars
         if(false){
             Draw.color(Pal.accent, Color.black, 0.7f);
@@ -167,7 +214,6 @@ public class LoadRenderer{
             for(int sx : Mathf.signs){
                 for(int sy : Mathf.signs){
                     float y1 = h/2f + sy*rad2, y2 = h/2f + sy*120f;
-                    //Lines.beginLine();
                     floats.clear();
 
                     if(w > h){ //non-portrait
@@ -212,7 +258,7 @@ public class LoadRenderer{
                             font.draw(assetText, minx + pad, maxy - pad + Math.max(0, layout.height - (maxy - miny)));
                         }else if(panei == 1){
                             float height = maxy - miny;
-                            float barpad = s*8f;
+                            float barpad = s * 8f;
                             float barspace = (height - barpad) / bars.length;
                             float barheight = barspace * 0.8f;
 
@@ -222,10 +268,10 @@ public class LoadRenderer{
                                     Draw.color(bar.red() ? colorRed : color);
                                     float y = maxy - i * barspace - barpad - barheight;
                                     float width = Mathf.clamp(bar.value());
-                                    float baseWidth = (maxx - minx) - (maxy - y) - barpad*2f - s*4;
+                                    float baseWidth = Core.graphics.isPortrait() ? maxx - minx : (maxx - minx) - (maxy - y) - barpad * 2f - s * 4;
                                     float cx = minx + barpad, cy = y, topY = cy + barheight, botY = cy;
 
-                                    Lines.square(cx + barheight/2f, botY + barheight/2f, barheight/2f);
+                                    Lines.square(cx + barheight / 2f, botY + barheight / 2f, barheight / 2f);
 
                                     Fill.quad(
                                     cx + barheight, cy,
@@ -244,14 +290,39 @@ public class LoadRenderer{
 
                                     font.setColor(Color.black);
                                     layout.setText(font, bar.text);
-                                    font.draw(bar.text, cx + barheight*1.5f, botY + barheight/2f + layout.height/2f);
+                                    font.draw(bar.text, cx + barheight * 1.5f, botY + barheight / 2f + layout.height / 2f);
                                 }
                             }
 
                             Draw.color(color);
+                        }else if(panei == 2){
 
-                            //layout.setText(font, systemInfo);
-                            //font.draw(systemInfo, minx + pad, maxy - pad + Math.max(0, layout.height - (maxy - miny)));
+                            float barw = 30f*s;
+                            float barspace = 40f*s;
+                            float barpad = 10f*s;
+                            int bars = (int)(maxx - minx / barspace) + 1;
+                            int barmax = (int)((maxy - miny) / barspace);
+
+                            for(int i = 0; i < bars; i++){
+                                int index = i % renderTimes.getWindowSize();
+                                float val = renderTimes.getValue(index);
+                                float scale = Mathf.clamp(!renderTimes.hasEnoughData() ? Mathf.randomSeed(i) : (val / renderTimes.getMean() - 0.5f));
+
+                                Color dst = scale > 0.8f ? colorRed : color;
+                                Draw.color(dst);
+                                int height = Math.max((int)(scale * barmax), 1);
+                                float cx = maxx - barw/2f - barpad - i*barspace;
+                                for(int j = 0; j < barmax; j++){
+                                    if(j >= height){
+                                        Draw.color(color, Color.black, 0.7f);
+                                    }else{
+                                        Draw.color(dst);
+                                    }
+                                    Fill.square(cx, miny + j * barspace + barw/2f + barpad, barw/2f);
+                                }
+                            }
+                            Draw.color(color);
+
                         }else if(panei == 3){
                             Draw.flush();
 
@@ -262,72 +333,86 @@ public class LoadRenderer{
                             int rx = (int)(vx + vw/2f - vsize/2f), ry = (int)(vy + vh/2f - vsize/2f), rw = (int)vsize, rh = (int)vsize;
 
                             float vrad = vsize/2f + vpad / 1f;
-                            Lines.circle(cx, cy, vsize/2f);
 
-                            if(rw > 0 && rh > 0){
-                                Gl.viewport(rx, ry, rw, rh);
+                            //planet + bars
+                            if(!graphics.isPortrait()){
+                                Lines.circle(cx, cy, vsize/2f);
 
-                                cam.position.set(2, 0, 2);
-                                cam.resize(rw, rh);
-                                cam.lookAt(0, 0, 0);
-                                cam.fov = 42f;
-                                cam.update();
-                                Shaders.mesh.bind();
-                                Shaders.mesh.setUniformMatrix4("u_proj", cam.combined.val);
-                                mesh.render(Shaders.mesh, Gl.lines);
+                                if(rw > 0 && rh > 0){
+                                    Gl.viewport(viewportX + rx, viewportY + ry, rw, rh);
 
-                                //restore viewport
-                                Gl.viewport(0, 0, graphics.getWidth(), graphics.getHeight());
-                            }
+                                    cam.position.set(2, 0, 2);
+                                    cam.resize(rw, rh);
+                                    cam.lookAt(0, 0, 0);
+                                    cam.fov = 42f;
+                                    cam.update();
+                                    Shaders.mesh.bind();
+                                    Shaders.mesh.setUniformMatrix4("u_proj", cam.combined.val);
+                                    mesh.render(Shaders.mesh, Gl.lines);
 
-                            int points = 4;
-                            for(int i = 0; i < points; i++){
-                                float ang = i * 360f/points + 45;
-                                Fill.poly(cx + Angles.trnsx(ang, vrad), cy + Angles.trnsy(ang, vrad), 3, 20*s, ang);
-                            }
-
-                            String text = "<<ready>>";
-                            Draw.color(Color.black);
-
-                            layout.setText(font, text);
-                            Fill.rect(cx, cy, layout.width + 14f*s, layout.height + 14f*s);
-
-                            font.setColor(color);
-                            font.draw(text, cx - layout.width/2f, cy + layout.height/2f);
-
-                            Draw.color(color);
-
-                            Lines.square(cx, cy, vcont/2f);
-
-                            Lines.line(vx, vy, vx, vy + vh);
-
-
-                            float pspace = 70f*s;
-                            int pcount = (int)(vh / pspace / 2) + 2;
-                            float pw = (vw - vcont)/2f;
-                            float slope = pw/2f;
-
-                            //side bars for planet
-                            for(int i : Mathf.signs){
-
-                                float px = cx + i*(vcont/2f + pw/2f);
-                                float xleft = px - pw/2f, xright = px + pw/2f;
-                                float offx = minx - xleft, offy = (minx - xleft)/2f;
-                                if(i > 0){
-                                    offx = 0;
-                                    offy = 0;
+                                    //restore viewport
+                                    Gl.viewport(viewportX, viewportY, viewportWidth, viewportHeight);
                                 }
 
-                                for(int j = -2; j < pcount*2; j++){
-                                    float py = vy + j*pspace*2, ybot = py - slope, ytop = py + slope;
-                                    Fill.quad(
+                                int points = 4;
+                                for(int i = 0; i < points; i++){
+                                    float ang = i * 360f/points + 45;
+                                    Fill.poly(cx + Angles.trnsx(ang, vrad), cy + Angles.trnsy(ang, vrad), 3, 20*s, ang);
+                                }
+
+                                String text = "<<ready>>";
+                                Draw.color(Color.black);
+
+                                layout.setText(font, text);
+                                Fill.rect(cx, cy, layout.width + 14f*s, layout.height + 14f*s);
+
+                                font.setColor(color);
+                                font.draw(text, cx - layout.width/2f, cy + layout.height/2f);
+
+                                Draw.color(color);
+
+                                Lines.square(cx, cy, vcont/2f);
+
+                                Lines.line(vx, vy, vx, vy + vh);
+
+
+                                float pspace = 70f*s;
+                                int pcount = (int)(vh / pspace / 2) + 2;
+                                float pw = (vw - vcont)/2f;
+                                float slope = pw/2f;
+
+                                //side bars for planet
+                                for(int i : Mathf.signs){
+
+                                    float px = cx + i*(vcont/2f + pw/2f);
+                                    float xleft = px - pw/2f, xright = px + pw/2f;
+
+                                    for(int j = -2; j < pcount*2; j++){
+                                        float py = vy + j*pspace*2, ybot = py - slope, ytop = py + slope;
+                                        Fill.quad(
                                         xleft, ybot,
                                         xleft, ybot + pspace,
                                         xright, ytop + pspace,
                                         xright, ytop
-                                    );
+                                        );
+                                    }
                                 }
                             }
+
+                            //fill the triangle with some stuff
+                            float trispace = 70f*s, tpad = 5f*s;
+                            int tris = (int)(vh / trispace) + 1;
+                            for(int tx = 0; tx < tris; tx++){
+                                for(int ty = 0; ty < tris; ty++){
+                                    float trix = vx - trispace/2f - trispace*tx - tpad, triy = vy + vh - trispace/2f - trispace*ty -tpad;
+
+                                    Draw.color(Mathf.randomSeed(Pack.longInt(tx + 91, ty + 55)) < 0.5 * (preview ? 1f : 1f - progress) ? colorRed : color);
+                                    Fill.square(trix, triy, trispace/2.5f, 0);
+                                    Draw.color(Color.black);
+                                    Fill.square(trix, triy, trispace/2.5f / Mathf.sqrt2, 0);
+                                }
+                            }
+                            Draw.color(color);
                         }
 
                         layout.free();
@@ -343,7 +428,15 @@ public class LoadRenderer{
 
                 }
             }
+
         }
+
+        //middle display always has correct ratio, ignores viewport
+        Draw.flush();
+        Gl.viewport(0, 0, graphics.getWidth(), graphics.getHeight());
+        Draw.proj(0, 0, graphics.getWidth(), graphics.getHeight());
+        w = graphics.getWidth();
+        h = graphics.getHeight();
 
         //middle display
         if(true){
@@ -422,6 +515,11 @@ public class LoadRenderer{
          */
         Lines.precise(false);
         Draw.flush();
+
+        fx.end();
+
+        fx.applyEffects();
+        fx.render();
     }
 
     static class Bar{
