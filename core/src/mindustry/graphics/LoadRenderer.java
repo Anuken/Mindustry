@@ -141,15 +141,12 @@ public class LoadRenderer{
 
 
         float aspect = 1.94f;
-        Draw.flush();
-        //portrait
-        if(graphics.getHeight() > graphics.getWidth()){
-            //aspect = 1f/2;
-        }
 
         Vec2 size = Scaling.fit.apply(graphics.getWidth(), graphics.getWidth() / aspect, graphics.getWidth(), graphics.getHeight());
 
         int viewportWidth = (int)size.x, viewportHeight = (int)size.y, viewportX = (int)(graphics.getWidth()/2f - size.x/2f), viewportY = (int)(graphics.getHeight()/2f - size.y/2f);
+
+        //portrait? no viewport
         if(graphics.getHeight() > graphics.getWidth()){
             viewportHeight = graphics.getHeight();
             viewportWidth = graphics.getWidth();
