@@ -170,7 +170,7 @@ public class Sorter extends Block{
             sortItem = content.item(read.s());
 
             if(revision == 1){
-                new DirectionalItemBuffer(20, 45f).read(read);
+                new DirectionalItemBuffer(20).read(read);
             }
         }
     }

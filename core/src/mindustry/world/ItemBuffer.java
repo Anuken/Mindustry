@@ -7,14 +7,11 @@ import mindustry.type.*;
 import static mindustry.Vars.content;
 
 public class ItemBuffer{
-    private final float speed;
-
     private long[] buffer;
     private int index;
 
-    public ItemBuffer(int capacity, float speed){
+    public ItemBuffer(int capacity){
         this.buffer = new long[capacity];
-        this.speed = speed;
     }
 
     public boolean accepts(){
@@ -30,7 +27,7 @@ public class ItemBuffer{
         accept(item, (short)-1);
     }
 
-    public Item poll(){
+    public Item poll(float speed){
         if(index > 0){
             long l = buffer[0];
             float time = Float.intBitsToFloat(Pack.leftInt(l));
@@ -40,18 +37,6 @@ public class ItemBuffer{
             }
         }
         return null;
-    }
-
-    public short pollData(){
-        if(index > 0){
-            long l = buffer[0];
-            float time = Float.intBitsToFloat(Pack.leftInt(l));
-
-            if(Time.time() >= time + speed || Time.time() < time){
-                return Pack.rightShort(Pack.rightInt(l));
-            }
-        }
-        return -1;
     }
 
     public void remove(){

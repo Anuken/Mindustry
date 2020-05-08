@@ -22,6 +22,7 @@ public class OverflowGate extends Block{
         update = true;
         group = BlockGroup.transportation;
         unloadable = false;
+        canOverdrive = false;
     }
 
     @Override
@@ -136,7 +137,7 @@ public class OverflowGate extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             if(revision == 1){
-                new DirectionalItemBuffer(25, 50f).read(read);
+                new DirectionalItemBuffer(25).read(read);
             }else if(revision == 3){
                 lastInput = world.tile(read.i());
                 lastItem = items.first();

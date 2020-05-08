@@ -137,6 +137,10 @@ public class ItemModule extends BlockModule{
         return total;
     }
 
+    public boolean any(){
+        return total > 0;
+    }
+
     public Item first(){
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){

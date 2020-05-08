@@ -16,10 +16,11 @@ public class BufferedItemBridge extends ExtendingItemBridge{
         super(name);
         hasPower = false;
         hasItems = true;
+        canOverdrive = true;
     }
 
     public class BufferedItemBridgeEntity extends ExtendingItemBridgeEntity{
-        ItemBuffer buffer = new ItemBuffer(bufferCapacity, speed);
+        ItemBuffer buffer = new ItemBuffer(bufferCapacity);
 
         @Override
         public void updateTransport(Tilec other){
@@ -27,7 +28,7 @@ public class BufferedItemBridge extends ExtendingItemBridge{
                 buffer.accept(items.take());
             }
 
-            Item item = buffer.poll();
+            Item item = buffer.poll(speed / timeScale);
             if(timer(timerAccept, 4) && item != null && other.acceptItem(this, item)){
                 cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f);
                 other.handleItem(this, item);

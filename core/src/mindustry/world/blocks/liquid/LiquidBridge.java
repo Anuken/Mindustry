@@ -44,7 +44,7 @@ public class LiquidBridge extends ItemBridge{
 
                 if(uptime >= 0.5f){
 
-                    if(moveLiquid(other, false, liquids.current()) > 0.1f){
+                    if(moveLiquid(other, liquids.current()) > 0.1f){
                         cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f);
                     }else{
                         cycleSpeed = Mathf.lerpDelta(cycleSpeed, 1f, 0.01f);
