@@ -383,16 +383,6 @@ public class Control implements ApplicationListener, Loadable{
             Core.app.post(() -> Core.app.post(this::playTutorial));
         }
 
-        if(!OS.prop("user.name").equals("anuke") && !OS.hasEnv("iknowwhatimdoing")){
-            app.post(() -> app.post(() -> {
-                FloatingDialog dialog = new FloatingDialog("Don't play 6.0");
-                dialog.cont.add("6.0 is not ready for testing. Don't play it, and don't report any issues with it.\n[scarlet]This dialog cannot be closed. If you know what you're doing, you should know how to disable it.")
-                .grow().wrap().get().setAlignment(Align.center);
-                dialog.setFillParent(true);
-                dialog.show();
-            }));
-        }
-
         //display UI scale changed dialog
         if(Core.settings.getBool("uiscalechanged", false)){
             Core.app.post(() -> Core.app.post(() -> {
