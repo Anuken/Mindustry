@@ -18,7 +18,6 @@ public class TODOPlanetGenerator extends PlanetGenerator{
     float scl = 5f;
     float waterOffset = 0.07f;
 
-    //TODO generate array from planet image later
     Block[][] arr = {
     {Blocks.water, Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.darksandTaintedWater, Blocks.snow, Blocks.ice},
     {Blocks.water, Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.darksandTaintedWater, Blocks.snow, Blocks.snow, Blocks.ice},
@@ -50,10 +49,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
     @Override
     public float getHeight(Vec3 position){
         float height = rawHeight(position);
-        if(height <= water){
-            return water;
-        }
-        return height;
+        return Math.max(height, water);
     }
 
     @Override
