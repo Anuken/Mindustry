@@ -31,8 +31,8 @@ allprojects{
     group = 'com.github.Anuken'
 
     ext{
-        versionNumber = '5'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
+        versionNumber = '6'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'pre-alpha'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
