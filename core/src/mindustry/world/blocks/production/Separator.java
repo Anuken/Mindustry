@@ -112,7 +112,7 @@ public class Separator extends Block{
                 consume();
 
                 if(item != null && items.get(item) < itemCapacity){
-                    offloadNear(item);
+                    offload(item);
                 }
             }
 

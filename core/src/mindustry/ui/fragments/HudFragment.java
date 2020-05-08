@@ -181,7 +181,7 @@ public class HudFragment extends Fragment{
 
             //fps display
             cont.table(info -> {
-                info.top().left().margin(4).visible(() -> Core.settings.getBool("fps"));
+                info.top().left().margin(4).visible(() -> Core.settings.getBool("fps") && shown);
                 info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Scl.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
                 IntFormat ping = new IntFormat("ping");
@@ -193,7 +193,7 @@ public class HudFragment extends Fragment{
         });
         
         parent.fill(t -> {
-            t.visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial);
+            t.visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial && shown);
             //minimap
             t.add(new Minimap());
             t.row();

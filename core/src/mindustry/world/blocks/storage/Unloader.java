@@ -25,6 +25,7 @@ public class Unloader extends Block{
         hasItems = true;
         configurable = true;
         saveConfig = true;
+        itemCapacity = 0;
 
         config(Item.class, (tile, item) -> {
             tile.items().clear();
@@ -47,40 +48,31 @@ public class Unloader extends Block{
 
     public class UnloaderEntity extends TileEntity{
         public Item sortItem = null;
-
-        private Item removeItem(Tilec tile, Item item){
-            if(item == null){
-                return tile.items().take();
-            }else{
-                if(tile.items().has(item)){
-                    tile.items().remove(item, 1);
-                    return item;
-                }
-
-                return null;
-            }
-        }
-
-        private boolean hasItem(Tilec tile, Item item){
-            if(item == null){
-                return tile.items().total() > 0;
-            }else{
-                return tile.items().has(item);
-            }
-        }
+        public Tilec dumpingTo;
 
         @Override
         public void updateTile(){
-            if(timer(timerUnload, speed / timeScale()) && items.total() == 0){
+            if(timer(timerUnload, speed / timeScale())){
                 for(Tilec other : proximity){
-                    if(other.interactable(team) && other.block().unloadable && other.block().hasItems && items.total() == 0 &&
-                        ((sortItem == null && items.total() > 0) || hasItem(other, sortItem))){
-                        offloadNear(removeItem(other, sortItem));
+                    if(other.interactable(team) && other.block().unloadable && other.block().hasItems
+                        && ((sortItem == null && other.items().total() > 0) || (sortItem != null && other.items().has(sortItem)))){
+                        //make sure the item can't be dumped back into this block
+                        dumpingTo = other;
+
+                        //get item to be taken
+                        Item item = sortItem == null ? other.items().beginTake() : sortItem;
+
+                        //remove item if it's dumped correctly
+                        if(put(item)){
+                            if(sortItem == null){
+                                other.items().endTake(item);
+                            }else{
+                                other.items().remove(item, 1);
+                            }
+                        }
                     }
                 }
             }
-
-            dump();
         }
 
         @Override
@@ -110,7 +102,7 @@ public class Unloader extends Block{
 
         @Override
         public boolean canDump(Tilec to, Item item){
-            return !(to.block() instanceof StorageBlock);
+            return !(to.block() instanceof StorageBlock) && to != dumpingTo;
         }
 
         @Override

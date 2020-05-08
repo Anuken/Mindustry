@@ -20,7 +20,7 @@ public class Tile implements Position, QuadTreeObject{
     static final ObjectSet<Tilec> tileSet = new ObjectSet<>();
 
     /** Tile traversal cost. */
-    public byte cost = 1;
+    public short cost = 1;
     /** Tile entity, usually null. */
     public @Nullable Tilec entity;
     public short x, y;
@@ -452,31 +452,21 @@ public class Tile implements Position, QuadTreeObject{
             }
         }
 
-        //+24
-
         if(occluded){
             cost += 2;
         }
 
-        //+26
-
         if(block.synthetic() && solid()){
-            cost += Mathf.clamp(block.health / 10f, 0, 20);
+            cost += Mathf.clamp(block.health / 6f, 0, 1000);
         }
-
-        //+46
 
         if(floor.isLiquid){
             cost += 10;
         }
 
-        //+56
-
         if(floor.drownTime > 0){
             cost += 70;
         }
-
-        //+126
 
         if(cost < 0){
             cost = Byte.MAX_VALUE;

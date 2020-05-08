@@ -40,7 +40,8 @@ public class LoadRenderer implements Disposable{
     private long lastFrameTime;
 
     {
-        fx.addEffect(new VignettingFilter(false));
+        //vignetting is probably too much
+        //fx.addEffect(new VignettingFilter(false));
         fx.addEffect(new BloomFilter());
 
         bars = new Bar[]{

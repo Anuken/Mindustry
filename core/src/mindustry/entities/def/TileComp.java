@@ -477,7 +477,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
      * Tries to put this item into a nearby container, if there are no available
      * containers, it gets added to the block's inventory.
      */
-    public void offloadNear(Item item){
+    public void offload(Item item){
         Array<Tilec> proximity = proximity();
         int dump = rotation() / block.dumpIncrement;
         useContent(item);
@@ -492,6 +492,26 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         }
 
         handleItem(this, item);
+    }
+
+    /**
+     * Tries to put this item into a nearby container. Returns success. Unlike #offload(), this method does not change the block inventory.
+     */
+    public boolean put(Item item){
+        Array<Tilec> proximity = proximity();
+        int dump = rotation() / block.dumpIncrement;
+        useContent(item);
+
+        for(int i = 0; i < proximity.size; i++){
+            incrementDump(proximity.size);
+            Tilec other = proximity.get((i + dump) % proximity.size);
+            if(other.team() == team() && other.acceptItem(this, item) && canDump(other, item)){
+                other.handleItem(this, item);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** Try dumping any item near the  */
