@@ -301,6 +301,7 @@ project(":tools"){
 
         compile arcModule("natives:natives-desktop")
         compile arcModule("natives:natives-freetype-desktop")
+        compile arcModule("natives:natives-box2d-desktop")
         compile arcModule("backends:backend-headless")
 
         compile "org.reflections:reflections:0.9.12"
