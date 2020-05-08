@@ -118,7 +118,7 @@ public abstract class BulletType extends Content{
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
-                float a = b.rotation() + Mathf.random(fragCone/2);
+                float a = b.rotation() + Mathf.range(fragCone/2);
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax));
             }
         }
