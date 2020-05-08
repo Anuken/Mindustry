@@ -35,12 +35,12 @@ public class CustomRulesDialog extends FloatingDialog{
         banDialog.addCloseButton();
 
         banDialog.shown(this::rebuildBanned);
-        banDialog.buttons.addImageTextButton("$addall", Icon.add, () -> {
+        banDialog.buttons.button("$addall", Icon.add, () -> {
             rules.bannedBlocks.addAll(content.blocks().select(Block::isBuildable));
             rebuildBanned();
         }).size(180, 64f);
 
-        banDialog.buttons.addImageTextButton("$clear", Icon.trash, () -> {
+        banDialog.buttons.button("$clear", Icon.trash, () -> {
             rules.bannedBlocks.clear();
             rebuildBanned();
         }).size(180, 64f);
@@ -69,10 +69,10 @@ public class CustomRulesDialog extends FloatingDialog{
             for(Block block : array){
                 t.table(Tex.underline, b -> {
                     b.left().margin(4f);
-                    b.addImage(block.icon(Cicon.medium)).size(Cicon.medium.size).padRight(3);
+                    b.image(block.icon(Cicon.medium)).size(Cicon.medium.size).padRight(3);
                     b.add(block.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
 
-                    b.addImageButton(Icon.cancel, Styles.clearPartiali, () -> {
+                    b.button(Icon.cancel, Styles.clearPartiali, () -> {
                        rules.bannedBlocks.remove(block);
                        rebuildBanned();
                     }).size(70f).pad(-4f).padLeft(0f);
@@ -84,14 +84,14 @@ public class CustomRulesDialog extends FloatingDialog{
             }
         }).get().setScrollYForce(previousScroll);
         banDialog.cont.row();
-        banDialog.cont.addImageTextButton("$add", Icon.add, () -> {
+        banDialog.cont.button("$add", Icon.add, () -> {
             FloatingDialog dialog = new FloatingDialog("$add");
             dialog.cont.pane(t -> {
                 t.left().margin(14f);
                 int[] i = {0};
                 content.blocks().each(b -> !rules.bannedBlocks.contains(b) && b.isBuildable(), b -> {
                     int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
-                    t.addImageButton(new TextureRegionDrawable(b.icon(Cicon.medium)), Styles.cleari, () -> {
+                    t.button(new TextureRegionDrawable(b.icon(Cicon.medium)), Styles.cleari, () -> {
                         rules.bannedBlocks.add(b);
                         rebuildBanned();
                         dialog.hide();
@@ -118,7 +118,7 @@ public class CustomRulesDialog extends FloatingDialog{
         cont.clear();
         cont.pane(m -> main = m).get().setScrollingDisabled(true, false);
         main.margin(10f);
-        main.addButton("$settings.reset", () -> {
+        main.button("$settings.reset", () -> {
             rules = resetter.get();
             setup();
             requestKeyboard();
@@ -145,7 +145,7 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
         number("$rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
 
-        main.addButton("$configure",
+        main.button("$configure",
             () -> loadoutDialog.show(Blocks.coreShard.itemCapacity, rules.loadout,
                 () -> {
                     rules.loadout.clear();
@@ -154,7 +154,7 @@ public class CustomRulesDialog extends FloatingDialog{
         )).left().width(300f);
         main.row();
 
-        main.addButton("$bannedblocks", banDialog::show).left().width(300f);
+        main.button("$bannedblocks", banDialog::show).left().width(300f);
         main.row();
 
         title("$rules.title.player");
@@ -162,7 +162,6 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.playerdamagemultiplier", f -> rules.playerDamageMultiplier = f, () -> rules.playerDamageMultiplier);
 
         title("$rules.title.unit");
-        check("$rules.unitdrops", b -> rules.unitDrops = b, () -> rules.unitDrops, () -> true);
         number("$rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
         number("$rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("$rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier);
@@ -176,7 +175,7 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.solarpowermultiplier", f -> rules.solarPowerMultiplier = f, () -> rules.solarPowerMultiplier);
         check("$rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
 
-        main.addButton(b -> {
+        main.button(b -> {
             b.left();
             b.table(Tex.pane, in -> {
                 in.stack(new Image(Tex.alphaBg), new Image(Tex.whiteui){{
@@ -197,7 +196,7 @@ public class CustomRulesDialog extends FloatingDialog{
             t.left();
             t.add(text).left().padRight(5)
             .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
-            Vars.platform.addDialog(t.addField((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseFloat(s)))
+            Vars.platform.addDialog(t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseFloat(s)))
             .padRight(100f)
             .update(a -> a.setDisabled(!condition.get()))
             .valid(Strings::canParsePositiveFloat).width(120f).left().get());
@@ -210,14 +209,14 @@ public class CustomRulesDialog extends FloatingDialog{
     }
 
     void check(String text, Boolc cons, Boolp prov, Boolp condition){
-        main.addCheck(text, cons).checked(prov.get()).update(a -> a.setDisabled(!condition.get())).padRight(100f).get().left();
+        main.check(text, cons).checked(prov.get()).update(a -> a.setDisabled(!condition.get())).padRight(100f).get().left();
         main.row();
     }
 
     void title(String text){
         main.add(text).color(Pal.accent).padTop(20).padRight(100f).padBottom(-3);
         main.row();
-        main.addImage().color(Pal.accent).height(3f).padRight(100f).padBottom(20);
+        main.image().color(Pal.accent).height(3f).padRight(100f).padBottom(20);
         main.row();
     }
 }

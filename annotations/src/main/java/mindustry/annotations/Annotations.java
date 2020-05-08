@@ -5,11 +5,47 @@ import java.lang.annotation.*;
 public class Annotations{
     //region entity interfaces
 
+    /** Indicates that a method overrides other methods. */
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Replace{
+    }
+
+    /** Indicates that a method should be final in all implementing classes. */
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Final{
+    }
+
+    /** Indicates that a component field is imported from other components. */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Import{
+    }
+
+    /** Indicates that a component field is read-only. */
+    @Target({ElementType.FIELD, ElementType.METHOD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ReadOnly{
+    }
+
     /** Indicates multiple inheritance on a component type. */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Depends{
-        Class[] value();
+    public @interface Component{
+    }
+
+    /** Indicates that a method is implemented by the annotation processor. */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface InternalImpl{
+    }
+
+    /** Indicates priority of a method in an entity. Methods with higher priority are done last. */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface MethodPriority{
+        float value();
     }
 
     /** Indicates that a component def is present on all entities. */
@@ -18,11 +54,28 @@ public class Annotations{
     public @interface BaseComponent{
     }
 
+    /** Creates a group that only examines entities that have all the components listed. */
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface GroupDef{
+        Class[] value();
+        boolean collide() default false;
+        boolean spatial() default false;
+        boolean mapping() default false;
+    }
+
     /** Indicates an entity definition. */
-    @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
     public @interface EntityDef{
+        /** List of component interfaces */
         Class[] value();
+        /** Whether the class is final */
+        boolean isFinal() default true;
+        /** If true, entities are recycled. */
+        boolean pooled() default false;
+        /** Whether to serialize (makes the serialize method return this value) */
+        boolean serialize() default true;
+        /** Whether to generate IO code */
+        boolean genio() default true;
     }
 
     /** Indicates an internal interface for entity components. */
@@ -33,6 +86,25 @@ public class Annotations{
 
     //endregion
     //region misc. utility
+
+    /** Automatically loads block regions annotated with this. */
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Load{
+        /**
+         * The region name to load. Variables can be used:
+         * "@" -> block name
+         * "$size" -> block size
+         * "#" "#1" "#2" -> index number, for arrays
+         * */
+        String value();
+        /** 1D Array length, if applicable.  */
+        int length() default 1;
+        /** 2D array lengths. */
+        int[] lengths() default {};
+        /** Fallback string used to replace "@" (the block name) if the region isn't found. */
+        String fallback() default "error";
+    }
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
@@ -153,26 +225,9 @@ public class Annotations{
         PacketPriority priority() default PacketPriority.normal;
     }
 
-    /**
-     * Specifies that this method will be used to write classes of the type returned by {@link #value()}.<br>
-     * This method must return void and have two parameters, the first being of type {@link java.nio.ByteBuffer} and the second
-     * being the type returned by {@link #value()}.
-     */
-    @Target(ElementType.METHOD)
+    @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface WriteClass{
-        Class<?> value();
-    }
-
-    /**
-     * Specifies that this method will be used to read classes of the type returned by {@link #value()}. <br>
-     * This method must return the type returned by {@link #value()},
-     * and have one parameter, being of type {@link java.nio.ByteBuffer}.
-     */
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface ReadClass{
-        Class<?> value();
+    public @interface TypeIOHandler{
     }
 
     //endregion

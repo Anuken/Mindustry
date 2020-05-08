@@ -5,10 +5,9 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
@@ -32,33 +31,36 @@ public class CooledTurret extends Turret{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.booster, new BoosterListValue(reload, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
+        stats.add(BlockStat.booster, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
     }
 
-    @Override
-    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        if(tile.entity.liquids.currentAmount() <= 0.001f){
-            Events.fire(Trigger.turretCool);
+    public class CooledTurretEntity extends TurretEntity{
+
+        @Override
+        public void handleLiquid(Tilec source, Liquid liquid, float amount){
+            if(liquids.currentAmount() <= 0.001f){
+                Events.fire(Trigger.turretCool);
+            }
+
+            super.handleLiquid(source, liquid, amount);
         }
 
-        super.handleLiquid(tile, source, liquid, amount);
-    }
+        @Override
+        protected void updateShooting(){
+            super.updateShooting();
 
-    @Override
-    protected void updateShooting(Tile tile){
-        super.updateShooting(tile);
+            float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-        float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
+            Liquid liquid = liquids.current();
 
-        TurretEntity entity = tile.ent();
-        Liquid liquid = entity.liquids.current();
+            float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta()), Math.max(0, ((reloadTime - reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed();
+            reload += used * liquid.heatCapacity * coolantMultiplier;
+            liquids.remove(liquid, used);
 
-        float used = Math.min(Math.min(entity.liquids.get(liquid), maxUsed * Time.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed(tile);
-        entity.reload += used * liquid.heatCapacity * coolantMultiplier;
-        entity.liquids.remove(liquid, used);
-
-        if(Mathf.chance(0.06 * used)){
-            Effects.effect(coolEffect, tile.drawx() + Mathf.range(size * tilesize / 2f), tile.drawy() + Mathf.range(size * tilesize / 2f));
+            if(Mathf.chance(0.06 * used)){
+                coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
+            }
         }
     }
+
 }

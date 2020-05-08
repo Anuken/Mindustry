@@ -10,7 +10,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -105,7 +105,7 @@ public class Tutorial{
 
     public enum TutorialStage{
         intro(
-        line -> Strings.format(line, item(Items.copper), mineCopper),
+        line -> Core.bundle.format(line, item(Items.copper), mineCopper),
         () -> item(Items.copper) >= mineCopper
         ),
         drill(() -> placed(Blocks.mechanicalDrill, 1)){
@@ -162,7 +162,7 @@ public class Tutorial{
         },
         withdraw(() -> event("withdraw")){
             void begin(){
-                state.teams.playerCores().first().items.add(Items.copper, 10);
+                state.teams.playerCores().first().items().add(Items.copper, 10);
             }
         },
         deposit(() -> event("deposit")),
@@ -240,18 +240,18 @@ public class Tutorial{
         //utility
 
         static void placeBlocks(){
-            TileEntity core = state.teams.playerCores().first();
+            Tilec core = state.teams.playerCores().first();
             for(int i = 0; i < blocksToBreak; i++){
-                world.ltile(core.tile.x + blockOffset, core.tile.y + i).remove();
-                world.tile(core.tile.x + blockOffset, core.tile.y + i).setBlock(Blocks.scrapWall, state.rules.defaultTeam);
+                world.tile(core.tile().x + blockOffset, core.tile().y + i).remove();
+                world.tile(core.tile().x + blockOffset, core.tile().y + i).setBlock(Blocks.scrapWall, state.rules.defaultTeam);
             }
         }
 
         static boolean blocksBroken(){
-            TileEntity core = state.teams.playerCores().first();
+            Tilec core = state.teams.playerCores().first();
 
             for(int i = 0; i < blocksToBreak; i++){
-                if(world.tile(core.tile.x + blockOffset, core.tile.y + i).block() == Blocks.scrapWall){
+                if(world.tile(core.tile().x + blockOffset, core.tile().y + i).block() == Blocks.scrapWall){
                     return false;
                 }
             }
@@ -271,7 +271,7 @@ public class Tutorial{
         }
 
         static int item(Item item){
-            return state.rules.defaultTeam.data().noCores() ? 0 : state.rules.defaultTeam.core().items.get(item);
+            return state.rules.defaultTeam.data().noCores() ? 0 : state.rules.defaultTeam.core().items().get(item);
         }
 
         static boolean toggled(String name){

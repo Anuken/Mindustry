@@ -52,6 +52,10 @@ public class TechTree implements ContentList{
                                     });
                                 });
 
+                                node(plastaniumConveyor, () -> {
+
+                                });
+
                                 node(armoredConveyor, () -> {
 
                                 });
@@ -276,6 +280,7 @@ public class TechTree implements ContentList{
                         });
                     });
 
+                    /*
                     node(draugFactory, () -> {
                         node(spiritFactory, () -> {
                             node(phantomFactory);
@@ -301,6 +306,7 @@ public class TechTree implements ContentList{
                         });
                     });
 
+                    /*
                     node(dartPad, () -> {
                         node(deltaPad, () -> {
 
@@ -316,7 +322,7 @@ public class TechTree implements ContentList{
                                 });
                             });
                         });
-                    });
+                    });*/
                 });
             });
         });
@@ -343,6 +349,7 @@ public class TechTree implements ContentList{
     public static class TechNode{
         static TechNode context;
 
+        public TechNode parent;
         public final Block block;
         public final ItemStack[] requirements;
         public final Array<TechNode> children = new Array<>();
@@ -352,6 +359,7 @@ public class TechTree implements ContentList{
                 ccontext.children.add(this);
             }
 
+            this.parent = ccontext;
             this.block = block;
             this.requirements = requirements;
 

@@ -37,7 +37,7 @@ task copyAssets(){
 }
 
 task deploy{
-    dependsOn copyAssets
+    if(System.getProperty("os.name").contains("Mac")) dependsOn copyAssets
     dependsOn createIPA
 }
 

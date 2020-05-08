@@ -1,11 +1,9 @@
 package mindustry.world.blocks.defense.turrets;
 
-import arc.math.Mathf;
-import arc.math.geom.Vec2;
-import mindustry.entities.Predict;
-import mindustry.entities.type.Bullet;
-import mindustry.entities.bullet.BulletType;
-import mindustry.world.Tile;
+import arc.math.*;
+import arc.math.geom.*;
+import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 
 import static mindustry.Vars.tilesize;
 
@@ -20,28 +18,28 @@ public class ArtilleryTurret extends ItemTurret{
         targetAir = false;
     }
 
-    @Override
-    protected void shoot(Tile tile, BulletType ammo){
-        TurretEntity entity = tile.ent();
+    public class ArtilleryTurretEntity extends ItemTurretEntity{
+        @Override
+        protected void shoot(BulletType ammo){
+            recoil = recoilAmount;
+            heat = 1f;
 
-        entity.recoil = recoil;
-        entity.heat = 1f;
+            BulletType type = peekAmmo();
 
-        BulletType type = peekAmmo(tile);
+            tr.trns(rotation, size * tilesize / 2);
 
-        tr.trns(entity.rotation, size * tilesize / 2);
+            Vec2 predict = Predict.intercept(tile, target, type.speed);
 
-        Vec2 predict = Predict.intercept(tile, entity.target, type.speed);
+            float dst = dst(predict.x, predict.y);
+            float maxTraveled = type.lifetime * type.speed;
 
-        float dst = entity.dst(predict.x, predict.y);
-        float maxTraveled = type.lifetime * type.speed;
+            for(int i = 0; i < shots; i++){
+                ammo.create(tile.entity, team, x + tr.x, y + tr.y,
+                rotation + Mathf.range(inaccuracy + type.inaccuracy), 1f + Mathf.range(velocityInaccuracy), (dst / maxTraveled));
+            }
 
-        for(int i = 0; i < shots; i++){
-            Bullet.create(ammo, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y,
-            entity.rotation + Mathf.range(inaccuracy + type.inaccuracy), 1f + Mathf.range(velocityInaccuracy), (dst / maxTraveled));
+            effects();
+            useAmmo();
         }
-
-        effects(tile);
-        useAmmo(tile);
     }
 }

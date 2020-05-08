@@ -203,7 +203,7 @@ public class Map implements Comparable<Map>, Publishable{
 
     @Override
     public boolean prePublish(){
-        tags.put("author", player.name);
+        tags.put("author", player.name());
         ui.editor.editor.getTags().put("author", tags.get("author"));
         ui.editor.save();
 

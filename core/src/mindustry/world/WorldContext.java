@@ -3,7 +3,7 @@ package mindustry.world;
 public interface WorldContext{
 
     /** Return a tile in the tile array.*/
-    Tile tile(int x, int y);
+    Tile tile(int index);
 
     /** Create the tile array.*/
     void resize(int width, int height);

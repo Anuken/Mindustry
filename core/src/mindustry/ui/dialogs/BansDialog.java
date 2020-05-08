@@ -39,7 +39,7 @@ public class BansDialog extends FloatingDialog{
 
             res.labelWrap("IP: [LIGHT_GRAY]" + info.lastIP + "\n[]Name: [LIGHT_GRAY]" + info.lastName).width(w - h - 24f);
             res.add().growX();
-            res.addImageButton(Icon.cancel, () -> {
+            res.button(Icon.cancel, () -> {
                 ui.showConfirm("$confirm", "$confirmunban", () -> {
                     netServer.admins.unbanPlayerID(info.id);
                     setup();

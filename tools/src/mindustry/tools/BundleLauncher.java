@@ -17,7 +17,7 @@ public class BundleLauncher{
         Fi.get(".").walk(child -> {
             if(child.name().equals("bundle.properties") || child.toString().contains("output")) return;
 
-            Log.info("Parsing bundle: {0}", child);
+            Log.info("Parsing bundle: @", child);
 
             OrderedMap<String, String> other = new OrderedMap<>();
             PropertiesUtils.load(other, child.reader(2048, "UTF-8"));
@@ -26,10 +26,10 @@ public class BundleLauncher{
             for(String key : other.orderedKeys()){
                 if(!base.containsKey(key)){
                     removals.add(key);
-                    Log.info("&lr- Removing unused key '{0}'...", key);
+                    Log.info("&lr- Removing unused key '@'...", key);
                 }
             }
-            Log.info("&lr{0} keys removed.", removals.size);
+            Log.info("&lr@ keys removed.", removals.size);
             for(String s : removals){
                 other.remove(s);
             }
@@ -40,15 +40,15 @@ public class BundleLauncher{
                 if(!other.containsKey(key) || other.get(key).trim().isEmpty()){
                     other.put(key, base.get(key));
                     added++;
-                    Log.info("&lc- Adding missing key '{0}'...", key);
+                    Log.info("&lc- Adding missing key '@'...", key);
                 }
             }
 
             Func2<String, String, String> processor = (key, value) -> (key + " = " + value).replace("\\", "\\\\").replace("\n", "\\n") + "\n" + (newlines.contains(key) ? "\n" : "");
             Fi output = child.sibling("output/" + child.name());
 
-            Log.info("&lc{0} keys added.", added);
-            Log.info("Writing bundle to {0}", output);
+            Log.info("&lc@ keys added.", added);
+            Log.info("Writing bundle to @", output);
             StringBuilder result = new StringBuilder();
 
             //add everything ordered

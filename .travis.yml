@@ -1,6 +1,6 @@
 jdk:
 - openjdk8
-dist: trusty
+dist: xenial
 android:
   components:
   - android-29

@@ -21,8 +21,7 @@ public class Net{
     private boolean server;
     private boolean active;
     private boolean clientLoaded;
-    private @Nullable
-    StreamBuilder currentStream;
+    private @Nullable StreamBuilder currentStream;
 
     private final Array<Object> packetQueue = new Array<>();
     private final ObjectMap<Class<?>, Cons> clientListeners = new ObjectMap<>();
@@ -168,7 +167,7 @@ public class Net{
 
     /**
      * Starts discovering servers on a different thread.
-     * Callback is run on the main libGDX thread.
+     * Callback is run on the main Arc thread.
      */
     public void discoverServers(Cons<Host> cons, Runnable done){
         provider.discoverServers(cons, done);
@@ -252,7 +251,7 @@ public class Net{
                 Pools.free(object);
             }
         }else{
-            Log.err("Unhandled packet type: '{0}'!", object);
+            Log.err("Unhandled packet type: '@'!", object);
         }
     }
 
@@ -266,7 +265,7 @@ public class Net{
                 serverListeners.get(object.getClass()).get(connection, object);
             Pools.free(object);
         }else{
-            Log.err("Unhandled packet type: '{0}'!", object.getClass());
+            Log.err("Unhandled packet type: '@'!", object.getClass());
         }
     }
 

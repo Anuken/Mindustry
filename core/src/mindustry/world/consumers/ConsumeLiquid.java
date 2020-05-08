@@ -3,11 +3,10 @@ package mindustry.world.consumers;
 import arc.struct.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.Cicon;
-import mindustry.world.*;
 import mindustry.world.meta.*;
 
 public class ConsumeLiquid extends ConsumeLiquidBase{
@@ -28,8 +27,8 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
     }
 
     @Override
-    public void build(Tile tile, Table table){
-        table.add(new ReqImage(liquid.icon(Cicon.medium), () -> valid(tile.entity))).size(8 * 4);
+    public void build(Tilec tile, Table table){
+        table.add(new ReqImage(liquid.icon(Cicon.medium), () -> valid(tile))).size(8 * 4);
     }
 
     @Override
@@ -38,13 +37,13 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
     }
 
     @Override
-    public void update(TileEntity entity){
-        entity.liquids.remove(liquid, Math.min(use(entity), entity.liquids.get(liquid)));
+    public void update(Tilec entity){
+        entity.liquids().remove(liquid, Math.min(use(entity), entity.liquids().get(liquid)));
     }
 
     @Override
-    public boolean valid(TileEntity entity){
-        return entity != null && entity.liquids != null && entity.liquids.get(liquid) >= use(entity);
+    public boolean valid(Tilec entity){
+        return entity != null && entity.liquids() != null && entity.liquids().get(liquid) >= use(entity);
     }
 
     @Override

@@ -42,12 +42,10 @@ public class Links{
         public LinkEntry(String name, String link, Drawable icon, Color color){
             this.name = name;
             this.color = color;
-            this.description = Core.bundle.getNotNull("link." + name + ".description");
+            this.description = Core.bundle.get("link." + name + ".description", "");
             this.link = link;
             this.icon = icon;
-
-            String title = Core.bundle.getOrNull("link." + name + ".title");
-            this.title = title != null ? title : Strings.capitalize(name.replace("-", " "));
+            this.title = Core.bundle.get("link." + name + ".title", Strings.capitalize(name.replace("-", " ")));
         }
     }
 }

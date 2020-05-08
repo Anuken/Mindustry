@@ -16,6 +16,7 @@ import arc.graphics.g2d.*;
 import arc.graphics.g2d.BitmapFont.*;
 import arc.graphics.g2d.PixmapPacker.*;
 import arc.graphics.g2d.TextureAtlas.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
@@ -32,6 +33,7 @@ public class Fonts{
     public static BitmapFont outline;
     public static BitmapFont chat;
     public static BitmapFont icon;
+    public static BitmapFont tech;
 
     public static int getUnicode(String content){
         return unicodeIcons.get(content, 0);
@@ -39,11 +41,15 @@ public class Fonts{
 
     /** Called from a static context to make the cursor appear immediately upon startup.*/
     public static void loadSystemCursors(){
-        SystemCursor.arrow.set(Core.graphics.newCursor("cursor"));
-        SystemCursor.hand.set(Core.graphics.newCursor("hand"));
-        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam"));
+        SystemCursor.arrow.set(Core.graphics.newCursor("cursor", cursorScale()));
+        SystemCursor.hand.set(Core.graphics.newCursor("hand", cursorScale()));
+        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam", cursorScale()));
 
         Core.graphics.restoreCursor();
+    }
+
+    public static int cursorScale(){
+        return Math.max(1, Mathf.round(Scl.scl(1f)));
     }
 
     public static void loadFonts(){
@@ -74,7 +80,10 @@ public class Fonts{
                 int ch = Integer.parseInt(character);
                 TextureRegion region = Core.atlas.find(texture);
 
-                if(region.getTexture() != uitex) throw new IllegalArgumentException("Font icon '" + texture + "' is not in the UI texture.");
+                if(region.getTexture() != uitex){
+                    continue;
+                    //throw new IllegalArgumentException("Font icon '" + texture + "' is not in the UI texture.");
+                }
 
                 unicodeIcons.put(nametex[0], ch);
 
@@ -132,6 +141,10 @@ public class Fonts{
         }};
 
         Core.assets.load("outline", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/font.ttf", param)).loaded = t -> Fonts.outline = (BitmapFont)t;
+
+        Core.assets.load("tech", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/tech.ttf", new FreeTypeFontParameter(){{
+            size = 18;
+        }})).loaded = f -> Fonts.tech = (BitmapFont)f;
     }
 
     /** Merges the UI and font atlas together for better performance. */

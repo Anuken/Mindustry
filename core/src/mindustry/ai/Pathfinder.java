@@ -1,13 +1,13 @@
 package mindustry.ai;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.math.geom.*;
-import arc.util.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.async.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -24,7 +24,7 @@ public class Pathfinder implements Runnable{
 
     /** tile data, see PathTileStruct */
     private int[][] tiles;
-    /** unordered array of path data for iteration only. DO NOT iterate ot access this in the main thread.*/
+    /** unordered array of path data for iteration only. DO NOT iterate ot access this in the main thread. */
     private Array<PathData> list = new Array<>();
     /** Maps teams + flags to a valid path to get to that flag for that team. */
     private PathData[][] pathMap = new PathData[Team.all().length][PathTarget.all.length];
@@ -45,10 +45,8 @@ public class Pathfinder implements Runnable{
             created = new GridBits(Team.all().length, PathTarget.all.length);
             list = new Array<>();
 
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    tiles[x][y] = packTile(world.rawTile(x, y));
-                }
+            for(Tile tile : world.tiles){
+                tiles[tile.x][tile.y] = packTile(tile);
             }
 
             //special preset which may help speed things up; this is optional
@@ -64,7 +62,7 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     private int packTile(Tile tile){
-        return PathTile.get(tile.cost, tile.getTeamID(), (byte)0, !tile.solid() && tile.floor().drownTime <= 0f);
+        return PathTile.get(tile.cost, tile.getTeamID(), !tile.solid() && tile.floor().drownTime <= 0f);
     }
 
     /** Starts or restarts the pathfinding thread. */
@@ -184,7 +182,7 @@ public class Pathfinder implements Runnable{
         return current;
     }
 
-    /** @return whether a tile can be passed through by this team. Pathfinding thread only.*/
+    /** @return whether a tile can be passed through by this team. Pathfinding thread only. */
     private boolean passable(int x, int y, Team team){
         int tile = tiles[x][y];
         return PathTile.passable(tile) || (PathTile.team(tile) != team.id && PathTile.team(tile) != (int)Team.derelict.id);
@@ -218,7 +216,7 @@ public class Pathfinder implements Runnable{
             //add targets
             for(int i = 0; i < path.targets.size; i++){
                 int pos = path.targets.get(i);
-                int tx = Pos.x(pos), ty = Pos.y(pos);
+                int tx = Point2.x(pos), ty = Point2.y(pos);
 
                 path.weights[tx][ty] = 0;
                 path.searches[tx][ty] = (short)path.search;
@@ -231,8 +229,10 @@ public class Pathfinder implements Runnable{
         updateFrontier(createPath(team, target, target.getTargets(team, new IntArray())), -1);
     }
 
-    /** Created a new flowfield that aims to get to a certain target for a certain team.
-     * Pathfinding thread only. */
+    /**
+     * Created a new flowfield that aims to get to a certain target for a certain team.
+     * Pathfinding thread only.
+     */
     private PathData createPath(Team team, PathTarget target, IntArray targets){
         PathData path = new PathData(team, target, world.width(), world.height());
 
@@ -255,7 +255,7 @@ public class Pathfinder implements Runnable{
         //add targets
         for(int i = 0; i < path.targets.size; i++){
             int pos = path.targets.get(i);
-            path.weights[Pos.x(pos)][Pos.y(pos)] = 0;
+            path.weights[Point2.x(pos)][Point2.y(pos)] = 0;
             path.frontier.addFirst(pos);
         }
 
@@ -285,7 +285,7 @@ public class Pathfinder implements Runnable{
 
                     if(other != null && (path.weights[dx][dy] > cost + other.cost || path.searches[dx][dy] < path.search) && passable(dx, dy, path.team)){
                         if(other.cost < 0) throw new IllegalArgumentException("Tile cost cannot be negative! " + other);
-                        path.frontier.addFirst(Pos.get(dx, dy));
+                        path.frontier.addFirst(Point2.pack(dx, dy));
                         path.weights[dx][dy] = cost + other.cost;
                         path.searches[dx][dy] = (short)path.search;
                     }
@@ -294,7 +294,7 @@ public class Pathfinder implements Runnable{
         }
     }
 
-    /** A path target defines a set of targets for a path.*/
+    /** A path target defines a set of targets for a path. */
     public enum PathTarget{
         enemyCores((team, out) -> {
             for(Tile other : indexer.getEnemy(team, BlockFlag.core)){
@@ -303,7 +303,7 @@ public class Pathfinder implements Runnable{
 
             //spawn points are also enemies.
             if(state.rules.waves && team == state.rules.defaultTeam){
-                for(Tile other : spawner.getGroundSpawns()){
+                for(Tile other : spawner.getSpawns()){
                     out.add(other.pos());
                 }
             }
@@ -322,7 +322,7 @@ public class Pathfinder implements Runnable{
             this.targeter = targeter;
         }
 
-        /** Get targets. This must run on the main thread.*/
+        /** Get targets. This must run on the main thread. */
         public IntArray getTargets(Team team, IntArray out){
             targeter.get(team, out);
             return out;
@@ -360,11 +360,11 @@ public class Pathfinder implements Runnable{
     @Struct
     class PathTileStruct{
         //traversal cost
-        byte cost;
+        short cost;
         //team of block, if applicable (0 by default)
         byte team;
         //type of target; TODO remove
-        byte type;
+        //byte type;
         //whether it's viable to pass this block
         boolean passable;
     }

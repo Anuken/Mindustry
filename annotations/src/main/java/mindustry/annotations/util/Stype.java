@@ -5,7 +5,6 @@ import mindustry.annotations.*;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
-import java.lang.annotation.*;
 
 public class Stype extends Selement<TypeElement>{
 
@@ -17,26 +16,28 @@ public class Stype extends Selement<TypeElement>{
         return new Stype((TypeElement)BaseProcessor.typeu.asElement(mirror));
     }
 
+    public String fullName(){
+        return mirror().toString();
+    }
+
     public Array<Stype> interfaces(){
         return Array.with(e.getInterfaces()).map(Stype::of);
     }
 
+    public Array<Stype> allInterfaces(){
+        return interfaces().flatMap(s -> s.allInterfaces().and(s)).distinct();
+    }
+
     public Array<Stype> superclasses(){
-        Array<Stype> out = new Array<>();
-        Stype sup = superclass();
-        while(!sup.name().equals("Object")){
-            out.add(sup);
-            sup = sup.superclass();
-        }
-        return out;
+        return Array.with(BaseProcessor.typeu.directSupertypes(mirror())).map(Stype::of);
+    }
+
+    public Array<Stype> allSuperclasses(){
+        return superclasses().flatMap(s -> s.allSuperclasses().and(s)).distinct();
     }
 
     public Stype superclass(){
         return new Stype((TypeElement)BaseProcessor.typeu.asElement(BaseProcessor.typeu.directSupertypes(mirror()).get(0)));
-    }
-
-    public <A extends Annotation> A annotation(Class<A> annotation){
-        return e.getAnnotation(annotation);
     }
 
     public Array<Svar> fields(){

@@ -4,8 +4,10 @@ import arc.struct.Array;
 import mindustry.content.Items;
 
 public class ItemStack implements Comparable<ItemStack>{
+    public static final ItemStack[] empty = {};
+
     public Item item;
-    public int amount = 1;
+    public int amount = 0;
 
     public ItemStack(Item item, int amount){
         if(item == null) item = Items.copper;
