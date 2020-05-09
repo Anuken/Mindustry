@@ -52,17 +52,22 @@ public abstract class Weather extends MappableContent{
     @Component
     abstract class WeatherComp implements Posc, Drawc{
         Weather weather;
-        float intensity = 1f;
+        float intensity = 1f, opacity = 1f;
 
         void init(Weather weather){
             this.weather = weather;
         }
 
         @Override
+        public void update(){
+            weather.update((Weatherc)this);
+        }
+
+        @Override
         public void draw(){
             if(renderer.weatherAlpha() > 0.0001f){
                 Draw.draw(Layer.weather, () -> {
-                    Draw.alpha(renderer.weatherAlpha());
+                    Draw.alpha(renderer.weatherAlpha() * opacity);
                     weather.draw((Weatherc)this);
                     Draw.reset();
                 });
