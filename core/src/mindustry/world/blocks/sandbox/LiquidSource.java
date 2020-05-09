@@ -24,6 +24,8 @@ public class LiquidSource extends Block{
         liquidCapacity = 100f;
         configurable = true;
         outputsLiquid = true;
+        saveConfig = true;
+
         config(Liquid.class, (tile, l) -> ((LiquidSourceEntity)tile).source = l);
         configClear(tile -> ((LiquidSourceEntity)tile).source = null);
     }

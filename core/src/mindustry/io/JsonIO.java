@@ -68,6 +68,8 @@ public class JsonIO{
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
 
+        //TODO this is terrible
+
         json.setSerializer(Sector.class, new Serializer<Sector>(){
             @Override
             public void write(Json json, Sector object, Class knownType){
@@ -128,6 +130,18 @@ public class JsonIO{
             @Override
             public Block read(Json json, JsonValue jsonData, Class type){
                 return Vars.content.getByName(ContentType.block, jsonData.asString());
+            }
+        });
+
+        json.setSerializer(Weather.class, new Serializer<Weather>(){
+            @Override
+            public void write(Json json, Weather object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public Weather read(Json json, JsonValue jsonData, Class type){
+                return Vars.content.getByName(ContentType.weather, jsonData.asString());
             }
         });
 

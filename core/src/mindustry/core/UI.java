@@ -113,8 +113,8 @@ public class UI implements ApplicationListener, Loadable{
         Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
         Colors.put("stat", Pal.stat);
 
-        drillCursor = Core.graphics.newCursor("drill");
-        unloadCursor = Core.graphics.newCursor("unload");
+        drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
+        unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
     }
 
     @Override

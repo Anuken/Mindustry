@@ -63,7 +63,7 @@ public class Puddles{
                 p.lastRipple(Time.time());
             }
         }else{
-            p.amount(p.amount() + reactPuddle(p.liquid(), liquid, amount, p.tile(), p.x(), p.y()));
+            p.amount(p.amount() + reactPuddle(p.liquid(), liquid, amount, p.tile(), (p.x() + source.worldx())/2f, (p.y() + source.worldy())/2f));
         }
     }
 

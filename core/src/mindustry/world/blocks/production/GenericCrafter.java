@@ -114,7 +114,7 @@ public class GenericCrafter extends Block{
                 if(outputItem != null){
                     useContent(outputItem.item);
                     for(int i = 0; i < outputItem.amount; i++){
-                        offloadNear(outputItem.item);
+                        offload(outputItem.item);
                     }
                 }
 

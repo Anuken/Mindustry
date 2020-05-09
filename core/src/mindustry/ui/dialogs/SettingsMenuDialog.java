@@ -344,7 +344,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        graphics.checkPref("linear", !mobile, b -> {
+        graphics.checkPref("linear", true, b -> {
             for(Texture tex : Core.atlas.getTextures()){
                 TextureFilter filter = b ? TextureFilter.Linear : TextureFilter.Nearest;
                 tex.setFilter(filter, filter);

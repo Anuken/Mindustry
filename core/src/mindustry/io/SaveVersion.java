@@ -241,7 +241,7 @@ public abstract class SaveVersion extends SaveFileReader{
         Array<TeamData> data = state.teams.getActive();
         stream.writeInt(data.size);
         for(TeamData team : data){
-            stream.writeInt((int)team.team.id);
+            stream.writeInt(team.team.id);
             stream.writeInt(team.brokenBlocks.size);
             for(BrokenBlock block : team.brokenBlocks){
                 stream.writeShort(block.x);
@@ -252,8 +252,8 @@ public abstract class SaveVersion extends SaveFileReader{
             }
         }
 
-        stream.writeInt(Groups.sync.count(Entityc::serialize));
-        for(Syncc entity : Groups.sync){
+        stream.writeInt(Groups.all.count(Entityc::serialize));
+        for(Entityc entity : Groups.all){
             if(!entity.serialize()) continue;
 
             writeChunk(stream, true, out -> {
@@ -278,9 +278,9 @@ public abstract class SaveVersion extends SaveFileReader{
         for(int j = 0; j < amount; j++){
             readChunk(stream, true, in -> {
                 byte typeid = in.readByte();
-                Syncc sync = (Syncc)EntityMapping.map(typeid).get();
-                sync.read(Reads.get(in));
-                sync.add();
+                Entityc entity = (Entityc)EntityMapping.map(typeid).get();
+                entity.read(Reads.get(in));
+                entity.add();
             });
         }
     }

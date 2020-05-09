@@ -62,7 +62,7 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     private int packTile(Tile tile){
-        return PathTile.get(tile.cost, tile.getTeamID(), (byte)0, !tile.solid() && tile.floor().drownTime <= 0f);
+        return PathTile.get(tile.cost, tile.getTeamID(), !tile.solid() && tile.floor().drownTime <= 0f);
     }
 
     /** Starts or restarts the pathfinding thread. */
@@ -360,11 +360,11 @@ public class Pathfinder implements Runnable{
     @Struct
     class PathTileStruct{
         //traversal cost
-        byte cost;
+        short cost;
         //team of block, if applicable (0 by default)
         byte team;
         //type of target; TODO remove
-        byte type;
+        //byte type;
         //whether it's viable to pass this block
         boolean passable;
     }

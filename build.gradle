@@ -31,8 +31,8 @@ allprojects{
     group = 'com.github.Anuken'
 
     ext{
-        versionNumber = '5'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
+        versionNumber = '6'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'pre-alpha'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
@@ -287,6 +287,9 @@ project(":tests"){
     test{
         useJUnitPlatform()
         workingDir = new File("../core/assets")
+        testLogging {
+            exceptionFormat = 'full'
+        }
     }
 }
 
@@ -298,6 +301,7 @@ project(":tools"){
 
         compile arcModule("natives:natives-desktop")
         compile arcModule("natives:natives-freetype-desktop")
+        compile arcModule("natives:natives-box2d-desktop")
         compile arcModule("backends:backend-headless")
 
         compile "org.reflections:reflections:0.9.12"

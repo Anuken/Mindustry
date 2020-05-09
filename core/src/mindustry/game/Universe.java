@@ -6,8 +6,9 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.type.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.state;
 
+/** Updates the campaign universe. Has no relevance to other gamemodes. */
 public class Universe{
     private long seconds;
     private float secondCounter;
@@ -48,6 +49,7 @@ public class Universe{
             //update sector light
             float light = state.getSector().getLight();
             float alpha = Mathf.clamp(Mathf.map(light, 0f, 0.8f, 0.1f, 1f));
+
             //assign and map so darkness is not 100% dark
             state.rules.ambientLight.a = 1f - alpha;
             state.rules.lighting = !Mathf.equal(alpha, 1f);

@@ -302,7 +302,7 @@ public class Block extends UnlockableContent{
 
         // Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
-        if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
+        if(hasItems && itemCapacity > 0) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
     }
 
     public void setBars(){

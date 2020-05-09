@@ -266,7 +266,7 @@ public class Drill extends Block{
             }
 
             if(dominantItems > 0 && progress >= drillTime + hardnessDrillMultiplier * dominantItem.hardness && items.total() < itemCapacity){
-                offloadNear(dominantItem);
+                offload(dominantItem);
                 useContent(dominantItem);
 
                 index++;

@@ -259,6 +259,15 @@ public class TypeIO{
         return id == -1 ? null : content.item(id);
     }
 
+    public static void writeWeather(Writes write, Weather item){
+        write.s(item == null ? -1 : item.id);
+    }
+
+    public static Weather readWeather(Reads read){
+        short id = read.s();
+        return id == -1 ? null : content.getByID(ContentType.weather, id);
+    }
+
     public static void writeString(Writes write, String string){
         if(string != null){
             byte[] bytes = string.getBytes(charset);

@@ -383,11 +383,11 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     }
 
     public boolean acceptLiquid(Tilec source, Liquid liquid, float amount){
-        return block.hasLiquids && liquids().get(liquid) + amount < block.liquidCapacity && block.consumes.liquidfilters.get(liquid.id);
+        return block.hasLiquids && liquids.get(liquid) + amount < block.liquidCapacity && block.consumes.liquidfilters.get(liquid.id);
     }
 
     public void handleLiquid(Tilec source, Liquid liquid, float amount){
-        liquids().add(liquid, amount);
+        liquids.add(liquid, amount);
     }
 
     public void dumpLiquid(Liquid liquid){
@@ -400,7 +400,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
             if(other != null && other.team() == team() && other.block().hasLiquids && canDumpLiquid(other, liquid) && other.liquids() != null){
                 float ofract = other.liquids().get(liquid) / other.block().liquidCapacity;
-                float fract = liquids().get(liquid) / block.liquidCapacity;
+                float fract = liquids.get(liquid) / block.liquidCapacity;
 
                 if(ofract < fract) transferLiquid(other, (fract - ofract) * block.liquidCapacity / 2f, liquid);
             }
@@ -417,30 +417,41 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
         if(next.acceptLiquid(this, liquid, flow)){
             next.handleLiquid(this, liquid, flow);
-            liquids().remove(liquid, flow);
+            liquids.remove(liquid, flow);
         }
     }
 
-    public float moveLiquid(Tilec next, boolean leak, Liquid liquid){
-        return moveLiquid(next, leak ? 1.5f : 100, liquid);
+    public float moveLiquidForward(float leakResistance, Liquid liquid){
+        Tile next = tile.getNearby(rotation());
+
+        if(next == null) return 0;
+
+        if(next.entity != null){
+            return moveLiquid(next.entity, liquid);
+        }else if(leakResistance != 100f && !next.block().solid && !next.block().hasLiquids){
+            float leakAmount = liquids.get(liquid) / leakResistance;
+            Puddles.deposit(next, tile(), liquid, leakAmount);
+            liquids.remove(liquid, leakAmount);
+        }
+        return 0;
     }
 
-    public float moveLiquid(Tilec next, float leakResistance, Liquid liquid){
+    public float moveLiquid(Tilec next, Liquid liquid){
         if(next == null) return 0;
 
         next = next.getLiquidDestination(this, liquid);
 
-        if(next.team() == team() && next.block().hasLiquids && liquids().get(liquid) > 0f){
+        if(next.team() == team() && next.block().hasLiquids && liquids.get(liquid) > 0f){
 
             if(next.acceptLiquid(this, liquid, 0f)){
                 float ofract = next.liquids().get(liquid) / next.block().liquidCapacity;
-                float fract = liquids().get(liquid) / block.liquidCapacity * block.liquidPressure;
-                float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (block.liquidCapacity), liquids().get(liquid));
+                float fract = liquids.get(liquid) / block.liquidCapacity * block.liquidPressure;
+                float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (block.liquidCapacity), liquids.get(liquid));
                 flow = Math.min(flow, next.block().liquidCapacity - next.liquids().get(liquid) - 0.001f);
 
                 if(flow > 0f && ofract <= fract && next.acceptLiquid(this, liquid, flow)){
                     next.handleLiquid(this, liquid, flow);
-                    liquids().remove(liquid, flow);
+                    liquids.remove(liquid, flow);
                     return flow;
                 }else if(ofract > 0.1f && fract > 0.1f){
                     //TODO these are incorrect effect positions
@@ -454,17 +465,13 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
                             Fx.fire.at(fx, fy);
                         }
                     }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
-                        liquids().remove(liquid, Math.min(liquids().get(liquid), 0.7f * Time.delta()));
+                        liquids.remove(liquid, Math.min(liquids.get(liquid), 0.7f * Time.delta()));
                         if(Mathf.chance(0.2f * Time.delta())){
                             Fx.steam.at(fx, fy);
                         }
                     }
                 }
             }
-        }else if(leakResistance != 100f && !next.block().solid && !next.block().hasLiquids){
-            float leakAmount = liquids().get(liquid) / leakResistance;
-            Puddles.deposit(next.tile(), tile(), liquid, leakAmount);
-            liquids().remove(liquid, leakAmount);
         }
         return 0;
     }
@@ -477,7 +484,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
      * Tries to put this item into a nearby container, if there are no available
      * containers, it gets added to the block's inventory.
      */
-    public void offloadNear(Item item){
+    public void offload(Item item){
         Array<Tilec> proximity = proximity();
         int dump = rotation() / block.dumpIncrement;
         useContent(item);
@@ -492,6 +499,26 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         }
 
         handleItem(this, item);
+    }
+
+    /**
+     * Tries to put this item into a nearby container. Returns success. Unlike #offload(), this method does not change the block inventory.
+     */
+    public boolean put(Item item){
+        Array<Tilec> proximity = proximity();
+        int dump = rotation() / block.dumpIncrement;
+        useContent(item);
+
+        for(int i = 0; i < proximity.size; i++){
+            incrementDump(proximity.size);
+            Tilec other = proximity.get((i + dump) % proximity.size);
+            if(other.team() == team() && other.acceptItem(this, item) && canDump(other, item)){
+                other.handleItem(this, item);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** Try dumping any item near the  */
@@ -631,6 +658,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
             float brcx = tile.drawx() + (block.size * tilesize / 2f) - (tilesize / 2f);
             float brcy = tile.drawy() - (block.size * tilesize / 2f) + (tilesize / 2f);
 
+            Draw.z(Layer.blockOver);
             Draw.color(Pal.gray);
             Fill.square(brcx, brcy, 2.5f, 45);
             Draw.color(cons.status().color);
@@ -657,8 +685,8 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     }
 
     public void drawLight(){
-        if(block.hasLiquids && block.drawLiquidLight && liquids().current().lightColor.a > 0.001f){
-            drawLiquidLight(liquids().current(), liquids().smoothAmount());
+        if(block.hasLiquids && block.drawLiquidLight && liquids.current().lightColor.a > 0.001f){
+            drawLiquidLight(liquids.current(), liquids.smoothAmount());
         }
     }
 
@@ -761,8 +789,8 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         }
 
         if(block.hasLiquids){
-            flammability += liquids().sum((liquid, amount) -> liquid.explosiveness * amount / 2f);
-            explosiveness += liquids().sum((liquid, amount) -> liquid.flammability * amount / 2f);
+            flammability += liquids.sum((liquid, amount) -> liquid.explosiveness * amount / 2f);
+            explosiveness += liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
         }
 
         if(block.consumes.hasPower() && block.consumes.getPower().buffered){
@@ -771,7 +799,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
         if(block.hasLiquids){
 
-            liquids().each((liquid, amount) -> {
+            liquids.each((liquid, amount) -> {
                 float splash = Mathf.clamp(amount / 4f, 0f, 10f);
 
                 for(int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++){
@@ -805,7 +833,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
             float result = items.sum((item, amount) -> item.flammability * amount);
 
             if(block.hasLiquids){
-                result += liquids().sum((liquid, amount) -> liquid.flammability * amount / 3f);
+                result += liquids.sum((liquid, amount) -> liquid.flammability * amount / 3f);
             }
 
             return result;

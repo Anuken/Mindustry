@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -18,6 +19,8 @@ import mindustry.maps.*;
 import mindustry.maps.filters.*;
 import mindustry.maps.filters.GenerateFilter.*;
 import mindustry.type.*;
+import mindustry.type.Sector.*;
+import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.legacy.*;
 
@@ -208,10 +211,23 @@ public class World{
     }
 
     public void loadSector(Sector sector){
-        state.map = new Map(StringMap.of("name", sector.planet.localizedName + "; Sector " + sector.id));
-        state.rules.sector = sector;
+        setSectorRules(sector);
+
         int size = sector.getSize();
         loadGenerator(size, size, tiles -> sector.planet.generator.generate(tiles, sector));
+    }
+
+    private void setSectorRules(Sector sector){
+        state.map = new Map(StringMap.of("name", sector.planet.localizedName + "; Sector " + sector.id));
+        state.rules.sector = sector;
+
+        if(sector.is(SectorAttribute.rainy)){
+            state.rules.weather.add(new WeatherEntry(Weathers.rain));
+        }
+
+        if(sector.is(SectorAttribute.snowy)){
+            state.rules.weather.add(new WeatherEntry(Weathers.snow));
+        }
     }
 
     public void loadMap(Map map){

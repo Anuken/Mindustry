@@ -489,6 +489,7 @@ public class Bullets implements ContentList{
             despawnEffect = Fx.none;
             hitSize = 4;
             lifetime = 16f;
+            drawSize = 400f;
         }};
 
         meltdownLaser = new BulletType(0.001f, 70){

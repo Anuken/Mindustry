@@ -7,6 +7,7 @@ import arc.graphics.*;
 import mindustry.content.*;
 import mindustry.io.*;
 import mindustry.type.*;
+import mindustry.type.Weather.*;
 import mindustry.world.*;
 
 /**
@@ -82,6 +83,8 @@ public class Rules{
     public boolean drawDarkness = true;
     /** Starting items put in cores */
     public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 100));
+    /** Weather events that occur here. */
+    public Array<WeatherEntry> weather = new Array<>(1);
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
     /** Whether everything is dark. Enables lights. Experimental. */

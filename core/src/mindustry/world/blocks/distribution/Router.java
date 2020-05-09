@@ -1,6 +1,5 @@
 package mindustry.world.blocks.distribution;
 
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -27,12 +26,12 @@ public class Router extends Block{
 
         @Override
         public void updateTile(){
-            if(lastItem == null && items.total() > 0){
+            if(lastItem == null && items.any()){
                 items.clear();
             }
 
             if(lastItem != null){
-                time += 1f / speed * Time.delta();
+                time += 1f / speed * delta();
                 Tilec target = getTileTarget(lastItem, lastInput, false);
 
                 if(target != null && (time >= 1f || !(target.block() instanceof Router))){
@@ -57,6 +56,15 @@ public class Router extends Block{
             lastInput = source.tile();
         }
 
+        @Override
+        public int removeStack(Item item, int amount){
+            int result = super.removeStack(item, amount);
+            if(result != 0 && item == lastItem){
+                lastItem = null;
+            }
+            return result;
+        }
+
         Tilec getTileTarget(Item item, Tile from, boolean set){
             int counter = tile.rotation();
             for(int i = 0; i < proximity.size; i++){
@@ -68,15 +76,6 @@ public class Router extends Block{
                 }
             }
             return null;
-        }
-
-        @Override
-        public int removeStack(Item item, int amount){
-            int result = super.removeStack(item, amount);
-            if(result != 0 && item == lastItem){
-                lastItem = null;
-            }
-            return result;
         }
     }
 }

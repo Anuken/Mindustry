@@ -89,7 +89,7 @@ public class Administration{
     public @Nullable String filterMessage(Playerc player, String message){
         String current = message;
         for(ChatFilter f : chatFilters){
-            current = f.filter(player, message);
+            current = f.filter(player, current);
             if(current == null) return null;
         }
         return current;

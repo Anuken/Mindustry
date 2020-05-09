@@ -18,7 +18,7 @@ import static mindustry.entities.Puddles.maxLiquid;
 
 @EntityDef(value = {Puddlec.class}, pooled = true)
 @Component
-abstract class PuddleComp implements Posc, Puddlec{
+abstract class PuddleComp implements Posc, Puddlec, Drawc{
     private static final int maxGeneration = 2;
     private static final Color tmp = new Color();
     private static final Rect rect = new Rect();

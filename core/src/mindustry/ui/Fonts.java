@@ -16,6 +16,7 @@ import arc.graphics.g2d.*;
 import arc.graphics.g2d.BitmapFont.*;
 import arc.graphics.g2d.PixmapPacker.*;
 import arc.graphics.g2d.TextureAtlas.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
@@ -40,11 +41,15 @@ public class Fonts{
 
     /** Called from a static context to make the cursor appear immediately upon startup.*/
     public static void loadSystemCursors(){
-        SystemCursor.arrow.set(Core.graphics.newCursor("cursor"));
-        SystemCursor.hand.set(Core.graphics.newCursor("hand"));
-        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam"));
+        SystemCursor.arrow.set(Core.graphics.newCursor("cursor", cursorScale()));
+        SystemCursor.hand.set(Core.graphics.newCursor("hand", cursorScale()));
+        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam", cursorScale()));
 
         Core.graphics.restoreCursor();
+    }
+
+    public static int cursorScale(){
+        return Math.max(1, Mathf.round(Scl.scl(1f)));
     }
 
     public static void loadFonts(){
