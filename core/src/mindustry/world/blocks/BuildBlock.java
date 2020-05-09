@@ -60,7 +60,7 @@ public class BuildBlock extends Block{
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         if(tile == null) return;
         float healthf = tile.entity.healthf();
-        tile.setBlock(block, team, (int)rotation);
+        tile.setBlock(block, team, rotation);
         tile.entity.health(block.health * healthf);
         //last builder was this local client player, call placed()
         if(!headless && builderID == player.unit().id()){

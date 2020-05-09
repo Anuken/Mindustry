@@ -82,6 +82,9 @@ public abstract class BulletType extends Content{
     public int lightining;
     public int lightningLength = 5;
 
+    public float weaveScale = 1f;
+    public float weaveMag = -1f;
+
     public float hitShake = 0f;
 
     public BulletType(float speed, float damage){
@@ -164,6 +167,10 @@ public abstract class BulletType extends Content{
             if(target != null){
                 b.vel().setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), 0.08f));
             }
+        }
+
+        if(weaveMag > 0){
+            b.vel().rotate(Mathf.sin(Time.time() + b.id() * 3, weaveScale, weaveMag) * Time.delta());
         }
     }
 
