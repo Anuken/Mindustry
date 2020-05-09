@@ -25,17 +25,16 @@ buildscript{
 }
 
 allprojects{
-    version = 'release'
     apply plugin: 'maven'
+    
+    version = 'release'
     group = 'com.github.Anuken'
 
     ext{
-        versionNumber = '5'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
+        versionNumber = '6'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'pre-alpha'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
-        gdxVersion = '1.9.10'
-        roboVMVersion = '2.3.8'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
 
         loadVersionProps = {
@@ -163,13 +162,16 @@ allprojects{
 project(":desktop"){
     apply plugin: "java"
 
+    compileJava.options.fork = true
+    compileJava.options.compilerArgs += ["-XDignore.symbol.file"]
+
     dependencies{
         compile project(":core")
+        compile arcModule("natives:natives-box2d-desktop")
+        compile arcModule("natives:natives-desktop")
+        compile arcModule("natives:natives-freetype-desktop")
 
         if(debugged()) compile project(":debug")
-
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
         compile "com.github.Anuken:steamworks4j:$steamworksVersion"
 
@@ -201,14 +203,13 @@ project(":ios"){
 
     dependencies{
         compile project(":core")
-        compileOnly project(":annotations")
 
+        compile arcModule("natives:natives-ios")
+        compile arcModule("natives:natives-freetype-ios")
+        compile arcModule("natives:natives-box2d-ios")
         compile arcModule("backends:backend-robovm")
 
-        compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
-        compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
+        compileOnly project(":annotations")
     }
 }
 
@@ -249,8 +250,11 @@ project(":core"){
         compile "org.lz4:lz4-java:1.4.1"
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
+        compile arcModule("extensions:box2d")
+        compile arcModule("extensions:g3d")
+        compile arcModule("extensions:fx")
         compile arcModule("extensions:arcnet")
-        compile "org.mozilla:rhino:1.7.11"
+        compile "org.mozilla:rhino-runtime:1.7.12"
         if(localArc() && debugged()) compile arcModule("extensions:recorder")
 
         compileOnly project(":annotations")
@@ -263,6 +267,7 @@ project(":server"){
 
     dependencies{
         compile project(":core")
+        compile arcModule("natives:natives-box2d-desktop")
         compile arcModule("backends:backend-headless")
     }
 }
@@ -276,11 +281,15 @@ project(":tests"){
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.1"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.3.1"
         compile arcModule("backends:backend-headless")
+        compile arcModule("natives:natives-box2d-desktop")
     }
 
     test{
         useJUnitPlatform()
         workingDir = new File("../core/assets")
+        testLogging {
+            exceptionFormat = 'full'
+        }
     }
 }
 
@@ -290,11 +299,12 @@ project(":tools"){
     dependencies{
         compile project(":core")
 
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-        compile "org.reflections:reflections:0.9.12"
+        compile arcModule("natives:natives-desktop")
+        compile arcModule("natives:natives-freetype-desktop")
+        compile arcModule("natives:natives-box2d-desktop")
+        compile arcModule("backends:backend-headless")
 
-        compile arcModule("backends:backend-sdl")
+        compile "org.reflections:reflections:0.9.12"
     }
 }
 

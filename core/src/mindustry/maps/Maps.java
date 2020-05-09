@@ -134,7 +134,7 @@ public class Maps{
                     loadMap(file, true);
                 }
             }catch(Exception e){
-                Log.err("Failed to load custom map file '{0}'!", file);
+                Log.err("Failed to load custom map file '@'!", file);
                 Log.err(e);
             }
         }
@@ -146,7 +146,7 @@ public class Maps{
                 map.workshop = true;
                 map.tags.put("steamid", file.parent().name());
             }catch(Exception e){
-                Log.err("Failed to load workshop map file '{0}'!", file);
+                Log.err("Failed to load workshop map file '@'!", file);
                 Log.err(e);
             }
         }
@@ -157,7 +157,7 @@ public class Maps{
                 Map map = loadMap(file, false);
                 map.mod = mod;
             }catch(Exception e){
-                Log.err("Failed to load mod map file '{0}'!", file);
+                Log.err("Failed to load mod map file '@'!", file);
                 Log.err(e);
             }
         });
@@ -212,7 +212,7 @@ public class Maps{
 
                 for(int x = 0; x < map.width; x++){
                     for(int y = 0; y < map.height; y++){
-                        Tile tile = world.getTiles()[x][y];
+                        Tile tile = world.rawTile(x, y);
 
                         if(tile.block() instanceof CoreBlock){
                             map.teams.add(tile.getTeamID());
@@ -228,7 +228,7 @@ public class Maps{
                     Core.assets.unload(map.previewFile().path() + "." + mapExtension);
                 }
 
-                Pixmap pix = MapIO.generatePreview(world.getTiles());
+                Pixmap pix = MapIO.generatePreview(world.tiles);
                 executor.submit(() -> map.previewFile().writePNG(pix));
                 writeCache(map);
 

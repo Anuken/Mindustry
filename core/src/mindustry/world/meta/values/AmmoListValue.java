@@ -28,7 +28,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
         table.row();
         for(T t : map.keys()){
             BulletType type = map.get(t);
-            table.addImage(icon(t)).size(3 * 8).padRight(4).right().top();
+            table.image(icon(t)).size(3 * 8).padRight(4).right().top();
             table.add(t.localizedName).padRight(10).left().top();
             table.table(Tex.underline, bt -> {
                 bt.left().defaults().padRight(3).left();

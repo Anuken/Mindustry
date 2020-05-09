@@ -5,7 +5,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
@@ -54,10 +54,10 @@ public class Teams{
         return false;
     }
 
-    public void eachEnemyCore(Team team, Cons<TileEntity> ret){
+    public void eachEnemyCore(Team team, Cons<Tilec> ret){
         for(TeamData data : active){
             if(areEnemies(team, data.team)){
-                for(TileEntity tile : data.cores){
+                for(Tilec tile : data.cores){
                     ret.get(tile);
                 }
             }
@@ -103,7 +103,7 @@ public class Teams{
     }
 
     public void registerCore(CoreEntity core){
-        TeamData data = get(core.getTeam());
+        TeamData data = get(core.team());
         //add core if not present
         if(!data.cores.contains(core)){
             data.cores.add(core);
@@ -118,7 +118,7 @@ public class Teams{
     }
 
     public void unregisterCore(CoreEntity entity){
-        TeamData data = get(entity.getTeam());
+        TeamData data = get(entity.team());
         //remove core
         data.cores.remove(entity);
         //unregister in active list
@@ -182,9 +182,9 @@ public class Teams{
      * This does not include deconstructed blocks.*/
     public static class BrokenBlock{
         public final short x, y, rotation, block;
-        public final int config;
+        public final Object config;
 
-        public BrokenBlock(short x, short y, short rotation, short block, int config){
+        public BrokenBlock(short x, short y, short rotation, short block, Object config){
             this.x = x;
             this.y = y;
             this.rotation = rotation;

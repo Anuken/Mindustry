@@ -57,10 +57,10 @@ public class MenuFragment extends Fragment{
 
         //info icon
         if(mobile){
-            parent.fill(c -> c.bottom().left().addButton("", Styles.infot, ui.about::show).size(84, 45));
-            parent.fill(c -> c.bottom().right().addButton("", Styles.discordt, ui.discord::show).size(84, 45));
+            parent.fill(c -> c.bottom().left().button("", Styles.infot, ui.about::show).size(84, 45));
+            parent.fill(c -> c.bottom().right().button("", Styles.discordt, ui.discord::show).size(84, 45));
         }else if(becontrol.active()){
-            parent.fill(c -> c.bottom().right().addImageTextButton("$be.check", Icon.refresh, () -> {
+            parent.fill(c -> c.bottom().right().button("$be.check", Icon.refresh, () -> {
                 ui.loadfrag.show();
                 becontrol.checkUpdate(result -> {
                     ui.loadfrag.hide();
@@ -100,7 +100,7 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-            play = new MobileButton(Icon.play, "$campaign", () -> checkPlay(ui.deploy::show)),
+            play = new MobileButton(Icon.play, "$campaign", () -> checkPlay(ui.planet::show)),
             custom = new MobileButton(Icon.rightOpenOut, "$customgame", () -> checkPlay(ui.custom::show)),
             maps = new MobileButton(Icon.download, "$loadgame", () -> checkPlay(ui.load::show)),
             join = new MobileButton(Icon.add, "$joingame", () -> checkPlay(ui.join::show)),
@@ -165,7 +165,7 @@ public class MenuFragment extends Fragment{
 
             buttons(t,
                 new Buttoni("$play", Icon.play,
-                    new Buttoni("$campaign", Icon.play, () -> checkPlay(ui.deploy::show)),
+                    new Buttoni("$campaign", Icon.play, () -> checkPlay(ui.planet::show)),
                     new Buttoni("$joingame", Icon.add, () -> checkPlay(ui.join::show)),
                     new Buttoni("$customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
                     new Buttoni("$loadgame", Icon.download, () -> checkPlay(ui.load::show)),
@@ -219,7 +219,7 @@ public class MenuFragment extends Fragment{
         for(Buttoni b : buttons){
             if(b == null) continue;
             Button[] out = {null};
-            out[0] = t.addImageTextButton(b.text, b.icon, Styles.clearToggleMenut, () -> {
+            out[0] = t.button(b.text, b.icon, Styles.clearToggleMenut, () -> {
                 if(currentMenu == out[0]){
                     currentMenu = null;
                     fadeOutMenu();

@@ -2,6 +2,7 @@ package mindustry.mod;
 
 import arc.*;
 import arc.files.*;
+import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -18,12 +19,13 @@ import java.util.regex.*;
 public class Scripts implements Disposable{
     private final Array<String> blacklist = Array.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
-        ".awt", "socket", "classloader", "oracle", "invoke");
-    private final Array<String> whitelist = Array.with("mindustry.net");
+        ".awt", "socket", "classloader", "oracle", "invoke", "arc.events", "java.util.function", "java.util.stream");
+    private final Array<String> whitelist = Array.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy");
     private final Context context;
     private Scriptable scope;
     private boolean errored;
     private LoadedMod currentMod = null;
+    private Array<EventHandle> events = new Array<>();
 
     public Scripts(){
         Time.mark();
@@ -41,7 +43,7 @@ public class Scripts implements Disposable{
         if(!run(Core.files.internal("scripts/global.js").readString(), "global.js")){
             errored = true;
         }
-        Log.debug("Time to load script engine: {0}", Time.elapsed());
+        Log.debug("Time to load script engine: @", Time.elapsed());
     }
 
     public boolean hasErrored(){
@@ -73,7 +75,12 @@ public class Scripts implements Disposable{
     }
 
     public void log(LogLevel level, String source, String message){
-        Log.log(level, "[{0}]: {1}", source, message);
+        Log.log(level, "[@]: @", source, message);
+    }
+
+    public <T> void onEvent(Class<T> type, Cons<T> listener){
+        Events.on(type, listener);
+        events.add(new EventHandle(type, listener));
     }
 
     public void run(LoadedMod mod, Fi file){
@@ -101,7 +108,21 @@ public class Scripts implements Disposable{
 
     @Override
     public void dispose(){
+        for(EventHandle e : events){
+            Events.remove(e.type, e.listener);
+        }
+        events.clear();
         Context.exit();
+    }
+
+    private static class EventHandle{
+        Class type;
+        Cons listener;
+
+        public EventHandle(Class type, Cons listener){
+            this.type = type;
+            this.listener = listener;
+        }
     }
 
     private class ScriptModuleProvider extends UrlModuleSourceProvider{
@@ -122,7 +143,7 @@ public class Scripts implements Disposable{
             if(matched.find()){
                 LoadedMod required = Vars.mods.locateMod(matched.group(1));
                 String script = matched.group(2);
-                if(required == null || root.equals(required.root.child("scripts"))){ // Mod not found, or already using a mod
+                if(required == null){ // Mod not found, treat it as a folder
                     Fi dir = root.child(matched.group(1));
                     if(!dir.exists()) return null; // Mod and folder not found
                     return loadSource(script, dir, validator);

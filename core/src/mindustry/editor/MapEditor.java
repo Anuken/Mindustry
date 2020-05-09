@@ -1,19 +1,16 @@
 package mindustry.editor;
 
-import arc.struct.StringMap;
-import arc.files.Fi;
-import arc.func.Cons;
-import arc.func.Boolf;
-import arc.graphics.Pixmap;
-import arc.math.Mathf;
-import arc.util.Structs;
-import mindustry.content.Blocks;
-import mindustry.game.Team;
-import mindustry.gen.TileOp;
-import mindustry.io.MapIO;
-import mindustry.maps.Map;
+import arc.files.*;
+import arc.func.*;
+import arc.graphics.*;
+import arc.math.*;
+import arc.struct.*;
+import mindustry.content.*;
+import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.io.*;
+import mindustry.maps.*;
 import mindustry.world.*;
-import mindustry.world.blocks.BlockPart;
 
 import static mindustry.Vars.*;
 
@@ -55,7 +52,6 @@ public class MapEditor{
             tags.put("steamid",  map.file.parent().name());
         }
         MapIO.loadMap(map, context);
-        checkLinkedTiles();
         renderer.resize(width(), height());
         loading = false;
     }
@@ -64,31 +60,8 @@ public class MapEditor{
         reset();
 
         createTiles(pixmap.getWidth(), pixmap.getHeight());
-        load(() -> MapIO.readPixmap(pixmap, tiles()));
+        load(() -> MapIO.readImage(pixmap, tiles()));
         renderer.resize(width(), height());
-    }
-
-    //adds missing blockparts
-    public void checkLinkedTiles(){
-        Tile[][] tiles = world.getTiles();
-
-        //clear block parts first
-        for(int x = 0; x < width(); x++){
-            for(int y = 0; y < height(); y++){
-                if(tiles[x][y].block() instanceof BlockPart){
-                    tiles[x][y].setBlock(Blocks.air);
-                }
-            }
-        }
-
-        //set up missing blockparts
-        for(int x = 0; x < width(); x++){
-            for(int y = 0; y < height(); y++){
-                if(tiles[x][y].block().isMultiblock()){
-                    tiles[x][y].set(tiles[x][y].block(), tiles[x][y].getTeam());
-                }
-            }
-        }
     }
 
     public void load(Runnable r){
@@ -99,11 +72,11 @@ public class MapEditor{
 
     /** Creates a 2-D array of EditorTiles with stone as the floor block. */
     private void createTiles(int width, int height){
-        Tile[][] tiles = world.createTiles(width, height);
+        Tiles tiles = world.resize(width, height);
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                tiles[x][y] = new EditorTile(x, y, Blocks.stone.id, (short)0, (short)0);
+                tiles.set(x, y, new EditorTile(x, y, Blocks.stone.id, (short)0, (short)0));
             }
         }
     }
@@ -119,8 +92,8 @@ public class MapEditor{
         tags = new StringMap();
     }
 
-    public Tile[][] tiles(){
-        return world.getTiles();
+    public Tiles tiles(){
+        return world.tiles;
     }
 
     public Tile tile(int x, int y){
@@ -151,41 +124,12 @@ public class MapEditor{
         if(drawBlock.isMultiblock()){
             x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
             y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
-
-            int offsetx = -(drawBlock.size - 1) / 2;
-            int offsety = -(drawBlock.size - 1) / 2;
-
-            for(int dx = 0; dx < drawBlock.size; dx++){
-                for(int dy = 0; dy < drawBlock.size; dy++){
-                    int worldx = dx + offsetx + x;
-                    int worldy = dy + offsety + y;
-
-                    if(Structs.inBounds(worldx, worldy, width(), height())){
-                        Tile tile = tile(worldx, worldy);
-
-                        Block block = tile.block();
-
-                        //bail out if there's anything blocking the way
-                        if(block.isMultiblock() || block instanceof BlockPart){
-                            return;
-                        }
-
-                        renderer.updatePoint(worldx, worldy);
-                    }
-                }
-            }
-
-            tile(x, y).set(drawBlock, drawTeam);
+            tile(x, y).setBlock(drawBlock, drawTeam, 0);
         }else{
             boolean isFloor = drawBlock.isFloor() && drawBlock != Blocks.air;
 
             Cons<Tile> drawer = tile -> {
                 if(!tester.get(tile)) return;
-
-                //remove linked tiles blocking the way
-                if(!isFloor && (tile.isLinked() || tile.block().isMultiblock())){
-                    tile.link().remove();
-                }
 
                 if(isFloor){
                     tile.setFloor(drawBlock.asFloor());
@@ -211,7 +155,7 @@ public class MapEditor{
     public void drawCircle(int x, int y, Cons<Tile> drawer){
         for(int rx = -brushSize; rx <= brushSize; rx++){
             for(int ry = -brushSize; ry <= brushSize; ry++){
-                if(Mathf.dst2(rx, ry) <= (brushSize - 0.5f) * (brushSize - 0.5f)){
+                if(Mathf.within(rx, ry, brushSize - 0.5f + 0.0001f)){
                     int wx = x + rx, wy = y + ry;
 
                     if(wx < 0 || wy < 0 || wx >= width() || wy >= height()){
@@ -245,20 +189,20 @@ public class MapEditor{
     public void resize(int width, int height){
         clearOp();
 
-        Tile[][] previous = world.getTiles();
+        Tiles previous = world.tiles;
         int offsetX = -(width - width()) / 2, offsetY = -(height - height()) / 2;
         loading = true;
 
-        Tile[][] tiles = world.createTiles(width, height);
+        Tiles tiles = world.resize(width, height);
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
                 int px = offsetX + x, py = offsetY + y;
-                if(Structs.inBounds(px, py, previous.length, previous[0].length)){
-                    tiles[x][y] = previous[px][py];
-                    tiles[x][y].x = (short)x;
-                    tiles[x][y].y = (short)y;
+                if(previous.in(px, py)){
+                    tiles.set(x, y, previous.getn(px, py));
+                    tiles.getn(x, y).x = (short)x;
+                    tiles.getn(x, y).y = (short)y;
                 }else{
-                    tiles[x][y] = new EditorTile(x, y, Blocks.stone.id, (short)0, (short)0);
+                    tiles.set(x, y, new EditorTile(x, y, Blocks.stone.id, (short)0, (short)0));
                 }
             }
         }
@@ -308,18 +252,20 @@ public class MapEditor{
 
     class Context implements WorldContext{
         @Override
-        public Tile tile(int x, int y){
-            return world.tile(x, y);
+        public Tile tile(int index){
+            return world.tiles.geti(index);
         }
 
         @Override
         public void resize(int width, int height){
-            world.createTiles(width, height);
+            world.resize(width, height);
         }
 
         @Override
         public Tile create(int x, int y, int floorID, int overlayID, int wallID){
-            return (tiles()[x][y] = new EditorTile(x, y, floorID, overlayID, wallID));
+            Tile tile = new EditorTile(x, y, floorID, overlayID, wallID);
+            tiles().set(x, y, tile);
+            return tile;
         }
 
         @Override

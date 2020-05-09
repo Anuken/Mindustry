@@ -13,6 +13,7 @@ import static mindustry.Vars.*;
 
 public class Team implements Comparable<Team>{
     public final byte id;
+    public final int uid;
     public final Color color;
     public String name;
 
@@ -24,7 +25,7 @@ public class Team implements Comparable<Team>{
     public final static Team
         derelict = new Team(0, "derelict", Color.valueOf("4d4e58")),
         sharded = new Team(1, "sharded", Pal.accent.cpy()),
-        crux = new Team(2, "crux", Color.valueOf("e82d2d")),
+        crux = new Team(2, "crux", Color.valueOf("f25555")),
         green = new Team(3, "green", Color.valueOf("4dd98b")),
         purple = new Team(4, "purple", Color.valueOf("9a4bdf")),
         blue = new Team(5, "blue", Color.royal.cpy());
@@ -39,7 +40,7 @@ public class Team implements Comparable<Team>{
     }
 
     public static Team get(int id){
-        return all[Pack.u((byte)id)];
+        return all[((byte)id) & 0xff];
     }
 
     /** @return the 6 base team colors. */
@@ -58,6 +59,7 @@ public class Team implements Comparable<Team>{
         this.id = (byte)id;
 
         int us = Pack.u(this.id);
+        uid = us;
         if(us < 6) baseTeams[us] = this;
         all[us] = this;
     }

@@ -15,18 +15,15 @@ import static mindustry.Vars.*;
 
 public class Build{
 
-    /** Returns block type that was broken, or null if unsuccesful. */
     @Remote(called = Loc.server)
     public static void beginBreak(Team team, int x, int y){
         if(!validBreak(team, x, y)){
             return;
         }
 
-        Tile tile = world.ltile(x, y);
+        Tile tile = world.tilec(x, y);
+        //this should never happen, but it doesn't hurt to check for links
         float prevPercent = 1f;
-
-        //just in case
-        if(tile == null) return;
 
         if(tile.entity != null){
             prevPercent = tile.entity.healthf();
@@ -36,9 +33,9 @@ public class Build{
         Block previous = tile.block();
         Block sub = BuildBlock.get(previous.size);
 
-        tile.set(sub, team, rotation);
+        tile.setBlock(sub, team, rotation);
         tile.<BuildEntity>ent().setDeconstruct(previous);
-        tile.entity.health = tile.entity.maxHealth() * prevPercent;
+        tile.entity.health(tile.entity.maxHealth() * prevPercent);
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, true)));
     }
@@ -58,7 +55,7 @@ public class Build{
         Block previous = tile.block();
         Block sub = BuildBlock.get(result.size);
 
-        tile.set(sub, team, rotation);
+        tile.setBlock(sub, team, rotation);
         tile.<BuildEntity>ent().setConstruct(previous, result);
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
@@ -78,7 +75,7 @@ public class Build{
             return false;
         }
 
-        if(state.teams.eachEnemyCore(team, core -> Mathf.dst(x * tilesize + type.offset(), y * tilesize + type.offset(), core.x, core.y) < state.rules.enemyCoreBuildRadius + type.size * tilesize / 2f)){
+        if(state.teams.eachEnemyCore(team, core -> Mathf.dst(x * tilesize + type.offset(), y * tilesize + type.offset(), core.x(), core.y()) < state.rules.enemyCoreBuildRadius + type.size * tilesize / 2f)){
             return false;
         }
 
@@ -86,12 +83,18 @@ public class Build{
 
         if(tile == null) return false;
 
+        //ca check
+        if(world.getDarkness(x, y) >= 3){
+            return false;
+        }
+
         if(type.isMultiblock()){
-            if(type.canReplace(tile.block()) && tile.block().size == type.size && type.canPlaceOn(tile) && tile.interactable(team)){
+            if((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>ent().cblock == type)) && tile.block().size == type.size && type.canPlaceOn(tile) && tile.interactable(team)){
                 return true;
             }
 
-            if(!contactsGround(tile.x, tile.y, type)){
+            //TODO should water blocks be placeable here?
+            if(/*!type.requiresWater && */!contactsGround(tile.x, tile.y, type)){
                 return false;
             }
 
@@ -104,9 +107,13 @@ public class Build{
             for(int dx = 0; dx < type.size; dx++){
                 for(int dy = 0; dy < type.size; dy++){
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) ||
-                    !other.floor().placeableOn ||
-                    (other.floor().isDeep() && !type.floating)){
+                    if(
+                        other == null ||
+                        (other.block() != Blocks.air && !other.block().alwaysReplace) ||
+                        !other.floor().placeableOn ||
+                        (other.floor().isDeep() && !type.floating && !type.requiresWater) ||
+                        (type.requiresWater && tile.floor().liquidDrop != Liquids.water)
+                    ){
                         return false;
                     }
                 }
@@ -114,12 +121,13 @@ public class Build{
             return true;
         }else{
             return tile.interactable(team)
-            && contactsGround(tile.x, tile.y, type)
-            && (!tile.floor().isDeep() || type.floating)
-            && tile.floor().placeableOn
-            && ((type.canReplace(tile.block())
-            && !(type == tile.block() && rotation == tile.rotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
-            && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);
+                && contactsGround(tile.x, tile.y, type)
+                && (!tile.floor().isDeep() || type.floating || type.requiresWater)
+                && tile.floor().placeableOn
+                && (!type.requiresWater || tile.floor().liquidDrop == Liquids.water)
+                && (((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>ent().cblock == type))
+                && !(type == tile.block() && rotation == tile.rotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
+                && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);
         }
     }
 
@@ -147,7 +155,7 @@ public class Build{
 
     /** Returns whether the tile at this position is breakable by this team */
     public static boolean validBreak(Team team, int x, int y){
-        Tile tile = world.ltile(x, y);
+        Tile tile = world.tile(x, y);
         return tile != null && tile.block().canBreak(tile) && tile.breakable() && tile.interactable(team);
     }
 }

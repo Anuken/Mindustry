@@ -6,7 +6,7 @@ import arc.scene.ui.layout.*;
 import mindustry.ctype.*;
 import mindustry.ctype.ContentType;
 import mindustry.ui.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.content;
 

@@ -8,14 +8,13 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
-import mindustry.world.*;
+import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
 public class BlockConfigFragment extends Fragment{
     private Table table = new Table();
-    private Tile configTile;
-    private Block configBlock;
+    private Tilec configTile;
 
     @Override
     public void build(Group parent){
@@ -28,7 +27,7 @@ public class BlockConfigFragment extends Fragment{
             @Override
             public void act(float delta){
                 super.act(delta);
-                if(state.is(State.menu)){
+                if(state.isMenu()){
                     table.visible(false);
                     configTile = null;
                 }
@@ -40,33 +39,32 @@ public class BlockConfigFragment extends Fragment{
         return table.isVisible() && configTile != null;
     }
 
-    public Tile getSelectedTile(){
+    public Tilec getSelectedTile(){
         return configTile;
     }
 
-    public void showConfig(Tile tile){
+    public void showConfig(Tilec tile){
         configTile = tile;
-        configBlock = tile.block();
 
         table.visible(true);
         table.clear();
-        tile.block().buildConfiguration(tile, table);
+        tile.buildConfiguration(table);
         table.pack();
         table.setTransform(true);
         table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
         Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
 
         table.update(() -> {
-            if(configTile != null && configTile.block().shouldHideConfigure(configTile, player)){
+            if(configTile != null && configTile.shouldHideConfigure(player)){
                 hideConfig();
                 return;
             }
 
             table.setOrigin(Align.center);
-            if(configTile == null || configTile.block() == Blocks.air || configTile.block() != configBlock){
+            if(configTile == null || configTile.block() == Blocks.air || !configTile.isValid()){
                 hideConfig();
             }else{
-                configTile.block().updateTableAlign(tile, table);
+                configTile.updateTableAlign(table);
             }
         });
     }

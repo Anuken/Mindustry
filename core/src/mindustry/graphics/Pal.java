@@ -8,8 +8,8 @@ public class Pal{
     items = Color.valueOf("2ea756"),
     command = Color.valueOf("eab678"),
 
-    bulletYellow = Color.valueOf("ffeec9"),
-    bulletYellowBack = Color.valueOf("f9c87a"),
+    bulletYellow = Color.valueOf("fff8e8"),
+    bulletYellowBack = Color.valueOf("f9c27a"),
 
     darkMetal = Color.valueOf("6e7080"),
 
@@ -23,8 +23,6 @@ public class Pal{
 
     lightFlame = Color.valueOf("ffdd55"),
     darkFlame = Color.valueOf("db401c"),
-
-    power2 = Color.valueOf("ff9f6c"),
 
     lightPyraFlame = Color.valueOf("ffb855"),
     darkPyraFlame = Color.valueOf("db661c"),

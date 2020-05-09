@@ -1,18 +1,17 @@
 package mindustry.world.blocks;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.type.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -22,12 +21,10 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.modules.*;
 
-import java.io.*;
-
 import static mindustry.Vars.*;
 
 public class BuildBlock extends Block{
-    public static final int maxSize = 9;
+    public static final int maxSize = 16;
     private static final BuildBlock[] buildBlocks = new BuildBlock[maxSize];
 
     private static long lastTime = 0;
@@ -39,11 +36,8 @@ public class BuildBlock extends Block{
         this.size = size;
         update = true;
         health = 20;
-        layer = Layer.placement;
         consumesTap = true;
         solidifes = true;
-        entityType = BuildEntity::new;
-
         buildBlocks[size - 1] = this;
     }
 
@@ -55,9 +49,9 @@ public class BuildBlock extends Block{
 
     @Remote(called = Loc.server)
     public static void onDeconstructFinish(Tile tile, Block block, int builderID){
-        Team team = tile.getTeam();
-        Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
-        Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, true));
+        Team team = tile.team();
+        Fx.breakBlock.at(tile.drawx(), tile.drawy(), block.size);
+        Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, true));
         tile.remove();
         if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
     }
@@ -65,18 +59,16 @@ public class BuildBlock extends Block{
     @Remote(called = Loc.server)
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         if(tile == null) return;
-        float healthf = tile.entity == null ? 1f : tile.entity.healthf();
-        tile.set(block, team, rotation);
-        if(tile.entity != null){
-            tile.entity.health = block.health * healthf;
-        }
+        float healthf = tile.entity.healthf();
+        tile.setBlock(block, team, (int)rotation);
+        tile.entity.health(block.health * healthf);
         //last builder was this local client player, call placed()
-        if(!headless && builderID == player.id){
+        if(!headless && builderID == player.unit().id()){
             if(!skipConfig){
-                tile.block().playerPlaced(tile);
+                tile.entity.playerPlaced();
             }
         }
-        Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
+        Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
     }
 
     static boolean shouldPlay(){
@@ -105,9 +97,9 @@ public class BuildBlock extends Block{
 
     public static void constructed(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         Call.onConstructFinish(tile, block, builderID, rotation, team, skipConfig);
-        tile.block().placed(tile);
+        tile.entity.placed();
 
-        Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false));
+        Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, false));
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
     }
 
@@ -116,95 +108,12 @@ public class BuildBlock extends Block{
         return true;
     }
 
-    @Override
-    public String getDisplayName(Tile tile){
-        BuildEntity entity = tile.ent();
-        return Core.bundle.format("block.constructing", entity.cblock == null ? entity.previous.localizedName : entity.cblock.localizedName);
-    }
-
-    @Override
-    public TextureRegion getDisplayIcon(Tile tile){
-        BuildEntity entity = tile.ent();
-        return (entity.cblock == null ? entity.previous : entity.cblock).icon(mindustry.ui.Cicon.full);
-    }
-
-    @Override
-    public boolean isSolidFor(Tile tile){
-        BuildEntity entity = tile.ent();
-        return entity == null || (entity.cblock != null && entity.cblock.solid) || entity.previous == null || entity.previous.solid;
-    }
-
-    @Override
-    public Cursor getCursor(Tile tile){
-        return SystemCursor.hand;
-    }
-
-    @Override
-    public void tapped(Tile tile, Player player){
-        BuildEntity entity = tile.ent();
-
-        //if the target is constructible, begin constructing
-        if(entity.cblock != null){
-            if(player.buildWasAutoPaused && !player.isBuilding){
-                player.isBuilding = true;
-            }
-            //player.clearBuilding();
-            player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.rotation(), entity.cblock), false);
-        }
-    }
-
-    @Override
-    public void onDestroyed(Tile tile){
-        Effects.effect(Fx.blockExplosionSmoke, tile);
-
-        if(!tile.floor().solid && !tile.floor().isLiquid){
-            RubbleDecal.create(tile.drawx(), tile.drawy(), size);
-        }
-    }
-
-    @Override
-    public void draw(Tile tile){
-        BuildEntity entity = tile.ent();
-
-        //When breaking, don't draw the previous block... since it's the thing you were breaking
-        if(entity.cblock != null && entity.previous == entity.cblock){
-            return;
-        }
-
-        if(entity.previous == null || entity.cblock == null) return;
-
-        if(Core.atlas.isFound(entity.previous.icon(Cicon.full))){
-            Draw.rect(entity.previous.icon(Cicon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.rotation() * 90 : 0);
-        }
-    }
-
-    @Override
-    public void drawLayer(Tile tile){
-
-        BuildEntity entity = tile.ent();
-
-        Shaders.blockbuild.color = Pal.accent;
-
-        Block target = entity.cblock == null ? entity.previous : entity.cblock;
-
-        if(target == null) return;
-
-        for(TextureRegion region : target.getGeneratedIcons()){
-            Shaders.blockbuild.region = region;
-            Shaders.blockbuild.progress = entity.progress;
-
-            Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.rotation() * 90 : 0);
-            Draw.flush();
-        }
-    }
-
     public class BuildEntity extends TileEntity{
         /**
          * The recipe of the block that is being constructed.
          * If there is no recipe for this block, as is the case with rocks, 'previous' is used.
          */
-        public @Nullable
-        Block cblock;
+        public @Nullable Block cblock;
 
         public float progress = 0;
         public float buildCost;
@@ -218,7 +127,70 @@ public class BuildBlock extends Block{
         private float[] accumulator;
         private float[] totalAccumulator;
 
-        public boolean construct(Unit builder, @Nullable TileEntity core, float amount, boolean configured){
+        @Override
+        public String getDisplayName(){
+            return Core.bundle.format("block.constructing", cblock == null ? previous.localizedName : cblock.localizedName);
+        }
+
+        @Override
+        public TextureRegion getDisplayIcon(){
+            return (cblock == null ? previous : cblock).icon(Cicon.full);
+        }
+
+        @Override
+        public boolean checkSolid(){
+            return (cblock != null && cblock.solid) || previous == null || previous.solid;
+        }
+
+        @Override
+        public Cursor getCursor(){
+            return SystemCursor.hand;
+        }
+
+        @Override
+        public void tapped(Playerc player){
+            //if the target is constructible, begin constructing
+            if(!headless && cblock != null){
+                if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
+                    control.input.isBuilding = true;
+                }
+                player.builder().addBuild(new BuildRequest(tile.x, tile.y, tile.rotation(), cblock), false);
+            }
+        }
+
+        @Override
+        public void onDestroyed(){
+            Fx.blockExplosionSmoke.at(tile);
+
+            if(!tile.floor().solid && !tile.floor().isLiquid){
+                Effects.rubble(x, y, size);
+            }
+        }
+
+        @Override
+        public void draw(){
+            if(!(previous == null || cblock == null || previous == cblock) && Core.atlas.isFound(previous.icon(Cicon.full))){
+                Draw.rect(previous.icon(Cicon.full), x, y, previous.rotate ? tile.rotation() * 90 : 0);
+            }
+
+            Draw.draw(Layer.blockBuilding, () -> {
+                Shaders.blockbuild.color = Pal.accent;
+
+                Block target = cblock == null ? previous : cblock;
+
+                if(target != null){
+                    for(TextureRegion region : target.getGeneratedIcons()){
+                        Shaders.blockbuild.region = region;
+                        Shaders.blockbuild.progress = progress;
+
+                        Draw.rect(region, x, y, target.rotate ? tile.rotation() * 90 : 0);
+                        Draw.flush();
+                    }
+                }
+            });
+        }
+
+        public boolean construct(Unitc builder, @Nullable Tilec core, float amount, boolean configured){
             if(cblock == null){
                 kill();
                 return false;
@@ -228,7 +200,7 @@ public class BuildBlock extends Block{
                 setConstruct(previous, cblock);
             }
 
-            float maxProgress = core == null ? amount : checkRequired(core.items, amount, false);
+            float maxProgress = core == null ? amount : checkRequired(core.items(), amount, false);
 
             for(int i = 0; i < cblock.requirements.length; i++){
                 int reqamount = Math.round(state.rules.buildCostMultiplier * cblock.requirements[i].amount);
@@ -236,23 +208,20 @@ public class BuildBlock extends Block{
                 totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * maxProgress, reqamount);
             }
 
-            maxProgress = core == null ? maxProgress : checkRequired(core.items, maxProgress, true);
+            maxProgress = core == null ? maxProgress : checkRequired(core.items(), maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
-
-            if(builder instanceof Player){
-                builderID = builder.getID();
-            }
+            builderID = builder.id();
 
             if(progress >= 1f || state.rules.infiniteResources){
-                constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
+                constructed(tile, cblock, builderID, tile.rotation(), builder.team(), configured);
                 return true;
             }
             return false;
         }
 
-        public void deconstruct(Unit builder, @Nullable TileEntity core, float amount){
-            float deconstructMultiplier = 0.5f;
+        public void deconstruct(Unitc builder, @Nullable Tilec core, float amount){
+            float deconstructMultiplier = state.rules.deconstructRefundMultiplier;
 
             if(cblock != null){
                 ItemStack[] requirements = cblock.requirements;
@@ -272,8 +241,8 @@ public class BuildBlock extends Block{
 
                     if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
                         if(core != null){
-                            int accepting = core.tile.block().acceptStack(requirements[i].item, accumulated, core.tile, builder);
-                            core.tile.block().handleStack(requirements[i].item, accepting, core.tile, builder);
+                            int accepting = core.acceptStack(requirements[i].item, accumulated, builder);
+                            core.handleStack(requirements[i].item, accepting, builder);
                             accumulator[i] -= accepting;
                         }else{
                             accumulator[i] -= accumulated;
@@ -284,9 +253,7 @@ public class BuildBlock extends Block{
 
             progress = Mathf.clamp(progress - amount);
 
-            if(builder instanceof Player){
-                builderID = builder.getID();
-            }
+            builderID = builder.id();
 
             if(progress <= 0 || state.rules.infiniteResources){
                 Call.onDeconstructFinish(tile, this.cblock == null ? previous : this.cblock, builderID);
@@ -351,37 +318,37 @@ public class BuildBlock extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeFloat(progress);
-            stream.writeShort(previous == null ? -1 : previous.id);
-            stream.writeShort(cblock == null ? -1 : cblock.id);
+        public void write(Writes write){
+            super.write(write);
+            write.f(progress);
+            write.s(previous == null ? -1 : previous.id);
+            write.s(cblock == null ? -1 : cblock.id);
 
             if(accumulator == null){
-                stream.writeByte(-1);
+                write.b(-1);
             }else{
-                stream.writeByte(accumulator.length);
+                write.b(accumulator.length);
                 for(int i = 0; i < accumulator.length; i++){
-                    stream.writeFloat(accumulator[i]);
-                    stream.writeFloat(totalAccumulator[i]);
+                    write.f(accumulator[i]);
+                    write.f(totalAccumulator[i]);
                 }
             }
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            progress = stream.readFloat();
-            short pid = stream.readShort();
-            short rid = stream.readShort();
-            byte acsize = stream.readByte();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            progress = read.f();
+            short pid = read.s();
+            short rid = read.s();
+            byte acsize = read.b();
 
             if(acsize != -1){
                 accumulator = new float[acsize];
                 totalAccumulator = new float[acsize];
                 for(int i = 0; i < acsize; i++){
-                    accumulator[i] = stream.readFloat();
-                    totalAccumulator[i] = stream.readFloat();
+                    accumulator[i] = read.f();
+                    totalAccumulator[i] = read.f();
                 }
             }
 

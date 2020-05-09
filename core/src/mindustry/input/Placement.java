@@ -1,13 +1,11 @@
 package mindustry.input;
 
 import arc.*;
-import arc.struct.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.pooling.*;
 import mindustry.world.*;
-
-import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -123,17 +121,17 @@ public class Placement{
         int nodeLimit = 1000;
         int totalNodes = 0;
 
-        PriorityQueue<Tile> queue = new PriorityQueue<>(10, (a, b) -> Float.compare(costs.get(a.pos(), 0f) + distanceHeuristic(a.x, a.y, end.x, end.y), costs.get(b.pos(), 0f) + distanceHeuristic(b.x, b.y, end.x, end.y)));
+        PQueue<Tile> queue = new PQueue<>(10, (a, b) -> Float.compare(costs.get(a.pos(), 0f) + distanceHeuristic(a.x, a.y, end.x, end.y), costs.get(b.pos(), 0f) + distanceHeuristic(b.x, b.y, end.x, end.y)));
         queue.add(start);
         boolean found = false;
-        while(!queue.isEmpty() && totalNodes++ < nodeLimit){
+        while(!queue.empty() && totalNodes++ < nodeLimit){
             Tile next = queue.poll();
             float baseCost = costs.get(next.pos(), 0f);
             if(next == end){
                 found = true;
                 break;
             }
-            closed.add(Pos.get(next.x, next.y));
+            closed.add(Point2.pack((int)next.x, (int)next.y));
             for(Point2 point : Geometry.d4){
                 int newx = next.x + point.x, newy = next.y + point.y;
                 Tile child = world.tile(newx, newy);
@@ -155,11 +153,11 @@ public class Placement{
         Tile current = end;
         while(current != start && total++ < nodeLimit){
             if(current == null) return false;
-            int newPos = parents.get(current.pos(), Pos.invalid);
+            int newPos = parents.get(current.pos(), -1);
 
-            if(newPos == Pos.invalid) return false;
+            if(newPos == -1) return false;
 
-            points.add(Pools.obtain(Point2.class, Point2::new).set(Pos.x(newPos),  Pos.y(newPos)));
+            points.add(Pools.obtain(Point2.class, Point2::new).set(Point2.x(newPos), Point2.y(newPos)));
             current = world.tile(newPos);
         }
 
