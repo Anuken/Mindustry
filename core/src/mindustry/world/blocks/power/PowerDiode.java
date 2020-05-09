@@ -63,6 +63,7 @@ public class PowerDiode extends Block{
             if(tile.front() == null || tile.back() == null || !tile.back().block().hasPower || !tile.front().block().hasPower || tile.back().team() != tile.front().team()) return;
 
             PowerGraph backGraph = tile.back().power().graph;
+            if(backGraph.getBatteryStored()<2f) return;
             PowerGraph frontGraph = tile.front().power().graph;
             if(backGraph == frontGraph) return;
 
