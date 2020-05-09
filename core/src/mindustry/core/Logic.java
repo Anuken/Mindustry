@@ -179,7 +179,7 @@ public class Logic implements ApplicationListener{
             if(entry.cooldown < 0 && !entry.weather.isActive()){
                 float duration = Mathf.random(entry.minDuration, entry.maxDuration);
                 entry.cooldown = duration + Mathf.random(entry.minFrequency, entry.maxFrequency);
-                entry.weather.create(entry.intensity, duration);
+                Call.createWeather(entry.weather, entry.intensity, duration);
             }
         }
     }
@@ -237,7 +237,11 @@ public class Logic implements ApplicationListener{
                     universe.update();
                 }
                 Time.update();
-                updateWeather();
+
+                //weather is serverside
+                if(!net.client()){
+                    updateWeather();
+                }
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
                     if(!state.rules.waitForWaveToEnd || state.enemies == 0){

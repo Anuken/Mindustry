@@ -67,6 +67,11 @@ public abstract class Weather extends MappableContent{
         return ContentType.weather;
     }
 
+    @Remote
+    public static void createWeather(Weather weather, float intensity, float duration){
+        weather.create(intensity, duration);
+    }
+
     public static class WeatherEntry{
         /** The type of weather used. */
         public Weather weather;
