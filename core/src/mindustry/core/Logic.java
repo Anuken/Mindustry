@@ -1,6 +1,7 @@
 package mindustry.core;
 
 import arc.*;
+import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -11,6 +12,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.type.*;
+import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
@@ -167,6 +169,21 @@ public class Logic implements ApplicationListener{
         }
     }
 
+    private void updateWeather(){
+
+        for(WeatherEntry entry : state.rules.weather){
+            //update cooldown
+            entry.cooldown -= Time.delta();
+
+            //create new event when not active
+            if(entry.cooldown < 0 && !entry.weather.isActive()){
+                float duration = Mathf.random(entry.minDuration, entry.maxDuration);
+                entry.cooldown = duration + Mathf.random(entry.minFrequency, entry.maxFrequency);
+                entry.weather.create(entry.intensity, duration);
+            }
+        }
+    }
+
     @Remote(called = Loc.both)
     public static void launchZone(){
         if(!headless){
@@ -220,6 +237,7 @@ public class Logic implements ApplicationListener{
                     universe.update();
                 }
                 Time.update();
+                updateWeather();
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
                     if(!state.rules.waitForWaveToEnd || state.enemies == 0){

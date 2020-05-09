@@ -171,6 +171,10 @@ public class Sector{
 
     public enum SectorAttribute{
         /** Requires naval technology to land on, e.g. mostly water */
-        naval
+        naval,
+        /** Has rain. */
+        rainy,
+        /** Has snow. */
+        snowy
     }
 }

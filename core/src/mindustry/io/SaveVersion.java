@@ -241,7 +241,7 @@ public abstract class SaveVersion extends SaveFileReader{
         Array<TeamData> data = state.teams.getActive();
         stream.writeInt(data.size);
         for(TeamData team : data){
-            stream.writeInt((int)team.team.id);
+            stream.writeInt(team.team.id);
             stream.writeInt(team.brokenBlocks.size);
             for(BrokenBlock block : team.brokenBlocks){
                 stream.writeShort(block.x);

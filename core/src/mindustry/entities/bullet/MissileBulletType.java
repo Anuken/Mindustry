@@ -10,7 +10,7 @@ import mindustry.graphics.Pal;
 public class MissileBulletType extends BasicBulletType{
     protected Color trailColor = Pal.missileYellowBack;
 
-    protected float weaveScale = 0f;
+    protected float weaveScale = 1f;
     protected float weaveMag = -1f;
 
     public MissileBulletType(float speed, float damage, String bulletSprite){
@@ -34,7 +34,7 @@ public class MissileBulletType extends BasicBulletType{
         }
 
         if(weaveMag > 0){
-            b.vel().rotate(Mathf.sin(Time.time() + b.id() * 442, weaveScale, weaveMag) * Time.delta());
+            b.vel().rotate(Mathf.sin(Time.time() + b.id() * 3, weaveScale, weaveMag) * Time.delta());
         }
     }
 }

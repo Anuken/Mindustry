@@ -117,6 +117,18 @@ public class SectorDataGenerator{
                     data.floors[i] = entries.get(i).key;
                 }
 
+                //TODO bad code
+                boolean hasSnow = data.floors[0].name.contains("ice") || data.floors[0].name.contains("snow");
+                boolean hasRain = !hasSnow && data.floors[0].name.contains("water");
+
+                if(hasSnow){
+                    data.attributes |= (1 << SectorAttribute.snowy.ordinal());
+                }
+
+                if(hasRain){
+                    data.attributes |= (1 << SectorAttribute.rainy.ordinal());
+                }
+
                 data.resources = content.asArray().sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id))).toArray(UnlockableContent.class);
 
                 //50% water -> naval attribute
