@@ -124,7 +124,9 @@ public class MapEditor{
         if(drawBlock.isMultiblock()){
             x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
             y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
-            tile(x, y).setBlock(drawBlock, drawTeam, 0);
+            if(!hasOverlap(x, y)){
+                tile(x, y).setBlock(drawBlock, drawTeam, 0);
+            }
         }else{
             boolean isFloor = drawBlock.isFloor() && drawBlock != Blocks.air;
 
@@ -150,6 +152,33 @@ public class MapEditor{
                 drawCircle(x, y, drawer);
             }
         }
+    }
+
+    boolean hasOverlap(int x, int y){
+        Tile tile = world.tile(x, y);
+        //allow direct replacement of blocks of the same size
+        if(tile != null && tile.isCenter() && tile.block() != drawBlock && tile.block().size == drawBlock.size){
+            return false;
+        }
+
+        //else, check for overlap
+        int offsetx = -(drawBlock.size - 1) / 2;
+        int offsety = -(drawBlock.size - 1) / 2;
+        for(int dx = 0; dx < drawBlock.size; dx++){
+            for(int dy = 0; dy < drawBlock.size; dy++){
+                int worldx = dx + offsetx + x;
+                int worldy = dy + offsety + y;
+                if(!(worldx == x && worldy == y)){
+                    Tile other = world.tile(worldx, worldy);
+
+                    if(other != null && other.block().isMultiblock()){
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     public void drawCircle(int x, int y, Cons<Tile> drawer){

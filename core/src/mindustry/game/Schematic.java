@@ -49,9 +49,9 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     }
 
     public @NonNull CoreBlock findCore(){
-        CoreBlock block = (CoreBlock)tiles.find(s -> s.block instanceof CoreBlock).block;
-        if(block == null) throw new IllegalArgumentException("Schematic is missing a core!");
-        return block;
+        Stile tile = tiles.find(s -> s.block instanceof CoreBlock);
+        if(tile == null) throw new IllegalArgumentException("Schematic is missing a core!");
+        return (CoreBlock)tile.block;
     }
 
     public String name(){
