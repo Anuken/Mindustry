@@ -122,7 +122,7 @@ public class MapView extends Element implements GestureListener{
 
                 editor.flushOp();
 
-                if(button == KeyCode.mouseMiddle || button == KeyCode.mouseRight && lastTool != null){
+                if((button == KeyCode.mouseMiddle || button == KeyCode.mouseRight) && lastTool != null){
                     tool = lastTool;
                     lastTool = null;
                 }
