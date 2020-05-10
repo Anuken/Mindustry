@@ -125,7 +125,7 @@ public class MessageBlock extends Block{
                     });
                     dialog.show();
                 }
-                control.input.frag.config.hideConfig();
+                deselect();
             }).size(40f);
         }
 

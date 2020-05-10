@@ -194,7 +194,9 @@ public class PowerNode extends PowerBlock{
 
         tempTileEnts.each(valid, t -> {
             graphs.add(t.power().graph);
-            others.get(t);
+            if(t.power().graph != tile.entity.power().graph){
+                others.get(t);
+            }
         });
     }
 

@@ -108,8 +108,7 @@ public class Shaders{
     public static class SunShader extends LoadShader{
         public int octaves = 5;
         public float falloff = 0.5f, scale = 1f, power = 1.3f, magnitude = 0.6f, speed = 99999999999f, spread = 1.3f, seed = Mathf.random(9999f);
-
-        public float[] colorValues;
+        public Texture colors;
 
         public SunShader(){
             super("sun", "sun");
@@ -117,6 +116,10 @@ public class Shaders{
 
         @Override
         public void apply(){
+            colors.bind(1);
+            Gl.activeTexture(Gl.texture0);
+
+            setUniformi("u_colors", 1);
             setUniformi("u_octaves", octaves);
             setUniformf("u_falloff", falloff);
             setUniformf("u_scale", scale);
@@ -125,9 +128,6 @@ public class Shaders{
             setUniformf("u_time", Time.globalTime() / speed);
             setUniformf("u_seed", seed);
             setUniformf("u_spread", spread);
-
-            setUniformi("u_colornum", colorValues.length / 4);
-            setUniform4fv("u_colors[0]", colorValues, 0, colorValues.length);
         }
     }
 

@@ -177,13 +177,13 @@ public class PlanetDialog extends FloatingDialog{
         projector.proj(cam.combined);
         batch.proj(cam.combined);
 
-        bloom.capture();
+        beginBloom();
 
         skybox.render(cam.combined);
 
         renderPlanet(solarSystem);
 
-        bloom.render();
+        endBloom();
 
         Gl.enable(Gl.blend);
 
@@ -217,6 +217,14 @@ public class PlanetDialog extends FloatingDialog{
         cam.update();
     }
 
+    private void beginBloom(){
+        bloom.capture();
+    }
+
+    private void endBloom(){
+        bloom.render();
+    }
+
     private void renderPlanet(Planet planet){
         //render planet at offsetted position in the world
         planet.mesh.render(cam.combined, planet.getTransform(mat));
@@ -227,7 +235,7 @@ public class PlanetDialog extends FloatingDialog{
             renderSectors(planet);
         }
 
-        if(planet.parent != null && planet.hasAtmosphere){
+        if(planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
             Blending.additive.apply();
 
             Shaders.atmosphere.camera = cam;
