@@ -610,15 +610,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
         boolean consumed = false, showedInventory = false;
 
-        if(tile.block().configurable && tile.interactable(player.team())){
-            consumed = true;
-            tile.onConfigureTileTapped(tile);
-        }
-
         //check if tapped block is configurable
         if(tile.block().configurable && tile.interactable(player.team())){
             consumed = true;
-            if(((!frag.config.isShown() && tile.shouldShowConfigure(player)) //if the config fragment is hidden, show
+            if(Core.input.keyDown(Binding.dash)){
+                tile.onConfigureTileTapped(tile);
+            }
+            else if(((!frag.config.isShown() && tile.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
             || (frag.config.isShown() && frag.config.getSelectedTile().onConfigureTileTapped(tile)))){
                 Sounds.click.at(tile);
