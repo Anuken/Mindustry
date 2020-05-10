@@ -49,17 +49,7 @@ public class PlanetDialog extends FloatingDialog{
     private Planet planet = Planets.starter;
     private @Nullable Sector selected, hovered;
     private Table stable;
-    private Mesh atmosphere = MeshBuilder.buildHex(new HexMesher(){
-        @Override
-        public float getHeight(Vec3 position){
-            return 0;
-        }
-
-        @Override
-        public Color getColor(Vec3 position){
-            return Color.white;
-        }
-    }, 2, false, 1.5f, 0f);
+    private Mesh atmosphere = MeshBuilder.buildHex(Color.white, 2, false, 1.5f);
 
     //seed: 8kmfuix03fw
     private CubemapMesh skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));
