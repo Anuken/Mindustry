@@ -165,6 +165,13 @@ public class ItemBridge extends Block{
 
         @Override
         public boolean onConfigureTileTapped(Tilec other){
+            //reverse connection
+            if(other instanceof ItemBridgeEntity && ((ItemBridgeEntity)other).link == pos()){
+                configure(other.pos());
+                other.configure(-1);
+                return true;
+            }
+
             if(linkValid(tile, other.tile())){
                 if(link == other.pos()){
                     configure(-1);

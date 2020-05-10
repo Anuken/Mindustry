@@ -179,6 +179,10 @@ public class PowerNode extends PowerBlock{
 
         tempTileEnts.clear();
         graphs.clear();
+        if(tile.entity != null && tile.entity.power() != null){
+            graphs.add(tile.entity.power().graph);
+        }
+
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
             Tilec other = world.ent(x, y);
             if(valid.get(other) && !tempTileEnts.contains(other)){
@@ -194,9 +198,7 @@ public class PowerNode extends PowerBlock{
 
         tempTileEnts.each(valid, t -> {
             graphs.add(t.power().graph);
-            if(t.power().graph != tile.entity.power().graph){
-                others.get(t);
-            }
+            others.get(t);
         });
     }
 
@@ -319,6 +321,7 @@ public class PowerNode extends PowerBlock{
                         configure(power.links.get(0));
                     }
                 }
+                deselect();
                 return false;
             }
 
@@ -339,15 +342,8 @@ public class PowerNode extends PowerBlock{
         @Override
         public void drawConfigure(){
 
-            Draw.color(Pal.accent);
-
-            Lines.stroke(1.5f);
-            Lines.circle(x, y,
-            tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time(), 4f, 1f));
-
+            Drawf.circles(x, y, tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time(), 4f, 1f));
             Drawf.circles(x, y, laserRange * tilesize);
-
-            Lines.stroke(1.5f);
 
             for(int x = (int)(tile.x - laserRange - 2); x <= tile.x + laserRange + 2; x++){
                 for(int y = (int)(tile.y - laserRange - 2); y <= tile.y + laserRange + 2; y++){
