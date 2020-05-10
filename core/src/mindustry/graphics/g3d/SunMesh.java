@@ -2,45 +2,33 @@ package mindustry.graphics.g3d;
 
 import arc.graphics.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
+import arc.util.noise.*;
 import mindustry.graphics.*;
-import mindustry.graphics.Shaders.*;
 import mindustry.type.*;
 
-public class SunMesh extends ShaderSphereMesh{
-    public int octaves = 5;
-    public float falloff = 0.5f, scale = 1f, power = 1.3f, magnitude = 0.6f, speed = 99999999999f, spread = 1.3f, seed = Mathf.random(9999f);
-    public Texture colors;
+public class SunMesh extends HexMesh{
 
-    public SunMesh(Planet planet, int divisions){
-        super(planet, Shaders.sun, divisions);
-    }
+    public SunMesh(Planet planet, int divisions, double octaves, double persistence, double scl, double pow, double mag, float colorScale, Color... colors){
+        super(planet, new HexMesher(){
+            Simplex sim = new Simplex();
 
-    public void setColors(float scl, Color... colors){
-        Pixmap pix = new Pixmap(colors.length, 1);
-        for(int i = 0; i < colors.length; i++){
-            pix.draw(i, 0, Tmp.c1.set(colors[i]).mul(scl));
-        }
-        this.colors = new Texture(pix);
-        pix.dispose();
+            @Override
+            public float getHeight(Vec3 position){
+                return 0;
+            }
+
+            @Override
+            public Color getColor(Vec3 position){
+                double height = Math.pow(sim.octaveNoise3D(octaves, persistence, scl, position.x, position.y, position.z), pow) * mag;
+                return Tmp.c1.set(colors[Mathf.clamp((int)(height * colors.length), 0, colors.length - 1)]).mul(colorScale);
+            }
+        }, divisions, Shaders.unlit);
     }
 
     @Override
     public void preRender(){
-        SunShader s = (SunShader)shader;
-        s.octaves = octaves;
-        s.falloff = falloff;
-        s.scale = scale;
-        s.power = power;
-        s.magnitude = magnitude;
-        s.speed = speed;
-        s.seed = seed;
-        s.colors = colors;
-    }
-
-    @Override
-    public void dispose(){
-        super.dispose();
-        colors.dispose();
+        //do absolutely nothing
     }
 }
