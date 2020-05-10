@@ -142,25 +142,19 @@ public class ItemBridge extends Block{
 
         @Override
         public void drawConfigure(){
-            Draw.color(Pal.accent);
-            Lines.stroke(1f);
-            Lines.square(x, y,
-            tile.block().size * tilesize / 2f + 1f);
+            Drawf.select(x, y, tile.block().size * tilesize / 2f + 2f, Pal.accent);
 
             for(int i = 1; i <= range; i++){
                 for(int j = 0; j < 4; j++){
                     Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
                     if(linkValid(tile, other)){
                         boolean linked = other.pos() == link;
-                        Draw.color(linked ? Pal.place : Pal.breakInvalid);
 
-                        Lines.square(other.drawx(), other.drawy(),
-                        other.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
+                        Drawf.select(other.drawx(), other.drawy(),
+                            other.block().size * tilesize / 2f + 2f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)), linked ? Pal.place : Pal.breakInvalid);
                     }
                 }
             }
-
-            Draw.reset();
         }
 
         @Override
