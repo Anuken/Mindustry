@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
+import mindustry.game.*;
 import mindustry.maps.generators.*;
 import mindustry.world.*;
 
@@ -259,7 +260,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
+        Schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
 
         state.rules.waves = true;
     }
