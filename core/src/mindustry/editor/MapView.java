@@ -72,8 +72,13 @@ public class MapView extends Element implements GestureListener{
                     return false;
                 }
 
-                if(!mobile && button != KeyCode.mouseLeft && button != KeyCode.mouseMiddle){
+                if(!mobile && button != KeyCode.mouseLeft && button != KeyCode.mouseMiddle && button != KeyCode.mouseRight){
                     return true;
+                }
+                
+                if(button == KeyCode.mouseRight){
+                    lastTool = tool;
+                    tool = EditorTool.eraser;
                 }
 
                 if(button == KeyCode.mouseMiddle){
@@ -102,7 +107,7 @@ public class MapView extends Element implements GestureListener{
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
-                if(!mobile && button != KeyCode.mouseLeft && button != KeyCode.mouseMiddle){
+                if(!mobile && button != KeyCode.mouseLeft && button != KeyCode.mouseMiddle && button != KeyCode.mouseRight){
                     return;
                 }
 
@@ -117,7 +122,7 @@ public class MapView extends Element implements GestureListener{
 
                 editor.flushOp();
 
-                if(button == KeyCode.mouseMiddle && lastTool != null){
+                if((button == KeyCode.mouseMiddle || button == KeyCode.mouseRight) && lastTool != null){
                     tool = lastTool;
                     lastTool = null;
                 }
