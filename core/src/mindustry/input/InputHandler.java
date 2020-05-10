@@ -610,6 +610,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
         boolean consumed = false, showedInventory = false;
 
+        if(tile.block().configurable && tile.interactable(player.team())){
+            consumed = true;
+            tile.onConfigureTileTapped(tile);
+        }
+
         //check if tapped block is configurable
         if(tile.block().configurable && tile.interactable(player.team())){
             consumed = true;
