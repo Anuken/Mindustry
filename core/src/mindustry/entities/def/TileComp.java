@@ -196,12 +196,24 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     public byte absoluteRelativeTo(int cx, int cy){
         int x = tile.x, y = tile.y;
-        if(Math.abs(x - cx) > Math.abs(y - cy)){
-            if(x <= cx - 1) return 0;
-            if(x >= cx + 1) return 2;
-        }else{
-            if(y <= cy - 1) return 1;
-            if(y >= cy + 1) return 3;
+
+        //very straightforward for odd sizes
+        if(block.size % 2 == 1){
+            if(Math.abs(x - cx) > Math.abs(y - cy)){
+                if(x <= cx - 1) return 0;
+                if(x >= cx + 1) return 2;
+            }else{
+                if(y <= cy - 1) return 1;
+                if(y >= cy + 1) return 3;
+            }
+        }else{ //need offsets here
+            if(Math.abs(x - cx + 0.5f) > Math.abs(y - cy + 0.5f)){
+                if(x+0.5f <= cx - 1) return 0;
+                if(x+0.5f >= cx + 1) return 2;
+            }else{
+                if(y+0.5f <= cy - 1) return 1;
+                if(y+0.5f >= cy + 1) return 3;
+            }
         }
 
         return -1;

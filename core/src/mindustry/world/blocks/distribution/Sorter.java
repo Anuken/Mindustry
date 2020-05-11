@@ -70,8 +70,6 @@ public class Sorter extends Block{
                 Draw.rect("center", x, y);
                 Draw.color();
             }
-
-
         }
 
         @Override

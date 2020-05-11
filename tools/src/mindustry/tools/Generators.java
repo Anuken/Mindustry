@@ -24,6 +24,32 @@ public class Generators{
     public static void generate(){
         ObjectMap<Block, Image> gens = new ObjectMap<>();
 
+        ImagePacker.generate("splashes", () -> {
+            ArcNativesLoader.load();
+
+            int frames = 12;
+            int size = 32;
+            for(int i = 0; i < frames; i++){
+                float fin = (float)i / (frames);
+                float fout = 1f - fin;
+                float stroke = 4f * fout;
+                float radius = (size/2f) * fin;
+
+                Pixmap pixmap = new Pixmap(size, size);
+
+                pixmap.each((x, y) -> {
+                    float dst = Mathf.dst(x, y, size/2f, size/2f);
+                    if(Math.abs(dst - radius) <= stroke){
+                        pixmap.draw(x, y, Color.white);
+                    }
+                });
+
+                Fi.get("splash-" + i + ".png").writePNG(pixmap);
+
+                pixmap.dispose();
+            }
+        });
+
         ImagePacker.generate("cracks", () -> {
             RidgedPerlin r = new RidgedPerlin(1, 3);
             for(int size = 1; size <= Block.maxCrackSize; size++){
