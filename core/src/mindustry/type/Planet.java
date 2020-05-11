@@ -186,6 +186,14 @@ public class Planet extends UnlockableContent{
         mesh = meshLoader.get();
     }
 
+    @Override
+    public void dispose(){
+        if(mesh != null){
+            mesh.dispose();
+            mesh = null;
+        }
+    }
+
     /** Gets a sector a tile position. */
     public Sector getSector(Ptile tile){
         return sectors.get(tile.id);

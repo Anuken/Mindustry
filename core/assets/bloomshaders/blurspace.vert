@@ -15,8 +15,8 @@ varying MED vec2 v_texCoords3;
 varying MED vec2 v_texCoords4;
 const vec2 futher = vec2(3.2307692308, 3.2307692308);
 const vec2 closer = vec2(1.3846153846, 1.3846153846);
-void main()
-{
+
+void main(){
 	vec2 sizeAndDir = dir / size;
 	vec2 f = futher*sizeAndDir;
 	vec2 c = closer*sizeAndDir;

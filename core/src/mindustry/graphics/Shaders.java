@@ -15,12 +15,10 @@ import mindustry.type.*;
 import static mindustry.Vars.renderer;
 
 public class Shaders{
-    public static Shadow shadow;
     public static BlockBuild blockbuild;
     public static @Nullable Shield shield;
     public static UnitBuild build;
     public static FogShader fog;
-    public static MenuShader menu;
     public static LightShader light;
     public static SurfaceShader water, tar, slag;
     public static PlanetShader planet;
@@ -30,7 +28,6 @@ public class Shaders{
     public static Shader unlit;
 
     public static void init(){
-        shadow = new Shadow();
         blockbuild = new BlockBuild();
         try{
             shield = new Shield();
@@ -41,7 +38,6 @@ public class Shaders{
         }
         build = new UnitBuild();
         fog = new FogShader();
-        menu = new MenuShader();
         light = new LightShader();
         water = new SurfaceShader("water");
         tar = new SurfaceShader("tar");
@@ -131,25 +127,6 @@ public class Shaders{
 
     }
 
-    public static class MenuShader extends LoadShader{
-        float time = 0f;
-
-        public MenuShader(){
-            super("menu", "default");
-        }
-
-        @Override
-        public void apply(){
-            time = time % 158;
-
-            setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
-            setUniformi("u_time", (int)(time += Core.graphics.getDeltaTime() * 60f));
-            setUniformf("u_uv", Core.atlas.white().getU(), Core.atlas.white().getV());
-            setUniformf("u_scl", Scl.scl(1f));
-            setUniformf("u_uv2", Core.atlas.white().getU2(), Core.atlas.white().getV2());
-        }
-    }
-
     public static class FogShader extends LoadShader{
         public FogShader(){
             super("fog", "default");
@@ -172,23 +149,6 @@ public class Shaders{
             setUniformf("u_progress", progress);
             setUniformf("u_uv", region.getU(), region.getV());
             setUniformf("u_uv2", region.getU2(), region.getV2());
-            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
-        }
-    }
-
-    public static class Shadow extends LoadShader{
-        public Color color = new Color();
-        public TextureRegion region = new TextureRegion();
-        public float scl;
-
-        public Shadow(){
-            super("shadow", "default");
-        }
-
-        @Override
-        public void apply(){
-            setUniformf("u_color", color);
-            setUniformf("u_scl", scl);
             setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
         }
     }

@@ -16,8 +16,7 @@ varying MED vec2 v_texCoords4;
 const float center = 0.2270270270; 
 const float close = 0.3162162162;
 const float far = 0.0702702703;
-void main()
-{	 
+void main(){
    gl_FragColor.rgb = far * texture2D(u_texture, v_texCoords0).rgb 
 				+ close * texture2D(u_texture, v_texCoords1).rgb
 				+ center * texture2D(u_texture, v_texCoords2).rgb 

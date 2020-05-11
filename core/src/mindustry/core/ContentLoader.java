@@ -145,7 +145,8 @@ public class ContentLoader{
     }
 
     public void dispose(){
-        //clear all content, currently not used
+        initialize(Content::dispose);
+        clear();
     }
 
     /** Get last piece of content created for error-handling purposes. */
