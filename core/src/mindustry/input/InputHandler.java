@@ -50,13 +50,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public final OverlayFragment frag = new OverlayFragment();
 
-    public Block block;
+    public @Nullable Block block;
     public boolean overrideLineRotation;
     public int rotation;
     public boolean droppingItem;
     public Group uiGroup;
     public boolean isShooting, isBuilding = true, buildWasAutoPaused = false;
-    public UnitType controlledType;
+    public @Nullable UnitType controlledType;
 
     protected @Nullable Schematic lastSchematic;
     protected GestureDetector detector;
@@ -510,7 +510,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(request.block.saveConfig && request.block.lastConfig != null){
             Object conf = request.config;
-            request.config = block.lastConfig;
+            request.config = request.block.lastConfig;
             request.block.drawRequestConfig(request, allRequests());
             request.config = conf;
         }

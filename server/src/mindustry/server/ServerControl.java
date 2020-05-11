@@ -822,7 +822,7 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("gc", "Trigger a grabage struct. Testing only.", arg -> {
+        handler.register("gc", "Trigger a garbage collection. Testing only.", arg -> {
             int pre = (int)(Core.app.getJavaHeap() / 1024 / 1024);
             System.gc();
             int post = (int)(Core.app.getJavaHeap() / 1024 / 1024);

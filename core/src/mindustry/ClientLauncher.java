@@ -12,6 +12,7 @@ import arc.util.async.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.maps.*;
@@ -57,6 +58,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         atlas = TextureAtlas.blankAtlas();
         Vars.net = new Net(platform.getNet());
         mods = new Mods();
+        schematics = new Schematics();
 
         Fonts.loadSystemCursors();
 

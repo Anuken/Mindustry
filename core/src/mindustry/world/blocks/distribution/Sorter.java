@@ -140,7 +140,7 @@ public class Sorter extends Block{
         @Override
         public boolean onConfigureTileTapped(Tilec other){
             if(this == other){
-                control.input.frag.config.hideConfig();
+                deselect();
                 configure(null);
                 return false;
             }

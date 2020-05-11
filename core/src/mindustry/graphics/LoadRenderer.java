@@ -23,11 +23,11 @@ import static arc.Core.*;
 
 public class LoadRenderer implements Disposable{
     private static final Color color = new Color(Pal.accent).lerp(Color.black, 0.5f);
-    private static final Color colorRed = Pal.breakInvalid.lerp(Color.black, 0.3f);
+    private static final Color colorRed = Pal.breakInvalid.cpy().lerp(Color.black, 0.3f);
     private static final String red = "[#" + colorRed + "]";
     private static final String orange = "[#" + color + "]";
     private static final FloatArray floats = new FloatArray();
-    private static final boolean preview = true;
+    private static final boolean preview = false;
 
     private float testprogress = 0f;
     private StringBuilder assetText = new StringBuilder();
@@ -137,6 +137,7 @@ public class LoadRenderer implements Disposable{
             }
         }
 
+        Draw.flush();
 
         float aspect = 1.94f;
 
@@ -228,10 +229,13 @@ public class LoadRenderer implements Disposable{
                     }else if(panei == 1){
                         float height = maxy - miny;
                         float barpad = s * 8f;
-                        float barspace = (height - barpad) / bars.length;
+
+                        int barsUsed = Math.min((int)((height - barpad) / (font.getLineHeight() * 1.4f)), bars.length);
+
+                        float barspace = (height - barpad) / barsUsed;
                         float barheight = barspace * 0.8f;
 
-                        for(int i = 0; i < bars.length; i++){
+                        for(int i = 0; i < barsUsed; i++){
                             Bar bar = bars[i];
                             if(bar.valid()){
                                 Draw.color(bar.red() ? colorRed : color);

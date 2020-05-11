@@ -275,28 +275,6 @@ public class Schematics implements Loadable{
             .removeAll(s -> !s.block.isVisible() || !s.block.unlockedCur());
     }
 
-    public void placeLoadout(Schematic schem, int x, int y){
-        Stile coreTile = schem.tiles.find(s -> s.block instanceof CoreBlock);
-        if(coreTile == null) throw new IllegalArgumentException("Schematic has no core tile. Exiting.");
-        int ox = x - coreTile.x, oy = y - coreTile.y;
-        schem.tiles.each(st -> {
-            Tile tile = world.tile(st.x + ox, st.y + oy);
-            if(tile == null) return;
-
-            tile.setBlock(st.block, state.rules.defaultTeam, 0);
-            tile.rotation(st.rotation);
-
-            Object config = st.config;
-            if(tile.entity != null){
-                tile.entity.configureAny(config);
-            }
-
-            if(st.block instanceof Drill){
-                tile.getLinkedTiles(t -> t.setOverlay(Blocks.oreCopper));
-            }
-        });
-    }
-
     /** Adds a schematic to the list, also copying it into the files.*/
     public void add(Schematic schematic){
         all.add(schematic);
@@ -392,6 +370,28 @@ public class Schematics implements Loadable{
         }catch(IOException e){
             throw new RuntimeException(e);
         }
+    }
+
+    public static void placeLoadout(Schematic schem, int x, int y){
+        Stile coreTile = schem.tiles.find(s -> s.block instanceof CoreBlock);
+        if(coreTile == null) throw new IllegalArgumentException("Schematic has no core tile. Exiting.");
+        int ox = x - coreTile.x, oy = y - coreTile.y;
+        schem.tiles.each(st -> {
+            Tile tile = world.tile(st.x + ox, st.y + oy);
+            if(tile == null) return;
+
+            tile.setBlock(st.block, state.rules.defaultTeam, 0);
+            tile.rotation(st.rotation);
+
+            Object config = st.config;
+            if(tile.entity != null){
+                tile.entity.configureAny(config);
+            }
+
+            if(st.block instanceof Drill){
+                tile.getLinkedTiles(t -> t.setOverlay(Blocks.oreCopper));
+            }
+        });
     }
 
     //region IO methods

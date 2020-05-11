@@ -49,17 +49,7 @@ public class PlanetDialog extends FloatingDialog{
     private Planet planet = Planets.starter;
     private @Nullable Sector selected, hovered;
     private Table stable;
-    private Mesh atmosphere = MeshBuilder.buildHex(new HexMesher(){
-        @Override
-        public float getHeight(Vec3 position){
-            return 0;
-        }
-
-        @Override
-        public Color getColor(Vec3 position){
-            return Color.white;
-        }
-    }, 2, false, 1.5f, 0f);
+    private Mesh atmosphere = MeshBuilder.buildHex(Color.white, 2, false, 1.5f);
 
     //seed: 8kmfuix03fw
     private CubemapMesh skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));
@@ -187,13 +177,13 @@ public class PlanetDialog extends FloatingDialog{
         projector.proj(cam.combined);
         batch.proj(cam.combined);
 
-        bloom.capture();
+        beginBloom();
 
         skybox.render(cam.combined);
 
         renderPlanet(solarSystem);
 
-        bloom.render();
+        endBloom();
 
         Gl.enable(Gl.blend);
 
@@ -227,6 +217,14 @@ public class PlanetDialog extends FloatingDialog{
         cam.update();
     }
 
+    private void beginBloom(){
+        bloom.capture();
+    }
+
+    private void endBloom(){
+        bloom.render();
+    }
+
     private void renderPlanet(Planet planet){
         //render planet at offsetted position in the world
         planet.mesh.render(cam.combined, planet.getTransform(mat));
@@ -237,7 +235,7 @@ public class PlanetDialog extends FloatingDialog{
             renderSectors(planet);
         }
 
-        if(planet.parent != null && planet.hasAtmosphere){
+        if(planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
             Blending.additive.apply();
 
             Shaders.atmosphere.camera = cam;

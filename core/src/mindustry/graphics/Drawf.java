@@ -115,6 +115,14 @@ public class Drawf{
         Draw.reset();
     }
 
+    public static void select(float x, float y, float radius, Color color){
+        Lines.stroke(3f, Pal.gray);
+        Lines.square(x, y, radius + 1f);
+        Lines.stroke(1f, color);
+        Lines.square(x, y, radius);
+        Draw.reset();
+    }
+
     public static void square(float x, float y, float radius, Color color){
         Lines.stroke(3f, Pal.gray);
         Lines.square(x, y, radius + 1f, 45);

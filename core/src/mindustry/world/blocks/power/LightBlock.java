@@ -44,7 +44,7 @@ public class LightBlock extends Block{
         public void buildConfiguration(Table table){
             table.button(Icon.pencil, () -> {
                 ui.picker.show(Tmp.c1.set(color).a(0.5f), false, res -> configure(res.rgba()));
-                control.input.frag.config.hideConfig();
+                deselect();
             }).size(40f);
         }
 

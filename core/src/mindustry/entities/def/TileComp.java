@@ -156,6 +156,13 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         Call.onTileConfig(null, this, value);
     }
 
+    /** Deselect this tile from configuration. */
+    public void deselect(){
+        if(!headless && control.input.frag.config.getSelectedTile() == this){
+            control.input.frag.config.hideConfig();
+        }
+    }
+
     public void applyBoost(float intensity, float  duration){
         timeScale = Math.max(timeScale, intensity);
         timeScaleDuration = Math.max(timeScaleDuration, duration);
