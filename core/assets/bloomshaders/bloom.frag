@@ -13,8 +13,7 @@ uniform float OriginalIntensity;
 
 varying MED vec2 v_texCoords;
 
-void main()
-{
+void main(){
 	
 	vec3 original = texture2D(u_texture0, v_texCoords).rgb;
 	vec3 bloom = texture2D(u_texture1, v_texCoords).rgb * BloomIntensity; 	

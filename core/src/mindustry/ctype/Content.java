@@ -1,13 +1,13 @@
 package mindustry.ctype;
 
 import arc.files.*;
+import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.mod.Mods.*;
 
-
 /** Base class for a content type that is loaded in {@link mindustry.core.ContentLoader}. */
-public abstract class Content implements Comparable<Content>{
+public abstract class Content implements Comparable<Content>, Disposable{
     public final short id;
     /** Info on which mod this content was loaded from. */
     public @NonNull ModContentInfo minfo = new ModContentInfo();
@@ -38,6 +38,11 @@ public abstract class Content implements Comparable<Content>{
     /** @return whether an error ocurred during mod loading. */
     public boolean hasErrored(){
         return minfo.error != null;
+    }
+
+    @Override
+    public void dispose(){
+        //does nothing by default
     }
 
     @Override

@@ -9,8 +9,7 @@ precision lowp float;
 uniform sampler2D u_texture0;
 uniform vec2 threshold;
 varying MED vec2 v_texCoords;
-void main()
-{
+void main(){
 	vec4 color = texture2D(u_texture0, v_texCoords);
 	if(color.r + color.g + color.b > 0.5 * 3.0){
 		gl_FragColor = color;

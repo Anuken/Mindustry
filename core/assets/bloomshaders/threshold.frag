@@ -9,7 +9,7 @@ precision lowp float;
 uniform sampler2D u_texture0;
 uniform vec2 threshold;
 varying MED vec2 v_texCoords;
-void main()
-{	
+
+void main(){
  	gl_FragColor.rgb = (texture2D(u_texture0, v_texCoords).rgb - vec3(threshold.x))  * threshold.y;
 }

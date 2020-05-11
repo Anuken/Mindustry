@@ -25,10 +25,10 @@ public enum Category{
     public static final Category[] all = values();
 
     public Category prev(){
-        return all[(this.ordinal() - 1 + all.length) % all.length];
+        return all[(ordinal() - 1 + all.length) % all.length];
     }
 
     public Category next(){
-        return all[(this.ordinal() + 1) % all.length];
+        return all[(ordinal() + 1) % all.length];
     }
 }
