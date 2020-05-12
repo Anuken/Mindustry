@@ -1,6 +1,7 @@
 package mindustry.game;
 
 import arc.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.files.*;
 import arc.util.ArcAnnotate.*;
@@ -98,8 +99,10 @@ public class GlobalData{
         items.getAndIncrement(item, 0, amount);
         state.stats.itemsDelivered.getAndIncrement(item, 0, amount);
 
+        //clamp to capacity
+        items.put(item, Mathf.clamp(items.get(item), 0, getItemCapacity()));
+
         //clamp overflow
-        if(items.get(item, 0) < 0) items.put(item, Integer.MAX_VALUE);
         if(state.stats.itemsDelivered.get(item, 0) < 0) state.stats.itemsDelivered.put(item, Integer.MAX_VALUE);
     }
 
@@ -137,6 +140,11 @@ public class GlobalData{
 
     public ObjectIntMap<Item> items(){
         return items;
+    }
+
+    //TODO: make it upgradeable
+    public int getItemCapacity(){
+        return 10000;
     }
 
     /** Returns whether or not this piece of content is unlocked yet. */

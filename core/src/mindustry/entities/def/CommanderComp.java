@@ -2,7 +2,6 @@ package mindustry.entities.def;
 
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
-import arc.util.*;
 import mindustry.ai.formations.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
@@ -56,9 +55,6 @@ abstract class CommanderComp implements Unitc{
         for(Unitc u : units){
             members.add((FormationAI)u.controller());
         }
-
-        Log.info(members);
-        Log.info(members.size);
 
 
         //TODO doesn't handle units that don't fit a formation

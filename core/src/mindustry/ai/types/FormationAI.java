@@ -35,7 +35,7 @@ public class FormationAI extends AIController implements FormationMember{
             }
         }
 
-        unit.moveAt(vec.set(target).sub(unit).limit2(unit.type().speed));
+        unit.moveAt(vec.set(target).sub(unit).limit(unit.type().speed));
     }
 
     @Override
