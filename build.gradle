@@ -321,7 +321,7 @@ project(":annotations"){
 task deployAll{
     task cleanDeployOutput{
         doFirst{
-            if("${getBuildVersion()}" == "custom build" || "${getBuildVersion()}" == "") throw new IllegalArgumentException("----\n\nSET A BUILD NUMBER FIRST!\n\n----")
+            if(getBuildVersion() == "custom build" || getBuildVersion() == "") throw new IllegalArgumentException("----\n\nSET A BUILD NUMBER FIRST!\n\n----")
             if(!project.hasProperty("release")) throw new IllegalArgumentException("----\n\nSET THE RELEASE PROJECT PROPERTY FIRST!\n\n----")
 
             delete{
