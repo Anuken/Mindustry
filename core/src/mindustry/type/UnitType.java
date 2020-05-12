@@ -115,56 +115,76 @@ public class UnitType extends UnlockableContent{
     //region drawing
 
     public void draw(Unitc unit){
+        float opacity = Core.settings.getInt("unitopacity") / 100f;
+        if(Mathf.zero(opacity)) return;
+
         if(unit.controller().isBeingControlled(player.unit())){
+            Draw.alpha(opacity);
             drawControl(unit);
         }
 
         if(unit.isFlying()){
             Draw.z(Layer.darkness);
-            drawShadow(unit);
+            drawShadow(unit, opacity);
         }
 
         float z = Mathf.lerp(Layer.groundUnit, Layer.flyingUnit, unit.elevation());
 
         Draw.z(z - 0.02f);
         if(unit instanceof Legsc){
-            drawLegs((Legsc)unit);
+            drawLegs((Legsc)unit, opacity);
         }
 
         Draw.z(z - 0.01f);
-        drawOcclusion(unit);
+        drawOcclusion(unit, opacity);
 
         Draw.z(z);
-        drawEngine(unit);
-        drawBody(unit);
-        drawWeapons(unit);
-        if(drawCell) drawCell(unit);
+        drawEngine(unit, opacity);
+        drawBody(unit,opacity);
+        drawWeapons(unit, opacity);
+        if(drawCell) drawCell(unit, opacity);
         if(drawItems) drawItems(unit);
         drawLight(unit);
     }
 
-    public void drawControl(Unitc unit){
+    public void drawControl(Unitc unit, float opacity){
         Draw.z(Layer.groundUnit - 2);
 
         Draw.color(Pal.accent, Color.white, Mathf.absin(4f, 0.3f));
+        Draw.alpha(Draw.getColor().a * opacity);
         Lines.poly(unit.x(), unit.y(), 4, unit.hitSize() + 1.5f);
 
         Draw.reset();
     }
 
-    public void drawShadow(Unitc unit){
+    public void drawControl(Unitc unit){
+        drawControl(unit, 1f);
+    }
+
+    public void drawShadow(Unitc unit, float opacity){
         Draw.color(shadowColor);
+        Draw.alpha(Draw.getColor().a * opacity);
         Draw.rect(region, unit.x() + shadowTX * unit.elevation(), unit.y() + shadowTY * unit.elevation(), unit.rotation() - 90);
         Draw.color();
     }
 
-    public void drawOcclusion(Unitc unit){
+    public void drawShadow(Unitc unit){
+        drawShadow(unit, 1f);
+    }
+
+    public void drawOcclusion(Unitc unit, float opacity){
         Draw.color(0, 0, 0, 0.4f);
+        Draw.alpha(Draw.getColor().a * opacity);
         float rad = 1.6f;
         float size = Math.max(region.getWidth(), region.getHeight()) * Draw.scl;
         Draw.rect(occlusionRegion, unit, size * rad, size * rad);
         Draw.color();
     }
+
+    public void drawOcclusion(Unitc unit){
+        drawOcclusion(unit, 1f);
+    }
+
 
     public void drawItems(Unitc unit){
         applyColor(unit);
@@ -199,7 +219,7 @@ public class UnitType extends UnlockableContent{
         }
     }
 
-    public void drawEngine(Unitc unit){
+    public void drawEngine(Unitc unit, float opacity){
         if(!unit.isFlying()) return;
 
         if(unit instanceof Trailc){
@@ -212,12 +232,14 @@ public class UnitType extends UnlockableContent{
         }
 
         Draw.color(unit.team().color);
+        Draw.alpha(Draw.getColor().a * opacity);
         Fill.circle(
             unit.x() + Angles.trnsx(unit.rotation() + 180, engineOffset),
             unit.y() + Angles.trnsy(unit.rotation() + 180, engineOffset),
             (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * unit.elevation())
         );
         Draw.color(Color.white);
+        Draw.alpha(opacity);
         Fill.circle(
             unit.x() + Angles.trnsx(unit.rotation() + 180, engineOffset - 1f),
             unit.y() + Angles.trnsy(unit.rotation() + 180, engineOffset - 1f),
@@ -226,8 +248,13 @@ public class UnitType extends UnlockableContent{
         Draw.color();
     }
 
-    public void drawWeapons(Unitc unit){
+    public void drawEngine(Unitc unit){
+        drawEngine(unit, 1f);
+    }
+
+    public void drawWeapons(Unitc unit, float opacity){
         applyColor(unit);
+        Draw.alpha(Draw.getColor().a * opacity);
 
         for(WeaponMount mount : unit.mounts()){
             Weapon weapon = mount.weapon;
@@ -254,20 +281,34 @@ public class UnitType extends UnlockableContent{
         Draw.reset();
     }
 
-    public void drawBody(Unitc unit){
+    public void drawWeapons(Unitc unit){
+        drawWeapons(unit, 1f);
+    }
+
+    public void drawBody(Unitc unit, float opacity){
         applyColor(unit);
 
+        Draw.alpha(Draw.getColor().a * opacity);
         Draw.rect(region, unit, unit.rotation() - 90);
 
         Draw.reset();
     }
 
-    public void drawCell(Unitc unit){
+    public void drawBody(Unitc unit){
+        drawBody(unit, 1f);
+    }
+
+    public void drawCell(Unitc unit, float opacity){
         applyColor(unit);
 
         Draw.color(Color.black, unit.team().color, unit.healthf() + Mathf.absin(Time.time(), Math.max(unit.healthf() * 5f, 1f), 1f - unit.healthf()));
+        Draw.alpha(Draw.getColor().a * opacity);
         Draw.rect(cellRegion, unit, unit.rotation() - 90);
         Draw.reset();
+    }
+
+    public void drawCell(Unitc unit){
+        drawCell(unit, 1f);
     }
 
     public void drawLight(Unitc unit){
@@ -276,7 +317,7 @@ public class UnitType extends UnlockableContent{
         }
     }
 
-    public void drawLegs(Legsc unit){
+    public void drawLegs(Legsc unit, float opacity){
         Draw.reset();
 
         Draw.mixcol(Color.white, unit.hitTime());
@@ -289,6 +330,7 @@ public class UnitType extends UnlockableContent{
             Draw.color(Color.white, floor.mapColor, 0.5f);
         }
 
+        Draw.alpha(Draw.getColor().a * opacity);
         for(int i : Mathf.signs){
             Draw.rect(legRegion,
             unit.x() + Angles.trnsx(unit.baseRotation(), ft * i),
@@ -302,9 +344,14 @@ public class UnitType extends UnlockableContent{
             Draw.color(Color.white);
         }
 
+        Draw.alpha(Draw.getColor().a * opacity);
         Draw.rect(baseRegion, unit, unit.baseRotation() - 90);
 
         Draw.mixcol();
+    }
+
+    public void drawLegs(Legsc unit){
+        drawLegs(unit, 1f);
     }
 
     public void applyColor(Unitc unit){

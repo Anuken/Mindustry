@@ -525,6 +525,16 @@ public class DesktopInput extends InputHandler{
                 Core.settings.put("lasersopacity", 0);
             }
         }
+
+        if(Core.input.keyTap(Binding.toggle_draw_unit)){
+            if(Core.settings.getInt("unitopacity") == 0){
+                Core.settings.put("unitopacity", Core.settings.getInt("preferredunitopacity", 100));
+            }else{
+                Core.settings.put("preferredunitopacity", Core.settings.getInt("unitopacity"));
+                Core.settings.put("unitopacity", 0);
+            }
+        }
+
     }
 
     @Override

@@ -50,6 +50,7 @@ public enum Binding implements KeyBind{
     screenshot(KeyCode.p),
     toggle_power_lines(KeyCode.f5),
     toggle_block_status(KeyCode.f6),
+    toggle_draw_unit(KeyCode.f7),
     player_list(KeyCode.tab, "multiplayer"),
     chat(KeyCode.enter),
     chat_history_prev(KeyCode.up),

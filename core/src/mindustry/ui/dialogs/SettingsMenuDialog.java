@@ -281,6 +281,12 @@ public class SettingsMenuDialog extends SettingsDialog{
             return s + "%";
         });
         graphics.sliderPref("bridgeopacity", 75, 0, 100, 5, s -> s + "%");
+        graphics.sliderPref("unitopacity", 75, 0, 100, 5, s -> {
+            if(ui.settings != null){
+                Core.settings.put("preferredunitopacity", s);
+            }
+            return s + "%";
+        });
 
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
