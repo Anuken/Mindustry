@@ -135,8 +135,6 @@ public class PowerNode extends PowerBlock{
         float opacity = Core.settings.getInt("lasersopacity") / 100f;
         if(Mathf.zero(opacity)) return;
 
-        float opacity = opacityPercentage / 100f;
-
         float angle1 = Angles.angle(x1, y1, x2, y2);
         t1.trns(angle1, size1 * tilesize / 2f - 1.5f);
         t2.trns(angle1 + 180f, size2 * tilesize / 2f - 1.5f);
