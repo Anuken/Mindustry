@@ -132,8 +132,8 @@ public class PowerNode extends PowerBlock{
     }
 
     protected void drawLaser(float x1, float y1, float x2, float y2, float satisfaction, int size1, int size2){
-        int opacityPercentage = Core.settings.getInt("lasersopacity");
-        if(opacityPercentage == 0) return;
+        float opacity = Core.settings.getInt("lasersopacity") / 100f;
+        if(Mathf.zero(opacity)) return;
 
         float opacity = opacityPercentage / 100f;
 
