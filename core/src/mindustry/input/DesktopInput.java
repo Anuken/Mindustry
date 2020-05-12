@@ -153,8 +153,8 @@ public class DesktopInput extends InputHandler{
                 if(block.saveConfig && block.lastConfig != null){
                     brequest.set(cursorX, cursorY, rotation, block);
                     brequest.config = block.lastConfig;
-
                     block.drawRequestConfig(brequest, allRequests());
+                    brequest.config = null;
                 }
 
             }

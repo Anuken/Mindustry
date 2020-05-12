@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
@@ -23,6 +24,8 @@ public class SolidPump extends Pump{
     public float rotateSpeed = 1f;
     /** Attribute that is checked when calculating output. */
     public @Nullable Attribute attribute;
+
+    public @Load("@-rotator") TextureRegion rotatorRegion;
 
     public SolidPump(String name){
         super(name);
@@ -94,8 +97,8 @@ public class SolidPump extends Pump{
             Draw.alpha(liquids.total() / liquidCapacity);
             Draw.rect(liquidRegion, x, y);
             Draw.color();
-            Draw.rect(name + "-rotator", x, y, pumpTime * rotateSpeed);
-            Draw.rect(name + "-top", x, y);
+            Draw.rect(rotatorRegion, x, y, pumpTime * rotateSpeed);
+            Draw.rect(topRegion, x, y);
         }
 
         @Override

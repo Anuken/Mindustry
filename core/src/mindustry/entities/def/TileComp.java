@@ -184,39 +184,8 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         return relativeTo(tile.x, tile.y);
     }
 
-    /** Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile. */
     public byte relativeTo(int cx, int cy){
-        int x = tile.x, y = tile.y;
-        if(x == cx && y == cy - 1) return 1;
-        if(x == cx && y == cy + 1) return 3;
-        if(x == cx - 1 && y == cy) return 0;
-        if(x == cx + 1 && y == cy) return 2;
-        return -1;
-    }
-
-    public byte absoluteRelativeTo(int cx, int cy){
-        int x = tile.x, y = tile.y;
-
-        //very straightforward for odd sizes
-        if(block.size % 2 == 1){
-            if(Math.abs(x - cx) > Math.abs(y - cy)){
-                if(x <= cx - 1) return 0;
-                if(x >= cx + 1) return 2;
-            }else{
-                if(y <= cy - 1) return 1;
-                if(y >= cy + 1) return 3;
-            }
-        }else{ //need offsets here
-            if(Math.abs(x - cx + 0.5f) > Math.abs(y - cy + 0.5f)){
-                if(x+0.5f <= cx - 1) return 0;
-                if(x+0.5f >= cx + 1) return 2;
-            }else{
-                if(y+0.5f <= cy - 1) return 1;
-                if(y+0.5f >= cy + 1) return 3;
-            }
-        }
-
-        return -1;
+        return tile.absoluteRelativeTo(cx, cy);
     }
 
     public @Nullable Tilec front(){

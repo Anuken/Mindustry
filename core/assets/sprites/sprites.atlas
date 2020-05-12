@@ -34,14 +34,14 @@ mend-projector-top
   index: -1
 mender
   rotate: false
-  xy: 1071, 467
+  xy: 969, 331
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 mender-top
   rotate: false
-  xy: 969, 331
+  xy: 1003, 365
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -384,42 +384,42 @@ conveyor-4-3
   index: -1
 plastanium-conveyor
   rotate: false
-  xy: 1003, 297
+  xy: 1037, 331
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 plastanium-conveyor-0
   rotate: false
-  xy: 1037, 331
+  xy: 1071, 365
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 plastanium-conveyor-1
   rotate: false
-  xy: 1071, 365
+  xy: 1105, 399
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 plastanium-conveyor-2
   rotate: false
-  xy: 1105, 399
+  xy: 1139, 433
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 plastanium-conveyor-edge
   rotate: false
-  xy: 1139, 433
+  xy: 1173, 467
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 plastanium-conveyor-stack
   rotate: false
-  xy: 1173, 467
+  xy: 969, 229
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -615,35 +615,35 @@ mass-driver-base
   index: -1
 overflow-gate
   rotate: false
-  xy: 1037, 399
+  xy: 1071, 433
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 phase-conveyor
   rotate: false
-  xy: 1037, 365
+  xy: 1071, 399
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 phase-conveyor-arrow
   rotate: false
-  xy: 1071, 399
+  xy: 1105, 433
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 phase-conveyor-bridge
   rotate: false
-  xy: 1105, 433
+  xy: 1139, 467
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 phase-conveyor-end
   rotate: false
-  xy: 1139, 467
+  xy: 969, 263
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -867,7 +867,7 @@ conduit-liquid
   index: -1
 message
   rotate: false
-  xy: 1003, 365
+  xy: 1037, 399
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -1096,135 +1096,149 @@ mechanical-pump
   orig: 32, 32
   offset: 0, 0
   index: -1
-phase-conduit
+mechanical-pump-liquid
   rotate: false
-  xy: 1071, 433
+  xy: 1037, 433
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-phase-conduit-arrow
+rotary-pump-liquid
+  rotate: false
+  xy: 1037, 433
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+thermal-pump-liquid
+  rotate: false
+  xy: 1037, 433
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+phase-conduit
   rotate: false
   xy: 1105, 467
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-phase-conduit-bridge
+phase-conduit-arrow
   rotate: false
   xy: 969, 297
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-phase-conduit-end
+phase-conduit-bridge
   rotate: false
   xy: 1003, 331
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-plated-conduit-cap
+phase-conduit-end
   rotate: false
-  xy: 1003, 263
+  xy: 1037, 365
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-plated-conduit-top-0
+plated-conduit-cap
   rotate: false
   xy: 1037, 297
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-plated-conduit-top-1
+plated-conduit-top-0
   rotate: false
   xy: 1071, 331
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-plated-conduit-top-2
+plated-conduit-top-1
   rotate: false
   xy: 1105, 365
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-plated-conduit-top-3
+plated-conduit-top-2
   rotate: false
   xy: 1139, 399
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-plated-conduit-top-4
+plated-conduit-top-3
   rotate: false
   xy: 1173, 433
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-plated-conduit-top-5
+plated-conduit-top-4
   rotate: false
   xy: 1207, 467
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-plated-conduit-top-6
+plated-conduit-top-5
   rotate: false
   xy: 969, 195
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-pulse-conduit-top-0
+plated-conduit-top-6
   rotate: false
-  xy: 1105, 331
+  xy: 1003, 229
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-pulse-conduit-top-1
+pulse-conduit-top-0
   rotate: false
   xy: 1139, 365
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-pulse-conduit-top-2
+pulse-conduit-top-1
   rotate: false
   xy: 1173, 399
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-pulse-conduit-top-4
+pulse-conduit-top-2
   rotate: false
   xy: 1207, 433
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-pulse-conduit-top-5
+pulse-conduit-top-4
   rotate: false
   xy: 1241, 467
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-pulse-conduit-top-6
+pulse-conduit-top-5
   rotate: false
   xy: 1003, 195
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-pump-liquid
+pulse-conduit-top-6
   rotate: false
-  xy: 1105, 297
+  xy: 1037, 229
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -1441,7 +1455,7 @@ impact-reactor-plasma-3
   index: -1
 power-node
   rotate: false
-  xy: 1003, 229
+  xy: 1037, 263
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -1455,14 +1469,14 @@ power-node-large
   index: -1
 power-source
   rotate: false
-  xy: 1037, 263
+  xy: 1071, 297
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 power-void
   rotate: false
-  xy: 1071, 297
+  xy: 1105, 331
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -1693,7 +1707,7 @@ liquid-void
   index: -1
 melter
   rotate: false
-  xy: 1037, 433
+  xy: 1071, 467
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -1742,14 +1756,14 @@ plastanium-compressor-top
   index: -1
 pulverizer
   rotate: false
-  xy: 1037, 229
+  xy: 1071, 263
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 pulverizer-rotator
   rotate: false
-  xy: 1071, 263
+  xy: 1105, 297
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -2330,7 +2344,7 @@ door-open
   index: -1
 phase-wall
   rotate: false
-  xy: 969, 263
+  xy: 1003, 297
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -2344,7 +2358,7 @@ phase-wall-large
   index: -1
 plastanium-wall
   rotate: false
-  xy: 969, 229
+  xy: 1003, 263
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

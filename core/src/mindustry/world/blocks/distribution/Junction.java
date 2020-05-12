@@ -63,13 +63,13 @@ public class Junction extends Block{
 
         @Override
         public void handleItem(Tilec source, Item item){
-            int relative = source.relativeTo(tile.x, tile.y);
+            int relative = source.relativeTo(tile);
             buffer.accept(relative, item);
         }
 
         @Override
         public boolean acceptItem(Tilec source, Item item){
-            int relative = source.relativeTo(tile.x, tile.y);
+            int relative = source.relativeTo(tile);
 
             if(relative == -1 || !buffer.accepts(relative)) return false;
             Tilec to = nearby(relative);
