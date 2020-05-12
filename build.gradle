@@ -166,17 +166,17 @@ project(":desktop"){
     compileJava.options.compilerArgs += ["-XDignore.symbol.file"]
 
     dependencies{
-        compile project(":core")
-        compile arcModule("natives:natives-box2d-desktop")
-        compile arcModule("natives:natives-desktop")
-        compile arcModule("natives:natives-freetype-desktop")
+        implementation project(":core")
+        implementation arcModule("natives:natives-box2d-desktop")
+        implementation arcModule("natives:natives-desktop")
+        implementation arcModule("natives:natives-freetype-desktop")
 
-        if(debugged()) compile project(":debug")
+        if(debugged()) implementation project(":debug")
 
-        compile "com.github.Anuken:steamworks4j:$steamworksVersion"
+        implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
-        compile arcModule("backends:backend-sdl")
-        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
+        implementation arcModule("backends:backend-sdl")
+        implementation 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
     }
 }
 
@@ -202,19 +202,19 @@ project(":ios"){
     }
 
     dependencies{
-        compile project(":core")
+        implementation project(":core")
 
-        compile arcModule("natives:natives-ios")
-        compile arcModule("natives:natives-freetype-ios")
-        compile arcModule("natives:natives-box2d-ios")
-        compile arcModule("backends:backend-robovm")
+        implementation arcModule("natives:natives-ios")
+        implementation arcModule("natives:natives-freetype-ios")
+        implementation arcModule("natives:natives-box2d-ios")
+        implementation arcModule("backends:backend-robovm")
 
         compileOnly project(":annotations")
     }
 }
 
 project(":core"){
-    apply plugin: "java"
+    apply plugin: "java-library"
 
     task preGen{
         outputs.upToDateWhen{ false }
@@ -247,15 +247,15 @@ project(":core"){
     dependencies{
         compileJava.dependsOn(preGen)
 
-        compile "org.lz4:lz4-java:1.4.1"
-        compile arcModule("arc-core")
-        compile arcModule("extensions:freetype")
-        compile arcModule("extensions:box2d")
-        compile arcModule("extensions:g3d")
-        compile arcModule("extensions:fx")
-        compile arcModule("extensions:arcnet")
-        compile "org.mozilla:rhino-runtime:1.7.12"
-        if(localArc() && debugged()) compile arcModule("extensions:recorder")
+        api "org.lz4:lz4-java:1.4.1"
+        api arcModule("arc-core")
+        api arcModule("extensions:freetype")
+        api arcModule("extensions:box2d")
+        api arcModule("extensions:g3d")
+        api arcModule("extensions:fx")
+        api arcModule("extensions:arcnet")
+        api "org.mozilla:rhino-runtime:1.7.12"
+        if(localArc() && debugged()) api arcModule("extensions:recorder")
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")
@@ -266,9 +266,9 @@ project(":server"){
     apply plugin: "java"
 
     dependencies{
-        compile project(":core")
-        compile arcModule("natives:natives-box2d-desktop")
-        compile arcModule("backends:backend-headless")
+        implementation project(":core")
+        implementation arcModule("natives:natives-box2d-desktop")
+        implementation arcModule("backends:backend-headless")
     }
 }
 
@@ -279,9 +279,9 @@ project(":tests"){
         testImplementation project(":core")
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.3.1"
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.1"
+        testImplementation arcModule("backends:backend-headless")
+        testImplementation arcModule("natives:natives-box2d-desktop")
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.3.1"
-        compile arcModule("backends:backend-headless")
-        compile arcModule("natives:natives-box2d-desktop")
     }
 
     test{
@@ -297,24 +297,24 @@ project(":tools"){
     apply plugin: "java"
 
     dependencies{
-        compile project(":core")
+        implementation project(":core")
 
-        compile arcModule("natives:natives-desktop")
-        compile arcModule("natives:natives-freetype-desktop")
-        compile arcModule("natives:natives-box2d-desktop")
-        compile arcModule("backends:backend-headless")
+        implementation arcModule("natives:natives-desktop")
+        implementation arcModule("natives:natives-freetype-desktop")
+        implementation arcModule("natives:natives-box2d-desktop")
+        implementation arcModule("backends:backend-headless")
 
-        compile "org.reflections:reflections:0.9.12"
+        implementation "org.reflections:reflections:0.9.12"
     }
 }
 
 project(":annotations"){
-    apply plugin: "java"
+    apply plugin: "java-library"
 
     dependencies{
-        compile 'com.squareup:javapoet:1.12.1'
-        compile "com.github.Anuken.Arc:arc-core:$arcHash"
-        compile files("${System.getProperty('java.home')}/../lib/tools.jar")
+        implementation 'com.squareup:javapoet:1.12.1'
+        implementation "com.github.Anuken.Arc:arc-core:$arcHash"
+        implementation files("${System.getProperty('java.home')}/../lib/tools.jar")
     }
 }
 
