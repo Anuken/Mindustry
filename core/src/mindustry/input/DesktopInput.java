@@ -526,7 +526,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if(Core.input.keyTap(Binding.toggle_draw_unit)){
+        if(Core.input.keyTap(Binding.toggle_unit_visibility)){
             if(Core.settings.getInt("unitopacity") == 0){
                 Core.settings.put("unitopacity", Core.settings.getInt("preferredunitopacity", 100));
             }else{
