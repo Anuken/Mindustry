@@ -15,6 +15,15 @@ public class Units{
     private static float cdist;
     private static boolean boolResult;
 
+    /** @return whether a new instance of a unit of this team can be created. */
+    public static boolean canCreate(Team team){
+        return teamIndex.count(team) < getCap(team);
+    }
+
+    public static int getCap(Team team){
+        return state.rules.unitCap + indexer.getExtraUnits(team);
+    }
+
     /** @return whether this player can interact with a specific tile. if either of these are null, returns true.*/
     public static boolean canInteract(Playerc player, Tilec tile){
         return player == null || tile == null || tile.interactable(player.team());

@@ -11,6 +11,7 @@ import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.scene.ui.layout.Stack;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
@@ -21,6 +22,8 @@ import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -93,6 +96,9 @@ public class BlockInventoryFragment extends Fragment{
 
     private void rebuild(boolean actions){
         IntSet container = new IntSet();
+
+        Arrays.fill(shrinkHoldTimes, 0);
+        holdTime = emptyTime = 0f;
 
         table.clearChildren();
         table.clearActions();

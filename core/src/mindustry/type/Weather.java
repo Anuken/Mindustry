@@ -16,8 +16,8 @@ public abstract class Weather extends MappableContent{
     public float duration = 15f * Time.toMinutes;
 
     //internals
-    protected Rand rand = new Rand();
-    protected Prov<Weatherc> type = WeatherEntity::create;
+    public Rand rand = new Rand();
+    public Prov<Weatherc> type = WeatherEntity::create;
 
     public Weather(String name, Prov<Weatherc> type){
         super(name);
@@ -58,7 +58,11 @@ public abstract class Weather extends MappableContent{
 
     }
 
-    public void draw(Weatherc state){
+    public void drawOver(Weatherc state){
+
+    }
+
+    public void drawUnder(Weatherc state){
 
     }
 
@@ -105,7 +109,7 @@ public abstract class Weather extends MappableContent{
 
     @EntityDef(value = {Weatherc.class}, pooled = true, isFinal = false)
     @Component
-    abstract class WeatherComp implements Drawc{
+    abstract static class WeatherComp implements Drawc{
         private static final float fadeTime = 60 * 4;
 
         Weather weather;
@@ -132,8 +136,16 @@ public abstract class Weather extends MappableContent{
         public void draw(){
             if(renderer.weatherAlpha() > 0.0001f){
                 Draw.draw(Layer.weather, () -> {
+                    weather.rand.setSeed(0);
                     Draw.alpha(renderer.weatherAlpha() * opacity);
-                    weather.draw((Weatherc)this);
+                    weather.drawOver((Weatherc)this);
+                    Draw.reset();
+                });
+
+                Draw.draw(Layer.debris, () -> {
+                    weather.rand.setSeed(0);
+                    Draw.alpha(renderer.weatherAlpha() * opacity);
+                    weather.drawUnder((Weatherc)this);
                     Draw.reset();
                 });
             }

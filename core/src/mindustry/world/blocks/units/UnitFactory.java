@@ -220,7 +220,7 @@ public class UnitFactory extends Block{
             if(currentPlan != -1){
                 UnitPlan plan = plans[currentPlan];
 
-                if(progress >= plan.time/* && !Units.anyEntities(tile, !plan.unit.flying)*/){
+                if(progress >= plan.time/* && !Units.anyEntities(tile, !plan.unit.flying)*/ && Units.canCreate(team)){
                     progress = 0f;
 
                     Call.onUnitFactorySpawn(tile);

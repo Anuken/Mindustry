@@ -58,6 +58,8 @@ public class Rules{
     public float bossWaveMultiplier = 3f;
     /** How many times longer a launch wave takes. */
     public float launchWaveMultiplier = 2f;
+    /** Base unit cap. Can still be increased by blocks. */
+    public int unitCap = 10;
     /** Sector for saves that have them.*/
     public @Nullable Sector sector;
     /** Region that save is on. Indicates campaign. TODO not implemented. */

@@ -11,6 +11,7 @@ import mindustry.gen.*;
 public class TeamIndexProcess implements AsyncProcess{
     private QuadTree<Unitc>[] trees = new QuadTree[Team.all().length];
     private Array<Team> active = new Array<>();
+    private int[] counts = new int[Team.all().length];
 
     public QuadTree<Unitc> tree(Team team){
         if(trees[team.uid] == null) trees[team.uid] = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
@@ -18,9 +19,18 @@ public class TeamIndexProcess implements AsyncProcess{
         return trees[team.uid];
     }
 
+    public int count(Team team){
+        return counts[team.id];
+    }
+
+    public void updateCount(Team team, int amount){
+        counts[team.id] += amount;
+    }
+
     @Override
     public void reset(){
         active.clear();
+        counts = new int[Team.all().length];
         trees = new QuadTree[Team.all().length];
     }
 
@@ -38,8 +48,13 @@ public class TeamIndexProcess implements AsyncProcess{
             }
         }
 
+        for(Team team : active){
+            counts[team.id] = 0;
+        }
+
         for(Unitc unit : Groups.unit){
             tree(unit.team()).insert(unit);
+            counts[unit.team().id] ++;
         }
     }
 

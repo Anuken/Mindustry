@@ -37,7 +37,7 @@ public class LiquidJunction extends LiquidBlock{
 
         @Override
         public Tilec getLiquidDestination(Tilec source, Liquid liquid){
-            int dir = source.absoluteRelativeTo(tile.x, tile.y);
+            int dir = source.relativeTo(tile.x, tile.y);
             dir = (dir + 4) % 4;
             Tilec next = nearby(dir);
             if(next == null || (!next.acceptLiquid(this, liquid, 0f) && !(next.block() instanceof LiquidJunction))){

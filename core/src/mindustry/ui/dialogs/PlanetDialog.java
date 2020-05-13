@@ -80,7 +80,7 @@ public class PlanetDialog extends FloatingDialog{
         float bmargin = 6f;
 
         //TODO names
-        buttons.button("$back", Icon.left, style, this::hide).margin(bmargin);
+        //buttons.button("$back", Icon.left, style, this::hide).margin(bmargin);
         //buttons.addImageTextButton("Tech", Icon.tree, style, () -> ui.tech.show()).margin(bmargin);
         //buttons.addImageTextButton("Launch", Icon.upOpen, style, this::hide).margin(bmargin);
         //buttons.addImageTextButton("Database", Icon.book, style, () -> ui.database.show()).margin(bmargin);
