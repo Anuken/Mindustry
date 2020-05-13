@@ -335,6 +335,7 @@ public class BlockIndexer{
 
             typeMap.put(tile.pos(), new TileIndex(tile.block().flags, tile.team()));
         }
+
         if(!activeTeams.contains(tile.team())){
             activeTeams.add(tile.team());
         }

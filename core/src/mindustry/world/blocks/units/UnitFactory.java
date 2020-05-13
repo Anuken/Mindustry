@@ -38,7 +38,8 @@ public class UnitFactory extends Block{
         hasPower = true;
         hasItems = true;
         solid = false;
-        flags = EnumSet.of(BlockFlag.producer);
+        flags = EnumSet.of(BlockFlag.producer, BlockFlag.unitModifier);
+        unitCapModifier = 4;
         configurable = true;
 
         config(Integer.class, (tile, i) -> {

@@ -142,31 +142,43 @@ public class Logic implements ApplicationListener{
     }
 
     private void checkGameOver(){
-        if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
-            state.gameOver = true;
-            Events.fire(new GameOverEvent(state.rules.waveTeam));
-        }else if(state.rules.attackMode){
-            Team alive = null;
-
-            for(TeamData team : state.teams.getActive()){
-                if(team.hasCore()){
-                    if(alive != null){
-                        return;
-                    }
-                    alive = team.team;
-                }
+        //campaign maps do not have a 'win' state!
+        if(state.isCampaign()){
+            //gameover only when cores are dead
+            if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
+                state.gameOver = true;
+                Events.fire(new GameOverEvent(state.rules.waveTeam));
             }
 
-            if(alive != null && !state.gameOver){
-                if(state.isCampaign() && alive == state.rules.defaultTeam){
-                    //in attack maps, a victorious game over is equivalent to a launch
-                    Call.launchZone();
-                }else{
-                    Events.fire(new GameOverEvent(alive));
-                }
+            //check if there are no enemy spawns
+            if(state.rules.waves && spawner.countSpawns() + state.teams.cores(state.rules.waveTeam).size <= 0){
+                //if yes, waves get disabled
+                state.rules.waves = false;
+            }
+        }else{
+            if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
                 state.gameOver = true;
+                Events.fire(new GameOverEvent(state.rules.waveTeam));
+            }else if(state.rules.attackMode){
+                Team alive = null;
+
+                for(TeamData team : state.teams.getActive()){
+                    if(team.hasCore()){
+                        if(alive != null){
+                            return;
+                        }
+                        alive = team.team;
+                    }
+                }
+
+                if(alive != null && !state.gameOver){
+                    Events.fire(new GameOverEvent(alive));
+                    state.gameOver = true;
+                }
             }
         }
+
+
     }
 
     private void updateWeather(){
