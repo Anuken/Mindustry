@@ -174,7 +174,7 @@ public class DesktopInput extends InputHandler{
         if((player.dead() || state.isPaused()) && !ui.chatfrag.shown()){
             if(!(scene.getKeyboardFocus() instanceof TextField)){
                 //move camera around
-                float camSpeed = !Core.input.keyDown(Binding.dash) ? 3f : 8f;
+                float camSpeed = !Core.input.keyDown(Binding.boost) ? 3f : 8f;
                 Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta() * camSpeed));
 
                 if(Core.input.keyDown(Binding.mouse_move)){

@@ -1,19 +1,19 @@
 package mindustry.graphics;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 
 import static mindustry.Vars.state;
 
 /** Renders overlay lights. Client only. */
 public class LightRenderer{
-    public static boolean enable = true;
     private static final int scaling = 4;
 
     private float[] vertices = new float[24];
@@ -175,7 +175,7 @@ public class LightRenderer{
     }
 
     public void draw(){
-        if(!enable){
+        if(!Vars.enableLight){
             lights.clear();
             return;
         }

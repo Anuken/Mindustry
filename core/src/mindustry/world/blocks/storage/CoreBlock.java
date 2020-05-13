@@ -30,7 +30,7 @@ public class CoreBlock extends StorageBlock{
         update = true;
         hasItems = true;
         flags = EnumSet.of(BlockFlag.core, BlockFlag.producer, BlockFlag.unitModifier);
-        unitCapModifier = 30;
+        unitCapModifier = 10;
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
     }
