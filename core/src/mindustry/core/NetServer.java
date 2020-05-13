@@ -293,7 +293,10 @@ public class NetServer implements ApplicationListener{
         });
 
         clientCommands.<Playerc>register("t", "<message...>", "Send a message only to your teammates.", (args, player) -> {
-            Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(args[0], player, "[#" + player.team().color.toString() + "]<T>" + NetClient.colorizeName(player.id(), player.name())));
+            String message = admins.filterMessage(player, args[0]);
+            if(message != null){
+                Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(message, player, "[#" + player.team().color.toString() + "]<T>" + NetClient.colorizeName(player.id(), player.name())));
+            }
         });
 
         //duration of a a kick in seconds
