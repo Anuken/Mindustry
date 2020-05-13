@@ -317,7 +317,7 @@ public class BlockIndexer{
     }
 
     private void process(Tile tile){
-        if(tile.block().flags.size() > 0 && tile.team() != Team.derelict){
+        if(tile.block().flags.size() > 0 && tile.team() != Team.derelict && tile.isCenter()){
             TileArray[] map = getFlagged(tile.team());
 
             for(BlockFlag flag : tile.block().flags){
