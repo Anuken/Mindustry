@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 
 import static mindustry.Vars.state;
 
-public class AsyncLogic{
+public class AsyncCore{
     //all processes to be executed each frame
     private final Array<AsyncProcess> processes = Array.with(
         new PhysicsProcess(),
@@ -26,7 +26,7 @@ public class AsyncLogic{
         return thread;
     });
 
-    public AsyncLogic(){
+    public AsyncCore(){
         Events.on(WorldLoadEvent.class, e -> {
             complete();
             for(AsyncProcess p : processes){

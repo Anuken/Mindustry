@@ -172,7 +172,7 @@ public class Vars implements Loadable{
     public static Mods mods;
     public static Schematics schematics;
     public static BeControl becontrol;
-    public static AsyncLogic asyncLogic;
+    public static AsyncCore asyncCore;
     public static TeamIndexProcess teamIndex;
 
     public static Universe universe;
@@ -241,7 +241,7 @@ public class Vars implements Loadable{
         world = new World();
         universe = new Universe();
         becontrol = new BeControl();
-        asyncLogic = new AsyncLogic();
+        asyncCore = new AsyncCore();
 
         maps = new Maps();
         spawner = new WaveSpawner();
