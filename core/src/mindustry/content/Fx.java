@@ -1189,6 +1189,23 @@ public class Fx{
         Lines.poly(e.x, e.y, 6, e.rotation + e.fin(), 90);
     }),
 
+    unitShieldBreak = new Effect(35, e -> {
+        if(!(e.data instanceof Unitc)) return;
+
+        Unitc unit = e.data();
+
+        float radius = unit.hitSize() * 1.3f;
+        color(Pal.shield, e.fout());
+
+        randLenVectors(e.id, (int)(radius * 0.7f), radius, radius * e.finpow(), (x, y) -> {
+            Fill.poly(e.x + x, e.y + y, 3, e.fout() * 3f, Angles.angle(x, y));
+        });
+
+
+        stroke(1f * e.fout());
+        Lines.circle(e.x, e.y, radius);
+    }),
+
     coreLand = new Effect(120f, e -> {
     });
 }

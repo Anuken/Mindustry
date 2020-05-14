@@ -20,7 +20,6 @@ import static mindustry.Vars.*;
 public class GlobalData{
     private ObjectMap<ContentType, ObjectSet<String>> unlocked = new ObjectMap<>();
     private ObjectIntMap<Item> items = new ObjectIntMap<>();
-    private Array<Satellite> satellites = new Array<>();
     private boolean modified;
 
     public GlobalData(){

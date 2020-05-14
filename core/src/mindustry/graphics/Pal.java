@@ -8,6 +8,9 @@ public class Pal{
     items = Color.valueOf("2ea756"),
     command = Color.valueOf("eab678"),
 
+    shield = Color.valueOf("7e8ffc").mul(1.3f).a(0.7f),
+    shieldIn = Color.black.cpy().a(0f),
+
     bulletYellow = Color.valueOf("fff8e8"),
     bulletYellowBack = Color.valueOf("f9c27a"),
 

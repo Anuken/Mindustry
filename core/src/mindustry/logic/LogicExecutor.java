@@ -1,4 +1,4 @@
-package mindustry.world.blocks.experimental;
+package mindustry.logic;
 
 import mindustry.gen.*;
 

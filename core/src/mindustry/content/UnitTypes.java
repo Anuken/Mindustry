@@ -167,7 +167,7 @@ public class UnitTypes implements ContentList{
             health = 400;
             buildSpeed = 0.4f;
             engineOffset = 6.5f;
-            hitsize = 7f;
+            hitsize = 8f;
         }};
         
         /*

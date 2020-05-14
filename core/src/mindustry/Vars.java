@@ -80,8 +80,8 @@ public class Vars implements Loadable{
     public static final float miningRange = 70f;
     /** range for building */
     public static final float buildingRange = 220f;
-    /** ticks spent out of bound until self destruct. */
-    public static final float boundsCountdown = 60 * 7;
+    /** duration of one turn. */
+    public static final float turnDuration = 5 * Time.toMinutes;
     /** for map generator dialog */
     public static boolean updateEditorOnChange = false;
     /** size of tiles in units */

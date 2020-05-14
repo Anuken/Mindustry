@@ -141,6 +141,16 @@ public class UnitType extends UnlockableContent{
         if(drawCell) drawCell(unit);
         if(drawItems) drawItems(unit);
         drawLight(unit);
+
+        if(unit.shieldAlpha() > 0){
+            drawShield(unit);
+        }
+    }
+
+    public void drawShield(Unitc unit){
+        float alpha = unit.shieldAlpha();
+        float radius = unit.hitSize() * 1.3f;
+        Fill.light(unit.x(), unit.y(), Lines.circleVertices(radius), radius, Tmp.c1.set(Pal.shieldIn), Tmp.c2.set(Pal.shield).lerp(Color.white, Mathf.clamp(unit.hitTime())).a(Pal.shield.a * alpha));
     }
 
     public void drawControl(Unitc unit){
