@@ -41,7 +41,7 @@ public class GameState{
 
     /** Note that being in a campaign does not necessarily mean having a sector. */
     public boolean isCampaign(){
-        return rules.sector != null || rules.region != null;
+        return rules.sector != null;
     }
 
     public boolean hasSector(){

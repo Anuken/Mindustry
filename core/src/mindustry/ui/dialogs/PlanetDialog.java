@@ -273,7 +273,11 @@ public class PlanetDialog extends FloatingDialog{
             }
 
             if(sec.hostility >= 0.02f){
-                drawSelection(sec, Color.scarlet, 0.11f * sec.hostility);
+                drawSelection(sec, Color.scarlet, 0.11f * sec.hostility, 0.0001f);
+            }
+
+            if(sec.save != null){
+                drawSelection(sec, Color.lime, 0.03f, 0.0009f);
             }
         }
 
@@ -402,11 +406,11 @@ public class PlanetDialog extends FloatingDialog{
     }
 
     private void drawSelection(Sector sector){
-        drawSelection(sector, Pal.accent, 0.04f);
+        drawSelection(sector, Pal.accent, 0.04f, 0.001f);
     }
 
-    private void drawSelection(Sector sector, Color color, float length){
-        float arad = outlineRad + 0.0001f;
+    private void drawSelection(Sector sector, Color color, float stroke, float length){
+        float arad = outlineRad + length;
 
         for(int i = 0; i < sector.tile.corners.length; i++){
             Corner next = sector.tile.corners[(i + 1) % sector.tile.corners.length];
@@ -416,8 +420,8 @@ public class PlanetDialog extends FloatingDialog{
             curr.v.scl(arad);
             sector.tile.v.scl(arad);
 
-            Tmp.v31.set(curr.v).sub(sector.tile.v).setLength(curr.v.dst(sector.tile.v) - length).add(sector.tile.v);
-            Tmp.v32.set(next.v).sub(sector.tile.v).setLength(next.v.dst(sector.tile.v) - length).add(sector.tile.v);
+            Tmp.v31.set(curr.v).sub(sector.tile.v).setLength(curr.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
+            Tmp.v32.set(next.v).sub(sector.tile.v).setLength(next.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
 
             batch.tri(curr.v, next.v, Tmp.v31, color);
             batch.tri(Tmp.v31, next.v, Tmp.v32, color);

@@ -12,6 +12,7 @@ import arc.util.Log.*;
 import arc.util.io.*;
 import mindustry.ai.*;
 import mindustry.async.*;
+import mindustry.audio.LoopControl;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.game.*;
@@ -167,7 +168,7 @@ public class Vars implements Loadable{
     public static GlobalData data;
     public static EntityCollisions collisions;
     public static DefaultWaves defaultWaves;
-    public static LoopControl loops;
+    public static mindustry.audio.LoopControl loops;
     public static Platform platform = new Platform(){};
     public static Mods mods;
     public static Schematics schematics;

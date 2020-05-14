@@ -62,8 +62,6 @@ public class Rules{
     public int unitCap = 0;
     /** Sector for saves that have them.*/
     public @Nullable Sector sector;
-    /** Region that save is on. Indicates campaign. TODO not implemented. */
-    public @Nullable MapRegion region;
     /** Spawn layout. */
     public Array<SpawnGroup> spawns = new Array<>();
     /** Determines if there should be limited respawns. */
