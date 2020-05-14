@@ -17,7 +17,7 @@ abstract class EffectComp implements Posc, Drawc, Timedc, Rotc, Childc{
         effect.render(id(), color, time(), rotation(), x(), y(), data);
     }
 
-    @Override
+    @Replace
     public float clipSize(){
         return effect.size;
     }

@@ -5,6 +5,8 @@ import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.type.*;
 
+import static mindustry.Vars.content;
+
 @Serialize
 public class Stats{
     /** Items delivered to global resoure counter. Zones only. */
@@ -21,6 +23,9 @@ public class Stats{
     public int buildingsDeconstructed;
     /** Friendly buildings destroyed. */
     public int buildingsDestroyed;
+
+    /** Item production means. */
+    private transient WindowedMean[] itemProduction = new WindowedMean[content.items().size];
 
     public RankResult calculateRank(Sector zone, boolean launched){
         float score = 0;

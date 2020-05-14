@@ -20,7 +20,7 @@ import static mindustry.Vars.content;
 @Component
 abstract class StatusComp implements Posc, Flyingc{
     private Array<StatusEntry> statuses = new Array<>();
-    private Bits applied = new Bits(content.getBy(ContentType.status).size);
+    private transient Bits applied = new Bits(content.getBy(ContentType.status).size);
 
     @ReadOnly transient float speedMultiplier, damageMultiplier, armorMultiplier;
 
@@ -144,32 +144,5 @@ abstract class StatusComp implements Posc, Flyingc{
 
     boolean hasEffect(StatusEffect effect){
         return applied.get(effect.id);
-    }
-
-    //TODO autogen io code
-
-    void writeSave(DataOutput stream) throws IOException{
-        stream.writeByte(statuses.size);
-        for(StatusEntry entry : statuses){
-            stream.writeByte(entry.effect.id);
-            stream.writeFloat(entry.time);
-        }
-    }
-
-    void readSave(DataInput stream, byte version) throws IOException{
-        for(StatusEntry effect : statuses){
-            Pools.free(effect);
-        }
-
-        statuses.clear();
-
-        byte amount = stream.readByte();
-        for(int i = 0; i < amount; i++){
-            byte id = stream.readByte();
-            float time = stream.readFloat();
-            StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
-            entry.set(content.getByID(ContentType.status, id), time);
-            statuses.add(entry);
-        }
     }
 }

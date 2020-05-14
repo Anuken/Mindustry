@@ -114,7 +114,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
         }
     }
 
-    @Override
+    @Replace
     public float clipSize(){
         return 20;
     }

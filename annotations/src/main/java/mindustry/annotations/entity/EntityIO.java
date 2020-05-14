@@ -2,6 +2,7 @@ package mindustry.annotations.entity;
 
 import arc.files.*;
 import arc.struct.*;
+import arc.util.*;
 import arc.util.serialization.*;
 import com.squareup.javapoet.*;
 import mindustry.annotations.Annotations.*;
@@ -45,8 +46,8 @@ public class EntityIO{
         Array<FieldSpec> fields = Array.with(type.fieldSpecs).select(spec ->
             !spec.hasModifier(Modifier.TRANSIENT) &&
             !spec.hasModifier(Modifier.STATIC) &&
-            !spec.hasModifier(Modifier.FINAL) &&
-            (spec.type.isPrimitive() || serializer.has(spec.type.toString())));
+            !spec.hasModifier(Modifier.FINAL)/* &&
+            (spec.type.isPrimitive() || serializer.has(spec.type.toString()))*/);
 
         //sort to keep order
         fields.sortComparing(f -> f.name);
@@ -116,6 +117,55 @@ public class EntityIO{
             st("$L(write, $L)", serializer.writers.get(type), field);
         }else if(serializer.readers.containsKey(type) && !write){
             st("$L$L(read)", field, serializer.readers.get(type));
+        }else if(type.endsWith("[]")){ //it's a 1D array
+            String rawType = type.substring(0, type.length() - 2);
+
+            if(write){
+                s("i", field + ".length");
+                cont("for(int INDEX = 0; INDEX < $L.length; INDEX ++)", field);
+                io(rawType, field + "[INDEX]");
+            }else{
+                String fieldName = field.replace(" = ", "").replace("this.", "");
+                String lenf = fieldName + "_LENGTH";
+                s("i", "int " + lenf + " = ");
+                if(!field.isEmpty()){
+                    st("$Lnew $L[$L]", field, type.replace("[]", ""), lenf);
+                }
+                cont("for(int INDEX = 0; INDEX < $L; INDEX ++)", lenf);
+                io(rawType, field.replace(" = ", "[INDEX] = "));
+            }
+
+            econt();
+        }else if(type.startsWith("arc.struct") && type.contains("<")){ //it's some type of data structure
+            String struct = type.substring(0, type.indexOf("<"));
+            String generic = type.substring(type.indexOf("<") + 1, type.indexOf(">"));
+
+            if(struct.equals("arc.struct.Queue") || struct.equals("arc.struct.Array")){
+                if(write){
+                    s("i", field + ".size");
+                    cont("for(int INDEX = 0; INDEX < $L.size; INDEX ++)", field);
+                    io(generic, field + ".get(INDEX)");
+                }else{
+                    String fieldName = field.replace(" = ", "").replace("this.", "");
+                    String lenf = fieldName + "_LENGTH";
+                    s("i", "int " + lenf + " = ");
+                    if(!field.isEmpty()){
+                        st("$L.clear()", field.replace(" = ", ""));
+                    }
+                    cont("for(int INDEX = 0; INDEX < $L; INDEX ++)", lenf);
+                    io(generic, field.replace(" = ", "_ITEM = ").replace("this.", generic + " "));
+                    if(!field.isEmpty()){
+                        String temp = field.replace(" = ", "_ITEM").replace("this.", "");
+                        st("if($L != null) $L.add($L)", temp, field.replace(" = ", ""), temp);
+                    }
+                }
+
+                econt();
+            }else{
+                Log.warn("Missing serialization code for collection '@' in '@'", type, name);
+            }
+        }else{
+            Log.warn("Missing serialization code for type '@' in '@'", type, name);
         }
     }
 

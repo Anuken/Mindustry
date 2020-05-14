@@ -25,7 +25,7 @@ abstract class DecalComp implements Drawc, Timedc, Rotc, Posc{
         Draw.color();
     }
 
-    @Override
+    @Replace
     public float clipSize(){
         return region.getWidth()*2;
     }

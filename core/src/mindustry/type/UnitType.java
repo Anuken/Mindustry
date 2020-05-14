@@ -23,7 +23,7 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public class UnitType extends UnlockableContent{
-    static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
+    public static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
 
     public boolean flying;
     public @NonNull Prov<? extends Unitc> constructor;

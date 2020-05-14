@@ -1,19 +1,25 @@
 package mindustry.world.blocks.storage;
 
+import arc.graphics.g2d.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
-public class LaunchPad extends StorageBlock{
+public class LaunchPad extends Block{
     public final int timerLaunch = timers++;
     /** Time inbetween launches. */
     public float launchTime;
 
     public LaunchPad(String name){
         super(name);
-        update = true;
         hasItems = true;
         solid = true;
+        update = true;
     }
 
     @Override
@@ -23,7 +29,7 @@ public class LaunchPad extends StorageBlock{
         stats.add(BlockStat.launchTime, launchTime / 60f, StatUnit.seconds);
     }
 
-    public class LaunchPadEntity extends StorageBlockEntity{
+    public class LaunchPadEntity extends TileEntity{
         @Override
         public void draw(){
             super.draw();
@@ -54,12 +60,16 @@ public class LaunchPad extends StorageBlock{
 
         @Override
         public boolean acceptItem(Tilec source, Item item){
-            return item.type == ItemType.material && super.acceptItem(source, item);
+            return items.total() < itemCapacity;
         }
 
         @Override
         public void updateTile(){
-            //TODO
+
+            //launch when full
+            if(items.total() >= itemCapacity){
+
+            }
             /*
 
             if(state.isCampaign() && consValid() && items.total() >= itemCapacity && timer(timerLaunch, launchTime / timeScale())){
@@ -72,6 +82,38 @@ public class LaunchPad extends StorageBlock{
                     Events.fire(new LaunchItemEvent(item, used));
                 }
             }*/
+        }
+    }
+
+    @EntityDef(LaunchPayloadc.class)
+    @Component
+    static abstract class LaunchPayloadComp implements Drawc{
+        static final float speed = 1f;
+
+        @Import float x,y;
+
+        float height;
+        transient TextureRegion region;
+
+        Array<ItemStack> stacks = new Array<>();
+
+        @Override
+        public void draw(){
+            Draw.z(Layer.weather - 1);
+            Draw.rect(region, x, y);
+
+            Tmp.v1.trns(225f, height);
+
+            Draw.z(Layer.flyingUnit + 1);
+            Draw.color(UnitType.shadowColor);
+            Draw.rect(region, x + Tmp.v1.x, y + Tmp.v1.y);
+
+            Draw.reset();
+        }
+
+        @Override
+        public void update(){
+            height += Time.delta() * speed;
         }
     }
 }

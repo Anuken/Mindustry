@@ -62,7 +62,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         }
     }
 
-    @Override
+    @Replace
     public float clipSize(){
         return 20;
     }
