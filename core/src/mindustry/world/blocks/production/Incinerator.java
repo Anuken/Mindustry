@@ -28,7 +28,7 @@ public class Incinerator extends Block{
         @Override
         public void updateTile(){
             if(consValid()){
-                heat = Mathf.lerpDelta(heat, power.status, 0.04f);
+                heat = Mathf.lerpDelta(heat, efficiency(), 0.04f);
             }else{
                 heat = Mathf.lerpDelta(heat, 0f, 0.02f);
             }
