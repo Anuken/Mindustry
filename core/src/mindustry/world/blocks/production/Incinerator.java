@@ -27,8 +27,8 @@ public class Incinerator extends Block{
 
         @Override
         public void updateTile(){
-            if(consValid() && efficiency() > 0.9f){
-                heat = Mathf.lerpDelta(heat, 1f, 0.04f);
+            if(consValid()){
+                heat = Mathf.lerpDelta(heat, power.status, 0.04f);
             }else{
                 heat = Mathf.lerpDelta(heat, 0f, 0.02f);
             }
@@ -62,7 +62,7 @@ public class Incinerator extends Block{
 
         @Override
         public boolean acceptItem(Tilec source, Item item){
-            return heat > 0.5f;
+            return Mathf.chance(heat-0.1f) || heat > 0.9f;
         }
 
         @Override
@@ -74,7 +74,7 @@ public class Incinerator extends Block{
 
         @Override
         public boolean acceptLiquid(Tilec source, Liquid liquid, float amount){
-            return heat > 0.5f;
+            return Mathf.chance(heat-0.1f) || heat > 0.9f;
         }
     }
 }
