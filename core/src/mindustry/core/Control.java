@@ -353,6 +353,16 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void dispose(){
+        //try to save when exiting
+        if(saves != null && saves.getCurrent() != null && saves.getCurrent().isAutosave() && !net.client()){
+            try{
+                control.saves.getCurrent().save();
+                Log.info("Saved on exit.");
+            }catch(Throwable e){
+                e.printStackTrace();
+            }
+        }
+
         content.dispose();
         net.dispose();
         Musics.dispose();
