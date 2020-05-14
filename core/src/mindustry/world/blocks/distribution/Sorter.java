@@ -70,8 +70,6 @@ public class Sorter extends Block{
                 Draw.rect("center", x, y);
                 Draw.color();
             }
-
-
         }
 
         @Override
@@ -94,7 +92,7 @@ public class Sorter extends Block{
         }
 
         Tilec getTileTarget(Item item, Tilec source, boolean flip){
-            int dir = source.absoluteRelativeTo(tile.x, tile.y);
+            int dir = source.relativeTo(tile.x, tile.y);
             if(dir == -1) return null;
             Tilec to;
 

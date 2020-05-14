@@ -17,9 +17,9 @@ import static mindustry.Vars.*;
 //TODO ? remove ?
 public class SectorPreset extends UnlockableContent{
     public @NonNull WorldGenerator generator;
-    public @NonNull Objective configureObjective = new ZoneWave(this, 15);
+    public @NonNull Objectives.Objective configureObjective = new ZoneWave(this, 15);
     public @NonNull Planet planet;
-    public Array<Objective> requirements = new Array<>();
+    public Array<Objectives.Objective> requirements = new Array<>();
     //TODO autogenerate
     public Array<Item> resources = new Array<>();
 

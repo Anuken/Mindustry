@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -28,7 +29,8 @@ public class CoreBlock extends StorageBlock{
         solid = true;
         update = true;
         hasItems = true;
-        flags = EnumSet.of(BlockFlag.core, BlockFlag.producer);
+        flags = EnumSet.of(BlockFlag.core, BlockFlag.producer, BlockFlag.unitModifier);
+        unitCapModifier = 10;
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
     }
@@ -58,6 +60,13 @@ public class CoreBlock extends StorageBlock{
                 () -> Core.bundle.format("bar.capacity", ui.formatAmount(((CoreEntity)e).storageCapacity)),
                 () -> Pal.items,
                 () -> e.items().total() / (float)(((CoreEntity)e).storageCapacity * content.items().count(i -> i.type == ItemType.material))
+            ));
+
+        bars.add("units", e ->
+        new Bar(
+                () -> Core.bundle.format("bar.units", teamIndex.count(e.team()), Units.getCap(e.team())),
+                () -> Pal.power,
+                () -> (float)teamIndex.count(e.team()) / Units.getCap(e.team())
             ));
     }
 

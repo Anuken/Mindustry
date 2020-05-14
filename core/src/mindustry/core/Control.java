@@ -9,6 +9,7 @@ import arc.math.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.audio.MusicControl;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
@@ -39,7 +40,7 @@ import static mindustry.Vars.*;
  */
 public class Control implements ApplicationListener, Loadable{
     public Saves saves;
-    public MusicControl music;
+    public mindustry.audio.MusicControl music;
     public Tutorial tutorial;
     public InputHandler input;
 
@@ -263,9 +264,7 @@ public class Control implements ApplicationListener, Loadable{
         ui.loadAnd(() -> {
             ui.planet.hide();
             SaveSlot slot = sector.save;
-            //TODO comment for new sector states
-            //slot = null;
-            if(slot != null){
+            if(slot != null && !clearSectors){
                 try{
                     net.reset();
                     slot.load();

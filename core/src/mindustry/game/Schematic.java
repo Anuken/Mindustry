@@ -16,8 +16,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     public final Array<Stile> tiles;
     public StringMap tags;
     public int width, height;
-    public @Nullable
-    Fi file;
+    public @Nullable Fi file;
     /** Associated mod. If null, no mod is associated with this schematic. */
     public @Nullable LoadedMod mod;
 

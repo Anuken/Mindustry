@@ -508,7 +508,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void drawRequest(BuildRequest request){
         request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
 
-        if(request.block.saveConfig && request.block.lastConfig != null){
+        if(request.block.saveConfig && request.block.lastConfig != null && !request.hasConfig){
             Object conf = request.config;
             request.config = request.block.lastConfig;
             request.block.drawRequestConfig(request, allRequests());

@@ -69,8 +69,7 @@ public class Universe{
     }
 
     private void save(){
-        Core.settings.put("utime", seconds);
-        Core.settings.save();
+        Core.settings.putSave("utime", seconds);
     }
 
     private void load(){

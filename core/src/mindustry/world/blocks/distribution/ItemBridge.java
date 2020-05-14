@@ -237,7 +237,7 @@ public class ItemBridge extends Block{
             float opacity = Core.settings.getInt("bridgeopacity") / 100f;
             if(Mathf.zero(opacity)) return;
 
-            int i = tile.absoluteRelativeTo(other.x, other.y);
+            int i = relativeTo(other.x, other.y);
 
             Draw.color(Color.white, Color.black, Mathf.absin(Time.time(), 6f, 0.07f));
             Draw.alpha(Math.max(uptime, 0.25f) * opacity);
@@ -275,8 +275,8 @@ public class ItemBridge extends Block{
             Tile other = world.tile(link);
 
             if(linkValid(tile, other)){
-                int rel = tile.absoluteRelativeTo(other.x, other.y);
-                int rel2 = tile.relativeTo(source.tileX(), source.tileY());
+                int rel = relativeTo(other.x, other.y);
+                int rel2 = relativeTo(source.tileX(), source.tileY());
 
                 if(rel == rel2) return false;
             }else{
@@ -292,21 +292,21 @@ public class ItemBridge extends Block{
             Tile other = world.tile(link);
             if(!linkValid(tile, other)){
                 Tile edge = Edges.getFacingEdge(to.tile(), tile);
-                int i = tile.absoluteRelativeTo(edge.x, edge.y);
+                int i = relativeTo(edge.x, edge.y);
 
                 IntSetIterator it = incoming.iterator();
 
                 while(it.hasNext){
                     int v = it.next();
-                    if(tile.absoluteRelativeTo(Point2.x(v), Point2.y(v)) == i){
+                    if(relativeTo(Point2.x(v), Point2.y(v)) == i){
                         return false;
                     }
                 }
                 return true;
             }
 
-            int rel = tile.absoluteRelativeTo(other.x, other.y);
-            int rel2 = tile.relativeTo(to.tileX(), to.tileY());
+            int rel = relativeTo(other.x, other.y);
+            int rel2 = relativeTo(to.tileX(), to.tileY());
 
             return rel != rel2;
         }
@@ -318,8 +318,8 @@ public class ItemBridge extends Block{
             Tile other = world.tile(link);
 
             if(linkValid(tile, other)){
-                int rel = tile.absoluteRelativeTo(other.x, other.y);
-                int rel2 = tile.relativeTo(source.tileX(), source.tileY());
+                int rel = relativeTo(other.x, other.y);
+                int rel2 = relativeTo(source.tileX(), source.tileY());
 
                 if(rel == rel2) return false;
             }else if(!(source.block() instanceof ItemBridge && ((ItemBridgeEntity)source).link == tile.pos())){
@@ -334,21 +334,21 @@ public class ItemBridge extends Block{
             Tile other = world.tile(link);
             if(!linkValid(tile, other)){
                 Tile edge = Edges.getFacingEdge(to.tile(), tile);
-                int i = tile.absoluteRelativeTo(edge.x, edge.y);
+                int i = relativeTo(edge.x, edge.y);
 
                 IntSetIterator it = incoming.iterator();
 
                 while(it.hasNext){
                     int v = it.next();
-                    if(tile.absoluteRelativeTo(Point2.x(v), Point2.y(v)) == i){
+                    if(relativeTo(Point2.x(v), Point2.y(v)) == i){
                         return false;
                     }
                 }
                 return true;
             }
 
-            int rel = tile.absoluteRelativeTo(other.x, other.y);
-            int rel2 = tile.relativeTo(to.tileX(), to.tileY());
+            int rel = relativeTo(other.x, other.y);
+            int rel2 = relativeTo(to.tileX(), to.tileY());
 
             return rel != rel2;
         }

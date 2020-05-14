@@ -30,7 +30,6 @@ import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
-import mindustry.world.blocks.units.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -487,7 +486,7 @@ public class Schematics implements Loadable{
             //write each tile
             for(Stile tile : schematic.tiles){
                 stream.writeByte(blocks.orderedItems().indexOf(tile.block));
-                stream.writeInt(Point2.pack((int)tile.x, (int)tile.y));
+                stream.writeInt(Point2.pack(tile.x, tile.y));
                 TypeIO.writeObject(Writes.get(stream), tile.config);
                 stream.writeByte(tile.rotation);
             }
@@ -499,7 +498,7 @@ public class Schematics implements Loadable{
         if(block instanceof Sorter || block instanceof Unloader || block instanceof ItemSource) return content.item(value);
         if(block instanceof LiquidSource) return content.liquid(value);
         if(block instanceof MassDriver || block instanceof ItemBridge) return Point2.unpack(value).sub(Point2.x(position), Point2.y(position));
-        if(block instanceof LightBlock || block instanceof CommandCenter) return value;
+        if(block instanceof LightBlock) return value;
 
         return null;
     }

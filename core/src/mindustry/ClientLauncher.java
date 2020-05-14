@@ -36,7 +36,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         loader = new LoadRenderer();
         Events.fire(new ClientCreateEvent());
 
-        Vars.loadLogger();
         Vars.loadFileLogger();
         Vars.platform = this;
         beginTime = Time.millis();
@@ -138,11 +137,11 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 app.post(() -> app.post(() -> app.post(() -> app.post(() -> super.resize(graphics.getWidth(), graphics.getHeight())))));
             }
         }else{
-            asyncLogic.begin();
+            asyncCore.begin();
 
             super.update();
 
-            asyncLogic.end();
+            asyncCore.end();
         }
 
         int targetfps = Core.settings.getInt("fpscap", 120);

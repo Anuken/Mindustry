@@ -38,7 +38,8 @@ public class UnitFactory extends Block{
         hasPower = true;
         hasItems = true;
         solid = false;
-        flags = EnumSet.of(BlockFlag.producer);
+        flags = EnumSet.of(BlockFlag.producer, BlockFlag.unitModifier);
+        unitCapModifier = 4;
         configurable = true;
 
         config(Integer.class, (tile, i) -> {
@@ -220,7 +221,7 @@ public class UnitFactory extends Block{
             if(currentPlan != -1){
                 UnitPlan plan = plans[currentPlan];
 
-                if(progress >= plan.time/* && !Units.anyEntities(tile, !plan.unit.flying)*/){
+                if(progress >= plan.time/* && !Units.anyEntities(tile, !plan.unit.flying)*/ && Units.canCreate(team)){
                     progress = 0f;
 
                     Call.onUnitFactorySpawn(tile);

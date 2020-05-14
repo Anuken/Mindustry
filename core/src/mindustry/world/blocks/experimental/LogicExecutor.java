@@ -1,11 +1,12 @@
 package mindustry.world.blocks.experimental;
 
-import arc.math.*;
 import mindustry.gen.*;
+
+import java.nio.*;
 
 public class LogicExecutor{
     Instruction[] instructions;
-    int[] registers = new int[256];
+    ByteBuffer memory = ByteBuffer.allocate(1024 * 512);
     int counter;
 
     void step(){
@@ -29,16 +30,16 @@ public class LogicExecutor{
     class RegisterI implements Instruction{
         /** operation to perform */
         Op op;
-        /** destination register */
-        short dest;
-        /** registers to take data from. -1 for no register. */
-        short left, right;
+        /** destination memory */
+        int dest;
+        /** memory to take data from. -1 for immediate values. */
+        int left, right;
         /** left/right immediate values, only used if no registers are present. */
-        int ileft, iright;
+        double ileft, iright;
 
         @Override
         public void exec(){
-            registers[dest] = op.function.get(left == -1 ? ileft : registers[left], right == -1 ? iright : registers[right]);
+            //memory.putDouble(dest, op.function.get(left == -1 ? ileft : registers[left], right == -1 ? iright : registers[right]));
         }
     }
 
@@ -54,7 +55,7 @@ public class LogicExecutor{
 
         @Override
         public void exec(){
-            registers[dest] = op.function.get(device(device), parameter);
+            //registers[dest] = op.function.get(device(device), parameter);
         }
     }
 
@@ -89,12 +90,12 @@ public class LogicExecutor{
         mul("*", (a, b) -> a * b),
         div("/", (a, b) -> a / b),
         mod("%", (a, b) -> a % b),
-        pow("^", Mathf::pow),
-        shl(">>", (a, b) -> a >> b),
-        shr("<<", (a, b) -> a << b),
-        or("or", (a, b) -> a | b),
-        and("and", (a, b) -> a & b),
-        xor("xor", (a, b) -> a ^ b);
+        pow("^", Math::pow),
+        shl(">>", (a, b) -> (int)a >> (int)b),
+        shr("<<", (a, b) -> (int)a << (int)b),
+        or("or", (a, b) -> (int)a | (int)b),
+        and("and", (a, b) -> (int)a & (int)b),
+        xor("xor", (a, b) -> (int)a ^ (int)b);
 
         final OpLambda function;
         final String symbol;
@@ -105,7 +106,7 @@ public class LogicExecutor{
         }
 
         interface OpLambda{
-            int get(int a, int b);
+            double get(double a, double b);
         }
     }
 

@@ -86,10 +86,10 @@ public class ContentParser{
             desc.errored = Throwable::printStackTrace;
             return sound;
         });
-        put(Objective.class, (type, data) -> {
-            Class<? extends Objective> oc = data.has("type") ? resolve(data.getString("type"), "mindustry.game.Objectives") : ZoneWave.class;
+        put(Objectives.Objective.class, (type, data) -> {
+            Class<? extends Objectives.Objective> oc = data.has("type") ? resolve(data.getString("type"), "mindustry.game.Objectives") : ZoneWave.class;
             data.remove("type");
-            Objective obj = make(oc);
+            Objectives.Objective obj = make(oc);
             readFields(obj, data);
             return obj;
         });

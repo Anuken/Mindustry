@@ -80,18 +80,26 @@ public class Tile implements Position, QuadTreeObject{
     }
 
     public byte absoluteRelativeTo(int cx, int cy){
-        if(x == cx && y <= cy - 1) return 1;
-        if(x == cx && y >= cy + 1) return 3;
-        if(x <= cx - 1 && y == cy) return 0;
-        if(x >= cx + 1 && y == cy) return 2;
-        return -1;
-    }
 
-    public static byte absoluteRelativeTo(int x, int y, int cx, int cy){
-        if(x == cx && y <= cy - 1) return 1;
-        if(x == cx && y >= cy + 1) return 3;
-        if(x <= cx - 1 && y == cy) return 0;
-        if(x >= cx + 1 && y == cy) return 2;
+        //very straightforward for odd sizes
+        if(block.size % 2 == 1){
+            if(Math.abs(x - cx) > Math.abs(y - cy)){
+                if(x <= cx - 1) return 0;
+                if(x >= cx + 1) return 2;
+            }else{
+                if(y <= cy - 1) return 1;
+                if(y >= cy + 1) return 3;
+            }
+        }else{ //need offsets here
+            if(Math.abs(x - cx + 0.5f) > Math.abs(y - cy + 0.5f)){
+                if(x+0.5f <= cx - 1) return 0;
+                if(x+0.5f >= cx + 1) return 2;
+            }else{
+                if(y+0.5f <= cy - 1) return 1;
+                if(y+0.5f >= cy + 1) return 3;
+            }
+        }
+
         return -1;
     }
 

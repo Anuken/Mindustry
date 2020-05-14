@@ -123,7 +123,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
         float constraint = 1.3f;
         float radius = width / 2f / Mathf.sqrt3;
-        int rooms = rand.random(2, 5) - 1;
+        int rooms = rand.random(2, 5);
         Array<Room> array = new Array<>();
 
         for(int i = 0; i < rooms; i++){
@@ -261,6 +261,12 @@ public class TODOPlanetGenerator extends PlanetGenerator{
         });
 
         Schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
+
+        if(sector.hostility > 0.02f){
+            new BaseGenerator().generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector);
+
+            state.rules.attackMode = true;
+        }
 
         state.rules.waves = true;
     }

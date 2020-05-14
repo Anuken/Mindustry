@@ -39,8 +39,10 @@ public class BlockIndexer{
     private ObjectSet<Item> allOres = new ObjectSet<>();
     /** Stores teams that are present here as tiles. */
     private Array<Team> activeTeams = new Array<>();
-    /** Maps teams to a map of flagged tiles by type. */
+    /** Maps teams to a map of flagged tiles by flag. */
     private TileArray[][] flagMap = new TileArray[Team.all().length][BlockFlag.all.length];
+    /** Max units by team. */
+    private int[] unitCaps = new int[Team.all().length];
     /** Maps tile positions to their last known tile index data. */
     private IntMap<TileIndex> typeMap = new IntMap<>();
     /** Empty set used for returning. */
@@ -55,6 +57,10 @@ public class BlockIndexer{
                 for(BlockFlag flag : index.flags){
                     getFlagged(index.team)[flag.ordinal()].remove(event.tile);
                 }
+
+                if(index.flags.contains(BlockFlag.unitModifier)){
+                    updateCap(index.team);
+                }
             }
             process(event.tile);
             updateQuadrant(event.tile);
@@ -65,6 +71,7 @@ public class BlockIndexer{
             scanOres.addAll(Item.getAllOres());
             damagedTiles = new TileArray[Team.all().length];
             flagMap = new TileArray[Team.all().length][BlockFlag.all.length];
+            unitCaps = new int[Team.all().length];
 
             for(int i = 0; i < flagMap.length; i++){
                 for(int j = 0; j < BlockFlag.all.length; j++){
@@ -296,8 +303,21 @@ public class BlockIndexer{
         return null;
     }
 
+    /** @return extra unit cap of a team. This is added onto the base value. */
+    public int getExtraUnits(Team team){
+        return unitCaps[team.id];
+    }
+
+    private void updateCap(Team team){
+        TileArray capped = getFlagged(team)[BlockFlag.unitModifier.ordinal()];
+        unitCaps[team.id] = 0;
+        for(Tile capper : capped){
+            unitCaps[team.id] += capper.block().unitCapModifier;
+        }
+    }
+
     private void process(Tile tile){
-        if(tile.block().flags.size() > 0 && tile.team() != Team.derelict){
+        if(tile.block().flags.size() > 0 && tile.team() != Team.derelict && tile.isCenter()){
             TileArray[] map = getFlagged(tile.team());
 
             for(BlockFlag flag : tile.block().flags){
@@ -308,8 +328,14 @@ public class BlockIndexer{
 
                 map[flag.ordinal()] = arr;
             }
+
+            if(tile.block().flags.contains(BlockFlag.unitModifier)){
+                updateCap(tile.team());
+            }
+
             typeMap.put(tile.pos(), new TileIndex(tile.block().flags, tile.team()));
         }
+
         if(!activeTeams.contains(tile.team())){
             activeTeams.add(tile.team());
         }
