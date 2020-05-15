@@ -32,6 +32,7 @@ def transformColors = { List<List<String>> list ->
 }
 
 
+//d4816b
 transformColors([["6e7080", "989aa4", "b0bac0"], ["bc5452", "ea8878", "feb380"], ["de9458", "f8c266", "ffe18f"], ["feb380", "ea8878", "bc5452"]])
 
 def antialias = { File file ->

@@ -1,8 +1,10 @@
 package mindustry.world.blocks.storage;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -20,6 +22,10 @@ public class LaunchPad extends Block{
     public final int timerLaunch = timers++;
     /** Time inbetween launches. */
     public float launchTime;
+
+    public @Load("@-light") TextureRegion lightRegion;
+    public @Load("launchpod") TextureRegion podRegion;
+    public Color lightColor = Color.valueOf("eab678");
 
     public LaunchPad(String name){
         super(name);
@@ -47,7 +53,32 @@ public class LaunchPad extends Block{
         public void draw(){
             super.draw();
 
-            Draw.rect("launchpod", x, y);
+            if(lightRegion.found()){
+                Draw.color(lightColor);
+                float progress = Math.min((float)items.total() / itemCapacity, timer.getTime(timerLaunch) / launchTime);
+                int steps = 3;
+                float step = 1f;
+
+                for(int i = 0; i < 4; i++){
+                    for(int j = 0; j < steps; j++){
+                        float alpha = Mathf.curve(progress, (float)j / steps, (j+1f) / steps);
+                        float offset = -(j - 1f) * step;
+
+                        Draw.color(Pal.metalGrayDark, lightColor, alpha);
+                        Draw.rect(lightRegion, x + Geometry.d8edge(i).x * offset, y + Geometry.d8edge(i).y * offset, i * 90);
+                    }
+                }
+
+                Draw.reset();
+            }
+
+            float cooldown = Mathf.clamp(timer.getTime(timerLaunch) / launchTime);
+
+            Draw.mixcol(lightColor, 1f - cooldown);
+
+            Draw.rect(podRegion, x, y);
+
+            Draw.reset();
         }
 
         @Override
@@ -58,8 +89,8 @@ public class LaunchPad extends Block{
         @Override
         public void updateTile(){
 
-            //launch when full
-            if(items.total() >= itemCapacity){
+            //launch when full and base conditions are met
+            if(items.total() >= itemCapacity && efficiency() >= 1f && timer(timerLaunch, launchTime)){
                 LaunchPayloadc entity = LaunchPayloadEntity.create();
                 items.each((item, amount) -> entity.stacks().add(new ItemStack(item, amount)));
                 entity.set(this);

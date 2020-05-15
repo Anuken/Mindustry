@@ -56,6 +56,7 @@ public class Pal{
     accent = Color.valueOf("ffd37f"),
     stat = Color.valueOf("ffd37f"),
     gray = Color.valueOf("454545"),
+    metalGrayDark = Color.valueOf("6e7080"),
     accentBack = Color.valueOf("d4816b"),
     place = Color.valueOf("6335f8"),
     remove = Color.valueOf("e55454"),
