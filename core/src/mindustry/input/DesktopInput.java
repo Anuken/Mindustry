@@ -59,10 +59,8 @@ public class DesktopInput extends InputHandler{
                 b.label(() -> Core.bundle.format(!isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.label(() -> {
-                    if((block instanceof ItemBridge && ((ItemBridge) block).lastPlaced != -1))
-                        return "clear lastPlaced";
-                    else if((block.saveConfig && block.lastConfig != null))
-                        return "clear lastConfig";
+                    if(block != null && (block instanceof ItemBridge || block.saveConfig) && block.lastConfig != null)
+                        return Core.bundle.format("clearconfig", Core.keybinds.get(Binding.clear_building).key.toString());
                     else
                         return Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString());
                 }).style(Styles.outlineLabel);
@@ -378,8 +376,13 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.clear_building)){
-            if(block) Log.info(block);
-            player.builder().clearBuilding();
+            if(block != null && (block instanceof ItemBridge || block.saveConfig) && block.lastConfig != null){
+                if(block instanceof ItemBridge)
+                    ((ItemBridge) block).lastPlaced = -1;
+                else
+                    block.lastConfig = null;
+            } else
+                player.builder().clearBuilding();
         }
 
         if(Core.input.keyTap(Binding.schematic_select) && !Core.scene.hasKeyboard()){
