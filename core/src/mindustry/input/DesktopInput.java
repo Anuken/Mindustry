@@ -25,6 +25,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.distribution.*;
 
 import static arc.Core.scene;
 import static mindustry.Vars.*;
@@ -57,7 +58,12 @@ public class DesktopInput extends InputHandler{
                 b.defaults().left();
                 b.label(() -> Core.bundle.format(!isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
-                b.label(() -> Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString())).style(Styles.outlineLabel);
+                b.label(() -> {
+                    if(block != null &&(block instanceof ItemBridge || block.saveConfig)&& block.lastConfig != null)
+                        return Core.bundle.format("clearconfig", Core.keybinds.get(Binding.clear_building).key.toString());
+                    else
+                        return Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString());
+                }).style(Styles.outlineLabel);
                 b.row();
                 b.label(() -> Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic_select).key.toString())).style(Styles.outlineLabel);
             }).margin(10f);
@@ -370,7 +376,13 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.clear_building)){
-            player.builder().clearBuilding();
+            if(block != null &&(block instanceof ItemBridge || block.saveConfig)&& block.lastConfig != null){
+                if(block instanceof ItemBridge)
+                    ((ItemBridge)block).lastPlaced = -1;
+                else
+                    block.lastConfig = null;
+            } else
+                player.builder().clearBuilding();
         }
 
         if(Core.input.keyTap(Binding.schematic_select) && !Core.scene.hasKeyboard()){
