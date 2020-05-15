@@ -33,6 +33,12 @@ abstract class BuilderComp implements Unitc{
     transient boolean building = true;
 
     @Override
+    public void controller(UnitController next){
+        //reset building state so AI controlled units will always start off building
+        building = true;
+    }
+
+    @Override
     public void update(){
         if(!building) return;
 
