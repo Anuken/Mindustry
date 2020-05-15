@@ -295,7 +295,7 @@ public class Vars implements Loadable{
 
         Writer writer = settings.getDataDirectory().child("last_log.txt").writer(false);
         LogHandler log = Log.getLogger();
-        Log.setLogger(((level, text) -> {
+        Log.setLogger((level, text) -> {
             log.log(level, text);
 
             try{
@@ -305,7 +305,7 @@ public class Vars implements Loadable{
                 e.printStackTrace();
                 //ignore it
             }
-        }));
+        });
 
         loadedFileLogger = true;
     }

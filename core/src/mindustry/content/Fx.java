@@ -60,13 +60,13 @@ public class Fx{
 
         color(Pal.accent);
 
-        Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interpolation.pow2In);
+        Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.pow2In);
         float x = Tmp.v1.x, y = Tmp.v1.y;
         float size = 2.5f * e.fin();
 
         Fill.square(x, y, 1.5f * size, 45f);
 
-        Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interpolation.pow5In);
+        Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.pow5In);
         x = Tmp.v1.x;
         y = Tmp.v1.y;
 
@@ -76,7 +76,7 @@ public class Fx{
     itemTransfer = new Effect(30f, e -> {
         if(!(e.data instanceof Position)) return;
         Position to = e.data();
-        Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interpolation.pow3)
+        Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.pow3)
         .add(Tmp.v2.sub(e.x, e.y).nor().rotate90(1).scl(Mathf.randomSeedRange(e.id, 1f) * e.fslope() * 10f));
         float x = Tmp.v1.x, y = Tmp.v1.y;
         float size = Math.min(0.8f + e.rotation / 5f, 2);
@@ -96,7 +96,7 @@ public class Fx{
         Block block = l.block;
         Position to = Tmp.v3.set(l.x * tilesize, l.y * tilesize).add(block.offset(), block.offset());
 
-        Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interpolation.linear);
+        Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.linear);
         float x = Tmp.v1.x, y = Tmp.v1.y;
 
         Draw.rect(block.icon(Cicon.full), x, y);
@@ -1151,6 +1151,22 @@ public class Fx{
         color(Pal.command);
         stroke(e.fout() * 2f);
         Lines.circle(e.x, e.y, 4f + e.finpow() * 120f);
+    }),
+
+    launchPod = new Effect(40, e -> {
+        color(Pal.engine);
+
+        e.scaled(20f, f -> {
+            stroke(f.fout() * 2f);
+            Lines.circle(e.x, e.y, 4f + f.finpow() * 30f);
+        });
+
+        stroke(e.fout() * 2f);
+
+        randLenVectors(e.id, 24, e.finpow() * 50f, (x, y) -> {
+            float ang = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
+        });
     }),
 
     healWaveMend = new Effect(40, e -> {

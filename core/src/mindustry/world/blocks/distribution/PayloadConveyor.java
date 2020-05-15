@@ -21,7 +21,7 @@ public class PayloadConveyor extends Block{
     public float moveTime = 70f;
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-edge") TextureRegion edgeRegion;
-    public Interpolation interp = Interpolation.pow5;
+    public Interp interp = Interp.pow5;
 
     public PayloadConveyor(String name){
         super(name);
@@ -140,7 +140,7 @@ public class PayloadConveyor extends Block{
 
             for(int i = 0; i < 4; i++){
                 if(blends(i) && i != rotation()){
-                    Draw.alpha(1f - Interpolation.pow5In.apply(fract()));
+                    Draw.alpha(1f - Interp.pow5In.apply(fract()));
                     //prev from back
                     Tmp.v1.set(- s/2f + clipped.getWidth()/2f*Draw.scl,  - s/2f + clipped.getHeight()/2f*Draw.scl).rotate(i * 90 + 180);
                     Draw.rect(clipped, x + Tmp.v1.x, y + Tmp.v1.y, i * 90 + 180);

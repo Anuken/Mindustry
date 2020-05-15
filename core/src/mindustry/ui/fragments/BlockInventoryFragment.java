@@ -85,7 +85,7 @@ public class BlockInventoryFragment extends Fragment{
     public void hide(){
         if(table == null) return;
 
-        table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.run(() -> {
+        table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interp.pow3Out), Actions.run(() -> {
             table.clearChildren();
             table.clearListeners();
             table.update(null);
@@ -213,7 +213,7 @@ public class BlockInventoryFragment extends Fragment{
 
         if(actions){
             table.setScale(0f, 1f);
-            table.actions(Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
+            table.actions(Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
         }else{
             table.setScale(1f, 1f);
         }

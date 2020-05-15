@@ -284,7 +284,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showInfoFade(String info){
         Table table = new Table();
         table.setFillParent(true);
-        table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.remove());
+        table.actions(Actions.fadeOut(7f, Interp.fade), Actions.remove());
         table.top().add(info).style(Styles.outlineLabel).padTop(10);
         Core.scene.add(table);
     }
@@ -297,7 +297,7 @@ public class UI implements ApplicationListener, Loadable{
         table.update(() -> {
             if(state.isMenu()) table.remove();
         });
-        table.actions(Actions.delay(duration * 0.9f), Actions.fadeOut(duration * 0.1f, Interpolation.fade), Actions.remove());
+        table.actions(Actions.delay(duration * 0.9f), Actions.fadeOut(duration * 0.1f, Interp.fade), Actions.remove());
         table.top().table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).padTop(10);
         Core.scene.add(table);
     }

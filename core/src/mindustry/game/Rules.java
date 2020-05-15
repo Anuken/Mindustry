@@ -14,7 +14,6 @@ import mindustry.world.*;
  * Defines current rules on how the game should function.
  * Does not store game state, just configuration.
  */
-@Serialize
 public class Rules{
     /** Whether the player has infinite resources. */
     public boolean infiniteResources;

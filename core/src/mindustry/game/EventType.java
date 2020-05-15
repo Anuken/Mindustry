@@ -62,8 +62,8 @@ public class EventType{
     public static class LaunchItemEvent{
         public final ItemStack stack;
 
-        public LaunchItemEvent(Item item, int amount){
-            this.stack = new ItemStack(item, amount);
+        public LaunchItemEvent(ItemStack stack){
+            this.stack = stack;
         }
     }
 

@@ -348,9 +348,9 @@ public class HudFragment extends Fragment{
             Table container = Core.scene.table();
             container.top().add(table);
             container.setTranslation(0, table.getPrefHeight());
-            container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interpolation.fade), Actions.delay(2.5f),
+            container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interp.fade), Actions.delay(2.5f),
             //nesting actions() calls is necessary so the right prefHeight() is used
-            Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.remove())));
+            Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interp.fade), Actions.remove())));
         });
     }
 
@@ -396,9 +396,9 @@ public class HudFragment extends Fragment{
                 Table container = Core.scene.table();
                 container.top().add(table);
                 container.setTranslation(0, table.getPrefHeight());
-                container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interpolation.fade), Actions.delay(2.5f),
+                container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interp.fade), Actions.delay(2.5f),
                 //nesting actions() calls is necessary so the right prefHeight() is used
-                Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.run(() -> {
+                Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interp.fade), Actions.run(() -> {
                     lastUnlockTable = null;
                     lastUnlockLayout = null;
                 }), Actions.remove())));

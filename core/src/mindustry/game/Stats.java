@@ -2,13 +2,19 @@ package mindustry.game;
 
 import arc.math.*;
 import arc.struct.*;
-import mindustry.annotations.Annotations.*;
+import arc.util.*;
 import mindustry.type.*;
+
+import java.util.*;
 
 import static mindustry.Vars.content;
 
-@Serialize
 public class Stats{
+    /** export window size in seconds */
+    private static final int exportWindow = 60;
+    /** refresh period of export in ticks */
+    private static final float refreshPeriod = 60;
+
     /** Items delivered to global resoure counter. Zones only. */
     public ObjectIntMap<Item> itemsDelivered = new ObjectIntMap<>();
     /** Enemy (red team) units destroyed. */
@@ -24,8 +30,35 @@ public class Stats{
     /** Friendly buildings destroyed. */
     public int buildingsDestroyed;
 
-    /** Item production means. */
-    private transient WindowedMean[] itemProduction = new WindowedMean[content.items().size];
+    /** Item production means. Holds means per period. */
+    private transient WindowedMean[] itemExport = new WindowedMean[content.items().size];
+    /** Counters of items recieved this period. */
+    private transient float[] itemCounters = new float[content.items().size];
+    /** Counter refresh state. */
+    private transient Interval time = new Interval();
+
+    public Stats(){
+        for(int i = 0; i < itemExport.length; i++){
+            itemExport[i] = new WindowedMean(exportWindow);
+        }
+    }
+
+    /** Updates export statistics. */
+    public void handleItemExport(ItemStack stack){
+        itemCounters[stack.item.id] += stack.amount;
+    }
+
+    public void update(){
+
+        //refresh throughput
+        if(time.get(refreshPeriod)){
+            for(int i = 0; i < itemCounters.length; i++){
+                itemExport[i].add(itemCounters[i]);
+            }
+
+            Arrays.fill(itemCounters, 0);
+        }
+    }
 
     public RankResult calculateRank(Sector zone, boolean launched){
         float score = 0;

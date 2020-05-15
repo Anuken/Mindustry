@@ -26,10 +26,10 @@ public class LiquidModule extends BlockModule{
         smoothLiquid = Mathf.lerpDelta(smoothLiquid, currentAmount(), 0.1f);
         if(showFlow){
             if(flow == null) flow = new WindowedMean(windowSize);
-            flow.addValue(lastAdded);
+            flow.add(lastAdded);
             lastAdded = 0;
             if(currentFlowRate < 0 || flowTimer.get(updateInterval)){
-                currentFlowRate = flow.hasEnoughData() ? flow.getMean() : -1f;
+                currentFlowRate = flow.hasEnoughData() ? flow.mean() : -1f;
             }
         }else{
             currentFlowRate = -1f;

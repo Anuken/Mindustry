@@ -60,7 +60,7 @@ public class Renderer implements ApplicationListener{
 
         if(landTime > 0){
             landTime -= Time.delta();
-            landscale = Interpolation.pow5In.apply(minZoomScl, Scl.scl(4f), 1f - landTime / Fx.coreLand.lifetime);
+            landscale = Interp.pow5In.apply(minZoomScl, Scl.scl(4f), 1f - landTime / Fx.coreLand.lifetime);
             camerascale = landscale;
             weatherAlpha = 0f;
         }else{

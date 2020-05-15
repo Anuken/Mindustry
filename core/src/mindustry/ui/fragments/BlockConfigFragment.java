@@ -7,7 +7,6 @@ import arc.scene.actions.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.core.GameState.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
@@ -52,7 +51,7 @@ public class BlockConfigFragment extends Fragment{
         table.pack();
         table.setTransform(true);
         table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
-        Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
+        Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
 
         table.update(() -> {
             if(configTile != null && configTile.shouldHideConfigure(player)){
@@ -76,6 +75,6 @@ public class BlockConfigFragment extends Fragment{
 
     public void hideConfig(){
         configTile = null;
-        table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.visible(false));
+        table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interp.pow3Out), Actions.visible(false));
     }
 }

@@ -71,7 +71,7 @@ public class LoadRenderer implements Disposable{
             }
 
             float timespace = Time.timeSinceMillis(lastFrameTime) / 1000f;
-            renderTimes.addValue(timespace);
+            renderTimes.add(timespace);
             lastFrameTime = Time.millis();
         }
 
@@ -278,8 +278,8 @@ public class LoadRenderer implements Disposable{
 
                         for(int i = 0; i < bars; i++){
                             int index = i % renderTimes.getWindowSize();
-                            float val = renderTimes.getValue(index);
-                            float scale = Mathf.clamp(!renderTimes.hasEnoughData() ? Mathf.randomSeed(i) : (val / renderTimes.getMean() - 0.5f));
+                            float val = renderTimes.get(index);
+                            float scale = Mathf.clamp(!renderTimes.hasEnoughData() ? Mathf.randomSeed(i) : (val / renderTimes.mean() - 0.5f));
 
                             Color dst = scale > 0.8f ? colorRed : color;
                             Draw.color(dst);
