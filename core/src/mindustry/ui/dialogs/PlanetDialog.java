@@ -273,11 +273,11 @@ public class PlanetDialog extends FloatingDialog{
             }
 
             if(sec.hostility >= 0.02f){
-                drawSelection(sec, Color.scarlet, 0.11f * sec.hostility, 0.0001f);
+                drawSelection(sec, Color.scarlet, 0.11f * sec.hostility, -0.02f);
             }
 
             if(sec.save != null){
-                drawSelection(sec, Color.lime, 0.03f, 0.0009f);
+                drawSelection(sec, Color.lime, 0.03f, -0.01f);
             }
         }
 
@@ -354,6 +354,25 @@ public class PlanetDialog extends FloatingDialog{
                 if(++idx % max == 0) t.row();
             }
         }).fillX().row();
+
+        //production
+        if(selected.hasSave() && selected.save.meta.hasProduction){
+            stable.add("Production:").row();
+            stable.table(t -> {
+                t.left();
+
+                selected.save.meta.productionRates.each(entry -> {
+                    int total = (int)(entry.value * turnDuration / 60f);
+                    if(total > 1){
+                        t.image(entry.key.icon(Cicon.small)).padRight(3);
+                        t.add(ui.formatAmount(total) + " /turn").color(Color.lightGray);
+                        t.row();
+                    }
+                });
+            });
+        }
+
+
 
         stable.row();
 

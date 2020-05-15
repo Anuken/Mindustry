@@ -21,6 +21,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.net.Packets.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
@@ -294,6 +295,41 @@ public class HudFragment extends Fragment{
                 }
             });
             p.touchable(Touchable.disabled);
+        });
+
+        //DEBUG: rate table
+        parent.fill(t -> {
+            t.bottom().left();
+            t.table(Styles.black6, c -> {
+                Bits used = new Bits(content.items().size);
+
+                Runnable rebuild = () -> {
+                    c.clearChildren();
+
+                    for(Item item : content.items()){
+                        if(state.stats.getExport(item) >= 1){
+                            c.image(item.icon(Cicon.small));
+                            c.label(() -> (int)state.stats.getExport(item) + " /s").color(Color.lightGray);
+                            c.row();
+                        }
+                    }
+                };
+
+                c.update(() -> {
+                    boolean wrong = false;
+                    for(Item item : content.items()){
+                        boolean has = state.stats.getExport(item) >= 1;
+                        if(used.get(item.id) != has){
+                            used.set(item.id, has);
+                            wrong = true;
+                        }
+                    }
+                    if(wrong){
+                        rebuild.run();
+                    }
+                });
+            });
+
         });
 
         blockfrag.build(parent);

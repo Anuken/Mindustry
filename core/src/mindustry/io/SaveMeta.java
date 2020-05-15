@@ -3,6 +3,7 @@ package mindustry.io;
 import arc.struct.*;
 import mindustry.game.*;
 import mindustry.maps.*;
+import mindustry.type.*;
 
 import static mindustry.Vars.maps;
 
@@ -16,8 +17,11 @@ public class SaveMeta{
     public Rules rules;
     public StringMap tags;
     public String[] mods;
+    /** These are in items/second. */
+    public ObjectFloatMap<Item> productionRates;
+    public boolean hasProduction;
 
-    public SaveMeta(int version, long timestamp, long timePlayed, int build, String map, int wave, Rules rules, StringMap tags){
+    public SaveMeta(int version, long timestamp, long timePlayed, int build, String map, int wave, Rules rules,  ObjectFloatMap<Item> productionRates, StringMap tags){
         this.version = version;
         this.build = build;
         this.timestamp = timestamp;
@@ -27,5 +31,8 @@ public class SaveMeta{
         this.rules = rules;
         this.tags = tags;
         this.mods = JsonIO.read(String[].class, tags.get("mods", "[]"));
+        this.productionRates = productionRates;
+
+        productionRates.each(e -> hasProduction |= e.value > 0.001f);
     }
 }

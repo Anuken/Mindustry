@@ -80,7 +80,7 @@ public class Vars implements Loadable{
     public static final float miningRange = 70f;
     /** range for building */
     public static final float buildingRange = 220f;
-    /** duration of one turn. */
+    /** duration of one turn in ticks */
     public static final float turnDuration = 5 * Time.toMinutes;
     /** for map generator dialog */
     public static boolean updateEditorOnChange = false;

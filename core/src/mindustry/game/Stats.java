@@ -5,8 +5,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.type.*;
 
-import java.util.*;
-
 import static mindustry.Vars.content;
 
 public class Stats{
@@ -30,34 +28,42 @@ public class Stats{
     /** Friendly buildings destroyed. */
     public int buildingsDestroyed;
 
-    /** Item production means. Holds means per period. */
-    private transient WindowedMean[] itemExport = new WindowedMean[content.items().size];
-    /** Counters of items recieved this period. */
-    private transient float[] itemCounters = new float[content.items().size];
     /** Counter refresh state. */
     private transient Interval time = new Interval();
-
-    public Stats(){
-        for(int i = 0; i < itemExport.length; i++){
-            itemExport[i] = new WindowedMean(exportWindow);
-        }
-    }
+    /** Export statistics. */
+    public ObjectMap<Item, ProductionStat> production = new ObjectMap<>();
 
     /** Updates export statistics. */
     public void handleItemExport(ItemStack stack){
-        itemCounters[stack.item.id] += stack.amount;
+        production.getOr(stack.item, ProductionStat::new).counter += stack.amount;
+    }
+
+    public float getExport(Item item){
+        return production.getOr(item, ProductionStat::new).mean;
     }
 
     public void update(){
 
         //refresh throughput
         if(time.get(refreshPeriod)){
-            for(int i = 0; i < itemCounters.length; i++){
-                itemExport[i].add(itemCounters[i]);
-            }
+            for(ProductionStat stat : production.values()){
+                //initialize stat after loading
+                if(!stat.loaded){
+                    stat.means.fill(stat.mean);
+                    stat.loaded = true;
+                }
 
-            Arrays.fill(itemCounters, 0);
+                stat.means.add(stat.counter);
+                stat.counter = 0;
+                stat.mean = stat.means.rawMean();
+            }
         }
+    }
+
+    public ObjectFloatMap<Item> productionRates(){
+        ObjectFloatMap<Item> map = new ObjectFloatMap<>();
+        production.each((item, value) -> map.put(item, value.mean));
+        return map;
     }
 
     public RankResult calculateRank(Sector zone, boolean launched){
@@ -106,7 +112,15 @@ public class Stats{
         }
     }
 
+
     public enum Rank{
         F, D, C, B, A, S, SS
+    }
+
+    public static class ProductionStat{
+        public transient float counter;
+        public transient WindowedMean means = new WindowedMean(content.items().size);
+        public transient boolean loaded;
+        public float mean;
     }
 }

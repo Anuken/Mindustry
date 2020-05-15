@@ -30,10 +30,12 @@ abstract class BuilderComp implements Unitc{
 
     Queue<BuildRequest> requests = new Queue<>();
     transient float buildSpeed = 1f;
-    //boolean building;
+    transient boolean building = true;
 
     @Override
     public void update(){
+        if(!building) return;
+
         float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange;
 
         Iterator<BuildRequest> it = requests.iterator();

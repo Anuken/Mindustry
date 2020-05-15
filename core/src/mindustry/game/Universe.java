@@ -2,8 +2,10 @@ package mindustry.game;
 
 import arc.*;
 import arc.math.*;
+import arc.struct.ObjectFloatMap.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.io.*;
 import mindustry.type.*;
 
 import static mindustry.Vars.*;
@@ -69,7 +71,24 @@ public class Universe{
     }
 
     private void onTurn(){
-        //create a random event here, e.g. invasion
+        //TODO run waves on hostile sectors, damage them
+
+        //calculate passive items
+        for(Planet planet : content.planets()){
+            for(Sector sector : planet.sectors){
+                if(sector.hasSave()){
+                    SaveMeta meta = sector.save.meta;
+
+                    for(Entry<Item> entry : meta.productionRates){
+                        //total is calculated by  items/sec (value) * turn duration in seconds
+                        int total = (int)(entry.value * turnDuration / 60f);
+
+                        //add the items to global data
+                        data.addItem(entry.key, total);
+                    }
+                }
+            }
+        }
     }
 
     public float secondsMod(float mod, float scale){

@@ -225,8 +225,8 @@ public class Renderer implements ApplicationListener{
         }
 
         if(bloom != null){
-            Draw.draw(Layer.bullet - 0.001f, bloom::capture);
-            Draw.draw(Layer.effect + 0.001f, bloom::render);
+            Draw.draw(Layer.bullet - 0.01f, bloom::capture);
+            Draw.draw(Layer.effect + 0.01f, bloom::render);
         }
 
         Draw.z(Layer.plans);
