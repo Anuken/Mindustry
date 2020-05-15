@@ -1153,10 +1153,10 @@ public class Fx{
         Lines.circle(e.x, e.y, 4f + e.finpow() * 120f);
     }),
 
-    launchPod = new Effect(40, e -> {
+    launchPod = new Effect(50, e -> {
         color(Pal.engine);
 
-        e.scaled(20f, f -> {
+        e.scaled(25f, f -> {
             stroke(f.fout() * 2f);
             Lines.circle(e.x, e.y, 4f + f.finpow() * 30f);
         });
