@@ -106,7 +106,7 @@ public class LaunchPad extends Block{
     @EntityDef(LaunchPayloadc.class)
     @Component
     static abstract class LaunchPayloadComp implements Drawc, Timedc, Teamc{
-        static final float speed = 1.6f;
+        static final float speed = 3f;
 
         @Import float x,y;
 
