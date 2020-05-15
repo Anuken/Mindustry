@@ -39,7 +39,7 @@ public abstract class SaveVersion extends SaveFileReader{
             map.get("mapname"),
             map.getInt("wave"),
             JsonIO.read(Rules.class, map.get("rules", "{}")),
-            JsonIO.read(Stats.class, map.get("stats", "{}")).productionRates(),
+            JsonIO.read(Stats.class, map.get("stats", "{}")).exportRates(),
             map
         );
     }

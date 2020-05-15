@@ -161,7 +161,7 @@ public class Fx{
 
     rocketSmoke = new Effect(120, e -> {
         color(Color.gray);
-        alpha(Mathf.clamp(e.fout()*1.6f - e.rotation*0.8f));
+        alpha(Mathf.clamp(e.fout()*1.6f - Interp.pow3In.apply(e.rotation)*1.2f));
         Fill.circle(e.x, e.y, (1f + 6f * e.rotation) - e.fin()*2f);
     }),
 

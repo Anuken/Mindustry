@@ -4,8 +4,9 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.type.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class Stats{
     /** export window size in seconds */
@@ -13,7 +14,7 @@ public class Stats{
     /** refresh period of export in ticks */
     private static final float refreshPeriod = 60;
 
-    /** Items delivered to global resoure counter. Zones only. */
+    /** Total items delivered to global resoure counter. Campaign only. */
     public ObjectIntMap<Item> itemsDelivered = new ObjectIntMap<>();
     /** Enemy (red team) units destroyed. */
     public int enemyUnitsDestroyed;
@@ -27,42 +28,64 @@ public class Stats{
     public int buildingsDeconstructed;
     /** Friendly buildings destroyed. */
     public int buildingsDestroyed;
+    /** Export statistics. */
+    public ObjectMap<Item, ExportStat> export = new ObjectMap<>();
 
     /** Counter refresh state. */
     private transient Interval time = new Interval();
-    /** Export statistics. */
-    public ObjectMap<Item, ProductionStat> production = new ObjectMap<>();
+    /** Core item storage to prevent spoofing. */
+    private transient int[] lastCoreItems;
 
     /** Updates export statistics. */
     public void handleItemExport(ItemStack stack){
-        production.getOr(stack.item, ProductionStat::new).counter += stack.amount;
+        export.getOr(stack.item, ExportStat::new).counter += stack.amount;
     }
 
     public float getExport(Item item){
-        return production.getOr(item, ProductionStat::new).mean;
+        return export.getOr(item, ExportStat::new).mean;
     }
 
     public void update(){
+        //create last stored core items
+        if(lastCoreItems == null){
+            lastCoreItems = new int[content.items().size];
+            updateCoreDeltas();
+        }
 
         //refresh throughput
         if(time.get(refreshPeriod)){
-            for(ProductionStat stat : production.values()){
+            CoreEntity ent = state.rules.defaultTeam.core();
+
+            export.each((item, stat) -> {
                 //initialize stat after loading
                 if(!stat.loaded){
                     stat.means.fill(stat.mean);
                     stat.loaded = true;
                 }
 
-                stat.means.add(stat.counter);
+                //how the resources changed - only interested in negative deltas, since that's what happens during spoofing
+                int coreDelta = Math.min(ent == null ? 0 : ent.items.get(item) - lastCoreItems[item.id], 0);
+
+                //add counter, subtract how many items were taken from the core during this time
+                stat.means.add(Math.max(stat.counter + coreDelta, 0));
                 stat.counter = 0;
                 stat.mean = stat.means.rawMean();
-            }
+            });
+
+            updateCoreDeltas();
         }
     }
 
-    public ObjectFloatMap<Item> productionRates(){
+    private void updateCoreDeltas(){
+        CoreEntity ent = state.rules.defaultTeam.core();
+        for(int i = 0; i < lastCoreItems.length; i++){
+            lastCoreItems[i] = ent == null ? 0 : ent.items.get(i);
+        }
+    }
+
+    public ObjectFloatMap<Item> exportRates(){
         ObjectFloatMap<Item> map = new ObjectFloatMap<>();
-        production.each((item, value) -> map.put(item, value.mean));
+        export.each((item, value) -> map.put(item, value.mean));
         return map;
     }
 
@@ -117,9 +140,9 @@ public class Stats{
         F, D, C, B, A, S, SS
     }
 
-    public static class ProductionStat{
+    public static class ExportStat{
         public transient float counter;
-        public transient WindowedMean means = new WindowedMean(content.items().size);
+        public transient WindowedMean means = new WindowedMean(exportWindow);
         public transient boolean loaded;
         public float mean;
     }

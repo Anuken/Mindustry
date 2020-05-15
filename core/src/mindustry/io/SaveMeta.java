@@ -18,10 +18,10 @@ public class SaveMeta{
     public StringMap tags;
     public String[] mods;
     /** These are in items/second. */
-    public ObjectFloatMap<Item> productionRates;
+    public ObjectFloatMap<Item> exportRates;
     public boolean hasProduction;
 
-    public SaveMeta(int version, long timestamp, long timePlayed, int build, String map, int wave, Rules rules,  ObjectFloatMap<Item> productionRates, StringMap tags){
+    public SaveMeta(int version, long timestamp, long timePlayed, int build, String map, int wave, Rules rules, ObjectFloatMap<Item> exportRates, StringMap tags){
         this.version = version;
         this.build = build;
         this.timestamp = timestamp;
@@ -31,8 +31,8 @@ public class SaveMeta{
         this.rules = rules;
         this.tags = tags;
         this.mods = JsonIO.read(String[].class, tags.get("mods", "[]"));
-        this.productionRates = productionRates;
+        this.exportRates = exportRates;
 
-        productionRates.each(e -> hasProduction |= e.value > 0.001f);
+        exportRates.each(e -> hasProduction |= e.value > 0.001f);
     }
 }

@@ -361,7 +361,7 @@ public class PlanetDialog extends FloatingDialog{
             stable.table(t -> {
                 t.left();
 
-                selected.save.meta.productionRates.each(entry -> {
+                selected.save.meta.exportRates.each(entry -> {
                     int total = (int)(entry.value * turnDuration / 60f);
                     if(total > 1){
                         t.image(entry.key.icon(Cicon.small)).padRight(3);

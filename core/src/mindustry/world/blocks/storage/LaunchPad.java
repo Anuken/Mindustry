@@ -72,7 +72,7 @@ public class LaunchPad extends Block{
                 Draw.reset();
             }
 
-            float cooldown = Mathf.clamp(timer.getTime(timerLaunch) / 90f);
+            float cooldown = Mathf.clamp(timer.getTime(timerLaunch) / 90f / timeScale);
 
             Draw.mixcol(lightColor, 1f - cooldown);
 
@@ -90,7 +90,7 @@ public class LaunchPad extends Block{
         public void updateTile(){
 
             //launch when full and base conditions are met
-            if(items.total() >= itemCapacity && efficiency() >= 1f && timer(timerLaunch, launchTime)){
+            if(items.total() >= itemCapacity && efficiency() >= 1f && timer(timerLaunch, launchTime / timeScale)){
                 LaunchPayloadc entity = LaunchPayloadEntity.create();
                 items.each((item, amount) -> entity.stacks().add(new ItemStack(item, amount)));
                 entity.set(this);

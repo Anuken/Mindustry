@@ -76,10 +76,11 @@ public class Universe{
         //calculate passive items
         for(Planet planet : content.planets()){
             for(Sector sector : planet.sectors){
-                if(sector.hasSave()){
+                //make sure this is a different sector
+                if(sector.hasSave() && sector != state.rules.sector){
                     SaveMeta meta = sector.save.meta;
 
-                    for(Entry<Item> entry : meta.productionRates){
+                    for(Entry<Item> entry : meta.exportRates){
                         //total is calculated by  items/sec (value) * turn duration in seconds
                         int total = (int)(entry.value * turnDuration / 60f);
 

@@ -144,6 +144,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         con.kick(reason);
     }
 
+    void kick(String reason, int duration){
+        con.kick(reason, duration);
+    }
+
     @Override
     public void draw(){
         Draw.z(Layer.playerName);

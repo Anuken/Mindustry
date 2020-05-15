@@ -243,7 +243,7 @@ public class Saves{
         }
 
         public ObjectFloatMap<Item> getProductionRates(){
-            return meta.productionRates;
+            return meta.exportRates;
         }
 
         public String getPlayTime(){

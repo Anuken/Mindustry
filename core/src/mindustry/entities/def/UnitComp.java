@@ -177,6 +177,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return controller instanceof Playerc;
     }
 
+    public Playerc getPlayer(){
+        return isPlayer() ? (Playerc)controller : null;
+    }
+
     @Override
     public void killed(){
         float explosiveness = 2f + item().explosiveness * stack().amount;

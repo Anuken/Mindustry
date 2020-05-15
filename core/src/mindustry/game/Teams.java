@@ -165,8 +165,8 @@ public class Teams{
             return cores.isEmpty();
         }
 
-        public CoreEntity core(){
-            return cores.first();
+        public @Nullable CoreEntity core(){
+            return cores.isEmpty() ? null : cores.first();
         }
 
         @Override

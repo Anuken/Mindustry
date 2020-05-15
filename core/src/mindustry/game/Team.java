@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.game.Teams.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -72,7 +73,7 @@ public class Team implements Comparable<Team>{
         return state.teams.get(this);
     }
 
-    public CoreEntity core(){
+    public @Nullable CoreEntity core(){
         return data().core();
     }
 

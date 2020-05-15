@@ -27,7 +27,8 @@ public class Door extends Wall{
         solid = false;
         solidifes = true;
         consumesTap = true;
-    config(Boolean.class, (entity, open) -> {
+
+        config(Boolean.class, (entity, open) -> {
             DoorEntity door = (DoorEntity)entity;
             door.open = open;
             pathfinder.updateTile(door.tile());
