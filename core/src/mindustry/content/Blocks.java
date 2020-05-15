@@ -1320,7 +1320,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
             size = 3;
             itemCapacity = 100;
-            launchTime = 60f * 15;
+            launchTime = 60f * 20;
             hasPower = true;
             consumes.power(4f);
         }};
@@ -1329,7 +1329,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
             size = 4;
             itemCapacity = 300;
-            launchTime = 60f * 25;
+            launchTime = 60f * 35;
             hasPower = true;
             consumes.power(6f);
         }};

@@ -10,6 +10,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -55,7 +56,7 @@ public class LaunchPad extends Block{
 
             if(lightRegion.found()){
                 Draw.color(lightColor);
-                float progress = Math.min((float)items.total() / itemCapacity, timer.getTime(timerLaunch) / launchTime);
+                float progress = Math.min((float)items.total() / itemCapacity, timer.getTime(timerLaunch) / (launchTime / timeScale));
                 int steps = 3;
                 float step = 1f;
 
@@ -72,7 +73,7 @@ public class LaunchPad extends Block{
                 Draw.reset();
             }
 
-            float cooldown = Mathf.clamp(timer.getTime(timerLaunch) / 90f / timeScale);
+            float cooldown = Mathf.clamp(timer.getTime(timerLaunch) / (90f / timeScale));
 
             Draw.mixcol(lightColor, 1f - cooldown);
 
@@ -99,6 +100,7 @@ public class LaunchPad extends Block{
                 entity.add();
                 Fx.launchPod.at(this);
                 items.clear();
+                Effects.shake(3f, 3f, this);
             }
         }
     }

@@ -1217,13 +1217,18 @@ public class Fx{
         Unitc unit = e.data();
 
         float radius = unit.hitSize() * 1.3f;
-        color(Pal.shield, e.fout());
 
-        randLenVectors(e.id, (int)(radius * 0.7f), radius, radius * e.finpow(), (x, y) -> {
-            Fill.poly(e.x + x, e.y + y, 3, e.fout() * 3f, Angles.angle(x, y));
+
+        e.scaled(16f, c -> {
+            color(Pal.shield);
+            stroke(c.fout() * 2f + 0.1f);
+
+            randLenVectors(e.id, (int)(radius * 1.2f), radius/2f + c.finpow() * radius*1.25f, (x, y) -> {
+                lineAngle(c.x + x, c.y + y, Mathf.angle(x, y), c.fout() * 5 + 1f);
+            });
         });
 
-
+        color(Pal.shield, e.fout());
         stroke(1f * e.fout());
         Lines.circle(e.x, e.y, radius);
     }),
