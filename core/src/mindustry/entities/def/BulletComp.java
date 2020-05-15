@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.bullet.*;
@@ -18,6 +19,7 @@ import static mindustry.Vars.*;
 abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
     @Import Team team;
 
+    IntArray collided = new IntArray(6);
     Object data;
     BulletType type;
     float damage;
@@ -42,6 +44,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Override
     public void remove(){
         type.despawned(this);
+        collided.clear();
     }
 
     @Override
@@ -72,7 +75,8 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Override
     public boolean collides(Hitboxc other){
         return type.collides && (other instanceof Teamc && ((Teamc)other).team() != team())
-            && !(other instanceof Flyingc && ((((Flyingc)other).isFlying() && !type.collidesAir) || (((Flyingc)other).isGrounded() && !type.collidesGround)));
+            && !(other instanceof Flyingc && ((((Flyingc)other).isFlying() && !type.collidesAir) || (((Flyingc)other).isGrounded() && !type.collidesGround)))
+            && !(type.pierce && collided.contains(other.id())); //prevent multiple collisions
     }
 
     @MethodPriority(100)
@@ -92,7 +96,11 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         }
 
         //must be last.
-        if(!type.pierce) remove();
+        if(!type.pierce){
+            remove();
+        }else{
+            collided.add(other.id());
+        }
     }
 
     @Override

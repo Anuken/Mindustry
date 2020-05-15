@@ -4,6 +4,7 @@ import arc.*;
 import arc.math.*;
 import arc.struct.ObjectFloatMap.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.io.*;
 import mindustry.type.*;
@@ -70,25 +71,36 @@ public class Universe{
         }
     }
 
-    private void onTurn(){
-        //TODO run waves on hostile sectors, damage them
+    public int[] getTotalExports(){
+        int[] exports = new int[Vars.content.items().size];
 
-        //calculate passive items
         for(Planet planet : content.planets()){
             for(Sector sector : planet.sectors){
-                //make sure this is a different sector
-                if(sector.hasSave() && sector != state.rules.sector){
+
+                //ignore the current sector if the player is in it right now
+                if(sector.hasSave() && (state.isMenu() || sector != state.rules.sector)){
                     SaveMeta meta = sector.save.meta;
 
                     for(Entry<Item> entry : meta.exportRates){
                         //total is calculated by  items/sec (value) * turn duration in seconds
                         int total = (int)(entry.value * turnDuration / 60f);
 
-                        //add the items to global data
-                        data.addItem(entry.key, total);
+                        exports[entry.key.id] += total;
                     }
                 }
             }
+        }
+
+        return exports;
+    }
+
+    private void onTurn(){
+        //TODO run waves on hostile sectors, damage them
+
+        //calculate passive item generation
+        int[] exports = getTotalExports();
+        for(int i = 0; i < exports.length; i++){
+            data.addItem(content.item(i), exports[i]);
         }
     }
 

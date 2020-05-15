@@ -33,7 +33,7 @@ public class PlanetDialog extends FloatingDialog{
         borderColor = Pal.accent.cpy().a(0.3f),
         shadowColor = new Color(0, 0, 0, 0.7f);
     private static final float camLength = 4f;
-    float outlineRad = 1.16f;
+    private static final float outlineRad = 1.16f;
 
     //the base planet that's being rendered
     private final Planet solarSystem = Planets.sun;
@@ -44,7 +44,9 @@ public class PlanetDialog extends FloatingDialog{
     private final PlaneBatch3D projector = new PlaneBatch3D();
     private final Mat3D mat = new Mat3D();
     private final Vec3 camRelative = new Vec3();
+    private final ResourcesDialog resources = new ResourcesDialog();
 
+    private float zoom = 1f, smoothZoom = 1f;
     private Bloom bloom;
     private Planet planet = Planets.starter;
     private @Nullable Sector selected, hovered;
@@ -73,18 +75,17 @@ public class PlanetDialog extends FloatingDialog{
 
         Events.on(ResizeEvent.class, e -> makeBloom());
 
-
-        buttons.defaults().size(220f, 64f).pad(0f);
-
         TextButtonStyle style = Styles.cleart;
         float bmargin = 6f;
 
-        //TODO names
-        //buttons.button("$back", Icon.left, style, this::hide).margin(bmargin);
-        //buttons.addImageTextButton("Tech", Icon.tree, style, () -> ui.tech.show()).margin(bmargin);
-        //buttons.addImageTextButton("Launch", Icon.upOpen, style, this::hide).margin(bmargin);
-        //buttons.addImageTextButton("Database", Icon.book, style, () -> ui.database.show()).margin(bmargin);
-        //buttons.addImageTextButton("Resources", Icon.file, style, this::hide).margin(bmargin);
+        getCell(buttons).padBottom(-4);
+        buttons.background(Styles.black).defaults().growX().height(64f).pad(0);
+
+        //TODO
+        buttons.button("$back", Icon.left, style, this::hide).margin(bmargin);
+        buttons.button("Research", Icon.tree, style, () -> ui.tech.show()).margin(bmargin);
+        //buttons.button("Database", Icon.book, style, () -> ui.database.show()).margin(bmargin);
+        buttons.button("Resources", Icon.file, style, resources::show).margin(bmargin);
 
         cam.fov = 60f;
 
@@ -108,6 +109,10 @@ public class PlanetDialog extends FloatingDialog{
             camRelative.rotate(Tmp.v31.set(cam.up).rotate(cam.direction, 90), amount);
         });
 
+        scrolled(value -> {
+            zoom = Mathf.clamp(zoom + value / 10f, 0.5f, 2f);
+        });
+
         update(() -> {
             if(planet.isLandable()){
                 hovered = planet.getSector(cam.getMouseRay(), outlineRad);
@@ -115,7 +120,7 @@ public class PlanetDialog extends FloatingDialog{
                 hovered = selected = null;
             }
 
-
+            smoothZoom = Mathf.lerpDelta(smoothZoom, zoom, 0.4f);
         });
 
         addListener(new ElementGestureListener(){
@@ -166,7 +171,7 @@ public class PlanetDialog extends FloatingDialog{
         cam.up.set(Vec3.Y);
 
         cam.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
-        camRelative.setLength(planet.radius * camLength);
+        camRelative.setLength(planet.radius * camLength + (smoothZoom-1f) * planet.radius * 2);
         cam.position.set(planet.position).add(camRelative);
         cam.lookAt(planet.position);
         cam.update();
@@ -371,8 +376,6 @@ public class PlanetDialog extends FloatingDialog{
                 });
             });
         }
-
-
 
         stable.row();
 

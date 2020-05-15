@@ -439,7 +439,7 @@ public class Bullets implements ContentList{
             }
         };
 
-        basicFlame = new BulletType(3f, 6f){
+        basicFlame = new BulletType(3f, 30f){
             {
                 ammoMultiplier = 3f;
                 hitSize = 7f;
@@ -464,7 +464,7 @@ public class Bullets implements ContentList{
             }
         };
 
-        pyraFlame = new BulletType(3.3f, 9f){
+        pyraFlame = new BulletType(3.3f, 45f){
             {
                 ammoMultiplier = 4f;
                 hitSize = 7f;

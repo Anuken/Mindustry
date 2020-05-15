@@ -275,8 +275,8 @@ public class ItemBridge extends Block{
             Tile other = world.tile(link);
 
             if(linkValid(tile, other)){
-                int rel = relativeTo(other.x, other.y);
-                int rel2 = relativeTo(source.tileX(), source.tileY());
+                int rel = relativeTo(other);
+                int rel2 = relativeTo(Edges.getFacingEdge(source.tile(), tile));
 
                 if(rel == rel2) return false;
             }else{
