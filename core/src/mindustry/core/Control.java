@@ -109,14 +109,6 @@ public class Control implements ApplicationListener, Loadable{
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.onGameOver(event.winner);
-            //TODO set meta to indicate game over
-            /*
-            if(state.rules.zone != null && !net.client()){
-                //remove zone save on game over
-                if(saves.getZoneSlot() != null && !state.rules.tutorial){
-                    saves.getZoneSlot().delete();
-                }
-            }*/
         });
 
         //autohost for pvp maps
@@ -274,9 +266,21 @@ public class Control implements ApplicationListener, Loadable{
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
                     if(state.rules.defaultTeam.cores().isEmpty()){
+
+                        //kill all friendly units, since they should be dead anwyay
+                        for(Unitc unit : Groups.unit){
+                            if(unit.team() == state.rules.defaultTeam){
+                                unit.remove();
+                            }
+                        }
+
                         Tile spawn = world.tile(sector.getSpawnPosition());
                         //TODO PLACE CORRECT LOADOUT
                         Schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
+
+                        //set up camera/player locations
+                        player.set(spawn.x * tilesize, spawn.y * tilesize);
+                        camera.position.set(player);
 
                         Events.fire(Trigger.newGame);
                     }
