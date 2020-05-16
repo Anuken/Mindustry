@@ -6,6 +6,8 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.pooling.*;
+import arc.scene.ui.layout.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -73,19 +75,55 @@ public class Drill extends Block{
         if(tile == null) return;
         countOre(req.tile());
         if(returnItem == null) return;
-        /* This commented code shows only the icon
-        float dx = req.drawx() - size * tilesize/2f, dy = req.drawy() + size * tilesize/2f;
-        Draw.mixcol(Color.darkGray, 1f);
-        Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
+
+        /* The code section below adds drill speed text right below the top of the block*/
+        BitmapFont font = Fonts.outline;
+        GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+        boolean ints = font.usesIntegerPositions();
+        String text = Core.bundle.formatFloat("bar.schemdrillspeed", 60f / (drillTime + hardnessDrillMultiplier * returnItem.hardness) * returnCount, 2);
+        font.setUseIntegerPositions(false);
+        font.getData().setScale(1f / 4f / Scl.scl(1f));
+        layout.setText(font, text);
+
+        float width = renderer.pixelator.enabled() ? 0f : layout.width;
+
+        if(renderer.pixelator.enabled()) width = 0f;
+
+        font.setColor(Pal.accent);
+        float dx = req.drawx(), dy = req.drawy() + size * tilesize/2f;
+        font.draw(text, dx, dy - 1, Align.center);
+
+        font.setUseIntegerPositions(ints);
+        font.setColor(Color.white);
+        font.getData().setScale(1f);
         Draw.reset();
-        Draw.rect(returnItem.icon(Cicon.small), dx, dy);*/
-        /* This below code shows the icon + the drill speed */
+        Pools.free(layout);
+        /* end of code section */
+
+        /* This commented code colors their ore region */
+        Draw.color(returnItem.color);
+        Draw.rect("drill-top", req.drawx(), req.drawy(), 1f);
+        Draw.color();
+
+        /* This below code shows the drill speed with underlines
         float width = drawPlaceText(Core.bundle.formatFloat("bar.schemdrillspeed", 60f / (drillTime + hardnessDrillMultiplier * returnItem.hardness) * returnCount, 2), req.x, req.y, true);
+        end of code section */
+
+        /* This code section shows the icon on the top left like drawSelect
         float dx = req.drawx() - size * tilesize/2f, dy = req.drawy() + size * tilesize/2f;
         Draw.mixcol(Color.darkGray, 1f);
         Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
         Draw.reset();
         Draw.rect(returnItem.icon(Cicon.small), dx, dy);
+        end of code section */
+
+        /* This code section shows the icon at top-center of block
+        dx = req.drawx(); dy = req.drawy() + size * tilesize/2f;
+        Draw.mixcol(Color.darkGray, 1f);
+        Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
+        Draw.reset();
+        Draw.rect(returnItem.icon(Cicon.small), dx, dy); 
+        end of code section */
     }
 
     @Override
