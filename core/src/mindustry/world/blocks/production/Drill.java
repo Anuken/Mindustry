@@ -73,24 +73,19 @@ public class Drill extends Block{
         if(tile == null) return;
         countOre(req.tile());
         if(returnItem == null) return;
-        /*
+        /* This commented code shows only the icon
         float dx = req.drawx() - size * tilesize/2f, dy = req.drawy() + size * tilesize/2f;
         Draw.mixcol(Color.darkGray, 1f);
         Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
         Draw.reset();
         Draw.rect(returnItem.icon(Cicon.small), dx, dy);*/
+        /* This below code shows the icon + the drill speed */
         float width = drawPlaceText(Core.bundle.formatFloat("bar.schemdrillspeed", 60f / (drillTime + hardnessDrillMultiplier * returnItem.hardness) * returnCount, 2), req.x, req.y, true);
         float dx = req.drawx() - size * tilesize/2f, dy = req.drawy() + size * tilesize/2f;
         Draw.mixcol(Color.darkGray, 1f);
         Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
         Draw.reset();
         Draw.rect(returnItem.icon(Cicon.small), dx, dy);
-        /*
-        float dx = req.x * tilesize + offset() - width/2f - 4f, dy = req.y * tilesize + offset() + size * tilesize / 2f + 5;
-        Draw.mixcol(Color.darkGray, 1f);
-        Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
-        Draw.reset();
-        Draw.rect(returnItem.icon(Cicon.small), dx, dy);*/
     }
 
     @Override
