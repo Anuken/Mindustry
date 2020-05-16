@@ -55,9 +55,7 @@ public class Universe{
         turnCounter += Time.delta();
 
         if(turnCounter >= turnDuration){
-            turn ++;
-            turnCounter = 0;
-            onTurn();
+            runTurn();
         }
 
         if(state.hasSector()){
@@ -78,7 +76,7 @@ public class Universe{
             for(Sector sector : planet.sectors){
 
                 //ignore the current sector if the player is in it right now
-                if(sector.hasSave() && (state.isMenu() || sector != state.rules.sector)){
+                if(sector.hasSave() && !sector.isBeingPlayed()){
                     SaveMeta meta = sector.save.meta;
 
                     for(Entry<Item> entry : meta.exportRates){
@@ -94,8 +92,28 @@ public class Universe{
         return exports;
     }
 
-    private void onTurn(){
-        //TODO run waves on hostile sectors, damage them
+    public void runTurns(int amount){
+        for(int i = 0; i < amount; i++){
+            runTurn();
+        }
+    }
+
+    /** Runs a turn once. Resets turn counter. */
+    public void runTurn(){
+        turn ++;
+        turnCounter = 0;
+
+        //TODO EVENTS
+
+        //increment turns passed for sectors with waves
+        //TODO a turn passing may break the core; detect this, send an event and mark the sector as having no base!
+        for(Planet planet : content.planets()){
+            for(Sector sector : planet.sectors){
+                if(!sector.isBeingPlayed() && sector.hasSave() && sector.hasWaves()){
+                    sector.setTurnsPassed(sector.getTurnsPassed() + 1);
+                }
+            }
+        }
 
         //calculate passive item generation
         int[] exports = getTotalExports();

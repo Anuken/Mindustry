@@ -281,9 +281,9 @@ public class PlanetDialog extends FloatingDialog{
 
             if(selectAlpha > 0.01f){
                 float stroke = 0.026f;
-                if(sec.save != null){
+                if(sec.hasBase()){
                     drawSelection(sec, Tmp.c1.set(Team.sharded.color).a(selectAlpha), stroke, -0.01f);
-                }else if(sec.hostility >= 0.02f){
+                }else if(sec.hasEnemyBase()){
                     drawSelection(sec, Tmp.c1.set(Team.crux.color).a(selectAlpha), stroke, -0.02f);
                 }
             }
@@ -378,6 +378,13 @@ public class PlanetDialog extends FloatingDialog{
                     }
                 });
             });
+        }
+
+        //disaply how many turns this sector has been attacked
+        if(selected.getTurnsPassed() > 0){
+            stable.row();
+
+            stable.add("[scarlet]" + Iconc.warning + " " + selected.getTurnsPassed() + "x attacks");
         }
 
         stable.row();

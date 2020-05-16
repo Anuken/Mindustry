@@ -266,11 +266,23 @@ public class Control implements ApplicationListener, Loadable{
             ui.planet.hide();
             SaveSlot slot = sector.save;
             if(slot != null && !clearSectors){
+
                 try{
                     net.reset();
                     slot.load();
                     state.rules.sector = sector;
+
+                    //if there is no base, simulate a new game and place the right loadout at the spawn position
+                    if(state.rules.defaultTeam.cores().isEmpty()){
+                        Tile spawn = world.tile(sector.getSpawnPosition());
+                        //TODO PLACE CORRECT LOADOUT
+                        Schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
+
+                        Events.fire(Trigger.newGame);
+                    }
+
                     state.set(State.playing);
+
                 }catch(SaveException e){
                     Log.err(e);
                     sector.save = null;

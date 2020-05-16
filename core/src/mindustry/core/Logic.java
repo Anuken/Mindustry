@@ -11,6 +11,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
@@ -94,6 +95,22 @@ public class Logic implements ApplicationListener{
         });
 
         Events.on(LaunchItemEvent.class, e -> state.stats.handleItemExport(e.stack));
+
+        //when loading a 'damaged' sector, propagate the damage
+        Events.on(WorldLoadEvent.class, e -> {
+            if(state.isCampaign() && state.rules.sector.hasWaves() && state.rules.sector.getTurnsPassed() > 0){
+                SectorDamage.apply(state.rules.sector.getTurnsPassed());
+                state.rules.sector.setTurnsPassed(0);
+            }
+        });
+
+        //TODO this should be in the same place as launch handling code
+        Events.on(GameOverEvent.class, e -> {
+            //simulate a turn on a normal non-launch gameover
+            if(state.isCampaign() && !state.launched){
+                universe.runTurn();
+            }
+        });
     }
 
     /** Handles the event of content being used by either the player or some block. */
@@ -204,6 +221,7 @@ public class Logic implements ApplicationListener{
             ui.hudfrag.showLaunch();
         }
 
+        //TODO core launch effect
         for(Tilec tile : state.teams.playerCores()){
             Fx.launch.at(tile);
         }
@@ -213,6 +231,9 @@ public class Logic implements ApplicationListener{
             //state.getSector().setLaunched();
         }
 
+        Sector sector = state.rules.sector;
+
+        //TODO what about containers, do they get launched too?
         Time.runTask(30f, () -> {
             for(Tilec entity : state.teams.playerCores()){
                 for(Item item : content.items()){
@@ -223,6 +244,16 @@ public class Logic implements ApplicationListener{
             }
             state.launched = true;
             state.gameOver = true;
+
+            //save over the data w/o the cores
+            sector.save.save();
+            //TODO mark sector as not containing any cores
+
+            //run a turn, since launching takes up a turn
+            universe.runTurn();
+            //TODO needs extra damage to prevent player from landing immediately afterwards
+            sector.setTurnsPassed(sector.getTurnsPassed() + 1);
+
             Events.fire(new LaunchEvent());
             //manually fire game over event now
             Events.fire(new GameOverEvent(state.rules.defaultTeam));

@@ -215,6 +215,10 @@ public class World{
 
         int size = sector.getSize();
         loadGenerator(size, size, tiles -> sector.planet.generator.generate(tiles, sector));
+
+        if(state.rules.defaultTeam.core() != null){
+            sector.setSpawnPosition(state.rules.defaultTeam.core().pos());
+        }
     }
 
     private void setSectorRules(Sector sector){

@@ -260,9 +260,10 @@ public class TODOPlanetGenerator extends PlanetGenerator{
             }
         });
 
+        //TODO PLACE CORRECT LOADOUT
         Schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
 
-        if(sector.hostility > 0.02f){
+        if(sector.hasEnemyBase()){
             new BaseGenerator().generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector);
 
             state.rules.attackMode = true;
