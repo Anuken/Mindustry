@@ -120,7 +120,6 @@ public class Universe{
         Core.settings.put("utime", seconds);
         Core.settings.put("turn", turn);
         Core.settings.put("turntime", turnCounter);
-        Core.settings.save();
     }
 
     private void load(){

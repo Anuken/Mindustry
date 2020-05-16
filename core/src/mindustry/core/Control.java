@@ -403,7 +403,6 @@ public class Control implements ApplicationListener, Loadable{
                 Runnable exit = () -> {
                     Core.settings.put("uiscale", 100);
                     Core.settings.put("uiscalechanged", false);
-                    settings.save();
                     dialog.hide();
                     Core.app.exit();
                 };
@@ -420,7 +419,6 @@ public class Control implements ApplicationListener, Loadable{
 
                 dialog.buttons.button("$ok", () -> {
                     Core.settings.put("uiscalechanged", false);
-                    settings.save();
                     dialog.hide();
                 });
 
@@ -463,7 +461,6 @@ public class Control implements ApplicationListener, Loadable{
                 graphics.setFullscreenMode(graphics.getDisplayMode());
             }
             settings.put("fullscreen", !full);
-            settings.save();
         }
 
         if(state.isGame()){

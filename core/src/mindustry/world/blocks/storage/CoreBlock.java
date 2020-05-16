@@ -116,15 +116,15 @@ public class CoreBlock extends StorageBlock{
             }
             state.teams.registerCore(this);
 
-            storageCapacity = itemCapacity + proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
-            proximity.each(this::isContainer, t -> {
+            storageCapacity = itemCapacity + proximity().sum(e -> isContainer(e) && owns(e) ? e.block().itemCapacity : 0);
+            proximity.each(e -> isContainer(e) && owns(e), t -> {
                 t.items(items);
                 ((StorageBlockEntity)t).linkedCore = this;
             });
 
             for(Tilec other : state.teams.cores(team)){
                 if(other.tile() == tile) continue;
-                storageCapacity += other.block().itemCapacity + other.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
+                storageCapacity += other.block().itemCapacity + other.proximity().sum(e -> isContainer(e) && owns(other, e) ? e.block().itemCapacity : 0);
             }
 
             if(!world.isGenerating()){
@@ -160,6 +160,14 @@ public class CoreBlock extends StorageBlock{
             return tile instanceof StorageBlockEntity && (((StorageBlockEntity)tile).linkedCore == this || ((StorageBlockEntity)tile).linkedCore == null);
         }
 
+        public boolean owns(Tilec tile){
+            return tile instanceof StorageBlockEntity && (((StorageBlockEntity)tile).linkedCore == this || ((StorageBlockEntity)tile).linkedCore == null);
+        }
+
+        public boolean owns(Tilec core, Tilec tile){
+            return tile instanceof StorageBlockEntity && (((StorageBlockEntity)tile).linkedCore == core || ((StorageBlockEntity)tile).linkedCore == null);
+        }
+
         @Override
         public float handleDamage(float amount){
             if(player != null && team == player.team()){
@@ -173,7 +181,7 @@ public class CoreBlock extends StorageBlock{
             int total = proximity.count(e -> e.items() != null && e.items() == items);
             float fract = 1f / total / state.teams.cores(team).size;
 
-            proximity.each(e -> isContainer(e) && e.items() == items, t -> {
+            proximity.each(e -> isContainer(e) && e.items() == items && owns(e), t -> {
                 StorageBlockEntity ent = (StorageBlockEntity)t;
                 ent.linkedCore = null;
                 ent.items(new ItemModule());

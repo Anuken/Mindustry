@@ -53,7 +53,6 @@ public class GlobalData{
                 Streams.copy(add.read(), zos);
                 zos.closeEntry();
             }
-
         }
     }
 
@@ -88,7 +87,6 @@ public class GlobalData{
         }
         amount = Math.max(amount, 0);
 
-        modified = true;
         items.getAndIncrement(item, 0, amount);
         state.stats.itemsDelivered.getAndIncrement(item, 0, amount);
 
@@ -97,6 +95,8 @@ public class GlobalData{
 
         //clamp overflow
         if(state.stats.itemsDelivered.get(item, 0) < 0) state.stats.itemsDelivered.put(item, Integer.MAX_VALUE);
+
+        modified = true;
     }
 
     public boolean hasItems(Array<ItemStack> stacks){
@@ -115,24 +115,24 @@ public class GlobalData{
 
     public void removeItems(ItemStack[] stacks){
         for(ItemStack stack : stacks){
-            items.getAndIncrement(stack.item, 0, -stack.amount);
+            remove(stack.item, stack.amount);
         }
-        modified = true;
     }
 
     public void removeItems(Array<ItemStack> stacks){
         for(ItemStack stack : stacks){
-            items.getAndIncrement(stack.item, 0, -stack.amount);
+            remove(stack.item, stack.amount);
         }
+    }
+
+    public void remove(Item item, int amount){
+        items.getAndIncrement(item, 0, -amount);
+
         modified = true;
     }
 
     public boolean has(Item item, int amount){
         return items.get(item, 0) >= amount;
-    }
-
-    public ObjectIntMap<Item> items(){
-        return items;
     }
 
     //TODO: make it upgradeable
@@ -192,7 +192,6 @@ public class GlobalData{
         for(Item item : Vars.content.items()){
             Core.settings.put("item-" + item.name, items.get(item, 0));
         }
-        Core.settings.save();
     }
 
 }

@@ -186,7 +186,6 @@ public class Tutorial{
                 //end tutorial, never show it again
                 Events.fire(Trigger.tutorialComplete);
                 Core.settings.put("playedtutorial", true);
-                Core.settings.save();
             }
 
             void draw(){

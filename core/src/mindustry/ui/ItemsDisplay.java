@@ -51,7 +51,7 @@ public class ItemsDisplay extends Table{
 
     private String format(Item item){
         builder.setLength(0);
-        builder.append(ui.formatAmount(data.items().get(item, 0)));
+        builder.append(ui.formatAmount(data.getItem(item)));
         if(state.isGame() && player.team().data().hasCore() && player.team().core().items().get(item) > 0){
             builder.append(" [unlaunched]+ ");
             builder.append(ui.formatAmount(state.teams.get(player.team()).core().items().get(item)));

@@ -119,11 +119,11 @@ public class SStats implements SteamUserStatsCallback{
 
                 if(e.tile.block() == Blocks.meltdown || e.tile.block() == Blocks.spectre){
                     if(e.tile.block() == Blocks.meltdown && !Core.settings.getBool("meltdownp", false)){
-                        Core.settings.putSave("meltdownp", true);
+                        Core.settings.put("meltdownp", true);
                     }
 
                     if(e.tile.block() == Blocks.spectre && !Core.settings.getBool("spectrep", false)){
-                        Core.settings.putSave("spectrep", true);
+                        Core.settings.put("spectrep", true);
                     }
 
                     if(Core.settings.getBool("meltdownp", false) && Core.settings.getBool("spectrep", false)){
@@ -256,7 +256,6 @@ public class SStats implements SteamUserStatsCallback{
                 if(mechs.add(e.mech.name)){
                     SStat.zoneMechsUsed.max(mechs.size);
                     Core.settings.putObject("mechs", mechs);
-                    Core.settings.save();
                 }
             }
         });

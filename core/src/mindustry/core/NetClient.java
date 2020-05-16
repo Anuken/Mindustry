@@ -595,7 +595,6 @@ public class NetClient implements ApplicationListener{
             new Rand().nextBytes(bytes);
             String result = new String(Base64Coder.encode(bytes));
             Core.settings.put("usid-" + ip, result);
-            Core.settings.save();
             return result;
         }
     }

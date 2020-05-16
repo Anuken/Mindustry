@@ -382,7 +382,7 @@ public class PlanetDialog extends FloatingDialog{
 
         stable.row();
 
-        stable.button(selected.hasSave() ? "Continue" : "Launch", Styles.transt, () -> {
+        stable.button("Launch", Styles.transt, () -> {
             if(selected != null){
                 if(selected.is(SectorAttribute.naval)){
                     ui.showInfo("You need a naval loadout to launch here.");

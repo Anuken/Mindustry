@@ -516,7 +516,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.toggle_block_status)){
-            Core.settings.putSave("blockstatus", !Core.settings.getBool("blockstatus"));
+            Core.settings.put("blockstatus", !Core.settings.getBool("blockstatus"));
         }
 
         if(Core.input.keyTap(Binding.toggle_power_lines)){

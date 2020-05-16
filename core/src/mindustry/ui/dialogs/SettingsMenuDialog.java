@@ -93,7 +93,6 @@ public class SettingsMenuDialog extends SettingsDialog{
                 }
                 Core.settings.clear();
                 Core.settings.putAll(map);
-                Core.settings.save();
 
                 for(Fi file : dataDirectory.list()){
                     file.deleteDirectory();

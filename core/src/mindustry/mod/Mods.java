@@ -571,7 +571,7 @@ public class Mods implements Loadable{
     /** Makes a mod enabled or disabled. shifts it.*/
     public void setEnabled(LoadedMod mod, boolean enabled){
         if(mod.enabled() != enabled){
-            Core.settings.putSave("mod-" + mod.name + "-enabled", enabled);
+            Core.settings.put("mod-" + mod.name + "-enabled", enabled);
             requiresReload = true;
             mod.state = enabled ? ModState.enabled : ModState.disabled;
             mods.each(this::updateDependencies);
@@ -747,13 +747,11 @@ public class Mods implements Loadable{
         @Override
         public void addSteamID(String id){
             Core.settings.put(name + "-steamid", id);
-            Core.settings.save();
         }
 
         @Override
         public void removeSteamID(){
             Core.settings.remove(name + "-steamid");
-            Core.settings.save();
         }
 
         @Override
