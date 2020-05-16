@@ -150,10 +150,5 @@ public abstract class Weather extends MappableContent{
                 });
             }
         }
-
-        @Override
-        public float clipSize(){
-            return Float.MAX_VALUE;
-        }
     }
 }

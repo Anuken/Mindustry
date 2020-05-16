@@ -62,7 +62,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         }
     }
 
-    @Override
+    @Replace
     public float clipSize(){
         return 20;
     }
@@ -142,6 +142,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     void kick(String reason){
         con.kick(reason);
+    }
+
+    void kick(String reason, int duration){
+        con.kick(reason, duration);
     }
 
     @Override

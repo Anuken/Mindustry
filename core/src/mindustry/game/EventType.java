@@ -62,8 +62,8 @@ public class EventType{
     public static class LaunchItemEvent{
         public final ItemStack stack;
 
-        public LaunchItemEvent(Item item, int amount){
-            this.stack = new ItemStack(item, amount);
+        public LaunchItemEvent(ItemStack stack){
+            this.stack = stack;
         }
     }
 
@@ -90,9 +90,9 @@ public class EventType{
     /** Called when a zone's requirements are met. */
     public static class ZoneRequireCompleteEvent{
         public final SectorPreset zoneMet, zoneForMet;
-        public final Objective objective;
+        public final Objectives.Objective objective;
 
-        public ZoneRequireCompleteEvent(SectorPreset zoneMet, SectorPreset zoneForMet, Objective objective){
+        public ZoneRequireCompleteEvent(SectorPreset zoneMet, SectorPreset zoneForMet, Objectives.Objective objective){
             this.zoneMet = zoneMet;
             this.zoneForMet = zoneForMet;
             this.objective = objective;

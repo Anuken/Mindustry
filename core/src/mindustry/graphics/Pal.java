@@ -8,6 +8,9 @@ public class Pal{
     items = Color.valueOf("2ea756"),
     command = Color.valueOf("eab678"),
 
+    shield = Color.valueOf("ffd37f").a(0.7f),
+    shieldIn = Color.black.cpy().a(0f),
+
     bulletYellow = Color.valueOf("fff8e8"),
     bulletYellowBack = Color.valueOf("f9c27a"),
 
@@ -53,6 +56,7 @@ public class Pal{
     accent = Color.valueOf("ffd37f"),
     stat = Color.valueOf("ffd37f"),
     gray = Color.valueOf("454545"),
+    metalGrayDark = Color.valueOf("6e7080"),
     accentBack = Color.valueOf("d4816b"),
     place = Color.valueOf("6335f8"),
     remove = Color.valueOf("e55454"),

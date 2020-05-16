@@ -1,4 +1,4 @@
-package mindustry.game;
+package mindustry.audio;
 
 import arc.*;
 import arc.audio.*;

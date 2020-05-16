@@ -169,7 +169,7 @@ public class TechTreeDialog extends FloatingDialog{
 
     void showToast(String info){
         Table table = new Table();
-        table.actions(Actions.fadeOut(0.5f, Interpolation.fade), Actions.remove());
+        table.actions(Actions.fadeOut(0.5f, Interp.fade), Actions.remove());
         table.top().add(info);
         table.setName("toast");
         table.update(() -> {
@@ -238,7 +238,7 @@ public class TechTreeDialog extends FloatingDialog{
                             addAction(new RelativeTemporalAction(){
                                 {
                                     setDuration(0.1f);
-                                    setInterpolation(Interpolation.fade);
+                                    setInterpolation(Interp.fade);
                                 }
 
                                 @Override

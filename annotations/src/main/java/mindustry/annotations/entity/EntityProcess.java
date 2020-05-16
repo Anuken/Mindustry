@@ -4,6 +4,7 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.Pool.*;
@@ -262,7 +263,7 @@ public class EntityProcess extends BaseProcessor{
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return $S + $L", name + "#", "id").build());
 
-                EntityIO io = new EntityIO(type.name(), builder, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(name));
+                EntityIO io = ann.serialize() ? new EntityIO(type.name(), builder, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(name)) : null;
 
                 //add all methods from components
                 for(ObjectMap.Entry<String, Array<Smethod>> entry : methods){
@@ -323,7 +324,7 @@ public class EntityProcess extends BaseProcessor{
 
                     //SPECIAL CASE: I/O code
                     //note that serialization is generated even for non-serializing entities for manual usage
-                    if((first.name().equals("read") || first.name().equals("write")) && ann.genio()){
+                    if((first.name().equals("read") || first.name().equals("write")) && ann.genio() && ann.serialize()){
                         io.write(mbuilder, first.name().equals("write"));
                     }
 
@@ -620,7 +621,17 @@ public class EntityProcess extends BaseProcessor{
     Array<Stype> allComponents(Selement<?> type){
         if(!defComponents.containsKey(type)){
             //get base defs
-            Array<Stype> components = types(type.annotation(EntityDef.class), EntityDef::value).map(this::interfaceToComp);
+            Array<Stype> interfaces = types(type.annotation(EntityDef.class), EntityDef::value);
+            Array<Stype> components = new Array<>();
+            for(Stype i : interfaces){
+                Stype comp = interfaceToComp(i);
+                if(comp != null){
+                   components.add(comp);
+                }else{
+                    throw new IllegalArgumentException("Type '" + i + "' is not a component interface!");
+                }
+            }
+
             ObjectSet<Stype> out = new ObjectSet<>();
             for(Stype comp : components){
                 //get dependencies for each def, add them
@@ -665,7 +676,7 @@ public class EntityProcess extends BaseProcessor{
         return interfaceToComp(type) != null;
     }
 
-    Stype interfaceToComp(Stype type){
+    @Nullable Stype interfaceToComp(Stype type){
         String name = type.name().substring(0, type.name().length() - 1) + "Comp";
         return componentNames.get(name);
     }

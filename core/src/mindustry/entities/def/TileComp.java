@@ -15,6 +15,7 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.audio.SoundLoop;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
@@ -59,7 +60,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     private transient float timeScale = 1f, timeScaleDuration;
 
-    private transient @Nullable SoundLoop sound;
+    private transient @Nullable mindustry.audio.SoundLoop sound;
 
     private transient boolean sleeping;
     private transient float sleepTime;
@@ -182,6 +183,14 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     public byte relativeTo(Tile tile){
         return relativeTo(tile.x, tile.y);
+    }
+
+    public byte relativeTo(Tilec tile){
+        return relativeTo(tile.tile());
+    }
+
+    public byte relativeToEdge(Tile other){
+        return relativeTo(Edges.getFacingEdge(other, tile));
     }
 
     public byte relativeTo(int cx, int cy){

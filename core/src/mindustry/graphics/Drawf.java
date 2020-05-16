@@ -90,7 +90,11 @@ public class Drawf{
     }
 
     public static void shadow(float x, float y, float rad){
-        Draw.color(0, 0, 0, 0.4f);
+        shadow(x, y, rad, 1f);
+    }
+
+    public static void shadow(float x, float y, float rad, float alpha){
+        Draw.color(0, 0, 0, 0.4f * alpha);
         Draw.rect("circle-shadow", x, y, rad, rad);
         Draw.color();
     }

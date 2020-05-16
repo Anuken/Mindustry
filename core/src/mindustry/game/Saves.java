@@ -167,7 +167,7 @@ public class Saves{
     public class SaveSlot{
         public final Fi file;
         boolean requestedPreview;
-        SaveMeta meta;
+        public SaveMeta meta;
 
         public SaveSlot(Fi file){
             this.file = file;
@@ -240,6 +240,10 @@ public class Saves{
 
         public boolean isHidden(){
             return isSector();
+        }
+
+        public ObjectFloatMap<Item> getProductionRates(){
+            return meta.exportRates;
         }
 
         public String getPlayTime(){

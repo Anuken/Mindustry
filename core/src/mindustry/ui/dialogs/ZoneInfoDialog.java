@@ -63,13 +63,13 @@ public class ZoneInfoDialog extends FloatingDialog{
                 cont.table(req -> {
                     req.defaults().left();
 
-                    Array<Objective> zones = zone.requirements.select(o -> !(o instanceof Unlock));
+                    Array<Objectives.Objective> zones = zone.requirements.select(o -> !(o instanceof Unlock));
 
                     if(!zones.isEmpty()){
                         req.table(r -> {
                             r.add("$complete").colspan(2).left();
                             r.row();
-                            for(Objective o : zones){
+                            for(Objectives.Objective o : zones){
                                 r.image(Icon.terrain).padRight(4);
                                 r.add(o.display()).color(Color.lightGray);
                                 r.image(o.complete() ? Icon.ok : Icon.cancel, o.complete() ? Color.lightGray : Color.scarlet).padLeft(3);

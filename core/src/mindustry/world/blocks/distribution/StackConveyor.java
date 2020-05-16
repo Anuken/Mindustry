@@ -117,7 +117,7 @@ public class StackConveyor extends Block implements Autotiler{
             Tile from = world.tile(link);
             Tmp.v1.set(from);
             Tmp.v2.set(tile);
-            Tmp.v1.interpolate(Tmp.v2, 1f - cooldown, Interpolation.linear);
+            Tmp.v1.interpolate(Tmp.v2, 1f - cooldown, Interp.linear);
 
             //rotation
             float a = (from.rotation()%4) * 90;
@@ -126,7 +126,7 @@ public class StackConveyor extends Block implements Autotiler{
             if((from.rotation()%4) == 0 && (tile.rotation()%4) == 3) a =  4 * 90;
 
             //stack
-            Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interpolation.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
+            Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interp.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
 
             //item
             float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);

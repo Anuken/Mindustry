@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.io.*;
+import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
@@ -118,22 +119,51 @@ public class TypeIO{
         return content.block(read.s());
     }
 
+    public static void writeRequest(Writes write, BuildRequest request){
+        write.b(request.breaking ? (byte)1 : 0);
+        write.i(Point2.pack(request.x, request.y));
+        if(!request.breaking){
+            write.s(request.block.id);
+            write.b((byte)request.rotation);
+            write.b(request.hasConfig ? (byte)1 : 0);
+            writeObject(write, request.config);
+        }
+    }
+
+    public static BuildRequest readRequest(Reads read){
+        BuildRequest currentRequest;
+
+        byte type = read.b();
+        int position = read.i();
+
+        if(world.tile(position) == null){
+            return null;
+        }
+
+        if(type == 1){ //remove
+            currentRequest = new BuildRequest(Point2.x(position), Point2.y(position));
+        }else{ //place
+            short block = read.s();
+            byte rotation = read.b();
+            boolean hasConfig = read.b() == 1;
+            Object config = readObject(read);
+            currentRequest = new BuildRequest(Point2.x(position), Point2.y(position), rotation, content.block(block));
+            if(hasConfig){
+                currentRequest.configure(config);
+            }
+        }
+
+        return currentRequest;
+    }
+
     public static void writeRequests(Writes write, BuildRequest[] requests){
         if(requests == null){
             write.s(-1);
             return;
         }
-
         write.s((short)requests.length);
         for(BuildRequest request : requests){
-            write.b(request.breaking ? (byte)1 : 0);
-            write.i(Point2.pack(request.x, request.y));
-            if(!request.breaking){
-                write.s(request.block.id);
-                write.b((byte)request.rotation);
-                write.b(request.hasConfig ? (byte)1 : 0);
-                writeObject(write, request.config);
-            }
+            writeRequest(write, request);
         }
     }
 
@@ -145,28 +175,10 @@ public class TypeIO{
 
         BuildRequest[] reqs = new BuildRequest[reqamount];
         for(int i = 0; i < reqamount; i++){
-            byte type = read.b();
-            int position = read.i();
-            BuildRequest currentRequest;
-
-            if(world.tile(position) == null){
-                continue;
+            BuildRequest request = readRequest(read);
+            if(request != null){
+                reqs[i] = request;
             }
-
-            if(type == 1){ //remove
-                currentRequest = new BuildRequest(Point2.x(position), Point2.y(position));
-            }else{ //place
-                short block = read.s();
-                byte rotation = read.b();
-                boolean hasConfig = read.b() == 1;
-                Object config = readObject(read);
-                currentRequest = new BuildRequest(Point2.x(position), Point2.y(position), rotation, content.block(block));
-                if(hasConfig){
-                    currentRequest.configure(config);
-                }
-            }
-
-            reqs[i] = (currentRequest);
         }
 
         return reqs;
@@ -191,6 +203,38 @@ public class TypeIO{
         int length = read.i();
         String string = new String(read.b(new byte[length]), charset);
         return JsonIO.read(Rules.class, string);
+    }
+
+    public static void writeVec2(Writes write, Vec2 v){
+        if(v == null){
+            write.f(0);
+            write.f(0);
+        }else{
+            write.f(v.x);
+            write.f(v.y);
+        }
+    }
+
+    public static Vec2 readVec2(Reads read){
+        return new Vec2(read.f(), read.f());
+    }
+
+    public static void writeStatuse(Writes write, StatusEntry entry){
+        write.s(entry.effect.id);
+        write.f(entry.time);
+    }
+
+    public static StatusEntry readStatuse(Reads read){
+        return Pools.obtain(StatusEntry.class, StatusEntry::new).set(content.getByID(ContentType.status, read.s()), read.f());
+    }
+
+    public static void writeItems(Writes write, ItemStack stack){
+        writeItem(write, stack.item);
+        write.i(stack.amount);
+    }
+
+    public static ItemStack readItems(Reads read){
+        return new ItemStack(readItem(read), read.i());
     }
 
     public static void writeTeam(Writes write, Team reason){

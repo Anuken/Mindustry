@@ -7,10 +7,10 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
-import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
@@ -92,6 +92,8 @@ public class Logic implements ApplicationListener{
                 }
             }
         });
+
+        Events.on(LaunchItemEvent.class, e -> state.stats.handleItemExport(e.stack));
     }
 
     /** Handles the event of content being used by either the player or some block. */
@@ -215,7 +217,7 @@ public class Logic implements ApplicationListener{
             for(Tilec entity : state.teams.playerCores()){
                 for(Item item : content.items()){
                     data.addItem(item, entity.items().get(item));
-                    Events.fire(new LaunchItemEvent(item, entity.items().get(item)));
+                    Events.fire(new LaunchItemEvent(new ItemStack(item, entity.items().get(item))));
                 }
                 entity.tile().remove();
             }
@@ -245,6 +247,8 @@ public class Logic implements ApplicationListener{
             }
 
             if(!state.isPaused()){
+                state.stats.update();
+
                 if(state.isCampaign()){
                     universe.update();
                 }

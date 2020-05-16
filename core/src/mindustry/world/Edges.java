@@ -1,9 +1,10 @@
 package mindustry.world;
 
-import arc.math.Mathf;
+import arc.math.*;
 import arc.math.geom.*;
+import mindustry.gen.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 import static mindustry.Vars.world;
 
@@ -47,6 +48,10 @@ public class Edges{
                 Mathf.clamp(point.y, -(int)((i) / 2f), (int)(i / 2f + 0.5f)));
             }
         }
+    }
+
+    public static Tile getFacingEdge(Tilec tile, Tilec other){
+        return getFacingEdge(tile.block(), tile.tileX(), tile.tileY(), other.tile());
     }
 
     public static Tile getFacingEdge(Tile tile, Tile other){

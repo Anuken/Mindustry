@@ -1317,21 +1317,21 @@ public class Blocks implements ContentList{
         }};
 
         launchPad = new LaunchPad("launch-pad"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 250, Items.silicon, 75, Items.lead, 100));
+            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
             size = 3;
             itemCapacity = 100;
-            launchTime = 60f * 16;
+            launchTime = 60f * 20;
             hasPower = true;
-            consumes.power(1f);
+            consumes.power(4f);
         }};
 
         launchPadLarge = new LaunchPad("launch-pad-large"){{
             requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
             size = 4;
-            itemCapacity = 250;
-            launchTime = 60f * 14;
+            itemCapacity = 300;
+            launchTime = 60f * 35;
             hasPower = true;
-            consumes.power(2f);
+            consumes.power(6f);
         }};
 
 

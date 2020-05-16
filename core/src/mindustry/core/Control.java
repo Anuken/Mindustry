@@ -9,6 +9,7 @@ import arc.math.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
@@ -17,6 +18,7 @@ import mindustry.game.*;
 import mindustry.game.Saves.*;
 import mindustry.gen.*;
 import mindustry.input.*;
+import mindustry.io.*;
 import mindustry.io.SaveIO.*;
 import mindustry.maps.Map;
 import mindustry.type.*;
@@ -39,7 +41,7 @@ import static mindustry.Vars.*;
  */
 public class Control implements ApplicationListener, Loadable{
     public Saves saves;
-    public MusicControl music;
+    public mindustry.audio.MusicControl music;
     public Tutorial tutorial;
     public InputHandler input;
 
@@ -352,6 +354,16 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void dispose(){
+        //try to save when exiting
+        if(saves != null && saves.getCurrent() != null && saves.getCurrent().isAutosave() && !net.client() && !state.isMenu()){
+            try{
+                SaveIO.save(control.saves.getCurrent().file);
+                Log.info("Saved on exit.");
+            }catch(Throwable e){
+                e.printStackTrace();
+            }
+        }
+
         content.dispose();
         net.dispose();
         Musics.dispose();

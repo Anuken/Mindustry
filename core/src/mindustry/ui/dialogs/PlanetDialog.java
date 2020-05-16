@@ -15,6 +15,7 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -33,7 +34,7 @@ public class PlanetDialog extends FloatingDialog{
         borderColor = Pal.accent.cpy().a(0.3f),
         shadowColor = new Color(0, 0, 0, 0.7f);
     private static final float camLength = 4f;
-    float outlineRad = 1.16f;
+    private static final float outlineRad = 1.16f;
 
     //the base planet that's being rendered
     private final Planet solarSystem = Planets.sun;
@@ -44,7 +45,9 @@ public class PlanetDialog extends FloatingDialog{
     private final PlaneBatch3D projector = new PlaneBatch3D();
     private final Mat3D mat = new Mat3D();
     private final Vec3 camRelative = new Vec3();
+    private final ResourcesDialog resources = new ResourcesDialog();
 
+    private float zoom = 1f, smoothZoom = 1f, selectAlpha = 1f;
     private Bloom bloom;
     private Planet planet = Planets.starter;
     private @Nullable Sector selected, hovered;
@@ -73,18 +76,17 @@ public class PlanetDialog extends FloatingDialog{
 
         Events.on(ResizeEvent.class, e -> makeBloom());
 
-
-        buttons.defaults().size(220f, 64f).pad(0f);
-
         TextButtonStyle style = Styles.cleart;
         float bmargin = 6f;
 
-        //TODO names
-        //buttons.button("$back", Icon.left, style, this::hide).margin(bmargin);
-        //buttons.addImageTextButton("Tech", Icon.tree, style, () -> ui.tech.show()).margin(bmargin);
-        //buttons.addImageTextButton("Launch", Icon.upOpen, style, this::hide).margin(bmargin);
-        //buttons.addImageTextButton("Database", Icon.book, style, () -> ui.database.show()).margin(bmargin);
-        //buttons.addImageTextButton("Resources", Icon.file, style, this::hide).margin(bmargin);
+        getCell(buttons).padBottom(-4);
+        buttons.background(Styles.black).defaults().growX().height(64f).pad(0);
+
+        //TODO
+        buttons.button("$back", Icon.left, style, this::hide).margin(bmargin);
+        buttons.button("Research", Icon.tree, style, () -> ui.tech.show()).margin(bmargin);
+        //buttons.button("Database", Icon.book, style, () -> ui.database.show()).margin(bmargin);
+        buttons.button("Resources", Icon.file, style, resources::show).margin(bmargin);
 
         cam.fov = 60f;
 
@@ -108,6 +110,10 @@ public class PlanetDialog extends FloatingDialog{
             camRelative.rotate(Tmp.v31.set(cam.up).rotate(cam.direction, 90), amount);
         });
 
+        scrolled(value -> {
+            zoom = Mathf.clamp(zoom + value / 10f, 0.5f, 2f);
+        });
+
         update(() -> {
             if(planet.isLandable()){
                 hovered = planet.getSector(cam.getMouseRay(), outlineRad);
@@ -115,7 +121,8 @@ public class PlanetDialog extends FloatingDialog{
                 hovered = selected = null;
             }
 
-
+            smoothZoom = Mathf.lerpDelta(smoothZoom, zoom, 0.4f);
+            selectAlpha = Mathf.lerpDelta(selectAlpha, Mathf.num(smoothZoom < 1.9f), 0.1f);
         });
 
         addListener(new ElementGestureListener(){
@@ -166,7 +173,7 @@ public class PlanetDialog extends FloatingDialog{
         cam.up.set(Vec3.Y);
 
         cam.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
-        camRelative.setLength(planet.radius * camLength);
+        camRelative.setLength(planet.radius * camLength + (smoothZoom-1f) * planet.radius * 2);
         cam.position.set(planet.position).add(camRelative);
         cam.lookAt(planet.position);
         cam.update();
@@ -272,8 +279,13 @@ public class PlanetDialog extends FloatingDialog{
                 draw(sec, shadowColor, -0.001f);
             }
 
-            if(sec.hostility >= 0.02f){
-                drawSelection(sec, Color.scarlet, 0.11f * sec.hostility);
+            if(selectAlpha > 0.01f){
+                float stroke = 0.026f;
+                if(sec.save != null){
+                    drawSelection(sec, Tmp.c1.set(Team.sharded.color).a(selectAlpha), stroke, -0.01f);
+                }else if(sec.hostility >= 0.02f){
+                    drawSelection(sec, Tmp.c1.set(Team.crux.color).a(selectAlpha), stroke, -0.02f);
+                }
             }
         }
 
@@ -351,9 +363,26 @@ public class PlanetDialog extends FloatingDialog{
             }
         }).fillX().row();
 
+        //production
+        if(selected.hasSave() && selected.save.meta.hasProduction){
+            stable.add("Production:").row();
+            stable.table(t -> {
+                t.left();
+
+                selected.save.meta.exportRates.each(entry -> {
+                    int total = (int)(entry.value * turnDuration / 60f);
+                    if(total > 1){
+                        t.image(entry.key.icon(Cicon.small)).padRight(3);
+                        t.add(ui.formatAmount(total) + " /turn").color(Color.lightGray);
+                        t.row();
+                    }
+                });
+            });
+        }
+
         stable.row();
 
-        stable.button("Launch", Styles.transt, () -> {
+        stable.button(selected.hasSave() ? "Continue" : "Launch", Styles.transt, () -> {
             if(selected != null){
                 if(selected.is(SectorAttribute.naval)){
                     ui.showInfo("You need a naval loadout to launch here.");
@@ -373,6 +402,10 @@ public class PlanetDialog extends FloatingDialog{
                 Tmp.v31.set(selected.tile.v).rotate(Vec3.Y, -planet.getRotation()).scl(-1f).nor();
                 float dot = cam.direction.dot(Tmp.v31);
                 stable.getColor().a = Math.max(dot, 0f)*2f;
+                if(stable.getColor().a <= 0.001f){
+                    stable.remove();
+                    selected = null;
+                }
             }
         });
 
@@ -402,11 +435,11 @@ public class PlanetDialog extends FloatingDialog{
     }
 
     private void drawSelection(Sector sector){
-        drawSelection(sector, Pal.accent, 0.04f);
+        drawSelection(sector, Pal.accent, 0.04f, 0.001f);
     }
 
-    private void drawSelection(Sector sector, Color color, float length){
-        float arad = outlineRad + 0.0001f;
+    private void drawSelection(Sector sector, Color color, float stroke, float length){
+        float arad = outlineRad + length;
 
         for(int i = 0; i < sector.tile.corners.length; i++){
             Corner next = sector.tile.corners[(i + 1) % sector.tile.corners.length];
@@ -416,8 +449,8 @@ public class PlanetDialog extends FloatingDialog{
             curr.v.scl(arad);
             sector.tile.v.scl(arad);
 
-            Tmp.v31.set(curr.v).sub(sector.tile.v).setLength(curr.v.dst(sector.tile.v) - length).add(sector.tile.v);
-            Tmp.v32.set(next.v).sub(sector.tile.v).setLength(next.v.dst(sector.tile.v) - length).add(sector.tile.v);
+            Tmp.v31.set(curr.v).sub(sector.tile.v).setLength(curr.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
+            Tmp.v32.set(next.v).sub(sector.tile.v).setLength(next.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
 
             batch.tri(curr.v, next.v, Tmp.v31, color);
             batch.tri(Tmp.v31, next.v, Tmp.v32, color);

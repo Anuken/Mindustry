@@ -51,14 +51,14 @@ public class ItemModule extends BlockModule{
             boolean updateFlow = flowTimer.get(30);
 
             for(int i = 0; i < items.length; i++){
-                flow[i].addValue(cacheSums[i]);
+                flow[i].add(cacheSums[i]);
                 if(cacheSums[i] > 0){
                     cacheBits.set(i);
                 }
                 cacheSums[i] = 0;
 
                 if(updateFlow){
-                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].getMean() : -1;
+                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() : -1;
                 }
             }
         }else{
@@ -267,7 +267,7 @@ public class ItemModule extends BlockModule{
     }
 
     public interface ItemConsumer{
-        void accept(Item item, float amount);
+        void accept(Item item, int amount);
     }
 
     public interface ItemCalculator{

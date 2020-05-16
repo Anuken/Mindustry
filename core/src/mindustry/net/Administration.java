@@ -13,7 +13,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.headless;
+import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
 
 public class Administration{
@@ -24,9 +24,20 @@ public class Administration{
     private Array<ChatFilter> chatFilters = new Array<>();
     private Array<ActionFilter> actionFilters = new Array<>();
     private Array<String> subnetBans = new Array<>();
+    private IntIntMap lastPlaced = new IntIntMap();
 
     public Administration(){
         load();
+
+        Events.on(ResetEvent.class, e -> lastPlaced = new IntIntMap());
+
+        //keep track of who placed what on the server
+        Events.on(BlockBuildEndEvent.class, e -> {
+            //players should be able to configure their own tiles
+            if(net.server() && e.unit != null && e.unit.isPlayer()){
+                lastPlaced.put(e.tile.pos(), e.unit.getPlayer().id());
+            }
+        });
 
         //anti-spam
         addChatFilter((player, message) -> {
@@ -57,6 +68,31 @@ public class Administration{
             }
 
             return message;
+        });
+
+        //block interaction rate limit
+        addActionFilter(action -> {
+            if(action.type != ActionType.breakBlock &&
+                action.type != ActionType.placeBlock &&
+                action.type != ActionType.tapTile &&
+                Config.antiSpam.bool() &&
+                //make sure players can configure their own stuff, e.g. in schematics
+                lastPlaced.get(action.tile.pos(), -1) != action.player.id()){
+
+                Ratekeeper rate = action.player.getInfo().rate;
+                if(rate.allow(Config.interactRateWindow.num() * 1000, Config.interactRateLimit.num())){
+                    return true;
+                }else{
+                    if(rate.occurences > Config.interactRateKick.num()){
+                        player.kick("You are interacting with too many blocks.", 1000 * 30);
+                    }else{
+                        player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
+                    }
+
+                    return false;
+                }
+            }
+            return true;
         });
     }
 
@@ -420,6 +456,9 @@ public class Administration{
         logging("Whether to log everything to files.", true),
         strict("Whether strict mode is on - corrects positions and prevents duplicate UUIDs.", true),
         antiSpam("Whether spammers are automatically kicked and rate-limited.", headless),
+        interactRateWindow("Block interaction rate limit window, in seconds.", 6),
+        interactRateLimit("Block interaction rate limit.", 25),
+        interactRateKick("How many times a player must interact inside the window to get kicked.", 60),
         messageRateLimit("Message rate limit in seconds. 0 to disable.", 0),
         messageSpamKick("How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
         socketInput("Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
@@ -503,6 +542,7 @@ public class Administration{
         public transient long lastMessageTime, lastSyncTime;
         public transient String lastSentMessage;
         public transient int messageInfractions;
+        public transient Ratekeeper rate = new Ratekeeper();
 
         PlayerInfo(String id){
             this.id = id;

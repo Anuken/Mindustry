@@ -60,7 +60,7 @@ public class Renderer implements ApplicationListener{
 
         if(landTime > 0){
             landTime -= Time.delta();
-            landscale = Interpolation.pow5In.apply(minZoomScl, Scl.scl(4f), 1f - landTime / Fx.coreLand.lifetime);
+            landscale = Interp.pow5In.apply(minZoomScl, Scl.scl(4f), 1f - landTime / Fx.coreLand.lifetime);
             camerascale = landscale;
             weatherAlpha = 0f;
         }else{
@@ -225,8 +225,8 @@ public class Renderer implements ApplicationListener{
         }
 
         if(bloom != null){
-            Draw.draw(Layer.bullet - 0.001f, bloom::capture);
-            Draw.draw(Layer.effect + 0.001f, bloom::render);
+            Draw.draw(Layer.bullet - 0.01f, bloom::capture);
+            Draw.draw(Layer.effect + 0.01f, bloom::render);
         }
 
         Draw.z(Layer.plans);

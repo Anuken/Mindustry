@@ -199,6 +199,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void update(){
         player.typing(ui.chatfrag.shown());
 
+        if(player.isBuilder()){
+            player.builder().building(isBuilding);
+        }
+
         if(!player.dead()){
             controlledType = player.unit().type();
         }

@@ -9,7 +9,7 @@ import mindustry.net.*;
 abstract class SyncComp implements Posc{
     @Import float x, y;
 
-    Interpolator interpolator = new Interpolator();
+    transient Interpolator interpolator = new Interpolator();
 
     void setNet(float x, float y){
         set(x, y);

@@ -14,7 +14,6 @@ import mindustry.world.*;
  * Defines current rules on how the game should function.
  * Does not store game state, just configuration.
  */
-@Serialize
 public class Rules{
     /** Whether the player has infinite resources. */
     public boolean infiniteResources;
@@ -62,8 +61,6 @@ public class Rules{
     public int unitCap = 0;
     /** Sector for saves that have them.*/
     public @Nullable Sector sector;
-    /** Region that save is on. Indicates campaign. TODO not implemented. */
-    public @Nullable MapRegion region;
     /** Spawn layout. */
     public Array<SpawnGroup> spawns = new Array<>();
     /** Determines if there should be limited respawns. */

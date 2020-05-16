@@ -202,7 +202,7 @@ public class MenuFragment extends Fragment{
 
     private void fadeInMenu(){
         submenu.clearActions();
-        submenu.actions(Actions.alpha(1f, 0.15f, Interpolation.fade));
+        submenu.actions(Actions.alpha(1f, 0.15f, Interp.fade));
     }
 
     private void fadeOutMenu(){
@@ -212,7 +212,7 @@ public class MenuFragment extends Fragment{
         }
 
         submenu.clearActions();
-        submenu.actions(Actions.alpha(1f), Actions.alpha(0f, 0.2f, Interpolation.fade), Actions.run(() -> submenu.clearChildren()));
+        submenu.actions(Actions.alpha(1f), Actions.alpha(0f, 0.2f, Interp.fade), Actions.run(() -> submenu.clearChildren()));
     }
 
     private void buttons(Table t, Buttoni... buttons){
