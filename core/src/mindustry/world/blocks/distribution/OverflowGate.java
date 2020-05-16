@@ -89,7 +89,7 @@ public class OverflowGate extends Block{
         }
 
         public @Nullable Tilec getTileTarget(Item item, Tile src, boolean flip){
-            int from = relativeTo(src.x, src.y);
+            int from = relativeToEdge(src);
             if(from == -1) return null;
             Tilec to = nearby((from + 2) % 4);
             boolean canForward = to != null && to.acceptItem(this, item) && to.team() == team && !(to.block() instanceof OverflowGate);

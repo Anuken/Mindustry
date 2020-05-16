@@ -189,6 +189,10 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         return relativeTo(tile.tile());
     }
 
+    public byte relativeToEdge(Tile other){
+        return relativeTo(Edges.getFacingEdge(other, tile));
+    }
+
     public byte relativeTo(int cx, int cy){
         return tile.absoluteRelativeTo(cx, cy);
     }
