@@ -38,7 +38,17 @@ public class Stats{
 
     /** Updates export statistics. */
     public void handleItemExport(ItemStack stack){
-        export.getOr(stack.item, ExportStat::new).counter += stack.amount;
+        handleItemExport(stack.item, stack.amount);
+    }
+
+    /** Updates export statistics. */
+    public void handleItemExport(Item item, int amount){
+        export.getOr(item, ExportStat::new).counter += amount;
+    }
+
+    /** Subtracts from export statistics. */
+    public void handleItemImport(Item item, int amount){
+        export.getOr(item, ExportStat::new).counter -= amount;
     }
 
     public float getExport(Item item){

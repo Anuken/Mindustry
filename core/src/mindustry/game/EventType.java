@@ -32,6 +32,7 @@ public class EventType{
         update
     }
 
+    public static class TurnEvent{}
     public static class WinEvent{}
     public static class LoseEvent{}
     public static class LaunchEvent{}
@@ -66,6 +67,7 @@ public class EventType{
             this.stack = stack;
         }
     }
+
 
     public static class CommandIssueEvent{
         public final Tilec tile;

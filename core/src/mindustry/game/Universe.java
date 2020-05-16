@@ -6,6 +6,7 @@ import arc.struct.ObjectFloatMap.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.game.EventType.*;
 import mindustry.io.*;
 import mindustry.type.*;
 
@@ -76,7 +77,7 @@ public class Universe{
             for(Sector sector : planet.sectors){
 
                 //ignore the current sector if the player is in it right now
-                if(sector.hasSave() && !sector.isBeingPlayed()){
+                if(sector.hasBase() && !sector.isBeingPlayed()){
                     SaveMeta meta = sector.save.meta;
 
                     for(Entry<Item> entry : meta.exportRates){
@@ -103,12 +104,13 @@ public class Universe{
         turn ++;
         turnCounter = 0;
 
-        //TODO EVENTS
+        //TODO EVENTS + a notification
 
         //increment turns passed for sectors with waves
         //TODO a turn passing may break the core; detect this, send an event and mark the sector as having no base!
         for(Planet planet : content.planets()){
             for(Sector sector : planet.sectors){
+                //attacks happen even for sectors without bases - stuff still gets destroyed
                 if(!sector.isBeingPlayed() && sector.hasSave() && sector.hasWaves()){
                     sector.setTurnsPassed(sector.getTurnsPassed() + 1);
                 }
@@ -120,6 +122,20 @@ public class Universe{
         for(int i = 0; i < exports.length; i++){
             data.addItem(content.item(i), exports[i]);
         }
+
+        Events.fire(new TurnEvent());
+    }
+
+    public int getTurn(){
+        return turn;
+    }
+
+    public int getSectorsAttacked(){
+        int count = 0;
+        for(Planet planet : content.planets()){
+            count += planet.sectors.count(s -> !s.isBeingPlayed() && s.hasSave() && s.hasWaves());
+        }
+        return count;
     }
 
     public float secondsMod(float mod, float scale){

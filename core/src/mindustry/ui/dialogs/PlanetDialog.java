@@ -364,7 +364,7 @@ public class PlanetDialog extends FloatingDialog{
         }).fillX().row();
 
         //production
-        if(selected.hasSave() && selected.save.meta.hasProduction){
+        if(selected.hasBase() && selected.save.meta.hasProduction){
             stable.add("Production:").row();
             stable.table(t -> {
                 t.left();
@@ -381,7 +381,7 @@ public class PlanetDialog extends FloatingDialog{
         }
 
         //disaply how many turns this sector has been attacked
-        if(selected.getTurnsPassed() > 0){
+        if(selected.getTurnsPassed() > 0 && selected.hasBase()){
             stable.row();
 
             stable.add("[scarlet]" + Iconc.warning + " " + selected.getTurnsPassed() + "x attacks");
