@@ -197,7 +197,7 @@ public class WaveInfoDialog extends FloatingDialog{
                     });
 
                     t.row();
-                    t.check("$waves.boss", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss));
+                    t.check("$waves.guardian", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss));
 
                     t.row();
                     t.button("$waves.remove", () -> {

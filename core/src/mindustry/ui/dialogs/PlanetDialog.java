@@ -15,6 +15,7 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -46,7 +47,7 @@ public class PlanetDialog extends FloatingDialog{
     private final Vec3 camRelative = new Vec3();
     private final ResourcesDialog resources = new ResourcesDialog();
 
-    private float zoom = 1f, smoothZoom = 1f;
+    private float zoom = 1f, smoothZoom = 1f, selectAlpha = 1f;
     private Bloom bloom;
     private Planet planet = Planets.starter;
     private @Nullable Sector selected, hovered;
@@ -121,6 +122,7 @@ public class PlanetDialog extends FloatingDialog{
             }
 
             smoothZoom = Mathf.lerpDelta(smoothZoom, zoom, 0.4f);
+            selectAlpha = Mathf.lerpDelta(selectAlpha, Mathf.num(smoothZoom < 1.9f), 0.1f);
         });
 
         addListener(new ElementGestureListener(){
@@ -277,12 +279,13 @@ public class PlanetDialog extends FloatingDialog{
                 draw(sec, shadowColor, -0.001f);
             }
 
-            if(sec.hostility >= 0.02f){
-                drawSelection(sec, Color.scarlet, 0.11f * sec.hostility, -0.02f);
-            }
-
-            if(sec.save != null){
-                drawSelection(sec, Color.lime, 0.03f, -0.01f);
+            if(selectAlpha > 0.01f){
+                float stroke = 0.026f;
+                if(sec.save != null){
+                    drawSelection(sec, Tmp.c1.set(Team.sharded.color).a(selectAlpha), stroke, -0.01f);
+                }else if(sec.hostility >= 0.02f){
+                    drawSelection(sec, Tmp.c1.set(Team.crux.color).a(selectAlpha), stroke, -0.02f);
+                }
             }
         }
 
@@ -379,7 +382,7 @@ public class PlanetDialog extends FloatingDialog{
 
         stable.row();
 
-        stable.button("Launch", Styles.transt, () -> {
+        stable.button(selected.hasSave() ? "Continue" : "Launch", Styles.transt, () -> {
             if(selected != null){
                 if(selected.is(SectorAttribute.naval)){
                     ui.showInfo("You need a naval loadout to launch here.");
@@ -399,6 +402,10 @@ public class PlanetDialog extends FloatingDialog{
                 Tmp.v31.set(selected.tile.v).rotate(Vec3.Y, -planet.getRotation()).scl(-1f).nor();
                 float dot = cam.direction.dot(Tmp.v31);
                 stable.getColor().a = Math.max(dot, 0f)*2f;
+                if(stable.getColor().a <= 0.001f){
+                    stable.remove();
+                    selected = null;
+                }
             }
         });
 
