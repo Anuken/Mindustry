@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -64,6 +65,32 @@ public class Drill extends Block{
         hasItems = true;
         idleSound = Sounds.drill;
         idleSoundVolume = 0.003f;
+    }
+
+    @Override
+    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+        Tile tile = req.tile();
+        if(tile == null) return;
+        countOre(req.tile());
+        if(returnItem == null) return;
+        /*
+        float dx = req.drawx() - size * tilesize/2f, dy = req.drawy() + size * tilesize/2f;
+        Draw.mixcol(Color.darkGray, 1f);
+        Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
+        Draw.reset();
+        Draw.rect(returnItem.icon(Cicon.small), dx, dy);*/
+        float width = drawPlaceText(Core.bundle.formatFloat("bar.schemdrillspeed", 60f / (drillTime + hardnessDrillMultiplier * returnItem.hardness) * returnCount, 2), req.x, req.y, true);
+        float dx = req.drawx() - size * tilesize/2f, dy = req.drawy() + size * tilesize/2f;
+        Draw.mixcol(Color.darkGray, 1f);
+        Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
+        Draw.reset();
+        Draw.rect(returnItem.icon(Cicon.small), dx, dy);
+        /*
+        float dx = req.x * tilesize + offset() - width/2f - 4f, dy = req.y * tilesize + offset() + size * tilesize / 2f + 5;
+        Draw.mixcol(Color.darkGray, 1f);
+        Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
+        Draw.reset();
+        Draw.rect(returnItem.icon(Cicon.small), dx, dy);*/
     }
 
     @Override
