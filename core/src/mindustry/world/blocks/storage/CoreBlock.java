@@ -157,7 +157,7 @@ public class CoreBlock extends StorageBlock{
 
 
         public boolean isContainer(Tilec tile){
-            return tile instanceof StorageBlockEntity;
+            return tile instanceof StorageBlockEntity && (((StorageBlockEntity)tile).linkedCore == this || ((StorageBlockEntity)tile).linkedCore == null);
         }
 
         @Override
