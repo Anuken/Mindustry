@@ -59,7 +59,7 @@ public class DesktopInput extends InputHandler{
                 b.label(() -> Core.bundle.format(!isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.label(() -> {
-                    if(block != null && (block instanceof ItemBridge || block.saveConfig) && block.lastConfig != null)
+                    if(block != null &&(block instanceof ItemBridge || block.saveConfig)&& block.lastConfig != null)
                         return Core.bundle.format("clearconfig", Core.keybinds.get(Binding.clear_building).key.toString());
                     else
                         return Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString());
@@ -376,9 +376,9 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.clear_building)){
-            if(block != null && (block instanceof ItemBridge || block.saveConfig) && block.lastConfig != null){
+            if(block != null &&(block instanceof ItemBridge || block.saveConfig)&& block.lastConfig != null){
                 if(block instanceof ItemBridge)
-                    ((ItemBridge) block).lastPlaced = -1;
+                    ((ItemBridge)block).lastPlaced = -1;
                 else
                     block.lastConfig = null;
             } else
