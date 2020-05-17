@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.type.*;
@@ -13,16 +14,14 @@ import mindustry.world.blocks.storage.*;
 import static mindustry.Vars.*;
 
 public class FileMapGenerator implements WorldGenerator{
-    public final Map map = null;
+    public final Map map;
 
     public FileMapGenerator(String mapName){
-        //TODO doesn't work
-        //this.map = maps.loadInternalMap(mapName);
+        this.map = maps.loadInternalMap(mapName);
     }
 
     @Override
     public void generate(Tiles tiles){
-        if(true) throw new IllegalArgumentException("no!");
         tiles.fill();
 
         SaveIO.load(map.file);
@@ -50,8 +49,8 @@ public class FileMapGenerator implements WorldGenerator{
             }
 
             if(tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam){
-                //TODO PLACE THE LOADOUT
-                //schematics.placeLoadout(loadout, tile.x, tile.y);
+                //TODO PLACE THE (CORRECT) LOADOUT
+                Schematics.placeLoadout(Loadouts.basicFoundation, tile.x, tile.y);
                 anyCores = true;
             }
         }

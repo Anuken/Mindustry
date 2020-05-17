@@ -2,7 +2,6 @@ package mindustry.content;
 
 import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
-import mindustry.maps.generators.*;
 import mindustry.type.*;
 
 import static arc.struct.Array.with;
@@ -20,18 +19,17 @@ public class Zones implements ContentList{
     @Override
     public void load(){
 
-        groundZero = new SectorPreset("groundZero", starter, new FileMapGenerator("groundZero")){{
+        groundZero = new SectorPreset("groundZero", starter){{
             baseLaunchCost = list(copper, -60);
             startingItems = list(copper, 60);
             alwaysUnlocked = true;
             conditionWave = 5;
             launchPeriod = 5;
-            resources = with(copper, scrap, lead);
         }};
 
         //TODO remove
         /*
-        desertWastes = new Zone("desertWastes", starter, new FileMapGenerator("groundZero")){{
+        desertWastes = new Zone("desertWastes", starter){{
             startingItems = list(copper, 120);
             conditionWave = 20;
             launchPeriod = 10;
@@ -82,13 +80,11 @@ public class Zones implements ContentList{
             );
         }};*/
 
-        saltFlats = new SectorPreset("saltFlats", starter, new FileMapGenerator("saltFlats")){{
+        saltFlats = new SectorPreset("saltFlats", starter){{
             startingItems = list(copper, 200, Items.silicon, 200, lead, 200);
             loadout = Loadouts.basicFoundation;
             conditionWave = 10;
             launchPeriod = 5;
-            configureObjective = new Launched(this);
-            resources = with(copper, scrap, lead, coal, sand, titanium);
             requirements = with(
             new ZoneWave(desertWastes, 60),
             //new Unlock(Blocks.daggerFactory),
@@ -98,11 +94,10 @@ public class Zones implements ContentList{
             );
         }};
 
-        frozenForest = new SectorPreset("frozenForest", starter, new FileMapGenerator("frozenForest")){{
+        frozenForest = new SectorPreset("frozenForest", starter){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 250);
             conditionWave = 10;
-            resources = with(copper, lead, coal);
             requirements = with(
             new ZoneWave(groundZero, 10),
             new Unlock(Blocks.junction),
@@ -110,10 +105,9 @@ public class Zones implements ContentList{
             );
         }};
 
-        craters = new SectorPreset("craters", starter, new FileMapGenerator("craters")){{
+        craters = new SectorPreset("craters", starter){{
             startingItems = list(copper, 100);
             conditionWave = 10;
-            resources = with(copper, lead, coal, sand, scrap);
             requirements = with(
             new ZoneWave(frozenForest, 10),
             new Unlock(Blocks.mender),
@@ -121,12 +115,11 @@ public class Zones implements ContentList{
             );
         }};
 
-        ruinousShores = new SectorPreset("ruinousShores", starter, new FileMapGenerator("ruinousShores")){{
+        ruinousShores = new SectorPreset("ruinousShores", starter){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 140, lead, 50);
             conditionWave = 20;
             launchPeriod = 20;
-            resources = with(copper, scrap, lead, coal, sand);
             requirements = with(
             new ZoneWave(desertWastes, 20),
             new ZoneWave(craters, 15),
@@ -137,12 +130,11 @@ public class Zones implements ContentList{
             );
         }};
 
-        stainedMountains = new SectorPreset("stainedMountains", starter, new FileMapGenerator("stainedMountains")){{
+        stainedMountains = new SectorPreset("stainedMountains", starter){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 200, lead, 50);
             conditionWave = 10;
             launchPeriod = 10;
-            resources = with(copper, scrap, lead, coal, titanium, sand);
             requirements = with(
             new ZoneWave(frozenForest, 15),
             new Unlock(Blocks.pneumaticDrill),
@@ -151,10 +143,8 @@ public class Zones implements ContentList{
             );
         }};
 
-        fungalPass = new SectorPreset("fungalPass", starter, new FileMapGenerator("fungalPass")){{
+        fungalPass = new SectorPreset("fungalPass", starter){{
             startingItems = list(copper, 250, lead, 250, Items.metaglass, 100, Items.graphite, 100);
-            resources = with(copper, lead, coal, titanium, sand);
-            configureObjective = new Launched(this);
             requirements = with(
             new ZoneWave(stainedMountains, 15),
             //new Unlock(Blocks.daggerFactory),
@@ -164,13 +154,11 @@ public class Zones implements ContentList{
             );
         }};
 
-        overgrowth = new SectorPreset("overgrowth", starter, new FileMapGenerator("overgrowth")){{
+        overgrowth = new SectorPreset("overgrowth", starter){{
             startingItems = list(copper, 1500, lead, 1000, Items.silicon, 500, Items.metaglass, 250);
             conditionWave = 12;
             launchPeriod = 4;
             loadout = Loadouts.basicNucleus;
-            configureObjective = new Launched(this);
-            resources = with(copper, lead, coal, titanium, sand, thorium, scrap);
             requirements = with(
             new ZoneWave(craters, 40),
             new Launched(fungalPass),
@@ -181,12 +169,11 @@ public class Zones implements ContentList{
             );
         }};
 
-        tarFields = new SectorPreset("tarFields", starter, new FileMapGenerator("tarFields")){{
+        tarFields = new SectorPreset("tarFields", starter){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 250, lead, 100);
             conditionWave = 15;
             launchPeriod = 10;
-            resources = with(copper, scrap, lead, coal, titanium, thorium, sand);
             requirements = with(
             new ZoneWave(ruinousShores, 20),
             new Unlock(Blocks.coalCentrifuge),
@@ -195,12 +182,11 @@ public class Zones implements ContentList{
             );
         }};
 
-        desolateRift = new SectorPreset("desolateRift", starter, new FileMapGenerator("desolateRift")){{
+        desolateRift = new SectorPreset("desolateRift", starter){{
             loadout = Loadouts.basicNucleus;
             startingItems = list(copper, 1000, lead, 1000, Items.graphite, 250, titanium, 250, Items.silicon, 250);
             conditionWave = 3;
             launchPeriod = 2;
-            resources = with(copper, scrap, lead, coal, titanium, sand, thorium);
             requirements = with(
             new ZoneWave(tarFields, 20),
             new Unlock(Blocks.thermalGenerator),
@@ -220,12 +206,11 @@ public class Zones implements ContentList{
             resources = Array.with(Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
         }};*/
 
-        nuclearComplex = new SectorPreset("nuclearComplex", starter, new FileMapGenerator("nuclearProductionComplex")){{
+        nuclearComplex = new SectorPreset("nuclearComplex", starter){{
             loadout = Loadouts.basicNucleus;
             startingItems = list(copper, 1250, lead, 1500, Items.silicon, 400, Items.metaglass, 250);
             conditionWave = 30;
             launchPeriod = 15;
-            resources = with(copper, scrap, lead, coal, titanium, thorium, sand);
             requirements = with(
             new Launched(fungalPass),
             new Unlock(Blocks.thermalGenerator),
@@ -234,15 +219,15 @@ public class Zones implements ContentList{
         }};
 
         /*
-        impact0078 = new Zone("impact0078", new MapGenerator("impact0078").dist(2f)){{
+        impact0078 = new SectorPreset("impact0078"){{
             loadout = Loadouts.basicNucleus;
-            baseLaunchCost = ItemStack.with();
+            baseLaunchCost = ItemStack.list();
             startingItems = ItemStack.list(Items.copper, 2000, Items.lead, 2000, Items.graphite, 500, Items.titanium, 500, Items.silicon, 500);
             conditionWave = 3;
             launchPeriod = 2;
-            requirements = with(nuclearComplex, 40);
-            blockRequirements = new Block[]{Blocks.thermalGenerator};
-            resources = Array.with(Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium};
+            //requirements = with(nuclearComplex, 40);
+            //blockRequirements = new Block[]{Blocks.thermalGenerator};
+            //resources = Array.with(Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium};
         }};*/
     }
 }

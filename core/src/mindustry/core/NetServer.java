@@ -303,8 +303,8 @@ public class NetServer implements ApplicationListener{
         int kickDuration = 60 * 60;
         //voting round duration in seconds
         float voteDuration = 0.5f * 60;
-        //cooldown between votes
-        int voteCooldown = 60 * 1;
+        //cooldown between votes in seconds
+        int voteCooldown = 60 * 5;
 
         class VoteSession{
             Playerc target;
@@ -346,11 +346,12 @@ public class NetServer implements ApplicationListener{
             }
         }
 
-        Timekeeper vtime = new Timekeeper(voteCooldown);
+        //cooldowns per player
+        ObjectMap<String, Timekeeper> cooldowns = new ObjectMap<>();
         //current kick sessions
         VoteSession[] currentlyKicking = {null};
 
-        clientCommands.<Playerc>register("votekick", "[player...]", "Vote to kick a player, with a cooldown.", (args, player) -> {
+        clientCommands.<Playerc>register("votekick", "[player...]", "Vote to kick a player.", (args, player) -> {
             if(!Config.enableVotekick.bool()){
                 player.sendMessage("[scarlet]Vote-kick is disabled on this server.");
                 return;
@@ -391,6 +392,8 @@ public class NetServer implements ApplicationListener{
                     }else if(found.team() != player.team()){
                         player.sendMessage("[scarlet]Only players on your team can be kicked.");
                     }else{
+                        Timekeeper vtime = cooldowns.getOr(player.uuid(), () -> new Timekeeper(voteCooldown));
+
                         if(!vtime.get()){
                             player.sendMessage("[scarlet]You must wait " + voteCooldown/60 + " minutes between votekicks.");
                             return;
@@ -436,7 +439,6 @@ public class NetServer implements ApplicationListener{
                 currentlyKicking[0].vote(player, sign);
             }
         });
-
 
         clientCommands.<Playerc>register("sync", "Re-synchronize world state.", (args, player) -> {
             if(player.isLocal()){

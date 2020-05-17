@@ -122,6 +122,10 @@ public class Planet extends UnlockableContent{
         for(solarSystem = this; solarSystem.parent != null; solarSystem = solarSystem.parent);
     }
 
+    public void preset(int index, SectorPreset preset){
+        sectors.get(index).preset = preset;
+    }
+
     public boolean isLandable(){
         return grid != null && generator != null && sectors.size > 0;
     }

@@ -155,12 +155,6 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(ZoneConfigureCompleteEvent.class, e -> {
-            if(e.zone.configureObjective.display() != null){
-                ui.hudfrag.showToast(Core.bundle.format("zone.config.unlocked", e.zone.configureObjective.display()));
-            }
-        });
-
         Events.on(Trigger.newGame, () -> {
             Tilec core = player.closestCore();
 

@@ -25,6 +25,7 @@ public class Sector{
     public final SectorData data;
 
     public @Nullable SaveSlot save;
+    public @Nullable SectorPreset preset;
     public boolean unlocked;
 
     /** Sector enemy hostility from 0 to 1 */

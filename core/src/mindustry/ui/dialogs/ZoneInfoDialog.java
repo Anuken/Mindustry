@@ -110,6 +110,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                         t.left();
                         t.add("$zone.resources").padRight(6);
 
+                        /*
                         if(zone.resources.size > 0){
                             t.table(r -> {
                                 t.left();
@@ -123,7 +124,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                             });
                         }else{
                             t.add("$none");
-                        }
+                        }*/
                     });
 
                     Rules rules = zone.getRules();
@@ -143,9 +144,10 @@ public class ZoneInfoDialog extends FloatingDialog{
         });
         cont.row();
 
+        /*
         cont.button(zone.canConfigure() ? "$configure" : Core.bundle.format("configure.locked", zone.configureObjective.display()),
         () -> loadout.show(zone.loadout.findCore().itemCapacity, zone.getStartingItems(), zone::resetStartingItems, zone::updateLaunchCost, rebuildItems)
-        ).fillX().pad(3).disabled(b -> !zone.canConfigure());
+        ).fillX().pad(3).disabled(b -> !zone.canConfigure());*/
 
         cont.row();
 
