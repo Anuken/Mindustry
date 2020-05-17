@@ -15,8 +15,8 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
@@ -74,7 +74,9 @@ public class PlanetDialog extends FloatingDialog{
             }
         });
 
-        Events.on(ResizeEvent.class, e -> makeBloom());
+        Events.on(ResizeEvent.class, e -> {
+            makeBloom();
+        });
 
         TextButtonStyle style = Styles.cleart;
         float bmargin = 6f;
@@ -282,9 +284,9 @@ public class PlanetDialog extends FloatingDialog{
             if(selectAlpha > 0.01f){
                 float stroke = 0.026f;
                 if(sec.hasBase()){
-                    drawSelection(sec, Tmp.c1.set(Team.sharded.color).a(selectAlpha), stroke, -0.01f);
+                    drawSelection(sec, Tmp.c1.set(Team.sharded.color).mul(0.8f).a(selectAlpha), stroke, -0.01f);
                 }else if(sec.hasEnemyBase()){
-                    drawSelection(sec, Tmp.c1.set(Team.crux.color).a(selectAlpha), stroke, -0.02f);
+                    drawSelection(sec, Tmp.c1.set(Team.crux.color).mul(0.8f).a(selectAlpha), stroke, -0.02f);
                 }
             }
         }

@@ -55,6 +55,11 @@ public class FileMapGenerator implements WorldGenerator{
                 Schematics.placeLoadout(Loadouts.basicShard, tile.x, tile.y);
                 anyCores = true;
             }
+
+            //add random decoration
+            if(Mathf.chance(0.01) && !tile.floor().isLiquid && tile.block() == Blocks.air){
+                tile.setBlock(tile.floor().decoration);
+            }
         }
 
         if(!anyCores){
