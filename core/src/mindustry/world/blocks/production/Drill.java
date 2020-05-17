@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -64,6 +65,20 @@ public class Drill extends Block{
         hasItems = true;
         idleSound = Sounds.drill;
         idleSoundVolume = 0.003f;
+    }
+
+    @Override
+    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+        if(!req.worldContext) return;
+        Tile tile = req.tile();
+        if(tile == null) return;
+
+        countOre(req.tile());
+        if(returnItem == null) return;
+
+        Draw.color(returnItem.color);
+        Draw.rect("drill-top", req.drawx(), req.drawy());
+        Draw.color();
     }
 
     @Override
@@ -302,7 +317,7 @@ public class Drill extends Block{
 
             if(dominantItem != null && drawMineItem){
                 Draw.color(dominantItem.color);
-                Draw.rect("drill-top", x, y, 1f);
+                Draw.rect("drill-top", x, y);
                 Draw.color();
             }
         }
