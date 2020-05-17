@@ -21,6 +21,7 @@ import static mindustry.Vars.*;
 
 public class SchematicsDialog extends FloatingDialog{
     private SchematicInfoDialog info = new SchematicInfoDialog();
+    private TextField searchField;
     private String search = "";
 
     public SchematicsDialog(){
@@ -46,10 +47,10 @@ public class SchematicsDialog extends FloatingDialog{
         cont.table(s -> {
             s.left();
             s.image(Icon.zoom);
-            s.field(search, res -> {
+            searchField = s.field(search, res -> {
                 search = res;
                 rebuildPane[0].run();
-            }).growX();
+            }).growX().get();
         }).fillX().padBottom(4);
 
         cont.row();
@@ -229,6 +230,12 @@ public class SchematicsDialog extends FloatingDialog{
 
         dialog.addCloseButton();
         dialog.show();
+    }
+
+    public void focusSearchField(){
+        if(searchField == null) return;
+
+        Core.scene.setKeyboardFocus(searchField);
     }
 
     public static class SchematicImage extends Image{

@@ -383,6 +383,7 @@ public class DesktopInput extends InputHandler{
                 ui.schematics.hide();
             }else{
                 ui.schematics.show();
+                ui.schematics.focusSearchField();
             }
         }
 
