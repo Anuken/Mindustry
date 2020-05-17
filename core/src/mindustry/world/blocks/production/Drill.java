@@ -69,6 +69,7 @@ public class Drill extends Block{
 
     @Override
     public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+        if(!req.worldContext) return;
         Tile tile = req.tile();
         if(tile == null) return;
 
@@ -76,7 +77,7 @@ public class Drill extends Block{
         if(returnItem == null) return;
 
         Draw.color(returnItem.color);
-        Draw.rect(topRegion, req.drawx(), req.drawy(), 1f);
+        Draw.rect("drill-top", req.drawx(), req.drawy());
         Draw.color();
     }
 
@@ -316,7 +317,7 @@ public class Drill extends Block{
 
             if(dominantItem != null && drawMineItem){
                 Draw.color(dominantItem.color);
-                Draw.rect("drill-top", x, y, 1f);
+                Draw.rect("drill-top", x, y);
                 Draw.color();
             }
         }
