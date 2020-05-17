@@ -380,7 +380,7 @@ public class PlanetDialog extends FloatingDialog{
             });
         }
 
-        //disaply how many turns this sector has been attacked
+        //display how many turns this sector has been attacked
         if(selected.getTurnsPassed() > 0 && selected.hasBase()){
             stable.row();
 

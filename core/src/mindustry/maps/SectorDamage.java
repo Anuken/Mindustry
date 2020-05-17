@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 
@@ -58,9 +57,10 @@ public class SectorDamage{
 
                             //remove the block when destroyed
                             if(other.entity.health() < 0){
-                                if(!other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
-                                    Effects.rubble(other.entity.x(), other.entity.y(), other.block().size);
-                                }
+                                //rubble currently disabled
+                                //if(!other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
+                                //    Effects.rubble(other.entity.x(), other.entity.y(), other.block().size);
+                                //}
 
                                 other.remove();
                             }
