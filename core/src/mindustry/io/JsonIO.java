@@ -91,7 +91,7 @@ public class JsonIO{
 
             @Override
             public SectorPreset read(Json json, JsonValue jsonData, Class type){
-                return Vars.content.getByName(ContentType.zone, jsonData.asString());
+                return Vars.content.getByName(ContentType.sector, jsonData.asString());
             }
         });
 

@@ -1,15 +1,13 @@
 package mindustry.content;
 
 import mindustry.ctype.*;
-import mindustry.game.Objectives.*;
 import mindustry.type.*;
 
-import static arc.struct.Array.with;
-import static mindustry.content.Items.*;
+import static mindustry.content.Items.copper;
 import static mindustry.content.Planets.starter;
 import static mindustry.type.ItemStack.list;
 
-public class Zones implements ContentList{
+public class SectorPresets implements ContentList{
     public static SectorPreset
     groundZero, desertWastes,
     craters, frozenForest, ruinousShores, stainedMountains, tarFields, fungalPass,
@@ -19,7 +17,7 @@ public class Zones implements ContentList{
     @Override
     public void load(){
 
-        groundZero = new SectorPreset("groundZero", starter){{
+        groundZero = new SectorPreset("groundZero", starter, 15){{
             baseLaunchCost = list(copper, -60);
             startingItems = list(copper, 60);
             alwaysUnlocked = true;
@@ -80,6 +78,7 @@ public class Zones implements ContentList{
             );
         }};*/
 
+        /*
         saltFlats = new SectorPreset("saltFlats", starter){{
             startingItems = list(copper, 200, Items.silicon, 200, lead, 200);
             loadout = Loadouts.basicFoundation;
@@ -194,7 +193,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        /*
+
         crags = new Zone("crags", new MapGenerator("crags").dist(2f)){{
             loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with();
@@ -204,7 +203,7 @@ public class Zones implements ContentList{
             requirements = with(stainedMountains, 40);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
             resources = Array.with(Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
-        }};*/
+        }};
 
         nuclearComplex = new SectorPreset("nuclearComplex", starter){{
             loadout = Loadouts.basicNucleus;
@@ -218,7 +217,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        /*
+        
         impact0078 = new SectorPreset("impact0078"){{
             loadout = Loadouts.basicNucleus;
             baseLaunchCost = ItemStack.list();

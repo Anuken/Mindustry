@@ -31,15 +31,19 @@ public class SectorPreset extends UnlockableContent{
     protected Array<ItemStack> launchCost;
     protected Array<ItemStack> defaultStartingItems = new Array<>();
 
-    public SectorPreset(String name, Planet planet){
+    public SectorPreset(String name, Planet planet, int sector){
         super(name);
         this.generator = new FileMapGenerator(name);
         this.planet = planet;
+
+        planet.preset(sector, this);
     }
 
+    //TODO
+    /*
     public SectorPreset(String name){
         this(name, Planets.starter);
-    }
+    }*/
 
     public Rules getRules(){
         return generator.map.rules();
@@ -181,7 +185,7 @@ public class SectorPreset extends UnlockableContent{
 
     @Override
     public ContentType getContentType(){
-        return ContentType.zone;
+        return ContentType.sector;
     }
 
 }

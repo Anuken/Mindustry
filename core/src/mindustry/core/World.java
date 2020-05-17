@@ -427,6 +427,7 @@ public class World{
     }
 
     private class Context implements WorldContext{
+
         @Override
         public Tile tile(int index){
             return tiles.geti(index);

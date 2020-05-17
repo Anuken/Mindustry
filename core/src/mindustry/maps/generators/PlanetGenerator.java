@@ -1,7 +1,7 @@
 package mindustry.maps.generators;
 
 import arc.math.geom.*;
-import mindustry.graphics.g3d.HexMesher;
+import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import mindustry.world.*;
 

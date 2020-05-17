@@ -291,8 +291,8 @@ public class ContentParser{
             return unit;
         },
         ContentType.item, parser(ContentType.item, Item::new),
-        ContentType.liquid, parser(ContentType.liquid, Liquid::new),
-        ContentType.zone, parser(ContentType.zone, SectorPreset::new)
+        ContentType.liquid, parser(ContentType.liquid, Liquid::new)
+        //ContentType.sector, parser(ContentType.sector, SectorPreset::new)
     );
 
     private String getString(JsonValue value, String key){

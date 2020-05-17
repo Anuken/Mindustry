@@ -348,7 +348,7 @@ public class PlanetDialog extends FloatingDialog{
 
         //TODO add strings to bundle after prototyping is done
 
-        stable.add("[accent]" + selected.id).row();
+        stable.add("[accent]" + (selected.preset == null ? selected.id : selected.preset.localizedName)).row();
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();
         stable.add(selected.save != null ? selected.save.getPlayTime() : "[lightgray]Unexplored").row();
 

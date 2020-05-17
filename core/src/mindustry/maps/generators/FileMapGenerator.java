@@ -22,9 +22,10 @@ public class FileMapGenerator implements WorldGenerator{
 
     @Override
     public void generate(Tiles tiles){
-        tiles.fill();
-
         SaveIO.load(map.file);
+        world.beginMapLoad();
+
+        tiles = world.tiles;
 
         for(Tile tile : tiles){
             if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && state.hasSector()){
@@ -39,6 +40,7 @@ public class FileMapGenerator implements WorldGenerator{
         boolean anyCores = false;
 
         for(Tile tile : tiles){
+
             if(tile.overlay() == Blocks.spawn){
                 int rad = 10;
                 Geometry.circle(tile.x, tile.y, tiles.width, tiles.height, rad, (wx, wy) -> {
@@ -48,15 +50,15 @@ public class FileMapGenerator implements WorldGenerator{
                 });
             }
 
-            if(tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam){
+            if(tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam && !anyCores){
                 //TODO PLACE THE (CORRECT) LOADOUT
-                Schematics.placeLoadout(Loadouts.basicFoundation, tile.x, tile.y);
+                Schematics.placeLoadout(Loadouts.basicShard, tile.x, tile.y);
                 anyCores = true;
             }
         }
 
         if(!anyCores){
-            throw new IllegalArgumentException("All zone maps must have a core.");
+            throw new IllegalArgumentException("All maps must have a core.");
         }
 
         state.map = map;

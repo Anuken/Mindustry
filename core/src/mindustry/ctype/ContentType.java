@@ -11,7 +11,7 @@ public enum ContentType{
     unit,
     weather,
     effect_UNUSED,
-    zone,
+    sector,
     loadout_UNUSED,
     typeid_UNUSED,
     error,
