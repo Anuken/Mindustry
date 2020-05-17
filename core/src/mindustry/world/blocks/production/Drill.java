@@ -76,7 +76,7 @@ public class Drill extends Block{
         if(returnItem == null) return;
 
         Draw.color(returnItem.color);
-        Draw.rect("drill-top", req.drawx(), req.drawy(), 1f);
+        Draw.rect(topRegion, req.drawx(), req.drawy(), 1f);
         Draw.color();
     }
 
