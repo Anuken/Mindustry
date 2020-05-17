@@ -30,7 +30,7 @@ public class Sector{
     /** Sector enemy hostility from 0 to 1 */
     public float hostility;
 
-    //TODO implement a dynamic (?) launch period
+    //TODO implement a dynamic launch period
     public int launchPeriod = 10;
 
     public Sector(Planet planet, Ptile tile, SectorData data){
