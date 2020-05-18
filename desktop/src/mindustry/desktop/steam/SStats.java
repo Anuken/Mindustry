@@ -226,7 +226,7 @@ public class SStats implements SteamUserStatsCallback{
         Events.on(ResearchEvent.class, e -> {
             if(e.content == Blocks.router) researchRouter.complete();
 
-            if(!TechTree.all.contains(t -> t.block.locked())){
+            if(!TechTree.all.contains(t -> t.content.locked())){
                 researchAll.complete();
             }
         });

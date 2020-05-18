@@ -411,7 +411,7 @@ public class PlanetDialog extends FloatingDialog{
                 Tmp.v31.set(selected.tile.v).rotate(Vec3.Y, -planet.getRotation()).scl(-1f).nor();
                 float dot = cam.direction.dot(Tmp.v31);
                 stable.getColor().a = Math.max(dot, 0f)*2f;
-                if(stable.getColor().a <= 0.001f){
+                if(dot*2f <= -0.1f){
                     stable.remove();
                     selected = null;
                 }
