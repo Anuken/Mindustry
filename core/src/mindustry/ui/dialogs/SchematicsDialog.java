@@ -22,6 +22,7 @@ import static mindustry.Vars.*;
 
 public class SchematicsDialog extends FloatingDialog{
     private SchematicInfoDialog info = new SchematicInfoDialog();
+    private TextField searchField;
     private String search = "";
     private TextField searchField;
     private Schematic firstSchematic;
@@ -267,6 +268,12 @@ public class SchematicsDialog extends FloatingDialog{
 
         dialog.addCloseButton();
         dialog.show();
+    }
+
+    public void focusSearchField(){
+        if(searchField == null) return;
+
+        Core.scene.setKeyboardFocus(searchField);
     }
 
     public static class SchematicImage extends Image{
