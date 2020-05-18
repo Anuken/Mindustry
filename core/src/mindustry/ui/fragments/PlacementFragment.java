@@ -92,17 +92,19 @@ public class PlacementFragment extends Fragment{
         if(Core.input.keyDown(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
             Tilec tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             Block tryRecipe = tile == null ? null : tile.block();
+            Object tryConfig = tile == null ? null : tile.config();
 
             for(BuildRequest req : player.builder().requests()){
                 if(!req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).contains(Core.input.mouseWorld())){
                     tryRecipe = req.block;
+                    tryConfig = req.config;
                     break;
                 }
             }
 
             if(tryRecipe != null && tryRecipe.isVisible() && unlocked(tryRecipe)){
                 input.block = tryRecipe;
-                tryRecipe.lastConfig = tile.config();
+                tryRecipe.lastConfig = tryConfig;
                 currentCategory = input.block.category;
                 return true;
             }
