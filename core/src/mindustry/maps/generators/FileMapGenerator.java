@@ -17,11 +17,13 @@ public class FileMapGenerator implements WorldGenerator{
     public final Map map;
 
     public FileMapGenerator(String mapName){
-        this.map = maps.loadInternalMap(mapName);
+        this.map = maps != null ? maps.loadInternalMap(mapName) : null;
     }
 
     @Override
     public void generate(Tiles tiles){
+        if(map == null) throw new RuntimeException("Generator has null map, cannot be used.");
+
         SaveIO.load(map.file);
         world.beginMapLoad();
 

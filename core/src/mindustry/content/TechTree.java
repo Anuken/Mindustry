@@ -345,7 +345,7 @@ public class TechTree implements ContentList{
         return new TechNode(content, requirements, children);
     }
 
-    private static TechNode node(Block block){
+    private static TechNode node(UnlockableContent block){
         return node(block, () -> {});
     }
 
