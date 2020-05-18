@@ -2,10 +2,13 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.graphics.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -17,6 +20,8 @@ import static mindustry.Vars.*;
 
 public class MapsDialog extends BaseDialog{
     private BaseDialog dialog;
+    private String search = "";
+    private ObjectSet<Gamemode> modeFilter = new ObjectSet<>();
 
     public MapsDialog(){
         super("@maps");
@@ -35,6 +40,9 @@ public class MapsDialog extends BaseDialog{
     }
 
     void setup(){
+        search = "";
+        Runnable[] rebuildPane = {null};
+
         buttons.clearChildren();
 
         if(Core.graphics.isPortrait()){
@@ -109,46 +117,92 @@ public class MapsDialog extends BaseDialog{
             });
         }).size(210f, 64f);
 
-
-        cont.clear();
+        Table scrollarea = new Table();
+        scrollarea.marginRight(24);
 
         Table maps = new Table();
         maps.marginRight(24);
 
-        ScrollPane pane = new ScrollPane(maps);
+        ScrollPane pane = new ScrollPane(scrollarea);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
-        float mapsize = 200f;
-
-        int i = 0;
-        for(Map map : Vars.maps.all()){
-
-            if(i % maxwidth == 0){
-                maps.row();
-            }
-
-            TextButton button = maps.button("", Styles.cleart, () -> showMapInfo(map)).width(mapsize).pad(8).get();
-            button.clearChildren();
-            button.margin(9);
-            button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
-            button.row();
-            button.image().growX().pad(4).color(Pal.gray);
-            button.row();
-            button.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize - 20f);
-            button.row();
-            button.add(map.custom ? "@custom" : map.workshop ? "@workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.displayName() : "@builtin").color(Color.gray).padTop(3);
-
-            i++;
+        int ii = 0;
+        Table modes = new Table();
+        modes.label(() -> "$editor.filter");
+        for(Gamemode mode : Gamemode.values()){
+            if(mode.hidden || mode == Gamemode.sandbox) continue;
+            TextureRegionDrawable icon = Vars.ui.getIcon("mode" + Strings.capitalize(mode.name()) + "Small");
+            modes.button(icon, Styles.clearTogglePartiali, () -> {
+                if(modeFilter.contains(mode))
+                    modeFilter.remove(mode);
+                else
+                    modeFilter.add(mode);
+                rebuildPane[0].run();
+            }).size(65f,65f);
         }
 
-        if(Vars.maps.all().size == 0){
-            maps.add("@maps.none");
-        }
-
+        cont.top();
+        cont.clear();
         cont.add(buttons).growX();
         cont.row();
         cont.add(pane).uniformX();
+
+        scrollarea.table(t -> {
+            t.center();
+            t.image(Icon.zoom);
+            t.field(search, res -> {
+                search = res;
+                rebuildPane[0].run();
+            });
+        }).uniformX();
+        scrollarea.row();
+        scrollarea.add(modes);
+        scrollarea.row();
+        scrollarea.add(maps);
+
+        rebuildPane[0] = () -> {
+            maps.clear();
+
+            int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
+            float mapsize = 200f;
+
+            int i = 0;
+            for(Map map : Vars.maps.all()){
+                if(!search.isEmpty() && !map.name().toLowerCase().contains(search.toLowerCase())) continue;
+                if(!modeFilter.isEmpty()){
+                    boolean valid = true;
+                    for(Gamemode mode : modeFilter){
+                        if(!valid) continue;
+                        valid = mode.valid(map);
+                    }
+                    if(!valid) continue;
+                }
+
+                if(i % maxwidth == 0){
+                    maps.row();
+                }
+
+                TextButton button = maps.button("", Styles.cleart, () -> showMapInfo(map)).width(mapsize).pad(8).get();
+                button.clearChildren();
+                button.margin(9);
+                button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
+                button.row();
+                button.image().growX().pad(4).color(Pal.gray);
+                button.row();
+                button.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize - 20f);
+                button.row();
+                button.add(map.custom ? "@custom" : map.workshop ? "@workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.displayName() : "@builtin").color(Color.gray).padTop(3);
+
+                i++;
+            }
+
+            if(Vars.maps.all().size == 0){
+                maps.add("@maps.none");
+            }
+
+        };
+
+        rebuildPane[0].run();
     }
 
     void showMapInfo(Map map){
