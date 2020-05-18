@@ -18,6 +18,7 @@ import static mindustry.Vars.*;
 public class SectorPreset extends UnlockableContent{
     public @NonNull FileMapGenerator generator;
     public @NonNull Planet planet;
+    public @NonNull Sector sector;
     public Array<Objectives.Objective> requirements = new Array<>();
 
     public Cons<Rules> rules = rules -> {};
@@ -35,6 +36,7 @@ public class SectorPreset extends UnlockableContent{
         super(name);
         this.generator = new FileMapGenerator(name);
         this.planet = planet;
+        this.sector = planet.sectors.get(sector);
 
         planet.preset(sector, this);
     }
@@ -104,7 +106,7 @@ public class SectorPreset extends UnlockableContent{
         closure.run();
         for(ZoneObjective objective : incomplete){
             if(objective.complete()){
-                Events.fire(new ZoneRequireCompleteEvent(objective.zone, content.zones().find(z -> z.requirements.contains(objective)), objective));
+                Events.fire(new ZoneRequireCompleteEvent(objective.preset, content.zones().find(z -> z.requirements.contains(objective)), objective));
             }
         }
     }

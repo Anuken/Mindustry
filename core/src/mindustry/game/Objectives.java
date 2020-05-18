@@ -55,7 +55,7 @@ public class Objectives{
         public int wave;
 
         public ZoneWave(SectorPreset zone, int wave){
-            this.zone = zone;
+            this.preset = zone;
             this.wave = wave;
         }
 
@@ -63,40 +63,40 @@ public class Objectives{
 
         @Override
         public boolean complete(){
-            return zone.bestWave() >= wave;
+            return preset.bestWave() >= wave;
         }
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.wave", wave, zone.localizedName);
+            return Core.bundle.format("requirement.wave", wave, preset.localizedName);
         }
     }
 
     public static class Launched extends ZoneObjective{
 
         public Launched(SectorPreset zone){
-            this.zone = zone;
+            this.preset = zone;
         }
 
         protected Launched(){}
 
         @Override
         public boolean complete(){
-            return zone.hasLaunched();
+            return preset.hasLaunched();
         }
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.core", zone.localizedName);
+            return Core.bundle.format("requirement.core", preset.localizedName);
         }
     }
 
     public abstract static class ZoneObjective implements Objective{
-        public @NonNull SectorPreset zone;
+        public @NonNull SectorPreset preset;
     }
 
     /** Defines a specific objective for a game. */
-    public static interface Objective{
+    public interface Objective{
 
         /** @return whether this objective is met. */
         boolean complete();
@@ -112,7 +112,7 @@ public class Objectives{
         }
 
         default SectorPreset zone(){
-            return this instanceof ZoneObjective ? ((ZoneObjective)this).zone : null;
+            return this instanceof ZoneObjective ? ((ZoneObjective)this).preset : null;
         }
     }
 }

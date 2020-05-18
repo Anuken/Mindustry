@@ -11,11 +11,13 @@ import arc.math.geom.*;
 import arc.scene.event.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
+import mindustry.game.Objectives.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -35,6 +37,7 @@ public class PlanetDialog extends FloatingDialog{
         shadowColor = new Color(0, 0, 0, 0.7f);
     private static final float camLength = 4f;
     private static final float outlineRad = 1.16f;
+    private static final Array<Vec3> points = new Array<>();
 
     //the base planet that's being rendered
     private final Planet solarSystem = Planets.sun;
@@ -305,6 +308,19 @@ public class PlanetDialog extends FloatingDialog{
 
         batch.flush(Gl.triangles);
 
+        //render arcs
+        for(Sector sec : planet.sectors){
+            if(sec.preset != null){
+                for(Objective o : sec.preset.requirements){
+                    if(o instanceof ZoneObjective){
+                        SectorPreset preset = ((ZoneObjective)o).preset;
+
+                        drawArc(planet, sec.tile.v, preset.sector.tile.v);
+                    }
+                }
+            }
+        }
+
         //render sector grid
         Mesh mesh = outline(planet.grid.size);
         Shader shader = Shaders.planetGrid;
@@ -316,6 +332,24 @@ public class PlanetDialog extends FloatingDialog{
         shader.setUniformMatrix4("u_trans", planet.getTransform(mat).val);
         shader.apply();
         mesh.render(shader, Gl.lines);
+    }
+
+    private void drawArc(Planet planet, Vec3 a, Vec3 b){
+        Vec3 avg = Tmp.v31.set(a).add(b).scl(0.5f);
+        avg.setLength(planet.radius*2f);
+
+        points.clear();
+        points.addAll(Tmp.v33.set(a).setLength(outlineRad), Tmp.v31, Tmp.v34.set(b).setLength(outlineRad));
+        Tmp.bz3.set(points);
+        float points = 20;
+
+        for(int i = 0; i < points + 1; i++){
+            float f = i / points;
+            batch.color(Pal.accent);
+            batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
+
+        }
+        batch.flush(Gl.lineStrip);
     }
 
     private void drawBorders(Sector sector, Color base){
