@@ -14,6 +14,7 @@ import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
@@ -22,6 +23,8 @@ import static mindustry.Vars.*;
 public class SchematicsDialog extends FloatingDialog{
     private SchematicInfoDialog info = new SchematicInfoDialog();
     private String search = "";
+    private TextField searchField;
+    private Schematic firstSchematic;
 
     public SchematicsDialog(){
         super("$schematics");
@@ -46,10 +49,10 @@ public class SchematicsDialog extends FloatingDialog{
         cont.table(s -> {
             s.left();
             s.image(Icon.zoom);
-            s.field(search, res -> {
+            searchField = s.field(search, res -> {
                 search = res;
                 rebuildPane[0].run();
-            }).growX();
+            }).growX().get();
         }).fillX().padBottom(4);
 
         cont.row();
@@ -66,8 +69,12 @@ public class SchematicsDialog extends FloatingDialog{
                     return;
                 }
 
+                firstSchematic = null;
+
                 for(Schematic s : schematics.all()){
                     if(!search.isEmpty() && fuzzyMatch(s.name(), search)) continue;
+                    if(firstSchematic == null)
+                        firstSchematic = s;
 
                     Button[] sel = {null};
                     sel[0] = t.button(b -> {
@@ -144,6 +151,12 @@ public class SchematicsDialog extends FloatingDialog{
                     }
                 }
             };
+            t.update(() -> {
+                if(Core.input.keyTap(Binding.chat) && Core.scene.getKeyboardFocus() == searchField && firstSchematic != null){
+                    control.input.useSchematic(firstSchematic);
+                    hide();
+                }
+            });
 
             rebuildPane[0].run();
         }).get().setScrollingDisabled(true, false);
