@@ -24,8 +24,9 @@ public class FileMapGenerator implements WorldGenerator{
     public void generate(Tiles tiles){
         if(map == null) throw new RuntimeException("Generator has null map, cannot be used.");
 
-        SaveIO.load(map.file);
-        world.beginMapLoad();
+        world.setGenerating(false);
+        SaveIO.load(map.file, world.filterContext(map));
+        world.setGenerating(true);
 
         tiles = world.tiles;
 
@@ -52,14 +53,14 @@ public class FileMapGenerator implements WorldGenerator{
                 });
             }
 
-            if(tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam && !anyCores){
+            if(tile.isCenter() && tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam && !anyCores){
                 //TODO PLACE THE (CORRECT) LOADOUT
                 Schematics.placeLoadout(Loadouts.basicShard, tile.x, tile.y);
                 anyCores = true;
             }
 
             //add random decoration
-            if(Mathf.chance(0.01) && !tile.floor().isLiquid && tile.block() == Blocks.air){
+            if(Mathf.chance(0.015) && !tile.floor().isLiquid && tile.block() == Blocks.air){
                 tile.setBlock(tile.floor().decoration);
             }
         }

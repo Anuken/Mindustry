@@ -285,6 +285,8 @@ public class PlanetDialog extends FloatingDialog{
                 float stroke = 0.026f;
                 if(sec.hasBase()){
                     drawSelection(sec, Tmp.c1.set(Team.sharded.color).mul(0.8f).a(selectAlpha), stroke, -0.01f);
+                }else if(sec.preset != null){
+                    drawSelection(sec, Tmp.c1.set(Team.derelict.color).mul(0.8f).a(selectAlpha), stroke, -0.02f);
                 }else if(sec.hasEnemyBase()){
                     drawSelection(sec, Tmp.c1.set(Team.crux.color).mul(0.8f).a(selectAlpha), stroke, -0.02f);
                 }

@@ -49,6 +49,7 @@ public class HudFragment extends Fragment{
             showToast("New turn: [accent]" + universe.getTurn() + "[]" + (attacked > 0 ? "\n[scarlet]" + Iconc.warning + " " + attacked + " sectors attacked!": ""));
         });
 
+        //TODO tear this all down
         //menu at top left
         parent.fill(cont -> {
             cont.setName("overlaymarker");
@@ -132,6 +133,13 @@ public class HudFragment extends Fragment{
                 cont.image().height(4f).color(Pal.gray).fillX();
                 cont.row();
             }
+
+            //TODO BUTTONS FOR VIEWING EXPORTS/IMPORTS/RESEARCH
+            /*
+            cont.table(t -> {
+
+            });
+            cont.row();*/
 
             cont.update(() -> {
                 if(Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.shown() && !Core.scene.hasDialog() && !(Core.scene.getKeyboardFocus() instanceof TextField)){

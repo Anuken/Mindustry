@@ -240,6 +240,10 @@ public class World{
         }
     }
 
+    public Context filterContext(Map map){
+        return new FilterContext(map);
+    }
+
     public void loadMap(Map map){
         loadMap(map, new Rules());
     }
@@ -472,6 +476,7 @@ public class World{
         @Override
         public void end(){
             Array<GenerateFilter> filters = map.filters();
+
             if(!filters.isEmpty()){
                 //input for filter queries
                 GenerateInput input = new GenerateInput();

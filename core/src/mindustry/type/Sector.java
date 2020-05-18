@@ -58,7 +58,7 @@ public class Sector{
         return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.launched && !Vars.state.gameOver;
     }
 
-    /** @return whether waves are present, e.g. any bases here will be attacked. */
+    /** @return whether waves are present - if true, any bases here will be attacked. */
     public boolean hasWaves(){
         return save != null && save.meta.rules.waves;
     }

@@ -1,9 +1,11 @@
 package mindustry.content;
 
 import mindustry.ctype.*;
+import mindustry.game.Objectives.*;
 import mindustry.type.*;
 
-import static mindustry.content.Items.copper;
+import static arc.struct.Array.with;
+import static mindustry.content.Items.*;
 import static mindustry.content.Planets.starter;
 import static mindustry.type.ItemStack.list;
 
@@ -25,62 +27,8 @@ public class SectorPresets implements ContentList{
             launchPeriod = 5;
         }};
 
-        //TODO remove
-        /*
-        desertWastes = new Zone("desertWastes", starter){{
-            startingItems = list(copper, 120);
-            conditionWave = 20;
-            launchPeriod = 10;
-            loadout = Loadouts.advancedShard;
-            resources = with(copper, lead, coal, sand);
-            rules = r -> {
-                r.waves = true;
-                r.waveTimer = true;
-                r.launchWaveMultiplier = 3f;
-                r.waveSpacing = 60 * 50f;
-                r.spawns = with(
-                    new SpawnGroup(UnitTypes.crawler){{
-                        unitScaling = 3f;
-                    }},
-                    new SpawnGroup(UnitTypes.dagger){{
-                        unitScaling = 4f;
-                        begin = 2;
-                        spacing = 2;
-                    }},
-                    new SpawnGroup(UnitTypes.wraith){{
-                        unitScaling = 3f;
-                        begin = 11;
-                        spacing = 3;
-                    }},
-                    new SpawnGroup(UnitTypes.eruptor){{
-                        unitScaling = 3f;
-                        begin = 22;
-                        unitAmount = 1;
-                        spacing = 4;
-                    }},
-                    new SpawnGroup(UnitTypes.titan){{
-                        unitScaling = 3f;
-                        begin = 37;
-                        unitAmount = 2;
-                        spacing = 4;
-                    }},
-                    new SpawnGroup(UnitTypes.fortress){{
-                        unitScaling = 2f;
-                        effect = StatusEffects.boss;
-                        begin = 41;
-                        spacing = 20;
-                    }}
-                );
-            };
-            requirements = with(
-            new ZoneWave(groundZero, 20),
-            new Unlock(Blocks.combustionGenerator)
-            );
-        }};*/
-
-        /*
-        saltFlats = new SectorPreset("saltFlats", starter){{
-            startingItems = list(copper, 200, Items.silicon, 200, lead, 200);
+        saltFlats = new SectorPreset("saltFlats", starter, 16){{
+            startingItems = list(copper, 200, silicon, 200, lead, 200);
             loadout = Loadouts.basicFoundation;
             conditionWave = 10;
             launchPeriod = 5;
@@ -93,7 +41,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        frozenForest = new SectorPreset("frozenForest", starter){{
+        frozenForest = new SectorPreset("frozenForest", starter, 17){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 250);
             conditionWave = 10;
@@ -104,7 +52,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        craters = new SectorPreset("craters", starter){{
+        craters = new SectorPreset("craters", starter, 18){{
             startingItems = list(copper, 100);
             conditionWave = 10;
             requirements = with(
@@ -114,7 +62,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        ruinousShores = new SectorPreset("ruinousShores", starter){{
+        ruinousShores = new SectorPreset("ruinousShores", starter, 19){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 140, lead, 50);
             conditionWave = 20;
@@ -129,7 +77,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        stainedMountains = new SectorPreset("stainedMountains", starter){{
+        stainedMountains = new SectorPreset("stainedMountains", starter, 20){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 200, lead, 50);
             conditionWave = 10;
@@ -142,7 +90,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        fungalPass = new SectorPreset("fungalPass", starter){{
+        fungalPass = new SectorPreset("fungalPass", starter, 21){{
             startingItems = list(copper, 250, lead, 250, Items.metaglass, 100, Items.graphite, 100);
             requirements = with(
             new ZoneWave(stainedMountains, 15),
@@ -153,7 +101,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        overgrowth = new SectorPreset("overgrowth", starter){{
+        overgrowth = new SectorPreset("overgrowth", starter, 22){{
             startingItems = list(copper, 1500, lead, 1000, Items.silicon, 500, Items.metaglass, 250);
             conditionWave = 12;
             launchPeriod = 4;
@@ -168,7 +116,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        tarFields = new SectorPreset("tarFields", starter){{
+        tarFields = new SectorPreset("tarFields", starter, 23){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 250, lead, 100);
             conditionWave = 15;
@@ -181,7 +129,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        desolateRift = new SectorPreset("desolateRift", starter){{
+        desolateRift = new SectorPreset("desolateRift", starter, 24){{
             loadout = Loadouts.basicNucleus;
             startingItems = list(copper, 1000, lead, 1000, Items.graphite, 250, titanium, 250, Items.silicon, 250);
             conditionWave = 3;
@@ -194,18 +142,7 @@ public class SectorPresets implements ContentList{
         }};
 
 
-        crags = new Zone("crags", new MapGenerator("crags").dist(2f)){{
-            loadout = Loadouts.basicFoundation;
-            baseLaunchCost = ItemStack.with();
-            startingItems = ItemStack.list(Items.copper, 2000, Items.lead, 2000, Items.graphite, 500, Items.titanium, 500, Items.silicon, 500);
-            conditionWave = 3;
-            launchPeriod = 2;
-            requirements = with(stainedMountains, 40);
-            blockRequirements = new Block[]{Blocks.thermalGenerator};
-            resources = Array.with(Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
-        }};
-
-        nuclearComplex = new SectorPreset("nuclearComplex", starter){{
+        nuclearComplex = new SectorPreset("nuclearComplex", starter, 25){{
             loadout = Loadouts.basicNucleus;
             startingItems = list(copper, 1250, lead, 1500, Items.silicon, 400, Items.metaglass, 250);
             conditionWave = 30;
@@ -215,6 +152,18 @@ public class SectorPresets implements ContentList{
             new Unlock(Blocks.thermalGenerator),
             new Unlock(Blocks.laserDrill)
             );
+        }};
+
+        /*
+        crags = new Zone("crags", new MapGenerator("crags").dist(2f)){{
+            loadout = Loadouts.basicFoundation;
+            baseLaunchCost = ItemStack.with();
+            startingItems = ItemStack.list(Items.copper, 2000, Items.lead, 2000, Items.graphite, 500, Items.titanium, 500, Items.silicon, 500);
+            conditionWave = 3;
+            launchPeriod = 2;
+            requirements = with(stainedMountains, 40);
+            blockRequirements = new Block[]{Blocks.thermalGenerator};
+            resources = Array.with(Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
         }};
 
         
