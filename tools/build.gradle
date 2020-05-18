@@ -296,7 +296,6 @@ task pack(dependsOn: classes){
         javaexec{
             main = "mindustry.tools.ImagePacker"
             classpath = sourceSets.main.runtimeClasspath
-            standardInput = System.in
             workingDir = genFolder
         }
 
