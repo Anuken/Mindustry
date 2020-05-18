@@ -61,12 +61,13 @@ public class SchematicsDialog extends FloatingDialog{
                 t.clear();
                 int i = 0;
 
-                if(!schematics.all().contains(s -> search.isEmpty() || s.name().toLowerCase().contains(search.toLowerCase()))){
+                if(!schematics.all().contains(s -> search.isEmpty() || !fuzzyMatch(s.name(), search))){
                     t.add("$none");
+                    return;
                 }
 
                 for(Schematic s : schematics.all()){
-                    if(!search.isEmpty() && !s.name().toLowerCase().contains(search.toLowerCase())) continue;
+                    if(!search.isEmpty() && fuzzyMatch(s.name(), search)) continue;
 
                     Button[] sel = {null};
                     sel[0] = t.button(b -> {
@@ -150,6 +151,30 @@ public class SchematicsDialog extends FloatingDialog{
 
     public void showInfo(Schematic schematic){
         info.show(schematic);
+    }
+
+    public boolean fuzzyMatch(String text, String searchText){
+        Log.info("New fuzzyMatch");
+        String matchText = text.toLowerCase().replaceAll(" ","");
+        int searchPosition = 0;
+
+        for(int i=0; i < matchText.length(); i++){
+            Log.info("Next");
+            Log.info(matchText);
+            Log.info(matchText.length());
+            Log.info(matchText.charAt(i));
+            Log.info(searchText);
+            Log.info(searchText.length());
+            if(searchPosition<searchText.length())Log.info(searchText.charAt(searchPosition));
+            Log.info(searchPosition);
+            if(searchPosition < searchText.length() && matchText.charAt(i) == searchText.charAt(searchPosition))
+                searchPosition++;
+        }
+
+        if(searchPosition == searchText.length())
+            return false;
+
+        return true;
     }
 
     public void showImport(){
