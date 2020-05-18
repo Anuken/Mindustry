@@ -22,10 +22,9 @@ import static mindustry.Vars.*;
 
 public class SchematicsDialog extends FloatingDialog{
     private SchematicInfoDialog info = new SchematicInfoDialog();
-    private TextField searchField;
     private String search = "";
-    private TextField searchField;
     private Schematic firstSchematic;
+    private TextField searchField;
 
     public SchematicsDialog(){
         super("$schematics");
@@ -64,8 +63,9 @@ public class SchematicsDialog extends FloatingDialog{
             rebuildPane[0] = () -> {
                 t.clear();
                 int i = 0;
+                boolean useFuzzy = Core.settings.getBool("fuzzymatch");
 
-                if(!schematics.all().contains(s -> search.isEmpty() || !fuzzyMatch(s.name(), search))){
+                if(!schematics.all().contains(s -> search.isEmpty() || (useFuzzy ? fuzzyMatch(s.name(), search) : !s.name().toLowerCase().contains(search.toLowerCase())))){
                     t.add("$none");
                     return;
                 }
@@ -73,7 +73,7 @@ public class SchematicsDialog extends FloatingDialog{
                 firstSchematic = null;
 
                 for(Schematic s : schematics.all()){
-                    if(!search.isEmpty() && fuzzyMatch(s.name(), search)) continue;
+                    if(!search.isEmpty() && (useFuzzy ? fuzzyMatch(s.name(), search) : !s.name().toLowerCase().contains(search.toLowerCase()))) continue;
                     if(firstSchematic == null)
                         firstSchematic = s;
 
@@ -168,19 +168,10 @@ public class SchematicsDialog extends FloatingDialog{
     }
 
     public boolean fuzzyMatch(String text, String searchText){
-        Log.info("New fuzzyMatch");
         String matchText = text.toLowerCase().replaceAll(" ","");
         int searchPosition = 0;
 
         for(int i=0; i < matchText.length(); i++){
-            Log.info("Next");
-            Log.info(matchText);
-            Log.info(matchText.length());
-            Log.info(matchText.charAt(i));
-            Log.info(searchText);
-            Log.info(searchText.length());
-            if(searchPosition<searchText.length())Log.info(searchText.charAt(searchPosition));
-            Log.info(searchPosition);
             if(searchPosition < searchText.length() && matchText.charAt(i) == searchText.charAt(searchPosition))
                 searchPosition++;
         }
