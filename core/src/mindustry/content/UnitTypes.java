@@ -29,7 +29,6 @@ public class UnitTypes implements ContentList{
 
         dagger = new UnitType("dagger"){{
             speed = 0.5f;
-            drag = 0.3f;
             hitsize = 8f;
             mass = 1.75f;
             health = 130;
@@ -44,7 +43,6 @@ public class UnitTypes implements ContentList{
 
         titan = new UnitType("titan"){{
             speed = 0.4f;
-            drag = 0.3f;
             mass = 3.5f;
             hitsize = 9f;
             range = 10f;
@@ -66,7 +64,6 @@ public class UnitTypes implements ContentList{
 
         crawler = new UnitType("crawler"){{
             speed = 0.65f;
-            drag = 0.3f;
             hitsize = 8f;
             mass = 1.75f;
             health = 120;
@@ -89,10 +86,8 @@ public class UnitTypes implements ContentList{
 
         fortress = new UnitType("fortress"){{
             speed = 0.38f;
-            speed = 0.15f;
-            drag = 0.4f;
             mass = 5f;
-            hitsize = 10f;
+            hitsize = 13f;
             rotateSpeed = 3f;
             targetAir = false;
             health = 750;
@@ -113,7 +108,7 @@ public class UnitTypes implements ContentList{
             speed = 0.4f;
             drag = 0.4f;
             mass = 5f;
-            hitsize = 9f;
+            hitsize = 10f;
             rotateSpeed = 3f;
             targetAir = false;
             health = 600;
@@ -681,7 +676,7 @@ public class UnitTypes implements ContentList{
                 engineColor = Color.valueOf("feb380");
                 health = 350f;
                 buildSpeed = 1.5f;
-                weapons.add(new Weapon("swarmer"){{
+                weapons.add(new Weapon("missiles"){{
                     length = 1.5f;
                     recoil = 4f;
                     reload = 38f;

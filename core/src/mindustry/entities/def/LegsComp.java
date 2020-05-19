@@ -16,6 +16,6 @@ abstract class LegsComp implements Posc, Flyingc, Hitboxc, Unitc, Legsc, Elevati
     public void update(){
         float len = vel().len();
         baseRotation = Angles.moveToward(baseRotation, vel().angle(), type().baseRotateSpeed * Mathf.clamp(len / type().speed));
-        walkTime += Time.delta()*len*2f;
+        walkTime += Time.delta()*len;
     }
 }

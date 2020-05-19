@@ -6,6 +6,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
@@ -24,6 +25,7 @@ import static mindustry.Vars.*;
 
 public class UnitType extends UnlockableContent{
     public static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
+    private static final Vec2 legOffset = new Vec2();
 
     public boolean flying;
     public @NonNull Prov<? extends Unitc> constructor;
@@ -115,6 +117,8 @@ public class UnitType extends UnlockableContent{
     //region drawing
 
     public void draw(Unitc unit){
+        Legsc legs = unit instanceof Legsc ? (Legsc)unit : null;
+
         if(unit.controller().isBeingControlled(player.unit())){
             drawControl(unit);
         }
@@ -127,8 +131,13 @@ public class UnitType extends UnlockableContent{
         float z = Mathf.lerp(Layer.groundUnit, Layer.flyingUnit, unit.elevation());
 
         Draw.z(z - 0.02f);
-        if(unit instanceof Legsc){
-            drawLegs((Legsc)unit);
+
+        if(legs != null){
+            drawLegs(legs);
+
+            float ft = Mathf.sin(legs.walkTime(), 3f, 3f);
+            legOffset.trns(legs.baseRotation(), 0f, ft * 0.18f);
+            unit.trns(legOffset.x, legOffset.y);
         }
 
         Draw.z(z - 0.01f);
@@ -144,6 +153,10 @@ public class UnitType extends UnlockableContent{
 
         if(unit.shieldAlpha() > 0){
             drawShield(unit);
+        }
+
+        if(legs != null){
+            unit.trns(-legOffset.x, -legOffset.y);
         }
     }
 
@@ -291,7 +304,8 @@ public class UnitType extends UnlockableContent{
 
         Draw.mixcol(Color.white, unit.hitTime());
 
-        float ft = Mathf.sin(unit.walkTime(), 6f, 2f + unit.hitSize() / 15f);
+        float sin = Mathf.sin(unit.walkTime(), 3f, 1f);
+        float ft = sin*(2.5f + (unit.hitSize()-8f)/2f);
 
         Floor floor = unit.floorOn();
 
@@ -300,11 +314,15 @@ public class UnitType extends UnlockableContent{
         }
 
         for(int i : Mathf.signs){
+            //Draw.mixcol(Color.valueOf("989aa4"), Math.max(sin * i, 0));
             Draw.rect(legRegion,
             unit.x() + Angles.trnsx(unit.baseRotation(), ft * i),
             unit.y() + Angles.trnsy(unit.baseRotation(), ft * i),
-            legRegion.getWidth() * i * Draw.scl, legRegion.getHeight() * Draw.scl - Mathf.clamp(ft * i, 0, 2), unit.baseRotation() - 90);
+            legRegion.getWidth() * i * Draw.scl,
+            legRegion.getHeight() * Draw.scl - Math.max(-sin * i, 0) * legRegion.getHeight() * 0.5f * Draw.scl,
+            unit.baseRotation() - 90);
         }
+        //Draw.mixcol();
 
         if(floor.isLiquid){
             Draw.color(Color.white, floor.mapColor, unit.drownTime() * 0.4f);
