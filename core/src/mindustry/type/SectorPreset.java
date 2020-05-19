@@ -14,7 +14,6 @@ import mindustry.maps.generators.*;
 
 import static mindustry.Vars.*;
 
-//TODO ? remove ?
 public class SectorPreset extends UnlockableContent{
     public @NonNull FileMapGenerator generator;
     public @NonNull Planet planet;
@@ -40,12 +39,6 @@ public class SectorPreset extends UnlockableContent{
 
         planet.preset(sector, this);
     }
-
-    //TODO
-    /*
-    public SectorPreset(String name){
-        this(name, Planets.starter);
-    }*/
 
     public Rules getRules(){
         return generator.map.rules();

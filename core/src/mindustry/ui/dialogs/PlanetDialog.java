@@ -280,18 +280,19 @@ public class PlanetDialog extends FloatingDialog{
         batch.proj().mul(planet.getTransform(mat));
 
         for(Sector sec : planet.sectors){
-            if(sec.locked()){
-                draw(sec, shadowColor, -0.001f);
-            }
 
             if(selectAlpha > 0.01f){
-                float stroke = 0.026f;
-                if(sec.hasBase()){
-                    drawSelection(sec, Tmp.c1.set(Team.sharded.color).mul(0.8f).a(selectAlpha), stroke, -0.01f);
-                }else if(sec.preset != null){
-                    drawSelection(sec, Tmp.c1.set(Team.derelict.color).mul(0.8f).a(selectAlpha), stroke, -0.02f);
-                }else if(sec.hasEnemyBase()){
-                    drawSelection(sec, Tmp.c1.set(Team.crux.color).mul(0.8f).a(selectAlpha), stroke, -0.02f);
+                if(sec.unlocked()){
+                    float stroke = 0.026f;
+                    if(sec.hasBase()){
+                        drawSelection(sec, Tmp.c1.set(Team.sharded.color).mul(0.8f).a(selectAlpha), stroke, -0.005f);
+                    }else if(sec.preset != null){
+                        drawSelection(sec, Tmp.c1.set(Team.derelict.color).mul(0.8f).a(selectAlpha), stroke, -0.005f);
+                    }else if(sec.hasEnemyBase()){
+                        drawSelection(sec, Tmp.c1.set(Team.crux.color).mul(0.8f).a(selectAlpha), stroke, -0.005f);
+                    }
+                }else{
+                    draw(sec, Tmp.c1.set(shadowColor).mul(1, 1, 1, selectAlpha), -0.001f);
                 }
             }
         }
@@ -309,13 +310,13 @@ public class PlanetDialog extends FloatingDialog{
         batch.flush(Gl.triangles);
 
         //render arcs
-        for(Sector sec : planet.sectors){
-            if(sec.preset != null){
-                for(Objective o : sec.preset.requirements){
-                    if(o instanceof ZoneObjective){
-                        SectorPreset preset = ((ZoneObjective)o).preset;
+        if(selected != null && selected.preset != null){
+            for(Objective o : selected.preset.requirements){
+                if(o instanceof ZoneObjective){
+                    SectorPreset preset = ((ZoneObjective)o).preset;
 
-                        drawArc(planet, sec.tile.v, preset.sector.tile.v);
+                    if(true){
+                        drawArc(planet, selected.tile.v, preset.sector.tile.v);
                     }
                 }
             }
@@ -341,11 +342,12 @@ public class PlanetDialog extends FloatingDialog{
         points.clear();
         points.addAll(Tmp.v33.set(a).setLength(outlineRad), Tmp.v31, Tmp.v34.set(b).setLength(outlineRad));
         Tmp.bz3.set(points);
-        float points = 20;
+        float points = 25;
 
         for(int i = 0; i < points + 1; i++){
             float f = i / points;
-            batch.color(Pal.accent);
+            Tmp.c1.set(Pal.accent).lerp(Color.clear, (f+Time.globalTime()/80f)%1f);
+            batch.color(Tmp.c1);
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
 
         }
