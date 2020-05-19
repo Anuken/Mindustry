@@ -3,6 +3,7 @@ package mindustry.content;
 import arc.math.*;
 import arc.struct.*;
 import mindustry.ctype.*;
+import mindustry.game.Objectives.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -336,7 +337,7 @@ public class TechTree implements ContentList{
 
             requirements = new ItemStack[block.requirements.length];
             for(int i = 0; i < requirements.length; i++){
-                requirements[i] = new ItemStack(block.requirements[i].item, 40 + Mathf.round(Mathf.pow(block.requirements[i].amount, 1.25f) * 6, 10));
+                requirements[i] = new ItemStack(block.requirements[i].item, 40 + Mathf.round(Mathf.pow(block.requirements[i].amount, 1.25f) * 20, 10));
             }
         }else{
             requirements = ItemStack.empty;
@@ -355,11 +356,20 @@ public class TechTree implements ContentList{
     }
 
     public static class TechNode{
-        static TechNode context;
+        private static TechNode context;
 
+        /** Requirement node. */
         public TechNode parent;
-        public final UnlockableContent content;
-        public final ItemStack[] requirements;
+        /** Content to be researched. */
+        public UnlockableContent content;
+        /** Item requirements for this content. */
+        public ItemStack[] requirements;
+        /** Extra objectives needed to research this. TODO implement */
+        public Objective[] objectives = {};
+        /** Turns required to research this content. */
+        //TODO keep track of turns that have been used so far
+        public int turns = 1;
+        /** Nodes that depend on this node. */
         public final Array<TechNode> children = new Array<>();
 
         TechNode(TechNode ccontext, UnlockableContent content, ItemStack[] requirements, Runnable children){

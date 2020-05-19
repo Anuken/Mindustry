@@ -97,7 +97,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                 float rotation = this.rotation - 90;
 
                 //shoot if applicable
-                if(mount.reload <= 0.0001f && Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, 1.5f)){
+                if(mount.reload <= 0.0001f && Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone)){
                     for(int i : (weapon.mirror && !weapon.alternate ? Mathf.signs : Mathf.one)){
                         i *= Mathf.sign(weapon.flipped) * (mount.weapon.mirror ? Mathf.sign(mount.side) : 1);
 

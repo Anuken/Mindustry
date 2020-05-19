@@ -33,7 +33,7 @@ public class SectorPresets implements ContentList{
             conditionWave = 10;
             launchPeriod = 5;
             requirements = with(
-            new ZoneWave(groundZero, 60),
+            new SectorWave(groundZero, 60),
             //new Unlock(Blocks.daggerFactory),
             //new Unlock(Blocks.draugFactory),
             new Unlock(Blocks.door),
@@ -46,7 +46,7 @@ public class SectorPresets implements ContentList{
             startingItems = list(copper, 250);
             conditionWave = 10;
             requirements = with(
-            new ZoneWave(groundZero, 10),
+            new SectorWave(groundZero, 10),
             new Unlock(Blocks.junction),
             new Unlock(Blocks.router)
             );
@@ -56,7 +56,7 @@ public class SectorPresets implements ContentList{
             startingItems = list(copper, 100);
             conditionWave = 10;
             requirements = with(
-            new ZoneWave(frozenForest, 10),
+            new SectorWave(frozenForest, 10),
             new Unlock(Blocks.mender),
             new Unlock(Blocks.combustionGenerator)
             );
@@ -68,8 +68,8 @@ public class SectorPresets implements ContentList{
             conditionWave = 20;
             launchPeriod = 20;
             requirements = with(
-            new ZoneWave(groundZero, 20),
-            new ZoneWave(craters, 15),
+            new SectorWave(groundZero, 20),
+            new SectorWave(craters, 15),
             new Unlock(Blocks.graphitePress),
             new Unlock(Blocks.combustionGenerator),
             new Unlock(Blocks.kiln),
@@ -83,7 +83,7 @@ public class SectorPresets implements ContentList{
             conditionWave = 10;
             launchPeriod = 10;
             requirements = with(
-            new ZoneWave(frozenForest, 15),
+            new SectorWave(frozenForest, 15),
             new Unlock(Blocks.pneumaticDrill),
             new Unlock(Blocks.powerNode),
             new Unlock(Blocks.turbineGenerator)
@@ -93,7 +93,7 @@ public class SectorPresets implements ContentList{
         fungalPass = new SectorPreset("fungalPass", starter, 21){{
             startingItems = list(copper, 250, lead, 250, Items.metaglass, 100, Items.graphite, 100);
             requirements = with(
-            new ZoneWave(stainedMountains, 15),
+            new SectorWave(stainedMountains, 15),
             //new Unlock(Blocks.daggerFactory),
             //new Unlock(Blocks.crawlerFactory),
             new Unlock(Blocks.door),
@@ -107,7 +107,7 @@ public class SectorPresets implements ContentList{
             launchPeriod = 4;
             loadout = Loadouts.basicNucleus;
             requirements = with(
-            new ZoneWave(craters, 40),
+            new SectorWave(craters, 40),
             new Launched(fungalPass),
             new Unlock(Blocks.cultivator),
             new Unlock(Blocks.sporePress)
@@ -122,7 +122,7 @@ public class SectorPresets implements ContentList{
             conditionWave = 15;
             launchPeriod = 10;
             requirements = with(
-            new ZoneWave(ruinousShores, 20),
+            new SectorWave(ruinousShores, 20),
             new Unlock(Blocks.coalCentrifuge),
             new Unlock(Blocks.conduit),
             new Unlock(Blocks.wave)
@@ -135,7 +135,7 @@ public class SectorPresets implements ContentList{
             conditionWave = 3;
             launchPeriod = 2;
             requirements = with(
-            new ZoneWave(tarFields, 20),
+            new SectorWave(tarFields, 20),
             new Unlock(Blocks.thermalGenerator),
             new Unlock(Blocks.thoriumReactor)
             );

@@ -143,7 +143,7 @@ public class SaveIO{
         }
     }
 
-    /** Loads from a deflated (!) input stream.*/
+    /** Loads from a deflated (!) input stream. */
     public static void load(InputStream is, WorldContext context) throws SaveException{
         try(CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
             logic.reset();

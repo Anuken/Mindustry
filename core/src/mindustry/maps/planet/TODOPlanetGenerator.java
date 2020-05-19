@@ -38,7 +38,9 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
     ObjectMap<Block, Block> dec = ObjectMap.of(
         Blocks.sporeMoss, Blocks.sporeCluster,
-        Blocks.moss, Blocks.sporeCluster
+        Blocks.moss, Blocks.sporeCluster,
+        Blocks.taintedWater, Blocks.water,
+        Blocks.darksandTaintedWater, Blocks.darksandWater
     );
 
     ObjectMap<Block, Block> tars = ObjectMap.of(

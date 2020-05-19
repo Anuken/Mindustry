@@ -246,7 +246,7 @@ public class ChatFragment extends Table{
             if(sender == null){ //no sender, this is a server message?
                 formattedMessage = message;
             }else{
-                formattedMessage = "[CORAL][[" + sender + "[CORAL]]:[WHITE] " + message;
+                formattedMessage = "[coral][[" + sender + "[coral]]:[white] " + message;
             }
         }
     }

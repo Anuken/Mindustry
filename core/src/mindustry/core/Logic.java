@@ -111,6 +111,15 @@ public class Logic implements ApplicationListener{
                 universe.runTurn();
             }
         });
+
+        //disable new waves after the boss spawns
+        Events.on(WaveEvent.class, e -> {
+            //only works for preset sectors so far
+            if(state.isCampaign() && state.boss() != null && state.rules.sector.preset != null){
+                state.rules.waitEnemies = true;
+            }
+        });
+
     }
 
     /** Handles the event of content being used by either the player or some block. */
@@ -123,7 +132,8 @@ public class Logic implements ApplicationListener{
     /** Adds starting items, resets wave time, and sets state to playing. */
     public void play(){
         state.set(State.playing);
-        state.wavetime = state.rules.waveSpacing * 2; //grace period of 2x wave time before game starts
+        //grace period of 2x wave time before game starts
+        state.wavetime = state.rules.waveSpacing * 2;
         Events.fire(new PlayEvent());
 
         //add starting items
@@ -160,7 +170,7 @@ public class Logic implements ApplicationListener{
         Events.fire(new WaveEvent());
     }
 
-    private void checkGameOver(){
+    private void checkGameState(){
         //campaign maps do not have a 'win' state!
         if(state.isCampaign()){
             //gameover only when cores are dead
@@ -173,6 +183,22 @@ public class Logic implements ApplicationListener{
             if(state.rules.waves && spawner.countSpawns() + state.teams.cores(state.rules.waveTeam).size <= 0){
                 //if yes, waves get disabled
                 state.rules.waves = false;
+            }
+
+            //check if there is a boss present
+            Unitc boss = state.boss();
+            //if this was a boss wave and there is no boss anymore, then it's a victory
+            if(state.rules.sector.preset != null && boss == null && state.rules.waves && state.rules.waitEnemies){
+                //the sector has been conquered - waves get disabled
+                state.rules.waves = false;
+
+                //fire capture event
+                Events.fire(new SectorCaptureEvent(state.rules.sector));
+
+                //save, just in case
+                if(!headless){
+                    control.saves.saveSector(state.rules.sector);
+                }
             }
         }else{
             if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
@@ -233,7 +259,7 @@ public class Logic implements ApplicationListener{
 
         Sector sector = state.rules.sector;
 
-        //TODO what about containers, do they get launched too?
+        //TODO containers must be launched too
         Time.runTask(30f, () -> {
             for(Tilec entity : state.teams.playerCores()){
                 for(Item item : content.items()){
@@ -252,7 +278,7 @@ public class Logic implements ApplicationListener{
             //run a turn, since launching takes up a turn
             universe.runTurn();
             //TODO needs extra damage to prevent player from landing immediately afterwards
-            sector.setTurnsPassed(sector.getTurnsPassed() + 1);
+            sector.setTurnsPassed(sector.getTurnsPassed() + 3);
 
             Events.fire(new LaunchEvent());
             //manually fire game over event now
@@ -291,7 +317,7 @@ public class Logic implements ApplicationListener{
                 }
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
-                    if(!state.rules.waitForWaveToEnd || state.enemies == 0){
+                    if(!state.rules.waitEnemies || state.enemies == 0){
                         state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
                     }
                 }
@@ -304,7 +330,7 @@ public class Logic implements ApplicationListener{
             }
 
             if(!net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver){
-                checkGameOver();
+                checkGameState();
             }
         }
     }

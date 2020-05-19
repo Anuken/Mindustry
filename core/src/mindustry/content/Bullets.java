@@ -563,6 +563,7 @@ public class Bullets implements ContentList{
             damage = 2;
             speed = 2.1f;
             drag = 0.02f;
+            shootEffect = Fx.shootSmall;
         }};
 
         oilShot = new LiquidBulletType(Liquids.oil){{

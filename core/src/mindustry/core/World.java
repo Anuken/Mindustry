@@ -222,6 +222,9 @@ public class World{
             }
         });
 
+        //reset rules
+        setSectorRules(sector);
+
         if(state.rules.defaultTeam.core() != null){
             sector.setSpawnPosition(state.rules.defaultTeam.core().pos());
         }
@@ -230,6 +233,8 @@ public class World{
     private void setSectorRules(Sector sector){
         state.map = new Map(StringMap.of("name", sector.planet.localizedName + "; Sector " + sector.id));
         state.rules.sector = sector;
+
+        state.rules.weather.clear();
 
         if(sector.is(SectorAttribute.rainy)){
             state.rules.weather.add(new WeatherEntry(Weathers.rain));

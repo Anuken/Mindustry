@@ -99,7 +99,7 @@ public class WaveInfoDialog extends FloatingDialog{
         }}).width(390f).growY();
 
         cont.table(Tex.clear, m -> {
-            m.add("$waves.preview").color(Color.lightGray).growX().center().get().setAlignment(Align.center, Align.center);
+            m.add("$waves.preview").color(Color.lightGray).wrap().growX().center().get().setAlignment(Align.center, Align.center);
             m.row();
             m.button("-", () -> {
             }).update(t -> {

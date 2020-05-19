@@ -246,9 +246,9 @@ public class Generators{
                 Image image = ImagePacker.get(type.region);
 
                 if(type.constructor.get() instanceof Legsc){
-                    image.draw(type.baseRegion);
-                    image.draw(type.legRegion);
-                    image.draw(type.legRegion, true, false);
+                    image.drawCenter(type.baseRegion);
+                    image.drawCenter(type.legRegion);
+                    image.drawCenter(type.legRegion, true, false);
                 }
                 image.draw(type.region);
 
