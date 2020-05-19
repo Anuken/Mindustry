@@ -175,12 +175,6 @@ public class Control implements ApplicationListener, Loadable{
                 Effects.shake(5f, 5f, core);
             });
         });
-
-        Events.on(UnitDestroyEvent.class, e -> {
-            if(state.isCampaign()){
-                data.unlockContent(e.unit.type());
-            }
-        });
     }
 
     @Override

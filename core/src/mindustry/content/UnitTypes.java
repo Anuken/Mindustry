@@ -3,6 +3,7 @@ package mindustry.content;
 import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
+import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
@@ -61,6 +62,72 @@ public class UnitTypes implements ContentList{
                 bullet = Bullets.basicFlame;
             }});
 
+        }};
+
+        crawler = new UnitType("crawler"){{
+            speed = 0.65f;
+            drag = 0.3f;
+            hitsize = 8f;
+            mass = 1.75f;
+            health = 120;
+            weapons.add(new Weapon(){{
+                reload = 12f;
+                shootCone = 180f;
+                ejectEffect = Fx.none;
+                shootSound = Sounds.explosion;
+                bullet = new BombBulletType(2f, 3f, "clear"){{
+                    hitEffect = Fx.pulverize;
+                    lifetime = 30f;
+                    speed = 1.1f;
+                    splashDamageRadius = 55f;
+                    instantDisappear = true;
+                    splashDamage = 30f;
+                    killShooter = true;
+                }};
+            }});
+        }};
+
+        fortress = new UnitType("fortress"){{
+            speed = 0.38f;
+            speed = 0.15f;
+            drag = 0.4f;
+            mass = 5f;
+            hitsize = 10f;
+            rotateSpeed = 3f;
+            targetAir = false;
+            health = 750;
+            weapons.add(new Weapon("artillery"){{
+                y = 1f;
+                x = 9f;
+                reload = 60f;
+                alternate = true;
+                recoil = 4f;
+                shake = 2f;
+                ejectEffect = Fx.shellEjectMedium;
+                bullet = Bullets.artilleryUnit;
+                shootSound = Sounds.artillery;
+            }});
+        }};
+
+        eruptor = new UnitType("eruptor"){{
+            speed = 0.4f;
+            drag = 0.4f;
+            mass = 5f;
+            hitsize = 9f;
+            rotateSpeed = 3f;
+            targetAir = false;
+            health = 600;
+            immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
+            weapons.add(new Weapon("eruption"){{
+                shootY = 3f;
+                reload = 10f;
+                alternate = true;
+                ejectEffect = Fx.none;
+                bullet = Bullets.eruptorShot;
+                recoil = 1f;
+                x = 7f;
+                shootSound = Sounds.flame;
+            }});
         }};
 
         wraith = new UnitType("wraith"){{
@@ -152,6 +219,7 @@ public class UnitTypes implements ContentList{
                 recoil = 2f;
                 bullet = Bullets.healBulletBig;
                 shootSound = Sounds.pew;
+
             }});
         }};
 
@@ -171,49 +239,6 @@ public class UnitTypes implements ContentList{
         }};
         
         /*
-        crawler = new UnitType("crawler", GroundUnit::new){{
-            maxVelocity = 1.27f;
-            speed = 0.285f;
-            drag = 0.4f;
-            hitsize = 8f;
-            mass = 1.75f;
-            health = 120;
-            weapons.add(new Weapon(){{
-                reload = 12f;
-                ejectEffect = Fx.none;
-                shootSound = Sounds.explosion;
-                bullet = new BombBulletType(2f, 3f, "clear"){{
-                    hitEffect = Fx.pulverize;
-                    lifetime = 30f;
-                    speed = 1.1f;
-                    splashDamageRadius = 55f;
-                    instantDisappear = true;
-                    splashDamage = 30f;
-                    killShooter = true;
-                }};
-            }});
-        }};
-
-        titan = new UnitType("titan", GroundUnit::new){{
-            maxVelocity = 0.8f;
-            speed = 0.22f;
-            drag = 0.4f;
-            mass = 3.5f;
-            hitsize = 9f;
-            range = 10f;
-            rotatespeed = 0.1f;
-            health = 460;
-            immunities.add(StatusEffects.burning);
-            weapons.add(new Weapon("flamethrower"){{
-                shootSound = Sounds.flame;
-                length = 1f;
-                reload = 14f;
-                alternate = true;
-                recoil = 1f;
-                ejectEffect = Fx.none;
-                bullet = Bullets.basicFlame;
-            }});
-        }};
 
         fortress = new UnitType("fortress", GroundUnit::new){{
             maxVelocity = 0.78f;

@@ -49,6 +49,11 @@ public class HudFragment extends Fragment{
             showToast("New turn: [accent]" + universe.getTurn() + "[]" + (attacked > 0 ? "\n[scarlet]" + Iconc.warning + " " + attacked + " sectors attacked!": ""));
         });
 
+        //TODO details and stuff
+        Events.on(SectorCaptureEvent.class, e ->{
+            showToast("Sector[accent] captured[]!");
+        });
+
         //TODO tear this all down
         //menu at top left
         parent.fill(cont -> {
@@ -625,7 +630,7 @@ public class HudFragment extends Fragment{
             }
 
             if(state.rules.waveTimer){
-                builder.append((state.rules.waitForWaveToEnd && state.enemies > 0 ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60)))));
+                builder.append((state.rules.waitEnemies && state.enemies > 0 ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60)))));
             }else if(state.enemies == 0){
                 builder.append(Core.bundle.get("waiting"));
             }

@@ -51,15 +51,15 @@ public class Objectives{
         }
     }
 
-    public static class ZoneWave extends ZoneObjective{
+    public static class SectorWave extends SectorObjective{
         public int wave;
 
-        public ZoneWave(SectorPreset zone, int wave){
+        public SectorWave(SectorPreset zone, int wave){
             this.preset = zone;
             this.wave = wave;
         }
 
-        protected ZoneWave(){}
+        protected SectorWave(){}
 
         @Override
         public boolean complete(){
@@ -72,7 +72,7 @@ public class Objectives{
         }
     }
 
-    public static class Launched extends ZoneObjective{
+    public static class Launched extends SectorObjective{
 
         public Launched(SectorPreset zone){
             this.preset = zone;
@@ -91,7 +91,7 @@ public class Objectives{
         }
     }
 
-    public abstract static class ZoneObjective implements Objective{
+    public abstract static class SectorObjective implements Objective{
         public @NonNull SectorPreset preset;
     }
 
@@ -112,7 +112,7 @@ public class Objectives{
         }
 
         default SectorPreset zone(){
-            return this instanceof ZoneObjective ? ((ZoneObjective)this).preset : null;
+            return this instanceof SectorObjective ? ((SectorObjective)this).preset : null;
         }
     }
 }

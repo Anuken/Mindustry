@@ -283,13 +283,14 @@ public class PlanetDialog extends FloatingDialog{
 
             if(selectAlpha > 0.01f){
                 if(sec.unlocked()){
-                    float stroke = 0.026f;
-                    if(sec.hasBase()){
-                        drawSelection(sec, Tmp.c1.set(Team.sharded.color).mul(0.8f).a(selectAlpha), stroke, -0.005f);
-                    }else if(sec.preset != null){
-                        drawSelection(sec, Tmp.c1.set(Team.derelict.color).mul(0.8f).a(selectAlpha), stroke, -0.005f);
-                    }else if(sec.hasEnemyBase()){
-                        drawSelection(sec, Tmp.c1.set(Team.crux.color).mul(0.8f).a(selectAlpha), stroke, -0.005f);
+                    Color color =
+                        sec.hasBase() ? Team.sharded.color :
+                        sec.preset != null ? Team.derelict.color :
+                        sec.hasEnemyBase() ? Team.crux.color :
+                        null;
+
+                    if(color != null){
+                        drawSelection(sec, Tmp.c1.set(color).mul(0.8f).a(selectAlpha), 0.026f, -0.001f);
                     }
                 }else{
                     draw(sec, Tmp.c1.set(shadowColor).mul(1, 1, 1, selectAlpha), -0.001f);
@@ -312,12 +313,9 @@ public class PlanetDialog extends FloatingDialog{
         //render arcs
         if(selected != null && selected.preset != null){
             for(Objective o : selected.preset.requirements){
-                if(o instanceof ZoneObjective){
-                    SectorPreset preset = ((ZoneObjective)o).preset;
-
-                    if(true){
-                        drawArc(planet, selected.tile.v, preset.sector.tile.v);
-                    }
+                if(o instanceof SectorObjective){
+                    SectorPreset preset = ((SectorObjective)o).preset;
+                    drawArc(planet, selected.tile.v, preset.sector.tile.v);
                 }
             }
         }
