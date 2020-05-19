@@ -1,0 +1,48 @@
+var x = 0;
+var z = 0;
+const multiForge = extendContent(GenericSmelter, "multiForge", {
+//create buttons to change crafting
+	buildConfiguration(tile, table) {
+    table.addImageButton(new TextureRegionDrawable(Core.atlas.find("[#624200]copper-metaglass")), 
+    Styles.clearTransi, run(() => {
+    	z = 1
+    })).size(40),
+    table.addImageButton(new TextureRegionDrawable(Core.atlas.find("[#624200]copper-silicon")), 
+    Styles.clearTransi, run(() => {
+    	z = 0
+    })).size(40)
+},
+//create a basic crafting recipe
+	update(tile) {
+	if(z==0){
+		if(tile.entity.items.has(Items.coal, 3) & tile.entity.items.has(Items.sand, 3) & tile.entity.power.graph.getPowerBalance()>1){
+			if(tile.entity.timer.get(25)){
+				if(x > 0){
+					tile.entity.items.add(Items.silicon, 1);
+   				 this.tryDump(tile, Items.silicon);
+   				 tile.entity.items.remove(Items.coal, 3)
+   				 tile.entity.items.remove(Items.sand, 3)
+   				 Effects.effect(Fx.smeltsmoke, tile)
+   			};
+   			x++
+}}else{x = 0}
+} else{
+if(tile.entity.items.has(Items.sand, 4) & tile.entity.items.has(Items.lead, 4) & tile.entity.power.graph.getPowerBalance()>1){
+	if(tile.entity.timer.get(30)){
+				if(x > 0){
+					tile.entity.items.add(Items.metaglass, 2);
+					for(i=0; i<2; i++){
+   				 this.tryDump(tile, Items.metaglass);
+  			  	} 
+  				  Effects.effect(Fx.smeltsmoke, tile);
+   				 tile.entity.items.remove(Items.sand, 4);
+   				 tile.entity.items.remove(Items.lead, 4)
+   			};
+   x++
+}} else { x = 0}
+}}});
+//finish the remaining details
+multiForge.configurable = true;
+multiForge.hasItems = true;
+multiForge.consumes.items(new ItemStack(Items.lead, 4), new ItemStack(Items.coal, 3), new ItemStack(Items.sand, 4));
+multiForge.consumes.power(1)
