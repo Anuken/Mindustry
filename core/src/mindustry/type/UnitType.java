@@ -35,6 +35,7 @@ public class UnitType extends UnlockableContent{
     public float health = 200f, range = -1;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, isCounted = true;
+    public float sway = 1f;
 
     public int itemCapacity = 30;
     public int drillTier = -1;
@@ -136,7 +137,7 @@ public class UnitType extends UnlockableContent{
             drawLegs(legs);
 
             float ft = Mathf.sin(legs.walkTime(), 3f, 3f);
-            legOffset.trns(legs.baseRotation(), 0f, ft * 0.18f);
+            legOffset.trns(legs.baseRotation(), 0f, ft * 0.18f * sway);
             unit.trns(legOffset.x, legOffset.y);
         }
 

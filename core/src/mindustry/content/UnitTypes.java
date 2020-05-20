@@ -67,6 +67,7 @@ public class UnitTypes implements ContentList{
             hitsize = 8f;
             mass = 1.75f;
             health = 120;
+            sway = 0.25f;
             weapons.add(new Weapon(){{
                 reload = 12f;
                 shootCone = 180f;
@@ -136,11 +137,36 @@ public class UnitTypes implements ContentList{
             range = 140f;
             weapons.add(new Weapon(){{
                 y = 1.5f;
-                reload = 28f;
+                reload = 15f;
                 alternate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
                 shootSound = Sounds.shoot;
+            }});
+        }};
+
+        ghoul = new UnitType("ghoul"){{
+            health = 220;
+            speed = 2f;
+            mass = 3f;
+            accel = 0.08f;
+            drag = 0.016f;
+            flying = true;
+            targetAir = false;
+            engineOffset = 7.8f;
+            range = 140f;
+            faceTarget = false;
+            weapons.add(new Weapon(){{
+                shootY = 0f;
+                shootX = 0f;
+                reload = 6f;
+                shootCone = 180f;
+                alternate = true;
+                ejectEffect = Fx.none;
+                inaccuracy = 40f;
+                ignoreRotation = true;
+                bullet = Bullets.bombExplosive;
+                shootSound = Sounds.none;
             }});
         }};
 
@@ -235,50 +261,6 @@ public class UnitTypes implements ContentList{
         
         /*
 
-        fortress = new UnitType("fortress", GroundUnit::new){{
-            maxVelocity = 0.78f;
-            speed = 0.15f;
-            drag = 0.4f;
-            mass = 5f;
-            hitsize = 10f;
-            rotatespeed = 0.06f;
-            targetAir = false;
-            health = 750;
-            weapons.add(new Weapon("artillery"){{
-                length = 1f;
-                reload = 60f;
-                width = 10f;
-                alternate = true;
-                recoil = 4f;
-                shake = 2f;
-                ejectEffect = Fx.shellEjectMedium;
-                bullet = Bullets.artilleryUnit;
-                shootSound = Sounds.artillery;
-            }});
-        }};
-
-        eruptor = new UnitType("eruptor", GroundUnit::new){{
-            maxVelocity = 0.81f;
-            speed = 0.16f;
-            drag = 0.4f;
-            mass = 5f;
-            hitsize = 9f;
-            rotatespeed = 0.05f;
-            targetAir = false;
-            health = 600;
-            immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
-            weapons.add(new Weapon("eruption"){{
-                length = 3f;
-                reload = 10f;
-                alternate = true;
-                ejectEffect = Fx.none;
-                bullet = Bullets.eruptorShot;
-                recoil = 1f;
-                width = 7f;
-                shootSound = Sounds.flame;
-            }});
-        }};
-
         chaosArray = new UnitType("chaos-array", GroundUnit::new){{
             maxVelocity = 0.68f;
             speed = 0.12f;
@@ -325,49 +307,6 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.standardThoriumBig;
                 shootSound = Sounds.shootBig;
-            }});
-        }};
-
-        wraith = new UnitType("wraith", FlyingUnit::new){{
-            speed = 0.3f;
-            maxVelocity = 1.9f;
-            drag = 0.01f;
-            mass = 1.5f;
-            flying = true;
-            health = 75;
-            engineOffset = 5.5f;
-            range = 140f;
-            weapons.add(new Weapon(){{
-                length = 1.5f;
-                reload = 28f;
-                alternate = true;
-                ejectEffect = Fx.shellEjectSmall;
-                bullet = Bullets.standardCopper;
-                shootSound = Sounds.shoot;
-            }});
-        }};
-
-        ghoul = new UnitType("ghoul", FlyingUnit::new){{
-            health = 220;
-            speed = 0.2f;
-            maxVelocity = 1.4f;
-            mass = 3f;
-            drag = 0.01f;
-            flying = true;
-            targetAir = false;
-            engineOffset = 7.8f;
-            range = 140f;
-            weapons.add(new Weapon(){{
-                length = 0f;
-                width = 2f;
-                reload = 12f;
-                alternate = true;
-                ejectEffect = Fx.none;
-                velocityRnd = 1f;
-                inaccuracy = 40f;
-                ignoreRotation = true;
-                bullet = Bullets.bombExplosive;
-                shootSound = Sounds.none;
             }});
         }};
 

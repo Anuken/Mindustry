@@ -564,7 +564,7 @@ public class DesktopInput extends InputHandler{
 
         movement.set(xa, ya).nor().scl(speed);
         float mouseAngle = Angles.mouseAngle(unit.x(), unit.y());
-        boolean aimCursor = omni && isShooting && unit.type().hasWeapons();
+        boolean aimCursor = omni && isShooting && unit.type().hasWeapons() && unit.type().faceTarget;
 
         if(aimCursor){
             unit.lookAt(mouseAngle);
