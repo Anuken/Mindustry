@@ -21,8 +21,9 @@ import static mindustry.Vars.*;
 
 public class SchematicsDialog extends FloatingDialog{
     private SchematicInfoDialog info = new SchematicInfoDialog();
-    private TextField searchField;
+    private Schematic firstSchematic;
     private String search = "";
+    private TextField searchField;
 
     public SchematicsDialog(){
         super("$schematics");
@@ -74,8 +75,12 @@ public class SchematicsDialog extends FloatingDialog{
                     t.add("$none");
                 }
 
+                firstSchematic = null;
+
                 for(Schematic s : schematics.all()){
                     if(!search.isEmpty() && !s.name().toLowerCase().contains(search.toLowerCase())) continue;
+                    if(firstSchematic == null)
+                        firstSchematic = s;
 
                     Button[] sel = {null};
                     sel[0] = t.button(b -> {
