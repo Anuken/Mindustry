@@ -133,10 +133,12 @@ public class UnitTypes implements ContentList{
             mass = 1.5f;
             flying = true;
             health = 75;
+            faceTarget = false;
             engineOffset = 5.5f;
             range = 140f;
             weapons.add(new Weapon(){{
-                y = 1.5f;
+                y = 0f;
+                x = 2f;
                 reload = 15f;
                 alternate = true;
                 ejectEffect = Fx.shellEjectSmall;
@@ -157,13 +159,13 @@ public class UnitTypes implements ContentList{
             range = 140f;
             faceTarget = false;
             weapons.add(new Weapon(){{
+                x = 3f;
                 shootY = 0f;
-                shootX = 0f;
                 reload = 6f;
                 shootCone = 180f;
                 alternate = true;
                 ejectEffect = Fx.none;
-                inaccuracy = 40f;
+                inaccuracy = 15f;
                 ignoreRotation = true;
                 bullet = Bullets.bombExplosive;
                 shootSound = Sounds.none;

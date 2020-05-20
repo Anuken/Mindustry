@@ -42,7 +42,7 @@ public class Layer{
     plans = 85,
 
     //flying units
-    flyingUnit = 90,
+    flyingUnit = 115,
 
     //bullets *bloom begin*
     bullet = 100,
