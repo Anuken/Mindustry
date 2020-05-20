@@ -58,6 +58,14 @@ public class SchematicsDialog extends FloatingDialog{
         cont.pane(t -> {
             t.top();
             t.margin(20f);
+
+            t.update(() -> {
+                if(Core.input.keyTap(Binding.chat) && Core.scene.getKeyboardFocus() == searchField && firstSchematic != null){
+                    control.input.useSchematic(firstSchematic);
+                    hide();
+                }
+            });
+
             rebuildPane[0] = () -> {
                 t.clear();
                 int i = 0;
