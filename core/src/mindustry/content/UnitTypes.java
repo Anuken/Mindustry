@@ -1,16 +1,18 @@
 package mindustry.content;
 
+import arc.graphics.*;
 import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 
 public class UnitTypes implements ContentList{
 
     //ground
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType titan, dagger, crawler, fortress, eruptor, chaosArray, eradicator;
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType titan, dagger, crawler, fortress, eruptor, chaosArray, eradicator, alpha;
 
     //air
     public static @EntityDef({Unitc.class}) UnitType wraith, reaper, ghoul, revenant, lich;
@@ -262,6 +264,39 @@ public class UnitTypes implements ContentList{
             engineOffset = 6.5f;
             hitsize = 8f;
         }};
+
+        alpha = new UnitType("alpha"){{
+            drillTier = -1;
+            speed = 0.6f;
+            hitsize = 9f;
+            mass = 1.75f;
+            boostMultiplier = 2f;
+            itemCapacity = 15;
+            mass = 0.9f;
+            health = 160f;
+            buildSpeed = 0.9f;
+            canBoost = true;
+
+            weapons.add(new Weapon("shockgun"){{
+                shake = 2f;
+                shootY = 1f;
+                x = 1f;
+                shootX = 3f;
+                reload = 70f;
+                alternate = true;
+                recoil = 4f;
+                shootSound = Sounds.laser;
+
+                bullet = new LaserBulletType(){{
+                    damage = 20f;
+                    recoil = 1f;
+                    sideAngle = 45f;
+                    sideWidth = 1f;
+                    sideLength = 70f;
+                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
+                }};
+            }});
+        }};
         
         /*
 
@@ -480,7 +515,7 @@ public class UnitTypes implements ContentList{
             }
         };
 
-        alpha = new UnitType("alpha-mech", false){
+        "alpha "= new UnitType("alpha-mech", false){
             {
                 drillTier = -1;
                 speed = 0.5f;

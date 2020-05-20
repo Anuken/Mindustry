@@ -9,8 +9,8 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
@@ -30,11 +30,12 @@ public class UnitType extends UnlockableContent{
     public boolean flying;
     public @NonNull Prov<? extends Unitc> constructor;
     public @NonNull Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
-    public float speed = 1.1f, boostSpeed = 0.75f, rotateSpeed = 5f, baseRotateSpeed = 5f;
-    public float drag = 0.3f, mass = 1f, accel = 0.5f;
+    public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
+    public float drag = 0.3f, mass = 1f, accel = 0.5f, landShake = 0f;
     public float health = 200f, range = -1;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, isCounted = true, lowAltitude = false;
+    public boolean canBoost = false;
     public float sway = 1f;
 
     public int itemCapacity = 30;
@@ -54,7 +55,7 @@ public class UnitType extends UnlockableContent{
     public Sound deathSound = Sounds.bang;
 
     public Array<Weapon> weapons = new Array<>();
-    public TextureRegion baseRegion, legRegion, region, cellRegion, occlusionRegion;
+    public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion, occlusionRegion;
 
     public UnitType(String name){
         super(name);
@@ -83,6 +84,10 @@ public class UnitType extends UnlockableContent{
         return weapons.size > 0;
     }
 
+    public void update(Unitc unit){}
+
+    public void landed(Unitc unit){}
+
     @Override
     public void displayInfo(Table table){
         ContentDisplay.displayUnit(table, this);
@@ -108,6 +113,7 @@ public class UnitType extends UnlockableContent{
         baseRegion = Core.atlas.find(name + "-base");
         cellRegion = Core.atlas.find(name + "-cell", Core.atlas.find("power-cell"));
         occlusionRegion = Core.atlas.find("circle-shadow");
+        shadowRegion = icon(Cicon.full);
     }
 
     @Override
@@ -119,17 +125,16 @@ public class UnitType extends UnlockableContent{
 
     public void draw(Unitc unit){
         Legsc legs = unit instanceof Legsc ? (Legsc)unit : null;
+        float z = unit.elevation() > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : Layer.groundUnit;
 
         if(unit.controller().isBeingControlled(player.unit())){
             drawControl(unit);
         }
 
         if(unit.isFlying()){
-            Draw.z(Layer.darkness);
+            Draw.z(Math.min(Layer.darkness, z - 1f));
             drawShadow(unit);
         }
-
-        float z = unit.elevation() > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : Layer.groundUnit;
 
         Draw.z(z - 0.02f);
 
@@ -137,7 +142,7 @@ public class UnitType extends UnlockableContent{
             drawLegs(legs);
 
             float ft = Mathf.sin(legs.walkTime(), 3f, 3f);
-            legOffset.trns(legs.baseRotation(), 0f, ft * 0.18f * sway);
+            legOffset.trns(legs.baseRotation(), 0f, Mathf.lerp(ft * 0.18f * sway, 0f, unit.elevation()));
             unit.trns(legOffset.x, legOffset.y);
         }
 
@@ -178,7 +183,7 @@ public class UnitType extends UnlockableContent{
 
     public void drawShadow(Unitc unit){
         Draw.color(shadowColor);
-        Draw.rect(region, unit.x() + shadowTX * unit.elevation(), unit.y() + shadowTY * unit.elevation(), unit.rotation() - 90);
+        Draw.rect(shadowRegion, unit.x() + shadowTX * unit.elevation(), unit.y() + shadowTY * unit.elevation(), unit.rotation() - 90);
         Draw.color();
     }
 
@@ -226,26 +231,29 @@ public class UnitType extends UnlockableContent{
     public void drawEngine(Unitc unit){
         if(!unit.isFlying()) return;
 
+        float scale = unit.elevation();
+        float offset = engineOffset/2f + engineOffset/2f*scale;
+
         if(unit instanceof Trailc){
             Trail trail = ((Trailc)unit).trail();
 
-            float cx = unit.x() + Angles.trnsx(unit.rotation() + 180, engineOffset),
-            cy = unit.y() + Angles.trnsy(unit.rotation() + 180, engineOffset);
+            float cx = unit.x() + Angles.trnsx(unit.rotation() + 180, offset),
+            cy = unit.y() + Angles.trnsy(unit.rotation() + 180, offset);
             trail.update(cx, cy);
-            trail.draw(unit.team().color, (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * unit.elevation()));
+            trail.draw(unit.team().color, (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * scale));
         }
 
         Draw.color(unit.team().color);
         Fill.circle(
-            unit.x() + Angles.trnsx(unit.rotation() + 180, engineOffset),
-            unit.y() + Angles.trnsy(unit.rotation() + 180, engineOffset),
-            (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * unit.elevation())
+            unit.x() + Angles.trnsx(unit.rotation() + 180, offset),
+            unit.y() + Angles.trnsy(unit.rotation() + 180, offset),
+            (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f)) * scale
         );
         Draw.color(Color.white);
         Fill.circle(
-            unit.x() + Angles.trnsx(unit.rotation() + 180, engineOffset - 1f),
-            unit.y() + Angles.trnsy(unit.rotation() + 180, engineOffset - 1f),
-            (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f)) / 2f  * unit.elevation()
+            unit.x() + Angles.trnsx(unit.rotation() + 180, offset - 1f),
+            unit.y() + Angles.trnsy(unit.rotation() + 180, offset - 1f),
+            (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f)) / 2f  * scale
         );
         Draw.color();
     }
@@ -305,8 +313,10 @@ public class UnitType extends UnlockableContent{
 
         Draw.mixcol(Color.white, unit.hitTime());
 
-        float sin = Mathf.sin(unit.walkTime(), 3f, 1f);
+        float e = unit.elevation();
+        float sin = Mathf.lerp(Mathf.sin(unit.walkTime(), 3f, 1f), 0f, e);
         float ft = sin*(2.5f + (unit.hitSize()-8f)/2f);
+        float boostTrns = e * 2f;
 
         Floor floor = unit.floorOn();
 
@@ -317,11 +327,11 @@ public class UnitType extends UnlockableContent{
         for(int i : Mathf.signs){
             //Draw.mixcol(Color.valueOf("989aa4"), Math.max(sin * i, 0));
             Draw.rect(legRegion,
-            unit.x() + Angles.trnsx(unit.baseRotation(), ft * i),
-            unit.y() + Angles.trnsy(unit.baseRotation(), ft * i),
+            unit.x() + Angles.trnsx(unit.baseRotation(), ft * i - boostTrns, -boostTrns*i),
+            unit.y() + Angles.trnsy(unit.baseRotation(), ft * i - boostTrns, -boostTrns*i),
             legRegion.getWidth() * i * Draw.scl,
             legRegion.getHeight() * Draw.scl - Math.max(-sin * i, 0) * legRegion.getHeight() * 0.5f * Draw.scl,
-            unit.baseRotation() - 90);
+            unit.baseRotation() - 90 + 35f*i*e);
         }
         //Draw.mixcol();
 

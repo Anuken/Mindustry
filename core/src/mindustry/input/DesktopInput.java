@@ -45,7 +45,7 @@ public class DesktopInput extends InputHandler{
     /** Selected build request for movement. */
     private @Nullable BuildRequest sreq;
     /** Whether player is currently deleting removal requests. */
-    private boolean deleting = false;
+    private boolean deleting = false, shouldShoot = false;
 
     @Override
     public void buildUI(Group group){
@@ -186,11 +186,14 @@ public class DesktopInput extends InputHandler{
             Core.camera.position.lerpDelta(player, 0.08f);
         }
 
+        shouldShoot = true;
+
         if(!scene.hasMouse()){
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
                 Unitc on = selectedUnit();
                 if(on != null){
                     Call.onUnitControl(player, on);
+                    shouldShoot = false;
                 }
             }
 
@@ -454,10 +457,10 @@ public class DesktopInput extends InputHandler{
                 //only begin shooting if there's no cursor event
                 if(!tileTapped(selected.entity) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().requests().size == 0 || !player.builder().isBuilding()) && !droppingItem &&
                 !tryBeginMine(selected) && player.miner().mineTile() == null && !Core.scene.hasKeyboard()){
-                    isShooting = true;
+                    isShooting = shouldShoot;
                 }
             }else if(!Core.scene.hasKeyboard()){ //if it's out of bounds, shooting is just fine
-                isShooting = true;
+                isShooting = shouldShoot;
             }
         }else if(Core.input.keyTap(Binding.deselect) && isPlacing()){
             block = null;
@@ -558,7 +561,7 @@ public class DesktopInput extends InputHandler{
     protected void updateMovement(Unitc unit){
         boolean omni = !(unit instanceof WaterMovec);
         boolean legs = unit.isGrounded();
-        float speed = unit.type().speed;
+        float speed = unit.type().speed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation());
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
 
@@ -590,5 +593,13 @@ public class DesktopInput extends InputHandler{
         unit.aim(unit.type().faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation(), Core.input.mouseWorld().dst(unit)).add(unit.x(), unit.y()));
 
         unit.controlWeapons(true, isShooting);
+
+        isBoosting = Core.input.keyDown(Binding.boost);
+
+        if(unit.type().canBoost){
+            Tile tile = unit.tileOn();
+
+            unit.elevation(Mathf.approachDelta(unit.elevation(), (tile != null && tile.solid()) || (isBoosting && !movement.isZero()) ? 1f : 0f, 0.08f));
+        }
     }
 }

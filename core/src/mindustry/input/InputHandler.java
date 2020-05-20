@@ -55,7 +55,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public int rotation;
     public boolean droppingItem;
     public Group uiGroup;
-    public boolean isShooting, isBuilding = true, buildWasAutoPaused = false;
+    public boolean isShooting, isBuilding = true, buildWasAutoPaused = false, isBoosting = false;
     public @Nullable UnitType controlledType;
 
     protected @Nullable Schematic lastSchematic;
