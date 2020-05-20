@@ -1,6 +1,5 @@
-- Dodano awaryjne wczytywani modów dla źle przygotowanych modów na starsze wersje
+- Dodano awaryjne wczytywani modów dla źle przygotowanych modów na starsze wersje gry
 - Naprawiono nieskończony zasięg budowy
 - Naprawiono reaktor uderzeniowy mogący zniszczyć rdzeń na serwerze
-- Naprawiono most płynów działąjący wstecz
-- Updated various translations
+- Naprawiono most płynów działający wstecz
 - Zaktualizowano tłumaczenia
