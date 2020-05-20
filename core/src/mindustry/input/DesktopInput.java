@@ -59,10 +59,10 @@ public class DesktopInput extends InputHandler{
                 b.label(() -> Core.bundle.format(!isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.label(() -> {
-                    if(block != null &&(block instanceof ItemBridge || block.saveConfig)&& block.lastConfig != null)
-                        return Core.bundle.format("clearconfig", Core.keybinds.get(Binding.clear_building).key.toString());
-                    else
-                        return Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString());
+                    boolean isClearable = false;
+                    if(block != null && ((block.saveConfig && block.lastConfig != null) || (block instanceof ItemBridge) && ((ItemBridge)block).lastPlaced != -1))
+                            isClearable = true;
+                    return Core.bundle.format(!isClearable ? "cancelbuilding" : "clearconfig", Core.keybinds.get(Binding.clear_building).key.toString());
                 }).style(Styles.outlineLabel);
                 b.row();
                 b.label(() -> Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic_select).key.toString())).style(Styles.outlineLabel);
@@ -376,7 +376,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.clear_building)){
-            if(block != null &&(block instanceof ItemBridge || block.saveConfig)&& block.lastConfig != null){
+            if(block != null && ((block.saveConfig && block.lastConfig != null) || (block instanceof ItemBridge) && ((ItemBridge)block).lastPlaced != -1)){
                 if(block instanceof ItemBridge)
                     ((ItemBridge)block).lastPlaced = -1;
                 block.lastConfig = null;
