@@ -53,7 +53,6 @@ public class MultiPacker implements Disposable{
         main,
         environment,
         editor,
-        zone,
         ui;
 
         public static final PageType[] all = values();

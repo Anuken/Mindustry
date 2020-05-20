@@ -34,7 +34,7 @@ public class UnitType extends UnlockableContent{
     public float drag = 0.3f, mass = 1f, accel = 0.5f;
     public float health = 200f, range = -1;
     public boolean targetAir = true, targetGround = true;
-    public boolean faceTarget = true, isCounted = true;
+    public boolean faceTarget = true, isCounted = true, lowAltitude = false;
     public float sway = 1f;
 
     public int itemCapacity = 30;
@@ -129,7 +129,7 @@ public class UnitType extends UnlockableContent{
             drawShadow(unit);
         }
 
-        float z = Mathf.lerp(Layer.groundUnit, Layer.flyingUnit, unit.elevation());
+        float z = unit.elevation() > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : Layer.groundUnit;
 
         Draw.z(z - 0.02f);
 

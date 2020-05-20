@@ -174,12 +174,14 @@ public class UnitTypes implements ContentList{
 
         reaper = new UnitType("reaper"){{
             speed = 1.1f;
-            accel = 0.08f;
+            accel = 0.02f;
             drag = 0.05f;
             mass = 30f;
+            rotateSpeed = 0.5f;
             flying = true;
+            lowAltitude = true;
             health = 75000;
-            engineOffset = 40;
+            engineOffset = 38;
             engineSize = 7.3f;
             hitsize = 58f;
 

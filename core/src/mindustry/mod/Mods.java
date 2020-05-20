@@ -195,7 +195,6 @@ public class Mods implements Loadable{
             region.getTexture() == Core.atlas.find("white").getTexture() ? PageType.main :
             region.getTexture() == Core.atlas.find("stone1").getTexture() ? PageType.environment :
             region.getTexture() == Core.atlas.find("clear-editor").getTexture() ? PageType.editor :
-            region.getTexture() == Core.atlas.find("zone-groundZero").getTexture() ? PageType.zone :
             region.getTexture() == Core.atlas.find("whiteui").getTexture() ? PageType.ui :
             PageType.main;
     }
@@ -205,7 +204,6 @@ public class Mods implements Loadable{
         return
             parent.equals("environment") ? PageType.environment :
             parent.equals("editor") ? PageType.editor :
-            parent.equals("zones") ? PageType.zone :
             parent.equals("ui") || file.parent().parent().name().equals("ui") ? PageType.ui :
             PageType.main;
     }
