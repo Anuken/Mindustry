@@ -8,7 +8,6 @@ import arc.math.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
-import arc.util.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.ui.*;
