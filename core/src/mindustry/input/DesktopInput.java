@@ -379,8 +379,7 @@ public class DesktopInput extends InputHandler{
             if(block != null &&(block instanceof ItemBridge || block.saveConfig)&& block.lastConfig != null){
                 if(block instanceof ItemBridge)
                     ((ItemBridge)block).lastPlaced = -1;
-                else
-                    block.lastConfig = null;
+                block.lastConfig = null;
             } else
                 player.builder().clearBuilding();
         }
