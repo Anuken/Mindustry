@@ -4,12 +4,12 @@ W grze znajdziesz:
 - 24 podstawowe mapy
 - Kampanię z drzewkiem rozwoju technologii i terenami do odblokowania
 - 4 potężne fale bossów
-- System zarządzania elektrycznoścą, transportem cieczy i przedmiotów
+- System zarządzania elektrycznością, transportem cieczy i przedmiotów
 - 19 unikatowych typów dronów, mechów i statków
 - 120+ bloków do użycia podczas gry
 - 75+ różnorodnych bloków terenu
 - Graj ze znajomymi przez sieć lokalną lub na serwerze dedykowanym
-- Zmieniaj zasady gry: Modyfikuj kosz budowy bloków, statystyki przeciwników, przedmioty na start, czas trwania tury i więcej
+- Zmieniaj zasady gry: Modyfikuj koszt budowy bloków, statystyki przeciwników, przedmioty na start, czas trwania tury i wiele więcej
 - Stwórz własną mapę przy użyciu wbudowanego edytora i popisz się kreatywnością z innymi
 - Sam zdecyduj skąd nadejdzie następny atak
 
