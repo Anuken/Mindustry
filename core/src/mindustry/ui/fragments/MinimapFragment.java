@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.ui.*;
@@ -111,6 +112,10 @@ public class MinimapFragment extends Fragment{
     }
 
     public void toggle(){
+        float size = baseSize * zoom * world.width();
+        float ratio = (float)renderer.minimap.getTexture().getHeight() / renderer.minimap.getTexture().getWidth();
+        panx = size/2f - player.x() / (world.width() * tilesize) * size;
+        pany = size*ratio/2f - player.y() / (world.height() * tilesize) * size*ratio;
         shown = !shown;
     }
 }
