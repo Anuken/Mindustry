@@ -128,7 +128,7 @@ public class Vars implements Loadable{
     /** whether typing into the console is enabled - developers only */
     public static boolean enableConsole = false;
     /** whether to clear sector saves when landing */
-    public static boolean clearSectors = false;
+    public static boolean clearSectors = true;
     /** whether any light rendering is enabled */
     public static boolean enableLight = true;
     /** application data directory, equivalent to {@link Settings#getDataDirectory()} */

@@ -91,7 +91,7 @@ public class SectorPreset extends UnlockableContent{
     }
 
     public void updateObjectives(Runnable closure){
-        Array<SectorObjective> incomplete = content.zones()
+        Array<SectorObjective> incomplete = content.sectors()
             .flatMap(z -> z.requirements)
             .select(o -> o.zone() == this && !o.complete())
             .as(SectorObjective.class);
@@ -99,7 +99,7 @@ public class SectorPreset extends UnlockableContent{
         closure.run();
         for(SectorObjective objective : incomplete){
             if(objective.complete()){
-                Events.fire(new ZoneRequireCompleteEvent(objective.preset, content.zones().find(z -> z.requirements.contains(objective)), objective));
+                Events.fire(new ZoneRequireCompleteEvent(objective.preset, content.sectors().find(z -> z.requirements.contains(objective)), objective));
             }
         }
     }

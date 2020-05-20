@@ -87,7 +87,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
-            if(!content.zones().contains(z -> !z.canConfigure())){
+            if(!content.sectors().contains(z -> !z.canConfigure())){
                 configAllZones.complete();
             }
         });
@@ -147,7 +147,7 @@ public class SStats implements SteamUserStatsCallback{
             if(e.content == Items.thorium) obtainThorium.complete();
             if(e.content == Items.titanium) obtainTitanium.complete();
 
-            if(!content.zones().contains(SectorPreset::locked)){
+            if(!content.sectors().contains(SectorPreset::locked)){
                 unlockAllZones.complete();
             }
         });

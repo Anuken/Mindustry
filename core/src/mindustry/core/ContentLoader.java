@@ -266,7 +266,7 @@ public class ContentLoader{
         return (BulletType)getByID(ContentType.bullet, id);
     }
 
-    public Array<SectorPreset> zones(){
+    public Array<SectorPreset> sectors(){
         return getBy(ContentType.sector);
     }
 

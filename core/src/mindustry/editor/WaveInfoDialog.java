@@ -195,6 +195,24 @@ public class WaveInfoDialog extends FloatingDialog{
                         }).width(80f);
                         a.add("$waves.perspawn").padLeft(4);
                     });
+                    t.row();
+                    t.table(a -> {
+                        a.field((int)group.shields + "", TextFieldFilter.digitsOnly, text -> {
+                            if(Strings.canParsePostiveInt(text)){
+                                group.shields = Strings.parseInt(text);
+                                updateWaves();
+                            }
+                        }).width(80f);
+
+                        a.add(" + ");
+                        a.field((int)group.shieldScaling + "", TextFieldFilter.digitsOnly, text -> {
+                            if(Strings.canParsePostiveInt(text)){
+                                group.shieldScaling = Strings.parseInt(text);
+                                updateWaves();
+                            }
+                        }).width(80f);
+                        a.add("$waves.shields").padLeft(4);
+                    });
 
                     t.row();
                     t.check("$waves.guardian", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss));
