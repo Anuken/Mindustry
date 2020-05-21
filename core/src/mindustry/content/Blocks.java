@@ -118,7 +118,9 @@ public class Blocks implements ContentList{
             public void drawBase(Tile tile){}
         };
 
-        cliff = new Cliff("cliff");
+        cliff = new Cliff("cliff"){{
+            inEditor = false;
+        }};
 
         //Registers build blocks
         //no reference is needed here since they can be looked up by name later
