@@ -70,7 +70,7 @@ public class GameOverDialog extends FloatingDialog{
                     for(Item item : content.items()){
                         if(state.stats.itemsDelivered.get(item, 0) > 0){
                             t.table(items -> {
-                                items.add("    [LIGHT_GRAY]" + state.stats.itemsDelivered.get(item, 0));
+                                items.add("    [lightgray]" + state.stats.itemsDelivered.get(item, 0));
                                 items.image(item.icon(Cicon.small)).size(8 * 3).pad(4);
                             }).left();
                             t.row();
