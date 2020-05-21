@@ -75,7 +75,8 @@ public abstract class BulletType extends Content{
     public int incendAmount = 0;
     public float incendSpread = 8f;
     public float incendChance = 1f;
-
+    
+    //Number from 0 - 1 for how quickly it should turn
     public float homingPower = 0f;
     public float homingRange = 50f;
 
@@ -165,7 +166,7 @@ public abstract class BulletType extends Content{
         if(homingPower > 0.0001f){
             Teamc target = Units.closestTarget(b.team(), b.getX(), b.getY(), homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir));
             if(target != null){
-                b.vel().setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), 0.08f));
+                b.vel().setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));
             }
         }
 
