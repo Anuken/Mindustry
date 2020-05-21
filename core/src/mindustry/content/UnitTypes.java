@@ -34,7 +34,7 @@ public class UnitTypes implements ContentList{
             hitsize = 8f;
             mass = 1.75f;
             health = 130;
-            weapons.add(new Weapon("chain-blaster"){{
+            weapons.add(new Weapon("large-weapon"){{
                 reload = 14f;
                 x = 4f;
                 alternate = true;
@@ -61,7 +61,6 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 bullet = Bullets.basicFlame;
             }});
-
         }};
 
         crawler = new UnitType("crawler"){{
@@ -205,7 +204,7 @@ public class UnitTypes implements ContentList{
             mass = 1.75f;
             health = 130;
             immunities = ObjectSet.with(StatusEffects.wet);
-            weapons.add(new Weapon("chain-blaster"){{
+            weapons.add(new Weapon("large-weapon"){{
                 reload = 10f;
                 x = 1.25f;
                 alternate = true;
@@ -277,7 +276,7 @@ public class UnitTypes implements ContentList{
             buildSpeed = 0.9f;
             canBoost = true;
 
-            weapons.add(new Weapon("shockgun"){{
+            weapons.add(new Weapon("beam-weapon"){{
                 shake = 2f;
                 shootY = 1f;
                 x = 1f;
@@ -474,7 +473,7 @@ public class UnitTypes implements ContentList{
                 engineColor = Pal.lightTrail;
                 cellTrnsY = 1f;
                 buildSpeed = 1.2f;
-                weapons.add(new Weapon("vanguard-blaster"){{
+                weapons.add(new Weapon("vanguard-gun"){{
                     length = 1.5f;
                     reload = 30f;
                     alternate = true;
@@ -605,7 +604,7 @@ public class UnitTypes implements ContentList{
                 buildSpeed = 1.6f;
                 engineColor = Pal.heal;
 
-                weapons.add(new Weapon("heal-blaster"){{
+                weapons.add(new Weapon("heal-gun"){{
                     length = 1.5f;
                     reload = 24f;
                     alternate = false;
@@ -726,7 +725,7 @@ public class UnitTypes implements ContentList{
                 engineColor = Pal.lightTrail;
                 cellTrnsY = 1f;
                 buildSpeed = 1.1f;
-                weapons.add(new Weapon("blaster"){{
+                weapons.add(new Weapon("gun"){{
                     length = 1.5f;
                     reload = 15f;
                     alternate = true;
@@ -797,7 +796,7 @@ public class UnitTypes implements ContentList{
             @Override
             public void update(Playerc player){
                 float scl = scld(player);
-                if(Mathf.chance(Time.delta() * (0.15 * scl))){
+                if(Mathf.chanceDelta((0.15 * scl))){
                     Fx.hitLancer.at(Pal.lancerLaser, player.x, player.y);
                     Lightning.create(player.team(), Pal.lancerLaser, 10f * Vars.state.rules.playerDamageMultiplier,
                     player.x + player.vel().x, player.y + player.vel().y, player.rotation, 14);

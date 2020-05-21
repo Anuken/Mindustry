@@ -2,6 +2,7 @@ package mindustry.entities.comp;
 
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 
@@ -49,6 +50,20 @@ abstract class HealthComp implements Entityc{
         return health < maxHealth - 0.001f;
     }
 
+    /** Damage and pierce armor. */
+    void damagePierce(float amount, boolean withEffect){
+        if(this instanceof Shieldc){
+            damage(amount / Math.max(1f - ((Shieldc)this).armor(), Vars.minArmorDamage), withEffect);
+        }else{
+            damage(amount, withEffect);
+        }
+    }
+
+    /** Damage and pierce armor. */
+    void damagePierce(float amount){
+        damagePierce(amount, true);
+    }
+
     void damage(float amount){
         health -= amount;
         hitTime = 1f;
@@ -69,6 +84,10 @@ abstract class HealthComp implements Entityc{
 
     void damageContinuous(float amount){
         damage(amount * Time.delta(), hitTime <= -20 + hitDuration);
+    }
+
+    void damageContinuousPierce(float amount){
+        damagePierce(amount * Time.delta(), hitTime <= -20 + hitDuration);
     }
 
     void clampHealth(){

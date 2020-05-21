@@ -78,7 +78,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
         if(canDrown() && floor.isLiquid && floor.drownTime > 0){
             drownTime += Time.delta() * 1f / floor.drownTime;
             drownTime = Mathf.clamp(drownTime);
-            if(Mathf.chance(Time.delta() * 0.05f)){
+            if(Mathf.chanceDelta(0.05f)){
                 floor.drownUpdateEffect.at(x, y, 0f, floor.mapColor);
             }
 

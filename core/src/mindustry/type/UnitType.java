@@ -32,7 +32,7 @@ public class UnitType extends UnlockableContent{
     public @NonNull Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, mass = 1f, accel = 0.5f, landShake = 0f;
-    public float health = 200f, range = -1;
+    public float health = 200f, range = -1, armor = 0f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
@@ -76,6 +76,7 @@ public class UnitType extends UnlockableContent{
     public Unitc create(Team team){
         Unitc unit = constructor.get();
         unit.team(team);
+        unit.armor(armor);
         unit.type(this);
         return unit;
     }

@@ -23,7 +23,7 @@ public class StatusEffects implements ContentList{
             init(() -> {
                 opposite(wet,freezing);
                 trans(tarred, ((unit, time, newTime, result) -> {
-                    unit.damage(8f);
+                    unit.damagePierce(8f);
                     Fx.burning.at(unit.x() + Mathf.range(unit.bounds() / 2f), unit.y() + Mathf.range(unit.bounds() / 2f));
                     result.set(this, Math.min(time + newTime, 300f));
                 }));
@@ -39,7 +39,7 @@ public class StatusEffects implements ContentList{
                 opposite(melting, burning);
 
                 trans(blasted, ((unit, time, newTime, result) -> {
-                    unit.damage(18f);
+                    unit.damagePierce(18f);
                     result.set(this, time);
                 }));
             });
@@ -52,7 +52,7 @@ public class StatusEffects implements ContentList{
 
             init(() -> {
                 trans(shocked, ((unit, time, newTime, result) -> {
-                    unit.damage(20f);
+                    unit.damagePierce(20f);
                     if(unit.team() == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
