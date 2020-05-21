@@ -325,7 +325,6 @@ public class UnitType extends UnlockableContent{
         }
 
         for(int i : Mathf.signs){
-            //Draw.mixcol(Color.valueOf("989aa4"), Math.max(sin * i, 0));
             Draw.rect(legRegion,
             unit.x() + Angles.trnsx(unit.baseRotation(), ft * i - boostTrns, -boostTrns*i),
             unit.y() + Angles.trnsy(unit.baseRotation(), ft * i - boostTrns, -boostTrns*i),
@@ -333,7 +332,6 @@ public class UnitType extends UnlockableContent{
             legRegion.getHeight() * Draw.scl - Math.max(-sin * i, 0) * legRegion.getHeight() * 0.5f * Draw.scl,
             unit.baseRotation() - 90 + 35f*i*e);
         }
-        //Draw.mixcol();
 
         if(floor.isLiquid){
             Draw.color(Color.white, floor.mapColor, unit.drownTime() * 0.4f);

@@ -282,7 +282,7 @@ public class UnitTypes implements ContentList{
                 shootY = 1f;
                 x = 1f;
                 shootX = 3f;
-                reload = 70f;
+                reload = 50f;
                 alternate = true;
                 recoil = 4f;
                 shootSound = Sounds.laser;

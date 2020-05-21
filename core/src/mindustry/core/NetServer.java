@@ -591,6 +591,8 @@ public class NetServer implements ApplicationListener{
         connection.rejectedRequests.clear();
 
         if(!player.dead()){
+            player.unit().elevation(!player.unit().type().flying && boosting && player.unit().type().canBoost ? 1f : 0f);
+
             Unitc unit = player.unit();
             long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
             float maxSpeed = player.dead() ? Float.MAX_VALUE : player.unit().type().speed;

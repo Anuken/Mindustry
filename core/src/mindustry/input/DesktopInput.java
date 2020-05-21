@@ -504,9 +504,7 @@ public class DesktopInput extends InputHandler{
                 removeSelection(selectX, selectY, cursorX, cursorY);
             }
 
-            if(selected != null && selected.entity != null){
-                tryDropItems(selected.entity, Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-            }
+            tryDropItems(selected == null ? null : selected.entity, Core.input.mouseWorld().x, Core.input.mouseWorld().y);
 
             if(sreq != null){
                 if(getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null){
