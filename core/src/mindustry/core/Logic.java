@@ -114,8 +114,8 @@ public class Logic implements ApplicationListener{
 
         //disable new waves after the boss spawns
         Events.on(WaveEvent.class, e -> {
-            //only works for preset sectors so far
-            if(state.isCampaign() && state.boss() != null && state.rules.sector.preset != null){
+            //only works for non-attack sectors
+            if(state.isCampaign() && state.boss() != null && !state.rules.attackMode){
                 state.rules.waitEnemies = true;
             }
         });
@@ -188,7 +188,7 @@ public class Logic implements ApplicationListener{
             //check if there is a boss present
             Unitc boss = state.boss();
             //if this was a boss wave and there is no boss anymore, then it's a victory
-            if(state.rules.sector.preset != null && boss == null && state.rules.waves && state.rules.waitEnemies){
+            if(boss == null && state.rules.waves && state.rules.waitEnemies){
                 //the sector has been conquered - waves get disabled
                 state.rules.waves = false;
 
@@ -253,7 +253,7 @@ public class Logic implements ApplicationListener{
         }
 
         if(state.isCampaign()){
-            //TODO implement
+            //TODO implement?
             //state.getSector().setLaunched();
         }
 

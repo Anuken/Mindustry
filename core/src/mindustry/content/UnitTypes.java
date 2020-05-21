@@ -299,7 +299,6 @@ public class UnitTypes implements ContentList{
         }};
         
         /*
-
         chaosArray = new UnitType("chaos-array", GroundUnit::new){{
             maxVelocity = 0.68f;
             speed = 0.12f;

@@ -93,8 +93,7 @@ public class SectorPreset extends UnlockableContent{
     public void updateObjectives(Runnable closure){
         Array<SectorObjective> incomplete = content.sectors()
             .flatMap(z -> z.requirements)
-            .select(o -> o.zone() == this && !o.complete())
-            .as(SectorObjective.class);
+            .filter(o -> o.zone() == this && !o.complete()).as();
 
         closure.run();
         for(SectorObjective objective : incomplete){
