@@ -37,7 +37,7 @@ public class BansDialog extends FloatingDialog{
             Table res = new Table(Tex.button);
             res.margin(14f);
 
-            res.labelWrap("IP: [LIGHT_GRAY]" + info.lastIP + "\n[]Name: [LIGHT_GRAY]" + info.lastName).width(w - h - 24f);
+            res.labelWrap("IP: [lightgray]" + info.lastIP + "\n[]Name: [lightgray]" + info.lastName).width(w - h - 24f);
             res.add().growX();
             res.button(Icon.cancel, () -> {
                 ui.showConfirm("$confirm", "$confirmunban", () -> {
