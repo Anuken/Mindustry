@@ -40,7 +40,7 @@ public class ContentLoader{
         new TechTree(),
         new Weathers(),
         new Planets(),
-        new Zones()
+        new SectorPresets()
     };
 
     public ContentLoader(){
@@ -266,8 +266,8 @@ public class ContentLoader{
         return (BulletType)getByID(ContentType.bullet, id);
     }
 
-    public Array<SectorPreset> zones(){
-        return getBy(ContentType.zone);
+    public Array<SectorPreset> sectors(){
+        return getBy(ContentType.sector);
     }
 
     public Array<UnitType> units(){

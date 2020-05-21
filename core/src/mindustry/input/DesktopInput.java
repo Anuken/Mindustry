@@ -45,7 +45,7 @@ public class DesktopInput extends InputHandler{
     /** Selected build request for movement. */
     private @Nullable BuildRequest sreq;
     /** Whether player is currently deleting removal requests. */
-    private boolean deleting = false;
+    private boolean deleting = false, shouldShoot = false;
 
     @Override
     public void buildUI(Group group){
@@ -186,11 +186,14 @@ public class DesktopInput extends InputHandler{
             Core.camera.position.lerpDelta(player, 0.08f);
         }
 
+        shouldShoot = true;
+
         if(!scene.hasMouse()){
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
                 Unitc on = selectedUnit();
                 if(on != null){
                     Call.onUnitControl(player, on);
+                    shouldShoot = false;
                 }
             }
 
@@ -454,10 +457,10 @@ public class DesktopInput extends InputHandler{
                 //only begin shooting if there's no cursor event
                 if(!tileTapped(selected.entity) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().requests().size == 0 || !player.builder().isBuilding()) && !droppingItem &&
                 !tryBeginMine(selected) && player.miner().mineTile() == null && !Core.scene.hasKeyboard()){
-                    isShooting = true;
+                    isShooting = shouldShoot;
                 }
             }else if(!Core.scene.hasKeyboard()){ //if it's out of bounds, shooting is just fine
-                isShooting = true;
+                isShooting = shouldShoot;
             }
         }else if(Core.input.keyTap(Binding.deselect) && isPlacing()){
             block = null;
@@ -501,9 +504,7 @@ public class DesktopInput extends InputHandler{
                 removeSelection(selectX, selectY, cursorX, cursorY);
             }
 
-            if(selected != null && selected.entity != null){
-                tryDropItems(selected.entity, Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-            }
+            tryDropItems(selected == null ? null : selected.entity, Core.input.mouseWorld().x, Core.input.mouseWorld().y);
 
             if(sreq != null){
                 if(getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null){
@@ -516,7 +517,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.toggle_block_status)){
-            Core.settings.putSave("blockstatus", !Core.settings.getBool("blockstatus"));
+            Core.settings.put("blockstatus", !Core.settings.getBool("blockstatus"));
         }
 
         if(Core.input.keyTap(Binding.toggle_power_lines)){
@@ -558,13 +559,13 @@ public class DesktopInput extends InputHandler{
     protected void updateMovement(Unitc unit){
         boolean omni = !(unit instanceof WaterMovec);
         boolean legs = unit.isGrounded();
-        float speed = unit.type().speed;
+        float speed = unit.type().speed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation());
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
 
         movement.set(xa, ya).nor().scl(speed);
         float mouseAngle = Angles.mouseAngle(unit.x(), unit.y());
-        boolean aimCursor = omni && isShooting && unit.type().hasWeapons();
+        boolean aimCursor = omni && isShooting && unit.type().hasWeapons() && unit.type().faceTarget;
 
         if(aimCursor){
             unit.lookAt(mouseAngle);
@@ -587,68 +588,16 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        unit.aim(Core.input.mouseWorld());
+        unit.aim(unit.type().faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation(), Core.input.mouseWorld().dst(unit)).add(unit.x(), unit.y()));
+
         unit.controlWeapons(true, isShooting);
-        /*
-        Tile tile = unit.tileOn();
-        boolean canMove = !Core.scene.hasKeyboard() || ui.minimapfrag.shown();
 
-        //TODO implement
-        boolean isBoosting = Core.input.keyDown(Binding.dash) && !mech.flying;
+        isBoosting = Core.input.keyDown(Binding.boost);
 
-        //if player is in solid block
-        if(tile != null && tile.solid()){
-            isBoosting = true;
+        if(unit.type().canBoost){
+            Tile tile = unit.tileOn();
+
+            unit.elevation(Mathf.approachDelta(unit.elevation(), (tile != null && tile.solid()) || (isBoosting && !movement.isZero()) ? 1f : 0f, 0.08f));
         }
-
-        float speed = isBoosting && unit.type().flying ? mech.boostSpeed : mech.speed;
-
-        if(mech.flying){
-            //prevent strafing backwards, have a penalty for doing so
-            float penalty = 0.2f; //when going 180 degrees backwards, reduce speed to 0.2x
-            speed *= Mathf.lerp(1f, penalty, Angles.angleDist(rotation, velocity.angle()) / 180f);
-        }
-
-        movement.setZero();
-
-        float xa = Core.input.axis(Binding.move_x);
-        float ya = Core.input.axis(Binding.move_y);
-        if(!(Core.scene.getKeyboardFocus() instanceof TextField)){
-            movement.y += ya * speed;
-            movement.x += xa * speed;
-        }
-
-        if(Core.input.keyDown(Binding.mouse_move)){
-            movement.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * speed;
-            movement.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * speed;
-        }
-
-        Vec2 vec = Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY());
-        pointerX = vec.x;
-        pointerY = vec.y;
-        updateShooting();
-
-        movement.limit(speed).scl(Time.delta());
-
-        if(canMove){
-            velocity.add(movement.x, movement.y);
-        }else{
-            isShooting = false;
-        }
-        float prex = x, prey = y;
-        updateVelocityStatus();
-        moved = dst(prex, prey) > 0.001f;
-
-        if(canMove){
-            float baseLerp = mech.getRotationAlpha(this);
-            if(!isShooting() || !mech.faceTarget){
-                if(!movement.isZero()){
-                    rotation = Mathf.slerpDelta(rotation, mech.flying ? velocity.angle() : movement.angle(), 0.13f * baseLerp);
-                }
-            }else{
-                float angle = control.input.mouseAngle(x, y);
-                this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f * baseLerp);
-            }
-        }*/
     }
 }

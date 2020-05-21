@@ -32,6 +32,7 @@ public class EventType{
         update
     }
 
+    public static class TurnEvent{}
     public static class WinEvent{}
     public static class LoseEvent{}
     public static class LaunchEvent{}
@@ -66,6 +67,7 @@ public class EventType{
             this.stack = stack;
         }
     }
+
 
     public static class CommandIssueEvent{
         public final Tilec tile;
@@ -105,6 +107,15 @@ public class EventType{
 
         public ZoneConfigureCompleteEvent(SectorPreset zone){
             this.zone = zone;
+        }
+    }
+
+    /** Called when a sector is conquered, e.g. a boss or base is defeated. */
+    public static class SectorCaptureEvent{
+        public final Sector sector;
+
+        public SectorCaptureEvent(Sector sector){
+            this.sector = sector;
         }
     }
 

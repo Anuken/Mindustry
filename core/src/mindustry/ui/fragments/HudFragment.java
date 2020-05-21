@@ -41,8 +41,20 @@ public class HudFragment extends Fragment{
 
     private long lastToast;
 
+    @Override
     public void build(Group parent){
+        Events.on(TurnEvent.class, e -> {
+            //TODO localize, clean up, etc
+            int attacked = universe.getSectorsAttacked();
+            showToast("New turn: [accent]" + universe.getTurn() + "[]" + (attacked > 0 ? "\n[scarlet]" + Iconc.warning + " " + attacked + " sectors attacked!": ""));
+        });
 
+        //TODO details and stuff
+        Events.on(SectorCaptureEvent.class, e ->{
+            showToast("Sector[accent] captured[]!");
+        });
+
+        //TODO tear this all down
         //menu at top left
         parent.fill(cont -> {
             cont.setName("overlaymarker");
@@ -126,6 +138,13 @@ public class HudFragment extends Fragment{
                 cont.image().height(4f).color(Pal.gray).fillX();
                 cont.row();
             }
+
+            //TODO BUTTONS FOR VIEWING EXPORTS/IMPORTS/RESEARCH
+            /*
+            cont.table(t -> {
+
+            });
+            cont.row();*/
 
             cont.update(() -> {
                 if(Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.shown() && !Core.scene.hasDialog() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
@@ -611,7 +630,7 @@ public class HudFragment extends Fragment{
             }
 
             if(state.rules.waveTimer){
-                builder.append((state.rules.waitForWaveToEnd && state.enemies > 0 ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60)))));
+                builder.append((state.rules.waitEnemies && state.enemies > 0 ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60)))));
             }else if(state.enemies == 0){
                 builder.append(Core.bundle.get("waiting"));
             }

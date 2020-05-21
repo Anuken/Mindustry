@@ -48,6 +48,8 @@ public class Weapon{
     public float lengthRand = 0f;
     /** delay in ticks between shots */
     public float shotDelay = 0;
+    /** The half-radius of the cone in which shooting will start. */
+    public float shootCone = 1.5f;
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
     /** if turnCursor is false for a mech, how far away will the weapon target. */
@@ -66,7 +68,7 @@ public class Weapon{
     }
 
     public void load(){
-        region = Core.atlas.find(name + "-equip", Core.atlas.find(name, Core.atlas.find("clear")));
+        region = Core.atlas.find(name, Core.atlas.find("clear"));
     }
 
 }

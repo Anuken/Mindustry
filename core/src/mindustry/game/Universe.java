@@ -6,6 +6,7 @@ import arc.struct.ObjectFloatMap.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.game.EventType.*;
 import mindustry.io.*;
 import mindustry.type.*;
 
@@ -55,9 +56,7 @@ public class Universe{
         turnCounter += Time.delta();
 
         if(turnCounter >= turnDuration){
-            turn ++;
-            turnCounter = 0;
-            onTurn();
+            runTurn();
         }
 
         if(state.hasSector()){
@@ -78,7 +77,7 @@ public class Universe{
             for(Sector sector : planet.sectors){
 
                 //ignore the current sector if the player is in it right now
-                if(sector.hasSave() && (state.isMenu() || sector != state.rules.sector)){
+                if(sector.hasBase() && !sector.isBeingPlayed()){
                     SaveMeta meta = sector.save.meta;
 
                     for(Entry<Item> entry : meta.exportRates){
@@ -94,14 +93,49 @@ public class Universe{
         return exports;
     }
 
-    private void onTurn(){
-        //TODO run waves on hostile sectors, damage them
+    public void runTurns(int amount){
+        for(int i = 0; i < amount; i++){
+            runTurn();
+        }
+    }
+
+    /** Runs a turn once. Resets turn counter. */
+    public void runTurn(){
+        turn ++;
+        turnCounter = 0;
+
+        //TODO EVENTS + a notification
+
+        //increment turns passed for sectors with waves
+        //TODO a turn passing may break the core; detect this, send an event and mark the sector as having no base!
+        for(Planet planet : content.planets()){
+            for(Sector sector : planet.sectors){
+                //attacks happen even for sectors without bases - stuff still gets destroyed
+                if(!sector.isBeingPlayed() && sector.hasSave() && sector.hasWaves()){
+                    sector.setTurnsPassed(sector.getTurnsPassed() + 1);
+                }
+            }
+        }
 
         //calculate passive item generation
         int[] exports = getTotalExports();
         for(int i = 0; i < exports.length; i++){
             data.addItem(content.item(i), exports[i]);
         }
+
+        Events.fire(new TurnEvent());
+    }
+
+    public int getTurn(){
+        return turn;
+    }
+
+    public int getSectorsAttacked(){
+        int count = 0;
+        for(Planet planet : content.planets()){
+            count += planet.sectors.count(s -> !s.isBeingPlayed() && s.hasSave() && s.hasWaves());
+        }
+        return count;
     }
 
     public float secondsMod(float mod, float scale){
@@ -120,7 +154,6 @@ public class Universe{
         Core.settings.put("utime", seconds);
         Core.settings.put("turn", turn);
         Core.settings.put("turntime", turnCounter);
-        Core.settings.save();
     }
 
     private void load(){

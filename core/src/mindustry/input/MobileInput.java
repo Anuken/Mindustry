@@ -186,7 +186,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         //diagonal swap button
         table.button(Icon.diagonal, Styles.clearTogglePartiali, () -> {
             Core.settings.put("swapdiagonal", !Core.settings.getBool("swapdiagonal"));
-            Core.settings.save();
         }).update(l -> l.setChecked(Core.settings.getBool("swapdiagonal")));
 
         //rotate button

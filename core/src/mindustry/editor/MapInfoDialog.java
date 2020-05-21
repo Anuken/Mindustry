@@ -53,7 +53,6 @@ public class MapInfoDialog extends FloatingDialog{
             TextField author = t.field(tags.get("author", Core.settings.getString("mapAuthor", "")), text -> {
                 tags.put("author", text);
                 Core.settings.put("mapAuthor", text);
-                Core.settings.save();
             }).size(400, 55f).get();
             author.setMessageText("$unknown");
 

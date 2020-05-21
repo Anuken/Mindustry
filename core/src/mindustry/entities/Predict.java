@@ -51,15 +51,15 @@ public class Predict{
         return sol;
     }
 
-    public static Vec2 intercept(Position src, Hitboxc dst, float v){
-        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dst.deltaX(), dst.deltaY(), v);
-    }
-
     public static Vec2 intercept(Position src, Position dst, float v){
         float ddx = 0, ddy = 0;
         if(dst instanceof Hitboxc){
-            ddx = ((Hitboxc)dst).deltaX();
-            ddy = ((Hitboxc)dst).deltaY();
+            ddx += ((Hitboxc)dst).deltaX();
+            ddy += ((Hitboxc)dst).deltaY();
+        }
+        if(src instanceof Hitboxc){
+            ddx -= ((Hitboxc)src).deltaX()/(Time.delta());
+            ddy -= ((Hitboxc)src).deltaY()/(Time.delta());
         }
         return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), ddx, ddy, v);
     }

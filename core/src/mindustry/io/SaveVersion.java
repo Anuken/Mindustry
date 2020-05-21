@@ -83,7 +83,8 @@ public abstract class SaveVersion extends SaveFileReader{
             "width", world.width(),
             "height", world.height(),
             "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
-            "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name
+            "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name,
+            "nocores", state.rules.defaultTeam.cores().isEmpty()
         ).merge(tags));
     }
 

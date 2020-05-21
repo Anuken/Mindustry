@@ -25,7 +25,6 @@ public class HostDialog extends FloatingDialog{
             t.field(Core.settings.getString("name"), text -> {
                 player.name(text);
                 Core.settings.put("name", text);
-                Core.settings.save();
                 ui.listfrag.rebuild();
             }).grow().pad(8).get().setMaxLength(40);
 
@@ -33,7 +32,6 @@ public class HostDialog extends FloatingDialog{
                 new PaletteDialog().show(color -> {
                     player.color().set(color);
                     Core.settings.put("color-0", color.rgba());
-                    Core.settings.save();
                 });
             }).size(54f).get();
             button.update(() -> button.getStyle().imageUpColor = player.color());
@@ -71,17 +69,17 @@ public class HostDialog extends FloatingDialog{
                 if(steam){
                     Core.app.post(() -> Core.settings.getBoolOnce("steampublic2", () -> {
                         ui.showCustomConfirm("$setting.publichost.name", "$public.confirm", "$yes", "$no", () -> {
-                            Core.settings.putSave("publichost", true);
+                            Core.settings.put("publichost", true);
                             platform.updateLobby();
                         }, () -> {
-                            Core.settings.putSave("publichost", false);
+                            Core.settings.put("publichost", false);
                             platform.updateLobby();
                         });
                     }));
                 }
 
                 if(Version.modifier.contains("beta")){
-                    Core.settings.putSave("publichost", false);
+                    Core.settings.put("publichost", false);
                     platform.updateLobby();
                     Core.settings.getBoolOnce("betapublic", () -> ui.showInfo("$public.beta"));
                 }

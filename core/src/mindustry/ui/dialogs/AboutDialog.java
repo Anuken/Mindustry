@@ -67,7 +67,7 @@ public class AboutDialog extends FloatingDialog{
             table.button(Icon.link, () -> {
                 if(link.name.equals("wiki")) Events.fire(Trigger.openWiki);
 
-                if(!Core.net.openURI(link.link)){
+                if(!Core.app.openURI(link.link)){
                     ui.showErrorMessage("$linkfail");
                     Core.app.setClipboardText(link.link);
                 }

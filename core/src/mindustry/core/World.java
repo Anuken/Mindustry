@@ -214,12 +214,27 @@ public class World{
         setSectorRules(sector);
 
         int size = sector.getSize();
-        loadGenerator(size, size, tiles -> sector.planet.generator.generate(tiles, sector));
+        loadGenerator(size, size, tiles -> {
+            if(sector.preset != null){
+                sector.preset.generator.generate(tiles);
+            }else{
+                sector.planet.generator.generate(tiles, sector);
+            }
+        });
+
+        //reset rules
+        setSectorRules(sector);
+
+        if(state.rules.defaultTeam.core() != null){
+            sector.setSpawnPosition(state.rules.defaultTeam.core().pos());
+        }
     }
 
     private void setSectorRules(Sector sector){
         state.map = new Map(StringMap.of("name", sector.planet.localizedName + "; Sector " + sector.id));
         state.rules.sector = sector;
+
+        state.rules.weather.clear();
 
         if(sector.is(SectorAttribute.rainy)){
             state.rules.weather.add(new WeatherEntry(Weathers.rain));
@@ -228,6 +243,10 @@ public class World{
         if(sector.is(SectorAttribute.snowy)){
             state.rules.weather.add(new WeatherEntry(Weathers.snow));
         }
+    }
+
+    public Context filterContext(Map map){
+        return new FilterContext(map);
     }
 
     public void loadMap(Map map){
@@ -417,6 +436,7 @@ public class World{
     }
 
     private class Context implements WorldContext{
+
         @Override
         public Tile tile(int index){
             return tiles.geti(index);
@@ -461,6 +481,7 @@ public class World{
         @Override
         public void end(){
             Array<GenerateFilter> filters = map.filters();
+
             if(!filters.isEmpty()){
                 //input for filter queries
                 GenerateInput input = new GenerateInput();

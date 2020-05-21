@@ -49,7 +49,6 @@ public class JoinDialog extends FloatingDialog{
 
         TextField field = add.cont.field(Core.settings.getString("ip"), text -> {
             Core.settings.put("ip", text);
-            Core.settings.save();
         }).size(320f, 54f).get();
 
         platform.addDialog(field, 100);
@@ -265,7 +264,6 @@ public class JoinDialog extends FloatingDialog{
                 t.field(Core.settings.getString("name"), text -> {
                     player.name(text);
                     Core.settings.put("name", text);
-                    Core.settings.save();
                 }).grow().pad(8).get().setMaxLength(maxNameLength);
             }else{
                 t.add(player.name()).update(l -> l.setColor(player.color())).grow().pad(8);
@@ -275,7 +273,6 @@ public class JoinDialog extends FloatingDialog{
                 new PaletteDialog().show(color -> {
                     player.color().set(color);
                     Core.settings.put("color-0", color.rgba8888());
-                    Core.settings.save();
                 });
             }).size(54f).get();
             button.update(() -> button.getStyle().imageUpColor = player.color());
@@ -312,7 +309,7 @@ public class JoinDialog extends FloatingDialog{
             name.add(label).pad(10).growX().left().color(Pal.accent);
             name.button(Icon.downOpen, Styles.emptyi, () -> {
                 coll.toggle(false);
-                Core.settings.putSave("collapsed-" + label, coll.isCollapsed());
+                Core.settings.put("collapsed-" + label, coll.isCollapsed());
             }).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(40f).right().padRight(10f);
         }).growX();
         hosts.row();
@@ -442,7 +439,6 @@ public class JoinDialog extends FloatingDialog{
 
     private void saveServers(){
         Core.settings.putObject("server-list", servers);
-        Core.settings.save();
     }
 
     @Serialize

@@ -155,7 +155,7 @@ public class Administration{
     }
 
     public void setPlayerLimit(int limit){
-        Core.settings.putSave("playerlimit", limit);
+        Core.settings.put("playerlimit", limit);
     }
 
     public boolean getStrict(){
@@ -432,7 +432,6 @@ public class Administration{
         Core.settings.putObject("banned-ips", bannedIPs);
         Core.settings.putObject("whitelisted", whitelist);
         Core.settings.putObject("subnet-bans", subnetBans);
-        Core.settings.save();
     }
 
     @SuppressWarnings("unchecked")
@@ -522,7 +521,7 @@ public class Administration{
         }
 
         public void set(Object value){
-            Core.settings.putSave(key, value);
+            Core.settings.put(key, value);
             changed.run();
         }
     }

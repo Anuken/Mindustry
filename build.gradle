@@ -233,11 +233,11 @@ project(":core"){
 
             def androidLogList = loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
             def result = ""
-            androidLogList.forEach({line ->
+            androidLogList.forEach{line ->
                 if(result.length() + line.length() + 1 < maxLength){
                     result += line + "\n"
                 }
-            })
+            }
             def changelogs = file("../fastlane/metadata/android/en-US/changelogs/")
             new File(changelogs, buildVersion + ".txt").text = (result)
             new File(changelogs, androidVersion + ".txt").text = (result)

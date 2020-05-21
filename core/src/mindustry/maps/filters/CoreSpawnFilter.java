@@ -2,11 +2,10 @@ package mindustry.maps.filters;
 
 import arc.struct.*;
 import arc.util.*;
-import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.state;
 
 /** Selects X spawns from the core spawn pool.*/
 public class CoreSpawnFilter extends GenerateFilter{
@@ -15,7 +14,8 @@ public class CoreSpawnFilter extends GenerateFilter{
     @Override
     public FilterOption[] options(){
         return Structs.arr(
-        new SliderOption("amount", () -> amount, f -> amount = (int)f, 1, 10).display()
+        //disabled until necessary
+        // SliderOption("amount", () -> amount, f -> amount = (int)f, 1, 10).display()
         );
     }
 
@@ -23,7 +23,7 @@ public class CoreSpawnFilter extends GenerateFilter{
     public void apply(Tiles tiles, GenerateInput in){
         IntArray spawns = new IntArray();
         for(Tile tile : tiles){
-            if(tile.team() == state.rules.defaultTeam && tile.block() instanceof CoreBlock){
+            if(tile.team() == state.rules.defaultTeam && tile.block() instanceof CoreBlock && tile.isCenter()){
                 spawns.add(tile.pos());
             }
         }

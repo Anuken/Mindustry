@@ -130,7 +130,7 @@ public class Saves{
         }
         sector.save.save();
         lastSectorSave = sector.save;
-        Core.settings.putSave("last-sector-save", sector.save.getName());
+        Core.settings.put("last-sector-save", sector.save.getName());
     }
 
     public SaveSlot addSave(String name){
@@ -279,7 +279,6 @@ public class Saves{
 
         public void setName(String name){
             Core.settings.put("save-" + index() + "-name", name);
-            Core.settings.save();
         }
 
         public String[] getMods(){
@@ -312,7 +311,6 @@ public class Saves{
 
         public void setAutosave(boolean save){
             Core.settings.put("save-" + index() + "-autosave", save);
-            Core.settings.save();
         }
 
         public void importFile(Fi from) throws IOException{

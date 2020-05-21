@@ -14,14 +14,11 @@ import mindustry.maps.generators.*;
 
 import static mindustry.Vars.*;
 
-//TODO ? remove ?
 public class SectorPreset extends UnlockableContent{
-    public @NonNull WorldGenerator generator;
-    public @NonNull Objectives.Objective configureObjective = new ZoneWave(this, 15);
+    public @NonNull FileMapGenerator generator;
     public @NonNull Planet planet;
-    public Array<Objectives.Objective> requirements = new Array<>();
-    //TODO autogenerate
-    public Array<Item> resources = new Array<>();
+    public @NonNull Sector sector;
+    public Array<Objective> requirements = new Array<>();
 
     public Cons<Rules> rules = rules -> {};
     public boolean alwaysUnlocked;
@@ -32,27 +29,19 @@ public class SectorPreset extends UnlockableContent{
     protected Array<ItemStack> baseLaunchCost = new Array<>();
     protected Array<ItemStack> startingItems = new Array<>();
     protected Array<ItemStack> launchCost;
+    protected Array<ItemStack> defaultStartingItems = new Array<>();
 
-    private Array<ItemStack> defaultStartingItems = new Array<>();
-
-    public SectorPreset(String name, Planet planet, WorldGenerator generator){
+    public SectorPreset(String name, Planet planet, int sector){
         super(name);
-        this.generator = generator;
+        this.generator = new FileMapGenerator(name);
         this.planet = planet;
-    }
+        this.sector = planet.sectors.get(sector);
 
-    public SectorPreset(String name){
-        this(name, Planets.starter, new FileMapGenerator(name));
+        planet.preset(sector, this);
     }
 
     public Rules getRules(){
-        if(generator instanceof FileMapGenerator){
-            return ((FileMapGenerator)generator).map.rules();
-        }else{
-            Rules rules = new Rules();
-            this.rules.get(rules);
-            return rules;
-        }
+        return generator.map.rules();
     }
 
     public boolean isLaunchWave(int wave){
@@ -102,22 +91,16 @@ public class SectorPreset extends UnlockableContent{
     }
 
     public void updateObjectives(Runnable closure){
-        Array<ZoneObjective> incomplete = content.zones()
+        Array<SectorObjective> incomplete = content.sectors()
             .flatMap(z -> z.requirements)
             .select(o -> o.zone() == this && !o.complete())
-            .as(ZoneObjective.class);
-
-        boolean wasConfig = configureObjective.complete();
+            .as(SectorObjective.class);
 
         closure.run();
-        for(ZoneObjective objective : incomplete){
+        for(SectorObjective objective : incomplete){
             if(objective.complete()){
-                Events.fire(new ZoneRequireCompleteEvent(objective.zone, content.zones().find(z -> z.requirements.contains(objective)), objective));
+                Events.fire(new ZoneRequireCompleteEvent(objective.preset, content.sectors().find(z -> z.requirements.contains(objective)), objective));
             }
-        }
-
-        if(!wasConfig && configureObjective.complete()){
-            Events.fire(new ZoneConfigureCompleteEvent(this));
         }
     }
 
@@ -163,12 +146,11 @@ public class SectorPreset extends UnlockableContent{
     }
 
     public boolean canConfigure(){
-        return configureObjective.complete();
+        return true;
     }
 
     @Override
     public void init(){
-        resources.sort();
 
         for(ItemStack stack : startingItems){
             defaultStartingItems.add(new ItemStack(stack.item, stack.amount));
@@ -198,7 +180,7 @@ public class SectorPreset extends UnlockableContent{
 
     @Override
     public ContentType getContentType(){
-        return ContentType.zone;
+        return ContentType.sector;
     }
 
 }

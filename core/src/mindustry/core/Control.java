@@ -109,14 +109,6 @@ public class Control implements ApplicationListener, Loadable{
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.onGameOver(event.winner);
-            //TODO set meta to indicate game over
-            /*
-            if(state.rules.zone != null && !net.client()){
-                //remove zone save on game over
-                if(saves.getZoneSlot() != null && !state.rules.tutorial){
-                    saves.getZoneSlot().delete();
-                }
-            }*/
         });
 
         //autohost for pvp maps
@@ -163,12 +155,6 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(ZoneConfigureCompleteEvent.class, e -> {
-            if(e.zone.configureObjective.display() != null){
-                ui.hudfrag.showToast(Core.bundle.format("zone.config.unlocked", e.zone.configureObjective.display()));
-            }
-        });
-
         Events.on(Trigger.newGame, () -> {
             Tilec core = player.closestCore();
 
@@ -188,12 +174,6 @@ public class Control implements ApplicationListener, Loadable{
                 Fx.launch.at(core);
                 Effects.shake(5f, 5f, core);
             });
-        });
-
-        Events.on(UnitDestroyEvent.class, e -> {
-            if(state.isCampaign()){
-                data.unlockContent(e.unit.type());
-            }
         });
     }
 
@@ -266,11 +246,35 @@ public class Control implements ApplicationListener, Loadable{
             ui.planet.hide();
             SaveSlot slot = sector.save;
             if(slot != null && !clearSectors){
+
                 try{
                     net.reset();
                     slot.load();
                     state.rules.sector = sector;
+
+                    //if there is no base, simulate a new game and place the right loadout at the spawn position
+                    if(state.rules.defaultTeam.cores().isEmpty()){
+
+                        //kill all friendly units, since they should be dead anwyay
+                        for(Unitc unit : Groups.unit){
+                            if(unit.team() == state.rules.defaultTeam){
+                                unit.remove();
+                            }
+                        }
+
+                        Tile spawn = world.tile(sector.getSpawnPosition());
+                        //TODO PLACE CORRECT LOADOUT
+                        Schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
+
+                        //set up camera/player locations
+                        player.set(spawn.x * tilesize, spawn.y * tilesize);
+                        camera.position.set(player);
+
+                        Events.fire(Trigger.newGame);
+                    }
+
                     state.set(State.playing);
+
                 }catch(SaveException e){
                     Log.err(e);
                     sector.save = null;
@@ -403,7 +407,6 @@ public class Control implements ApplicationListener, Loadable{
                 Runnable exit = () -> {
                     Core.settings.put("uiscale", 100);
                     Core.settings.put("uiscalechanged", false);
-                    settings.save();
                     dialog.hide();
                     Core.app.exit();
                 };
@@ -420,7 +423,6 @@ public class Control implements ApplicationListener, Loadable{
 
                 dialog.buttons.button("$ok", () -> {
                     Core.settings.put("uiscalechanged", false);
-                    settings.save();
                     dialog.hide();
                 });
 
@@ -463,7 +465,6 @@ public class Control implements ApplicationListener, Loadable{
                 graphics.setFullscreenMode(graphics.getDisplayMode());
             }
             settings.put("fullscreen", !full);
-            settings.save();
         }
 
         if(state.isGame()){

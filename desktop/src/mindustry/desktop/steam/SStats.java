@@ -87,7 +87,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
-            if(!content.zones().contains(z -> !z.canConfigure())){
+            if(!content.sectors().contains(z -> !z.canConfigure())){
                 configAllZones.complete();
             }
         });
@@ -119,11 +119,11 @@ public class SStats implements SteamUserStatsCallback{
 
                 if(e.tile.block() == Blocks.meltdown || e.tile.block() == Blocks.spectre){
                     if(e.tile.block() == Blocks.meltdown && !Core.settings.getBool("meltdownp", false)){
-                        Core.settings.putSave("meltdownp", true);
+                        Core.settings.put("meltdownp", true);
                     }
 
                     if(e.tile.block() == Blocks.spectre && !Core.settings.getBool("spectrep", false)){
-                        Core.settings.putSave("spectrep", true);
+                        Core.settings.put("spectrep", true);
                     }
 
                     if(Core.settings.getBool("meltdownp", false) && Core.settings.getBool("spectrep", false)){
@@ -147,7 +147,7 @@ public class SStats implements SteamUserStatsCallback{
             if(e.content == Items.thorium) obtainThorium.complete();
             if(e.content == Items.titanium) obtainTitanium.complete();
 
-            if(!content.zones().contains(SectorPreset::locked)){
+            if(!content.sectors().contains(SectorPreset::locked)){
                 unlockAllZones.complete();
             }
         });
@@ -226,7 +226,7 @@ public class SStats implements SteamUserStatsCallback{
         Events.on(ResearchEvent.class, e -> {
             if(e.content == Blocks.router) researchRouter.complete();
 
-            if(!TechTree.all.contains(t -> t.block.locked())){
+            if(!TechTree.all.contains(t -> t.content.locked())){
                 researchAll.complete();
             }
         });
@@ -256,7 +256,6 @@ public class SStats implements SteamUserStatsCallback{
                 if(mechs.add(e.mech.name)){
                     SStat.zoneMechsUsed.max(mechs.size);
                     Core.settings.putObject("mechs", mechs);
-                    Core.settings.save();
                 }
             }
         });

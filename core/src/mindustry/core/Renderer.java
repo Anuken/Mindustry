@@ -130,7 +130,6 @@ public class Renderer implements ApplicationListener{
         }catch(Throwable e){
             e.printStackTrace();
             settings.put("bloom", false);
-            settings.save();
             ui.showErrorMessage("$error.bloom");
         }
     }

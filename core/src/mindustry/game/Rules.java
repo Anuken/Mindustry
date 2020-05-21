@@ -1,9 +1,8 @@
 package mindustry.game;
 
-import arc.util.ArcAnnotate.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.graphics.*;
+import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.io.*;
 import mindustry.type.*;
@@ -67,8 +66,8 @@ public class Rules{
     public boolean limitedRespawns = false;
     /** How many times player can respawn during one wave. */
     public int respawns = 5;
-    /** Hold wave timer until all enemies are destroyed. */
-    public boolean waitForWaveToEnd = false;
+    /** Whether to pause the wave timer until all enemies are destroyed. */
+    public boolean waitEnemies = false;
     /** Determinates if gamemode is attack mode */
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */

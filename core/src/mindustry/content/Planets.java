@@ -9,7 +9,7 @@ import mindustry.type.*;
 public class Planets implements ContentList{
     public static Planet
     sun,
-    starter;
+    starter; //TODO rename
 
     @Override
     public void load(){
@@ -31,6 +31,7 @@ public class Planets implements ContentList{
             );
         }};
 
+        //TODO rename
         starter = new Planet("TODO", sun, 3, 1){{
             generator = new TODOPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);

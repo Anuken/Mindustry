@@ -571,7 +571,7 @@ public class NetClient implements ApplicationListener{
             unit instanceof Legsc ? ((Legsc)unit).baseRotation() : 0,
             unit.vel().x, unit.vel().y,
             player.miner().mineTile(),
-            /*player.isBoosting*/false, control.input.isShooting, ui.chatfrag.shown(),
+            control.input.isBoosting, control.input.isShooting, ui.chatfrag.shown(),
             requests,
             Core.camera.position.x, Core.camera.position.y,
             Core.camera.width * viewScale, Core.camera.height * viewScale);
@@ -595,7 +595,6 @@ public class NetClient implements ApplicationListener{
             new Rand().nextBytes(bytes);
             String result = new String(Base64Coder.encode(bytes));
             Core.settings.put("usid-" + ip, result);
-            Core.settings.save();
             return result;
         }
     }

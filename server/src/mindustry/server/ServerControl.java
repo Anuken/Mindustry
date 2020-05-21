@@ -387,7 +387,7 @@ public class ServerControl implements ApplicationListener{
                     }
                 }
 
-                Core.settings.putSave("globalrules", base.toString());
+                Core.settings.put("globalrules", base.toString());
                 Call.onSetRules(state.rules);
             }
         });
@@ -545,7 +545,7 @@ public class ServerControl implements ApplicationListener{
             }else{
                 try{
                     ShuffleMode mode = ShuffleMode.valueOf(arg[0]);
-                    Core.settings.putSave("shufflemode", mode.name());
+                    Core.settings.put("shufflemode", mode.name());
                     maps.setShuffleMode(mode);
                     info("Shuffle mode set to &ly'@'&lg.", arg[0]);
                 }catch(Exception e){

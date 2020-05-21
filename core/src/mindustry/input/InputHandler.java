@@ -55,7 +55,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public int rotation;
     public boolean droppingItem;
     public Group uiGroup;
-    public boolean isShooting, isBuilding = true, buildWasAutoPaused = false;
+    public boolean isShooting, isBuilding = true, buildWasAutoPaused = false, isBoosting = false;
     public @Nullable UnitType controlledType;
 
     protected @Nullable Schematic lastSchematic;
@@ -802,7 +802,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return droppingItem;
     }
 
-    public void tryDropItems(Tilec tile, float x, float y){
+    public void tryDropItems(@Nullable Tilec tile, float x, float y){
         if(!droppingItem || player.unit().stack().amount <= 0 || canTapPlayer(x, y) || state.isPaused() ){
             droppingItem = false;
             return;
@@ -812,7 +812,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         ItemStack stack = player.unit().stack();
 
-        if(tile.acceptStack(stack.item, stack.amount, player.unit()) > 0 && tile.interactable(player.team()) && tile.block().hasItems && player.unit().stack().amount > 0 && tile.interactable(player.team())){
+        if(tile != null && tile.acceptStack(stack.item, stack.amount, player.unit()) > 0 && tile.interactable(player.team()) && tile.block().hasItems && player.unit().stack().amount > 0 && tile.interactable(player.team())){
             Call.transferInventory(player, tile);
         }else{
             Call.dropItem(player.angleTo(x, y));

@@ -39,7 +39,6 @@ public class LanguageDialog extends FloatingDialog{
             button.clicked(() -> {
                 if(getLocale().equals(loc)) return;
                 Core.settings.put("locale", loc.toString());
-                Core.settings.save();
                 Log.info("Setting locale: @", loc.toString());
                 ui.showInfo("$language.restart");
             });

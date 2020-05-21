@@ -1,5 +1,6 @@
 package mindustry.type;
 
+import arc.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -10,6 +11,8 @@ import mindustry.ctype.*;
 import mindustry.game.Saves.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.world.*;
+
+import static mindustry.Vars.world;
 
 /** A small section of a planet. */
 public class Sector{
@@ -22,12 +25,13 @@ public class Sector{
     public final SectorData data;
 
     public @Nullable SaveSlot save;
+    public @Nullable SectorPreset preset;
     public boolean unlocked;
 
-    /** */
+    /** Sector enemy hostility from 0 to 1 */
     public float hostility;
 
-    //TODO implement a dynamic (?) launch period
+    //TODO implement a dynamic launch period
     public int launchPeriod = 10;
 
     public Sector(Planet planet, Ptile tile, SectorData data){
@@ -39,17 +43,48 @@ public class Sector{
         this.data = data;
     }
 
+    /** @return whether this sector can be landed on at all.
+     * Only sectors adjacent to non-wave sectors can be landed on.
+     * TODO also preset sectors*/
+    public boolean unlocked(){
+        return Structs.contains(tile.tiles, p -> planet.getSector(p).isCaptured()) || (preset != null && preset.unlocked());
+    }
+
+    /** @return whether the player has a base here. */
+    public boolean hasBase(){
+        return save != null && !save.meta.tags.getBool("nocores");
+    }
+
+    /** @return whether the enemy has a generated base here. */
+    public boolean hasEnemyBase(){
+        return hostility >= 0.02f && (save == null || save.meta.rules.waves);
+    }
+
+    public boolean isBeingPlayed(){
+        //after the launch dialog, a sector is no longer considered being played
+        return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.launched && !Vars.state.gameOver;
+    }
+
+    public boolean isCaptured(){
+        return save != null && !save.meta.rules.waves;
+    }
+
+    /** @return whether waves are present - if true, any bases here will be attacked. */
+    public boolean hasWaves(){
+        return save != null && save.meta.rules.waves;
+    }
+
     public boolean hasSave(){
         return save != null;
     }
 
     public void generate(){
         //TODO use simplex and a seed
-        hostility = Math.max(Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 1f, 0.5f), 0);
+        hostility = Math.max(Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.5f, 0.4f), 0);
     }
 
     public boolean locked(){
-        return !unlocked;
+        return !unlocked();
     }
 
     /** @return light dot product in the range [0, 1]. */
@@ -72,6 +107,32 @@ public class Sector{
     public boolean metCondition(){
         //TODO implement
         return false;
+    }
+
+    public void setSpawnPosition(int position){
+        put("spawn-position", position);
+    }
+
+    /** Only valid after this sector has been landed on once. */
+    //TODO move to sector data?
+    public int getSpawnPosition(){
+        return Core.settings.getInt(key("spawn-position"), Point2.pack(world.width() / 2, world.height() / 2));
+    }
+
+    public void setTurnsPassed(int number){
+        put("turns-passed", number);
+    }
+
+    public int getTurnsPassed(){
+        return Core.settings.getInt(key("turns-passed"));
+    }
+
+    private String key(String key){
+        return planet.name + "-s-" + id + "-" + key;
+    }
+
+    private void put(String key, Object value){
+        Core.settings.put(key(key), value);
     }
 
     /** Projects this sector onto a 4-corner square for use in map gen.

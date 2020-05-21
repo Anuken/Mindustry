@@ -62,7 +62,7 @@ public class ChatFragment extends Table{
 
         update(() -> {
 
-            if(net.active() && input.keyTap(Binding.chat) && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null)){
+            if(net.active() && input.keyTap(Binding.chat) && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null || ui.minimapfrag.shown())){
                 toggle();
             }
 
@@ -246,7 +246,7 @@ public class ChatFragment extends Table{
             if(sender == null){ //no sender, this is a server message?
                 formattedMessage = message;
             }else{
-                formattedMessage = "[CORAL][[" + sender + "[CORAL]]:[WHITE] " + message;
+                formattedMessage = "[coral][[" + sender + "[coral]]:[white] " + message;
             }
         }
     }

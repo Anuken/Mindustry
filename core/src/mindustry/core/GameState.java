@@ -30,6 +30,7 @@ public class GameState{
     /** Current game state. */
     private State state = State.menu;
 
+    //TODO optimize
     public Unitc boss(){
         return Groups.unit.find(u -> u.isBoss() && u.team() == rules.waveTeam);
     }

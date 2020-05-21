@@ -11,12 +11,14 @@ import arc.math.geom.*;
 import arc.scene.event.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.Objectives.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
@@ -35,6 +37,7 @@ public class PlanetDialog extends FloatingDialog{
         shadowColor = new Color(0, 0, 0, 0.7f);
     private static final float camLength = 4f;
     private static final float outlineRad = 1.16f;
+    private static final Array<Vec3> points = new Array<>();
 
     //the base planet that's being rendered
     private final Planet solarSystem = Planets.sun;
@@ -74,7 +77,9 @@ public class PlanetDialog extends FloatingDialog{
             }
         });
 
-        Events.on(ResizeEvent.class, e -> makeBloom());
+        Events.on(ResizeEvent.class, e -> {
+            makeBloom();
+        });
 
         TextButtonStyle style = Styles.cleart;
         float bmargin = 6f;
@@ -275,16 +280,20 @@ public class PlanetDialog extends FloatingDialog{
         batch.proj().mul(planet.getTransform(mat));
 
         for(Sector sec : planet.sectors){
-            if(sec.locked()){
-                draw(sec, shadowColor, -0.001f);
-            }
 
             if(selectAlpha > 0.01f){
-                float stroke = 0.026f;
-                if(sec.save != null){
-                    drawSelection(sec, Tmp.c1.set(Team.sharded.color).a(selectAlpha), stroke, -0.01f);
-                }else if(sec.hostility >= 0.02f){
-                    drawSelection(sec, Tmp.c1.set(Team.crux.color).a(selectAlpha), stroke, -0.02f);
+                if(sec.unlocked()){
+                    Color color =
+                        sec.hasBase() ? Team.sharded.color :
+                        sec.preset != null ? Team.derelict.color :
+                        sec.hasEnemyBase() ? Team.crux.color :
+                        null;
+
+                    if(color != null){
+                        drawSelection(sec, Tmp.c1.set(color).mul(0.8f).a(selectAlpha), 0.026f, -0.001f);
+                    }
+                }else{
+                    draw(sec, Tmp.c1.set(shadowColor).mul(1, 1, 1, selectAlpha), -0.001f);
                 }
             }
         }
@@ -301,6 +310,16 @@ public class PlanetDialog extends FloatingDialog{
 
         batch.flush(Gl.triangles);
 
+        //render arcs
+        if(selected != null && selected.preset != null){
+            for(Objective o : selected.preset.requirements){
+                if(o instanceof SectorObjective){
+                    SectorPreset preset = ((SectorObjective)o).preset;
+                    drawArc(planet, selected.tile.v, preset.sector.tile.v);
+                }
+            }
+        }
+
         //render sector grid
         Mesh mesh = outline(planet.grid.size);
         Shader shader = Shaders.planetGrid;
@@ -312,6 +331,25 @@ public class PlanetDialog extends FloatingDialog{
         shader.setUniformMatrix4("u_trans", planet.getTransform(mat).val);
         shader.apply();
         mesh.render(shader, Gl.lines);
+    }
+
+    private void drawArc(Planet planet, Vec3 a, Vec3 b){
+        Vec3 avg = Tmp.v31.set(a).add(b).scl(0.5f);
+        avg.setLength(planet.radius*2f);
+
+        points.clear();
+        points.addAll(Tmp.v33.set(a).setLength(outlineRad), Tmp.v31, Tmp.v34.set(b).setLength(outlineRad));
+        Tmp.bz3.set(points);
+        float points = 25;
+
+        for(int i = 0; i < points + 1; i++){
+            float f = i / points;
+            Tmp.c1.set(Pal.accent).lerp(Color.clear, (f+Time.globalTime()/80f)%1f);
+            batch.color(Tmp.c1);
+            batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
+
+        }
+        batch.flush(Gl.lineStrip);
     }
 
     private void drawBorders(Sector sector, Color base){
@@ -348,7 +386,7 @@ public class PlanetDialog extends FloatingDialog{
 
         //TODO add strings to bundle after prototyping is done
 
-        stable.add("[accent]" + selected.id).row();
+        stable.add("[accent]" + (selected.preset == null ? selected.id : selected.preset.localizedName)).row();
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();
         stable.add(selected.save != null ? selected.save.getPlayTime() : "[lightgray]Unexplored").row();
 
@@ -364,7 +402,7 @@ public class PlanetDialog extends FloatingDialog{
         }).fillX().row();
 
         //production
-        if(selected.hasSave() && selected.save.meta.hasProduction){
+        if(selected.hasBase() && selected.save.meta.hasProduction){
             stable.add("Production:").row();
             stable.table(t -> {
                 t.left();
@@ -380,9 +418,16 @@ public class PlanetDialog extends FloatingDialog{
             });
         }
 
+        //display how many turns this sector has been attacked
+        if(selected.getTurnsPassed() > 0 && selected.hasBase()){
+            stable.row();
+
+            stable.add("[scarlet]" + Iconc.warning + " " + selected.getTurnsPassed() + "x attacks");
+        }
+
         stable.row();
 
-        stable.button(selected.hasSave() ? "Continue" : "Launch", Styles.transt, () -> {
+        stable.button("Launch", Styles.transt, () -> {
             if(selected != null){
                 if(selected.is(SectorAttribute.naval)){
                     ui.showInfo("You need a naval loadout to launch here.");
@@ -402,7 +447,7 @@ public class PlanetDialog extends FloatingDialog{
                 Tmp.v31.set(selected.tile.v).rotate(Vec3.Y, -planet.getRotation()).scl(-1f).nor();
                 float dot = cam.direction.dot(Tmp.v31);
                 stable.getColor().a = Math.max(dot, 0f)*2f;
-                if(stable.getColor().a <= 0.001f){
+                if(dot*2f <= -0.1f){
                     stable.remove();
                     selected = null;
                 }

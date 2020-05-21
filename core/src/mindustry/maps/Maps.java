@@ -330,7 +330,7 @@ public class Maps{
         }else{
             try{
                 return JsonIO.read(Array.class, str);
-            }catch(Exception e){
+            }catch(Throwable e){
                 e.printStackTrace();
                 return readFilters("");
             }

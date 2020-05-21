@@ -38,10 +38,11 @@ public abstract class UnlockableContent extends MappableContent{
     /** Returns a specific content icon, or the region {contentType}-{name} if not found.*/
     public TextureRegion icon(Cicon icon){
         if(cicons[icon.ordinal()] == null){
-            cicons[icon.ordinal()] = Core.atlas.find(getContentType().name() + "-" + name + "-" + icon.name(),
+            cicons[icon.ordinal()] =
+                Core.atlas.find(getContentType().name() + "-" + name + "-" + icon.name(),
                 Core.atlas.find(getContentType().name() + "-" + name + "-full",
-                Core.atlas.find(getContentType().name() + "-" + name,
                 Core.atlas.find(name,
+                Core.atlas.find(getContentType().name() + "-" + name,
                 Core.atlas.find(name + "1")))));
         }
         return cicons[icon.ordinal()];
