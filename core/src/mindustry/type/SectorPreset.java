@@ -134,7 +134,6 @@ public class SectorPreset extends UnlockableContent{
 
         stacks.sort();
         launchCost = stacks;
-        Core.settings.putObject(name + "-starting-items", startingItems);
         data.modified();
     }
 
@@ -153,12 +152,6 @@ public class SectorPreset extends UnlockableContent{
 
         for(ItemStack stack : startingItems){
             defaultStartingItems.add(new ItemStack(stack.item, stack.amount));
-        }
-
-        @SuppressWarnings("unchecked")
-        Array<ItemStack> arr = Core.settings.getObject(name + "-starting-items", Array.class, () -> null);
-        if(arr != null){
-            startingItems = arr;
         }
     }
 

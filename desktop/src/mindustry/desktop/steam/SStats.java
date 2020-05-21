@@ -20,14 +20,14 @@ public class SStats implements SteamUserStatsCallback{
     public final SteamUserStats stats = new SteamUserStats(this);
 
     private boolean updated = false;
-    private ObjectSet<String> mechs = new ObjectSet<>();
+    //private ObjectSet<String> mechs = new ObjectSet<>();
     private int statSavePeriod = 4; //in minutes
 
     public SStats(){
         stats.requestCurrentStats();
 
         Events.on(ClientLoadEvent.class, e -> {
-            mechs = Core.settings.getObject("mechs", ObjectSet.class, ObjectSet::new);
+            //mechs = Core.settings.getObject("mechs", ObjectSet.class, ObjectSet::new);
 
             Core.app.addListener(new ApplicationListener(){
                 Interval i = new Interval();
@@ -251,14 +251,15 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
+        //TODO dead achievement
+        /*
         Events.on(MechChangeEvent.class, e -> {
             if(campaign()){
                 if(mechs.add(e.mech.name)){
                     SStat.zoneMechsUsed.max(mechs.size);
-                    Core.settings.putObject("mechs", mechs);
                 }
             }
-        });
+        });*/
     }
 
     private void trigger(Trigger trigger, SAchievement ach){

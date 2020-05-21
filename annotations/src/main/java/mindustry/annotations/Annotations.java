@@ -124,15 +124,6 @@ public class Annotations{
     public @interface OverrideCallSuper{
     }
 
-    /** Marks a class as serializable.
-     * @deprecated due to very sparse use and inflexibility. */
-    @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.SOURCE)
-    @Deprecated
-    public @interface Serialize{
-
-    }
-
     //endregion
     //region struct
 

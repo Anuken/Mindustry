@@ -9,18 +9,18 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
-import arc.util.io.*;
 import mindustry.ai.*;
 import mindustry.async.*;
-import mindustry.audio.LoopControl;
+import mindustry.audio.*;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.input.*;
-import mindustry.maps.*;
+import mindustry.io.*;
 import mindustry.maps.Map;
+import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.Net;
 import mindustry.net.*;
@@ -29,7 +29,7 @@ import java.io.*;
 import java.nio.charset.*;
 import java.util.*;
 
-import static arc.Core.settings;
+import static arc.Core.*;
 
 public class Vars implements Loadable{
     /** Whether to load locales.*/
@@ -82,7 +82,7 @@ public class Vars implements Loadable{
     public static final float buildingRange = 220f;
     /** duration of one turn in ticks */
     public static final float turnDuration = 5 * Time.toMinutes;
-    /** min armor fraction damage */
+    /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.05f;
     /** for map generator dialog */
     public static boolean updateEditorOnChange = false;
@@ -201,9 +201,7 @@ public class Vars implements Loadable{
     }
 
     public static void init(){
-        Serialization.init();
         Groups.init();
-        DefaultSerializers.typeMappings.put("mindustry.type.ContentType", "mindustry.ctype.ContentType");
 
         if(loadLocales){
             //load locales
@@ -223,7 +221,7 @@ public class Vars implements Loadable{
 
         Version.init();
 
-        dataDirectory = Core.settings.getDataDirectory();
+        dataDirectory = settings.getDataDirectory();
         screenshotDirectory = dataDirectory.child("screenshots/");
         customMapDirectory = dataDirectory.child("maps/");
         mapPreviewDirectory = dataDirectory.child("previews/");
@@ -293,7 +291,7 @@ public class Vars implements Loadable{
     public static void loadFileLogger(){
         if(loadedFileLogger) return;
 
-        Core.settings.setAppName(appName);
+        settings.setAppName(appName);
 
         Writer writer = settings.getDataDirectory().child("last_log.txt").writer(false);
         LogHandler log = Log.getLogger();
@@ -313,15 +311,16 @@ public class Vars implements Loadable{
     }
 
     public static void loadSettings(){
-        Core.settings.setAppName(appName);
+        settings.setJson(JsonIO.json());
+        settings.setAppName(appName);
 
         if(steam || (Version.modifier != null && Version.modifier.contains("steam"))){
-            Core.settings.setDataDirectory(Core.files.local("saves/"));
+            settings.setDataDirectory(Core.files.local("saves/"));
         }
 
-        Core.settings.defaults("locale", "default", "blocksync", true);
-        Core.keybinds.setDefaults(Binding.values());
-        Core.settings.load();
+        settings.defaults("locale", "default", "blocksync", true);
+        keybinds.setDefaults(Binding.values());
+        settings.load();
 
         Scl.setProduct(settings.getInt("uiscale", 100) / 100f);
 
@@ -344,7 +343,7 @@ public class Vars implements Loadable{
 
             Fi handle = Core.files.internal("bundles/bundle");
             Locale locale;
-            String loc = Core.settings.getString("locale");
+            String loc = settings.getString("locale");
             if(loc.equals("default")){
                 locale = Locale.getDefault();
             }else{

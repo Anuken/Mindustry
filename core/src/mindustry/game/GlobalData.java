@@ -22,20 +22,6 @@ public class GlobalData{
     private ObjectIntMap<Item> items = new ObjectIntMap<>();
     private boolean modified;
 
-    public GlobalData(){
-        Core.settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
-        Core.settings.setSerializer(Item.class, (stream, t) -> stream.writeUTF(t.name), stream -> content.getByName(ContentType.item, stream.readUTF()));
-
-        Core.settings.setSerializer(ItemStack.class, (stream, t) -> {
-            stream.writeUTF(t.item.name);
-            stream.writeInt(t.amount);
-        }, stream -> {
-            String name = stream.readUTF();
-            int amount = stream.readInt();
-            return new ItemStack(content.getByName(ContentType.item, name), amount);
-        });
-    }
-
     public void exportData(Fi file) throws IOException{
         Array<Fi> files = new Array<>();
         files.add(Core.settings.getSettingsFile());
@@ -176,7 +162,7 @@ public class GlobalData{
     @SuppressWarnings("unchecked")
     public void load(){
         items.clear();
-        unlocked = Core.settings.getObject("unlocks", ObjectMap.class, ObjectMap::new);
+        unlocked = Core.settings.getJson("unlocks", ObjectMap.class, ObjectMap::new);
         for(Item item : Vars.content.items()){
             items.put(item, Core.settings.getInt("item-" + item.name, 0));
         }
@@ -188,7 +174,7 @@ public class GlobalData{
     }
 
     public void save(){
-        Core.settings.putObject("unlocks", unlocked);
+        Core.settings.putJson("unlocks", unlocked);
         for(Item item : Vars.content.items()){
             Core.settings.put("item-" + item.name, items.get(item, 0));
         }

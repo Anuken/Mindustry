@@ -354,7 +354,7 @@ public class Maps{
         }
 
         StringWriter buffer = new StringWriter();
-        json.setWriter(buffer);
+        json.setWriter(new JsonWriter(buffer));
 
         json.writeArrayStart();
         for(int i = 0; i < groups.size; i++){

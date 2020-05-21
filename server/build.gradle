@@ -31,7 +31,7 @@ task debug(dependsOn: classes, type: JavaExec){
     debug = true
 }
 
-task dist(type: Jar){
+task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
     from {configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }}

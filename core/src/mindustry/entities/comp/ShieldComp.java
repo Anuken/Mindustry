@@ -14,7 +14,7 @@ abstract class ShieldComp implements Healthc, Posc{
 
     /** Absorbs health damage. */
     float shield;
-    /** Absorbs percentage of damage, up to 90% */
+    /** Absorbs percentage of damage. */
     float armor;
     /** Shield opacity. */
     transient float shieldAlpha = 0f;

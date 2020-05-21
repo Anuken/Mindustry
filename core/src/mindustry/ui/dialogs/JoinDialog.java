@@ -9,10 +9,10 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import mindustry.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.legacy.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
@@ -420,7 +420,13 @@ public class JoinDialog extends FloatingDialog{
 
     @SuppressWarnings("unchecked")
     private void loadServers(){
-        servers = Core.settings.getObject("server-list", Array.class, Array::new);
+        servers = Core.settings.getJson("servers", Array.class, Array::new);
+
+        //load imported legacy data
+        if(Core.settings.has("server-list")){
+            servers = LegacyIO.readServers();
+            Core.settings.remove("server-list");
+        }
 
         //get servers
         Core.net.httpGet(becontrol.active() ? serverJsonBeURL : serverJsonURL, result -> {
@@ -438,10 +444,9 @@ public class JoinDialog extends FloatingDialog{
     }
 
     private void saveServers(){
-        Core.settings.putObject("server-list", servers);
+        Core.settings.putJson("servers", Server.class, servers);
     }
 
-    @Serialize
     public static class Server{
         public String ip;
         public int port;
