@@ -510,6 +510,11 @@ public class DesktopInput extends InputHandler{
                 lineRequests.clear();
                 Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
+                if(Core.input.keyDown(Binding.schematic_select)){
+                    lastSchematic = schematics.create(selectX, selectY, cursorX, cursorY);
+                    useSchematic(lastSchematic);
+                    if(selectRequests.isEmpty()) lastSchematic = null;
+                }
                 removeSelection(selectX, selectY, cursorX, cursorY);
             }
 
