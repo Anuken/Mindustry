@@ -98,7 +98,7 @@ public class DesktopInput extends InputHandler{
 
         //draw break selection
         if(mode == breaking){
-            drawBreakSelection(selectX, selectY, cursorX, cursorY);
+            drawBreakSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.maxSchematicSize);
         }
 
         if(Core.input.keyDown(Binding.schematic_select) && !Core.scene.hasKeyboard() && mode != breaking){
@@ -403,7 +403,9 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyRelease(Binding.schematic_select) && !Core.scene.hasKeyboard() && selectX == -1 && selectY == -1 && schemX != -1 && schemY != -1){
             lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
             useSchematic(lastSchematic);
-            if(selectRequests.isEmpty()) lastSchematic = null;
+            if(selectRequests.isEmpty()){
+                lastSchematic = null;
+            }
             schemX = -1;
             schemY = -1;
         }
@@ -519,13 +521,13 @@ public class DesktopInput extends InputHandler{
                 lineRequests.clear();
                 Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
-                removeSelection(selectX, selectY, cursorX, cursorY);
-                selectX = -1;
-                selectY = -1;
-                if(lastSchematic != null && Core.input.keyDown(Binding.schematic_select)){
+                removeSelection(selectX, selectY, cursorX, cursorY !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.maxSchematicSize);
+                if(lastSchematic != null){
                     useSchematic(lastSchematic);
                     lastSchematic = null;
                 }
+                selectX = -1;
+                selectY = -1;
             }
 
             tryDropItems(selected == null ? null : selected.build, Core.input.mouseWorld().x, Core.input.mouseWorld().y);

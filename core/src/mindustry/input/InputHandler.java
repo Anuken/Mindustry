@@ -526,7 +526,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return null;
     }
 
-    protected void drawBreakSelection(int x1, int y1, int x2, int y2){
+    protected void drawBreakSelection(int x1, int y1, int x2, int y2, int maxLength){
         NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
         NormalizeResult dresult = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
 
@@ -571,6 +571,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
         Draw.color(Pal.remove);
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+    }
+
+    protected void drawBreakSelection(int x1, int y1, int x2, int y2){
+        drawBreakSelection(x1, y1, x2, y2, maxLength);
     }
 
     protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength){
@@ -641,7 +645,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     /** Remove everything from the queue in a selection. */
+    protected void removeSelection(int x1, int y1, int x2, int y2, int maxLength){
+        removeSelection(x1, y1, x2, y2, false, maxLength);
+    }
+
+    /** Remove everything from the queue in a selection. */
     protected void removeSelection(int x1, int y1, int x2, int y2, boolean flush){
+        removeSelection(x1, y1, x2, y2, false, maxLength);
+    }
+
+    /** Remove everything from the queue in a selection. */
+    protected void removeSelection(int x1, int y1, int x2, int y2, boolean flush, int maxLength){
         NormalizeResult result = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
         for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
             for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
