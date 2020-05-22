@@ -75,8 +75,6 @@ public abstract class BulletType extends Content{
     public int incendAmount = 0;
     public float incendSpread = 8f;
     public float incendChance = 1f;
-    
-    //Number from 0 - 1 for how quickly it should turn
     public float homingPower = 0f;
     public float homingRange = 50f;
 

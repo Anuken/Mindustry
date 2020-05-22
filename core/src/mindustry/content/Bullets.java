@@ -86,7 +86,7 @@ public class Bullets implements ContentList{
             collidesTiles = false;
             splashDamageRadius = 25f;
             splashDamage = 33f;
-            homingPower = 2f;
+            homingPower = 0.08f;
             homingRange = 50f;
         }};
 
@@ -230,7 +230,7 @@ public class Bullets implements ContentList{
             bulletHeight = 8f;
             bulletShrink = 0f;
             drag = -0.01f;
-            homingPower = 7f;
+            homingPower = 0.08f;
             splashDamageRadius = 10f;
             splashDamage = 10f;
             lifetime = 160f;
@@ -337,7 +337,7 @@ public class Bullets implements ContentList{
         standardHoming = new BasicBulletType(3f, 9, "bullet"){{
             bulletWidth = 7f;
             bulletHeight = 9f;
-            homingPower = 5f;
+            homingPower = 0.08f;
             reloadMultiplier = 1.4f;
             ammoMultiplier = 5;
             lifetime = 60f;
