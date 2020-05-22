@@ -21,7 +21,7 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
-    public UnitType unitType = UnitTypes.dart;
+    public UnitType unitType = UnitTypes.alpha;
 
     public CoreBlock(String name){
         super(name);
@@ -65,7 +65,7 @@ public class CoreBlock extends StorageBlock{
             ));
 
         bars.add("units", e ->
-        new Bar(
+            new Bar(
                 () -> Core.bundle.format("bar.units", teamIndex.count(e.team()), Units.getCap(e.team())),
                 () -> Pal.power,
                 () -> (float)teamIndex.count(e.team()) / Units.getCap(e.team())

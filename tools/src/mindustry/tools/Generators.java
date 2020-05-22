@@ -266,7 +266,7 @@ public class Generators{
 
                         image.draw(weapon.region,
                         (int)(i * weapon.x / Draw.scl + image.width / 2 - weapon.region.getWidth() / 2),
-                        (int)(weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
+                        (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
                         i > 0, false);
                     }
                 }

@@ -15,7 +15,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType titan, dagger, crawler, fortress, eruptor, chaosArray, eradicator;
 
     //ground + builder
-    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType alpha;
+    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType oculon;
 
     //air
     public static @EntityDef({Unitc.class}) UnitType wraith, reaper, ghoul, revenant, lich;
@@ -27,7 +27,8 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Builderc.class}) UnitType phantom, spirit;
 
     //air + building + mining
-    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType dart;
+    //TODO implement other starter drones
+    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
 
     //water
     public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType vanguard;
@@ -168,7 +169,7 @@ public class UnitTypes implements ContentList{
             weapons.add(new Weapon(){{
                 x = 3f;
                 shootY = 0f;
-                reload = 6f;
+                reload = 12f;
                 shootCone = 180f;
                 alternate = true;
                 ejectEffect = Fx.none;
@@ -210,7 +211,7 @@ public class UnitTypes implements ContentList{
             mass = 1.75f;
             health = 130;
             immunities = ObjectSet.with(StatusEffects.wet);
-            weapons.add(new Weapon("large-weapon"){{
+            weapons.add(new Weapon("mount-weapon"){{
                 reload = 10f;
                 x = 1.25f;
                 alternate = true;
@@ -254,14 +255,14 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        dart = new UnitType("dart"){{
+        alpha = new UnitType("alpha"){{
             flying = true;
             mineSpeed = 2f;
             drag = 0.05f;
             mass = 2f;
-            speed = 2.9f;
+            speed = 2.4f;
             rotateSpeed = 15f;
-            accel = 0.15f;
+            accel = 0.1f;
             range = 70f;
             itemCapacity = 70;
             health = 400;
@@ -295,7 +296,7 @@ public class UnitTypes implements ContentList{
             hitsize = 8f;
         }};
 
-        alpha = new UnitType("alpha"){{
+        oculon = new UnitType("oculon"){{
             drillTier = -1;
             speed = 0.6f;
             hitsize = 9f;

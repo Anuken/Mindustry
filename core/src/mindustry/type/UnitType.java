@@ -42,9 +42,7 @@ public class UnitType extends UnlockableContent{
     public int drillTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
 
-    public Color engineColor = Pal.engine;
     public float engineOffset = 5f, engineSize = 2.5f;
-
     public float strafePenalty = 0.5f;
     public float hitsize = 6f;
     public float itemOffsetY = 3f;
@@ -66,7 +64,6 @@ public class UnitType extends UnlockableContent{
         }else{
             //TODO fix for mods
             throw new RuntimeException("Unit has no type: " + name);
-            //constructor = () -> Nulls.unit;
         }
     }
 
@@ -154,8 +151,8 @@ public class UnitType extends UnlockableContent{
         Draw.z(z);
         drawEngine(unit);
         drawBody(unit);
-        drawWeapons(unit);
         if(drawCell) drawCell(unit);
+        drawWeapons(unit);
         if(drawItems) drawItems(unit);
         drawLight(unit);
 

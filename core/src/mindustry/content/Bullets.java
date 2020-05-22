@@ -619,9 +619,9 @@ public class Bullets implements ContentList{
             drag = 0.04f;
         }};
 
-        bombExplosive = new BombBulletType(10f, 20f, "shell"){{
-            bulletWidth = 9f;
-            bulletHeight = 13f;
+        bombExplosive = new BombBulletType(18f, 25f, "shell"){{
+            bulletWidth = 10f;
+            bulletHeight = 14f;
             hitEffect = Fx.flakExplosion;
             shootEffect = Fx.none;
             smokeEffect = Fx.none;
