@@ -29,6 +29,7 @@ public class CoreBlock extends StorageBlock{
         solid = true;
         update = true;
         hasItems = true;
+        priority = TargetPriority.core;
         flags = EnumSet.of(BlockFlag.core, BlockFlag.producer, BlockFlag.unitModifier);
         unitCapModifier = 10;
         activeSound = Sounds.respawning;
