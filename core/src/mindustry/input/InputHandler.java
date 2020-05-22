@@ -30,6 +30,7 @@ import mindustry.type.*;
 import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.BuildBlock.*;
 import mindustry.world.blocks.power.*;
 
@@ -445,7 +446,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             for(int y = dresult.y; y <= dresult.y2; y++){
                 Tile tile = world.tilec(x, y);
                 if(tile == null || !validBreak(tile.x, tile.y)) continue;
-
                 drawBreaking(tile.x, tile.y);
             }
         }
@@ -492,6 +492,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.color(Pal.accentBack);
         Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
         Draw.color(Pal.accent);
+        Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+    }
+
+    protected void drawUpgradeSelection(int x1, int y1, int x2, int y2){
+        NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
+        NormalizeResult dresult = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
+
+        Lines.stroke(2f);
+
+        Draw.color(Color.navy);
+        Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
+        Draw.color(Color.royal);
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
     }
 

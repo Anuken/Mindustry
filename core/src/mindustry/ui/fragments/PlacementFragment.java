@@ -89,7 +89,7 @@ public class PlacementFragment extends Fragment{
     boolean gridUpdate(InputHandler input){
         scrollPositions.put(currentCategory, blockPane.getScrollY());
 
-        if(Core.input.keyDown(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
+        if(Core.input.keyDown(Binding.pick) && player.isBuilder() && !(control.input.isPlacing() && Core.input.keyDown(Binding.select))){ //mouse eyedropper select
             Tilec tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             Block tryRecipe = tile == null ? null : tile.block();
             Object tryConfig = tile == null ? null : tile.config();
