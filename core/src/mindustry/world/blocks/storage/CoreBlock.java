@@ -49,6 +49,7 @@ public class CoreBlock extends StorageBlock{
         unit.set(entity);
         unit.impulse(0f, 8f);
         unit.controller(player);
+        unit.spawnedByCore(true);
         unit.add();
     }
 

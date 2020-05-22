@@ -54,6 +54,21 @@ public class Fx{
         reset();
     }),
 
+    unitDespawn = new Effect(100f, e -> {
+        if(!(e.data instanceof Unitc)) return;
+
+        Unitc select = (Unitc)e.data;
+        float scl = e.fout(Interp.pow2Out);
+        float p = Draw.scl;
+        Draw.scl *= scl;
+
+        mixcol(Pal.accent, 1f);
+        rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90f);
+        reset();
+
+        Draw.scl = p;
+    }),
+
     unitSpirit = new Effect(17f, e -> {
         if(!(e.data instanceof Position)) return;
         Position to = e.data();

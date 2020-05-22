@@ -24,6 +24,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     private transient UnitController controller;
     private UnitType type;
+    boolean spawnedByCore;
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
@@ -171,6 +172,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         controller.update();
+
+        //remove units spawned by the core
+        if(spawnedByCore && !(controller instanceof Playerc)){
+            Fx.unitDespawn.at(x, y, 0, this);
+            remove();
+        }
     }
 
     @Override
