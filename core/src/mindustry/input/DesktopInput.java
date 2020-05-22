@@ -560,7 +560,9 @@ public class DesktopInput extends InputHandler{
     protected void updateMovement(Unitc unit){
         boolean omni = !(unit instanceof WaterMovec);
         boolean legs = unit.isGrounded();
-        float speed = unit.type().speed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation());
+
+        float strafePenalty = legs ? 1f : Mathf.lerp(1f, unit.type().strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
+        float speed = unit.type().speed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation()) * strafePenalty;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
 
@@ -572,11 +574,7 @@ public class DesktopInput extends InputHandler{
             unit.lookAt(mouseAngle);
         }else{
             if(!unit.vel().isZero(0.01f)){
-                if(unit.type().flying){
-                    unit.rotation(unit.vel().angle());
-                }else{
-                    unit.lookAt(unit.vel().angle());
-                }
+                unit.lookAt(unit.vel().angle());
             }
         }
 

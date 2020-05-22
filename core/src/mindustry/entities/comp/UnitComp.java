@@ -4,6 +4,7 @@ import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -174,7 +175,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         controller.update();
 
         //remove units spawned by the core
-        if(spawnedByCore && !(controller instanceof Playerc)){
+        if(spawnedByCore && !isPlayer()){
             Fx.unitDespawn.at(x, y, 0, this);
             remove();
         }
@@ -195,6 +196,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return controller instanceof Playerc;
     }
 
+    @Nullable
     public Playerc getPlayer(){
         return isPlayer() ? (Playerc)controller : null;
     }

@@ -12,16 +12,22 @@ import mindustry.type.*;
 public class UnitTypes implements ContentList{
 
     //ground
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType titan, dagger, crawler, fortress, eruptor, chaosArray, eradicator, alpha;
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType titan, dagger, crawler, fortress, eruptor, chaosArray, eradicator;
+
+    //ground + builder
+    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType alpha;
 
     //air
     public static @EntityDef({Unitc.class}) UnitType wraith, reaper, ghoul, revenant, lich;
 
-    //mining
+    //air + mining
     public static @EntityDef({Unitc.class, Minerc.class}) UnitType draug;
 
-    //building
+    //air + building
     public static @EntityDef({Unitc.class, Builderc.class}) UnitType phantom, spirit;
+
+    //air + building + mining
+    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType dart;
 
     //water
     public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType vanguard;
@@ -245,7 +251,32 @@ public class UnitTypes implements ContentList{
                 recoil = 2f;
                 bullet = Bullets.healBulletBig;
                 shootSound = Sounds.pew;
+            }});
+        }};
 
+        dart = new UnitType("dart"){{
+            flying = true;
+            mineSpeed = 2f;
+            drag = 0.05f;
+            mass = 2f;
+            speed = 2.9f;
+            rotateSpeed = 15f;
+            accel = 0.15f;
+            range = 70f;
+            itemCapacity = 70;
+            health = 400;
+            buildSpeed = 0.85f;
+            engineOffset = 6f;
+            hitsize = 8f;
+
+            weapons.add(new Weapon("small-heal-weapon"){{
+                reload = 14f;
+                x = -1f;
+                y = -1f;
+                shootX = 3.5f;
+                alternate = true;
+                ejectEffect = Fx.none;
+                bullet = Bullets.healBullet;
             }});
         }};
 

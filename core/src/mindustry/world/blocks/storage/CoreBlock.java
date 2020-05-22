@@ -21,7 +21,7 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
-    public UnitType unitType = UnitTypes.phantom;
+    public UnitType unitType = UnitTypes.dart;
 
     public CoreBlock(String name){
         super(name);

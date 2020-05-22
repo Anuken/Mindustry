@@ -45,6 +45,7 @@ public class UnitType extends UnlockableContent{
     public Color engineColor = Pal.engine;
     public float engineOffset = 5f, engineSize = 2.5f;
 
+    public float strafePenalty = 0.5f;
     public float hitsize = 6f;
     public float itemOffsetY = 3f;
     public float lightRadius = 60f, lightOpacity = 0.6f;
@@ -147,7 +148,7 @@ public class UnitType extends UnlockableContent{
             unit.trns(legOffset.x, legOffset.y);
         }
 
-        Draw.z(z - 0.01f);
+        Draw.z(Math.min(z - 0.01f, Layer.bullet - 1f));
         drawOcclusion(unit);
 
         Draw.z(z);
