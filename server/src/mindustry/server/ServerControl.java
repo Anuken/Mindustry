@@ -340,6 +340,13 @@ public class ServerControl implements ApplicationListener{
             info("&lyServer: &lb@", arg[0]);
         });
 
+
+        handler.register("pause", "<on/off>", "Pause or unpause the game.", arg -> {
+            boolean pause = arg[0].equals("on");
+            state.serverPaused = pause;
+            info(pause ? "Game paused." : "Game unpaused.");
+        });
+
         handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
             String rules = Core.settings.getString("globalrules");
             JsonValue base = JsonIO.json().fromJson(null, rules);
