@@ -526,9 +526,9 @@ public class DesktopInput extends InputHandler{
                     useSchematic(lastSchematic);
                     lastSchematic = null;
                 }
-                selectX = -1;
-                selectY = -1;
             }
+            selectX = -1;
+            selectY = -1;
 
             tryDropItems(selected == null ? null : selected.build, Core.input.mouseWorld().x, Core.input.mouseWorld().y);
 
