@@ -431,7 +431,7 @@ public class Administration{
     public void save(){
         Core.settings.putJson("player-data", playerInfo);
         Core.settings.putJson("ip-bans", String.class, bannedIPs);
-        Core.settings.putJson("whitelist", String.class, whitelist);
+        Core.settings.putJson("whitelist-ids", String.class, whitelist);
         Core.settings.putJson("banned-subnets", String.class, subnetBans);
     }
 
@@ -441,7 +441,7 @@ public class Administration{
             //load default data
             playerInfo = Core.settings.getJson("player-data", ObjectMap.class, ObjectMap::new);
             bannedIPs = Core.settings.getJson("ip-bans", Array.class, Array::new);
-            whitelist = Core.settings.getJson("whitelist", Array.class, Array::new);
+            whitelist = Core.settings.getJson("whitelist-ids", Array.class, Array::new);
             subnetBans = Core.settings.getJson("banned-subnets", Array.class, Array::new);
         }else{
             //save over loaded legacy data
