@@ -8,11 +8,13 @@ import arc.scene.style.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -20,6 +22,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -27,7 +30,8 @@ import static mindustry.Vars.*;
 
 public class UnitFactory extends Block{
     public float launchVelocity = 5f;
-    public @Load("@-top") TextureRegion topRegion;
+    public @Load(value = "@-top", fallback = "factory-top") TextureRegion topRegion;
+    public @Load(value = "@-out", fallback = "factory-out") TextureRegion outRegion;
     public int[] capacities;
 
     public UnitPlan[] plans = new UnitPlan[0];
@@ -37,10 +41,12 @@ public class UnitFactory extends Block{
         update = true;
         hasPower = true;
         hasItems = true;
-        solid = false;
+        solid = true;
         flags = EnumSet.of(BlockFlag.producer, BlockFlag.unitModifier);
         unitCapModifier = 4;
         configurable = true;
+        outputsPayload = true;
+        rotate = true;
 
         config(Integer.class, (tile, i) -> {
             ((UnitFactoryEntity)tile).currentPlan = i < 0 || i >= plans.length ? -1 : i;
@@ -92,14 +98,18 @@ public class UnitFactory extends Block{
         super.setStats();
 
         stats.remove(BlockStat.itemCapacity);
-
-        //TODO
-        //stats.add(BlockStat.productionTime, produceTime / 60f, StatUnit.seconds);
     }
 
     @Override
     public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top")};
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-out"), Core.atlas.find(name + "-top")};
+    }
+
+    @Override
+    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * req.animScale * Draw.scl, region.getHeight() * req.animScale * Draw.scl);
+        Draw.rect(outRegion, req.drawx(), req.drawy(), outRegion.getWidth() * req.animScale * Draw.scl, outRegion.getHeight() * req.animScale * Draw.scl, req.rotation * 90);
+        Draw.rect(topRegion, req.drawx(), req.drawy(), outRegion.getWidth() * req.animScale * Draw.scl, outRegion.getHeight() * req.animScale * Draw.scl);
     }
 
     public static class UnitPlan{
@@ -119,6 +129,7 @@ public class UnitFactory extends Block{
     public class UnitFactoryEntity extends TileEntity{
         public int currentPlan = -1;
         public float progress, time, speedScl;
+        public @Nullable Payload payload;
 
         public float fraction(){
             return currentPlan == -1 ? 0 : progress / plans[currentPlan].time;
@@ -173,7 +184,8 @@ public class UnitFactory extends Block{
 
         @Override
         public void draw(){
-            super.draw();
+            Draw.rect(region, x, y);
+            Draw.rect(outRegion, x, y, rotation() * 90);
 
             if(currentPlan != -1){
                 UnitPlan plan = plans[currentPlan];
@@ -200,6 +212,10 @@ public class UnitFactory extends Block{
                 });
             }
 
+            if(payload != null){
+                payload.draw(x, y, rotation() * 90);
+            }
+
             Draw.z(Layer.blockOver);
             Draw.rect(topRegion, x, y);
         }
@@ -218,14 +234,17 @@ public class UnitFactory extends Block{
                 speedScl = Mathf.lerpDelta(speedScl, 0f, 0.05f);
             }
 
-            if(currentPlan != -1){
+            if(payload != null){
+
+            }
+
+            if(currentPlan != -1 && payload != null){
                 UnitPlan plan = plans[currentPlan];
 
-                if(progress >= plan.time/* && !Units.anyEntities(tile, !plan.unit.flying)*/ && Units.canCreate(team)){
+                if(progress >= plan.time && Units.canCreate(team)){
                     progress = 0f;
 
-                    Call.onUnitFactorySpawn(tile);
-                    useContent(plan.unit);
+                    this.payload = new UnitPayload(plan.unit.create(team));
                     consume();
                 }
 
