@@ -120,13 +120,15 @@ public class PowerNode extends PowerBlock{
         Draw.color(Pal.placing);
         Drawf.circles(x * tilesize + offset(), y * tilesize + offset(), laserRange * tilesize);
 
-        getPotentialLinks(tile, other -> {
-            Drawf.square(other.x(), other.y(), other.block().size * tilesize / 2f + 2f, Pal.place);
+        if(Core.settings.getBool("autonodeconnection")) {
+            getPotentialLinks(tile, other -> {
+                Drawf.square(other.x(), other.y(), other.block().size * tilesize / 2f + 2f, Pal.place);
 
-            insulators(tile.x, tile.y, other.tileX(), other.tileY(), cause -> {
-                Drawf.square(cause.x(), cause.y(), cause.block().size * tilesize / 2f + 2f, Pal.plastanium);
+                insulators(tile.x, tile.y, other.tileX(), other.tileY(), cause -> {
+                    Drawf.square(cause.x(), cause.y(), cause.block().size * tilesize / 2f + 2f, Pal.plastanium);
+                });
             });
-        });
+        }
 
         Draw.reset();
     }
@@ -266,32 +268,34 @@ public class PowerNode extends PowerBlock{
         public void placed(){
             if(net.client()) return;
 
-            Boolf<Tilec> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) ||
-                (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) && linkValid(this, other)
-                && !other.proximity().contains(this) && other.power().graph != power.graph;
+            if(Core.settings.getBool("autonodeconnection")) {
+                Boolf<Tilec> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) ||
+                        (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) && linkValid(this, other)
+                        && !other.proximity().contains(this) && other.power().graph != power.graph;
 
-            tempTileEnts.clear();
-            Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
-                Tilec other = world.ent(x, y);
-                if(valid.get(other)){
-                    if(!insulated(this, other)){
-                        tempTileEnts.add(other);
+                tempTileEnts.clear();
+                Geometry.circle(tile.x, tile.y, (int) (laserRange + 2), (x, y) -> {
+                    Tilec other = world.ent(x, y);
+                    if (valid.get(other)) {
+                        if (!insulated(this, other)) {
+                            tempTileEnts.add(other);
+                        }
                     }
-                }
-            });
+                });
 
-            tempTileEnts.sort((a, b) -> {
-                int type = -Boolean.compare(a.block() instanceof PowerNode, b.block() instanceof PowerNode);
-                if(type != 0) return type;
-                return Float.compare(a.dst2(tile), b.dst2(tile));
-            });
-            tempTileEnts.each(valid, other -> {
-                if(!power.links.contains(other.pos())){
-                    configureAny(other.pos());
-                }
-            });
+                tempTileEnts.sort((a, b) -> {
+                    int type = -Boolean.compare(a.block() instanceof PowerNode, b.block() instanceof PowerNode);
+                    if (type != 0) return type;
+                    return Float.compare(a.dst2(tile), b.dst2(tile));
+                });
+                tempTileEnts.each(valid, other -> {
+                    if (!power.links.contains(other.pos())) {
+                        configureAny(other.pos());
+                    }
+                });
 
-            super.placed();
+                super.placed();
+            }
         }
 
         @Override

@@ -235,6 +235,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("conveyorpathfinding", true);
         game.checkPref("coreselect", false);
         game.checkPref("hints", true);
+        game.checkPref("autonodeconnection", true);
         if(!mobile){
             game.checkPref("buildautopause", false);
         }
