@@ -4,6 +4,7 @@ import arc.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -36,6 +37,9 @@ public class UnitBlock extends PayloadAcceptor{
         public void spawned(){
             progress = 0f;
 
+            Tmp.v1.trns(rotdeg(), size * tilesize/2f);
+            Fx.smeltsmoke.at(x + Tmp.v1.x, y + Tmp.v1.y);
+
             if(!net.client() && payload != null){
                 Unitc unit = payload.unit;
                 unit.set(x, y);
@@ -48,6 +52,7 @@ public class UnitBlock extends PayloadAcceptor{
             }
 
             payload = null;
+            payloadPos = 0f;
         }
 
         public void outputPayload(){

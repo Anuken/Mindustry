@@ -198,6 +198,7 @@ public class UnitFactory extends UnitBlock{
 
                     payloadPos = 0f;
                     payload = new UnitPayload(plan.unit.create(team));
+                    payVector.setZero();
                     consume();
                 }
 

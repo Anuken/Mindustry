@@ -5,13 +5,12 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
-import mindustry.world.consumers.*;
 
 import static mindustry.Vars.state;
 
@@ -104,7 +103,8 @@ public class Reconstructor extends UnitBlock{
                         if(progress >= constructTime){
                             payload.unit = payload.unit.type().upgrade.create(payload.unit.team());
                             progress = 0;
-                            Fx.unitSpawn.at(this);
+                            Effects.shake(2f, 3f, this);
+                            Fx.producesmoke.at(this);
                             consume();
                         }
                     }

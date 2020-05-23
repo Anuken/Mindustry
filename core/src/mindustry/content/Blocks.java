@@ -1672,7 +1672,7 @@ public class Blocks implements ContentList{
         groundFactory = new UnitFactory("ground-factory"){{
             requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.dagger, 500f, ItemStack.with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.dagger, 200f, ItemStack.with(Items.silicon, 10)),
                 new UnitPlan(UnitTypes.titan, 800f, ItemStack.with(Items.silicon, 20, Items.titanium, 10)),
             };
             size = 3;
@@ -1706,6 +1706,7 @@ public class Blocks implements ContentList{
             consumes.power(3f);
             consumes.items(ItemStack.with(Items.silicon, 30, Items.graphite, 30));
             itemCapacity = 30;
+            constructTime = 200f;
         }};
 
         repairPoint = new RepairPoint("repair-point"){{

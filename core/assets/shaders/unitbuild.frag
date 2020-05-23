@@ -41,10 +41,7 @@ void main() {
     vec2 v = vec2(1.0/u_texsize.x, 1.0/u_texsize.y);
 
 	vec4 c = texture2D(u_texture, v_texCoord.xy);
-
-    if(1.0-abs(coords.x - 0.5)*2.0 < 1.0-u_progress){
-    //    c = vec4(0.0);
-    }
+    float alpha = c.a;
 
     c.a *= u_progress;
 
@@ -56,6 +53,8 @@ void main() {
             f = 0.0;
         c = mix(c, u_color, f * u_color.a);
     }
+
+    c.a *= alpha;
 
     gl_FragColor = c * v_color;
 }
