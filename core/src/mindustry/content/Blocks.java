@@ -25,7 +25,6 @@ import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
-import mindustry.world.blocks.storage.MessageBlock;
 import mindustry.world.blocks.units.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -77,13 +76,11 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
-    groundFactory, airFactory, navalFactory, repairPoint,
+    groundFactory, airFactory, navalFactory, basicReconstructor, repairPoint,
 
     //misc experimental
 
     blockForge, blockLauncher;
-
-    ;
 
     @Override
     public void load(){
@@ -592,7 +589,7 @@ public class Blocks implements ContentList{
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name + "-top")};
 
             drawer = entity -> {
-                int rotation = rotate ? entity.rotation() * 90 : 0;
+                float rotation = rotate ? entity.rotdeg() : 0;
 
                 Draw.rect(re(bottomRegion), entity.x(), entity.y(), rotation);
 
@@ -1700,6 +1697,15 @@ public class Blocks implements ContentList{
             size = 3;
             requiresWater = true;
             consumes.power(1.2f);
+        }};
+
+        basicReconstructor = new Reconstructor("basic-reconstructor"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+
+            size = 3;
+            consumes.power(3f);
+            consumes.items(ItemStack.with(Items.silicon, 30, Items.graphite, 30));
+            itemCapacity = 30;
         }};
 
         repairPoint = new RepairPoint("repair-point"){{

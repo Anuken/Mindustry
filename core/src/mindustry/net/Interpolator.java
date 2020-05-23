@@ -25,9 +25,7 @@ public class Interpolator{
         if(lasts.length != values.length){
             lasts = new float[values.length];
         }
-        for(int i = 0; i < values.length; i++){
-            lasts[i] = values[i];
-        }
+        System.arraycopy(values, 0, lasts, 0, values.length);
         last.set(cx, cy);
         target.set(x, y);
     }

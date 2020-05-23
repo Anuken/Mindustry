@@ -32,16 +32,9 @@ public class PowerDiode extends Block{
     }
 
     @Override
-    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list) {
-        TextureRegion reg = icon(Cicon.full);
-        Draw.rect(icon(Cicon.full), req.drawx(), req.drawy(),
-                reg.getWidth() * req.animScale * Draw.scl,
-                reg.getHeight() * req.animScale * Draw.scl,
-                0);
-        Draw.rect(arrow, req.drawx(), req.drawy(),
-                arrow.getWidth() * req.animScale * Draw.scl,
-                arrow.getHeight() * req.animScale * Draw.scl,
-                !rotate ? 0 : req.rotation * 90);
+    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+        Draw.rect(icon(Cicon.full), req.drawx(), req.drawy());
+        Draw.rect(arrow, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
     }
 
     // battery % of the graph on either side, defaults to zero
@@ -53,7 +46,7 @@ public class PowerDiode extends Block{
         @Override
         public void draw(){
             Draw.rect(region, x, y, 0);
-            Draw.rect(arrow, x, y, rotate ? tile.rotation() * 90 : 0);
+            Draw.rect(arrow, x, y, rotate ? tile.rotdeg() : 0);
         }
 
         @Override

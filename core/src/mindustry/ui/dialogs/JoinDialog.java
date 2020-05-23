@@ -61,15 +61,12 @@ public class JoinDialog extends FloatingDialog{
                 Server server = new Server();
                 server.setIP(Core.settings.getString("ip"));
                 servers.add(server);
-                saveServers();
-                setupRemote();
-                refreshRemote();
             }else{
                 renaming.setIP(Core.settings.getString("ip"));
-                saveServers();
-                setupRemote();
-                refreshRemote();
             }
+            saveServers();
+            setupRemote();
+            refreshRemote();
             add.hide();
         }).disabled(b -> Core.settings.getString("ip").isEmpty() || net.active());
 

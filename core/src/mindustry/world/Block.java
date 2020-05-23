@@ -165,7 +165,6 @@ public class Block extends UnlockableContent{
     public float buildCostMultiplier = 1f;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
-    public boolean alwaysUnlocked = false;
 
     protected Prov<Tilec> entityType = null; //initialized later
     //TODO move
@@ -352,16 +351,16 @@ public class Block extends UnlockableContent{
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
         Draw.alpha(1f);
+        float prevScale = Draw.scl;
+        Draw.scl *= req.animScale;
         drawRequestRegion(req, list);
+        Draw.scl = prevScale;
         Draw.reset();
     }
 
     public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
         TextureRegion reg = getRequestRegion(req, list);
-        Draw.rect(reg, req.drawx(), req.drawy(),
-        reg.getWidth() * req.animScale * Draw.scl,
-        reg.getHeight() * req.animScale * Draw.scl,
-        !rotate ? 0 : req.rotation * 90);
+        Draw.rect(reg, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
 
         if(req.hasConfig){
             drawRequestConfig(req, list);
@@ -380,12 +379,8 @@ public class Block extends UnlockableContent{
         Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
         if(color == null) return;
 
-        float prev = Draw.scl;
-
         Draw.color(color);
-        Draw.scl *= req.animScale;
         Draw.rect(region, req.drawx(), req.drawy());
-        Draw.scl = prev;
         Draw.color();
     }
 
@@ -625,11 +620,6 @@ public class Block extends UnlockableContent{
     @Override
     public boolean isHidden(){
         return !buildVisibility.visible();
-    }
-
-    @Override
-    public boolean alwaysUnlocked(){
-        return alwaysUnlocked;
     }
 
     @Override

@@ -13,8 +13,6 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
 
-import java.io.*;
-
 import static mindustry.Vars.content;
 
 @Component

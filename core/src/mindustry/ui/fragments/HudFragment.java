@@ -580,16 +580,14 @@ public class HudFragment extends Fragment{
             ibuild.setLength(0);
             int m = i/60;
             int s = i % 60;
-            if(m <= 0){
-                ibuild.append(s);
-            }else{
+            if(m > 0){
                 ibuild.append(m);
                 ibuild.append(":");
                 if(s < 10){
                     ibuild.append("0");
                 }
-                ibuild.append(s);
             }
+            ibuild.append(s);
             return ibuild.toString();
         });
 

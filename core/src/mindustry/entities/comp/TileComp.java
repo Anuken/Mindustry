@@ -223,7 +223,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     }
 
     public float rotdeg(){
-        return tile.rotation() * 90;
+        return tile.rotdeg();
     }
 
     public int rotation(){
@@ -704,7 +704,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     }
 
     public void draw(){
-        Draw.rect(block.region, x, y, block.rotate ? rotation() * 90 : 0);
+        Draw.rect(block.region, x, y, block.rotate ? rotdeg() : 0);
     }
 
     public void drawLight(){

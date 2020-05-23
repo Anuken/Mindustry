@@ -960,7 +960,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    class PlaceLine{
+    static class PlaceLine{
         public int x, y, rotation;
         public boolean last;
     }

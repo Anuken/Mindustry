@@ -8,7 +8,6 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 
 import static mindustry.Vars.*;
 

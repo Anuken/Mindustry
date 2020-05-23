@@ -20,7 +20,7 @@ public enum Gamemode{
     }),
     attack(rules -> {
         rules.attackMode = true;
-    }, map -> map.teams.contains((int)state.rules.waveTeam.id)),
+    }, map -> map.teams.contains(state.rules.waveTeam.id)),
     pvp(rules -> {
         rules.pvp = true;
         rules.enemyCoreBuildRadius = 600f;

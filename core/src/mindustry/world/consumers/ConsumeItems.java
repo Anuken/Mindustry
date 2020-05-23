@@ -6,7 +6,6 @@ import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
@@ -19,7 +18,7 @@ public class ConsumeItems extends Consume{
 
     /** Mods.*/
     protected ConsumeItems(){
-        this(new ItemStack[]{});
+        this(ItemStack.empty);
     }
 
     @Override

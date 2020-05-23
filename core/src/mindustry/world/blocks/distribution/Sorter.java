@@ -34,7 +34,7 @@ public class Sorter extends Block{
 
     @Override
     public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
-        drawRequestConfigCenter(req, (Item)req.config, "center");
+        drawRequestConfigCenter(req, req.config, "center");
     }
 
     @Override

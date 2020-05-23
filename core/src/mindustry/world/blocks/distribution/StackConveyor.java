@@ -74,11 +74,11 @@ public class StackConveyor extends Block implements Autotiler{
         if(bits == null) return;
 
         TextureRegion region = regions[0];
-        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * Draw.scl * req.animScale, region.getHeight() * Draw.scl * req.animScale, req.rotation * 90);
+        Draw.rect(region, req.drawx(), req.drawy(), req.rotation * 90);
 
         for(int i = 0; i < 4; i++){
             if((bits[3] & (1 << i)) == 0){
-                Draw.rect(edgeRegion, req.drawx(), req.drawy(), region.getWidth() * Draw.scl * req.animScale, region.getHeight() * Draw.scl * req.animScale, (req.rotation - i) * 90);
+                Draw.rect(edgeRegion, req.drawx(), req.drawy(), (req.rotation - i) * 90);
             }
         }
     }
@@ -101,7 +101,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
-            Draw.rect(regions[state], x, y, rotation() * 90);
+            Draw.rect(regions[state], x, y, rotdeg());
 
             for(int i = 0; i < 4; i++){
                 if((blendprox & (1 << i)) == 0){

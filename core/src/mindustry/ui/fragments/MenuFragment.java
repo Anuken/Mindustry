@@ -244,7 +244,7 @@ public class MenuFragment extends Fragment{
         }
     }
 
-    private class Buttoni{
+    private static class Buttoni{
         final Drawable icon;
         final String text;
         final Runnable runnable;

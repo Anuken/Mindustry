@@ -216,7 +216,7 @@ public class CoreBlock extends StorageBlock{
 
             if(heat > 0.001f){
                 Draw.draw(Layer.blockOver, () -> {
-                    Drawf.drawRespawn(this, heat, progress, time, unitType, lastRequested);
+                    Drawf.respawn(this, heat, progress, time, unitType, lastRequested);
                 });
             }
         }
