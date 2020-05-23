@@ -270,14 +270,15 @@ public class UnitTypes implements ContentList{
             engineOffset = 6f;
             hitsize = 8f;
 
-            weapons.add(new Weapon("small-heal-weapon"){{
-                reload = 14f;
+            weapons.add(new Weapon("small-basic-weapon"){{
+                reload = 20f;
                 x = -1f;
                 y = -1f;
                 shootX = 3.5f;
                 alternate = true;
                 ejectEffect = Fx.none;
-                bullet = Bullets.healBullet;
+                //TODO use different ammo
+                bullet = Bullets.standardCopper;
             }});
         }};
 

@@ -4,9 +4,9 @@ import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
-public class Reassembler extends Block{
+public class Reconstructor extends Block{
 
-    public Reassembler(String name){
+    public Reconstructor(String name){
         super(name);
     }
 

@@ -161,6 +161,12 @@ public class ScriptConsoleFragment extends Table{
 
         if(message.replaceAll(" ", "").isEmpty()) return;
 
+        //special case for 'clear' command
+        if(message.equals("clear")){
+            clearMessages();
+            return;
+        }
+
         history.insert(1, message);
 
         addMessage("[lightgray]> " + message.replace("[", "[["));

@@ -5296,7 +5296,7 @@ revenant-missiles
   orig: 48, 48
   offset: 0, 0
   index: -1
-small-heal-weapon
+small-basic-weapon
   rotate: false
   xy: 981, 731
   size: 48, 48

@@ -44,8 +44,6 @@ public class Weapon{
     public float x = 5f, y = 0f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
-    /** randomization of shot length */
-    public float lengthRand = 0f;
     /** delay in ticks between shots */
     public float shotDelay = 0;
     /** The half-radius of the cone in which shooting will start. */
