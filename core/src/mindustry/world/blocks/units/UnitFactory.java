@@ -7,12 +7,11 @@ import arc.math.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -29,7 +28,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class UnitFactory extends Block{
-    public float launchVelocity = 5f;
+    public float payloadSpeed = 0.5f;
     public @Load(value = "@-top", fallback = "factory-top") TextureRegion topRegion;
     public @Load(value = "@-out", fallback = "factory-out") TextureRegion outRegion;
     public int[] capacities;
@@ -128,29 +127,11 @@ public class UnitFactory extends Block{
 
     public class UnitFactoryEntity extends TileEntity{
         public int currentPlan = -1;
-        public float progress, time, speedScl;
-        public @Nullable Payload payload;
+        public float progress, time, speedScl, payloadPos;
+        public @Nullable UnitPayload payload;
 
         public float fraction(){
             return currentPlan == -1 ? 0 : progress / plans[currentPlan].time;
-        }
-
-        public void spawned(){
-            progress = 0f;
-
-            Effects.shake(2f, 3f, this);
-            Fx.producesmoke.at(this);
-
-            if(!net.client() && currentPlan != -1){
-                UnitPlan plan = plans[currentPlan];
-                Unitc unit = plan.unit.create(team);
-                unit.set(x, y );
-                unit.add();
-                unit.rotation(90);
-                unit.vel().y = launchVelocity + Mathf.range(1f);
-                unit.vel().x = Mathf.range(1f);
-                Events.fire(new UnitCreateEvent(unit));
-            }
         }
 
         @Override
@@ -200,7 +181,7 @@ public class UnitFactory extends Block{
                     Shaders.build.time = -time / 20f;
 
                     Draw.shader(Shaders.build);
-                    Draw.rect(region, x, y);
+                    Draw.rect(region, x, y, rotation() * 90 - 90);
                     Draw.shader();
 
                     Draw.color(Pal.accent);
@@ -212,12 +193,37 @@ public class UnitFactory extends Block{
                 });
             }
 
+            Draw.z(Layer.blockOver);
+
             if(payload != null){
-                payload.draw(x, y, rotation() * 90);
+                payload.draw(
+                    x + Angles.trnsx(rotation() * 90, payloadPos),
+                    y + Angles.trnsy(rotation() * 90, payloadPos),
+                    rotation() * 90
+                );
             }
 
-            Draw.z(Layer.blockOver);
+            Draw.z(Layer.blockOver + 0.1f);
+
             Draw.rect(topRegion, x, y);
+        }
+
+        public void spawned(){
+            progress = 0f;
+
+            if(!net.client() && payload != null){
+                Unitc unit = payload.unit;
+                unit.set(x, y);
+
+                unit.rotation(rotation() * 90);
+                unit.vel().trns(rotation() * 90, payloadSpeed * 2f).add(Mathf.range(0.1f), Mathf.range(0.1f));
+                unit.trns(Tmp.v1.trns(rotation() * 90, size * tilesize/2f));
+                unit.trns(unit.vel());
+                unit.add();
+                Events.fire(new UnitCreateEvent(unit));
+            }
+
+            payload = null;
         }
 
         @Override
@@ -235,16 +241,30 @@ public class UnitFactory extends Block{
             }
 
             if(payload != null){
+                payloadPos += edelta() * payloadSpeed;
+                if(payloadPos >= size * tilesize/2f){
+                    payloadPos = size * tilesize/2f;
 
+                    Tile front = frontLarge();
+                    if(front != null && front.entity != null && front.block().outputsPayload){
+                        if(movePayload(payload)){
+                            payload = null;
+                        }
+                    }else if(front != null && !front.solid()){
+                        //create unit
+                        Call.onUnitFactorySpawn(tile);
+                    }
+                }
             }
 
-            if(currentPlan != -1 && payload != null){
+            if(currentPlan != -1 && payload == null){
                 UnitPlan plan = plans[currentPlan];
 
                 if(progress >= plan.time && Units.canCreate(team)){
                     progress = 0f;
 
-                    this.payload = new UnitPayload(plan.unit.create(team));
+                    payloadPos = 0f;
+                    payload = new UnitPayload(plan.unit.create(team));
                     consume();
                 }
 

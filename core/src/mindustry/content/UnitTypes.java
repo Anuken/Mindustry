@@ -258,15 +258,15 @@ public class UnitTypes implements ContentList{
         alpha = new UnitType("alpha"){{
             flying = true;
             mineSpeed = 2f;
+            buildSpeed = 0.5f;
             drag = 0.05f;
             mass = 2f;
             speed = 2.4f;
             rotateSpeed = 15f;
             accel = 0.1f;
             range = 70f;
-            itemCapacity = 70;
+            itemCapacity = 30;
             health = 400;
-            buildSpeed = 0.85f;
             engineOffset = 6f;
             hitsize = 8f;
 
@@ -292,7 +292,7 @@ public class UnitTypes implements ContentList{
             range = 70f;
             itemCapacity = 70;
             health = 400;
-            buildSpeed = 0.4f;
+            buildSpeed = 0.6f;
             engineOffset = 6.5f;
             hitsize = 8f;
         }};

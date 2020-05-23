@@ -27,6 +27,10 @@ abstract class PosComp implements Position{
         set(this.x + x, this.y + y);
     }
 
+    void trns(Position pos){
+        trns(pos.getX(), pos.getY());
+    }
+
     int tileX(){
         return Vars.world.toTile(x);
     }
