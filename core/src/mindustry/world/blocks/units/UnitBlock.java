@@ -30,7 +30,6 @@ public class UnitBlock extends PayloadAcceptor{
         tile.<UnitBlockEntity>ent().spawned();
     }
 
-
     public class UnitBlockEntity extends PayloadAcceptorEntity<UnitPayload>{
         public float progress, payloadPos, time, speedScl;
 
