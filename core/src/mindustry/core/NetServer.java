@@ -551,6 +551,7 @@ public class NetServer implements ApplicationListener{
         player.mouseX(pointerX);
         player.mouseY(pointerY);
         player.typing(chatting);
+        player.shooting(shooting);
 
         player.unit().controlWeapons(shooting, shooting);
         player.unit().aim(pointerX, pointerY);

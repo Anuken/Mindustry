@@ -23,7 +23,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Import float x, y, rotation, elevation, maxHealth;
 
-    private transient UnitController controller;
+    private UnitController controller;
     private UnitType type;
     boolean spawnedByCore;
 

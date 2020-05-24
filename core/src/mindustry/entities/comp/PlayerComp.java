@@ -28,17 +28,17 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     static final float deathDelay = 30f;
 
     @NonNull @ReadOnly Unitc unit = Nulls.unit;
+    transient @Nullable NetConnection con;
 
     @ReadOnly Team team = Team.sharded;
     String name = "noname";
-    @Nullable NetConnection con;
-    boolean admin, typing;
+    boolean admin, typing, shooting;
     Color color = new Color();
     float mouseX, mouseY;
-    float deathTimer;
 
-    String lastText = "";
-    float textFadeTime;
+    transient float deathTimer;
+    transient String lastText = "";
+    transient float textFadeTime;
 
     public boolean isBuilder(){
         return unit instanceof Builderc;
@@ -64,7 +64,16 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Replace
     public float clipSize(){
-        return 20;
+        return unit.isNull() ? 20 : unit.type().hitsize * 2f;
+    }
+
+    @Override
+    public void afterSync(){
+        unit.aim(mouseX, mouseY);
+        //this is only necessary when the thing being controlled isn't synced
+        unit.isShooting(shooting);
+        //extra precaution, necessary for non-synced things
+        unit.controller(this);
     }
 
     @Override
@@ -113,6 +122,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     public void unit(Unitc unit){
         if(unit == null) throw new IllegalArgumentException("Unit cannot be null. Use clearUnit() instead.");
+        if(this.unit == unit) return;
         if(this.unit != Nulls.unit){
             //un-control the old unit
             this.unit.controller(this.unit.type().createController());

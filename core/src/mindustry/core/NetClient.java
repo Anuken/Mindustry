@@ -567,7 +567,7 @@ public class NetClient implements ApplicationListener{
 
             Call.onClientShapshot(lastSent++,
             unit.x(), unit.y(),
-            player.mouseX(), player.mouseY(),
+            player.unit().aimX(), player.unit().aimY(),
             unit.rotation(),
             unit instanceof Legsc ? ((Legsc)unit).baseRotation() : 0,
             unit.vel().x, unit.vel().y,

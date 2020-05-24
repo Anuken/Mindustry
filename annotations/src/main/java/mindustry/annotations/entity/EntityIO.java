@@ -133,6 +133,8 @@ public class EntityIO{
 
                 io(field.type, "this." + (sf != null ? field.name + targetSuf : field.name) + " = ");
             }
+
+            st("afterSync()");
         }
     }
 
@@ -196,6 +198,8 @@ public class EntityIO{
             }
         }else if(serializer.writers.containsKey(type) && write){
             st("$L(write, $L)", serializer.writers.get(type), field);
+        }else if(serializer.mutatorReaders.containsKey(type) && !write && !field.replace(" = ", "").contains(" ")){
+            st("$L$L(read, $L)", field, serializer.mutatorReaders.get(type), field.replace(" = ", ""));
         }else if(serializer.readers.containsKey(type) && !write){
             st("$L$L(read)", field, serializer.readers.get(type));
         }else if(type.endsWith("[]")){ //it's a 1D array

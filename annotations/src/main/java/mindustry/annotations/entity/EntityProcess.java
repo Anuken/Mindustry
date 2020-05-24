@@ -287,8 +287,9 @@ public class EntityProcess extends BaseProcessor{
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return $S + $L", name + "#", "id").build());
 
-                EntityIO io = ann.serialize() ? new EntityIO(type.name(), builder, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(name)) : null;
-                boolean hasIO = ann.genio() && ann.serialize();
+                EntityIO io = new EntityIO(type.name(), builder, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(name));
+                //entities with no sync comp and no serialization gen no code
+                boolean hasIO = ann.genio() && (components.contains(s -> s.name().contains("Sync")) || ann.serialize());
 
                 //add all methods from components
                 for(ObjectMap.Entry<String, Array<Smethod>> entry : methods){
@@ -347,20 +348,20 @@ public class EntityProcess extends BaseProcessor{
                         }
                     }
 
-                    if(io != null){
+                    if(hasIO){
                         //SPECIAL CASE: I/O code
                         //note that serialization is generated even for non-serializing entities for manual usage
-                        if((first.name().equals("read") || first.name().equals("write")) && hasIO){
+                        if((first.name().equals("read") || first.name().equals("write"))){
                             io.write(mbuilder, first.name().equals("write"));
                         }
 
                         //SPECIAL CASE: sync I/O code
-                        if((first.name().equals("readSync") || first.name().equals("writeSync")) && hasIO){
+                        if((first.name().equals("readSync") || first.name().equals("writeSync"))){
                             io.writeSync(mbuilder, first.name().equals("writeSync"), syncedFields);
                         }
 
                         //SPECIAL CASE: sync I/O code for writing to/from a manual buffer
-                        if((first.name().equals("readSyncManual") || first.name().equals("writeSyncManual")) && hasIO){
+                        if((first.name().equals("readSyncManual") || first.name().equals("writeSyncManual"))){
                             io.writeSyncManual(mbuilder, first.name().equals("writeSyncManual"), syncedFields);
                         }
 
@@ -369,7 +370,7 @@ public class EntityProcess extends BaseProcessor{
                             io.writeInterpolate(mbuilder, syncedFields);
                         }
 
-                        //snap to target position
+                        //SPECIAL CASE: method to snap to target position after being read for the first time
                         if(first.name().equals("snapSync")){
                             mbuilder.addStatement("updateSpacing = 16");
                             mbuilder.addStatement("lastUpdated = $T.millis()", Time.class);

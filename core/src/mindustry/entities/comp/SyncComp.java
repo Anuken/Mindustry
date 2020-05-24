@@ -17,6 +17,7 @@ abstract class SyncComp implements Entityc{
     void writeSync(Writes write){}
     void readSyncManual(FloatBuffer buffer){}
     void writeSyncManual(FloatBuffer buffer){}
+    void afterSync(){}
     void interpolate(){}
 
     @Override

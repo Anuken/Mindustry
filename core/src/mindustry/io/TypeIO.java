@@ -5,6 +5,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.io.*;
 import arc.util.pooling.*;
+import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
@@ -15,6 +16,7 @@ import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import java.io.*;
 import java.nio.*;
@@ -25,8 +27,6 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unused")
 @TypeIOHandler
 public class TypeIO{
-
-    //TODO read/write enums like commands!
 
     public static void writeObject(Writes write, Object object){
         if(object == null){
@@ -85,6 +85,32 @@ public class TypeIO{
             case 8: byte len = read.b(); Point2[] out = new Point2[len]; for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i()); return out;
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
+    }
+
+    //only for players!
+    public static void writeUnit(Writes write, Unitc unit){
+        write.b(unit.isNull() ? 0 : unit instanceof BlockUnitc ? 1 : 2);
+        //block units are special
+        if(unit instanceof BlockUnitc){
+            write.i(((BlockUnitc)unit).tile().pos());
+        }else{
+            write.i(unit.id());
+        }
+    }
+
+    public static Unitc readUnit(Reads read){
+        byte type = read.b();
+        int id = read.i();
+        //nothing
+        if(type == 0) return Nulls.unit;
+        if(type == 2){ //standard unit
+            Unitc unit = Groups.unit.getByID(id);
+            return unit == null ? Nulls.unit : unit;
+        }else if(type == 1){ //block
+            Tilec tile = world.ent(id);
+            return tile instanceof ControlBlock ? ((ControlBlock)tile).unit() : Nulls.unit;
+        }
+        return Nulls.unit;
     }
 
     public static void writeEntity(Writes write, Entityc entity){
@@ -184,6 +210,33 @@ public class TypeIO{
         return reqs;
     }
 
+    public static void writeController(Writes write, UnitController control){
+        //no real unit controller state is written, only the type
+        if(control instanceof Playerc){
+            write.b(0);
+            write.i(((Playerc)control).id());
+        }else{
+            write.b(1);
+        }
+    }
+
+    public static UnitController readController(Reads read, UnitController prev){
+        byte type = read.b();
+        if(type == 0){ //is player
+            int id = read.i();
+            Playerc player = Groups.player.getByID(id);
+            //local players will cause problems if assigned, since they may not know they are controlling the unit
+            if(player == null || player.isLocal()) return prev;
+            return player;
+        }else{
+            //there are two cases here:
+            //1: prev controller was not a player, carry on
+            //2: prev controller was a player, so replace this controller with *anything else*
+            //...since AI doesn't update clientside it doesn't matter what
+            return prev instanceof Playerc ? new GroundAI() : prev;
+        }
+    }
+
     public static void writeKick(Writes write, KickReason reason){
         write.b((byte)reason.ordinal());
     }
@@ -215,6 +268,10 @@ public class TypeIO{
         }
     }
 
+    public static Vec2 readVec2(Reads read, Vec2 base){
+        return base.set(read.f(), read.f());
+    }
+
     public static Vec2 readVec2(Reads read){
         return new Vec2(read.f(), read.f());
     }
@@ -231,6 +288,10 @@ public class TypeIO{
     public static void writeItems(Writes write, ItemStack stack){
         writeItem(write, stack.item);
         write.i(stack.amount);
+    }
+
+    public static ItemStack readItems(Reads read, ItemStack stack){
+        return stack.set(readItem(read), read.i());
     }
 
     public static ItemStack readItems(Reads read){
@@ -277,6 +338,10 @@ public class TypeIO{
         return new Color(read.i());
     }
 
+    public static Color readColor(Reads read, Color color){
+        return color.set(read.i());
+    }
+
     public static void writeLiquid(Writes write, Liquid liquid){
         write.s(liquid == null ? -1 : liquid.id);
     }
@@ -314,18 +379,17 @@ public class TypeIO{
 
     public static void writeString(Writes write, String string){
         if(string != null){
-            byte[] bytes = string.getBytes(charset);
-            write.s((short)bytes.length);
-            write.b(bytes);
+            write.b(1);
+            write.str(string);
         }else{
-            write.s((short)-1);
+            write.b(0);
         }
     }
 
     public static String readString(Reads read){
-        short slength = read.s();
-        if(slength != -1){
-            return new String(read.b(new byte[slength]), charset);
+        byte exists = read.b();
+        if(exists != 0){
+            return read.str();
         }else{
             return null;
         }
