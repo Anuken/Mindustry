@@ -33,8 +33,17 @@ public class UnitTypes implements ContentList{
     //water
     public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType vanguard;
 
+    //special block unit type
+    public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
+
     @Override
     public void load(){
+        block = new UnitType("block"){{
+            speed = 0f;
+            hitsize = 0f;
+            health = 1;
+            rotateSpeed = 360f;
+        }};
 
         dagger = new UnitType("dagger"){{
             speed = 0.5f;

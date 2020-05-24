@@ -748,6 +748,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 return unit;
             }
         }
+
+        Tilec tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+        if(tile instanceof ControlBlock){
+            return ((ControlBlock)tile).unit();
+        }
+
         return null;
     }
 

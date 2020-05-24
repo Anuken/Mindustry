@@ -1,8 +1,6 @@
 package mindustry.world.blocks.defense.turrets;
 
 import arc.math.*;
-import arc.math.geom.*;
-import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 
 import static mindustry.Vars.tilesize;
@@ -28,9 +26,7 @@ public class ArtilleryTurret extends ItemTurret{
 
             tr.trns(rotation, size * tilesize / 2);
 
-            Vec2 predict = Predict.intercept(tile, target, type.speed);
-
-            float dst = dst(predict.x, predict.y);
+            float dst = dst(targetPos.x, targetPos.y);
             float maxTraveled = type.lifetime * type.speed;
 
             for(int i = 0; i < shots; i++){

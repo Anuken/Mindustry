@@ -60,7 +60,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     private transient float timeScale = 1f, timeScaleDuration;
 
-    private transient @Nullable mindustry.audio.SoundLoop sound;
+    private transient @Nullable SoundLoop sound;
 
     private transient boolean sleeping;
     private transient float sleepTime;
@@ -83,6 +83,8 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         if(shouldAdd){
             add();
         }
+
+        created();
 
         return this;
     }
@@ -296,6 +298,8 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     //endregion
     //region handler methods
+
+    public void created(){}
     
     public boolean shouldConsume(){
         return true;
