@@ -94,7 +94,7 @@ public class Build{
             }
 
             //TODO should water blocks be placeable here?
-            if(/*!type.requiresWater && */!contactsGround(tile.x, tile.y, type)){
+            if(!type.requiresWater && !type.requiresDeepWater && !contactsGround(tile.x, tile.y, type)){
                 return false;
             }
 
@@ -111,8 +111,9 @@ public class Build{
                         other == null ||
                         (other.block() != Blocks.air && !other.block().alwaysReplace) ||
                         !other.floor().placeableOn ||
-                        (other.floor().isDeep() && !type.floating && !type.requiresWater) ||
-                        (type.requiresWater && tile.floor().liquidDrop != Liquids.water)
+                        (other.floor().isDeep() && !type.floating && !type.requiresWater && !type.requiresDeepWater) ||
+                        (type.requiresWater && tile.floor().liquidDrop != Liquids.water) ||
+                        (type.requiresDeepWater && !other.floor().isDeep())
                     ){
                         return false;
                     }
@@ -121,10 +122,11 @@ public class Build{
             return true;
         }else{
             return tile.interactable(team)
-                && contactsGround(tile.x, tile.y, type)
-                && (!tile.floor().isDeep() || type.floating || type.requiresWater)
+                && (type.requiresWater || type.requiresDeepWater || contactsGround(tile.x, tile.y, type))
+                && (!tile.floor().isDeep() || type.floating || type.requiresWater || type.requiresDeepWater)
                 && tile.floor().placeableOn
                 && (!type.requiresWater || tile.floor().liquidDrop == Liquids.water)
+                && (!type.requiresDeepWater || tile.floor().isDeep())
                 && (((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>ent().cblock == type))
                 && !(type == tile.block() && rotation == tile.rotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
                 && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);
