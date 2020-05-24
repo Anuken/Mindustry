@@ -43,7 +43,7 @@ public class UnitBlock extends PayloadAcceptor{
                 Unitc unit = payload.unit;
                 unit.set(x, y);
                 unit.rotation(rotdeg());
-                unit.vel().trns(rotdeg(), payloadSpeed * 2f).add(Mathf.range(0.1f), Mathf.range(0.1f));
+                unit.vel().trns(rotdeg(), payloadSpeed * 2f).add(Mathf.range(0.3f), Mathf.range(0.3f));
                 unit.trns(Tmp.v1.trns(rotdeg(), size * tilesize/2f));
                 unit.trns(unit.vel());
                 unit.add();

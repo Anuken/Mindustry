@@ -209,6 +209,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(controlledType != null && player.dead()){
             Unitc unit = Units.closest(player.team(), player.x(), player.y(), u -> !u.isPlayer() && u.type() == controlledType);
+
             if(unit != null){
                 Call.onUnitControl(player, unit);
             }
@@ -218,6 +219,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void checkUnit(){
         if(controlledType != null){
             Unitc unit = Units.closest(player.team(), player.x(), player.y(), u -> !u.isPlayer() && u.type() == controlledType);
+            if(unit == null && controlledType == UnitTypes.block){
+                unit = world.entWorld(player.x(), player.y()) instanceof ControlBlock ? ((ControlBlock)world.entWorld(player.x(), player.y())).unit() : null;
+            }
+
             if(unit != null){
                 if(net.client()){
                     Call.onUnitControl(player, unit);

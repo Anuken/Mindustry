@@ -399,11 +399,11 @@ public class NetClient implements ApplicationListener{
                 }
 
                 //read the entity
-                entity.read(Reads.get(input));
+                entity.readSync(Reads.get(input));
 
-                if(created && entity.interpolator().target != null){
-                    //set initial starting position
-                    entity.setNet(entity.interpolator().target.x, entity.interpolator().target.y);
+                if(created){
+                    //snap initial starting position
+                    entity.snapSync();
                 }
 
                 if(add){

@@ -1,37 +1,28 @@
 package mindustry.entities.comp;
 
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
-import mindustry.net.*;
+
+import java.nio.*;
 
 @Component
-abstract class SyncComp implements Posc{
-    @Import float x, y;
+abstract class SyncComp implements Entityc{
+    transient long lastUpdated, updateSpacing;
 
-    transient Interpolator interpolator = new Interpolator();
-
-    void setNet(float x, float y){
-        set(x, y);
-
-        //TODO change interpolator API
-        interpolator.target.set(x, y);
-        interpolator.last.set(x, y);
-        interpolator.pos.set(0, 0);
-        interpolator.updateSpacing = 16;
-        interpolator.lastUpdated = 0;
-    }
+    //all these method bodies are internally generated
+    void snapSync(){}
+    void readSync(Reads read){}
+    void writeSync(Writes write){}
+    void readSyncManual(FloatBuffer buffer){}
+    void writeSyncManual(FloatBuffer buffer){}
+    void interpolate(){}
 
     @Override
     public void update(){
         if(Vars.net.client() && !isLocal()){
             interpolate();
         }
-    }
-
-    void interpolate(){
-        interpolator.update();
-        x = interpolator.pos.x;
-        y = interpolator.pos.y;
     }
 }

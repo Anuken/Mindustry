@@ -35,8 +35,8 @@ public class UnitFactory extends UnitBlock{
         hasPower = true;
         hasItems = true;
         solid = true;
-        flags = EnumSet.of(BlockFlag.producer, BlockFlag.unitModifier);
-        unitCapModifier = 4;
+        //flags = EnumSet.of(BlockFlag.producer, BlockFlag.unitModifier);
+        //unitCapModifier = 2;
         configurable = true;
         outputsPayload = true;
         rotate = true;

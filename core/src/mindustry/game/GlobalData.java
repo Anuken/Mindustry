@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 
 /** Stores player unlocks. Clientside only. */
 public class GlobalData{
-    private ObjectMap<ContentType, ObjectSet<String>> unlocked = new ObjectMap<>();
+    private ObjectSet<String> unlocked = new ObjectSet<>();
     private ObjectIntMap<Item> items = new ObjectIntMap<>();
     private boolean modified;
 
@@ -128,7 +128,7 @@ public class GlobalData{
 
     /** Returns whether or not this piece of content is unlocked yet. */
     public boolean isUnlocked(UnlockableContent content){
-        return content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.name);
+        return content.alwaysUnlocked() || unlocked.contains(content.name);
     }
 
     /**
@@ -140,7 +140,7 @@ public class GlobalData{
         if(content.alwaysUnlocked()) return;
 
         //fire unlock event so other classes can use it
-        if(unlocked.getOr(content.getContentType(), ObjectSet::new).add(content.name)){
+        if(unlocked.add(content.name)){
             modified = true;
             content.onUnlock();
             Events.fire(new UnlockEvent(content));
@@ -162,7 +162,7 @@ public class GlobalData{
     @SuppressWarnings("unchecked")
     public void load(){
         items.clear();
-        unlocked = Core.settings.getJson("unlocks", ObjectMap.class, ObjectMap::new);
+        unlocked = Core.settings.getJson("unlocked-content", ObjectSet.class, ObjectSet::new);
         for(Item item : Vars.content.items()){
             items.put(item, Core.settings.getInt("item-" + item.name, 0));
         }
@@ -174,7 +174,7 @@ public class GlobalData{
     }
 
     public void save(){
-        Core.settings.putJson("unlocks", unlocked);
+        Core.settings.putJson("unlocked-content", String.class, unlocked);
         for(Item item : Vars.content.items()){
             Core.settings.put("item-" + item.name, items.get(item, 0));
         }

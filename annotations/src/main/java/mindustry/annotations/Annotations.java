@@ -17,7 +17,15 @@ public class Annotations{
     public @interface Final{
     }
 
-    /** Indicates that a component field is imported from other components. */
+    /** Indicates that a field will be interpolated when synced. */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface SyncField{
+        /** If true, the field will be linearly interpolated. If false, it will be interpolated as an angle. */
+        boolean value();
+    }
+
+    /** Indicates that a component field is imported from other components. This means it doesn't actually exist. */
     @Target({ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Import{

@@ -1,12 +1,14 @@
 package mindustry.annotations.entity;
 
 import arc.files.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import com.squareup.javapoet.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.annotations.*;
+import mindustry.annotations.util.*;
 import mindustry.annotations.util.TypeIOResolver.*;
 
 import javax.lang.model.element.*;
@@ -15,6 +17,8 @@ import static mindustry.annotations.BaseProcessor.instanceOf;
 
 public class EntityIO{
     final static Json json = new Json();
+    //suffixes for sync fields
+    final static String targetSuf = "_TARGET_", lastSuf = "_LAST_";
 
     final ClassSerializer serializer;
     final String name;
@@ -102,6 +106,83 @@ public class EntityIO{
             st("throw new IllegalArgumentException(\"Unknown revision '\" + REV + \"' for entity type '" + name + "'\")");
             econt();
         }
+    }
+
+    void writeSync(MethodSpec.Builder method, boolean write, Array<Svar> syncFields) throws Exception{
+        this.method = method;
+        this.write = write;
+
+        if(write){
+            //write uses most recent revision
+            for(RevisionField field : revisions.peek().fields){
+                io(field.type, "this." + field.name);
+            }
+        }else{
+            Revision rev = revisions.peek();
+
+            //base read code
+            st("if(lastUpdated != 0) updateSpacing = $T.timeSinceMillis(lastUpdated)", Time.class);
+            st("lastUpdated = $T.millis()", Time.class);
+
+            //add code for reading revision
+            for(RevisionField field : rev.fields){
+                Svar sf = syncFields.find(s -> s.name().equals(field.name));
+                if(sf != null){
+                    st(field.name + lastSuf + " = this." + field.name);
+                }
+
+                io(field.type, "this." + (sf != null ? field.name + targetSuf : field.name) + " = ");
+            }
+        }
+    }
+
+    void writeSyncManual(MethodSpec.Builder method, boolean write, Array<Svar> syncFields) throws Exception{
+        this.method = method;
+        this.write = write;
+
+        if(write){
+            for(Svar field : syncFields){
+                st("buffer.put(this.$L)", field.name());
+            }
+        }else{
+            //base read code
+            st("if(lastUpdated != 0) updateSpacing = $T.timeSinceMillis(lastUpdated)", Time.class);
+            st("lastUpdated = $T.millis()", Time.class);
+
+            //just read the field
+            for(Svar field : syncFields){
+                //last
+                st("this.$L = this.$L", field.name() + lastSuf, field.name());
+                //assign target
+                st("this.$L = buffer.get()", field.name() + targetSuf);
+            }
+        }
+    }
+
+    void writeInterpolate(MethodSpec.Builder method, Array<Svar> fields) throws Exception{
+        this.method = method;
+
+        cont("if(lastUpdated != 0 && updateSpacing != 0)");
+
+        //base calculations
+        st("float timeSinceUpdate = Time.timeSinceMillis(lastUpdated)");
+        st("float alpha = Math.min(timeSinceUpdate / updateSpacing, 2f)");
+
+        //write interpolated data, using slerp / lerp
+        for(Svar field : fields){
+            String name = field.name(), targetName = name + targetSuf, lastName = name + lastSuf;
+            st("$L = $T.$L($L, $L, alpha)", name, Mathf.class, field.annotation(SyncField.class).value() ? "lerp" : "slerp", lastName, targetName);
+        }
+
+        ncont("else"); //no meaningful data has arrived yet
+
+        //write values directly to targets
+        for(Svar field : fields){
+            String name = field.name(), targetName = name + targetSuf;
+            st("$L = $L", name, targetName);
+        }
+
+        econt();
     }
 
     private void io(String type, String field) throws Exception{
