@@ -240,6 +240,7 @@ public class WaveInfoDialog extends FloatingDialog{
         dialog.cont.pane(p -> {
             int i = 0;
             for(UnitType type : content.units()){
+                if(type.isHidden()) continue;
                 p.button(t -> {
                     t.left();
                     t.image(type.icon(mindustry.ui.Cicon.medium)).size(40f).padRight(2f);

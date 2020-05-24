@@ -38,12 +38,19 @@ public class UnitTypes implements ContentList{
 
     @Override
     public void load(){
-        block = new UnitType("block"){{
-            speed = 0f;
-            hitsize = 0f;
-            health = 1;
-            rotateSpeed = 360f;
-        }};
+        block = new UnitType("block"){
+            {
+                speed = 0f;
+                hitsize = 0f;
+                health = 1;
+                rotateSpeed = 360f;
+            }
+
+            @Override
+            public boolean isHidden(){
+                return true;
+            }
+        };
 
         dagger = new UnitType("dagger"){{
             speed = 0.5f;
