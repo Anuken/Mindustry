@@ -1672,8 +1672,9 @@ public class Blocks implements ContentList{
         groundFactory = new UnitFactory("ground-factory"){{
             requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.dagger, 200f, ItemStack.with(Items.silicon, 10)),
-                new UnitPlan(UnitTypes.titan, 800f, ItemStack.with(Items.silicon, 20, Items.titanium, 10)),
+                new UnitPlan(UnitTypes.dagger, 200f, ItemStack.with(Items.silicon, 10, Items.lead, 10)),
+                new UnitPlan(UnitTypes.crawler, 200f, ItemStack.with(Items.silicon, 10, Items.blastCompound, 5)),
+                new UnitPlan(UnitTypes.tau, 200f, ItemStack.with(Items.silicon, 20, Items.lead, 10)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1683,7 +1684,9 @@ public class Blocks implements ContentList{
             requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.wraith, 200f, ItemStack.with(Items.silicon, 10)),
-                //new UnitPlan(UnitTypes.ghoul, 200f, ItemStack.with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.spirit, 200f, ItemStack.with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.draug, 200f, ItemStack.with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.phantom, 200f, ItemStack.with(Items.silicon, 10)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1706,7 +1709,8 @@ public class Blocks implements ContentList{
             consumes.power(3f);
             consumes.items(ItemStack.with(Items.silicon, 30, Items.graphite, 30));
             itemCapacity = 30;
-            constructTime = 200f;
+
+            constructTime = 60f * 5f;
         }};
 
         repairPoint = new RepairPoint("repair-point"){{

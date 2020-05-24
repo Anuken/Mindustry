@@ -11,6 +11,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.state;
 
@@ -36,6 +37,13 @@ public class Reconstructor extends UnitBlock{
     public void setBars(){
         super.setBars();
         bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, ((ReconstructorEntity)entity)::fraction));
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.productionTime, constructTime / 60f, StatUnit.seconds);
     }
 
     public class ReconstructorEntity extends UnitBlockEntity{

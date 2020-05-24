@@ -15,7 +15,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType titan, dagger, crawler, fortress, eruptor, chaosArray, eradicator;
 
     //ground + builder
-    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType oculon;
+    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType oculon, tau;
 
     //air
     public static @EntityDef({Unitc.class}) UnitType wraith, reaper, ghoul, revenant, lich;
@@ -96,9 +96,59 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        tau = new UnitType("tau"){{
+                itemCapacity = 60;
+                canBoost = true;
+                boostMultiplier = 1.5f;
+                speed = 0.5f;
+                hitsize = 8f;
+                health = 100f;
+                buildSpeed = 0.8f;
+
+                weapons.add(new Weapon("heal-weapon"){{
+                    shootY = 1.5f;
+                    reload = 24f;
+                    x = 1f;
+                    shootX = 3.5f;
+                    alternate = false;
+                    ejectEffect = Fx.none;
+                    recoil = 2f;
+                    bullet = Bullets.healBullet;
+                    shootSound = Sounds.pew;
+                }});
+            }
+
+            /*
+
+            float healRange = 60f;
+            float healAmount = 10f;
+            float healReload = 160f;
+            boolean wasHealed;
+
+            @Override
+            public void update(Unitc player){
+
+                if(player.timer().get(Playerc.timerAbility, healReload)){
+                    wasHealed = false;
+
+                    Units.nearby(player.team(), player.x, player.y, healRange, unit -> {
+                        if(unit.health < unit.maxHealth()){
+                            Fx.heal.at(unit);
+                            wasHealed = true;
+                        }
+                        unit.heal(healAmount);
+                    });
+
+                    if(wasHealed){
+                        Fx.healWave.at(player);
+                    }
+                }
+            }*/
+        };
+
         fortress = new UnitType("fortress"){{
             titan.upgrade = this;
-            tier = 2;
+            tier = 3;
 
             speed = 0.38f;
             mass = 5f;
