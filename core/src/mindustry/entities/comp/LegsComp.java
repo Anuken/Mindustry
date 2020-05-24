@@ -7,7 +7,7 @@ import mindustry.gen.*;
 
 @Component
 abstract class LegsComp implements Posc, Flyingc, Hitboxc, Unitc, Legsc, ElevationMovec{
-    @SyncField(false) float baseRotation;
+    @SyncField(false) @SyncLocal float baseRotation;
     transient float walkTime;
 
     @Override

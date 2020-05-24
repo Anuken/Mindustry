@@ -588,15 +588,9 @@ public class DesktopInput extends InputHandler{
         }
 
         unit.aim(unit.type().faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation(), Core.input.mouseWorld().dst(unit)).add(unit.x(), unit.y()));
+        unit.controlWeapons(true, isShooting && !(!unit.type().flying && unit.isFlying()));
 
-        unit.controlWeapons(true, isShooting);
-
-        isBoosting = Core.input.keyDown(Binding.boost);
-
-        if(unit.type().canBoost){
-            Tile tile = unit.tileOn();
-
-            unit.elevation(Mathf.approachDelta(unit.elevation(), (tile != null && tile.solid()) || (isBoosting && !movement.isZero()) ? 1f : 0f, 0.08f));
-        }
+        isBoosting = Core.input.keyDown(Binding.boost) && !movement.isZero();
+        player.boosting(isBoosting);
     }
 }

@@ -220,6 +220,7 @@ public class EntityProcess extends BaseProcessor{
 
                 //all SyncField fields
                 Array<Svar> syncedFields = new Array<>();
+                Array<Svar> allFields = new Array<>();
 
                 //add all components
                 for(Stype comp : components){
@@ -252,6 +253,8 @@ public class EntityProcess extends BaseProcessor{
                         fbuilder.addAnnotations(f.annotations().map(AnnotationSpec::get));
                         builder.addField(fbuilder.build());
                         specVariables.put(builder.fieldSpecs.get(builder.fieldSpecs.size() - 1), f);
+
+                        allFields.add(f);
 
                         //add extra sync fields
                         if(f.has(SyncField.class)){
@@ -357,7 +360,7 @@ public class EntityProcess extends BaseProcessor{
 
                         //SPECIAL CASE: sync I/O code
                         if((first.name().equals("readSync") || first.name().equals("writeSync"))){
-                            io.writeSync(mbuilder, first.name().equals("writeSync"), syncedFields);
+                            io.writeSync(mbuilder, first.name().equals("writeSync"), syncedFields, allFields);
                         }
 
                         //SPECIAL CASE: sync I/O code for writing to/from a manual buffer

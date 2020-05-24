@@ -548,10 +548,16 @@ public class NetServer implements ApplicationListener{
         connection.viewWidth = viewWidth;
         connection.viewHeight = viewHeight;
 
+        //disable shooting when a mech flies
+        if(!player.dead() && player.unit().isFlying() && !player.unit().type().flying){
+            shooting = false;
+        }
+
         player.mouseX(pointerX);
         player.mouseY(pointerY);
         player.typing(chatting);
         player.shooting(shooting);
+        player.boosting(boosting);
 
         player.unit().controlWeapons(shooting, shooting);
         player.unit().aim(pointerX, pointerY);
@@ -593,8 +599,6 @@ public class NetServer implements ApplicationListener{
         connection.rejectedRequests.clear();
 
         if(!player.dead()){
-            player.unit().elevation(!player.unit().type().flying && boosting && player.unit().type().canBoost ? 1f : 0f);
-
             Unitc unit = player.unit();
             long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
             float maxSpeed = player.dead() ? Float.MAX_VALUE : player.unit().type().speed;
@@ -645,8 +649,9 @@ public class NetServer implements ApplicationListener{
             //read sync data so it can be used for interpolation for the server
             unit.readSyncManual(fbuffer);
 
-            //TODO fix
-            unit.vel().set(xVelocity, yVelocity); //only for visual calculation purposes, doesn't actually update the player (TODO or does it?)
+            //TODO clients shouldn't care about velocities, so should it always just get set to 0? why even save it?
+            //[[ignore sent velocity values, set it to the delta movement vector instead]]
+            //unit.vel().set(vector);
         }else{
             player.x(x);
             player.y(y);

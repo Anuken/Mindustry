@@ -23,6 +23,15 @@ public class Annotations{
     public @interface SyncField{
         /** If true, the field will be linearly interpolated. If false, it will be interpolated as an angle. */
         boolean value();
+        /** If true, the field is clamped to 0-1. */
+        boolean clamped() default false;
+    }
+
+    /** Indicates that a field will not be read from the server when syncing. */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface SyncLocal{
+
     }
 
     /** Indicates that a component field is imported from other components. This means it doesn't actually exist. */

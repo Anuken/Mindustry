@@ -334,12 +334,12 @@ public class UnitTypes implements ContentList{
             accel = 0.1f;
             range = 70f;
             itemCapacity = 30;
-            health = 400;
+            health = 80f;
             engineOffset = 6f;
             hitsize = 8f;
 
             weapons.add(new Weapon("small-basic-weapon"){{
-                reload = 20f;
+                reload = 25f;
                 x = -1f;
                 y = -1f;
                 shootX = 3.5f;

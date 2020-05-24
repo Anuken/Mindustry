@@ -18,6 +18,7 @@ import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
@@ -32,7 +33,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @ReadOnly Team team = Team.sharded;
     String name = "noname";
-    boolean admin, typing, shooting;
+    boolean admin, typing, shooting, boosting;
     Color color = new Color();
     float mouseX, mouseY;
 
@@ -71,7 +72,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     public void afterSync(){
         unit.aim(mouseX, mouseY);
         //this is only necessary when the thing being controlled isn't synced
-        unit.isShooting(shooting);
+        unit.controlWeapons(shooting, shooting);
         //extra precaution, necessary for non-synced things
         unit.controller(this);
     }
@@ -89,14 +90,24 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             y(unit.y());
             unit.team(team);
             deathTimer = 0;
+
+            //update some basic state to sync things
+            if(unit.type().canBoost){
+                Tile tile = unit.tileOn();
+                unit.elevation(Mathf.approachDelta(unit.elevation(), (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f));
+            }
         }else if(core != null){
+            //have a small delay before death to prevent the camera from jumping around too quickly
+            //(this is not for balance)
             deathTimer += Time.delta();
             if(deathTimer >= deathDelay){
                 core.requestSpawn((Playerc)this);
+                deathTimer = 0;
             }
         }
 
         textFadeTime -= Time.delta() / (60 * 5);
+
     }
 
     public void team(Team team){

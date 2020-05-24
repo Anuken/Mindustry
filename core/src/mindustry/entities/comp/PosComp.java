@@ -12,7 +12,7 @@ import static mindustry.Vars.world;
 
 @Component
 abstract class PosComp implements Position{
-    @SyncField(true) float x, y;
+    @SyncField(true) @SyncLocal float x, y;
 
     void set(float x, float y){
         this.x = x;

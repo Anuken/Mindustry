@@ -61,7 +61,9 @@ public class EntityIO{
 
         //add new revision if it doesn't match or there are no revisions
         if(revisions.isEmpty() || !revisions.peek().equal(fields)){
-            revisions.add(new Revision(nextRevision, fields.map(f -> new RevisionField(f.name, f.type.toString(), f.type.isPrimitive() ? BaseProcessor.typeSize(f.type.toString()) : -1))));
+            revisions.add(new Revision(nextRevision,
+                fields.map(f -> new RevisionField(f.name, f.type.toString(),
+                f.type.isPrimitive() ? BaseProcessor.typeSize(f.type.toString()) : -1))));
             //write revision
             directory.child(nextRevision + ".json").writeString(json.toJson(revisions.peek()));
         }
@@ -108,7 +110,7 @@ public class EntityIO{
         }
     }
 
-    void writeSync(MethodSpec.Builder method, boolean write, Array<Svar> syncFields) throws Exception{
+    void writeSync(MethodSpec.Builder method, boolean write, Array<Svar> syncFields, Array<Svar> allFields) throws Exception{
         this.method = method;
         this.write = write;
 
@@ -123,15 +125,22 @@ public class EntityIO{
             //base read code
             st("if(lastUpdated != 0) updateSpacing = $T.timeSinceMillis(lastUpdated)", Time.class);
             st("lastUpdated = $T.millis()", Time.class);
+            st("boolean islocal = isLocal()");
 
             //add code for reading revision
             for(RevisionField field : rev.fields){
-                Svar sf = syncFields.find(s -> s.name().equals(field.name));
-                if(sf != null){
+                Svar var = allFields.find(s -> s.name().equals(field.name));
+                boolean sf = var.has(SyncField.class), sl = var.has(SyncLocal.class);
+
+                if(sl) cont("if(!islocal)");
+
+                if(sf){
                     st(field.name + lastSuf + " = this." + field.name);
                 }
 
-                io(field.type, "this." + (sf != null ? field.name + targetSuf : field.name) + " = ");
+                io(field.type, "this." + (sf ? field.name + targetSuf : field.name) + " = ");
+
+                if(sl) econt();
             }
 
             st("afterSync()");
@@ -173,7 +182,7 @@ public class EntityIO{
         //write interpolated data, using slerp / lerp
         for(Svar field : fields){
             String name = field.name(), targetName = name + targetSuf, lastName = name + lastSuf;
-            st("$L = $T.$L($L, $L, alpha)", name, Mathf.class, field.annotation(SyncField.class).value() ? "lerp" : "slerp", lastName, targetName);
+            st("$L = $L($T.$L($L, $L, alpha))", name, field.annotation(SyncField.class).clamped() ? "arc.math.Mathf.clamp" : "", Mathf.class, field.annotation(SyncField.class).value() ? "lerp" : "slerp", lastName, targetName);
         }
 
         ncont("else"); //no meaningful data has arrived yet

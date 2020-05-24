@@ -5,5 +5,5 @@ import mindustry.gen.*;
 
 @Component
 abstract class RotComp implements Entityc{
-    @SyncField(false) float rotation;
+    @SyncField(false) @SyncLocal float rotation;
 }
