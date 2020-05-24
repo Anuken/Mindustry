@@ -48,8 +48,6 @@ public class Rules{
     public float enemyCoreBuildRadius = 400f;
     /** Radius around enemy wave drop zones.*/
     public float dropZoneRadius = 300f;
-    /** Player respawn time in ticks. */
-    public float respawnTime = 60 * 4;
     /** Time between waves in ticks. */
     public float waveSpacing = 60 * 60 * 2;
     /** How many times longer a boss wave takes. */
@@ -62,10 +60,6 @@ public class Rules{
     public @Nullable Sector sector;
     /** Spawn layout. */
     public Array<SpawnGroup> spawns = new Array<>();
-    /** Determines if there should be limited respawns. */
-    public boolean limitedRespawns = false;
-    /** How many times player can respawn during one wave. */
-    public int respawns = 5;
     /** Whether to pause the wave timer until all enemies are destroyed. */
     public boolean waitEnemies = false;
     /** Determinates if gamemode is attack mode */

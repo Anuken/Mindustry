@@ -47,7 +47,8 @@ public class CoreBlock extends StorageBlock{
         if(!net.client()){
             Unitc unit = block.unitType.create(tile.team());
             unit.set(entity);
-            unit.impulse(0f, 2f);
+            unit.rotation(90f);
+            unit.impulse(0f, 3f);
             unit.controller(player);
             unit.spawnedByCore(true);
             unit.add();

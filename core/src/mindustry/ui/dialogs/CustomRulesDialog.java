@@ -133,9 +133,6 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true);
         number("$rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
-        title("$rules.title.respawns");
-        number("$rules.respawntime", f -> rules.respawnTime = f * 60f, () -> rules.respawnTime / 60f);
-
         title("$rules.title.resourcesbuilding");
         check("$rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
         check("$rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);

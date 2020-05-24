@@ -16,7 +16,6 @@ public enum Gamemode{
         rules.infiniteResources = true;
         rules.waves = true;
         rules.waveTimer = false;
-        rules.respawnTime = 0f;
     }),
     attack(rules -> {
         rules.attackMode = true;
@@ -24,7 +23,6 @@ public enum Gamemode{
     pvp(rules -> {
         rules.pvp = true;
         rules.enemyCoreBuildRadius = 600f;
-        rules.respawnTime = 60 * 10;
         rules.buildCostMultiplier = 1f;
         rules.buildSpeedMultiplier = 1f;
         rules.playerDamageMultiplier = 0.33f;
@@ -39,7 +37,6 @@ public enum Gamemode{
         rules.waves = false;
         rules.enemyCoreBuildRadius = 0f;
         rules.waveTimer = false;
-        rules.respawnTime = 0f;
     });
 
     private final Cons<Rules> rules;
