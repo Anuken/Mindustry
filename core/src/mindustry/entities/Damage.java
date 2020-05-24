@@ -163,7 +163,7 @@ public class Damage{
     }
 
     /** Damages everything in a radius. */
-    public static void damage(float x, float y, float radius, float damage){
+    public static void damageAll(float x, float y, float radius, float damage){
         damage(null, x, y, radius, damage, false);
     }
 
