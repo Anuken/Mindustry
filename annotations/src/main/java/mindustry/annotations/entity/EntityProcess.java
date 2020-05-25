@@ -552,6 +552,9 @@ public class EntityProcess extends BaseProcessor{
                 idStore.addStatement("idMap[$L] = $L::new", def.classID, def.name);
                 extraNames.get(def.base).each(extra -> {
                     idStore.addStatement("nameMap.put($S, $L::new)", extra, def.name);
+                    if(!camelToKebab(extra).equals(extra)){
+                        idStore.addStatement("nameMap.put($S, $L::new)", camelToKebab(extra), def.name);
+                    }
                 });
 
                 //return mapping
@@ -742,6 +745,22 @@ public class EntityProcess extends BaseProcessor{
         Array<Stype> comps = types(elem.annotation(EntityDef.class), EntityDef::value).map(this::interfaceToComp);;
         comps.sortComparing(Selement::name);
         return comps.toString("", s -> s.name().replace("Comp", "")) + "Entity";
+    }
+
+    static String camelToKebab(String s){
+        StringBuilder result = new StringBuilder(s.length() + 1);
+
+        for(int i = 0; i < s.length(); i++){
+            char c = s.charAt(i);
+            if(i > 0 && Character.isUpperCase(s.charAt(i))){
+                result.append('-');
+            }
+
+            result.append(Character.toLowerCase(c));
+
+        }
+
+        return result.toString();
     }
 
     boolean isComponent(Stype type){

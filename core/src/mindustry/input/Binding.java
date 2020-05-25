@@ -10,8 +10,9 @@ public enum Binding implements KeyBind{
     move_x(new Axis(KeyCode.a, KeyCode.d), "general"),
     move_y(new Axis(KeyCode.s, KeyCode.w)),
     mouse_move(KeyCode.mouseBack),
-    boost(KeyCode.shiftLeft), //TODO rename
-    control(KeyCode.shiftLeft),
+    boost(KeyCode.shiftLeft),
+    control(KeyCode.controlLeft),
+    respawn(KeyCode.v),
     select(KeyCode.mouseLeft),
     deselect(KeyCode.mouseRight),
     break_block(KeyCode.mouseRight),

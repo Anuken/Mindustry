@@ -133,7 +133,7 @@ public class Bullets implements ContentList{
             frontColor = Pal.bulletYellow;
         }};
 
-        glassFrag = new BasicBulletType(3f, 6, "bullet"){{
+        glassFrag = new BasicBulletType(3f, 5, "bullet"){{
             bulletWidth = 5f;
             bulletHeight = 12f;
             bulletShrink = 1f;
@@ -174,10 +174,10 @@ public class Bullets implements ContentList{
             bulletWidth = 6f;
             bulletHeight = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 30f;
-            splashDamageRadius = 26f;
+            splashDamage = 20f;
+            splashDamageRadius = 20f;
             fragBullet = glassFrag;
-            fragBullets = 6;
+            fragBullets = 5;
         }};
 
         flakPlastic = new FlakBulletType(4f, 6){{
@@ -192,16 +192,18 @@ public class Bullets implements ContentList{
         }};
 
         flakExplosive = new FlakBulletType(4f, 5){{
-            //default bullet type, no changes
             shootEffect = Fx.shootBig;
             ammoMultiplier = 4f;
+            splashDamage = 15f;
+            splashDamageRadius = 34f;
 
             status = StatusEffects.blasted;
             statusDuration = 60f;
         }};
 
-        flakSurge = new FlakBulletType(4f, 7){{
-            splashDamage = 33f;
+        flakSurge = new FlakBulletType(4.5f, 13){{
+            splashDamage = 40f;
+            splashDamageRadius = 40f;
             lightining = 2;
             lightningLength = 12;
             shootEffect = Fx.shootBig;

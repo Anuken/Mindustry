@@ -64,7 +64,7 @@ public class DesktopInput extends InputHandler{
         });
 
         group.fill(t -> {
-            t.visible(() -> lastSchematic != null && !selectRequests.isEmpty());
+            t.visible(() -> Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty());
             t.bottom();
             t.table(Styles.black6, b -> {
                 b.defaults().left();
@@ -75,6 +75,15 @@ public class DesktopInput extends InputHandler{
                 b.table(a -> {
                     a.button("$schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
+            }).margin(6f);
+        });
+
+        group.fill(t -> {
+            t.visible(() -> Core.settings.getBool("hints") && !player.dead() && !player.unit().spawnedByCore());
+            t.bottom();
+            t.table(Styles.black6, b -> {
+                b.defaults().left();
+                b.label(() -> Core.bundle.format("respawn", Core.keybinds.get(Binding.respawn).key.toString())).style(Styles.outlineLabel);
             }).margin(6f);
         });
     }
@@ -195,6 +204,11 @@ public class DesktopInput extends InputHandler{
                     Call.onUnitControl(player, on);
                     shouldShoot = false;
                 }
+            }
+
+            if(Core.input.keyDown(Binding.respawn) && !player.dead() && !player.unit().spawnedByCore()){
+                Call.onUnitClear(player);
+                controlledType = null;
             }
 
             //TODO this is for debugging, remove later
@@ -565,10 +579,11 @@ public class DesktopInput extends InputHandler{
         float speed = unit.type().speed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation()) * strafePenalty;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
+        boolean boosted = (!unit.type().flying && unit.isFlying());
 
         movement.set(xa, ya).nor().scl(speed);
         float mouseAngle = Angles.mouseAngle(unit.x(), unit.y());
-        boolean aimCursor = omni && isShooting && unit.type().hasWeapons() && unit.type().faceTarget;
+        boolean aimCursor = omni && isShooting && unit.type().hasWeapons() && unit.type().faceTarget && !boosted;
 
         if(aimCursor){
             unit.lookAt(mouseAngle);
@@ -588,7 +603,7 @@ public class DesktopInput extends InputHandler{
         }
 
         unit.aim(unit.type().faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation(), Core.input.mouseWorld().dst(unit)).add(unit.x(), unit.y()));
-        unit.controlWeapons(true, isShooting && !(!unit.type().flying && unit.isFlying()));
+        unit.controlWeapons(true, isShooting && !boosted);
 
         isBoosting = Core.input.keyDown(Binding.boost) && !movement.isZero();
         player.boosting(isBoosting);

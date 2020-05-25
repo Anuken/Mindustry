@@ -184,6 +184,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    public static void onUnitClear(Playerc player){
+        //no free core teleports?
+        if(!player.dead() && player.unit().spawnedByCore()) return;
+
+        Fx.spawn.at(player);
+        player.clearUnit();
+        player.deathTimer(60f); //for instant respawn
+    }
+
     public Eachable<BuildRequest> allRequests(){
         return cons -> {
             for(BuildRequest request : player.builder().requests()) cons.get(request);

@@ -1,16 +1,19 @@
 package mindustry.entities.comp;
 
-import arc.util.ArcAnnotate.*;
+import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.world.blocks.payloads.*;
 
 /** An entity that holds a payload. */
 @Component
 abstract class PayloadComp{
-    //TODO multiple payloads?
-    @Nullable Payload payload;
+    Array<Payload> payloads = new Array<>();
 
     boolean hasPayload(){
-        return payload != null;
+        return payloads.size > 0;
+    }
+
+    void addPayload(Payload load){
+        payloads.add(load);
     }
 }
