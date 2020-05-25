@@ -1,6 +1,7 @@
 package mindustry.world.blocks.payloads;
 
 import arc.graphics.g2d.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -11,6 +12,18 @@ public class UnitPayload implements Payload{
 
     public UnitPayload(Unitc unit){
         this.unit = unit;
+    }
+
+    @Override
+    public void write(Writes write){
+        write.b(payloadUnit);
+        write.b(unit.classId());
+        unit.write(write);
+    }
+
+    @Override
+    public void set(float x, float y){
+        unit.set(x, y);
     }
 
     @Override

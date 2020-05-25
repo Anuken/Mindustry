@@ -80,7 +80,7 @@ public class Blocks implements ContentList{
 
     //misc experimental
 
-    blockForge, blockLauncher;
+    blockForge, blockLauncher, blockLoader, blockUnloader;
 
     @Override
     public void load(){
@@ -1787,6 +1787,20 @@ public class Blocks implements ContentList{
             size = 3;
             hasPower = true;
             consumes.power(2f);
+        }};
+
+        blockLoader = new BlockLoader("block-loader"){{
+            requirements(Category.production, BuildVisibility.debugOnly, ItemStack.with(Items.thorium, 100));
+            hasPower = true;
+            consumes.power(2f);
+            size = 3;
+        }};
+
+        blockUnloader = new BlockUnloader("block-unloader"){{
+            requirements(Category.production, BuildVisibility.debugOnly, ItemStack.with(Items.thorium, 100));
+            hasPower = true;
+            consumes.power(2f);
+            size = 3;
         }};
 
         //endregion

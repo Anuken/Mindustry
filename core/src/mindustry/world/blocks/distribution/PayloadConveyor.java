@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -191,6 +192,24 @@ public class PayloadConveyor extends Block{
             this.stepAccepted = curStep();
             this.itemRotation = source.angleTo(this);
             this.animation = 0;
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+
+            write.f(progress);
+            write.f(itemRotation);
+            Payload.write(item, write);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+
+            progress = read.f();
+            itemRotation = read.f();
+            item = Payload.read(read);
         }
 
         boolean blends(int direction){

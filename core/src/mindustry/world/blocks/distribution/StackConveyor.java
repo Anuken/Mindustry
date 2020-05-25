@@ -41,7 +41,6 @@ public class StackConveyor extends Block implements Autotiler{
         idleSound = Sounds.conveyor;
         idleSoundVolume = 0.004f;
         unloadable = false;
-        dumpIncrement = 4;
     }
 
     @Override

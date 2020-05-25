@@ -24,6 +24,7 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.Net;
 import mindustry.net.*;
+import mindustry.world.*;
 
 import java.io.*;
 import java.nio.charset.*;
@@ -84,6 +85,8 @@ public class Vars implements Loadable{
     public static final float turnDuration = 5 * Time.toMinutes;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.05f;
+    /** tile used in certain situations, instead of null */
+    public static Tile emptyTile;
     /** for map generator dialog */
     public static boolean updateEditorOnChange = false;
     /** size of tiles in units */
@@ -231,6 +234,7 @@ public class Vars implements Loadable{
         schematicDirectory = dataDirectory.child("schematics/");
         bebuildDirectory = dataDirectory.child("be_builds/");
         emptyMap = new Map(new StringMap());
+        emptyTile = null;
 
         if(tree == null) tree = new FileTree();
         if(mods == null) mods = new Mods();

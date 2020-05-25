@@ -50,7 +50,6 @@ public class Block extends UnlockableContent{
     public int itemCapacity = 10;
     public float liquidCapacity = 10f;
     public float liquidPressure = 1f;
-    public int dumpIncrement = 1;
 
     public final BlockStats stats = new BlockStats();
     public final BlockBars bars = new BlockBars();

@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -51,10 +52,38 @@ public class PayloadAcceptor extends Block{
         public boolean moveInPayload(){
             if(payload == null) return false;
 
+            payload.set(x + payVector.x, y + payVector.y);
             payRotation = Mathf.slerpDelta(payRotation, rotate ? rotdeg() : 90f, 0.3f);
             payVector.approachDelta(Vec2.ZERO, payloadSpeed);
 
             return hasArrived();
+        }
+
+        public void moveOutPayload(){
+            if(payload == null) return;
+
+            payload.set(x + payVector.x, y + payVector.y);
+            payVector.trns(rotdeg(), payVector.len() + edelta() * payloadSpeed);
+            payRotation = rotdeg();
+
+            if(payVector.len() >= size * tilesize/2f){
+                payVector.clamp(-size * tilesize / 2f, size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f);
+
+                Tile front = frontLarge();
+                if(front != null && front.entity != null && front.block().outputsPayload){
+                    if(movePayload(payload)){
+                        payload = null;
+                    }
+                }else if(front != null && !front.solid()){
+                    dumpPayload();
+                }
+            }
+        }
+
+        public void dumpPayload(){
+            if(payload.dump(x + payVector.x, y + payVector.y, payRotation)){
+                payload = null;
+            }
         }
 
         public boolean hasArrived(){
@@ -66,6 +95,25 @@ public class PayloadAcceptor extends Block{
                 Draw.z(Layer.blockOver);
                 payload.draw(x + payVector.x, y + payVector.y, payRotation);
             }
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+
+            write.f(payVector.x);
+            write.f(payVector.y);
+            write.f(payRotation);
+            Payload.write(payload, write);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+
+            payVector.set(read.f(), read.f());
+            payRotation = read.f();
+            payload = Payload.read(read);
         }
     }
 }

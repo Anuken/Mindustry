@@ -242,36 +242,40 @@ public class Generators{
         ImagePacker.generate("unit-icons", () -> {
             content.units().each(type -> {
                 type.load();
+                try{
 
-                Image image = ImagePacker.get(type.region);
+                    Image image = ImagePacker.get(type.region);
 
-                if(type.constructor.get() instanceof Legsc){
-                    image.drawCenter(type.baseRegion);
-                    image.drawCenter(type.legRegion);
-                    image.drawCenter(type.legRegion, true, false);
-                }
-                image.draw(type.region);
-
-                Image baseCell = ImagePacker.get(type.cellRegion);
-                Image cell = new Image(type.cellRegion.getWidth(), type.cellRegion.getHeight());
-                cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
-
-                image.draw(cell, image.width/2 - cell.width/2, image.height/2 - cell.height/2);
-
-                for(Weapon weapon : type.weapons){
-                    weapon.load();
-
-                    for(int i : (weapon.mirror ? Mathf.signs : Mathf.one)){
-                        i *= Mathf.sign(weapon.flipped);
-
-                        image.draw(weapon.region,
-                        (int)(i * weapon.x / Draw.scl + image.width / 2 - weapon.region.getWidth() / 2),
-                        (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
-                        i > 0, false);
+                    if(type.constructor.get() instanceof Legsc){
+                        image.drawCenter(type.baseRegion);
+                        image.drawCenter(type.legRegion);
+                        image.drawCenter(type.legRegion, true, false);
                     }
-                }
+                    image.draw(type.region);
 
-                image.save("unit-" + type.name + "-full");
+                    Image baseCell = ImagePacker.get(type.cellRegion);
+                    Image cell = new Image(type.cellRegion.getWidth(), type.cellRegion.getHeight());
+                    cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
+
+                    image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2);
+
+                    for(Weapon weapon : type.weapons){
+                        weapon.load();
+
+                        for(int i : (weapon.mirror ? Mathf.signs : Mathf.one)){
+                            i *= Mathf.sign(weapon.flipped);
+
+                            image.draw(weapon.region,
+                            (int)(i * weapon.x / Draw.scl + image.width / 2 - weapon.region.getWidth() / 2),
+                            (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
+                            i > 0, false);
+                        }
+                    }
+
+                    image.save("unit-" + type.name + "-full");
+                }catch(IllegalArgumentException ignored){
+                    //skip
+                }
             });
         });
 

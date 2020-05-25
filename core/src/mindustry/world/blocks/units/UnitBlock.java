@@ -31,7 +31,7 @@ public class UnitBlock extends PayloadAcceptor{
     }
 
     public class UnitBlockEntity extends PayloadAcceptorEntity<UnitPayload>{
-        public float progress, payloadPos, time, speedScl;
+        public float progress, time, speedScl;
 
         public void spawned(){
             progress = 0f;
@@ -51,29 +51,11 @@ public class UnitBlock extends PayloadAcceptor{
             }
 
             payload = null;
-            payloadPos = 0f;
         }
 
-        public void outputPayload(){
-            if(payload == null) return;
-
-            payloadPos += edelta() * payloadSpeed;
-            payVector.trns(rotdeg(), payloadPos);
-            payRotation = rotdeg();
-
-            if(payloadPos >= size * tilesize/2f){
-                payloadPos = size * tilesize/2f;
-
-                Tile front = frontLarge();
-                if(front != null && front.entity != null && front.block().outputsPayload){
-                    if(movePayload(payload)){
-                        payload = null;
-                    }
-                }else if(front != null && !front.solid()){
-                    //create unit if there's space
-                    Call.onUnitBlockSpawn(tile);
-                }
-            }
+        @Override
+        public void dumpPayload(){
+            Call.onUnitBlockSpawn(tile);
         }
     }
 }
