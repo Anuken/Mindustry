@@ -97,7 +97,7 @@ public class OverlayRenderer{
 
         input.drawTop();
 
-        buildFade = Mathf.lerpDelta(buildFade, input.isPlacing() ? 1f : 0f, 0.06f);
+        buildFade = Mathf.lerpDelta(buildFade, input.isPlacing() || input.isUsingSchematic() ? 1f : 0f, 0.06f);
 
         Draw.reset();
         Lines.stroke(buildFade * 2f);
