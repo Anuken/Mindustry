@@ -2,6 +2,7 @@ package mindustry.entities.comp;
 
 import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.tilesize;
@@ -28,5 +29,15 @@ abstract class BlockUnitComp implements Unitc{
     @Replace
     public void damage(float v, boolean b){
         tile.damage(v, b);
+    }
+
+    @Replace
+    public boolean dead(){
+        return tile.dead();
+    }
+
+    @Replace
+    public void team(Team team){
+        tile.team(team);
     }
 }
