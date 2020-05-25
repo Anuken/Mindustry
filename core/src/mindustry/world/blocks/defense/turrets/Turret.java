@@ -9,6 +9,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -17,6 +18,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.tilesize;
@@ -108,12 +110,24 @@ public abstract class Turret extends Block{
         public abstract BulletType type();
     }
 
-    public class TurretEntity extends TileEntity{
+    public class TurretEntity extends TileEntity implements ControlBlock{
         public Array<AmmoEntry> ammo = new Array<>();
         public int totalAmmo;
         public float reload, rotation = 90, recoil, heat;
         public int shotCounter;
-        public Posc target;
+        public @Nullable Posc target;
+        public Vec2 targetPos = new Vec2();
+        public @NonNull BlockUnitc unit = Nulls.blockUnit;
+
+        public void created(){
+            unit = (BlockUnitc)UnitTypes.block.create(team);
+            unit.tile(this);
+        }
+
+        @Override
+        public Unitc unit(){
+            return unit;
+        }
 
         @Override
         public void draw(){
@@ -138,6 +152,10 @@ public abstract class Turret extends Block{
             recoil = Mathf.lerpDelta(recoil, 0f, restitution);
             heat = Mathf.lerpDelta(heat, 0f, cooldown);
 
+            unit.health(health);
+            unit.rotation(rotation);
+            unit.team(team);
+
             if(hasAmmo()){
 
                 if(timer(timerTarget, targetInterval)){
@@ -145,27 +163,35 @@ public abstract class Turret extends Block{
                 }
 
                 if(validateTarget()){
+                    boolean canShoot = true;
 
-                    BulletType type = peekAmmo();
-                    float speed = type.speed;
-                    if(speed < 0.1f) speed = 9999999f;
+                    //player behavior
+                    if(isControlled()){
+                        targetPos.set(unit.aimX(), unit.aimY());
+                        canShoot = unit.isShooting();
+                    }else{ //default AI behavior
+                        BulletType type = peekAmmo();
+                        float speed = type.speed;
+                        //slow bullets never intersect
+                        if(speed < 0.1f) speed = 9999999f;
 
-                    Vec2 result = Predict.intercept(this, target, speed);
-                    if(result.isZero()){
-                        result.set(target.getX(), target.getY());
+                        targetPos.set(Predict.intercept(this, target, speed));
+                        if(targetPos.isZero()){
+                            targetPos.set(target);
+                        }
+
+                        if(Float.isNaN(rotation)){
+                            rotation = 0;
+                        }
                     }
 
-                    float targetRot = result.sub(x, y).angle();
-
-                    if(Float.isNaN(rotation)){
-                        rotation = 0;
-                    }
+                    float targetRot = angleTo(targetPos);
 
                     if(shouldTurn()){
                         turnToTarget(targetRot);
                     }
 
-                    if(Angles.angleDist(rotation, targetRot) < shootCone){
+                    if(Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
                         updateShooting();
                     }
                 }
@@ -179,7 +205,7 @@ public abstract class Turret extends Block{
         }
 
         protected boolean validateTarget(){
-            return !Units.invalidateTarget(target, team, x, y);
+            return !Units.invalidateTarget(target, team, x, y) || isControlled();
         }
 
         protected void findTarget(){

@@ -5,14 +5,13 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.content;
 
 public class LiquidSource extends Block{
 
@@ -39,7 +38,7 @@ public class LiquidSource extends Block{
 
     @Override
     public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
-        drawRequestConfigCenter(req, (Content)req.config, "center");
+        drawRequestConfigCenter(req, req.config, "center");
     }
 
     public class LiquidSourceEntity extends TileEntity{

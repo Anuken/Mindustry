@@ -8,10 +8,11 @@ import arc.util.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
 import mindustry.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+
+import java.io.*;
 
 import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
@@ -428,18 +429,119 @@ public class Administration{
     }
 
     public void save(){
-        Core.settings.putObject("player-info", playerInfo);
-        Core.settings.putObject("banned-ips", bannedIPs);
-        Core.settings.putObject("whitelisted", whitelist);
-        Core.settings.putObject("subnet-bans", subnetBans);
+        Core.settings.putJson("player-data", playerInfo);
+        Core.settings.putJson("ip-bans", String.class, bannedIPs);
+        Core.settings.putJson("whitelist-ids", String.class, whitelist);
+        Core.settings.putJson("banned-subnets", String.class, subnetBans);
     }
 
     @SuppressWarnings("unchecked")
     private void load(){
-        playerInfo = Core.settings.getObject("player-info", ObjectMap.class, ObjectMap::new);
-        bannedIPs = Core.settings.getObject("banned-ips", Array.class, Array::new);
-        whitelist = Core.settings.getObject("whitelisted", Array.class, Array::new);
-        subnetBans = Core.settings.getObject("subnet-bans", Array.class, Array::new);
+        if(!loadLegacy()){
+            //load default data
+            playerInfo = Core.settings.getJson("player-data", ObjectMap.class, ObjectMap::new);
+            bannedIPs = Core.settings.getJson("ip-bans", Array.class, Array::new);
+            whitelist = Core.settings.getJson("whitelist-ids", Array.class, Array::new);
+            subnetBans = Core.settings.getJson("banned-subnets", Array.class, Array::new);
+        }else{
+            //save over loaded legacy data
+            save();
+            Log.info("Loaded legacy (5.0) server data.");
+        }
+    }
+
+    private boolean loadLegacy(){
+        try{
+            byte[] info = Core.settings.getBytes("player-info");
+            byte[] ips = Core.settings.getBytes("banned-ips");
+            byte[] whitelist = Core.settings.getBytes("whitelisted");
+            byte[] subnet = Core.settings.getBytes("subnet-bans");
+
+            if(info != null){
+                DataInputStream d = new DataInputStream(new ByteArrayInputStream(info));
+                int size = d.readInt();
+                if(size != 0){
+                    d.readUTF();
+                    d.readUTF();
+
+                    for(int i = 0; i < size; i++){
+                        String mapKey = d.readUTF();
+
+                        PlayerInfo data = new PlayerInfo();
+
+                        data.id = d.readUTF();
+                        data.lastName = d.readUTF();
+                        data.lastIP = d.readUTF();
+                        int ipsize = d.readInt();
+                        if(ipsize != 0){
+                            d.readUTF();
+                            for(int j = 0; j < ipsize; j++){
+                                data.ips.add(d.readUTF());
+                            }
+                        }
+
+                        int namesize = d.readInt();
+                        if(namesize != 0){
+                            d.readUTF();
+                            for(int j = 0; j < ipsize; j++){
+                                data.names.add(d.readUTF());
+                            }
+                        }
+                        //ips, names...
+                        data.adminUsid = d.readUTF();
+                        data.timesKicked = d.readInt();
+                        data.timesJoined = d.readInt();
+                        data.banned = d.readBoolean();
+                        data.admin = d.readBoolean();
+                        data.lastKicked = d.readLong();
+
+                        playerInfo.put(mapKey, data);
+                    }
+                }
+                Core.settings.remove("player-info");
+            }
+
+            if(ips != null){
+                DataInputStream d = new DataInputStream(new ByteArrayInputStream(ips));
+                int size = d.readInt();
+                if(size != 0){
+                    d.readUTF();
+                    for(int i = 0; i < size; i++){
+                        bannedIPs.add(d.readUTF());
+                    }
+                }
+                Core.settings.remove("banned-ips");
+            }
+
+            if(whitelist != null){
+                DataInputStream d = new DataInputStream(new ByteArrayInputStream(whitelist));
+                int size = d.readInt();
+                if(size != 0){
+                    d.readUTF();
+                    for(int i = 0; i < size; i++){
+                        this.whitelist.add(d.readUTF());
+                    }
+                }
+                Core.settings.remove("whitelisted");
+            }
+
+            if(subnet != null){
+                DataInputStream d = new DataInputStream(new ByteArrayInputStream(subnet));
+                int size = d.readInt();
+                if(size != 0){
+                    d.readUTF();
+                    for(int i = 0; i < size; i++){
+                        subnetBans.add(d.readUTF());
+                    }
+                }
+                Core.settings.remove("subnet-bans");
+            }
+
+            return info != null || ips != null || whitelist != null || subnet != null;
+        }catch(Throwable e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /** Server configuration definition. Each config value can be a string, boolean or number. */
@@ -526,7 +628,6 @@ public class Administration{
         }
     }
 
-    @Serialize
     public static class PlayerInfo{
         public String id;
         public String lastName = "<unknown>", lastIP = "<unknown>";

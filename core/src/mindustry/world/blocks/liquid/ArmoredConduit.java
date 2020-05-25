@@ -28,7 +28,7 @@ public class ArmoredConduit extends Conduit{
             Tilec next = tile.front();
             if(next != null && next.team() == team && next.block().hasLiquids) return;
 
-            Draw.rect(capRegion, x, y, tile.rotation() * 90);
+            Draw.rect(capRegion, x, y, tile.rotdeg());
         }
 
         @Override

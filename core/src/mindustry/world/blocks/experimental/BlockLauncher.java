@@ -26,7 +26,7 @@ public class BlockLauncher extends PayloadAcceptor{
         size = 3;
     }
 
-    public class BlockLauncherEntity extends PayloadAcceptorEntity{
+    public class BlockLauncherEntity extends PayloadAcceptorEntity<BlockPayload>{
 
         @Override
         public void draw(){
@@ -42,15 +42,14 @@ public class BlockLauncher extends PayloadAcceptor{
 
         @Override
         public void updateTile(){
-            if(updatePayload() && efficiency() >= 0.99f){
+            if(moveInPayload() && efficiency() >= 0.99f){
                 Effects.shake(4f, 4f, this);
                 Fx.producesmoke.at(this);
 
                 positions.clear();
-                BlockPayload pay = (BlockPayload)payload;
 
                 Geometry.circle(tileX(), tileY(), world.width(), world.height(), (int)(range / tilesize), (cx, cy) -> {
-                    if(Build.validPlace(team, cx, cy, pay.block, 0)){
+                    if(Build.validPlace(team, cx, cy, payload.block, 0)){
                         positions.add(Point2.pack(cx, cy));
                     }
                 });
@@ -58,7 +57,7 @@ public class BlockLauncher extends PayloadAcceptor{
                 if(positions.isEmpty()) return;
 
                 int pick = positions.random();
-                LaunchedBlock launch = new LaunchedBlock(Point2.x(pick), Point2.y(pick), pay.block, team);
+                LaunchedBlock launch = new LaunchedBlock(Point2.x(pick), Point2.y(pick), payload.block, team);
                 Fx.blockTransfer.at(x, y, 0, launch);
                 Time.run(Fx.blockTransfer.lifetime, () -> {
                     float ex = launch.x * tilesize + launch.block.offset(), ey = launch.y * tilesize + launch.block.offset();
@@ -75,7 +74,7 @@ public class BlockLauncher extends PayloadAcceptor{
         }
     }
 
-    public class LaunchedBlock{
+    public static class LaunchedBlock{
         public final int x, y;
         public final Block block;
         public final Team team;

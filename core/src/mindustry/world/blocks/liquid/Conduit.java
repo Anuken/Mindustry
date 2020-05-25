@@ -42,13 +42,11 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
         Draw.color(botColor);
         Draw.alpha(0.5f);
-        Draw.rect(botRegions[bits[0]], req.drawx(), req.drawy(),
-            botRegions[bits[0]].getWidth() * Draw.scl * req.animScale, botRegions[bits[0]].getHeight() * Draw.scl * req.animScale,
-            req.rotation * 90);
+        Draw.rect(botRegions[bits[0]], req.drawx(), req.drawy(), req.rotation * 90);
         Draw.color();
 
 
-        Draw.rect(topRegions[bits[0]], req.drawx(), req.drawy(), topRegions[bits[0]].getWidth() * Draw.scl * req.animScale, topRegions[bits[0]].getHeight() * Draw.scl * req.animScale, req.rotation * 90);
+        Draw.rect(topRegions[bits[0]], req.drawx(), req.drawy(), req.rotation * 90);
     }
 
     @Override
@@ -82,7 +80,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
         @Override
         public void draw(){
-            int rotation = rotation() * 90;
+            float rotation = rotdeg();
 
             Draw.color(botColor);
             Draw.rect(botRegions[blendbits], x, y, rotation);

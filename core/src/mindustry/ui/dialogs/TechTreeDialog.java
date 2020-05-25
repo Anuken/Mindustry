@@ -22,7 +22,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.ui.layout.*;
 import mindustry.ui.layout.TreeLayout.*;
 

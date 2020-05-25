@@ -339,7 +339,6 @@ public class ArcNetProvider implements NetProvider{
 
     @SuppressWarnings("unchecked")
     public static class PacketSerializer implements NetSerializer{
-        static Cons2<Packet, ByteBuffer> writer = Packet::write;
 
         @Override
         public Object read(ByteBuffer byteBuffer){
@@ -359,13 +358,11 @@ public class ArcNetProvider implements NetProvider{
                 byteBuffer.put((byte)-2); //code for framework message
                 writeFramework(byteBuffer, (FrameworkMessage)o);
             }else{
-                if(!(o instanceof Packet))
-                    throw new RuntimeException("All sent objects must implement be Packets! Class: " + o.getClass());
+                if(!(o instanceof Packet)) throw new RuntimeException("All sent objects must implement be Packets! Class: " + o.getClass());
                 byte id = Registrator.getID(o.getClass());
-                if(id == -1)
-                    throw new RuntimeException("Unregistered class: " + o.getClass());
+                if(id == -1) throw new RuntimeException("Unregistered class: " + o.getClass());
                 byteBuffer.put(id);
-                writer.get((Packet)o, byteBuffer);
+                ((Packet)o).write(byteBuffer);
             }
         }
 

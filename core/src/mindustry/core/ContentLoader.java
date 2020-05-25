@@ -8,7 +8,6 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
 import mindustry.entities.bullet.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;

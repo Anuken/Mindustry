@@ -17,7 +17,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     @Import float x, y;
     @Import Vec2 vel;
 
-    float elevation;
+    @SyncField(value = true, clamped = true) @SyncLocal float elevation;
     private transient boolean wasFlying;
     transient float drownTime;
     transient float splashTimer;
@@ -78,7 +78,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
         if(canDrown() && floor.isLiquid && floor.drownTime > 0){
             drownTime += Time.delta() * 1f / floor.drownTime;
             drownTime = Mathf.clamp(drownTime);
-            if(Mathf.chance(Time.delta() * 0.05f)){
+            if(Mathf.chanceDelta(0.05f)){
                 floor.drownUpdateEffect.at(x, y, 0f, floor.mapColor);
             }
 

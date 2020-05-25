@@ -1,11 +1,10 @@
 package mindustry.entities.bullet;
 
-import arc.graphics.Color;
-import arc.math.Mathf;
-import arc.util.Time;
-import mindustry.content.Fx;
+import arc.graphics.*;
+import arc.math.*;
+import mindustry.content.*;
 import mindustry.gen.*;
-import mindustry.graphics.Pal;
+import mindustry.graphics.*;
 
 public class MissileBulletType extends BasicBulletType{
     protected Color trailColor = Pal.missileYellowBack;
@@ -14,7 +13,7 @@ public class MissileBulletType extends BasicBulletType{
         super(speed, damage, bulletSprite);
         backColor = Pal.missileYellowBack;
         frontColor = Pal.missileYellow;
-        homingPower = 7f;
+        homingPower = 0.08f;
         hitSound = Sounds.explosion;
     }
 
@@ -26,7 +25,7 @@ public class MissileBulletType extends BasicBulletType{
     public void update(Bulletc b){
         super.update(b);
 
-        if(Mathf.chance(Time.delta() * 0.2)){
+        if(Mathf.chanceDelta(0.2)){
             Fx.missileTrail.at(b.x(), b.y(), 2f, trailColor);
         }
     }

@@ -12,7 +12,7 @@ import static mindustry.Vars.world;
 
 @Component
 abstract class PosComp implements Position{
-    float x, y;
+    @SyncField(true) @SyncLocal float x, y;
 
     void set(float x, float y){
         this.x = x;
@@ -25,6 +25,10 @@ abstract class PosComp implements Position{
 
     void trns(float x, float y){
         set(this.x + x, this.y + y);
+    }
+
+    void trns(Position pos){
+        trns(pos.getX(), pos.getY());
     }
 
     int tileX(){

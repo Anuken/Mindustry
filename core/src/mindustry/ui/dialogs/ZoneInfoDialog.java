@@ -79,7 +79,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                     }
 
                     req.row();
-                    Array<Unlock> blocks = zone.requirements.select(o -> o instanceof Unlock).as(Unlock.class);
+                    Array<Unlock> blocks = zone.requirements.select(o -> o instanceof Unlock).as();
 
                     if(!blocks.isEmpty()){
                         req.table(r -> {

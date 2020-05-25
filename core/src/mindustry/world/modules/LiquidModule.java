@@ -57,9 +57,7 @@ public class LiquidModule extends BlockModule{
     }
 
     public void reset(Liquid liquid, float amount){
-        for(int i = 0; i < liquids.length; i++){
-            liquids[i] = 0f;
-        }
+        Arrays.fill(liquids, 0f);
         liquids[liquid.id] = amount;
         total = amount;
         current = liquid;

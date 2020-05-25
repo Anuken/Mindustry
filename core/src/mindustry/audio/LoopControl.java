@@ -50,7 +50,7 @@ public class LoopControl{
         });
     }
 
-    private class SoundData{
+    private static class SoundData{
         float volume;
         float total;
         Vec2 sum = new Vec2();

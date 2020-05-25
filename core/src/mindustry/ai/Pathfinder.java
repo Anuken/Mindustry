@@ -330,7 +330,7 @@ public class Pathfinder implements Runnable{
     }
 
     /** Data for a specific flow field to some set of destinations. */
-    class PathData{
+    static class PathData{
         /** Team this path is for. */
         final Team team;
         /** Flag that is being targeted. */

@@ -60,7 +60,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     private transient float timeScale = 1f, timeScaleDuration;
 
-    private transient @Nullable mindustry.audio.SoundLoop sound;
+    private transient @Nullable SoundLoop sound;
 
     private transient boolean sleeping;
     private transient float sleepTime;
@@ -83,6 +83,8 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         if(shouldAdd){
             add();
         }
+
+        created();
 
         return this;
     }
@@ -197,6 +199,11 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         return tile.absoluteRelativeTo(cx, cy);
     }
 
+    public @Nullable Tile frontLarge(){
+        int trns = block.size/2 + 1;
+        return tile.getNearby(Geometry.d4(rotation()).x * trns, Geometry.d4(rotation()).y * trns);
+    }
+
     public @Nullable Tilec front(){
         return nearby((rotation() + 4) % 4);
     }
@@ -215,6 +222,10 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     public int pos(){
         return tile.pos();
+    }
+
+    public float rotdeg(){
+        return tile.rotdeg();
     }
 
     public int rotation(){
@@ -287,6 +298,8 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     //endregion
     //region handler methods
+
+    public void created(){}
     
     public boolean shouldConsume(){
         return true;
@@ -345,13 +358,30 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     }
 
+
     /**
-     * Tries dumping a payload.
+     * Tries moving a payload forwards.
+     * @param todump payload to dump.
+     * @return whether the payload was moved successfully
+     */
+    public boolean movePayload(@NonNull Payload todump){
+        int trns = block.size/2 + 1;
+        Tile next = tile.getNearby(Geometry.d4(rotation()).x * trns, Geometry.d4(rotation()).y * trns);
+
+        if(next != null && next.entity != null && next.entity.team() == team() && next.entity.acceptPayload(this, todump)){
+            next.entity.handlePayload(this, todump);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Tries dumping a payload to any adjacent block.
      * @param todump payload to dump.
      * @return whether the payload was moved successfully
      */
     public boolean dumpPayload(@NonNull Payload todump){
-        Array<Tilec> proximity = proximity();
         int dump = rotation();
 
         if(proximity.size == 0) return false;
@@ -678,7 +708,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     }
 
     public void draw(){
-        Draw.rect(block.region, x, y, block.rotate ? rotation() * 90 : 0);
+        Draw.rect(block.region, x, y, block.rotate ? rotdeg() : 0);
     }
 
     public void drawLight(){

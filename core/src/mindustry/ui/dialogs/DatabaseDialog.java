@@ -10,7 +10,6 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;

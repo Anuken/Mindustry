@@ -4,6 +4,7 @@ import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -22,8 +23,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Import float x, y, rotation, elevation, maxHealth;
 
-    private transient UnitController controller;
+    private UnitController controller;
     private UnitType type;
+    boolean spawnedByCore;
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
@@ -171,6 +173,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         controller.update();
+
+        //remove units spawned by the core
+        if(spawnedByCore && !isPlayer()){
+            Fx.unitDespawn.at(x, y, 0, this);
+            remove();
+        }
     }
 
     @Override
@@ -188,6 +196,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return controller instanceof Playerc;
     }
 
+    @Nullable
     public Playerc getPlayer(){
         return isPlayer() ? (Playerc)controller : null;
     }

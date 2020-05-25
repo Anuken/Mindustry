@@ -399,11 +399,11 @@ public class NetClient implements ApplicationListener{
                 }
 
                 //read the entity
-                entity.read(Reads.get(input));
+                entity.readSync(Reads.get(input));
 
-                if(created && entity.interpolator().target != null){
-                    //set initial starting position
-                    entity.setNet(entity.interpolator().target.x, entity.interpolator().target.y);
+                if(created){
+                    //snap initial starting position
+                    entity.snapSync();
                 }
 
                 if(add){
@@ -437,7 +437,7 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void onStateSnapshot(float waveTime, int wave, int enemies, short coreDataLen, byte[] coreData){
+    public static void onStateSnapshot(float waveTime, int wave, int enemies, boolean paused, short coreDataLen, byte[] coreData){
         try{
             if(wave > state.wave){
                 state.wave = wave;
@@ -447,6 +447,7 @@ public class NetClient implements ApplicationListener{
             state.wavetime = waveTime;
             state.wave = wave;
             state.enemies = enemies;
+            state.serverPaused = paused;
 
             netClient.byteStream.setBytes(net.decompressSnapshot(coreData, coreDataLen));
             DataInputStream input = netClient.dataStream;
@@ -566,7 +567,7 @@ public class NetClient implements ApplicationListener{
 
             Call.onClientShapshot(lastSent++,
             unit.x(), unit.y(),
-            player.mouseX(), player.mouseY(),
+            player.unit().aimX(), player.unit().aimY(),
             unit.rotation(),
             unit instanceof Legsc ? ((Legsc)unit).baseRotation() : 0,
             unit.vel().x, unit.vel().y,

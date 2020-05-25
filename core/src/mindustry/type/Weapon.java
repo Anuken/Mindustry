@@ -44,16 +44,12 @@ public class Weapon{
     public float x = 5f, y = 0f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
-    /** randomization of shot length */
-    public float lengthRand = 0f;
     /** delay in ticks between shots */
     public float shotDelay = 0;
     /** The half-radius of the cone in which shooting will start. */
     public float shootCone = 1.5f;
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
-    /** if turnCursor is false for a mech, how far away will the weapon target. */
-    public float targetDistance = 1f;
     /** sound used for shooting */
     public Sound shootSound = Sounds.pew;
     /** displayed region (autoloaded) */

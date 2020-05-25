@@ -1,6 +1,7 @@
 package mindustry.world.blocks.payloads;
 
 import arc.graphics.g2d.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -14,6 +15,9 @@ public class UnitPayload implements Payload{
 
     @Override
     public boolean dump(float x, float y, float rotation){
+        //no client dumping
+        if(Vars.net.client()) return true;
+
         unit.set(x, y);
         unit.rotation(rotation);
         unit.add();
@@ -23,8 +27,8 @@ public class UnitPayload implements Payload{
 
     @Override
     public void draw(float x, float y, float rotation){
-        Drawf.shadow(x, y, 24);
-        Draw.rect("pneumatic-drill", x, y, rotation);
+       // Drawf.shadow(x, y, 24);
+        //Draw.rect("pneumatic-drill", x, y, rotation);
         Drawf.shadow(x, y, 20);
         Draw.rect(unit.type().icon(Cicon.full), x, y, rotation - 90);
     }

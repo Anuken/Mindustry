@@ -30,9 +30,11 @@ public class UnitType extends UnlockableContent{
     public boolean flying;
     public @NonNull Prov<? extends Unitc> constructor;
     public @NonNull Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
+    public @Nullable UnitType upgrade;
+    public int tier = 1;
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
-    public float drag = 0.3f, mass = 1f, accel = 0.5f, landShake = 0f;
-    public float health = 200f, range = -1;
+    public float drag = 0.3f, accel = 0.5f, landShake = 0f;
+    public float health = 200f, range = -1, armor = 0f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
@@ -42,9 +44,8 @@ public class UnitType extends UnlockableContent{
     public int drillTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
 
-    public Color engineColor = Pal.engine;
     public float engineOffset = 5f, engineSize = 2.5f;
-
+    public float strafePenalty = 0.5f;
     public float hitsize = 6f;
     public float itemOffsetY = 3f;
     public float lightRadius = 60f, lightOpacity = 0.6f;
@@ -65,7 +66,6 @@ public class UnitType extends UnlockableContent{
         }else{
             //TODO fix for mods
             throw new RuntimeException("Unit has no type: " + name);
-            //constructor = () -> Nulls.unit;
         }
     }
 
@@ -76,6 +76,7 @@ public class UnitType extends UnlockableContent{
     public Unitc create(Team team){
         Unitc unit = constructor.get();
         unit.team(team);
+        unit.armor(armor);
         unit.type(this);
         return unit;
     }
@@ -146,14 +147,14 @@ public class UnitType extends UnlockableContent{
             unit.trns(legOffset.x, legOffset.y);
         }
 
-        Draw.z(z - 0.01f);
+        Draw.z(Math.min(z - 0.01f, Layer.bullet - 1f));
         drawOcclusion(unit);
 
         Draw.z(z);
         drawEngine(unit);
         drawBody(unit);
-        drawWeapons(unit);
         if(drawCell) drawCell(unit);
+        drawWeapons(unit);
         if(drawItems) drawItems(unit);
         drawLight(unit);
 
