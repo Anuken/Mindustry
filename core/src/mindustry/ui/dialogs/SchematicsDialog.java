@@ -162,12 +162,6 @@ public class SchematicsDialog extends FloatingDialog{
                     }
                 }
             };
-            t.update(() -> {
-                if(Core.input.keyTap(Binding.chat) && Core.scene.getKeyboardFocus() == searchField && firstSchematic != null){
-                    control.input.useSchematic(firstSchematic);
-                    hide();
-                }
-            });
 
             rebuildPane[0].run();
         }).get().setScrollingDisabled(true, false);
