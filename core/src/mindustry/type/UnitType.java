@@ -125,7 +125,7 @@ public class UnitType extends UnlockableContent{
     //region drawing
 
     public void draw(Unitc unit){
-        Legsc legs = unit instanceof Legsc ? (Legsc)unit : null;
+        Mechc legs = unit instanceof Mechc ? (Mechc)unit : null;
         float z = unit.elevation() > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : Layer.groundUnit;
 
         if(unit.controller().isBeingControlled(player.unit())){
@@ -309,7 +309,7 @@ public class UnitType extends UnlockableContent{
         }
     }
 
-    public void drawLegs(Legsc unit){
+    public void drawLegs(Mechc unit){
         Draw.reset();
 
         Draw.mixcol(Color.white, unit.hitTime());

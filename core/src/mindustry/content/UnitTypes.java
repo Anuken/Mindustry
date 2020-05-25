@@ -12,10 +12,10 @@ import mindustry.type.*;
 public class UnitTypes implements ContentList{
 
     //ground
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType titan, dagger, crawler, fortress, eruptor, chaosArray, eradicator;
+    public static @EntityDef({Unitc.class, Mechc.class}) UnitType titan, dagger, crawler, fortress, eruptor, chaosArray, eradicator;
 
     //ground + builder
-    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType oculon, tau;
+    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType oculon, tau;
 
     //air
     public static @EntityDef({Unitc.class}) UnitType wraith, reaper, ghoul, revenant, lich;
