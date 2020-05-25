@@ -63,9 +63,10 @@ public class SchematicsDialog extends FloatingDialog{
             rebuildPane[0] = () -> {
                 t.clear();
                 int i = 0;
-                boolean useFuzzy = Core.settings.getBool("fuzzymatch");
+                String regex = "[`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?]";
+                String searchString = search.toLowerCase().replaceAll(regex," ");
 
-                if(!schematics.all().contains(s -> search.isEmpty() || (useFuzzy ? fuzzyMatch(s.name(), search) : !s.name().toLowerCase().contains(search.toLowerCase())))){
+                if(!schematics.all().contains(s -> search.isEmpty() || !s.name().toLowerCase().replaceAll(regex," ").contains(searchString))){
                     t.add("$none");
                     return;
                 }
@@ -73,9 +74,8 @@ public class SchematicsDialog extends FloatingDialog{
                 firstSchematic = null;
 
                 for(Schematic s : schematics.all()){
-                    if(!search.isEmpty() && (useFuzzy ? fuzzyMatch(s.name(), search) : !s.name().toLowerCase().contains(search.toLowerCase()))) continue;
-                    if(firstSchematic == null)
-                        firstSchematic = s;
+                    if(!search.isEmpty() && !s.name().toLowerCase().replaceAll(regex," ").contains(searchString)) continue;
+                    if(firstSchematic == null) firstSchematic = s;
 
                     Button[] sel = {null};
                     sel[0] = t.button(b -> {
@@ -165,21 +165,6 @@ public class SchematicsDialog extends FloatingDialog{
 
     public void showInfo(Schematic schematic){
         info.show(schematic);
-    }
-
-    public boolean fuzzyMatch(String text, String searchText){
-        String matchText = text.toLowerCase().replaceAll(" ","");
-        int searchPosition = 0;
-
-        for(int i=0; i < matchText.length(); i++){
-            if(searchPosition < searchText.length() && matchText.charAt(i) == searchText.charAt(searchPosition))
-                searchPosition++;
-        }
-
-        if(searchPosition == searchText.length())
-            return false;
-
-        return true;
     }
 
     public void showImport(){
