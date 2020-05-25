@@ -25,7 +25,6 @@ import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -548,7 +547,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 mid.table(Tex.underline, t -> {
                     Slider slider = new Slider(0, MapEditor.brushSizes.length - 1, 1, false);
-                    slider.moved(f -> editor.brushSize = MapEditor.brushSizes[(int)(float)f]);
+                    slider.moved(f -> editor.brushSize = MapEditor.brushSizes[(int)f]);
                     for(int j = 0; j < MapEditor.brushSizes.length; j++){
                         if(MapEditor.brushSizes[j] == editor.brushSize){
                             slider.setValue(j);
@@ -684,7 +683,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         for(Block block : blocksOut){
             TextureRegion region = block.icon(Cicon.medium);
 
-            if(!Core.atlas.isFound(region)) continue;
+            if(!Core.atlas.isFound(region) || !block.inEditor) continue;
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglei);
             button.getStyle().imageUp = new TextureRegionDrawable(region);

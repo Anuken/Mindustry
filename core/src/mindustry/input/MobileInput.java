@@ -139,17 +139,12 @@ public class MobileInput extends InputHandler implements GestureListener{
                 r1.setSize(req.block.size * tilesize);
                 r1.setCenter(other.worldx() + req.block.offset(), other.worldy() + req.block.offset());
 
-                if(r2.overlaps(r1)){
-                    return req;
-                }
             }else{
                 r1.setSize(other.block().size * tilesize);
                 r1.setCenter(other.worldx() + other.block().offset(), other.worldy() + other.block().offset());
-
-                if(r2.overlaps(r1)){
-                    return req;
-                }
             }
+
+            if(r2.overlaps(r1)) return req;
         }
         return null;
     }

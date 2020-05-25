@@ -14,6 +14,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.production.*;
 
 import static mindustry.Vars.*;
 
@@ -81,7 +82,7 @@ public class PayloadConveyor extends Block{
             //TODO DEBUG
             if(Core.input.keyTap(KeyCode.g) && world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y) == this){
                 item = new UnitPayload((Mathf.chance(0.5) ? UnitTypes.wraith : UnitTypes.dagger).create(Team.sharded));
-                itemRotation = rotation() * 90;
+                itemRotation = rotdeg();
                 animation = 0f;
             }
 
@@ -106,7 +107,7 @@ public class PayloadConveyor extends Block{
                         //dump item forward
                         float trnext = size * tilesize / 2f, cx = Geometry.d4(rotation()).x, cy = Geometry.d4(rotation()).y;
 
-                        if(item.dump(x + cx * trnext, y + cy * trnext, rotation() * 90)){
+                        if(item.dump(x + cx * trnext, y + cy * trnext, rotdeg())){
                             item = null;
                         }
                     }
@@ -123,7 +124,7 @@ public class PayloadConveyor extends Block{
             float glow = Math.max((dst - (Math.abs(fract() - 0.5f) * 2)) / dst, 0);
             Draw.mixcol(Pal.accent, glow);
 
-            float trnext = fract() * size * tilesize, trprev = size * tilesize * (fract() - 1), rot = rotation() * 90;
+            float trnext = fract() * size * tilesize, trprev = size * tilesize * (fract() - 1), rot = rotdeg();
 
             TextureRegion clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trnext, 0), topRegion);
             float s = tilesize * size;
@@ -164,12 +165,12 @@ public class PayloadConveyor extends Block{
             animation = Math.max(animation, fract());
 
             float fract = animation;
-            rot = Mathf.slerp(itemRotation, rotation() * 90, fract);
+            rot = Mathf.slerp(itemRotation, rotdeg(), fract);
 
             if(fract < 0.5f){
                 Tmp.v1.trns(itemRotation + 180, (0.5f - fract) * tilesize * size);
             }else{
-                Tmp.v1.trns(rotation() * 90, (fract - 0.5f) * tilesize * size);
+                Tmp.v1.trns(rotdeg(), (fract - 0.5f) * tilesize * size);
             }
 
             float vx = Tmp.v1.x, vy = Tmp.v1.y;
@@ -196,10 +197,7 @@ public class PayloadConveyor extends Block{
             if(direction == rotation()){
                 return !blocked || next != null;
             }else{
-                Tilec accept = nearby(Geometry.d4(direction).x * size, Geometry.d4(direction).y * size);
-                return accept != null && accept.block().size == size && accept.block().outputsPayload &&
-                    //block must either be facing this one, or not be rotating
-                    ((accept.tileX() + Geometry.d4(accept.rotation()).x * size == tileX() && accept.tileY() + Geometry.d4(accept.rotation()).y * size == tileY()) || !accept.block().rotate);
+                return PayloadAcceptor.blends(this, direction);
             }
         }
 

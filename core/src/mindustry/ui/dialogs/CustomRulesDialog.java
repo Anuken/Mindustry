@@ -15,7 +15,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -130,12 +129,9 @@ public class CustomRulesDialog extends FloatingDialog{
         title("$rules.title.waves");
         check("$rules.waves", b -> rules.waves = b, () -> rules.waves);
         check("$rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer);
-        check("$rules.waitForWaveToEnd", b -> rules.waitForWaveToEnd = b, () -> rules.waitForWaveToEnd);
+        check("$rules.waitForWaveToEnd", b -> rules.waitEnemies = b, () -> rules.waitEnemies);
         number("$rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true);
         number("$rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
-
-        title("$rules.title.respawns");
-        number("$rules.respawntime", f -> rules.respawnTime = f * 60f, () -> rules.respawnTime / 60f);
 
         title("$rules.title.resourcesbuilding");
         check("$rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);

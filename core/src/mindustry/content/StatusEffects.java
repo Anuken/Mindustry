@@ -9,7 +9,7 @@ import mindustry.type.StatusEffect;
 import static mindustry.Vars.*;
 
 public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, wet, melting, tarred, overdrive, shielded, shocked, corroded, boss;
+    public static StatusEffect none, burning, freezing, wet, melting, tarred, overdrive, shielded, shocked, blasted, corroded, boss;
 
     @Override
     public void load(){
@@ -17,13 +17,13 @@ public class StatusEffects implements ContentList{
         none = new StatusEffect("none");
 
         burning = new StatusEffect("burning"){{
-            damage = 0.06f;
+            damage = 0.075f;
             effect = Fx.burning;
 
             init(() -> {
                 opposite(wet,freezing);
                 trans(tarred, ((unit, time, newTime, result) -> {
-                    unit.damage(1f);
+                    unit.damagePierce(8f);
                     Fx.burning.at(unit.x() + Mathf.range(unit.bounds() / 2f), unit.y() + Mathf.range(unit.bounds() / 2f));
                     result.set(this, Math.min(time + newTime, 300f));
                 }));
@@ -37,6 +37,11 @@ public class StatusEffects implements ContentList{
 
             init(() -> {
                 opposite(melting, burning);
+
+                trans(blasted, ((unit, time, newTime, result) -> {
+                    unit.damagePierce(18f);
+                    result.set(this, time);
+                }));
             });
         }};
 
@@ -47,7 +52,7 @@ public class StatusEffects implements ContentList{
 
             init(() -> {
                 trans(shocked, ((unit, time, newTime, result) -> {
-                    unit.damage(20f);
+                    unit.damagePierce(20f);
                     if(unit.team() == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
@@ -97,6 +102,8 @@ public class StatusEffects implements ContentList{
         }};
 
         shocked = new StatusEffect("shocked");
+
+        blasted = new StatusEffect("blasted");
 
         //no effects, just small amounts of damage.
         corroded = new StatusEffect("corroded"){{

@@ -30,7 +30,7 @@ public class Smethod extends Selement<ExecutableElement>{
     }
 
     public Array<TypeMirror> thrown(){
-        return Array.with(e.getThrownTypes()).as(TypeMirror.class);
+        return Array.with(e.getThrownTypes()).as();
     }
 
     public Array<TypeName> thrownt(){
@@ -38,7 +38,7 @@ public class Smethod extends Selement<ExecutableElement>{
     }
 
     public Array<TypeParameterElement> typeVariables(){
-        return Array.with(e.getTypeParameters()).as(TypeParameterElement.class);
+        return Array.with(e.getTypeParameters()).as();
     }
 
     public Array<Svar> params(){

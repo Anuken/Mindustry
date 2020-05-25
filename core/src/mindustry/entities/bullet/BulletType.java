@@ -75,7 +75,6 @@ public abstract class BulletType extends Content{
     public int incendAmount = 0;
     public float incendSpread = 8f;
     public float incendChance = 1f;
-
     public float homingPower = 0f;
     public float homingRange = 50f;
 
@@ -163,9 +162,9 @@ public abstract class BulletType extends Content{
 
     public void update(Bulletc b){
         if(homingPower > 0.0001f){
-            Teamc target = Units.closestTarget(b.team(), b.getX(), b.getY(), homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir));
+            Teamc target = Units.closestTarget(b.team(), b.getX(), b.getY(), homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
             if(target != null){
-                b.vel().setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), 0.08f));
+                b.vel().setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));
             }
         }
 
@@ -178,8 +177,6 @@ public abstract class BulletType extends Content{
     public ContentType getContentType(){
         return ContentType.bullet;
     }
-
-    //TODO change 'create' to 'at'
 
     public Bulletc create(Teamc owner, float x, float y, float angle){
         return create(owner, owner.team(), x, y, angle);
@@ -219,7 +216,7 @@ public abstract class BulletType extends Content{
         bullet.damage(damage < 0 ? this.damage : damage);
         bullet.add();
 
-        if(keepVelocity && owner instanceof Velc) bullet.vel().add(((Velc)owner).vel());
+        if(keepVelocity && owner instanceof Hitboxc) bullet.vel().add(((Hitboxc)owner).deltaX(), ((Hitboxc)owner).deltaY());
         return bullet;
 
     }

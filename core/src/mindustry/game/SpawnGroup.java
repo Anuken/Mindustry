@@ -1,10 +1,9 @@
 package mindustry.game;
 
-import arc.util.serialization.Json;
-import arc.util.serialization.Json.Serializable;
-import arc.util.serialization.JsonValue;
+import arc.util.serialization.*;
+import arc.util.serialization.Json.*;
 import mindustry.content.*;
-import mindustry.ctype.ContentType;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
@@ -30,6 +29,10 @@ public class SpawnGroup implements Serializable{
     public int max = 100;
     /** How many waves need to pass before the amount of units spawned increases by 1 */
     public float unitScaling = never;
+    /** Shield points that this unit has. */
+    public float shields = 0f;
+    /** How much shields get increased per wave. */
+    public float shieldScaling = 0f;
     /** Amount of enemies spawned initially, with no scaling */
     public int unitAmount = 1;
     /** Status effect applied to the spawned unit. Null to disable. */
@@ -57,7 +60,7 @@ public class SpawnGroup implements Serializable{
      * Creates a unit, and assigns correct values based on this group's data.
      * This method does not add() the unit.
      */
-    public Unitc createUnit(Team team){
+    public Unitc createUnit(Team team, int wave){
         Unitc unit = type.create(team);
 
         if(effect != null){
@@ -67,6 +70,8 @@ public class SpawnGroup implements Serializable{
         if(items != null){
             unit.addItem(items.item, items.amount);
         }
+
+        unit.shield(Math.max(shields + shieldScaling*(wave - begin), 0));
 
         return unit;
     }
@@ -80,6 +85,8 @@ public class SpawnGroup implements Serializable{
         if(spacing != 1) json.writeValue("spacing", spacing);
         //if(max != 40) json.writeValue("max", max);
         if(unitScaling != never) json.writeValue("scaling", unitScaling);
+        if(shields != 0) json.writeValue("shields", shields);
+        if(shieldScaling != 0) json.writeValue("shieldScaling", shieldScaling);
         if(unitAmount != 1) json.writeValue("amount", unitAmount);
         if(effect != null) json.writeValue("effect", effect.id);
     }
@@ -93,6 +100,8 @@ public class SpawnGroup implements Serializable{
         spacing = data.getInt("spacing", 1);
         //max = data.getInt("max", 40);
         unitScaling = data.getFloat("scaling", never);
+        shields = data.getFloat("shields", 0);
+        shieldScaling = data.getFloat("shieldScaling", 0);
         unitAmount = data.getInt("amount", 1);
         effect = content.getByID(ContentType.status, data.getInt("effect", -1));
     }

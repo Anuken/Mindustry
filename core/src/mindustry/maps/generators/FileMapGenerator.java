@@ -17,13 +17,16 @@ public class FileMapGenerator implements WorldGenerator{
     public final Map map;
 
     public FileMapGenerator(String mapName){
-        this.map = maps.loadInternalMap(mapName);
+        this.map = maps != null ? maps.loadInternalMap(mapName) : null;
     }
 
     @Override
     public void generate(Tiles tiles){
-        SaveIO.load(map.file);
-        world.beginMapLoad();
+        if(map == null) throw new RuntimeException("Generator has null map, cannot be used.");
+
+        world.setGenerating(false);
+        SaveIO.load(map.file, world.filterContext(map));
+        world.setGenerating(true);
 
         tiles = world.tiles;
 
@@ -50,16 +53,16 @@ public class FileMapGenerator implements WorldGenerator{
                 });
             }
 
-            if(tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam && !anyCores){
+            if(tile.isCenter() && tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam && !anyCores){
                 //TODO PLACE THE (CORRECT) LOADOUT
                 Schematics.placeLoadout(Loadouts.basicShard, tile.x, tile.y);
                 anyCores = true;
             }
 
             //add random decoration
-            if(Mathf.chance(0.01) && !tile.floor().isLiquid && tile.block() == Blocks.air){
-                tile.setBlock(tile.floor().decoration);
-            }
+            //if(Mathf.chance(0.015) && !tile.floor().isLiquid && tile.block() == Blocks.air){
+            //    tile.setBlock(tile.floor().decoration);
+            //}
         }
 
         if(!anyCores){

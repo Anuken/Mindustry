@@ -8,7 +8,6 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
 import mindustry.entities.bullet.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
@@ -266,7 +265,7 @@ public class ContentLoader{
         return (BulletType)getByID(ContentType.bullet, id);
     }
 
-    public Array<SectorPreset> zones(){
+    public Array<SectorPreset> sectors(){
         return getBy(ContentType.sector);
     }
 

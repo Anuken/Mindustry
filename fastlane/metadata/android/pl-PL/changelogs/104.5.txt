@@ -1,0 +1,4 @@
+- Aktualizacja sugerowanych linków
+- Aktualizacja tłumaczeń
+- Poprawiono zmienianie nazwy gracza po tym jak serwer został zamknięty
+- Dodano mnożnik paneli słonecznych

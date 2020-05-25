@@ -184,7 +184,28 @@ public class Drawf{
         Draw.rect(Core.atlas.find("shape-3"), x, y - oy + length / 2f, width, length, width / 2f, oy, rotation - 90);
     }
 
-    public static void drawRespawn(Tilec tile, float heat, float progress, float time, UnitType to, @Nullable Playerc player){
+    public static void construct(Tilec t, UnitType unit, float rotation, float progress, float speed, float time){
+        TextureRegion region = unit.icon(Cicon.full);
+
+        Shaders.build.region = region;
+        Shaders.build.progress = progress;
+        Shaders.build.color.set(Pal.accent);
+        Shaders.build.color.a = speed;
+        Shaders.build.time = -time / 20f;
+
+        Draw.shader(Shaders.build);
+        Draw.rect(region, t.x(), t.y(), rotation);
+        Draw.shader();
+
+        Draw.color(Pal.accent);
+        Draw.alpha(speed);
+
+        Lines.lineAngleCenter(t.x() + Mathf.sin(time, 20f, Vars.tilesize / 2f * t.block().size - 2f), t.y(), 90, t.block().size * Vars.tilesize - 4f);
+
+        Draw.reset();
+    }
+
+    public static void respawn(Tilec tile, float heat, float progress, float time, UnitType to, @Nullable Playerc player){
         float x = tile.x(), y = tile.y();
         progress = Mathf.clamp(progress);
 

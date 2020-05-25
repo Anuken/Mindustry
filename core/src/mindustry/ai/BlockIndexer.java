@@ -437,7 +437,7 @@ public class BlockIndexer{
         }
     }
 
-    private class TileIndex{
+    private static class TileIndex{
         public final EnumSet<BlockFlag> flags;
         public final Team team;
 

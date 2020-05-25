@@ -246,9 +246,9 @@ public class Generators{
                 Image image = ImagePacker.get(type.region);
 
                 if(type.constructor.get() instanceof Legsc){
-                    image.draw(type.baseRegion);
-                    image.draw(type.legRegion);
-                    image.draw(type.legRegion, true, false);
+                    image.drawCenter(type.baseRegion);
+                    image.drawCenter(type.legRegion);
+                    image.drawCenter(type.legRegion, true, false);
                 }
                 image.draw(type.region);
 
@@ -266,7 +266,7 @@ public class Generators{
 
                         image.draw(weapon.region,
                         (int)(i * weapon.x / Draw.scl + image.width / 2 - weapon.region.getWidth() / 2),
-                        (int)(weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
+                        (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
                         i > 0, false);
                     }
                 }

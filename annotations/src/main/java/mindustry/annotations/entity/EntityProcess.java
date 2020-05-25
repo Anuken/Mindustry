@@ -218,10 +218,14 @@ public class EntityProcess extends BaseProcessor{
                 //add serialize() boolean
                 builder.addMethod(MethodSpec.methodBuilder("serialize").addModifiers(Modifier.PUBLIC, Modifier.FINAL).returns(boolean.class).addStatement("return " + ann.serialize()).build());
 
+                //all SyncField fields
+                Array<Svar> syncedFields = new Array<>();
+                Array<Svar> allFields = new Array<>();
+
                 //add all components
                 for(Stype comp : components){
 
-                    //write fields to the class; ignoring transient ones
+                    //write fields to the class; ignoring transient/imported ones
                     Array<Svar> fields = comp.fields().select(f -> !f.has(Import.class));
                     for(Svar f : fields){
                         if(!usedFields.add(f.name())){
@@ -239,6 +243,7 @@ public class EntityProcess extends BaseProcessor{
                         if(f.is(Modifier.TRANSIENT)){
                             fbuilder.addModifiers(Modifier.TRANSIENT);
                         }
+
                         //add initializer if it exists
                         if(varInitializers.containsKey(f)){
                             fbuilder.initializer(varInitializers.get(f));
@@ -248,6 +253,26 @@ public class EntityProcess extends BaseProcessor{
                         fbuilder.addAnnotations(f.annotations().map(AnnotationSpec::get));
                         builder.addField(fbuilder.build());
                         specVariables.put(builder.fieldSpecs.get(builder.fieldSpecs.size() - 1), f);
+
+                        allFields.add(f);
+
+                        //add extra sync fields
+                        if(f.has(SyncField.class)){
+                            if(!f.tname().toString().equals("float")) err("All SyncFields must be of type float", f);
+
+                            syncedFields.add(f);
+
+                            //a synced field has 3 values:
+                            //- target state
+                            //- last state
+                            //- current state (the field itself, will be written to)
+
+                            //target
+                            builder.addField(FieldSpec.builder(float.class, f.name() + EntityIO.targetSuf).addModifiers(Modifier.TRANSIENT, Modifier.PRIVATE).build());
+
+                            //last
+                            builder.addField(FieldSpec.builder(float.class, f.name() + EntityIO.lastSuf).addModifiers(Modifier.TRANSIENT, Modifier.PRIVATE).build());
+                        }
                     }
 
                     //get all utility methods from components
@@ -256,6 +281,8 @@ public class EntityProcess extends BaseProcessor{
                     }
                 }
 
+                syncedFields.sortComparing(Selement::name);
+
                 //override toString method
                 builder.addMethod(MethodSpec.methodBuilder("toString")
                     .addAnnotation(Override.class)
@@ -263,7 +290,9 @@ public class EntityProcess extends BaseProcessor{
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return $S + $L", name + "#", "id").build());
 
-                EntityIO io = ann.serialize() ? new EntityIO(type.name(), builder, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(name)) : null;
+                EntityIO io = new EntityIO(type.name(), builder, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(name));
+                //entities with no sync comp and no serialization gen no code
+                boolean hasIO = ann.genio() && (components.contains(s -> s.name().contains("Sync")) || ann.serialize());
 
                 //add all methods from components
                 for(ObjectMap.Entry<String, Array<Smethod>> entry : methods){
@@ -322,10 +351,38 @@ public class EntityProcess extends BaseProcessor{
                         }
                     }
 
-                    //SPECIAL CASE: I/O code
-                    //note that serialization is generated even for non-serializing entities for manual usage
-                    if((first.name().equals("read") || first.name().equals("write")) && ann.genio() && ann.serialize()){
-                        io.write(mbuilder, first.name().equals("write"));
+                    if(hasIO){
+                        //SPECIAL CASE: I/O code
+                        //note that serialization is generated even for non-serializing entities for manual usage
+                        if((first.name().equals("read") || first.name().equals("write"))){
+                            io.write(mbuilder, first.name().equals("write"));
+                        }
+
+                        //SPECIAL CASE: sync I/O code
+                        if((first.name().equals("readSync") || first.name().equals("writeSync"))){
+                            io.writeSync(mbuilder, first.name().equals("writeSync"), syncedFields, allFields);
+                        }
+
+                        //SPECIAL CASE: sync I/O code for writing to/from a manual buffer
+                        if((first.name().equals("readSyncManual") || first.name().equals("writeSyncManual"))){
+                            io.writeSyncManual(mbuilder, first.name().equals("writeSyncManual"), syncedFields);
+                        }
+
+                        //SPECIAL CASE: interpolate method implementation
+                        if(first.name().equals("interpolate")){
+                            io.writeInterpolate(mbuilder, syncedFields);
+                        }
+
+                        //SPECIAL CASE: method to snap to target position after being read for the first time
+                        if(first.name().equals("snapSync")){
+                            mbuilder.addStatement("updateSpacing = 16");
+                            mbuilder.addStatement("lastUpdated = $T.millis()", Time.class);
+                            for(Svar field : syncedFields){
+                                //reset last+current state to target position
+                                mbuilder.addStatement("$L = $L", field.name() + EntityIO.lastSuf, field.name() + EntityIO.targetSuf);
+                                mbuilder.addStatement("$L = $L", field.name(), field.name() + EntityIO.targetSuf);
+                            }
+                        }
                     }
 
                     for(Smethod elem : entry.value){
@@ -373,12 +430,12 @@ public class EntityProcess extends BaseProcessor{
                     //implement reset()
                     MethodSpec.Builder resetBuilder = MethodSpec.methodBuilder("reset").addModifiers(Modifier.PUBLIC);
                     for(FieldSpec spec : builder.fieldSpecs){
-                        Svar variable = specVariables.get(spec);
-                        if(variable.isAny(Modifier.STATIC, Modifier.FINAL)) continue;
+                        @Nullable Svar variable = specVariables.get(spec);
+                        if(variable != null && variable.isAny(Modifier.STATIC, Modifier.FINAL)) continue;
 
                         if(spec.type.isPrimitive()){
                             //set to primitive default
-                            resetBuilder.addStatement("$L = $L", spec.name, varInitializers.containsKey(variable) ? varInitializers.get(variable) : getDefault(spec.type.toString()));
+                            resetBuilder.addStatement("$L = $L", spec.name, variable != null && varInitializers.containsKey(variable) ? varInitializers.get(variable) : getDefault(spec.type.toString()));
                         }else{
                             //set to default null
                             if(!varInitializers.containsKey(variable)){
@@ -495,6 +552,9 @@ public class EntityProcess extends BaseProcessor{
                 idStore.addStatement("idMap[$L] = $L::new", def.classID, def.name);
                 extraNames.get(def.base).each(extra -> {
                     idStore.addStatement("nameMap.put($S, $L::new)", extra, def.name);
+                    if(!camelToKebab(extra).equals(extra)){
+                        idStore.addStatement("nameMap.put($S, $L::new)", camelToKebab(extra), def.name);
+                    }
                 });
 
                 //return mapping
@@ -685,6 +745,22 @@ public class EntityProcess extends BaseProcessor{
         Array<Stype> comps = types(elem.annotation(EntityDef.class), EntityDef::value).map(this::interfaceToComp);;
         comps.sortComparing(Selement::name);
         return comps.toString("", s -> s.name().replace("Comp", "")) + "Entity";
+    }
+
+    static String camelToKebab(String s){
+        StringBuilder result = new StringBuilder(s.length() + 1);
+
+        for(int i = 0; i < s.length(); i++){
+            char c = s.charAt(i);
+            if(i > 0 && Character.isUpperCase(s.charAt(i))){
+                result.append('-');
+            }
+
+            result.append(Character.toLowerCase(c));
+
+        }
+
+        return result.toString();
     }
 
     boolean isComponent(Stype type){

@@ -330,7 +330,7 @@ public class Maps{
         }else{
             try{
                 return JsonIO.read(Array.class, str);
-            }catch(Exception e){
+            }catch(Throwable e){
                 e.printStackTrace();
                 return readFilters("");
             }
@@ -349,12 +349,10 @@ public class Maps{
     }
 
     public String writeWaves(Array<SpawnGroup> groups){
-        if(groups == null){
-            return "[]";
-        }
+        if(groups == null) return "[]";
 
         StringWriter buffer = new StringWriter();
-        json.setWriter(buffer);
+        json.setWriter(new JsonWriter(buffer));
 
         json.writeArrayStart();
         for(int i = 0; i < groups.size; i++){

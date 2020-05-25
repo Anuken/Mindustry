@@ -29,7 +29,7 @@ public class LiquidBlock extends Block{
     public class LiquidBlockEntity extends TileEntity{
         @Override
         public void draw(){
-            int rotation = rotate ? rotation() * 90 : 0;
+            float rotation = rotate ? rotdeg() : 0;
             Draw.rect(bottomRegion, x, y, rotation);
 
             if(liquids.total() > 0.001f){

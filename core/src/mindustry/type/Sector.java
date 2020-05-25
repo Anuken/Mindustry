@@ -43,6 +43,13 @@ public class Sector{
         this.data = data;
     }
 
+    /** @return whether this sector can be landed on at all.
+     * Only sectors adjacent to non-wave sectors can be landed on.
+     * TODO also preset sectors*/
+    public boolean unlocked(){
+        return Structs.contains(tile.tiles, p -> planet.getSector(p).isCaptured()) || (preset != null && preset.unlocked());
+    }
+
     /** @return whether the player has a base here. */
     public boolean hasBase(){
         return save != null && !save.meta.tags.getBool("nocores");
@@ -58,7 +65,11 @@ public class Sector{
         return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.launched && !Vars.state.gameOver;
     }
 
-    /** @return whether waves are present, e.g. any bases here will be attacked. */
+    public boolean isCaptured(){
+        return save != null && !save.meta.rules.waves;
+    }
+
+    /** @return whether waves are present - if true, any bases here will be attacked. */
     public boolean hasWaves(){
         return save != null && save.meta.rules.waves;
     }
@@ -73,7 +84,7 @@ public class Sector{
     }
 
     public boolean locked(){
-        return !unlocked;
+        return !unlocked();
     }
 
     /** @return light dot product in the range [0, 1]. */

@@ -283,6 +283,10 @@ public class Tile implements Position, QuadTreeObject{
         return rotation;
     }
 
+    public int rotdeg(){
+        return rotation * 90;
+    }
+
     public void rotation(int rotation){
         this.rotation = (byte)rotation;
     }

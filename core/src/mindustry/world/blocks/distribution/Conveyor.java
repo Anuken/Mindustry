@@ -63,7 +63,7 @@ public class Conveyor extends Block implements Autotiler{
         if(bits == null) return;
 
         TextureRegion region = regions[bits[0]][0];
-        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl * req.animScale, region.getHeight() * bits[2] * Draw.scl * req.animScale, req.rotation * 90);
+        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl, region.getHeight() * bits[2] * Draw.scl, req.rotation * 90);
     }
 
     @Override
@@ -249,7 +249,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void getStackOffset(Item item, Vec2 trns){
-            trns.trns(tile.rotation() * 90 + 180f, tilesize / 2f);
+            trns.trns(tile.rotdeg() + 180f, tilesize / 2f);
         }
 
         @Override

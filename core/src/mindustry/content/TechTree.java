@@ -3,6 +3,7 @@ package mindustry.content;
 import arc.math.*;
 import arc.struct.*;
 import mindustry.ctype.*;
+import mindustry.game.Objectives.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -328,39 +329,56 @@ public class TechTree implements ContentList{
         });
     }
 
-    private static TechNode node(Block block, Runnable children){
-        ItemStack[] requirements = new ItemStack[block.requirements.length];
-        for(int i = 0; i < requirements.length; i++){
-            requirements[i] = new ItemStack(block.requirements[i].item, 40 + Mathf.round(Mathf.pow(block.requirements[i].amount, 1.25f) * 6, 10));
+    private static TechNode node(UnlockableContent content, Runnable children){
+        ItemStack[] requirements;
+
+        if(content instanceof Block){
+            Block block = (Block)content;
+
+            requirements = new ItemStack[block.requirements.length];
+            for(int i = 0; i < requirements.length; i++){
+                requirements[i] = new ItemStack(block.requirements[i].item, 40 + Mathf.round(Mathf.pow(block.requirements[i].amount, 1.25f) * 20, 10));
+            }
+        }else{
+            requirements = ItemStack.empty;
         }
 
-        return new TechNode(block, requirements, children);
+        return new TechNode(content, requirements, children);
     }
 
-    private static TechNode node(Block block){
+    private static TechNode node(UnlockableContent block){
         return node(block, () -> {});
     }
 
-    public static TechNode create(Block parent, Block block){
-        TechNode.context = all.find(t -> t.block == parent);
+    public static TechNode create(UnlockableContent parent, UnlockableContent block){
+        TechNode.context = all.find(t -> t.content == parent);
         return node(block, () -> {});
     }
 
     public static class TechNode{
-        static TechNode context;
+        private static TechNode context;
 
+        /** Requirement node. */
         public TechNode parent;
-        public final Block block;
-        public final ItemStack[] requirements;
+        /** Content to be researched. */
+        public UnlockableContent content;
+        /** Item requirements for this content. */
+        public ItemStack[] requirements;
+        /** Extra objectives needed to research this. TODO implement */
+        public Objective[] objectives = {};
+        /** Turns required to research this content. */
+        //TODO keep track of turns that have been used so far
+        public int turns = 1;
+        /** Nodes that depend on this node. */
         public final Array<TechNode> children = new Array<>();
 
-        TechNode(TechNode ccontext, Block block, ItemStack[] requirements, Runnable children){
+        TechNode(TechNode ccontext, UnlockableContent content, ItemStack[] requirements, Runnable children){
             if(ccontext != null){
                 ccontext.children.add(this);
             }
 
             this.parent = ccontext;
-            this.block = block;
+            this.content = content;
             this.requirements = requirements;
 
             context = this;
@@ -369,8 +387,8 @@ public class TechTree implements ContentList{
             all.add(this);
         }
 
-        TechNode(Block block, ItemStack[] requirements, Runnable children){
-            this(context, block, requirements, children);
+        TechNode(UnlockableContent content, ItemStack[] requirements, Runnable children){
+            this(context, content, requirements, children);
         }
     }
 }

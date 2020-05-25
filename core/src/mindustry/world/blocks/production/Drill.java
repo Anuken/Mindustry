@@ -272,7 +272,7 @@ public class Drill extends Block{
                 warmup = Mathf.lerpDelta(warmup, speed, warmupSpeed);
                 progress += delta() * dominantItems * speed * warmup;
 
-                if(Mathf.chance(Time.delta() * updateEffectChance * warmup))
+                if(Mathf.chanceDelta(updateEffectChance * warmup))
                     updateEffect.at(getX() + Mathf.range(size * 2f), getY() + Mathf.range(size * 2f));
             }else{
                 lastDrillSpeed = 0f;

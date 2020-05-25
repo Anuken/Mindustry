@@ -22,8 +22,8 @@ import static mindustry.Vars.*;
 
 public class SchematicsDialog extends FloatingDialog{
     private SchematicInfoDialog info = new SchematicInfoDialog();
-    private String search = "";
     private Schematic firstSchematic;
+    private String search = "";
     private TextField searchField;
 
     public SchematicsDialog(){
@@ -60,6 +60,14 @@ public class SchematicsDialog extends FloatingDialog{
         cont.pane(t -> {
             t.top();
             t.margin(20f);
+
+            t.update(() -> {
+                if(Core.input.keyTap(Binding.chat) && Core.scene.getKeyboardFocus() == searchField && firstSchematic != null){
+                    control.input.useSchematic(firstSchematic);
+                    hide();
+                }
+            });
+
             rebuildPane[0] = () -> {
                 t.clear();
                 int i = 0;
@@ -74,8 +82,10 @@ public class SchematicsDialog extends FloatingDialog{
                 firstSchematic = null;
 
                 for(Schematic s : schematics.all()){
+
                     if(!search.isEmpty() && !s.name().toLowerCase().replaceAll(regex," ").contains(searchString)) continue;
                     if(firstSchematic == null) firstSchematic = s;
+
 
                     Button[] sel = {null};
                     sel[0] = t.button(b -> {

@@ -3,7 +3,6 @@ package mindustry.world.blocks.production;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -101,7 +100,7 @@ public class GenericCrafter extends Block{
                 totalProgress += delta();
                 warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
 
-                if(Mathf.chance(Time.delta() * updateEffectChance)){
+                if(Mathf.chanceDelta(updateEffectChance)){
                     updateEffect.at(getX() + Mathf.range(size * 4f), getY() + Mathf.range(size * 4));
                 }
             }else{

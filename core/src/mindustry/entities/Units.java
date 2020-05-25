@@ -39,7 +39,7 @@ public class Units{
      * @return whether the target is invalid
      */
     public static boolean invalidateTarget(Posc target, Team team, float x, float y, float range){
-        return target == null || !target.isAdded() || (range != Float.MAX_VALUE && !target.within(x, y, range)) || (target instanceof Teamc && ((Teamc)target).team() == team) || (target instanceof Healthc && !((Healthc)target).isValid());
+        return target == null || (range != Float.MAX_VALUE && !target.within(x, y, range)) || (target instanceof Teamc && ((Teamc)target).team() == team) || (target instanceof Healthc && !((Healthc)target).isValid());
     }
 
     /** See {@link #invalidateTarget(Posc, Team, float, float, float)} */

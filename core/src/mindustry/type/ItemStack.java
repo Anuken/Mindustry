@@ -21,6 +21,12 @@ public class ItemStack implements Comparable<ItemStack>{
         item = Items.copper;
     }
 
+    public ItemStack set(Item item, int amount){
+        this.item = item;
+        this.amount = amount;
+        return this;
+    }
+
     public ItemStack copy(){
         return new ItemStack(item, amount);
     }

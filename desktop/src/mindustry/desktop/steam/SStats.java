@@ -20,14 +20,14 @@ public class SStats implements SteamUserStatsCallback{
     public final SteamUserStats stats = new SteamUserStats(this);
 
     private boolean updated = false;
-    private ObjectSet<String> mechs = new ObjectSet<>();
+    //private ObjectSet<String> mechs = new ObjectSet<>();
     private int statSavePeriod = 4; //in minutes
 
     public SStats(){
         stats.requestCurrentStats();
 
         Events.on(ClientLoadEvent.class, e -> {
-            mechs = Core.settings.getObject("mechs", ObjectSet.class, ObjectSet::new);
+            //mechs = Core.settings.getObject("mechs", ObjectSet.class, ObjectSet::new);
 
             Core.app.addListener(new ApplicationListener(){
                 Interval i = new Interval();
@@ -87,7 +87,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
-            if(!content.zones().contains(z -> !z.canConfigure())){
+            if(!content.sectors().contains(z -> !z.canConfigure())){
                 configAllZones.complete();
             }
         });
@@ -147,7 +147,7 @@ public class SStats implements SteamUserStatsCallback{
             if(e.content == Items.thorium) obtainThorium.complete();
             if(e.content == Items.titanium) obtainTitanium.complete();
 
-            if(!content.zones().contains(SectorPreset::locked)){
+            if(!content.sectors().contains(SectorPreset::locked)){
                 unlockAllZones.complete();
             }
         });
@@ -226,7 +226,7 @@ public class SStats implements SteamUserStatsCallback{
         Events.on(ResearchEvent.class, e -> {
             if(e.content == Blocks.router) researchRouter.complete();
 
-            if(!TechTree.all.contains(t -> t.block.locked())){
+            if(!TechTree.all.contains(t -> t.content.locked())){
                 researchAll.complete();
             }
         });
@@ -251,14 +251,15 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
+        //TODO dead achievement
+        /*
         Events.on(MechChangeEvent.class, e -> {
             if(campaign()){
                 if(mechs.add(e.mech.name)){
                     SStat.zoneMechsUsed.max(mechs.size);
-                    Core.settings.putObject("mechs", mechs);
                 }
             }
-        });
+        });*/
     }
 
     private void trigger(Trigger trigger, SAchievement ach){

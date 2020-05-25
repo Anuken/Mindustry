@@ -87,7 +87,7 @@ public class ContentParser{
             return sound;
         });
         put(Objectives.Objective.class, (type, data) -> {
-            Class<? extends Objectives.Objective> oc = data.has("type") ? resolve(data.getString("type"), "mindustry.game.Objectives") : ZoneWave.class;
+            Class<? extends Objectives.Objective> oc = data.has("type") ? resolve(data.getString("type"), "mindustry.game.Objectives") : SectorWave.class;
             data.remove("type");
             Objectives.Objective obj = make(oc);
             readFields(obj, data);
@@ -242,8 +242,9 @@ public class ContentParser{
 
                 //add research tech node
                 if(research[0] != null){
+                    //TODO only works with blocks
                     Block parent = find(ContentType.block, research[0]);
-                    TechNode baseNode = exists && TechTree.all.contains(t -> t.block == block) ? TechTree.all.find(t -> t.block == block) : TechTree.create(parent, block);
+                    TechNode baseNode = exists && TechTree.all.contains(t -> t.content == block) ? TechTree.all.find(t -> t.content == block) : TechTree.create(parent, block);
                     LoadedMod cur = currentMod;
 
                     postreads.add(() -> {
@@ -254,7 +255,7 @@ public class ContentParser{
                             baseNode.parent.children.remove(baseNode);
                         }
 
-                        TechNode parnode = TechTree.all.find(t -> t.block == parent);
+                        TechNode parnode = TechTree.all.find(t -> t.content == parent);
                         if(parnode == null){
                             throw new IllegalArgumentException("Block '" + parent.name + "' isn't in the tech tree, but '" + block.name + "' requires it to be researched.");
                         }

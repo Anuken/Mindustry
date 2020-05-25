@@ -1,9 +1,12 @@
 package mindustry.content;
 
+import arc.graphics.*;
 import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
+import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 
 public class UnitTypes implements ContentList{
@@ -11,28 +14,49 @@ public class UnitTypes implements ContentList{
     //ground
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType titan, dagger, crawler, fortress, eruptor, chaosArray, eradicator;
 
+    //ground + builder
+    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType oculon, tau;
+
     //air
     public static @EntityDef({Unitc.class}) UnitType wraith, reaper, ghoul, revenant, lich;
 
-    //mining
+    //air + mining
     public static @EntityDef({Unitc.class, Minerc.class}) UnitType draug;
 
-    //building
+    //air + building
     public static @EntityDef({Unitc.class, Builderc.class}) UnitType phantom, spirit;
+
+    //air + building + mining
+    //TODO implement other starter drones
+    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
 
     //water
     public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType vanguard;
 
+    //special block unit type
+    public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
+
     @Override
     public void load(){
+        block = new UnitType("block"){
+            {
+                speed = 0f;
+                hitsize = 0f;
+                health = 1;
+                rotateSpeed = 360f;
+            }
+
+            @Override
+            public boolean isHidden(){
+                return true;
+            }
+        };
 
         dagger = new UnitType("dagger"){{
             speed = 0.5f;
-            drag = 0.3f;
             hitsize = 8f;
-            mass = 1.75f;
             health = 130;
-            weapons.add(new Weapon("chain-blaster"){{
+            weapons.add(new Weapon("large-weapon"){{
                 reload = 14f;
                 x = 4f;
                 alternate = true;
@@ -42,9 +66,10 @@ public class UnitTypes implements ContentList{
         }};
 
         titan = new UnitType("titan"){{
+            dagger.upgrade = this;
+            tier = 2;
+
             speed = 0.4f;
-            drag = 0.3f;
-            mass = 3.5f;
             hitsize = 9f;
             range = 10f;
             health = 460;
@@ -60,21 +85,138 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 bullet = Bullets.basicFlame;
             }});
+        }};
 
+        crawler = new UnitType("crawler"){{
+            speed = 0.65f;
+            hitsize = 8f;
+            health = 120;
+            sway = 0.25f;
+            weapons.add(new Weapon(){{
+                reload = 12f;
+                shootCone = 180f;
+                ejectEffect = Fx.none;
+                shootSound = Sounds.explosion;
+                bullet = new BombBulletType(2f, 3f, "clear"){{
+                    hitEffect = Fx.pulverize;
+                    lifetime = 30f;
+                    speed = 1.1f;
+                    splashDamageRadius = 55f;
+                    instantDisappear = true;
+                    splashDamage = 30f;
+                    killShooter = true;
+                }};
+            }});
+        }};
+
+        tau = new UnitType("tau"){{
+                itemCapacity = 60;
+                canBoost = true;
+                boostMultiplier = 1.5f;
+                speed = 0.5f;
+                hitsize = 8f;
+                health = 100f;
+                buildSpeed = 0.8f;
+
+                weapons.add(new Weapon("heal-weapon"){{
+                    shootY = 1.5f;
+                    reload = 24f;
+                    x = 1f;
+                    shootX = 3.5f;
+                    alternate = false;
+                    ejectEffect = Fx.none;
+                    recoil = 2f;
+                    bullet = Bullets.healBullet;
+                    shootSound = Sounds.pew;
+                }});
+            }
+
+            /*
+
+            float healRange = 60f;
+            float healAmount = 10f;
+            float healReload = 160f;
+            boolean wasHealed;
+
+            @Override
+            public void update(Unitc player){
+
+                if(player.timer().get(Playerc.timerAbility, healReload)){
+                    wasHealed = false;
+
+                    Units.nearby(player.team(), player.x, player.y, healRange, unit -> {
+                        if(unit.health < unit.maxHealth()){
+                            Fx.heal.at(unit);
+                            wasHealed = true;
+                        }
+                        unit.heal(healAmount);
+                    });
+
+                    if(wasHealed){
+                        Fx.healWave.at(player);
+                    }
+                }
+            }*/
+        };
+
+        fortress = new UnitType("fortress"){{
+            titan.upgrade = this;
+            tier = 3;
+
+            speed = 0.38f;
+            hitsize = 13f;
+            rotateSpeed = 3f;
+            targetAir = false;
+            health = 750;
+            weapons.add(new Weapon("artillery"){{
+                y = 1f;
+                x = 9f;
+                reload = 60f;
+                alternate = true;
+                recoil = 4f;
+                shake = 2f;
+                ejectEffect = Fx.shellEjectMedium;
+                bullet = Bullets.artilleryUnit;
+                shootSound = Sounds.artillery;
+            }});
+        }};
+
+        eruptor = new UnitType("eruptor"){{
+            crawler.upgrade = this;
+            tier = 2;
+
+            speed = 0.4f;
+            drag = 0.4f;
+            hitsize = 10f;
+            rotateSpeed = 3f;
+            targetAir = false;
+            health = 600;
+            immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
+            weapons.add(new Weapon("eruption"){{
+                shootY = 3f;
+                reload = 10f;
+                alternate = true;
+                ejectEffect = Fx.none;
+                bullet = Bullets.eruptorShot;
+                recoil = 1f;
+                x = 7f;
+                shootSound = Sounds.flame;
+            }});
         }};
 
         wraith = new UnitType("wraith"){{
             speed = 3f;
             accel = 0.08f;
             drag = 0.01f;
-            mass = 1.5f;
             flying = true;
             health = 75;
+            faceTarget = false;
             engineOffset = 5.5f;
             range = 140f;
             weapons.add(new Weapon(){{
-                y = 1.5f;
-                reload = 28f;
+                y = 0f;
+                x = 2f;
+                reload = 15f;
                 alternate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
@@ -82,14 +224,42 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        ghoul = new UnitType("ghoul"){{
+            wraith.upgrade = this;
+            tier = 2;
+
+            health = 220;
+            speed = 2f;
+            accel = 0.08f;
+            drag = 0.016f;
+            flying = true;
+            targetAir = false;
+            engineOffset = 7.8f;
+            range = 140f;
+            faceTarget = false;
+            weapons.add(new Weapon(){{
+                x = 3f;
+                shootY = 0f;
+                reload = 12f;
+                shootCone = 180f;
+                alternate = true;
+                ejectEffect = Fx.none;
+                inaccuracy = 15f;
+                ignoreRotation = true;
+                bullet = Bullets.bombExplosive;
+                shootSound = Sounds.none;
+            }});
+        }};
+
         reaper = new UnitType("reaper"){{
             speed = 1.1f;
-            accel = 0.08f;
+            accel = 0.02f;
             drag = 0.05f;
-            mass = 30f;
+            rotateSpeed = 0.5f;
             flying = true;
+            lowAltitude = true;
             health = 75000;
-            engineOffset = 40;
+            engineOffset = 38;
             engineSize = 7.3f;
             hitsize = 58f;
 
@@ -108,10 +278,9 @@ public class UnitTypes implements ContentList{
             speed = 1.3f;
             drag = 0.1f;
             hitsize = 8f;
-            mass = 1.75f;
             health = 130;
             immunities = ObjectSet.with(StatusEffects.wet);
-            weapons.add(new Weapon("chain-blaster"){{
+            weapons.add(new Weapon("mount-weapon"){{
                 reload = 10f;
                 x = 1.25f;
                 alternate = true;
@@ -155,110 +324,80 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        alpha = new UnitType("alpha"){{
+            flying = true;
+            mineSpeed = 2f;
+            buildSpeed = 0.5f;
+            drag = 0.05f;
+            speed = 2.4f;
+            rotateSpeed = 15f;
+            accel = 0.1f;
+            range = 70f;
+            itemCapacity = 30;
+            health = 80f;
+            engineOffset = 6f;
+            hitsize = 8f;
+
+            weapons.add(new Weapon("small-basic-weapon"){{
+                reload = 25f;
+                x = -1f;
+                y = -1f;
+                shootX = 3.5f;
+                alternate = true;
+                ejectEffect = Fx.none;
+                //TODO use different ammo
+                bullet = Bullets.standardCopper;
+            }});
+        }};
+
         phantom = new UnitType("phantom"){{
             flying = true;
             drag = 0.05f;
-            mass = 2f;
             speed = 3f;
             rotateSpeed = 15f;
             accel = 0.3f;
             range = 70f;
             itemCapacity = 70;
             health = 400;
-            buildSpeed = 0.4f;
+            buildSpeed = 0.6f;
             engineOffset = 6.5f;
             hitsize = 8f;
         }};
-        
-        /*
-        crawler = new UnitType("crawler", GroundUnit::new){{
-            maxVelocity = 1.27f;
-            speed = 0.285f;
-            drag = 0.4f;
-            hitsize = 8f;
-            mass = 1.75f;
-            health = 120;
-            weapons.add(new Weapon(){{
-                reload = 12f;
-                ejectEffect = Fx.none;
-                shootSound = Sounds.explosion;
-                bullet = new BombBulletType(2f, 3f, "clear"){{
-                    hitEffect = Fx.pulverize;
-                    lifetime = 30f;
-                    speed = 1.1f;
-                    splashDamageRadius = 55f;
-                    instantDisappear = true;
-                    splashDamage = 30f;
-                    killShooter = true;
+
+        oculon = new UnitType("oculon"){{
+            tier = 2;
+
+            drillTier = -1;
+            speed = 0.6f;
+            hitsize = 9f;
+            boostMultiplier = 2f;
+            itemCapacity = 15;
+            health = 160f;
+            buildSpeed = 0.9f;
+            canBoost = true;
+
+            weapons.add(new Weapon("beam-weapon"){{
+                shake = 2f;
+                shootY = 1f;
+                x = 1f;
+                shootX = 3f;
+                reload = 50f;
+                alternate = true;
+                recoil = 4f;
+                shootSound = Sounds.laser;
+
+                bullet = new LaserBulletType(){{
+                    damage = 20f;
+                    recoil = 1f;
+                    sideAngle = 45f;
+                    sideWidth = 1f;
+                    sideLength = 70f;
+                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
                 }};
             }});
         }};
-
-        titan = new UnitType("titan", GroundUnit::new){{
-            maxVelocity = 0.8f;
-            speed = 0.22f;
-            drag = 0.4f;
-            mass = 3.5f;
-            hitsize = 9f;
-            range = 10f;
-            rotatespeed = 0.1f;
-            health = 460;
-            immunities.add(StatusEffects.burning);
-            weapons.add(new Weapon("flamethrower"){{
-                shootSound = Sounds.flame;
-                length = 1f;
-                reload = 14f;
-                alternate = true;
-                recoil = 1f;
-                ejectEffect = Fx.none;
-                bullet = Bullets.basicFlame;
-            }});
-        }};
-
-        fortress = new UnitType("fortress", GroundUnit::new){{
-            maxVelocity = 0.78f;
-            speed = 0.15f;
-            drag = 0.4f;
-            mass = 5f;
-            hitsize = 10f;
-            rotatespeed = 0.06f;
-            targetAir = false;
-            health = 750;
-            weapons.add(new Weapon("artillery"){{
-                length = 1f;
-                reload = 60f;
-                width = 10f;
-                alternate = true;
-                recoil = 4f;
-                shake = 2f;
-                ejectEffect = Fx.shellEjectMedium;
-                bullet = Bullets.artilleryUnit;
-                shootSound = Sounds.artillery;
-            }});
-        }};
-
-        eruptor = new UnitType("eruptor", GroundUnit::new){{
-            maxVelocity = 0.81f;
-            speed = 0.16f;
-            drag = 0.4f;
-            mass = 5f;
-            hitsize = 9f;
-            rotatespeed = 0.05f;
-            targetAir = false;
-            health = 600;
-            immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
-            weapons.add(new Weapon("eruption"){{
-                length = 3f;
-                reload = 10f;
-                alternate = true;
-                ejectEffect = Fx.none;
-                bullet = Bullets.eruptorShot;
-                recoil = 1f;
-                width = 7f;
-                shootSound = Sounds.flame;
-            }});
-        }};
-
+        
+        /*
         chaosArray = new UnitType("chaos-array", GroundUnit::new){{
             maxVelocity = 0.68f;
             speed = 0.12f;
@@ -305,49 +444,6 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.standardThoriumBig;
                 shootSound = Sounds.shootBig;
-            }});
-        }};
-
-        wraith = new UnitType("wraith", FlyingUnit::new){{
-            speed = 0.3f;
-            maxVelocity = 1.9f;
-            drag = 0.01f;
-            mass = 1.5f;
-            flying = true;
-            health = 75;
-            engineOffset = 5.5f;
-            range = 140f;
-            weapons.add(new Weapon(){{
-                length = 1.5f;
-                reload = 28f;
-                alternate = true;
-                ejectEffect = Fx.shellEjectSmall;
-                bullet = Bullets.standardCopper;
-                shootSound = Sounds.shoot;
-            }});
-        }};
-
-        ghoul = new UnitType("ghoul", FlyingUnit::new){{
-            health = 220;
-            speed = 0.2f;
-            maxVelocity = 1.4f;
-            mass = 3f;
-            drag = 0.01f;
-            flying = true;
-            targetAir = false;
-            engineOffset = 7.8f;
-            range = 140f;
-            weapons.add(new Weapon(){{
-                length = 0f;
-                width = 2f;
-                reload = 12f;
-                alternate = true;
-                ejectEffect = Fx.none;
-                velocityRnd = 1f;
-                inaccuracy = 40f;
-                ignoreRotation = true;
-                bullet = Bullets.bombExplosive;
-                shootSound = Sounds.none;
             }});
         }};
 
@@ -477,7 +573,7 @@ public class UnitTypes implements ContentList{
                 engineColor = Pal.lightTrail;
                 cellTrnsY = 1f;
                 buildSpeed = 1.2f;
-                weapons.add(new Weapon("vanguard-blaster"){{
+                weapons.add(new Weapon("vanguard-gun"){{
                     length = 1.5f;
                     reload = 30f;
                     alternate = true;
@@ -517,7 +613,7 @@ public class UnitTypes implements ContentList{
             }
         };
 
-        alpha = new UnitType("alpha-mech", false){
+        "alpha "= new UnitType("alpha-mech", false){
             {
                 drillTier = -1;
                 speed = 0.5f;
@@ -608,7 +704,7 @@ public class UnitTypes implements ContentList{
                 buildSpeed = 1.6f;
                 engineColor = Pal.heal;
 
-                weapons.add(new Weapon("heal-blaster"){{
+                weapons.add(new Weapon("heal-gun"){{
                     length = 1.5f;
                     reload = 24f;
                     alternate = false;
@@ -656,7 +752,7 @@ public class UnitTypes implements ContentList{
                 engineColor = Color.valueOf("feb380");
                 health = 350f;
                 buildSpeed = 1.5f;
-                weapons.add(new Weapon("swarmer"){{
+                weapons.add(new Weapon("missiles"){{
                     length = 1.5f;
                     recoil = 4f;
                     reload = 38f;
@@ -729,7 +825,7 @@ public class UnitTypes implements ContentList{
                 engineColor = Pal.lightTrail;
                 cellTrnsY = 1f;
                 buildSpeed = 1.1f;
-                weapons.add(new Weapon("blaster"){{
+                weapons.add(new Weapon("gun"){{
                     length = 1.5f;
                     reload = 15f;
                     alternate = true;
@@ -800,7 +896,7 @@ public class UnitTypes implements ContentList{
             @Override
             public void update(Playerc player){
                 float scl = scld(player);
-                if(Mathf.chance(Time.delta() * (0.15 * scl))){
+                if(Mathf.chanceDelta((0.15 * scl))){
                     Fx.hitLancer.at(Pal.lancerLaser, player.x, player.y);
                     Lightning.create(player.team(), Pal.lancerLaser, 10f * Vars.state.rules.playerDamageMultiplier,
                     player.x + player.vel().x, player.y + player.vel().y, player.rotation, 14);

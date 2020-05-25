@@ -105,7 +105,7 @@ public class Placement{
                 found = true;
                 break;
             }
-            closed.add(Point2.pack((int)next.x, (int)next.y));
+            closed.add(Point2.pack(next.x, next.y));
             for(Point2 point : Geometry.d4){
                 int newx = next.x + point.x, newy = next.y + point.y;
                 Tile child = world.tile(newx, newy);

@@ -41,14 +41,17 @@ public class Layer{
     //building plans
     plans = 85,
 
-    //flying units
-    flyingUnit = 90,
+    //flying units (low altitude)
+    flyingUnitLow = 90,
 
     //bullets *bloom begin*
     bullet = 100,
 
     //effects *bloom end*
     effect = 110,
+
+    //flying units
+    flyingUnit = 115,
 
     //overlaied UI, like block config guides
     overlayUI = 120,

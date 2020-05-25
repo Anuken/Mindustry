@@ -36,7 +36,7 @@ def transformColors = { List<List<String>> list ->
 transformColors([["6e7080", "989aa4", "b0bac0"], ["bc5452", "ea8878", "feb380"], ["de9458", "f8c266", "ffe18f"], ["feb380", "ea8878", "bc5452"]])
 
 def antialias = { File file ->
-    if(!doAntialias || file.lastModified() <= 1000) return
+    if(!doAntialias) return
 
     def image = ImageIO.read(file)
     def out = ImageIO.read(file)
@@ -296,7 +296,6 @@ task pack(dependsOn: classes){
         javaexec{
             main = "mindustry.tools.ImagePacker"
             classpath = sourceSets.main.runtimeClasspath
-            standardInput = System.in
             workingDir = genFolder
         }
 
@@ -320,9 +319,9 @@ task pack(dependsOn: classes){
             }
         }
 
-        executor.shutdown();
+        executor.shutdown()
         try{
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)
         }catch(InterruptedException e){
             e.printStackTrace()
         }

@@ -17,7 +17,24 @@ public class Annotations{
     public @interface Final{
     }
 
-    /** Indicates that a component field is imported from other components. */
+    /** Indicates that a field will be interpolated when synced. */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface SyncField{
+        /** If true, the field will be linearly interpolated. If false, it will be interpolated as an angle. */
+        boolean value();
+        /** If true, the field is clamped to 0-1. */
+        boolean clamped() default false;
+    }
+
+    /** Indicates that a field will not be read from the server when syncing. */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface SyncLocal{
+
+    }
+
+    /** Indicates that a component field is imported from other components. This means it doesn't actually exist. */
     @Target({ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Import{
@@ -72,9 +89,11 @@ public class Annotations{
         boolean isFinal() default true;
         /** If true, entities are recycled. */
         boolean pooled() default false;
-        /** Whether to serialize (makes the serialize method return this value) */
+        /** Whether to serialize (makes the serialize method return this value).
+         * If true, this entity is automatically put into save files.
+         * If false, no serialization code is generated at all. */
         boolean serialize() default true;
-        /** Whether to generate IO code */
+        /** Whether to generate IO code. This is for advanced usage only. */
         boolean genio() default true;
     }
 
@@ -122,15 +141,6 @@ public class Annotations{
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface OverrideCallSuper{
-    }
-
-    /** Marks a class as serializable.
-     * @deprecated due to very sparse use and inflexibility. */
-    @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.SOURCE)
-    @Deprecated
-    public @interface Serialize{
-
     }
 
     //endregion

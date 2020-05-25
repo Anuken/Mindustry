@@ -11,23 +11,20 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.game.EventType.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.*;
-
-public class UnitFactory extends Block{
-    public float launchVelocity = 5f;
-    public @Load("@-top") TextureRegion topRegion;
+public class UnitFactory extends UnitBlock{
+    public @Load(value = "@-top", fallback = "factory-top") TextureRegion topRegion;
+    public @Load(value = "@-out", fallback = "factory-out") TextureRegion outRegion;
     public int[] capacities;
 
     public UnitPlan[] plans = new UnitPlan[0];
@@ -37,10 +34,12 @@ public class UnitFactory extends Block{
         update = true;
         hasPower = true;
         hasItems = true;
-        solid = false;
-        flags = EnumSet.of(BlockFlag.producer, BlockFlag.unitModifier);
-        unitCapModifier = 4;
+        solid = true;
+        //flags = EnumSet.of(BlockFlag.producer, BlockFlag.unitModifier);
+        //unitCapModifier = 2;
         configurable = true;
+        outputsPayload = true;
+        rotate = true;
 
         config(Integer.class, (tile, i) -> {
             ((UnitFactoryEntity)tile).currentPlan = i < 0 || i >= plans.length ? -1 : i;
@@ -56,12 +55,6 @@ public class UnitFactory extends Block{
 
             return ItemStack.empty;
         }));
-    }
-
-    @Remote(called = Loc.server)
-    public static void onUnitFactorySpawn(Tile tile){
-        if(!(tile.entity instanceof UnitFactoryEntity)) return;
-        tile.<UnitFactoryEntity>ent().spawned();
     }
 
     @Override
@@ -92,14 +85,18 @@ public class UnitFactory extends Block{
         super.setStats();
 
         stats.remove(BlockStat.itemCapacity);
-
-        //TODO
-        //stats.add(BlockStat.productionTime, produceTime / 60f, StatUnit.seconds);
     }
 
     @Override
     public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top")};
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-out"), Core.atlas.find(name + "-top")};
+    }
+
+    @Override
+    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+        Draw.rect(region, req.drawx(), req.drawy());
+        Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
+        Draw.rect(topRegion, req.drawx(), req.drawy());
     }
 
     public static class UnitPlan{
@@ -116,30 +113,11 @@ public class UnitFactory extends Block{
         UnitPlan(){}
     }
 
-    public class UnitFactoryEntity extends TileEntity{
+    public class UnitFactoryEntity extends UnitBlockEntity{
         public int currentPlan = -1;
-        public float progress, time, speedScl;
 
         public float fraction(){
             return currentPlan == -1 ? 0 : progress / plans[currentPlan].time;
-        }
-
-        public void spawned(){
-            progress = 0f;
-
-            Effects.shake(2f, 3f, this);
-            Fx.producesmoke.at(this);
-
-            if(!net.client() && currentPlan != -1){
-                UnitPlan plan = plans[currentPlan];
-                Unitc unit = plan.unit.create(team);
-                unit.set(x, y );
-                unit.add();
-                unit.rotation(90);
-                unit.vel().y = launchVelocity + Mathf.range(1f);
-                unit.vel().x = Mathf.range(1f);
-                Events.fire(new UnitCreateEvent(unit));
-            }
         }
 
         @Override
@@ -147,6 +125,11 @@ public class UnitFactory extends Block{
             Array<UnitType> units = Array.with(plans).map(u -> u.unit);
 
             ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans[currentPlan].unit, unit -> configure(units.indexOf(unit)));
+        }
+
+        @Override
+        public boolean acceptPayload(Tilec source, Payload payload){
+            return false;
         }
 
         @Override
@@ -173,34 +156,21 @@ public class UnitFactory extends Block{
 
         @Override
         public void draw(){
-            super.draw();
+            Draw.rect(region, x, y);
+            Draw.rect(outRegion, x, y, rotdeg());
 
             if(currentPlan != -1){
                 UnitPlan plan = plans[currentPlan];
-
-                Draw.draw(Layer.blockOver, () -> {
-                    TextureRegion region = plan.unit.icon(Cicon.full);
-
-                    Shaders.build.region = region;
-                    Shaders.build.progress = progress / plan.time;
-                    Shaders.build.color.set(Pal.accent);
-                    Shaders.build.color.a = speedScl;
-                    Shaders.build.time = -time / 20f;
-
-                    Draw.shader(Shaders.build);
-                    Draw.rect(region, x, y);
-                    Draw.shader();
-
-                    Draw.color(Pal.accent);
-                    Draw.alpha(speedScl);
-
-                    Lines.lineAngleCenter(x + Mathf.sin(time, 20f, Vars.tilesize / 2f * size - 2f), y, 90, size * Vars.tilesize - 4f);
-
-                    Draw.reset();
-                });
+                Draw.draw(Layer.blockOver, () -> Drawf.construct(this, plan.unit, rotdeg() - 90f, progress / plan.time, speedScl, time));
             }
 
             Draw.z(Layer.blockOver);
+
+            payRotation = rotdeg();
+            drawPayload();
+
+            Draw.z(Layer.blockOver + 0.1f);
+
             Draw.rect(topRegion, x, y);
         }
 
@@ -210,22 +180,25 @@ public class UnitFactory extends Block{
                 currentPlan = -1;
             }
 
-            if((consValid() || tile.isEnemyCheat()) && currentPlan != -1){
-                time += delta() * efficiency() * speedScl * Vars.state.rules.unitBuildSpeedMultiplier;
-                progress += delta() * efficiency() * Vars.state.rules.unitBuildSpeedMultiplier;
+            if(consValid() && currentPlan != -1){
+                time += edelta() * speedScl * Vars.state.rules.unitBuildSpeedMultiplier;
+                progress += edelta() * Vars.state.rules.unitBuildSpeedMultiplier;
                 speedScl = Mathf.lerpDelta(speedScl, 1f, 0.05f);
             }else{
                 speedScl = Mathf.lerpDelta(speedScl, 0f, 0.05f);
             }
 
-            if(currentPlan != -1){
+            outputPayload();
+
+            if(currentPlan != -1 && payload == null){
                 UnitPlan plan = plans[currentPlan];
 
-                if(progress >= plan.time/* && !Units.anyEntities(tile, !plan.unit.flying)*/ && Units.canCreate(team)){
+                if(progress >= plan.time && Units.canCreate(team)){
                     progress = 0f;
 
-                    Call.onUnitFactorySpawn(tile);
-                    useContent(plan.unit);
+                    payloadPos = 0f;
+                    payload = new UnitPayload(plan.unit.create(team));
+                    payVector.setZero();
                     consume();
                 }
 

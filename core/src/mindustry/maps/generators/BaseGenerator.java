@@ -1,8 +1,6 @@
 package mindustry.maps.generators;
 
-import arc.math.geom.*;
 import arc.struct.*;
-import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -10,8 +8,8 @@ import mindustry.world.*;
 public class BaseGenerator{
 
     public void generate(Tiles tiles, Array<Tile> cores, Tile spawn, Team team, Sector sector){
-        //algorithm idea: make it spawn prefab turret setups and route resources to them with conveyors from chunks of ore drill setups
 
+        /*
         GridBits used = new GridBits(tiles.width, tiles.height);
         Queue<Tile> frontier = new Queue<>();
         for(Tile tile : cores){
@@ -44,7 +42,7 @@ public class BaseGenerator{
             tile.clearOverlay();
             tile.setBlock(Blocks.coreShard, team);
 
-        }
+        }*/
 
 
     }

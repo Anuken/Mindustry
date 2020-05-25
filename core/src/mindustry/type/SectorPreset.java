@@ -14,14 +14,13 @@ import mindustry.maps.generators.*;
 
 import static mindustry.Vars.*;
 
-//TODO ? remove ?
 public class SectorPreset extends UnlockableContent{
     public @NonNull FileMapGenerator generator;
     public @NonNull Planet planet;
-    public Array<Objectives.Objective> requirements = new Array<>();
+    public @NonNull Sector sector;
+    public Array<Objective> requirements = new Array<>();
 
     public Cons<Rules> rules = rules -> {};
-    public boolean alwaysUnlocked;
     public int conditionWave = Integer.MAX_VALUE;
     public int launchPeriod = 10;
     public Schematic loadout = Loadouts.basicShard;
@@ -35,15 +34,10 @@ public class SectorPreset extends UnlockableContent{
         super(name);
         this.generator = new FileMapGenerator(name);
         this.planet = planet;
+        this.sector = planet.sectors.get(sector);
 
         planet.preset(sector, this);
     }
-
-    //TODO
-    /*
-    public SectorPreset(String name){
-        this(name, Planets.starter);
-    }*/
 
     public Rules getRules(){
         return generator.map.rules();
@@ -96,15 +90,14 @@ public class SectorPreset extends UnlockableContent{
     }
 
     public void updateObjectives(Runnable closure){
-        Array<ZoneObjective> incomplete = content.zones()
+        Array<SectorObjective> incomplete = content.sectors()
             .flatMap(z -> z.requirements)
-            .select(o -> o.zone() == this && !o.complete())
-            .as(ZoneObjective.class);
+            .filter(o -> o.zone() == this && !o.complete()).as();
 
         closure.run();
-        for(ZoneObjective objective : incomplete){
+        for(SectorObjective objective : incomplete){
             if(objective.complete()){
-                Events.fire(new ZoneRequireCompleteEvent(objective.zone, content.zones().find(z -> z.requirements.contains(objective)), objective));
+                Events.fire(new ZoneRequireCompleteEvent(objective.preset, content.sectors().find(z -> z.requirements.contains(objective)), objective));
             }
         }
     }
@@ -140,7 +133,6 @@ public class SectorPreset extends UnlockableContent{
 
         stacks.sort();
         launchCost = stacks;
-        Core.settings.putObject(name + "-starting-items", startingItems);
         data.modified();
     }
 
@@ -160,17 +152,6 @@ public class SectorPreset extends UnlockableContent{
         for(ItemStack stack : startingItems){
             defaultStartingItems.add(new ItemStack(stack.item, stack.amount));
         }
-
-        @SuppressWarnings("unchecked")
-        Array<ItemStack> arr = Core.settings.getObject(name + "-starting-items", Array.class, () -> null);
-        if(arr != null){
-            startingItems = arr;
-        }
-    }
-
-    @Override
-    public boolean alwaysUnlocked(){
-        return alwaysUnlocked;
     }
 
     @Override

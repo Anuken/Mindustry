@@ -184,7 +184,7 @@ public class Damage{
             float dst = tr.set(entity.getX() - x, entity.getY() - y).len();
             entity.vel().add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
 
-            if(complete && damage >= 9999999f && entity == player){
+            if(complete && damage >= 9999999f && entity.isPlayer()){
                 Events.fire(Trigger.exclusionDeath);
             }
         };
@@ -270,6 +270,7 @@ public class Damage{
     }
 
     @Struct
+    static
     class PropCellStruct{
         byte x;
         byte y;

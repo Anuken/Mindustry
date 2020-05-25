@@ -36,6 +36,7 @@ import static mindustry.Vars.*;
 public class NetServer implements ApplicationListener{
     private final static int maxSnapshotSize = 430, timerBlockSync = 0;
     private final static float serverSyncTime = 12, blockSyncTime = 60 * 8;
+    private final static FloatBuffer fbuffer = FloatBuffer.allocate(20);
     private final static Vec2 vector = new Vec2();
     private final static Rect viewport = new Rect();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
@@ -547,9 +548,16 @@ public class NetServer implements ApplicationListener{
         connection.viewWidth = viewWidth;
         connection.viewHeight = viewHeight;
 
+        //disable shooting when a mech flies
+        if(!player.dead() && player.unit().isFlying() && !player.unit().type().flying){
+            shooting = false;
+        }
+
         player.mouseX(pointerX);
         player.mouseY(pointerY);
         player.typing(chatting);
+        player.shooting(shooting);
+        player.boosting(boosting);
 
         player.unit().controlWeapons(shooting, shooting);
         player.unit().aim(pointerX, pointerY);
@@ -596,34 +604,54 @@ public class NetServer implements ApplicationListener{
             float maxSpeed = player.dead() ? Float.MAX_VALUE : player.unit().type().speed;
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
 
-            vector.set(x - unit.interpolator().target.x, y - unit.interpolator().target.y);
+            if(connection.lastUnit != unit && !player.dead()){
+                connection.lastUnit = unit;
+                connection.lastPosition.set(unit);
+            }
+
+            vector.set(x, y).sub(connection.lastPosition);
             vector.limit(maxMove);
 
             float prevx = unit.x(), prevy = unit.y();
-            unit.set(unit.interpolator().target.x, unit.interpolator().target.y);
+            unit.set(connection.lastPosition);
             if(!unit.isFlying()){
                 unit.move(vector.x, vector.y);
             }else{
                 unit.trns(vector.x, vector.y);
             }
+
+            //set last position after movement
+            connection.lastPosition.set(unit);
             float newx = unit.x(), newy = unit.y();
 
             if(!verifyPosition){
-                unit.x(prevx);
-                unit.y(prevy);
+                unit.set(prevx, prevy);
                 newx = x;
                 newy = y;
-            }else if(Mathf.dst(x, y, newx, newy) > correctDist){
+            }else if(!Mathf.within(x, y, newx, newy, correctDist)){
                 Call.onPositionSet(player.con(), newx, newy); //teleport and correct position when necessary
             }
 
             //reset player to previous synced position so it gets interpolated
-            unit.x(prevx);
-            unit.y(prevy);
+            unit.set(prevx, prevy);
 
-            //set interpolator target to *new* position so it moves toward it
-            unit.interpolator().read(unit.x(), unit.y(), newx, newy, rotation, baseRotation);
-            unit.vel().set(xVelocity, yVelocity); //only for visual calculation purposes, doesn't actually update the player
+            //write sync data to the buffer
+            fbuffer.limit(20);
+            fbuffer.position(0);
+
+            //now, put the new position, rotation and baserotation into the buffer so it can be read
+            if(unit instanceof Legsc) fbuffer.put(baseRotation); //base rotation is optional
+            fbuffer.put(rotation); //rotation is always there
+            fbuffer.put(newx);
+            fbuffer.put(newy);
+            fbuffer.flip();
+
+            //read sync data so it can be used for interpolation for the server
+            unit.readSyncManual(fbuffer);
+
+            //TODO clients shouldn't care about velocities, so should it always just get set to 0? why even save it?
+            //[[ignore sent velocity values, set it to the delta movement vector instead]]
+            //unit.vel().set(vector);
         }else{
             player.x(x);
             player.y(y);
@@ -781,7 +809,7 @@ public class NetServer implements ApplicationListener{
         byte[] stateBytes = syncStream.toByteArray();
 
         //write basic state data.
-        Call.onStateSnapshot(player.con(), state.wavetime, state.wave, state.enemies, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+        Call.onStateSnapshot(player.con(), state.wavetime, state.wave, state.enemies, state.serverPaused, (short)stateBytes.length, net.compressSnapshot(stateBytes));
 
         viewport.setSize(player.con().viewWidth, player.con().viewHeight).setCenter(player.con().viewX, player.con().viewY);
 
@@ -793,7 +821,7 @@ public class NetServer implements ApplicationListener{
             //write all entities now
             dataStream.writeInt(entity.id()); //write id
             dataStream.writeByte(entity.classId()); //write type ID
-            entity.write(Writes.get(dataStream)); //write entity
+            entity.writeSync(Writes.get(dataStream)); //write entity
 
             sent++;
 

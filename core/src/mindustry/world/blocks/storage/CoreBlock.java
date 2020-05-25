@@ -21,7 +21,7 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
-    public UnitType unitType = UnitTypes.phantom;
+    public UnitType unitType = UnitTypes.alpha;
 
     public CoreBlock(String name){
         super(name);
@@ -29,6 +29,7 @@ public class CoreBlock extends StorageBlock{
         solid = true;
         update = true;
         hasItems = true;
+        priority = TargetPriority.core;
         flags = EnumSet.of(BlockFlag.core, BlockFlag.producer, BlockFlag.unitModifier);
         unitCapModifier = 10;
         activeSound = Sounds.respawning;
@@ -42,13 +43,16 @@ public class CoreBlock extends StorageBlock{
         CoreEntity entity = tile.ent();
         CoreBlock block = (CoreBlock)tile.block();
         Fx.spawn.at(entity);
-        entity.progress = 0;
 
-        Unitc unit = block.unitType.create(tile.team());
-        unit.set(entity);
-        unit.impulse(0f, 8f);
-        unit.controller(player);
-        unit.add();
+        if(!net.client()){
+            Unitc unit = block.unitType.create(tile.team());
+            unit.set(entity);
+            unit.rotation(90f);
+            unit.impulse(0f, 3f);
+            unit.controller(player);
+            unit.spawnedByCore(true);
+            unit.add();
+        }
     }
 
     @Override
@@ -63,7 +67,7 @@ public class CoreBlock extends StorageBlock{
             ));
 
         bars.add("units", e ->
-        new Bar(
+            new Bar(
                 () -> Core.bundle.format("bar.units", teamIndex.count(e.team()), Units.getCap(e.team())),
                 () -> Pal.power,
                 () -> (float)teamIndex.count(e.team()) / Units.getCap(e.team())
@@ -76,20 +80,10 @@ public class CoreBlock extends StorageBlock{
     }
 
     public class CoreEntity extends TileEntity{
-        protected float time, heat, progress;
         protected int storageCapacity;
-        protected boolean shouldBuild;
-        protected Playerc lastRequested;
 
         public void requestSpawn(Playerc player){
-            shouldBuild = true;
-            if(lastRequested == null){
-                lastRequested = player;
-            }
-
-            if(progress >= 1f){
-                Call.onPlayerSpawn(tile, player);
-            }
+            Call.onPlayerSpawn(tile, player);
         }
 
         @Override
@@ -209,17 +203,6 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public void draw(){
-            super.draw();
-
-            if(heat > 0.001f){
-                Draw.draw(Layer.blockOver, () -> {
-                    Drawf.drawRespawn(this, heat, progress, time, unitType, lastRequested);
-                });
-            }
-        }
-
-        @Override
         public void handleItem(Tilec source, Item item){
             if(net.server() || !net.active()){
                 super.handleItem(source, item);
@@ -227,27 +210,6 @@ public class CoreBlock extends StorageBlock{
                     Events.fire(new CoreItemDeliverEvent());
                 }
             }
-        }
-
-        @Override
-        public void updateTile(){
-
-            if(shouldBuild){
-                heat = Mathf.lerpDelta(heat, 1f, 0.1f);
-                time += delta();
-                progress += 1f / state.rules.respawnTime * delta();
-            }else{
-                progress = 0f;
-                heat = Mathf.lerpDelta(heat, 0f, 0.1f);
-            }
-
-            shouldBuild = false;
-            lastRequested = null;
-        }
-
-        @Override
-        public boolean shouldActiveSound(){
-            return shouldBuild;
         }
     }
 }

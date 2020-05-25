@@ -48,7 +48,7 @@ public class WaveSpawner{
 
                 eachFlyerSpawn((spawnX, spawnY) -> {
                     for(int i = 0; i < spawned; i++){
-                        Unitc unit = group.createUnit(state.rules.waveTeam);
+                        Unitc unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
                         unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
                         unit.add();
                     }
@@ -61,7 +61,7 @@ public class WaveSpawner{
                     for(int i = 0; i < spawned; i++){
                         Tmp.v1.rnd(spread);
 
-                        Unitc unit = group.createUnit(state.rules.waveTeam);
+                        Unitc unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
                         unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
                         Time.run(Math.min(i * 5, 60 * 2), () -> spawnEffect(unit));
                     }

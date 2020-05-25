@@ -110,6 +110,15 @@ public class EventType{
         }
     }
 
+    /** Called when a sector is conquered, e.g. a boss or base is defeated. */
+    public static class SectorCaptureEvent{
+        public final Sector sector;
+
+        public SectorCaptureEvent(Sector sector){
+            this.sector = sector;
+        }
+    }
+
     /** Called when the player withdraws items from a block. */
     public static class WithdrawEvent{
         public final Tilec tile;
