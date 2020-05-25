@@ -11,19 +11,19 @@ import static mindustry.Vars.content;
 public interface Payload{
     int payloadUnit = 0, payloadBlock = 1;
 
+    /** sets this payload's position on the map. */
+    void set(float x, float y, float rotation);
+
     /** draws this payload at a position. */
-    void draw(float x, float y, float rotation);
+    void draw();
+
+    /** @return whether this payload was dumped. */
+    default boolean dump(){
+        return false;
+    }
 
     /** writes the payload for saving. */
     void write(Writes write);
-
-    /** sets this payload's position on the map. */
-    void set(float x, float y);
-
-    /** @return whether this payload was dumped. */
-    default boolean dump(float x, float y, float rotation){
-        return false;
-    }
 
     static void write(@Nullable Payload payload, Writes write){
         if(payload == null){

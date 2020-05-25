@@ -29,6 +29,7 @@ import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -683,7 +684,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         for(Block block : blocksOut){
             TextureRegion region = block.icon(Cicon.medium);
 
-            if(!Core.atlas.isFound(region) || !block.inEditor) continue;
+            if(!Core.atlas.isFound(region) || !block.inEditor || (block.buildVisibility == BuildVisibility.debugOnly)) continue;
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglei);
             button.getStyle().imageUp = new TextureRegionDrawable(region);

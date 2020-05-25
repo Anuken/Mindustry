@@ -2,15 +2,12 @@ package mindustry.world.blocks.distribution;
 
 import arc.*;
 import arc.graphics.g2d.*;
-import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -80,12 +77,7 @@ public class PayloadConveyor extends Block{
         public void updateTile(){
             progress = Time.time() % moveTime;
 
-            //TODO DEBUG
-            if(Core.input.keyTap(KeyCode.g) && world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y) == this){
-                item = new UnitPayload((Mathf.chance(0.5) ? UnitTypes.wraith : UnitTypes.dagger).create(Team.sharded));
-                itemRotation = rotdeg();
-                animation = 0f;
-            }
+            updatePayload();
 
             //TODO nondeterministic input priority
             int curStep = curStep();
@@ -106,9 +98,7 @@ public class PayloadConveyor extends Block{
                         }
                     }else if(!blocked){
                         //dump item forward
-                        float trnext = size * tilesize / 2f, cx = Geometry.d4(rotation()).x, cy = Geometry.d4(rotation()).y;
-
-                        if(item.dump(x + cx * trnext, y + cy * trnext, rotdeg())){
+                        if(item.dump()){
                             item = null;
                         }
                     }
@@ -159,25 +149,8 @@ public class PayloadConveyor extends Block{
 
             Draw.z(Layer.blockOver);
 
-            if(animation > fract()){
-                animation = Mathf.lerp(animation, 0.8f, 0.15f);
-            }
-
-            animation = Math.max(animation, fract());
-
-            float fract = animation;
-            rot = Mathf.slerp(itemRotation, rotdeg(), fract);
-
-            if(fract < 0.5f){
-                Tmp.v1.trns(itemRotation + 180, (0.5f - fract) * tilesize * size);
-            }else{
-                Tmp.v1.trns(rotdeg(), (fract - 0.5f) * tilesize * size);
-            }
-
-            float vx = Tmp.v1.x, vy = Tmp.v1.y;
-
             if(item != null){
-                item.draw(x + vx, y + vy, rot);
+                item.draw();
             }
         }
 
@@ -192,6 +165,8 @@ public class PayloadConveyor extends Block{
             this.stepAccepted = curStep();
             this.itemRotation = source.angleTo(this);
             this.animation = 0;
+
+            updatePayload();
         }
 
         @Override
@@ -210,6 +185,29 @@ public class PayloadConveyor extends Block{
             progress = read.f();
             itemRotation = read.f();
             item = Payload.read(read);
+        }
+
+        public void updatePayload(){
+            if(item != null){
+                if(animation > fract()){
+                    animation = Mathf.lerp(animation, 0.8f, 0.15f);
+                }
+
+                animation = Math.max(animation, fract());
+
+                float fract = animation;
+                float rot = Mathf.slerp(itemRotation, rotdeg(), fract);
+
+                if(fract < 0.5f){
+                    Tmp.v1.trns(itemRotation + 180, (0.5f - fract) * tilesize * size);
+                }else{
+                    Tmp.v1.trns(rotdeg(), (fract - 0.5f) * tilesize * size);
+                }
+
+                float vx = Tmp.v1.x, vy = Tmp.v1.y;
+
+                item.set(x + vx, y + vy, rot);
+            }
         }
 
         boolean blends(int direction){

@@ -38,13 +38,13 @@ public class BlockPayload implements Payload{
     }
 
     @Override
-    public void set(float x, float y){
+    public void set(float x, float y, float rotation){
         entity.set(x, y);
     }
 
     @Override
-    public void draw(float x, float y, float rotation){
-        Drawf.shadow(x, y, entity.block().size * tilesize * 2f);
-        Draw.rect(entity.block().icon(Cicon.full), x, y, 0);
+    public void draw(){
+        Drawf.shadow(entity.x(), entity.y(), entity.block().size * tilesize * 2f);
+        Draw.rect(entity.block().icon(Cicon.full), entity.x(), entity.y());
     }
 }

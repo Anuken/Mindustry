@@ -46,13 +46,22 @@ public class PayloadAcceptor extends Block{
             this.payload = (T)payload;
             this.payVector.set(source).sub(this).clamp(-size * tilesize / 2f, size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f);
             this.payRotation = source.angleTo(this);
+
+            updatePayload();
+        }
+
+        public void updatePayload(){
+            if(payload != null){
+                payload.set(x + payVector.x, y + payVector.y, payRotation);
+            }
         }
 
         /** @return true if the payload is in position. */
         public boolean moveInPayload(){
             if(payload == null) return false;
 
-            payload.set(x + payVector.x, y + payVector.y);
+            updatePayload();
+
             payRotation = Mathf.slerpDelta(payRotation, rotate ? rotdeg() : 90f, 0.3f);
             payVector.approachDelta(Vec2.ZERO, payloadSpeed);
 
@@ -62,7 +71,8 @@ public class PayloadAcceptor extends Block{
         public void moveOutPayload(){
             if(payload == null) return;
 
-            payload.set(x + payVector.x, y + payVector.y);
+            updatePayload();
+
             payVector.trns(rotdeg(), payVector.len() + edelta() * payloadSpeed);
             payRotation = rotdeg();
 
@@ -81,7 +91,7 @@ public class PayloadAcceptor extends Block{
         }
 
         public void dumpPayload(){
-            if(payload.dump(x + payVector.x, y + payVector.y, payRotation)){
+            if(payload.dump()){
                 payload = null;
             }
         }
@@ -92,8 +102,10 @@ public class PayloadAcceptor extends Block{
 
         public void drawPayload(){
             if(payload != null){
+                payload.set(x + payVector.x, y + payVector.y, payRotation);
+
                 Draw.z(Layer.blockOver);
-                payload.draw(x + payVector.x, y + payVector.y, payRotation);
+                payload.draw();
             }
         }
 
