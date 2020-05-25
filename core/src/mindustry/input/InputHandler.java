@@ -202,6 +202,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         };
     }
 
+    public boolean isUsingSchematic(){
+        return !selectRequests.isEmpty();
+    }
+
     public OverlayFragment getFrag(){
         return frag;
     }
