@@ -74,7 +74,7 @@ public class SchematicsDialog extends FloatingDialog{
                 String regex = "[`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?]";
                 String searchString = search.toLowerCase().replaceAll(regex," ");
 
-                if(!schematics.all().contains(s -> search.isEmpty() || !s.name().toLowerCase().replaceAll(regex," ").contains(searchString))){
+                if(!schematics.all().contains(s -> search.isEmpty() || s.name().toLowerCase().replaceAll(regex," ").contains(searchString))){
                     t.add("$none");
                     return;
                 }
@@ -85,7 +85,6 @@ public class SchematicsDialog extends FloatingDialog{
 
                     if(!search.isEmpty() && !s.name().toLowerCase().replaceAll(regex," ").contains(searchString)) continue;
                     if(firstSchematic == null) firstSchematic = s;
-
 
                     Button[] sel = {null};
                     sel[0] = t.button(b -> {
