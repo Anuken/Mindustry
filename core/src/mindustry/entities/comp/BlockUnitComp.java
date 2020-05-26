@@ -8,6 +8,8 @@ import static mindustry.Vars.tilesize;
 
 @Component
 abstract class BlockUnitComp implements Unitc{
+    @Import Team team;
+
     @ReadOnly Tilec tile;
 
     public void tile(Tilec tile){
@@ -37,8 +39,11 @@ abstract class BlockUnitComp implements Unitc{
 
     @Replace
     public void team(Team team){
-        if(tile != null){
-            tile.team(team);
+        if(tile != null && this.team != team){
+            this.team = team;
+            if(tile.team() != team){
+                tile.team(team);
+            }
         }
     }
 }

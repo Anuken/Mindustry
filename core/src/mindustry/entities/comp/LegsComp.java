@@ -15,6 +15,9 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
 
     @Override
     public void update(){
+        //keep elevation halfway
+        elevation = 0.5f;
+
         int count = type().legCount;
         float legLength = type().legLength;
 
@@ -34,19 +37,15 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         }
 
         float moveSpeed = 0.1f;
-
-        int div = Math.max(legs.length / 3, 2);
-
+        int div = Math.max(legs.length / 2, 2);
         float moveSpace = legLength / 1.6f / (div / 2f);
-
-        elevation = 0.5f;
 
         totalLength += Mathf.dst(deltaX(), deltaY());
 
         int stage = (int)(totalLength / moveSpace);
         int odd = stage % div;
         float movespace = 360f / legs.length / 4f;
-        float trns = vel().len() * 12.5f * div/2f;
+        float trns = vel().len() * 12.5f * div/1.5f;
 
         Tmp.v4.trns(rotation, trns);
 
@@ -54,15 +53,10 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             float dstRot = rotation + 360f / legs.length * i + (360f / legs.length / 2f);
             float rot2 = Angles.moveToward(dstRot, rotation + (Angles.angleDist(dstRot, rotation) < 90f ? 180f : 0), movespace);
 
-            //float ox = Mathf.randomSeedRange(i, 6f), oy = Mathf.randomSeedRange(i, 6f);
-
             Leg l = legs[i];
 
-            //Tmp.v3.trns(Mathf.randomSeed(stage + i*3, 360f), 10f);
-            Tmp.v3.setZero();
-
-            Tmp.v1.trns(dstRot, legLength).add(x, y).add(Tmp.v3).add(Tmp.v4);
-            Tmp.v2.trns(rot2, legLength / 2f).add(x, y).add(Tmp.v3).add(Tmp.v4);
+            Tmp.v1.trns(dstRot, legLength).add(x, y).add(Tmp.v4);
+            Tmp.v2.trns(rot2, legLength / 2f).add(x, y).add(Tmp.v4);
 
             if(i % div == odd){
                 l.base.lerpDelta(Tmp.v1, moveSpeed);
@@ -71,5 +65,10 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
 
             l.joint.lerpDelta(Tmp.v2, moveSpeed / 4f);
         }
+    }
+
+    @Override
+    public void add(){
+        elevation = 0.5f;
     }
 }
