@@ -42,7 +42,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             }
         }
 
-        float moveSpeed = 0.1f;
+        float moveSpeed = type().legSpeed;
         int div = Math.max(legs.length / 2, 2);
         float moveSpace = legLength / 1.6f / (div / 2f);
 
@@ -69,7 +69,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         }
 
         float movespace = 360f / legs.length / 4f;
-        float trns = vel().len() * 12.5f * div/1.5f;
+        float trns = vel().len() * 12.5f * div/1.5f * type().legTrns;
 
         Tmp.v4.trns(rotation, trns);
 

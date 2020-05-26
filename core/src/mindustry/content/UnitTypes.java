@@ -1,6 +1,7 @@
 package mindustry.content;
 
 import arc.graphics.*;
+import arc.math.*;
 import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
@@ -71,30 +72,24 @@ public class UnitTypes implements ContentList{
         cix = new UnitType("cix"){{
             drag = 0.1f;
             speed = 0.8f;
-            hitsize = 11f;
+            hitsize = 9f;
             health = 140;
 
             legCount = 6;
             rotateShooting = false;
 
-            weapons.add(
-            new Weapon("missiles-mount"){{
-                reload = 20f;
-                x = 4f;
-                rotate = true;
-                mirror = false;
-                shake = 1f;
-                bullet = Bullets.missileSwarm;
-            }},
-            new Weapon("missiles-mount"){{
-                reload = 20f;
-                x = -4f;
-                rotate = true;
-                mirror = false;
-                flipSprite = true;
-                shake = 1f;
-                bullet = Bullets.missileSwarm;
-            }});
+            for(boolean b : Mathf.booleans){
+                weapons.add(
+                new Weapon("missiles-mount"){{
+                    reload = 20f;
+                    x = 4f * Mathf.sign(b);
+                    rotate = true;
+                    mirror = false;
+                    flipSprite = !b;
+                    shake = 1f;
+                    bullet = Bullets.missileSwarm;
+                }});
+            }
         }};
 
         titan = new UnitType("titan"){{

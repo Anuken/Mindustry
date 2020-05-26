@@ -39,9 +39,10 @@ public class UnitType extends UnlockableContent{
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
-    public int legCount = 4;
-    public float legLength = 24f;
     public float sway = 1f;
+
+    public int legCount = 4;
+    public float legLength = 24f, legSpeed = 0.1f, legTrns = 1f;
 
     public int itemCapacity = 30;
     public int drillTier = -1;
