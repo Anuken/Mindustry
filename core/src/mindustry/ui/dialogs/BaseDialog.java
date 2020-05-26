@@ -11,11 +11,11 @@ import mindustry.graphics.*;
 
 import static mindustry.Vars.*;
 
-public class FloatingDialog extends Dialog{
+public class BaseDialog extends Dialog{
     private boolean wasPaused;
     protected boolean shouldPause;
 
-    public FloatingDialog(String title, DialogStyle style){
+    public BaseDialog(String title, DialogStyle style){
         super(title, style);
         setFillParent(true);
         this.title.setAlignment(Align.center);
@@ -40,7 +40,7 @@ public class FloatingDialog extends Dialog{
         });
     }
 
-    public FloatingDialog(String title){
+    public BaseDialog(String title){
         this(title, Core.scene.getStyle(DialogStyle.class));
     }
 

@@ -42,7 +42,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private MapResizeDialog resizeDialog;
     private MapGenerateDialog generateDialog;
     private ScrollPane pane;
-    private FloatingDialog menu;
+    private BaseDialog menu;
     private Rules lastSavedRules;
     private boolean saved = false;
     private boolean shownWithMap = false;
@@ -58,7 +58,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         infoDialog = new MapInfoDialog(editor);
         generateDialog = new MapGenerateDialog(editor, true);
 
-        menu = new FloatingDialog("$menu");
+        menu = new BaseDialog("$menu");
         menu.addCloseButton();
 
         float swidth = 180f;
@@ -309,7 +309,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
      * 3) listener
      */
     private void createDialog(String title, Object... arguments){
-        FloatingDialog dialog = new FloatingDialog(title);
+        BaseDialog dialog = new BaseDialog(title);
 
         float h = 90f;
 

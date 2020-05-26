@@ -9,7 +9,7 @@ import mindustry.io.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
-public class MapInfoDialog extends FloatingDialog{
+public class MapInfoDialog extends BaseDialog{
     private final MapEditor editor;
     private final WaveInfoDialog waveInfo;
     private final MapGenerateDialog generate;

@@ -280,50 +280,6 @@ public class TechTree implements ContentList{
                             });
                         });
                     });
-
-                    /*
-                    node(draugFactory, () -> {
-                        node(spiritFactory, () -> {
-                            node(phantomFactory);
-                        });
-
-                        node(daggerFactory, () -> {
-                            node(commandCenter, () -> {});
-                            node(crawlerFactory, () -> {
-                                node(titanFactory, () -> {
-                                    node(fortressFactory, () -> {
-
-                                    });
-                                });
-                            });
-
-                            node(wraithFactory, () -> {
-                                node(ghoulFactory, () -> {
-                                    node(revenantFactory, () -> {
-
-                                    });
-                                });
-                            });
-                        });
-                    });
-
-                    /*
-                    node(dartPad, () -> {
-                        node(deltaPad, () -> {
-
-                            node(javelinPad, () -> {
-                                node(tridentPad, () -> {
-                                    node(glaivePad);
-                                });
-                            });
-
-                            node(tauPad, () -> {
-                                node(omegaPad, () -> {
-
-                                });
-                            });
-                        });
-                    });*/
                 });
             });
         });
@@ -367,8 +323,7 @@ public class TechTree implements ContentList{
         /** Extra objectives needed to research this. TODO implement */
         public Objective[] objectives = {};
         /** Turns required to research this content. */
-        //TODO keep track of turns that have been used so far
-        public int turns = 1;
+        public int turns = 3; //TODO keep track of turns that have been used so far
         /** Nodes that depend on this node. */
         public final Array<TechNode> children = new Array<>();
 

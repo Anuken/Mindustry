@@ -400,7 +400,7 @@ public class Control implements ApplicationListener, Loadable{
         //display UI scale changed dialog
         if(Core.settings.getBool("uiscalechanged", false)){
             Core.app.post(() -> Core.app.post(() -> {
-                FloatingDialog dialog = new FloatingDialog("$confirm");
+                BaseDialog dialog = new BaseDialog("$confirm");
                 dialog.setFillParent(true);
 
                 float[] countdown = {60 * 11};

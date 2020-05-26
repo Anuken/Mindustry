@@ -17,14 +17,13 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-public class ModsDialog extends FloatingDialog{
+public class ModsDialog extends BaseDialog{
 
     public ModsDialog(){
         super("$mods");
         addCloseButton();
 
         buttons.button("$mods.guide", Icon.link, () -> Core.app.openURI(modGuideURL)).size(210, 64f);
-
 
         shown(this::setup);
 
@@ -67,7 +66,7 @@ public class ModsDialog extends FloatingDialog{
             float margin = 12f;
 
             buttons.button("$mod.import", Icon.add, style, () -> {
-                FloatingDialog dialog = new FloatingDialog("$mod.import");
+                BaseDialog dialog = new BaseDialog("$mod.import");
 
                 TextButtonStyle bstyle = Styles.cleart;
 
@@ -245,7 +244,7 @@ public class ModsDialog extends FloatingDialog{
     }
 
     private void showMod(LoadedMod mod){
-        FloatingDialog dialog = new FloatingDialog(mod.meta.displayName());
+        BaseDialog dialog = new BaseDialog(mod.meta.displayName());
 
         dialog.addCloseButton();
 

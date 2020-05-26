@@ -6,7 +6,7 @@ import arc.scene.ui.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
-public class ColorPicker extends FloatingDialog{
+public class ColorPicker extends BaseDialog{
     private Cons<Color> cons = c -> {};
     private Color current = new Color();
 

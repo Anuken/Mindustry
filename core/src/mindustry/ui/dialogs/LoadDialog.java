@@ -19,7 +19,7 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-public class LoadDialog extends FloatingDialog{
+public class LoadDialog extends BaseDialog{
     ScrollPane pane;
     Table slots;
 

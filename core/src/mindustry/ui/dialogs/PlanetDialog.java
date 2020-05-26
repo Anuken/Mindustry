@@ -29,7 +29,7 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class PlanetDialog extends FloatingDialog{
+public class PlanetDialog extends BaseDialog{
     private static final Color
         outlineColor = Pal.accent.cpy().a(1f),
         hoverColor = Pal.accent.cpy().a(0.5f),

@@ -17,7 +17,7 @@ import java.util.*;
 
 import static mindustry.Vars.platform;
 
-public class FileChooser extends FloatingDialog{
+public class FileChooser extends BaseDialog{
     private static final Fi homeDirectory = Core.files.absolute(Core.files.getExternalStoragePath());
     private static Fi lastDirectory = homeDirectory;
 

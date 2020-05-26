@@ -17,8 +17,8 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class MapsDialog extends FloatingDialog{
-    private FloatingDialog dialog;
+public class MapsDialog extends BaseDialog{
+    private BaseDialog dialog;
 
     public MapsDialog(){
         super("$maps");
@@ -158,7 +158,7 @@ public class MapsDialog extends FloatingDialog{
     }
 
     void showMapInfo(Map map){
-        dialog = new FloatingDialog("$editor.mapinfo");
+        dialog = new BaseDialog("$editor.mapinfo");
         dialog.addCloseButton();
 
         float mapsize = Core.graphics.isPortrait() ? 160f : 300f;

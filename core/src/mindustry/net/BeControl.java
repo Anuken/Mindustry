@@ -91,7 +91,7 @@ public class BeControl{
                 int[] length = {0};
                 Fi file = bebuildDirectory.child("client-be-" + updateBuild + ".jar");
 
-                FloatingDialog dialog = new FloatingDialog("$be.updating");
+                BaseDialog dialog = new BaseDialog("$be.updating");
                 download(updateUrl, file, i -> length[0] = i, v -> progress[0] = v, () -> cancel[0], () -> {
                     try{
                         Runtime.getRuntime().exec(new String[]{"java", "-DlastBuild=" + Version.build, "-Dberestart", "-jar", file.absolutePath()});

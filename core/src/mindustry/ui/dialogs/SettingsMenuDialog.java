@@ -31,7 +31,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     private Table prefs;
     private Table menu;
-    private FloatingDialog dataDialog;
+    private BaseDialog dataDialog;
     private boolean wasPaused;
 
     public SettingsMenuDialog(){
@@ -77,7 +77,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         prefs.clearChildren();
         prefs.add(menu);
 
-        dataDialog = new FloatingDialog("$settings.data");
+        dataDialog = new BaseDialog("$settings.data");
         dataDialog.addCloseButton();
 
         dataDialog.cont.table(Tex.button, t -> {

@@ -532,7 +532,7 @@ public class HudFragment extends Fragment{
     }
 
     private void showLaunchConfirm(){
-        FloatingDialog dialog = new FloatingDialog("$launch");
+        BaseDialog dialog = new BaseDialog("$launch");
         dialog.update(() -> {
             if(!inLaunchWave()){
                 dialog.hide();

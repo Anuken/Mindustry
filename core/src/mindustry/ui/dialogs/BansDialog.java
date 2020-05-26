@@ -7,7 +7,7 @@ import mindustry.net.Administration.*;
 
 import static mindustry.Vars.*;
 
-public class BansDialog extends FloatingDialog{
+public class BansDialog extends BaseDialog{
 
     public BansDialog(){
         super("$server.bans");
