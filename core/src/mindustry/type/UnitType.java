@@ -37,7 +37,7 @@ public class UnitType extends UnlockableContent{
     public float drag = 0.3f, accel = 0.5f, landShake = 0f;
     public float health = 200f, range = -1, armor = 0f;
     public boolean targetAir = true, targetGround = true;
-    public boolean faceTarget = true, isCounted = true, lowAltitude = false;
+    public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
     public int legCount = 4;
     public float legLength = 24f;
@@ -288,7 +288,7 @@ public class UnitType extends UnlockableContent{
                 Draw.rect(weapon.region,
                 unit.x() + Angles.trnsx(rotation, weapon.x * i, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
                 unit.y() + Angles.trnsy(rotation, weapon.x * i, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil),
-                width * Draw.scl,
+                width * Draw.scl * -Mathf.sign(weapon.flipSprite),
                 weapon.region.getHeight() * Draw.scl,
                 weaponRotation);
             }
@@ -323,21 +323,24 @@ public class UnitType extends UnlockableContent{
         Leg[] legs = unit.legs();
 
 
-        float srad = 2.1f;
         float ssize = footRegion.getWidth() * Draw.scl * 1.5f;
 
         for(Leg leg : legs){
             Drawf.shadow(leg.base.x, leg.base.y, ssize);
         }
 
+        int index = 0;
+
         for(Leg leg : legs){
+            boolean flip = index++ >= legs.length/2f;
+            int flips = Mathf.sign(flip);
 
             Draw.color();
 
-            Lines.stroke(legRegion.getHeight() * Draw.scl);
+            Lines.stroke(legRegion.getHeight() * Draw.scl * flips);
             Lines.line(legRegion, unit.x(), unit.y(), leg.joint.x, leg.joint.y, CapStyle.none, 0);
 
-            Lines.stroke(legBaseRegion.getHeight() * Draw.scl);
+            Lines.stroke(legBaseRegion.getHeight() * Draw.scl * flips);
             Lines.line(legBaseRegion, leg.joint.x, leg.joint.y, leg.base.x, leg.base.y, CapStyle.none, 0);
 
             float angle1 = unit.angleTo(leg.joint), angle2 = unit.angleTo(leg.base);

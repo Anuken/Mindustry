@@ -2,16 +2,20 @@ package mindustry.entities.comp;
 
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.world.blocks.environment.*;
 
 @Component
 abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
-    @Import float x, y, rotation, elevation;
+    @Import float x, y, elevation;
 
     transient Leg[] legs = {};
     transient float totalLength;
+    transient int lastGroup;
 
     @Override
     public void update(){
@@ -20,7 +24,9 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
 
         int count = type().legCount;
         float legLength = type().legLength;
+        float rotation = vel().angle();
 
+        //set up initial leg positions
         if(legs.length != type().legCount){
             this.legs = new Leg[count];
 
@@ -43,7 +49,25 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         totalLength += Mathf.dst(deltaX(), deltaY());
 
         int stage = (int)(totalLength / moveSpace);
-        int odd = stage % div;
+        int group = stage % div;
+
+        if(lastGroup != group){
+            //create ripple effects when switching leg groups
+            int i = 0;
+            for(Leg l : legs){
+                if(i++ % div == lastGroup){
+                    Floor floor = Vars.world.floorWorld(l.base.x, l.base.y);
+                    if(floor.isLiquid){
+                        floor.walkEffect.at(l.base.x, l.base.y, 0, floor.mapColor);
+                    }else{
+                        Fx.unitLandSmall.at(l.base.x, l.base.y, 0.5f, floor.mapColor);
+                    }
+                }
+            }
+
+            lastGroup = group;
+        }
+
         float movespace = 360f / legs.length / 4f;
         float trns = vel().len() * 12.5f * div/1.5f;
 
@@ -58,7 +82,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             Tmp.v1.trns(dstRot, legLength).add(x, y).add(Tmp.v4);
             Tmp.v2.trns(rot2, legLength / 2f).add(x, y).add(Tmp.v4);
 
-            if(i % div == odd){
+            if(i % div == group){
                 l.base.lerpDelta(Tmp.v1, moveSpeed);
                 l.joint.lerpDelta(Tmp.v2, moveSpeed / 4f);
             }

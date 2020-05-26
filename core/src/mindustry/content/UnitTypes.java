@@ -71,10 +71,30 @@ public class UnitTypes implements ContentList{
         cix = new UnitType("cix"){{
             drag = 0.1f;
             speed = 0.8f;
-            hitsize = 8f;
-            health = 130;
+            hitsize = 11f;
+            health = 140;
 
             legCount = 6;
+            rotateShooting = false;
+
+            weapons.add(
+            new Weapon("missiles-mount"){{
+                reload = 20f;
+                x = 4f;
+                rotate = true;
+                mirror = false;
+                shake = 1f;
+                bullet = Bullets.missileSwarm;
+            }},
+            new Weapon("missiles-mount"){{
+                reload = 20f;
+                x = -4f;
+                rotate = true;
+                mirror = false;
+                flipSprite = true;
+                shake = 1f;
+                bullet = Bullets.missileSwarm;
+            }});
         }};
 
         titan = new UnitType("titan"){{
