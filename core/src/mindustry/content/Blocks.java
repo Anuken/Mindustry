@@ -80,7 +80,7 @@ public class Blocks implements ContentList{
 
     //misc experimental
 
-    blockForge, blockLauncher;
+    blockForge, blockLauncher, blockLoader, blockUnloader;
 
     @Override
     public void load(){
@@ -1274,7 +1274,7 @@ public class Blocks implements ContentList{
         //region storage
 
         coreShard = new CoreBlock("core-shard"){{
-            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with());
+            requirements(Category.effect, BuildVisibility.hidden, ItemStack.with());
             alwaysUnlocked = true;
 
             health = 1100;
@@ -1283,7 +1283,7 @@ public class Blocks implements ContentList{
         }};
 
         coreFoundation = new CoreBlock("core-foundation"){{
-            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with());
+            requirements(Category.effect, BuildVisibility.hidden, ItemStack.with());
 
             health = 2000;
             itemCapacity = 9000;
@@ -1291,7 +1291,7 @@ public class Blocks implements ContentList{
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
-            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with());
+            requirements(Category.effect, BuildVisibility.hidden, ItemStack.with());
 
             health = 4000;
             itemCapacity = 13000;
@@ -1787,6 +1787,20 @@ public class Blocks implements ContentList{
             size = 3;
             hasPower = true;
             consumes.power(2f);
+        }};
+
+        blockLoader = new BlockLoader("block-loader"){{
+            requirements(Category.production, BuildVisibility.debugOnly, ItemStack.with(Items.thorium, 100));
+            hasPower = true;
+            consumes.power(2f);
+            size = 3;
+        }};
+
+        blockUnloader = new BlockUnloader("block-unloader"){{
+            requirements(Category.production, BuildVisibility.debugOnly, ItemStack.with(Items.thorium, 100));
+            hasPower = true;
+            consumes.power(2f);
+            size = 3;
         }};
 
         //endregion

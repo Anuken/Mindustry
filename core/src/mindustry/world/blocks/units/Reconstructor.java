@@ -99,7 +99,7 @@ public class Reconstructor extends UnitBlock{
             if(payload != null){
                 //check if offloading
                 if(payload.unit.type().upgrade == null || payload.unit.type().tier != tier){
-                    outputPayload();
+                    moveOutPayload();
                 }else{ //update progress
                     if(moveInPayload()){
                         if(consValid()){

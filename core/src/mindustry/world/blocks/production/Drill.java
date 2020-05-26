@@ -158,7 +158,7 @@ public class Drill extends Block{
         });
 
         stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
-        if(liquidBoostIntensity > 0){
+        if(liquidBoostIntensity != 1){
             stats.add(BlockStat.boostEffect, liquidBoostIntensity * liquidBoostIntensity, StatUnit.timesSpeed);
         }
     }

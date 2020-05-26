@@ -572,6 +572,8 @@ public class EntityProcess extends BaseProcessor{
             //implement each definition
             for(EntityDefinition def : definitions){
 
+                ObjectSet<String> methodNames = def.components.flatMap(type -> type.methods().map(Smethod::simpleString)).<String>as().asSet();
+
                 //get interface for each component
                 for(Stype comp : def.components){
 
@@ -588,8 +590,8 @@ public class EntityProcess extends BaseProcessor{
                     for(Smethod method : inter.methods()){
                         String var = method.name();
                         FieldSpec field = Array.with(def.builder.fieldSpecs).find(f -> f.name.equals(var));
-                        //make sure it's a real variable AND that the component doesn't already implement it with custom logic
-                        if(field == null || comp.methods().contains(m -> m.simpleString().equals(method.simpleString()))) continue;
+                        //make sure it's a real variable AND that the component doesn't already implement it somewhere with custom logic
+                        if(field == null || methodNames.contains(method.simpleString())) continue;
 
                         //getter
                         if(!method.isVoid()){

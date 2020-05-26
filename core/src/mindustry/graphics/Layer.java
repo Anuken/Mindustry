@@ -26,11 +26,11 @@ public class Layer{
     //blocks currently in progress *shaders used*
     blockBuilding = 40,
 
-    //ground units
-    groundUnit = 50,
-
     //turrets
-    turret = 60,
+    turret = 50,
+
+    //ground units
+    groundUnit = 60,
 
     //power lines
     power = 70,

@@ -202,6 +202,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         };
     }
 
+    public boolean isUsingSchematic(){
+        return !selectRequests.isEmpty();
+    }
+
     public OverlayFragment getFrag(){
         return frag;
     }
@@ -765,7 +769,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         Tilec tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-        if(tile instanceof ControlBlock){
+        if(tile instanceof ControlBlock && tile.team() == player.team()){
             return ((ControlBlock)tile).unit();
         }
 

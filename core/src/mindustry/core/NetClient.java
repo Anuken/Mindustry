@@ -569,7 +569,7 @@ public class NetClient implements ApplicationListener{
             unit.x(), unit.y(),
             player.unit().aimX(), player.unit().aimY(),
             unit.rotation(),
-            unit instanceof Legsc ? ((Legsc)unit).baseRotation() : 0,
+            unit instanceof Mechc ? ((Mechc)unit).baseRotation() : 0,
             unit.vel().x, unit.vel().y,
             player.miner().mineTile(),
             control.input.isBoosting, control.input.isShooting, ui.chatfrag.shown(),
