@@ -7,11 +7,13 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
 
 @Component
 abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     @Import float x, y, elevation;
+    @Import UnitType type;
 
     transient Leg[] legs = {};
     transient float totalLength;
@@ -22,12 +24,12 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         //keep elevation halfway
         elevation = 0.5f;
 
-        int count = type().legCount;
-        float legLength = type().legLength;
+        int count = type.legCount;
+        float legLength = type.legLength;
         float rotation = vel().angle();
 
         //set up initial leg positions
-        if(legs.length != type().legCount){
+        if(legs.length != type.legCount){
             this.legs = new Leg[count];
 
             float spacing = 360f / count;
@@ -42,7 +44,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             }
         }
 
-        float moveSpeed = type().legSpeed;
+        float moveSpeed = type.legSpeed;
         int div = Math.max(legs.length / 2, 2);
         float moveSpace = legLength / 1.6f / (div / 2f);
 
@@ -62,6 +64,11 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
                     }else{
                         Fx.unitLandSmall.at(l.base.x, l.base.y, 0.5f, floor.mapColor);
                     }
+
+                    //shake when legs contact ground
+                    if(type.landShake > 0){
+                        Effects.shake(type.landShake, type.landShake, this);
+                    }
                 }
             }
 
@@ -69,7 +76,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         }
 
         float movespace = 360f / legs.length / 4f;
-        float trns = vel().len() * 12.5f * div/1.5f * type().legTrns;
+        float trns = vel().len() * 12.5f * div/1.5f * type.legTrns;
 
         Tmp.v4.trns(rotation, trns);
 

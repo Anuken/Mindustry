@@ -392,6 +392,15 @@ public class Control implements ApplicationListener, Loadable{
     public void init(){
         platform.updateRPC();
 
+        //just a regular reminder
+        if(!OS.prop("user.name").equals("anuke") && !OS.hasEnv("iknowwhatimdoing")){
+            if(mobile){
+                ui.showInfo("[scarlet]6.0 doesn't work on mobile.[] Don't play it.");
+            }else{
+                ui.showInfo("[scarlet]6.0 is not supposed to be played.[] Go do something else.");
+            }
+        }
+
         //play tutorial on stop
         if(!settings.getBool("playedtutorial", false)){
             Core.app.post(() -> Core.app.post(this::playTutorial));
