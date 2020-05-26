@@ -1298,6 +1298,14 @@ public class Blocks implements ContentList{
             size = 5;
         }};
 
+        coreNucleus = new CoreBlock("core-nexus"){{
+            requirements(Category.effect, BuildVisibility.hidden, ItemStack.with());
+
+            health = 7000;
+            itemCapacity = 20000;
+            size = 6;
+        }};
+
         vault = new StorageBlock("vault"){{
             requirements(Category.effect, ItemStack.with(Items.titanium, 250, Items.thorium, 125));
             size = 3;
