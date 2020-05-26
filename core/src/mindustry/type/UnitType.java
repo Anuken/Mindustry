@@ -59,7 +59,7 @@ public class UnitType extends UnlockableContent{
     public Sound deathSound = Sounds.bang;
 
     public Array<Weapon> weapons = new Array<>();
-    public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion, occlusionRegion;
+    public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion, occlusionRegion, jointRegion, footRegion, legBaseRegion;
 
     public UnitType(String name){
         super(name);
@@ -114,6 +114,9 @@ public class UnitType extends UnlockableContent{
         weapons.each(Weapon::load);
         region = Core.atlas.find(name);
         legRegion = Core.atlas.find(name + "-leg");
+        jointRegion = Core.atlas.find(name + "-joint");
+        footRegion = Core.atlas.find(name + "-foot");
+        legBaseRegion = Core.atlas.find(name + "-leg-base", name + "-leg");
         baseRegion = Core.atlas.find(name + "-base");
         cellRegion = Core.atlas.find(name + "-cell", Core.atlas.find("power-cell"));
         occlusionRegion = Core.atlas.find("circle-shadow");
@@ -319,24 +322,28 @@ public class UnitType extends UnlockableContent{
     public void drawLegs(Legsc unit){
         Leg[] legs = unit.legs();
 
-        Lines.stroke(4f, Color.gray);
+
         float srad = 2.1f;
+        float ssize = footRegion.getWidth() * Draw.scl * 1.5f;
+
+        for(Leg leg : legs){
+            Drawf.shadow(leg.base.x, leg.base.y, ssize);
+        }
 
         for(Leg leg : legs){
 
             Draw.color();
 
+            Lines.stroke(legRegion.getHeight() * Draw.scl);
             Lines.line(legRegion, unit.x(), unit.y(), leg.joint.x, leg.joint.y, CapStyle.none, 0);
-            Lines.line(legRegion, leg.joint.x, leg.joint.y, leg.base.x, leg.base.y, CapStyle.none, 0);
 
-            Draw.color(Pal.darkMetal);
-            Fill.circle(leg.joint.x, leg.joint.y, srad);
+            Lines.stroke(legBaseRegion.getHeight() * Draw.scl);
+            Lines.line(legBaseRegion, leg.joint.x, leg.joint.y, leg.base.x, leg.base.y, CapStyle.none, 0);
 
-            Draw.color(Pal.darkerMetal);
-            Fill.circle(leg.base.x, leg.base.y, srad);
+            float angle1 = unit.angleTo(leg.joint), angle2 = unit.angleTo(leg.base);
 
-            Draw.color();
-            //Lines.line(unit.x(), unit.y(), leg.base.x, leg.base.y);
+            Draw.rect(jointRegion, leg.joint.x, leg.joint.y);
+            Draw.rect(footRegion, leg.base.x, leg.base.y, angle2);
         }
 
         Draw.reset();
