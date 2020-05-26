@@ -14,6 +14,7 @@ import arc.util.ArcAnnotate.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -38,6 +39,8 @@ public class UnitType extends UnlockableContent{
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
+    public int legCount = 4;
+    public float legLength = 24f;
     public float sway = 1f;
 
     public int itemCapacity = 30;
@@ -140,11 +143,15 @@ public class UnitType extends UnlockableContent{
         Draw.z(z - 0.02f);
 
         if(legs != null){
-            drawLegs(legs);
+            drawMech(legs);
 
             float ft = Mathf.sin(legs.walkTime(), 3f, 3f);
             legOffset.trns(legs.baseRotation(), 0f, Mathf.lerp(ft * 0.18f * sway, 0f, unit.elevation()));
             unit.trns(legOffset.x, legOffset.y);
+        }
+
+        if(unit instanceof Legsc){
+            drawLegs((Legsc)unit);
         }
 
         Draw.z(Math.min(z - 0.01f, Layer.bullet - 1f));
@@ -309,7 +316,33 @@ public class UnitType extends UnlockableContent{
         }
     }
 
-    public void drawLegs(Mechc unit){
+    public void drawLegs(Legsc unit){
+        Leg[] legs = unit.legs();
+
+        Lines.stroke(4f, Color.gray);
+        float srad = 2.1f;
+
+        for(Leg leg : legs){
+
+            Draw.color();
+
+            Lines.line(legRegion, unit.x(), unit.y(), leg.joint.x, leg.joint.y, CapStyle.none, 0);
+            Lines.line(legRegion, leg.joint.x, leg.joint.y, leg.base.x, leg.base.y, CapStyle.none, 0);
+
+            Draw.color(Pal.darkMetal);
+            Fill.circle(leg.joint.x, leg.joint.y, srad);
+
+            Draw.color(Pal.darkerMetal);
+            Fill.circle(leg.base.x, leg.base.y, srad);
+
+            Draw.color();
+            //Lines.line(unit.x(), unit.y(), leg.base.x, leg.base.y);
+        }
+
+        Draw.reset();
+    }
+
+    public void drawMech(Mechc unit){
         Draw.reset();
 
         Draw.mixcol(Color.white, unit.hitTime());

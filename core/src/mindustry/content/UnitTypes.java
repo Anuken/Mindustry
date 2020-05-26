@@ -17,6 +17,9 @@ public class UnitTypes implements ContentList{
     //ground + builder
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType oculon, tau;
 
+    //legs
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType cix;
+
     //air
     public static @EntityDef({Unitc.class}) UnitType wraith, reaper, ghoul, revenant, lich;
 
@@ -63,6 +66,15 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
             }});
+        }};
+
+        cix = new UnitType("cix"){{
+            drag = 0.1f;
+            speed = 0.8f;
+            hitsize = 8f;
+            health = 130;
+
+            legCount = 6;
         }};
 
         titan = new UnitType("titan"){{

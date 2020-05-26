@@ -22,7 +22,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public Color botColor = Color.valueOf("565656");
 
     public @Load(value = "@-top-#", length = 7) TextureRegion[] topRegions;
-    public @Load(value = "@-bottom-#", length = 7, fallback = "conduit") TextureRegion[] botRegions;
+    public @Load(value = "@-bottom-#", length = 7, fallback = "conduit-bottom-#") TextureRegion[] botRegions;
 
     public float leakResistance = 1.5f;
 
@@ -44,8 +44,6 @@ public class Conduit extends LiquidBlock implements Autotiler{
         Draw.alpha(0.5f);
         Draw.rect(botRegions[bits[0]], req.drawx(), req.drawy(), req.rotation * 90);
         Draw.color();
-
-
         Draw.rect(topRegions[bits[0]], req.drawx(), req.drawy(), req.rotation * 90);
     }
 
