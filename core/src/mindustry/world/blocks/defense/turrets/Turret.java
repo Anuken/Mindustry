@@ -269,10 +269,10 @@ public abstract class Turret extends Block{
             if(alternate){
                 float i = (shotCounter % shots) - shots/2f + (((shots+1)%2) / 2f);
 
-                tr.trns(rotation - 90, spread * i + Mathf.range(xRand), size * tilesize / 2);
+                tr.trns(rotation - 90, spread * i + Mathf.range(xRand), size * tilesize / 2 - recoil);
                 bullet(type, rotation + Mathf.range(inaccuracy));
             }else{
-                tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
+                tr.trns(rotation, size * tilesize / 2f - recoil, Mathf.range(xRand));
 
                 for(int i = 0; i < shots; i++){
                     bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - shots / 2f) * spread);
