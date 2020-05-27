@@ -14,9 +14,9 @@ import static mindustry.Vars.content;
 public class MassDriverBolt extends BulletType{
 
     public MassDriverBolt(){
-        super(5.3f, 50);
+        super(1f, 50);
         collidesTiles = false;
-        lifetime = 6969f;
+        lifetime = 1f;
         despawnEffect = Fx.smeltsmoke;
         hitEffect = Fx.hitBulletBig;
         drag = 0f;
