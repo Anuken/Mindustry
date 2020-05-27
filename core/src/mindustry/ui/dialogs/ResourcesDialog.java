@@ -7,7 +7,7 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class ResourcesDialog extends FloatingDialog{
+public class ResourcesDialog extends BaseDialog{
 
     public ResourcesDialog(){
         super("//TODO resources");

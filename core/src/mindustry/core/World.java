@@ -22,6 +22,7 @@ import mindustry.type.*;
 import mindustry.type.Sector.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.legacy.*;
 
 import static mindustry.Vars.*;
@@ -76,6 +77,18 @@ public class World{
 
     public int unitHeight(){
         return height()*tilesize;
+    }
+
+    @NonNull
+    public Floor floor(int x, int y){
+        Tile tile = tile(x, y);
+        return tile == null ? Blocks.air.asFloor() : tile.floor();
+    }
+
+    @NonNull
+    public Floor floorWorld(float x, float y){
+        Tile tile = tileWorld(x, y);
+        return tile == null ? Blocks.air.asFloor() : tile.floor();
     }
 
     @Nullable

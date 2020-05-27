@@ -9,28 +9,6 @@ import mindustry.world.*;
 /** Holds objective classes. */
 public class Objectives{
 
-    //TODO
-    public static class Wave implements Objective{
-        public int wave;
-
-        public Wave(int wave){
-            this.wave = wave;
-        }
-
-        protected Wave(){}
-
-        @Override
-        public boolean complete(){
-            return false;
-        }
-
-        @Override
-        public String display(){
-            //TODO
-            return null;
-        }
-    }
-
     public static class Unlock implements Objective{
         public @NonNull Block block;
 
@@ -102,9 +80,8 @@ public class Objectives{
         boolean complete();
 
         /** @return the string displayed when this objective is completed, in imperative form.
-         * e.g. when the objective is 'complete 10 waves', this would display "complete 10 waves".
-         * If this objective should not be displayed, should return null.*/
-        @Nullable String display();
+         * e.g. when the objective is 'complete 10 waves', this would display "complete 10 waves". */
+        String display();
 
         /** Build a display for this zone requirement.*/
         default void build(Table table){

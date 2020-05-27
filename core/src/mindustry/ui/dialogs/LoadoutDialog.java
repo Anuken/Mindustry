@@ -11,7 +11,7 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class LoadoutDialog extends FloatingDialog{
+public class LoadoutDialog extends BaseDialog{
     private Runnable hider;
     private Runnable resetter;
     private Runnable updater;

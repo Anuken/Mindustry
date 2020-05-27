@@ -549,7 +549,7 @@ public class NetServer implements ApplicationListener{
         connection.viewHeight = viewHeight;
 
         //disable shooting when a mech flies
-        if(!player.dead() && player.unit().isFlying() && !player.unit().type().flying){
+        if(!player.dead() && player.unit().isFlying() && player.unit() instanceof Mechc){
             shooting = false;
         }
 

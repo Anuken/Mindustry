@@ -9,7 +9,7 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class GameOverDialog extends FloatingDialog{
+public class GameOverDialog extends BaseDialog{
     private Team winner;
 
     public GameOverDialog(){

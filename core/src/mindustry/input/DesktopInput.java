@@ -579,11 +579,11 @@ public class DesktopInput extends InputHandler{
         float speed = unit.type().speed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation()) * strafePenalty;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
-        boolean boosted = (!unit.type().flying && unit.isFlying());
+        boolean boosted = (unit instanceof Mechc && unit.isFlying());
 
         movement.set(xa, ya).nor().scl(speed);
         float mouseAngle = Angles.mouseAngle(unit.x(), unit.y());
-        boolean aimCursor = omni && isShooting && unit.type().hasWeapons() && unit.type().faceTarget && !boosted;
+        boolean aimCursor = omni && isShooting && unit.type().hasWeapons() && unit.type().faceTarget && !boosted && unit.type().rotateShooting;
 
         if(aimCursor){
             unit.lookAt(mouseAngle);

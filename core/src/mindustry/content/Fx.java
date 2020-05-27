@@ -218,6 +218,13 @@ public class Fx{
         });
     }).ground(),
 
+    unitLandSmall = new Effect(30, e -> {
+        color(Tmp.c1.set(e.color).mul(1.1f));
+        randLenVectors(e.id, 6, 12f * e.finpow(), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 3f + 0.1f);
+        });
+    }).ground(),
+
     unitPickup = new Effect(18, e -> {
         color(Pal.lightishGray);
         stroke(e.fin() * 2f);

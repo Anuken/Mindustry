@@ -19,18 +19,18 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-public class CustomRulesDialog extends FloatingDialog{
+public class CustomRulesDialog extends BaseDialog{
     private Table main;
     private Rules rules;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
-    private FloatingDialog banDialog;
+    private BaseDialog banDialog;
 
     public CustomRulesDialog(){
         super("$mode.custom");
 
         loadoutDialog = new LoadoutDialog();
-        banDialog = new FloatingDialog("$bannedblocks");
+        banDialog = new BaseDialog("$bannedblocks");
         banDialog.addCloseButton();
 
         banDialog.shown(this::rebuildBanned);
@@ -84,7 +84,7 @@ public class CustomRulesDialog extends FloatingDialog{
         }).get().setScrollYForce(previousScroll);
         banDialog.cont.row();
         banDialog.cont.button("$add", Icon.add, () -> {
-            FloatingDialog dialog = new FloatingDialog("$add");
+            BaseDialog dialog = new BaseDialog("$add");
             dialog.cont.pane(t -> {
                 t.left().margin(14f);
                 int[] i = {0};
