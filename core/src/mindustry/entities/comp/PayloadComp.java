@@ -3,6 +3,7 @@ package mindustry.entities.comp;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
@@ -12,6 +13,8 @@ import mindustry.world.blocks.payloads.*;
 /** An entity that holds a payload. */
 @Component
 abstract class PayloadComp implements Posc, Rotc{
+    @Import float x, y;
+
     Array<Payload> payloads = new Array<>();
 
     boolean hasPayload(){
@@ -76,11 +79,11 @@ abstract class PayloadComp implements Posc, Rotc{
     /** @return whether the tile has been successfully placed. */
     boolean dropBlock(BlockPayload payload){
         Tilec tile = payload.entity;
-        int tx = tileX(), ty = tileY();
-        Tile on = tileOn();
-        if(Build.validPlace(tile.team(), tx, ty, tile.block(), tile.rotation())){
+        int tx = Vars.world.toTile(x - tile.block().offset()), ty = Vars.world.toTile(y - tile.block().offset());
+        Tile on = Vars.world.tile(tx, ty);
+        if(on != null && Build.validPlace(tile.team(), tx, ty, tile.block(), tile.rotation())){
             int rot = (int)((rotation() + 45f) / 90f) % 4;
-            payload.place(tileOn(), rot);
+            payload.place(on, rot);
 
             Fx.unitDrop.at(tile);
             Fx.placeBlock.at(on.drawx(), on.drawy(), on.block().size);

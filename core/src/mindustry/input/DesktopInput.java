@@ -25,6 +25,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static arc.Core.scene;
 import static mindustry.Vars.*;
@@ -617,7 +618,7 @@ public class DesktopInput extends InputHandler{
                     pay.pickup(target);
                 }else if(!pay.hasPayload()){
                     Tilec tile = world.entWorld(pay.x(), pay.y());
-                    if(tile != null && tile.team() == unit.team()){
+                    if(tile != null && tile.team() == unit.team() && tile.block().synthetic() && tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 3){
                         pay.pickup(tile);
                     }
                 }
