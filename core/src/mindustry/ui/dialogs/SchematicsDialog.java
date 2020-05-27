@@ -97,7 +97,7 @@ public class SchematicsDialog extends FloatingDialog{
                                 showInfo(s);
                             });
 
-                            buttons.button(Icon.download, style, () -> {
+                            buttons.button(Icon.upload, style, () -> {
                                 showExport(s);
                             });
 
