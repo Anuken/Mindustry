@@ -51,7 +51,7 @@ public class MassDriverBolt extends BulletType{
         float dst1 = b.dst(data.from);
         float dst2 = b.dst(data.to);
         
-        //if the target is dead, just keep flying until the bullet explodes
+        //if the target is dead, oof upon passing the destination point
         if(data.to.dead()){
             if(dst1 > baseDist){
                 despawned(b);
