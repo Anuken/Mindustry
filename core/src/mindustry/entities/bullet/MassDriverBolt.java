@@ -53,7 +53,7 @@ public class MassDriverBolt extends BulletType{
         
         //if the target is dead, unlogically oof itself
         if(data.to.dead()){
-            remove();
+            b.remove();
         }
 
         boolean intersect = false;
