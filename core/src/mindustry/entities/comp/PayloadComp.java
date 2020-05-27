@@ -13,7 +13,7 @@ import mindustry.world.blocks.payloads.*;
 /** An entity that holds a payload. */
 @Component
 abstract class PayloadComp implements Posc, Rotc{
-    @Import float x, y;
+    @Import float x, y, rotation;
 
     Array<Payload> payloads = new Array<>();
 
@@ -44,7 +44,6 @@ abstract class PayloadComp implements Posc, Rotc{
 
         if(tryDropPayload(load)){
             payloads.pop();
-
             return true;
         }
         return false;
@@ -70,6 +69,7 @@ abstract class PayloadComp implements Posc, Rotc{
 
         u.set(this);
         u.trns(Tmp.v1.rnd(Mathf.random(2f)));
+        u.rotation(rotation);
         u.add();
         Fx.unitDrop.at(u);
 
