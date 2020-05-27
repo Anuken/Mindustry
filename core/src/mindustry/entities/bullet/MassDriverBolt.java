@@ -19,7 +19,7 @@ public class MassDriverBolt extends BulletType{
         lifetime = 6969f;
         despawnEffect = Fx.smeltsmoke;
         hitEffect = Fx.hitBulletBig;
-        drag = 0.005f;
+        drag = 0f;
     }
 
     @Override
