@@ -16,10 +16,10 @@ public class MassDriverBolt extends BulletType{
     public MassDriverBolt(){
         super(5.3f, 50);
         collidesTiles = false;
-        lifetime = 200f;
+        lifetime = 6969f;
         despawnEffect = Fx.smeltsmoke;
         hitEffect = Fx.hitBulletBig;
-        drag = 0.005f;
+        drag = 0f;
     }
 
     @Override
@@ -47,14 +47,14 @@ public class MassDriverBolt extends BulletType{
 
         DriverBulletData data = (DriverBulletData)b.data();
 
-        //if the target is dead, just keep flying until the bullet explodes
-        if(data.to.dead()){
-            return;
-        }
-
         float baseDst = data.from.dst(data.to);
         float dst1 = b.dst(data.from);
         float dst2 = b.dst(data.to);
+        
+        //if the target is dead, unlogically oof itself
+        if(data.to.dead()){
+            remove();
+        }
 
         boolean intersect = false;
 
