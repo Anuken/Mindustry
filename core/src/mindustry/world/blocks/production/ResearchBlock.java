@@ -1,5 +1,6 @@
 package mindustry.world.blocks.production;
 
+import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -16,6 +17,7 @@ public class ResearchBlock extends Block{
         solid = true;
         hasPower = true;
         hasItems = true;
+        configurable = true;
     }
 
     public class ResearchBlockEntity extends TileEntity{
@@ -23,6 +25,11 @@ public class ResearchBlock extends Block{
 
         @Override
         public void updateTile(){
+
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
 
         }
 

@@ -287,19 +287,16 @@ public class MassDriver extends Block{
         }
 
         protected boolean shooterValid(Tile other){
-
             if(other == null) return true;
             if(!(other.block() instanceof MassDriver)) return false;
             MassDriverEntity entity = other.ent();
-            return link == tile.pos() && tile.dst(other) <= range;
+            return entity.link == tile.pos() && tile.dst(other) <= range;
         }
 
         protected boolean linkValid(){
-            if(tile == null) return false;
             if(link == -1) return false;
-            Tilec link = world.ent(this.link);
-
-            return link != null && link.block() instanceof MassDriver && link.team() == team && tile.dst(link) <= range;
+            Tile link = world.tile(this.link);
+            return link != null && link.block() instanceof MassDriver && link.team() == tile.team() && tile.dst(link) <= range;
         }
 
         @Override

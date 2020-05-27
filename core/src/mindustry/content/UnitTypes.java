@@ -34,6 +34,9 @@ public class UnitTypes implements ContentList{
     //TODO implement other starter drones
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
 
+    //air + building + mining + payload
+    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType trident;
+
     //water
     public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType vanguard;
 
@@ -264,6 +267,7 @@ public class UnitTypes implements ContentList{
             engineOffset = 7.8f;
             range = 140f;
             faceTarget = false;
+
             weapons.add(new Weapon(){{
                 x = 3f;
                 shootY = 0f;
@@ -422,6 +426,45 @@ public class UnitTypes implements ContentList{
                     colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
                 }};
             }});
+        }};
+
+        trident = new UnitType("trident"){{
+            //wraith.upgrade = this;
+            tier = 3;
+
+            health = 500;
+            speed = 2f;
+            accel = 0.05f;
+            drag = 0.016f;
+            lowAltitude = true;
+            flying = true;
+            engineOffset = 10.5f;
+            rotateShooting = false;
+            hitsize = 14f;
+            engineSize = 3f;
+
+            for(boolean b : Mathf.booleans){
+                weapons.add(
+                new Weapon("heal-weapon-mount"){{
+                    reload = 25f;
+                    x = 8f * Mathf.sign(b);
+                    y = -6f;
+                    rotate = true;
+                    mirror = false;
+                    flipSprite = !b;
+                    bullet = Bullets.healBulletBig;
+                }},
+                new Weapon("heal-weapon-mount"){{
+                    reload = 15f;
+                    x = 4f * Mathf.sign(b);
+                    y = 5f;
+                    rotate = true;
+                    mirror = false;
+                    flipSprite = !b;
+                    bullet = Bullets.healBullet;
+                }}
+                );
+            }
         }};
         
         /*

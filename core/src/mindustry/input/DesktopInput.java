@@ -607,5 +607,25 @@ public class DesktopInput extends InputHandler{
 
         isBoosting = Core.input.keyDown(Binding.boost) && !movement.isZero();
         player.boosting(isBoosting);
+
+        if(unit instanceof Payloadc){
+            Payloadc pay = (Payloadc)unit;
+
+            if(Core.input.keyTap(Binding.pickupCargo) && pay.payloads().size < unit.type().payloadCapacity){
+                Unitc target = Units.closest(player.team(), pay.x(), pay.y(), 30f, u -> u.isAI() && u.isGrounded());
+                if(target != null){
+                    pay.pickup(target);
+                }else if(!pay.hasPayload()){
+                    Tilec tile = world.entWorld(pay.x(), pay.y());
+                    if(tile != null && tile.team() == unit.team()){
+                        pay.pickup(tile);
+                    }
+                }
+            }
+
+            if(Core.input.keyTap(Binding.dropCargo)){
+                pay.dropLastPayload();
+            }
+        }
     }
 }

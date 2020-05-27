@@ -17,6 +17,10 @@ public class BlockPayload implements Payload{
         this.entity = block.newEntity().create(block, team);
     }
 
+    public BlockPayload(Tilec entity){
+        this.entity = entity;
+    }
+
     public Block block(){
         return entity.block();
     }

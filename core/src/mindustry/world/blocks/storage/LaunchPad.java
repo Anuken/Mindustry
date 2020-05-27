@@ -54,6 +54,8 @@ public class LaunchPad extends Block{
         public void draw(){
             super.draw();
 
+            if(!Vars.state.isCampaign()) return;
+
             if(lightRegion.found()){
                 Draw.color(lightColor);
                 float progress = Math.min((float)items.total() / itemCapacity, timer.getTime(timerLaunch) / (launchTime / timeScale));
@@ -89,6 +91,7 @@ public class LaunchPad extends Block{
 
         @Override
         public void updateTile(){
+            if(!Vars.state.isCampaign()) return;
 
             //launch when full and base conditions are met
             if(items.total() >= itemCapacity && efficiency() >= 1f && timer(timerLaunch, launchTime / timeScale)){
