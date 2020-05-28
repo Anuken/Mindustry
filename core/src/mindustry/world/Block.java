@@ -346,6 +346,10 @@ public class Block extends UnlockableContent{
         return this;
     }
 
+    public @Nullable Block upgrade(Tile tile){
+        return null;
+    }
+
     public void drawRequest(BuildRequest req, Eachable<BuildRequest> list, boolean valid){
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));

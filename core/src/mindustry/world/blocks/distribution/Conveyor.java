@@ -91,6 +91,11 @@ public class Conveyor extends Block implements Autotiler{
             Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.junction : this;
     }
 
+    @Override
+    public Block upgrade(Tile tile){
+        return tile.block() != null && tile.block() instanceof Conveyor ? this : null;
+    }
+
     public class ConveyorEntity extends TileEntity{
         //parallel array data
         Item[] ids = new Item[capacity];

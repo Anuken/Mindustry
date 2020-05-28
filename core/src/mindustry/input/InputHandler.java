@@ -31,10 +31,6 @@ import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
-import mindustry.world.blocks.defense.*;
-import mindustry.world.blocks.distribution.*;
-import mindustry.world.blocks.environment.*;
-import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.power.*;
 
 import java.util.*;
@@ -624,22 +620,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(int x = dresult.x; x <= dresult.x2; x++){
             for(int y = dresult.y; y <= dresult.y2; y++){
                 Tile tile = world.tilec(x, y);
-                if(tile.block() == Blocks.air || tile.block() instanceof Rock
-                    || !validPlace(x, y, block, tile.rotation())
-                    || !(tile.block() instanceof Conveyor || tile.block() instanceof Conduit || tile.block() instanceof Wall)) continue;
+                if(tile == null || !validPlace(x, y, block, tile.rotation()) || tile.block() == Blocks.air || tile.block() instanceof Rock) continue;
 
-                if((block instanceof ArmoredConveyor || block instanceof ArmoredConduit) && !forced){
-                    if(tile.left() != null){
-                        Tilec left = tile.left();
-                        if(((Autotiler)tile.block()).blends(tile, tile.rotation(), left.tileX(), left.tileY(), left.rotation(), left.block())) continue;
-                    }
-                    if(tile.right() != null){
-                        Tilec right = tile.right();
-                        if(((Autotiler)tile.block()).blends(tile, tile.rotation(), right.tileX(), right.tileY(), right.rotation(), right.block())) continue;
-                    }
-                }
+                Block upgrade = block.upgrade(tile);
+                if(upgrade == null) continue;
 
-                BuildRequest req = new BuildRequest(x, y, tile.rotation(), block);
+                BuildRequest req = new BuildRequest(x, y, tile.rotation(), upgrade);
                 req.animScale = 1f;
                 lineRequests.add(req);
             }
