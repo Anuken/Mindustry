@@ -17,11 +17,6 @@ public class GroundAI extends AIController{
 
         if(Units.invalidateTarget(target, unit.team(), unit.x(), unit.y(), Float.MAX_VALUE)){
             target = null;
-
-            //TODO this is hacky, cleanup
-            if(unit instanceof Mechc && unit.moving()){
-                unit.lookAt(((Mechc)unit).baseRotation());
-            }
         }
 
         if(retarget()){
@@ -51,6 +46,8 @@ public class GroundAI extends AIController{
             if(unit.type().hasWeapons()){
                 unit.aimLook(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
             }
+        }else if(unit.moving()){
+            unit.lookAt(unit.vel().angle());
         }
 
         unit.controlWeapons(rotate, shoot);

@@ -22,7 +22,7 @@ abstract class VelComp implements Posc{
     }
 
     boolean moving(){
-        return !vel.isZero(0.001f);
+        return !vel.isZero(0.01f);
     }
 
     void move(float cx, float cy){
