@@ -445,6 +445,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             for(int y = dresult.y; y <= dresult.y2; y++){
                 Tile tile = world.tilec(x, y);
                 if(tile == null || !validBreak(tile.x, tile.y)) continue;
+
                 drawBreaking(tile.x, tile.y);
             }
         }
