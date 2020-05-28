@@ -401,7 +401,7 @@ public class Bullets implements ContentList{
             despawnEffect = Fx.none;
             status = StatusEffects.shocked;
             statusDuration = 10f;
-            lightningDamage = 0f;
+            lightningDamage = 0;
         }};
 
         healBullet = new HealBulletType(5.2f, 13){{
@@ -587,7 +587,7 @@ public class Bullets implements ContentList{
         lightning = new BulletType(0.001f, 12f){
             {
                 lifetime = 1f;
-                lightningDamage = 12f;
+                lightningDamage = 12;
                 shootEffect = Fx.hitLancer;
                 smokeEffect = Fx.none;
                 despawnEffect = Fx.none;
