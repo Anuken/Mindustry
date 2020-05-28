@@ -38,7 +38,7 @@ public class GroundAI extends AIController{
             }
 
             if(dst > unit.range() * 0.5f){
-                moveToCore(PathTarget.enemyCores);
+                moveToCore(FlagTarget.enemyCores);
             }
         }
 
@@ -56,7 +56,7 @@ public class GroundAI extends AIController{
         unit.controlWeapons(rotate, shoot);
     }
 
-    protected void moveToCore(PathTarget path){
+    protected void moveToCore(FlagTarget path){
         Tile tile = unit.tileOn();
         if(tile == null) return;
         Tile targetTile = pathfinder.getTargetTile(tile, unit.team(), path);
@@ -86,7 +86,7 @@ public class GroundAI extends AIController{
 
         Tile tile = unit.tileOn();
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, enemy, PathTarget.enemyCores);
+        Tile targetTile = pathfinder.getTargetTile(tile, enemy, FlagTarget.enemyCores);
         Tilec core = unit.closestCore();
 
         if(tile == targetTile || core == null || unit.within(core, 120f)) return;

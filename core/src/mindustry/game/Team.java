@@ -19,9 +19,9 @@ public class Team implements Comparable<Team>{
     public String name;
 
     /** All 256 registered teams. */
-    private static final Team[] all = new Team[256];
+    public static final Team[] all = new Team[256];
     /** The 6 base teams used in the editor. */
-    private static final Team[] baseTeams = new Team[6];
+    public static final Team[] baseTeams = new Team[6];
 
     public final static Team
         derelict = new Team(0, "derelict", Color.valueOf("4d4e58")),
@@ -42,16 +42,6 @@ public class Team implements Comparable<Team>{
 
     public static Team get(int id){
         return all[((byte)id) & 0xff];
-    }
-
-    /** @return the 6 base team colors. */
-    public static Team[] base(){
-        return baseTeams;
-    }
-
-    /** @return all the teams - do not use this for lookup! */
-    public static Team[] all(){
-        return all;
     }
 
     protected Team(int id, String name, Color color){

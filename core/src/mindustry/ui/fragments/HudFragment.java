@@ -183,7 +183,7 @@ public class HudFragment extends Fragment{
                     t.table(teams -> {
                         teams.left();
                         int i = 0;
-                        for(Team team : Team.base()){
+                        for(Team team : Team.baseTeams){
                             ImageButton button = teams.button(Tex.whiteui, Styles.clearTogglePartiali, 40f, () -> Call.setPlayerTeamEditor(player, team))
                                 .size(50f).margin(6f).get();
                             button.getImageCell().grow();

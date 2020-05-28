@@ -16,7 +16,10 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType titan, dagger, crawler, fortress, eruptor, chaosArray, eradicator;
 
     //ground + builder
-    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType oculon, tau;
+    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType tau;
+
+    //ground + builder + miner + commander
+    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType oculon;
 
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType cix;

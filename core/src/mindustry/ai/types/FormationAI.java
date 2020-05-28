@@ -1,6 +1,7 @@
 package mindustry.ai.types;
 
 import arc.math.geom.*;
+import mindustry.*;
 import mindustry.ai.formations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -28,14 +29,20 @@ public class FormationAI extends AIController implements FormationMember{
         if(leader.isShooting()){
             unit.aimLook(leader.aimX(), leader.aimY());
         }else{
-
-            unit.lookAt(leader.rotation());
             if(!unit.vel().isZero(0.001f)){
-            //    unit.lookAt(unit.vel().angle());
+                unit.lookAt(unit.vel().angle());
+            }else{
+                unit.lookAt(leader.rotation());
             }
         }
 
-        unit.moveAt(vec.set(target).sub(unit).limit(unit.type().speed));
+        Vec2 realtarget = vec.set(target);
+
+        if(unit.isGrounded() && Vars.world.raycast(unit.tileX(), unit.tileY(), leader.tileX(), leader.tileY(), Vars.world::solid)){
+            realtarget.set(Vars.pathfinder.getTargetTile(unit.tileOn(), unit.team(), leader));
+        }
+
+        unit.moveAt(realtarget.sub(unit).limit(unit.type().speed));
     }
 
     @Override
