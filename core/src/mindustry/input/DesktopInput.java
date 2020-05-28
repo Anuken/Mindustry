@@ -26,7 +26,10 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
+import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.liquid.*;
+import mindustry.world.blocks.environment.*;
 
 import static arc.Core.scene;
 import static mindustry.Vars.*;
@@ -101,7 +104,7 @@ public class DesktopInput extends InputHandler{
             drawBreakSelection(selectX, selectY, cursorX, cursorY);
         }
 
-        if(mode == placing && Core.input.keyDown(Binding.pick)){
+        if(mode == upgrading){
             drawUpgradeSelection(selectX, selectY, cursorX, cursorY);
         }
 
@@ -149,7 +152,7 @@ public class DesktopInput extends InputHandler{
 
         if(player.isBuilder()){
             //draw things that may be placed soon
-            if(mode == placing && block != null && !Core.input.keyDown(Binding.pick)){
+            if(mode == placing && block != null){
                 for(int i = 0; i < lineRequests.size; i++){
                     BuildRequest req = lineRequests.get(i);
                     if(i == lineRequests.size - 1 && req.block.rotate){
@@ -157,14 +160,31 @@ public class DesktopInput extends InputHandler{
                     }
                     drawRequest(lineRequests.get(i));
                 }
-            }else if(mode == placing && block != null && Core.input.keyDown(Binding.pick)){
+            }else if(mode == upgrading && block != null){
                 lineRequests.clear();
                 for(int x = (selectX < cursorX) ? selectX : cursorX; x <= ((selectX < cursorX) ? cursorX : selectX); x++){
                     for(int y = (selectY < cursorY) ? selectY : cursorY; y <= ((selectY < cursorY) ? cursorY : selectY); y++){
                         Tile tile = world.tilec(x, y);
-                        if(tile.block() == Blocks.air) continue;
-                        if(!(tile.block() instanceof Conveyor)) continue;
+                        if(tile.block() == Blocks.air || tile.block() instanceof Rock) continue;
                         if(!validPlace(x, y, block, tile.rotation())) continue;
+                        if(!(tile.block() instanceof Conveyor || tile.block() instanceof Conduit || tile.block() instanceof Wall)) continue;
+
+                        if((block instanceof ArmoredConveyor || block instanceof ArmoredConduit) && !Core.input.keyDown(Binding.diagonal_placement)){
+                            if(tile.left() != null){
+                                Tilec left = tile.left();
+                                if(tile.block() instanceof Conveyor)
+                                    if(((Conveyor)tile.block()).blends(tile, tile.rotation(), left.tileX(), left.tileY(), left.rotation(), left.block())) continue;
+                                if(tile.block() instanceof Conduit)
+                                    if(((Conduit)tile.block()).blends(tile, tile.rotation(), left.tileX(), left.tileY(), left.rotation(), left.block())) continue;
+                            }
+                            if(tile.right() != null){
+                                Tilec right = tile.right();
+                                if(tile.block() instanceof Conveyor)
+                                    if(((Conveyor)tile.block()).blends(tile, tile.rotation(), right.tileX(), right.tileY(), right.rotation(), right.block())) continue;
+                                if(tile.block() instanceof Conduit)
+                                    if(((Conduit)tile.block()).blends(tile, tile.rotation(), right.tileX(), right.tileY(), right.rotation(), right.block())) continue;
+                            }
+                        }
 
                         BuildRequest req = new BuildRequest(x, y, tile.rotation(), block);
                         req.animScale = 1f;
@@ -173,7 +193,7 @@ public class DesktopInput extends InputHandler{
                         drawRequest(x, y, block, tile.rotation());
                     }
                 }
-            }else if(isPlacing() && !(Core.input.keyDown(Binding.pick) && mode == placing)){
+            }else if(isPlacing() && mode != upgrading){
                 if(block.rotate){
                     drawArrow(block, cursorX, cursorY, rotation);
                 }
@@ -310,7 +330,7 @@ public class DesktopInput extends InputHandler{
             }
 
             if(isPlacing() && mode == placing){
-                if(!Core.input.keyDown(Binding.pick)) updateLine(selectX, selectY);
+                updateLine(selectX, selectY);
             }else if(!selectRequests.isEmpty()){
                 rotateRequests(selectRequests, Mathf.sign(Core.input.axisTap(Binding.rotate)));
             }
@@ -457,7 +477,7 @@ public class DesktopInput extends InputHandler{
             sreq.y = (int)(y / tilesize);
         }
 
-        if(block == null || mode != placing){
+        if(block == null || !(mode == placing || mode == upgrading)){
             lineRequests.clear();
         }
 
@@ -467,7 +487,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if((cursorX != lastLineX || cursorY != lastLineY) && isPlacing() && mode == placing){
-            if(!Core.input.keyDown(Binding.pick)) updateLine(selectX, selectY);
+            updateLine(selectX, selectY);
             lastLineX = cursorX;
             lastLineY = cursorY;
         }
@@ -485,7 +505,7 @@ public class DesktopInput extends InputHandler{
                 lastLineX = cursorX;
                 lastLineY = cursorY;
                 mode = placing;
-                if(!Core.input.keyDown(Binding.pick)) updateLine(selectX, selectY);
+                updateLine(selectX, selectY);
             }else if(req != null && !req.breaking && mode == none && !req.initialized){
                 sreq = req;
             }else if(req != null && req.breaking){
@@ -513,10 +533,14 @@ public class DesktopInput extends InputHandler{
             selectY = tileY(Core.input.mouseY());
         }
 
-        if(Core.input.keyDown(Binding.select) && mode == none && !isPlacing() && deleting){
-            BuildRequest req = getRequest(cursorX, cursorY);
-            if(req != null && req.breaking){
-                player.builder().requests().remove(req);
+        if(Core.input.keyDown(Binding.select)){
+            if(mode == none && !isPlacing() && deleting){
+                BuildRequest req = getRequest(cursorX, cursorY);
+                if(req != null && req.breaking){
+                    player.builder().requests().remove(req);
+                }
+            }else if(mode == placing && isPlacing() && Core.input.keyDown(Binding.pick)){
+                mode = upgrading;
             }
         }else{
             deleting = false;
@@ -531,13 +555,20 @@ public class DesktopInput extends InputHandler{
             overrideLineRotation = false;
         }
 
+        if(Core.input.keyRelease(Binding.pick)){
+            if(mode == upgrading && block != null){
+                mode = placing;
+                updateLine(selectX, selectY);
+            }
+        }
+
         if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
 
-            if(mode == placing && block != null && !Core.input.keyDown(Binding.pick)){ //touch up while placing, place everything in selection
+            if(mode == placing && block != null){ //touch up while placing, place everything in selection
                 flushRequests(lineRequests);
                 lineRequests.clear();
                 Events.fire(new LineConfirmEvent());
-            }else if(mode == placing && block != null && Core.input.keyDown(Binding.pick)){
+            }else if(mode == upgrading && block != null){
                 flushRequests(lineRequests);
                 lineRequests.clear();
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
