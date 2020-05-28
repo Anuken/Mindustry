@@ -26,10 +26,6 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-import mindustry.world.blocks.defense.*;
-import mindustry.world.blocks.distribution.*;
-import mindustry.world.blocks.liquid.*;
-import mindustry.world.blocks.environment.*;
 
 import static arc.Core.scene;
 import static mindustry.Vars.*;
@@ -152,48 +148,13 @@ public class DesktopInput extends InputHandler{
 
         if(player.isBuilder()){
             //draw things that may be placed soon
-            if(mode == placing && block != null){
+            if((mode == placing || mode == upgrading) && block != null){
                 for(int i = 0; i < lineRequests.size; i++){
                     BuildRequest req = lineRequests.get(i);
-                    if(i == lineRequests.size - 1 && req.block.rotate){
+                    if(mode == placing && i == lineRequests.size - 1 && req.block.rotate){
                         drawArrow(block, req.x, req.y, req.rotation);
                     }
                     drawRequest(lineRequests.get(i));
-                }
-            }else if(mode == upgrading && block != null){
-                lineRequests.clear();
-                for(int x = (selectX < cursorX) ? selectX : cursorX; x <= ((selectX < cursorX) ? cursorX : selectX); x++){
-                    for(int y = (selectY < cursorY) ? selectY : cursorY; y <= ((selectY < cursorY) ? cursorY : selectY); y++){
-                        Tile tile = world.tilec(x, y);
-                        if(tile.block() == Blocks.air || tile.block() instanceof Rock
-                                || !validPlace(x, y, block, tile.rotation())
-                                || !(tile.block() instanceof Conveyor || tile.block() instanceof Conduit || tile.block() instanceof Wall)) continue;
-
-                        if((block instanceof ArmoredConveyor || block instanceof ArmoredConduit) && !Core.input.keyDown(Binding.diagonal_placement)){
-                            if(tile.left() != null){
-                                Tilec left = tile.left();
-                                if(tile.block() instanceof Conveyor){
-                                    if(((Conveyor)tile.block()).blends(tile, tile.rotation(), left.tileX(), left.tileY(), left.rotation(), left.block())) continue;
-                                }else if(tile.block() instanceof Conduit){
-                                    if(((Conduit)tile.block()).blends(tile, tile.rotation(), left.tileX(), left.tileY(), left.rotation(), left.block())) continue;
-                                }
-                            }
-                            if(tile.right() != null){
-                                Tilec right = tile.right();
-                                if(tile.block() instanceof Conveyor){
-                                    if(((Conveyor)tile.block()).blends(tile, tile.rotation(), right.tileX(), right.tileY(), right.rotation(), right.block())) continue;
-                                }else if(tile.block() instanceof Conduit){
-                                    if(((Conduit)tile.block()).blends(tile, tile.rotation(), right.tileX(), right.tileY(), right.rotation(), right.block())) continue;
-                                }
-                            }
-                        }
-
-                        BuildRequest req = new BuildRequest(x, y, tile.rotation(), block);
-                        req.animScale = 1f;
-                        lineRequests.add(req);
-
-                        drawRequest(x, y, block, tile.rotation());
-                    }
                 }
             }else if(isPlacing() && mode != upgrading){
                 if(block.rotate){
@@ -324,17 +285,26 @@ public class DesktopInput extends InputHandler{
             selectScale = 0f;
         }
 
-        if(!Core.input.keyDown(Binding.diagonal_placement) && Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0){
-            rotation = Mathf.mod(rotation + (int)Core.input.axisTap(Binding.rotate), 4);
+        if(!Core.input.keyDown(Binding.diagonal_placement)){
+            if(Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0){
+                rotation = Mathf.mod(rotation + (int)Core.input.axisTap(Binding.rotate), 4);
 
-            if(sreq != null){
-                sreq.rotation = Mathf.mod(sreq.rotation + (int)Core.input.axisTap(Binding.rotate), 4);
+                if(sreq != null){
+                    sreq.rotation = Mathf.mod(sreq.rotation + (int)Core.input.axisTap(Binding.rotate), 4);
+                }
+
+                if(isPlacing() && mode == placing){
+                    updateLine(selectX, selectY);
+                }else if(!selectRequests.isEmpty()){
+                    rotateRequests(selectRequests, Mathf.sign(Core.input.axisTap(Binding.rotate)));
+                }
             }
-
-            if(isPlacing() && mode == placing){
-                updateLine(selectX, selectY);
-            }else if(!selectRequests.isEmpty()){
-                rotateRequests(selectRequests, Mathf.sign(Core.input.axisTap(Binding.rotate)));
+            if(isPlacing() && mode == upgrading){
+                updateArea(selectX, selectY);
+            }
+        }else{
+            if(isPlacing() && mode == upgrading){
+                updateArea(selectX, selectY, true);
             }
         }
 
@@ -492,7 +462,12 @@ public class DesktopInput extends InputHandler{
             updateLine(selectX, selectY);
             lastLineX = cursorX;
             lastLineY = cursorY;
+        }else if((cursorX != lastLineX || cursorY != lastLineY) && isPlacing() && mode == upgrading){
+            updateArea(selectX, selectY);
+            lastLineX = cursorX;
+            lastLineY = cursorY;
         }
+
 
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
             BuildRequest req = getRequest(cursorX, cursorY);
@@ -543,6 +518,7 @@ public class DesktopInput extends InputHandler{
                 }
             }else if(mode == placing && isPlacing() && Core.input.keyDown(Binding.pick)){
                 mode = upgrading;
+                updateArea(selectX, selectY);
             }
         }else{
             deleting = false;
