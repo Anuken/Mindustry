@@ -24,6 +24,11 @@ public class FormationAI extends AIController implements FormationMember{
 
     @Override
     public void update(){
+        if(leader.dead()){
+            unit.resetController();
+            return;
+        }
+
         unit.controlWeapons(leader.isRotate(), leader.isShooting());
         // unit.moveAt(Tmp.v1.set(deltaX, deltaY).limit(unit.type().speed));
         if(leader.isShooting()){
@@ -43,6 +48,11 @@ public class FormationAI extends AIController implements FormationMember{
         }
 
         unit.moveAt(realtarget.sub(unit).limit(unit.type().speed));
+    }
+
+    @Override
+    public void removed(Unitc unit){
+        formation.removeMember(this);
     }
 
     @Override

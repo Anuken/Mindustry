@@ -4,7 +4,6 @@ import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
-import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
@@ -210,31 +209,6 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyDown(Binding.respawn) && !player.dead() && !player.unit().spawnedByCore()){
                 Call.onUnitClear(player);
                 controlledType = null;
-            }
-
-            //TODO this is for debugging, remove later
-            if(Core.input.keyTap(KeyCode.g) && !player.dead() && player.unit() instanceof Commanderc){
-                Commanderc commander = (Commanderc)player.unit();
-
-                if(commander.isCommanding()){
-                    commander.clearCommand();
-                }else{
-
-                    FormationPattern pattern = new SquareFormation();
-                    Formation formation = new Formation(new Vec3(player.x(), player.y(), player.unit().rotation()), pattern);
-                    formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
-
-                    units.clear();
-
-                    Fx.commandSend.at(player);
-                    Units.nearby(player.team(), player.x(), player.y(), 200f, u -> {
-                        if(u.isAI()){
-                            units.add(u);
-                        }
-                    });
-
-                    commander.command(formation, units);
-                }
             }
         }
 
@@ -626,6 +600,34 @@ public class DesktopInput extends InputHandler{
 
             if(Core.input.keyTap(Binding.dropCargo)){
                 pay.dropLastPayload();
+            }
+        }
+
+        if(unit instanceof Commanderc){
+            Commanderc commander = (Commanderc)unit;
+
+            if(Core.input.keyTap(Binding.command)){
+                if(commander.isCommanding()){
+                    commander.clearCommand();
+                }else{
+                    FormationPattern pattern = new SquareFormation();
+                    Formation formation = new Formation(new Vec3(player.x(), player.y(), player.unit().rotation()), pattern);
+                    formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
+
+                    units.clear();
+
+                    Fx.commandSend.at(player);
+                    Units.nearby(player.team(), player.x(), player.y(), 200f, u -> {
+                        if(u.isAI()){
+                            units.add(u);
+                        }
+                    });
+
+                    units.sort(u -> u.dst2(player.unit()));
+                    units.truncate(unit.type().commandLimit);
+
+                    commander.command(formation, units);
+                }
             }
         }
     }

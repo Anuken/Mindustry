@@ -42,6 +42,7 @@ public class UnitType extends UnlockableContent{
     public boolean canBoost = false;
     public float sway = 1f;
     public int payloadCapacity = 1;
+    public int commandLimit = 24;
 
     public int legCount = 4;
     public float legLength = 24f, legSpeed = 0.1f, legTrns = 1f;

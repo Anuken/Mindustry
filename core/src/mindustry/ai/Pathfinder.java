@@ -17,7 +17,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Pathfinder implements Runnable{
-    private static final long maxUpdate = Time.millisToNanos(4);
+    private static final long maxUpdate = Time.millisToNanos(6);
     private static final int updateFPS = 60;
     private static final int updateInterval = 1000 / updateFPS;
     private static final int impassable = -1;
@@ -37,6 +37,7 @@ public class Pathfinder implements Runnable{
     private ObjectMap<Position, PathTarget> targetCache = new ObjectMap<>();
     /** Current pathfinding thread */
     private @Nullable Thread thread;
+    private IntArray tmpArray = new IntArray();
 
     public Pathfinder(){
         Events.on(WorldLoadEvent.class, event -> {
@@ -198,13 +199,19 @@ public class Pathfinder implements Runnable{
         if(target.refreshRate() > 0 && Time.timeSinceMillis(data.lastUpdateTime) > target.refreshRate()){
             data.lastUpdateTime = Time.millis();
 
-            synchronized(data.targets){
-                data.targets.clear();
-                data.target.getPositions(data.team, data.targets);
-            }
+            tmpArray.clear();
+            data.target.getPositions(data.team, tmpArray);
 
-            //queue an update
-            queue.post(() -> updateTargets(data));
+            synchronized(data.targets){
+                //make sure the position actually changed
+                if(!(data.targets.size == 1 && tmpArray.size == 1 && data.targets.first() == tmpArray.first())){
+                    data.targets.clear();
+                    data.target.getPositions(data.team, data.targets);
+
+                    //queue an update
+                    queue.post(() -> updateTargets(data));
+                }
+            }
         }
 
         int[][] values = data.weights;
@@ -279,7 +286,7 @@ public class Pathfinder implements Runnable{
                 int tx = Point2.x(pos), ty = Point2.y(pos);
 
                 path.weights[tx][ty] = 0;
-                path.searches[tx][ty] = (short)path.search;
+                path.searches[tx][ty] = path.search;
                 path.frontier.addFirst(pos);
             }
         }
@@ -417,7 +424,7 @@ public class Pathfinder implements Runnable{
 
         @Override
         public int refreshRate(){
-            return 1000 * 2;
+            return 900;
         }
     }
 
@@ -437,7 +444,7 @@ public class Pathfinder implements Runnable{
         /** costs of getting to a specific tile */
         final int[][] weights;
         /** search IDs of each position - the highest, most recent search is prioritized and overwritten */
-        final short[][] searches;
+        final int[][] searches;
         /** search frontier, these are Pos objects */
         final IntQueue frontier = new IntQueue();
         /** all target positions; these positions have a cost of 0, and must be synchronized on! */
@@ -452,7 +459,7 @@ public class Pathfinder implements Runnable{
             this.target = target;
 
             this.weights = new int[width][height];
-            this.searches = new short[width][height];
+            this.searches = new int[width][height];
             this.frontier.ensureCapacity((width + height) * 3);
         }
     }
