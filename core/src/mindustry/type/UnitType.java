@@ -21,6 +21,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.payloads.*;
 
 import static mindustry.Vars.*;
 
@@ -40,6 +41,7 @@ public class UnitType extends UnlockableContent{
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
     public float sway = 1f;
+    public int payloadCapacity = 1;
 
     public int legCount = 4;
     public float legLength = 24f, legSpeed = 0.1f, legTrns = 1f;
@@ -159,6 +161,11 @@ public class UnitType extends UnlockableContent{
         }
 
         Draw.z(Math.min(z - 0.01f, Layer.bullet - 1f));
+
+        if(unit instanceof Payloadc){
+            drawPayload((Payloadc)unit);
+        }
+
         drawOcclusion(unit);
 
         Draw.z(z);
@@ -175,6 +182,14 @@ public class UnitType extends UnlockableContent{
 
         if(legs != null){
             unit.trns(-legOffset.x, -legOffset.y);
+        }
+    }
+
+    public void drawPayload(Payloadc unit){
+        if(unit.hasPayload()){
+            Payload pay = unit.payloads().first();
+            pay.set(unit.x(), unit.y(), unit.rotation());
+            pay.draw();
         }
     }
 

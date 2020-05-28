@@ -40,13 +40,17 @@ abstract class PosComp implements Position{
     }
 
     /** Returns air if this unit is on a non-air top block. */
-    public Floor floorOn(){
+    Floor floorOn(){
         Tile tile = tileOn();
         return tile == null || tile.block() != Blocks.air ? (Floor)Blocks.air : tile.floor();
     }
 
-    public @Nullable
-    Tile tileOn(){
+     Block blockOn(){
+        Tile tile = tileOn();
+        return tile == null ? Blocks.air : tile.block();
+    }
+
+    @Nullable Tile tileOn(){
         return world.tileWorld(x, y);
     }
 

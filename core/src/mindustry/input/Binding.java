@@ -10,24 +10,32 @@ public enum Binding implements KeyBind{
     move_x(new Axis(KeyCode.a, KeyCode.d), "general"),
     move_y(new Axis(KeyCode.s, KeyCode.w)),
     mouse_move(KeyCode.mouseBack),
+
     boost(KeyCode.shiftLeft),
     control(KeyCode.controlLeft),
     respawn(KeyCode.v),
     select(KeyCode.mouseLeft),
     deselect(KeyCode.mouseRight),
     break_block(KeyCode.mouseRight),
+
+    pickupCargo(KeyCode.leftBracket),
+    dropCargo(KeyCode.rightBracket),
+
     clear_building(KeyCode.q),
     pause_building(KeyCode.e),
     rotate(new Axis(KeyCode.scroll)),
     rotateplaced(KeyCode.r),
     diagonal_placement(KeyCode.controlLeft),
     pick(KeyCode.mouseMiddle),
+
     schematic_select(KeyCode.f),
     schematic_flip_x(KeyCode.z),
     schematic_flip_y(KeyCode.x),
     schematic_menu(KeyCode.t),
+
     category_prev(KeyCode.comma),
     category_next(KeyCode.period),
+
     block_select_left(KeyCode.left),
     block_select_right(KeyCode.right),
     block_select_up(KeyCode.up),
@@ -42,6 +50,7 @@ public enum Binding implements KeyBind{
     block_select_08(KeyCode.num8),
     block_select_09(KeyCode.num9),
     block_select_10(KeyCode.num0),
+
     zoom(new Axis(KeyCode.scroll), "view"),
     menu(Core.app.getType() == ApplicationType.Android ? KeyCode.back : KeyCode.escape),
     fullscreen(KeyCode.f11),

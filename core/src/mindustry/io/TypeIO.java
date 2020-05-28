@@ -17,6 +17,7 @@ import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.payloads.*;
 
 import java.io.*;
 import java.nio.*;
@@ -85,6 +86,14 @@ public class TypeIO{
             case 8: byte len = read.b(); Point2[] out = new Point2[len]; for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i()); return out;
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
+    }
+
+    public static void writePayload(Writes writes, Payload payload){
+        Payload.write(payload, writes);
+    }
+
+    public static Payload readPayload(Reads read){
+        return Payload.read(read);
     }
 
     //only for players!
