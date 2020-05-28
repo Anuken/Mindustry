@@ -206,7 +206,7 @@ public class Bullets implements ContentList{
             splashDamageRadius = 40f;
             lightining = 2;
             lightningLength = 12;
-            lightningDamage = 13;
+            lightningDamage = 13f;
             shootEffect = Fx.shootBig;
         }};
 
@@ -253,7 +253,7 @@ public class Bullets implements ContentList{
             despawnEffect = Fx.blastExplosion;
             lightining = 2;
             lightningLength = 14;
-            lightningDamage = 15;
+            lightningDamage = 15f;
         }};
 
         missileJavelin = new MissileBulletType(5f, 10.5f, "missile"){{
@@ -401,7 +401,7 @@ public class Bullets implements ContentList{
             despawnEffect = Fx.none;
             status = StatusEffects.shocked;
             statusDuration = 10f;
-            lightningDamage = 0;
+            lightningDamage = 0f;
         }};
 
         healBullet = new HealBulletType(5.2f, 13){{
@@ -587,7 +587,7 @@ public class Bullets implements ContentList{
         lightning = new BulletType(0.001f, 12f){
             {
                 lifetime = 1f;
-                lightningDamage = 12;
+                lightningDamage = 12f;
                 shootEffect = Fx.hitLancer;
                 smokeEffect = Fx.none;
                 despawnEffect = Fx.none;

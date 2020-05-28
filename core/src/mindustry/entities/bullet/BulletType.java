@@ -80,7 +80,7 @@ public abstract class BulletType extends Content{
 
     public int lightining;
     public int lightningLength = 5;
-    public int lightningDamage;
+    public float lightningDamage;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
