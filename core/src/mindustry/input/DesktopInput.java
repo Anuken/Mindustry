@@ -165,24 +165,26 @@ public class DesktopInput extends InputHandler{
                 for(int x = (selectX < cursorX) ? selectX : cursorX; x <= ((selectX < cursorX) ? cursorX : selectX); x++){
                     for(int y = (selectY < cursorY) ? selectY : cursorY; y <= ((selectY < cursorY) ? cursorY : selectY); y++){
                         Tile tile = world.tilec(x, y);
-                        if(tile.block() == Blocks.air || tile.block() instanceof Rock) continue;
-                        if(!validPlace(x, y, block, tile.rotation())) continue;
-                        if(!(tile.block() instanceof Conveyor || tile.block() instanceof Conduit || tile.block() instanceof Wall)) continue;
+                        if(tile.block() == Blocks.air || tile.block() instanceof Rock
+                                || !validPlace(x, y, block, tile.rotation())
+                                || !(tile.block() instanceof Conveyor || tile.block() instanceof Conduit || tile.block() instanceof Wall)) continue;
 
                         if((block instanceof ArmoredConveyor || block instanceof ArmoredConduit) && !Core.input.keyDown(Binding.diagonal_placement)){
                             if(tile.left() != null){
                                 Tilec left = tile.left();
-                                if(tile.block() instanceof Conveyor)
+                                if(tile.block() instanceof Conveyor){
                                     if(((Conveyor)tile.block()).blends(tile, tile.rotation(), left.tileX(), left.tileY(), left.rotation(), left.block())) continue;
-                                if(tile.block() instanceof Conduit)
+                                }else if(tile.block() instanceof Conduit){
                                     if(((Conduit)tile.block()).blends(tile, tile.rotation(), left.tileX(), left.tileY(), left.rotation(), left.block())) continue;
+                                }
                             }
                             if(tile.right() != null){
                                 Tilec right = tile.right();
-                                if(tile.block() instanceof Conveyor)
+                                if(tile.block() instanceof Conveyor){
                                     if(((Conveyor)tile.block()).blends(tile, tile.rotation(), right.tileX(), right.tileY(), right.rotation(), right.block())) continue;
-                                if(tile.block() instanceof Conduit)
+                                }else if(tile.block() instanceof Conduit){
                                     if(((Conduit)tile.block()).blends(tile, tile.rotation(), right.tileX(), right.tileY(), right.rotation(), right.block())) continue;
+                                }
                             }
                         }
 
