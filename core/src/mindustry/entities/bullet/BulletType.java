@@ -142,7 +142,7 @@ public abstract class BulletType extends Content{
         despawnEffect.at(b.getX(), b.getY(), b.rotation());
         hitSound.at(b);
 
-        if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
+        if(fragBullet != null || splashDamageRadius > 0 || lightining > 0){
             hit(b);
         }
     }
