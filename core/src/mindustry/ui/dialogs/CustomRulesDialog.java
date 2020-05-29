@@ -163,7 +163,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("$rules.enemyCheat", b -> rules.enemyCheat = b, () -> rules.enemyCheat);
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
-        title("$rules.title.experimental");
+        title("$rules.title.environment");
         number("$rules.solarpowermultiplier", f -> rules.solarPowerMultiplier = f, () -> rules.solarPowerMultiplier);
         check("$rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
 

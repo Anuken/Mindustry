@@ -82,6 +82,8 @@ public abstract class BulletType extends Content{
 
     public int lightning;
     public int lightningLength = 5;
+    /** Use a negative value to use default bullet damage. */
+    public float lightningDamage = -1;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
@@ -136,7 +138,7 @@ public abstract class BulletType extends Content{
         }
 
         for(int i = 0; i < lightning; i++){
-            Lightning.create(b.team(), Pal.surge, damage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
+            Lightning.create(b.team(), Pal.surge, lightningDamage < 0 ? damage : lightningDamage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
         }
     }
 
