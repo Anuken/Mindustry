@@ -58,6 +58,12 @@ public class Conduit extends LiquidBlock implements Autotiler{
     }
 
     @Override
+    public Block upgrade(Tile tile){
+        return tile.block() != null && tile.block() instanceof Conduit ? this : null;
+    }
+
+
+    @Override
     public void transformCase(int num, int[] bits){
         bits[0] = num == 0 ? 3 : num == 1 ? 6 : num == 2 ? 2 : num == 3 ? 4 : num == 4 ? 5 : num == 5 ? 1 : 0;
     }

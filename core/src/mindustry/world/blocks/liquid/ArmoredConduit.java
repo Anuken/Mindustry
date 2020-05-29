@@ -1,6 +1,7 @@
 package mindustry.world.blocks.liquid;
 
 import arc.graphics.g2d.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -17,6 +18,19 @@ public class ArmoredConduit extends Conduit{
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return otherblock.outputsLiquid && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock);
+    }
+
+    @Override
+    public @Nullable Block upgrade(Tile tile){
+        return tile != null
+            && tile.block() instanceof Conduit
+            && (tile.left() == null
+                    || tile.left().block() instanceof Conduit
+                    || !super.blends(tile, tile.rotation(), tile.left().tileX(), tile.left().tileY(), tile.left().rotation(), tile.left().block()))
+            && (tile.right() == null
+                    || tile.right().block() instanceof Conduit
+                    || !super.blends(tile, tile.rotation(), tile.right().tileX(), tile.right().tileY(), tile.right().rotation(), tile.right().block()))
+            ? this : null;
     }
 
     public class ArmoredConduitEntity extends ConduitEntity{
