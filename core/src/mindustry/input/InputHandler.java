@@ -629,8 +629,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
     }
-
-
     protected void updateArea(int x1, int y1, boolean forced){
         updateArea(x1, y1, tileX(getMouseX()), tileY(getMouseY()), forced);
     }

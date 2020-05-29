@@ -468,7 +468,6 @@ public class DesktopInput extends InputHandler{
             lastLineY = cursorY;
         }
 
-
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
             BuildRequest req = getRequest(cursorX, cursorY);
 
