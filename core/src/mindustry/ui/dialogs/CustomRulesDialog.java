@@ -177,6 +177,8 @@ public class CustomRulesDialog extends BaseDialog{
             b.add("$rules.ambientlight");
         }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f);
         main.row();
+
+        //TODO add weather patterns
     }
 
     void number(String text, Floatc cons, Floatp prov){
