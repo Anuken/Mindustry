@@ -52,6 +52,8 @@ public abstract class Turret extends Block{
     public float shootCone = 8f;
     public float shootShake = 0f;
     public float xRand = 0f;
+    /** Currently used for artillery only. */
+    public float minRange = 0f;
     public float burstSpacing = 0;
     public boolean alternate = false;
     public boolean targetAir = true;
@@ -289,16 +291,12 @@ public abstract class Turret extends Block{
             return entry.type();
         }
 
-        /**
-         * Get the ammo type that will be returned if useAmmo is called.
-         */
+        /** @return the ammo type that will be returned if useAmmo is called. */
         public BulletType peekAmmo(){
             return ammo.peek().type();
         }
 
-        /**
-         * Returns whether the turret has ammo.
-         */
+        /** @return  whether the turret has ammo. */
         public boolean hasAmmo(){
             return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
         }
@@ -358,7 +356,7 @@ public abstract class Turret extends Block{
         }
 
         protected void bullet(BulletType type, float angle){
-            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, targetPos.x, targetPos.y) / type.range()) : 1f;
+            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f;
 
             type.create(this, team, x + tr.x, y + tr.y, angle, 1f + Mathf.range(velocityInaccuracy), lifeScl);
         }

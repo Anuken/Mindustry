@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -15,6 +16,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
@@ -79,8 +81,21 @@ public class CoreBlock extends StorageBlock{
         return false;
     }
 
-    public class CoreEntity extends TileEntity{
-        protected int storageCapacity;
+    public class CoreEntity extends TileEntity implements ControlBlock{
+        public int storageCapacity;
+        //note that this unit is never actually used for control; the possession handler makes the player respawn when this unit is controlled
+        public @NonNull BlockUnitc unit = Nulls.blockUnit;
+
+        @Override
+        public void created(){
+            unit = (BlockUnitc)UnitTypes.block.create(team);
+            unit.tile(this);
+        }
+
+        @Override
+        public Unitc unit(){
+            return unit;
+        }
 
         public void requestSpawn(Playerc player){
             Call.onPlayerSpawn(tile, player);

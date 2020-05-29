@@ -1596,6 +1596,7 @@ public class Blocks implements ContentList{
             recoilAmount = 6f;
             shootShake = 2f;
             range = 290f;
+            minRange = 50f;
 
             health = 130 * size * size;
             shootSound = Sounds.artillery;

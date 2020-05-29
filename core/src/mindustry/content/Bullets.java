@@ -123,7 +123,7 @@ public class Bullets implements ContentList{
         artilleryUnit = new ArtilleryBulletType(2f, 8, "shell"){{
             hitEffect = Fx.blastExplosion;
             knockback = 0.8f;
-            lifetime = 90f;
+            lifetime = 110f;
             bulletWidth = bulletHeight = 14f;
             collides = true;
             collidesTiles = true;

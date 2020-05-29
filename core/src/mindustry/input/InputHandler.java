@@ -32,6 +32,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
 import mindustry.world.blocks.power.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.util.*;
 
@@ -172,7 +173,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void onUnitControl(Playerc player, @Nullable Unitc unit){
-        if(unit == null){
+        //clear player unit when they possess a core
+        if((unit instanceof BlockUnitc && ((BlockUnitc)unit).tile() instanceof CoreEntity)){
+            Fx.spawn.at(player);
+            player.clearUnit();
+            player.deathTimer(60f); //for instant respawn
+        }else if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
         }else if(unit.isAI() && unit.team() == player.team()){
