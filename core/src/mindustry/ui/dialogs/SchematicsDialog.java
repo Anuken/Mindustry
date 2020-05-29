@@ -71,17 +71,20 @@ public class SchematicsDialog extends BaseDialog{
             rebuildPane[0] = () -> {
                 t.clear();
                 int i = 0;
+                String regex = "[`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?]";
+                String searchString = search.toLowerCase().replaceAll(regex," ");
 
-                if(!schematics.all().contains(s -> search.isEmpty() || s.name().toLowerCase().contains(search.toLowerCase()))){
+                if(!schematics.all().contains(s -> search.isEmpty() || s.name().toLowerCase().replaceAll(regex," ").contains(searchString))){
                     t.add("$none");
+                    return;
                 }
 
                 firstSchematic = null;
 
                 for(Schematic s : schematics.all()){
-                    if(!search.isEmpty() && !s.name().toLowerCase().contains(search.toLowerCase())) continue;
-                    if(firstSchematic == null)
-                        firstSchematic = s;
+
+                    if(!search.isEmpty() && !s.name().toLowerCase().replaceAll(regex," ").contains(searchString)) continue;
+                    if(firstSchematic == null) firstSchematic = s;
 
                     Button[] sel = {null};
                     sel[0] = t.button(b -> {
