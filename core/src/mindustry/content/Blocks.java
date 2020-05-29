@@ -1359,7 +1359,7 @@ public class Blocks implements ContentList{
             rotatespeed = 10f;
         }};
 
-        scatter = new BurstTurret("scatter"){{
+        scatter = new ItemTurret("scatter"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 85, Items.lead, 45));
             ammo(
             Items.scrap, Bullets.flakScrap,
@@ -1399,13 +1399,14 @@ public class Blocks implements ContentList{
             shootSound = Sounds.flame;
         }};
 
-        hail = new ArtilleryTurret("hail"){{
+        hail = new ItemTurret("hail"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 40, Items.graphite, 17));
             ammo(
             Items.graphite, Bullets.artilleryDense,
             Items.silicon, Bullets.artilleryHoming,
             Items.pyratite, Bullets.artilleryIncendiary
             );
+            targetAir = false;
             reloadTime = 60f;
             recoilAmount = 2f;
             range = 230f;
@@ -1415,7 +1416,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.artillery;
         }};
 
-        wave = new LiquidTurret("wave"){{
+        wave = new ItemTurret("wave"){{
             requirements(Category.turret, ItemStack.with(Items.metaglass, 45, Items.lead, 75));
             ammo(
             Liquids.water, Bullets.waterShot,
@@ -1423,11 +1424,13 @@ public class Blocks implements ContentList{
             Liquids.cryofluid, Bullets.cryoShot,
             Liquids.oil, Bullets.oilShot
             );
+            targetAir = false;
             size = 2;
             recoilAmount = 0f;
             reloadTime = 2f;
             inaccuracy = 5f;
             shootCone = 50f;
+            liquidCapacity = 10f;
             shootEffect = Fx.shootLiquid;
             range = 110f;
             health = 250 * size * size;
@@ -1474,7 +1477,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.spark;
         }};
 
-        swarmer = new BurstTurret("swarmer"){{
+        swarmer = new ItemTurret("swarmer"){{
             requirements(Category.turret, ItemStack.with(Items.graphite, 35, Items.titanium, 35, Items.plastanium, 45, Items.silicon, 30));
             ammo(
             Items.blastCompound, Bullets.missileExplosive,
@@ -1492,7 +1495,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.missile;
         }};
 
-        salvo = new BurstTurret("salvo"){{
+        salvo = new ItemTurret("salvo"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 105, Items.graphite, 95, Items.titanium, 60));
             ammo(
             Items.copper, Bullets.standardCopper,
@@ -1570,7 +1573,7 @@ public class Blocks implements ContentList{
             });
         }};
 
-        ripple = new ArtilleryTurret("ripple"){{
+        ripple = new ItemTurret("ripple"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 150, Items.graphite, 135, Items.titanium, 60));
             ammo(
             Items.graphite, Bullets.artilleryDense,
@@ -1579,6 +1582,8 @@ public class Blocks implements ContentList{
             Items.blastCompound, Bullets.artilleryExplosive,
             Items.plastanium, Bullets.artilleryPlastic
             );
+
+            targetAir = false;
             size = 3;
             shots = 4;
             inaccuracy = 12f;

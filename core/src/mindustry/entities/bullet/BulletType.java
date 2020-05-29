@@ -61,6 +61,8 @@ public abstract class BulletType extends Content{
     public boolean collides = true;
     /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
+    /** Whether to scale velocity to disappear at the target position. Used for artillery. */
+    public boolean scaleVelocity;
 
     //additional effects
 
