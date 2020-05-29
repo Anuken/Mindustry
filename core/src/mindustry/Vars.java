@@ -71,12 +71,10 @@ public class Vars implements Loadable{
     public static final int maxTextLength = 150;
     /** max player name length in bytes */
     public static final int maxNameLength = 40;
-    /** displayed item size when ingame, TODO remove. */
+    /** displayed item size when ingame. */
     public static final float itemSize = 5f;
-    /** extra padding around the world; units outside this bound will begin to self-destruct. */
-    public static final float worldBounds = 100f;
-    /** units outside of this bound will simply die instantly */
-    public static final float finalWorldBounds = worldBounds + 500;
+    /** units outside of this bound will die instantly */
+    public static final float finalWorldBounds = 500;
     /** mining range for manual miners */
     public static final float miningRange = 70f;
     /** range for building */

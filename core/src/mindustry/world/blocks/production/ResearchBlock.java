@@ -9,6 +9,7 @@ import mindustry.gen.*;
 import mindustry.world.*;
 
 public class ResearchBlock extends Block{
+    public float researchSpeed = 1f;
 
     public ResearchBlock(String name){
         super(name);

@@ -272,8 +272,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
         editor.getTags().put("rules", JsonIO.write(state.rules));
         editor.getTags().remove("width");
         editor.getTags().remove("height");
-        //TODO unkill player
-        //player.dead = true;
+
+        player.clearUnit();
 
         Map returned = null;
 

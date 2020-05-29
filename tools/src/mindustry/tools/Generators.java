@@ -32,7 +32,7 @@ public class Generators{
             for(int i = 0; i < frames; i++){
                 float fin = (float)i / (frames);
                 float fout = 1f - fin;
-                float stroke = 4f * fout;
+                float stroke = 3.5f * fout;
                 float radius = (size/2f) * fin;
 
                 Pixmap pixmap = new Pixmap(size, size);

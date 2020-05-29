@@ -149,7 +149,6 @@ public class Units{
         result = null;
         cdist = 0f;
 
-        //TODO optimize
         for(Unitc e : Groups.unit){
             if(!predicate.get(e) || e.team() != team) continue;
 
