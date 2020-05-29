@@ -153,10 +153,6 @@ public class CustomRulesDialog extends BaseDialog{
         main.button("$bannedblocks", banDialog::show).left().width(300f);
         main.row();
 
-        title("$rules.title.player");
-        number("$rules.playerhealthmultiplier", f -> rules.playerHealthMultiplier = f, () -> rules.playerHealthMultiplier);
-        number("$rules.playerdamagemultiplier", f -> rules.playerDamageMultiplier = f, () -> rules.playerDamageMultiplier);
-
         title("$rules.title.unit");
         number("$rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
         number("$rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);

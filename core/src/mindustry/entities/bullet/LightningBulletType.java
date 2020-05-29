@@ -20,6 +20,11 @@ public class LightningBulletType extends BulletType{
     }
 
     @Override
+    public float range(){
+        return lightningLength * 2.33f;
+    }
+
+    @Override
     public void draw(Bulletc b){
     }
 

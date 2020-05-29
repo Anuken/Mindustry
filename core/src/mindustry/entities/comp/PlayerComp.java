@@ -79,7 +79,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Override
     public void update(){
-        if(unit.dead()){
+        if(unit.dead() || !unit.isAdded()){
             clearUnit();
         }
 
@@ -146,7 +146,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     boolean dead(){
-        return unit.isNull();
+        return unit.isNull() || unit.dead() || !unit.isAdded();
     }
 
     String uuid(){

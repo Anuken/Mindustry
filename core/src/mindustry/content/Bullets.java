@@ -30,7 +30,7 @@ public class Bullets implements ContentList{
     standardGlaive, standardDenseBig, standardThoriumBig, standardIncendiaryBig,
 
     //electric
-    lancerLaser, meltdownLaser, lightning, arc, damageLightning,
+    lancerLaser, meltdownLaser, arc, damageLightning,
 
     //liquid
     waterShot, cryoShot, slagShot, oilShot,
@@ -204,7 +204,7 @@ public class Bullets implements ContentList{
         flakSurge = new FlakBulletType(4.5f, 13){{
             splashDamage = 40f;
             splashDamageRadius = 40f;
-            lightining = 2;
+            lightning = 2;
             lightningLength = 12;
             shootEffect = Fx.shootBig;
         }};
@@ -250,7 +250,7 @@ public class Bullets implements ContentList{
             lifetime = 150f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
-            lightining = 2;
+            lightning = 2;
             lightningLength = 14;
         }};
 
@@ -580,31 +580,6 @@ public class Bullets implements ContentList{
         oilShot = new LiquidBulletType(Liquids.oil){{
             drag = 0.03f;
         }};
-
-        lightning = new BulletType(0.001f, 12f){
-            {
-                lifetime = 1f;
-                shootEffect = Fx.hitLancer;
-                smokeEffect = Fx.none;
-                despawnEffect = Fx.none;
-                hitEffect = Fx.hitLancer;
-                keepVelocity = false;
-            }
-
-            @Override
-            public float range(){
-                return 70f;
-            }
-
-            @Override
-            public void draw(Bulletc b){
-            }
-
-            @Override
-            public void init(Bulletc b){
-                Lightning.create(b.team(), Pal.lancerLaser, damage * (b.owner().isLocal() ? state.rules.playerDamageMultiplier : 1f), b.x(), b.y(), b.rotation(), 30);
-            }
-        };
 
         arc = new LightningBulletType(){{
             damage = 21;

@@ -80,7 +80,7 @@ public abstract class BulletType extends Content{
     public float homingPower = 0f;
     public float homingRange = 50f;
 
-    public int lightining;
+    public int lightning;
     public int lightningLength = 5;
 
     public float weaveScale = 1f;
@@ -134,18 +134,18 @@ public abstract class BulletType extends Content{
         if(splashDamageRadius > 0){
             Damage.damage(b.team(), x, y, splashDamageRadius, splashDamage * b.damageMultiplier());
         }
+
+        for(int i = 0; i < lightning; i++){
+            Lightning.create(b.team(), Pal.surge, damage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
+        }
     }
 
     public void despawned(Bulletc b){
         despawnEffect.at(b.getX(), b.getY(), b.rotation());
         hitSound.at(b);
 
-        if(fragBullet != null || splashDamageRadius > 0){
+        if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
             hit(b);
-        }
-
-        for(int i = 0; i < lightining; i++){
-            Lightning.create(b.team(), Pal.surge, damage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
         }
     }
 
