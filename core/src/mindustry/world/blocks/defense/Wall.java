@@ -42,6 +42,12 @@ public class Wall extends Block{
         return super.canReplace(other) && health > other.health;
     }
 
+    @Override
+    public Block upgrade(Tile tile){
+        if(!(tile.block() instanceof Wall)) return null;
+        return this;
+    }
+
     public class WallEntity extends TileEntity{
 
         @Override

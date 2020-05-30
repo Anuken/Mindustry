@@ -168,6 +168,13 @@ public class Drill extends Block{
         return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
     }
 
+    @Override
+    public Block upgrade(Tile tile){
+        if(!(tile.block() instanceof Drill) || this.size != tile.block().size) return null;
+        return this;
+    }
+
+
     void countOre(Tile tile){
         returnItem = null;
         returnCount = 0;

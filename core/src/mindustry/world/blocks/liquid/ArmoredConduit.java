@@ -1,7 +1,6 @@
 package mindustry.world.blocks.liquid;
 
 import arc.graphics.g2d.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -21,7 +20,7 @@ public class ArmoredConduit extends Conduit{
     }
 
     @Override
-    public @Nullable Block upgrade(Tile tile){
+    public Block upgrade(Tile tile){
         return tile != null
             && tile.block() instanceof Conduit
             && (tile.left() == null

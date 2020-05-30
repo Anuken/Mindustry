@@ -1,6 +1,5 @@
 package mindustry.world.blocks.distribution;
 
-import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -17,7 +16,7 @@ public class ArmoredConveyor extends Conveyor{
     }
 
     @Override
-    public @Nullable Block upgrade(Tile tile){
+    public Block upgrade(Tile tile){
         return tile != null
             && tile.block() instanceof Conveyor
             && (tile.left() == null
