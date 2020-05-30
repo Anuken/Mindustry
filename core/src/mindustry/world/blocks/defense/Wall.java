@@ -44,7 +44,7 @@ public class Wall extends Block{
     }
 
     @Override
-    public Block upgrade(Tile tile, boolean forced){
+    public Block upgrade(Tile tile){
         return tile.block() instanceof Wall ? this : null;
     }
 

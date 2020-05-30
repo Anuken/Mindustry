@@ -349,6 +349,10 @@ public class Block extends UnlockableContent{
     }
 
     public @Nullable Block upgrade(Tile tile, boolean forced){
+        return upgrade(tile);
+    }
+
+    public @Nullable Block upgrade(Tile tile){
         return null;
     }
 
