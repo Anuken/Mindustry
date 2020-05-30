@@ -87,11 +87,17 @@ public class PlanetDialog extends BaseDialog{
         getCell(buttons).padBottom(-4);
         buttons.background(Styles.black).defaults().growX().height(64f).pad(0);
 
+        keyDown(key -> {
+            if(key == KeyCode.escape || key == KeyCode.back){
+                Core.app.post(this::hide);
+            }
+        });
+
         //TODO
-        buttons.button("$back", Icon.left, style, this::hide).margin(bmargin);
-        buttons.button("Research", Icon.tree, style, () -> ui.tech.show()).margin(bmargin);
+        //buttons.button("$back", Icon.left, style, this::hide).margin(bmargin);
+        //buttons.button("Research", Icon.tree, style, () -> ui.tech.show()).margin(bmargin);
         //buttons.button("Database", Icon.book, style, () -> ui.database.show()).margin(bmargin);
-        buttons.button("Resources", Icon.file, style, resources::show).margin(bmargin);
+        //buttons.button("Resources", Icon.file, style, resources::show).margin(bmargin);
 
         cam.fov = 60f;
 
