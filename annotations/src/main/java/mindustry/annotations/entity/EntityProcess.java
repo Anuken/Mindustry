@@ -196,14 +196,14 @@ public class EntityProcess extends BaseProcessor{
 
                 //skip double classes
                 if(usedNames.containsKey(name)){
-                    extraNames.getOr(usedNames.get(name), ObjectSet::new).add(type.name());
+                    extraNames.get(usedNames.get(name), ObjectSet::new).add(type.name());
                     continue;
                 }
 
                 usedNames.put(name, type);
-                extraNames.getOr(type, ObjectSet::new).add(name);
+                extraNames.get(type, ObjectSet::new).add(name);
                 if(!type.isType()){
-                    extraNames.getOr(type, ObjectSet::new).add(type.name());
+                    extraNames.get(type, ObjectSet::new).add(type.name());
                 }
 
                 TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
@@ -277,7 +277,7 @@ public class EntityProcess extends BaseProcessor{
 
                     //get all utility methods from components
                     for(Smethod elem : comp.methods()){
-                        methods.getOr(elem.toString(), Array::new).add(elem);
+                        methods.get(elem.toString(), Array::new).add(elem);
                     }
                 }
 
@@ -552,8 +552,8 @@ public class EntityProcess extends BaseProcessor{
                 idStore.addStatement("idMap[$L] = $L::new", def.classID, def.name);
                 extraNames.get(def.base).each(extra -> {
                     idStore.addStatement("nameMap.put($S, $L::new)", extra, def.name);
-                    if(!camelToKebab(extra).equals(extra)){
-                        idStore.addStatement("nameMap.put($S, $L::new)", camelToKebab(extra), def.name);
+                    if(!Strings.camelToKebab(extra).equals(extra)){
+                        idStore.addStatement("nameMap.put($S, $L::new)", Strings.camelToKebab(extra), def.name);
                     }
                 });
 
@@ -747,22 +747,6 @@ public class EntityProcess extends BaseProcessor{
         Array<Stype> comps = types(elem.annotation(EntityDef.class), EntityDef::value).map(this::interfaceToComp);;
         comps.sortComparing(Selement::name);
         return comps.toString("", s -> s.name().replace("Comp", "")) + "Entity";
-    }
-
-    static String camelToKebab(String s){
-        StringBuilder result = new StringBuilder(s.length() + 1);
-
-        for(int i = 0; i < s.length(); i++){
-            char c = s.charAt(i);
-            if(i > 0 && Character.isUpperCase(s.charAt(i))){
-                result.append('-');
-            }
-
-            result.append(Character.toLowerCase(c));
-
-        }
-
-        return result.toString();
     }
 
     boolean isComponent(Stype type){
