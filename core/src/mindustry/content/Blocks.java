@@ -1416,7 +1416,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.artillery;
         }};
 
-        wave = new ItemTurret("wave"){{
+        wave = new LiquidTurret("wave"){{
             requirements(Category.turret, ItemStack.with(Items.metaglass, 45, Items.lead, 75));
             ammo(
             Liquids.water, Bullets.waterShot,

@@ -221,25 +221,28 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         return tile.absoluteRelativeTo(cx, cy);
     }
 
-    public @Nullable Tile frontLarge(){
-        int trns = block.size/2 + 1;
-        return tile.getNearby(Geometry.d4(rotation()).x * trns, Geometry.d4(rotation()).y * trns);
-    }
-
+    /** Multiblock front. */
     public @Nullable Tilec front(){
-        return nearby((rotation() + 4) % 4);
+        int trns = block.size/2 + 1;
+        return nearby(Geometry.d4(rotation()).x * trns, Geometry.d4(rotation()).y * trns);
     }
 
-    public @Nullable Tilec right(){
-        return nearby((rotation() + 3) % 4);
-    }
-
+    /** Multiblock back. */
     public @Nullable Tilec back(){
-        return nearby((rotation() + 2) % 4);
+        int trns = block.size/2 + 1;
+        return nearby(Geometry.d4(rotation() + 2).x * trns, Geometry.d4(rotation() + 2).y * trns);
     }
 
+    /** Multiblock left. */
     public @Nullable Tilec left(){
-        return nearby((rotation() + 1) % 4);
+        int trns = block.size/2 + 1;
+        return nearby(Geometry.d4(rotation() + 1).x * trns, Geometry.d4(rotation() + 1).y * trns);
+    }
+
+    /** Multiblock right. */
+    public @Nullable Tilec right(){
+        int trns = block.size/2 + 1;
+        return nearby(Geometry.d4(rotation() + 3).x * trns, Geometry.d4(rotation() + 3).y * trns);
     }
 
     public int pos(){
