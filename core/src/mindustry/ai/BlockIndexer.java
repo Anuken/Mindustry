@@ -175,7 +175,6 @@ public class BlockIndexer{
         int ty = world.toTile(wy);
 
         int tileRange = (int)(range / tilesize + 1);
-        intSet.clear();
         boolean any = false;
 
         for(int x = -tileRange + tx; x <= tileRange + tx; x++){
@@ -186,10 +185,9 @@ public class BlockIndexer{
 
                 if(other == null) continue;
 
-                if(other.team() == team && !intSet.contains(other.pos()) && pred.get(other)){
+                if(other.team() == team && pred.get(other) && intSet.add(other.pos())){
                     cons.get(other);
                     any = true;
-                    intSet.add(other.pos());
                 }
             }
         }

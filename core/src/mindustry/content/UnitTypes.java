@@ -285,6 +285,55 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        revenant = new UnitType("revenant"){{
+            ghoul.upgrade = this;
+            tier = 3;
+
+            health = 220;
+            speed = 1.9f;
+            accel = 0.04f;
+            drag = 0.016f;
+            flying = true;
+            range = 140f;
+            //rotateShooting = false;
+            hitsize = 18f;
+            lowAltitude = true;
+
+            engineOffset = 12f;
+            engineSize = 3f;
+
+            for(boolean b : Mathf.booleans){
+                weapons.add(
+                new Weapon("revenant-missiles"){{
+                    reload = 70f;
+                    x = 7f * Mathf.sign(b);
+                    rotate = true;
+                    mirror = false;
+                    flipSprite = !b;
+                    shake = 1f;
+
+                    bullet = new MissileBulletType(2.7f, 12, "missile"){{
+                        bulletWidth = 8f;
+                        bulletHeight = 8f;
+                        bulletShrink = 0f;
+                        drag = -0.003f;
+                        homingRange = 60f;
+                        keepVelocity = false;
+                        splashDamageRadius = 25f;
+                        splashDamage = 10f;
+                        lifetime = 60f;
+                        trailColor = Pal.unitBack;
+                        backColor = Pal.unitBack;
+                        frontColor = Pal.unitFront;
+                        hitEffect = Fx.blastExplosion;
+                        despawnEffect = Fx.blastExplosion;
+                        weaveScale = 6f;
+                        weaveMag = 1f;
+                    }};
+                }});
+            }
+        }};
+
         reaper = new UnitType("reaper"){{
             speed = 1.1f;
             accel = 0.02f;

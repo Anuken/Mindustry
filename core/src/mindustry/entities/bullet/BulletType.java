@@ -87,7 +87,6 @@ public abstract class BulletType extends Content{
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
-
     public float hitShake = 0f;
 
     public BulletType(float speed, float damage){
