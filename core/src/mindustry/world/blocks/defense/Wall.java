@@ -16,6 +16,7 @@ public class Wall extends Block{
         destructible = true;
         group = BlockGroup.walls;
         buildCostMultiplier = 5f;
+        upgradable = true;
     }
 
     @Override
@@ -44,8 +45,7 @@ public class Wall extends Block{
 
     @Override
     public Block upgrade(Tile tile){
-        if(!(tile.block() instanceof Wall)) return null;
-        return this;
+        return tile.block() instanceof Wall ? this : null;
     }
 
     public class WallEntity extends TileEntity{

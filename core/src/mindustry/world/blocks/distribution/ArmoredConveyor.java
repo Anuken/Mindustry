@@ -17,8 +17,7 @@ public class ArmoredConveyor extends Conveyor{
 
     @Override
     public Block upgrade(Tile tile){
-        return tile != null
-            && tile.block() instanceof Conveyor
+        return tile.block() instanceof Conveyor
             && (tile.left() == null
                     || tile.left().block() instanceof Conveyor
                     || !super.blends(tile, tile.rotation(), tile.left().tileX(), tile.left().tileY(), tile.left().rotation(), tile.left().block()))

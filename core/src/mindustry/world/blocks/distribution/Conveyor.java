@@ -42,6 +42,7 @@ public class Conveyor extends Block implements Autotiler{
         hasItems = true;
         itemCapacity = 4;
         conveyorPlacement = true;
+        upgradable = true;
 
         idleSound = Sounds.conveyor;
         idleSoundVolume = 0.004f;
@@ -93,7 +94,7 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public Block upgrade(Tile tile){
-        return tile.block() != null && tile.block() instanceof Conveyor ? this : null;
+        return tile.block() instanceof Conveyor ? this : null;
     }
 
     public class ConveyorEntity extends TileEntity{

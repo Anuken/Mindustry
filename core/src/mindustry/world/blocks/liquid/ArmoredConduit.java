@@ -21,8 +21,7 @@ public class ArmoredConduit extends Conduit{
 
     @Override
     public Block upgrade(Tile tile){
-        return tile != null
-            && tile.block() instanceof Conduit
+        return tile.block() instanceof Conduit
             && (tile.left() == null
                     || tile.left().block() instanceof Conduit
                     || !super.blends(tile, tile.rotation(), tile.left().tileX(), tile.left().tileY(), tile.left().rotation(), tile.left().block()))

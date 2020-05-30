@@ -65,6 +65,7 @@ public class Drill extends Block{
         hasItems = true;
         idleSound = Sounds.drill;
         idleSoundVolume = 0.003f;
+        upgradable = true;
     }
 
     @Override
@@ -170,8 +171,7 @@ public class Drill extends Block{
 
     @Override
     public Block upgrade(Tile tile){
-        if(!(tile.block() instanceof Drill) || this.size != tile.block().size) return null;
-        return this;
+        return tile.block() instanceof Drill && this.size != size ? this : null;
     }
 
 

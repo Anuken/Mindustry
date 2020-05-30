@@ -32,6 +32,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         solid = false;
         floating = true;
         conveyorPlacement = true;
+        upgradable = true;
     }
 
     @Override
@@ -59,7 +60,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     @Override
     public Block upgrade(Tile tile){
-        return tile.block() != null && tile.block() instanceof Conduit ? this : null;
+        return tile.block() instanceof Conduit ? this : null;
     }
     @Override
     public void transformCase(int num, int[] bits){
