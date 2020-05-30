@@ -1,6 +1,7 @@
 package mindustry.ai.types;
 
 import arc.math.geom.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.ai.formations.*;
 import mindustry.entities.units.*;
@@ -10,7 +11,7 @@ public class FormationAI extends AIController implements FormationMember{
     public Unitc leader;
 
     private Vec3 target = new Vec3();
-    private Formation formation;
+    private @Nullable Formation formation;
 
     public FormationAI(Unitc leader, Formation formation){
         this.leader = leader;
@@ -52,7 +53,9 @@ public class FormationAI extends AIController implements FormationMember{
 
     @Override
     public void removed(Unitc unit){
-        formation.removeMember(this);
+        if(formation != null){
+            formation.removeMember(this);
+        }
     }
 
     @Override

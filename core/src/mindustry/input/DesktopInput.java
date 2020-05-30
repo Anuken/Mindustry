@@ -13,9 +13,6 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ai.formations.*;
-import mindustry.ai.formations.patterns.*;
-import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -583,6 +580,7 @@ public class DesktopInput extends InputHandler{
         isBoosting = Core.input.keyDown(Binding.boost) && !movement.isZero();
         player.boosting(isBoosting);
 
+        //TODO netsync this
         if(unit instanceof Payloadc){
             Payloadc pay = (Payloadc)unit;
 
@@ -604,30 +602,9 @@ public class DesktopInput extends InputHandler{
         }
 
         if(unit instanceof Commanderc){
-            Commanderc commander = (Commanderc)unit;
 
             if(Core.input.keyTap(Binding.command)){
-                if(commander.isCommanding()){
-                    commander.clearCommand();
-                }else{
-                    FormationPattern pattern = new SquareFormation();
-                    Formation formation = new Formation(new Vec3(player.x(), player.y(), player.unit().rotation()), pattern);
-                    formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
-
-                    units.clear();
-
-                    Fx.commandSend.at(player);
-                    Units.nearby(player.team(), player.x(), player.y(), 200f, u -> {
-                        if(u.isAI()){
-                            units.add(u);
-                        }
-                    });
-
-                    units.sort(u -> u.dst2(player.unit()));
-                    units.truncate(unit.type().commandLimit);
-
-                    commander.command(formation, units);
-                }
+                Call.onUnitCommand(player);
             }
         }
     }

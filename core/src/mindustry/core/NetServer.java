@@ -641,6 +641,7 @@ public class NetServer implements ApplicationListener{
 
             //now, put the new position, rotation and baserotation into the buffer so it can be read
             if(unit instanceof Mechc) fbuffer.put(baseRotation); //base rotation is optional
+            fbuffer.put(unit.elevation());
             fbuffer.put(rotation); //rotation is always there
             fbuffer.put(newx);
             fbuffer.put(newy);
