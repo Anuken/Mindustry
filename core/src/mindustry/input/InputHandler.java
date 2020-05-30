@@ -621,7 +621,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             for(int y = dresult.y; y <= dresult.y2; y++){
                 Tile tile = world.tilec(x, y);
                 if(tile == null || !tile.block().upgradable) continue;
-                Block upgrade = block.upgrade(tile);
+                Block upgrade = block.upgrade(tile, forced);
                 if(upgrade == null || !validPlace(x, y, upgrade, tile.rotation()) || tile.pos() != Point2.pack(x, y)) continue;
 
                 BuildRequest req = new BuildRequest(x, y, tile.rotation(), upgrade);

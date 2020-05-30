@@ -93,7 +93,7 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public Block upgrade(Tile tile){
+    public Block upgrade(Tile tile, boolean forced){
         return tile.block() instanceof Conveyor ? this : null;
     }
 

@@ -59,7 +59,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     }
 
     @Override
-    public Block upgrade(Tile tile){
+    public Block upgrade(Tile tile, boolean forced){
         return tile.block() instanceof Conduit ? this : null;
     }
     @Override
