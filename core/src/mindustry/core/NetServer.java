@@ -393,7 +393,7 @@ public class NetServer implements ApplicationListener{
                     }else if(found.team() != player.team()){
                         player.sendMessage("[scarlet]Only players on your team can be kicked.");
                     }else{
-                        Timekeeper vtime = cooldowns.getOr(player.uuid(), () -> new Timekeeper(voteCooldown));
+                        Timekeeper vtime = cooldowns.get(player.uuid(), () -> new Timekeeper(voteCooldown));
 
                         if(!vtime.get()){
                             player.sendMessage("[scarlet]You must wait " + voteCooldown/60 + " minutes between votekicks.");
@@ -481,11 +481,11 @@ public class NetServer implements ApplicationListener{
     }
 
     public void addPacketHandler(String type, Cons2<Playerc, String> handler){
-        customPacketHandlers.getOr(type, Array::new).add(handler);
+        customPacketHandlers.get(type, Array::new).add(handler);
     }
 
     public Array<Cons2<Playerc, String>> getPacketHandlers(String type){
-        return customPacketHandlers.getOr(type, Array::new);
+        return customPacketHandlers.get(type, Array::new);
     }
 
     public static void onDisconnect(Playerc player, String reason){

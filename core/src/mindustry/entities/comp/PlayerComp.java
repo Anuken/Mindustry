@@ -12,6 +12,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.Administration.*;
@@ -143,6 +144,8 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             unit.team(team);
             unit.controller(this);
         }
+
+        Events.fire(new UnitChangeEvent((Playerc)this, unit));
     }
 
     boolean dead(){

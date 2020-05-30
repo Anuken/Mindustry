@@ -238,7 +238,7 @@ public class Pathfinder implements Runnable{
     }
 
     private PathTarget getTarget(Position position){
-        return targetCache.getOr(position, () -> new PositionTarget(position));
+        return targetCache.get(position, () -> new PositionTarget(position));
     }
 
     /** @return whether a tile can be passed through by this team. Pathfinding thread only. */

@@ -5,9 +5,12 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
+//TODO more stats:
+//- units constructed
 public class Stats{
     /** export window size in seconds */
     private static final int exportWindow = 60;
@@ -30,6 +33,8 @@ public class Stats{
     public int buildingsDestroyed;
     /** Export statistics. */
     public ObjectMap<Item, ExportStat> export = new ObjectMap<>();
+    /** Items stored in all cores. Used for the campaign. */
+    public ObjectIntMap<Item> coreItems = new ObjectIntMap<>();
 
     /** Counter refresh state. */
     private transient Interval time = new Interval();
@@ -43,19 +48,30 @@ public class Stats{
 
     /** Updates export statistics. */
     public void handleItemExport(Item item, int amount){
-        export.getOr(item, ExportStat::new).counter += amount;
+        export.get(item, ExportStat::new).counter += amount;
     }
 
     /** Subtracts from export statistics. */
     public void handleItemImport(Item item, int amount){
-        export.getOr(item, ExportStat::new).counter -= amount;
+        export.get(item, ExportStat::new).counter -= amount;
     }
 
     public float getExport(Item item){
-        return export.getOr(item, ExportStat::new).mean;
+        return export.get(item, ExportStat::new).mean;
     }
 
     public void update(){
+        //update core items
+        CoreEntity entity = state.rules.defaultTeam.core();
+        if(entity != null){
+            ItemModule items = entity.items;
+            for(int i = 0; i < items.length(); i++){
+                coreItems.put(content.item(i), items.get(i));
+            }
+        }else{
+            coreItems.clear();
+        }
+        
         //create last stored core items
         if(lastCoreItems == null){
             lastCoreItems = new int[content.items().size];
