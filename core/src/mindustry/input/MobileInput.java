@@ -52,7 +52,9 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Whether or not the player is currently shifting all placed tiles. */
     private boolean selecting;
     /** Whether the player is currently in line-place mode. */
-    private boolean lineMode, schematicMode;
+    private boolean lineMode, schematicMode, upgradingMode;
+    /** Whether upgrading is in forced mode. */
+    private boolean upgradeForced = false;
     /** Current place mode. */
     private PlaceMode mode = none;
     /** Whether no recipe was available when switching to break mode. */
@@ -174,9 +176,12 @@ public class MobileInput extends InputHandler implements GestureListener{
         table.left().margin(0f).defaults().size(48f);
 
         table.button(Icon.hammer, Styles.clearTogglePartiali, () -> {
-            mode = mode == breaking ? block == null ? none : placing : breaking;
+            mode = mode == breaking ? upgrading : mode == upgrading ? block == null ? none : placing : breaking;
             lastBlock = block;
-        }).update(l -> l.setChecked(mode == breaking)).name("breakmode");
+        }).update(l -> {
+            l.setChecked(mode == breaking || mode == upgrading);
+            l.getStyle().imageUp = mode == upgrading ? Icon.upgrade : Icon.hammer;
+        }).name("breakmode");
 
         //diagonal swap button
         table.button(Icon.diagonal, Styles.clearTogglePartiali, () -> {
@@ -238,16 +243,38 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void buildUI(Group group){
-        Boolp schem = () -> lastSchematic != null && !selectRequests.isEmpty();
+        Boolp schem = () -> lastSchematic != null && !selectRequests.isEmpty() && mode != upgrading;
 
         group.fill(t -> {
-            t.bottom().left().visible(() -> (player.builder().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
+            t.visible(() -> (player.builder().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get() && mode != upgrading);
+            t.bottom().left();
             t.button("$cancel", Icon.cancel, () -> {
                 player.builder().clearBuilding();
                 selectRequests.clear();
                 mode = none;
                 block = null;
             }).width(155f).margin(12f);
+        });
+
+        group.fill(t -> {
+            t.visible(() -> mode == upgrading);
+            t.bottom().left();
+            t.table(Tex.pane, b -> {
+                b.defaults().size(50f);
+
+                b.button(Icon.lockOpen, Styles.clearPartiali, () -> {
+                    upgradeForced = !upgradeForced;
+                }).update(l -> {
+                    l.getStyle().imageUp = upgradeForced ? Icon.lock : Icon.lockOpen;
+                });
+                b.button(Icon.cancel, Styles.clearPartiali, () -> {
+                    selectRequests.clear();
+                    lineRequests.clear();
+                    upgradingMode = false;
+                    mode = none;
+                }).margin(4f);
+
+            });
         });
 
         group.fill(t -> {
@@ -363,6 +390,15 @@ public class MobileInput extends InputHandler implements GestureListener{
             }else if(mode == breaking){
                 drawBreakSelection(lineStartX, lineStartY, tileX, tileY);
             }
+        }else if(upgradingMode){
+            int tileX = tileX(Core.input.mouseX());
+            int tileY = tileY(Core.input.mouseY());
+            if(block != null){
+                for(int i = 0; i < lineRequests.size; i++){
+                    BuildRequest request = lineRequests.get(i);
+                    request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
+                }
+            }
         }
 
         //draw targeting crosshair
@@ -392,6 +428,8 @@ public class MobileInput extends InputHandler implements GestureListener{
         //draw schematic selection
         if(mode == schematicSelect){
             drawSelection(lineStartX, lineStartY, lastLineX, lastLineY, Vars.maxSchematicSize);
+        }else if(upgradingMode){
+            drawUpgradeSelection(lineStartX, lineStartY, lastLineX, lastLineY);
         }
     }
 
@@ -494,6 +532,9 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
             schematicMode = false;
             mode = none;
+        }else if(mode == upgrading){
+            flushSelectRequests(lineRequests);
+            upgradingMode = false;
         }else{
             Tile tile = tileAt(screenX, screenY);
 
@@ -520,13 +561,19 @@ public class MobileInput extends InputHandler implements GestureListener{
         lineStartY = cursor.y;
         lastLineX = cursor.x;
         lastLineY = cursor.y;
-        lineMode = true;
+        if(mode != upgrading) lineMode = true;
+        else if(mode == upgrading) upgradingMode = true;
 
         if(mode == breaking){
             Fx.tapBlock.at(cursor.worldx(), cursor.worldy(), 1f);
         }else if(block != null){
-            updateLine(lineStartX, lineStartY, cursor.x, cursor.y);
-            Fx.tapBlock.at(cursor.worldx() + block.offset(), cursor.worldy() + block.offset(), block.size);
+            if(mode == upgrading){
+                updateArea(lineStartX, lineStartY, cursor.x, cursor.y, upgradeForced);
+                Fx.tapBlock.at(cursor.worldx(), cursor.worldy(), 1f);
+            }else{
+                updateLine(lineStartX, lineStartY, cursor.x, cursor.y);
+                Fx.tapBlock.at(cursor.worldx() + block.offset(), cursor.worldy() + block.offset(), block.size);
+            }
         }
 
         return false;
@@ -553,6 +600,12 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
             //add to selection queue if it's a valid place position
             selectRequests.add(lastPlaced = new BuildRequest(cursor.x, cursor.y, rotation, block));
+        }else if(mode == upgrading){
+            Tile tile = world.tilec(cursor.x, cursor.y);
+            Block upgrade = block.upgrade(tile);
+            if(tile != null && tile.block().upgradable && upgrade != null && validPlace(cursor.x, cursor.y, block, tile.rotation()) && tile.pos() == Point2.pack(cursor.x, cursor.y)){
+                lineRequests.add(new BuildRequest(cursor.x, cursor.y, tile.rotation(), upgrade));
+            }
         }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasRequest(linked)){
             //add to selection queue if it's a valid BREAK position
             selectRequests.add(new BuildRequest(linked.x, linked.y));
@@ -653,6 +706,14 @@ public class MobileInput extends InputHandler implements GestureListener{
                 lastLineY = ly;
                 updateLine(lineStartX, lineStartY, lx, ly);
             }
+        }else if(upgradingMode){
+            int lx = tileX(Core.input.mouseX()), ly = tileY(Core.input.mouseY());
+
+            if(lastLineX != lx || lastLineY != ly){
+                lastLineX = lx;
+                lastLineY = ly;
+                updateArea(lineStartX, lineStartY, lx, ly, upgradeForced);
+            }
         }else{
             lineRequests.clear();
             lineScale = 0f;
@@ -707,7 +768,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         deltaY *= scale;
 
         //can't pan in line mode with one finger or while dropping items!
-        if((lineMode && !Core.input.isTouched(1)) || droppingItem || schematicMode){
+        if((lineMode && !Core.input.isTouched(1)) || droppingItem || schematicMode || upgradingMode){
             return false;
         }
 

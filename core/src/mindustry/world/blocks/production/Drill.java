@@ -171,7 +171,7 @@ public class Drill extends Block{
 
     @Override
     public Block upgrade(Tile tile){
-        return tile.block() instanceof Drill && this.size != size ? this : null;
+        return tile.block() instanceof Drill && this.size == size ? this : null;
     }
 
 
