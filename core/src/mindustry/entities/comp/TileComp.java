@@ -188,6 +188,12 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         }
     }
 
+    /** Called clientside when the client taps a block to config.
+     * @return whether the configuration UI should be shown. */
+    public boolean configTapped(){
+        return true;
+    }
+
     public void applyBoost(float intensity, float  duration){
         timeScale = Math.max(timeScale, intensity);
         timeScaleDuration = Math.max(timeScaleDuration, duration);

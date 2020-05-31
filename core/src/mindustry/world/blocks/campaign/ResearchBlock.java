@@ -1,4 +1,4 @@
-package mindustry.world.blocks.production;
+package mindustry.world.blocks.campaign;
 
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;

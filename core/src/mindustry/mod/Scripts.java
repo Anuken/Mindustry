@@ -17,6 +17,7 @@ import java.net.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{
+    private final static Object[] emptyObjects = {};
     private final Array<String> blacklist = Array.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
         ".awt", "socket", "classloader", "oracle", "invoke", "arc.events", "java.util.function", "java.util.stream");

@@ -222,6 +222,8 @@ public class EntityProcess extends BaseProcessor{
                 Array<Svar> syncedFields = new Array<>();
                 Array<Svar> allFields = new Array<>();
 
+                boolean isSync = components.contains(s -> s.name().contains("Sync"));
+
                 //add all components
                 for(Stype comp : components){
 
@@ -257,7 +259,7 @@ public class EntityProcess extends BaseProcessor{
                         allFields.add(f);
 
                         //add extra sync fields
-                        if(f.has(SyncField.class)){
+                        if(f.has(SyncField.class) && isSync){
                             if(!f.tname().toString().equals("float")) err("All SyncFields must be of type float", f);
 
                             syncedFields.add(f);

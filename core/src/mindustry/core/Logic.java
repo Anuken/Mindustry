@@ -90,7 +90,7 @@ public class Logic implements ApplicationListener{
             }
         });
 
-        Events.on(LaunchItemEvent.class, e -> state.stats.handleItemExport(e.stack));
+        Events.on(LaunchItemEvent.class, e -> state.secinfo.handleItemExport(e.stack));
 
         //when loading a 'damaged' sector, propagate the damage
         Events.on(WorldLoadEvent.class, e -> {
@@ -100,13 +100,14 @@ public class Logic implements ApplicationListener{
             }
         });
 
-        //TODO this should be in the same place as launch handling code
+        //TODO dying takes up a turn (?)
+        /*
         Events.on(GameOverEvent.class, e -> {
             //simulate a turn on a normal non-launch gameover
             if(state.isCampaign() && !state.launched){
                 universe.runTurn();
             }
-        });
+        });*/
 
         //disable new waves after the boss spawns
         Events.on(WaveEvent.class, e -> {
@@ -269,11 +270,9 @@ public class Logic implements ApplicationListener{
 
             //save over the data w/o the cores
             sector.save.save();
-            //TODO mark sector as not containing any cores
 
             //run a turn, since launching takes up a turn
             universe.runTurn();
-            //TODO needs extra damage to prevent player from landing immediately afterwards
             sector.setTurnsPassed(sector.getTurnsPassed() + 3);
 
             Events.fire(new LaunchEvent());
@@ -300,7 +299,7 @@ public class Logic implements ApplicationListener{
             }
 
             if(!state.isPaused()){
-                state.stats.update();
+                state.secinfo.update();
 
                 if(state.isCampaign()){
                     universe.update();

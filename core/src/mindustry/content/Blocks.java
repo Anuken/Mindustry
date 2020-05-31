@@ -14,6 +14,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.campaign.LaunchPad;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.distribution.*;
@@ -1315,7 +1316,7 @@ public class Blocks implements ContentList{
             speed = 7f;
         }};
 
-        launchPad = new LaunchPad("launch-pad"){{
+        launchPad = new mindustry.world.blocks.campaign.LaunchPad("launch-pad"){{
             requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
             size = 3;
             itemCapacity = 100;

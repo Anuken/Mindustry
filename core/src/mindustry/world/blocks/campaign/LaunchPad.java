@@ -1,4 +1,4 @@
-package mindustry.world.blocks.storage;
+package mindustry.world.blocks.campaign;
 
 import arc.*;
 import arc.graphics.*;

@@ -9,6 +9,7 @@ import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.event.*;
+import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -150,6 +151,17 @@ public class PlanetDialog extends BaseDialog{
         stable.background(Styles.black3);
 
         shown(this::setup);
+    }
+
+    /** show with no limitations, just as a map. */
+    @Override
+    public Dialog show(){
+        //TODO
+        return super.show();
+    }
+
+    public void show(Sector selected, int range){
+        //TODO
     }
 
     void makeBloom(){
@@ -413,7 +425,7 @@ public class PlanetDialog extends BaseDialog{
             stable.table(t -> {
                 t.left();
 
-                selected.save.meta.exportRates.each(entry -> {
+                selected.save.meta.secinfo.exportRates().each(entry -> {
                     int total = (int)(entry.value * turnDuration / 60f);
                     if(total > 1){
                         t.image(entry.key.icon(Cicon.small)).padRight(3);
@@ -421,7 +433,24 @@ public class PlanetDialog extends BaseDialog{
                         t.row();
                     }
                 });
-            });
+            }).row();
+        }
+
+        //stored resources
+        if(selected.hasBase() && selected.save.meta.secinfo.coreItems.size > 0){
+            stable.add("Stored Resources:").row();
+            stable.table(t -> {
+                t.left();
+
+                for(Item item : content.items()){
+                    int amount = selected.save.meta.secinfo.coreItems.get(item);
+                    if(amount > 0){
+                        t.image(item.icon(Cicon.small)).padRight(3);
+                        t.add(ui.formatAmount(amount)).color(Color.lightGray);
+                        t.row();
+                    }
+                }
+            }).row();
         }
 
         //display how many turns this sector has been attacked
