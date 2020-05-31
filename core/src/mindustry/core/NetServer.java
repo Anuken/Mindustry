@@ -862,7 +862,7 @@ public class NetServer implements ApplicationListener{
 
         StringBuilder result = new StringBuilder();
         int curChar = 0;
-        while(curChar < name.length() && result.toString().getBytes().length < maxNameLength){
+        while(curChar < name.length() && result.toString().getBytes(Strings.utf8).length < maxNameLength){
             result.append(name.charAt(curChar++));
         }
         return result.toString();

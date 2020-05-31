@@ -52,7 +52,10 @@ public class PlanetDialog extends BaseDialog{
     private final ResourcesDialog resources = new ResourcesDialog();
 
     private float zoom = 1f, smoothZoom = 1f, selectAlpha = 1f;
-    private Bloom bloom;
+    private Bloom bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false){{
+        setThreshold(0.8f);
+        blurPasses = 6;
+    }};
     private Planet planet = Planets.starter;
     private @Nullable Sector selected, hovered;
     private Table stable;
@@ -63,8 +66,6 @@ public class PlanetDialog extends BaseDialog{
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
-
-        makeBloom();
 
         Events.on(DisposeEvent.class, () -> {
             skybox.dispose();
@@ -79,7 +80,7 @@ public class PlanetDialog extends BaseDialog{
         });
 
         Events.on(ResizeEvent.class, e -> {
-            makeBloom();
+            bloom.resize(Core.graphics.getWidth() / 4, Core.graphics.getHeight() / 4);
         });
 
         TextButtonStyle style = Styles.cleart;
@@ -164,19 +165,6 @@ public class PlanetDialog extends BaseDialog{
         //TODO
     }
 
-    void makeBloom(){
-        if(bloom != null){
-            bloom.dispose();
-            bloom = null;
-        }
-
-        bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false, true){{
-            setClearColor(0, 0, 0, 0);
-            setThreshold(0.8f);
-            blurPasses = 6;
-        }};
-    }
-
     void setup(){
         cont.clear();
         titleTable.remove();
@@ -188,6 +176,7 @@ public class PlanetDialog extends BaseDialog{
         Draw.flush();
         Gl.clear(Gl.depthBufferBit);
         Gl.enable(Gl.depthTest);
+        Gl.depthMask(true);
 
         Gl.enable(Gl.cullFace);
         Gl.cullFace(Gl.back);
@@ -248,7 +237,7 @@ public class PlanetDialog extends BaseDialog{
     }
 
     private void beginBloom(){
-        bloom.capture();
+       bloom.capture();
     }
 
     private void endBloom(){
@@ -438,18 +427,25 @@ public class PlanetDialog extends BaseDialog{
 
         //stored resources
         if(selected.hasBase() && selected.save.meta.secinfo.coreItems.size > 0){
-            stable.add("Stored Resources:").row();
+            stable.add("Stored:").row();
             stable.table(t -> {
                 t.left();
 
-                for(Item item : content.items()){
-                    int amount = selected.save.meta.secinfo.coreItems.get(item);
-                    if(amount > 0){
-                        t.image(item.icon(Cicon.small)).padRight(3);
-                        t.add(ui.formatAmount(amount)).color(Color.lightGray);
-                        t.row();
+                t.table(res -> {
+                    int i = 0;
+                    for(Item item : content.items()){
+                        int amount = selected.save.meta.secinfo.coreItems.get(item);
+                        if(amount > 0){
+                            res.image(item.icon(Cicon.small)).padRight(3);
+                            res.add(ui.formatAmount(amount)).color(Color.lightGray);
+                            if(++i % 2 == 0){
+                                res.row();
+                            }
+                        }
                     }
-                }
+                });
+
+
             }).row();
         }
 

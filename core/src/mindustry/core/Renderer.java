@@ -126,7 +126,6 @@ public class Renderer implements ApplicationListener{
                 bloom = null;
             }
             bloom = new Bloom(true);
-            bloom.setClearColor(0f, 0f, 0f, 0f);
         }catch(Throwable e){
             e.printStackTrace();
             settings.put("bloom", false);
