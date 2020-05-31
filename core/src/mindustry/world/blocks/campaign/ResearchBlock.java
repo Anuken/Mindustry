@@ -35,6 +35,14 @@ public class ResearchBlock extends Block{
         }
 
         @Override
+        public boolean configTapped(){
+            //TODO select target
+            Vars.ui.tech.show();
+
+            return false;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
 

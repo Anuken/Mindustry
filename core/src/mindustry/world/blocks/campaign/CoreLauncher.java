@@ -11,6 +11,7 @@ public class CoreLauncher extends Block{
 
         hasItems = true;
         configurable = true;
+        update = true;
     }
 
     public class CoreLauncherEntity extends TileEntity{

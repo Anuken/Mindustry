@@ -14,7 +14,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.campaign.LaunchPad;
+import mindustry.world.blocks.campaign.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.distribution.*;
@@ -71,7 +71,7 @@ public class Blocks implements ContentList{
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
 
     //storage
-    coreShard, coreFoundation, coreNucleus, vault, container, unloader, launchPad, launchPadLarge,
+    coreShard, coreFoundation, coreNucleus, vault, container, unloader,
 
     //turrets
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
@@ -79,8 +79,10 @@ public class Blocks implements ContentList{
     //units
     groundFactory, airFactory, navalFactory, basicReconstructor, repairPoint,
 
-    //misc experimental
+    //campaign
+    launchPad, launchPadLarge, coreSilo, dataProcessor,
 
+    //misc experimental
     blockForge, blockLauncher, blockLoader, blockUnloader;
 
     @Override
@@ -1316,25 +1318,6 @@ public class Blocks implements ContentList{
             speed = 7f;
         }};
 
-        launchPad = new mindustry.world.blocks.campaign.LaunchPad("launch-pad"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
-            size = 3;
-            itemCapacity = 100;
-            launchTime = 60f * 20;
-            hasPower = true;
-            consumes.power(4f);
-        }};
-
-        launchPadLarge = new LaunchPad("launch-pad-large"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
-            size = 4;
-            itemCapacity = 300;
-            launchTime = 60f * 35;
-            hasPower = true;
-            consumes.power(6f);
-        }};
-
-
         //endregion
         //region turrets
 
@@ -1780,6 +1763,41 @@ public class Blocks implements ContentList{
         new LegacyCommandCenter("legacy-command-center");
 
         //endregion
+        //region campaign
+
+        launchPad = new LaunchPad("launch-pad"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+            size = 3;
+            itemCapacity = 100;
+            launchTime = 60f * 20;
+            hasPower = true;
+            consumes.power(4f);
+        }};
+
+        launchPadLarge = new LaunchPad("launch-pad-large"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
+            size = 4;
+            itemCapacity = 300;
+            launchTime = 60f * 35;
+            hasPower = true;
+            consumes.power(6f);
+        }};
+
+        coreSilo = new CoreLauncher("core-silo"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+            size = 5;
+            itemCapacity = 1000;
+            hasPower = true;
+            consumes.power(4f);
+        }};
+
+        dataProcessor = new ResearchBlock("data-processor"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+
+            size = 3;
+        }};
+
+        //endregion campaign
         //region experimental
 
         blockForge = new BlockForge("block-forge"){{

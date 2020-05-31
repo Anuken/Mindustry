@@ -2,11 +2,12 @@ package mindustry.game;
 
 import arc.*;
 import arc.math.*;
-import arc.struct.ObjectFloatMap.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
+import mindustry.game.SectorInfo.*;
 import mindustry.io.*;
 import mindustry.type.*;
 
@@ -80,9 +81,9 @@ public class Universe{
                 if(sector.hasBase() && !sector.isBeingPlayed()){
                     SaveMeta meta = sector.save.meta;
 
-                    for(Entry<Item> entry : meta.exportRates){
+                    for(ObjectMap.Entry<Item, ExportStat> entry : meta.secinfo.export){
                         //total is calculated by  items/sec (value) * turn duration in seconds
-                        int total = (int)(entry.value * turnDuration / 60f);
+                        int total = (int)(entry.value.mean * turnDuration / 60f);
 
                         exports[entry.key.id] += total;
                     }
