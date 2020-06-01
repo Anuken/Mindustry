@@ -5,7 +5,6 @@ import arc.*;
 import arc.assets.*;
 import arc.files.*;
 import arc.graphics.*;
-import arc.graphics.g3d.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -165,7 +164,6 @@ public class Vars implements Loadable{
     /** list of all locales that can be switched to */
     public static Locale[] locales;
 
-    public static Camera3D cam3;
     public static FileTree tree = new FileTree();
     public static Net net;
     public static ContentLoader content;
@@ -264,10 +262,6 @@ public class Vars implements Loadable{
 
         mods.load();
         maps.load();
-
-        if(!headless){
-            cam3 = new Camera3D();
-        }
     }
 
     public static void loadLogger(){
