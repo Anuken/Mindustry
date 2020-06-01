@@ -103,7 +103,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.row();
 
-            t.button("$data.export", Icon.download, style, () -> {
+            t.button("$data.export", Icon.upload, style, () -> {
                 if(ios){
                     Fi file = Core.files.local("mindustry-data-export.zip");
                     try{
