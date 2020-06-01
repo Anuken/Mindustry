@@ -554,7 +554,7 @@ public class ApplicationTests{
 
         for(int x = 5; x < tiles.width && i < content.blocks().size; ){
             Block block = content.block(i++);
-            if(block.isBuildable()){
+            if(block.canBeBuilt()){
                 x += block.size;
                 tiles.get(x, 5).setBlock(block);
                 x += block.size;

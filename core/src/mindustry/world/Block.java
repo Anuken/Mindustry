@@ -162,6 +162,8 @@ public class Block extends UnlockableContent{
     public float buildCost;
     /** Whether this block is visible and can currently be built. */
     public BuildVisibility buildVisibility = BuildVisibility.hidden;
+    /** Defines when this block can be placed. */
+    public BuildPlaceability buildPlaceability = BuildPlaceability.always;
     /** Multiplier for speed of building this block. */
     public float buildCostMultiplier = 1f;
     /** Whether this block has instant transfer.*/
@@ -298,7 +300,7 @@ public class Block extends UnlockableContent{
     public void setStats(){
         stats.add(BlockStat.size, "@x@", size, size);
         stats.add(BlockStat.health, health, StatUnit.none);
-        if(isBuildable()){
+        if(canBeBuilt()){
             stats.add(BlockStat.buildTime, buildCost / 60, StatUnit.seconds);
             stats.add(BlockStat.buildCost, new ItemListValue(false, requirements));
         }
@@ -465,6 +467,15 @@ public class Block extends UnlockableContent{
         return buildVisibility.visible() && !isHidden();
     }
 
+    public boolean isPlaceable(){
+        return isVisible() && buildPlaceability.placeable() && !state.rules.bannedBlocks.contains(this);
+    }
+
+    /** @return a message detailing why this block can't be placed. */
+    public String unplaceableMessage(){
+        return state.rules.bannedBlocks.contains(this) ? Core.bundle.get("banned") : buildPlaceability.message();
+    }
+
     public boolean isFloor(){
         return this instanceof Floor;
     }
@@ -481,7 +492,7 @@ public class Block extends UnlockableContent{
         return id == 0;
     }
 
-    public boolean isBuildable(){
+    public boolean canBeBuilt(){
         return buildVisibility != BuildVisibility.hidden && buildVisibility != BuildVisibility.debugOnly;
     }
 

@@ -35,7 +35,7 @@ public class CustomRulesDialog extends BaseDialog{
 
         banDialog.shown(this::rebuildBanned);
         banDialog.buttons.button("$addall", Icon.add, () -> {
-            rules.bannedBlocks.addAll(content.blocks().select(Block::isBuildable));
+            rules.bannedBlocks.addAll(content.blocks().select(Block::canBeBuilt));
             rebuildBanned();
         }).size(180, 64f);
 
@@ -88,7 +88,7 @@ public class CustomRulesDialog extends BaseDialog{
             dialog.cont.pane(t -> {
                 t.left().margin(14f);
                 int[] i = {0};
-                content.blocks().each(b -> !rules.bannedBlocks.contains(b) && b.isBuildable(), b -> {
+                content.blocks().each(b -> !rules.bannedBlocks.contains(b) && b.canBeBuilt(), b -> {
                     int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
                     t.button(new TextureRegionDrawable(b.icon(Cicon.medium)), Styles.cleari, () -> {
                         rules.bannedBlocks.add(b);

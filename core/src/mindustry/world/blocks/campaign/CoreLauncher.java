@@ -3,6 +3,7 @@ package mindustry.world.blocks.campaign;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.state;
 
@@ -15,6 +16,7 @@ public class CoreLauncher extends Block{
         hasItems = true;
         configurable = true;
         update = true;
+        buildPlaceability = BuildPlaceability.sectorCaptured;
     }
 
     public class CoreLauncherEntity extends TileEntity{
