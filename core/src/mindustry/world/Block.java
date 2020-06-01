@@ -83,6 +83,8 @@ public class Block extends UnlockableContent{
     public boolean placeableOn = true;
     /** whether this block has insulating properties. */
     public boolean insulated = false;
+    /** whether the sprite is a full square. */
+    public boolean squareSprite = true;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
