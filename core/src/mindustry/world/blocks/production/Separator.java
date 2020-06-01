@@ -92,7 +92,7 @@ public class Separator extends Block{
             }
 
             if(progress >= 1f){
-                progress = 0f;
+                progress %= 1f;
                 int sum = 0;
                 for(ItemStack stack : results) sum += stack.amount;
 

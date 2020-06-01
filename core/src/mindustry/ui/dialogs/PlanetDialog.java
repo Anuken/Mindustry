@@ -49,6 +49,7 @@ public class PlanetDialog extends BaseDialog{
     private final Mat3D mat = new Mat3D();
     private final Vec3 camRelative = new Vec3();
     private final ResourcesDialog resources = new ResourcesDialog();
+    private final FrameBuffer buffer = new FrameBuffer(2, 2, true);
 
     private float zoom = 1f, smoothZoom = 1f, selectAlpha = 1f;
     private Bloom bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false){{
@@ -178,8 +179,6 @@ public class PlanetDialog extends BaseDialog{
 
         cont.rect((x, y, w, h) -> render()).grow();
     }
-
-    FrameBuffer buffer = new FrameBuffer(2, 2, true);
 
     @Override
     public void draw(){
