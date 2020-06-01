@@ -4,7 +4,10 @@ import mindustry.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
+import static mindustry.Vars.state;
+
 public class CoreLauncher extends Block{
+    public int range = 1;
 
     public CoreLauncher(String name){
         super(name);
@@ -23,12 +26,10 @@ public class CoreLauncher extends Block{
 
         @Override
         public boolean configTapped(){
-            //TODO show w/ sector
-            Vars.ui.planet.show();
-
+            if(state.isCampaign()){
+                Vars.ui.planet.show(state.rules.sector, range);
+            }
             return false;
         }
-
-
     }
 }

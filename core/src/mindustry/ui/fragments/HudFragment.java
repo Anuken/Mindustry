@@ -35,6 +35,8 @@ public class HudFragment extends Fragment{
     private Table lastUnlockLayout;
     private boolean shown = true;
     private float dsize = 47.2f;
+    //TODO implement
+    private CoreItemsDisplay coreItems = new CoreItemsDisplay();
 
     private String hudText = "";
     private boolean showHudText;
@@ -52,6 +54,10 @@ public class HudFragment extends Fragment{
         //TODO details and stuff
         Events.on(SectorCaptureEvent.class, e ->{
             showToast("Sector[accent] captured[]!");
+        });
+
+        Events.on(ResetEvent.class, e -> {
+            coreItems.resetUsed();
         });
 
         //TODO tear this all down

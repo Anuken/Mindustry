@@ -132,7 +132,6 @@ public class Conveyor extends Block implements Autotiler{
 
             Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
 
-            //TODO is sprite Z layer clustering necessary? does it create garbage?
             Draw.z(Layer.blockOver);
 
             for(int i = 0; i < len; i++){

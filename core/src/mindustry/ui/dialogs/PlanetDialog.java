@@ -44,7 +44,6 @@ public class PlanetDialog extends BaseDialog{
     private final Planet solarSystem = Planets.sun;
 
     private final Mesh[] outlines = new Mesh[10];
-    private final Camera3D cam = new Camera3D();
     private final VertexBatch3D batch = new VertexBatch3D(10000, false, true, 0);
     private final PlaneBatch3D projector = new PlaneBatch3D();
     private final Mat3D mat = new Mat3D();
@@ -101,7 +100,7 @@ public class PlanetDialog extends BaseDialog{
         //buttons.button("Database", Icon.book, style, () -> ui.database.show()).margin(bmargin);
         //buttons.button("Resources", Icon.file, style, resources::show).margin(bmargin);
 
-        cam.fov = 60f;
+        cam3.fov = 60f;
 
         camRelative.set(0, 0f, camLength);
         projector.setScaling(1f / 150f);
@@ -114,13 +113,13 @@ public class PlanetDialog extends BaseDialog{
             //scale X speed depending on polar coordinate
             float speed = 1f - Math.abs(upV - 90) / 90f;
 
-            camRelative.rotate(cam.up, cx / xscale * speed);
+            camRelative.rotate(cam3.up, cx / xscale * speed);
 
             //prevent user from scrolling all the way up and glitching it out
             float amount = cy / yscale;
             amount = Mathf.clamp(upV + amount, margin, 180f - margin) - upV;
 
-            camRelative.rotate(Tmp.v31.set(cam.up).rotate(cam.direction, 90), amount);
+            camRelative.rotate(Tmp.v31.set(cam3.up).rotate(cam3.direction, 90), amount);
         });
 
         scrolled(value -> {
@@ -129,7 +128,7 @@ public class PlanetDialog extends BaseDialog{
 
         update(() -> {
             if(planet.isLandable()){
-                hovered = planet.getSector(cam.getMouseRay(), outlineRad);
+                hovered = planet.getSector(cam3.getMouseRay(), outlineRad);
             }else{
                 hovered = selected = null;
             }
@@ -162,6 +161,14 @@ public class PlanetDialog extends BaseDialog{
     }
 
     public void show(Sector selected, int range){
+        this.selected = null;
+        this.hovered = null;
+
+        //update view to sector
+        camRelative.set(Tmp.v33.set(selected.tile.v).rotate(Vec3.Y, -selected.planet.getRotation()));
+        zoom = smoothZoom = 1f;
+
+        show();
         //TODO
     }
 
@@ -170,6 +177,27 @@ public class PlanetDialog extends BaseDialog{
         titleTable.remove();
 
         cont.rect((x, y, w, h) -> render()).grow();
+    }
+
+    FrameBuffer buffer = new FrameBuffer(2, 2, true);
+
+    @Override
+    public void draw(){
+        boolean doBuffer = color.a < 0.99f;
+
+        if(doBuffer){
+            buffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+            buffer.begin(Color.clear);
+        }
+
+        super.draw();
+
+        if(doBuffer){
+            buffer.end();
+            Draw.color(color);
+            Draw.rect(Draw.wrap(buffer.getTexture()), Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Core.graphics.getWidth(), -Core.graphics.getHeight());
+            Draw.color();
+        }
     }
 
     private void render(){
@@ -182,23 +210,23 @@ public class PlanetDialog extends BaseDialog{
         Gl.cullFace(Gl.back);
 
         //lock to up vector so it doesn't get confusing
-        cam.up.set(Vec3.Y);
+        cam3.up.set(Vec3.Y);
 
-        cam.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+        cam3.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         camRelative.setLength(planet.radius * camLength + (smoothZoom-1f) * planet.radius * 2);
-        cam.position.set(planet.position).add(camRelative);
-        cam.lookAt(planet.position);
-        cam.update();
+        cam3.position.set(planet.position).add(camRelative);
+        cam3.lookAt(planet.position);
+        cam3.update();
 
         //TODO hacky
-        Shaders.planet.camDir.set(cam.direction).rotate(Vec3.Y, planet.getRotation());
+        Shaders.planet.camDir.set(cam3.direction).rotate(Vec3.Y, planet.getRotation());
 
-        projector.proj(cam.combined);
-        batch.proj(cam.combined);
+        projector.proj(cam3.combined);
+        batch.proj(cam3.combined);
 
         beginBloom();
 
-        skybox.render(cam.combined);
+        skybox.render(cam3.combined);
 
         renderPlanet(solarSystem);
 
@@ -226,14 +254,14 @@ public class PlanetDialog extends BaseDialog{
 
         if(selected != null){
             addChild(stable);
-            Vec3 pos = cam.project(Tmp.v31.set(selected.tile.v).setLength(outlineRad).rotate(Vec3.Y, -planet.getRotation()).add(planet.position));
+            Vec3 pos = cam3.project(Tmp.v31.set(selected.tile.v).setLength(outlineRad).rotate(Vec3.Y, -planet.getRotation()).add(planet.position));
             stable.setPosition(pos.x, pos.y, Align.center);
             stable.toFront();
         }else{
             stable.remove();
         }
 
-        cam.update();
+        cam3.update();
     }
 
     private void beginBloom(){
@@ -246,7 +274,7 @@ public class PlanetDialog extends BaseDialog{
 
     private void renderPlanet(Planet planet){
         //render planet at offsetted position in the world
-        planet.mesh.render(cam.combined, planet.getTransform(mat));
+        planet.mesh.render(cam3.combined, planet.getTransform(mat));
 
         renderOrbit(planet);
 
@@ -257,7 +285,7 @@ public class PlanetDialog extends BaseDialog{
         if(planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
             Blending.additive.apply();
 
-            Shaders.atmosphere.camera = cam;
+            Shaders.atmosphere.camera = cam3;
             Shaders.atmosphere.planet = planet;
             Shaders.atmosphere.bind();
             Shaders.atmosphere.apply();
@@ -330,11 +358,11 @@ public class PlanetDialog extends BaseDialog{
         //render sector grid
         Mesh mesh = outline(planet.grid.size);
         Shader shader = Shaders.planetGrid;
-        Vec3 tile = planet.intersect(cam.getMouseRay(), outlineRad);
+        Vec3 tile = planet.intersect(cam3.getMouseRay(), outlineRad);
         Shaders.planetGrid.mouse.lerp(tile == null ? Vec3.Zero : tile.sub(planet.position).rotate(Vec3.Y, planet.getRotation()), 0.2f);
 
         shader.bind();
-        shader.setUniformMatrix4("u_proj", cam.combined.val);
+        shader.setUniformMatrix4("u_proj", cam3.combined.val);
         shader.setUniformMatrix4("u_trans", planet.getTransform(mat).val);
         shader.apply();
         mesh.render(shader, Gl.lines);
@@ -476,7 +504,7 @@ public class PlanetDialog extends BaseDialog{
             if(selected != null){
                 //fade out UI when not facing selected sector
                 Tmp.v31.set(selected.tile.v).rotate(Vec3.Y, -planet.getRotation()).scl(-1f).nor();
-                float dot = cam.direction.dot(Tmp.v31);
+                float dot = cam3.direction.dot(Tmp.v31);
                 stable.getColor().a = Math.max(dot, 0f)*2f;
                 if(dot*2f <= -0.1f){
                     stable.remove();
