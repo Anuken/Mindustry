@@ -9,6 +9,7 @@ import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.event.*;
+import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -51,7 +52,10 @@ public class PlanetDialog extends BaseDialog{
     private final ResourcesDialog resources = new ResourcesDialog();
 
     private float zoom = 1f, smoothZoom = 1f, selectAlpha = 1f;
-    private Bloom bloom;
+    private Bloom bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false){{
+        setThreshold(0.8f);
+        blurPasses = 6;
+    }};
     private Planet planet = Planets.starter;
     private @Nullable Sector selected, hovered;
     private Table stable;
@@ -62,8 +66,6 @@ public class PlanetDialog extends BaseDialog{
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
-
-        makeBloom();
 
         Events.on(DisposeEvent.class, () -> {
             skybox.dispose();
@@ -78,7 +80,7 @@ public class PlanetDialog extends BaseDialog{
         });
 
         Events.on(ResizeEvent.class, e -> {
-            makeBloom();
+            bloom.resize(Core.graphics.getWidth() / 4, Core.graphics.getHeight() / 4);
         });
 
         TextButtonStyle style = Styles.cleart;
@@ -87,11 +89,17 @@ public class PlanetDialog extends BaseDialog{
         getCell(buttons).padBottom(-4);
         buttons.background(Styles.black).defaults().growX().height(64f).pad(0);
 
+        keyDown(key -> {
+            if(key == KeyCode.escape || key == KeyCode.back){
+                Core.app.post(this::hide);
+            }
+        });
+
         //TODO
-        buttons.button("$back", Icon.left, style, this::hide).margin(bmargin);
-        buttons.button("Research", Icon.tree, style, () -> ui.tech.show()).margin(bmargin);
+        //buttons.button("$back", Icon.left, style, this::hide).margin(bmargin);
+        //buttons.button("Research", Icon.tree, style, () -> ui.tech.show()).margin(bmargin);
         //buttons.button("Database", Icon.book, style, () -> ui.database.show()).margin(bmargin);
-        buttons.button("Resources", Icon.file, style, resources::show).margin(bmargin);
+        //buttons.button("Resources", Icon.file, style, resources::show).margin(bmargin);
 
         cam.fov = 60f;
 
@@ -146,17 +154,15 @@ public class PlanetDialog extends BaseDialog{
         shown(this::setup);
     }
 
-    void makeBloom(){
-        if(bloom != null){
-            bloom.dispose();
-            bloom = null;
-        }
+    /** show with no limitations, just as a map. */
+    @Override
+    public Dialog show(){
+        //TODO
+        return super.show();
+    }
 
-        bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false, true){{
-            setClearColor(0, 0, 0, 0);
-            setThreshold(0.8f);
-            blurPasses = 6;
-        }};
+    public void show(Sector selected, int range){
+        //TODO
     }
 
     void setup(){
@@ -170,6 +176,7 @@ public class PlanetDialog extends BaseDialog{
         Draw.flush();
         Gl.clear(Gl.depthBufferBit);
         Gl.enable(Gl.depthTest);
+        Gl.depthMask(true);
 
         Gl.enable(Gl.cullFace);
         Gl.cullFace(Gl.back);
@@ -230,7 +237,7 @@ public class PlanetDialog extends BaseDialog{
     }
 
     private void beginBloom(){
-        bloom.capture();
+       bloom.capture();
     }
 
     private void endBloom(){
@@ -407,7 +414,7 @@ public class PlanetDialog extends BaseDialog{
             stable.table(t -> {
                 t.left();
 
-                selected.save.meta.exportRates.each(entry -> {
+                selected.save.meta.secinfo.exportRates().each(entry -> {
                     int total = (int)(entry.value * turnDuration / 60f);
                     if(total > 1){
                         t.image(entry.key.icon(Cicon.small)).padRight(3);
@@ -415,7 +422,31 @@ public class PlanetDialog extends BaseDialog{
                         t.row();
                     }
                 });
-            });
+            }).row();
+        }
+
+        //stored resources
+        if(selected.hasBase() && selected.save.meta.secinfo.coreItems.size > 0){
+            stable.add("Stored:").row();
+            stable.table(t -> {
+                t.left();
+
+                t.table(res -> {
+                    int i = 0;
+                    for(Item item : content.items()){
+                        int amount = selected.save.meta.secinfo.coreItems.get(item);
+                        if(amount > 0){
+                            res.image(item.icon(Cicon.small)).padRight(3);
+                            res.add(ui.formatAmount(amount)).color(Color.lightGray);
+                            if(++i % 2 == 0){
+                                res.row();
+                            }
+                        }
+                    }
+                });
+
+
+            }).row();
         }
 
         //display how many turns this sector has been attacked

@@ -43,29 +43,31 @@ public class BlockConfigFragment extends Fragment{
     }
 
     public void showConfig(Tilec tile){
-        configTile = tile;
+        if(tile.configTapped()){
+            configTile = tile;
 
-        table.visible(true);
-        table.clear();
-        tile.buildConfiguration(table);
-        table.pack();
-        table.setTransform(true);
-        table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
-        Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
+            table.visible(true);
+            table.clear();
+            tile.buildConfiguration(table);
+            table.pack();
+            table.setTransform(true);
+            table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
+            Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
 
-        table.update(() -> {
-            if(configTile != null && configTile.shouldHideConfigure(player)){
-                hideConfig();
-                return;
-            }
+            table.update(() -> {
+                if(configTile != null && configTile.shouldHideConfigure(player)){
+                    hideConfig();
+                    return;
+                }
 
-            table.setOrigin(Align.center);
-            if(configTile == null || configTile.block() == Blocks.air || !configTile.isValid()){
-                hideConfig();
-            }else{
-                configTile.updateTableAlign(table);
-            }
-        });
+                table.setOrigin(Align.center);
+                if(configTile == null || configTile.block() == Blocks.air || !configTile.isValid()){
+                    hideConfig();
+                }else{
+                    configTile.updateTableAlign(table);
+                }
+            });
+        }
     }
 
     public boolean hasConfigMouse(){

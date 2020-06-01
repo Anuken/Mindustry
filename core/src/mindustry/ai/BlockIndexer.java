@@ -34,15 +34,15 @@ public class BlockIndexer{
     /** Maps each team ID to a quarant. A quadrant is a grid of bits, where each bit is set if and only if there is a block of that team in that quadrant. */
     private GridBits[] structQuadrants;
     /** Stores all damaged tile entities by team. */
-    private TileArray[] damagedTiles = new TileArray[Team.all().length];
+    private TileArray[] damagedTiles = new TileArray[Team.all.length];
     /** All ores available on this map. */
     private ObjectSet<Item> allOres = new ObjectSet<>();
     /** Stores teams that are present here as tiles. */
     private Array<Team> activeTeams = new Array<>();
     /** Maps teams to a map of flagged tiles by flag. */
-    private TileArray[][] flagMap = new TileArray[Team.all().length][BlockFlag.all.length];
+    private TileArray[][] flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
     /** Max units by team. */
-    private int[] unitCaps = new int[Team.all().length];
+    private int[] unitCaps = new int[Team.all.length];
     /** Maps tile positions to their last known tile index data. */
     private IntMap<TileIndex> typeMap = new IntMap<>();
     /** Empty set used for returning. */
@@ -69,9 +69,9 @@ public class BlockIndexer{
         Events.on(WorldLoadEvent.class, event -> {
             scanOres.clear();
             scanOres.addAll(Item.getAllOres());
-            damagedTiles = new TileArray[Team.all().length];
-            flagMap = new TileArray[Team.all().length][BlockFlag.all.length];
-            unitCaps = new int[Team.all().length];
+            damagedTiles = new TileArray[Team.all.length];
+            flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
+            unitCaps = new int[Team.all.length];
 
             for(int i = 0; i < flagMap.length; i++){
                 for(int j = 0; j < BlockFlag.all.length; j++){
@@ -84,7 +84,7 @@ public class BlockIndexer{
             ores = null;
 
             //create bitset for each team type that contains each quadrant
-            structQuadrants = new GridBits[Team.all().length];
+            structQuadrants = new GridBits[Team.all.length];
 
             for(Tile tile : world.tiles){
                 process(tile);
@@ -175,7 +175,6 @@ public class BlockIndexer{
         int ty = world.toTile(wy);
 
         int tileRange = (int)(range / tilesize + 1);
-        intSet.clear();
         boolean any = false;
 
         for(int x = -tileRange + tx; x <= tileRange + tx; x++){
@@ -186,10 +185,9 @@ public class BlockIndexer{
 
                 if(other == null) continue;
 
-                if(other.team() == team && !intSet.contains(other.pos()) && pred.get(other)){
+                if(other.team() == team && pred.get(other) && intSet.add(other.pos())){
                     cons.get(other);
                     any = true;
-                    intSet.add(other.pos());
                 }
             }
         }

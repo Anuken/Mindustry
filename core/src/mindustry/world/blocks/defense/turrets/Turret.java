@@ -8,18 +8,22 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.tilesize;
 
@@ -38,6 +42,7 @@ public abstract class Turret extends Block{
     public float range = 50f;
     public float reloadTime = 10f;
     public float inaccuracy = 0f;
+    public float velocityInaccuracy = 0f;
     public int shots = 1;
     public float spread = 4f;
     public float recoilAmount = 1f;
@@ -47,9 +52,17 @@ public abstract class Turret extends Block{
     public float shootCone = 8f;
     public float shootShake = 0f;
     public float xRand = 0f;
+    /** Currently used for artillery only. */
+    public float minRange = 0f;
+    public float burstSpacing = 0;
     public boolean alternate = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
+    public boolean acceptCoolant = true;
+    /** How much reload is lowered by for each unit of liquid of heat capacity. */
+    public float coolantMultiplier = 5f;
+    /** Effect displayed when coolant is used. */
+    public Effect coolEffect = Fx.fuelburn;
 
     protected Vec2 tr = new Vec2();
     protected Vec2 tr2 = new Vec2();
@@ -75,6 +88,7 @@ public abstract class Turret extends Block{
         group = BlockGroup.turrets;
         flags = EnumSet.of(BlockFlag.turret);
         outlineIcon = true;
+        liquidCapacity = 20f;
     }
 
     @Override
@@ -92,6 +106,20 @@ public abstract class Turret extends Block{
         stats.add(BlockStat.shots, shots, StatUnit.none);
         stats.add(BlockStat.targetsAir, targetAir);
         stats.add(BlockStat.targetsGround, targetGround);
+
+        if(acceptCoolant){
+            stats.add(BlockStat.booster, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
+        }
+    }
+
+    @Override
+    public void init(){
+        if(acceptCoolant && !consumes.has(ConsumeType.liquid)){
+            hasLiquids = true;
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.2f)).update(false).boost();
+        }
+
+        super.init();
     }
 
     @Override
@@ -119,6 +147,7 @@ public abstract class Turret extends Block{
         public Vec2 targetPos = new Vec2();
         public @NonNull BlockUnitc unit = Nulls.blockUnit;
 
+        @Override
         public void created(){
             unit = (BlockUnitc)UnitTypes.block.create(team);
             unit.tile(this);
@@ -196,12 +225,38 @@ public abstract class Turret extends Block{
                     }
                 }
             }
-        }
 
+            if(acceptCoolant){
+                updateCooling();
+            }
+        }
 
         @Override
         public void drawSelect(){
             Drawf.dashCircle(x, y, range, team.color);
+        }
+
+        @Override
+        public void handleLiquid(Tilec source, Liquid liquid, float amount){
+            if(acceptCoolant && liquids.currentAmount() <= 0.001f){
+                Events.fire(Trigger.turretCool);
+            }
+
+            super.handleLiquid(source, liquid, amount);
+        }
+
+        protected void updateCooling(){
+            float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
+
+            Liquid liquid = liquids.current();
+
+            float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta()), Math.max(0, ((reloadTime - reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed();
+            reload += used * liquid.heatCapacity * coolantMultiplier;
+            liquids.remove(liquid, used);
+
+            if(Mathf.chance(0.06 * used)){
+                coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
+            }
         }
 
         protected boolean validateTarget(){
@@ -232,20 +287,16 @@ public abstract class Turret extends Block{
             entry.amount -= ammoPerShot;
             if(entry.amount == 0) ammo.pop();
             totalAmmo -= ammoPerShot;
-            Time.run(reloadTime / 2f, () -> ejectEffects());
+            Time.run(reloadTime / 2f, this::ejectEffects);
             return entry.type();
         }
 
-        /**
-         * Get the ammo type that will be returned if useAmmo is called.
-         */
+        /** @return the ammo type that will be returned if useAmmo is called. */
         public BulletType peekAmmo(){
             return ammo.peek().type();
         }
 
-        /**
-         * Returns whether the turret has ammo.
-         */
+        /** @return  whether the turret has ammo. */
         public boolean hasAmmo(){
             return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
         }
@@ -266,27 +317,48 @@ public abstract class Turret extends Block{
             recoil = recoilAmount;
             heat = 1f;
 
-            if(alternate){
-                float i = (shotCounter % shots) - shots/2f + (((shots+1)%2) / 2f);
-
-                tr.trns(rotation - 90, spread * i + Mathf.range(xRand), size * tilesize / 2);
-                bullet(type, rotation + Mathf.range(inaccuracy));
-            }else{
-                tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
-
+            //when burst spacing is enabled, use the burst pattern
+            if(burstSpacing > 0.0001f){
                 for(int i = 0; i < shots; i++){
-                    bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - shots / 2f) * spread);
+                    Time.run(burstSpacing * i, () -> {
+                        if(!isValid() || !hasAmmo()) return;
+
+                        recoil = recoilAmount;
+
+                        tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
+                        bullet(type, rotation + Mathf.range(inaccuracy));
+                        effects();
+                        useAmmo();
+                    });
                 }
+
+            }else{
+                //otherwise, use the normal shot pattern(s)
+
+                if(alternate){
+                    float i = (shotCounter % shots) - shots/2f + (((shots+1)%2) / 2f);
+
+                    tr.trns(rotation - 90, spread * i + Mathf.range(xRand), size * tilesize / 2f);
+                    bullet(type, rotation + Mathf.range(inaccuracy));
+                }else{
+                    tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
+
+                    for(int i = 0; i < shots; i++){
+                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - (int)(shots / 2f)) * spread);
+                    }
+                }
+
+                shotCounter++;
+
+                effects();
+                useAmmo();
             }
-
-            shotCounter++;
-
-            effects();
-            useAmmo();
         }
 
         protected void bullet(BulletType type, float angle){
-            type.create(this, team, x + tr.x, y + tr.y, angle);
+            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f;
+
+            type.create(this, team, x + tr.x, y + tr.y, angle, 1f + Mathf.range(velocityInaccuracy), lifeScl);
         }
 
         protected void effects(){

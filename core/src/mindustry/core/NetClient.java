@@ -130,11 +130,11 @@ public class NetClient implements ApplicationListener{
     }
 
     public void addPacketHandler(String type, Cons<String> handler){
-        customPacketHandlers.getOr(type, Array::new).add(handler);
+        customPacketHandlers.get(type, Array::new).add(handler);
     }
 
     public Array<Cons<String>> getPacketHandlers(String type){
-        return customPacketHandlers.getOr(type, Array::new);
+        return customPacketHandlers.get(type, Array::new);
     }
 
     @Remote(targets = Loc.server, variants = Variant.both)

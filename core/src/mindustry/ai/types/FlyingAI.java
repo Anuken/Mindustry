@@ -11,7 +11,7 @@ public class FlyingAI extends AIController{
 
     @Override
     public void update(){
-        if(!unit.vel().isZero(0.01f)){
+        if(unit.moving()){
             unit.rotation(unit.vel().angle());
         }
 

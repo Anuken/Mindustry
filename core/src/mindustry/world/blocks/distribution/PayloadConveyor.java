@@ -156,7 +156,8 @@ public class PayloadConveyor extends Block{
 
         @Override
         public boolean acceptPayload(Tilec source, Payload payload){
-            return this.item == null && progress <= 5f;
+            //accepting payloads from units isn't supported
+            return this.item == null && progress <= 5f && source != this;
         }
 
         @Override

@@ -4,7 +4,6 @@ import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
-import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
@@ -14,9 +13,6 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ai.formations.*;
-import mindustry.ai.formations.patterns.*;
-import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -214,31 +210,6 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyDown(Binding.respawn) && !player.dead() && !player.unit().spawnedByCore()){
                 Call.onUnitClear(player);
                 controlledType = null;
-            }
-
-            //TODO this is for debugging, remove later
-            if(Core.input.keyTap(KeyCode.g) && !player.dead() && player.unit() instanceof Commanderc){
-                Commanderc commander = (Commanderc)player.unit();
-
-                if(commander.isCommanding()){
-                    commander.clearCommand();
-                }else{
-
-                    FormationPattern pattern = new SquareFormation();
-                    Formation formation = new Formation(new Vec3(player.x(), player.y(), player.unit().rotation()), pattern);
-                    formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
-
-                    units.clear();
-
-                    Fx.commandSend.at(player);
-                    Units.nearby(player.team(), player.x(), player.y(), 200f, u -> {
-                        if(u.isAI()){
-                            units.add(u);
-                        }
-                    });
-
-                    commander.command(formation, units);
-                }
             }
         }
 
@@ -621,7 +592,7 @@ public class DesktopInput extends InputHandler{
         if(aimCursor){
             unit.lookAt(mouseAngle);
         }else{
-            if(!unit.vel().isZero(0.01f)){
+            if(unit.moving()){
                 unit.lookAt(unit.vel().angle());
             }
         }
@@ -641,6 +612,7 @@ public class DesktopInput extends InputHandler{
         isBoosting = Core.input.keyDown(Binding.boost) && !movement.isZero();
         player.boosting(isBoosting);
 
+        //TODO netsync this
         if(unit instanceof Payloadc){
             Payloadc pay = (Payloadc)unit;
 
@@ -658,6 +630,13 @@ public class DesktopInput extends InputHandler{
 
             if(Core.input.keyTap(Binding.dropCargo)){
                 pay.dropLastPayload();
+            }
+        }
+
+        if(unit instanceof Commanderc){
+
+            if(Core.input.keyTap(Binding.command)){
+                Call.onUnitCommand(player);
             }
         }
     }

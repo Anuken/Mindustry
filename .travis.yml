@@ -4,7 +4,7 @@ dist: xenial
 android:
   components:
   - android-29
-  - build-tools-29.0.2
+  - build-tools-29.0.3
 
 script:
 - git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds

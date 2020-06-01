@@ -32,7 +32,7 @@ public class Generators{
             for(int i = 0; i < frames; i++){
                 float fin = (float)i / (frames);
                 float fout = 1f - fin;
-                float stroke = 4f * fout;
+                float stroke = 3.5f * fout;
                 float radius = (size/2f) * fin;
 
                 Pixmap pixmap = new Pixmap(size, size);
@@ -173,6 +173,7 @@ public class Generators{
                         scaled.save("../ui/block-" + block.name + "-" + icon.name());
                     }
 
+                    boolean hasEmpty = false;
                     Color average = new Color();
                     for(int x = 0; x < image.width; x++){
                         for(int y = 0; y < image.height; y++){
@@ -180,6 +181,9 @@ public class Generators{
                             average.r += color.r;
                             average.g += color.g;
                             average.b += color.b;
+                            if(color.a < 0.9f){
+                                hasEmpty = true;
+                            }
                         }
                     }
                     average.mul(1f / (image.width * image.height));
@@ -188,7 +192,8 @@ public class Generators{
                     }else{
                         average.mul(1.1f);
                     }
-                    average.a = 1f;
+                    //encode square sprite in alpha channel
+                    average.a = hasEmpty ? 0.1f : 1f;
                     colors.draw(block.id, 0, average);
                 }catch(IllegalArgumentException e){
                     Log.info("Skipping &ly'@'", block.name);

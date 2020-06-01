@@ -14,7 +14,7 @@ import mindustry.world.*;
  * Does not store game state, just configuration.
  */
 public class Rules{
-    /** Whether the player has infinite resources. */
+    /** Whether the player team has infinite resources. */
     public boolean infiniteResources;
     /** Whether the waves come automatically on a timer. If not, waves come when the play button is pressed. */
     public boolean waveTimer = true;
@@ -30,15 +30,11 @@ public class Rules{
     public float unitBuildSpeedMultiplier = 1f;
     /** How much health units start with. */
     public float unitHealthMultiplier = 1f;
-    /** How much health players start with. */
-    public float playerHealthMultiplier = 1f;
     /** How much health blocks start with. */
     public float blockHealthMultiplier = 1f;
-    /** How much damage player mechs deal. */
-    public float playerDamageMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
-    /** Multiplier for buildings for the player. */
+    /** Multiplier for buildings resource cost. */
     public float buildCostMultiplier = 1f;
     /** Multiplier for building speed. */
     public float buildSpeedMultiplier = 1f;

@@ -15,6 +15,10 @@ public interface UnitController{
 
     }
 
+    default void removed(Unitc unit){
+
+    }
+
     default boolean isBeingControlled(Unitc player){
         return false;
     }

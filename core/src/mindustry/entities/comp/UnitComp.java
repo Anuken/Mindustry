@@ -71,6 +71,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return controller;
     }
 
+    public void resetController(){
+        controller(type.createController());
+    }
+
     @Override
     public void set(UnitType def, UnitController controller){
         type(type);
@@ -125,6 +129,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public void remove(){
         teamIndex.updateCount(team(), -1);
+        controller.removed(this);
     }
 
     @Override

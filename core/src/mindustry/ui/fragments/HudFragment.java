@@ -183,7 +183,7 @@ public class HudFragment extends Fragment{
                     t.table(teams -> {
                         teams.left();
                         int i = 0;
-                        for(Team team : Team.base()){
+                        for(Team team : Team.baseTeams){
                             ImageButton button = teams.button(Tex.whiteui, Styles.clearTogglePartiali, 40f, () -> Call.setPlayerTeamEditor(player, team))
                                 .size(50f).margin(6f).get();
                             button.getImageCell().grow();
@@ -326,9 +326,9 @@ public class HudFragment extends Fragment{
                     c.clearChildren();
 
                     for(Item item : content.items()){
-                        if(state.stats.getExport(item) >= 1){
+                        if(state.secinfo.getExport(item) >= 1){
                             c.image(item.icon(Cicon.small));
-                            c.label(() -> (int)state.stats.getExport(item) + " /s").color(Color.lightGray);
+                            c.label(() -> (int)state.secinfo.getExport(item) + " /s").color(Color.lightGray);
                             c.row();
                         }
                     }
@@ -337,7 +337,7 @@ public class HudFragment extends Fragment{
                 c.update(() -> {
                     boolean wrong = false;
                     for(Item item : content.items()){
-                        boolean has = state.stats.getExport(item) >= 1;
+                        boolean has = state.secinfo.getExport(item) >= 1;
                         if(used.get(item.id) != has){
                             used.set(item.id, has);
                             wrong = true;

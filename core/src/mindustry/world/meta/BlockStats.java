@@ -55,7 +55,7 @@ public class BlockStats{
             map.put(stat.category, new OrderedMap<>());
         }
 
-        map.get(stat.category).getOr(stat, Array::new).add(value);
+        map.get(stat.category).get(stat, Array::new).add(value);
 
         dirty = true;
     }

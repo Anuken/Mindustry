@@ -14,6 +14,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.campaign.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.distribution.*;
@@ -70,7 +71,7 @@ public class Blocks implements ContentList{
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
 
     //storage
-    coreShard, coreFoundation, coreNucleus, vault, container, unloader, launchPad, launchPadLarge,
+    coreShard, coreFoundation, coreNucleus, vault, container, unloader,
 
     //turrets
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
@@ -78,8 +79,10 @@ public class Blocks implements ContentList{
     //units
     groundFactory, airFactory, navalFactory, basicReconstructor, repairPoint,
 
-    //misc experimental
+    //campaign
+    launchPad, launchPadLarge, coreSilo, dataProcessor,
 
+    //misc experimental
     blockForge, blockLauncher, blockLoader, blockUnloader;
 
     @Override
@@ -1315,25 +1318,6 @@ public class Blocks implements ContentList{
             speed = 7f;
         }};
 
-        launchPad = new LaunchPad("launch-pad"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
-            size = 3;
-            itemCapacity = 100;
-            launchTime = 60f * 20;
-            hasPower = true;
-            consumes.power(4f);
-        }};
-
-        launchPadLarge = new LaunchPad("launch-pad-large"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
-            size = 4;
-            itemCapacity = 300;
-            launchTime = 60f * 35;
-            hasPower = true;
-            consumes.power(6f);
-        }};
-
-
         //endregion
         //region turrets
 
@@ -1359,7 +1343,7 @@ public class Blocks implements ContentList{
             rotatespeed = 10f;
         }};
 
-        scatter = new BurstTurret("scatter"){{
+        scatter = new ItemTurret("scatter"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 85, Items.lead, 45));
             ammo(
             Items.scrap, Bullets.flakScrap,
@@ -1399,13 +1383,14 @@ public class Blocks implements ContentList{
             shootSound = Sounds.flame;
         }};
 
-        hail = new ArtilleryTurret("hail"){{
+        hail = new ItemTurret("hail"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 40, Items.graphite, 17));
             ammo(
             Items.graphite, Bullets.artilleryDense,
             Items.silicon, Bullets.artilleryHoming,
             Items.pyratite, Bullets.artilleryIncendiary
             );
+            targetAir = false;
             reloadTime = 60f;
             recoilAmount = 2f;
             range = 230f;
@@ -1423,11 +1408,13 @@ public class Blocks implements ContentList{
             Liquids.cryofluid, Bullets.cryoShot,
             Liquids.oil, Bullets.oilShot
             );
+            targetAir = false;
             size = 2;
             recoilAmount = 0f;
             reloadTime = 2f;
             inaccuracy = 5f;
             shootCone = 50f;
+            liquidCapacity = 10f;
             shootEffect = Fx.shootLiquid;
             range = 110f;
             health = 250 * size * size;
@@ -1474,7 +1461,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.spark;
         }};
 
-        swarmer = new BurstTurret("swarmer"){{
+        swarmer = new ItemTurret("swarmer"){{
             requirements(Category.turret, ItemStack.with(Items.graphite, 35, Items.titanium, 35, Items.plastanium, 45, Items.silicon, 30));
             ammo(
             Items.blastCompound, Bullets.missileExplosive,
@@ -1492,7 +1479,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.missile;
         }};
 
-        salvo = new BurstTurret("salvo"){{
+        salvo = new ItemTurret("salvo"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 105, Items.graphite, 95, Items.titanium, 60));
             ammo(
             Items.copper, Bullets.standardCopper,
@@ -1570,7 +1557,7 @@ public class Blocks implements ContentList{
             });
         }};
 
-        ripple = new ArtilleryTurret("ripple"){{
+        ripple = new ItemTurret("ripple"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 150, Items.graphite, 135, Items.titanium, 60));
             ammo(
             Items.graphite, Bullets.artilleryDense,
@@ -1579,6 +1566,8 @@ public class Blocks implements ContentList{
             Items.blastCompound, Bullets.artilleryExplosive,
             Items.plastanium, Bullets.artilleryPlastic
             );
+
+            targetAir = false;
             size = 3;
             shots = 4;
             inaccuracy = 12f;
@@ -1591,6 +1580,7 @@ public class Blocks implements ContentList{
             recoilAmount = 6f;
             shootShake = 2f;
             range = 290f;
+            minRange = 50f;
 
             health = 130 * size * size;
             shootSound = Sounds.artillery;
@@ -1773,6 +1763,41 @@ public class Blocks implements ContentList{
         new LegacyCommandCenter("legacy-command-center");
 
         //endregion
+        //region campaign
+
+        launchPad = new LaunchPad("launch-pad"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+            size = 3;
+            itemCapacity = 100;
+            launchTime = 60f * 20;
+            hasPower = true;
+            consumes.power(4f);
+        }};
+
+        launchPadLarge = new LaunchPad("launch-pad-large"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
+            size = 4;
+            itemCapacity = 300;
+            launchTime = 60f * 35;
+            hasPower = true;
+            consumes.power(6f);
+        }};
+
+        coreSilo = new CoreLauncher("core-silo"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+            size = 5;
+            itemCapacity = 1000;
+            hasPower = true;
+            consumes.power(4f);
+        }};
+
+        dataProcessor = new ResearchBlock("data-processor"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+
+            size = 3;
+        }};
+
+        //endregion campaign
         //region experimental
 
         blockForge = new BlockForge("block-forge"){{

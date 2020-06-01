@@ -126,7 +126,6 @@ public class Renderer implements ApplicationListener{
                 bloom = null;
             }
             bloom = new Bloom(true);
-            bloom.setClearColor(0f, 0f, 0f, 0f);
         }catch(Throwable e){
             e.printStackTrace();
             settings.put("bloom", false);
@@ -186,7 +185,6 @@ public class Renderer implements ApplicationListener{
         graphics.clear(clearColor);
         Draw.reset();
 
-        //TODO 'animated water' is a bad name for this setting
         if(Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")){
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }

@@ -1,4 +1,4 @@
-package mindustry.world.blocks.production;
+package mindustry.world.blocks.campaign;
 
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
@@ -9,6 +9,7 @@ import mindustry.gen.*;
 import mindustry.world.*;
 
 public class ResearchBlock extends Block{
+    public float researchSpeed = 1f;
 
     public ResearchBlock(String name){
         super(name);
@@ -31,6 +32,14 @@ public class ResearchBlock extends Block{
         @Override
         public void buildConfiguration(Table table){
 
+        }
+
+        @Override
+        public boolean configTapped(){
+            //TODO select target
+            Vars.ui.tech.show();
+
+            return false;
         }
 
         @Override

@@ -300,25 +300,6 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
-    protected int schemOriginX(){
-        Tmp.v1.setZero();
-        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
-        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).x);
-    }
-
-    @Override
-    protected int schemOriginY(){
-        Tmp.v1.setZero();
-        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
-        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).y);
-    }
-
-    @Override
-    public boolean isPlacing(){
-        return super.isPlacing() && mode == placing;
-    }
-
-    @Override
     public void drawBottom(){
         Lines.stroke(1f);
 
@@ -378,13 +359,11 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(mode == placing && block != null){
                 //draw placing
                 for(int i = 0; i < lineRequests.size; i++){
-                    BuildRequest req = lineRequests.get(i);
-                    if(i == lineRequests.size - 1 && req.block.rotate){
-                        drawArrow(block, req.x, req.y, req.rotation);
-                    }
-
                     BuildRequest request = lineRequests.get(i);
-                    request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(req.x, request.y, request.block.size, null) == null);
+                    if(i == lineRequests.size - 1 && request.block.rotate){
+                        drawArrow(block, request.x, request.y, request.rotation);
+                    }
+                    request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
                     drawSelected(request.x, request.y, request.block, Pal.accent);
                 }
             }else if(mode == breaking){
@@ -447,7 +426,26 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     //endregion
-    //region input events
+    //region input events, overrides
+
+    @Override
+    protected int schemOriginX(){
+        Tmp.v1.setZero();
+        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
+        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).x);
+    }
+
+    @Override
+    protected int schemOriginY(){
+        Tmp.v1.setZero();
+        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
+        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).y);
+    }
+
+    @Override
+    public boolean isPlacing(){
+        return super.isPlacing() && mode == placing;
+    }
 
     @Override
     public boolean isBreaking(){

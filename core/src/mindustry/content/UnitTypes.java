@@ -16,7 +16,10 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType titan, dagger, crawler, fortress, eruptor, chaosArray, eradicator;
 
     //ground + builder
-    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType oculon, tau;
+    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType tau;
+
+    //ground + builder + miner + commander
+    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType oculon;
 
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType cix;
@@ -206,8 +209,19 @@ public class UnitTypes implements ContentList{
                 recoil = 4f;
                 shake = 2f;
                 ejectEffect = Fx.shellEjectMedium;
-                bullet = Bullets.artilleryUnit;
                 shootSound = Sounds.artillery;
+                bullet = new ArtilleryBulletType(2f, 8, "shell"){{
+                    hitEffect = Fx.blastExplosion;
+                    knockback = 0.8f;
+                    lifetime = 110f;
+                    bulletWidth = bulletHeight = 14f;
+                    collides = true;
+                    collidesTiles = true;
+                    splashDamageRadius = 20f;
+                    splashDamage = 38f;
+                    backColor = Pal.bulletYellowBack;
+                    frontColor = Pal.bulletYellow;
+                }};
             }});
         }};
 
@@ -280,6 +294,55 @@ public class UnitTypes implements ContentList{
                 bullet = Bullets.bombExplosive;
                 shootSound = Sounds.none;
             }});
+        }};
+
+        revenant = new UnitType("revenant"){{
+            ghoul.upgrade = this;
+            tier = 3;
+
+            health = 220;
+            speed = 1.9f;
+            accel = 0.04f;
+            drag = 0.016f;
+            flying = true;
+            range = 140f;
+            //rotateShooting = false;
+            hitsize = 18f;
+            lowAltitude = true;
+
+            engineOffset = 12f;
+            engineSize = 3f;
+
+            for(boolean b : Mathf.booleans){
+                weapons.add(
+                new Weapon("revenant-missiles"){{
+                    reload = 70f;
+                    x = 7f * Mathf.sign(b);
+                    rotate = true;
+                    mirror = false;
+                    flipSprite = !b;
+                    shake = 1f;
+
+                    bullet = new MissileBulletType(2.7f, 12, "missile"){{
+                        bulletWidth = 8f;
+                        bulletHeight = 8f;
+                        bulletShrink = 0f;
+                        drag = -0.003f;
+                        homingRange = 60f;
+                        keepVelocity = false;
+                        splashDamageRadius = 25f;
+                        splashDamage = 10f;
+                        lifetime = 60f;
+                        trailColor = Pal.unitBack;
+                        backColor = Pal.unitBack;
+                        frontColor = Pal.unitFront;
+                        hitEffect = Fx.blastExplosion;
+                        despawnEffect = Fx.blastExplosion;
+                        weaveScale = 6f;
+                        weaveMag = 1f;
+                    }};
+                }});
+            }
         }};
 
         reaper = new UnitType("reaper"){{
@@ -517,37 +580,6 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        revenant = new UnitType("revenant", HoverUnit::new){{
-            health = 1000;
-            mass = 5f;
-            hitsize = 20f;
-            speed = 0.1f;
-            maxVelocity = 1f;
-            drag = 0.01f;
-            range = 80f;
-            shootCone = 40f;
-            flying = true;
-            //rotateWeapons = true;
-            engineOffset = 12f;
-            engineSize = 3f;
-            rotatespeed = 0.01f;
-            attackLength = 90f;
-            baseRotateSpeed = 0.06f;
-            weapons.add(new Weapon("revenant-missiles"){{
-                length = 3f;
-                reload = 70f;
-                width = 10f;
-                shots = 2;
-                inaccuracy = 2f;
-                alternate = true;
-                ejectEffect = Fx.none;
-                velocityRnd = 0.2f;
-                spacing = 1f;
-                shootSound = Sounds.missile;
-                bullet = Bullets.missileRevenant;
-            }});
-        }};
-
         lich = new UnitType("lich", HoverUnit::new){{
             health = 6000;
             mass = 20f;
@@ -622,47 +654,6 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.shootBig;
             }});
         }};
-
-
-        /*
-        vanguard = new UnitType("vanguard-ship"){
-            float healRange = 60f;
-            float healReload = 200f;
-            float healPercent = 10f;
-
-            {
-                flying = true;
-                drillTier = 1;
-                mineSpeed = 4f;
-                speed = 0.49f;
-                drag = 0.09f;
-                health = 200f;
-                weaponOffsetX = -1;
-                engineSize = 2.3f;
-                weaponOffsetY = -1;
-                engineColor = Pal.lightTrail;
-                cellTrnsY = 1f;
-                buildSpeed = 1.2f;
-                weapons.add(new Weapon("vanguard-gun"){{
-                    length = 1.5f;
-                    reload = 30f;
-                    alternate = true;
-                    inaccuracy = 6f;
-                    velocityRnd = 0.1f;
-                    ejectEffect = Fx.none;
-                    bullet = new HealBulletType(){{
-                        healPercent = 3f;
-                        backColor = engineColor;
-                        homingPower = 20f;
-                        bulletHeight = 4f;
-                        bulletWidth = 1.5f;
-                        damage = 3f;
-                        speed = 4f;
-                        lifetime = 40f;
-                        shootEffect = Fx.shootHealYellow;
-                        smokeEffect = hitEffect = despawnEffect = Fx.hitYellowLaser;
-                    }});
-        }};
             }
 
             @Override
@@ -681,46 +672,6 @@ public class UnitTypes implements ContentList{
                     }
                 }
             }
-        };
-
-        "alpha "= new UnitType("alpha-mech", false){
-            {
-                drillTier = -1;
-                speed = 0.5f;
-                boostSpeed = 0.95f;
-                itemCapacity = 15;
-                mass = 0.9f;
-                health = 150f;
-                buildSpeed = 0.9f;
-                weaponOffsetX = 1;
-                weaponOffsetY = -1;
-                engineColor = Pal.heal;
-
-                weapons.add(new Weapon("shockgun"){{
-                    shake = 2f;
-                    length = 0.5f;
-                    reload = 70f;
-                    alternate = true;
-                    recoil = 4f;
-                    width = 5f;
-                    shootSound = Sounds.laser;
-
-                    bullet = new LaserBulletType(){{
-                        damage = 20f;
-                        recoil = 1f;
-                        sideAngle = 45f;
-                        sideWidth = 1f;
-                        sideLength = 70f;
-                        colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
-                    }});
-        }};
-            }
-
-            @Override
-            public void update(Playerc player){
-                player.heal(Time.delta() * 0.09f);
-            }
-
         };
 
         delta = new UnitType("delta-mech", false){
@@ -989,48 +940,6 @@ public class UnitTypes implements ContentList{
             }
         };
 
-        trident = new UnitType("trident-ship"){
-            {
-                flying = true;
-                drillPower = 2;
-                speed = 0.15f;
-                drag = 0.034f;
-                mass = 2.5f;
-                turnCursor = false;
-                health = 250f;
-                itemCapacity = 30;
-                engineColor = Color.valueOf("84f491");
-                cellTrnsY = 1f;
-                buildSpeed = 2.5f;
-                weapons.add(new Weapon("bomber"){{
-                    length = 0f;
-                    width = 2f;
-                    reload = 25f;
-                    shots = 2;
-                    shotDelay = 1f;
-                    shots = 8;
-                    alternate = true;
-                    ejectEffect = Fx.none;
-                    velocityRnd = 1f;
-                    inaccuracy = 20f;
-                    ignoreRotation = true;
-                    bullet = new BombBulletType(16f, 25f, "shell"){{
-                        bulletWidth = 10f;
-                        bulletHeight = 14f;
-                        hitEffect = Fx.flakExplosion;
-                        shootEffect = Fx.none;
-                        smokeEffect = Fx.none;
-                        shootSound = Sounds.artillery;
-                    }});
-        }};
-            }
-
-            @Override
-            public boolean canShoot(Playerc player){
-                return player.vel().len() > 1.2f;
-            }
-        };
-
         glaive = new UnitType("glaive-ship"){
             {
                 flying = true;
@@ -1054,8 +963,6 @@ public class UnitTypes implements ContentList{
                     shootSound = Sounds.shootSnap;
                 }};
             }
-        };
-
-        starter = vanguard;*/
+        };*/
     }
 }

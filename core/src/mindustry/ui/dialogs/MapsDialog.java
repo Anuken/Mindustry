@@ -80,7 +80,7 @@ public class MapsDialog extends BaseDialog{
 
 
                         //when you attempt to import a save, it will have no name, so generate one
-                        String name = map.tags.getOr("name", () -> {
+                        String name = map.tags.get("name", () -> {
                             String result = "unknown";
                             int number = 0;
                             while(maps.byName(result + number++) != null);

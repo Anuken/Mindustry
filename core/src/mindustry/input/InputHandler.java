@@ -14,6 +14,8 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.ai.formations.*;
+import mindustry.ai.formations.patterns.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -32,6 +34,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
 import mindustry.world.blocks.power.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.util.*;
 
@@ -172,7 +175,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void onUnitControl(Playerc player, @Nullable Unitc unit){
-        if(unit == null){
+        //clear player unit when they possess a core
+        if((unit instanceof BlockUnitc && ((BlockUnitc)unit).tile() instanceof CoreEntity)){
+            Fx.spawn.at(player);
+            player.clearUnit();
+            player.deathTimer(60f); //for instant respawn
+        }else if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
         }else if(unit.isAI() && unit.team() == player.team()){
@@ -192,6 +200,37 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Fx.spawn.at(player);
         player.clearUnit();
         player.deathTimer(60f); //for instant respawn
+    }
+
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    public static void onUnitCommand(Playerc player){
+        //no free core teleports?
+        if(!player.dead() || !(player.unit() instanceof Commanderc)) return;
+
+        Commanderc commander = (Commanderc)player.unit();
+
+        if(commander.isCommanding()){
+            commander.clearCommand();
+        }else{
+            FormationPattern pattern = new SquareFormation();
+            Formation formation = new Formation(new Vec3(player.x(), player.y(), player.unit().rotation()), pattern);
+            formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
+
+            units.clear();
+
+            Fx.commandSend.at(player);
+            Units.nearby(player.team(), player.x(), player.y(), 200f, u -> {
+                if(u.isAI()){
+                    units.add(u);
+                }
+            });
+
+            units.sort(u -> u.dst2(player.unit()));
+            units.truncate(player.unit().type().commandLimit);
+
+            commander.command(formation, units);
+        }
+
     }
 
     public Eachable<BuildRequest> allRequests(){

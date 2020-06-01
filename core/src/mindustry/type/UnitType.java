@@ -42,6 +42,7 @@ public class UnitType extends UnlockableContent{
     public boolean canBoost = false;
     public float sway = 1f;
     public int payloadCapacity = 1;
+    public int commandLimit = 24;
 
     public int legCount = 4;
     public float legLength = 24f, legSpeed = 0.1f, legTrns = 1f;
@@ -263,10 +264,6 @@ public class UnitType extends UnlockableContent{
 
         if(unit instanceof Trailc){
             Trail trail = ((Trailc)unit).trail();
-
-            float cx = unit.x() + Angles.trnsx(unit.rotation() + 180, offset),
-            cy = unit.y() + Angles.trnsy(unit.rotation() + 180, offset);
-            trail.update(cx, cy);
             trail.draw(unit.team().color, (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * scale));
         }
 
