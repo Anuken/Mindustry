@@ -45,6 +45,8 @@ public class Planet extends UnlockableContent{
     public float orbitTime;
     /** Time for the planet to perform a full revolution, in seconds. One day. */
     public float rotateTime = 24f * 60f;
+    /** Approx. radius of one sector. */
+    public float sectorApproxRadius;
     /** Whether this planet is tidally locked relative to its parent - see https://en.wikipedia.org/wiki/Tidal_locking */
     public boolean tidalLock = false;
     /** Whether the bloom render effect is enabled. */
@@ -80,6 +82,8 @@ public class Planet extends UnlockableContent{
                 sectors.add(new Sector(this, grid.tiles[i], new SectorData()));
             }
 
+            sectorApproxRadius = sectors.first().tile.v.dst(sectors.first().tile.corners[0].v);
+
             //read data for sectors
             Fi data = Vars.tree.get("planets/" + name + ".dat");
             if(data.exists()){
@@ -96,7 +100,6 @@ public class Planet extends UnlockableContent{
             }
 
             for(Sector sector : sectors){
-                sector.unlocked = true;
                 sector.generate();
             }
         }else{

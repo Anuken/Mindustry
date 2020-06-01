@@ -8,17 +8,11 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.game.Objectives.*;
-import mindustry.game.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
-import mindustry.type.Sector.*;
-import mindustry.ui.*;
 
 public class PlanetRenderer implements Disposable{
     public static final float outlineRad = 1.17f, camLength = 4f;
@@ -29,6 +23,10 @@ public class PlanetRenderer implements Disposable{
         shadowColor = new Color(0, 0, 0, 0.7f);
 
     private static final Array<Vec3> points = new Array<>();
+    private static final PlanetInterfaceRenderer emptyRenderer = new PlanetInterfaceRenderer(){
+        @Override public void renderSectors(Planet planet){}
+        @Override public void renderProjections(){}
+    };
 
     /** Camera direction relative to the planet. Length is determined by zoom. */
     public final Vec3 camPos = new Vec3();
@@ -38,15 +36,16 @@ public class PlanetRenderer implements Disposable{
     public Planet planet = Planets.starter;
     /** Camera used for rendering. */
     public Camera3D cam = new Camera3D();
+    /** Raw vertex batch. */
+    public final VertexBatch3D batch = new VertexBatch3D(10000, false, true, 0);
 
-    public float zoom = 1f, selectAlpha = 1f;
-    public @Nullable Sector selected, hovered;
+    public float zoom = 1f;
 
     private final Mesh[] outlines = new Mesh[10];
-    private final VertexBatch3D batch = new VertexBatch3D(10000, false, true, 0);
     private final PlaneBatch3D projector = new PlaneBatch3D();
     private final Mat3D mat = new Mat3D();
     private final FrameBuffer buffer = new FrameBuffer(2, 2, true);
+    private PlanetInterfaceRenderer irenderer;
 
     private final Bloom bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false){{
         setThreshold(0.8f);
@@ -64,7 +63,9 @@ public class PlanetRenderer implements Disposable{
     }
 
     /** Render the entire planet scene to the screen. */
-    public void render(){
+    public void render(PlanetInterfaceRenderer irenderer){
+        this.irenderer = irenderer;
+
         Draw.flush();
         Gl.clear(Gl.depthBufferBit);
         Gl.enable(Gl.depthTest);
@@ -95,21 +96,7 @@ public class PlanetRenderer implements Disposable{
 
         Gl.enable(Gl.blend);
 
-        //TODO perhaps draw this somewhere else
-        if(hovered != null){
-            Draw.batch(projector, () -> {
-                setPlane(hovered);
-                Draw.color(Color.white, Pal.accent, Mathf.absin(5f, 1f));
-
-                TextureRegion icon = hovered.locked() ? Icon.lock.getRegion() : hovered.is(SectorAttribute.naval) ? Liquids.water.icon(Cicon.large) : null;
-
-                if(icon != null){
-                    Draw.rect(icon, 0, 0);
-                }
-
-                Draw.reset();
-            });
-        }
+        irenderer.renderProjections();
 
         Gl.disable(Gl.cullFace);
         Gl.disable(Gl.depthTest);
@@ -168,46 +155,7 @@ public class PlanetRenderer implements Disposable{
         //apply transformed position
         batch.proj().mul(planet.getTransform(mat));
 
-        for(Sector sec : planet.sectors){
-
-            if(selectAlpha > 0.01f){
-                if(sec.unlocked()){
-                    Color color =
-                    sec.hasBase() ? Team.sharded.color :
-                    sec.preset != null ? Team.derelict.color :
-                    sec.hasEnemyBase() ? Team.crux.color :
-                    null;
-
-                    if(color != null){
-                        drawSelection(sec, Tmp.c1.set(color).mul(0.8f).a(selectAlpha), 0.026f, -0.001f);
-                    }
-                }else{
-                    draw(sec, Tmp.c1.set(shadowColor).mul(1, 1, 1, selectAlpha), -0.001f);
-                }
-            }
-        }
-
-        if(hovered != null){
-            draw(hovered, hoverColor, -0.001f);
-            drawBorders(hovered, borderColor);
-        }
-
-        if(selected != null){
-            drawSelection(selected);
-            drawBorders(selected, borderColor);
-        }
-
-        batch.flush(Gl.triangles);
-
-        //render arcs
-        if(selected != null && selected.preset != null){
-            for(Objective o : selected.preset.requirements){
-                if(o instanceof SectorObjective){
-                    SectorPreset preset = ((SectorObjective)o).preset;
-                    drawArc(planet, selected.tile.v, preset.sector.tile.v);
-                }
-            }
-        }
+        irenderer.renderSectors(planet);
 
         //render sector grid
         Mesh mesh = outline(planet.grid.size);
@@ -222,12 +170,12 @@ public class PlanetRenderer implements Disposable{
         mesh.render(shader, Gl.lines);
     }
 
-    private void drawArc(Planet planet, Vec3 a, Vec3 b){
-        Vec3 avg = Tmp.v31.set(a).add(b).scl(0.5f);
+    public void drawArc(Planet planet, Vec3 a, Vec3 b){
+        Vec3 avg = Tmp.v31.set(b).add(a).scl(0.5f);
         avg.setLength(planet.radius*2f);
 
         points.clear();
-        points.addAll(Tmp.v33.set(a).setLength(outlineRad), Tmp.v31, Tmp.v34.set(b).setLength(outlineRad));
+        points.addAll(Tmp.v33.set(b).setLength(outlineRad), Tmp.v31, Tmp.v34.set(a).setLength(outlineRad));
         Tmp.bz3.set(points);
         float points = 25;
 
@@ -241,7 +189,7 @@ public class PlanetRenderer implements Disposable{
         batch.flush(Gl.lineStrip);
     }
 
-    private void drawBorders(Sector sector, Color base){
+    public void drawBorders(Sector sector, Color base){
         Color color = Tmp.c1.set(base).a(base.a + 0.3f + Mathf.absin(Time.globalTime(), 5f, 0.3f));
 
         float r1 = 1f;
@@ -268,7 +216,14 @@ public class PlanetRenderer implements Disposable{
         }
     }
 
-    private void setPlane(Sector sector){
+    public void drawPlane(Sector sector, Runnable run){
+        Draw.batch(projector, () -> {
+            setPlane(sector);
+            run.run();
+        });
+    }
+
+    public void setPlane(Sector sector){
         float rotation = -planet.getRotation();
         float length = 0.01f;
 
@@ -282,7 +237,7 @@ public class PlanetRenderer implements Disposable{
         );
     }
 
-    private void draw(Sector sector, Color color, float offset){
+    public void fill(Sector sector, Color color, float offset){
         float rr = outlineRad + offset;
         for(int i = 0; i < sector.tile.corners.length; i++){
             Corner c = sector.tile.corners[i], next = sector.tile.corners[(i+1) % sector.tile.corners.length];
@@ -290,11 +245,11 @@ public class PlanetRenderer implements Disposable{
         }
     }
 
-    private void drawSelection(Sector sector){
+    public void drawSelection(Sector sector){
         drawSelection(sector, Pal.accent, 0.04f, 0.001f);
     }
 
-    private void drawSelection(Sector sector, Color color, float stroke, float length){
+    public void drawSelection(Sector sector, Color color, float stroke, float length){
         float arad = outlineRad + length;
 
         for(int i = 0; i < sector.tile.corners.length; i++){
@@ -347,5 +302,10 @@ public class PlanetRenderer implements Disposable{
                 m.dispose();
             }
         }
+    }
+
+    public interface PlanetInterfaceRenderer{
+        void renderSectors(Planet planet);
+        void renderProjections();
     }
 }

@@ -26,7 +26,6 @@ public class Sector{
 
     public @Nullable SaveSlot save;
     public @Nullable SectorPreset preset;
-    public boolean unlocked;
 
     /** Sector enemy hostility from 0 to 1 */
     public float hostility;
@@ -47,7 +46,7 @@ public class Sector{
      * Only sectors adjacent to non-wave sectors can be landed on.
      * TODO also preset sectors*/
     public boolean unlocked(){
-        return Structs.contains(tile.tiles, p -> planet.getSector(p).isCaptured()) || (preset != null && preset.unlocked());
+        return hasBase() || Structs.contains(tile.tiles, p -> planet.getSector(p).isCaptured()) || (preset != null && preset.unlocked());
     }
 
     /** @return whether the player has a base here. */
