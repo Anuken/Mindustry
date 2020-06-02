@@ -51,7 +51,7 @@ public class Pal{
     stoneGray = Color.valueOf("8f8f8f"),
     engine = Color.valueOf("ffbb64"),
 
-    health = Color.valueOf("ff341c"),
+    health = Color.valueOf("98ffa9"),
     heal = Color.valueOf("98ffa9"),
     bar = Color.slate,
     accent = Color.valueOf("ffd37f"),
