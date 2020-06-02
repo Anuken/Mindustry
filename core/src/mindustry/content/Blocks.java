@@ -1786,8 +1786,10 @@ public class Blocks implements ContentList{
         coreSilo = new CoreLauncher("core-silo"){{
             requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
             size = 5;
-            itemCapacity = 1000;
+            itemCapacity = 500;
             hasPower = true;
+
+            consumes.items(ItemStack.with(Items.copper, 500));
             consumes.power(4f);
         }};
 

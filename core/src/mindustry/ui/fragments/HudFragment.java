@@ -509,6 +509,14 @@ public class HudFragment extends Fragment{
         }
     }
 
+    public void showLaunchDirect(){
+        Image image = new Image();
+        image.getColor().a = 0f;
+        image.setFillParent(true);
+        image.actions(Actions.fadeIn(launchDuration / 60f, Interp.pow2In), Actions.delay(8f / 60f), Actions.remove());
+        Core.scene.add(image);
+    }
+
     public void showLaunch(){
         Image image = new Image();
         image.getColor().a = 0f;

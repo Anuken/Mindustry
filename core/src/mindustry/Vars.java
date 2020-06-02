@@ -83,6 +83,8 @@ public class Vars implements Loadable{
     public static final float turnDuration = 5 * Time.toMinutes;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.05f;
+    /** launch animation duration */
+    public static final float launchDuration = 140f;
     /** tile used in certain situations, instead of null */
     public static Tile emptyTile;
     /** for map generator dialog */

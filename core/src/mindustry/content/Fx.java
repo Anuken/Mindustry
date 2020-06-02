@@ -180,6 +180,12 @@ public class Fx{
         Fill.circle(e.x, e.y, (1f + 6f * e.rotation) - e.fin()*2f);
     }),
 
+    rocketSmokeLarge = new Effect(220, e -> {
+        color(Color.gray);
+        alpha(Mathf.clamp(e.fout()*1.6f - Interp.pow3In.apply(e.rotation)*1.2f));
+        Fill.circle(e.x, e.y, (1f + 6f * e.rotation * 1.3f) - e.fin()*2f);
+    }),
+
     magmasmoke = new Effect(110, e -> {
         color(Color.gray);
         Fill.circle(e.x, e.y, e.fslope() * 6f);

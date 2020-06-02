@@ -128,7 +128,7 @@ public class GlobalData{
 
     /** Returns whether or not this piece of content is unlocked yet. */
     public boolean isUnlocked(UnlockableContent content){
-        return content.alwaysUnlocked() || unlocked.contains(content.name);
+        return content.alwaysUnlocked || unlocked.contains(content.name);
     }
 
     /**
@@ -137,7 +137,7 @@ public class GlobalData{
      * Results are not saved until you call {@link #save()}.
      */
     public void unlockContent(UnlockableContent content){
-        if(content.alwaysUnlocked()) return;
+        if(content.alwaysUnlocked) return;
 
         //fire unlock event so other classes can use it
         if(unlocked.add(content.name)){

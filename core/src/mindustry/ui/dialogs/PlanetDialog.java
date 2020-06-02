@@ -22,6 +22,7 @@ import mindustry.graphics.g3d.PlanetRenderer.*;
 import mindustry.type.*;
 import mindustry.type.Sector.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.campaign.CoreLauncher.*;
 
 import static mindustry.Vars.*;
 import static mindustry.graphics.g3d.PlanetRenderer.*;
@@ -35,6 +36,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     private int launchRange;
     private float zoom = 1f, selectAlpha = 1f;
     private @Nullable Sector selected, hovered, launchSector;
+    private CoreLauncherEntity launcher;
     private Mode mode = look;
 
     public PlanetDialog(){
@@ -96,7 +98,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         return super.show();
     }
 
-    public void show(Sector sector, int range){
+    public void show(Sector sector, int range, CoreLauncherEntity launcher){
+        this.launcher = launcher;
         selected = null;
         hovered = null;
 
@@ -193,6 +196,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     void setup(){
+        zoom = planets.zoom = 1f;
+        selectAlpha = 1f;
+
         cont.clear();
         titleTable.remove();
 
@@ -324,8 +330,18 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     ui.showInfo("You need a naval loadout to launch here.");
                     return;
                 }
-                control.playSector(sector);
+
                 hide();
+
+                if(mode == launch){
+                    launcher.launch();
+                    zoom = 0.5f;
+
+                    ui.hudfrag.showLaunchDirect();
+                    Time.runTask(launchDuration, () -> control.playSector(sector));
+                }else{
+                    control.playSector(sector);
+                }
             }).growX().padTop(2f).height(50f).minWidth(170f);
         }
 
