@@ -149,7 +149,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     boolean dead(){
-        return unit.isNull() || unit.dead() || !unit.isAdded();
+        return unit.isNull() || !unit.isValid();
     }
 
     String uuid(){

@@ -46,7 +46,7 @@ public class Blocks implements ContentList{
 
     //crafting
     siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
-    melter, separator, sporePress, pulverizer, incinerator, coalCentrifuge,
+    melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
     powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, message, illuminator,
@@ -672,6 +672,24 @@ public class Blocks implements ContentList{
 
             consumes.power(1f);
             consumes.liquid(Liquids.slag, 0.07f);
+        }};
+
+        disassembler = new Separator("disassembler"){{
+            requirements(Category.crafting, ItemStack.with(Items.graphite, 150, Items.titanium, 100, Items.silicon, 150, Items.surgealloy, 70));
+            results = ItemStack.with(
+            Items.sand, 4,
+            Items.graphite, 2,
+            Items.titanium, 2,
+            Items.thorium, 1
+            );
+            hasPower = true;
+            craftTime = 15f;
+            size = 3;
+            itemCapacity = 20;
+
+            consumes.power(4f);
+            consumes.item(Items.scrap);
+            consumes.liquid(Liquids.slag, 0.1f);
         }};
 
         sporePress = new GenericCrafter("spore-press"){{

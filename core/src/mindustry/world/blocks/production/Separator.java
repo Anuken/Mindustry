@@ -63,7 +63,15 @@ public class Separator extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return items.total() < itemCapacity;
+            int total = items.total();
+            //very inefficient way of allowing separators to ignore input buffer storage
+            if(consumes.has(ConsumeType.item) && consumes.get(ConsumeType.item) instanceof ConsumeItems){
+                ConsumeItems c = consumes.get(ConsumeType.item);
+                for(ItemStack stack : c.items){
+                    total -= items.get(stack.item);
+                }
+            }
+            return total < itemCapacity;
         }
 
         @Override
@@ -119,6 +127,11 @@ public class Separator extends Block{
             if(timer(timerDump, dumpTime)){
                 dump();
             }
+        }
+
+        @Override
+        public boolean canDump(Tilec to, Item item){
+            return !consumes.itemFilters.get(item.id);
         }
 
         @Override
