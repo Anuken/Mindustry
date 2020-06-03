@@ -95,20 +95,30 @@ public class PayloadConveyor extends Block{
                             //move forward.
                             next.handlePayload(this, item);
                             item = null;
+                            moved();
                         }
                     }else if(!blocked){
                         //dump item forward
                         if(item.dump()){
                             item = null;
+                            moved();
                         }
                     }
                 }
             }
         }
 
+        public void moved(){
+
+        }
+
+        public void drawBottom(){
+            super.draw();
+        }
+
         @Override 
         public void draw(){
-            super.draw();
+            drawBottom();
 
             float dst = 0.8f;
 

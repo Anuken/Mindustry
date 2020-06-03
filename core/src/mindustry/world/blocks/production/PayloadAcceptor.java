@@ -28,7 +28,8 @@ public class PayloadAcceptor extends Block{
             accept.block().size == size &&
             accept.block().outputsPayload &&
             //block must either be facing this one, or not be rotating
-            ((accept.tileX() + Geometry.d4(accept.rotation()).x * size == tile.tileX() && accept.tileY() + Geometry.d4(accept.rotation()).y * size == tile.tileY()) || !accept.block().rotate);
+            ((accept.tileX() + Geometry.d4(accept.rotation()).x * size == tile.tileX() && accept.tileY() + Geometry.d4(accept.rotation()).y * size == tile.tileY())
+            || !accept.block().rotate  || (accept.block().rotate && !accept.block().outputFacing));
     }
 
     public class PayloadAcceptorEntity<T extends Payload> extends TileEntity{

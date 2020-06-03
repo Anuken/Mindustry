@@ -58,7 +58,7 @@ public class Blocks implements ContentList{
 
     //transport
     conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
-    overflowGate, underflowGate, massDriver, massConveyor,
+    overflowGate, underflowGate, massDriver, payloadConveyor, payloadRouter,
 
     //liquid
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
@@ -990,7 +990,11 @@ public class Blocks implements ContentList{
             consumes.power(1.75f);
         }};
 
-        massConveyor = new PayloadConveyor("mass-conveyor"){{
+        payloadConveyor = new PayloadConveyor("mass-conveyor"){{
+            requirements(Category.distribution, ItemStack.with(Items.copper, 1));
+        }};
+
+        payloadRouter = new PayloadRouter("payload-router"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1));
         }};
 
