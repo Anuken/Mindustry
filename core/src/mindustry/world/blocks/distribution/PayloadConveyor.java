@@ -118,7 +118,7 @@ public class PayloadConveyor extends Block{
 
         @Override 
         public void draw(){
-            drawBottom();
+            super.draw();
 
             float dst = 0.8f;
 
