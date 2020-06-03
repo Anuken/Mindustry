@@ -65,8 +65,6 @@ public class Vars implements Loadable{
     public static final Array<String> defaultServers = Array.with();
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
-    /** whether to enable editing of units in the editor */
-    public static final boolean enableUnitEditing = false;
     /** max chat message length */
     public static final int maxTextLength = 150;
     /** max player name length in bytes */
