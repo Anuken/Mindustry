@@ -80,7 +80,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Override
     public void update(){
-        if(unit.dead() || !unit.isAdded()){
+        if(!unit.isValid()){
             clearUnit();
         }
 

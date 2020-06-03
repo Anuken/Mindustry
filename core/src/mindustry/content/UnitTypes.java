@@ -99,9 +99,6 @@ public class UnitTypes implements ContentList{
         }};
 
         titan = new UnitType("titan"){{
-            dagger.upgrade = this;
-            tier = 2;
-
             speed = 0.4f;
             hitsize = 9f;
             range = 10f;
@@ -193,9 +190,6 @@ public class UnitTypes implements ContentList{
         };
 
         fortress = new UnitType("fortress"){{
-            titan.upgrade = this;
-            tier = 3;
-
             speed = 0.38f;
             hitsize = 13f;
             rotateSpeed = 3f;
@@ -226,9 +220,6 @@ public class UnitTypes implements ContentList{
         }};
 
         eruptor = new UnitType("eruptor"){{
-            crawler.upgrade = this;
-            tier = 2;
-
             speed = 0.4f;
             drag = 0.4f;
             hitsize = 10f;
@@ -269,9 +260,6 @@ public class UnitTypes implements ContentList{
         }};
 
         ghoul = new UnitType("ghoul"){{
-            wraith.upgrade = this;
-            tier = 2;
-
             health = 220;
             speed = 2f;
             accel = 0.08f;
@@ -297,9 +285,6 @@ public class UnitTypes implements ContentList{
         }};
 
         revenant = new UnitType("revenant"){{
-            ghoul.upgrade = this;
-            tier = 3;
-
             health = 220;
             speed = 1.9f;
             accel = 0.04f;
@@ -459,8 +444,6 @@ public class UnitTypes implements ContentList{
         }};
 
         oculon = new UnitType("oculon"){{
-            tier = 2;
-
             drillTier = -1;
             speed = 0.6f;
             hitsize = 9f;
@@ -492,8 +475,6 @@ public class UnitTypes implements ContentList{
         }};
 
         trident = new UnitType("trident"){{
-            //wraith.upgrade = this;
-            tier = 3;
 
             health = 500;
             speed = 2f;

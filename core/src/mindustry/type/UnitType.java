@@ -32,8 +32,6 @@ public class UnitType extends UnlockableContent{
     public boolean flying;
     public @NonNull Prov<? extends Unitc> constructor;
     public @NonNull Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
-    public @Nullable UnitType upgrade;
-    public int tier = 1;
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, accel = 0.5f, landShake = 0f;
     public float health = 200f, range = -1, armor = 0f;

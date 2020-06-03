@@ -45,6 +45,11 @@ abstract class BlockUnitComp implements Unitc{
     }
 
     @Replace
+    public boolean isValid(){
+        return tile != null && tile.isValid();
+    }
+
+    @Replace
     public void team(Team team){
         if(tile != null && this.team != team){
             this.team = team;

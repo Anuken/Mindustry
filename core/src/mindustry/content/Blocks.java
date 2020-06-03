@@ -1701,6 +1701,12 @@ public class Blocks implements ContentList{
             itemCapacity = 30;
 
             constructTime = 60f * 5f;
+
+            upgrades = new UnitType[][]{
+                {UnitTypes.dagger, UnitTypes.titan},
+                {UnitTypes.crawler, UnitTypes.eruptor},
+                {UnitTypes.wraith, UnitTypes.ghoul},
+            };
         }};
 
         repairPoint = new RepairPoint("repair-point"){{
