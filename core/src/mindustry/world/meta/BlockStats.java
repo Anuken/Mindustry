@@ -38,9 +38,13 @@ public class BlockStats{
     }
 
     public void add(BlockStat stat, Attribute attr){
+        add(stat, attr, 1f);
+    }
+
+    public void add(BlockStat stat, Attribute attr, float scale){
         for(Block block : Vars.content.blocks()){
             if(!block.isFloor() || block.asFloor().attributes.get(attr) == 0) continue;
-            add(stat, new FloorEfficiencyValue(block.asFloor(), block.asFloor().attributes.get(attr)));
+            add(stat, new FloorEfficiencyValue(block.asFloor(), block.asFloor().attributes.get(attr) * scale));
         }
     }
 

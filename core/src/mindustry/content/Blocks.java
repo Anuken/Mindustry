@@ -45,7 +45,7 @@ public class Blocks implements ContentList{
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
 
     //crafting
-    siliconSmelter, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
+    siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
@@ -483,6 +483,22 @@ public class Blocks implements ContentList{
 
             consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2));
             consumes.power(0.50f);
+        }};
+
+        siliconCrucible = new ThermalSmelter("silicon-crucible"){{
+            requirements(Category.crafting, ItemStack.with(Items.titanium, 120, Items.metaglass, 80, Items.plastanium, 35, Items.silicon, 60));
+            craftEffect = Fx.smeltsmoke;
+            outputItem = new ItemStack(Items.silicon, 5);
+            craftTime = 140f;
+            size = 3;
+            hasPower = true;
+            hasLiquids = false;
+            flameColor = Color.valueOf("ffef99");
+            itemCapacity = 30;
+            heatBoostScale = 0.15f;
+
+            consumes.items(new ItemStack(Items.coal, 3), new ItemStack(Items.sand, 6), new ItemStack(Items.pyratite, 1));
+            consumes.power(4f);
         }};
 
         kiln = new GenericSmelter("kiln"){{
