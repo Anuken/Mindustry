@@ -53,7 +53,7 @@ public class Blocks implements ContentList{
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
-    phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, forceProjector, shockMine,
+    phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, largeOverdriveProjector, forceProjector, shockMine,
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //transport
@@ -894,6 +894,18 @@ public class Blocks implements ContentList{
             consumes.item(Items.phasefabric).boost();
         }};
 
+        //TODO better name
+        largeOverdriveProjector = new OverdriveProjector("large-overdrive-projector"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 130, Items.silicon, 130, Items.plastanium, 80, Items.surgealloy, 120));
+            consumes.power(10f);
+            size = 3;
+            range = 180f;
+            speedBoost = 1.5f;
+            speedBoostPhase = 1f;
+            useTime = 250f;
+            consumes.item(Items.phasefabric).boost();
+        }};
+
         forceProjector = new ForceProjector("force-projector"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 100, Items.titanium, 75, Items.silicon, 125));
             size = 3;
@@ -1678,7 +1690,7 @@ public class Blocks implements ContentList{
             requirements(Category.turret, ItemStack.with(Items.silicon, 80, Items.thorium, 80, Items.surgealloy, 50));
 
             hasPower = true;
-            consumes.power(1.1f);
+            consumes.power(2f);
             size = 2;
             shootLength = 5f;
             bulletDamage = 12f;

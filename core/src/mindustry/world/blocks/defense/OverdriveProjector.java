@@ -105,8 +105,8 @@ public class OverdriveProjector extends Block{
             Draw.alpha(heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
             Draw.rect(topRegion, x, y);
             Draw.alpha(1f);
-            Lines.stroke((2f * f + 0.2f) * heat);
-            Lines.square(x, y, (1f - f) * 8f);
+            Lines.stroke((2f * f + 0.1f) * heat);
+            Lines.square(x, y, Math.min(1f + (1f - f) * size * tilesize / 2f, size * tilesize/2f));
 
             Draw.reset();
         }
