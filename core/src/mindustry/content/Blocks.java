@@ -485,7 +485,7 @@ public class Blocks implements ContentList{
             consumes.power(0.50f);
         }};
 
-        siliconCrucible = new ThermalSmelter("silicon-crucible"){{
+        siliconCrucible = new AttributeSmelter("silicon-crucible"){{
             requirements(Category.crafting, ItemStack.with(Items.titanium, 120, Items.metaglass, 80, Items.plastanium, 35, Items.silicon, 60));
             craftEffect = Fx.smeltsmoke;
             outputItem = new ItemStack(Items.silicon, 5);
@@ -495,7 +495,7 @@ public class Blocks implements ContentList{
             hasLiquids = false;
             flameColor = Color.valueOf("ffef99");
             itemCapacity = 30;
-            heatBoostScale = 0.15f;
+            boostScale = 0.15f;
 
             consumes.items(new ItemStack(Items.coal, 3), new ItemStack(Items.sand, 6), new ItemStack(Items.pyratite, 1));
             consumes.power(4f);
