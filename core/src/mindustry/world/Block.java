@@ -69,7 +69,7 @@ public class Block extends UnlockableContent{
     /** whether unloaders work on this block*/
     public boolean unloadable = true;
     /** whether this is solid */
-    public boolean solid;
+    public boolean solid = false;
     /** whether this block CAN be solid. */
     public boolean solidifes;
     /** whether this is rotateable */
@@ -195,7 +195,6 @@ public class Block extends UnlockableContent{
 
     public Block(String name){
         super(name);
-        this.solid = false;
         initEntity();
     }
 
