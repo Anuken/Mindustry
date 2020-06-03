@@ -63,6 +63,8 @@ public abstract class BulletType extends Content{
     public boolean keepVelocity = true;
     /** Whether to scale velocity to disappear at the target position. Used for artillery. */
     public boolean scaleVelocity;
+    /** Whether this bullet can be hit by point defense. */
+    public boolean hittable = true;
 
     //additional effects
 

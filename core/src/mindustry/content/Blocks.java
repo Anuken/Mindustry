@@ -74,7 +74,7 @@ public class Blocks implements ContentList{
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
 
     //turrets
-    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
+    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment,
 
     //units
     groundFactory, airFactory, navalFactory, basicReconstructor, repairPoint,
@@ -83,7 +83,7 @@ public class Blocks implements ContentList{
     launchPad, launchPadLarge, coreSilo, dataProcessor,
 
     //misc experimental
-    blockForge, blockLauncher, blockLoader, blockUnloader;
+    blockForge, blockLoader, blockUnloader;
 
     @Override
     public void load(){
@@ -1674,6 +1674,18 @@ public class Blocks implements ContentList{
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
         }};
 
+        segment = new PointDefenseTurret("segment"){{
+            requirements(Category.turret, ItemStack.with(Items.silicon, 80, Items.thorium, 80, Items.surgealloy, 50));
+
+            hasPower = true;
+            consumes.power(1.1f);
+            size = 2;
+            shootLength = 5f;
+            bulletDamage = 12f;
+            reloadTime = 25f;
+            health = 190 * size * size;
+        }};
+
         //endregion
         //region units
 
@@ -1833,13 +1845,6 @@ public class Blocks implements ContentList{
             hasPower = true;
             consumes.power(2f);
             size = 3;
-        }};
-
-        blockLauncher = new BlockLauncher("block-launcher"){{
-            requirements(Category.production, BuildVisibility.debugOnly, ItemStack.with(Items.thorium, 100));
-            size = 3;
-            hasPower = true;
-            consumes.power(2f);
         }};
 
         blockLoader = new BlockLoader("block-loader"){{

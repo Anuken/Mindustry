@@ -195,7 +195,6 @@ public class Block extends UnlockableContent{
 
     public Block(String name){
         super(name);
-        this.solid = false;
         initEntity();
     }
 

@@ -367,6 +367,7 @@ public class Bullets implements ContentList{
             despawnEffect = Fx.none;
             status = StatusEffects.shocked;
             statusDuration = 10f;
+            hittable = false;
         }};
 
         healBullet = new HealBulletType(5.2f, 13){{
@@ -431,6 +432,7 @@ public class Bullets implements ContentList{
                 despawnEffect = Fx.none;
                 status = StatusEffects.burning;
                 keepVelocity = false;
+                hittable = false;
             }
 
             @Override
@@ -455,6 +457,7 @@ public class Bullets implements ContentList{
                 hitEffect = Fx.hitFlameSmall;
                 despawnEffect = Fx.none;
                 status = StatusEffects.burning;
+                hittable = false;
             }
 
             @Override
@@ -486,6 +489,7 @@ public class Bullets implements ContentList{
                 drawSize = 420f;
                 lifetime = 16f;
                 pierce = true;
+                hittable = false;
             }
 
             @Override
