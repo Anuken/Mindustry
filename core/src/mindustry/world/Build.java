@@ -91,7 +91,7 @@ public class Build{
             }
 
             //TODO should water blocks be placeable here?
-            if(/*!type.requiresWater && */!contactsGround(tile.x, tile.y, type)){
+            if(/*!type.requiresWater && */!contactsShallows(tile.x, tile.y, type)){
                 return false;
             }
 
@@ -118,7 +118,7 @@ public class Build{
             return true;
         }else{
             return tile.interactable(team)
-                && contactsGround(tile.x, tile.y, type)
+                && contactsShallows(tile.x, tile.y, type)
                 && (!tile.floor().isDeep() || type.floating || type.requiresWater)
                 && tile.floor().placeableOn
                 && (!type.requiresWater || tile.floor().liquidDrop == Liquids.water)
@@ -128,7 +128,22 @@ public class Build{
         }
     }
 
-    private static boolean contactsGround(int x, int y, Block block){
+    public static boolean contactsGround(int x, int y, Block block){
+        if(block.isMultiblock()){
+            for(Point2 point : Edges.getEdges(block.size)){
+                Tile tile = world.tile(x + point.x, y + point.y);
+                if(tile != null && !tile.floor().isLiquid) return true;
+            }
+        }else{
+            for(Point2 point : Geometry.d4){
+                Tile tile = world.tile(x + point.x, y + point.y);
+                if(tile != null && !tile.floor().isLiquid) return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean contactsShallows(int x, int y, Block block){
         if(block.isMultiblock()){
             for(Point2 point : Edges.getInsideEdges(block.size)){
                 Tile tile = world.tile(x + point.x, y + point.y);

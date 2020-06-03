@@ -1,5 +1,7 @@
 package mindustry.world.blocks.campaign;
 
+import arc.Graphics.*;
+import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -11,7 +13,7 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 public class CoreLauncher extends Block{
     public int range = 1;
@@ -38,10 +40,13 @@ public class CoreLauncher extends Block{
 
             if(state.isCampaign() && consValid()){
                 Vars.ui.planet.show(state.rules.sector, range, this);
-
-                cons.trigger();
             }
             return false;
+        }
+
+        @Override
+        public Cursor getCursor(){
+            return consValid() ? SystemCursor.hand : SystemCursor.arrow;
         }
 
         public void launch(){
@@ -50,6 +55,8 @@ public class CoreLauncher extends Block{
             ent.block(Blocks.coreShard);
             ent.lifetime(Vars.launchDuration);
             ent.add();
+
+            cons.trigger();
         }
     }
 
@@ -115,12 +122,6 @@ public class CoreLauncher extends Block{
             if(in.get(3f - fin()*2f)){
                 Fx.rocketSmokeLarge.at(cx() + Mathf.range(r), cy() + Mathf.range(r), fin());
             }
-        }
-
-        @Override
-        public void remove(){
-
-            //TODO something
         }
     }
 }

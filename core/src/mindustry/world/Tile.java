@@ -246,6 +246,15 @@ public class Tile implements Position, QuadTreeObject{
         setOverlay(overlay);
     }
 
+    /** Sets the block to air. */
+    public void setAir(){
+        setBlock(Blocks.air);
+    }
+
+    public void circle(int radius, Intc2 cons){
+        Geometry.circle(x, y, world.width(), world.height(), radius, cons);
+    }
+
     public void recache(){
         if(!headless && !world.isGenerating()){
             renderer.blocks.floor.recacheTile(this);

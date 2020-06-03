@@ -333,6 +333,16 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                 hide();
 
+                //save before launch.
+                if(control.saves.getCurrent() != null && state.isGame()){
+                    try{
+                        control.saves.getCurrent().save();
+                    }catch(Throwable e){
+                        e.printStackTrace();
+                        ui.showException("[accent]" + Core.bundle.get("savefail"), e);
+                    }
+                }
+
                 if(mode == launch){
                     launcher.launch();
                     zoom = 0.5f;

@@ -202,15 +202,15 @@ public class DesktopInput extends InputHandler{
                     shouldShoot = false;
                 }
             }
-
-            if(Core.input.keyDown(Binding.respawn) && !player.dead() && !player.unit().spawnedByCore()){
-                Call.onUnitClear(player);
-                controlledType = null;
-            }
         }
 
         if(!player.dead() && !state.isPaused() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
             updateMovement(player.unit());
+
+            if(Core.input.keyDown(Binding.respawn) && !player.unit().spawnedByCore()){
+                Call.onUnitClear(player);
+                controlledType = null;
+            }
         }
 
         if(Core.input.keyRelease(Binding.select)){

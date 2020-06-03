@@ -1790,7 +1790,7 @@ public class Blocks implements ContentList{
             hasPower = true;
 
             consumes.items(ItemStack.with(Items.copper, 500));
-            consumes.power(4f);
+            consumes.power(3f);
         }};
 
         dataProcessor = new ResearchBlock("data-processor"){{

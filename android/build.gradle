@@ -8,6 +8,8 @@ buildscript{
     }
 
     dependencies{
+        //IMPORTANT NOTICE: any version of the plugin after 3.4.1 will break builds for every API level < 24, perhaps even higher.
+        //it appears abstract methods don't get desugared properly (if at all)
         classpath 'com.android.tools.build:gradle:3.4.1'
     }
 }
