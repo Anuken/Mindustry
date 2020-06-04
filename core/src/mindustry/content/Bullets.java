@@ -86,6 +86,8 @@ public class Bullets implements ContentList{
             collidesTiles = false;
             splashDamageRadius = 25f;
             splashDamage = 33f;
+            reloadMultiplier = 1.2f;
+            ammoMultiplier = 3f;
             homingPower = 0.08f;
             homingRange = 50f;
         }};
@@ -97,7 +99,7 @@ public class Bullets implements ContentList{
             bulletWidth = bulletHeight = 13f;
             collidesTiles = false;
             splashDamageRadius = 25f;
-            splashDamage = 30f;
+            splashDamage = 35f;
             status = StatusEffects.burning;
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
@@ -220,20 +222,20 @@ public class Bullets implements ContentList{
             bulletShrink = 0f;
             drag = -0.01f;
             homingPower = 0.08f;
-            splashDamageRadius = 10f;
-            splashDamage = 10f;
+            splashDamageRadius = 20f;
+            splashDamage = 20f;
             lifetime = 160f;
             hitEffect = Fx.blastExplosion;
             status = StatusEffects.burning;
         }};
 
-        missileSurge = new MissileBulletType(4.4f, 15, "bullet"){{
+        missileSurge = new MissileBulletType(4.4f, 20, "bullet"){{
             bulletWidth = 8f;
             bulletHeight = 8f;
             bulletShrink = 0f;
             drag = -0.01f;
-            splashDamageRadius = 30f;
-            splashDamage = 22f;
+            splashDamageRadius = 28f;
+            splashDamage = 40f;
             lifetime = 150f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
@@ -304,11 +306,11 @@ public class Bullets implements ContentList{
             lifetime = 60f;
         }};
 
-        standardHoming = new BasicBulletType(3f, 9, "bullet"){{
+        standardHoming = new BasicBulletType(3f, 12, "bullet"){{
             bulletWidth = 7f;
             bulletHeight = 9f;
             homingPower = 0.08f;
-            reloadMultiplier = 1.4f;
+            reloadMultiplier = 1.5f;
             ammoMultiplier = 5;
             lifetime = 60f;
         }};
@@ -340,19 +342,19 @@ public class Bullets implements ContentList{
             despawnEffect = Fx.hitBulletSmall;
         }};
 
-        standardDenseBig = new BasicBulletType(7f, 44, "bullet"){{
+        standardDenseBig = new BasicBulletType(7f, 55, "bullet"){{
             bulletWidth = 15f;
             bulletHeight = 21f;
             shootEffect = Fx.shootBig;
         }};
 
-        standardThoriumBig = new BasicBulletType(8f, 67, "bullet"){{
+        standardThoriumBig = new BasicBulletType(8f, 80, "bullet"){{
             bulletWidth = 16f;
             bulletHeight = 23f;
             shootEffect = Fx.shootBig;
         }};
 
-        standardIncendiaryBig = new BasicBulletType(7f, 44, "bullet"){{
+        standardIncendiaryBig = new BasicBulletType(7f, 60, "bullet"){{
             bulletWidth = 16f;
             bulletHeight = 21f;
             frontColor = Pal.lightishOrange;

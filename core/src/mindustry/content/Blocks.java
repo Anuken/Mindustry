@@ -1518,11 +1518,11 @@ public class Blocks implements ContentList{
             Items.pyratite, Bullets.missileIncendiary,
             Items.surgealloy, Bullets.missileSurge
             );
-            reloadTime = 40f;
+            reloadTime = 30f;
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;
-            range = 185f;
+            range = 190f;
             xRand = 6f;
             size = 2;
             health = 300 * size * size;
@@ -1692,7 +1692,7 @@ public class Blocks implements ContentList{
             size = 4;
             shootShake = 2f;
             range = 190f;
-            reloadTime = 80f;
+            reloadTime = 90f;
             firingMoveFract = 0.5f;
             shootDuration = 220f;
             powerUse = 14f;
