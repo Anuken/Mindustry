@@ -7,7 +7,7 @@ import mindustry.net.Administration.*;
 
 import static mindustry.Vars.*;
 
-public class AdminsDialog extends FloatingDialog{
+public class AdminsDialog extends BaseDialog{
 
     public AdminsDialog(){
         super("$server.admins");

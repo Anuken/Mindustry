@@ -1,5 +1,6 @@
 package mindustry.entities.comp;
 
+import arc.math.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.async.PhysicsProcess.*;
 import mindustry.gen.*;
@@ -9,10 +10,17 @@ import mindustry.gen.*;
  * Has mass.*/
 @Component
 abstract class PhysicsComp implements Velc, Hitboxc, Flyingc{
-    transient PhysicRef physref;
-    transient float mass = 1f;
+    @Import float hitSize;
 
-    public void impulse(float x, float y){
+    transient PhysicRef physref;
+
+    //mass is simply the area of this object
+    float mass(){
+        return hitSize * hitSize * Mathf.pi;
+    }
+
+    void impulse(float x, float y){
+        float mass = mass();
         vel().add(x / mass, y / mass);
     }
 }

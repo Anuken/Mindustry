@@ -22,7 +22,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     /** weapon mount array, never null */
     @ReadOnly transient WeaponMount[] mounts = {};
     @ReadOnly transient float range, aimX, aimY;
-    @ReadOnly transient boolean isRotate, isShooting;
+    @ReadOnly transient boolean isRotate;
+    boolean isShooting;
 
     void setWeaponRotation(float rotation){
         for(WeaponMount mount : mounts){
@@ -109,7 +110,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                             shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX * i, weapon.shootY);
                         float shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + (this.rotation - angleTo(mount.aimX, mount.aimY));
 
-                        shoot(weapon, shootX, shootY, shootAngle, -i);
+                        shoot(weapon, shootX, shootY, mount.aimX, mount.aimY, shootAngle, -i);
                     }
 
                     if(mount.weapon.mirror) mount.side = !mount.side;
@@ -119,22 +120,23 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
         }
     }
 
-    private void shoot(Weapon weapon, float x, float y, float rotation, int side){
+    private void shoot(Weapon weapon, float x, float y, float aimX, float aimY, float rotation, int side){
         float baseX = this.x, baseY = this.y;
 
         weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
 
+        BulletType ammo = weapon.bullet;
+        float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1f;
+
         sequenceNum = 0;
         if(weapon.shotDelay > 0.01f){
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
-                Time.run(sequenceNum * weapon.shotDelay, () -> bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy)));
+                Time.run(sequenceNum * weapon.shotDelay, () -> bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl));
                 sequenceNum++;
             });
         }else{
-            Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy)));
+            Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy), lifeScl));
         }
-
-        BulletType ammo = weapon.bullet;
 
         Tmp.v1.trns(rotation + 180f, ammo.recoil);
 
@@ -152,8 +154,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
         ammo.smokeEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? this : null);
     }
 
-    private void bullet(Weapon weapon, float x, float y, float angle){
+    private void bullet(Weapon weapon, float x, float y, float angle, float lifescl){
         Tmp.v1.trns(angle, 3f);
-        weapon.bullet.create(this, team(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd));
+        weapon.bullet.create(this, team(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd), lifescl);
     }
 }

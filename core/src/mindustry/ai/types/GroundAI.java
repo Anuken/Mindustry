@@ -1,6 +1,5 @@
 package mindustry.ai.types;
 
-import arc.util.*;
 import mindustry.ai.Pathfinder.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -17,11 +16,6 @@ public class GroundAI extends AIController{
 
         if(Units.invalidateTarget(target, unit.team(), unit.x(), unit.y(), Float.MAX_VALUE)){
             target = null;
-
-            //TODO this is hacky, cleanup
-            if(unit instanceof Legsc && unit.moving()){
-                unit.lookAt(((Legsc)unit).baseRotation());
-            }
         }
 
         if(retarget()){
@@ -38,7 +32,7 @@ public class GroundAI extends AIController{
             }
 
             if(dst > unit.range() * 0.5f){
-                moveToCore(PathTarget.enemyCores);
+                moveToCore(FlagTarget.enemyCores);
             }
         }
 
@@ -51,19 +45,21 @@ public class GroundAI extends AIController{
             if(unit.type().hasWeapons()){
                 unit.aimLook(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
             }
+        }else if(unit.moving()){
+            unit.lookAt(unit.vel().angle());
         }
 
         unit.controlWeapons(rotate, shoot);
     }
 
-    protected void moveToCore(PathTarget path){
+    protected void moveToCore(FlagTarget path){
         Tile tile = unit.tileOn();
         if(tile == null) return;
         Tile targetTile = pathfinder.getTargetTile(tile, unit.team(), path);
 
         if(tile == targetTile) return;
 
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed * Time.delta()));
+        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
     }
 
     protected void moveAwayFromCore(){
@@ -86,11 +82,11 @@ public class GroundAI extends AIController{
 
         Tile tile = unit.tileOn();
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, enemy, PathTarget.enemyCores);
+        Tile targetTile = pathfinder.getTargetTile(tile, enemy, FlagTarget.enemyCores);
         Tilec core = unit.closestCore();
 
         if(tile == targetTile || core == null || unit.within(core, 120f)) return;
 
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed * Time.delta()));
+        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
     }
 }

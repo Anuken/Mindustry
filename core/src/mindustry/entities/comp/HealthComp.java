@@ -2,7 +2,6 @@ package mindustry.entities.comp;
 
 import arc.math.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 
@@ -53,7 +52,7 @@ abstract class HealthComp implements Entityc{
     /** Damage and pierce armor. */
     void damagePierce(float amount, boolean withEffect){
         if(this instanceof Shieldc){
-            damage(amount / Math.max(1f - ((Shieldc)this).armor(), Vars.minArmorDamage), withEffect);
+            damage(amount + ((Shieldc)this).armor(), withEffect);
         }else{
             damage(amount, withEffect);
         }

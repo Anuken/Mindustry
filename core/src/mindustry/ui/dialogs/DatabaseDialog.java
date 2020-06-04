@@ -16,7 +16,7 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.ui;
 
-public class DatabaseDialog extends FloatingDialog{
+public class DatabaseDialog extends BaseDialog{
 
     public DatabaseDialog(){
         super("$database");

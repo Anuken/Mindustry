@@ -35,8 +35,8 @@ public class UnitFactory extends UnitBlock{
         hasPower = true;
         hasItems = true;
         solid = true;
-        flags = EnumSet.of(BlockFlag.producer, BlockFlag.unitModifier);
-        unitCapModifier = 4;
+        //flags = EnumSet.of(BlockFlag.producer, BlockFlag.unitModifier);
+        //unitCapModifier = 2;
         configurable = true;
         outputsPayload = true;
         rotate = true;
@@ -188,7 +188,7 @@ public class UnitFactory extends UnitBlock{
                 speedScl = Mathf.lerpDelta(speedScl, 0f, 0.05f);
             }
 
-            outputPayload();
+            moveOutPayload();
 
             if(currentPlan != -1 && payload == null){
                 UnitPlan plan = plans[currentPlan];
@@ -196,7 +196,6 @@ public class UnitFactory extends UnitBlock{
                 if(progress >= plan.time && Units.canCreate(team)){
                     progress = 0f;
 
-                    payloadPos = 0f;
                     payload = new UnitPayload(plan.unit.create(team));
                     payVector.setZero();
                     consume();

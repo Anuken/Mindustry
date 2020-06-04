@@ -9,6 +9,7 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
@@ -19,8 +20,8 @@ public class Reconstructor extends UnitBlock{
     public @Load(value = "@-top", fallback = "factory-top") TextureRegion topRegion;
     public @Load(value = "@-out", fallback = "factory-out") TextureRegion outRegion;
     public @Load(value = "@-in", fallback = "factory-in") TextureRegion inRegion;
-    public int tier = 1;
     public float constructTime = 60 * 2;
+    public UnitType[][] upgrades = {};
 
     public Reconstructor(String name){
         super(name);
@@ -57,8 +58,7 @@ public class Reconstructor extends UnitBlock{
             return this.payload == null
                 && relativeTo(source) != rotation()
                 && payload instanceof UnitPayload
-                && ((UnitPayload)payload).unit.type().upgrade != null
-                && ((UnitPayload)payload).unit.type().tier == tier;
+                && hasUpgrade(((UnitPayload)payload).unit.type());
         }
 
         @Override
@@ -79,7 +79,7 @@ public class Reconstructor extends UnitBlock{
                     Draw.alpha(1f - progress/ constructTime);
                     Draw.rect(payload.unit.type().icon(Cicon.full), x, y, rotdeg() - 90);
                     Draw.reset();
-                    Drawf.construct(this, payload.unit.type().upgrade, rotdeg() - 90f, progress / constructTime, speedScl, time);
+                    Drawf.construct(this, upgrade(payload.unit.type()), rotdeg() - 90f, progress / constructTime, speedScl, time);
                 });
             }else{
                 Draw.z(Layer.blockOver);
@@ -98,8 +98,8 @@ public class Reconstructor extends UnitBlock{
 
             if(payload != null){
                 //check if offloading
-                if(payload.unit.type().upgrade == null || payload.unit.type().tier != tier){
-                    outputPayload();
+                if(!hasUpgrade(payload.unit.type())){
+                    moveOutPayload();
                 }else{ //update progress
                     if(moveInPayload()){
                         if(consValid()){
@@ -109,7 +109,7 @@ public class Reconstructor extends UnitBlock{
 
                         //upgrade the unit
                         if(progress >= constructTime){
-                            payload.unit = payload.unit.type().upgrade.create(payload.unit.team());
+                            payload.unit = upgrade(payload.unit.type()).create(payload.unit.team());
                             progress = 0;
                             Effects.shake(2f, 3f, this);
                             Fx.producesmoke.at(this);
@@ -124,7 +124,16 @@ public class Reconstructor extends UnitBlock{
         }
 
         public boolean constructing(){
-            return payload != null && payload.unit.type().upgrade != null && payload.unit.type().tier == tier;
+            return payload != null && hasUpgrade(payload.unit.type());
+        }
+
+        public boolean hasUpgrade(UnitType type){
+            return upgrade(type) != null;
+        }
+
+        public UnitType upgrade(UnitType type){
+            UnitType[] r =  Structs.find(upgrades, arr -> arr[0] == type);
+            return r == null ? null : r[1];
         }
     }
 }

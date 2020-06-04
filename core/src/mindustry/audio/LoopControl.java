@@ -16,7 +16,7 @@ public class LoopControl{
         float baseVol = sound.calcFalloff(pos.getX(), pos.getY());
         float vol = baseVol * volume;
 
-        SoundData data = sounds.getOr(sound, SoundData::new);
+        SoundData data = sounds.get(sound, SoundData::new);
         data.volume += vol;
         data.volume = Mathf.clamp(data.volume, 0f, 1f);
         data.total += baseVol;

@@ -14,7 +14,7 @@ import mindustry.world.*;
  * Does not store game state, just configuration.
  */
 public class Rules{
-    /** Whether the player has infinite resources. */
+    /** Whether the player team has infinite resources. */
     public boolean infiniteResources;
     /** Whether the waves come automatically on a timer. If not, waves come when the play button is pressed. */
     public boolean waveTimer = true;
@@ -30,15 +30,11 @@ public class Rules{
     public float unitBuildSpeedMultiplier = 1f;
     /** How much health units start with. */
     public float unitHealthMultiplier = 1f;
-    /** How much health players start with. */
-    public float playerHealthMultiplier = 1f;
     /** How much health blocks start with. */
     public float blockHealthMultiplier = 1f;
-    /** How much damage player mechs deal. */
-    public float playerDamageMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
-    /** Multiplier for buildings for the player. */
+    /** Multiplier for buildings resource cost. */
     public float buildCostMultiplier = 1f;
     /** Multiplier for building speed. */
     public float buildSpeedMultiplier = 1f;
@@ -48,8 +44,6 @@ public class Rules{
     public float enemyCoreBuildRadius = 400f;
     /** Radius around enemy wave drop zones.*/
     public float dropZoneRadius = 300f;
-    /** Player respawn time in ticks. */
-    public float respawnTime = 60 * 4;
     /** Time between waves in ticks. */
     public float waveSpacing = 60 * 60 * 2;
     /** How many times longer a boss wave takes. */
@@ -62,10 +56,6 @@ public class Rules{
     public @Nullable Sector sector;
     /** Spawn layout. */
     public Array<SpawnGroup> spawns = new Array<>();
-    /** Determines if there should be limited respawns. */
-    public boolean limitedRespawns = false;
-    /** How many times player can respawn during one wave. */
-    public int respawns = 5;
     /** Whether to pause the wave timer until all enemies are destroyed. */
     public boolean waitEnemies = false;
     /** Determinates if gamemode is attack mode */

@@ -12,7 +12,6 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
-import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
@@ -24,10 +23,12 @@ public class Tile implements Position, QuadTreeObject{
     /** Tile entity, usually null. */
     public @Nullable Tilec entity;
     public short x, y;
+    /** Extra data. Used for dumping. */
+    public byte data;
     protected @NonNull Block block;
     protected @NonNull Floor floor;
     protected @NonNull Floor overlay;
-    /** Rotation, 0-3. Also used to store offload location, in which case it can be any number.*/
+    /** Rotation, 0-3. Not guaranteed to be in any specific range. */
     protected byte rotation;
     protected boolean changing = false;
 
@@ -45,7 +46,7 @@ public class Tile implements Position, QuadTreeObject{
         this.block = wall;
 
         //update entity and create it if needed
-        changeEntity(Team.derelict);
+        changeEntity(Team.derelict, wall::newEntity);
         changed();
     }
 
@@ -164,12 +165,16 @@ public class Tile implements Position, QuadTreeObject{
     }
 
     public void setBlock(@NonNull Block type, Team team, int rotation){
+        setBlock(type, team, rotation, type::newEntity);
+    }
+
+    public void setBlock(@NonNull Block type, Team team, int rotation, Prov<Tilec> entityprov){
         changing = true;
 
         this.block = type;
         this.rotation = rotation == 0 ? 0 : (byte)Mathf.mod(rotation, 4);
         preChanged();
-        changeEntity(team);
+        changeEntity(team, entityprov);
 
         if(entity != null){
             entity.team(team);
@@ -239,6 +244,15 @@ public class Tile implements Position, QuadTreeObject{
         Block overlay = this.overlay;
         setFloor(floor);
         setOverlay(overlay);
+    }
+
+    /** Sets the block to air. */
+    public void setAir(){
+        setBlock(Blocks.air);
+    }
+
+    public void circle(int radius, Intc2 cons){
+        Geometry.circle(x, y, world.width(), world.height(), radius, cons);
     }
 
     public void recache(){
@@ -359,7 +373,7 @@ public class Tile implements Position, QuadTreeObject{
     }
 
     /**
-     * Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
+     * Returns the list of all tiles linked to this multiblock.
      * This array contains all linked tiles, including this tile itself.
      */
     public Array<Tile> getLinkedTiles(Array<Tile> tmpArray){
@@ -369,7 +383,7 @@ public class Tile implements Position, QuadTreeObject{
     }
 
     /**
-     * Returns the list of all tiles linked to this multiblock if it were this block, or an empty array if it's not a multiblock.
+     * Returns the list of all tiles linked to this multiblock if it were this block.
      * This array contains all linked tiles, including this tile itself.
      */
     public Array<Tile> getLinkedTilesAs(Block block, Array<Tile> tmpArray){
@@ -523,7 +537,7 @@ public class Tile implements Position, QuadTreeObject{
         }
     }
 
-    protected void changeEntity(Team team){
+    protected void changeEntity(Team team, Prov<Tilec> entityprov){
         if(entity != null){
             int size = entity.block().size;
             entity.remove();
@@ -546,14 +560,7 @@ public class Tile implements Position, QuadTreeObject{
         }
 
         if(block.hasEntity()){
-            entity = block.newEntity().init(this, team, block.update);
-            entity.cons(new ConsumeModule(entity));
-            if(block.hasItems) entity.items(new ItemModule());
-            if(block.hasLiquids) entity.liquids(new LiquidModule());
-            if(block.hasPower){
-                entity.power(new PowerModule());
-                entity.power().graph.add(entity);
-            }
+            entity = entityprov.get().init(this, team, block.update);
         }
     }
 

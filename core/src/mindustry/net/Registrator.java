@@ -5,14 +5,14 @@ import arc.func.Prov;
 import mindustry.net.Packets.*;
 
 public class Registrator{
-    private static ClassEntry[] classes = {
+    private static final ClassEntry[] classes = {
     new ClassEntry(StreamBegin.class, StreamBegin::new),
     new ClassEntry(StreamChunk.class, StreamChunk::new),
     new ClassEntry(WorldStream.class, WorldStream::new),
     new ClassEntry(ConnectPacket.class, ConnectPacket::new),
     new ClassEntry(InvokePacket.class, InvokePacket::new)
     };
-    private static ObjectIntMap<Class> ids = new ObjectIntMap<>();
+    private static final ObjectIntMap<Class<?>> ids = new ObjectIntMap<>();
 
     static{
         if(classes.length > 127) throw new RuntimeException("Can't have more than 127 registered classes!");

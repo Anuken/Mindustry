@@ -30,9 +30,8 @@ public class UnitBlock extends PayloadAcceptor{
         tile.<UnitBlockEntity>ent().spawned();
     }
 
-
     public class UnitBlockEntity extends PayloadAcceptorEntity<UnitPayload>{
-        public float progress, payloadPos, time, speedScl;
+        public float progress, time, speedScl;
 
         public void spawned(){
             progress = 0f;
@@ -44,7 +43,7 @@ public class UnitBlock extends PayloadAcceptor{
                 Unitc unit = payload.unit;
                 unit.set(x, y);
                 unit.rotation(rotdeg());
-                unit.vel().trns(rotdeg(), payloadSpeed * 2f).add(Mathf.range(0.1f), Mathf.range(0.1f));
+                unit.vel().trns(rotdeg(), payloadSpeed * 2f).add(Mathf.range(0.3f), Mathf.range(0.3f));
                 unit.trns(Tmp.v1.trns(rotdeg(), size * tilesize/2f));
                 unit.trns(unit.vel());
                 unit.add();
@@ -52,29 +51,11 @@ public class UnitBlock extends PayloadAcceptor{
             }
 
             payload = null;
-            payloadPos = 0f;
         }
 
-        public void outputPayload(){
-            if(payload == null) return;
-
-            payloadPos += edelta() * payloadSpeed;
-            payVector.trns(rotdeg(), payloadPos);
-            payRotation = rotdeg();
-
-            if(payloadPos >= size * tilesize/2f){
-                payloadPos = size * tilesize/2f;
-
-                Tile front = frontLarge();
-                if(front != null && front.entity != null && front.block().outputsPayload){
-                    if(movePayload(payload)){
-                        payload = null;
-                    }
-                }else if(front != null && !front.solid()){
-                    //create unit if there's space
-                    Call.onUnitBlockSpawn(tile);
-                }
-            }
+        @Override
+        public void dumpPayload(){
+            Call.onUnitBlockSpawn(tile);
         }
     }
 }

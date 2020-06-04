@@ -28,6 +28,7 @@ public class LaserBulletType extends BulletType{
         hitSize = 4;
         lifetime = 16f;
         pierce = true;
+        hittable = false;
     }
 
     public LaserBulletType(){

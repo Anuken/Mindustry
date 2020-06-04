@@ -10,7 +10,7 @@ import mindustry.gen.*;
 
 import static mindustry.Vars.renderer;
 
-public class MinimapDialog extends FloatingDialog{
+public class MinimapDialog extends BaseDialog{
 
     public MinimapDialog(){
         super("$minimap");

@@ -4,7 +4,6 @@ import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
-import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
@@ -14,8 +13,6 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ai.formations.*;
-import mindustry.ai.formations.patterns.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -25,6 +22,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.*;
+import mindustry.world.meta.*;
 
 import static arc.Core.scene;
 import static mindustry.Vars.*;
@@ -64,7 +63,7 @@ public class DesktopInput extends InputHandler{
         });
 
         group.fill(t -> {
-            t.visible(() -> lastSchematic != null && !selectRequests.isEmpty());
+            t.visible(() -> Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty());
             t.bottom();
             t.table(Styles.black6, b -> {
                 b.defaults().left();
@@ -75,6 +74,15 @@ public class DesktopInput extends InputHandler{
                 b.table(a -> {
                     a.button("$schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
+            }).margin(6f);
+        });
+
+        group.fill(t -> {
+            t.visible(() -> Core.settings.getBool("hints") && !player.dead() && !player.unit().spawnedByCore());
+            t.bottom();
+            t.table(Styles.black6, b -> {
+                b.defaults().left();
+                b.label(() -> Core.bundle.format("respawn", Core.keybinds.get(Binding.respawn).key.toString())).style(Styles.outlineLabel);
             }).margin(6f);
         });
     }
@@ -196,35 +204,15 @@ public class DesktopInput extends InputHandler{
                     shouldShoot = false;
                 }
             }
-
-            //TODO this is for debugging, remove later
-            if(Core.input.keyTap(KeyCode.g) && !player.dead() && player.unit() instanceof Commanderc){
-                Commanderc commander = (Commanderc)player.unit();
-
-                if(commander.isCommanding()){
-                    commander.clearCommand();
-                }else{
-
-                    FormationPattern pattern = new SquareFormation();
-                    Formation formation = new Formation(new Vec3(player.x(), player.y(), player.unit().rotation()), pattern);
-                    formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
-
-                    units.clear();
-
-                    Fx.commandSend.at(player);
-                    Units.nearby(player.team(), player.x(), player.y(), 200f, u -> {
-                        if(u.isAI()){
-                            units.add(u);
-                        }
-                    });
-
-                    commander.command(formation, units);
-                }
-            }
         }
 
         if(!player.dead() && !state.isPaused() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
             updateMovement(player.unit());
+
+            if(Core.input.keyDown(Binding.respawn) && !player.unit().spawnedByCore()){
+                Call.onUnitClear(player);
+                controlledType = null;
+            }
         }
 
         if(Core.input.keyRelease(Binding.select)){
@@ -565,15 +553,16 @@ public class DesktopInput extends InputHandler{
         float speed = unit.type().speed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation()) * strafePenalty;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
+        boolean boosted = (unit instanceof Mechc && unit.isFlying());
 
         movement.set(xa, ya).nor().scl(speed);
         float mouseAngle = Angles.mouseAngle(unit.x(), unit.y());
-        boolean aimCursor = omni && isShooting && unit.type().hasWeapons() && unit.type().faceTarget;
+        boolean aimCursor = omni && isShooting && unit.type().hasWeapons() && unit.type().faceTarget && !boosted && unit.type().rotateShooting;
 
         if(aimCursor){
             unit.lookAt(mouseAngle);
         }else{
-            if(!unit.vel().isZero(0.01f)){
+            if(unit.moving()){
                 unit.lookAt(unit.vel().angle());
             }
         }
@@ -588,15 +577,47 @@ public class DesktopInput extends InputHandler{
         }
 
         unit.aim(unit.type().faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation(), Core.input.mouseWorld().dst(unit)).add(unit.x(), unit.y()));
+        unit.controlWeapons(true, isShooting && !boosted);
 
-        unit.controlWeapons(true, isShooting);
+        isBoosting = Core.input.keyDown(Binding.boost) && !movement.isZero();
+        player.boosting(isBoosting);
 
-        isBoosting = Core.input.keyDown(Binding.boost);
+        //TODO netsync this
+        if(unit instanceof Payloadc){
+            Payloadc pay = (Payloadc)unit;
 
-        if(unit.type().canBoost){
-            Tile tile = unit.tileOn();
+            if(Core.input.keyTap(Binding.pickupCargo) && pay.payloads().size < unit.type().payloadCapacity){
+                Unitc target = Units.closest(player.team(), pay.x(), pay.y(), 30f, u -> u.isAI() && u.isGrounded());
+                if(target != null){
+                    pay.pickup(target);
+                }else if(!pay.hasPayload()){
+                    Tilec tile = world.entWorld(pay.x(), pay.y());
+                    if(tile != null && tile.team() == unit.team() && tile.block().synthetic()){
+                        //pick up block directly
+                        if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2){
+                            pay.pickup(tile);
+                        }else{ //pick up block payload
+                            Payload taken = tile.takePayload();
+                            if(taken != null){
+                                pay.addPayload(taken);
+                                Fx.unitPickup.at(tile);
+                            }
+                        }
 
-            unit.elevation(Mathf.approachDelta(unit.elevation(), (tile != null && tile.solid()) || (isBoosting && !movement.isZero()) ? 1f : 0f, 0.08f));
+                    }
+                }
+            }
+
+            if(Core.input.keyTap(Binding.dropCargo)){
+                pay.dropLastPayload();
+            }
+        }
+
+        if(unit instanceof Commanderc){
+
+            if(Core.input.keyTap(Binding.command)){
+                Call.onUnitCommand(player);
+            }
         }
     }
 }

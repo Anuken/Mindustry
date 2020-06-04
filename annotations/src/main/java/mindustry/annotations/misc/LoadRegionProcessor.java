@@ -30,7 +30,7 @@ public class LoadRegionProcessor extends BaseProcessor{
                 err("@LoadRegion field must be public", field);
             }
 
-            fieldMap.getOr(field.enclosingType(), Array::new).add(field);
+            fieldMap.get(field.enclosingType(), Array::new).add(field);
         }
 
         for(Entry<Stype, Array<Svar>> entry : fieldMap){

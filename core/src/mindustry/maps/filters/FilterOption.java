@@ -90,7 +90,7 @@ public abstract class FilterOption{
         public void build(Table table){
             table.button(b -> b.image(supplier.get().icon(Cicon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable())
                 .setRegion(supplier.get() == Blocks.air ? Icon.block.getRegion() : supplier.get().icon(Cicon.small))).size(8 * 3), () -> {
-                FloatingDialog dialog = new FloatingDialog("");
+                BaseDialog dialog = new BaseDialog("");
                 dialog.setFillParent(false);
                 int i = 0;
                 for(Block block : Vars.content.blocks()){

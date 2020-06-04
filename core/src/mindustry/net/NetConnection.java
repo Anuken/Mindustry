@@ -1,5 +1,6 @@
 package mindustry.net;
 
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -18,6 +19,8 @@ public abstract class NetConnection{
     public String uuid = "AAAAAAAA", usid = uuid;
     public boolean mobile, modclient;
     public @Nullable Playerc player;
+    public @Nullable Unitc lastUnit;
+    public Vec2 lastPosition = new Vec2();
 
     /** ID of last recieved client snapshot. */
     public int lastRecievedClientSnapshot = -1;

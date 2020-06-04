@@ -1,6 +1,7 @@
 package mindustry.android;
 
 import android.*;
+import android.annotation.*;
 import android.app.*;
 import android.content.*;
 import android.content.pm.*;

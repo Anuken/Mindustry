@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Feature request
+    url: https://github.com/Anuken/Mindustry-Suggestions/issues/new/choose
+    about: Do not make a new issue for feature requests! Instead, post it in suggestions repository.
+  - name: Question
+    url: https://discord.com/invite/mindustry
+    about: Questions about the game should be asked in the Discord, not in the issue tracker. 

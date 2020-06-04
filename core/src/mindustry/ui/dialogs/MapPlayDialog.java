@@ -12,7 +12,7 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class MapPlayDialog extends FloatingDialog{
+public class MapPlayDialog extends BaseDialog{
     CustomRulesDialog dialog = new CustomRulesDialog();
     Rules rules;
     @NonNull Gamemode selectedGamemode = Gamemode.survival;
@@ -89,7 +89,7 @@ public class MapPlayDialog extends FloatingDialog{
     }
 
     private void displayGameModeHelp(){
-        FloatingDialog d = new FloatingDialog(Core.bundle.get("mode.help.title"));
+        BaseDialog d = new BaseDialog(Core.bundle.get("mode.help.title"));
         d.setFillParent(false);
         Table table = new Table();
         table.defaults().pad(1f);

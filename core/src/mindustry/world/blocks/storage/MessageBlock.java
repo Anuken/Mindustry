@@ -98,7 +98,7 @@ public class MessageBlock extends Block{
                         accepted = str -> configure(str);
                     }});
                 }else{
-                    FloatingDialog dialog = new FloatingDialog("$editmessage");
+                    BaseDialog dialog = new BaseDialog("$editmessage");
                     dialog.setFillParent(false);
                     TextArea a = dialog.cont.add(new TextArea(message.replace("\n", "\r"))).size(380f, 160f).get();
                     a.setFilter((textField, c) -> {

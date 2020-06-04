@@ -14,7 +14,7 @@ public abstract class Content implements Comparable<Content>, Disposable{
 
 
     public Content(){
-        this.id = (short) Vars.content.getBy(getContentType()).size;
+        this.id = (short)Vars.content.getBy(getContentType()).size;
         Vars.content.handleContent(this);
     }
 
@@ -25,15 +25,13 @@ public abstract class Content implements Comparable<Content>, Disposable{
     public abstract ContentType getContentType();
 
     /** Called after all content and modules are created. Do not use to load regions or texture data! */
-    public void init(){
-    }
+    public void init(){}
 
     /**
      * Called after all content is created, only on non-headless versions.
      * Use for loading regions or other image data.
      */
-    public void load(){
-    }
+    public void load(){}
 
     /** @return whether an error ocurred during mod loading. */
     public boolean hasErrored(){

@@ -1,5 +1,6 @@
 package mindustry.world;
 
+import arc.func.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.modules.*;
@@ -20,13 +21,13 @@ public class CachedTile extends Tile{
     }
 
     @Override
-    protected void changeEntity(Team team){
+    protected void changeEntity(Team team, Prov<Tilec> entityprov){
         entity = null;
 
         Block block = block();
 
         if(block.hasEntity()){
-            Tilec n = block.newEntity();
+            Tilec n = entityprov.get();
             n.cons(new ConsumeModule(entity));
             n.tile(this);
             n.block(block);

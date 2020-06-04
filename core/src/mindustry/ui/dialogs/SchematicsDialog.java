@@ -20,7 +20,7 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class SchematicsDialog extends FloatingDialog{
+public class SchematicsDialog extends BaseDialog{
     private SchematicInfoDialog info = new SchematicInfoDialog();
     private Schematic firstSchematic;
     private String search = "";
@@ -69,19 +69,18 @@ public class SchematicsDialog extends FloatingDialog{
             });
 
             rebuildPane[0] = () -> {
+                int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
+
                 t.clear();
                 int i = 0;
-
-                if(!schematics.all().contains(s -> search.isEmpty() || s.name().toLowerCase().contains(search.toLowerCase()))){
-                    t.add("$none");
-                }
+                String regex = "[`~!@#$%^&*()-_=+[{]}|;:'\",<.>/?]";
+                String searchString = search.toLowerCase().replaceAll(regex, " ");
 
                 firstSchematic = null;
 
                 for(Schematic s : schematics.all()){
-                    if(!search.isEmpty() && !s.name().toLowerCase().contains(search.toLowerCase())) continue;
-                    if(firstSchematic == null)
-                        firstSchematic = s;
+                    if(!search.isEmpty() && !s.name().toLowerCase().replaceAll(regex, " ").contains(searchString)) continue;
+                    if(firstSchematic == null) firstSchematic = s;
 
                     Button[] sel = {null};
                     sel[0] = t.button(b -> {
@@ -97,7 +96,7 @@ public class SchematicsDialog extends FloatingDialog{
                                 showInfo(s);
                             });
 
-                            buttons.button(Icon.download, style, () -> {
+                            buttons.button(Icon.upload, style, () -> {
                                 showExport(s);
                             });
 
@@ -153,9 +152,13 @@ public class SchematicsDialog extends FloatingDialog{
 
                     sel[0].getStyle().up = Tex.pane;
 
-                    if(++i % (mobile ? Core.graphics.isPortrait() ? 2 : 3 : 4) == 0){
+                    if(++i % maxwidth == 0){
                         t.row();
                     }
+                }
+
+                if(firstSchematic == null){
+                    t.add("$none");
                 }
             };
 
@@ -168,7 +171,7 @@ public class SchematicsDialog extends FloatingDialog{
     }
 
     public void showImport(){
-        FloatingDialog dialog = new FloatingDialog("$editor.export");
+        BaseDialog dialog = new BaseDialog("$editor.export");
         dialog.cont.pane(p -> {
             p.margin(10f);
             p.table(Tex.button, t -> {
@@ -217,7 +220,7 @@ public class SchematicsDialog extends FloatingDialog{
     }
 
     public void showExport(Schematic s){
-        FloatingDialog dialog = new FloatingDialog("$editor.export");
+        BaseDialog dialog = new BaseDialog("$editor.export");
         dialog.cont.pane(p -> {
            p.margin(10f);
            p.table(Tex.button, t -> {
@@ -312,7 +315,7 @@ public class SchematicsDialog extends FloatingDialog{
         }
     }
 
-    public static class SchematicInfoDialog extends FloatingDialog{
+    public static class SchematicInfoDialog extends BaseDialog{
 
         SchematicInfoDialog(){
             super("");
