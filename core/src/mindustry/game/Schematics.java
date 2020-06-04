@@ -393,6 +393,22 @@ public class Schematics implements Loadable{
         });
     }
 
+    public static void place(Schematic schem, int x, int y, Team team){
+        int ox = x - schem.width/2, oy = y - schem.height/2;
+        schem.tiles.each(st -> {
+            Tile tile = world.tile(st.x + ox, st.y + oy);
+            if(tile == null) return;
+
+            tile.setBlock(st.block, team, 0);
+            tile.rotation(st.rotation);
+
+            Object config = st.config;
+            if(tile.entity != null){
+                tile.entity.configureAny(config);
+            }
+        });
+    }
+
     //region IO methods
 
     /** Loads a schematic from base64. May throw an exception. */

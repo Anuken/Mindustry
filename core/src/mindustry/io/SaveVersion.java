@@ -152,6 +152,9 @@ public abstract class SaveVersion extends SaveFileReader{
             Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.blockID());
 
+            //make note of whether there was an entity here
+            stream.writeBoolean(tile.entity != null);
+
             //only write the entity for multiblocks once - in the center
             if(tile.entity != null){
                 if(tile.isCenter()){
@@ -218,8 +221,9 @@ public abstract class SaveVersion extends SaveFileReader{
                 Tile tile = context.tile(i);
                 if(block == null) block = Blocks.air;
                 boolean isCenter = true;
+                boolean hadEntity = stream.readBoolean();
 
-                if(block.hasEntity()){
+                if(hadEntity){
                     isCenter = stream.readBoolean();
                 }
 
@@ -228,15 +232,20 @@ public abstract class SaveVersion extends SaveFileReader{
                     tile.setBlock(block);
                 }
 
-                if(block.hasEntity()){
+                if(hadEntity){
                     if(isCenter){ //only read entity for center blocks
-                        try{
-                            readChunk(stream, true, in -> {
-                                byte revision = in.readByte();
-                                tile.entity.readAll(Reads.get(in), revision);
-                            });
-                        }catch(Throwable e){
-                            throw new IOException("Failed to read tile entity of block: " + block, e);
+                        if(block.hasEntity()){
+                            try{
+                                readChunk(stream, true, in -> {
+                                    byte revision = in.readByte();
+                                    tile.entity.readAll(Reads.get(in), revision);
+                                });
+                            }catch(Throwable e){
+                                throw new IOException("Failed to read tile entity of block: " + block, e);
+                            }
+                        }else{
+                            //skip the entity region, as the entity and its IO code are now gone
+                            skipRegion(stream, true);
                         }
                     }
                 }else{

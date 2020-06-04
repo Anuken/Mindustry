@@ -88,8 +88,8 @@ public abstract class SaveFileReader{
     }
 
     /** Reads a chunk of some length. Use the runner for reading to catch more descriptive errors. */
-    public int readChunk(DataInput input, boolean isByte, IORunner<DataInput> runner) throws IOException{
-        int length = isByte ? input.readUnsignedShort() : input.readInt();
+    public int readChunk(DataInput input, boolean isShort, IORunner<DataInput> runner) throws IOException{
+        int length = isShort ? input.readUnsignedShort() : input.readInt();
         runner.accept(input);
         return length;
     }

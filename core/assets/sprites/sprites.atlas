@@ -1516,14 +1516,14 @@ thorium-reactor
   orig: 96, 96
   offset: 0, 0
   index: -1
-thorium-reactor-center
+thorium-reactor-lights
   rotate: false
   xy: 1901, 1301
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
-thorium-reactor-lights
+thorium-reactor-top
   rotate: false
   xy: 900, 1203
   size: 96, 96
