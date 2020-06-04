@@ -3,7 +3,6 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.graphics.*;
 import arc.input.*;
-import arc.math.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
@@ -124,7 +123,7 @@ public class MapsDialog extends BaseDialog{
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = Mathf.clamp((int)(Core.graphics.getWidth() / Scl.scl(230)), 1, 8);
+        int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
         float mapsize = 200f;
 
         int i = 0;

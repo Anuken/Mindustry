@@ -675,7 +675,7 @@ public class Blocks implements ContentList{
         }};
 
         disassembler = new Separator("disassembler"){{
-            requirements(Category.crafting, ItemStack.with(Items.graphite, 150, Items.titanium, 100, Items.silicon, 150, Items.surgealloy, 70));
+            requirements(Category.crafting, ItemStack.with(Items.graphite, 140, Items.titanium, 100, Items.silicon, 150, Items.surgealloy, 70));
             results = ItemStack.with(
             Items.sand, 4,
             Items.graphite, 2,
