@@ -538,6 +538,11 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         return this;
     }
 
+    /** Tries to take the payload. Returns null if no payload is present. */
+    public @Nullable Payload takePayload(){
+        return null;
+    }
+
     /**
      * Tries to put this item into a nearby container, if there are no available
      * containers, it gets added to the block's inventory.

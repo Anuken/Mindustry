@@ -13,6 +13,7 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -21,6 +22,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
 import static arc.Core.scene;
@@ -590,8 +592,18 @@ public class DesktopInput extends InputHandler{
                     pay.pickup(target);
                 }else if(!pay.hasPayload()){
                     Tilec tile = world.entWorld(pay.x(), pay.y());
-                    if(tile != null && tile.team() == unit.team() && tile.block().synthetic() && tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 3){
-                        pay.pickup(tile);
+                    if(tile != null && tile.team() == unit.team() && tile.block().synthetic()){
+                        //pick up block directly
+                        if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2){
+                            pay.pickup(tile);
+                        }else{ //pick up block payload
+                            Payload taken = tile.takePayload();
+                            if(taken != null){
+                                pay.addPayload(taken);
+                                Fx.unitPickup.at(tile);
+                            }
+                        }
+
                     }
                 }
             }

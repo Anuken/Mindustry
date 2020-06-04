@@ -56,6 +56,13 @@ public class PayloadConveyor extends Block{
         public int step = -1, stepAccepted = -1;
 
         @Override
+        public Payload takePayload(){
+            Payload t = item;
+            item = null;
+            return t;
+        }
+
+        @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
 

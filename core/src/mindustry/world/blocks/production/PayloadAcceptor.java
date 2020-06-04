@@ -51,6 +51,13 @@ public class PayloadAcceptor extends Block{
             updatePayload();
         }
 
+        @Override
+        public Payload takePayload(){
+            T t = payload;
+            payload = null;
+            return t;
+        }
+
         public void updatePayload(){
             if(payload != null){
                 payload.set(x + payVector.x, y + payVector.y, payRotation);
