@@ -73,7 +73,7 @@ public class NetworkIO{
         writeString(buffer, name, 100);
         writeString(buffer, map);
 
-        buffer.putInt(Core.settings.getInt("total_players", Groups.player.size()));
+        buffer.putInt(Core.settings.getInt("totalplayers", Groups.player.size()));
         buffer.putInt(state.wave);
         buffer.putInt(Version.build);
         writeString(buffer, Version.type);
