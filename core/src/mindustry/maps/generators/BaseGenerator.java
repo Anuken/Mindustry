@@ -15,6 +15,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 
 import static mindustry.Vars.*;
@@ -24,7 +25,7 @@ public class BaseGenerator{
     private static final Schematic tmpSchem2 = new Schematic(new Array<>(), new StringMap(), 0, 0);
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
 
-    private final static int range = 200;
+    private final static int range = 180;
 
     private Tiles tiles;
     private Team team;
@@ -52,8 +53,6 @@ public class BaseGenerator{
         BasePart coreschem = bases.cores.getFrac(bracket);
 
         Block wall = wallsSmall.getFrac(bracket), wallLarge = wallsLarge.getFrac(bracket);
-
-        //TODO random rotation
 
         for(Tile tile : cores){
             tile.clearOverlay();
@@ -86,7 +85,7 @@ public class BaseGenerator{
                     boolean any = false;
 
                     for(Point2 p : Geometry.d8){
-                        if(Angles.angleDist(Angles.angle(p.x, p.y), spawn.angleTo(tile.x, tile.y)) > wallAngle){
+                        if(Angles.angleDist(Angles.angle(p.x, p.y), spawn.angleTo(tile)) > wallAngle){
                             continue;
                         }
 
@@ -121,6 +120,14 @@ public class BaseGenerator{
                     curr.setBlock(wallLarge, team);
                 }
             });
+        }
+    }
+
+    public void postGenerate(){
+        for(Tile tile : tiles){
+            if(tile.isCenter() && tile.block() instanceof PowerNode){
+                tile.entity.placed();
+            }
         }
     }
 

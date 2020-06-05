@@ -17,6 +17,7 @@ import static mindustry.Vars.*;
 public class TODOPlanetGenerator extends PlanetGenerator{
     Simplex noise = new Simplex();
     RidgedPerlin rid = new RidgedPerlin(1, 2);
+    BaseGenerator basegen = new BaseGenerator();
     float scl = 5f;
     float waterOffset = 0.07f;
 
@@ -282,7 +283,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
         Schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
 
         if(sector.hasEnemyBase()){
-            new BaseGenerator().generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector);
+            basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector);
 
             state.rules.attackMode = true;
         }
@@ -290,4 +291,8 @@ public class TODOPlanetGenerator extends PlanetGenerator{
         state.rules.waves = true;
     }
 
+    @Override
+    public void postGenerate(Tiles tiles){
+        basegen.postGenerate();
+    }
 }

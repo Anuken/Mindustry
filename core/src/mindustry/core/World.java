@@ -235,6 +235,11 @@ public class World{
             }
         });
 
+        //postgenerate for bases
+        if(sector.preset == null){
+            sector.planet.generator.postGenerate(tiles);
+        }
+
         //reset rules
         setSectorRules(sector);
 
