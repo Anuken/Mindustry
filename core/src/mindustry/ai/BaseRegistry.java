@@ -72,7 +72,11 @@ public class BaseRegistry{
 
                 part.tier = schem.tiles.sumf(s -> s.block.buildCost / s.block.buildCostMultiplier);
 
-                (part.core != null ? cores : parts).add(part);
+                if(part.core != null){
+                    cores.add(part);
+                }else if(part.requiredItem == null){
+                    parts.add(part);
+                }
 
                 if(drills > 0){
                     Tmp.v1.scl(1f / drills).scl(1f / tilesize);

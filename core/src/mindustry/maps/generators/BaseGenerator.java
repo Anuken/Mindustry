@@ -1,5 +1,6 @@
 package mindustry.maps.generators;
 
+import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -23,13 +24,17 @@ public class BaseGenerator{
     private static final Schematic tmpSchem2 = new Schematic(new Array<>(), new StringMap(), 0, 0);
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
 
+    private final static int range = 200;
+
     private Tiles tiles;
     private Team team;
     private ObjectMap<Item, OreBlock> ores = new ObjectMap<>();
+    private Array<Tile> cores;
 
     public void generate(Tiles tiles, Array<Tile> cores, Tile spawn, Team team, Sector sector){
         this.tiles = tiles;
         this.team = team;
+        this.cores = cores;
 
         for(Block block : content.blocks()){
             if(block instanceof OreBlock && block.asFloor().itemDrop != null){
@@ -41,8 +46,9 @@ public class BaseGenerator{
         Array<Block> wallsLarge = content.blocks().select(b -> b instanceof Wall && b.size == 2);
 
         float bracket = 0.1f;
-        int range = 200;
         int wallAngle = 70; //180 for full coverage
+        double resourceChance = 0.4;
+        double nonResourceChance = 0.0007;
         BasePart coreschem = bases.cores.getFrac(bracket);
 
         Block wall = wallsSmall.getFrac(bracket), wallLarge = wallsLarge.getFrac(bracket);
@@ -60,71 +66,73 @@ public class BaseGenerator{
             }
         }
 
-        //first pass: random schematics
-        for(Tile core : cores){
-            core.circle(range, (x, y) -> {
-                Tile tile = tiles.getn(x, y);
-                if(tile.overlay().itemDrop != null){
-                    Array<BasePart> parts = bases.forItem(tile.overlay().itemDrop);
-                    if(!parts.isEmpty()){
-                        tryPlace(parts.random(), x, y);
+        //first pass: random item specific schematics
+        pass(tile -> {
+            if(tile.overlay().itemDrop != null && Mathf.chance(resourceChance)){
+                Array<BasePart> parts = bases.forItem(tile.overlay().itemDrop);
+                if(!parts.isEmpty()){
+                    tryPlace(parts.random(), tile.x, tile.y);
+                }
+            }else if(tile.overlay().itemDrop == null && Mathf.chance(nonResourceChance)){
+                tryPlace(bases.parts.random(), tile.x, tile.y);
+            }
+        });
+
+        if(wallAngle > 0){
+
+            //small walls
+            pass(tile -> {
+                if(tile.block().alwaysReplace){
+                    boolean any = false;
+
+                    for(Point2 p : Geometry.d8){
+                        if(Angles.angleDist(Angles.angle(p.x, p.y), spawn.angleTo(tile.x, tile.y)) > wallAngle){
+                            continue;
+                        }
+
+                        Tile o = tiles.get(tile.x + p.x, tile.y + p.y);
+                        if(o != null && o.team() == team && !(o.block() instanceof Wall)){
+                            any = true;
+                            break;
+                        }
+                    }
+
+                    if(any){
+                        tile.setBlock(wall, team);
                     }
                 }
             });
-        }
 
-        if(wallAngle > 0){
-            //second pass: small walls
-            for(Tile core : cores){
-                core.circle(range, (x, y) -> {
-                    Tile tile = tiles.getn(x, y);
-                    if(tile.block().alwaysReplace){
-                        boolean any = false;
+            //large walls
+            pass(curr -> {
+                int walls = 0;
+                for(int cx = 0; cx < 2; cx++){
+                    for(int cy = 0; cy < 2; cy++){
+                        Tile tile = tiles.get(curr.x + cx, curr.y + cy);
+                        if(tile == null || tile.block().size != 1 || (tile.block() != wall && !tile.block().alwaysReplace)) return;
 
-                        for(Point2 p : Geometry.d8){
-                            if(Angles.angleDist(Angles.angle(p.x, p.y), spawn.angleTo(core)) > wallAngle){
-                                continue;
-                            }
-
-                            Tile o = tiles.get(tile.x + p.x, tile.y + p.y);
-                            if(o != null && o.team() == team && !(o.block() instanceof Wall)){
-                                any = true;
-                                break;
-                            }
-                        }
-
-                        if(any){
-                            tile.setBlock(wall, team);
+                        if(tile.block() == wall){
+                            walls ++;
                         }
                     }
-                });
-            }
+                }
 
-            //third pass: large walls
-            for(Tile core : cores){
-                core.circle(range, (x, y) -> {
-                    int walls = 0;
-                    for(int cx = 0; cx < 2; cx++){
-                        for(int cy = 0; cy < 2; cy++){
-                            Tile tile = tiles.get(x + cx, y + cy);
-                            if(tile == null || tile.block().size != 1 || (tile.block() != wall && !tile.block().alwaysReplace)) return;
-
-                            if(tile.block() == wall){
-                                walls ++;
-                            }
-                        }
-                    }
-
-                    if(walls >= 3){
-                        tiles.getn(x, y).setBlock(wallLarge, team);
-                    }
-                });
-            }
+                if(walls >= 3){
+                    curr.setBlock(wallLarge, team);
+                }
+            });
         }
     }
 
+    void pass(Cons<Tile> cons){
+        Tile core = cores.first();
+        //for(Tile core : cores){
+        core.circle(range, (x, y) -> cons.get(tiles.getn(x, y)));
+        //}
+    }
+
     boolean tryPlace(BasePart part, int x, int y){
-        int rotation = 0;
+        int rotation = Mathf.range(2);
         axis.set((int)(part.schematic.width / 2f), (int)(part.schematic.height / 2f));
         Schematic result = rotate(part.schematic, rotation);
 
@@ -151,6 +159,9 @@ public class BaseGenerator{
                 if(tile.block instanceof Drill){
                     tile.block.iterateTaken(tile.x + cx, tile.y + cy, (ex, ey) -> {
                         tiles.getn(ex, ey).setOverlay(ores.get(part.requiredItem));
+
+                        //random ores nearby to make it look more natural
+                        tiles.getc(ex + Mathf.range(1), ey + Mathf.range(1)).setOverlay(ores.get(part.requiredItem));
                     });
                 }
             }
