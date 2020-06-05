@@ -8,11 +8,14 @@ import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import java.io.*;
+
+import static mindustry.Vars.tilesize;
 
 public class BaseRegistry{
     public Array<BasePart> cores = new Array<>();
@@ -35,6 +38,8 @@ public class BaseRegistry{
                 Schematic schem = Schematics.read(Core.files.internal("baseparts/" + name));
 
                 BasePart part = new BasePart(schem);
+                Tmp.v1.setZero();
+                int drills = 0;
 
                 for(Stile tile : schem.tiles){
                     //make note of occupied positions
@@ -56,12 +61,27 @@ public class BaseRegistry{
                         Liquid config = (Liquid)tile.config;
                         if(config != null) part.requiredLiquid = config;
                     }
+
+                    //calculate averages
+                    if(tile.block instanceof Drill){
+                        Tmp.v1.add(tile.x*tilesize + tile.block.offset(), tile.y*tilesize + tile.block.offset());
+                        drills ++;
+                    }
                 }
                 schem.tiles.removeAll(s -> s.block.buildVisibility == BuildVisibility.sandboxOnly);
 
                 part.tier = schem.tiles.sumf(s -> s.block.buildCost / s.block.buildCostMultiplier);
 
                 (part.core != null ? cores : parts).add(part);
+
+                if(drills > 0){
+                    Tmp.v1.scl(1f / drills).scl(1f / tilesize);
+                    part.centerX = (int)Tmp.v1.x;
+                    part.centerY = (int)Tmp.v1.y;
+                }else{
+                    part.centerX = part.schematic.width/2;
+                    part.centerY = part.schematic.height/2;
+                }
 
                 if(part.requiredItem != null){
                     itemParts.get(part.requiredItem, Array::new).add(part);
@@ -79,6 +99,9 @@ public class BaseRegistry{
     public static class BasePart implements Comparable<BasePart>{
         public final Schematic schematic;
         public final GridBits occupied;
+
+        //offsets for drills
+        public int centerX, centerY;
 
         public @Nullable Liquid requiredLiquid;
         public @Nullable Item requiredItem;
