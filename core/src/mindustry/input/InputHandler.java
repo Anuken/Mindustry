@@ -204,8 +204,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void onUnitCommand(Playerc player){
-        //no free core teleports?
-        if(!player.dead() || !(player.unit() instanceof Commanderc)) return;
+        if(player.dead() || !(player.unit() instanceof Commanderc)) return;
 
         Commanderc commander = (Commanderc)player.unit();
 

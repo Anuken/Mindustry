@@ -324,7 +324,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         stable.row();
 
-        if((sector.hasBase() && mode == look) || canLaunch(sector)){
+        if((sector.hasBase() && mode == look) || canLaunch(sector) || sector.preset.alwaysUnlocked){
             stable.button(sector.hasBase() ? "Resume" : "Launch", Styles.transt, () -> {
                 if(sector.is(SectorAttribute.naval)){
                     ui.showInfo("You need a naval loadout to launch here.");
