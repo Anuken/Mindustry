@@ -178,6 +178,7 @@ public class Vars implements Loadable{
     public static BeControl becontrol;
     public static AsyncCore asyncCore;
     public static TeamIndexProcess teamIndex;
+    public static BaseRegistry bases;
 
     public static Universe universe;
     public static World world;
@@ -250,6 +251,7 @@ public class Vars implements Loadable{
         spawner = new WaveSpawner();
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
+        bases = new BaseRegistry();
 
         state = new GameState();
         data = new GlobalData();

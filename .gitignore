@@ -42,6 +42,7 @@ packr-out/
 config/
 *.gif
 
+/core/assets/basepartnames
 version.properties
 
 .attach_*

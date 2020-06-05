@@ -106,6 +106,7 @@ allprojects{
                 output += other.name.substring("bundle".length() + 1, other.name.lastIndexOf('.')) + "\n"
             }
             new File(project(':core').projectDir, 'assets/locales').text = output
+            new File(project(':core').projectDir, 'assets/basepartnames').text = new File(project(':core').projectDir, 'assets/baseparts/').list().join("\n")
         }
 
         writeVersion = {

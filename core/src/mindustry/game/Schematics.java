@@ -106,6 +106,9 @@ public class Schematics implements Loadable{
         if(shadowBuffer == null){
             Core.app.post(() -> shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 8, maxSchematicSize + padding + 8));
         }
+
+        //load base schematics
+        bases.load();
     }
 
     public void overwrite(Schematic target, Schematic newSchematic){
@@ -372,14 +375,18 @@ public class Schematics implements Loadable{
     }
 
     public static void placeLoadout(Schematic schem, int x, int y){
+        placeLoadout(schem, x, y, state.rules.defaultTeam, Blocks.oreCopper);
+    }
+
+    public static void placeLoadout(Schematic schem, int x, int y, Team team, Block resource){
         Stile coreTile = schem.tiles.find(s -> s.block instanceof CoreBlock);
-        if(coreTile == null) throw new IllegalArgumentException("Schematic has no core tile. Exiting.");
+        if(coreTile == null) throw new IllegalArgumentException("Loadout schematic has no core tile!");
         int ox = x - coreTile.x, oy = y - coreTile.y;
         schem.tiles.each(st -> {
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
-            tile.setBlock(st.block, state.rules.defaultTeam, 0);
+            tile.setBlock(st.block, team, 0);
             tile.rotation(st.rotation);
 
             Object config = st.config;
@@ -388,7 +395,7 @@ public class Schematics implements Loadable{
             }
 
             if(st.block instanceof Drill){
-                tile.getLinkedTiles(t -> t.setOverlay(Blocks.oreCopper));
+                tile.getLinkedTiles(t -> t.setOverlay(resource));
             }
         });
     }

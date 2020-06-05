@@ -94,12 +94,12 @@ public abstract class SaveFileReader{
         return length;
     }
 
-    public void skipRegion(DataInput input) throws IOException{
-        skipRegion(input, false);
+    public void skipChunk(DataInput input) throws IOException{
+        skipChunk(input, false);
     }
 
-    /** Skip a region completely. */
-    public void skipRegion(DataInput input, boolean isByte) throws IOException{
+    /** Skip a chunk completely, discarding the bytes. */
+    public void skipChunk(DataInput input, boolean isByte) throws IOException{
         int length = readChunk(input, isByte, t -> {});
         int skipped = input.skipBytes(length);
         if(length != skipped){

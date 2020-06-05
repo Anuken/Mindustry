@@ -689,7 +689,7 @@ public class Blocks implements ContentList{
 
             consumes.power(4f);
             consumes.item(Items.scrap);
-            consumes.liquid(Liquids.slag, 0.1f);
+            consumes.liquid(Liquids.slag, 0.12f);
         }};
 
         sporePress = new GenericCrafter("spore-press"){{
@@ -917,11 +917,11 @@ public class Blocks implements ContentList{
             requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 130, Items.silicon, 130, Items.plastanium, 80, Items.surgealloy, 120));
             consumes.power(10f);
             size = 3;
-            range = 180f;
-            speedBoost = 1.5f;
-            speedBoostPhase = 1f;
+            range = 200f;
+            speedBoost = 2.5f;
             useTime = 250f;
-            consumes.item(Items.phasefabric).boost();
+            hasBoost = false;
+            consumes.item(Items.phasefabric);
         }};
 
         forceProjector = new ForceProjector("force-projector"){{

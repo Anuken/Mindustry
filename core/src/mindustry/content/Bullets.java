@@ -191,10 +191,10 @@ public class Bullets implements ContentList{
         }};
 
         flakSurge = new FlakBulletType(4.5f, 13){{
-            splashDamage = 40f;
+            splashDamage = 45f;
             splashDamageRadius = 40f;
             lightning = 2;
-            lightningLength = 12;
+            lightningLength = 7;
             shootEffect = Fx.shootBig;
         }};
 

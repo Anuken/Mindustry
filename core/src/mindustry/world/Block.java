@@ -405,6 +405,23 @@ public class Block extends UnlockableContent{
         return (hasItems && itemCapacity > 0);
     }
 
+    /** Iterate through ever grid position taken up by this block. */
+    public void iterateTaken(int x, int y, Intc2 placer){
+        if(isMultiblock()){
+            int offsetx = -(size - 1) / 2;
+            int offsety = -(size - 1) / 2;
+
+            for(int dx = 0; dx < size; dx++){
+                for(int dy = 0; dy < size; dy++){
+                    placer.get(dx + offsetx + x, dy + offsety + y);
+                }
+            }
+
+        }else{
+            placer.get(x, y);
+        }
+    }
+
     /** Never use outside of the editor! */
     public TextureRegion editorIcon(){
         if(editorIcon == null) editorIcon = Core.atlas.find(name + "-icon-editor");

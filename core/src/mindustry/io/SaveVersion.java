@@ -245,7 +245,7 @@ public abstract class SaveVersion extends SaveFileReader{
                             }
                         }else{
                             //skip the entity region, as the entity and its IO code are now gone
-                            skipRegion(stream, true);
+                            skipChunk(stream, true);
                         }
                     }
                 }else{
