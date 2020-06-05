@@ -36,6 +36,7 @@ public class BaseGenerator{
         this.tiles = tiles;
         this.team = team;
         this.cores = cores;
+        Mathf.random.setSeed(sector.id);
 
         for(Block block : content.blocks()){
             if(block instanceof OreBlock && block.asFloor().itemDrop != null){
@@ -43,20 +44,22 @@ public class BaseGenerator{
             }
         }
 
+        float costBudget = 1000;
+
         Array<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1);
         Array<Block> wallsLarge = content.blocks().select(b -> b instanceof Wall && b.size == 2);
 
         float bracket = 0.1f;
         int wallAngle = 70; //180 for full coverage
         double resourceChance = 0.4;
-        double nonResourceChance = 0.0007;
+        double nonResourceChance = 0.0005;
         BasePart coreschem = bases.cores.getFrac(bracket);
 
         Block wall = wallsSmall.getFrac(bracket), wallLarge = wallsLarge.getFrac(bracket);
 
         for(Tile tile : cores){
             tile.clearOverlay();
-            Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, coreschem.requiredItem == null ? Blocks.oreCopper : ores.get(coreschem.requiredItem));
+            Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, coreschem.required instanceof Item ? ores.get((Item)coreschem.required) : Blocks.oreCopper);
 
             //fill core with every type of item (even non-material)
             Tilec entity = tile.entity;
@@ -65,14 +68,16 @@ public class BaseGenerator{
             }
         }
 
-        //first pass: random item specific schematics
+        //random schematics
         pass(tile -> {
-            if(tile.overlay().itemDrop != null && Mathf.chance(resourceChance)){
-                Array<BasePart> parts = bases.forItem(tile.overlay().itemDrop);
+            if(!tile.block().alwaysReplace) return;
+
+            if((tile.drop() != null || (tile.floor().liquidDrop != null && Mathf.chance(nonResourceChance * 2))) && Mathf.chance(resourceChance)){
+                Array<BasePart> parts = bases.forResource(tile.drop() != null ? tile.drop() : tile.floor().liquidDrop);
                 if(!parts.isEmpty()){
                     tryPlace(parts.random(), tile.x, tile.y);
                 }
-            }else if(tile.overlay().itemDrop == null && Mathf.chance(nonResourceChance)){
+            }else if(Mathf.chance(nonResourceChance)){
                 tryPlace(bases.parts.random(), tile.x, tile.y);
             }
         });
@@ -142,33 +147,35 @@ public class BaseGenerator{
         int rotation = Mathf.range(2);
         axis.set((int)(part.schematic.width / 2f), (int)(part.schematic.height / 2f));
         Schematic result = rotate(part.schematic, rotation);
+        int rotdeg = rotation*90;
 
-        rotator.set(part.centerX, part.centerY).rotateAround(axis, rotation * 90);
+        rotator.set(part.centerX, part.centerY).rotateAround(axis, rotdeg);
+        //bottom left schematic corner
         int cx = x - (int)rotator.x;
         int cy = y - (int)rotator.y;
 
-        for(int rx = cx; rx <= cx + result.width; rx++){
-            for(int ry = cy; ry <= cy + result.height; ry++){
-                Tile tile = tiles.get(rx, ry);
-                int ox = rx - cx, oy = ry - cy;
-                rotator.set(ox, oy).rotateAround(axis, rotation * 90);
-                ox = (int)rotator.x;
-                oy = (int)rotator.y;
-
-                if(tile == null || ((!tile.block().alwaysReplace || world.getDarkness(rx, ry) > 0) && part.occupied.get(ox, oy))){
-                    return false;
-                }
+        for(Stile tile : result.tiles){
+            int realX = tile.x + cx, realY = tile.y + cy;
+            if(isTaken(tile.block, realX, realY)){
+                return false;
             }
         }
 
-        if(part.requiredItem != null){
+        if(part.required instanceof Item){
             for(Stile tile : result.tiles){
                 if(tile.block instanceof Drill){
-                    tile.block.iterateTaken(tile.x + cx, tile.y + cy, (ex, ey) -> {
-                        tiles.getn(ex, ey).setOverlay(ores.get(part.requiredItem));
 
-                        //random ores nearby to make it look more natural
-                        tiles.getc(ex + Mathf.range(1), ey + Mathf.range(1)).setOverlay(ores.get(part.requiredItem));
+                    tile.block.iterateTaken(tile.x + cx, tile.y + cy, (ex, ey) -> {
+
+                        if(!tiles.getn(ex, ey).floor().isLiquid){
+                            tiles.getn(ex, ey).setOverlay(ores.get((Item)part.required));
+                        }
+
+                        Tile rand = tiles.getc(ex + Mathf.range(1), ey + Mathf.range(1));
+                        if(!rand.floor().isLiquid){
+                            //random ores nearby to make it look more natural
+                            rand.setOverlay(ores.get((Item)part.required));
+                        }
                     });
                 }
             }
@@ -179,10 +186,36 @@ public class BaseGenerator{
         return true;
     }
 
+    boolean isTaken(Block block, int x, int y){
+        if(block.isMultiblock()){
+            int offsetx = -(block.size - 1) / 2;
+            int offsety = -(block.size - 1) / 2;
+
+            for(int dx = 0; dx < block.size; dx++){
+                for(int dy = 0; dy < block.size; dy++){
+                    if(overlaps(dx + offsetx + x, dy + offsety + y)){
+                        return true;
+                    }
+                }
+            }
+
+        }else{
+            return overlaps(x, y);
+        }
+
+        return false;
+    }
+
+    boolean overlaps(int x, int y){
+        Tile tile = tiles.get(x, y);
+
+        return tile == null || !tile.block().alwaysReplace || world.getDarkness(x, y) > 0;
+    }
+
     Schematic rotate(Schematic input, int times){
         if(times == 0) return input;
 
-        boolean sign = times < 0;
+        boolean sign = times > 0;
         for(int i = 0; i < Math.abs(times); i++){
             input = rotated(input, sign);
         }

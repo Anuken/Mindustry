@@ -4,6 +4,7 @@ import arc.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.type.*;
@@ -20,16 +21,16 @@ import static mindustry.Vars.tilesize;
 public class BaseRegistry{
     public Array<BasePart> cores = new Array<>();
     public Array<BasePart> parts = new Array<>();
-    public ObjectMap<Item, Array<BasePart>> itemParts = new ObjectMap<>();
+    public ObjectMap<Content, Array<BasePart>> reqParts = new ObjectMap<>();
 
-    public Array<BasePart> forItem(Item item){
-        return itemParts.get(item, Array::new);
+    public Array<BasePart> forResource(Content item){
+        return reqParts.get(item, Array::new);
     }
 
     public void load(){
         cores.clear();
         parts.clear();
-        itemParts.clear();
+        reqParts.clear();
 
         String[] names = Core.files.internal("basepartnames").readString().split("\n");
 
@@ -42,9 +43,6 @@ public class BaseRegistry{
                 int drills = 0;
 
                 for(Stile tile : schem.tiles){
-                    //make note of occupied positions
-                    tile.block.iterateTaken(tile.x, tile.y, part.occupied::set);
-
                     //keep track of core type
                     if(tile.block instanceof CoreBlock){
                         part.core = tile.block;
@@ -53,17 +51,17 @@ public class BaseRegistry{
                     //save the required resource based on item source - multiple sources are not allowed
                     if(tile.block instanceof ItemSource){
                         Item config = (Item)tile.config;
-                        if(config != null) part.requiredItem = config;
+                        if(config != null) part.required = config;
                     }
 
                     //same for liquids - this is not used yet
                     if(tile.block instanceof LiquidSource){
                         Liquid config = (Liquid)tile.config;
-                        if(config != null) part.requiredLiquid = config;
+                        if(config != null) part.required = config;
                     }
 
                     //calculate averages
-                    if(tile.block instanceof Drill){
+                    if(tile.block instanceof Drill || tile.block instanceof Pump){
                         Tmp.v1.add(tile.x*tilesize + tile.block.offset(), tile.y*tilesize + tile.block.offset());
                         drills ++;
                     }
@@ -74,7 +72,7 @@ public class BaseRegistry{
 
                 if(part.core != null){
                     cores.add(part);
-                }else if(part.requiredItem == null){
+                }else if(part.required == null){
                     parts.add(part);
                 }
 
@@ -87,9 +85,8 @@ public class BaseRegistry{
                     part.centerY = part.schematic.height/2;
                 }
 
-                if(part.requiredItem != null){
-                    itemParts.get(part.requiredItem, Array::new).add(part);
-                }
+                if(part.required != null) reqParts.get(part.required, Array::new).add(part);
+
             }catch(IOException e){
                 throw new RuntimeException(e);
             }
@@ -97,18 +94,16 @@ public class BaseRegistry{
 
         cores.sort(Structs.comps(Structs.comparingFloat(b -> b.core.health), Structs.comparingFloat(b -> b.tier)));
         parts.sort();
-        itemParts.each((key, arr) -> arr.sort());
+        reqParts.each((key, arr) -> arr.sort());
     }
 
     public static class BasePart implements Comparable<BasePart>{
         public final Schematic schematic;
-        public final GridBits occupied;
 
         //offsets for drills
         public int centerX, centerY;
 
-        public @Nullable Liquid requiredLiquid;
-        public @Nullable Item requiredItem;
+        public @Nullable Content required;
         public @Nullable Block core;
 
         //total build cost
@@ -116,7 +111,6 @@ public class BaseRegistry{
 
         public BasePart(Schematic schematic){
             this.schematic = schematic;
-            this.occupied = new GridBits(schematic.width, schematic.height);
         }
 
         @Override
