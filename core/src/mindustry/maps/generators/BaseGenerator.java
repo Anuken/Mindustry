@@ -51,7 +51,7 @@ public class BaseGenerator{
 
         float bracket = 0.1f;
         int wallAngle = 70; //180 for full coverage
-        double resourceChance = 0.4;
+        double resourceChance = 0.5;
         double nonResourceChance = 0.0005;
         BasePart coreschem = bases.cores.getFrac(bracket);
 
