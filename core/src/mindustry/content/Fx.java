@@ -125,10 +125,10 @@ public class Fx{
 
         stroke(3f * e.fout());
         color(e.color, Color.white, e.fin());
-        beginLine();
 
-        linePoint(e.x, e.y);
+        beginLine();
         lines.each(Lines::linePoint);
+        linePoint(e.x, e.y);
         endLine();
 
         int i = 0;

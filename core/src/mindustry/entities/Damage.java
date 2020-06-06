@@ -207,47 +207,53 @@ public class Damage{
         }
     }
 
-    public static void tileDamage(Team team, int startx, int starty, int radius, float baseDamage){
-        bits.clear();
-        propagation.clear();
-        int bitOffset = bits.width() / 2;
+    public static void tileDamage(Team team, int startx, int starty, int baseRadius, float baseDamage){
+        //tile damage is posted, so that destroying a block that causes a chain explosion will run in the next frame
+        //this prevents recursive damage calls from messing up temporary variables
+        Core.app.post(() -> {
 
-        propagation.addFirst(PropCell.get((byte)0, (byte)0, (short)baseDamage));
-        //clamp radius to fit bits
-        radius = Math.min(radius, bits.width() / 2);
+            bits.clear();
+            propagation.clear();
+            int bitOffset = bits.width() / 2;
 
-        while(!propagation.isEmpty()){
-            int prop = propagation.removeLast();
-            int x = PropCell.x(prop);
-            int y = PropCell.y(prop);
-            int damage = PropCell.damage(prop);
-            //manhattan distance used for calculating falloff, results in a diamond pattern
-            int dst = Math.abs(x) + Math.abs(y);
+            propagation.addFirst(PropCell.get((byte)0, (byte)0, (short)baseDamage));
+            //clamp radius to fit bits
+            int radius = Math.min(baseRadius, bits.width() / 2);
 
-            int scaledDamage = (int)(damage * (1f - (float)dst / radius));
+            while(!propagation.isEmpty()){
+                int prop = propagation.removeLast();
+                int x = PropCell.x(prop);
+                int y = PropCell.y(prop);
+                int damage = PropCell.damage(prop);
+                //manhattan distance used for calculating falloff, results in a diamond pattern
+                int dst = Math.abs(x) + Math.abs(y);
 
-            bits.set(bitOffset + x, bitOffset + y);
-            Tilec tile = world.ent(startx + x, starty + y);
+                int scaledDamage = (int)(damage * (1f - (float)dst / radius));
 
-            if(scaledDamage <= 0 || tile == null) continue;
+                bits.set(bitOffset + x, bitOffset + y);
+                Tile tile = world.tile(startx + x, starty + y);
 
-            //apply damage to entity if needed
-            if(tile.team() != team){
-                int health = (int)tile.health();
-                if(tile.health() > 0){
-                    tile.damage(scaledDamage);
-                    scaledDamage -= health;
+                if(scaledDamage <= 0 || tile == null) continue;
 
-                    if(scaledDamage <= 0) continue;
+                //apply damage to entity if needed
+                if(tile.entity != null && tile.team() != team){
+                    int health = (int)tile.entity.health();
+                    if(tile.entity.health() > 0){
+                        tile.entity.damage(scaledDamage);
+                        scaledDamage -= health;
+
+                        if(scaledDamage <= 0) continue;
+                    }
+                }
+
+                for(Point2 p : Geometry.d4){
+                    if(!bits.get(bitOffset + x + p.x, bitOffset + y + p.y)){
+                        propagation.addFirst(PropCell.get((byte)(x + p.x), (byte)(y + p.y), (short)scaledDamage));
+                    }
                 }
             }
+        });
 
-            for(Point2 p : Geometry.d4){
-                if(!bits.get(bitOffset + x + p.x, bitOffset + y + p.y)){
-                    propagation.addFirst(PropCell.get((byte)(x + p.x), (byte)(y + p.y), (short)scaledDamage));
-                }
-            }
-        }
     }
 
     private static void completeDamage(Team team, float x, float y, float radius, float damage){

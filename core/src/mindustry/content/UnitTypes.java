@@ -119,23 +119,28 @@ public class UnitTypes implements ContentList{
         }};
 
         crawler = new UnitType("crawler"){{
+            defaultController = SuicideAI::new;
+
             speed = 0.8f;
             hitsize = 8f;
-            health = 120;
+            health = 140;
             sway = 0.25f;
+            range = 40f;
+
             weapons.add(new Weapon(){{
                 reload = 12f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
                 shootSound = Sounds.explosion;
-                bullet = new BombBulletType(2f, 3f, "clear"){{
+                bullet = new BombBulletType(0f, 0f, "clear"){{
                     hitEffect = Fx.pulverize;
-                    lifetime = 30f;
-                    speed = 1.1f;
+                    lifetime = 10f;
+                    speed = 1f;
                     splashDamageRadius = 55f;
                     instantDisappear = true;
                     splashDamage = 30f;
                     killShooter = true;
+                    hittable = false;
                 }};
             }});
         }};
@@ -233,10 +238,16 @@ public class UnitTypes implements ContentList{
                 reload = 10f;
                 alternate = true;
                 ejectEffect = Fx.none;
-                bullet = Bullets.eruptorShot;
                 recoil = 1f;
                 x = 7f;
                 shootSound = Sounds.flame;
+
+                bullet = new LiquidBulletType(Liquids.slag){{
+                    damage = 11;
+                    speed = 2.3f;
+                    drag = 0.02f;
+                    shootEffect = Fx.shootSmall;
+                }};
             }});
         }};
 

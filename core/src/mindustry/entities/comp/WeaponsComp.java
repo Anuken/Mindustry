@@ -37,7 +37,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
 
     void setupWeapons(UnitType def){
         mounts = new WeaponMount[def.weapons.size];
-        range = 0f;
+        range = def.range;
         for(int i = 0; i < mounts.length; i++){
             mounts[i] = new WeaponMount(def.weapons.get(i));
             range = Math.max(range, def.weapons.get(i).bullet.range());
