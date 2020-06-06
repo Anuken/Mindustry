@@ -1548,7 +1548,7 @@ public class Blocks implements ContentList{
             ammoEjectBack = 3f;
             cooldown = 0.03f;
             recoilAmount = 3f;
-            shootShake = 2f;
+            shootShake = 1f;
             burstSpacing = 3f;
             shots = 4;
             ammoUseEffect = Fx.shellEjectBig;
