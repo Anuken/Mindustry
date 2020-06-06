@@ -48,7 +48,7 @@ abstract class BuilderComp implements Unitc{
         while(it.hasNext()){
             BuildRequest req = it.next();
             Tile tile = world.tile(req.x, req.y);
-            if(!tileAvailable(req,tile)){
+            if(tile == null || (req.breaking && tile.block() == Blocks.air) || (!req.breaking && (tile.rotation() == req.rotation || !req.block.rotate) && tile.block() == req.block)){
                 it.remove();
             }
         }
@@ -62,7 +62,7 @@ abstract class BuilderComp implements Unitc{
         if(requests.size > 1){
             int total = 0;
             BuildRequest req;
-            while(buildAvailable(req,tile)){
+            while((dst((req = buildRequest()).tile()) > finalPlaceDst || shouldSkip(req, core)) && total < requests.size){
                 requests.removeFirst();
                 requests.addLast(req);
                 total++;
@@ -80,11 +80,11 @@ abstract class BuilderComp implements Unitc{
         }
 
         if(!(tile.block() instanceof BuildBlock)){
-            if(!current.initialized && !current.breaking && Build.validPlace(team(), current.x, current.y, current.block, current.rotation)){
+            if(!current.initialized && !current.breaking && Build.validPlace(current.block, team(), current.x, current.y, current.rotation)){
                 boolean hasAll = !Structs.contains(current.block.requirements, i -> !core.items().has(i.item));
 
                 if(hasAll || state.rules.infiniteResources){
-                    Build.beginPlace(team(), current.x, current.y, current.block, current.rotation);
+                    Build.beginPlace(current.block, team(), current.x, current.y, current.rotation);
                 }else{
                     current.stuck = true;
                 }
@@ -126,14 +126,6 @@ abstract class BuilderComp implements Unitc{
         current.progress = entity.progress;
     }
 
-    boolean tileAvailable(Tile tile,BuildRequest req) {
-
-        return tile == null || (req.breaking && tile.block() == Blocks.air) || (!req.breaking && (tile.rotation() == req.rotation || !req.block.rotate) && tile.block() == req.block);
-
-    }
-    boolean buildAvailable(Tile tile,BuildRequest req) {
-        return (dst((req = buildRequest()).tile()) > finalPlaceDst || shouldSkip(req, core)) && total < requests.size;
-    }
 
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     void drawBuildRequests(){
@@ -146,7 +138,7 @@ abstract class BuilderComp implements Unitc{
                 control.input.drawBreaking(request);
             }else{
                 request.block.drawRequest(request, control.input.allRequests(),
-                Build.validPlace(team(), request.x, request.y, request.block, request.rotation) || control.input.requestMatches(request));
+                        Build.validPlace(request.block, team(), request.x, request.y, request.rotation) || control.input.requestMatches(request));
             }
         }
 
@@ -245,7 +237,7 @@ abstract class BuilderComp implements Unitc{
         Arrays.sort(vecs, Structs.comparingFloat(vec -> -Angles.angleDist(angleTo(vec), ang)));
 
         float x1 = vecs[0].x, y1 = vecs[0].y,
-        x3 = vecs[1].x, y3 = vecs[1].y;
+                x3 = vecs[1].x, y3 = vecs[1].y;
 
         Draw.alpha(1f);
 
