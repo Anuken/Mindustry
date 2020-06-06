@@ -119,7 +119,7 @@ public class UnitTypes implements ContentList{
         }};
 
         crawler = new UnitType("crawler"){{
-            speed = 0.65f;
+            speed = 0.8f;
             hitsize = 8f;
             health = 120;
             sway = 0.25f;
@@ -419,14 +419,21 @@ public class UnitTypes implements ContentList{
             hitsize = 8f;
 
             weapons.add(new Weapon("small-basic-weapon"){{
-                reload = 25f;
+                reload = 15f;
                 x = -1f;
                 y = -1f;
                 shootX = 3.5f;
                 alternate = true;
-                ejectEffect = Fx.none;
-                //TODO use different ammo
-                bullet = Bullets.standardCopper;
+
+                bullet = new BasicBulletType(2.5f, 9){{
+                    bulletWidth = 7f;
+                    bulletHeight = 9f;
+                    lifetime = 60f;
+                    shootEffect = Fx.shootSmall;
+                    smokeEffect = Fx.shootSmallSmoke;
+                    tileDamageMultiplier = 0.15f;
+                    ammoMultiplier = 2;
+                }};
             }});
         }};
 

@@ -919,9 +919,9 @@ public class Blocks implements ContentList{
             size = 3;
             range = 200f;
             speedBoost = 2.5f;
-            useTime = 250f;
+            useTime = 300f;
             hasBoost = false;
-            consumes.item(Items.phasefabric);
+            consumes.items(ItemStack.with(Items.phasefabric, 1, Items.silicon, 1));
         }};
 
         forceProjector = new ForceProjector("force-projector"){{
@@ -1194,8 +1194,8 @@ public class Blocks implements ContentList{
         rtgGenerator = new DecayGenerator("rtg-generator"){{
             requirements(Category.power, ItemStack.with(Items.lead, 100, Items.silicon, 75, Items.phasefabric, 25, Items.plastanium, 75, Items.thorium, 50));
             size = 2;
-            powerProduction = 3f;
-            itemDuration = 440f;
+            powerProduction = 4f;
+            itemDuration = 500f;
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
@@ -1855,10 +1855,8 @@ public class Blocks implements ContentList{
             requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
             size = 5;
             itemCapacity = 500;
-            hasPower = true;
 
             consumes.items(ItemStack.with(Items.copper, 500));
-            consumes.power(3f);
         }};
 
         dataProcessor = new ResearchBlock("data-processor"){{
