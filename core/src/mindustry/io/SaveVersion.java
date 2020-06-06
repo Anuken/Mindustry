@@ -269,8 +269,8 @@ public abstract class SaveVersion extends SaveFileReader{
         stream.writeInt(data.size);
         for(TeamData team : data){
             stream.writeInt(team.team.id);
-            stream.writeInt(team.brokenBlocks.size);
-            for(BrokenBlock block : team.brokenBlocks){
+            stream.writeInt(team.blocks.size);
+            for(BrokenBlock block : team.blocks){
                 stream.writeShort(block.x);
                 stream.writeShort(block.y);
                 stream.writeShort(block.rotation);
@@ -297,7 +297,7 @@ public abstract class SaveVersion extends SaveFileReader{
             TeamData data = team.data();
             int blocks = stream.readInt();
             for(int j = 0; j < blocks; j++){
-                data.brokenBlocks.addLast(new BrokenBlock(stream.readShort(), stream.readShort(), stream.readShort(), content.block(stream.readShort()).id, TypeIO.readObject(Reads.get(stream))));
+                data.blocks.addLast(new BrokenBlock(stream.readShort(), stream.readShort(), stream.readShort(), content.block(stream.readShort()).id, TypeIO.readObject(Reads.get(stream))));
             }
         }
 

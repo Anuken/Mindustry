@@ -80,11 +80,11 @@ abstract class BuilderComp implements Unitc{
         }
 
         if(!(tile.block() instanceof BuildBlock)){
-            if(!current.initialized && !current.breaking && Build.validPlace(team(), current.x, current.y, current.block, current.rotation)){
+            if(!current.initialized && !current.breaking && Build.validPlace(current.block, team(), current.x, current.y, current.rotation)){
                 boolean hasAll = !Structs.contains(current.block.requirements, i -> !core.items().has(i.item));
 
                 if(hasAll || state.rules.infiniteResources){
-                    Build.beginPlace(team(), current.x, current.y, current.block, current.rotation);
+                    Build.beginPlace(current.block, team(), current.x, current.y, current.rotation);
                 }else{
                     current.stuck = true;
                 }
@@ -138,7 +138,7 @@ abstract class BuilderComp implements Unitc{
                 control.input.drawBreaking(request);
             }else{
                 request.block.drawRequest(request, control.input.allRequests(),
-                Build.validPlace(team(), request.x, request.y, request.block, request.rotation) || control.input.requestMatches(request));
+                Build.validPlace(request.block, team(), request.x, request.y, request.rotation) || control.input.requestMatches(request));
             }
         }
 

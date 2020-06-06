@@ -3,6 +3,7 @@ package mindustry.content;
 import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
+import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
@@ -430,6 +431,8 @@ public class UnitTypes implements ContentList{
         }};
 
         phantom = new UnitType("phantom"){{
+            defaultController = BuilderAI::new;
+
             flying = true;
             drag = 0.05f;
             speed = 3f;

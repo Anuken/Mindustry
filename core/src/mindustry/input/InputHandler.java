@@ -507,7 +507,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        for(BrokenBlock req : player.team().data().brokenBlocks){
+        for(BrokenBlock req : player.team().data().blocks){
             Block block = content.block(req.block);
             if(block.bounds(req.x, req.y, Tmp.r2).overlaps(Tmp.r1)){
                 drawSelected(req.x, req.y, content.block(req.block), Pal.remove);
@@ -629,7 +629,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         //remove blocks to rebuild
-        Iterator<BrokenBlock> broken = state.teams.get(player.team()).brokenBlocks.iterator();
+        Iterator<BrokenBlock> broken = state.teams.get(player.team()).blocks.iterator();
         while(broken.hasNext()){
             BrokenBlock req = broken.next();
             Block block = content.block(req.block);
@@ -907,7 +907,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 return false;
             }
         }
-        return Build.validPlace(player.team(), x, y, type, rotation);
+        return Build.validPlace(type, player.team(), x, y, rotation);
     }
 
     public boolean validBreak(int x, int y){

@@ -5,6 +5,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -147,7 +148,8 @@ public class Teams{
         public final Array<CoreEntity> cores = new Array<>();
         public final Array<Team> enemies = new Array<>();
         public final Team team;
-        public Queue<BrokenBlock> brokenBlocks = new Queue<>();
+        public Queue<BrokenBlock> blocks = new Queue<>();
+        public BaseAI ai = new BaseAI();
 
         public TeamData(Team team){
             this.team = team;
@@ -167,6 +169,11 @@ public class Teams{
 
         public @Nullable CoreEntity core(){
             return cores.isEmpty() ? null : cores.first();
+        }
+
+        /** @return whether this team is controlled by the AI and builds bases. */
+        public boolean hasAI(){
+            return state.rules.attackMode && team == state.rules.waveTeam;
         }
 
         @Override

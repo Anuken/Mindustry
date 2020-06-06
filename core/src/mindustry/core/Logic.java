@@ -65,21 +65,21 @@ public class Logic implements ApplicationListener{
 
             //remove existing blocks that have been placed here.
             //painful O(n) iteration + copy
-            for(int i = 0; i < data.brokenBlocks.size; i++){
-                BrokenBlock b = data.brokenBlocks.get(i);
+            for(int i = 0; i < data.blocks.size; i++){
+                BrokenBlock b = data.blocks.get(i);
                 if(b.x == tile.x && b.y == tile.y){
-                    data.brokenBlocks.removeIndex(i);
+                    data.blocks.removeIndex(i);
                     break;
                 }
             }
 
-            data.brokenBlocks.addFirst(new BrokenBlock(tile.x, tile.y, tile.rotation(), block.id, tile.entity.config()));
+            data.blocks.addFirst(new BrokenBlock(tile.x, tile.y, tile.rotation(), block.id, tile.entity.config()));
         });
 
         Events.on(BlockBuildEndEvent.class, event -> {
             if(!event.breaking){
                 TeamData data = state.teams.get(event.team);
-                Iterator<BrokenBlock> it = data.brokenBlocks.iterator();
+                Iterator<BrokenBlock> it = data.blocks.iterator();
                 while(it.hasNext()){
                     BrokenBlock b = it.next();
                     Block block = content.block(b.block);
@@ -309,6 +309,12 @@ public class Logic implements ApplicationListener{
                 //weather is serverside
                 if(!net.client()){
                     updateWeather();
+
+                    for(TeamData data : state.teams.getActive()){
+                        if(data.hasAI()){
+                            data.ai.update(data);
+                        }
+                    }
                 }
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){

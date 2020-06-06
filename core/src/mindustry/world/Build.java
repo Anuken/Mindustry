@@ -42,8 +42,8 @@ public class Build{
 
     /** Places a BuildBlock at this location. */
     @Remote(called = Loc.server)
-    public static void beginPlace(Team team, int x, int y, Block result, int rotation){
-        if(!validPlace(team, x, y, result, rotation)){
+    public static void beginPlace(Block result, Team team, int x, int y, int rotation){
+        if(!validPlace(result, team, x, y, rotation)){
             return;
         }
 
@@ -62,7 +62,7 @@ public class Build{
     }
 
     /** Returns whether a tile can be placed at this location by this team. */
-    public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
+    public static boolean validPlace(Block type, Team team, int x, int y, int rotation){
         //the wave team can build whatever they want as long as it's visible - banned blocks are not applicable
         if(type == null || (!type.isPlaceable() && !(state.rules.waves && team == state.rules.waveTeam && type.isVisible()))){
             return false;
