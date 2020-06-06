@@ -29,8 +29,12 @@ abstract class BoundedComp implements Velc, Posc, Healthc, Flyingc{
         }
 
         //kill when out of bounds
-        if(x < -finalWorldBounds || y < -finalWorldBounds || x >= world.width() * tilesize + finalWorldBounds || y >= world.height() * tilesize + finalWorldBounds){
+        if(outOfBound()){
             kill();
         }
+    }
+
+    private boolean outOfBound() {
+        return x < -finalWorldBounds || y < -finalWorldBounds || x >= world.width() * tilesize + finalWorldBounds || y >= world.height() * tilesize + finalWorldBounds;
     }
 }
