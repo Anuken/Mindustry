@@ -21,7 +21,6 @@ public class SectorPreset extends UnlockableContent{
     public Array<Objective> requirements = new Array<>();
 
     public Cons<Rules> rules = rules -> {};
-    public boolean alwaysUnlocked;
     public int conditionWave = Integer.MAX_VALUE;
     public int launchPeriod = 10;
     public Schematic loadout = Loadouts.basicShard;
@@ -153,11 +152,6 @@ public class SectorPreset extends UnlockableContent{
         for(ItemStack stack : startingItems){
             defaultStartingItems.add(new ItemStack(stack.item, stack.amount));
         }
-    }
-
-    @Override
-    public boolean alwaysUnlocked(){
-        return alwaysUnlocked;
     }
 
     @Override

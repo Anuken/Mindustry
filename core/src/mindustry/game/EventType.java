@@ -289,14 +289,13 @@ public class EventType{
         }
     }
 
-    //TODO rename
-    public static class MechChangeEvent{
+    public static class UnitChangeEvent{
         public final Playerc player;
-        public final UnitType mech;
+        public final Unitc unit;
 
-        public MechChangeEvent(Playerc player, UnitType mech){
+        public UnitChangeEvent(Playerc player, Unitc unit){
             this.player = player;
-            this.mech = mech;
+            this.unit = unit;
         }
     }
 

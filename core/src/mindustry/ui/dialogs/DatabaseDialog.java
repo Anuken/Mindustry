@@ -10,14 +10,13 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.ui;
 
-public class DatabaseDialog extends FloatingDialog{
+public class DatabaseDialog extends BaseDialog{
 
     public DatabaseDialog(){
         super("$database");

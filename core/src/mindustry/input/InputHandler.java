@@ -14,6 +14,8 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.ai.formations.*;
+import mindustry.ai.formations.patterns.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -32,6 +34,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
 import mindustry.world.blocks.power.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.util.*;
 
@@ -172,7 +175,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void onUnitControl(Playerc player, @Nullable Unitc unit){
-        if(unit == null){
+        //clear player unit when they possess a core
+        if((unit instanceof BlockUnitc && ((BlockUnitc)unit).tile() instanceof CoreEntity)){
+            Fx.spawn.at(player);
+            player.clearUnit();
+            player.deathTimer(60f); //for instant respawn
+        }else if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
         }else if(unit.isAI() && unit.team() == player.team()){
@@ -184,12 +192,56 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    public static void onUnitClear(Playerc player){
+        //no free core teleports?
+        if(!player.dead() && player.unit().spawnedByCore()) return;
+
+        Fx.spawn.at(player);
+        player.clearUnit();
+        player.deathTimer(60f); //for instant respawn
+    }
+
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    public static void onUnitCommand(Playerc player){
+        if(player.dead() || !(player.unit() instanceof Commanderc)) return;
+
+        Commanderc commander = (Commanderc)player.unit();
+
+        if(commander.isCommanding()){
+            commander.clearCommand();
+        }else{
+            FormationPattern pattern = new SquareFormation();
+            Formation formation = new Formation(new Vec3(player.x(), player.y(), player.unit().rotation()), pattern);
+            formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
+
+            units.clear();
+
+            Fx.commandSend.at(player);
+            Units.nearby(player.team(), player.x(), player.y(), 200f, u -> {
+                if(u.isAI()){
+                    units.add(u);
+                }
+            });
+
+            units.sort(u -> u.dst2(player.unit()));
+            units.truncate(player.unit().type().commandLimit);
+
+            commander.command(formation, units);
+        }
+
+    }
+
     public Eachable<BuildRequest> allRequests(){
         return cons -> {
             for(BuildRequest request : player.builder().requests()) cons.get(request);
             for(BuildRequest request : selectRequests) cons.get(request);
             for(BuildRequest request : lineRequests) cons.get(request);
         };
+    }
+
+    public boolean isUsingSchematic(){
+        return !selectRequests.isEmpty();
     }
 
     public OverlayFragment getFrag(){
@@ -209,6 +261,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(controlledType != null && player.dead()){
             Unitc unit = Units.closest(player.team(), player.x(), player.y(), u -> !u.isPlayer() && u.type() == controlledType);
+
             if(unit != null){
                 Call.onUnitControl(player, unit);
             }
@@ -218,6 +271,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void checkUnit(){
         if(controlledType != null){
             Unitc unit = Units.closest(player.team(), player.x(), player.y(), u -> !u.isPlayer() && u.type() == controlledType);
+            if(unit == null && controlledType == UnitTypes.block){
+                unit = world.entWorld(player.x(), player.y()) instanceof ControlBlock ? ((ControlBlock)world.entWorld(player.x(), player.y())).unit() : null;
+            }
+
             if(unit != null){
                 if(net.client()){
                     Call.onUnitControl(player, unit);
@@ -450,7 +507,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        for(BrokenBlock req : player.team().data().brokenBlocks){
+        for(BlockPlan req : player.team().data().blocks){
             Block block = content.block(req.block);
             if(block.bounds(req.x, req.y, Tmp.r2).overlaps(Tmp.r1)){
                 drawSelected(req.x, req.y, content.block(req.block), Pal.remove);
@@ -572,9 +629,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         //remove blocks to rebuild
-        Iterator<BrokenBlock> broken = state.teams.get(player.team()).brokenBlocks.iterator();
+        Iterator<BlockPlan> broken = state.teams.get(player.team()).blocks.iterator();
         while(broken.hasNext()){
-            BrokenBlock req = broken.next();
+            BlockPlan req = broken.next();
             Block block = content.block(req.block);
             if(block.bounds(req.x, req.y, Tmp.r2).overlaps(Tmp.r1)){
                 broken.remove();
@@ -748,6 +805,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 return unit;
             }
         }
+
+        Tilec tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+        if(tile instanceof ControlBlock && tile.team() == player.team()){
+            return ((ControlBlock)tile).unit();
+        }
+
         return null;
     }
 
@@ -844,7 +907,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 return false;
             }
         }
-        return Build.validPlace(player.team(), x, y, type, rotation);
+        return Build.validPlace(type, player.team(), x, y, rotation);
     }
 
     public boolean validBreak(int x, int y){
@@ -960,7 +1023,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    class PlaceLine{
+    static class PlaceLine{
         public int x, y, rotation;
         public boolean last;
     }

@@ -9,7 +9,8 @@ import mindustry.gen.*;
 abstract class VelComp implements Posc{
     @Import float x, y;
 
-    final Vec2 vel = new Vec2();
+    //TODO @SyncLocal this? does it even need to be sent?
+    transient final Vec2 vel = new Vec2();
     transient float drag = 0f;
 
     //velocity needs to be called first, as it affects delta and lastPosition
@@ -21,7 +22,7 @@ abstract class VelComp implements Posc{
     }
 
     boolean moving(){
-        return !vel.isZero(0.001f);
+        return !vel.isZero(0.01f);
     }
 
     void move(float cx, float cy){

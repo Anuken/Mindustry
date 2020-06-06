@@ -346,7 +346,7 @@ public class Mods implements Loadable{
                 for(Fi file : folder.list()){
                     if(file.name().startsWith("bundle") && file.extension().equals("properties")){
                         String name = file.nameWithoutExtension();
-                        bundles.getOr(name, Array::new).add(file);
+                        bundles.get(name, Array::new).add(file);
                     }
                 }
             }
@@ -357,7 +357,7 @@ public class Mods implements Loadable{
         while(bundle != null){
             String str = bundle.getLocale().toString();
             String locale = "bundle" + (str.isEmpty() ? "" : "_" + str);
-            for(Fi file : bundles.getOr(locale, Array::new)){
+            for(Fi file : bundles.get(locale, Array::new)){
                 try{
                     PropertiesUtils.load(bundle.getProperties(), file.reader());
                 }catch(Throwable e){

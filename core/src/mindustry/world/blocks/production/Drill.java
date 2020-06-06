@@ -158,7 +158,7 @@ public class Drill extends Block{
         });
 
         stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
-        if(liquidBoostIntensity > 0){
+        if(liquidBoostIntensity != 1){
             stats.add(BlockStat.boostEffect, liquidBoostIntensity * liquidBoostIntensity, StatUnit.timesSpeed);
         }
     }
@@ -280,12 +280,14 @@ public class Drill extends Block{
                 return;
             }
 
-            if(dominantItems > 0 && progress >= drillTime + hardnessDrillMultiplier * dominantItem.hardness && items.total() < itemCapacity){
+            float delay = drillTime + hardnessDrillMultiplier * dominantItem.hardness;
+
+            if(dominantItems > 0 && progress >= delay && items.total() < itemCapacity){
                 offload(dominantItem);
                 useContent(dominantItem);
 
-                index++;
-                progress = 0f;
+                index ++;
+                progress %= delay;
 
                 drillEffect.at(getX() + Mathf.range(size), getY() + Mathf.range(size), dominantItem.color);
             }

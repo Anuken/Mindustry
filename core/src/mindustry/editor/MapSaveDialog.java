@@ -8,7 +8,7 @@ import mindustry.ui.dialogs.*;
 
 import static mindustry.Vars.ui;
 
-public class MapSaveDialog extends FloatingDialog{
+public class MapSaveDialog extends BaseDialog{
     private TextField field;
     private Cons<String> listener;
 

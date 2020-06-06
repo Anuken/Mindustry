@@ -88,18 +88,18 @@ public abstract class SaveFileReader{
     }
 
     /** Reads a chunk of some length. Use the runner for reading to catch more descriptive errors. */
-    public int readChunk(DataInput input, boolean isByte, IORunner<DataInput> runner) throws IOException{
-        int length = isByte ? input.readUnsignedShort() : input.readInt();
+    public int readChunk(DataInput input, boolean isShort, IORunner<DataInput> runner) throws IOException{
+        int length = isShort ? input.readUnsignedShort() : input.readInt();
         runner.accept(input);
         return length;
     }
 
-    public void skipRegion(DataInput input) throws IOException{
-        skipRegion(input, false);
+    public void skipChunk(DataInput input) throws IOException{
+        skipChunk(input, false);
     }
 
-    /** Skip a region completely. */
-    public void skipRegion(DataInput input, boolean isByte) throws IOException{
+    /** Skip a chunk completely, discarding the bytes. */
+    public void skipChunk(DataInput input, boolean isByte) throws IOException{
         int length = readChunk(input, isByte, t -> {});
         int skipped = input.skipBytes(length);
         if(length != skipped){

@@ -23,7 +23,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Import float x, y, rotation, elevation, maxHealth;
 
-    private transient UnitController controller;
+    private UnitController controller;
     private UnitType type;
     boolean spawnedByCore;
 
@@ -69,6 +69,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public UnitController controller(){
         return controller;
+    }
+
+    public void resetController(){
+        controller(type.createController());
     }
 
     @Override
@@ -125,6 +129,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public void remove(){
         teamIndex.updateCount(team(), -1);
+        controller.removed(this);
     }
 
     @Override

@@ -12,12 +12,14 @@ import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
@@ -28,17 +30,17 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     static final float deathDelay = 30f;
 
     @NonNull @ReadOnly Unitc unit = Nulls.unit;
+    transient @Nullable NetConnection con;
 
     @ReadOnly Team team = Team.sharded;
     String name = "noname";
-    @Nullable NetConnection con;
-    boolean admin, typing;
+    boolean admin, typing, shooting, boosting;
     Color color = new Color();
     float mouseX, mouseY;
-    float deathTimer;
 
-    String lastText = "";
-    float textFadeTime;
+    transient float deathTimer;
+    transient String lastText = "";
+    transient float textFadeTime;
 
     public boolean isBuilder(){
         return unit instanceof Builderc;
@@ -64,12 +66,21 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Replace
     public float clipSize(){
-        return 20;
+        return unit.isNull() ? 20 : unit.type().hitsize * 2f;
+    }
+
+    @Override
+    public void afterSync(){
+        unit.aim(mouseX, mouseY);
+        //this is only necessary when the thing being controlled isn't synced
+        unit.controlWeapons(shooting, shooting);
+        //extra precaution, necessary for non-synced things
+        unit.controller(this);
     }
 
     @Override
     public void update(){
-        if(unit.dead()){
+        if(!unit.isValid()){
             clearUnit();
         }
 
@@ -80,14 +91,24 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             y(unit.y());
             unit.team(team);
             deathTimer = 0;
+
+            //update some basic state to sync things
+            if(unit.type().canBoost){
+                Tile tile = unit.tileOn();
+                unit.elevation(Mathf.approachDelta(unit.elevation(), (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f));
+            }
         }else if(core != null){
+            //have a small delay before death to prevent the camera from jumping around too quickly
+            //(this is not for balance)
             deathTimer += Time.delta();
             if(deathTimer >= deathDelay){
                 core.requestSpawn((Playerc)this);
+                deathTimer = 0;
             }
         }
 
         textFadeTime -= Time.delta() / (60 * 5);
+
     }
 
     public void team(Team team){
@@ -113,6 +134,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     public void unit(Unitc unit){
         if(unit == null) throw new IllegalArgumentException("Unit cannot be null. Use clearUnit() instead.");
+        if(this.unit == unit) return;
         if(this.unit != Nulls.unit){
             //un-control the old unit
             this.unit.controller(this.unit.type().createController());
@@ -122,10 +144,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             unit.team(team);
             unit.controller(this);
         }
+
+        Events.fire(new UnitChangeEvent((Playerc)this, unit));
     }
 
     boolean dead(){
-        return unit.isNull();
+        return unit.isNull() || !unit.isValid();
     }
 
     String uuid(){

@@ -26,7 +26,7 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
-public class MapGenerateDialog extends FloatingDialog{
+public class MapGenerateDialog extends BaseDialog{
     private final Prov<GenerateFilter>[] filterTypes = new Prov[]{
         NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
         RiverNoiseFilter::new, OreFilter::new, OreMedianFilter::new, MedianFilter::new,
@@ -52,7 +52,7 @@ public class MapGenerateDialog extends FloatingDialog{
     private CachedTile ctile = new CachedTile(){
         //nothing.
         @Override
-        protected void changeEntity(Team team){
+        protected void changeEntity(Team team, Prov<Tilec> entityprov){
 
         }
     };
@@ -284,7 +284,7 @@ public class MapGenerateDialog extends FloatingDialog{
     }
 
     void showAdd(){
-        FloatingDialog selection = new FloatingDialog("$add");
+        BaseDialog selection = new BaseDialog("$add");
         selection.setFillParent(false);
         selection.cont.defaults().size(210f, 60f);
         int i = 0;
@@ -410,7 +410,7 @@ public class MapGenerateDialog extends FloatingDialog{
             this.floor = floor.id;
             this.block = wall.id;
             this.ore = ore.id;
-            this.team = (byte) team.id;
+            this.team = team.id;
             this.rotation = (byte)rotation;
         }
 

@@ -19,7 +19,7 @@ public class Weapon{
     /** whether to mirror the weapon (draw two of them, which is the default) */
     public boolean mirror = true;
     /** whether to flip the weapon's position/side on the ship (only valid when mirror is false) */
-    public boolean flipped = false;
+    public boolean flipped = false, flipSprite = false;
     /** whether to shoot the weapons in different arms one after another, rather than all at once; only valid when mirror = true */
     public boolean alternate = false;
     /** whether to rotate toward the target independently of unit */
@@ -47,7 +47,7 @@ public class Weapon{
     /** delay in ticks between shots */
     public float shotDelay = 0;
     /** The half-radius of the cone in which shooting will start. */
-    public float shootCone = 1.5f;
+    public float shootCone = 5f;
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
     /** sound used for shooting */

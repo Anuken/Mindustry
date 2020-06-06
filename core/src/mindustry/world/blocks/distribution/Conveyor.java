@@ -63,7 +63,7 @@ public class Conveyor extends Block implements Autotiler{
         if(bits == null) return;
 
         TextureRegion region = regions[bits[0]][0];
-        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl * req.animScale, region.getHeight() * bits[2] * Draw.scl * req.animScale, req.rotation * 90);
+        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl, region.getHeight() * bits[2] * Draw.scl, req.rotation * 90);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class Conveyor extends Block implements Autotiler{
         int lastInserted, mid;
         float minitem = 1;
 
-        int blendbits;
+        int blendbits, blending;
         int blendsclx, blendscly;
 
         float clogHeat = 0f;
@@ -116,10 +116,22 @@ public class Conveyor extends Block implements Autotiler{
         public void draw(){
             byte rotation = tile.rotation();
             int frame = clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * timeScale())) % 4) : 0;
-            Draw.rect(regions[Mathf.clamp(blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], x, y,
-            tilesize * blendsclx, tilesize * blendscly, rotation * 90);
 
-            //TODO is clustering necessary? does it create garbage?
+            //draw extra conveyors facing this one for non-square tiling purposes
+            Draw.z(Layer.blockUnder);
+            for(int i = 0; i < 4; i++){
+                if((blending & (1 << i)) != 0){
+                    int dir = rotation - i;
+                    float rot = i == 0 ? rotation * 90 : (dir)*90;
+
+                    Draw.rect(sliced(regions[0][frame], i != 0 ? 1 : 2), x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, rot);
+                }
+            }
+
+            Draw.z(Layer.block);
+
+            Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
+
             Draw.z(Layer.blockOver);
 
             for(int i = 0; i < len; i++){
@@ -128,8 +140,9 @@ public class Conveyor extends Block implements Autotiler{
                 tr2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
 
                 Draw.rect(item.icon(Cicon.medium),
-                (tile.x * tilesize + tr1.x * ys[i] + tr2.x),
-                (tile.y * tilesize + tr1.y * ys[i] + tr2.y), itemSize, itemSize);
+                    (tile.x * tilesize + tr1.x * ys[i] + tr2.x),
+                    (tile.y * tilesize + tr1.y * ys[i] + tr2.y),
+                    itemSize, itemSize);
             }
         }
 
@@ -146,6 +159,7 @@ public class Conveyor extends Block implements Autotiler{
             blendbits = bits[0];
             blendsclx = bits[1];
             blendscly = bits[2];
+            blending = bits[4];
 
             if(tile.front() != null && tile.front() != null){
                 next = tile.front();
@@ -249,7 +263,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void getStackOffset(Item item, Vec2 trns){
-            trns.trns(tile.rotation() * 90 + 180f, tilesize / 2f);
+            trns.trns(tile.rotdeg() + 180f, tilesize / 2f);
         }
 
         @Override

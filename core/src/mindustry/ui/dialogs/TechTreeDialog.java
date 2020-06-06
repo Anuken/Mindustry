@@ -1,8 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.scene.ui.layout.Stack;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
@@ -13,16 +11,18 @@ import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
+import mindustry.game.Objectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.ui.layout.*;
 import mindustry.ui.layout.TreeLayout.*;
 
@@ -30,7 +30,7 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-public class TechTreeDialog extends FloatingDialog{
+public class TechTreeDialog extends BaseDialog{
     private final float nodeSize = Scl.scl(60f);
     private ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
     private TechTreeNode root = new TechTreeNode(TechTree.root, null);
@@ -360,6 +360,21 @@ public class TechTreeDialog extends FloatingDialog{
                                     list.label(() -> " " + Math.min(data.getItem(req.item), req.amount) + " / " + req.amount)
                                     .update(l -> l.setColor(data.has(req.item, req.amount) ? Color.lightGray : Color.scarlet));
                                 }).fillX().left();
+                                t.row();
+                            }
+
+                            //TODO test if this works
+                            if(node.objectives.length > 0){
+                                t.table(r -> {
+                                    r.add("$complete").colspan(2).left();
+                                    r.row();
+                                    for(Objective o : node.objectives){
+                                        r.image(Icon.right).padRight(4);
+                                        r.add(o.display()).color(Color.lightGray);
+                                        r.image(o.complete() ? Icon.ok : Icon.cancel, o.complete() ? Color.lightGray : Color.scarlet).padLeft(3);
+                                        r.row();
+                                    }
+                                });
                                 t.row();
                             }
                         });

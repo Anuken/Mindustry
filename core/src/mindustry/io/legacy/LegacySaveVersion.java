@@ -110,7 +110,7 @@ public abstract class LegacySaveVersion extends SaveVersion{
             int amount = stream.readInt();
             for(int j = 0; j < amount; j++){
                 //simply skip all the entities
-                skipRegion(stream, true);
+                skipChunk(stream, true);
             }
         }
     }

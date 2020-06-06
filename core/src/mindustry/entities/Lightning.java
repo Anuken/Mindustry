@@ -11,7 +11,6 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-//TODO move into a different class
 public class Lightning{
     private static final Rand random = new Rand();
     private static final Rect rect = new Rect();

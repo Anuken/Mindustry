@@ -19,7 +19,7 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class JoinDialog extends FloatingDialog{
+public class JoinDialog extends BaseDialog{
     Array<Server> servers = new Array<>();
     Dialog add;
     Server renaming;
@@ -44,7 +44,7 @@ public class JoinDialog extends FloatingDialog{
             buttons.button("?", () -> ui.showInfo("$join.info")).size(60f, 64f).width(-1);
         }
 
-        add = new FloatingDialog("$joingame.title");
+        add = new BaseDialog("$joingame.title");
         add.cont.add("$joingame.ip").padRight(5f).left();
 
         TextField field = add.cont.field(Core.settings.getString("ip"), text -> {
@@ -61,15 +61,12 @@ public class JoinDialog extends FloatingDialog{
                 Server server = new Server();
                 server.setIP(Core.settings.getString("ip"));
                 servers.add(server);
-                saveServers();
-                setupRemote();
-                refreshRemote();
             }else{
                 renaming.setIP(Core.settings.getString("ip"));
-                saveServers();
-                setupRemote();
-                refreshRemote();
             }
+            saveServers();
+            setupRemote();
+            refreshRemote();
             add.hide();
         }).disabled(b -> Core.settings.getString("ip").isEmpty() || net.active());
 

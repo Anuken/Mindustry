@@ -35,6 +35,8 @@ public abstract class BulletType extends Content{
     public float ammoMultiplier = 2f;
     /** Multiplied by turret reload speed to get final shoot speed. */
     public float reloadMultiplier = 1f;
+    /** Multiplier of how much base damage is done to tiles. */
+    public float tileDamageMultiplier = 1f;
     /** Recoil from shooter entities. */
     public float recoil;
     /** Whether to kill the shooter when this is shot. For suicide bombers. */
@@ -61,6 +63,10 @@ public abstract class BulletType extends Content{
     public boolean collides = true;
     /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
+    /** Whether to scale velocity to disappear at the target position. Used for artillery. */
+    public boolean scaleVelocity;
+    /** Whether this bullet can be hit by point defense. */
+    public boolean hittable = true;
 
     //additional effects
 
@@ -78,12 +84,13 @@ public abstract class BulletType extends Content{
     public float homingPower = 0f;
     public float homingRange = 50f;
 
-    public int lightining;
+    public int lightning;
     public int lightningLength = 5;
+    /** Use a negative value to use default bullet damage. */
+    public float lightningDamage = -1;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
-
     public float hitShake = 0f;
 
     public BulletType(float speed, float damage){
@@ -132,18 +139,18 @@ public abstract class BulletType extends Content{
         if(splashDamageRadius > 0){
             Damage.damage(b.team(), x, y, splashDamageRadius, splashDamage * b.damageMultiplier());
         }
+
+        for(int i = 0; i < lightning; i++){
+            Lightning.create(b.team(), Pal.surge, lightningDamage < 0 ? damage : lightningDamage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
+        }
     }
 
     public void despawned(Bulletc b){
         despawnEffect.at(b.getX(), b.getY(), b.rotation());
         hitSound.at(b);
 
-        if(fragBullet != null || splashDamageRadius > 0){
+        if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
             hit(b);
-        }
-
-        for(int i = 0; i < lightining; i++){
-            Lightning.create(b.team(), Pal.surge, damage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
         }
     }
 
@@ -162,7 +169,7 @@ public abstract class BulletType extends Content{
 
     public void update(Bulletc b){
         if(homingPower > 0.0001f){
-            Teamc target = Units.closestTarget(b.team(), b.getX(), b.getY(), homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir));
+            Teamc target = Units.closestTarget(b.team(), b.getX(), b.getY(), homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
             if(target != null){
                 b.vel().setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));
             }
@@ -177,8 +184,6 @@ public abstract class BulletType extends Content{
     public ContentType getContentType(){
         return ContentType.bullet;
     }
-
-    //TODO change 'create' to 'at'
 
     public Bulletc create(Teamc owner, float x, float y, float angle){
         return create(owner, owner.team(), x, y, angle);

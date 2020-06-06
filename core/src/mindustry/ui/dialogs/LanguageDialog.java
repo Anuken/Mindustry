@@ -13,7 +13,7 @@ import java.util.Locale;
 import static mindustry.Vars.locales;
 import static mindustry.Vars.ui;
 
-public class LanguageDialog extends FloatingDialog{
+public class LanguageDialog extends BaseDialog{
     private Locale lastLocale;
     private ObjectMap<Locale, String> displayNames = ObjectMap.of(
         Locale.TRADITIONAL_CHINESE, "正體中文",

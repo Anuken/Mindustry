@@ -30,7 +30,7 @@ public class LoadRegionProcessor extends BaseProcessor{
                 err("@LoadRegion field must be public", field);
             }
 
-            fieldMap.getOr(field.enclosingType(), Array::new).add(field);
+            fieldMap.get(field.enclosingType(), Array::new).add(field);
         }
 
         for(Entry<Stype, Array<Svar>> entry : fieldMap){
@@ -41,7 +41,7 @@ public class LoadRegionProcessor extends BaseProcessor{
                 //get # of array dimensions
                 int dims = count(field.mirror().toString(), "[]");
                 boolean doFallback = !an.fallback().equals("error");
-                String fallbackString = doFallback ? ", " + parse(an.value()).replace("content.name", '"' + an.fallback() + '"') : "";
+                String fallbackString = doFallback ? ", " + parse(an.fallback()) : "";
 
                 //not an array
                 if(dims == 0){

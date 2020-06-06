@@ -1,6 +1,6 @@
 package mindustry.editor;
 
-import mindustry.annotations.Annotations.Struct;
+import mindustry.annotations.Annotations.*;
 import arc.struct.LongArray;
 import mindustry.game.Team;
 import mindustry.gen.TileOp;

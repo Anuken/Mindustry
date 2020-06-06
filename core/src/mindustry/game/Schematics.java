@@ -6,12 +6,14 @@ import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.io.Streams.*;
+import arc.util.pooling.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -38,6 +40,8 @@ import static mindustry.Vars.*;
 
 /** Handles schematics.*/
 public class Schematics implements Loadable{
+    private static final Schematic tmpSchem = new Schematic(new Array<>(), new StringMap(), 0, 0);
+    private static final Schematic tmpSchem2 = new Schematic(new Array<>(), new StringMap(), 0, 0);
     public static final String base64Header = "bXNjaAB";
 
     private static final byte[] header = {'m', 's', 'c', 'h'};
@@ -106,6 +110,9 @@ public class Schematics implements Loadable{
         if(shadowBuffer == null){
             Core.app.post(() -> shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 8, maxSchematicSize + padding + 8));
         }
+
+        //load base schematics
+        bases.load();
     }
 
     public void overwrite(Schematic target, Schematic newSchematic){
@@ -372,14 +379,18 @@ public class Schematics implements Loadable{
     }
 
     public static void placeLoadout(Schematic schem, int x, int y){
+        placeLoadout(schem, x, y, state.rules.defaultTeam, Blocks.oreCopper);
+    }
+
+    public static void placeLoadout(Schematic schem, int x, int y, Team team, Block resource){
         Stile coreTile = schem.tiles.find(s -> s.block instanceof CoreBlock);
-        if(coreTile == null) throw new IllegalArgumentException("Schematic has no core tile. Exiting.");
+        if(coreTile == null) throw new IllegalArgumentException("Loadout schematic has no core tile!");
         int ox = x - coreTile.x, oy = y - coreTile.y;
         schem.tiles.each(st -> {
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
-            tile.setBlock(st.block, state.rules.defaultTeam, 0);
+            tile.setBlock(st.block, team, 0);
             tile.rotation(st.rotation);
 
             Object config = st.config;
@@ -388,7 +399,23 @@ public class Schematics implements Loadable{
             }
 
             if(st.block instanceof Drill){
-                tile.getLinkedTiles(t -> t.setOverlay(Blocks.oreCopper));
+                tile.getLinkedTiles(t -> t.setOverlay(resource));
+            }
+        });
+    }
+
+    public static void place(Schematic schem, int x, int y, Team team){
+        int ox = x - schem.width/2, oy = y - schem.height/2;
+        schem.tiles.each(st -> {
+            Tile tile = world.tile(st.x + ox, st.y + oy);
+            if(tile == null) return;
+
+            tile.setBlock(st.block, team, 0);
+            tile.rotation(st.rotation);
+
+            Object config = st.config;
+            if(tile.entity != null){
+                tile.entity.configureAny(config);
             }
         });
     }
@@ -501,6 +528,70 @@ public class Schematics implements Loadable{
         if(block instanceof LightBlock) return value;
 
         return null;
+    }
+
+    //endregion
+    //region misc utility
+
+    /** @return a temporary schematic representing the input rotated 90 degrees counterclockwise N times. */
+    public static Schematic rotate(Schematic input, int times){
+        if(times == 0) return input;
+
+        boolean sign = times > 0;
+        for(int i = 0; i < Math.abs(times); i++){
+            input = rotated(input, sign);
+        }
+        return input;
+    }
+
+    private static Schematic rotated(Schematic input, boolean counter){
+        int direction = Mathf.sign(counter);
+        Schematic schem = input == tmpSchem ? tmpSchem2 : tmpSchem2;
+        schem.width = input.width;
+        schem.height = input.height;
+        Pools.freeAll(schem.tiles);
+        schem.tiles.clear();
+        for(Stile tile : input.tiles){
+            schem.tiles.add(Pools.obtain(Stile.class, Stile::new).set(tile));
+        }
+
+        int ox = schem.width/2, oy = schem.height/2;
+
+        schem.tiles.each(req -> {
+            req.config = BuildRequest.pointConfig(req.config, p -> {
+                int cx = p.x, cy = p.y;
+                int lx = cx;
+
+                if(direction >= 0){
+                    cx = -cy;
+                    cy = lx;
+                }else{
+                    cx = cy;
+                    cy = -lx;
+                }
+                p.set(cx, cy);
+            });
+
+            //rotate actual request, centered on its multiblock position
+            float wx = (req.x - ox) * tilesize + req.block.offset(), wy = (req.y - oy) * tilesize + req.block.offset();
+            float x = wx;
+            if(direction >= 0){
+                wx = -wy;
+                wy = x;
+            }else{
+                wx = wy;
+                wy = -x;
+            }
+            req.x = (short)(world.toTile(wx - req.block.offset()) + ox);
+            req.y = (short)(world.toTile(wy - req.block.offset()) + oy);
+            req.rotation = (byte)Mathf.mod(req.rotation + direction, 4);
+        });
+
+        //assign flipped values, since it's rotated
+        schem.width = input.height;
+        schem.height = input.width;
+
+        return schem;
     }
 
     //endregion

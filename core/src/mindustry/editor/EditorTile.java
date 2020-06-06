@@ -1,5 +1,6 @@
 package mindustry.editor;
 
+import arc.func.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.editor.DrawOperation.*;
@@ -108,9 +109,9 @@ public class EditorTile extends Tile{
     }
     
     @Override
-    protected void changeEntity(Team team){
+    protected void changeEntity(Team team, Prov<Tilec> entityprov){
         if(state.isGame()){
-            super.changeEntity(team);
+            super.changeEntity(team, entityprov);
             return;
         }
 
@@ -122,7 +123,7 @@ public class EditorTile extends Tile{
         Block block = block();
 
         if(block.hasEntity()){
-            entity = block.newEntity().init(this, team, false);
+            entity = entityprov.get().init(this, team, false);
             entity.cons(new ConsumeModule(entity));
             if(block.hasItems) entity.items(new ItemModule());
             if(block.hasLiquids) entity.liquids(new LiquidModule());

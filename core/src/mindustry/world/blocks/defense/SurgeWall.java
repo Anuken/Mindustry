@@ -7,7 +7,7 @@ import mindustry.graphics.*;
 
 public class SurgeWall extends Wall{
     public float lightningChance = 0.05f;
-    public float lightningDamage = 15f;
+    public float lightningDamage = 20f;
     public int lightningLength = 17;
 
     public SurgeWall(String name){

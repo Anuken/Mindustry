@@ -33,10 +33,6 @@ import static mindustry.Vars.*;
 public class Logic implements ApplicationListener{
 
     public Logic(){
-        Events.on(WorldLoadEvent.class, event -> {
-            //TODO remove later
-            //Weathers.snow.create();
-        });
 
         Events.on(WaveEvent.class, event -> {
             if(state.isCampaign()){
@@ -69,23 +65,23 @@ public class Logic implements ApplicationListener{
 
             //remove existing blocks that have been placed here.
             //painful O(n) iteration + copy
-            for(int i = 0; i < data.brokenBlocks.size; i++){
-                BrokenBlock b = data.brokenBlocks.get(i);
+            for(int i = 0; i < data.blocks.size; i++){
+                BlockPlan b = data.blocks.get(i);
                 if(b.x == tile.x && b.y == tile.y){
-                    data.brokenBlocks.removeIndex(i);
+                    data.blocks.removeIndex(i);
                     break;
                 }
             }
 
-            data.brokenBlocks.addFirst(new BrokenBlock(tile.x, tile.y, tile.rotation(), block.id, tile.entity.config()));
+            data.blocks.addFirst(new BlockPlan(tile.x, tile.y, tile.rotation(), block.id, tile.entity.config()));
         });
 
         Events.on(BlockBuildEndEvent.class, event -> {
             if(!event.breaking){
                 TeamData data = state.teams.get(event.team);
-                Iterator<BrokenBlock> it = data.brokenBlocks.iterator();
+                Iterator<BlockPlan> it = data.blocks.iterator();
                 while(it.hasNext()){
-                    BrokenBlock b = it.next();
+                    BlockPlan b = it.next();
                     Block block = content.block(b.block);
                     if(event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1).overlaps(block.bounds(b.x, b.y, Tmp.r2))){
                         it.remove();
@@ -94,7 +90,7 @@ public class Logic implements ApplicationListener{
             }
         });
 
-        Events.on(LaunchItemEvent.class, e -> state.stats.handleItemExport(e.stack));
+        Events.on(LaunchItemEvent.class, e -> state.secinfo.handleItemExport(e.stack));
 
         //when loading a 'damaged' sector, propagate the damage
         Events.on(WorldLoadEvent.class, e -> {
@@ -104,13 +100,14 @@ public class Logic implements ApplicationListener{
             }
         });
 
-        //TODO this should be in the same place as launch handling code
+        //TODO dying takes up a turn (?)
+        /*
         Events.on(GameOverEvent.class, e -> {
             //simulate a turn on a normal non-launch gameover
             if(state.isCampaign() && !state.launched){
                 universe.runTurn();
             }
-        });
+        });*/
 
         //disable new waves after the boss spawns
         Events.on(WaveEvent.class, e -> {
@@ -273,11 +270,9 @@ public class Logic implements ApplicationListener{
 
             //save over the data w/o the cores
             sector.save.save();
-            //TODO mark sector as not containing any cores
 
             //run a turn, since launching takes up a turn
             universe.runTurn();
-            //TODO needs extra damage to prevent player from landing immediately afterwards
             sector.setTurnsPassed(sector.getTurnsPassed() + 3);
 
             Events.fire(new LaunchEvent());
@@ -304,7 +299,7 @@ public class Logic implements ApplicationListener{
             }
 
             if(!state.isPaused()){
-                state.stats.update();
+                state.secinfo.update();
 
                 if(state.isCampaign()){
                     universe.update();
@@ -314,6 +309,20 @@ public class Logic implements ApplicationListener{
                 //weather is serverside
                 if(!net.client()){
                     updateWeather();
+
+                    for(TeamData data : state.teams.getActive()){
+                        if(data.hasAI() && data.hasCore()){
+                            data.ai.update();
+                        }
+
+                        //TODO this is terrible
+                        //fills enemy core with resources
+                        if(state.rules.enemyInfiniteResources && state.rules.waves && data.team == state.rules.waveTeam && data.hasCore()){
+                            for(Item item : content.items()){
+                                data.core().items.set(item, data.core().block.itemCapacity);
+                            }
+                        }
+                    }
                 }
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){

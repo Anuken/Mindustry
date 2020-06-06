@@ -15,28 +15,27 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-public class CustomRulesDialog extends FloatingDialog{
+public class CustomRulesDialog extends BaseDialog{
     private Table main;
     private Rules rules;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
-    private FloatingDialog banDialog;
+    private BaseDialog banDialog;
 
     public CustomRulesDialog(){
         super("$mode.custom");
 
         loadoutDialog = new LoadoutDialog();
-        banDialog = new FloatingDialog("$bannedblocks");
+        banDialog = new BaseDialog("$bannedblocks");
         banDialog.addCloseButton();
 
         banDialog.shown(this::rebuildBanned);
         banDialog.buttons.button("$addall", Icon.add, () -> {
-            rules.bannedBlocks.addAll(content.blocks().select(Block::isBuildable));
+            rules.bannedBlocks.addAll(content.blocks().select(Block::canBeBuilt));
             rebuildBanned();
         }).size(180, 64f);
 
@@ -85,11 +84,11 @@ public class CustomRulesDialog extends FloatingDialog{
         }).get().setScrollYForce(previousScroll);
         banDialog.cont.row();
         banDialog.cont.button("$add", Icon.add, () -> {
-            FloatingDialog dialog = new FloatingDialog("$add");
+            BaseDialog dialog = new BaseDialog("$add");
             dialog.cont.pane(t -> {
                 t.left().margin(14f);
                 int[] i = {0};
-                content.blocks().each(b -> !rules.bannedBlocks.contains(b) && b.isBuildable(), b -> {
+                content.blocks().each(b -> !rules.bannedBlocks.contains(b) && b.canBeBuilt(), b -> {
                     int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
                     t.button(new TextureRegionDrawable(b.icon(Cicon.medium)), Styles.cleari, () -> {
                         rules.bannedBlocks.add(b);
@@ -134,9 +133,6 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true);
         number("$rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
-        title("$rules.title.respawns");
-        number("$rules.respawntime", f -> rules.respawnTime = f * 60f, () -> rules.respawnTime / 60f);
-
         title("$rules.title.resourcesbuilding");
         check("$rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
         check("$rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
@@ -157,10 +153,6 @@ public class CustomRulesDialog extends FloatingDialog{
         main.button("$bannedblocks", banDialog::show).left().width(300f);
         main.row();
 
-        title("$rules.title.player");
-        number("$rules.playerhealthmultiplier", f -> rules.playerHealthMultiplier = f, () -> rules.playerHealthMultiplier);
-        number("$rules.playerdamagemultiplier", f -> rules.playerDamageMultiplier = f, () -> rules.playerDamageMultiplier);
-
         title("$rules.title.unit");
         number("$rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
         number("$rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
@@ -171,7 +163,7 @@ public class CustomRulesDialog extends FloatingDialog{
         check("$rules.enemyCheat", b -> rules.enemyCheat = b, () -> rules.enemyCheat);
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
-        title("$rules.title.experimental");
+        title("$rules.title.environment");
         number("$rules.solarpowermultiplier", f -> rules.solarPowerMultiplier = f, () -> rules.solarPowerMultiplier);
         check("$rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
 
@@ -185,6 +177,8 @@ public class CustomRulesDialog extends FloatingDialog{
             b.add("$rules.ambientlight");
         }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f);
         main.row();
+
+        //TODO add weather patterns
     }
 
     void number(String text, Floatc cons, Floatp prov){

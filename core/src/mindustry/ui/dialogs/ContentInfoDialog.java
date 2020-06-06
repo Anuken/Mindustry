@@ -4,7 +4,7 @@ import arc.scene.ui.ScrollPane;
 import arc.scene.ui.layout.Table;
 import mindustry.ctype.UnlockableContent;
 
-public class ContentInfoDialog extends FloatingDialog{
+public class ContentInfoDialog extends BaseDialog{
 
     public ContentInfoDialog(){
         super("$info.title");

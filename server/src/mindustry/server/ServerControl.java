@@ -405,7 +405,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Team team = arg.length == 0 ? Team.sharded : Structs.find(Team.all(), t -> t.name.equals(arg[0]));
+            Team team = arg.length == 0 ? Team.sharded : Structs.find(Team.all, t -> t.name.equals(arg[0]));
 
             if(team == null){
                 err("No team with that name found.");

@@ -5,7 +5,6 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
 import mindustry.ui.*;
 
 public class Liquid extends UnlockableContent{

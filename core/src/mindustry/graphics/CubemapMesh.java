@@ -54,8 +54,8 @@ public class CubemapMesh implements Disposable{
     };
 
     private final Mesh mesh;
-    private final Cubemap map;
     private final Shader shader;
+    private Cubemap map;
 
     public CubemapMesh(Cubemap map){
         this.map = map;
@@ -67,6 +67,10 @@ public class CubemapMesh implements Disposable{
         mesh.getVerticesBuffer().put(vertices, 0, vertices.length);
 
         shader = new Shader(Core.files.internal("shaders/cubemap.vert"), Core.files.internal("shaders/cubemap.frag"));
+    }
+
+    public void setCubemap(Cubemap map){
+        this.map = map;
     }
 
     public void render(Mat3D projection){

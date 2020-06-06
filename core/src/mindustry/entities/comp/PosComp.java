@@ -12,7 +12,7 @@ import static mindustry.Vars.world;
 
 @Component
 abstract class PosComp implements Position{
-    float x, y;
+    @SyncField(true) @SyncLocal float x, y;
 
     void set(float x, float y){
         this.x = x;
@@ -27,6 +27,10 @@ abstract class PosComp implements Position{
         set(this.x + x, this.y + y);
     }
 
+    void trns(Position pos){
+        trns(pos.getX(), pos.getY());
+    }
+
     int tileX(){
         return Vars.world.toTile(x);
     }
@@ -36,13 +40,17 @@ abstract class PosComp implements Position{
     }
 
     /** Returns air if this unit is on a non-air top block. */
-    public Floor floorOn(){
+    Floor floorOn(){
         Tile tile = tileOn();
         return tile == null || tile.block() != Blocks.air ? (Floor)Blocks.air : tile.floor();
     }
 
-    public @Nullable
-    Tile tileOn(){
+     Block blockOn(){
+        Tile tile = tileOn();
+        return tile == null ? Blocks.air : tile.block();
+    }
+
+    @Nullable Tile tileOn(){
         return world.tileWorld(x, y);
     }
 

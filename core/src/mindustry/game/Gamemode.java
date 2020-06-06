@@ -16,19 +16,17 @@ public enum Gamemode{
         rules.infiniteResources = true;
         rules.waves = true;
         rules.waveTimer = false;
-        rules.respawnTime = 0f;
     }),
     attack(rules -> {
         rules.attackMode = true;
-    }, map -> map.teams.contains((int)state.rules.waveTeam.id)),
+        rules.waves = true;
+        rules.waveTimer = true;
+    }, map -> map.teams.contains(state.rules.waveTeam.id)),
     pvp(rules -> {
         rules.pvp = true;
         rules.enemyCoreBuildRadius = 600f;
-        rules.respawnTime = 60 * 10;
         rules.buildCostMultiplier = 1f;
         rules.buildSpeedMultiplier = 1f;
-        rules.playerDamageMultiplier = 0.33f;
-        rules.playerHealthMultiplier = 0.5f;
         rules.unitBuildSpeedMultiplier = 2f;
         rules.unitHealthMultiplier = 3f;
         rules.attackMode = true;
@@ -39,7 +37,6 @@ public enum Gamemode{
         rules.waves = false;
         rules.enemyCoreBuildRadius = 0f;
         rules.waveTimer = false;
-        rules.respawnTime = 0f;
     });
 
     private final Cons<Rules> rules;

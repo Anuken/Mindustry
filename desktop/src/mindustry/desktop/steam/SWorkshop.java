@@ -51,7 +51,7 @@ public class SWorkshop implements SteamUGCCallback{
     }
 
     public Array<Fi> getWorkshopFiles(Class<? extends Publishable> type){
-        return workshopFiles.getOr(type, () -> new Array<>(0));
+        return workshopFiles.get(type, () -> new Array<>(0));
     }
 
     /** Publish a new item and submit an update for it.
@@ -96,7 +96,7 @@ public class SWorkshop implements SteamUGCCallback{
                 if(details.getResult() == SteamResult.OK){
                     if(details.getOwnerID().equals(SVars.user.user.getSteamID())){
 
-                        FloatingDialog dialog = new FloatingDialog("$workshop.info");
+                        BaseDialog dialog = new BaseDialog("$workshop.info");
                         dialog.setFillParent(false);
                         dialog.cont.add("$workshop.menu").pad(20f);
                         dialog.addCloseButton();
@@ -107,7 +107,7 @@ public class SWorkshop implements SteamUGCCallback{
                         }).size(210f, 64f);
 
                         dialog.buttons.button("$workshop.update", Icon.up, () -> {
-                            new FloatingDialog("$workshop.update"){{
+                            new BaseDialog("$workshop.update"){{
                                 setFillParent(false);
                                 cont.margin(10).add("$changelog").padRight(6f);
                                 cont.row();
@@ -177,7 +177,7 @@ public class SWorkshop implements SteamUGCCallback{
     }
 
     void showPublish(Cons<SteamPublishedFileID> published){
-        FloatingDialog dialog = new FloatingDialog("$confirm");
+        BaseDialog dialog = new BaseDialog("$confirm");
         dialog.setFillParent(false);
         dialog.cont.add("$publish.confirm").width(600f).wrap();
         dialog.addCloseButton();

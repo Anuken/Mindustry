@@ -32,7 +32,7 @@ public class Generators{
             for(int i = 0; i < frames; i++){
                 float fin = (float)i / (frames);
                 float fout = 1f - fin;
-                float stroke = 4f * fout;
+                float stroke = 3.5f * fout;
                 float radius = (size/2f) * fin;
 
                 Pixmap pixmap = new Pixmap(size, size);
@@ -173,6 +173,7 @@ public class Generators{
                         scaled.save("../ui/block-" + block.name + "-" + icon.name());
                     }
 
+                    boolean hasEmpty = false;
                     Color average = new Color();
                     for(int x = 0; x < image.width; x++){
                         for(int y = 0; y < image.height; y++){
@@ -180,6 +181,9 @@ public class Generators{
                             average.r += color.r;
                             average.g += color.g;
                             average.b += color.b;
+                            if(color.a < 0.9f){
+                                hasEmpty = true;
+                            }
                         }
                     }
                     average.mul(1f / (image.width * image.height));
@@ -188,7 +192,8 @@ public class Generators{
                     }else{
                         average.mul(1.1f);
                     }
-                    average.a = 1f;
+                    //encode square sprite in alpha channel
+                    average.a = hasEmpty ? 0.1f : 1f;
                     colors.draw(block.id, 0, average);
                 }catch(IllegalArgumentException e){
                     Log.info("Skipping &ly'@'", block.name);
@@ -242,36 +247,40 @@ public class Generators{
         ImagePacker.generate("unit-icons", () -> {
             content.units().each(type -> {
                 type.load();
+                try{
 
-                Image image = ImagePacker.get(type.region);
+                    Image image = ImagePacker.get(type.region);
 
-                if(type.constructor.get() instanceof Legsc){
-                    image.drawCenter(type.baseRegion);
-                    image.drawCenter(type.legRegion);
-                    image.drawCenter(type.legRegion, true, false);
-                }
-                image.draw(type.region);
-
-                Image baseCell = ImagePacker.get(type.cellRegion);
-                Image cell = new Image(type.cellRegion.getWidth(), type.cellRegion.getHeight());
-                cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
-
-                image.draw(cell, image.width/2 - cell.width/2, image.height/2 - cell.height/2);
-
-                for(Weapon weapon : type.weapons){
-                    weapon.load();
-
-                    for(int i : (weapon.mirror ? Mathf.signs : Mathf.one)){
-                        i *= Mathf.sign(weapon.flipped);
-
-                        image.draw(weapon.region,
-                        (int)(i * weapon.x / Draw.scl + image.width / 2 - weapon.region.getWidth() / 2),
-                        (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
-                        i > 0, false);
+                    if(type.constructor.get() instanceof Mechc){
+                        image.drawCenter(type.baseRegion);
+                        image.drawCenter(type.legRegion);
+                        image.drawCenter(type.legRegion, true, false);
                     }
-                }
+                    image.draw(type.region);
 
-                image.save("unit-" + type.name + "-full");
+                    Image baseCell = ImagePacker.get(type.cellRegion);
+                    Image cell = new Image(type.cellRegion.getWidth(), type.cellRegion.getHeight());
+                    cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
+
+                    image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2);
+
+                    for(Weapon weapon : type.weapons){
+                        weapon.load();
+
+                        for(int i : (weapon.mirror ? Mathf.signs : Mathf.one)){
+                            i *= Mathf.sign(weapon.flipped);
+
+                            image.draw(weapon.region,
+                            (int)(i * weapon.x / Draw.scl + image.width / 2 - weapon.region.getWidth() / 2),
+                            (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
+                            i > 0, false);
+                        }
+                    }
+
+                    image.save("unit-" + type.name + "-full");
+                }catch(IllegalArgumentException ignored){
+                    //skip
+                }
             });
         });
 

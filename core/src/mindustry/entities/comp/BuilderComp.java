@@ -138,7 +138,7 @@ abstract class BuilderComp implements Unitc{
                 control.input.drawBreaking(request);
             }else{
                 request.block.drawRequest(request, control.input.allRequests(),
-                        Build.validPlace(request.block, team(), request.x, request.y, request.rotation) || control.input.requestMatches(request));
+                Build.validPlace(request.block, team(), request.x, request.y, request.rotation) || control.input.requestMatches(request));
             }
         }
 
@@ -237,7 +237,7 @@ abstract class BuilderComp implements Unitc{
         Arrays.sort(vecs, Structs.comparingFloat(vec -> -Angles.angleDist(angleTo(vec), ang)));
 
         float x1 = vecs[0].x, y1 = vecs[0].y,
-                x3 = vecs[1].x, y3 = vecs[1].y;
+        x3 = vecs[1].x, y3 = vecs[1].y;
 
         Draw.alpha(1f);
 

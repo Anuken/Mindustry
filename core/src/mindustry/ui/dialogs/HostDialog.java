@@ -12,7 +12,7 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-public class HostDialog extends FloatingDialog{
+public class HostDialog extends BaseDialog{
     float w = 300;
 
     public HostDialog(){

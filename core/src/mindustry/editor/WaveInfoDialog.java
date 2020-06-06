@@ -24,7 +24,7 @@ import mindustry.ui.dialogs.*;
 import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.never;
 
-public class WaveInfoDialog extends FloatingDialog{
+public class WaveInfoDialog extends BaseDialog{
     private final static int displayed = 20;
     private Array<SpawnGroup> groups = new Array<>();
 
@@ -49,7 +49,7 @@ public class WaveInfoDialog extends FloatingDialog{
 
         addCloseButton();
         buttons.button("$waves.edit", () -> {
-            FloatingDialog dialog = new FloatingDialog("$waves.edit");
+            BaseDialog dialog = new BaseDialog("$waves.edit");
             dialog.addCloseButton();
             dialog.setFillParent(false);
             dialog.cont.defaults().size(210f, 64f);
@@ -235,11 +235,12 @@ public class WaveInfoDialog extends FloatingDialog{
     }
 
     void showUpdate(SpawnGroup group){
-        FloatingDialog dialog = new FloatingDialog("");
+        BaseDialog dialog = new BaseDialog("");
         dialog.setFillParent(true);
         dialog.cont.pane(p -> {
             int i = 0;
             for(UnitType type : content.units()){
+                if(type.isHidden()) continue;
                 p.button(t -> {
                     t.left();
                     t.image(type.icon(mindustry.ui.Cicon.medium)).size(40f).padRight(2f);

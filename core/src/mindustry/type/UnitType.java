@@ -14,12 +14,14 @@ import arc.util.ArcAnnotate.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.payloads.*;
 
 import static mindustry.Vars.*;
 
@@ -31,12 +33,17 @@ public class UnitType extends UnlockableContent{
     public @NonNull Prov<? extends Unitc> constructor;
     public @NonNull Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
-    public float drag = 0.3f, mass = 1f, accel = 0.5f, landShake = 0f;
+    public float drag = 0.3f, accel = 0.5f, landShake = 0f;
     public float health = 200f, range = -1, armor = 0f;
     public boolean targetAir = true, targetGround = true;
-    public boolean faceTarget = true, isCounted = true, lowAltitude = false;
+    public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
     public float sway = 1f;
+    public int payloadCapacity = 1;
+    public int commandLimit = 24;
+
+    public int legCount = 4;
+    public float legLength = 24f, legSpeed = 0.1f, legTrns = 1f;
 
     public int itemCapacity = 30;
     public int drillTier = -1;
@@ -54,7 +61,7 @@ public class UnitType extends UnlockableContent{
     public Sound deathSound = Sounds.bang;
 
     public Array<Weapon> weapons = new Array<>();
-    public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion, occlusionRegion;
+    public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion, occlusionRegion, jointRegion, footRegion, legBaseRegion;
 
     public UnitType(String name){
         super(name);
@@ -109,6 +116,9 @@ public class UnitType extends UnlockableContent{
         weapons.each(Weapon::load);
         region = Core.atlas.find(name);
         legRegion = Core.atlas.find(name + "-leg");
+        jointRegion = Core.atlas.find(name + "-joint");
+        footRegion = Core.atlas.find(name + "-foot");
+        legBaseRegion = Core.atlas.find(name + "-leg-base", name + "-leg");
         baseRegion = Core.atlas.find(name + "-base");
         cellRegion = Core.atlas.find(name + "-cell", Core.atlas.find("power-cell"));
         occlusionRegion = Core.atlas.find("circle-shadow");
@@ -123,7 +133,7 @@ public class UnitType extends UnlockableContent{
     //region drawing
 
     public void draw(Unitc unit){
-        Legsc legs = unit instanceof Legsc ? (Legsc)unit : null;
+        Mechc legs = unit instanceof Mechc ? (Mechc)unit : null;
         float z = unit.elevation() > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : Layer.groundUnit;
 
         if(unit.controller().isBeingControlled(player.unit())){
@@ -138,14 +148,23 @@ public class UnitType extends UnlockableContent{
         Draw.z(z - 0.02f);
 
         if(legs != null){
-            drawLegs(legs);
+            drawMech(legs);
 
             float ft = Mathf.sin(legs.walkTime(), 3f, 3f);
             legOffset.trns(legs.baseRotation(), 0f, Mathf.lerp(ft * 0.18f * sway, 0f, unit.elevation()));
             unit.trns(legOffset.x, legOffset.y);
         }
 
+        if(unit instanceof Legsc){
+            drawLegs((Legsc)unit);
+        }
+
         Draw.z(Math.min(z - 0.01f, Layer.bullet - 1f));
+
+        if(unit instanceof Payloadc){
+            drawPayload((Payloadc)unit);
+        }
+
         drawOcclusion(unit);
 
         Draw.z(z);
@@ -162,6 +181,14 @@ public class UnitType extends UnlockableContent{
 
         if(legs != null){
             unit.trns(-legOffset.x, -legOffset.y);
+        }
+    }
+
+    public void drawPayload(Payloadc unit){
+        if(unit.hasPayload()){
+            Payload pay = unit.payloads().first();
+            pay.set(unit.x(), unit.y(), unit.rotation());
+            pay.draw();
         }
     }
 
@@ -235,10 +262,6 @@ public class UnitType extends UnlockableContent{
 
         if(unit instanceof Trailc){
             Trail trail = ((Trailc)unit).trail();
-
-            float cx = unit.x() + Angles.trnsx(unit.rotation() + 180, offset),
-            cy = unit.y() + Angles.trnsy(unit.rotation() + 180, offset);
-            trail.update(cx, cy);
             trail.draw(unit.team().color, (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * scale));
         }
 
@@ -276,7 +299,7 @@ public class UnitType extends UnlockableContent{
                 Draw.rect(weapon.region,
                 unit.x() + Angles.trnsx(rotation, weapon.x * i, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
                 unit.y() + Angles.trnsy(rotation, weapon.x * i, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil),
-                width * Draw.scl,
+                width * Draw.scl * -Mathf.sign(weapon.flipSprite),
                 weapon.region.getHeight() * Draw.scl,
                 weaponRotation);
             }
@@ -308,6 +331,39 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawLegs(Legsc unit){
+        Leg[] legs = unit.legs();
+
+
+        float ssize = footRegion.getWidth() * Draw.scl * 1.5f;
+
+        for(Leg leg : legs){
+            Drawf.shadow(leg.base.x, leg.base.y, ssize);
+        }
+
+        int index = 0;
+
+        for(Leg leg : legs){
+            boolean flip = index++ >= legs.length/2f;
+            int flips = Mathf.sign(flip);
+
+            Draw.color();
+
+            Lines.stroke(legRegion.getHeight() * Draw.scl * flips);
+            Lines.line(legRegion, unit.x(), unit.y(), leg.joint.x, leg.joint.y, CapStyle.none, 0);
+
+            Lines.stroke(legBaseRegion.getHeight() * Draw.scl * flips);
+            Lines.line(legBaseRegion, leg.joint.x, leg.joint.y, leg.base.x, leg.base.y, CapStyle.none, 0);
+
+            float angle1 = unit.angleTo(leg.joint), angle2 = unit.angleTo(leg.base);
+
+            Draw.rect(jointRegion, leg.joint.x, leg.joint.y);
+            Draw.rect(footRegion, leg.base.x, leg.base.y, angle2);
+        }
+
+        Draw.reset();
+    }
+
+    public void drawMech(Mechc unit){
         Draw.reset();
 
         Draw.mixcol(Color.white, unit.hitTime());
