@@ -795,6 +795,7 @@ public class Blocks implements ContentList{
             requirements(Category.defense, ItemStack.with(Items.plastanium, 5, Items.metaglass, 2));
             health = 190 * wallHealthMultiplier;
             insulated = true;
+            absorbLasers = true;
         }};
 
         plastaniumWallLarge = new Wall("plastanium-wall-large"){{
@@ -802,6 +803,7 @@ public class Blocks implements ContentList{
             health = 190 * wallHealthMultiplier * 4;
             size = 2;
             insulated = true;
+            absorbLasers = true;
         }};
 
         thoriumWall = new Wall("thorium-wall"){{
@@ -1484,7 +1486,7 @@ public class Blocks implements ContentList{
             powerUse = 2.5f;
             shootShake = 2f;
             shootEffect = Fx.lancerLaserShoot;
-            smokeEffect = Fx.lancerLaserShootSmoke;
+            smokeEffect = Fx.none;
             chargeEffect = Fx.lancerLaserCharge;
             chargeBeginEffect = Fx.lancerLaserChargeBegin;
             heatColor = Color.red;
