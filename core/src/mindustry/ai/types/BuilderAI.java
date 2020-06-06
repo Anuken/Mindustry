@@ -18,8 +18,12 @@ public class BuilderAI extends AIController{
     public void update(){
         Builderc builder = (Builderc)unit;
 
+        if(builder.moving()){
+            builder.lookAt(builder.vel().angle());
+        }
+
         //approach request if building
-        if(builder.building()){
+        if(builder.buildRequest() != null){
             BuildRequest req = builder.buildRequest();
 
             boolean valid =

@@ -22,6 +22,8 @@ public class Rules{
     public boolean waves;
     /** Whether the enemy AI has infinite resources in most of their buildings and turrets. */
     public boolean enemyCheat;
+    /** Whether the enemy AI has infinite resources in their core only. TODO remove */
+    public boolean enemyInfiniteResources = true;
     /** Whether the game objective is PvP. Note that this enables automatic hosting. */
     public boolean pvp;
     /** Whether reactors can explode and damage other blocks. */
@@ -69,6 +71,8 @@ public class Rules{
     /** Whether to draw shadows of blocks at map edges and static blocks.
      * Do not change unless you know exactly what you are doing.*/
     public boolean drawDarkness = true;
+    /** EXPERIMENTAL building AI. TODO remove */
+    public boolean buildAI = true;
     /** Starting items put in cores */
     public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 100));
     /** Weather events that occur here. */

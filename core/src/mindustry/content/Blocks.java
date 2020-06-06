@@ -1708,7 +1708,7 @@ public class Blocks implements ContentList{
             requirements(Category.turret, ItemStack.with(Items.silicon, 80, Items.thorium, 80, Items.surgealloy, 50));
 
             hasPower = true;
-            consumes.power(2f);
+            consumes.power(3f);
             size = 2;
             shootLength = 5f;
             bulletDamage = 12f;

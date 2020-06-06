@@ -19,6 +19,8 @@ public enum Gamemode{
     }),
     attack(rules -> {
         rules.attackMode = true;
+        rules.waves = true;
+        rules.waveTimer = true;
     }, map -> map.teams.contains(state.rules.waveTeam.id)),
     pvp(rules -> {
         rules.pvp = true;

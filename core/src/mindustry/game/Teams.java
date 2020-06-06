@@ -148,11 +148,12 @@ public class Teams{
         public final Array<CoreEntity> cores = new Array<>();
         public final Array<Team> enemies = new Array<>();
         public final Team team;
+        public final BaseAI ai;
         public Queue<BlockPlan> blocks = new Queue<>();
-        public BaseAI ai = new BaseAI();
 
         public TeamData(Team team){
             this.team = team;
+            this.ai = new BaseAI(this);
         }
 
         public boolean active(){
@@ -173,7 +174,7 @@ public class Teams{
 
         /** @return whether this team is controlled by the AI and builds bases. */
         public boolean hasAI(){
-            return state.rules.attackMode && team == state.rules.waveTeam;
+            return state.rules.attackMode && team == state.rules.waveTeam && state.rules.buildAI;
         }
 
         @Override
@@ -191,9 +192,9 @@ public class Teams{
         public final short x, y, rotation, block;
         public final Object config;
 
-        public BlockPlan(short x, short y, short rotation, short block, Object config){
-            this.x = x;
-            this.y = y;
+        public BlockPlan(int x, int y, short rotation, short block, Object config){
+            this.x = (short)x;
+            this.y = (short)y;
             this.rotation = rotation;
             this.block = block;
             this.config = config;
