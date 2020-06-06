@@ -148,7 +148,7 @@ public class Teams{
         public final Array<CoreEntity> cores = new Array<>();
         public final Array<Team> enemies = new Array<>();
         public final Team team;
-        public Queue<BrokenBlock> blocks = new Queue<>();
+        public Queue<BlockPlan> blocks = new Queue<>();
         public BaseAI ai = new BaseAI();
 
         public TeamData(Team team){
@@ -187,11 +187,11 @@ public class Teams{
 
     /** Represents a block made by this team that was destroyed somewhere on the map.
      * This does not include deconstructed blocks.*/
-    public static class BrokenBlock{
+    public static class BlockPlan{
         public final short x, y, rotation, block;
         public final Object config;
 
-        public BrokenBlock(short x, short y, short rotation, short block, Object config){
+        public BlockPlan(short x, short y, short rotation, short block, Object config){
             this.x = x;
             this.y = y;
             this.rotation = rotation;

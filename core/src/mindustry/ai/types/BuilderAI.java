@@ -38,8 +38,8 @@ public class BuilderAI extends AIController{
         }else{
             //find new request
             if(!unit.team().data().blocks.isEmpty()){
-                Queue<BrokenBlock> blocks = unit.team().data().blocks;
-                BrokenBlock block = blocks.first();
+                Queue<BlockPlan> blocks = unit.team().data().blocks;
+                BlockPlan block = blocks.first();
 
                 //check if it's already been placed
                 if(world.tile(block.x, block.y) != null && world.tile(block.x, block.y).block().id == block.block){

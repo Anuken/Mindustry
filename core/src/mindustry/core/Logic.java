@@ -66,22 +66,22 @@ public class Logic implements ApplicationListener{
             //remove existing blocks that have been placed here.
             //painful O(n) iteration + copy
             for(int i = 0; i < data.blocks.size; i++){
-                BrokenBlock b = data.blocks.get(i);
+                BlockPlan b = data.blocks.get(i);
                 if(b.x == tile.x && b.y == tile.y){
                     data.blocks.removeIndex(i);
                     break;
                 }
             }
 
-            data.blocks.addFirst(new BrokenBlock(tile.x, tile.y, tile.rotation(), block.id, tile.entity.config()));
+            data.blocks.addFirst(new BlockPlan(tile.x, tile.y, tile.rotation(), block.id, tile.entity.config()));
         });
 
         Events.on(BlockBuildEndEvent.class, event -> {
             if(!event.breaking){
                 TeamData data = state.teams.get(event.team);
-                Iterator<BrokenBlock> it = data.blocks.iterator();
+                Iterator<BlockPlan> it = data.blocks.iterator();
                 while(it.hasNext()){
-                    BrokenBlock b = it.next();
+                    BlockPlan b = it.next();
                     Block block = content.block(b.block);
                     if(event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1).overlaps(block.bounds(b.x, b.y, Tmp.r2))){
                         it.remove();
