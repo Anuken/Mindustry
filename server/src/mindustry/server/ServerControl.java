@@ -183,6 +183,17 @@ public class ServerControl implements ApplicationListener{
                 info("   &y" + command.text + (command.paramText.isEmpty() ? "" : " ") + command.paramText + " - &lm" + command.description);
             }
         });
+        
+        handler.register("alias", "<name> <command...>", "Adds new custom command.", arg -> {
+            String name = arg[0];
+            String command = arg[1];
+            if(handler.getCommandList().contains(c -> c.text.equals(name))){
+                info("This command already exists: " + name);
+            }else{
+                handler.register(name, "Custom command.", arg1 -> handler.handleMessage(command));
+                info("Added alias: " + name);
+            }
+        });
 
         handler.register("version", "Displays server version info.", arg -> {
             info("&lmVersion: &lyMindustry @-@ @ / build @", Version.number, Version.modifier, Version.type, Version.build + (Version.revision == 0 ? "" : "." + Version.revision));
