@@ -43,8 +43,9 @@ public class UnitType extends UnlockableContent{
     public int commandLimit = 24;
     public float baseElevation = 0f;
 
+    //TODO document
     public int legCount = 4;
-    public float legLength = 24f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f;
+    public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0;
 
     public int itemCapacity = 30;
     public int drillTier = -1;
@@ -62,7 +63,8 @@ public class UnitType extends UnlockableContent{
     public Sound deathSound = Sounds.bang;
 
     public Array<Weapon> weapons = new Array<>();
-    public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion, occlusionRegion, jointRegion, footRegion, legBaseRegion;
+    public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
+        occlusionRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion;
 
     public UnitType(String name){
         super(name);
@@ -117,6 +119,7 @@ public class UnitType extends UnlockableContent{
         region = Core.atlas.find(name);
         legRegion = Core.atlas.find(name + "-leg");
         jointRegion = Core.atlas.find(name + "-joint");
+        baseJointRegion = Core.atlas.find(name + "-joint-base");
         footRegion = Core.atlas.find(name + "-foot");
         legBaseRegion = Core.atlas.find(name + "-leg-base", name + "-leg");
         baseRegion = Core.atlas.find(name + "-base");
@@ -356,6 +359,7 @@ public class UnitType extends UnlockableContent{
             int flips = Mathf.sign(flip);
 
             Vec2 position = legOffset.trns(angle, legBaseOffset).add(unit);
+            Tmp.v1.set(leg.base).sub(leg.joint).inv().setLength(legExtension);
 
             Draw.color();
 
@@ -363,12 +367,19 @@ public class UnitType extends UnlockableContent{
             Lines.line(legRegion, position.x, position.y, leg.joint.x, leg.joint.y, CapStyle.none, 0);
 
             Lines.stroke(legBaseRegion.getHeight() * Draw.scl * flips);
-            Lines.line(legBaseRegion, leg.joint.x, leg.joint.y, leg.base.x, leg.base.y, CapStyle.none, 0);
+            Lines.line(legBaseRegion, leg.joint.x + Tmp.v1.x, leg.joint.y + Tmp.v1.y, leg.base.x, leg.base.y, CapStyle.none, 0);
 
             float angle2 = position.angleTo(leg.base);
 
-            Draw.rect(jointRegion, leg.joint.x, leg.joint.y);
+            if(jointRegion.found()){
+                Draw.rect(jointRegion, leg.joint.x, leg.joint.y);
+            }
+
             Draw.rect(footRegion, leg.base.x, leg.base.y, angle2);
+
+            if(baseJointRegion.found()){
+                Draw.rect(baseJointRegion, position.x, position.y, rotation);
+            }
         }
 
         Draw.reset();

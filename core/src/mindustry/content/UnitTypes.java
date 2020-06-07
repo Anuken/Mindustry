@@ -76,29 +76,6 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        cix = new UnitType("cix"){{
-            drag = 0.1f;
-            speed = 0.8f;
-            hitsize = 9f;
-            health = 140;
-
-            legCount = 6;
-            rotateShooting = false;
-
-            for(boolean b : Mathf.booleans){
-                weapons.add(
-                new Weapon("missiles-mount"){{
-                    reload = 20f;
-                    x = 4f * Mathf.sign(b);
-                    rotate = true;
-                    mirror = false;
-                    flipSprite = !b;
-                    shake = 1f;
-                    bullet = Bullets.missileSwarm;
-                }});
-            }
-        }};
-
         titan = new UnitType("titan"){{
             speed = 0.4f;
             hitsize = 9f;
@@ -115,33 +92,6 @@ public class UnitTypes implements ContentList{
                 recoil = 1f;
                 ejectEffect = Fx.none;
                 bullet = Bullets.basicFlame;
-            }});
-        }};
-
-        crawler = new UnitType("crawler"){{
-            defaultController = SuicideAI::new;
-
-            speed = 0.8f;
-            hitsize = 8f;
-            health = 140;
-            sway = 0.25f;
-            range = 40f;
-
-            weapons.add(new Weapon(){{
-                reload = 12f;
-                shootCone = 180f;
-                ejectEffect = Fx.none;
-                shootSound = Sounds.explosion;
-                bullet = new BombBulletType(0f, 0f, "clear"){{
-                    hitEffect = Fx.pulverize;
-                    lifetime = 10f;
-                    speed = 1f;
-                    splashDamageRadius = 55f;
-                    instantDisappear = true;
-                    splashDamage = 30f;
-                    killShooter = true;
-                    hittable = false;
-                }};
             }});
         }};
 
@@ -225,6 +175,33 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        crawler = new UnitType("crawler"){{
+            defaultController = SuicideAI::new;
+
+            speed = 0.8f;
+            hitsize = 8f;
+            health = 140;
+            sway = 0.25f;
+            range = 40f;
+
+            weapons.add(new Weapon(){{
+                reload = 12f;
+                shootCone = 180f;
+                ejectEffect = Fx.none;
+                shootSound = Sounds.explosion;
+                bullet = new BombBulletType(0f, 0f, "clear"){{
+                    hitEffect = Fx.pulverize;
+                    lifetime = 10f;
+                    speed = 1f;
+                    splashDamageRadius = 55f;
+                    instantDisappear = true;
+                    splashDamage = 30f;
+                    killShooter = true;
+                    hittable = false;
+                }};
+            }});
+        }};
+
         eruptor = new UnitType("eruptor"){{
             speed = 0.4f;
             drag = 0.4f;
@@ -254,6 +231,36 @@ public class UnitTypes implements ContentList{
                     shootEffect = Fx.shootSmall;
                 }};
             }});
+        }};
+
+        cix = new UnitType("cix"){{
+            drag = 0.1f;
+            speed = 0.4f;
+            hitsize = 9f;
+            health = 140;
+            baseElevation = 0.51f;
+
+            legCount = 6;
+            legMoveSpace = 0.9f;
+            legLength = 34f;
+            rotateShooting = false;
+            legExtension = -15;
+            legBaseOffset = 8f;
+            landShake = 2f;
+            legSpeed = 0.1f;
+
+            for(boolean b : Mathf.booleans){
+                weapons.add(
+                new Weapon("missiles-mount"){{
+                    reload = 20f;
+                    x = 4f * Mathf.sign(b);
+                    rotate = true;
+                    mirror = false;
+                    flipSprite = !b;
+                    shake = 1f;
+                    bullet = Bullets.missileSwarm;
+                }});
+            }
         }};
 
         wraith = new UnitType("wraith"){{

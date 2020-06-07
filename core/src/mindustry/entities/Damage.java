@@ -13,6 +13,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -173,9 +174,37 @@ public class Damage{
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
-    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete){
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean air, boolean ground){
+        damage(team, x, y, radius, damage, false, air, ground);
+    }
+
+    /** Applies a status effect to all enemy units in a range. */
+    public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground){
         Cons<Unitc> cons = entity -> {
-            if(entity.team() == team || entity.dst(x, y) > radius){
+            if(entity.team() == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
+                return;
+            }
+
+            entity.apply(effect, duration);
+        };
+
+        rect.setSize(radius * 2).setCenter(x, y);
+        if(team != null){
+            Units.nearbyEnemies(team, rect, cons);
+        }else{
+            Units.nearby(rect, cons);
+        }
+    }
+
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete){
+        damage(team, x, y, radius, damage, complete, true, true);
+    }
+
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground){
+        Cons<Unitc> cons = entity -> {
+            if(entity.team() == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
                 return;
             }
             float amount = calculateDamage(x, y, entity.getX(), entity.getY(), radius, damage);

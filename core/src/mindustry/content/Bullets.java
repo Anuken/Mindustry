@@ -383,9 +383,8 @@ public class Bullets implements ContentList{
         fireball = new BulletType(1f, 4){
             {
                 pierce = true;
-                hitTiles = false;
-                collides = false;
                 collidesTiles = false;
+                collides = false;
                 drag = 0.03f;
                 hitEffect = despawnEffect = Fx.none;
             }
