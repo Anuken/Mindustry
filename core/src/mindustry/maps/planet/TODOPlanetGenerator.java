@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.maps.generators.*;
@@ -16,35 +17,45 @@ import static mindustry.Vars.*;
 public class TODOPlanetGenerator extends PlanetGenerator{
     Simplex noise = new Simplex();
     RidgedPerlin rid = new RidgedPerlin(1, 2);
+    BaseGenerator basegen = new BaseGenerator();
     float scl = 5f;
     float waterOffset = 0.07f;
 
-    Block[][] arr = {
-    {Blocks.water, Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.darksandTaintedWater, Blocks.snow, Blocks.ice},
-    {Blocks.water, Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.darksandTaintedWater, Blocks.snow, Blocks.snow, Blocks.ice},
-    {Blocks.water, Blocks.darksandWater, Blocks.darksand, Blocks.sand, Blocks.salt, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.darksandTaintedWater, Blocks.snow, Blocks.ice, Blocks.ice},
-    {Blocks.water, Blocks.sandWater, Blocks.sand, Blocks.salt, Blocks.salt, Blocks.salt, Blocks.sand, Blocks.sand, Blocks.iceSnow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice},
+    Block[][] arr =
+    {
+    {Blocks.water, Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.darksandTaintedWater, Blocks.stone, Blocks.stone},
+    {Blocks.water, Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.darksandTaintedWater, Blocks.stone, Blocks.stone, Blocks.stone},
+    {Blocks.water, Blocks.darksandWater, Blocks.darksand, Blocks.sand, Blocks.salt, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.darksandTaintedWater, Blocks.stone, Blocks.stone, Blocks.stone},
+    {Blocks.water, Blocks.sandWater, Blocks.sand, Blocks.salt, Blocks.salt, Blocks.salt, Blocks.sand, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.snow, Blocks.iceSnow, Blocks.ice},
     {Blocks.deepwater, Blocks.water, Blocks.sandWater, Blocks.sand, Blocks.salt, Blocks.sand, Blocks.sand, Blocks.ignarock, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.ice},
     {Blocks.deepwater, Blocks.water, Blocks.sandWater, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.moss, Blocks.iceSnow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.snow, Blocks.ice},
-    {Blocks.deepwater, Blocks.sandWater, Blocks.sand, Blocks.sand, Blocks.moss, Blocks.moss, Blocks.moss, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.snow, Blocks.ice},
+    {Blocks.deepwater, Blocks.sandWater, Blocks.sand, Blocks.sand, Blocks.moss, Blocks.moss, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.snow, Blocks.ice},
     {Blocks.taintedWater, Blocks.darksandTaintedWater, Blocks.darksand, Blocks.darksand, Blocks.ignarock, Blocks.moss, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.snow, Blocks.ice, Blocks.ice},
     {Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.moss, Blocks.sporeMoss, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice},
     {Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.sporeMoss, Blocks.ice, Blocks.ice, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.ice},
     {Blocks.taintedWater, Blocks.darksandTaintedWater, Blocks.darksand, Blocks.sporeMoss, Blocks.sporeMoss, Blocks.ice, Blocks.ice, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice},
     {Blocks.darksandTaintedWater, Blocks.darksandTaintedWater, Blocks.darksand, Blocks.sporeMoss, Blocks.moss, Blocks.sporeMoss, Blocks.iceSnow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice},
-    {Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.ice, Blocks.iceSnow, Blocks.iceSnow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice}
+    {Blocks.darksandWater, Blocks.darksand, Blocks.snow, Blocks.ice, Blocks.iceSnow, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice}
     };
 
     ObjectMap<Block, Block> dec = ObjectMap.of(
         Blocks.sporeMoss, Blocks.sporeCluster,
-        Blocks.moss, Blocks.sporeCluster
+        Blocks.moss, Blocks.sporeCluster,
+        Blocks.taintedWater, Blocks.water,
+        Blocks.darksandTaintedWater, Blocks.darksandWater
+    );
+
+    ObjectMap<Block, Block> tars = ObjectMap.of(
+        Blocks.sporeMoss, Blocks.shale,
+        Blocks.moss, Blocks.shale
     );
 
     float water = 2f / arr[0].length;
 
+
     float rawHeight(Vec3 position){
         position = Tmp.v33.set(position).scl(scl);
-        return (Mathf.pow((float)noise.octaveNoise3D(7, 0.48f, 1f/3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
+        return (Mathf.pow((float)noise.octaveNoise3D(7, 0.5f, 1f/3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
     }
 
     @Override
@@ -77,15 +88,23 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
     Block getBlock(Vec3 position){
         float height = rawHeight(position);
+        Tmp.v31.set(position);
         position = Tmp.v33.set(position).scl(scl);
         float rad = scl;
         float temp = Mathf.clamp(Math.abs(position.y * 2f) / (rad));
-        float tnoise = (float)noise.octaveNoise3D(7, 0.48f, 1f/3f, position.x, position.y + 999f, position.z);
+        float tnoise = (float)noise.octaveNoise3D(7, 0.5f, 1f/3f, position.x, position.y + 999f, position.z);
         temp = Mathf.lerp(temp, tnoise, 0.5f);
         height *= 1.2f;
         height = Mathf.clamp(height);
 
-        return arr[Mathf.clamp((int)(temp * arr.length), 0, arr.length - 1)][Mathf.clamp((int)(height * arr[0].length), 0, arr[0].length - 1)];
+        float tar = (float)noise.octaveNoise3D(4, 0.55f, 1f/2f, position.x, position.y + 999f, position.z) * 0.3f + Tmp.v31.dst(0, 0, 1f) * 0.2f;
+
+        Block res = arr[Mathf.clamp((int)(temp * arr.length), 0, arr[0].length - 1)][Mathf.clamp((int)(height * arr[0].length), 0, arr[0].length - 1)];
+        if(tar > 0.5f){
+            return tars.get(res, res);
+        }else{
+            return res;
+        }
     }
 
     @Override
@@ -114,7 +133,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
                 connected.add(to);
                 float nscl = rand.random(20f, 60f);
                 int stroke = rand.random(4, 12);
-                brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + noise(tile.x, tile.y, 1, 1, 1f / nscl) * 60, manhattan), stroke);
+                brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + noise(tile.x, tile.y, 1, 1, 1f / nscl) * 60, Astar.manhattan), stroke);
             }
         }
 
@@ -264,7 +283,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
         Schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
 
         if(sector.hasEnemyBase()){
-            new BaseGenerator().generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector);
+            basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector);
 
             state.rules.attackMode = true;
         }
@@ -272,4 +291,8 @@ public class TODOPlanetGenerator extends PlanetGenerator{
         state.rules.waves = true;
     }
 
+    @Override
+    public void postGenerate(Tiles tiles){
+        basegen.postGenerate();
+    }
 }

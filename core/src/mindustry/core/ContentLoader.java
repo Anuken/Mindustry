@@ -8,7 +8,6 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
 import mindustry.entities.bullet.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
@@ -137,6 +136,9 @@ public class ContentLoader{
 
                 Block block = block(i);
                 block.mapColor.rgba8888(color);
+                //partial alpha colors indicate a square sprite
+                block.squareSprite = block.mapColor.a > 0.5f;
+                block.mapColor.a = 1f;
                 block.hasColor = true;
             }
         }
@@ -266,7 +268,7 @@ public class ContentLoader{
         return (BulletType)getByID(ContentType.bullet, id);
     }
 
-    public Array<SectorPreset> zones(){
+    public Array<SectorPreset> sectors(){
         return getBy(ContentType.sector);
     }
 

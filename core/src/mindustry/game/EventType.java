@@ -110,6 +110,15 @@ public class EventType{
         }
     }
 
+    /** Called when a sector is conquered, e.g. a boss or base is defeated. */
+    public static class SectorCaptureEvent{
+        public final Sector sector;
+
+        public SectorCaptureEvent(Sector sector){
+            this.sector = sector;
+        }
+    }
+
     /** Called when the player withdraws items from a block. */
     public static class WithdrawEvent{
         public final Tilec tile;
@@ -280,14 +289,13 @@ public class EventType{
         }
     }
 
-    //TODO rename
-    public static class MechChangeEvent{
+    public static class UnitChangeEvent{
         public final Playerc player;
-        public final UnitType mech;
+        public final Unitc unit;
 
-        public MechChangeEvent(Playerc player, UnitType mech){
+        public UnitChangeEvent(Playerc player, Unitc unit){
             this.player = player;
-            this.mech = mech;
+            this.unit = unit;
         }
     }
 

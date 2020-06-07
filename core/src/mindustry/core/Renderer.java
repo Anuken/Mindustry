@@ -13,6 +13,7 @@ import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.graphics.g3d.*;
 import mindustry.ui.*;
 
 import static arc.Core.*;
@@ -24,6 +25,7 @@ public class Renderer implements ApplicationListener{
     public final OverlayRenderer overlays = new OverlayRenderer();
     public final LightRenderer lights = new LightRenderer();
     public final Pixelator pixelator = new Pixelator();
+    public PlanetRenderer planets;
 
     public FrameBuffer effectBuffer = new FrameBuffer();
     private Bloom bloom;
@@ -47,6 +49,8 @@ public class Renderer implements ApplicationListener{
 
     @Override
     public void init(){
+        planets = new PlanetRenderer();
+
         if(settings.getBool("bloom")){
             setupBloom();
         }
@@ -96,6 +100,7 @@ public class Renderer implements ApplicationListener{
         minimap.dispose();
         effectBuffer.dispose();
         blocks.dispose();
+        planets.dispose();
         if(bloom != null){
             bloom.dispose();
             bloom = null;
@@ -126,7 +131,6 @@ public class Renderer implements ApplicationListener{
                 bloom = null;
             }
             bloom = new Bloom(true);
-            bloom.setClearColor(0f, 0f, 0f, 0f);
         }catch(Throwable e){
             e.printStackTrace();
             settings.put("bloom", false);
@@ -186,7 +190,6 @@ public class Renderer implements ApplicationListener{
         graphics.clear(clearColor);
         Draw.reset();
 
-        //TODO 'animated water' is a bad name for this setting
         if(Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")){
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
@@ -285,7 +288,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public void scaleCamera(float amount){
-        targetscale += amount;
+        targetscale *= (amount / 4) + 1;
         clampScale();
     }
 

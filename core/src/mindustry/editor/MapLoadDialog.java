@@ -10,7 +10,7 @@ import mindustry.ui.dialogs.*;
 
 import static mindustry.Vars.maps;
 
-public class MapLoadDialog extends FloatingDialog{
+public class MapLoadDialog extends BaseDialog{
     private Map selected = null;
 
     public MapLoadDialog(Cons<Map> loader){

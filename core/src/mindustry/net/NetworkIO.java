@@ -1,5 +1,6 @@
 package mindustry.net;
 
+import arc.Core;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.core.*;
@@ -72,7 +73,7 @@ public class NetworkIO{
         writeString(buffer, name, 100);
         writeString(buffer, map);
 
-        buffer.putInt(Groups.player.size());
+        buffer.putInt(Core.settings.getInt("totalPlayers", Groups.player.size()));
         buffer.putInt(state.wave);
         buffer.putInt(Version.build);
         writeString(buffer, Version.type);

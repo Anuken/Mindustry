@@ -3,7 +3,6 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.graphics.*;
 import arc.input.*;
-import arc.math.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
@@ -17,8 +16,8 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class MapsDialog extends FloatingDialog{
-    private FloatingDialog dialog;
+public class MapsDialog extends BaseDialog{
+    private BaseDialog dialog;
 
     public MapsDialog(){
         super("$maps");
@@ -80,7 +79,7 @@ public class MapsDialog extends FloatingDialog{
 
 
                         //when you attempt to import a save, it will have no name, so generate one
-                        String name = map.tags.getOr("name", () -> {
+                        String name = map.tags.get("name", () -> {
                             String result = "unknown";
                             int number = 0;
                             while(maps.byName(result + number++) != null);
@@ -124,7 +123,7 @@ public class MapsDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = Mathf.clamp((int)(Core.graphics.getWidth() / Scl.scl(230)), 1, 8);
+        int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
         float mapsize = 200f;
 
         int i = 0;
@@ -158,7 +157,7 @@ public class MapsDialog extends FloatingDialog{
     }
 
     void showMapInfo(Map map){
-        dialog = new FloatingDialog("$editor.mapinfo");
+        dialog = new BaseDialog("$editor.mapinfo");
         dialog.addCloseButton();
 
         float mapsize = Core.graphics.isPortrait() ? 160f : 300f;

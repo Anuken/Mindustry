@@ -68,6 +68,7 @@ class Image{
         graphics.fillRect(x, y, 1, 1);
     }
 
+
     /** Draws a region at the top left corner. */
     void draw(TextureRegion region){
         draw(region, 0, 0, false, false);

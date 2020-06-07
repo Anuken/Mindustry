@@ -17,6 +17,9 @@ public class Layer{
     //things such as spent casings or rubble
     debris = 20,
 
+    //stuff under blocks, like connections of conveyors/conduits
+    blockUnder = 29.5f,
+
     //base block layer - most blocks go here
     block = 30,
 
@@ -26,11 +29,11 @@ public class Layer{
     //blocks currently in progress *shaders used*
     blockBuilding = 40,
 
-    //ground units
-    groundUnit = 50,
-
     //turrets
-    turret = 60,
+    turret = 50,
+
+    //ground units
+    groundUnit = 60,
 
     //power lines
     power = 70,
@@ -41,14 +44,17 @@ public class Layer{
     //building plans
     plans = 85,
 
-    //flying units
-    flyingUnit = 90,
+    //flying units (low altitude)
+    flyingUnitLow = 90,
 
     //bullets *bloom begin*
     bullet = 100,
 
     //effects *bloom end*
     effect = 110,
+
+    //flying units
+    flyingUnit = 115,
 
     //overlaied UI, like block config guides
     overlayUI = 120,

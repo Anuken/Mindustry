@@ -9,28 +9,6 @@ import mindustry.world.*;
 /** Holds objective classes. */
 public class Objectives{
 
-    //TODO
-    public static class Wave implements Objective{
-        public int wave;
-
-        public Wave(int wave){
-            this.wave = wave;
-        }
-
-        protected Wave(){}
-
-        @Override
-        public boolean complete(){
-            return false;
-        }
-
-        @Override
-        public String display(){
-            //TODO
-            return null;
-        }
-    }
-
     public static class Unlock implements Objective{
         public @NonNull Block block;
 
@@ -51,60 +29,59 @@ public class Objectives{
         }
     }
 
-    public static class ZoneWave extends ZoneObjective{
+    public static class SectorWave extends SectorObjective{
         public int wave;
 
-        public ZoneWave(SectorPreset zone, int wave){
-            this.zone = zone;
+        public SectorWave(SectorPreset zone, int wave){
+            this.preset = zone;
             this.wave = wave;
         }
 
-        protected ZoneWave(){}
+        protected SectorWave(){}
 
         @Override
         public boolean complete(){
-            return zone.bestWave() >= wave;
+            return preset.bestWave() >= wave;
         }
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.wave", wave, zone.localizedName);
+            return Core.bundle.format("requirement.wave", wave, preset.localizedName);
         }
     }
 
-    public static class Launched extends ZoneObjective{
+    public static class Launched extends SectorObjective{
 
         public Launched(SectorPreset zone){
-            this.zone = zone;
+            this.preset = zone;
         }
 
         protected Launched(){}
 
         @Override
         public boolean complete(){
-            return zone.hasLaunched();
+            return preset.hasLaunched();
         }
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.core", zone.localizedName);
+            return Core.bundle.format("requirement.core", preset.localizedName);
         }
     }
 
-    public abstract static class ZoneObjective implements Objective{
-        public @NonNull SectorPreset zone;
+    public abstract static class SectorObjective implements Objective{
+        public @NonNull SectorPreset preset;
     }
 
     /** Defines a specific objective for a game. */
-    public static interface Objective{
+    public interface Objective{
 
         /** @return whether this objective is met. */
         boolean complete();
 
         /** @return the string displayed when this objective is completed, in imperative form.
-         * e.g. when the objective is 'complete 10 waves', this would display "complete 10 waves".
-         * If this objective should not be displayed, should return null.*/
-        @Nullable String display();
+         * e.g. when the objective is 'complete 10 waves', this would display "complete 10 waves". */
+        String display();
 
         /** Build a display for this zone requirement.*/
         default void build(Table table){
@@ -112,7 +89,7 @@ public class Objectives{
         }
 
         default SectorPreset zone(){
-            return this instanceof ZoneObjective ? ((ZoneObjective)this).zone : null;
+            return this instanceof SectorObjective ? ((SectorObjective)this).preset : null;
         }
     }
 }

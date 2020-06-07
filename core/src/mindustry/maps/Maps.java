@@ -349,12 +349,10 @@ public class Maps{
     }
 
     public String writeWaves(Array<SpawnGroup> groups){
-        if(groups == null){
-            return "[]";
-        }
+        if(groups == null) return "[]";
 
         StringWriter buffer = new StringWriter();
-        json.setWriter(buffer);
+        json.setWriter(new JsonWriter(buffer));
 
         json.writeArrayStart();
         for(int i = 0; i < groups.size; i++){

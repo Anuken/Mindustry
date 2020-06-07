@@ -9,17 +9,17 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import mindustry.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.legacy.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class JoinDialog extends FloatingDialog{
+public class JoinDialog extends BaseDialog{
     Array<Server> servers = new Array<>();
     Dialog add;
     Server renaming;
@@ -44,7 +44,7 @@ public class JoinDialog extends FloatingDialog{
             buttons.button("?", () -> ui.showInfo("$join.info")).size(60f, 64f).width(-1);
         }
 
-        add = new FloatingDialog("$joingame.title");
+        add = new BaseDialog("$joingame.title");
         add.cont.add("$joingame.ip").padRight(5f).left();
 
         TextField field = add.cont.field(Core.settings.getString("ip"), text -> {
@@ -61,15 +61,12 @@ public class JoinDialog extends FloatingDialog{
                 Server server = new Server();
                 server.setIP(Core.settings.getString("ip"));
                 servers.add(server);
-                saveServers();
-                setupRemote();
-                refreshRemote();
             }else{
                 renaming.setIP(Core.settings.getString("ip"));
-                saveServers();
-                setupRemote();
-                refreshRemote();
             }
+            saveServers();
+            setupRemote();
+            refreshRemote();
             add.hide();
         }).disabled(b -> Core.settings.getString("ip").isEmpty() || net.active());
 
@@ -420,7 +417,13 @@ public class JoinDialog extends FloatingDialog{
 
     @SuppressWarnings("unchecked")
     private void loadServers(){
-        servers = Core.settings.getObject("server-list", Array.class, Array::new);
+        servers = Core.settings.getJson("servers", Array.class, Array::new);
+
+        //load imported legacy data
+        if(Core.settings.has("server-list")){
+            servers = LegacyIO.readServers();
+            Core.settings.remove("server-list");
+        }
 
         //get servers
         Core.net.httpGet(becontrol.active() ? serverJsonBeURL : serverJsonURL, result -> {
@@ -438,10 +441,9 @@ public class JoinDialog extends FloatingDialog{
     }
 
     private void saveServers(){
-        Core.settings.putObject("server-list", servers);
+        Core.settings.putJson("servers", Server.class, servers);
     }
 
-    @Serialize
     public static class Server{
         public String ip;
         public int port;

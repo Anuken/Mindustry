@@ -39,7 +39,7 @@ public abstract class SaveVersion extends SaveFileReader{
             map.get("mapname"),
             map.getInt("wave"),
             JsonIO.read(Rules.class, map.get("rules", "{}")),
-            JsonIO.read(Stats.class, map.get("stats", "{}")).exportRates(),
+            JsonIO.read(SectorInfo.class, map.get("secinfo", "{}")),
             map
         );
     }
@@ -70,6 +70,11 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void writeMeta(DataOutput stream, StringMap tags) throws IOException{
+        //prepare campaign data for writing
+        if(state.isCampaign()){
+            state.secinfo.prepare();
+        }
+
         writeStringMap(stream, StringMap.of(
             "saved", Time.millis(),
             "playtime", headless ? 0 : control.saves.getTotalPlaytime(),
@@ -78,13 +83,15 @@ public abstract class SaveVersion extends SaveFileReader{
             "wave", state.wave,
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
+            "secinfo", state.isCampaign() ? JsonIO.write(state.secinfo) : "{}",
             "rules", JsonIO.write(state.rules),
             "mods", JsonIO.write(mods.getModStrings().toArray(String.class)),
             "width", world.width(),
             "height", world.height(),
             "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
             "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name,
-            "nocores", state.rules.defaultTeam.cores().isEmpty()
+            "nocores", state.rules.defaultTeam.cores().isEmpty(),
+            "playerteam", player == null ? state.rules.defaultTeam.uid : player.team().uid
         ).merge(tags));
     }
 
@@ -94,6 +101,7 @@ public abstract class SaveVersion extends SaveFileReader{
         state.wave = map.getInt("wave");
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
         state.stats = JsonIO.read(Stats.class, map.get("stats", "{}"));
+        state.secinfo = JsonIO.read(SectorInfo.class, map.get("secinfo", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
         if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
         lastReadBuild = map.getInt("build", -1);
@@ -104,6 +112,10 @@ public abstract class SaveVersion extends SaveFileReader{
             player.set(Tmp.v1);
 
             control.input.controlledType = content.getByName(ContentType.unit, map.get("controlledType", "<none>"));
+            Team team = Team.get(map.getInt("playerteam", state.rules.defaultTeam.uid));
+            if(!net.client() && team != Team.derelict){
+                player.team(team);
+            }
         }
 
         Map worldmap = maps.byName(map.get("mapname", "\\\\\\"));
@@ -144,6 +156,9 @@ public abstract class SaveVersion extends SaveFileReader{
         for(int i = 0; i < world.width() * world.height(); i++){
             Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.blockID());
+
+            //make note of whether there was an entity here
+            stream.writeBoolean(tile.entity != null);
 
             //only write the entity for multiblocks once - in the center
             if(tile.entity != null){
@@ -211,8 +226,9 @@ public abstract class SaveVersion extends SaveFileReader{
                 Tile tile = context.tile(i);
                 if(block == null) block = Blocks.air;
                 boolean isCenter = true;
+                boolean hadEntity = stream.readBoolean();
 
-                if(block.hasEntity()){
+                if(hadEntity){
                     isCenter = stream.readBoolean();
                 }
 
@@ -221,15 +237,20 @@ public abstract class SaveVersion extends SaveFileReader{
                     tile.setBlock(block);
                 }
 
-                if(block.hasEntity()){
+                if(hadEntity){
                     if(isCenter){ //only read entity for center blocks
-                        try{
-                            readChunk(stream, true, in -> {
-                                byte revision = in.readByte();
-                                tile.entity.readAll(Reads.get(in), revision);
-                            });
-                        }catch(Throwable e){
-                            throw new IOException("Failed to read tile entity of block: " + block, e);
+                        if(block.hasEntity()){
+                            try{
+                                readChunk(stream, true, in -> {
+                                    byte revision = in.readByte();
+                                    tile.entity.readAll(Reads.get(in), revision);
+                                });
+                            }catch(Throwable e){
+                                throw new IOException("Failed to read tile entity of block: " + block, e);
+                            }
+                        }else{
+                            //skip the entity region, as the entity and its IO code are now gone
+                            skipChunk(stream, true);
                         }
                     }
                 }else{
@@ -253,8 +274,8 @@ public abstract class SaveVersion extends SaveFileReader{
         stream.writeInt(data.size);
         for(TeamData team : data){
             stream.writeInt(team.team.id);
-            stream.writeInt(team.brokenBlocks.size);
-            for(BrokenBlock block : team.brokenBlocks){
+            stream.writeInt(team.blocks.size);
+            for(BlockPlan block : team.blocks){
                 stream.writeShort(block.x);
                 stream.writeShort(block.y);
                 stream.writeShort(block.rotation);
@@ -281,7 +302,7 @@ public abstract class SaveVersion extends SaveFileReader{
             TeamData data = team.data();
             int blocks = stream.readInt();
             for(int j = 0; j < blocks; j++){
-                data.brokenBlocks.addLast(new BrokenBlock(stream.readShort(), stream.readShort(), stream.readShort(), content.block(stream.readShort()).id, TypeIO.readObject(Reads.get(stream))));
+                data.blocks.addLast(new BlockPlan(stream.readShort(), stream.readShort(), stream.readShort(), content.block(stream.readShort()).id, TypeIO.readObject(Reads.get(stream))));
             }
         }
 

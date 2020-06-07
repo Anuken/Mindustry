@@ -16,13 +16,15 @@ public class GameState{
     /** Wave countdown in ticks. */
     public float wavetime;
     /** Whether the game is in game over state. */
-    public boolean gameOver = false, launched = false;
+    public boolean gameOver = false, launched = false, serverPaused = false;
     /** Map that is currently being played on. */
     public @NonNull Map map = emptyMap;
     /** The current game rules. */
     public Rules rules = new Rules();
     /** Statistics for this save/game. Displayed after game over. */
     public Stats stats = new Stats();
+    /** Sector information. Only valid in the campaign. */
+    public SectorInfo secinfo = new SectorInfo();
     /** Team data. Gets reset every new game. */
     public Teams teams = new Teams();
     /** Number of enemies in the game; only used clientside in servers. */
@@ -30,6 +32,7 @@ public class GameState{
     /** Current game state. */
     private State state = State.menu;
 
+    //TODO optimize
     public Unitc boss(){
         return Groups.unit.find(u -> u.isBoss() && u.team() == rules.waveTeam);
     }
@@ -58,7 +61,7 @@ public class GameState{
     }
 
     public boolean isPaused(){
-        return (is(State.paused) && !net.active()) || (gameOver && !net.active());
+        return (is(State.paused) && !net.active()) || (gameOver && !net.active()) || (serverPaused && !isMenu());
     }
 
     public boolean isPlaying(){

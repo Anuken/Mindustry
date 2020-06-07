@@ -14,14 +14,17 @@ import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class SchematicsDialog extends FloatingDialog{
+public class SchematicsDialog extends BaseDialog{
     private SchematicInfoDialog info = new SchematicInfoDialog();
+    private Schematic firstSchematic;
     private String search = "";
+    private TextField searchField;
 
     public SchematicsDialog(){
         super("$schematics");
@@ -46,10 +49,10 @@ public class SchematicsDialog extends FloatingDialog{
         cont.table(s -> {
             s.left();
             s.image(Icon.zoom);
-            s.field(search, res -> {
+            searchField = s.field(search, res -> {
                 search = res;
                 rebuildPane[0].run();
-            }).growX();
+            }).growX().get();
         }).fillX().padBottom(4);
 
         cont.row();
@@ -57,16 +60,27 @@ public class SchematicsDialog extends FloatingDialog{
         cont.pane(t -> {
             t.top();
             t.margin(20f);
+
+            t.update(() -> {
+                if(Core.input.keyTap(Binding.chat) && Core.scene.getKeyboardFocus() == searchField && firstSchematic != null){
+                    control.input.useSchematic(firstSchematic);
+                    hide();
+                }
+            });
+
             rebuildPane[0] = () -> {
+                int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
+
                 t.clear();
                 int i = 0;
+                String regex = "[`~!@#$%^&*()-_=+[{]}|;:'\",<.>/?]";
+                String searchString = search.toLowerCase().replaceAll(regex, " ");
 
-                if(!schematics.all().contains(s -> search.isEmpty() || s.name().toLowerCase().contains(search.toLowerCase()))){
-                    t.add("$none");
-                }
+                firstSchematic = null;
 
                 for(Schematic s : schematics.all()){
-                    if(!search.isEmpty() && !s.name().toLowerCase().contains(search.toLowerCase())) continue;
+                    if(!search.isEmpty() && !s.name().toLowerCase().replaceAll(regex, " ").contains(searchString)) continue;
+                    if(firstSchematic == null) firstSchematic = s;
 
                     Button[] sel = {null};
                     sel[0] = t.button(b -> {
@@ -82,7 +96,7 @@ public class SchematicsDialog extends FloatingDialog{
                                 showInfo(s);
                             });
 
-                            buttons.button(Icon.download, style, () -> {
+                            buttons.button(Icon.upload, style, () -> {
                                 showExport(s);
                             });
 
@@ -138,9 +152,13 @@ public class SchematicsDialog extends FloatingDialog{
 
                     sel[0].getStyle().up = Tex.pane;
 
-                    if(++i % (mobile ? Core.graphics.isPortrait() ? 2 : 3 : 4) == 0){
+                    if(++i % maxwidth == 0){
                         t.row();
                     }
+                }
+
+                if(firstSchematic == null){
+                    t.add("$none");
                 }
             };
 
@@ -153,7 +171,7 @@ public class SchematicsDialog extends FloatingDialog{
     }
 
     public void showImport(){
-        FloatingDialog dialog = new FloatingDialog("$editor.export");
+        BaseDialog dialog = new BaseDialog("$editor.export");
         dialog.cont.pane(p -> {
             p.margin(10f);
             p.table(Tex.button, t -> {
@@ -202,7 +220,7 @@ public class SchematicsDialog extends FloatingDialog{
     }
 
     public void showExport(Schematic s){
-        FloatingDialog dialog = new FloatingDialog("$editor.export");
+        BaseDialog dialog = new BaseDialog("$editor.export");
         dialog.cont.pane(p -> {
            p.margin(10f);
            p.table(Tex.button, t -> {
@@ -229,6 +247,12 @@ public class SchematicsDialog extends FloatingDialog{
 
         dialog.addCloseButton();
         dialog.show();
+    }
+
+    public void focusSearchField(){
+        if(searchField == null) return;
+
+        Core.scene.setKeyboardFocus(searchField);
     }
 
     public static class SchematicImage extends Image{
@@ -291,7 +315,7 @@ public class SchematicsDialog extends FloatingDialog{
         }
     }
 
-    public static class SchematicInfoDialog extends FloatingDialog{
+    public static class SchematicInfoDialog extends BaseDialog{
 
         SchematicInfoDialog(){
             super("");

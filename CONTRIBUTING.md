@@ -26,11 +26,12 @@ This means:
 - 4 spaces indentation
 - `camelCase`, **even for constants or enums**. Why? Because `SCREAMING_CASE` is ugly, annoying to type and does not achieve anything useful. Constants are *less* dangerous than variables, not more.
 - No underscores for anything. (Yes, I know `Bindings` violates this principle, but that's for legacy reasons and really should be cleaned up some day)
+- Do not use braceless `if/else` statements. `if(x) statement else statement2` should **never** be done. In very specific situations, having braceless if-statements on one line is allowed: `if(cond) return;` would be valid.
 
 Import [this style file](.github/Mindustry-CodeStyle-IJ.xml) into IntelliJ to get correct formatting when developing Mindustry.
 
 #### Do not use incompatible Java features (java.util.function, java.awt).
-Android [does not support](https://developer.android.com/studio/write/java8-support#supported_features) many of Java 8's features, such as the packages `java.util.function`, `java.util.stream` or `forEach` in collections. Do not use these in your code.  
+Android and RoboVM (iOS) do not support many of Java 8's features, such as the packages `java.util.function`, `java.util.stream` or `forEach` in collections. Do not use these in your code.  
 If you need to use functional interfaces, use the ones in `arc.func`, which are more or less the same with different naming schemes.
   
 The same applies to any class *outside* of the standard `java.[n]io` / `java.net` / `java.util` packages: Most of them are not supported.  

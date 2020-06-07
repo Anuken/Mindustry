@@ -76,7 +76,14 @@ public class OverlayRenderer{
         if(select != null && select.isAI()){
             Draw.mixcol(Pal.accent, 1f);
             Draw.alpha(unitFade);
-            Draw.rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90);
+
+            if(select instanceof BlockUnitc){
+                //special selection for block "units"
+                Fill.square(select.x(), select.y(), ((BlockUnitc)select).tile().block().size * tilesize/2f);
+            }else{
+                Draw.rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90);
+            }
+
             Lines.stroke(unitFade);
             Lines.square(select.x(), select.y(), select.hitSize() * 1.5f, Time.time() * 2f);
             Draw.reset();
@@ -90,7 +97,7 @@ public class OverlayRenderer{
 
         input.drawTop();
 
-        buildFade = Mathf.lerpDelta(buildFade, input.isPlacing() ? 1f : 0f, 0.06f);
+        buildFade = Mathf.lerpDelta(buildFade, input.isPlacing() || input.isUsingSchematic() ? 1f : 0f, 0.06f);
 
         Draw.reset();
         Lines.stroke(buildFade * 2f);

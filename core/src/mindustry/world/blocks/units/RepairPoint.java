@@ -17,7 +17,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.tilesize;
 
 public class RepairPoint extends Block{
-    private static Rect rect = new Rect();
+    private static final Rect rect = new Rect();
 
     public int timerTarget = timers++;
 

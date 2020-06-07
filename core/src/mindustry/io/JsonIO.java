@@ -129,7 +129,8 @@ public class JsonIO{
 
             @Override
             public Block read(Json json, JsonValue jsonData, Class type){
-                return Vars.content.getByName(ContentType.block, jsonData.asString());
+                Block block = Vars.content.getByName(ContentType.block, jsonData.asString());
+                return block == null ? Blocks.air : block;
             }
         });
 

@@ -20,8 +20,7 @@ public class ControlsDialog extends KeybindDialog{
         buttons.button("$back", Icon.left, this::hide).size(230f, 64f);
 
         keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back)
-                hide();
+            if(key == KeyCode.escape || key == KeyCode.back) hide();
         });
     }
 }

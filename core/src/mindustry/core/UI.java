@@ -449,7 +449,7 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showConfirm(String title, String text, Boolp hide, Runnable confirmed){
-        FloatingDialog dialog = new FloatingDialog(title);
+        BaseDialog dialog = new BaseDialog(title);
         dialog.cont.add(text).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
@@ -475,7 +475,7 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showCustomConfirm(String title, String text, String yes, String no, Runnable confirmed, Runnable denied){
-        FloatingDialog dialog = new FloatingDialog(title);
+        BaseDialog dialog = new BaseDialog(title);
         dialog.cont.add(text).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
@@ -493,7 +493,7 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showOkText(String title, String text, Runnable confirmed){
-        FloatingDialog dialog = new FloatingDialog(title);
+        BaseDialog dialog = new BaseDialog(title);
         dialog.cont.add(text).width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);

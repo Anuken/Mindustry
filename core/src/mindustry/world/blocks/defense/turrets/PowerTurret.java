@@ -4,7 +4,7 @@ import arc.util.ArcAnnotate.*;
 import mindustry.entities.bullet.*;
 import mindustry.world.meta.*;
 
-public class PowerTurret extends CooledTurret{
+public class PowerTurret extends Turret{
     public @NonNull BulletType shootType;
     public float powerUse = 1f;
 
@@ -26,7 +26,7 @@ public class PowerTurret extends CooledTurret{
         super.init();
     }
 
-    public class PowerTurretEntity extends CooledTurretEntity{
+    public class PowerTurretEntity extends TurretEntity{
 
         @Override
         public BulletType useAmmo(){

@@ -84,8 +84,6 @@ public class OverflowGate extends Block{
             lastItem = item;
             time = 0f;
             lastInput = source.tile();
-
-            updateTile();
         }
 
         public @Nullable Tilec getTileTarget(Item item, Tile src, boolean flip){

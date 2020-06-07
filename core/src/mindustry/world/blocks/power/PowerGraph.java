@@ -56,8 +56,7 @@ public class PowerGraph{
 
     /** @return multiplier of speed at which resources should be consumed for power generation. */
     public float getUsageFraction(){
-        //TODO enable it later, or not?
-        return 1f; //lastUsageFraction;
+        return 1f;
     }
 
     public float getPowerProduced(){

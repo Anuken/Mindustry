@@ -27,7 +27,7 @@ public class LogicExecutor{
         void exec();
     }
 
-    class RegisterI implements Instruction{
+    static class RegisterI implements Instruction{
         /** operation to perform */
         Op op;
         /** destination memory */
@@ -43,7 +43,7 @@ public class LogicExecutor{
         }
     }
 
-    class ReadI implements Instruction{
+    static class ReadI implements Instruction{
         /** register to write result to */
         short dest;
         /** device to read from */
@@ -59,7 +59,7 @@ public class LogicExecutor{
         }
     }
 
-    class WriteI implements Instruction{
+    static class WriteI implements Instruction{
 
         @Override
         public void exec(){

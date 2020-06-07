@@ -15,6 +15,8 @@ public abstract class UnlockableContent extends MappableContent{
     public String localizedName;
     /** Localized description. May be null. */
     public @Nullable String description;
+    /** Whether this content is always unlocked in the tech tree. */
+    public boolean alwaysUnlocked = false;
     /** Icons by Cicon ID.*/
     protected TextureRegion[] cicons = new TextureRegion[mindustry.ui.Cicon.all.length];
 
@@ -57,11 +59,6 @@ public abstract class UnlockableContent extends MappableContent{
 
     /** Whether this content is always hidden in the content database dialog. */
     public boolean isHidden(){
-        return false;
-    }
-
-    /** Override to make content always unlocked. */
-    public boolean alwaysUnlocked(){
         return false;
     }
 

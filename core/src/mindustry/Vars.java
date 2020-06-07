@@ -9,27 +9,28 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
-import arc.util.io.*;
 import mindustry.ai.*;
 import mindustry.async.*;
-import mindustry.audio.LoopControl;
+import mindustry.audio.*;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.input.*;
-import mindustry.maps.*;
+import mindustry.io.*;
 import mindustry.maps.Map;
+import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.Net;
 import mindustry.net.*;
+import mindustry.world.*;
 
 import java.io.*;
 import java.nio.charset.*;
 import java.util.*;
 
-import static arc.Core.settings;
+import static arc.Core.*;
 
 public class Vars implements Loadable{
     /** Whether to load locales.*/
@@ -64,24 +65,26 @@ public class Vars implements Loadable{
     public static final Array<String> defaultServers = Array.with();
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
-    /** whether to enable editing of units in the editor */
-    public static final boolean enableUnitEditing = false;
     /** max chat message length */
     public static final int maxTextLength = 150;
     /** max player name length in bytes */
     public static final int maxNameLength = 40;
-    /** displayed item size when ingame, TODO remove. */
+    /** displayed item size when ingame. */
     public static final float itemSize = 5f;
-    /** extra padding around the world; units outside this bound will begin to self-destruct. */
-    public static final float worldBounds = 100f;
-    /** units outside of this bound will simply die instantly */
-    public static final float finalWorldBounds = worldBounds + 500;
+    /** units outside of this bound will die instantly */
+    public static final float finalWorldBounds = 500;
     /** mining range for manual miners */
     public static final float miningRange = 70f;
     /** range for building */
     public static final float buildingRange = 220f;
     /** duration of one turn in ticks */
     public static final float turnDuration = 5 * Time.toMinutes;
+    /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
+    public static final float minArmorDamage = 0.05f;
+    /** launch animation duration */
+    public static final float launchDuration = 140f;
+    /** tile used in certain situations, instead of null */
+    public static Tile emptyTile;
     /** for map generator dialog */
     public static boolean updateEditorOnChange = false;
     /** size of tiles in units */
@@ -175,6 +178,7 @@ public class Vars implements Loadable{
     public static BeControl becontrol;
     public static AsyncCore asyncCore;
     public static TeamIndexProcess teamIndex;
+    public static BaseRegistry bases;
 
     public static Universe universe;
     public static World world;
@@ -199,9 +203,7 @@ public class Vars implements Loadable{
     }
 
     public static void init(){
-        Serialization.init();
         Groups.init();
-        DefaultSerializers.typeMappings.put("mindustry.type.ContentType", "mindustry.ctype.ContentType");
 
         if(loadLocales){
             //load locales
@@ -221,7 +223,7 @@ public class Vars implements Loadable{
 
         Version.init();
 
-        dataDirectory = Core.settings.getDataDirectory();
+        dataDirectory = settings.getDataDirectory();
         screenshotDirectory = dataDirectory.child("screenshots/");
         customMapDirectory = dataDirectory.child("maps/");
         mapPreviewDirectory = dataDirectory.child("previews/");
@@ -231,6 +233,7 @@ public class Vars implements Loadable{
         schematicDirectory = dataDirectory.child("schematics/");
         bebuildDirectory = dataDirectory.child("be_builds/");
         emptyMap = new Map(new StringMap());
+        emptyTile = null;
 
         if(tree == null) tree = new FileTree();
         if(mods == null) mods = new Mods();
@@ -248,6 +251,7 @@ public class Vars implements Loadable{
         spawner = new WaveSpawner();
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
+        bases = new BaseRegistry();
 
         state = new GameState();
         data = new GlobalData();
@@ -291,7 +295,7 @@ public class Vars implements Loadable{
     public static void loadFileLogger(){
         if(loadedFileLogger) return;
 
-        Core.settings.setAppName(appName);
+        settings.setAppName(appName);
 
         Writer writer = settings.getDataDirectory().child("last_log.txt").writer(false);
         LogHandler log = Log.getLogger();
@@ -311,15 +315,16 @@ public class Vars implements Loadable{
     }
 
     public static void loadSettings(){
-        Core.settings.setAppName(appName);
+        settings.setJson(JsonIO.json());
+        settings.setAppName(appName);
 
         if(steam || (Version.modifier != null && Version.modifier.contains("steam"))){
-            Core.settings.setDataDirectory(Core.files.local("saves/"));
+            settings.setDataDirectory(Core.files.local("saves/"));
         }
 
-        Core.settings.defaults("locale", "default", "blocksync", true);
-        Core.keybinds.setDefaults(Binding.values());
-        Core.settings.load();
+        settings.defaults("locale", "default", "blocksync", true);
+        keybinds.setDefaults(Binding.values());
+        settings.load();
 
         Scl.setProduct(settings.getInt("uiscale", 100) / 100f);
 
@@ -342,7 +347,7 @@ public class Vars implements Loadable{
 
             Fi handle = Core.files.internal("bundles/bundle");
             Locale locale;
-            String loc = Core.settings.getString("locale");
+            String loc = settings.getString("locale");
             if(loc.equals("default")){
                 locale = Locale.getDefault();
             }else{

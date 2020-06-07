@@ -14,7 +14,7 @@ import mindustry.ui.Links.*;
 
 import static mindustry.Vars.*;
 
-public class AboutDialog extends FloatingDialog{
+public class AboutDialog extends BaseDialog{
     private Array<String> contributors = new Array<>();
     private static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds", "f-droid");
 
@@ -93,7 +93,7 @@ public class AboutDialog extends FloatingDialog{
     }
 
     public void showCredits(){
-        FloatingDialog dialog = new FloatingDialog("$credits");
+        BaseDialog dialog = new BaseDialog("$credits");
         dialog.addCloseButton();
         dialog.cont.add("$credits.text").fillX().wrap().get().setAlignment(Align.center);
         dialog.cont.row();

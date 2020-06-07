@@ -20,16 +20,17 @@ public class SaveDialog extends LoadDialog{
         });
     }
 
+    @Override
     public void addSetup(){
-        slots.row();
-        slots.button("$save.new", Icon.add, () ->
+
+        buttons.button("$save.new", Icon.add, () ->
         ui.showTextInput("$save", "$save.newslot", 30, "", text -> {
             ui.loadAnd("$saving", () -> {
                 control.saves.addSave(text);
                 Core.app.post(() -> Core.app.post(this::setup));
             });
         })
-        ).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
+        ).fillX().margin(10f);
     }
 
     @Override

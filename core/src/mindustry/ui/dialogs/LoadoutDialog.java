@@ -8,11 +8,10 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 
 import static mindustry.Vars.*;
 
-public class LoadoutDialog extends FloatingDialog{
+public class LoadoutDialog extends BaseDialog{
     private Runnable hider;
     private Runnable resetter;
     private Runnable updater;

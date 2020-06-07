@@ -9,6 +9,7 @@ import mindustry.io.*;
 
 import java.io.*;
 import java.nio.*;
+import java.util.zip.*;
 
 /**
  * Class for storing all packets.
@@ -169,9 +170,14 @@ public class Packets{
             TypeIO.writeString(buffer, versionType);
             TypeIO.writeString(buffer, name);
             TypeIO.writeString(buffer, usid);
-            buffer.put(mobile ? (byte)1 : 0);
+
             buffer.put(Base64Coder.decode(uuid));
-            buffer.put((byte)color);
+            CRC32 crc = new CRC32();
+            crc.update(Base64Coder.decode(uuid));
+            buffer.putLong(crc.getValue());
+
+            buffer.put(mobile ? (byte)1 : 0);
+            buffer.putInt(color);
             buffer.put((byte)mods.size);
             for(int i = 0; i < mods.size; i++){
                 TypeIO.writeString(buffer, mods.get(i));
@@ -184,11 +190,11 @@ public class Packets{
             versionType = TypeIO.readString(buffer);
             name = TypeIO.readString(buffer);
             usid = TypeIO.readString(buffer);
-            mobile = buffer.get() == 1;
-            color = buffer.getInt();
             byte[] idbytes = new byte[16];
             buffer.get(idbytes);
             uuid = new String(Base64Coder.encode(idbytes));
+            mobile = buffer.get() == 1;
+            color = buffer.getInt();
             int totalMods = buffer.get();
             mods = new Array<>(totalMods);
             for(int i = 0; i < totalMods; i++){

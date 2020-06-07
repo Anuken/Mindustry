@@ -46,13 +46,13 @@ public class StatusEffect extends MappableContent{
     /** Runs every tick on the affected unit while time is greater than 0. */
     public void update(Unitc unit, float time){
         if(damage > 0){
-            unit.damageContinuous(damage);
+            unit.damageContinuousPierce(damage);
         }else if(damage < 0){ //heal unit
             unit.heal(damage * Time.delta());
         }
 
-        if(effect != Fx.none && Mathf.chance(Time.delta() * 0.15f)){
-            effect.at(unit.getX() + Mathf.range(unit.bounds() / 2f), unit.getY() + Mathf.range(unit.bounds() / 2f));
+        if(effect != Fx.none && Mathf.chanceDelta(0.15f)){
+            effect.at(unit.x() + Mathf.range(unit.bounds() / 2f), unit.y() + Mathf.range(unit.bounds() / 2f));
         }
     }
 

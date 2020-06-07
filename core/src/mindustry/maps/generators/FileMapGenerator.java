@@ -60,9 +60,9 @@ public class FileMapGenerator implements WorldGenerator{
             }
 
             //add random decoration
-            if(Mathf.chance(0.015) && !tile.floor().isLiquid && tile.block() == Blocks.air){
-                tile.setBlock(tile.floor().decoration);
-            }
+            //if(Mathf.chance(0.015) && !tile.floor().isLiquid && tile.block() == Blocks.air){
+            //    tile.setBlock(tile.floor().decoration);
+            //}
         }
 
         if(!anyCores){

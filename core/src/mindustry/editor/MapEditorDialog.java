@@ -25,11 +25,11 @@ import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -42,7 +42,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private MapResizeDialog resizeDialog;
     private MapGenerateDialog generateDialog;
     private ScrollPane pane;
-    private FloatingDialog menu;
+    private BaseDialog menu;
     private Rules lastSavedRules;
     private boolean saved = false;
     private boolean shownWithMap = false;
@@ -58,7 +58,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         infoDialog = new MapInfoDialog(editor);
         generateDialog = new MapGenerateDialog(editor, true);
 
-        menu = new FloatingDialog("$menu");
+        menu = new BaseDialog("$menu");
         menu.addCloseButton();
 
         float swidth = 180f;
@@ -272,8 +272,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
         editor.getTags().put("rules", JsonIO.write(state.rules));
         editor.getTags().remove("width");
         editor.getTags().remove("height");
-        //TODO unkill player
-        //player.dead = true;
+
+        player.clearUnit();
 
         Map returned = null;
 
@@ -309,7 +309,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
      * 3) listener
      */
     private void createDialog(String title, Object... arguments){
-        FloatingDialog dialog = new FloatingDialog(title);
+        BaseDialog dialog = new BaseDialog(title);
 
         float h = 90f;
 
@@ -529,7 +529,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 int i = 0;
 
-                for(Team team : Team.base()){
+                for(Team team : Team.baseTeams){
                     ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglePartiali);
                     button.margin(4f);
                     button.getImageCell().grow();
@@ -548,7 +548,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 mid.table(Tex.underline, t -> {
                     Slider slider = new Slider(0, MapEditor.brushSizes.length - 1, 1, false);
-                    slider.moved(f -> editor.brushSize = MapEditor.brushSizes[(int)(float)f]);
+                    slider.moved(f -> editor.brushSize = MapEditor.brushSizes[(int)f]);
                     for(int j = 0; j < MapEditor.brushSizes.length; j++){
                         if(MapEditor.brushSizes[j] == editor.brushSize){
                             slider.setValue(j);
@@ -684,7 +684,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         for(Block block : blocksOut){
             TextureRegion region = block.icon(Cicon.medium);
 
-            if(!Core.atlas.isFound(region)) continue;
+            if(!Core.atlas.isFound(region) || !block.inEditor || (block.buildVisibility == BuildVisibility.debugOnly)) continue;
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglei);
             button.getStyle().imageUp = new TextureRegionDrawable(region);

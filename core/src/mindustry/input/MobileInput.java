@@ -139,17 +139,12 @@ public class MobileInput extends InputHandler implements GestureListener{
                 r1.setSize(req.block.size * tilesize);
                 r1.setCenter(other.worldx() + req.block.offset(), other.worldy() + req.block.offset());
 
-                if(r2.overlaps(r1)){
-                    return req;
-                }
             }else{
                 r1.setSize(other.block().size * tilesize);
                 r1.setCenter(other.worldx() + other.block().offset(), other.worldy() + other.block().offset());
-
-                if(r2.overlaps(r1)){
-                    return req;
-                }
             }
+
+            if(r2.overlaps(r1)) return req;
         }
         return null;
     }
@@ -246,7 +241,8 @@ public class MobileInput extends InputHandler implements GestureListener{
         Boolp schem = () -> lastSchematic != null && !selectRequests.isEmpty();
 
         group.fill(t -> {
-            t.bottom().left().visible(() -> (player.builder().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
+            t.visible(() -> (player.builder().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
+            t.bottom().left();
             t.button("$cancel", Icon.cancel, () -> {
                 player.builder().clearBuilding();
                 selectRequests.clear();
@@ -275,25 +271,6 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             }).margin(4f);
         });
-    }
-
-    @Override
-    protected int schemOriginX(){
-        Tmp.v1.setZero();
-        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
-        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).x);
-    }
-
-    @Override
-    protected int schemOriginY(){
-        Tmp.v1.setZero();
-        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
-        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).y);
-    }
-
-    @Override
-    public boolean isPlacing(){
-        return super.isPlacing() && mode == placing;
     }
 
     @Override
@@ -356,13 +333,11 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(mode == placing && block != null){
                 //draw placing
                 for(int i = 0; i < lineRequests.size; i++){
-                    BuildRequest req = lineRequests.get(i);
-                    if(i == lineRequests.size - 1 && req.block.rotate){
-                        drawArrow(block, req.x, req.y, req.rotation);
-                    }
-
                     BuildRequest request = lineRequests.get(i);
-                    request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(req.x, request.y, request.block.size, null) == null);
+                    if(i == lineRequests.size - 1 && request.block.rotate){
+                        drawArrow(block, request.x, request.y, request.rotation);
+                    }
+                    request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
                     drawSelected(request.x, request.y, request.block, Pal.accent);
                 }
             }else if(mode == breaking){
@@ -414,7 +389,26 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     //endregion
-    //region input events
+    //region input events, overrides
+
+    @Override
+    protected int schemOriginX(){
+        Tmp.v1.setZero();
+        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
+        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).x);
+    }
+
+    @Override
+    protected int schemOriginY(){
+        Tmp.v1.setZero();
+        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
+        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).y);
+    }
+
+    @Override
+    public boolean isPlacing(){
+        return super.isPlacing() && mode == placing;
+    }
 
     @Override
     public boolean isBreaking(){

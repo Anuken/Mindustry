@@ -6,7 +6,7 @@ import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
-public class PausedDialog extends FloatingDialog{
+public class PausedDialog extends BaseDialog{
     private SaveDialog save = new SaveDialog();
     private LoadDialog load = new LoadDialog();
     private boolean wasClient = false;

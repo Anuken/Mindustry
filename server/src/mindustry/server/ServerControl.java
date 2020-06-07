@@ -138,7 +138,7 @@ public class ServerControl implements ApplicationListener{
             nextMapOverride = null;
             if(map != null){
                 Call.onInfoMessage((state.rules.pvp
-                ? "[YELLOW]The " + event.winner.name + " team is victorious![]" : "[SCARLET]Game over![]")
+                ? "[yellow]The " + event.winner.name + " team is victorious![]" : "[scarlet]Game over![]")
                 + "\nNext selected map:[accent] " + map.name() + "[]"
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
                 "\nNew game begins in " + roundExtraTime + " seconds.");
@@ -340,6 +340,13 @@ public class ServerControl implements ApplicationListener{
             info("&lyServer: &lb@", arg[0]);
         });
 
+
+        handler.register("pause", "<on/off>", "Pause or unpause the game.", arg -> {
+            boolean pause = arg[0].equals("on");
+            state.serverPaused = pause;
+            info(pause ? "Game paused." : "Game unpaused.");
+        });
+
         handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
             String rules = Core.settings.getString("globalrules");
             JsonValue base = JsonIO.json().fromJson(null, rules);
@@ -398,7 +405,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Team team = arg.length == 0 ? Team.sharded : Structs.find(Team.all(), t -> t.name.equals(arg[0]));
+            Team team = arg.length == 0 ? Team.sharded : Structs.find(Team.all, t -> t.name.equals(arg[0]));
 
             if(team == null){
                 err("No team with that name found.");

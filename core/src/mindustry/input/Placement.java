@@ -105,7 +105,7 @@ public class Placement{
                 found = true;
                 break;
             }
-            closed.add(Point2.pack((int)next.x, (int)next.y));
+            closed.add(Point2.pack(next.x, next.y));
             for(Point2 point : Geometry.d4){
                 int newx = next.x + point.x, newy = next.y + point.y;
                 Tile child = world.tile(newx, newy);
@@ -272,13 +272,5 @@ public class Placement{
         int getScaledY(int i){
             return y + (x2 - x > y2 - y ? 0 : i);
         }
-    }
-
-    public interface DistanceHeuristic{
-        float cost(int x1, int y1, int x2, int y2);
-    }
-
-    public interface TileHueristic{
-        float cost(Tile tile, Tile other);
     }
 }

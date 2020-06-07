@@ -227,7 +227,7 @@ public class PlacementFragment extends Fragment{
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
 
-                            if(state.rules.bannedBlocks.contains(block)){
+                            if(!block.isPlaceable()){
                                 button.forEach(elem -> elem.setColor(Color.darkGray));
                             }
                         });
@@ -324,11 +324,11 @@ public class PlacementFragment extends Fragment{
                                 }
                             }).growX().left().margin(3);
 
-                            if(state.rules.bannedBlocks.contains(lastDisplay) || !player.isBuilder()){
+                            if(!lastDisplay.isPlaceable() || !player.isBuilder()){
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add(!player.isBuilder() ? "$unit.nobuild" : "$banned");
+                                    b.add(!player.isBuilder() ? "$unit.nobuild" : lastDisplay.unplaceableMessage()).width(190f).wrap();
                                     b.left();
                                 }).padTop(2).left();
                             }
@@ -432,7 +432,7 @@ public class PlacementFragment extends Fragment{
         returnArray.sort((b1, b2) -> {
             int locked = -Boolean.compare(unlocked(b1), unlocked(b2));
             if(locked != 0) return locked;
-            return Boolean.compare(state.rules.bannedBlocks.contains(b1), state.rules.bannedBlocks.contains(b2));
+            return Boolean.compare(!b1.isPlaceable(), !b2.isPlaceable());
         });
         return returnArray;
     }

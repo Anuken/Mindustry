@@ -22,6 +22,7 @@ import mindustry.type.*;
 import mindustry.type.Sector.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.legacy.*;
 
 import static mindustry.Vars.*;
@@ -76,6 +77,18 @@ public class World{
 
     public int unitHeight(){
         return height()*tilesize;
+    }
+
+    @NonNull
+    public Floor floor(int x, int y){
+        Tile tile = tile(x, y);
+        return tile == null ? Blocks.air.asFloor() : tile.floor();
+    }
+
+    @NonNull
+    public Floor floorWorld(float x, float y){
+        Tile tile = tileWorld(x, y);
+        return tile == null ? Blocks.air.asFloor() : tile.floor();
     }
 
     @Nullable
@@ -222,6 +235,14 @@ public class World{
             }
         });
 
+        //postgenerate for bases
+        if(sector.preset == null){
+            sector.planet.generator.postGenerate(tiles);
+        }
+
+        //reset rules
+        setSectorRules(sector);
+
         if(state.rules.defaultTeam.core() != null){
             sector.setSpawnPosition(state.rules.defaultTeam.core().pos());
         }
@@ -230,6 +251,8 @@ public class World{
     private void setSectorRules(Sector sector){
         state.map = new Map(StringMap.of("name", sector.planet.localizedName + "; Sector " + sector.id));
         state.rules.sector = sector;
+
+        state.rules.weather.clear();
 
         if(sector.is(SectorAttribute.rainy)){
             state.rules.weather.add(new WeatherEntry(Weathers.rain));
@@ -317,6 +340,35 @@ public class World{
 
             if(cons.accept(x0, y0)) break;
             if(x0 == x1 && y0 == y1) break;
+
+            e2 = 2 * err;
+            if(e2 > -dy){
+                err = err - dy;
+                x0 = x0 + sx;
+            }
+
+            if(e2 < dx){
+                err = err + dx;
+                y0 = y0 + sy;
+            }
+        }
+    }
+
+    public boolean raycast(int x0f, int y0f, int x1, int y1, Raycaster cons){
+        int x0 = x0f;
+        int y0 = y0f;
+        int dx = Math.abs(x1 - x0);
+        int dy = Math.abs(y1 - y0);
+
+        int sx = x0 < x1 ? 1 : -1;
+        int sy = y0 < y1 ? 1 : -1;
+
+        int err = dx - dy;
+        int e2;
+        while(true){
+
+            if(cons.accept(x0, y0)) return true;
+            if(x0 == x1 && y0 == y1) return false;
 
             e2 = 2 * err;
             if(e2 > -dy){

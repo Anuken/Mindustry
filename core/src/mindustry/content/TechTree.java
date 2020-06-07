@@ -2,7 +2,9 @@ package mindustry.content;
 
 import arc.math.*;
 import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.ctype.*;
+import mindustry.game.Objectives.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -279,50 +281,6 @@ public class TechTree implements ContentList{
                             });
                         });
                     });
-
-                    /*
-                    node(draugFactory, () -> {
-                        node(spiritFactory, () -> {
-                            node(phantomFactory);
-                        });
-
-                        node(daggerFactory, () -> {
-                            node(commandCenter, () -> {});
-                            node(crawlerFactory, () -> {
-                                node(titanFactory, () -> {
-                                    node(fortressFactory, () -> {
-
-                                    });
-                                });
-                            });
-
-                            node(wraithFactory, () -> {
-                                node(ghoulFactory, () -> {
-                                    node(revenantFactory, () -> {
-
-                                    });
-                                });
-                            });
-                        });
-                    });
-
-                    /*
-                    node(dartPad, () -> {
-                        node(deltaPad, () -> {
-
-                            node(javelinPad, () -> {
-                                node(tridentPad, () -> {
-                                    node(glaivePad);
-                                });
-                            });
-
-                            node(tauPad, () -> {
-                                node(omegaPad, () -> {
-
-                                });
-                            });
-                        });
-                    });*/
                 });
             });
         });
@@ -336,7 +294,7 @@ public class TechTree implements ContentList{
 
             requirements = new ItemStack[block.requirements.length];
             for(int i = 0; i < requirements.length; i++){
-                requirements[i] = new ItemStack(block.requirements[i].item, 40 + Mathf.round(Mathf.pow(block.requirements[i].amount, 1.25f) * 6, 10));
+                requirements[i] = new ItemStack(block.requirements[i].item, 40 + Mathf.round(Mathf.pow(block.requirements[i].amount, 1.25f) * 20, 10));
             }
         }else{
             requirements = ItemStack.empty;
@@ -355,11 +313,21 @@ public class TechTree implements ContentList{
     }
 
     public static class TechNode{
-        static TechNode context;
+        private static TechNode context;
 
-        public TechNode parent;
-        public final UnlockableContent content;
-        public final ItemStack[] requirements;
+        /** Depth in tech tree. */
+        public int depth;
+        /** Requirement node. */
+        public @Nullable TechNode parent;
+        /** Content to be researched. */
+        public UnlockableContent content;
+        /** Item requirements for this content. */
+        public ItemStack[] requirements;
+        /** Extra objectives needed to research this. TODO implement */
+        public Objective[] objectives = {};
+        /** Research turns required to research this content. */
+        public int turns = 3; //TODO keep track of turns that have been used so far
+        /** Nodes that depend on this node. */
         public final Array<TechNode> children = new Array<>();
 
         TechNode(TechNode ccontext, UnlockableContent content, ItemStack[] requirements, Runnable children){
@@ -370,6 +338,7 @@ public class TechTree implements ContentList{
             this.parent = ccontext;
             this.content = content;
             this.requirements = requirements;
+            this.depth = parent == null ? 0 : parent.depth + 1;
 
             context = this;
             children.run();

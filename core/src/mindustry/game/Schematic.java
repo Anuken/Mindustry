@@ -1,10 +1,11 @@
 package mindustry.game;
 
+import arc.files.*;
 import arc.struct.*;
 import arc.struct.IntIntMap.*;
-import arc.files.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -124,6 +125,24 @@ public class Schematic implements Publishable, Comparable<Schematic>{
             this.y = (short)y;
             this.config = config;
             this.rotation = rotation;
+        }
+
+        //pooling only
+        public Stile(){
+            block = Blocks.air;
+        }
+
+        public Stile set(Stile other){
+            block = other.block;
+            x = other.x;
+            y = other.y;
+            config = other.config;
+            rotation = other.rotation;
+            return this;
+        }
+
+        public Stile copy(){
+            return new Stile(block, x, y, config, rotation);
         }
     }
 }

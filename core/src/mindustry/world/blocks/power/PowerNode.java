@@ -266,7 +266,7 @@ public class PowerNode extends PowerBlock{
         public void placed(){
             if(net.client()) return;
 
-            Boolf<Tilec> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) ||
+            Boolf<Tilec> valid = other -> other != null && other != this && ((!other.block().outputsPower && other.block().consumesPower) ||
                 (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) && linkValid(this, other)
                 && !other.proximity().contains(this) && other.power().graph != power.graph;
 

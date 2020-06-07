@@ -2,18 +2,17 @@ package mindustry.world.blocks.distribution;
 
 import arc.*;
 import arc.graphics.g2d.*;
-import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.production.*;
 
 import static mindustry.Vars.*;
 
@@ -57,6 +56,13 @@ public class PayloadConveyor extends Block{
         public int step = -1, stepAccepted = -1;
 
         @Override
+        public Payload takePayload(){
+            Payload t = item;
+            item = null;
+            return t;
+        }
+
+        @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
@@ -78,12 +84,7 @@ public class PayloadConveyor extends Block{
         public void updateTile(){
             progress = Time.time() % moveTime;
 
-            //TODO DEBUG
-            if(Core.input.keyTap(KeyCode.g) && world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y) == this){
-                item = new UnitPayload((Mathf.chance(0.5) ? UnitTypes.wraith : UnitTypes.dagger).create(Team.sharded));
-                itemRotation = rotation() * 90;
-                animation = 0f;
-            }
+            updatePayload();
 
             //TODO nondeterministic input priority
             int curStep = curStep();
@@ -101,17 +102,25 @@ public class PayloadConveyor extends Block{
                             //move forward.
                             next.handlePayload(this, item);
                             item = null;
+                            moved();
                         }
                     }else if(!blocked){
                         //dump item forward
-                        float trnext = size * tilesize / 2f, cx = Geometry.d4(rotation()).x, cy = Geometry.d4(rotation()).y;
-
-                        if(item.dump(x + cx * trnext, y + cy * trnext, rotation() * 90)){
+                        if(item.dump()){
                             item = null;
+                            moved();
                         }
                     }
                 }
             }
+        }
+
+        public void moved(){
+
+        }
+
+        public void drawBottom(){
+            super.draw();
         }
 
         @Override 
@@ -123,7 +132,7 @@ public class PayloadConveyor extends Block{
             float glow = Math.max((dst - (Math.abs(fract() - 0.5f) * 2)) / dst, 0);
             Draw.mixcol(Pal.accent, glow);
 
-            float trnext = fract() * size * tilesize, trprev = size * tilesize * (fract() - 1), rot = rotation() * 90;
+            float trnext = fract() * size * tilesize, trprev = size * tilesize * (fract() - 1), rot = rotdeg();
 
             TextureRegion clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trnext, 0), topRegion);
             float s = tilesize * size;
@@ -157,31 +166,15 @@ public class PayloadConveyor extends Block{
 
             Draw.z(Layer.blockOver);
 
-            if(animation > fract()){
-                animation = Mathf.lerp(animation, 0.8f, 0.15f);
-            }
-
-            animation = Math.max(animation, fract());
-
-            float fract = animation;
-            rot = Mathf.slerp(itemRotation, rotation() * 90, fract);
-
-            if(fract < 0.5f){
-                Tmp.v1.trns(itemRotation + 180, (0.5f - fract) * tilesize * size);
-            }else{
-                Tmp.v1.trns(rotation() * 90, (fract - 0.5f) * tilesize * size);
-            }
-
-            float vx = Tmp.v1.x, vy = Tmp.v1.y;
-
             if(item != null){
-                item.draw(x + vx, y + vy, rot);
+                item.draw();
             }
         }
 
         @Override
         public boolean acceptPayload(Tilec source, Payload payload){
-            return this.item == null && progress <= 5f;
+            //accepting payloads from units isn't supported
+            return this.item == null && progress <= 5f && source != this;
         }
 
         @Override
@@ -190,16 +183,56 @@ public class PayloadConveyor extends Block{
             this.stepAccepted = curStep();
             this.itemRotation = source.angleTo(this);
             this.animation = 0;
+
+            updatePayload();
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+
+            write.f(progress);
+            write.f(itemRotation);
+            Payload.write(item, write);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+
+            progress = read.f();
+            itemRotation = read.f();
+            item = Payload.read(read);
+        }
+
+        public void updatePayload(){
+            if(item != null){
+                if(animation > fract()){
+                    animation = Mathf.lerp(animation, 0.8f, 0.15f);
+                }
+
+                animation = Math.max(animation, fract());
+
+                float fract = animation;
+                float rot = Mathf.slerp(itemRotation, rotdeg(), fract);
+
+                if(fract < 0.5f){
+                    Tmp.v1.trns(itemRotation + 180, (0.5f - fract) * tilesize * size);
+                }else{
+                    Tmp.v1.trns(rotdeg(), (fract - 0.5f) * tilesize * size);
+                }
+
+                float vx = Tmp.v1.x, vy = Tmp.v1.y;
+
+                item.set(x + vx, y + vy, rot);
+            }
         }
 
         boolean blends(int direction){
             if(direction == rotation()){
                 return !blocked || next != null;
             }else{
-                Tilec accept = nearby(Geometry.d4(direction).x * size, Geometry.d4(direction).y * size);
-                return accept != null && accept.block().size == size && accept.block().outputsPayload &&
-                    //block must either be facing this one, or not be rotating
-                    ((accept.tileX() + Geometry.d4(accept.rotation()).x * size == tileX() && accept.tileY() + Geometry.d4(accept.rotation()).y * size == tileY()) || !accept.block().rotate);
+                return PayloadAcceptor.blends(this, direction);
             }
         }
 

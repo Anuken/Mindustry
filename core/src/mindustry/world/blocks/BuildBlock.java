@@ -170,7 +170,7 @@ public class BuildBlock extends Block{
         @Override
         public void draw(){
             if(!(previous == null || cblock == null || previous == cblock) && Core.atlas.isFound(previous.icon(Cicon.full))){
-                Draw.rect(previous.icon(Cicon.full), x, y, previous.rotate ? tile.rotation() * 90 : 0);
+                Draw.rect(previous.icon(Cicon.full), x, y, previous.rotate ? tile.rotdeg() : 0);
             }
 
             Draw.draw(Layer.blockBuilding, () -> {
@@ -183,7 +183,7 @@ public class BuildBlock extends Block{
                         Shaders.blockbuild.region = region;
                         Shaders.blockbuild.progress = progress;
 
-                        Draw.rect(region, x, y, target.rotate ? tile.rotation() * 90 : 0);
+                        Draw.rect(region, x, y, target.rotate ? tile.rotdeg() : 0);
                         Draw.flush();
                     }
                 }

@@ -87,6 +87,8 @@ public class Shaders{
 
         @Override
         public void apply(){
+            camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, renderer.planets.planet.getRotation());
+
             setUniformf("u_lightdir", lightDir);
             setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
             setUniformf("u_camdir", camDir);

@@ -17,14 +17,13 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-public class ModsDialog extends FloatingDialog{
+public class ModsDialog extends BaseDialog{
 
     public ModsDialog(){
         super("$mods");
         addCloseButton();
 
         buttons.button("$mods.guide", Icon.link, () -> Core.app.openURI(modGuideURL)).size(210, 64f);
-
 
         shown(this::setup);
 
@@ -67,7 +66,7 @@ public class ModsDialog extends FloatingDialog{
             float margin = 12f;
 
             buttons.button("$mod.import", Icon.add, style, () -> {
-                FloatingDialog dialog = new FloatingDialog("$mod.import");
+                BaseDialog dialog = new BaseDialog("$mod.import");
 
                 TextButtonStyle bstyle = Styles.cleart;
 
@@ -94,7 +93,9 @@ public class ModsDialog extends FloatingDialog{
                     t.button("$mod.import.github", Icon.github, bstyle, () -> {
                         dialog.hide();
 
-                        ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
+                        ui.showTextInput("$mod.import.github", "", 64, Core.settings.getString("lastmod", "Anuken/ExampleMod"), text -> {
+                            Core.settings.put("lastmod", text);
+
                             ui.loadfrag.show();
                             Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
                                 Core.net.httpGet(loc.getHeader("Location"), result -> {
@@ -245,7 +246,7 @@ public class ModsDialog extends FloatingDialog{
     }
 
     private void showMod(LoadedMod mod){
-        FloatingDialog dialog = new FloatingDialog(mod.meta.displayName());
+        BaseDialog dialog = new BaseDialog(mod.meta.displayName());
 
         dialog.addCloseButton();
 

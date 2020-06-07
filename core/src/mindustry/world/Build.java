@@ -42,8 +42,8 @@ public class Build{
 
     /** Places a BuildBlock at this location. */
     @Remote(called = Loc.server)
-    public static void beginPlace(Team team, int x, int y, Block result, int rotation){
-        if(!validPlace(team, x, y, result, rotation)){
+    public static void beginPlace(Block result, Team team, int x, int y, int rotation){
+        if(!validPlace(result, team, x, y, rotation)){
             return;
         }
 
@@ -62,12 +62,9 @@ public class Build{
     }
 
     /** Returns whether a tile can be placed at this location by this team. */
-    public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
-        if(type == null || !type.isVisible() || type.isHidden()){
-            return false;
-        }
-
-        if(state.rules.bannedBlocks.contains(type) && !(state.rules.waves && team == state.rules.waveTeam)){
+    public static boolean validPlace(Block type, Team team, int x, int y, int rotation){
+        //the wave team can build whatever they want as long as it's visible - banned blocks are not applicable
+        if(type == null || (!type.isPlaceable() && !(state.rules.waves && team == state.rules.waveTeam && type.isVisible()))){
             return false;
         }
 
@@ -94,7 +91,7 @@ public class Build{
             }
 
             //TODO should water blocks be placeable here?
-            if(/*!type.requiresWater && */!contactsGround(tile.x, tile.y, type)){
+            if(/*!type.requiresWater && */!contactsShallows(tile.x, tile.y, type)){
                 return false;
             }
 
@@ -121,7 +118,7 @@ public class Build{
             return true;
         }else{
             return tile.interactable(team)
-                && contactsGround(tile.x, tile.y, type)
+                && contactsShallows(tile.x, tile.y, type)
                 && (!tile.floor().isDeep() || type.floating || type.requiresWater)
                 && tile.floor().placeableOn
                 && (!type.requiresWater || tile.floor().liquidDrop == Liquids.water)
@@ -131,7 +128,22 @@ public class Build{
         }
     }
 
-    private static boolean contactsGround(int x, int y, Block block){
+    public static boolean contactsGround(int x, int y, Block block){
+        if(block.isMultiblock()){
+            for(Point2 point : Edges.getEdges(block.size)){
+                Tile tile = world.tile(x + point.x, y + point.y);
+                if(tile != null && !tile.floor().isLiquid) return true;
+            }
+        }else{
+            for(Point2 point : Geometry.d4){
+                Tile tile = world.tile(x + point.x, y + point.y);
+                if(tile != null && !tile.floor().isLiquid) return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean contactsShallows(int x, int y, Block block){
         if(block.isMultiblock()){
             for(Point2 point : Edges.getInsideEdges(block.size)){
                 Tile tile = world.tile(x + point.x, y + point.y);

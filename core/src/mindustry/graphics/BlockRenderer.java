@@ -120,7 +120,7 @@ public class BlockRenderer implements Disposable{
         }
 
         if(brokenFade > 0.001f){
-            for(BrokenBlock block : state.teams.get(player.team()).brokenBlocks){
+            for(BlockPlan block : state.teams.get(player.team()).blocks){
                 Block b = content.block(block.block);
                 if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset(), block.y * tilesize + b.offset()))) continue;
 

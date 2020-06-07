@@ -88,7 +88,7 @@ public class ForceProjector extends Block{
 
         @Override
         public void updateTile(){
-            boolean phaseValid = consumes.get(ConsumeType.item).valid(tile.entity);
+            boolean phaseValid = consumes.get(ConsumeType.item).valid(this);
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
 
@@ -98,7 +98,7 @@ public class ForceProjector extends Block{
 
             radscl = Mathf.lerpDelta(radscl, broken ? 0f : warmup, 0.05f);
 
-            if(Mathf.chance(Time.delta() * buildup / breakage * 0.1f)){
+            if(Mathf.chanceDelta(buildup / breakage * 0.1f)){
                 Fx.reactorsmoke.at(x + Mathf.range(tilesize / 2f), y + Mathf.range(tilesize / 2f));
             }
 

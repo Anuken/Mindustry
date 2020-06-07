@@ -12,17 +12,20 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+
+import static mindustry.Vars.tilesize;
 
 public class Conduit extends LiquidBlock implements Autotiler{
     public final int timerFlow = timers++;
     
     public Color botColor = Color.valueOf("565656");
 
-    public @Load(value = "@-top-#", length = 7) TextureRegion[] topRegions;
-    public @Load(value = "@-bottom-#", length = 7, fallback = "conduit") TextureRegion[] botRegions;
+    public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
+    public @Load(value = "@-bottom-#", length = 5, fallback = "conduit-bottom-#") TextureRegion[] botRegions;
 
     public float leakResistance = 1.5f;
 
@@ -40,15 +43,13 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
         if(bits == null) return;
 
+        Draw.scl(bits[1], bits[2]);
         Draw.color(botColor);
         Draw.alpha(0.5f);
-        Draw.rect(botRegions[bits[0]], req.drawx(), req.drawy(),
-            botRegions[bits[0]].getWidth() * Draw.scl * req.animScale, botRegions[bits[0]].getHeight() * Draw.scl * req.animScale,
-            req.rotation * 90);
+        Draw.rect(botRegions[bits[0]], req.drawx(), req.drawy(), req.rotation * 90);
         Draw.color();
-
-
-        Draw.rect(topRegions[bits[0]], req.drawx(), req.drawy(), topRegions[bits[0]].getWidth() * Draw.scl * req.animScale, topRegions[bits[0]].getHeight() * Draw.scl * req.animScale, req.rotation * 90);
+        Draw.rect(topRegions[bits[0]], req.drawx(), req.drawy(), req.rotation * 90);
+        Draw.scl();
     }
 
     @Override
@@ -59,11 +60,6 @@ public class Conduit extends LiquidBlock implements Autotiler{
             req.tile() != null &&
             req.tile().block() instanceof Conduit &&
             Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.liquidJunction : this;
-    }
-
-    @Override
-    public void transformCase(int num, int[] bits){
-        bits[0] = num == 0 ? 3 : num == 1 ? 6 : num == 2 ? 2 : num == 3 ? 4 : num == 4 ? 5 : num == 5 ? 1 : 0;
     }
 
     @Override
@@ -78,28 +74,51 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     public class ConduitEntity extends LiquidBlockEntity{
         public float smoothLiquid;
-        int blendbits;
+        public int blendbits, xscl, yscl, blending;
 
         @Override
         public void draw(){
-            int rotation = rotation() * 90;
+            float rotation = rotdeg();
+            int r = rotation();
 
+            //draw extra conduits facing this one for tiling purposes
+            Draw.z(Layer.blockUnder);
+            for(int i = 0; i < 4; i++){
+                if((blending & (1 << i)) != 0){
+                    int dir = r - i;
+                    float rot = i == 0 ? rotation : (dir)*90;
+                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, rot, i != 0 ? 1 : 2);
+                }
+            }
+
+            Draw.z(Layer.block);
+
+            Draw.scl(xscl, yscl);
+            drawAt(x, y, blendbits, rotation, 0);
+            Draw.reset();
+        }
+
+        protected void drawAt(float x, float y, int bits, float rotation, int slice){
             Draw.color(botColor);
-            Draw.rect(botRegions[blendbits], x, y, rotation);
+            Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
 
             Draw.color(liquids.current().color);
             Draw.alpha(smoothLiquid);
-            Draw.rect(botRegions[blendbits], x, y, rotation);
+            Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
             Draw.color();
 
-            Draw.rect(topRegions[blendbits], x, y, rotation);
+            Draw.rect(sliced(topRegions[bits], slice), x, y, rotation);
         }
 
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            blendbits = buildBlending(tile, rotation(), null, true)[0];
+            int[] bits = buildBlending(tile, rotation(), null, true);
+            blendbits = bits[0];
+            xscl = bits[1];
+            yscl = bits[2];
+            blending = bits[4];
         }
 
         @Override

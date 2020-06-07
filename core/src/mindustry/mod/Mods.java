@@ -195,7 +195,6 @@ public class Mods implements Loadable{
             region.getTexture() == Core.atlas.find("white").getTexture() ? PageType.main :
             region.getTexture() == Core.atlas.find("stone1").getTexture() ? PageType.environment :
             region.getTexture() == Core.atlas.find("clear-editor").getTexture() ? PageType.editor :
-            region.getTexture() == Core.atlas.find("zone-groundZero").getTexture() ? PageType.zone :
             region.getTexture() == Core.atlas.find("whiteui").getTexture() ? PageType.ui :
             PageType.main;
     }
@@ -205,7 +204,6 @@ public class Mods implements Loadable{
         return
             parent.equals("environment") ? PageType.environment :
             parent.equals("editor") ? PageType.editor :
-            parent.equals("zones") ? PageType.zone :
             parent.equals("ui") || file.parent().parent().name().equals("ui") ? PageType.ui :
             PageType.main;
     }
@@ -348,7 +346,7 @@ public class Mods implements Loadable{
                 for(Fi file : folder.list()){
                     if(file.name().startsWith("bundle") && file.extension().equals("properties")){
                         String name = file.nameWithoutExtension();
-                        bundles.getOr(name, Array::new).add(file);
+                        bundles.get(name, Array::new).add(file);
                     }
                 }
             }
@@ -359,7 +357,7 @@ public class Mods implements Loadable{
         while(bundle != null){
             String str = bundle.getLocale().toString();
             String locale = "bundle" + (str.isEmpty() ? "" : "_" + str);
-            for(Fi file : bundles.getOr(locale, Array::new)){
+            for(Fi file : bundles.get(locale, Array::new)){
                 try{
                     PropertiesUtils.load(bundle.getProperties(), file.reader());
                 }catch(Throwable e){

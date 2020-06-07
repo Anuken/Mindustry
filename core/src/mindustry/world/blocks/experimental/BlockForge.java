@@ -5,8 +5,11 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -14,9 +17,12 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.production.*;
+import mindustry.world.consumers.*;
 
-public class BlockForge extends Block{
+public class BlockForge extends PayloadAcceptor{
     public float buildSpeed = 0.4f;
+    public @Load(value = "@-out", fallback = "factory-out") TextureRegion outRegion;
 
     public BlockForge(String name){
         super(name);
@@ -27,8 +33,19 @@ public class BlockForge extends Block{
         hasItems = true;
         configurable = true;
         hasPower = true;
+        rotate = true;
 
         config(Block.class, (tile, block) -> ((BlockForgeEntity)tile).recipe = block);
+
+        consumes.add(new ConsumeItemDynamic(e -> {
+            BlockForgeEntity entity = (BlockForgeEntity)e;
+
+            if(entity.recipe != null){
+                return entity.recipe.requirements;
+            }
+
+            return ItemStack.empty;
+        }));
     }
 
     @Override
@@ -38,8 +55,13 @@ public class BlockForge extends Block{
         bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, () -> ((BlockForgeEntity)entity).progress));
     }
 
-    public class BlockForgeEntity extends TileEntity{
-        public @Nullable Payload payload;
+    @Override
+    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+        Draw.rect(region, req.drawx(), req.drawy());
+        Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
+    }
+
+    public class BlockForgeEntity extends PayloadAcceptorEntity<BlockPayload>{
         public @Nullable Block recipe;
         public float progress, time, heat;
 
@@ -58,15 +80,20 @@ public class BlockForge extends Block{
         }
 
         @Override
+        public boolean acceptPayload(Tilec source, Payload payload){
+            return false;
+        }
+
+        @Override
         public void updateTile(){
-            boolean produce = recipe != null && consValid() && payload == null && items.has(recipe.requirements);
+            boolean produce = recipe != null && consValid() && payload == null;
 
             if(produce){
                 progress += buildSpeed * edelta();
 
                 if(progress >= recipe.buildCost){
-                    items.remove(recipe.requirements);
-                    payload = new BlockPayload(recipe);
+                    consume();
+                    payload = new BlockPayload(recipe, team);
                     progress = 0f;
                 }
             }else{
@@ -76,14 +103,12 @@ public class BlockForge extends Block{
             heat = Mathf.lerpDelta(heat, Mathf.num(produce), 0.3f);
             time += heat * delta();
 
-            if(payload != null && dumpPayload(payload)){
-                payload = null;
-            }
+            moveOutPayload();
         }
 
         @Override
         public void buildConfiguration(Table table){
-            Array<Block> blocks = Vars.content.blocks().select(b -> b.isVisible() && b.size <= 2 && b.requirements.length <= 3);
+            Array<Block> blocks = Vars.content.blocks().select(b -> b.isVisible() && b.size <= 2);
 
             ItemSelection.buildTable(table, blocks, () -> recipe, block -> recipe = block);
         }
@@ -95,34 +120,14 @@ public class BlockForge extends Block{
 
         @Override
         public void draw(){
-            super.draw();
-
-            if(payload != null){
-                payload.draw(x, y, 0);
-            }
+            Draw.rect(region, x, y);
+            Draw.rect(outRegion, x, y, rotdeg());
 
             if(recipe != null){
-                Draw.draw(Layer.blockOver, () -> {
-                    TextureRegion region = recipe.icon(Cicon.full);
-
-                    Shaders.build.region = region;
-                    Shaders.build.progress = progress / recipe.buildCost;
-                    Shaders.build.color.set(Pal.accent);
-                    Shaders.build.color.a = heat;
-                    Shaders.build.time = -time / 20f;
-
-                    Draw.shader(Shaders.build);
-                    Draw.rect(region, x, y);
-                    Draw.shader();
-
-                    Draw.color(Pal.accent);
-                    Draw.alpha(heat);
-
-                    Lines.lineAngleCenter(x + Mathf.sin(time, 20f, Vars.tilesize / 2f * size - 2f), y, 90, size * Vars.tilesize - 4f);
-
-                    Draw.reset();
-                });
+                Draw.draw(Layer.blockOver, () -> Drawf.construct(this, recipe, 0, progress / recipe.buildCost, heat, time));
             }
+
+            drawPayload();
         }
 
         @Override

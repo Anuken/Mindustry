@@ -33,7 +33,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
             table.table(Tex.underline, bt -> {
                 bt.left().defaults().padRight(3).left();
 
-                if(type.damage > 0){
+                if(type.damage > 0 && type.collides){
                     bt.add(Core.bundle.format("bullet.damage", type.damage));
                 }
 
@@ -66,7 +66,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     sep(bt, "$bullet.homing");
                 }
 
-                if(type.lightining > 0){
+                if(type.lightning > 0){
                     sep(bt, "$bullet.shock");
                 }
 

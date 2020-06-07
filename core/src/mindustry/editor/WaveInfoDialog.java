@@ -24,7 +24,7 @@ import mindustry.ui.dialogs.*;
 import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.never;
 
-public class WaveInfoDialog extends FloatingDialog{
+public class WaveInfoDialog extends BaseDialog{
     private final static int displayed = 20;
     private Array<SpawnGroup> groups = new Array<>();
 
@@ -49,7 +49,7 @@ public class WaveInfoDialog extends FloatingDialog{
 
         addCloseButton();
         buttons.button("$waves.edit", () -> {
-            FloatingDialog dialog = new FloatingDialog("$waves.edit");
+            BaseDialog dialog = new BaseDialog("$waves.edit");
             dialog.addCloseButton();
             dialog.setFillParent(false);
             dialog.cont.defaults().size(210f, 64f);
@@ -99,7 +99,7 @@ public class WaveInfoDialog extends FloatingDialog{
         }}).width(390f).growY();
 
         cont.table(Tex.clear, m -> {
-            m.add("$waves.preview").color(Color.lightGray).growX().center().get().setAlignment(Align.center, Align.center);
+            m.add("$waves.preview").color(Color.lightGray).wrap().growX().center().get().setAlignment(Align.center, Align.center);
             m.row();
             m.button("-", () -> {
             }).update(t -> {
@@ -195,6 +195,24 @@ public class WaveInfoDialog extends FloatingDialog{
                         }).width(80f);
                         a.add("$waves.perspawn").padLeft(4);
                     });
+                    t.row();
+                    t.table(a -> {
+                        a.field((int)group.shields + "", TextFieldFilter.digitsOnly, text -> {
+                            if(Strings.canParsePostiveInt(text)){
+                                group.shields = Strings.parseInt(text);
+                                updateWaves();
+                            }
+                        }).width(80f);
+
+                        a.add(" + ");
+                        a.field((int)group.shieldScaling + "", TextFieldFilter.digitsOnly, text -> {
+                            if(Strings.canParsePostiveInt(text)){
+                                group.shieldScaling = Strings.parseInt(text);
+                                updateWaves();
+                            }
+                        }).width(80f);
+                        a.add("$waves.shields").padLeft(4);
+                    });
 
                     t.row();
                     t.check("$waves.guardian", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss));
@@ -217,11 +235,12 @@ public class WaveInfoDialog extends FloatingDialog{
     }
 
     void showUpdate(SpawnGroup group){
-        FloatingDialog dialog = new FloatingDialog("");
+        BaseDialog dialog = new BaseDialog("");
         dialog.setFillParent(true);
         dialog.cont.pane(p -> {
             int i = 0;
             for(UnitType type : content.units()){
+                if(type.isHidden()) continue;
                 p.button(t -> {
                     t.left();
                     t.image(type.icon(mindustry.ui.Cicon.medium)).size(40f).padRight(2f);
