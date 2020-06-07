@@ -43,7 +43,7 @@ public class BasicBulletType extends BulletType{
     public void draw(Bulletc b){
         float height = bulletHeight * ((1f - bulletShrink) + bulletShrink * b.fout());
         float width = bulletWidth * ((1f - bulletSquish) + bulletSquish * b.fout());
-        float spin = b.time() * spinSpeed;
+        float spin = b.time() * spinSpeed + b.id();
 
         Draw.color(backColor);
         Draw.rect(backRegion, b.x(), b.y(), width, height, b.rotation() - 90 + spin);
