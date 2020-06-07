@@ -14,7 +14,7 @@ import mindustry.type.*;
 public class UnitTypes implements ContentList{
 
     //ground
-    public static @EntityDef({Unitc.class, Mechc.class}) UnitType titan, dagger, crawler, fortress, eruptor, chaosArray, eradicator;
+    public static @EntityDef({Unitc.class, Mechc.class}) UnitType titan, dagger, crawler, fortress, chaosArray, eradicator;
 
     //ground + builder
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType tau;
@@ -23,7 +23,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType oculon;
 
     //legs
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType cix;
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType cix, eruptor;
 
     //air
     public static @EntityDef({Unitc.class}) UnitType wraith, reaper, ghoul, revenant, lich;
@@ -233,6 +233,11 @@ public class UnitTypes implements ContentList{
             targetAir = false;
             health = 600;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
+            legCount = 4;
+            legLength = 9f;
+            legTrns = 2f;
+            legMoveSpace = 1.4f;
+
             weapons.add(new Weapon("eruption"){{
                 shootY = 3f;
                 reload = 10f;
@@ -303,7 +308,6 @@ public class UnitTypes implements ContentList{
             drag = 0.016f;
             flying = true;
             range = 140f;
-            //rotateShooting = false;
             hitsize = 18f;
             lowAltitude = true;
 

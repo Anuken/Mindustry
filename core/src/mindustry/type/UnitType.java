@@ -43,7 +43,7 @@ public class UnitType extends UnlockableContent{
     public int commandLimit = 24;
 
     public int legCount = 4;
-    public float legLength = 24f, legSpeed = 0.1f, legTrns = 1f;
+    public float legLength = 24f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f;
 
     public int itemCapacity = 30;
     public int drillTier = -1;
@@ -331,30 +331,41 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawLegs(Legsc unit){
+        Draw.z(Layer.groundUnit - 0.02f);
+
         Leg[] legs = unit.legs();
 
-
         float ssize = footRegion.getWidth() * Draw.scl * 1.5f;
+        float rotation = unit.baseRotation();
 
         for(Leg leg : legs){
             Drawf.shadow(leg.base.x, leg.base.y, ssize);
         }
 
+        //TODO should be below/above legs
+        if(baseRegion.found()){
+            Draw.rect(baseRegion, unit.x(), unit.y(), rotation);
+        }
+
         int index = 0;
 
+        //TODO figure out layering
         for(Leg leg : legs){
+            float angle = unit.legAngle(rotation, index);
             boolean flip = index++ >= legs.length/2f;
             int flips = Mathf.sign(flip);
+
+            Vec2 position = legOffset.trns(angle, legBaseOffset).add(unit);
 
             Draw.color();
 
             Lines.stroke(legRegion.getHeight() * Draw.scl * flips);
-            Lines.line(legRegion, unit.x(), unit.y(), leg.joint.x, leg.joint.y, CapStyle.none, 0);
+            Lines.line(legRegion, position.x, position.y, leg.joint.x, leg.joint.y, CapStyle.none, 0);
 
             Lines.stroke(legBaseRegion.getHeight() * Draw.scl * flips);
             Lines.line(legBaseRegion, leg.joint.x, leg.joint.y, leg.base.x, leg.base.y, CapStyle.none, 0);
 
-            float angle1 = unit.angleTo(leg.joint), angle2 = unit.angleTo(leg.base);
+            float angle2 = position.angleTo(leg.base);
 
             Draw.rect(jointRegion, leg.joint.x, leg.joint.y);
             Draw.rect(footRegion, leg.base.x, leg.base.y, angle2);

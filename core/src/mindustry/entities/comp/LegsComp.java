@@ -18,15 +18,22 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     transient Leg[] legs = {};
     transient float totalLength;
     transient int lastGroup;
+    transient float baseRotation;
 
     @Override
     public void update(){
         //keep elevation halfway
-        elevation = 0.5f;
+        elevation = 0.4f;
 
+        if(Mathf.dst(deltaX(), deltaY()) > 0.001f){
+            baseRotation = Mathf.slerpDelta(baseRotation, Mathf.angle(deltaX(), deltaY()), 0.1f);
+        }
+
+        Log.info(baseRotation);
+
+        float rot = baseRotation;
         int count = type.legCount;
         float legLength = type.legLength;
-        float rotation = vel().angle();
 
         //set up initial leg positions
         if(legs.length != type.legCount){
@@ -37,8 +44,8 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             for(int i = 0; i < legs.length; i++){
                 Leg l = new Leg();
 
-                l.joint.trns(i * spacing + rotation, legLength/2f).add(x, y);
-                l.base.trns(i * spacing + rotation, legLength).add(x, y);
+                l.joint.trns(i * spacing + rot, legLength/2f + type.legBaseOffset).add(x, y);
+                l.base.trns(i * spacing + rot, legLength + type.legBaseOffset).add(x, y);
 
                 legs[i] = l;
             }
@@ -46,7 +53,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
 
         float moveSpeed = type.legSpeed;
         int div = Math.max(legs.length / 2, 2);
-        float moveSpace = legLength / 1.6f / (div / 2f);
+        float moveSpace = legLength / 1.6f / (div / 2f) * type.legMoveSpace;
 
         totalLength += Mathf.dst(deltaX(), deltaY());
 
@@ -78,16 +85,19 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         float movespace = 360f / legs.length / 4f;
         float trns = vel().len() * 12.5f * div/1.5f * type.legTrns;
 
-        Tmp.v4.trns(rotation, trns);
+        //rotation + offset vector
+        Tmp.v4.trns(rot, trns);
 
         for(int i = 0; i < legs.length; i++){
-            float dstRot = rotation + 360f / legs.length * i + (360f / legs.length / 2f);
-            float rot2 = Angles.moveToward(dstRot, rotation + (Angles.angleDist(dstRot, rotation) < 90f ? 180f : 0), movespace);
+            float dstRot = legAngle(rot, i);
+            float rot2 = Angles.moveToward(dstRot, rot + (Angles.angleDist(dstRot, rot) < 90f ? 180f : 0), movespace);
 
             Leg l = legs[i];
 
-            Tmp.v1.trns(dstRot, legLength).add(x, y).add(Tmp.v4);
-            Tmp.v2.trns(rot2, legLength / 2f).add(x, y).add(Tmp.v4);
+            //leg destination
+            Tmp.v1.trns(dstRot, legLength + type.legBaseOffset).add(x, y).add(Tmp.v4);
+            //join destination
+            Tmp.v2.trns(rot2, legLength / 2f + type.legBaseOffset).add(x, y).add(Tmp.v4);
 
             if(i % div == group){
                 l.base.lerpDelta(Tmp.v1, moveSpeed);
@@ -98,8 +108,24 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         }
     }
 
+    /** @return outwards facing angle of leg at the specified index. */
+    float legAngle(float rotation, int index){
+        return rotation + 360f / legs.length * index + (360f / legs.length / 2f);
+    }
+
     @Override
     public void add(){
-        elevation = 0.5f;
+        elevation = 0.4f;
     }
+
+    /*
+    @Replace
+    public boolean isGrounded(){
+        return true;
+    }
+
+    @Replace
+    public boolean isFlying(){
+        return false;
+    }*/
 }
