@@ -1572,7 +1572,7 @@ public class Blocks implements ContentList{
             health = 220 * size * size;
             shootSound = Sounds.shotgun;
 
-            ammo(Items.graphite, new BulletType(0.01f, 105){
+            ammo(Items.thorium, new BulletType(0.01f, 105){
                 int rays = 1;
                 float rayLength = range + 10f;
 
@@ -1581,6 +1581,7 @@ public class Blocks implements ContentList{
                     shootEffect = smokeEffect = Fx.lightningShoot;
                     lifetime = 10f;
                     despawnEffect = Fx.none;
+                    ammoMultiplier = 6f;
                     pierce = true;
                 }
 
