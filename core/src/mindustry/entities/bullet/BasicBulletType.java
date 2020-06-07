@@ -44,7 +44,7 @@ public class BasicBulletType extends BulletType{
         float height = bulletHeight * ((1f - bulletShrink) + bulletShrink * b.fout());
         float width = bulletWidth * ((1f - bulletSquish) + bulletSquish * b.fout());
         if(spinSpeed > 0){
-            float spin = b.time() * spinSpeed + b.id();
+            float spin = b.time() * spinSpeed + 100 * b.id();
         }else{
             float spin = 0;
         }
