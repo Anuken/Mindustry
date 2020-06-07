@@ -6971,7 +6971,7 @@ water-edge
 sprites4.png
 size: 2048,1024
 format: RGBA8888
-filter: Nearest,Nearest
+filter: MipMapLinearLinear,Linear
 repeat: none
 alloy-smelter-icon-editor
   rotate: false

@@ -29,8 +29,6 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             baseRotation = Mathf.slerpDelta(baseRotation, Mathf.angle(deltaX(), deltaY()), 0.1f);
         }
 
-        Log.info(baseRotation);
-
         float rot = baseRotation;
         int count = type.legCount;
         float legLength = type.legLength;
