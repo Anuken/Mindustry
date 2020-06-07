@@ -995,7 +995,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     /** Returns whether or not a hand cursor should be shown over this block. */
     public Cursor getCursor(){
-        return block.configurable ? && tile.team() == player.team() SystemCursor.hand : SystemCursor.arrow;
+        return block.configurable && tile.team() == player.team() ? SystemCursor.hand : SystemCursor.arrow;
     }
 
     /**
