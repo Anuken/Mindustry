@@ -12,7 +12,7 @@ public class BasicBulletType extends BulletType{
     public Color backColor = Pal.bulletYellowBack, frontColor = Pal.bulletYellow;
     public float bulletWidth = 5f, bulletHeight = 7f;
     public float bulletShrink = 0.5f, bulletSquish = 0.5f;
-    public float spinSpeed = 0f;
+    public float bulletSpin = 0f;
     public String bulletSprite;
 
     public TextureRegion backRegion;
@@ -43,7 +43,7 @@ public class BasicBulletType extends BulletType{
     public void draw(Bulletc b){
         float height = bulletHeight * ((1f - bulletShrink) + bulletShrink * b.fout());
         float width = bulletWidth * ((1f - bulletSquish) + bulletSquish * b.fout());
-        float spin = (b.time() + b.id()) * spinSpeed;
+        float spin = (b.time() + b.id()) * bulletSpin;
 
         Draw.color(backColor);
         Draw.rect(backRegion, b.x(), b.y(), width, height, b.rotation() - 90 + spin);
