@@ -21,7 +21,7 @@ import static mindustry.Vars.*;
 @Component
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc{
 
-    @Import float x, y, rotation, elevation, maxHealth;
+    @Import float x, y, rotation, elevation, maxHealth, drag, armor;
 
     private UnitController controller;
     private UnitType type;
@@ -71,6 +71,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return controller;
     }
 
+    public void resetController(){
+        controller(type.createController());
+    }
+
     @Override
     public void set(UnitType def, UnitController controller){
         type(type);
@@ -81,13 +85,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void type(UnitType type){
         this.type = type;
         this.maxHealth = type.health;
+        this.drag = type.drag;
+        this.elevation = type.flying ? 1f : type.baseElevation;
+        this.armor = type.armor;
+
         heal();
-        drag(type.drag);
         hitSize(type.hitsize);
         controller(type.createController());
         setupWeapons(type);
-
-        elevation = type.flying ? 1f : 0f;
     }
 
     @Override
@@ -125,6 +130,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public void remove(){
         teamIndex.updateCount(team(), -1);
+        controller.removed(this);
     }
 
     @Override

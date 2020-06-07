@@ -12,6 +12,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.Administration.*;
@@ -79,7 +80,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Override
     public void update(){
-        if(unit.dead()){
+        if(!unit.isValid()){
             clearUnit();
         }
 
@@ -143,10 +144,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             unit.team(team);
             unit.controller(this);
         }
+
+        Events.fire(new UnitChangeEvent((Playerc)this, unit));
     }
 
     boolean dead(){
-        return unit.isNull();
+        return unit.isNull() || !unit.isValid();
     }
 
     String uuid(){

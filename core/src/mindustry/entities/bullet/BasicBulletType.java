@@ -22,6 +22,11 @@ public class BasicBulletType extends BulletType{
         this.bulletSprite = bulletSprite;
     }
 
+
+    public BasicBulletType(float speed, float damage){
+        this(speed, damage, "bullet");
+    }
+
     /** For mods. */
     public BasicBulletType(){
         this(1f, 1f, "bullet");

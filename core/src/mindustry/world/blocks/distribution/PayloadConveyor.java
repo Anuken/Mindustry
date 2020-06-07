@@ -56,6 +56,13 @@ public class PayloadConveyor extends Block{
         public int step = -1, stepAccepted = -1;
 
         @Override
+        public Payload takePayload(){
+            Payload t = item;
+            item = null;
+            return t;
+        }
+
+        @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
@@ -95,15 +102,25 @@ public class PayloadConveyor extends Block{
                             //move forward.
                             next.handlePayload(this, item);
                             item = null;
+                            moved();
                         }
                     }else if(!blocked){
                         //dump item forward
                         if(item.dump()){
                             item = null;
+                            moved();
                         }
                     }
                 }
             }
+        }
+
+        public void moved(){
+
+        }
+
+        public void drawBottom(){
+            super.draw();
         }
 
         @Override 
@@ -156,7 +173,8 @@ public class PayloadConveyor extends Block{
 
         @Override
         public boolean acceptPayload(Tilec source, Payload payload){
-            return this.item == null && progress <= 5f;
+            //accepting payloads from units isn't supported
+            return this.item == null && progress <= 5f && source != this && payload.fits();
         }
 
         @Override

@@ -224,8 +224,11 @@ public class TypeIO{
         if(control instanceof Playerc){
             write.b(0);
             write.i(((Playerc)control).id());
-        }else{
+        }else if(control instanceof FormationAI){
             write.b(1);
+            write.i(((FormationAI)control).leader.id());
+        }else{
+            write.b(2);
         }
     }
 
@@ -237,12 +240,15 @@ public class TypeIO{
             //local players will cause problems if assigned, since they may not know they are controlling the unit
             if(player == null || player.isLocal()) return prev;
             return player;
+        }else if(type == 1){
+            int id = read.i();
+            return prev instanceof FormationAI ? prev : new FormationAI(Groups.unit.getByID(id), null);
         }else{
             //there are two cases here:
             //1: prev controller was not a player, carry on
             //2: prev controller was a player, so replace this controller with *anything else*
             //...since AI doesn't update clientside it doesn't matter what
-            return prev instanceof Playerc ? new GroundAI() : prev;
+            return (!(prev instanceof AIController) || (prev instanceof FormationAI)) ? new GroundAI() : prev;
         }
     }
 

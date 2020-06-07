@@ -1,6 +1,8 @@
 package mindustry.ai.types;
 
 import arc.math.geom.*;
+import arc.util.ArcAnnotate.*;
+import mindustry.*;
 import mindustry.ai.formations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -9,7 +11,7 @@ public class FormationAI extends AIController implements FormationMember{
     public Unitc leader;
 
     private Vec3 target = new Vec3();
-    private Formation formation;
+    private @Nullable Formation formation;
 
     public FormationAI(Unitc leader, Formation formation){
         this.leader = leader;
@@ -23,19 +25,37 @@ public class FormationAI extends AIController implements FormationMember{
 
     @Override
     public void update(){
+        if(leader.dead()){
+            unit.resetController();
+            return;
+        }
+
         unit.controlWeapons(leader.isRotate(), leader.isShooting());
         // unit.moveAt(Tmp.v1.set(deltaX, deltaY).limit(unit.type().speed));
         if(leader.isShooting()){
             unit.aimLook(leader.aimX(), leader.aimY());
         }else{
-
-            unit.lookAt(leader.rotation());
-            if(!unit.vel().isZero(0.001f)){
-            //    unit.lookAt(unit.vel().angle());
+            if(!unit.moving()){
+                unit.lookAt(unit.vel().angle());
+            }else{
+                unit.lookAt(leader.rotation());
             }
         }
 
-        unit.moveAt(vec.set(target).sub(unit).limit(unit.type().speed));
+        Vec2 realtarget = vec.set(target);
+
+        if(unit.isGrounded() && Vars.world.raycast(unit.tileX(), unit.tileY(), leader.tileX(), leader.tileY(), Vars.world::solid)){
+            realtarget.set(Vars.pathfinder.getTargetTile(unit.tileOn(), unit.team(), leader));
+        }
+
+        unit.moveAt(realtarget.sub(unit).limit(unit.type().speed));
+    }
+
+    @Override
+    public void removed(Unitc unit){
+        if(formation != null){
+            formation.removeMember(this);
+        }
     }
 
     @Override

@@ -393,7 +393,7 @@ public class NetServer implements ApplicationListener{
                     }else if(found.team() != player.team()){
                         player.sendMessage("[scarlet]Only players on your team can be kicked.");
                     }else{
-                        Timekeeper vtime = cooldowns.getOr(player.uuid(), () -> new Timekeeper(voteCooldown));
+                        Timekeeper vtime = cooldowns.get(player.uuid(), () -> new Timekeeper(voteCooldown));
 
                         if(!vtime.get()){
                             player.sendMessage("[scarlet]You must wait " + voteCooldown/60 + " minutes between votekicks.");
@@ -481,11 +481,11 @@ public class NetServer implements ApplicationListener{
     }
 
     public void addPacketHandler(String type, Cons2<Playerc, String> handler){
-        customPacketHandlers.getOr(type, Array::new).add(handler);
+        customPacketHandlers.get(type, Array::new).add(handler);
     }
 
     public Array<Cons2<Playerc, String>> getPacketHandlers(String type){
-        return customPacketHandlers.getOr(type, Array::new);
+        return customPacketHandlers.get(type, Array::new);
     }
 
     public static void onDisconnect(Playerc player, String reason){
@@ -641,6 +641,7 @@ public class NetServer implements ApplicationListener{
 
             //now, put the new position, rotation and baserotation into the buffer so it can be read
             if(unit instanceof Mechc) fbuffer.put(baseRotation); //base rotation is optional
+            fbuffer.put(unit.elevation());
             fbuffer.put(rotation); //rotation is always there
             fbuffer.put(newx);
             fbuffer.put(newy);
@@ -861,7 +862,7 @@ public class NetServer implements ApplicationListener{
 
         StringBuilder result = new StringBuilder();
         int curChar = 0;
-        while(curChar < name.length() && result.toString().getBytes().length < maxNameLength){
+        while(curChar < name.length() && result.toString().getBytes(Strings.utf8).length < maxNameLength){
             result.append(name.charAt(curChar++));
         }
         return result.toString();

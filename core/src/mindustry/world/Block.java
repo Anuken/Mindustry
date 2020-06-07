@@ -45,6 +45,7 @@ public class Block extends UnlockableContent{
     public boolean consumesPower = true;
     public boolean outputsPower = false;
     public boolean outputsPayload = false;
+    public boolean outputFacing = true;
     public boolean acceptsItems = false;
 
     public int itemCapacity = 10;
@@ -83,6 +84,10 @@ public class Block extends UnlockableContent{
     public boolean placeableOn = true;
     /** whether this block has insulating properties. */
     public boolean insulated = false;
+    /** whether the sprite is a full square. */
+    public boolean squareSprite = true;
+    /** whether this block absorbs laser attacks. */
+    public boolean absorbLasers = false;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -160,6 +165,8 @@ public class Block extends UnlockableContent{
     public float buildCost;
     /** Whether this block is visible and can currently be built. */
     public BuildVisibility buildVisibility = BuildVisibility.hidden;
+    /** Defines when this block can be placed. */
+    public BuildPlaceability buildPlaceability = BuildPlaceability.always;
     /** Multiplier for speed of building this block. */
     public float buildCostMultiplier = 1f;
     /** Whether this block has instant transfer.*/
@@ -190,7 +197,6 @@ public class Block extends UnlockableContent{
 
     public Block(String name){
         super(name);
-        this.solid = false;
         initEntity();
     }
 
@@ -296,7 +302,7 @@ public class Block extends UnlockableContent{
     public void setStats(){
         stats.add(BlockStat.size, "@x@", size, size);
         stats.add(BlockStat.health, health, StatUnit.none);
-        if(isBuildable()){
+        if(canBeBuilt()){
             stats.add(BlockStat.buildTime, buildCost / 60, StatUnit.seconds);
             stats.add(BlockStat.buildCost, new ItemListValue(false, requirements));
         }
@@ -401,6 +407,23 @@ public class Block extends UnlockableContent{
         return (hasItems && itemCapacity > 0);
     }
 
+    /** Iterate through ever grid position taken up by this block. */
+    public void iterateTaken(int x, int y, Intc2 placer){
+        if(isMultiblock()){
+            int offsetx = -(size - 1) / 2;
+            int offsety = -(size - 1) / 2;
+
+            for(int dx = 0; dx < size; dx++){
+                for(int dy = 0; dy < size; dy++){
+                    placer.get(dx + offsetx + x, dy + offsety + y);
+                }
+            }
+
+        }else{
+            placer.get(x, y);
+        }
+    }
+
     /** Never use outside of the editor! */
     public TextureRegion editorIcon(){
         if(editorIcon == null) editorIcon = Core.atlas.find(name + "-icon-editor");
@@ -463,6 +486,15 @@ public class Block extends UnlockableContent{
         return buildVisibility.visible() && !isHidden();
     }
 
+    public boolean isPlaceable(){
+        return isVisible() && buildPlaceability.placeable() && !state.rules.bannedBlocks.contains(this);
+    }
+
+    /** @return a message detailing why this block can't be placed. */
+    public String unplaceableMessage(){
+        return state.rules.bannedBlocks.contains(this) ? Core.bundle.get("banned") : buildPlaceability.message();
+    }
+
     public boolean isFloor(){
         return this instanceof Floor;
     }
@@ -479,7 +511,7 @@ public class Block extends UnlockableContent{
         return id == 0;
     }
 
-    public boolean isBuildable(){
+    public boolean canBeBuilt(){
         return buildVisibility != BuildVisibility.hidden && buildVisibility != BuildVisibility.debugOnly;
     }
 

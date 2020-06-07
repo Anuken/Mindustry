@@ -47,7 +47,7 @@ public class Weapon{
     /** delay in ticks between shots */
     public float shotDelay = 0;
     /** The half-radius of the cone in which shooting will start. */
-    public float shootCone = 1.5f;
+    public float shootCone = 5f;
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
     /** sound used for shooting */

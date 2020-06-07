@@ -20,6 +20,7 @@ public class LiquidTurret extends Turret{
 
     public LiquidTurret(String name){
         super(name);
+        acceptCoolant = false;
         hasLiquids = true;
         activeSound = Sounds.spray;
     }

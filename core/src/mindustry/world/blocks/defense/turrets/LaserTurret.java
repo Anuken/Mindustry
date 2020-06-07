@@ -45,6 +45,11 @@ public class LaserTurret extends PowerTurret{
         float bulletLife;
 
         @Override
+        protected void updateCooling(){
+            //do nothing, cooling is irrelevant here
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
 

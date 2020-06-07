@@ -19,14 +19,14 @@ public enum Gamemode{
     }),
     attack(rules -> {
         rules.attackMode = true;
+        rules.waves = true;
+        rules.waveTimer = true;
     }, map -> map.teams.contains(state.rules.waveTeam.id)),
     pvp(rules -> {
         rules.pvp = true;
         rules.enemyCoreBuildRadius = 600f;
         rules.buildCostMultiplier = 1f;
         rules.buildSpeedMultiplier = 1f;
-        rules.playerDamageMultiplier = 0.33f;
-        rules.playerHealthMultiplier = 0.5f;
         rules.unitBuildSpeedMultiplier = 2f;
         rules.unitHealthMultiplier = 3f;
         rules.attackMode = true;

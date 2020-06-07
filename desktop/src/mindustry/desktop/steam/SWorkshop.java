@@ -51,7 +51,7 @@ public class SWorkshop implements SteamUGCCallback{
     }
 
     public Array<Fi> getWorkshopFiles(Class<? extends Publishable> type){
-        return workshopFiles.getOr(type, () -> new Array<>(0));
+        return workshopFiles.get(type, () -> new Array<>(0));
     }
 
     /** Publish a new item and submit an update for it.

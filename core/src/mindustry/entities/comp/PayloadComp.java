@@ -50,6 +50,15 @@ abstract class PayloadComp implements Posc, Rotc{
     }
 
     boolean tryDropPayload(Payload payload){
+        Tile on = tileOn();
+
+        //drop off payload on an acceptor if possible
+        if(on != null && on.entity != null && on.entity.acceptPayload(on.entity, payload)){
+            Fx.unitDrop.at(on.entity);
+            on.entity.handlePayload(on.entity, payload);
+            return true;
+        }
+
         if(payload instanceof BlockPayload){
             return dropBlock((BlockPayload)payload);
         }else if(payload instanceof UnitPayload){
@@ -81,7 +90,7 @@ abstract class PayloadComp implements Posc, Rotc{
         Tilec tile = payload.entity;
         int tx = Vars.world.toTile(x - tile.block().offset()), ty = Vars.world.toTile(y - tile.block().offset());
         Tile on = Vars.world.tile(tx, ty);
-        if(on != null && Build.validPlace(tile.team(), tx, ty, tile.block(), tile.rotation())){
+        if(on != null && Build.validPlace(tile.block(), tile.team(), tx, ty, tile.rotation())){
             int rot = (int)((rotation() + 45f) / 90f) % 4;
             payload.place(on, rot);
 

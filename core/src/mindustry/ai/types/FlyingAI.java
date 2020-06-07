@@ -11,7 +11,7 @@ public class FlyingAI extends AIController{
 
     @Override
     public void update(){
-        if(!unit.vel().isZero(0.01f)){
+        if(unit.moving()){
             unit.rotation(unit.vel().angle());
         }
 
@@ -45,6 +45,8 @@ public class FlyingAI extends AIController{
 
         unit.controlWeapons(shoot, shoot);
     }
+
+    //TODO clean up
 
     protected void circle(float circleLength){
         circle(circleLength, unit.type().speed);

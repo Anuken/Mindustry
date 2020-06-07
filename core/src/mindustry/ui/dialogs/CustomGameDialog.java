@@ -38,7 +38,7 @@ public class CustomGameDialog extends BaseDialog{
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = Mathf.clamp((int)(Core.graphics.getWidth() / Scl.scl(200)), 1, 8);
+        int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(210)), 1);
         float images = 146f;
 
         int i = 0;

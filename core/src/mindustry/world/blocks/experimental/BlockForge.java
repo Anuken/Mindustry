@@ -124,26 +124,7 @@ public class BlockForge extends PayloadAcceptor{
             Draw.rect(outRegion, x, y, rotdeg());
 
             if(recipe != null){
-                Draw.draw(Layer.blockOver, () -> {
-                    TextureRegion region = recipe.icon(Cicon.full);
-
-                    Shaders.build.region = region;
-                    Shaders.build.progress = progress / recipe.buildCost;
-                    Shaders.build.color.set(Pal.accent);
-                    Shaders.build.color.a = heat;
-                    Shaders.build.time = -time / 20f;
-
-                    Draw.shader(Shaders.build);
-                    Draw.rect(region, x, y);
-                    Draw.shader();
-
-                    Draw.color(Pal.accent);
-                    Draw.alpha(heat);
-
-                    Lines.lineAngleCenter(x + Mathf.sin(time, 20f, Vars.tilesize / 2f * size - 2f), y, 90, size * Vars.tilesize - 4f);
-
-                    Draw.reset();
-                });
+                Draw.draw(Layer.blockOver, () -> Drawf.construct(this, recipe, 0, progress / recipe.buildCost, heat, time));
             }
 
             drawPayload();

@@ -62,11 +62,6 @@ public abstract class UnlockableContent extends MappableContent{
         return false;
     }
 
-    /** Override to make content always unlocked. */
-    public boolean alwaysUnlocked(){
-        return alwaysUnlocked;
-    }
-
     public final boolean unlocked(){
         return Vars.data.isUnlocked(this);
     }

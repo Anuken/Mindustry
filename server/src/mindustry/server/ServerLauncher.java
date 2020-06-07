@@ -74,6 +74,8 @@ public class ServerLauncher implements ApplicationListener{
             System.exit(1);
         }
 
+        bases.load();
+
         Core.app.addListener(new ApplicationListener(){public void update(){ asyncCore.begin(); }});
         Core.app.addListener(logic = new Logic());
         Core.app.addListener(netServer = new NetServer());

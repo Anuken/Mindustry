@@ -272,8 +272,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
         editor.getTags().put("rules", JsonIO.write(state.rules));
         editor.getTags().remove("width");
         editor.getTags().remove("height");
-        //TODO unkill player
-        //player.dead = true;
+
+        player.clearUnit();
 
         Map returned = null;
 
@@ -529,7 +529,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 int i = 0;
 
-                for(Team team : Team.base()){
+                for(Team team : Team.baseTeams){
                     ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglePartiali);
                     button.margin(4f);
                     button.getImageCell().grow();

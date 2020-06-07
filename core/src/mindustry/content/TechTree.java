@@ -2,6 +2,7 @@ package mindustry.content;
 
 import arc.math.*;
 import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
 import mindustry.type.*;
@@ -314,15 +315,17 @@ public class TechTree implements ContentList{
     public static class TechNode{
         private static TechNode context;
 
+        /** Depth in tech tree. */
+        public int depth;
         /** Requirement node. */
-        public TechNode parent;
+        public @Nullable TechNode parent;
         /** Content to be researched. */
         public UnlockableContent content;
         /** Item requirements for this content. */
         public ItemStack[] requirements;
         /** Extra objectives needed to research this. TODO implement */
         public Objective[] objectives = {};
-        /** Turns required to research this content. */
+        /** Research turns required to research this content. */
         public int turns = 3; //TODO keep track of turns that have been used so far
         /** Nodes that depend on this node. */
         public final Array<TechNode> children = new Array<>();
@@ -335,6 +338,7 @@ public class TechTree implements ContentList{
             this.parent = ccontext;
             this.content = content;
             this.requirements = requirements;
+            this.depth = parent == null ? 0 : parent.depth + 1;
 
             context = this;
             children.run();

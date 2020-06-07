@@ -35,7 +35,7 @@ public class CustomRulesDialog extends BaseDialog{
 
         banDialog.shown(this::rebuildBanned);
         banDialog.buttons.button("$addall", Icon.add, () -> {
-            rules.bannedBlocks.addAll(content.blocks().select(Block::isBuildable));
+            rules.bannedBlocks.addAll(content.blocks().select(Block::canBeBuilt));
             rebuildBanned();
         }).size(180, 64f);
 
@@ -88,7 +88,7 @@ public class CustomRulesDialog extends BaseDialog{
             dialog.cont.pane(t -> {
                 t.left().margin(14f);
                 int[] i = {0};
-                content.blocks().each(b -> !rules.bannedBlocks.contains(b) && b.isBuildable(), b -> {
+                content.blocks().each(b -> !rules.bannedBlocks.contains(b) && b.canBeBuilt(), b -> {
                     int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
                     t.button(new TextureRegionDrawable(b.icon(Cicon.medium)), Styles.cleari, () -> {
                         rules.bannedBlocks.add(b);
@@ -153,10 +153,6 @@ public class CustomRulesDialog extends BaseDialog{
         main.button("$bannedblocks", banDialog::show).left().width(300f);
         main.row();
 
-        title("$rules.title.player");
-        number("$rules.playerhealthmultiplier", f -> rules.playerHealthMultiplier = f, () -> rules.playerHealthMultiplier);
-        number("$rules.playerdamagemultiplier", f -> rules.playerDamageMultiplier = f, () -> rules.playerDamageMultiplier);
-
         title("$rules.title.unit");
         number("$rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
         number("$rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
@@ -167,7 +163,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("$rules.enemyCheat", b -> rules.enemyCheat = b, () -> rules.enemyCheat);
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
-        title("$rules.title.experimental");
+        title("$rules.title.environment");
         number("$rules.solarpowermultiplier", f -> rules.solarPowerMultiplier = f, () -> rules.solarPowerMultiplier);
         check("$rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
 
@@ -181,6 +177,8 @@ public class CustomRulesDialog extends BaseDialog{
             b.add("$rules.ambientlight");
         }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f);
         main.row();
+
+        //TODO add weather patterns
     }
 
     void number(String text, Floatc cons, Floatp prov){

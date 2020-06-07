@@ -28,7 +28,8 @@ public class PayloadAcceptor extends Block{
             accept.block().size == size &&
             accept.block().outputsPayload &&
             //block must either be facing this one, or not be rotating
-            ((accept.tileX() + Geometry.d4(accept.rotation()).x * size == tile.tileX() && accept.tileY() + Geometry.d4(accept.rotation()).y * size == tile.tileY()) || !accept.block().rotate);
+            ((accept.tileX() + Geometry.d4(accept.rotation()).x * size == tile.tileX() && accept.tileY() + Geometry.d4(accept.rotation()).y * size == tile.tileY())
+            || !accept.block().rotate  || (accept.block().rotate && !accept.block().outputFacing));
     }
 
     public class PayloadAcceptorEntity<T extends Payload> extends TileEntity{
@@ -48,6 +49,13 @@ public class PayloadAcceptor extends Block{
             this.payRotation = source.angleTo(this);
 
             updatePayload();
+        }
+
+        @Override
+        public Payload takePayload(){
+            T t = payload;
+            payload = null;
+            return t;
         }
 
         public void updatePayload(){
@@ -79,12 +87,12 @@ public class PayloadAcceptor extends Block{
             if(payVector.len() >= size * tilesize/2f){
                 payVector.clamp(-size * tilesize / 2f, size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f);
 
-                Tile front = frontLarge();
-                if(front != null && front.entity != null && front.block().outputsPayload){
+                Tilec front = front();
+                if(front != null && front.block().outputsPayload){
                     if(movePayload(payload)){
                         payload = null;
                     }
-                }else if(front != null && !front.solid()){
+                }else if(front != null && !front.tile().solid()){
                     dumpPayload();
                 }
             }

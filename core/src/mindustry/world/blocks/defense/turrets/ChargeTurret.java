@@ -9,7 +9,6 @@ import mindustry.entities.bullet.*;
 import static mindustry.Vars.tilesize;
 
 public class ChargeTurret extends PowerTurret{
-
     public float chargeTime = 30f;
     public int chargeEffects = 5;
     public float chargeMaxDelay = 10f;
@@ -27,13 +26,13 @@ public class ChargeTurret extends PowerTurret{
         public void shoot(BulletType ammo){
             useAmmo();
 
-            tr.trns(rotation, size * tilesize / 2);
+            tr.trns(rotation, size * tilesize / 2f);
             chargeBeginEffect.at(x + tr.x, y + tr.y, rotation);
 
             for(int i = 0; i < chargeEffects; i++){
                 Time.run(Mathf.random(chargeMaxDelay), () -> {
                     if(!isValid()) return;
-                    tr.trns(rotation, size * tilesize / 2);
+                    tr.trns(rotation, size * tilesize / 2f);
                     chargeEffect.at(x + tr.x, y + tr.y, rotation);
                 });
             }
@@ -42,7 +41,7 @@ public class ChargeTurret extends PowerTurret{
 
             Time.run(chargeTime, () -> {
                 if(!isValid()) return;
-                tr.trns(rotation, size * tilesize / 2);
+                tr.trns(rotation, size * tilesize / 2f);
                 recoil = recoilAmount;
                 heat = 1f;
                 bullet(ammo, rotation + Mathf.range(inaccuracy));

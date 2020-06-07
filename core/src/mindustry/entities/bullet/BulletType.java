@@ -1,6 +1,7 @@
 package mindustry.entities.bullet;
 
 import arc.audio.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -35,6 +36,8 @@ public abstract class BulletType extends Content{
     public float ammoMultiplier = 2f;
     /** Multiplied by turret reload speed to get final shoot speed. */
     public float reloadMultiplier = 1f;
+    /** Multiplier of how much base damage is done to tiles. */
+    public float tileDamageMultiplier = 1f;
     /** Recoil from shooter entities. */
     public float recoil;
     /** Whether to kill the shooter when this is shot. For suicide bombers. */
@@ -45,8 +48,6 @@ public abstract class BulletType extends Content{
     public float splashDamage = 0f;
     /** Knockback in velocity. */
     public float knockback;
-    /** Whether this bullet hits tiles. */
-    public boolean hitTiles = true;
     /** Status effect applied on hit. */
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
@@ -61,6 +62,10 @@ public abstract class BulletType extends Content{
     public boolean collides = true;
     /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
+    /** Whether to scale velocity to disappear at the target position. Used for artillery. */
+    public boolean scaleVelocity;
+    /** Whether this bullet can be hit by point defense. */
+    public boolean hittable = true;
 
     //additional effects
 
@@ -68,6 +73,7 @@ public abstract class BulletType extends Content{
     public int fragBullets = 9;
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
     public BulletType fragBullet = null;
+    public Color hitColor = Color.white;
 
     /** Use a negative value to disable splash damage. */
     public float splashDamageRadius = -1f;
@@ -78,12 +84,13 @@ public abstract class BulletType extends Content{
     public float homingPower = 0f;
     public float homingRange = 50f;
 
-    public int lightining;
+    public int lightning;
     public int lightningLength = 5;
+    /** Use a negative value to use default bullet damage. */
+    public float lightningDamage = -1;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
-
     public float hitShake = 0f;
 
     public BulletType(float speed, float damage){
@@ -112,7 +119,7 @@ public abstract class BulletType extends Content{
     }
 
     public void hit(Bulletc b, float x, float y){
-        hitEffect.at(x, y, b.rotation());
+        hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(b);
 
         Effects.shake(hitShake, hitShake, b);
@@ -130,7 +137,15 @@ public abstract class BulletType extends Content{
         }
 
         if(splashDamageRadius > 0){
-            Damage.damage(b.team(), x, y, splashDamageRadius, splashDamage * b.damageMultiplier());
+            Damage.damage(b.team(), x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
+
+            if(status != StatusEffects.none){
+                Damage.status(b.team(), x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
+            }
+        }
+
+        for(int i = 0; i < lightning; i++){
+            Lightning.create(b.team(), Pal.surge, lightningDamage < 0 ? damage : lightningDamage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
         }
     }
 
@@ -138,12 +153,8 @@ public abstract class BulletType extends Content{
         despawnEffect.at(b.getX(), b.getY(), b.rotation());
         hitSound.at(b);
 
-        if(fragBullet != null || splashDamageRadius > 0){
+        if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
             hit(b);
-        }
-
-        for(int i = 0; i < lightining; i++){
-            Lightning.create(b.team(), Pal.surge, damage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
         }
     }
 

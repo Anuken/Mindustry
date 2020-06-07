@@ -17,6 +17,9 @@ public class Layer{
     //things such as spent casings or rubble
     debris = 20,
 
+    //stuff under blocks, like connections of conveyors/conduits
+    blockUnder = 29.5f,
+
     //base block layer - most blocks go here
     block = 30,
 

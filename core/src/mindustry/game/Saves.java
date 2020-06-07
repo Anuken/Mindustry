@@ -242,10 +242,6 @@ public class Saves{
             return isSector();
         }
 
-        public ObjectFloatMap<Item> getProductionRates(){
-            return meta.exportRates;
-        }
-
         public String getPlayTime(){
             return Strings.formatMillis(current == this ? totalPlaytime : meta.timePlayed);
         }

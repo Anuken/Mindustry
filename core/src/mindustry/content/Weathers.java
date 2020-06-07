@@ -62,7 +62,7 @@ public class Weathers implements ContentList{
         };
 
         rain = new Weather("rain"){
-            float yspeed = 7f, xspeed = 2f, padding = 16f, size = 40f, density = 1200f;
+            float yspeed = 5f, xspeed = 1.5f, padding = 16f, size = 40f, density = 1200f;
             TextureRegion[] splashes = new TextureRegion[12];
 
             @Override

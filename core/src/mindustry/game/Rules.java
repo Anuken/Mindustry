@@ -14,7 +14,7 @@ import mindustry.world.*;
  * Does not store game state, just configuration.
  */
 public class Rules{
-    /** Whether the player has infinite resources. */
+    /** Whether the player team has infinite resources. */
     public boolean infiniteResources;
     /** Whether the waves come automatically on a timer. If not, waves come when the play button is pressed. */
     public boolean waveTimer = true;
@@ -22,6 +22,8 @@ public class Rules{
     public boolean waves;
     /** Whether the enemy AI has infinite resources in most of their buildings and turrets. */
     public boolean enemyCheat;
+    /** Whether the enemy AI has infinite resources in their core only. TODO remove */
+    public boolean enemyInfiniteResources = true;
     /** Whether the game objective is PvP. Note that this enables automatic hosting. */
     public boolean pvp;
     /** Whether reactors can explode and damage other blocks. */
@@ -30,15 +32,11 @@ public class Rules{
     public float unitBuildSpeedMultiplier = 1f;
     /** How much health units start with. */
     public float unitHealthMultiplier = 1f;
-    /** How much health players start with. */
-    public float playerHealthMultiplier = 1f;
     /** How much health blocks start with. */
     public float blockHealthMultiplier = 1f;
-    /** How much damage player mechs deal. */
-    public float playerDamageMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
-    /** Multiplier for buildings for the player. */
+    /** Multiplier for buildings resource cost. */
     public float buildCostMultiplier = 1f;
     /** Multiplier for building speed. */
     public float buildSpeedMultiplier = 1f;
@@ -73,6 +71,8 @@ public class Rules{
     /** Whether to draw shadows of blocks at map edges and static blocks.
      * Do not change unless you know exactly what you are doing.*/
     public boolean drawDarkness = true;
+    /** EXPERIMENTAL building AI. TODO remove */
+    public boolean buildAI = true;
     /** Starting items put in cores */
     public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 100));
     /** Weather events that occur here. */

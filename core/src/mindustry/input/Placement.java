@@ -273,12 +273,4 @@ public class Placement{
             return y + (x2 - x > y2 - y ? 0 : i);
         }
     }
-
-    public interface DistanceHeuristic{
-        float cost(int x1, int y1, int x2, int y2);
-    }
-
-    public interface TileHueristic{
-        float cost(Tile tile, Tile other);
-    }
 }

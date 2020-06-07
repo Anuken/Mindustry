@@ -136,6 +136,9 @@ public class ContentLoader{
 
                 Block block = block(i);
                 block.mapColor.rgba8888(color);
+                //partial alpha colors indicate a square sprite
+                block.squareSprite = block.mapColor.a > 0.5f;
+                block.mapColor.a = 1f;
                 block.hasColor = true;
             }
         }

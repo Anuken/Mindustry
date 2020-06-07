@@ -1,5 +1,6 @@
 package mindustry.world.blocks;
 
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
@@ -10,10 +11,37 @@ import mindustry.world.*;
 
 import java.util.*;
 
+//TODO documentation
 public interface Autotiler{
+
+    //holds some static temporary variables, required due to some RoboVM bugs
     class AutotilerHolder{
-        static final int[] blendresult = new int[4];
+        static final int[] blendresult = new int[5];
         static final BuildRequest[] directionals = new BuildRequest[4];
+    }
+
+    /** slices a texture region:
+     * mode == 0 -> no slice
+     * mode == 1 -> bottom
+     * mode == 2 -> top */
+    default TextureRegion sliced(TextureRegion input, int mode){
+        return mode == 0 ? input : mode == 1 ? botHalf(input) : topHalf(input);
+    }
+
+    default TextureRegion topHalf(TextureRegion input){
+        TextureRegion region = Tmp.tr1;
+        region.set(input);
+        region.setWidth(region.getWidth() / 2);
+        return region;
+    }
+
+    default TextureRegion botHalf(TextureRegion input){
+        TextureRegion region = Tmp.tr1;
+        region.set(input);
+        int width = region.getWidth();
+        region.setWidth(width / 2);
+        region.setX(region.getX() + width);
+        return region;
     }
 
     default @Nullable int[] getTiling(BuildRequest req, Eachable<BuildRequest> list){
@@ -37,6 +65,19 @@ public interface Autotiler{
         return buildBlending(req.tile(), req.rotation, directionals, req.worldContext);
     }
 
+    /**
+     * @return an array of blending values:
+     * [0]: the type of connection:
+     *   - 0: straight
+     *   - 1: curve (top)
+     *   - 2: straight (bottom)
+     *   - 3: all sides
+     *   - 4: straight (top)
+     * [1]: X scale
+     * [2]: Y scale
+     * [3]: a 4-bit mask with bits 0-3 indicating blend state in that direction (0 being 0 degrees, 1 being 90, etc)
+     * [4]: same as [3] but only blends with non-square sprites
+     * */
     default int[] buildBlending(Tile tile, int rotation, BuildRequest[] directional, boolean world){
         int[] blendresult = AutotilerHolder.blendresult;
         blendresult[0] = 0;
@@ -56,6 +97,15 @@ public interface Autotiler{
         for(int i = 0; i < 4; i++){
             if(blends(tile, rotation, directional, i, world)){
                 blendresult[3] |= (1 << i);
+            }
+        }
+
+        blendresult[4] = 0;
+
+        for(int i = 0; i < 4; i++){
+            int realDir = Mathf.mod(rotation - i, 4);
+            if(blends(tile, rotation, directional, i, world) && (tile != null && tile.getNearbyEntity(realDir) != null && !tile.getNearbyEntity(realDir).block().squareSprite)){
+                blendresult[4] |= (1 << i);
             }
         }
 

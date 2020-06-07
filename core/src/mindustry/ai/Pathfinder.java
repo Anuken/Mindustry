@@ -17,23 +17,27 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Pathfinder implements Runnable{
-    private static final long maxUpdate = Time.millisToNanos(4);
+    private static final long maxUpdate = Time.millisToNanos(6);
     private static final int updateFPS = 60;
     private static final int updateInterval = 1000 / updateFPS;
     private static final int impassable = -1;
+    private static final int fieldTimeout = 1000 * 60 * 2;
 
     /** tile data, see PathTileStruct */
     private int[][] tiles;
-    /** unordered array of path data for iteration only. DO NOT iterate ot access this in the main thread. */
-    private Array<PathData> list = new Array<>();
-    /** Maps teams + flags to a valid path to get to that flag for that team. */
-    private PathData[][] pathMap = new PathData[Team.all().length][PathTarget.all.length];
-    /** Grid map of created path data that should not be queued again. */
-    private GridBits created = new GridBits(Team.all().length, PathTarget.all.length);
+    /** unordered array of path data for iteration only. DO NOT iterate or access this in the main thread. */
+    private Array<Flowfield> threadList = new Array<>(), mainList = new Array<>();
+    /** Maps team ID and target to to a flowfield.*/
+    private ObjectMap<PathTarget, Flowfield>[] fieldMap = new ObjectMap[Team.all.length];
+    /** Used field maps. */
+    private ObjectSet<PathTarget>[] fieldMapUsed = new ObjectSet[Team.all.length];
     /** handles task scheduling on the update thread. */
     private TaskQueue queue = new TaskQueue();
-    /** current pathfinding thread */
+    /** Stores path target for a position. Main thread only.*/
+    private ObjectMap<Position, PathTarget> targetCache = new ObjectMap<>();
+    /** Current pathfinding thread */
     private @Nullable Thread thread;
+    private IntArray tmpArray = new IntArray();
 
     public Pathfinder(){
         Events.on(WorldLoadEvent.class, event -> {
@@ -41,16 +45,18 @@ public class Pathfinder implements Runnable{
 
             //reset and update internal tile array
             tiles = new int[world.width()][world.height()];
-            pathMap = new PathData[Team.all().length][PathTarget.all.length];
-            created = new GridBits(Team.all().length, PathTarget.all.length);
-            list = new Array<>();
+            fieldMap = new ObjectMap[Team.all.length];
+            fieldMapUsed = new ObjectSet[Team.all.length];
+            targetCache = new ObjectMap<>();
+            threadList = new Array<>();
+            mainList = new Array<>();
 
             for(Tile tile : world.tiles){
                 tiles[tile.x][tile.y] = packTile(tile);
             }
 
             //special preset which may help speed things up; this is optional
-            preloadPath(state.rules.waveTeam, PathTarget.enemyCores);
+            preloadPath(state.rules.waveTeam, FlagTarget.enemyCores);
 
             start();
         });
@@ -62,7 +68,7 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     private int packTile(Tile tile){
-        return PathTile.get(tile.cost, tile.getTeamID(), !tile.solid() && tile.floor().drownTime <= 0f);
+        return PathTile.get(tile.cost, tile.getTeamID(), !tile.solid() && tile.floor().drownTime <= 0f, !tile.solid() && tile.floor().isLiquid);
     }
 
     /** Starts or restarts the pathfinding thread. */
@@ -80,12 +86,13 @@ public class Pathfinder implements Runnable{
         queue.clear();
     }
 
-    public int debugValue(Team team, int x, int y){
-        if(pathMap[team.id][PathTarget.enemyCores.ordinal()] == null) return 0;
-        return pathMap[team.id][PathTarget.enemyCores.ordinal()].weights[x][y];
-    }
+    //public int debugValue(Team team, int x, int y){
+    //    if(pathMap[team.id][FlagTarget.enemyCores.ordinal()] == null) return 0;
+    //    return pathMap[team.id][FlagTarget.enemyCores.ordinal()].weights[x][y];
+    //}
 
-    /** Update a tile in the internal pathfinding grid. Causes a complete pathfinding reclaculation. */
+    /** Update a tile in the internal pathfinding grid.
+     * Causes a complete pathfinding reclaculation. Main thread only. */
     public void updateTile(Tile tile){
         if(net.client()) return;
 
@@ -98,19 +105,17 @@ public class Pathfinder implements Runnable{
         });
 
         //can't iterate through array so use the map, which should not lead to problems
-        for(PathData[] arr : pathMap){
-            for(PathData path : arr){
-                if(path != null){
-                    synchronized(path.targets){
-                        path.targets.clear();
-                        path.target.getTargets(path.team, path.targets);
-                    }
+        for(Flowfield path : mainList){
+            if(path != null){
+                synchronized(path.targets){
+                    path.targets.clear();
+                    path.target.getPositions(path.team, path.targets);
                 }
             }
         }
 
         queue.post(() -> {
-            for(PathData data : list){
+            for(Flowfield data : threadList){
                 updateTargets(data, x, y);
             }
         });
@@ -126,8 +131,31 @@ public class Pathfinder implements Runnable{
                 queue.run();
 
                 //total update time no longer than maxUpdate
-                for(PathData data : list){
-                    updateFrontier(data, maxUpdate / list.size);
+                for(Flowfield data : threadList){
+                    updateFrontier(data, maxUpdate / threadList.size);
+
+                    //remove flowfields that have 'timed out' so they can be garbage collected and no longer waste space
+                    if(data.target.refreshRate() > 0 && Time.timeSinceMillis(data.lastUpdateTime) > fieldTimeout){
+                        //make sure it doesn't get removed twice
+                        data.lastUpdateTime = Time.millis();
+
+                        Team team = data.team;
+
+                        Core.app.post(() -> {
+                            //remove its used state
+                            if(fieldMap[team.uid] != null){
+                                fieldMap[team.uid].remove(data.target);
+                                fieldMapUsed[team.uid].remove(data.target);
+                            }
+                            //remove from main thread list
+                            mainList.remove(data);
+                        });
+
+                        queue.post(() -> {
+                            //remove from this thread list with a delay
+                            threadList.remove(data);
+                        });
+                    }
                 }
 
                 try{
@@ -142,21 +170,48 @@ public class Pathfinder implements Runnable{
         }
     }
 
+    public Tile getTargetTile(Tile tile, Team team, Position target){
+        return getTargetTile(tile, team, getTarget(target));
+    }
+
     /** Gets next tile to travel to. Main thread only. */
     public Tile getTargetTile(Tile tile, Team team, PathTarget target){
         if(tile == null) return null;
 
-        PathData data = pathMap[team.id][target.ordinal()];
+        if(fieldMap[team.uid] == null){
+            fieldMap[team.uid] = new ObjectMap<>();
+            fieldMapUsed[team.uid] = new ObjectSet<>();
+        }
+
+        Flowfield data = fieldMap[team.uid].get(target);
 
         if(data == null){
             //if this combination is not found, create it on request
-            if(!created.get(team.id, target.ordinal())){
-                created.set(team.id, target.ordinal());
+            if(fieldMapUsed[team.uid].add(target)){
                 //grab targets since this is run on main thread
-                IntArray targets = target.getTargets(team, new IntArray());
+                IntArray targets = target.getPositions(team, new IntArray());
                 queue.post(() -> createPath(team, target, targets));
             }
             return tile;
+        }
+
+        //if refresh rate is positive, queue a refresh
+        if(target.refreshRate() > 0 && Time.timeSinceMillis(data.lastUpdateTime) > target.refreshRate()){
+            data.lastUpdateTime = Time.millis();
+
+            tmpArray.clear();
+            data.target.getPositions(data.team, tmpArray);
+
+            synchronized(data.targets){
+                //make sure the position actually changed
+                if(!(data.targets.size == 1 && tmpArray.size == 1 && data.targets.first() == tmpArray.first())){
+                    data.targets.clear();
+                    data.target.getPositions(data.team, data.targets);
+
+                    //queue an update
+                    queue.post(() -> updateTargets(data));
+                }
+            }
         }
 
         int[][] values = data.weights;
@@ -182,6 +237,10 @@ public class Pathfinder implements Runnable{
         return current;
     }
 
+    private PathTarget getTarget(Position position){
+        return targetCache.get(position, () -> new PositionTarget(position));
+    }
+
     /** @return whether a tile can be passed through by this team. Pathfinding thread only. */
     private boolean passable(int x, int y, Team team){
         int tile = tiles[x][y];
@@ -192,7 +251,7 @@ public class Pathfinder implements Runnable{
      * Clears the frontier, increments the search and sets up all flow sources.
      * This only occurs for active teams.
      */
-    private void updateTargets(PathData path, int x, int y){
+    private void updateTargets(Flowfield path, int x, int y){
         if(!Structs.inBounds(x, y, path.weights)) return;
 
         if(path.weights[x][y] == 0){
@@ -208,9 +267,17 @@ public class Pathfinder implements Runnable{
             path.weights[x][y] = impassable;
         }
 
-        //increment search, clear frontier
-        path.search++;
+        //clear frontier to prevent contamination
         path.frontier.clear();
+
+        updateTargets(path);
+    }
+
+    /** Increments the search and sets up flow sources. Does not change the frontier. */
+    private void updateTargets(Flowfield path){
+
+        //increment search, but do not clear the frontier
+        path.search++;
 
         synchronized(path.targets){
             //add targets
@@ -219,25 +286,33 @@ public class Pathfinder implements Runnable{
                 int tx = Point2.x(pos), ty = Point2.y(pos);
 
                 path.weights[tx][ty] = 0;
-                path.searches[tx][ty] = (short)path.search;
+                path.searches[tx][ty] = path.search;
                 path.frontier.addFirst(pos);
             }
         }
     }
 
     private void preloadPath(Team team, PathTarget target){
-        updateFrontier(createPath(team, target, target.getTargets(team, new IntArray())), -1);
+        updateFrontier(createPath(team, target, target.getPositions(team, new IntArray())), -1);
     }
 
     /**
      * Created a new flowfield that aims to get to a certain target for a certain team.
      * Pathfinding thread only.
      */
-    private PathData createPath(Team team, PathTarget target, IntArray targets){
-        PathData path = new PathData(team, target, world.width(), world.height());
+    private Flowfield createPath(Team team, PathTarget target, IntArray targets){
+        Flowfield path = new Flowfield(team, target, world.width(), world.height());
+        path.lastUpdateTime = Time.millis();
 
-        list.add(path);
-        pathMap[team.id][target.ordinal()] = path;
+        threadList.add(path);
+
+        //add to main thread's list of paths
+        Core.app.post(() -> {
+            mainList.add(path);
+            if(fieldMap[team.uid] != null){
+                fieldMap[team.uid].put(target, path);
+            }
+        });
 
         //grab targets from passed array
         synchronized(path.targets){
@@ -263,7 +338,7 @@ public class Pathfinder implements Runnable{
     }
 
     /** Update the frontier for a path. Pathfinding thread only. */
-    private void updateFrontier(PathData path, long nsToRun){
+    private void updateFrontier(Flowfield path, long nsToRun){
         long start = Time.nanos();
 
         while(path.frontier.size > 0 && (nsToRun < 0 || Time.timeSinceNanos(start) <= nsToRun)){
@@ -295,7 +370,7 @@ public class Pathfinder implements Runnable{
     }
 
     /** A path target defines a set of targets for a path. */
-    public enum PathTarget{
+    public enum FlagTarget implements PathTarget{
         enemyCores((team, out) -> {
             for(Tile other : indexer.getEnemy(team, BlockFlag.core)){
                 out.add(other.pos());
@@ -314,23 +389,54 @@ public class Pathfinder implements Runnable{
             }
         });
 
-        public static final PathTarget[] all = values();
+        public static final FlagTarget[] all = values();
 
         private final Cons2<Team, IntArray> targeter;
 
-        PathTarget(Cons2<Team, IntArray> targeter){
+        FlagTarget(Cons2<Team, IntArray> targeter){
             this.targeter = targeter;
         }
 
-        /** Get targets. This must run on the main thread. */
-        public IntArray getTargets(Team team, IntArray out){
+        @Override
+        public IntArray getPositions(Team team, IntArray out){
             targeter.get(team, out);
             return out;
         }
+
+        @Override
+        public int refreshRate(){
+            return 0;
+        }
+    }
+
+    public static class PositionTarget implements PathTarget{
+        public final Position position;
+
+        public PositionTarget(Position position){
+            this.position = position;
+        }
+
+        @Override
+        public IntArray getPositions(Team team, IntArray out){
+            out.add(Point2.pack(world.toTile(position.getX()), world.toTile(position.getY())));
+            return out;
+        }
+
+        @Override
+        public int refreshRate(){
+            return 900;
+        }
+    }
+
+    public interface PathTarget{
+        /** Gets targets to pathfind towards. This must run on the main thread. */
+        IntArray getPositions(Team team, IntArray out);
+        /** Refresh rate in milliseconds. Return any number <= 0 to disable. */
+        int refreshRate();
     }
 
     /** Data for a specific flow field to some set of destinations. */
-    static class PathData{
+    static class Flowfield{
         /** Team this path is for. */
         final Team team;
         /** Flag that is being targeted. */
@@ -338,20 +444,22 @@ public class Pathfinder implements Runnable{
         /** costs of getting to a specific tile */
         final int[][] weights;
         /** search IDs of each position - the highest, most recent search is prioritized and overwritten */
-        final short[][] searches;
+        final int[][] searches;
         /** search frontier, these are Pos objects */
         final IntQueue frontier = new IntQueue();
         /** all target positions; these positions have a cost of 0, and must be synchronized on! */
         final IntArray targets = new IntArray();
         /** current search ID */
         int search = 1;
+        /** last updated time */
+        long lastUpdateTime;
 
-        PathData(Team team, PathTarget target, int width, int height){
+        Flowfield(Team team, PathTarget target, int width, int height){
             this.team = team;
             this.target = target;
 
             this.weights = new int[width][height];
-            this.searches = new short[width][height];
+            this.searches = new int[width][height];
             this.frontier.ensureCapacity((width + height) * 3);
         }
     }
@@ -363,9 +471,9 @@ public class Pathfinder implements Runnable{
         short cost;
         //team of block, if applicable (0 by default)
         byte team;
-        //type of target; TODO remove
-        //byte type;
         //whether it's viable to pass this block
         boolean passable;
+        //whether it's viable to pass this block through water
+        boolean passableWater;
     }
 }

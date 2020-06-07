@@ -37,6 +37,8 @@ public class MapRenderer implements Disposable{
     }
 
     public void resize(int width, int height){
+        updates.clear();
+        delayedUpdates.clear();
         if(chunks != null){
             for(int x = 0; x < chunks.length; x++){
                 for(int y = 0; y < chunks[0].length; y++){

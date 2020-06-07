@@ -14,6 +14,7 @@ public class ArtilleryBulletType extends BasicBulletType{
         collidesTiles = false;
         collides = false;
         collidesAir = false;
+        scaleVelocity = true;
         hitShake = 1f;
         hitSound = Sounds.explosion;
     }

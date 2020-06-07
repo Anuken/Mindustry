@@ -66,7 +66,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     sep(bt, "$bullet.homing");
                 }
 
-                if(type.lightining > 0){
+                if(type.lightning > 0){
                     sep(bt, "$bullet.shock");
                 }
 

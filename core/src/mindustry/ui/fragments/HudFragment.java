@@ -35,6 +35,8 @@ public class HudFragment extends Fragment{
     private Table lastUnlockLayout;
     private boolean shown = true;
     private float dsize = 47.2f;
+    //TODO implement
+    private CoreItemsDisplay coreItems = new CoreItemsDisplay();
 
     private String hudText = "";
     private boolean showHudText;
@@ -52,6 +54,10 @@ public class HudFragment extends Fragment{
         //TODO details and stuff
         Events.on(SectorCaptureEvent.class, e ->{
             showToast("Sector[accent] captured[]!");
+        });
+
+        Events.on(ResetEvent.class, e -> {
+            coreItems.resetUsed();
         });
 
         //TODO tear this all down
@@ -183,7 +189,7 @@ public class HudFragment extends Fragment{
                     t.table(teams -> {
                         teams.left();
                         int i = 0;
-                        for(Team team : Team.base()){
+                        for(Team team : Team.baseTeams){
                             ImageButton button = teams.button(Tex.whiteui, Styles.clearTogglePartiali, 40f, () -> Call.setPlayerTeamEditor(player, team))
                                 .size(50f).margin(6f).get();
                             button.getImageCell().grow();
@@ -326,9 +332,9 @@ public class HudFragment extends Fragment{
                     c.clearChildren();
 
                     for(Item item : content.items()){
-                        if(state.stats.getExport(item) >= 1){
+                        if(state.secinfo.getExport(item) >= 1){
                             c.image(item.icon(Cicon.small));
-                            c.label(() -> (int)state.stats.getExport(item) + " /s").color(Color.lightGray);
+                            c.label(() -> (int)state.secinfo.getExport(item) + " /s").color(Color.lightGray);
                             c.row();
                         }
                     }
@@ -337,7 +343,7 @@ public class HudFragment extends Fragment{
                 c.update(() -> {
                     boolean wrong = false;
                     for(Item item : content.items()){
-                        boolean has = state.stats.getExport(item) >= 1;
+                        boolean has = state.secinfo.getExport(item) >= 1;
                         if(used.get(item.id) != has){
                             used.set(item.id, has);
                             wrong = true;
@@ -501,6 +507,14 @@ public class HudFragment extends Fragment{
 
             lastUnlockLayout.pack();
         }
+    }
+
+    public void showLaunchDirect(){
+        Image image = new Image();
+        image.getColor().a = 0f;
+        image.setFillParent(true);
+        image.actions(Actions.fadeIn(launchDuration / 60f, Interp.pow2In), Actions.delay(8f / 60f), Actions.remove());
+        Core.scene.add(image);
     }
 
     public void showLaunch(){
