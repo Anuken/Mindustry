@@ -41,6 +41,7 @@ public class UnitType extends UnlockableContent{
     public float sway = 1f;
     public int payloadCapacity = 1;
     public int commandLimit = 24;
+    public float baseElevation = 0f;
 
     public int legCount = 4;
     public float legLength = 24f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f;
@@ -81,7 +82,6 @@ public class UnitType extends UnlockableContent{
     public Unitc create(Team team){
         Unitc unit = constructor.get();
         unit.team(team);
-        unit.armor(armor);
         unit.type(this);
         return unit;
     }
@@ -331,7 +331,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawLegs(Legsc unit){
-        Draw.z(Layer.groundUnit - 0.02f);
+        //Draw.z(Layer.groundUnit - 0.02f);
 
         Leg[] legs = unit.legs();
 

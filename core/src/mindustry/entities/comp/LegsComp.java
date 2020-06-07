@@ -11,8 +11,8 @@ import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
 
 @Component
-abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
-    @Import float x, y, elevation;
+abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, ElevationMovec{
+    @Import float x, y;
     @Import UnitType type;
 
     transient Leg[] legs = {};
@@ -22,9 +22,6 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
 
     @Override
     public void update(){
-        //keep elevation halfway
-        elevation = 0.4f;
-
         if(Mathf.dst(deltaX(), deltaY()) > 0.001f){
             baseRotation = Mathf.slerpDelta(baseRotation, Mathf.angle(deltaX(), deltaY()), 0.1f);
         }
@@ -109,11 +106,6 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     /** @return outwards facing angle of leg at the specified index. */
     float legAngle(float rotation, int index){
         return rotation + 360f / legs.length * index + (360f / legs.length / 2f);
-    }
-
-    @Override
-    public void add(){
-        elevation = 0.4f;
     }
 
     /*
