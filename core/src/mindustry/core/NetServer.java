@@ -305,7 +305,7 @@ public class NetServer implements ApplicationListener{
         //voting round duration in seconds
         float voteDuration = 0.5f * 60;
         //cooldown between votes in seconds
-        int voteCooldown = 60 * 5;
+        int voteCooldown = 10;
 
         class VoteSession{
             Playerc target;
