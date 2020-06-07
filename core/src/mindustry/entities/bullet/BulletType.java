@@ -1,6 +1,7 @@
 package mindustry.entities.bullet;
 
 import arc.audio.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -74,6 +75,7 @@ public abstract class BulletType extends Content{
     public int fragBullets = 9;
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
     public BulletType fragBullet = null;
+    public Color hitColor = Color.white;
 
     /** Use a negative value to disable splash damage. */
     public float splashDamageRadius = -1f;
@@ -119,7 +121,7 @@ public abstract class BulletType extends Content{
     }
 
     public void hit(Bulletc b, float x, float y){
-        hitEffect.at(x, y, b.rotation());
+        hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(b);
 
         Effects.shake(hitShake, hitShake, b);
