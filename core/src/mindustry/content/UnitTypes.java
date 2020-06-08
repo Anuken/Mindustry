@@ -212,7 +212,7 @@ public class UnitTypes implements ContentList{
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
             legCount = 4;
             legLength = 9f;
-            legTrns = 0.8f;
+            legTrns = 0.6f;
             legMoveSpace = 1.4f;
             legBend = 1f;
 

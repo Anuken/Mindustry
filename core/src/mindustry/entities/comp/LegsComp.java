@@ -49,11 +49,9 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, Elevatio
         float moveSpeed = type.legSpeed;
         int div = Math.max(legs.length / type.legGroupSize, 2);
         moveSpace = legLength / 1.6f / (div / 2f) * type.legMoveSpace;
-
         totalLength += Mathf.dst(deltaX(), deltaY());
 
-        float trns = vel().len() * 12.5f * div/1.5f * type.legTrns;
-        trns = moveSpace * 0.85f * type.legTrns;
+        float trns = moveSpace * 0.85f * type.legTrns;
 
         //rotation + offset vector
         Tmp.v4.trns(rot, trns);
@@ -61,7 +59,6 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, Elevatio
         for(int i = 0; i < legs.length; i++){
             float dstRot = legAngle(rot, i);
             float rot2 = Angles.moveToward(dstRot, rot + (Angles.angleDist(dstRot, rot) < 90f ? 180f : 0), type.legBend * 360f / legs.length / 4f);
-            boolean side = i < legs.length/2;
             Leg l = legs[i];
 
             float stageF = (totalLength + i*type.legPairOffset) / moveSpace;
