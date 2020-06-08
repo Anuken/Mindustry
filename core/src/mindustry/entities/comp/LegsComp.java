@@ -1,12 +1,14 @@
 package mindustry.entities.comp;
 
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
 
@@ -52,14 +54,32 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, Elevatio
 
         totalLength += Mathf.dst(deltaX(), deltaY());
 
-        int stage = (int)(totalLength / moveSpace);
-        int group = stage % div;
 
-        if(lastGroup != group){
-            //create ripple effects when switching leg groups
-            int i = 0;
-            for(Leg l : legs){
-                if(i++ % div == lastGroup){
+        //float movespace = 360f / legs.length / 4f;
+        float stepMult = 0.8f;
+        float trns = legLength/2f*stepMult * 1.3f;//Mathf.dst(deltaX(), deltaY()) * 12.5f * div/1.5f * type.legTrns;
+
+        //trns = moveSpace * 0.7f;
+        //trns = 0;
+
+        //rotation + offset vector
+        Vec2 posOffset = Tmp.v4.trns(rot, trns);
+        float approach = Mathf.dst(deltaX(), deltaY());
+
+        for(int i = 0; i < legs.length; i++){
+            Leg l = legs[i];
+            float dstRot = legAngle(rot, i);
+            boolean side = i < legs.length/2;
+            //float rot2 = Angles.moveToward(dstRot, rot + (Angles.angleDist(dstRot, rot) < 90f ? 180f : 0), movespace);
+
+            int stage = (int)((totalLength + i*type.legPairOffset) / moveSpace);
+            int group = stage % div;
+            boolean move = i % div == group;
+
+            if(l.group != group){
+
+                //create effect when transitioning to a group it can't move in
+                if(!move && i % div == l.group){
                     Floor floor = Vars.world.floorWorld(l.base.x, l.base.y);
                     if(floor.isLiquid){
                         floor.walkEffect.at(l.base.x, l.base.y, 0, floor.mapColor);
@@ -69,37 +89,35 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, Elevatio
 
                     //shake when legs contact ground
                     if(type.landShake > 0){
-                        Effects.shake(type.landShake, type.landShake, this);
+                        Effects.shake(type.landShake, type.landShake, l.base);
                     }
                 }
+
+
+                l.group = group;
             }
 
-            lastGroup = group;
-        }
-
-        float movespace = 360f / legs.length / 4f;
-        float trns = vel().len() * 12.5f * div/1.5f * type.legTrns;
-
-        //rotation + offset vector
-        Tmp.v4.trns(rot, trns);
-
-        for(int i = 0; i < legs.length; i++){
-            float dstRot = legAngle(rot, i);
-            float rot2 = Angles.moveToward(dstRot, rot + (Angles.angleDist(dstRot, rot) < 90f ? 180f : 0), movespace);
-
-            Leg l = legs[i];
+            Vec2 offset = Tmp.v5.trns(dstRot, type.legBaseOffset).add(x, y);
 
             //leg destination
-            Tmp.v1.trns(dstRot, legLength + type.legBaseOffset).add(x, y).add(Tmp.v4);
-            //join destination
-            Tmp.v2.trns(rot2, legLength / 2f + type.legBaseOffset).add(x, y).add(Tmp.v4);
+            Vec2 footDest = Tmp.v1.trns(dstRot - Mathf.sign(i % 2 == 0) * 0, legLength*stepMult).add(offset).add(posOffset);
+            //joint destination
+            //Tmp.v2.trns(rot2, legLength / 2f + type.legBaseOffset).add(x, y).add(offset);
 
-            if(i % div == group){
-                l.base.lerpDelta(Tmp.v1, moveSpeed);
-                l.joint.lerpDelta(Tmp.v2, moveSpeed / 4f);
+
+            if(move){
+                l.base.lerpDelta(footDest, moveSpeed);
+                //l.joint.lerpDelta(Tmp.v2, moveSpeed / 4f);
             }
 
-            l.joint.lerpDelta(Tmp.v2, moveSpeed / 4f);
+            Vec2 result = Tmp.v2;
+            InverseKinematics.solve(legLength/2f, legLength/2f, Tmp.v6.set(l.base).sub(offset), side, result);
+            result.add(offset);
+
+            // if()
+
+            //l.joint.lerpDelta(Tmp.v2, moveSpeed / 4f);
+            l.joint.set(result);
         }
     }
 

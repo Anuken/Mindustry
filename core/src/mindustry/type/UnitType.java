@@ -27,6 +27,7 @@ import static mindustry.Vars.*;
 
 public class UnitType extends UnlockableContent{
     public static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
+    public static final boolean debug = false;
     private static final Vec2 legOffset = new Vec2();
 
     public boolean flying;
@@ -45,7 +46,7 @@ public class UnitType extends UnlockableContent{
 
     //TODO document
     public int legCount = 4;
-    public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0;
+    public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0;
 
     public int itemCapacity = 30;
     public int drillTier = -1;
@@ -172,9 +173,11 @@ public class UnitType extends UnlockableContent{
 
         Draw.z(z);
         drawEngine(unit);
-        drawBody(unit);
-        if(drawCell) drawCell(unit);
-        drawWeapons(unit);
+        if(!debug){
+            drawBody(unit);
+            if(drawCell) drawCell(unit);
+            drawWeapons(unit);
+        }
         if(drawItems) drawItems(unit);
         drawLight(unit);
 
@@ -350,35 +353,40 @@ public class UnitType extends UnlockableContent{
             Draw.rect(baseRegion, unit.x(), unit.y(), rotation);
         }
 
-        int index = 0;
-
         //TODO figure out layering
-        for(Leg leg : legs){
-            float angle = unit.legAngle(rotation, index);
-            boolean flip = index++ >= legs.length/2f;
+        for(int i = 0; i < legs.length; i++){
+            Leg leg = legs[i];
+            float angle = unit.legAngle(rotation, i);
+            boolean flip = i >= legs.length/2f;
             int flips = Mathf.sign(flip);
 
             Vec2 position = legOffset.trns(angle, legBaseOffset).add(unit);
             Tmp.v1.set(leg.base).sub(leg.joint).inv().setLength(legExtension);
 
-            Draw.color();
+            if(debug){
+                Draw.color(Color.red);
+                Lines.line(position.x, position.y, leg.joint.x, leg.joint.y);
 
-            Lines.stroke(legRegion.getHeight() * Draw.scl * flips);
-            Lines.line(legRegion, position.x, position.y, leg.joint.x, leg.joint.y, CapStyle.none, 0);
+                Draw.color(Color.green);
+                Lines.line(leg.joint.x, leg.joint.y, leg.base.x, leg.base.y);
 
-            Lines.stroke(legBaseRegion.getHeight() * Draw.scl * flips);
-            Lines.line(legBaseRegion, leg.joint.x + Tmp.v1.x, leg.joint.y + Tmp.v1.y, leg.base.x, leg.base.y, CapStyle.none, 0);
+                Draw.reset();
+            }else{
+                Draw.rect(footRegion, leg.base.x, leg.base.y, position.angleTo(leg.base));
 
-            float angle2 = position.angleTo(leg.base);
+                Lines.stroke(legRegion.getHeight() * Draw.scl * flips);
+                Lines.line(legRegion, position.x, position.y, leg.joint.x, leg.joint.y, CapStyle.none, 0);
 
-            if(jointRegion.found()){
-                Draw.rect(jointRegion, leg.joint.x, leg.joint.y);
-            }
+                Lines.stroke(legBaseRegion.getHeight() * Draw.scl * flips);
+                Lines.line(legBaseRegion, leg.joint.x + Tmp.v1.x, leg.joint.y + Tmp.v1.y, leg.base.x, leg.base.y, CapStyle.none, 0);
 
-            Draw.rect(footRegion, leg.base.x, leg.base.y, angle2);
+                if(jointRegion.found()){
+                    Draw.rect(jointRegion, leg.joint.x, leg.joint.y);
+                }
 
-            if(baseJointRegion.found()){
-                Draw.rect(baseJointRegion, position.x, position.y, rotation);
+                if(baseJointRegion.found()){
+                    Draw.rect(baseJointRegion, position.x, position.y, rotation);
+                }
             }
         }
 

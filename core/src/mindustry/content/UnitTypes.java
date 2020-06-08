@@ -235,18 +235,19 @@ public class UnitTypes implements ContentList{
 
         cix = new UnitType("cix"){{
             drag = 0.1f;
-            speed = 0.4f;
+            speed = 0.5f;
             hitsize = 9f;
             health = 140;
             baseElevation = 0.51f;
 
             legCount = 6;
-            legMoveSpace = 0.9f;
+            legMoveSpace = 1f;
+            legPairOffset = 3;
             legLength = 34f;
             rotateShooting = false;
             legExtension = -15;
-            legBaseOffset = 8f;
-            landShake = 2f;
+            legBaseOffset = 10f;
+            landShake = 0f;
             legSpeed = 0.1f;
 
             for(boolean b : Mathf.booleans){
