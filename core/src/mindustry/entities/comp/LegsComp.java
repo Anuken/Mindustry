@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -54,10 +55,11 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, Elevatio
         float trns = moveSpace * 0.85f * type.legTrns;
 
         //rotation + offset vector
-        Tmp.v4.trns(rot, trns);
+        Vec2 moveOffset = Tmp.v4.trns(rot, trns).add(x, y);
 
         for(int i = 0; i < legs.length; i++){
             float dstRot = legAngle(rot, i);
+            Vec2 baseOffset = Tmp.v5.trns(dstRot, type.legBaseOffset).add(moveOffset);
             float rot2 = Angles.moveToward(dstRot, rot + (Angles.angleDist(dstRot, rot) < 90f ? 180f : 0), type.legBend * 360f / legs.length / 4f);
             Leg l = legs[i];
 
@@ -85,23 +87,22 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, Elevatio
                     }
                 }
 
-
                 l.group = group;
             }
 
             //leg destination
-            Tmp.v1.trns(dstRot - Mathf.sign(i % 2 == 0) * 0f, legLength + type.legBaseOffset).add(x, y).add(Tmp.v4);
+            Vec2 legDest = Tmp.v1.trns(dstRot, legLength).add(baseOffset);
             //join destination
-            Tmp.v2.trns(rot2, legLength / 2f + type.legBaseOffset).add(x, y).add(Tmp.v4);
+            Vec2 jointDest = Tmp.v2.trns(rot2, legLength / 2f + type.legBaseOffset).add(moveOffset);
 
             if(move){
                 float moveFract = stageF % 1f;
 
-                l.base.lerpDelta(Tmp.v1, moveFract);
-                l.joint.lerpDelta(Tmp.v2, moveFract / 2f);
+                l.base.lerpDelta(legDest, moveFract);
+                l.joint.lerpDelta(jointDest, moveFract / 2f);
             }
 
-            l.joint.lerpDelta(Tmp.v2, moveSpeed / 4f);
+            l.joint.lerpDelta(jointDest, moveSpeed / 4f);
         }
     }
 
