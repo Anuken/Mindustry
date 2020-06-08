@@ -8,6 +8,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
 
@@ -55,18 +56,22 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, Elevatio
         float trns = moveSpace * 0.85f * type.legTrns;
 
         //rotation + offset vector
-        Vec2 moveOffset = Tmp.v4.trns(rot, trns).add(x, y);
+        Vec2 moveOffset = Tmp.v4.trns(rot, trns);
 
         for(int i = 0; i < legs.length; i++){
             float dstRot = legAngle(rot, i);
-            Vec2 baseOffset = Tmp.v5.trns(dstRot, type.legBaseOffset).add(moveOffset);
-            float rot2 = Angles.moveToward(dstRot, rot + (Angles.angleDist(dstRot, rot) < 90f ? 180f : 0), type.legBend * 360f / legs.length / 4f);
+            Vec2 baseOffset = Tmp.v5.trns(dstRot, type.legBaseOffset).add(x, y);
             Leg l = legs[i];
 
             float stageF = (totalLength + i*type.legPairOffset) / moveSpace;
             int stage = (int)stageF;
             int group = stage % div;
             boolean move = i % div == group;
+            boolean side = i < legs.length/2;
+            //back legs have reversed directions
+            boolean backLeg = Math.abs((i + 0.5f) - legs.length/2f) <= 0.501f;
+            if(backLeg) side = !side;
+
             l.moving = move;
             l.stage = stageF % 1f;
 
@@ -91,9 +96,13 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, Elevatio
             }
 
             //leg destination
-            Vec2 legDest = Tmp.v1.trns(dstRot, legLength).add(baseOffset);
+            Vec2 legDest = Tmp.v1.trns(dstRot, legLength * type.legLengthScl).add(baseOffset).add(moveOffset);
             //join destination
-            Vec2 jointDest = Tmp.v2.trns(rot2, legLength / 2f + type.legBaseOffset).add(moveOffset);
+            Vec2 jointDest = Tmp.v2;//.trns(rot2, legLength / 2f + type.legBaseOffset).add(moveOffset);
+            InverseKinematics.solve(legLength/2f, legLength/2f, Tmp.v6.set(l.base).sub(baseOffset), side, jointDest);
+            jointDest.add(baseOffset);
+            //lerp between kinematic and linear
+            jointDest.lerp(Tmp.v6.set(baseOffset).lerp(l.base, 0.5f), 1f - type.kinematicScl);
 
             if(move){
                 float moveFract = stageF % 1f;

@@ -214,7 +214,6 @@ public class UnitTypes implements ContentList{
             legLength = 9f;
             legTrns = 0.6f;
             legMoveSpace = 1.4f;
-            legBend = 1f;
 
             weapons.add(new Weapon("eruption"){{
                 shootY = 3f;
@@ -250,8 +249,9 @@ public class UnitTypes implements ContentList{
             legBaseOffset = 10f;
             landShake = 2f;
             legSpeed = 0.1f;
-            legBend = 0.3f;
+            legLengthScl = 1f;
             rippleScale = 2f;
+            legSpeed = 0.2f;
 
             for(boolean b : Mathf.booleans){
                 weapons.add(

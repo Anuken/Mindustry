@@ -5,7 +5,7 @@ import arc.math.geom.*;
 
 public class InverseKinematics{
     private static final Vec2[] mat1 = {new Vec2(), new Vec2()}, mat2 = {new Vec2(), new Vec2()};
-    private static final Vec2 temp = new Vec2(), temp2 = new Vec2(), at1 = new Vec2(), at2 = new Vec2();
+    private static final Vec2 temp = new Vec2(), temp2 = new Vec2(), at1 = new Vec2();
 
     static public boolean solve(float lengthA, float lengthB, Vec2 end, boolean side, Vec2 result){
         at1.set(end).rotate(side ? 1 : -1).setLength(lengthA + lengthB).add(end.x / 2f, end.y / 2f);
