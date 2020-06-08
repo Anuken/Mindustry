@@ -228,7 +228,7 @@ public class Fx{
 
     unitLandSmall = new Effect(30, e -> {
         color(Tmp.c1.set(e.color).mul(1.1f));
-        randLenVectors(e.id, 6, 12f * e.finpow(), (x, y) -> {
+        randLenVectors(e.id, (int)(6 * e.rotation), 12f * e.finpow() * e.rotation, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 3f + 0.1f);
         });
     }).ground(),
@@ -1183,7 +1183,7 @@ public class Fx{
     ripple = new Effect(30, e -> {
         color(Tmp.c1.set(e.color).mul(1.5f));
         stroke(e.fout() + 0.4f);
-        Lines.circle(e.x, e.y, 2f + e.fin() * 4f);
+        Lines.circle(e.x, e.y, (2f + e.fin() * 4f) * e.rotation);
     }).ground(),
 
     bubble = new Effect(20, e -> {

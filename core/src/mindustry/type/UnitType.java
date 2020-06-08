@@ -34,7 +34,7 @@ public class UnitType extends UnlockableContent{
     public @NonNull Prov<? extends Unitc> constructor;
     public @NonNull Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
-    public float drag = 0.3f, accel = 0.5f, landShake = 0f;
+    public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f;
     public float health = 200f, range = -1, armor = 0f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
@@ -45,8 +45,8 @@ public class UnitType extends UnlockableContent{
     public float baseElevation = 0f;
 
     //TODO document
-    public int legCount = 4;
-    public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0;
+    public int legCount = 4, legGroupSize = 2;
+    public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legBend = 0f;
 
     public int itemCapacity = 30;
     public int drillTier = -1;
@@ -361,6 +361,7 @@ public class UnitType extends UnlockableContent{
             int flips = Mathf.sign(flip);
 
             Vec2 position = legOffset.trns(angle, legBaseOffset).add(unit);
+
             Tmp.v1.set(leg.base).sub(leg.joint).inv().setLength(legExtension);
 
             if(debug){
@@ -372,6 +373,14 @@ public class UnitType extends UnlockableContent{
 
                 Draw.reset();
             }else{
+                if(leg.moving && baseElevation > 0){
+                    float scl = baseElevation;
+                    float elev = Mathf.slope(1f - leg.stage) * scl;
+                    Draw.color(shadowColor);
+                    Draw.rect(footRegion, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));
+                    Draw.color();
+                }
+
                 Draw.rect(footRegion, leg.base.x, leg.base.y, position.angleTo(leg.base));
 
                 Lines.stroke(legRegion.getHeight() * Draw.scl * flips);

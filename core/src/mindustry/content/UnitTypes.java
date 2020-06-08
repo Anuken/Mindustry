@@ -212,8 +212,9 @@ public class UnitTypes implements ContentList{
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
             legCount = 4;
             legLength = 9f;
-            legTrns = 2f;
+            legTrns = 0.8f;
             legMoveSpace = 1.4f;
+            legBend = 1f;
 
             weapons.add(new Weapon("eruption"){{
                 shootY = 3f;
@@ -247,8 +248,10 @@ public class UnitTypes implements ContentList{
             rotateShooting = false;
             legExtension = -15;
             legBaseOffset = 10f;
-            landShake = 0f;
+            landShake = 2f;
             legSpeed = 0.1f;
+            legBend = 0.3f;
+            rippleScale = 2f;
 
             for(boolean b : Mathf.booleans){
                 weapons.add(
