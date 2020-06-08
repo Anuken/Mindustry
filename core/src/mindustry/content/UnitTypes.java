@@ -96,26 +96,26 @@ public class UnitTypes implements ContentList{
         }};
 
         tau = new UnitType("tau"){{
-                itemCapacity = 60;
-                canBoost = true;
-                boostMultiplier = 1.5f;
-                speed = 0.5f;
-                hitsize = 8f;
-                health = 100f;
-                buildSpeed = 0.8f;
+            itemCapacity = 60;
+            canBoost = true;
+            boostMultiplier = 1.5f;
+            speed = 0.5f;
+            hitsize = 8f;
+            health = 100f;
+            buildSpeed = 0.8f;
 
-                weapons.add(new Weapon("heal-weapon"){{
-                    shootY = 1.5f;
-                    reload = 24f;
-                    x = 1f;
-                    shootX = 3.5f;
-                    alternate = false;
-                    ejectEffect = Fx.none;
-                    recoil = 2f;
-                    bullet = Bullets.healBullet;
-                    shootSound = Sounds.pew;
-                }});
-            }
+            weapons.add(new Weapon("heal-weapon"){{
+                shootY = 1.5f;
+                reload = 24f;
+                x = 1f;
+                shootX = 3.5f;
+                alternate = false;
+                ejectEffect = Fx.none;
+                recoil = 2f;
+                bullet = Bullets.healBullet;
+                shootSound = Sounds.pew;
+            }});
+        }
 
             /*
 
@@ -144,6 +144,39 @@ public class UnitTypes implements ContentList{
                 }
             }*/
         };
+
+        oculon = new UnitType("oculon"){{
+            drillTier = 1;
+            hitsize = 9f;
+            boostMultiplier = 2f;
+            itemCapacity = 20;
+            health = 230f;
+            buildSpeed = 1.5f;
+            canBoost = true;
+
+            speed = 0.4f;
+            hitsize = 10f;
+
+            weapons.add(new Weapon("beam-weapon"){{
+                shake = 2f;
+                shootY = 4f;
+                shootX = 6f;
+                x = 0.25f;
+                reload = 50f;
+                alternate = true;
+                recoil = 4f;
+                shootSound = Sounds.laser;
+
+                bullet = new LaserBulletType(){{
+                    damage = 20f;
+                    recoil = 1f;
+                    sideAngle = 45f;
+                    sideWidth = 1f;
+                    sideLength = 70f;
+                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
+                }};
+            }});
+        }};
 
         fortress = new UnitType("fortress"){{
             speed = 0.38f;
@@ -252,6 +285,8 @@ public class UnitTypes implements ContentList{
             legLengthScl = 1f;
             rippleScale = 2f;
             legSpeed = 0.2f;
+            legSplashDamage = 32;
+            legSplashRange = 30;
 
             for(boolean b : Mathf.booleans){
                 weapons.add(
@@ -477,37 +512,6 @@ public class UnitTypes implements ContentList{
             buildSpeed = 0.6f;
             engineOffset = 6.5f;
             hitsize = 8f;
-        }};
-
-        oculon = new UnitType("oculon"){{
-            drillTier = -1;
-            speed = 0.6f;
-            hitsize = 9f;
-            boostMultiplier = 2f;
-            itemCapacity = 15;
-            health = 160f;
-            buildSpeed = 0.9f;
-            canBoost = true;
-
-            weapons.add(new Weapon("beam-weapon"){{
-                shake = 2f;
-                shootY = 1f;
-                x = 1f;
-                shootX = 3f;
-                reload = 50f;
-                alternate = true;
-                recoil = 4f;
-                shootSound = Sounds.laser;
-
-                bullet = new LaserBulletType(){{
-                    damage = 20f;
-                    recoil = 1f;
-                    sideAngle = 45f;
-                    sideWidth = 1f;
-                    sideLength = 70f;
-                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
-                }};
-            }});
         }};
 
         trident = new UnitType("trident"){{

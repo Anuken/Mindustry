@@ -20,8 +20,7 @@ public class InverseKinematics{
         result.set(mat2[0].dot(end), mat2[1].dot(end));
         float len = result.len();
         float dist = Math.max(0, Math.min(lengthA, (len + (lengthA * lengthA - lengthB * lengthB) / len) / 2));
-        float e = Mathf.sqrt(lengthA * lengthA - dist * dist);
-        Vec2 src = temp.set(dist, e);
+        Vec2 src = temp.set(dist, Mathf.sqrt(lengthA * lengthA - dist * dist));
         result.set(mat1[0].dot(src), mat1[1].dot(src));
 
         return dist > 0 && dist < lengthA;

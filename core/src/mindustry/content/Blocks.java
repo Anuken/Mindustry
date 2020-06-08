@@ -77,7 +77,7 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment,
 
     //units
-    groundFactory, airFactory, navalFactory, basicReconstructor, repairPoint,
+    groundFactory, airFactory, navalFactory, basicReconstructor, advancedReconstructor, repairPoint,
 
     //campaign
     launchPad, launchPadLarge, coreSilo, dataProcessor,
@@ -1722,8 +1722,6 @@ public class Blocks implements ContentList{
         //endregion
         //region units
 
-        //for testing only.
-
         groundFactory = new UnitFactory("ground-factory"){{
             requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
@@ -1768,9 +1766,26 @@ public class Blocks implements ContentList{
             constructTime = 60f * 5f;
 
             upgrades = new UnitType[][]{
+                {UnitTypes.tau, UnitTypes.oculon},
                 {UnitTypes.dagger, UnitTypes.titan},
                 {UnitTypes.crawler, UnitTypes.eruptor},
                 {UnitTypes.wraith, UnitTypes.ghoul},
+            };
+        }};
+
+        advancedReconstructor = new Reconstructor("advanced-reconstructor"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+
+            size = 5;
+            consumes.power(6f);
+            consumes.items(ItemStack.with(Items.silicon, 60, Items.titanium, 60));
+            itemCapacity = 80;
+
+            constructTime = 60f * 15f;
+
+            upgrades = new UnitType[][]{
+                {UnitTypes.ghoul, UnitTypes.revenant},
+                {UnitTypes.titan, UnitTypes.fortress},
             };
         }};
 

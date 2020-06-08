@@ -13,6 +13,7 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -47,6 +48,7 @@ public class UnitType extends UnlockableContent{
     //TODO document
     public int legCount = 4, legGroupSize = 2;
     public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f;
+    public float legSplashDamage = 0f, legSplashRange = 5;
     public boolean flipBackLegs = true;
 
     public int itemCapacity = 30;
@@ -413,7 +415,7 @@ public class UnitType extends UnlockableContent{
         float ft = sin*(2.5f + (unit.hitSize()-8f)/2f);
         float boostTrns = e * 2f;
 
-        Floor floor = unit.floorOn();
+        Floor floor = unit.isFlying() ? Blocks.air.asFloor() : unit.floorOn();
 
         if(floor.isLiquid){
             Draw.color(Color.white, floor.mapColor, 0.5f);

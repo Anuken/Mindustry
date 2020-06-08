@@ -31,6 +31,7 @@ public class LaserBulletType extends BulletType{
         despawnEffect = Fx.none;
         shootEffect = Fx.hitLancer;
         smokeEffect = Fx.none;
+        collides = false;
         hitSize = 4;
         lifetime = 16f;
         pierce = true;
