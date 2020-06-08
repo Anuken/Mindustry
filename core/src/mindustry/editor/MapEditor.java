@@ -39,7 +39,7 @@ public class MapEditor{
 
         loading = true;
         createTiles(width, height);
-        renderer.resize(width(), height());
+        renderer.resize(width, height);
         loading = false;
     }
 

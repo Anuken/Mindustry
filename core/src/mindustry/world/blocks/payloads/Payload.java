@@ -22,6 +22,11 @@ public interface Payload{
         return false;
     }
 
+    /** @return whether this payload fits on a standard 3x3 conveyor. */
+    default boolean fits(){
+        return true;
+    }
+
     /** writes the payload for saving. */
     void write(Writes write);
 

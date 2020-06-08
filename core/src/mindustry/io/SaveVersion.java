@@ -90,7 +90,8 @@ public abstract class SaveVersion extends SaveFileReader{
             "height", world.height(),
             "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
             "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name,
-            "nocores", state.rules.defaultTeam.cores().isEmpty()
+            "nocores", state.rules.defaultTeam.cores().isEmpty(),
+            "playerteam", player == null ? state.rules.defaultTeam.uid : player.team().uid
         ).merge(tags));
     }
 
@@ -111,6 +112,10 @@ public abstract class SaveVersion extends SaveFileReader{
             player.set(Tmp.v1);
 
             control.input.controlledType = content.getByName(ContentType.unit, map.get("controlledType", "<none>"));
+            Team team = Team.get(map.getInt("playerteam", state.rules.defaultTeam.uid));
+            if(!net.client() && team != Team.derelict){
+                player.team(team);
+            }
         }
 
         Map worldmap = maps.byName(map.get("mapname", "\\\\\\"));
@@ -269,8 +274,8 @@ public abstract class SaveVersion extends SaveFileReader{
         stream.writeInt(data.size);
         for(TeamData team : data){
             stream.writeInt(team.team.id);
-            stream.writeInt(team.brokenBlocks.size);
-            for(BrokenBlock block : team.brokenBlocks){
+            stream.writeInt(team.blocks.size);
+            for(BlockPlan block : team.blocks){
                 stream.writeShort(block.x);
                 stream.writeShort(block.y);
                 stream.writeShort(block.rotation);
@@ -297,7 +302,7 @@ public abstract class SaveVersion extends SaveFileReader{
             TeamData data = team.data();
             int blocks = stream.readInt();
             for(int j = 0; j < blocks; j++){
-                data.brokenBlocks.addLast(new BrokenBlock(stream.readShort(), stream.readShort(), stream.readShort(), content.block(stream.readShort()).id, TypeIO.readObject(Reads.get(stream))));
+                data.blocks.addLast(new BlockPlan(stream.readShort(), stream.readShort(), stream.readShort(), content.block(stream.readShort()).id, TypeIO.readObject(Reads.get(stream))));
             }
         }
 

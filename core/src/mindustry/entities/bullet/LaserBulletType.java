@@ -8,9 +8,15 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.*;
+
+import static mindustry.Vars.world;
 
 public class LaserBulletType extends BulletType{
+    protected static Tile furthest;
+
     protected Color[] colors = {Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white};
+    protected Effect laserEffect = Fx.lancerLaserShootSmoke;
     protected float length = 160f;
     protected float width = 15f;
     protected float lengthFalloff = 0.5f;
@@ -24,7 +30,7 @@ public class LaserBulletType extends BulletType{
         hitEffect = Fx.hitLancer;
         despawnEffect = Fx.none;
         shootEffect = Fx.hitLancer;
-        smokeEffect = Fx.lancerLaserShootSmoke;
+        smokeEffect = Fx.none;
         hitSize = 4;
         lifetime = 16f;
         pierce = true;
@@ -42,13 +48,27 @@ public class LaserBulletType extends BulletType{
 
     @Override
     public void init(Bulletc b){
-        Damage.collideLine(b, b.team(), hitEffect, b.x(), b.y(), b.rotation(), length);
+        Tmp.v1.trns(b.rotation(), length);
+
+        furthest = null;
+
+        world.raycast(b.tileX(), b.tileY(), world.toTile(b.x() + Tmp.v1.x), world.toTile(b.y() + Tmp.v1.y),
+            (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team() && furthest.block().absorbLasers);
+
+        float resultLength = furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
+
+        Damage.collideLine(b, b.team(), hitEffect, b.x(), b.y(), b.rotation(), resultLength);
+        if(furthest != null) b.data(resultLength);
+
+        laserEffect.at(b.x(), b.y(), b.rotation(), resultLength * 0.75f);
     }
 
     @Override
     public void draw(Bulletc b){
+        float realLength = b.data() == null ? length : (Float)b.data();
+
         float f = Mathf.curve(b.fin(), 0f, 0.2f);
-        float baseLen = length * f;
+        float baseLen = realLength * f;
         float cwidth = width;
         float compound = 1f;
 

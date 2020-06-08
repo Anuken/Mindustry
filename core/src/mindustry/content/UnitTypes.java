@@ -3,6 +3,7 @@ package mindustry.content;
 import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
+import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
@@ -13,7 +14,7 @@ import mindustry.type.*;
 public class UnitTypes implements ContentList{
 
     //ground
-    public static @EntityDef({Unitc.class, Mechc.class}) UnitType titan, dagger, crawler, fortress, eruptor, chaosArray, eradicator;
+    public static @EntityDef({Unitc.class, Mechc.class}) UnitType titan, dagger, crawler, fortress, chaosArray, eradicator;
 
     //ground + builder
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType tau;
@@ -22,7 +23,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType oculon;
 
     //legs
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType cix;
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType cix, eruptor;
 
     //air
     public static @EntityDef({Unitc.class}) UnitType wraith, reaper, ghoul, revenant, lich;
@@ -75,29 +76,6 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        cix = new UnitType("cix"){{
-            drag = 0.1f;
-            speed = 0.8f;
-            hitsize = 9f;
-            health = 140;
-
-            legCount = 6;
-            rotateShooting = false;
-
-            for(boolean b : Mathf.booleans){
-                weapons.add(
-                new Weapon("missiles-mount"){{
-                    reload = 20f;
-                    x = 4f * Mathf.sign(b);
-                    rotate = true;
-                    mirror = false;
-                    flipSprite = !b;
-                    shake = 1f;
-                    bullet = Bullets.missileSwarm;
-                }});
-            }
-        }};
-
         titan = new UnitType("titan"){{
             speed = 0.4f;
             hitsize = 9f;
@@ -114,28 +92,6 @@ public class UnitTypes implements ContentList{
                 recoil = 1f;
                 ejectEffect = Fx.none;
                 bullet = Bullets.basicFlame;
-            }});
-        }};
-
-        crawler = new UnitType("crawler"){{
-            speed = 0.65f;
-            hitsize = 8f;
-            health = 120;
-            sway = 0.25f;
-            weapons.add(new Weapon(){{
-                reload = 12f;
-                shootCone = 180f;
-                ejectEffect = Fx.none;
-                shootSound = Sounds.explosion;
-                bullet = new BombBulletType(2f, 3f, "clear"){{
-                    hitEffect = Fx.pulverize;
-                    lifetime = 30f;
-                    speed = 1.1f;
-                    splashDamageRadius = 55f;
-                    instantDisappear = true;
-                    splashDamage = 30f;
-                    killShooter = true;
-                }};
             }});
         }};
 
@@ -219,6 +175,33 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        crawler = new UnitType("crawler"){{
+            defaultController = SuicideAI::new;
+
+            speed = 0.8f;
+            hitsize = 8f;
+            health = 140;
+            sway = 0.25f;
+            range = 40f;
+
+            weapons.add(new Weapon(){{
+                reload = 12f;
+                shootCone = 180f;
+                ejectEffect = Fx.none;
+                shootSound = Sounds.explosion;
+                bullet = new BombBulletType(0f, 0f, "clear"){{
+                    hitEffect = Fx.pulverize;
+                    lifetime = 10f;
+                    speed = 1f;
+                    splashDamageRadius = 55f;
+                    instantDisappear = true;
+                    splashDamage = 30f;
+                    killShooter = true;
+                    hittable = false;
+                }};
+            }});
+        }};
+
         eruptor = new UnitType("eruptor"){{
             speed = 0.4f;
             drag = 0.4f;
@@ -227,16 +210,57 @@ public class UnitTypes implements ContentList{
             targetAir = false;
             health = 600;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
+            legCount = 4;
+            legLength = 9f;
+            legTrns = 2f;
+            legMoveSpace = 1.4f;
+
             weapons.add(new Weapon("eruption"){{
                 shootY = 3f;
                 reload = 10f;
                 alternate = true;
                 ejectEffect = Fx.none;
-                bullet = Bullets.eruptorShot;
                 recoil = 1f;
                 x = 7f;
                 shootSound = Sounds.flame;
+
+                bullet = new LiquidBulletType(Liquids.slag){{
+                    damage = 11;
+                    speed = 2.3f;
+                    drag = 0.02f;
+                    shootEffect = Fx.shootSmall;
+                }};
             }});
+        }};
+
+        cix = new UnitType("cix"){{
+            drag = 0.1f;
+            speed = 0.4f;
+            hitsize = 9f;
+            health = 140;
+            baseElevation = 0.51f;
+
+            legCount = 6;
+            legMoveSpace = 0.9f;
+            legLength = 34f;
+            rotateShooting = false;
+            legExtension = -15;
+            legBaseOffset = 8f;
+            landShake = 2f;
+            legSpeed = 0.1f;
+
+            for(boolean b : Mathf.booleans){
+                weapons.add(
+                new Weapon("missiles-mount"){{
+                    reload = 20f;
+                    x = 4f * Mathf.sign(b);
+                    rotate = true;
+                    mirror = false;
+                    flipSprite = !b;
+                    shake = 1f;
+                    bullet = Bullets.missileSwarm;
+                }});
+            }
         }};
 
         wraith = new UnitType("wraith"){{
@@ -291,7 +315,6 @@ public class UnitTypes implements ContentList{
             drag = 0.016f;
             flying = true;
             range = 140f;
-            //rotateShooting = false;
             hitsize = 18f;
             lowAltitude = true;
 
@@ -418,18 +441,27 @@ public class UnitTypes implements ContentList{
             hitsize = 8f;
 
             weapons.add(new Weapon("small-basic-weapon"){{
-                reload = 25f;
+                reload = 15f;
                 x = -1f;
                 y = -1f;
                 shootX = 3.5f;
                 alternate = true;
-                ejectEffect = Fx.none;
-                //TODO use different ammo
-                bullet = Bullets.standardCopper;
+
+                bullet = new BasicBulletType(2.5f, 9){{
+                    bulletWidth = 7f;
+                    bulletHeight = 9f;
+                    lifetime = 60f;
+                    shootEffect = Fx.shootSmall;
+                    smokeEffect = Fx.shootSmallSmoke;
+                    tileDamageMultiplier = 0.15f;
+                    ammoMultiplier = 2;
+                }};
             }});
         }};
 
         phantom = new UnitType("phantom"){{
+            defaultController = BuilderAI::new;
+
             flying = true;
             drag = 0.05f;
             speed = 3f;

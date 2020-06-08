@@ -6,12 +6,14 @@ import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.io.Streams.*;
+import arc.util.pooling.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -38,6 +40,8 @@ import static mindustry.Vars.*;
 
 /** Handles schematics.*/
 public class Schematics implements Loadable{
+    private static final Schematic tmpSchem = new Schematic(new Array<>(), new StringMap(), 0, 0);
+    private static final Schematic tmpSchem2 = new Schematic(new Array<>(), new StringMap(), 0, 0);
     public static final String base64Header = "bXNjaAB";
 
     private static final byte[] header = {'m', 's', 'c', 'h'};
@@ -524,6 +528,70 @@ public class Schematics implements Loadable{
         if(block instanceof LightBlock) return value;
 
         return null;
+    }
+
+    //endregion
+    //region misc utility
+
+    /** @return a temporary schematic representing the input rotated 90 degrees counterclockwise N times. */
+    public static Schematic rotate(Schematic input, int times){
+        if(times == 0) return input;
+
+        boolean sign = times > 0;
+        for(int i = 0; i < Math.abs(times); i++){
+            input = rotated(input, sign);
+        }
+        return input;
+    }
+
+    private static Schematic rotated(Schematic input, boolean counter){
+        int direction = Mathf.sign(counter);
+        Schematic schem = input == tmpSchem ? tmpSchem2 : tmpSchem2;
+        schem.width = input.width;
+        schem.height = input.height;
+        Pools.freeAll(schem.tiles);
+        schem.tiles.clear();
+        for(Stile tile : input.tiles){
+            schem.tiles.add(Pools.obtain(Stile.class, Stile::new).set(tile));
+        }
+
+        int ox = schem.width/2, oy = schem.height/2;
+
+        schem.tiles.each(req -> {
+            req.config = BuildRequest.pointConfig(req.config, p -> {
+                int cx = p.x, cy = p.y;
+                int lx = cx;
+
+                if(direction >= 0){
+                    cx = -cy;
+                    cy = lx;
+                }else{
+                    cx = cy;
+                    cy = -lx;
+                }
+                p.set(cx, cy);
+            });
+
+            //rotate actual request, centered on its multiblock position
+            float wx = (req.x - ox) * tilesize + req.block.offset(), wy = (req.y - oy) * tilesize + req.block.offset();
+            float x = wx;
+            if(direction >= 0){
+                wx = -wy;
+                wy = x;
+            }else{
+                wx = wy;
+                wy = -x;
+            }
+            req.x = (short)(world.toTile(wx - req.block.offset()) + ox);
+            req.y = (short)(world.toTile(wy - req.block.offset()) + oy);
+            req.rotation = (byte)Mathf.mod(req.rotation + direction, 4);
+        });
+
+        //assign flipped values, since it's rotated
+        schem.width = input.height;
+        schem.height = input.width;
+
+        return schem;
     }
 
     //endregion

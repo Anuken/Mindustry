@@ -125,10 +125,10 @@ public class Fx{
 
         stroke(3f * e.fout());
         color(e.color, Color.white, e.fin());
-        beginLine();
 
-        linePoint(e.x, e.y);
+        beginLine();
         lines.each(Lines::linePoint);
+        linePoint(e.x, e.y);
         endLine();
 
         int i = 0;
@@ -884,8 +884,9 @@ public class Fx{
 
     lancerLaserShootSmoke = new Effect(26f, e -> {
         color(Color.white);
+        float length = e.data == null ? 70f : (Float)e.data;
 
-        randLenVectors(e.id, 7, 70f, e.rotation, 0f, (x, y) -> {
+        randLenVectors(e.id, 7, length, e.rotation, 0f, (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 9f);
         });
 

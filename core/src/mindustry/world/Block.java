@@ -86,6 +86,8 @@ public class Block extends UnlockableContent{
     public boolean insulated = false;
     /** whether the sprite is a full square. */
     public boolean squareSprite = true;
+    /** whether this block absorbs laser attacks. */
+    public boolean absorbLasers = false;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */

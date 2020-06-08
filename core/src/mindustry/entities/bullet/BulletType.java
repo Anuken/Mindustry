@@ -1,6 +1,7 @@
 package mindustry.entities.bullet;
 
 import arc.audio.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -35,6 +36,8 @@ public abstract class BulletType extends Content{
     public float ammoMultiplier = 2f;
     /** Multiplied by turret reload speed to get final shoot speed. */
     public float reloadMultiplier = 1f;
+    /** Multiplier of how much base damage is done to tiles. */
+    public float tileDamageMultiplier = 1f;
     /** Recoil from shooter entities. */
     public float recoil;
     /** Whether to kill the shooter when this is shot. For suicide bombers. */
@@ -45,8 +48,6 @@ public abstract class BulletType extends Content{
     public float splashDamage = 0f;
     /** Knockback in velocity. */
     public float knockback;
-    /** Whether this bullet hits tiles. */
-    public boolean hitTiles = true;
     /** Status effect applied on hit. */
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
@@ -72,6 +73,7 @@ public abstract class BulletType extends Content{
     public int fragBullets = 9;
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
     public BulletType fragBullet = null;
+    public Color hitColor = Color.white;
 
     /** Use a negative value to disable splash damage. */
     public float splashDamageRadius = -1f;
@@ -117,7 +119,7 @@ public abstract class BulletType extends Content{
     }
 
     public void hit(Bulletc b, float x, float y){
-        hitEffect.at(x, y, b.rotation());
+        hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(b);
 
         Effects.shake(hitShake, hitShake, b);
@@ -135,7 +137,11 @@ public abstract class BulletType extends Content{
         }
 
         if(splashDamageRadius > 0){
-            Damage.damage(b.team(), x, y, splashDamageRadius, splashDamage * b.damageMultiplier());
+            Damage.damage(b.team(), x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
+
+            if(status != StatusEffects.none){
+                Damage.status(b.team(), x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
+            }
         }
 
         for(int i = 0; i < lightning; i++){

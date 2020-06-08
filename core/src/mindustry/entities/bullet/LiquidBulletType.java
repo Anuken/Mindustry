@@ -30,7 +30,7 @@ public class LiquidBulletType extends BulletType{
         hitEffect = Fx.hitLiquid;
         smokeEffect = Fx.none;
         shootEffect = Fx.none;
-        drag = 0.009f;
+        drag = 0.001f;
         knockback = 0.55f;
     }
 
@@ -61,7 +61,14 @@ public class LiquidBulletType extends BulletType{
     public void draw(Bulletc b){
         Draw.color(liquid.color, Color.white, b.fout() / 100f);
 
-        Fill.circle(b.x(), b.y(), 0.5f + b.fout() * 2.5f);
+        Fill.circle(b.x(), b.y(), 3f);
+    }
+
+    @Override
+    public void despawned(Bulletc b){
+        super.despawned(b);
+
+        hit(b, b.x(), b.y());
     }
 
     @Override

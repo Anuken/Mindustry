@@ -4,10 +4,8 @@ import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.pooling.*;
 import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
-import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.gen.*;
@@ -21,8 +19,6 @@ import mindustry.world.blocks.production.*;
 import static mindustry.Vars.*;
 
 public class BaseGenerator{
-    private static final Schematic tmpSchem = new Schematic(new Array<>(), new StringMap(), 0, 0);
-    private static final Schematic tmpSchem2 = new Schematic(new Array<>(), new StringMap(), 0, 0);
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
 
     private final static int range = 180;
@@ -138,15 +134,13 @@ public class BaseGenerator{
 
     void pass(Cons<Tile> cons){
         Tile core = cores.first();
-        //for(Tile core : cores){
         core.circle(range, (x, y) -> cons.get(tiles.getn(x, y)));
-        //}
     }
 
     boolean tryPlace(BasePart part, int x, int y){
         int rotation = Mathf.range(2);
         axis.set((int)(part.schematic.width / 2f), (int)(part.schematic.height / 2f));
-        Schematic result = rotate(part.schematic, rotation);
+        Schematic result = Schematics.rotate(part.schematic, rotation);
         int rotdeg = rotation*90;
 
         rotator.set(part.centerX, part.centerY).rotateAround(axis, rotdeg);
@@ -210,65 +204,5 @@ public class BaseGenerator{
         Tile tile = tiles.get(x, y);
 
         return tile == null || !tile.block().alwaysReplace || world.getDarkness(x, y) > 0;
-    }
-
-    Schematic rotate(Schematic input, int times){
-        if(times == 0) return input;
-
-        boolean sign = times > 0;
-        for(int i = 0; i < Math.abs(times); i++){
-            input = rotated(input, sign);
-        }
-        return input;
-    }
-
-    Schematic rotated(Schematic input, boolean counter){
-        int direction = Mathf.sign(counter);
-        Schematic schem = input == tmpSchem ? tmpSchem2 : tmpSchem2;
-        schem.width = input.width;
-        schem.height = input.height;
-        Pools.freeAll(schem.tiles);
-        schem.tiles.clear();
-        for(Stile tile : input.tiles){
-            schem.tiles.add(Pools.obtain(Stile.class, Stile::new).set(tile));
-        }
-
-        int ox = schem.width/2, oy = schem.height/2;
-
-        schem.tiles.each(req -> {
-            req.config = BuildRequest.pointConfig(req.config, p -> {
-                int cx = p.x, cy = p.y;
-                int lx = cx;
-
-                if(direction >= 0){
-                    cx = -cy;
-                    cy = lx;
-                }else{
-                    cx = cy;
-                    cy = -lx;
-                }
-                p.set(cx, cy);
-            });
-
-            //rotate actual request, centered on its multiblock position
-            float wx = (req.x - ox) * tilesize + req.block.offset(), wy = (req.y - oy) * tilesize + req.block.offset();
-            float x = wx;
-            if(direction >= 0){
-                wx = -wy;
-                wy = x;
-            }else{
-                wx = wy;
-                wy = -x;
-            }
-            req.x = (short)(world.toTile(wx - req.block.offset()) + ox);
-            req.y = (short)(world.toTile(wy - req.block.offset()) + oy);
-            req.rotation = (byte)Mathf.mod(req.rotation + direction, 4);
-        });
-
-        //assign flipped values, since it's rotated
-        schem.width = input.height;
-        schem.height = input.width;
-
-        return schem;
     }
 }

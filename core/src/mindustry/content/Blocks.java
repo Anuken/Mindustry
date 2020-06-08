@@ -795,6 +795,7 @@ public class Blocks implements ContentList{
             requirements(Category.defense, ItemStack.with(Items.plastanium, 5, Items.metaglass, 2));
             health = 190 * wallHealthMultiplier;
             insulated = true;
+            absorbLasers = true;
         }};
 
         plastaniumWallLarge = new Wall("plastanium-wall-large"){{
@@ -802,6 +803,7 @@ public class Blocks implements ContentList{
             health = 190 * wallHealthMultiplier * 4;
             size = 2;
             insulated = true;
+            absorbLasers = true;
         }};
 
         thoriumWall = new Wall("thorium-wall"){{
@@ -919,9 +921,9 @@ public class Blocks implements ContentList{
             size = 3;
             range = 200f;
             speedBoost = 2.5f;
-            useTime = 250f;
+            useTime = 300f;
             hasBoost = false;
-            consumes.item(Items.phasefabric);
+            consumes.items(ItemStack.with(Items.phasefabric, 1, Items.silicon, 1));
         }};
 
         forceProjector = new ForceProjector("force-projector"){{
@@ -1194,8 +1196,8 @@ public class Blocks implements ContentList{
         rtgGenerator = new DecayGenerator("rtg-generator"){{
             requirements(Category.power, ItemStack.with(Items.lead, 100, Items.silicon, 75, Items.phasefabric, 25, Items.plastanium, 75, Items.thorium, 50));
             size = 2;
-            powerProduction = 3f;
-            itemDuration = 440f;
+            powerProduction = 4f;
+            itemDuration = 500f;
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
@@ -1484,7 +1486,7 @@ public class Blocks implements ContentList{
             powerUse = 2.5f;
             shootShake = 2f;
             shootEffect = Fx.lancerLaserShoot;
-            smokeEffect = Fx.lancerLaserShootSmoke;
+            smokeEffect = Fx.none;
             chargeEffect = Fx.lancerLaserCharge;
             chargeBeginEffect = Fx.lancerLaserChargeBegin;
             heatColor = Color.red;
@@ -1546,7 +1548,7 @@ public class Blocks implements ContentList{
             ammoEjectBack = 3f;
             cooldown = 0.03f;
             recoilAmount = 3f;
-            shootShake = 2f;
+            shootShake = 1f;
             burstSpacing = 3f;
             shots = 4;
             ammoUseEffect = Fx.shellEjectBig;
@@ -1570,7 +1572,7 @@ public class Blocks implements ContentList{
             health = 220 * size * size;
             shootSound = Sounds.shotgun;
 
-            ammo(Items.graphite, new BulletType(0.01f, 105){
+            ammo(Items.thorium, new BulletType(0.01f, 105){
                 int rays = 1;
                 float rayLength = range + 10f;
 
@@ -1579,6 +1581,7 @@ public class Blocks implements ContentList{
                     shootEffect = smokeEffect = Fx.lightningShoot;
                     lifetime = 10f;
                     despawnEffect = Fx.none;
+                    ammoMultiplier = 6f;
                     pierce = true;
                 }
 
@@ -1708,7 +1711,7 @@ public class Blocks implements ContentList{
             requirements(Category.turret, ItemStack.with(Items.silicon, 80, Items.thorium, 80, Items.surgealloy, 50));
 
             hasPower = true;
-            consumes.power(2f);
+            consumes.power(3f);
             size = 2;
             shootLength = 5f;
             bulletDamage = 12f;
@@ -1855,10 +1858,8 @@ public class Blocks implements ContentList{
             requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
             size = 5;
             itemCapacity = 500;
-            hasPower = true;
 
             consumes.items(ItemStack.with(Items.copper, 500));
-            consumes.power(3f);
         }};
 
         dataProcessor = new ResearchBlock("data-processor"){{
