@@ -70,7 +70,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, Elevatio
             boolean side = i < legs.length/2;
             //back legs have reversed directions
             boolean backLeg = Math.abs((i + 0.5f) - legs.length/2f) <= 0.501f;
-            if(backLeg) side = !side;
+            if(backLeg && type.flipBackLegs) side = !side;
 
             l.moving = move;
             l.stage = stageF % 1f;
