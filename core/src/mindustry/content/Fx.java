@@ -120,8 +120,8 @@ public class Fx{
     }),
 
     lightning = new Effect(10f, 500f, e -> {
-        if(!(e.data instanceof Array)) return;
-        Array<Vec2> lines = e.data();
+        if(!(e.data instanceof Seq)) return;
+        Seq<Vec2> lines = e.data();
 
         stroke(3f * e.fout());
         color(e.color, Color.white, e.fin());

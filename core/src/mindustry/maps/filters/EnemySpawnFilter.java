@@ -19,7 +19,7 @@ public class EnemySpawnFilter extends GenerateFilter{
 
     @Override
     public void apply(Tiles tiles, GenerateInput in){
-        IntArray spawns = new IntArray();
+        IntSeq spawns = new IntSeq();
         for(Tile tile : tiles){
             if(tile.overlay() == Blocks.spawn){
                 spawns.add(tile.pos());

@@ -18,15 +18,15 @@ import java.util.regex.*;
 
 public class Scripts implements Disposable{
     private final static Object[] emptyObjects = {};
-    private final Array<String> blacklist = Array.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
+    private final Seq<String> blacklist = Seq.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
         ".awt", "socket", "classloader", "oracle", "invoke", "arc.events", "java.util.function", "java.util.stream");
-    private final Array<String> whitelist = Array.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.");
+    private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.");
     private final Context context;
     private Scriptable scope;
     private boolean errored;
     private LoadedMod currentMod = null;
-    private Array<EventHandle> events = new Array<>();
+    private Seq<EventHandle> events = new Seq<>();
 
     public Scripts(){
         Time.mark();

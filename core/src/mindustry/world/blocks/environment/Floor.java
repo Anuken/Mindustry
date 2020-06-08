@@ -64,7 +64,7 @@ public class Floor extends Block{
     public Block decoration = Blocks.air;
 
     protected TextureRegion[][] edges;
-    protected Array<Block> blenders = new Array<>();
+    protected Seq<Block> blenders = new Seq<>();
     protected IntSet blended = new IntSet();
     protected TextureRegion edgeRegion;
 

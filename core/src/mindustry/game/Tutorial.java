@@ -195,7 +195,7 @@ public class Tutorial{
 
         protected String line = "";
         protected final Func<String, String> text;
-        protected Array<String> sentences;
+        protected Seq<String> sentences;
         protected final Boolp done;
 
         TutorialStage(Func<String, String> text, Boolp done){
@@ -218,7 +218,7 @@ public class Tutorial{
 
         void load(){
             this.line = Core.bundle.has("tutorial." + name() + ".mobile") && mobile ? "tutorial." + name() + ".mobile" : "tutorial." + name();
-            this.sentences = Array.select(Core.bundle.get(line).split("\n"), s -> !s.isEmpty());
+            this.sentences = Seq.select(Core.bundle.get(line).split("\n"), s -> !s.isEmpty());
         }
 
         /** called every frame when this stage is active.*/

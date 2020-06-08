@@ -34,12 +34,12 @@ public class DatabaseDialog extends BaseDialog{
         table.margin(20);
         ScrollPane pane = new ScrollPane(table);
 
-        Array<Content>[] allContent = Vars.content.getContentMap();
+        Seq<Content>[] allContent = Vars.content.getContentMap();
 
         for(int j = 0; j < allContent.length; j++){
             ContentType type = ContentType.values()[j];
 
-            Array<Content> array = allContent[j].select(c -> c instanceof UnlockableContent && !((UnlockableContent)c).isHidden());
+            Seq<Content> array = allContent[j].select(c -> c instanceof UnlockableContent && !((UnlockableContent)c).isHidden());
             if(array.size == 0) continue;
 
             table.add("$content." + type.name() + ".name").growX().left().color(Pal.accent);

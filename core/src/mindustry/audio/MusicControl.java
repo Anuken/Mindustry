@@ -16,9 +16,9 @@ public class MusicControl{
     protected static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.6f, musicWaveChance = 0.5f;
 
     /** normal, ambient music, plays at any time */
-    public Array<Music> ambientMusic = Array.with();
+    public Seq<Music> ambientMusic = Seq.with();
     /** darker music, used in times of conflict  */
-    public Array<Music> darkMusic = Array.with();
+    public Seq<Music> darkMusic = Seq.with();
     protected Music lastRandomPlayed;
     protected Interval timer = new Interval();
     protected @Nullable Music current;
@@ -39,8 +39,8 @@ public class MusicControl{
     protected void reload(){
         current = null;
         fade = 0f;
-        ambientMusic = Array.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
-        darkMusic = Array.with(Musics.game2, Musics.game5, Musics.game7);
+        ambientMusic = Seq.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
+        darkMusic = Seq.with(Musics.game2, Musics.game5, Musics.game7);
     }
 
     public void stop(){

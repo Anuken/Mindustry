@@ -26,7 +26,7 @@ public class LoadRenderer implements Disposable{
     private static final Color colorRed = Pal.breakInvalid.cpy().lerp(Color.black, 0.3f);
     private static final String red = "[#" + colorRed + "]";
     private static final String orange = "[#" + color + "]";
-    private static final FloatArray floats = new FloatArray();
+    private static final FloatSeq floats = new FloatSeq();
     private static final boolean preview = false;
 
     private float testprogress = 0f;

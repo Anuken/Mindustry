@@ -109,7 +109,7 @@ public class ImagePacker{
         ObjectMap<String, String> content2id = new ObjectMap<>();
         map.each((key, val) -> content2id.put(val.split("\\|")[0], key));
 
-        Array<UnlockableContent> cont = Array.withArrays(Vars.content.blocks(), Vars.content.items(), Vars.content.liquids());
+        Seq<UnlockableContent> cont = Seq.withArrays(Vars.content.blocks(), Vars.content.items(), Vars.content.liquids());
         cont.removeAll(u -> u instanceof BuildBlock || u == Blocks.air);
 
         int minid = 0xF8FF;

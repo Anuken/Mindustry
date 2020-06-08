@@ -75,7 +75,7 @@ public class NetServer implements ApplicationListener{
     /** Data stream for writing player sync data to. */
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
     /** Packet handlers for custom types of messages. */
-    private ObjectMap<String, Array<Cons2<Playerc, String>>> customPacketHandlers = new ObjectMap<>();
+    private ObjectMap<String, Seq<Cons2<Playerc, String>>> customPacketHandlers = new ObjectMap<>();
 
     public NetServer(){
 
@@ -140,8 +140,8 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            Array<String> extraMods = packet.mods.copy();
-            Array<String> missingMods = mods.getIncompatibility(extraMods);
+            Seq<String> extraMods = packet.mods.copy();
+            Seq<String> missingMods = mods.getIncompatibility(extraMods);
 
             if(!extraMods.isEmpty() || !missingMods.isEmpty()){
                 //can't easily be localized since kick reasons can't have formatted text with them
@@ -481,11 +481,11 @@ public class NetServer implements ApplicationListener{
     }
 
     public void addPacketHandler(String type, Cons2<Playerc, String> handler){
-        customPacketHandlers.get(type, Array::new).add(handler);
+        customPacketHandlers.get(type, Seq::new).add(handler);
     }
 
-    public Array<Cons2<Playerc, String>> getPacketHandlers(String type){
-        return customPacketHandlers.get(type, Array::new);
+    public Seq<Cons2<Playerc, String>> getPacketHandlers(String type){
+        return customPacketHandlers.get(type, Seq::new);
     }
 
     public static void onDisconnect(Playerc player, String reason){
@@ -797,7 +797,7 @@ public class NetServer implements ApplicationListener{
 
     public void writeEntitySnapshot(Playerc player) throws IOException{
         syncStream.reset();
-        Array<CoreEntity> cores = state.teams.cores(player.team());
+        Seq<CoreEntity> cores = state.teams.cores(player.team());
 
         dataStream.writeByte(cores.size);
 

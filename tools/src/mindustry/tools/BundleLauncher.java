@@ -11,9 +11,9 @@ public class BundleLauncher{
     public static void main(String[] args){
         OrderedMap<String, String> base = new OrderedMap<>();
         PropertiesUtils.load(base, Fi.get("bundle.properties").reader());
-        Array<String> removals = new Array<>();
+        Seq<String> removals = new Seq<>();
         String str = Fi.get("bundle.properties").readString();
-        ObjectSet<String> newlines = Array.with(str.split("\n")).select(l -> l.contains(" = ") && str.indexOf(l) + l.length() < str.length() - 2 && str.charAt(str.indexOf(l) + l.length() + 1) == '\n').map(l -> l.split(" = ")[0]).asSet();
+        ObjectSet<String> newlines = Seq.with(str.split("\n")).select(l -> l.contains(" = ") && str.indexOf(l) + l.length() < str.length() - 2 && str.charAt(str.indexOf(l) + l.length() + 1) == '\n').map(l -> l.split(" = ")[0]).asSet();
         Fi.get(".").walk(child -> {
             if(child.name().equals("bundle.properties") || child.toString().contains("output")) return;
 

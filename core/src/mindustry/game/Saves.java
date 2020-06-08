@@ -23,7 +23,7 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Saves{
-    private Array<SaveSlot> saves = new Array<>();
+    private Seq<SaveSlot> saves = new Seq<>();
     private @Nullable SaveSlot current;
     private @Nullable SaveSlot lastSectorSave;
     private AsyncExecutor previewExecutor = new AsyncExecutor(1);
@@ -160,7 +160,7 @@ public class Saves{
         return file;
     }
 
-    public Array<SaveSlot> getSaveSlots(){
+    public Seq<SaveSlot> getSaveSlots(){
         return saves;
     }
 
@@ -259,7 +259,7 @@ public class Saves{
         }
 
         public void cautiousLoad(Runnable run){
-            Array<String> mods = Array.with(getMods());
+            Seq<String> mods = Seq.with(getMods());
             mods.removeAll(Vars.mods.getModStrings());
 
             if(!mods.isEmpty()){

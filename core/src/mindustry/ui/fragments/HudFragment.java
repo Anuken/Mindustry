@@ -119,7 +119,7 @@ public class HudFragment extends Fragment{
                     select.image().color(Pal.gray).width(4f).fillY();
 
                     float size = Scl.scl(dsize);
-                    Array<Element> children = new Array<>(select.getChildren());
+                    Seq<Element> children = new Seq<>(select.getChildren());
 
                     //now, you may be wondering, why is this necessary? the answer is, I don't know, but it fixes layout issues somehow
                     int index = 0;
@@ -474,7 +474,7 @@ public class HudFragment extends Fragment{
             int cap = col * col - 1;
 
             //get old elements
-            Array<Element> elements = new Array<>(lastUnlockLayout.getChildren());
+            Seq<Element> elements = new Seq<>(lastUnlockLayout.getChildren());
             int esize = elements.size;
 
             //...if it's already reached the cap, ignore everything

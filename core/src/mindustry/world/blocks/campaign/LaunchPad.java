@@ -113,7 +113,7 @@ public class LaunchPad extends Block{
     static abstract class LaunchPayloadComp implements Drawc, Timedc, Teamc{
         @Import float x,y;
 
-        Array<ItemStack> stacks = new Array<>();
+        Seq<ItemStack> stacks = new Seq<>();
         transient Interval in = new Interval();
 
         @Override

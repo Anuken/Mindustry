@@ -32,7 +32,7 @@ public class Maps{
     /** List of all built-in maps. Filenames only. */
     private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "veins", "glacier"};
     /** All maps stored in an ordered array. */
-    private Array<Map> maps = new Array<>();
+    private Seq<Map> maps = new Seq<>();
     /** Serializer for meta. */
     private Json json = new Json();
 
@@ -61,17 +61,17 @@ public class Maps{
     }
 
     /** Returns a list of all maps, including custom ones. */
-    public Array<Map> all(){
+    public Seq<Map> all(){
         return maps;
     }
 
     /** Returns a list of only custom maps. */
-    public Array<Map> customMaps(){
+    public Seq<Map> customMaps(){
         return maps.select(m -> m.custom);
     }
 
     /** Returns a list of only default maps. */
-    public Array<Map> defaultMaps(){
+    public Seq<Map> defaultMaps(){
         return maps.select(m -> !m.custom);
     }
 
@@ -298,10 +298,10 @@ public class Maps{
 
     /** Reads JSON of filters, returning a new default array if not found.*/
     @SuppressWarnings("unchecked")
-    public Array<GenerateFilter> readFilters(String str){
+    public Seq<GenerateFilter> readFilters(String str){
         if(str == null || str.isEmpty()){
             //create default filters list
-            Array<GenerateFilter> filters =  Array.with(
+            Seq<GenerateFilter> filters =  Seq.with(
                 new ScatterFilter(){{
                     flooronto = Blocks.stone;
                     block = Blocks.rock;
@@ -329,7 +329,7 @@ public class Maps{
             return filters;
         }else{
             try{
-                return JsonIO.read(Array.class, str);
+                return JsonIO.read(Seq.class, str);
             }catch(Throwable e){
                 e.printStackTrace();
                 return readFilters("");
@@ -337,8 +337,8 @@ public class Maps{
         }
     }
 
-    public void addDefaultOres(Array<GenerateFilter> filters){
-        Array<Block> ores = content.blocks().select(b -> b.isOverlay() && b.asFloor().oreDefault);
+    public void addDefaultOres(Seq<GenerateFilter> filters){
+        Seq<Block> ores = content.blocks().select(b -> b.isOverlay() && b.asFloor().oreDefault);
         for(Block block : ores){
             OreFilter filter = new OreFilter();
             filter.threshold = block.asFloor().oreThreshold;
@@ -348,7 +348,7 @@ public class Maps{
         }
     }
 
-    public String writeWaves(Array<SpawnGroup> groups){
+    public String writeWaves(Seq<SpawnGroup> groups){
         if(groups == null) return "[]";
 
         StringWriter buffer = new StringWriter();
@@ -364,8 +364,8 @@ public class Maps{
         return buffer.toString();
     }
 
-    public Array<SpawnGroup> readWaves(String str){
-        return str == null ? null : str.equals("[]") ? new Array<>() : Array.with(json.fromJson(SpawnGroup[].class, str));
+    public Seq<SpawnGroup> readWaves(String str){
+        return str == null ? null : str.equals("[]") ? new Seq<>() : Seq.with(json.fromJson(SpawnGroup[].class, str));
     }
 
     public void loadPreviews(){
@@ -473,17 +473,17 @@ public class Maps{
     public enum ShuffleMode implements MapProvider{
         none(map -> null),
         all(prev -> {
-            Array<Map> maps = Array.withArrays(Vars.maps.defaultMaps(), Vars.maps.customMaps());
+            Seq<Map> maps = Seq.withArrays(Vars.maps.defaultMaps(), Vars.maps.customMaps());
             maps.shuffle();
             return maps.find(m -> m != prev || maps.size == 1);
         }),
         custom(prev -> {
-            Array<Map> maps = Array.withArrays(Vars.maps.customMaps().isEmpty() ? Vars.maps.defaultMaps() : Vars.maps.customMaps());
+            Seq<Map> maps = Seq.withArrays(Vars.maps.customMaps().isEmpty() ? Vars.maps.defaultMaps() : Vars.maps.customMaps());
             maps.shuffle();
             return maps.find(m -> m != prev || maps.size == 1);
         }),
         builtin(prev -> {
-            Array<Map> maps = Array.withArrays(Vars.maps.defaultMaps());
+            Seq<Map> maps = Seq.withArrays(Vars.maps.defaultMaps());
             maps.shuffle();
             return maps.find(m -> m != prev || maps.size == 1);
         });

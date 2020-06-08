@@ -9,12 +9,12 @@ import arc.struct.*;
 public interface SlotAssignmentStrategy{
 
     /** Updates the assignment of members to slots */
-    void updateSlotAssignments(Array<SlotAssignment> assignments);
+    void updateSlotAssignments(Seq<SlotAssignment> assignments);
 
     /** Calculates the number of slots from the assignment data. */
-    int calculateNumberOfSlots(Array<SlotAssignment> assignments);
+    int calculateNumberOfSlots(Seq<SlotAssignment> assignments);
 
     /** Removes the slot assignment at the specified index. */
-    void removeSlotAssignment(Array<SlotAssignment> assignments, int index);
+    void removeSlotAssignment(Seq<SlotAssignment> assignments, int index);
 
 }

@@ -191,7 +191,7 @@ public class TechTreeDialog extends BaseDialog{
             this.parent = parent;
             this.width = this.height = nodeSize;
             if(node.children != null){
-                children = Array.with(node.children).map(t -> new LayoutNode(t, this)).toArray(LayoutNode.class);
+                children = Seq.with(node.children).map(t -> new LayoutNode(t, this)).toArray(LayoutNode.class);
             }
         }
     }

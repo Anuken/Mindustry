@@ -23,7 +23,7 @@ public class Drill extends Block{
     public float hardnessDrillMultiplier = 50f;
 
     protected final ObjectIntMap<Item> oreCount = new ObjectIntMap<>();
-    protected final Array<Item> itemArray = new Array<>();
+    protected final Seq<Item> itemArray = new Seq<>();
 
     /** Maximum tier of blocks this drill can mine. */
     public int tier;
@@ -138,7 +138,7 @@ public class Drill extends Block{
         super.setStats();
 
         stats.add(BlockStat.drillTier, table -> {
-            Array<Block> list = content.blocks().select(b -> b.isFloor() && b.asFloor().itemDrop != null && b.asFloor().itemDrop.hardness <= tier);
+            Seq<Block> list = content.blocks().select(b -> b.isFloor() && b.asFloor().itemDrop != null && b.asFloor().itemDrop.hardness <= tier);
 
             table.table(l -> {
                 l.left();

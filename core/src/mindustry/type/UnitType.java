@@ -66,7 +66,7 @@ public class UnitType extends UnlockableContent{
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
 
-    public Array<Weapon> weapons = new Array<>();
+    public Seq<Weapon> weapons = new Seq<>();
     public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
         occlusionRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion;
 

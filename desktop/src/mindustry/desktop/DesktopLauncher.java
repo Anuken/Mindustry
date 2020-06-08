@@ -53,7 +53,7 @@ public class DesktopLauncher extends ClientLauncher{
     public DesktopLauncher(String[] args){
         Version.init();
         boolean useSteam = Version.modifier.contains("steam");
-        testMobile = Array.with(args).contains("-testMobile");
+        testMobile = Seq.with(args).contains("-testMobile");
 
         if(useDiscord){
             try{
@@ -196,7 +196,7 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
-    public Array<Fi> getWorkshopContent(Class<? extends Publishable> type){
+    public Seq<Fi> getWorkshopContent(Class<? extends Publishable> type){
         return !steam ? super.getWorkshopContent(type) : SVars.workshop.getWorkshopFiles(type);
     }
 

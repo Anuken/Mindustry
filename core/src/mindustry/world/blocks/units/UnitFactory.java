@@ -122,7 +122,7 @@ public class UnitFactory extends UnitBlock{
 
         @Override
         public void buildConfiguration(Table table){
-            Array<UnitType> units = Array.with(plans).map(u -> u.unit);
+            Seq<UnitType> units = Seq.with(plans).map(u -> u.unit);
 
             ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans[currentPlan].unit, unit -> configure(units.indexOf(unit)));
         }

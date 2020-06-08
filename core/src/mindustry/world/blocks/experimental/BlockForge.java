@@ -108,7 +108,7 @@ public class BlockForge extends PayloadAcceptor{
 
         @Override
         public void buildConfiguration(Table table){
-            Array<Block> blocks = Vars.content.blocks().select(b -> b.isVisible() && b.size <= 2);
+            Seq<Block> blocks = Vars.content.blocks().select(b -> b.isVisible() && b.size <= 2);
 
             ItemSelection.buildTable(table, blocks, () -> recipe, block -> recipe = block);
         }

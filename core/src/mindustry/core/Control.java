@@ -57,7 +57,7 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
                 Time.runTask(5f, platform::updateRPC);
-                for(Sound sound : assets.getAll(Sound.class, new Array<>())){
+                for(Sound sound : assets.getAll(Sound.class, new Seq<>())){
                     sound.stop();
                 }
             }

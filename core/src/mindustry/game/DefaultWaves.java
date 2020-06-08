@@ -1,15 +1,15 @@
 package mindustry.game;
 
-import arc.struct.Array;
+import arc.struct.Seq;
 import mindustry.content.*;
 import mindustry.type.ItemStack;
 
 public class DefaultWaves{
-    private Array<SpawnGroup> spawns;
+    private Seq<SpawnGroup> spawns;
 
-    public Array<SpawnGroup> get(){
+    public Seq<SpawnGroup> get(){
         if(spawns == null && UnitTypes.dagger != null){
-            spawns = Array.with(
+            spawns = Seq.with(
             new SpawnGroup(UnitTypes.dagger){{
                 end = 10;
                 unitScaling = 2f;
@@ -186,6 +186,6 @@ public class DefaultWaves{
             }}
             );
         }
-        return spawns == null ? new Array<>() : spawns;
+        return spawns == null ? new Seq<>() : spawns;
     }
 }

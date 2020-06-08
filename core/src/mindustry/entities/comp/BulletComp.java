@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
     @Import Team team;
 
-    IntArray collided = new IntArray(6);
+    IntSeq collided = new IntSeq(6);
     Object data;
     BulletType type;
     float damage;

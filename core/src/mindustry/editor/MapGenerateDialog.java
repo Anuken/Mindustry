@@ -38,7 +38,7 @@ public class MapGenerateDialog extends BaseDialog{
     private Pixmap pixmap;
     private Texture texture;
     private GenerateInput input = new GenerateInput();
-    private Array<GenerateFilter> filters = new Array<>();
+    private Seq<GenerateFilter> filters = new Seq<>();
     private int scaling = mobile ? 3 : 1;
     private Table filterTable;
 
@@ -48,7 +48,7 @@ public class MapGenerateDialog extends BaseDialog{
     private GenTile returnTile = new GenTile();
 
     private GenTile[][] buffer1, buffer2;
-    private Cons<Array<GenerateFilter>> applier;
+    private Cons<Seq<GenerateFilter>> applier;
     private CachedTile ctile = new CachedTile(){
         //nothing.
         @Override
@@ -95,18 +95,18 @@ public class MapGenerateDialog extends BaseDialog{
         onResize(this::rebuildFilters);
     }
 
-    public void show(Array<GenerateFilter> filters, Cons<Array<GenerateFilter>> applier){
+    public void show(Seq<GenerateFilter> filters, Cons<Seq<GenerateFilter>> applier){
         this.filters = filters;
         this.applier = applier;
         show();
     }
 
-    public void show(Cons<Array<GenerateFilter>> applier){
+    public void show(Cons<Seq<GenerateFilter>> applier){
         show(this.filters, applier);
     }
 
     /** Applies the specified filters to the editor. */
-    public void applyToEditor(Array<GenerateFilter> filters){
+    public void applyToEditor(Seq<GenerateFilter> filters){
         //writeback buffer
         GenTile[][] writeTiles = new GenTile[editor.width()][editor.height()];
 
@@ -342,7 +342,7 @@ public class MapGenerateDialog extends BaseDialog{
             return;
         }
 
-        Array<GenerateFilter> copy = new Array<>(filters);
+        Seq<GenerateFilter> copy = new Seq<>(filters);
 
         result = executor.submit(() -> {
             try{

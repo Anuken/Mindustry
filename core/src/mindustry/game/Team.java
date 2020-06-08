@@ -55,7 +55,7 @@ public class Team implements Comparable<Team>{
         all[us] = this;
     }
 
-    public Array<Team> enemies(){
+    public Seq<Team> enemies(){
         return state.teams.enemiesOf(this);
     }
 
@@ -75,7 +75,7 @@ public class Team implements Comparable<Team>{
         return state.teams.areEnemies(this, other);
     }
 
-    public Array<CoreEntity> cores(){
+    public Seq<CoreEntity> cores(){
         return state.teams.cores(this);
     }
 

@@ -4,6 +4,7 @@ import arc.*;
 import arc.files.*;
 import arc.mock.*;
 import arc.struct.*;
+import arc.struct.ObjectIntMap.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -45,7 +46,7 @@ public class SectorDataGenerator{
 
             Fi fi = Fi.get("planets").child(planet.name + ".dat");
 
-            Array<SectorData> list = planet.sectors.map(sector -> {
+            Seq<SectorData> list = planet.sectors.map(sector -> {
                 SectorData data = new SectorData();
 
                 ObjectIntMap<Block> floors = new ObjectIntMap<>();
@@ -105,7 +106,7 @@ public class SectorDataGenerator{
                 }
 
                 //sort counts in descending order
-                Array<ObjectIntMap.Entry<Block>> entries = floors.entries().toArray();
+                Seq<Entry<Block>> entries = floors.entries().toArray();
                 entries.sort(e -> -e.value);
                 //remove all blocks occuring < 30 times - unimportant
                 entries.removeAll(e -> e.value < 30);

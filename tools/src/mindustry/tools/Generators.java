@@ -229,7 +229,7 @@ public class Generators{
         });
 
         ImagePacker.generate("item-icons", () -> {
-            for(UnlockableContent item : (Array<? extends UnlockableContent>)(Array)Array.withArrays(content.items(), content.liquids())){
+            for(UnlockableContent item : (Seq<? extends UnlockableContent>)(Seq)Seq.withArrays(content.items(), content.liquids())){
                 Image base = ImagePacker.get(item.getContentType().name() + "-" + item.name);
                 for(Cicon icon : Cicon.scaled){
                     //if(icon.size == base.width) continue;

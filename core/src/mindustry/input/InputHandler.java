@@ -47,7 +47,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     final static int maxLength = 100;
     final static Vec2 stackTrns = new Vec2();
     final static Rect r1 = new Rect(), r2 = new Rect();
-    final static Array<Unitc> units = new Array<>();
+    final static Seq<Unitc> units = new Seq<>();
     /** Distance on the back from where items originate. */
     final static float backTrns = 3f;
 
@@ -66,8 +66,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected PlaceLine line = new PlaceLine();
     protected BuildRequest resultreq;
     protected BuildRequest brequest = new BuildRequest();
-    protected Array<BuildRequest> lineRequests = new Array<>();
-    protected Array<BuildRequest> selectRequests = new Array<>();
+    protected Seq<BuildRequest> lineRequests = new Seq<>();
+    protected Seq<BuildRequest> selectRequests = new Seq<>();
 
     //methods to override
 
@@ -362,7 +362,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         });
     }
 
-    public void rotateRequests(Array<BuildRequest> requests, int direction){
+    public void rotateRequests(Seq<BuildRequest> requests, int direction){
         int ox = schemOriginX(), oy = schemOriginY();
 
         requests.each(req -> {
@@ -396,7 +396,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         });
     }
 
-    public void flipRequests(Array<BuildRequest> requests, boolean x){
+    public void flipRequests(Seq<BuildRequest> requests, boolean x){
         int origin = (x ? schemOriginX() : schemOriginY()) * tilesize;
 
         requests.each(req -> {
@@ -533,7 +533,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
     }
 
-    protected void flushSelectRequests(Array<BuildRequest> requests){
+    protected void flushSelectRequests(Seq<BuildRequest> requests){
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
                 BuildRequest other = getRequest(req.x, req.y, req.block.size, null);
@@ -547,7 +547,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    protected void flushRequests(Array<BuildRequest> requests){
+    protected void flushRequests(Seq<BuildRequest> requests){
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
                 BuildRequest copy = req.copy();
@@ -953,7 +953,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){
-        Array<Point2> points;
+        Seq<Point2> points;
         boolean diagonal = Core.input.keyDown(Binding.diagonal_placement);
 
         if(Core.settings.getBool("swapdiagonal") && mobile){
@@ -971,7 +971,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(block instanceof PowerNode){
-            Array<Point2> skip = new Array<>();
+            Seq<Point2> skip = new Seq<>();
             
             for(int i = 1; i < points.size; i++){
                 int overlaps = 0;

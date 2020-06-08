@@ -51,7 +51,7 @@ public class NetClient implements ApplicationListener{
     private ReusableByteInStream byteStream = new ReusableByteInStream();
     private DataInputStream dataStream = new DataInputStream(byteStream);
     /** Packet handlers for custom types of messages. */
-    private ObjectMap<String, Array<Cons<String>>> customPacketHandlers = new ObjectMap<>();
+    private ObjectMap<String, Seq<Cons<String>>> customPacketHandlers = new ObjectMap<>();
 
     public NetClient(){
 
@@ -130,11 +130,11 @@ public class NetClient implements ApplicationListener{
     }
 
     public void addPacketHandler(String type, Cons<String> handler){
-        customPacketHandlers.get(type, Array::new).add(handler);
+        customPacketHandlers.get(type, Seq::new).add(handler);
     }
 
-    public Array<Cons<String>> getPacketHandlers(String type){
-        return customPacketHandlers.get(type, Array::new);
+    public Seq<Cons<String>> getPacketHandlers(String type){
+        return customPacketHandlers.get(type, Seq::new);
     }
 
     @Remote(targets = Loc.server, variants = Variant.both)

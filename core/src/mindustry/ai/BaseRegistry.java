@@ -19,12 +19,12 @@ import java.io.*;
 import static mindustry.Vars.tilesize;
 
 public class BaseRegistry{
-    public Array<BasePart> cores = new Array<>();
-    public Array<BasePart> parts = new Array<>();
-    public ObjectMap<Content, Array<BasePart>> reqParts = new ObjectMap<>();
+    public Seq<BasePart> cores = new Seq<>();
+    public Seq<BasePart> parts = new Seq<>();
+    public ObjectMap<Content, Seq<BasePart>> reqParts = new ObjectMap<>();
 
-    public Array<BasePart> forResource(Content item){
-        return reqParts.get(item, Array::new);
+    public Seq<BasePart> forResource(Content item){
+        return reqParts.get(item, Seq::new);
     }
 
     public void load(){
@@ -85,7 +85,7 @@ public class BaseRegistry{
                     part.centerY = part.schematic.height/2;
                 }
 
-                if(part.required != null) reqParts.get(part.required, Array::new).add(part);
+                if(part.required != null) reqParts.get(part.required, Seq::new).add(part);
 
             }catch(IOException e){
                 throw new RuntimeException(e);

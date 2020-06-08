@@ -11,13 +11,13 @@ import mindustry.world.*;
 import static mindustry.content.Blocks.*;
 
 public class TechTree implements ContentList{
-    public static Array<TechNode> all;
+    public static Seq<TechNode> all;
     public static TechNode root;
 
     @Override
     public void load(){
         TechNode.context = null;
-        all = new Array<>();
+        all = new Seq<>();
 
         root = node(coreShard, () -> {
 
@@ -328,7 +328,7 @@ public class TechTree implements ContentList{
         /** Research turns required to research this content. */
         public int turns = 3; //TODO keep track of turns that have been used so far
         /** Nodes that depend on this node. */
-        public final Array<TechNode> children = new Array<>();
+        public final Seq<TechNode> children = new Seq<>();
 
         TechNode(TechNode ccontext, UnlockableContent content, ItemStack[] requirements, Runnable children){
             if(ccontext != null){

@@ -139,7 +139,7 @@ public abstract class Turret extends Block{
     }
 
     public class TurretEntity extends TileEntity implements ControlBlock{
-        public Array<AmmoEntry> ammo = new Array<>();
+        public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float reload, rotation = 90, recoil, heat;
         public int shotCounter;

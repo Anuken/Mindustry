@@ -17,7 +17,7 @@ import static mindustry.Vars.content;
 
 @Component
 abstract class StatusComp implements Posc, Flyingc{
-    private Array<StatusEntry> statuses = new Array<>();
+    private Seq<StatusEntry> statuses = new Seq<>();
     private transient Bits applied = new Bits(content.getBy(ContentType.status).size);
 
     @ReadOnly transient float speedMultiplier, damageMultiplier, armorMultiplier;

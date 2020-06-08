@@ -38,7 +38,7 @@ public class BlockIndexer{
     /** All ores available on this map. */
     private ObjectSet<Item> allOres = new ObjectSet<>();
     /** Stores teams that are present here as tiles. */
-    private Array<Team> activeTeams = new Array<>();
+    private Seq<Team> activeTeams = new Seq<>();
     /** Maps teams to a map of flagged tiles by flag. */
     private TileArray[][] flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
     /** Max units by team. */
@@ -48,7 +48,7 @@ public class BlockIndexer{
     /** Empty set used for returning. */
     private TileArray emptySet = new TileArray();
     /** Array used for returning and reusing. */
-    private Array<Tile> returnArray = new Array<>();
+    private Seq<Tile> returnArray = new Seq<>();
 
     public BlockIndexer(){
         Events.on(TileChangeEvent.class, event -> {
@@ -196,7 +196,7 @@ public class BlockIndexer{
     }
 
     /** Get all enemy blocks with a flag. */
-    public Array<Tile> getEnemy(Team team, BlockFlag type){
+    public Seq<Tile> getEnemy(Team team, BlockFlag type){
         returnArray.clear();
         for(Team enemy : team.enemies()){
             if(state.teams.isActive(enemy)){
@@ -446,7 +446,7 @@ public class BlockIndexer{
     }
 
     public static class TileArray implements Iterable<Tile>{
-        private Array<Tile> tiles = new Array<>(false, 16);
+        private Seq<Tile> tiles = new Seq<>(false, 16);
         private IntSet contained = new IntSet();
 
         public void add(Tile tile){

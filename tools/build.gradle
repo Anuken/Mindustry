@@ -114,7 +114,7 @@ def medianBlur = { File file ->
     def image = ImageIO.read(file)
     def result = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_ARGB)
     def radius = 4
-    IntArray array = new IntArray()
+    IntSeq array = new IntSeq()
 
     def getRGB = { int ix, int iy ->
         return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))

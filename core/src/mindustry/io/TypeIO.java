@@ -50,9 +50,9 @@ public class TypeIO{
             write.b((byte)5);
             write.b((byte)map.getContentType().ordinal());
             write.s(map.id);
-        }else if(object instanceof IntArray){
+        }else if(object instanceof IntSeq){
             write.b((byte)6);
-            IntArray arr = (IntArray)object;
+            IntSeq arr = (IntSeq)object;
             write.s((short)arr.size);
             for(int i = 0; i < arr.size; i++){
                 write.i(arr.items[i]);
@@ -81,7 +81,7 @@ public class TypeIO{
             case 3: return read.f();
             case 4: return readString(read);
             case 5: return content.getByID(ContentType.all[read.b()], read.s());
-            case 6: short length = read.s(); IntArray arr = new IntArray(); for(int i = 0; i < length; i ++) arr.add(read.i()); return arr;
+            case 6: short length = read.s(); IntSeq arr = new IntSeq(); for(int i = 0; i < length; i ++) arr.add(read.i()); return arr;
             case 7: return new Point2(read.i(), read.i());
             case 8: byte len = read.b(); Point2[] out = new Point2[len]; for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i()); return out;
             default: throw new IllegalArgumentException("Unknown object type: " + type);

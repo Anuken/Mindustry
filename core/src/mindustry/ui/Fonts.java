@@ -67,7 +67,7 @@ public class Fonts{
     }
 
     public static void loadContentIcons(){
-        Array<BitmapFont> fonts = Array.with(Fonts.chat, Fonts.def, Fonts.outline);
+        Seq<BitmapFont> fonts = Seq.with(Fonts.chat, Fonts.def, Fonts.outline);
         Texture uitex = Core.atlas.find("logo").getTexture();
         int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
 
@@ -156,7 +156,7 @@ public class Fonts{
 
         Page page = UI.packer.getPages().first();
 
-        Array<AtlasRegion> regions = atlas.getRegions().select(t -> t.getTexture() == texture);
+        Seq<AtlasRegion> regions = atlas.getRegions().select(t -> t.getTexture() == texture);
         for(AtlasRegion region : regions){
             //get new pack rect
             page.setDirty(false);

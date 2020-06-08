@@ -7,7 +7,7 @@ import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.mock.*;
-import arc.struct.Array;
+import arc.struct.Seq;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -102,8 +102,8 @@ public class ContentParser{
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
      * This is done to accomodate binding of content names first.*/
-    private Array<Runnable> reads = new Array<>();
-    private Array<Runnable> postreads = new Array<>();
+    private Seq<Runnable> reads = new Seq<>();
+    private Seq<Runnable> postreads = new Seq<>();
     private ObjectSet<Object> toBeParsed = new ObjectSet<>();
     private LoadedMod currentMod;
     private Content currentContent;
@@ -368,7 +368,7 @@ public class ContentParser{
 
     private void init(){
         for(ContentType type : ContentType.all){
-            Array<Content> arr = Vars.content.getBy(type);
+            Seq<Content> arr = Vars.content.getBy(type);
             if(!arr.isEmpty()){
                 Class<?> c = arr.first().getClass();
                 //get base content class, skipping intermediates
@@ -459,7 +459,7 @@ public class ContentParser{
         }else if(t instanceof NullPointerException){
             builder.append(Strings.parseException(t, true));
         }else{
-            Array<Throwable> causes = Strings.getCauses(t);
+            Seq<Throwable> causes = Strings.getCauses(t);
             for(Throwable e : causes){
                 builder.append("[accent][[").append(e.getClass().getSimpleName().replace("Exception", ""))
                 .append("][] ")

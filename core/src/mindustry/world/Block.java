@@ -9,7 +9,7 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
-import arc.struct.Array;
+import arc.struct.Seq;
 import arc.struct.EnumSet;
 import arc.struct.*;
 import arc.util.*;
@@ -183,12 +183,12 @@ public class Block extends UnlockableContent{
 
     //TODO remove completely
     protected TextureRegion[] cacheRegions = {};
-    protected Array<String> cacheRegionStrings = new Array<>();
+    protected Seq<String> cacheRegionStrings = new Seq<>();
 
     //TODO move
     public static TextureRegion[][] cracks;
-    protected static final Array<Tile> tempTiles = new Array<>();
-    protected static final Array<Tilec> tempTileEnts = new Array<>();
+    protected static final Seq<Tile> tempTiles = new Seq<>();
+    protected static final Seq<Tilec> tempTileEnts = new Seq<>();
 
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
@@ -348,7 +348,7 @@ public class Block extends UnlockableContent{
     }
 
     /** @return a possible replacement for this block when placed in a line by the player. */
-    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+    public Block getReplacement(BuildRequest req, Seq<BuildRequest> requests){
         return this;
     }
 

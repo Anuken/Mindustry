@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class MinimapRenderer implements Disposable{
     private static final float baseSize = 16f;
-    private final Array<Unitc> units = new Array<>();
+    private final Seq<Unitc> units = new Seq<>();
     private Pixmap pixmap;
     private Texture texture;
     private TextureRegion region;

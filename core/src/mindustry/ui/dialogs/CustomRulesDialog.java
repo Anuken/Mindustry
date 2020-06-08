@@ -59,7 +59,7 @@ public class CustomRulesDialog extends BaseDialog{
                 t.add("$empty");
             }
 
-            Array<Block> array = Array.with(rules.bannedBlocks);
+            Seq<Block> array = Seq.with(rules.bannedBlocks);
             array.sort();
 
             int cols = mobile && Core.graphics.isPortrait() ? 1 : mobile ? 2 : 3;

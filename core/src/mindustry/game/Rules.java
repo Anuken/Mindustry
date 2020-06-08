@@ -57,7 +57,7 @@ public class Rules{
     /** Sector for saves that have them.*/
     public @Nullable Sector sector;
     /** Spawn layout. */
-    public Array<SpawnGroup> spawns = new Array<>();
+    public Seq<SpawnGroup> spawns = new Seq<>();
     /** Whether to pause the wave timer until all enemies are destroyed. */
     public boolean waitEnemies = false;
     /** Determinates if gamemode is attack mode */
@@ -74,9 +74,9 @@ public class Rules{
     /** EXPERIMENTAL building AI. TODO remove */
     public boolean buildAI = true;
     /** Starting items put in cores */
-    public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 100));
+    public Seq<ItemStack> loadout = Seq.with(ItemStack.with(Items.copper, 100));
     /** Weather events that occur here. */
-    public Array<WeatherEntry> weather = new Array<>(1);
+    public Seq<WeatherEntry> weather = new Seq<>(1);
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
     /** Whether everything is dark. Enables lights. Experimental. */

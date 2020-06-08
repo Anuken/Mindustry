@@ -369,7 +369,7 @@ public class ApplicationTests{
         world.tile(0, 0).setBlock(Blocks.itemSource);
         world.tile(0, 0).entity.configureAny(Items.copper);
 
-        Array<Tilec> entities = Array.with(world.tile(0, 0).entity);
+        Seq<Tilec> entities = Seq.with(world.tile(0, 0).entity);
 
         for(int i = 0; i < length; i++){
             world.tile(i + 1, 0).setBlock(Blocks.conveyor);
@@ -429,13 +429,13 @@ public class ApplicationTests{
 
     @Test
     void arrayIterators(){
-        Array<String> arr = Array.with("a", "b" , "c", "d", "e", "f");
-        Array<String> results = new Array<>();
+        Seq<String> arr = Seq.with("a", "b" , "c", "d", "e", "f");
+        Seq<String> results = new Seq<>();
 
         for(String s : arr);
         for(String s : results);
 
-        Array.iteratorsAllocated = 0;
+        Seq.iteratorsAllocated = 0;
 
         //simulate non-enhanced for loops, which should be correct
 
@@ -455,7 +455,7 @@ public class ApplicationTests{
         }
 
         assertEquals(results.size, index);
-        assertEquals(0, Array.iteratorsAllocated, "No new iterators must have been allocated.");
+        assertEquals(0, Seq.iteratorsAllocated, "No new iterators must have been allocated.");
     }
 
     @Test

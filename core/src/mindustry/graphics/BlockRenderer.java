@@ -26,14 +26,14 @@ public class BlockRenderer implements Disposable{
 
     public final FloorRenderer floor = new FloorRenderer();
 
-    private Array<Tile> requests = new Array<>(false, initialRequests, Tile.class);
+    private Seq<Tile> requests = new Seq<>(false, initialRequests, Tile.class);
 
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private float brokenFade = 0f;
     private FrameBuffer shadows = new FrameBuffer();
     private FrameBuffer fog = new FrameBuffer();
-    private Array<Tilec> outArray2 = new Array<>();
-    private Array<Tile> shadowEvents = new Array<>();
+    private Seq<Tilec> outArray2 = new Seq<>();
+    private Seq<Tile> shadowEvents = new Seq<>();
     private boolean displayStatus = false;
 
     public BlockRenderer(){

@@ -14,7 +14,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public abstract class BasicGenerator implements WorldGenerator{
-    protected static final ShortArray ints1 = new ShortArray(), ints2 = new ShortArray();
+    protected static final ShortSeq ints1 = new ShortSeq(), ints2 = new ShortSeq();
 
     protected Rand rand = new Rand();
 
@@ -124,7 +124,7 @@ public abstract class BasicGenerator implements WorldGenerator{
         });
     }
 
-    public void ores(Array<Block> ores){
+    public void ores(Seq<Block> ores){
         pass((x, y) -> {
             if(floor.asFloor().isLiquid) return;
 
@@ -297,7 +297,7 @@ public abstract class BasicGenerator implements WorldGenerator{
         }
     }
 
-    public void brush(Array<Tile> path, int rad){
+    public void brush(Seq<Tile> path, int rad){
         path.each(tile -> erase(tile.x, tile.y, rad));
     }
 
@@ -313,7 +313,7 @@ public abstract class BasicGenerator implements WorldGenerator{
         }
     }
 
-    public Array<Tile> pathfind(int startX, int startY, int endX, int endY, TileHueristic th, DistanceHeuristic dh){
+    public Seq<Tile> pathfind(int startX, int startY, int endX, int endY, TileHueristic th, DistanceHeuristic dh){
         return Astar.pathfind(startX, startY, endX, endY, th, dh, tile -> world.getDarkness(tile.x, tile.y) <= 1f);
     }
 
@@ -331,7 +331,7 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void inverseFloodFill(Tile start){
-        IntArray arr = new IntArray();
+        IntSeq arr = new IntSeq();
         arr.add(start.pos());
         while(!arr.isEmpty()){
             int i = arr.pop();

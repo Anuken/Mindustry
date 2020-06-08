@@ -298,7 +298,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         Log.info("found @ matches @", matches, lobbyDoneCallback);
 
         if(lobbyDoneCallback != null){
-            Array<Host> hosts = new Array<>();
+            Seq<Host> hosts = new Seq<>();
             for(int i = 0; i < matches; i++){
                 try{
                     SteamID lobby = smat.getLobbyByIndex(i);

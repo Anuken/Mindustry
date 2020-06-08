@@ -527,7 +527,7 @@ public class World{
 
         @Override
         public void end(){
-            Array<GenerateFilter> filters = map.filters();
+            Seq<GenerateFilter> filters = map.filters();
 
             if(!filters.isEmpty()){
                 //input for filter queries

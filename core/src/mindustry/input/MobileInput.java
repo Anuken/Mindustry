@@ -48,7 +48,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     private float shiftDeltaX, shiftDeltaY;
 
     /** Place requests to be removed. */
-    private Array<BuildRequest> removals = new Array<>();
+    private Seq<BuildRequest> removals = new Seq<>();
     /** Whether or not the player is currently shifting all placed tiles. */
     private boolean selecting;
     /** Whether the player is currently in line-place mode. */

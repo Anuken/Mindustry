@@ -27,8 +27,8 @@ public class PlacementFragment extends Fragment{
     final int rowWidth = 4;
 
     public Category currentCategory = Category.distribution;
-    Array<Block> returnArray = new Array<>();
-    Array<Category> returnCatArray = new Array<>();
+    Seq<Block> returnArray = new Seq<>();
+    Seq<Category> returnCatArray = new Seq<>();
     boolean[] categoryEmpty = new boolean[Category.all.length];
     ObjectMap<Category,Block> selectedBlocks = new ObjectMap<>();
     ObjectFloatMap<Category> scrollPositions = new ObjectFloatMap<>();
@@ -115,7 +115,7 @@ public class PlacementFragment extends Fragment{
         for(int i = 0; i < blockSelect.length; i++){
             if(Core.input.keyTap(blockSelect[i])){
                 if(i > 9) { //select block directionally
-                    Array<Block> blocks = getByCategory(currentCategory);
+                    Seq<Block> blocks = getByCategory(currentCategory);
                     Block currentBlock = getSelectedBlock(currentCategory);
                     for(int j = 0; j < blocks.size; j++){
                         if(blocks.get(j) == currentBlock){
@@ -157,7 +157,7 @@ public class PlacementFragment extends Fragment{
                         i += (blockSelectSeq - (i != 9 ? 0 : 1)) * 10;
                         blockSelectEnd = true;
                     }
-                    Array<Block> blocks = getByCategory(currentCategory);
+                    Seq<Block> blocks = getByCategory(currentCategory);
                     input.block = (i < blocks.size) ? blocks.get(i) : null;
                     selectedBlocks.put(currentCategory, input.block);
                     blockSelectSeqMillis = Time.millis();
@@ -276,7 +276,7 @@ public class PlacementFragment extends Fragment{
                             topTable.table(header -> {
                                 String keyCombo = "";
                                 if(!mobile && Core.settings.getBool("blockselectkeys")){
-                                    Array<Block> blocks = getByCategory(currentCategory);
+                                    Seq<Block> blocks = getByCategory(currentCategory);
                                     for(int i = 0; i < blocks.size; i++){
                                         if(blocks.get(i) == lastDisplay && (i + 1) / 10 - 1 < blockSelect.length){
                                             keyCombo = Core.bundle.format("placement.blockselectkeys", Core.keybinds.get(blockSelect[currentCategory.ordinal()]).key.toString())
@@ -384,7 +384,7 @@ public class PlacementFragment extends Fragment{
 
                     //update category empty values
                     for(Category cat : Category.all){
-                        Array<Block> blocks = getByCategory(cat);
+                        Seq<Block> blocks = getByCategory(cat);
                         categoryEmpty[cat.ordinal()] = blocks.isEmpty();
                     }
 
@@ -415,14 +415,14 @@ public class PlacementFragment extends Fragment{
         });
     }
 
-    Array<Category> getCategories(){
+    Seq<Category> getCategories(){
         returnCatArray.clear();
         returnCatArray.addAll(Category.all);
         returnCatArray.sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.ordinal()], categoryEmpty[c2.ordinal()]));
         return returnCatArray;
     }
 
-    Array<Block> getByCategory(Category cat){
+    Seq<Block> getByCategory(Category cat){
         returnArray.clear();
         for(Block block : content.blocks()){
             if(block.category == cat && block.isVisible() && unlocked(block)){

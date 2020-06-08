@@ -15,8 +15,8 @@ import static mindustry.Vars.collisions;
 public class EntityGroup<T extends Entityc> implements Iterable<T>{
     private static int lastId = 0;
 
-    private final Array<T> array;
-    private final Array<T> intersectArray = new Array<>();
+    private final Seq<T> array;
+    private final Seq<T> intersectArray = new Seq<>();
     private final Rect viewport = new Rect();
     private final Rect intersectRect = new Rect();
     private IntMap<T> map;
@@ -30,7 +30,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     }
 
     public EntityGroup(Class<T> type, boolean spatial, boolean mapping){
-        array = new Array<>(false, 32, type);
+        array = new Seq<>(false, 32, type);
 
         if(spatial){
             tree = new QuadTree<>(new Rect(0, 0, 0, 0));
@@ -57,7 +57,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         each(Entityc::update);
     }
 
-    public void copy(Array arr){
+    public void copy(Seq arr){
         arr.addAll(array);
     }
 
@@ -111,7 +111,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         tree.intersect(height, x, y, width, out);
     }
 
-    public Array<T> intersect(float x, float y, float width, float height){
+    public Seq<T> intersect(float x, float y, float width, float height){
         intersectArray.clear();
         //don't waste time for empty groups
         if(isEmpty()) return intersectArray;

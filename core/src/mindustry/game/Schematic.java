@@ -14,21 +14,21 @@ import mindustry.world.blocks.storage.*;
 import static mindustry.Vars.*;
 
 public class Schematic implements Publishable, Comparable<Schematic>{
-    public final Array<Stile> tiles;
+    public final Seq<Stile> tiles;
     public StringMap tags;
     public int width, height;
     public @Nullable Fi file;
     /** Associated mod. If null, no mod is associated with this schematic. */
     public @Nullable LoadedMod mod;
 
-    public Schematic(Array<Stile> tiles, @NonNull StringMap tags, int width, int height){
+    public Schematic(Seq<Stile> tiles, @NonNull StringMap tags, int width, int height){
         this.tiles = tiles;
         this.tags = tags;
         this.width = width;
         this.height = height;
     }
 
-    public Array<ItemStack> requirements(){
+    public Seq<ItemStack> requirements(){
         IntIntMap amounts = new IntIntMap();
 
         tiles.each(t -> {
@@ -36,7 +36,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
                 amounts.getAndIncrement(stack.item.id, 0, stack.amount);
             }
         });
-        Array<ItemStack> stacks = new Array<>();
+        Seq<ItemStack> stacks = new Seq<>();
         for(Entry ent : amounts.entries()){
             stacks.add(new ItemStack(Vars.content.item(ent.key), ent.value));
         }

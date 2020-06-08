@@ -18,17 +18,17 @@ public class SectorPreset extends UnlockableContent{
     public @NonNull FileMapGenerator generator;
     public @NonNull Planet planet;
     public @NonNull Sector sector;
-    public Array<Objective> requirements = new Array<>();
+    public Seq<Objective> requirements = new Seq<>();
 
     public Cons<Rules> rules = rules -> {};
     public int conditionWave = Integer.MAX_VALUE;
     public int launchPeriod = 10;
     public Schematic loadout = Loadouts.basicShard;
 
-    protected Array<ItemStack> baseLaunchCost = new Array<>();
-    protected Array<ItemStack> startingItems = new Array<>();
-    protected Array<ItemStack> launchCost;
-    protected Array<ItemStack> defaultStartingItems = new Array<>();
+    protected Seq<ItemStack> baseLaunchCost = new Seq<>();
+    protected Seq<ItemStack> startingItems = new Seq<>();
+    protected Seq<ItemStack> launchCost;
+    protected Seq<ItemStack> defaultStartingItems = new Seq<>();
 
     public SectorPreset(String name, Planet planet, int sector){
         super(name);
@@ -51,14 +51,14 @@ public class SectorPreset extends UnlockableContent{
         return data.isUnlocked(this) || !requirements.contains(r -> !r.complete());
     }
 
-    public Array<ItemStack> getLaunchCost(){
+    public Seq<ItemStack> getLaunchCost(){
         if(launchCost == null){
             updateLaunchCost();
         }
         return launchCost;
     }
 
-    public Array<ItemStack> getStartingItems(){
+    public Seq<ItemStack> getStartingItems(){
         return startingItems;
     }
 
@@ -90,7 +90,7 @@ public class SectorPreset extends UnlockableContent{
     }
 
     public void updateObjectives(Runnable closure){
-        Array<SectorObjective> incomplete = content.sectors()
+        Seq<SectorObjective> incomplete = content.sectors()
             .flatMap(z -> z.requirements)
             .filter(o -> o.zone() == this && !o.complete()).as();
 
@@ -112,7 +112,7 @@ public class SectorPreset extends UnlockableContent{
     }
 
     public void updateLaunchCost(){
-        Array<ItemStack> stacks = new Array<>();
+        Seq<ItemStack> stacks = new Seq<>();
 
         Cons<ItemStack> adder = stack -> {
             for(ItemStack other : stacks){

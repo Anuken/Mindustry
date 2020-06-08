@@ -15,7 +15,7 @@ import mindustry.world.blocks.payloads.*;
 abstract class PayloadComp implements Posc, Rotc{
     @Import float x, y, rotation;
 
-    Array<Payload> payloads = new Array<>();
+    Seq<Payload> payloads = new Seq<>();
 
     boolean hasPayload(){
         return payloads.size > 0;

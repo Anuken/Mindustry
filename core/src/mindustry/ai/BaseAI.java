@@ -54,7 +54,7 @@ public class BaseAI{
                 int wx = (int)(core.tileX() + Tmp.v1.x), wy = (int)(core.tileY() + Tmp.v1.y);
                 Tile tile = world.tiles.getc(wx, wy);
 
-                Array<BasePart> parts = null;
+                Seq<BasePart> parts = null;
 
                 //pick a completely random base part, and place it a random location
                 //((yes, very intelligent))

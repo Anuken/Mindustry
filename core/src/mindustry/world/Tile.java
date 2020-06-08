@@ -376,7 +376,7 @@ public class Tile implements Position, QuadTreeObject{
      * Returns the list of all tiles linked to this multiblock.
      * This array contains all linked tiles, including this tile itself.
      */
-    public Array<Tile> getLinkedTiles(Array<Tile> tmpArray){
+    public Seq<Tile> getLinkedTiles(Seq<Tile> tmpArray){
         tmpArray.clear();
         getLinkedTiles(tmpArray::add);
         return tmpArray;
@@ -386,7 +386,7 @@ public class Tile implements Position, QuadTreeObject{
      * Returns the list of all tiles linked to this multiblock if it were this block.
      * This array contains all linked tiles, including this tile itself.
      */
-    public Array<Tile> getLinkedTilesAs(Block block, Array<Tile> tmpArray){
+    public Seq<Tile> getLinkedTilesAs(Block block, Seq<Tile> tmpArray){
         tmpArray.clear();
         if(block.isMultiblock()){
             int offsetx = -(block.size - 1) / 2;

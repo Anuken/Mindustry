@@ -11,7 +11,7 @@ import static mindustry.Vars.content;
 public class MedianFilter extends GenerateFilter{
     float radius = 2;
     float percentile = 0.5f;
-    IntArray blocks = new IntArray(), floors = new IntArray();
+    IntSeq blocks = new IntSeq(), floors = new IntSeq();
 
     @Override
     public FilterOption[] options(){

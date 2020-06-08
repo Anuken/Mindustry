@@ -91,7 +91,7 @@ public enum EditorTool{
             edit = true;
         }
 
-        IntArray stack = new IntArray();
+        IntSeq stack = new IntSeq();
 
         @Override
         public void touched(MapEditor editor, int x, int y){
@@ -200,7 +200,7 @@ public enum EditorTool{
                     stack = null;
                     System.gc();
                     e.printStackTrace();
-                    stack = new IntArray();
+                    stack = new IntSeq();
                 }
             }
         }
