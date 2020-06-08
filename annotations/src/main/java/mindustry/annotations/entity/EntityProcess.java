@@ -30,18 +30,18 @@ import java.lang.annotation.*;
 "mindustry.annotations.Annotations.TypeIOHandler"
 })
 public class EntityProcess extends BaseProcessor{
-    Array<EntityDefinition> definitions = new Array<>();
-    Array<GroupDefinition> groupDefs = new Array<>();
-    Array<Stype> baseComponents;
+    Seq<EntityDefinition> definitions = new Seq<>();
+    Seq<GroupDefinition> groupDefs = new Seq<>();
+    Seq<Stype> baseComponents;
     ObjectMap<String, Stype> componentNames = new ObjectMap<>();
-    ObjectMap<Stype, Array<Stype>> componentDependencies = new ObjectMap<>();
-    ObjectMap<Selement, Array<Stype>> defComponents = new ObjectMap<>();
+    ObjectMap<Stype, Seq<Stype>> componentDependencies = new ObjectMap<>();
+    ObjectMap<Selement, Seq<Stype>> defComponents = new ObjectMap<>();
     ObjectMap<Svar, String> varInitializers = new ObjectMap<>();
     ObjectMap<Smethod, String> methodBlocks = new ObjectMap<>();
     ObjectSet<String> imports = new ObjectSet<>();
-    Array<Selement> allGroups = new Array<>();
-    Array<Selement> allDefs = new Array<>();
-    Array<Stype> allInterfaces = new Array<>();
+    Seq<Selement> allGroups = new Seq<>();
+    Seq<Selement> allDefs = new Seq<>();
+    Seq<Stype> allInterfaces = new Seq<>();
     ClassSerializer serializer;
 
     {
@@ -58,7 +58,7 @@ public class EntityProcess extends BaseProcessor{
         if(round == 1){
             serializer = TypeIOResolver.resolve(this);
             baseComponents = types(BaseComponent.class);
-            Array<Stype> allComponents = types(Component.class);
+            Seq<Stype> allComponents = types(Component.class);
 
             //store code
             for(Stype component : allComponents){
@@ -103,7 +103,7 @@ public class EntityProcess extends BaseProcessor{
                 }
 
                 //implement super interfaces
-                Array<Stype> depends = getDependencies(component);
+                Seq<Stype> depends = getDependencies(component);
                 for(Stype type : depends){
                     inter.addSuperinterface(ClassName.get(packageName, interfaceName(type)));
                 }
@@ -133,7 +133,7 @@ public class EntityProcess extends BaseProcessor{
                     //getter
                     if(!signatures.contains(cname + "()")){
                         inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
-                        .addAnnotations(Array.with(field.annotations()).select(a -> a.toString().contains("Null")).map(AnnotationSpec::get))
+                        .addAnnotations(Seq.with(field.annotations()).select(a -> a.toString().contains("Null")).map(AnnotationSpec::get))
                         .addJavadoc(field.doc() == null ? "" : field.doc())
                         .returns(field.tname()).build());
                     }
@@ -144,7 +144,7 @@ public class EntityProcess extends BaseProcessor{
                         inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
                         .addJavadoc(field.doc() == null ? "" : field.doc())
                         .addParameter(ParameterSpec.builder(field.tname(), field.name())
-                        .addAnnotations(Array.with(field.annotations())
+                        .addAnnotations(Seq.with(field.annotations())
                         .select(a -> a.toString().contains("Null")).map(AnnotationSpec::get)).build()).build());
                     }
                 }
@@ -161,7 +161,7 @@ public class EntityProcess extends BaseProcessor{
 
                 //log methods generated
                 for(MethodSpec spec : inter.methodSpecs){
-                    Log.debug("&g> > &c@ @(@)", simpleName(spec.returnType.toString()), spec.name, Array.with(spec.parameters).toString(", ", p -> simpleName(p.type.toString()) + " " + p.name));
+                    Log.debug("&g> > &c@ @(@)", simpleName(spec.returnType.toString()), spec.name, Seq.with(spec.parameters).toString(", ", p -> simpleName(p.type.toString()) + " " + p.name));
                 }
 
                 Log.debug("");
@@ -172,7 +172,7 @@ public class EntityProcess extends BaseProcessor{
             //parse groups
             for(Selement<?> group : allGroups){
                 GroupDef an = group.annotation(GroupDef.class);
-                Array<Stype> types = types(an, GroupDef::value).map(this::interfaceToComp);
+                Seq<Stype> types = types(an, GroupDef::value).map(this::interfaceToComp);
                 boolean collides = an.collide();
                 groupDefs.add(new GroupDefinition(group.name().startsWith("g") ? group.name().substring(1) : group.name(),
                     ClassName.bestGuess(packageName + "." + interfaceName(types.first())), types, an.spatial(), an.mapping(), collides));
@@ -209,9 +209,9 @@ public class EntityProcess extends BaseProcessor{
                 TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
                 if(isFinal) builder.addModifiers(Modifier.FINAL);
 
-                Array<Stype> components = allComponents(type);
-                Array<GroupDefinition> groups = groupDefs.select(g -> (!g.components.isEmpty() && !g.components.contains(s -> !components.contains(s))) || g.manualInclusions.contains(type));
-                ObjectMap<String, Array<Smethod>> methods = new ObjectMap<>();
+                Seq<Stype> components = allComponents(type);
+                Seq<GroupDefinition> groups = groupDefs.select(g -> (!g.components.isEmpty() && !g.components.contains(s -> !components.contains(s))) || g.manualInclusions.contains(type));
+                ObjectMap<String, Seq<Smethod>> methods = new ObjectMap<>();
                 ObjectMap<FieldSpec, Svar> specVariables = new ObjectMap<>();
                 ObjectSet<String> usedFields = new ObjectSet<>();
 
@@ -219,8 +219,8 @@ public class EntityProcess extends BaseProcessor{
                 builder.addMethod(MethodSpec.methodBuilder("serialize").addModifiers(Modifier.PUBLIC, Modifier.FINAL).returns(boolean.class).addStatement("return " + ann.serialize()).build());
 
                 //all SyncField fields
-                Array<Svar> syncedFields = new Array<>();
-                Array<Svar> allFields = new Array<>();
+                Seq<Svar> syncedFields = new Seq<>();
+                Seq<Svar> allFields = new Seq<>();
 
                 boolean isSync = components.contains(s -> s.name().contains("Sync"));
 
@@ -228,7 +228,7 @@ public class EntityProcess extends BaseProcessor{
                 for(Stype comp : components){
 
                     //write fields to the class; ignoring transient/imported ones
-                    Array<Svar> fields = comp.fields().select(f -> !f.has(Import.class));
+                    Seq<Svar> fields = comp.fields().select(f -> !f.has(Import.class));
                     for(Svar f : fields){
                         if(!usedFields.add(f.name())){
                             err("Field '" + f.name() + "' of component '" + comp.name() + "' re-defines a field in entity '" + type.name() + "'");
@@ -279,7 +279,7 @@ public class EntityProcess extends BaseProcessor{
 
                     //get all utility methods from components
                     for(Smethod elem : comp.methods()){
-                        methods.get(elem.toString(), Array::new).add(elem);
+                        methods.get(elem.toString(), Seq::new).add(elem);
                     }
                 }
 
@@ -297,7 +297,7 @@ public class EntityProcess extends BaseProcessor{
                 boolean hasIO = ann.genio() && (components.contains(s -> s.name().contains("Sync")) || ann.serialize());
 
                 //add all methods from components
-                for(ObjectMap.Entry<String, Array<Smethod>> entry : methods){
+                for(ObjectMap.Entry<String, Seq<Smethod>> entry : methods){
                     if(entry.value.contains(m -> m.has(Replace.class))){
                         //check replacements
                         if(entry.value.count(m -> m.has(Replace.class)) > 1){
@@ -513,7 +513,7 @@ public class EntityProcess extends BaseProcessor{
             if(!idProps.exists()) idProps.writeString("");
             PropertiesUtils.load(map, idProps.reader());
             //next ID to be used in generation
-            Integer max = map.values().toArray().map(Integer::parseInt).max(i -> i);
+            Integer max = map.values().toSeq().map(Integer::parseInt).max(i -> i);
             int maxID = max == null ? 0 : max + 1;
 
             //assign IDs
@@ -591,7 +591,7 @@ public class EntityProcess extends BaseProcessor{
                     //generate getter/setter for each method
                     for(Smethod method : inter.methods()){
                         String var = method.name();
-                        FieldSpec field = Array.with(def.builder.fieldSpecs).find(f -> f.name.equals(var));
+                        FieldSpec field = Seq.with(def.builder.fieldSpecs).find(f -> f.name.equals(var));
                         //make sure it's a real variable AND that the component doesn't already implement it somewhere with custom logic
                         if(field == null || methodNames.contains(method.simpleString())) continue;
 
@@ -601,7 +601,7 @@ public class EntityProcess extends BaseProcessor{
                         }
 
                         //setter
-                        if(method.isVoid() && !Array.with(field.annotations).contains(f -> f.type.toString().equals("@mindustry.annotations.Annotations.ReadOnly"))){
+                        if(method.isVoid() && !Seq.with(field.annotations).contains(f -> f.type.toString().equals("@mindustry.annotations.Annotations.ReadOnly"))){
                             def.builder.addMethod(MethodSpec.overriding(method.e).addModifiers(Modifier.FINAL).addStatement("this." + var + " = " + var).build());
                         }
                     }
@@ -616,8 +616,8 @@ public class EntityProcess extends BaseProcessor{
             //create mock types of all components
             for(Stype interf : allInterfaces){
                 //indirect interfaces to implement methods for
-                Array<Stype> dependencies = interf.allInterfaces().and(interf);
-                Array<Smethod> methods = dependencies.flatMap(Stype::methods);
+                Seq<Stype> dependencies = interf.allInterfaces().and(interf);
+                Seq<Smethod> methods = dependencies.flatMap(Stype::methods);
                 methods.sortComparing(Object::toString);
 
                 //used method signatures
@@ -668,8 +668,8 @@ public class EntityProcess extends BaseProcessor{
         }
     }
 
-    Array<String> getImports(Element elem){
-        return Array.with(trees.getPath(elem).getCompilationUnit().getImports()).map(Object::toString);
+    Seq<String> getImports(Element elem){
+        return Seq.with(trees.getPath(elem).getCompilationUnit().getImports()).map(Object::toString);
     }
 
     /** @return interface for a component type */
@@ -682,11 +682,11 @@ public class EntityProcess extends BaseProcessor{
     }
 
     /** @return all components that a entity def has */
-    Array<Stype> allComponents(Selement<?> type){
+    Seq<Stype> allComponents(Selement<?> type){
         if(!defComponents.containsKey(type)){
             //get base defs
-            Array<Stype> interfaces = types(type.annotation(EntityDef.class), EntityDef::value);
-            Array<Stype> components = new Array<>();
+            Seq<Stype> interfaces = types(type.annotation(EntityDef.class), EntityDef::value);
+            Seq<Stype> components = new Seq<>();
             for(Stype i : interfaces){
                 Stype comp = interfaceToComp(i);
                 if(comp != null){
@@ -709,7 +709,7 @@ public class EntityProcess extends BaseProcessor{
         return defComponents.get(type);
     }
 
-    Array<Stype> getDependencies(Stype component){
+    Seq<Stype> getDependencies(Stype component){
         if(!componentDependencies.containsKey(component)){
             ObjectSet<Stype> out = new ObjectSet<>();
             //add base component interfaces
@@ -746,7 +746,7 @@ public class EntityProcess extends BaseProcessor{
     }
 
     String createName(Selement<?> elem){
-        Array<Stype> comps = types(elem.annotation(EntityDef.class), EntityDef::value).map(this::interfaceToComp);;
+        Seq<Stype> comps = types(elem.annotation(EntityDef.class), EntityDef::value).map(this::interfaceToComp);;
         comps.sortComparing(Selement::name);
         return comps.toString("", s -> s.name().replace("Comp", "")) + "Entity";
     }
@@ -755,11 +755,11 @@ public class EntityProcess extends BaseProcessor{
         return type.annotation(Component.class) != null;
     }
 
-    <T extends Annotation> Array<Stype> types(T t, Cons<T> consumer){
+    <T extends Annotation> Seq<Stype> types(T t, Cons<T> consumer){
         try{
             consumer.get(t);
         }catch(MirroredTypesException e){
-            return Array.with(e.getTypeMirrors()).map(Stype::of);
+            return Seq.with(e.getTypeMirrors()).map(Stype::of);
         }
         throw new IllegalArgumentException("Missing types.");
     }
@@ -767,11 +767,11 @@ public class EntityProcess extends BaseProcessor{
     class GroupDefinition{
         final String name;
         final ClassName baseType;
-        final Array<Stype> components;
+        final Seq<Stype> components;
         final boolean spatial, mapping, collides;
         final ObjectSet<Selement> manualInclusions = new ObjectSet<>();
 
-        public GroupDefinition(String name, ClassName bestType, Array<Stype> components, boolean spatial, boolean mapping, boolean collides){
+        public GroupDefinition(String name, ClassName bestType, Seq<Stype> components, boolean spatial, boolean mapping, boolean collides){
             this.baseType = bestType;
             this.components = components;
             this.name = name;
@@ -787,14 +787,14 @@ public class EntityProcess extends BaseProcessor{
     }
 
     class EntityDefinition{
-        final Array<GroupDefinition> groups;
-        final Array<Stype> components;
+        final Seq<GroupDefinition> groups;
+        final Seq<Stype> components;
         final TypeSpec.Builder builder;
         final Selement base;
         final String name;
         int classID;
 
-        public EntityDefinition(String name, Builder builder, Selement base, Array<Stype> components, Array<GroupDefinition> groups){
+        public EntityDefinition(String name, Builder builder, Selement base, Seq<Stype> components, Seq<GroupDefinition> groups){
             this.builder = builder;
             this.name = name;
             this.base = base;

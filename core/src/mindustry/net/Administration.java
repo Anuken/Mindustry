@@ -414,7 +414,7 @@ public class Administration{
     }
 
     public Seq<PlayerInfo> getWhitelisted(){
-        return playerInfo.values().toArray().select(p -> isWhitelisted(p.id, p.adminUsid));
+        return playerInfo.values().toSeq().select(p -> isWhitelisted(p.id, p.adminUsid));
     }
 
     private PlayerInfo getCreateInfo(String id){

@@ -139,7 +139,7 @@ public class RemoteWriteGenerator{
         //reset stream
         method.addStatement("OUT.reset()");
 
-        method.addTypeVariables(Array.with(elem.getTypeParameters()).map(BaseProcessor::getTVN));
+        method.addTypeVariables(Seq.with(elem.getTypeParameters()).map(BaseProcessor::getTVN));
 
         for(int i = 0; i < elem.getParameters().size(); i++){
             //first argument is skipped as it is always the player caller

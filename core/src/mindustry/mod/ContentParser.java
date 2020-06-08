@@ -536,7 +536,7 @@ public class ContentParser{
     private void checkNullFields(Object object){
         if(object instanceof Number || object instanceof String || toBeParsed.contains(object)) return;
 
-        parser.getFields(object.getClass()).values().toArray().each(field -> {
+        parser.getFields(object.getClass()).values().toSeq().each(field -> {
             try{
                 if(field.field.getType().isPrimitive()) return;
 

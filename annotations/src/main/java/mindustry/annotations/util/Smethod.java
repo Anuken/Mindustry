@@ -29,20 +29,20 @@ public class Smethod extends Selement<ExecutableElement>{
         return new Stype((TypeElement)up());
     }
 
-    public Array<TypeMirror> thrown(){
-        return Array.with(e.getThrownTypes()).as();
+    public Seq<TypeMirror> thrown(){
+        return Seq.with(e.getThrownTypes()).as();
     }
 
-    public Array<TypeName> thrownt(){
-        return Array.with(e.getThrownTypes()).map(TypeName::get);
+    public Seq<TypeName> thrownt(){
+        return Seq.with(e.getThrownTypes()).map(TypeName::get);
     }
 
-    public Array<TypeParameterElement> typeVariables(){
-        return Array.with(e.getTypeParameters()).as();
+    public Seq<TypeParameterElement> typeVariables(){
+        return Seq.with(e.getTypeParameters()).as();
     }
 
-    public Array<Svar> params(){
-        return Array.with(e.getParameters()).map(Svar::new);
+    public Seq<Svar> params(){
+        return Seq.with(e.getParameters()).map(Svar::new);
     }
 
     public boolean isVoid(){
