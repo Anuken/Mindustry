@@ -23,8 +23,6 @@ public class Tile implements Position, QuadTreeObject{
     /** Tile entity, usually null. */
     public @Nullable Tilec entity;
     public short x, y;
-    /** Extra data. Used for dumping. */
-    public byte data;
     protected @NonNull Block block;
     protected @NonNull Floor floor;
     protected @NonNull Floor overlay;

@@ -68,8 +68,16 @@ public class PayloadConveyor extends Block{
 
             Tilec accept = nearby(Geometry.d4(rotation()).x * size, Geometry.d4(rotation()).y * size);
             //next block must be aligned and of the same size
-            if(accept != null && accept.block().size == size &&
-                tileX() + Geometry.d4(rotation()).x * size == accept.tileX() && tileY() + Geometry.d4(rotation()).y * size == accept.tileY()){
+            if(accept != null && (
+                //same size
+                (accept.block().size == size && tileX() + Geometry.d4(rotation()).x * size == accept.tileX() && tileY() + Geometry.d4(rotation()).y * size == accept.tileY()) ||
+
+                //differing sizes
+                (accept.block().size > size &&
+                    (rotation() % 2 == 0 ? //check orientation
+                    Math.abs(accept.y() - y) <= accept.block().size * tilesize - size * tilesize : //check Y alignment
+                    Math.abs(accept.x() - x) <= accept.block().size * tilesize - size * tilesize   //check X alignment
+                )))){
                 next = accept;
             }else{
                 next = null;

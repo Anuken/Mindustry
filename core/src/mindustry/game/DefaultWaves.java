@@ -35,7 +35,7 @@ public class DefaultWaves{
                 max = 4;
             }},
 
-            new SpawnGroup(UnitTypes.titan){{
+            new SpawnGroup(UnitTypes.mace){{
                 begin = 7;
                 spacing = 3;
                 unitScaling = 2;
@@ -50,21 +50,21 @@ public class DefaultWaves{
                 spacing = 2;
             }},
 
-            new SpawnGroup(UnitTypes.titan){{
+            new SpawnGroup(UnitTypes.mace){{
                 begin = 28;
                 spacing = 3;
                 unitScaling = 1;
                 end = 40;
             }},
 
-            new SpawnGroup(UnitTypes.titan){{
+            new SpawnGroup(UnitTypes.mace){{
                 begin = 45;
                 spacing = 3;
                 unitScaling = 2;
                 effect = StatusEffects.overdrive;
             }},
 
-            new SpawnGroup(UnitTypes.titan){{
+            new SpawnGroup(UnitTypes.mace){{
                 begin = 120;
                 spacing = 2;
                 unitScaling = 3;

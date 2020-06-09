@@ -1767,7 +1767,7 @@ public class Blocks implements ContentList{
 
             upgrades = new UnitType[][]{
                 {UnitTypes.tau, UnitTypes.oculon},
-                {UnitTypes.dagger, UnitTypes.titan},
+                {UnitTypes.dagger, UnitTypes.mace},
                 {UnitTypes.crawler, UnitTypes.eruptor},
                 {UnitTypes.wraith, UnitTypes.ghoul},
             };
@@ -1785,7 +1785,7 @@ public class Blocks implements ContentList{
 
             upgrades = new UnitType[][]{
                 {UnitTypes.ghoul, UnitTypes.revenant},
-                {UnitTypes.titan, UnitTypes.fortress},
+                {UnitTypes.mace, UnitTypes.fortress},
             };
         }};
 

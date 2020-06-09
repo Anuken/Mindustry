@@ -14,7 +14,7 @@ import mindustry.type.*;
 public class UnitTypes implements ContentList{
 
     //ground
-    public static @EntityDef({Unitc.class, Mechc.class}) UnitType titan, dagger, crawler, fortress, chaosArray, eradicator;
+    public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, chaosArray, eradicator;
 
     //ground + builder
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType tau;
@@ -76,7 +76,7 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        titan = new UnitType("titan"){{
+        mace = new UnitType("mace"){{
             speed = 0.4f;
             hitsize = 9f;
             range = 10f;

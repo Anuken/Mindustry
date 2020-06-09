@@ -52,6 +52,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     transient Block block;
     transient Seq<Tilec> proximity = new Seq<>(8);
     transient boolean updateFlow;
+    transient byte dump;
 
     PowerModule power;
     ItemModule items;
@@ -413,8 +414,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
      * @return whether the payload was moved successfully
      */
     public boolean dumpPayload(@NonNull Payload todump){
-        int dump = tile.data;
-
         if(proximity.size == 0) return false;
 
         for(int i = 0; i < proximity.size; i++){
@@ -449,8 +448,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     }
 
     public void dumpLiquid(Liquid liquid){
-        int dump = tile.data;
-
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
             Tilec other = proximity.get((i + dump) % proximity.size);
@@ -549,7 +546,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
      */
     public void offload(Item item){
         Seq<Tilec> proximity = proximity();
-        int dump = tile.data;
         useContent(item);
 
         for(int i = 0; i < proximity.size; i++){
@@ -569,7 +565,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
      */
     public boolean put(Item item){
         Seq<Tilec> proximity = proximity();
-        int dump = tile.data;
         useContent(item);
 
         for(int i = 0; i < proximity.size; i++){
@@ -597,7 +592,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         if(!block.hasItems || items.total() == 0 || (todump != null && !items.has(todump))) return false;
 
         Seq<Tilec> proximity = proximity();
-        int dump = tile.data;
 
         if(proximity.size == 0) return false;
 
@@ -632,7 +626,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     }
 
     public void incrementDump(int prox){
-        tile.data = (byte)((tile.data + 1) % prox);
+        dump = (byte)((dump + 1) % prox);
     }
 
     /** Used for dumping items. */
