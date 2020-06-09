@@ -3,7 +3,6 @@ package mindustry.world.blocks.units;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -17,9 +16,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.state;
 
 public class Reconstructor extends UnitBlock{
-    public @Load(value = "@-top", fallback = "factory-top") TextureRegion topRegion;
-    public @Load(value = "@-out", fallback = "factory-out") TextureRegion outRegion;
-    public @Load(value = "@-in", fallback = "factory-in") TextureRegion inRegion;
     public float constructTime = 60 * 2;
     public UnitType[][] upgrades = {};
 

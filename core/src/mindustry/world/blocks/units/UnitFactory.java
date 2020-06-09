@@ -10,7 +10,6 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -23,8 +22,6 @@ import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 public class UnitFactory extends UnitBlock{
-    public @Load(value = "@-top", fallback = "factory-top") TextureRegion topRegion;
-    public @Load(value = "@-out", fallback = "factory-out") TextureRegion outRegion;
     public int[] capacities;
 
     public UnitPlan[] plans = new UnitPlan[0];

@@ -2,7 +2,6 @@ package mindustry.world.blocks.experimental;
 
 import arc.graphics.g2d.*;
 import arc.util.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -19,10 +18,6 @@ public class BlockLoader extends PayloadAcceptor{
     public float loadTime = 2f;
     public int itemsLoaded = 5;
     public float liquidsLoaded = 5f;
-
-    public @Load(value = "@-top", fallback = "factory-top") TextureRegion topRegion;
-    public @Load(value = "@-out", fallback = "factory-out") TextureRegion outRegion;
-    public @Load(value = "@-in", fallback = "factory-in") TextureRegion inRegion;
 
     public BlockLoader(String name){
         super(name);

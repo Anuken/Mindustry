@@ -8,7 +8,6 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -22,7 +21,6 @@ import mindustry.world.consumers.*;
 
 public class BlockForge extends PayloadAcceptor{
     public float buildSpeed = 0.4f;
-    public @Load(value = "@-out", fallback = "factory-out") TextureRegion outRegion;
 
     public BlockForge(String name){
         super(name);

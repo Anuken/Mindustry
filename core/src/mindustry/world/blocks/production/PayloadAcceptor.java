@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -14,6 +15,10 @@ import static mindustry.Vars.tilesize;
 
 public class PayloadAcceptor extends Block{
     public float payloadSpeed = 0.5f;
+
+    public @Load(value = "@-top", fallback = "factory-top-$size") TextureRegion topRegion;
+    public @Load(value = "@-out", fallback = "factory-out-$size") TextureRegion outRegion;
+    public @Load(value = "@-in", fallback = "factory-in-$size") TextureRegion inRegion;
 
     public PayloadAcceptor(String name){
         super(name);
@@ -92,7 +97,7 @@ public class PayloadAcceptor extends Block{
                     if(movePayload(payload)){
                         payload = null;
                     }
-                }else if(front != null && !front.tile().solid()){
+                }else if(front == null || !front.tile().solid()){
                     dumpPayload();
                 }
             }
