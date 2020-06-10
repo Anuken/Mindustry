@@ -4,6 +4,7 @@ sourceSets.main.java.srcDirs = ["src/"]
 import arc.struct.*
 import arc.graphics.*
 import arc.packer.*
+import arc.util.Tmp
 
 import javax.imageio.ImageIO
 import java.awt.*
@@ -258,6 +259,35 @@ task swapColors(){
         }else{
             throw new InvalidUserDataException("No replacement colors specified. Use -Pcolors=\"<path to color file>\"")
         }
+    }
+}
+
+task genPalette(){
+    doLast{
+        def total = 0
+        def size = 32
+        def outImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
+        def colorsUsed = new IntSet()
+
+        fileTree(dir: '../core/assets-raw/sprites/blocks', include: "**/*.png").visit{ file ->
+            if(file.isDirectory()) return
+
+            def img = ImageIO.read(file.file)
+            for(x in (0..img.getWidth() - 1)){
+                for(y in (0..img.getHeight() - 1)){
+                    def c = img.getRGB(x, y)
+
+                    if(Tmp.c1.argb8888(c).a > 0.999f && colorsUsed.add(c)){
+                        outImage.setRGB((int)(total / size), total % size, c)
+                        total ++
+                    }
+                }
+            }
+        }
+
+        ImageIO.write(outImage, "png", new File("palette.png"))
+        println "Found $total colors."
+
     }
 }
 

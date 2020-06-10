@@ -77,7 +77,9 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment,
 
     //units
-    groundFactory, airFactory, navalFactory, basicReconstructor, advancedReconstructor, repairPoint,
+    groundFactory, airFactory, navalFactory,
+    reconstructorBasis, reconstructorMorphism, reconstructorFunctor, reconstructorPrime,
+    repairPoint,
 
     //campaign
     launchPad, launchPadLarge, coreSilo, dataProcessor,
@@ -1755,7 +1757,7 @@ public class Blocks implements ContentList{
             consumes.power(1.2f);
         }};
 
-        basicReconstructor = new Reconstructor("basic-reconstructor"){{
+        reconstructorBasis = new Reconstructor("reconstructor-basis"){{
             requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
 
             size = 3;
@@ -1773,7 +1775,7 @@ public class Blocks implements ContentList{
             };
         }};
 
-        advancedReconstructor = new Reconstructor("advanced-reconstructor"){{
+        reconstructorMorphism = new Reconstructor("reconstructor-morphism"){{
             requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
 
             size = 5;
@@ -1786,6 +1788,35 @@ public class Blocks implements ContentList{
             upgrades = new UnitType[][]{
                 {UnitTypes.ghoul, UnitTypes.revenant},
                 {UnitTypes.mace, UnitTypes.fortress},
+            };
+        }};
+
+        //TODO finish these
+        reconstructorFunctor = new Reconstructor("reconstructor-functor"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+
+            size = 7;
+            consumes.power(6f);
+            consumes.items(ItemStack.with(Items.silicon, 60, Items.titanium, 60));
+            itemCapacity = 80;
+
+            constructTime = 60f * 15f;
+
+            upgrades = new UnitType[][]{
+            };
+        }};
+
+        reconstructorPrime = new Reconstructor("reconstructor-prime"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+
+            size = 9;
+            consumes.power(6f);
+            consumes.items(ItemStack.with(Items.silicon, 60, Items.titanium, 60));
+            itemCapacity = 80;
+
+            constructTime = 60f * 15f;
+
+            upgrades = new UnitType[][]{
             };
         }};
 
