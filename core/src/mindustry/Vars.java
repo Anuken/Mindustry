@@ -256,9 +256,9 @@ public class Vars implements Loadable{
         state = new GameState();
         data = new GlobalData();
 
-        mobile = Core.app.getType() == ApplicationType.Android || Core.app.getType() == ApplicationType.iOS || testMobile;
-        ios = Core.app.getType() == ApplicationType.iOS;
-        android = Core.app.getType() == ApplicationType.Android;
+        mobile = Core.app.isMobile() || testMobile;
+        ios = Core.app.isIOS();
+        android = Core.app.isAndroid();
 
         modDirectory.mkdirs();
 
