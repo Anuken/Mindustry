@@ -63,6 +63,9 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, Elevatio
             Vec2 baseOffset = Tmp.v5.trns(dstRot, type.legBaseOffset).add(x, y);
             Leg l = legs[i];
 
+            l.joint.sub(baseOffset).limit(type.maxStretch * legLength/2f).add(baseOffset);
+            l.base.sub(baseOffset).limit(type.maxStretch * legLength).add(baseOffset);
+
             float stageF = (totalLength + i*type.legPairOffset) / moveSpace;
             int stage = (int)stageF;
             int group = stage % div;

@@ -1762,7 +1762,7 @@ public class Blocks implements ContentList{
 
             size = 3;
             consumes.power(3f);
-            consumes.items(ItemStack.with(Items.silicon, 30, Items.graphite, 30));
+            consumes.items(ItemStack.with(Items.silicon, 40, Items.graphite, 30));
             itemCapacity = 30;
 
             constructTime = 60f * 5f;
@@ -1780,7 +1780,7 @@ public class Blocks implements ContentList{
 
             size = 5;
             consumes.power(6f);
-            consumes.items(ItemStack.with(Items.silicon, 60, Items.titanium, 60));
+            consumes.items(ItemStack.with(Items.silicon, 120, Items.titanium, 80));
             itemCapacity = 80;
 
             constructTime = 60f * 15f;
@@ -1796,11 +1796,12 @@ public class Blocks implements ContentList{
             requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
 
             size = 7;
-            consumes.power(6f);
-            consumes.items(ItemStack.with(Items.silicon, 60, Items.titanium, 60));
-            itemCapacity = 80;
+            consumes.power(12f);
+            consumes.items(ItemStack.with(Items.silicon, 200, Items.titanium, 200, Items.surgealloy, 200));
+            consumes.liquid(Liquids.cryofluid, 1f);
+            itemCapacity = 300;
 
-            constructTime = 60f * 15f;
+            constructTime = 60f * 60f;
 
             upgrades = new UnitType[][]{
             };
@@ -1810,11 +1811,12 @@ public class Blocks implements ContentList{
             requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
 
             size = 9;
-            consumes.power(6f);
-            consumes.items(ItemStack.with(Items.silicon, 60, Items.titanium, 60));
-            itemCapacity = 80;
+            consumes.power(25f);
+            consumes.items(ItemStack.with(Items.silicon, 300, Items.plastanium, 300, Items.surgealloy, 300, Items.phasefabric, 250));
+            consumes.liquid(Liquids.cryofluid, 3f);
+            itemCapacity = 400;
 
-            constructTime = 60f * 15f;
+            constructTime = 60f * 60f * 3;
 
             upgrades = new UnitType[][]{
             };
