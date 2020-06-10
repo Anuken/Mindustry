@@ -172,7 +172,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
         }, new IOSApplicationConfiguration(){{
-           //errorHandler = ModCrashHandler::handle;
+            useGL30 = true;
         }});
     }
 
