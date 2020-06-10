@@ -20,6 +20,8 @@ import mindustry.mod.*;
 import mindustry.net.Net;
 import mindustry.ui.*;
 
+import java.nio.*;
+
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
@@ -33,6 +35,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void setup(){
+
         loader = new LoadRenderer();
         Events.fire(new ClientCreateEvent());
 

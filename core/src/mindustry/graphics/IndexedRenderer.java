@@ -63,7 +63,7 @@ public class IndexedRenderer implements Disposable{
         program.bind();
         texture.bind();
 
-        program.setUniformMatrix4("u_projTrans", BatchShader.copyTransform(combined));
+        program.setUniformMatrix4("u_projTrans", combined);
         program.setUniformi("u_texture", 0);
 
         mesh.render(program, Gl.triangles, 0, vertices.length / vsize);
