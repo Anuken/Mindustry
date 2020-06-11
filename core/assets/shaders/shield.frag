@@ -1,3 +1,5 @@
+#define HIGHP
+
 #define MAX_HITS 64
 #define HIT_RADIUS 12.0
 #define ALPHA 0.18

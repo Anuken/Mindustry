@@ -39,7 +39,7 @@ public class Vars implements Loadable{
     /** Maximum schematic size.*/
     public static final int maxSchematicSize = 32;
     /** Whether to use array texture batches. */
-    public static boolean useArrayTextures = true;
+    public static boolean useArrayTextures = false;
     /** All schematic base64 starts with this string.*/
     public static final String schematicBaseStart ="bXNjaAB";
     /** IO buffer size. */
