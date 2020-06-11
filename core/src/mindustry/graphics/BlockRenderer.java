@@ -26,7 +26,7 @@ public class BlockRenderer implements Disposable{
 
     public final FloorRenderer floor = new FloorRenderer();
 
-    private Seq<Tile> requests = new Seq<>(false, initialRequests, Tile.class);
+    private Seq<Tile> tileview = new Seq<>(false, initialRequests, Tile.class);
 
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private float brokenFade = 0f;
@@ -34,6 +34,7 @@ public class BlockRenderer implements Disposable{
     private FrameBuffer fog = new FrameBuffer();
     private Seq<Tilec> outArray2 = new Seq<>();
     private Seq<Tile> shadowEvents = new Seq<>();
+    private IntSet processedEntities = new IntSet();
     private boolean displayStatus = false;
 
     public BlockRenderer(){
@@ -185,7 +186,8 @@ public class BlockRenderer implements Disposable{
             return;
         }
 
-        requests.clear();
+        tileview.clear();
+        processedEntities.clear();
 
         int minx = Math.max(avgx - rangex - expandr, 0);
         int miny = Math.max(avgy - rangey - expandr, 0);
@@ -197,16 +199,19 @@ public class BlockRenderer implements Disposable{
                 boolean expanded = (Math.abs(x - avgx) > rangex || Math.abs(y - avgy) > rangey);
                 Tile tile = world.rawTile(x, y);
                 Block block = tile.block();
+                //link to center
+                if(tile.entity != null) tile = tile.entity.tile();
 
-                if(block != Blocks.air && tile.isCenter() && block.cacheLayer == CacheLayer.normal){
+                if(block != Blocks.air && block.cacheLayer == CacheLayer.normal && (tile.entity == null || !processedEntities.contains(tile.entity.id()))){
                     if(block.expanded || !expanded){
-                        requests.add(tile);
+                        tileview.add(tile);
+                        if(tile.entity != null) processedEntities.add(tile.entity.id());
                     }
 
                     if(tile.entity != null && tile.entity.power() != null && tile.entity.power().links.size > 0){
                         for(Tilec other : tile.entity.getPowerConnections(outArray2)){
                             if(other.block() instanceof PowerNode){ //TODO need a generic way to render connections!
-                                requests.add(other.tile());
+                                tileview.add(other.tile());
                             }
                         }
                     }
@@ -223,8 +228,8 @@ public class BlockRenderer implements Disposable{
     public void drawBlocks(){
         drawDestroyed();
 
-        for(int i = 0; i < requests.size; i++){
-            Tile tile = requests.items[i];
+        for(int i = 0; i < tileview.size; i++){
+            Tile tile = tileview.items[i];
             Block block = tile.block();
             Tilec entity = tile.entity;
 
