@@ -14,8 +14,8 @@ uniform vec2 u_texsize;
 uniform float u_time;
 uniform float u_dp;
 uniform vec2 u_offset;
+uniform vec4 u_shieldcolor;
 
-varying vec4 v_color;
 varying vec2 v_texCoord;
 
 void main(){
@@ -32,7 +32,7 @@ void main(){
        		(texture2D(u_texture, T + vec2(0, step) * v).a > 0.0 || texture2D(u_texture, T + vec2(0, -step) * v).a > 0.0 ||
        		texture2D(u_texture, T + vec2(step, 0) * v).a > 0.0 || texture2D(u_texture, T + vec2(-step, 0) * v).a > 0.0)){
 
-		gl_FragColor = mix(v_color, vec4(1.0), si);
+		gl_FragColor = mix(u_shieldcolor, vec4(1.0), si);
 	}else{
 
 	    if(color.a > 0.0){

@@ -195,9 +195,7 @@ public class LightRenderer{
 
         Draw.color();
         Shaders.light.ambient.set(state.rules.ambientLight);
-        Draw.shader(Shaders.light);
-        Draw.rect(buffer);
-        Draw.shader();
+        buffer.blit(Shaders.light);
 
         lights.clear();
     }

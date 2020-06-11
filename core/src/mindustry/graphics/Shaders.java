@@ -16,7 +16,7 @@ import static mindustry.Vars.renderer;
 
 public class Shaders{
     public static BlockBuild blockbuild;
-    public static @Nullable Shield shield;
+    public static @Nullable ShieldShader shield;
     public static UnitBuild build;
     public static FogShader fog;
     public static LightShader light;
@@ -30,7 +30,7 @@ public class Shaders{
     public static void init(){
         blockbuild = new BlockBuild();
         try{
-            shield = new Shield();
+            shield = new ShieldShader();
         }catch(Throwable t){
             //don't load shield shader
             shield = null;
@@ -119,7 +119,7 @@ public class Shaders{
         public Color ambient = new Color(0.01f, 0.01f, 0.04f, 0.99f);
 
         public LightShader(){
-            super("light", "default");
+            super("light", "screenspace");
         }
 
         @Override
@@ -175,16 +175,18 @@ public class Shaders{
         }
     }
 
-    public static class Shield extends LoadShader{
+    public static class ShieldShader extends LoadShader{
+        public Color color = Pal.accent.cpy();
 
-        public Shield(){
-            super("shield", "default");
+        public ShieldShader(){
+            super("shield", "screenspace");
         }
 
         @Override
         public void apply(){
             setUniformf("u_dp", Scl.scl(1f));
             setUniformf("u_time", Time.time() / Scl.scl(1f));
+            setUniformf("u_shieldcolor", color);
             setUniformf("u_offset",
             Core.camera.position.x - Core.camera.width / 2,
             Core.camera.position.y - Core.camera.height / 2);
@@ -196,7 +198,7 @@ public class Shaders{
     public static class SurfaceShader extends LoadShader{
 
         public SurfaceShader(String frag){
-            super(frag, "default");
+            super(frag, "screenspace");
 
             Core.assets.load("sprites/noise.png", Texture.class).loaded = t -> {
                 ((Texture)t).setFilter(TextureFilter.Linear);

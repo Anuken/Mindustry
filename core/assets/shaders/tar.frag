@@ -12,7 +12,6 @@ uniform vec2 u_campos;
 uniform vec2 u_resolution;
 uniform float u_time;
 
-varying vec4 v_color;
 varying vec2 v_texCoord;
 
 void main(){

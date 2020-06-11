@@ -238,11 +238,7 @@ public class Renderer implements ApplicationListener{
             Draw.drawRange(Layer.shields, 1f, () -> effectBuffer.begin(Color.clear), () -> {
                 effectBuffer.end();
 
-                Draw.shader(Shaders.shield);
-                Draw.color(Pal.accent);
-                Draw.rect(effectBuffer);
-                Draw.color();
-                Draw.shader();
+                effectBuffer.blit(Shaders.shield);
             });
         }
 
