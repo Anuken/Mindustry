@@ -10,10 +10,9 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.type.*;
 
-import static mindustry.Vars.renderer;
+import static mindustry.Vars.*;
 
 public class Shaders{
     public static BlockBuild blockbuild;
@@ -134,7 +133,7 @@ public class Shaders{
 
     public static class FogShader extends LoadShader{
         public FogShader(){
-            super("fog", "default", true);
+            super("fog", "default");
         }
     }
 
@@ -144,7 +143,7 @@ public class Shaders{
         public TextureRegion region;
 
         public UnitBuild(){
-            super("unitbuild", "default", true);
+            super("unitbuild", "default");
         }
 
         @Override
@@ -164,7 +163,7 @@ public class Shaders{
         public TextureRegion region = new TextureRegion();
 
         public BlockBuild(){
-            super("blockbuild", "default", true);
+            super("blockbuild", "default");
         }
 
         @Override
@@ -227,18 +226,7 @@ public class Shaders{
     public static class LoadShader extends Shader{
 
         public LoadShader(String frag, String vert){
-            this(frag, vert, false);
-        }
-
-        public LoadShader(String frag, String vert, boolean preprocess){
-            super(
-                preprocess && Core.gl30 != null && Vars.useArrayTextures ? ArrayTextureSpriteBatch.preprocessShader(
-                    Core.files.internal("shaders/" + vert + ".vert").readString(), false) :
-                    Core.files.internal("shaders/" + vert + ".vert").readString(),
-                preprocess && Core.gl30 != null && Vars.useArrayTextures ? ArrayTextureSpriteBatch.preprocessShader(
-                    Core.files.internal("shaders/" + frag + ".frag").readString(), true) :
-                    Core.files.internal("shaders/" + frag + ".frag").readString()
-            );
+            super(Core.files.internal("shaders/" + vert + ".vert").readString(), Core.files.internal("shaders/" + frag + ".frag").readString());
         }
     }
 }

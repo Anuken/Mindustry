@@ -163,15 +163,17 @@ public class ForceProjector extends Block{
                 if(Core.settings.getBool("animatedshields")){
                     Fill.poly(x, y, 6, radius);
 
-                    Draw.z(Layer.shields + 0.1f);
+                    Draw.z(Layer.shields + 0.01f);
 
-                    Draw.color(Color.white);
-                    Draw.alpha(hit);
-                    Fill.poly(x, y, 6, radius);
-                    Draw.color();
+                    if(hit > 0){
+                        Draw.color(Color.white);
+                        Draw.alpha(1f);
+                        Fill.poly(x, y, 6, radius);
+                        Draw.color();
+                    }
                 }else{
                     Lines.stroke(1.5f);
-                    Draw.alpha(0.09f + 0.08f * hit);
+                    Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));
                     Fill.poly(x, y, 6, radius);
                     Draw.alpha(1f);
                     Lines.poly(x, y, 6, radius);

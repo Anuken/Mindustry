@@ -33,9 +33,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void setup(){
-        //array textures are gl30 only
-        if(gl30 == null) useArrayTextures = false;
-
         loader = new LoadRenderer();
         Events.fire(new ClientCreateEvent());
 
@@ -70,9 +67,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         assets.load(new AssetDescriptor<>("sprites/sprites.atlas", TextureAtlas.class)).loaded = t -> {
             atlas = (TextureAtlas)t;
-            if(!useArrayTextures){
-                Fonts.mergeFontAtlas(atlas);
-            }
+            Fonts.mergeFontAtlas(atlas);
         };
 
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());

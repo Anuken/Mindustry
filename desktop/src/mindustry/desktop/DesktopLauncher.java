@@ -39,7 +39,6 @@ public class DesktopLauncher extends ClientLauncher{
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
                 title = "Mindustry";
                 maximized = true;
-                gl30 = true;
                 stencil = 8;
                 width = 900;
                 height = 700;

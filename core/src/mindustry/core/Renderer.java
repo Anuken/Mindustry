@@ -237,7 +237,6 @@ public class Renderer implements ApplicationListener{
         if(settings.getBool("animatedshields")){
             Draw.drawRange(Layer.shields, 1f, () -> effectBuffer.begin(Color.clear), () -> {
                 effectBuffer.end();
-
                 effectBuffer.blit(Shaders.shield);
             });
         }
