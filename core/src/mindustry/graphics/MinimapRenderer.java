@@ -129,7 +129,7 @@ public class MinimapRenderer implements Disposable{
         for(Tile tile : world.tiles){
             pixmap.draw(tile.x, pixmap.getHeight() - 1 - tile.y, colorFor(tile));
         }
-        texture.draw(pixmap, 0, 0);
+        texture.draw(pixmap);
     }
 
     public void update(Tile tile){

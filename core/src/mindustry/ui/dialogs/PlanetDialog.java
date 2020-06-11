@@ -218,9 +218,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if(doBuffer){
             buffer.end();
-            Draw.color(color);
-            Draw.rect(Draw.wrap(buffer.getTexture()), Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Core.graphics.getWidth(), -Core.graphics.getHeight());
-            Draw.color();
+
+            buffer.blit(Shaders.screenspace);
         }
     }
 

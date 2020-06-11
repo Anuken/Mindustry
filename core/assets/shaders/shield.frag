@@ -1,8 +1,3 @@
-#ifdef GL_ES
-precision highp float;
-precision highp int;
-#endif
-
 #define MAX_HITS 64
 #define HIT_RADIUS 12.0
 #define ALPHA 0.18

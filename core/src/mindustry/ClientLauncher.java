@@ -20,8 +20,6 @@ import mindustry.mod.*;
 import mindustry.net.Net;
 import mindustry.ui.*;
 
-import java.nio.*;
-
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
@@ -35,6 +33,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void setup(){
+        //array textures are gl30 only
+        if(gl30 == null) useArrayTextures = false;
 
         loader = new LoadRenderer();
         Events.fire(new ClientCreateEvent());
@@ -48,7 +48,9 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             return (Float.isNaN(result) || Float.isInfinite(result)) ? 1f : Mathf.clamp(result, 0.0001f, 60f / 10f);
         });
 
-        batch = new SortedSpriteBatch();
+        batch = new SortedSpriteDelegate(Vars.useArrayTextures ?
+            new ArrayTextureSpriteBatch() :
+            new SpriteBatch());
         assets = new AssetManager();
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
 
@@ -70,7 +72,9 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         assets.load(new AssetDescriptor<>("sprites/sprites.atlas", TextureAtlas.class)).loaded = t -> {
             atlas = (TextureAtlas)t;
-            Fonts.mergeFontAtlas(atlas);
+            if(!useArrayTextures){
+                Fonts.mergeFontAtlas(atlas);
+            }
         };
 
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());

@@ -1,8 +1,3 @@
-#ifdef GL_ES
-precision highp float;
-precision mediump int;
-#endif
-
 #define NSCALE 180.0 / 2.0
 
 uniform sampler2D u_texture;

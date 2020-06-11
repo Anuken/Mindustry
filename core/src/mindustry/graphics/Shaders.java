@@ -10,6 +10,7 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.type.*;
 
 import static mindustry.Vars.renderer;
@@ -26,6 +27,7 @@ public class Shaders{
     public static AtmosphereShader atmosphere;
     public static MeshShader mesh = new MeshShader();
     public static Shader unlit;
+    public static Shader screenspace;
 
     public static void init(){
         blockbuild = new BlockBuild();
@@ -46,6 +48,7 @@ public class Shaders{
         planetGrid = new PlanetGridShader();
         atmosphere = new AtmosphereShader();
         unlit = new LoadShader("planet", "unlit");
+        screenspace = new LoadShader("screenspace", "screenspace");
     }
 
     public static class AtmosphereShader extends LoadShader{
@@ -131,7 +134,7 @@ public class Shaders{
 
     public static class FogShader extends LoadShader{
         public FogShader(){
-            super("fog", "default");
+            super("fog", "default", true);
         }
     }
 
@@ -141,7 +144,7 @@ public class Shaders{
         public TextureRegion region;
 
         public UnitBuild(){
-            super("unitbuild", "default");
+            super("unitbuild", "default", true);
         }
 
         @Override
@@ -161,7 +164,7 @@ public class Shaders{
         public TextureRegion region = new TextureRegion();
 
         public BlockBuild(){
-            super("blockbuild", "default");
+            super("blockbuild", "default", true);
         }
 
         @Override
@@ -222,8 +225,20 @@ public class Shaders{
     }
 
     public static class LoadShader extends Shader{
+
         public LoadShader(String frag, String vert){
-            super(Core.files.internal("shaders/" + vert + ".vert"), Core.files.internal("shaders/" + frag + ".frag"));
+            this(frag, vert, false);
+        }
+
+        public LoadShader(String frag, String vert, boolean preprocess){
+            super(
+                preprocess && Core.gl30 != null && Vars.useArrayTextures ? ArrayTextureSpriteBatch.preprocessShader(
+                    Core.files.internal("shaders/" + vert + ".vert").readString(), false) :
+                    Core.files.internal("shaders/" + vert + ".vert").readString(),
+                preprocess && Core.gl30 != null && Vars.useArrayTextures ? ArrayTextureSpriteBatch.preprocessShader(
+                    Core.files.internal("shaders/" + frag + ".frag").readString(), true) :
+                    Core.files.internal("shaders/" + frag + ".frag").readString()
+            );
         }
     }
 }

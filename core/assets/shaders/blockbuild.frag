@@ -1,8 +1,3 @@
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 uniform sampler2D u_texture;
 
 uniform vec4 u_color;

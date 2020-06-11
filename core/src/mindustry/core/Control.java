@@ -278,7 +278,7 @@ public class Control implements ApplicationListener, Loadable{
                 }catch(SaveException e){
                     Log.err(e);
                     sector.save = null;
-                    ui.showErrorMessage("$save.corrupted");
+                    Time.runTask(10f, () -> ui.showErrorMessage("$save.corrupted"));
                     slot.delete();
                     playSector(sector);
                 }

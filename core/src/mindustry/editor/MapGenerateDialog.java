@@ -391,7 +391,7 @@ public class MapGenerateDialog extends BaseDialog{
                     if(pixmap == null || texture == null){
                         return;
                     }
-                    texture.draw(pixmap, 0, 0);
+                    texture.draw(pixmap);
                     generating = false;
                 });
             }catch(Exception e){
