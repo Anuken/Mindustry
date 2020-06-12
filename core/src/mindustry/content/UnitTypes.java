@@ -1,11 +1,8 @@
 package mindustry.content;
 
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
@@ -399,14 +396,13 @@ public class UnitTypes implements ContentList{
             speed = 1.1f;
             accel = 0.02f;
             drag = 0.05f;
-            rotateSpeed = 0.5f;
+            rotateSpeed = 2.5f;
             flying = true;
             lowAltitude = true;
             health = 75000;
             engineOffset = 38;
             engineSize = 7.3f;
             hitsize = 58f;
-            parts = 4;
 
             weapons.add(new Weapon(){{
                 y = 1.5f;
@@ -416,63 +412,7 @@ public class UnitTypes implements ContentList{
                 bullet = Bullets.standardCopper;
                 shootSound = Sounds.shoot;
             }});
-            }
-
-            @Override
-            public void drawBody(Unitc unit){
-                applyColor(unit);
-
-                for(int i = 0; i < parts; i++){
-                    Vec2 v = drift(i);
-                    Draw.rect(partRegions[i], unit.x() + v.x, unit.y() + v.y, unit.rotation() - 90 + rot(unit, i));
-                }
-
-                Draw.reset();
-            }
-
-            @Override
-            public void drawCell(Unitc unit){
-                applyColor(unit);
-
-                Draw.color(cellColor(unit));
-                for(int i = 0; i < parts; i++){
-                    Vec2 v = drift(i);
-                    Draw.rect(partCellRegions[i], unit.x() + v.x, unit.y() + v.y, unit.rotation() - 90 + rot(unit, i));
-                }
-                Draw.reset();
-            }
-
-            @Override
-            public void drawEngine(Unitc unit){
-                float bend = rot(unit, parts - 1);
-                Vec2 v = drift(parts - 1);
-                float cx = Angles.trnsx(bend + unit.rotation() + 180, engineOffset) - Angles.trnsx(unit.rotation() + 180, engineOffset) + v.x,
-                    cy = Angles.trnsy(bend + unit.rotation() + 180, engineOffset) - Angles.trnsy(unit.rotation() + 180, engineOffset) + v.y;
-                unit.trns(cx, cy);
-
-                super.drawEngine(unit);
-
-                unit.trns(-cx, -cy);
-            }
-
-            @Override
-            public void update(Unitc unit){
-                unit.animation(Mathf.slerpDelta(unit.animation(), unit.rotation(), 0.01f));
-            }
-
-            Vec2 drift(int i){
-                float l = 0.5f;
-                float s = 12f;
-                float off = i*19;
-                return Tmp.v1.set(Mathf.absin(Time.time()+off, s, l), Mathf.absin(Time.time() + 94+off, s, l)).limit(l);
-            }
-
-            float rot(Unitc unit, int i){
-                float offset = ((i + 0.5f) - parts/2f) / (parts/2f);
-                float mag = i == parts - 1 ? 8f : 13f;
-                return Mathf.clamp((unit.animation() - unit.rotation()) / 3f, -mag, mag) * offset;
-            }
-        };
+        }};
 
 
         vanguard = new UnitType("vanguard"){{

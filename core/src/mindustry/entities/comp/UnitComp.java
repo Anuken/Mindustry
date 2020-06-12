@@ -26,7 +26,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     private UnitController controller;
     private UnitType type;
     boolean spawnedByCore;
-    float animation;
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
