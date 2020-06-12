@@ -1,6 +1,5 @@
 package mindustry.world.blocks.units;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -35,8 +34,8 @@ public class Reconstructor extends UnitBlock{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-out"), Core.atlas.find(name + "-top")};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region, outRegion, topRegion};
     }
 
     @Override

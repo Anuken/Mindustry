@@ -443,13 +443,13 @@ public class Block extends UnlockableContent{
         return editorVariantRegions;
     }
 
-    protected TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name)};
+    protected TextureRegion[] icons(){
+        return new TextureRegion[]{region};
     }
 
     public TextureRegion[] getGeneratedIcons(){
         if(generatedIcons == null){
-            generatedIcons = generateIcons();
+            generatedIcons = icons();
         }
         return generatedIcons;
     }

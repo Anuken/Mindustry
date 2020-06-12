@@ -1,6 +1,5 @@
 package mindustry.world.blocks.distribution;
 
-import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -72,8 +71,8 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-0-0")};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{regions[0][0]};
     }
 
     @Override

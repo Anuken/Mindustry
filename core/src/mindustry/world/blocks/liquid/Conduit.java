@@ -17,7 +17,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class Conduit extends LiquidBlock implements Autotiler{
     public final int timerFlow = timers++;
@@ -68,8 +68,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find("conduit-bottom"), Core.atlas.find(name + "-top-0")};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{Core.atlas.find("conduit-bottom"), topRegions[0]};
     }
 
     public class ConduitEntity extends LiquidBlockEntity{

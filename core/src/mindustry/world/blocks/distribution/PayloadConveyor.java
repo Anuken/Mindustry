@@ -32,7 +32,7 @@ public class PayloadConveyor extends Block{
     }
 
     @Override
-    protected TextureRegion[] generateIcons(){
+    protected TextureRegion[] icons(){
         return new TextureRegion[]{Core.atlas.find(name + "-icon")};
     }
 

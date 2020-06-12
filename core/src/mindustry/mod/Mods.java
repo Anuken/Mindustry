@@ -175,6 +175,7 @@ public class Mods implements Loadable{
                 arr.each(c -> {
                     if(c instanceof UnlockableContent && c.minfo.mod != null){
                         UnlockableContent u = (UnlockableContent)c;
+                        u.load();
                         u.createIcons(packer);
                     }
                 });

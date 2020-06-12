@@ -61,8 +61,8 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return drawIcons == null ? super.generateIcons() : drawIcons.get();
+    public TextureRegion[] icons(){
+        return drawIcons == null ? super.icons() : drawIcons.get();
     }
 
     @Override

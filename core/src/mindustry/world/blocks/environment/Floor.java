@@ -132,7 +132,7 @@ public class Floor extends Block{
 
         Color color = new Color();
         Color color2 = new Color();
-        PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)generateIcons()[0]);
+        PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)icons()[0]);
         PixmapRegion edge = Core.atlas.getPixmap("edge-stencil");
         Pixmap result = new Pixmap(edge.width, edge.height);
 
@@ -144,11 +144,6 @@ public class Floor extends Block{
         }
 
         packer.add(PageType.environment, name + "-edge", result);
-    }
-
-    @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
 
     @Override

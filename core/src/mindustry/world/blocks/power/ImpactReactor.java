@@ -60,8 +60,8 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name)};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{bottomRegion, region};
     }
 
     public class FusionReactorEntity extends GeneratorEntity{

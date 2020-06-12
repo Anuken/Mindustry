@@ -99,10 +99,11 @@ public class Generators{
             Image colors = new Image(content.blocks().size, 1);
 
             for(Block block : content.blocks()){
+                block.load();
+
                 TextureRegion[] regions = block.getGeneratedIcons();
 
                 if(block instanceof Floor){
-                    block.load();
                     for(TextureRegion region : block.variantRegions()){
                         GenRegion gen = (GenRegion)region;
                         if(gen.path == null) continue;
@@ -198,7 +199,7 @@ public class Generators{
                 }catch(IllegalArgumentException e){
                     Log.info("Skipping &ly'@'", block.name);
                 }catch(NullPointerException e){
-                    Log.err("Block &ly'@'&lr has an null region!");
+                    Log.err("Block &ly'@'&lr has an null region!", block);
                 }
             }
 
@@ -229,7 +230,7 @@ public class Generators{
         });
 
         ImagePacker.generate("item-icons", () -> {
-            for(UnlockableContent item : (Seq<? extends UnlockableContent>)(Seq)Seq.withArrays(content.items(), content.liquids())){
+            for(UnlockableContent item : Seq.<UnlockableContent>withArrays(content.items(), content.liquids())){
                 Image base = ImagePacker.get(item.getContentType().name() + "-" + item.name);
                 for(Cicon icon : Cicon.scaled){
                     //if(icon.size == base.width) continue;
@@ -339,7 +340,7 @@ public class Generators{
                 }
 
                 try{
-                    Image image = gens.get(floor, ImagePacker.get(floor.generateIcons()[0]));
+                    Image image = gens.get(floor, ImagePacker.get(floor.getGeneratedIcons()[0]));
                     Image edge = ImagePacker.get("edge-stencil");
                     Image result = new Image(edge.width, edge.height);
 

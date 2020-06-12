@@ -33,7 +33,7 @@ public class Wall extends Block{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
+    public TextureRegion[] icons(){
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
 
