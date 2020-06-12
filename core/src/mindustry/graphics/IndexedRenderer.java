@@ -67,14 +67,15 @@ public class IndexedRenderer implements Disposable{
     }
 
     public void draw(int index, TextureRegion region, float x, float y, float w, float h){
-        final float fx2 = x + w;
-        final float fy2 = y + h;
-        final float u = region.getU();
-        final float v = region.getV2();
-        final float u2 = region.getU2();
-        final float v2 = region.getV();
+        float fx2 = x + w;
+        float fy2 = y + h;
+        float u = region.getU();
+        float v = region.getV2();
+        float u2 = region.getU2();
+        float v2 = region.getV();
 
         float[] vertices = tmpVerts;
+        float color = this.color;
 
         int idx = 0;
         vertices[idx++] = x;
@@ -118,46 +119,35 @@ public class IndexedRenderer implements Disposable{
     }
 
     public void draw(int index, TextureRegion region, float x, float y, float w, float h, float rotation){
-        final float u = region.getU();
-        final float v = region.getV2();
-        final float u2 = region.getU2();
-        final float v2 = region.getV();
+        float u = region.getU();
+        float v = region.getV2();
+        float u2 = region.getU2();
+        float v2 = region.getV();
 
-        final float originX = w / 2, originY = h / 2;
+        float originX = w / 2, originY = h / 2;
 
-        final float cos = Mathf.cosDeg(rotation);
-        final float sin = Mathf.sinDeg(rotation);
+        float cos = Mathf.cosDeg(rotation);
+        float sin = Mathf.sinDeg(rotation);
 
         float fx = -originX;
         float fy = -originY;
         float fx2 = w - originX;
         float fy2 = h - originY;
 
-        final float worldOriginX = x + originX;
-        final float worldOriginY = y + originY;
+        float worldOriginX = x + originX;
+        float worldOriginY = y + originY;
 
-        float x1 = cos * fx - sin * fy;
-        float y1 = sin * fx + cos * fy;
-
-        float x2 = cos * fx - sin * fy2;
-        float y2 = sin * fx + cos * fy2;
-
-        float x3 = cos * fx2 - sin * fy2;
-        float y3 = sin * fx2 + cos * fy2;
-
+        float x1 = cos * fx - sin * fy + worldOriginX;
+        float y1 = sin * fx + cos * fy + worldOriginY;
+        float x2 = cos * fx - sin * fy2 + worldOriginX;
+        float y2 = sin * fx + cos * fy2 + worldOriginY;
+        float x3 = cos * fx2 - sin * fy2 + worldOriginX;
+        float y3 = sin * fx2 + cos * fy2 + worldOriginY;
         float x4 = x1 + (x3 - x2);
         float y4 = y3 - (y2 - y1);
 
-        x1 += worldOriginX;
-        y1 += worldOriginY;
-        x2 += worldOriginX;
-        y2 += worldOriginY;
-        x3 += worldOriginX;
-        y3 += worldOriginY;
-        x4 += worldOriginX;
-        y4 += worldOriginY;
-
         float[] vertices = tmpVerts;
+        float color = this.color;
 
         int idx = 0;
         vertices[idx++] = x1;
