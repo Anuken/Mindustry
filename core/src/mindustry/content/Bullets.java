@@ -48,16 +48,16 @@ public class Bullets implements ContentList{
             hitEffect = Fx.flakExplosion;
             knockback = 0.8f;
             lifetime = 50f;
-            bulletWidth = bulletHeight = 11f;
+            width = height = 11f;
             collidesTiles = false;
             splashDamageRadius = 25f;
             splashDamage = 33f;
         }};
 
         artilleryPlasticFrag = new BasicBulletType(2.5f, 10, "bullet"){{
-            bulletWidth = 10f;
-            bulletHeight = 12f;
-            bulletShrink = 1f;
+            width = 10f;
+            height = 12f;
+            shrinkY = 1f;
             lifetime = 15f;
             backColor = Pal.plastaniumBack;
             frontColor = Pal.plastaniumFront;
@@ -68,7 +68,7 @@ public class Bullets implements ContentList{
             hitEffect = Fx.plasticExplosion;
             knockback = 1f;
             lifetime = 55f;
-            bulletWidth = bulletHeight = 13f;
+            width = height = 13f;
             collidesTiles = false;
             splashDamageRadius = 35f;
             splashDamage = 45f;
@@ -82,7 +82,7 @@ public class Bullets implements ContentList{
             hitEffect = Fx.flakExplosion;
             knockback = 0.8f;
             lifetime = 45f;
-            bulletWidth = bulletHeight = 11f;
+            width = height = 11f;
             collidesTiles = false;
             splashDamageRadius = 25f;
             splashDamage = 33f;
@@ -96,7 +96,7 @@ public class Bullets implements ContentList{
             hitEffect = Fx.blastExplosion;
             knockback = 0.8f;
             lifetime = 60f;
-            bulletWidth = bulletHeight = 13f;
+            width = height = 13f;
             collidesTiles = false;
             splashDamageRadius = 25f;
             splashDamage = 35f;
@@ -110,7 +110,7 @@ public class Bullets implements ContentList{
             hitEffect = Fx.blastExplosion;
             knockback = 0.8f;
             lifetime = 70f;
-            bulletWidth = bulletHeight = 14f;
+            width = height = 14f;
             collidesTiles = false;
             ammoMultiplier = 4f;
             splashDamageRadius = 45f;
@@ -123,9 +123,9 @@ public class Bullets implements ContentList{
         }};
 
         glassFrag = new BasicBulletType(3f, 5, "bullet"){{
-            bulletWidth = 5f;
-            bulletHeight = 12f;
-            bulletShrink = 1f;
+            width = 5f;
+            height = 12f;
+            shrinkY = 1f;
             lifetime = 20f;
             backColor = Pal.gray;
             frontColor = Color.white;
@@ -136,8 +136,8 @@ public class Bullets implements ContentList{
             lifetime = 60f;
             ammoMultiplier = 4f;
             shootEffect = Fx.shootSmall;
-            bulletWidth = 6f;
-            bulletHeight = 8f;
+            width = 6f;
+            height = 8f;
             hitEffect = Fx.flakExplosion;
             splashDamage = 27f;
             splashDamageRadius = 15f;
@@ -148,8 +148,8 @@ public class Bullets implements ContentList{
             ammoMultiplier = 5f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.5f;
-            bulletWidth = 6f;
-            bulletHeight = 8f;
+            width = 6f;
+            height = 8f;
             hitEffect = Fx.flakExplosion;
             splashDamage = 22f;
             splashDamageRadius = 24f;
@@ -160,8 +160,8 @@ public class Bullets implements ContentList{
             ammoMultiplier = 5f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.8f;
-            bulletWidth = 6f;
-            bulletHeight = 8f;
+            width = 6f;
+            height = 8f;
             hitEffect = Fx.flakExplosion;
             splashDamage = 20f;
             splashDamageRadius = 20f;
@@ -199,9 +199,9 @@ public class Bullets implements ContentList{
         }};
 
         missileExplosive = new MissileBulletType(2.7f, 10, "missile"){{
-            bulletWidth = 8f;
-            bulletHeight = 8f;
-            bulletShrink = 0f;
+            width = 8f;
+            height = 8f;
+            shrinkY = 0f;
             drag = -0.01f;
             splashDamageRadius = 30f;
             splashDamage = 30f;
@@ -217,9 +217,9 @@ public class Bullets implements ContentList{
         missileIncendiary = new MissileBulletType(2.9f, 12, "missile"){{
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
-            bulletWidth = 7f;
-            bulletHeight = 8f;
-            bulletShrink = 0f;
+            width = 7f;
+            height = 8f;
+            shrinkY = 0f;
             drag = -0.01f;
             homingPower = 0.08f;
             splashDamageRadius = 20f;
@@ -230,9 +230,9 @@ public class Bullets implements ContentList{
         }};
 
         missileSurge = new MissileBulletType(4.4f, 20, "bullet"){{
-            bulletWidth = 8f;
-            bulletHeight = 8f;
-            bulletShrink = 0f;
+            width = 8f;
+            height = 8f;
+            shrinkY = 0f;
             drag = -0.01f;
             splashDamageRadius = 28f;
             splashDamage = 40f;
@@ -244,9 +244,9 @@ public class Bullets implements ContentList{
         }};
 
         missileJavelin = new MissileBulletType(5f, 10.5f, "missile"){{
-            bulletWidth = 8f;
-            bulletHeight = 8f;
-            bulletShrink = 0f;
+            width = 8f;
+            height = 8f;
+            shrinkY = 0f;
             drag = -0.003f;
             keepVelocity = false;
             splashDamageRadius = 20f;
@@ -262,9 +262,9 @@ public class Bullets implements ContentList{
         }};
 
         missileSwarm = new MissileBulletType(2.7f, 12, "missile"){{
-            bulletWidth = 8f;
-            bulletHeight = 8f;
-            bulletShrink = 0f;
+            width = 8f;
+            height = 8f;
+            shrinkY = 0f;
             drag = -0.003f;
             homingRange = 60f;
             keepVelocity = false;
@@ -281,8 +281,8 @@ public class Bullets implements ContentList{
         }};
 
         standardCopper = new BasicBulletType(2.5f, 9, "bullet"){{
-            bulletWidth = 7f;
-            bulletHeight = 9f;
+            width = 7f;
+            height = 9f;
             lifetime = 60f;
             shootEffect = Fx.shootSmall;
             smokeEffect = Fx.shootSmallSmoke;
@@ -290,16 +290,16 @@ public class Bullets implements ContentList{
         }};
 
         standardDense = new BasicBulletType(3.5f, 18, "bullet"){{
-            bulletWidth = 9f;
-            bulletHeight = 12f;
+            width = 9f;
+            height = 12f;
             reloadMultiplier = 0.6f;
             ammoMultiplier = 4;
             lifetime = 60f;
         }};
 
         standardThorium = new BasicBulletType(4f, 29, "bullet"){{
-            bulletWidth = 10f;
-            bulletHeight = 13f;
+            width = 10f;
+            height = 13f;
             shootEffect = Fx.shootBig;
             smokeEffect = Fx.shootBigSmoke;
             ammoMultiplier = 4;
@@ -307,8 +307,8 @@ public class Bullets implements ContentList{
         }};
 
         standardHoming = new BasicBulletType(3f, 12, "bullet"){{
-            bulletWidth = 7f;
-            bulletHeight = 9f;
+            width = 7f;
+            height = 9f;
             homingPower = 0.08f;
             reloadMultiplier = 1.5f;
             ammoMultiplier = 5;
@@ -316,8 +316,8 @@ public class Bullets implements ContentList{
         }};
 
         standardIncendiary = new BasicBulletType(3.2f, 11, "bullet"){{
-            bulletWidth = 10f;
-            bulletHeight = 12f;
+            width = 10f;
+            height = 12f;
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             status = StatusEffects.burning;
@@ -326,8 +326,8 @@ public class Bullets implements ContentList{
         }};
 
         standardGlaive = new BasicBulletType(4f, 7.5f, "bullet"){{
-            bulletWidth = 10f;
-            bulletHeight = 12f;
+            width = 10f;
+            height = 12f;
             frontColor = Color.valueOf("feb380");
             backColor = Color.valueOf("ea8878");
             status = StatusEffects.burning;
@@ -335,28 +335,28 @@ public class Bullets implements ContentList{
         }};
 
         standardMechSmall = new BasicBulletType(4f, 9, "bullet"){{
-            bulletWidth = 11f;
-            bulletHeight = 14f;
+            width = 11f;
+            height = 14f;
             lifetime = 40f;
             inaccuracy = 5f;
             despawnEffect = Fx.hitBulletSmall;
         }};
 
         standardDenseBig = new BasicBulletType(7f, 55, "bullet"){{
-            bulletWidth = 15f;
-            bulletHeight = 21f;
+            width = 15f;
+            height = 21f;
             shootEffect = Fx.shootBig;
         }};
 
         standardThoriumBig = new BasicBulletType(8f, 80, "bullet"){{
-            bulletWidth = 16f;
-            bulletHeight = 23f;
+            width = 16f;
+            height = 23f;
             shootEffect = Fx.shootBig;
         }};
 
         standardIncendiaryBig = new BasicBulletType(7f, 60, "bullet"){{
-            bulletWidth = 16f;
-            bulletHeight = 21f;
+            width = 16f;
+            height = 21f;
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             status = StatusEffects.burning;
@@ -510,16 +510,16 @@ public class Bullets implements ContentList{
         driverBolt = new MassDriverBolt();
 
         frag = new BasicBulletType(5f, 8, "bullet"){{
-            bulletWidth = 8f;
-            bulletHeight = 9f;
-            bulletShrink = 0.5f;
+            width = 8f;
+            height = 9f;
+            shrinkY = 0.5f;
             lifetime = 50f;
             drag = 0.04f;
         }};
 
         bombExplosive = new BombBulletType(18f, 25f, "shell"){{
-            bulletWidth = 10f;
-            bulletHeight = 14f;
+            width = 10f;
+            height = 14f;
             hitEffect = Fx.flakExplosion;
             shootEffect = Fx.none;
             smokeEffect = Fx.none;
@@ -529,8 +529,8 @@ public class Bullets implements ContentList{
         }};
 
         bombIncendiary = new BombBulletType(7f, 10f, "shell"){{
-            bulletWidth = 8f;
-            bulletHeight = 12f;
+            width = 8f;
+            height = 12f;
             hitEffect = Fx.flakExplosion;
             backColor = Pal.lightOrange;
             frontColor = Pal.lightishOrange;
@@ -541,8 +541,8 @@ public class Bullets implements ContentList{
 
         bombOil = new BombBulletType(2f, 3f, "shell"){
             {
-                bulletWidth = 8f;
-                bulletHeight = 12f;
+                width = 8f;
+                height = 12f;
                 hitEffect = Fx.pulverize;
                 backColor = new Color(0x4f4f4fff);
                 frontColor = Color.gray;

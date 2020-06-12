@@ -13,7 +13,7 @@ import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 public class Reconstructor extends UnitBlock{
     public float constructTime = 60 * 2;
@@ -63,7 +63,7 @@ public class Reconstructor extends UnitBlock{
 
             //draw input
             for(int i = 0; i < 4; i++){
-                if(blends(this, i) && i != rotation()){
+                if(blends(i) && i != rotation()){
                     Draw.rect(inRegion, x, y, i * 90);
                 }
             }

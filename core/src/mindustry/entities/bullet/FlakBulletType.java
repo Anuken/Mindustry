@@ -13,8 +13,8 @@ public class FlakBulletType extends BasicBulletType{
         splashDamage = 15f;
         splashDamageRadius = 34f;
         hitEffect = Fx.flakExplosionBig;
-        bulletWidth = 8f;
-        bulletHeight = 10f;
+        width = 8f;
+        height = 10f;
         collidesGround = false;
     }
 

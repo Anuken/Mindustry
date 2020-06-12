@@ -28,7 +28,6 @@ import static mindustry.Vars.*;
 
 public class UnitType extends UnlockableContent{
     public static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
-    public static final boolean debug = false;
     private static final Vec2 legOffset = new Vec2();
 
     public boolean flying;
@@ -62,6 +61,7 @@ public class UnitType extends UnlockableContent{
     public float lightRadius = 60f, lightOpacity = 0.6f;
     public Color lightColor = Pal.powerLight;
     public boolean drawCell = true, drawItems = true;
+    public int parts = 0;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
@@ -69,16 +69,13 @@ public class UnitType extends UnlockableContent{
     public Seq<Weapon> weapons = new Seq<>();
     public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
         occlusionRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion;
+    public TextureRegion[] partRegions;
+    public TextureRegion[] partCellRegions;
 
     public UnitType(String name){
         super(name);
 
-        if(EntityMapping.map(name) != null){
-            constructor = EntityMapping.map(name);
-        }else{
-            //TODO fix for mods
-            throw new RuntimeException("Unit has no type: " + name);
-        }
+        constructor = EntityMapping.map(name);
     }
 
     public UnitController createController(){
@@ -130,6 +127,14 @@ public class UnitType extends UnlockableContent{
         cellRegion = Core.atlas.find(name + "-cell", Core.atlas.find("power-cell"));
         occlusionRegion = Core.atlas.find("circle-shadow");
         shadowRegion = icon(Cicon.full);
+
+        partRegions = new TextureRegion[parts];
+        partCellRegions = new TextureRegion[parts];
+
+        for(int i = 0; i < parts; i++){
+            partRegions[i] = Core.atlas.find(name + "-part" + i);
+            partCellRegions[i] = Core.atlas.find(name + "-cell" + i);
+        }
     }
 
     @Override
@@ -175,12 +180,10 @@ public class UnitType extends UnlockableContent{
         drawOcclusion(unit);
 
         Draw.z(z);
-        drawEngine(unit);
-        if(!debug){
-            drawBody(unit);
-            if(drawCell) drawCell(unit);
-            drawWeapons(unit);
-        }
+        if(engineSize > 0) drawEngine(unit);
+        drawBody(unit);
+        if(drawCell) drawCell(unit);
+        drawWeapons(unit);
         if(drawItems) drawItems(unit);
         drawLight(unit);
 
@@ -328,9 +331,13 @@ public class UnitType extends UnlockableContent{
     public void drawCell(Unitc unit){
         applyColor(unit);
 
-        Draw.color(Color.black, unit.team().color, unit.healthf() + Mathf.absin(Time.time(), Math.max(unit.healthf() * 5f, 1f), 1f - unit.healthf()));
+        Draw.color(cellColor(unit));
         Draw.rect(cellRegion, unit, unit.rotation() - 90);
         Draw.reset();
+    }
+
+    public Color cellColor(Unitc unit){
+        return Tmp.c1.set(Color.black).lerp(unit.team().color, unit.healthf() + Mathf.absin(Time.time(), Math.max(unit.healthf() * 5f, 1f), 1f - unit.healthf()));
     }
 
     public void drawLight(Unitc unit){
@@ -367,38 +374,28 @@ public class UnitType extends UnlockableContent{
 
             Tmp.v1.set(leg.base).sub(leg.joint).inv().setLength(legExtension);
 
-            if(debug){
-                Draw.color(Color.red);
-                Lines.line(position.x, position.y, leg.joint.x, leg.joint.y);
+            if(leg.moving && baseElevation > 0){
+                float scl = baseElevation;
+                float elev = Mathf.slope(1f - leg.stage) * scl;
+                Draw.color(shadowColor);
+                Draw.rect(footRegion, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));
+                Draw.color();
+            }
 
-                Draw.color(Color.green);
-                Lines.line(leg.joint.x, leg.joint.y, leg.base.x, leg.base.y);
+            Draw.rect(footRegion, leg.base.x, leg.base.y, position.angleTo(leg.base));
 
-                Draw.reset();
-            }else{
-                if(leg.moving && baseElevation > 0){
-                    float scl = baseElevation;
-                    float elev = Mathf.slope(1f - leg.stage) * scl;
-                    Draw.color(shadowColor);
-                    Draw.rect(footRegion, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));
-                    Draw.color();
-                }
+            Lines.stroke(legRegion.getHeight() * Draw.scl * flips);
+            Lines.line(legRegion, position.x, position.y, leg.joint.x, leg.joint.y, CapStyle.none, 0);
 
-                Draw.rect(footRegion, leg.base.x, leg.base.y, position.angleTo(leg.base));
+            Lines.stroke(legBaseRegion.getHeight() * Draw.scl * flips);
+            Lines.line(legBaseRegion, leg.joint.x + Tmp.v1.x, leg.joint.y + Tmp.v1.y, leg.base.x, leg.base.y, CapStyle.none, 0);
 
-                Lines.stroke(legRegion.getHeight() * Draw.scl * flips);
-                Lines.line(legRegion, position.x, position.y, leg.joint.x, leg.joint.y, CapStyle.none, 0);
+            if(jointRegion.found()){
+                Draw.rect(jointRegion, leg.joint.x, leg.joint.y);
+            }
 
-                Lines.stroke(legBaseRegion.getHeight() * Draw.scl * flips);
-                Lines.line(legBaseRegion, leg.joint.x + Tmp.v1.x, leg.joint.y + Tmp.v1.y, leg.base.x, leg.base.y, CapStyle.none, 0);
-
-                if(jointRegion.found()){
-                    Draw.rect(jointRegion, leg.joint.x, leg.joint.y);
-                }
-
-                if(baseJointRegion.found()){
-                    Draw.rect(baseJointRegion, position.x, position.y, rotation);
-                }
+            if(baseJointRegion.found()){
+                Draw.rect(baseJointRegion, position.x, position.y, rotation);
             }
         }
 

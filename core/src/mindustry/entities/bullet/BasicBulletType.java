@@ -10,16 +10,16 @@ import mindustry.graphics.Pal;
 /** An extended BulletType for most ammo-based bullets shot from turrets and units. */
 public class BasicBulletType extends BulletType{
     public Color backColor = Pal.bulletYellowBack, frontColor = Pal.bulletYellow;
-    public float bulletWidth = 5f, bulletHeight = 7f;
-    public float bulletShrink = 0.5f;
-    public String bulletSprite;
+    public float width = 5f, height = 7f;
+    public float shrinkX = 0f, shrinkY = 0.5f;
+    public String sprite;
 
     public TextureRegion backRegion;
     public TextureRegion frontRegion;
 
     public BasicBulletType(float speed, float damage, String bulletSprite){
         super(speed, damage);
-        this.bulletSprite = bulletSprite;
+        this.sprite = bulletSprite;
     }
 
 
@@ -34,18 +34,19 @@ public class BasicBulletType extends BulletType{
 
     @Override
     public void load(){
-        backRegion = Core.atlas.find(bulletSprite + "-back");
-        frontRegion = Core.atlas.find(bulletSprite);
+        backRegion = Core.atlas.find(sprite + "-back");
+        frontRegion = Core.atlas.find(sprite);
     }
 
     @Override
     public void draw(Bulletc b){
-        float height = bulletHeight * ((1f - bulletShrink) + bulletShrink * b.fout());
+        float height = this.height * ((1f - shrinkY) + shrinkY * b.fout());
+        float width = this.width * ((1f - shrinkX) + shrinkX * b.fout());
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x(), b.y(), bulletWidth, height, b.rotation() - 90);
+        Draw.rect(backRegion, b.x(), b.y(), width, height, b.rotation() - 90);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x(), b.y(), bulletWidth, height, b.rotation() - 90);
+        Draw.rect(frontRegion, b.x(), b.y(), width, height, b.rotation() - 90);
         Draw.color();
     }
 }

@@ -35,7 +35,7 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Block extends UnlockableContent{
-    public static final int crackRegions = 8, maxCrackSize = 5;
+    public static final int crackRegions = 8, maxCrackSize = 9;
 
     public boolean hasItems;
     public boolean hasLiquids;

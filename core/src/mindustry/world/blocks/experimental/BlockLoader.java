@@ -71,7 +71,7 @@ public class BlockLoader extends PayloadAcceptor{
 
             //draw input
             for(int i = 0; i < 4; i++){
-                if(blends(this, i) && i != rotation()){
+                if(blends(i) && i != rotation()){
                     Draw.rect(inRegion, x, y, i * 90);
                 }
             }
