@@ -1,8 +1,10 @@
 package mindustry.world.blocks.units;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -11,6 +13,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -18,6 +21,7 @@ import static mindustry.Vars.*;
 public class Reconstructor extends UnitBlock{
     public float constructTime = 60 * 2;
     public UnitType[][] upgrades = {};
+    public int[] capacities;
 
     public Reconstructor(String name){
         super(name);
@@ -28,6 +32,11 @@ public class Reconstructor extends UnitBlock{
         Draw.rect(region, req.drawx(), req.drawy());
         Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
         Draw.rect(topRegion, req.drawx(), req.drawy());
+    }
+
+    @Override
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-out"), Core.atlas.find(name + "-top")};
     }
 
     @Override
@@ -43,6 +52,19 @@ public class Reconstructor extends UnitBlock{
         stats.add(BlockStat.productionTime, constructTime / 60f, StatUnit.seconds);
     }
 
+    @Override
+    public void init(){
+        capacities = new int[Vars.content.items().size];
+        if(consumes.has(ConsumeType.item) && consumes.get(ConsumeType.item) instanceof ConsumeItems){
+            for(ItemStack stack : consumes.<ConsumeItems>get(ConsumeType.item).items){
+                capacities[stack.item.id] = Math.max(capacities[stack.item.id], stack.amount * 2);
+                itemCapacity = Math.max(itemCapacity, stack.amount * 2);
+            }
+        }
+
+        super.init();
+    }
+
     public class ReconstructorEntity extends UnitBlockEntity{
 
         public float fraction(){
@@ -55,6 +77,11 @@ public class Reconstructor extends UnitBlock{
                 && relativeTo(source) != rotation()
                 && payload instanceof UnitPayload
                 && hasUpgrade(((UnitPayload)payload).unit.type());
+        }
+
+        @Override
+        public int getMaximumAccepted(Item item){
+            return capacities[item.id];
         }
 
         @Override

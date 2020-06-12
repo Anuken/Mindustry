@@ -56,14 +56,15 @@ public class UnitFactory extends UnitBlock{
 
     @Override
     public void init(){
-        super.init();
-
         capacities = new int[Vars.content.items().size];
         for(UnitPlan plan : plans){
             for(ItemStack stack : plan.requirements){
                 capacities[stack.item.id] = Math.max(capacities[stack.item.id], stack.amount * 2);
+                itemCapacity = Math.max(itemCapacity, stack.amount * 2);
             }
         }
+
+        super.init();
     }
 
     @Override
