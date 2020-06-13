@@ -78,7 +78,7 @@ public class Blocks implements ContentList{
 
     //units
     groundFactory, airFactory, navalFactory,
-    reconstructorBasis, reconstructorMorphism, reconstructorFunctor, reconstructorPrime,
+    additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
     repairPoint,
 
     //campaign
@@ -1685,7 +1685,7 @@ public class Blocks implements ContentList{
             consumes.power(1.2f);
         }};
 
-        reconstructorBasis = new Reconstructor("reconstructor-basis"){{
+        additiveReconstructor = new Reconstructor("additive-reconstructor"){{
             requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
 
             size = 3;
@@ -1702,7 +1702,7 @@ public class Blocks implements ContentList{
             };
         }};
 
-        reconstructorMorphism = new Reconstructor("reconstructor-morphism"){{
+        multiplicativeReconstructor = new Reconstructor("multiplicative-reconstructor"){{
             requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
 
             size = 5;
@@ -1717,8 +1717,7 @@ public class Blocks implements ContentList{
             };
         }};
 
-        //TODO finish these
-        reconstructorFunctor = new Reconstructor("reconstructor-functor"){{
+        exponentialReconstructor = new Reconstructor("exponential-reconstructor"){{
             requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
 
             size = 7;
@@ -1732,7 +1731,7 @@ public class Blocks implements ContentList{
             };
         }};
 
-        reconstructorPrime = new Reconstructor("reconstructor-prime"){{
+        tetrativeReconstructor = new Reconstructor("tetrative-reconstructor"){{
             requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
 
             size = 9;

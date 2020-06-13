@@ -111,6 +111,7 @@ public class Reconstructor extends UnitBlock{
             }
 
             Draw.z(Layer.blockOver + 0.1f);
+            Drawf.shadow(x, y, size * tilesize, 0.5f);
             Draw.rect(topRegion, x, y);
         }
 

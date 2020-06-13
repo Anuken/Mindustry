@@ -187,6 +187,11 @@ public class ImagePacker{
             this.path = path;
         }
 
+        @Override
+        public boolean found(){
+            return !invalid;
+        }
+
         static void validate(TextureRegion region){
             if(((GenRegion)region).invalid){
                 ImagePacker.err("Region does not exist: @", ((GenRegion)region).name);

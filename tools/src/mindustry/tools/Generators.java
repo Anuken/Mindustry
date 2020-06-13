@@ -200,8 +200,6 @@ public class Generators{
                     //encode square sprite in alpha channel
                     average.a = hasEmpty ? 0.1f : 1f;
                     colors.draw(block.id, 0, average);
-                }catch(IllegalArgumentException e){
-                    Log.info("Skipping &ly'@'", block.name);
                 }catch(NullPointerException e){
                     Log.err("Block &ly'@'&lr has an null region!", block);
                 }

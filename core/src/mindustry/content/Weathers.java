@@ -81,8 +81,8 @@ public class Weathers implements ContentList{
                 Core.camera.bounds(Tmp.r2);
                 int total = (int)(Tmp.r1.area() / density * state.intensity());
                 Lines.stroke(0.75f);
-                Draw.color(Color.royal, Color.white, 0.3f);
                 float alpha = Draw.getColor().a;
+                Draw.color(Color.royal, Color.white, 0.3f);
 
                 for(int i = 0; i < total; i++){
                     float scl = rand.random(0.5f, 1f);
