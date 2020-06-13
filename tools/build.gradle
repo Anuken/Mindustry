@@ -235,7 +235,7 @@ task swapColors(){
             def carr = new File(getProperty("colors")).text.split("\n")
             def map = [:]
             def swaps = 0
-            carr.each{ str -> map[Color.argb8888(Color.valueOf(str.split("=")[0]))] = Color.argb8888(Color.valueOf(str.split("=")[1])) }
+            carr.each{ str -> map[Color.valueOf(str.split("=")[0]).argb8888()] = Color.valueOf(str.split("=")[1]).argb8888() }
             def tmpc = new Color()
 
             fileTree(dir: '../core/assets-raw/sprites', include: "**/*.png").visit{ file ->
@@ -246,7 +246,7 @@ task swapColors(){
                 for(x in (0..img.getWidth() - 1)){
                     for(y in (0..img.getHeight() - 1)){
                         def c = img.getRGB(x, y)
-                        Color.argb8888ToColor(tmpc, c)
+                        tmpc.argb8888(c)
                         if(tmpc.a < 0.1f) continue
                         if(map.containsKey(c)){
                             img.setRGB(x, y, (int)map.get(c))
