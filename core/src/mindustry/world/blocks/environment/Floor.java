@@ -160,6 +160,11 @@ public class Floor extends Block{
         }
     }
 
+    @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
+    }
+
     public boolean isDeep(){
         return drownTime > 0;
     }

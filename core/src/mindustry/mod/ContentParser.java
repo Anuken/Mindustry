@@ -28,6 +28,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
@@ -141,6 +142,11 @@ public class ContentParser{
                     }else if(type == ConsumeLiquid.class){
                         return (T)fromJson(ConsumeLiquid.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
                     }
+                }
+
+                //try to load DrawBlock by instantiating it
+                if(type == DrawBlock.class && jsonData.isString()){
+                    return Reflect.make("mindustry.world.draw." + Strings.capitalize(jsonData.asString()));
                 }
 
                 if(Content.class.isAssignableFrom(type)){

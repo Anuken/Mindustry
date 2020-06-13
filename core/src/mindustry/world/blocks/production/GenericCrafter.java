@@ -1,6 +1,5 @@
 package mindustry.world.blocks.production;
 
-import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.io.*;
@@ -10,6 +9,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 public class GenericCrafter extends Block{
@@ -21,8 +21,10 @@ public class GenericCrafter extends Block{
     public Effect updateEffect = Fx.none;
     public float updateEffectChance = 0.04f;
 
-    public Cons<GenericCrafterEntity> drawer = null;
-    public Prov<TextureRegion[]> drawIcons = null;
+    public DrawBlock drawer = new DrawBlock();
+
+    //public Cons<GenericCrafterEntity> drawer = null;
+    //public Prov<TextureRegion[]> drawIcons = null;
 
     public GenericCrafter(String name){
         super(name);
@@ -55,6 +57,13 @@ public class GenericCrafter extends Block{
     }
 
     @Override
+    public void load(){
+        super.load();
+
+        drawer.load(this);
+    }
+
+    @Override
     public void init(){
         outputsLiquid = outputLiquid != null;
         super.init();
@@ -62,7 +71,7 @@ public class GenericCrafter extends Block{
 
     @Override
     public TextureRegion[] icons(){
-        return drawIcons == null ? super.icons() : drawIcons.get();
+        return drawer.icons(this);
     }
 
     @Override
@@ -77,11 +86,7 @@ public class GenericCrafter extends Block{
 
         @Override
         public void draw(){
-            if(drawer == null){
-                super.draw();
-            }else{
-                drawer.get(this);
-            }
+            drawer.draw(this);
         }
 
         @Override

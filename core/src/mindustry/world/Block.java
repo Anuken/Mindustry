@@ -173,17 +173,12 @@ public class Block extends UnlockableContent{
     public boolean instantTransfer = false;
 
     protected Prov<Tilec> entityType = null; //initialized later
-    //TODO move
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
     //TODO move
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] variantRegions, editorVariantRegions;
     public TextureRegion region, editorIcon;
-
-    //TODO remove completely
-    protected TextureRegion[] cacheRegions = {};
-    protected Seq<String> cacheRegionStrings = new Seq<>();
 
     //TODO move
     public static TextureRegion[][] cracks;
@@ -200,7 +195,6 @@ public class Block extends UnlockableContent{
         initEntity();
     }
 
-    //TODO rename to draw() once class refactoring is done.
     public void drawBase(Tile tile){
         //delegates to entity unless it is null
         if(tile.entity != null){
@@ -574,19 +568,6 @@ public class Block extends UnlockableContent{
         }
     }
 
-    /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #re(int)}.
-     * DO NOT USE. This will eventually be removed. */
-    protected int re(String suffix){
-        cacheRegionStrings.add(name + suffix);
-        return cacheRegionStrings.size - 1;
-    }
-
-    /** Returns an internally cached region by ID.
-     * DO NOT USE. This will eventually be removed*/
-    protected TextureRegion re(int id){
-        return cacheRegions[id];
-    }
-
     @Override
     public void displayInfo(Table table){
         ContentDisplay.displayBlock(table, this);
@@ -630,11 +611,6 @@ public class Block extends UnlockableContent{
     @Override
     public void load(){
         region = Core.atlas.find(name);
-
-        cacheRegions = new TextureRegion[cacheRegionStrings.size];
-        for(int i = 0; i < cacheRegions.length; i++){
-            cacheRegions[i] = Core.atlas.find(cacheRegionStrings.get(i));
-        }
 
         if(cracks == null || (cracks[0][0].getTexture() != null && cracks[0][0].getTexture().isDisposed())){
             cracks = new TextureRegion[maxCrackSize][crackRegions];

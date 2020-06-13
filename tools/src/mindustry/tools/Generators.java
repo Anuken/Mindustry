@@ -15,7 +15,9 @@ import mindustry.tools.ImagePacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.legacy.*;
 
 import static mindustry.Vars.*;
 
@@ -99,6 +101,8 @@ public class Generators{
             Image colors = new Image(content.blocks().size, 1);
 
             for(Block block : content.blocks()){
+                if(block.isAir() || block instanceof BuildBlock || block instanceof OreBlock || block instanceof LegacyBlock) continue;
+
                 block.load();
 
                 TextureRegion[] regions = block.getGeneratedIcons();
