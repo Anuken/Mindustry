@@ -1,10 +1,9 @@
-name: Java Unit Tests
+name: Java CI
 
 on: [push]
 
 jobs:
   buildJava8:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -15,8 +14,8 @@ jobs:
         java-version: 8
     - name: Run unit tests with gradle and Java 8
       run: ./gradlew test
+      
   buildJava14:
-
     runs-on: ubuntu-latest
 
     steps:
