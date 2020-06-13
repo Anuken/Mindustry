@@ -60,7 +60,6 @@ public class Selement<T extends Element>{
     }
 
     public <A extends Annotation> A annotation(Class<A> annotation){
-        if(true) return e.getAnnotation(annotation);
         try{
             Method m = com.sun.tools.javac.code.AnnoConstruct.class.getDeclaredMethod("getAttribute", Class.class);
             m.setAccessible(true);

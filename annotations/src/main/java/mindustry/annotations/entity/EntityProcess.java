@@ -170,6 +170,7 @@ public class EntityProcess extends BaseProcessor{
         }else if(round == 2){ //round 2: get component classes and generate interfaces for them
 
             //parse groups
+            //this needs to be done before the entity interfaces are generated, as the entity classes need to know which groups to add themselves to
             for(Selement<?> group : allGroups){
                 GroupDef an = group.annotation(GroupDef.class);
                 Seq<Stype> types = types(an, GroupDef::value).map(this::interfaceToComp);

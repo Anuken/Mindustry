@@ -1,3 +1,8 @@
+if(JavaVersion.current() != JavaVersion.VERSION_1_8){
+    throw new GradleException("!!! YOU MUST USE JAVA 8 TO COMPILE AND RUN MINDUSTRY !!! Read the README. Your version: ${System.properties["java.version"]}\n" +
+            "\nThe reason: Java has a compiler bug that requires a workaround. This workaround uses proprietary API and is only implemented on Java 8.")
+}
+
 include 'desktop', 'core', 'server', 'ios', 'annotations', 'tools', 'tests'
 
 def use = { ... names ->
