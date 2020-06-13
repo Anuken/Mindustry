@@ -414,6 +414,27 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        lich = new UnitType("lich"){{
+            speed = 1.1f;
+            accel = 0.02f;
+            drag = 0.05f;
+            rotateSpeed = 2.5f;
+            flying = true;
+            lowAltitude = true;
+            health = 75000;
+            engineOffset = 38;
+            engineSize = 7.3f;
+            hitsize = 58f;
+
+            weapons.add(new Weapon(){{
+                y = 1.5f;
+                reload = 28f;
+                alternate = true;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.standardCopper;
+                shootSound = Sounds.shoot;
+            }});
+        }};
 
         vanguard = new UnitType("vanguard"){{
             speed = 1.3f;

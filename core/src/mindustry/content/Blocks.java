@@ -1728,6 +1728,7 @@ public class Blocks implements ContentList{
             constructTime = 60f * 60f;
 
             upgrades = new UnitType[][]{
+                {UnitTypes.revenant, UnitTypes.lich},
             };
         }};
 
@@ -1742,6 +1743,7 @@ public class Blocks implements ContentList{
             constructTime = 60f * 60f * 3;
 
             upgrades = new UnitType[][]{
+                {UnitTypes.lich, UnitTypes.reaper},
             };
         }};
 
