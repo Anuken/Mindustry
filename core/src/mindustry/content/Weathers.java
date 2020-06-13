@@ -136,8 +136,6 @@ public class Weathers implements ContentList{
                         if(tile != null && tile.floor().liquidDrop == Liquids.water){
                             Draw.tint(Tmp.c1.set(tile.floor().mapColor).mul(1.5f));
                             Draw.rect(splashes[(int)(life * (splashes.length - 1))], x, y);
-                            //Lines.stroke((1f - life) * 2f);
-                            //Lines.circle(x, y, life * 4f);
                         }
                     }
                 }
