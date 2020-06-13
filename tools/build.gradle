@@ -240,7 +240,8 @@ task swapColors(){
 
             fileTree(dir: '../core/assets-raw/sprites', include: "**/*.png").visit{ file ->
                 if(file.isDirectory()) return
-                swaps++
+
+                boolean found = false
 
                 def img = ImageIO.read(file.file)
                 for(x in (0..img.getWidth() - 1)){
@@ -250,10 +251,14 @@ task swapColors(){
                         if(tmpc.a < 0.1f) continue
                         if(map.containsKey(c)){
                             img.setRGB(x, y, (int)map.get(c))
+                            found = true
                         }
                     }
                 }
-                ImageIO.write(img, "png", file.file)
+                if(found){
+                    swaps++
+                    ImageIO.write(img, "png", file.file)
+                }
             }
             println "Swapped $swaps images."
         }else{
