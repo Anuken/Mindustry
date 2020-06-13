@@ -231,7 +231,6 @@ public class Renderer implements ApplicationListener{
             Draw.draw(Layer.effect + 0.01f, bloom::render);
         }
 
-        Draw.z(Layer.plans);
         Draw.draw(Layer.plans, overlays::drawBottom);
 
         if(settings.getBool("animatedshields")){
