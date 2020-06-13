@@ -207,6 +207,7 @@ public class HudFragment extends Fragment{
 
             //fps display
             cont.table(info -> {
+                info.touchable(Touchable.disabled);
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps") && shown);
                 info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Scl.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
@@ -217,7 +218,7 @@ public class HudFragment extends Fragment{
                 info.label(() -> ping.get(netClient.getPing())).visible(net::client).left().style(Styles.outlineLabel);
             }).top().left();
         });
-        
+
         parent.fill(t -> {
             t.visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial && shown);
             //minimap
@@ -225,7 +226,8 @@ public class HudFragment extends Fragment{
             t.row();
             //position
             t.label(() -> player.tileX() + "," + player.tileY())
-                .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial);
+                .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial)
+                .touchable(Touchable.disabled);
             t.top().right();
         });
 
