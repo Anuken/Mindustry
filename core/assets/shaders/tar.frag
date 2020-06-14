@@ -1,3 +1,5 @@
+#define HIGHP
+
 #define NSCALE 180.0 / 2.0
 
 uniform sampler2D u_texture;
