@@ -134,7 +134,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             //set next map to be played
-            Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(state.map);
+            Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(lastMode, state.map);
             nextMapOverride = null;
             if(map != null){
                 Call.onInfoMessage((state.rules.pvp
@@ -209,19 +209,6 @@ public class ServerControl implements ApplicationListener{
             }
 
             if(lastTask != null) lastTask.cancel();
-            
-            Map result;
-            if(arg.length > 0){
-                result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
-
-                if(result == null){
-                    err("No map with name &y'@'&lr found.", arg[0]);
-                    return;
-                }
-            }else{
-                result = maps.getShuffleMode().next(state.map);
-                info("Randomized next map to be @.", result.name());
-            }
 
             Gamemode preset = Gamemode.survival;
 
@@ -232,6 +219,19 @@ public class ServerControl implements ApplicationListener{
                     err("No gamemode '@' found.", arg[1]);
                     return;
                 }
+            }
+            
+            Map result;
+            if(arg.length > 0){
+                result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
+
+                if(result == null){
+                    err("No map with name &y'@'&lr found.", arg[0]);
+                    return;
+                }
+            }else{
+                result = maps.getShuffleMode().next(preset, state.map);
+                info("Randomized next map to be @.", result.name());
             }
 
             info("Loading map...");

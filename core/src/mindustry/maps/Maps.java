@@ -31,6 +31,8 @@ import static mindustry.Vars.*;
 public class Maps{
     /** List of all built-in maps. Filenames only. */
     private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "veins", "glacier"};
+    /** Maps tagged as PvP */
+    private static final String[] pvpMaps = {"veins", "glacier"};
     /** All maps stored in an ordered array. */
     private Seq<Map> maps = new Seq<>();
     /** Serializer for meta. */
@@ -56,8 +58,8 @@ public class Maps{
     }
 
     /** @return the next map to shuffle to. May be null, in which case the server should be stopped. */
-    public @Nullable Map getNextMap(@Nullable Map previous){
-        return shuffler != null ? shuffler.next(previous) : shuffleMode.next(previous);
+    public @Nullable Map getNextMap(Gamemode mode, @Nullable Map previous){
+        return shuffleMode.next(mode, previous);
     }
 
     /** Returns a list of all maps, including custom ones. */
@@ -467,26 +469,14 @@ public class Maps{
     }
 
     public interface MapProvider{
-        @Nullable Map next(@Nullable Map previous);
+        @Nullable Map next(Gamemode mode, @Nullable Map previous);
     }
 
     public enum ShuffleMode implements MapProvider{
-        none(map -> null),
-        all(prev -> {
-            Seq<Map> maps = Seq.withArrays(Vars.maps.defaultMaps(), Vars.maps.customMaps());
-            maps.shuffle();
-            return maps.find(m -> m != prev || maps.size == 1);
-        }),
-        custom(prev -> {
-            Seq<Map> maps = Seq.withArrays(Vars.maps.customMaps().isEmpty() ? Vars.maps.defaultMaps() : Vars.maps.customMaps());
-            maps.shuffle();
-            return maps.find(m -> m != prev || maps.size == 1);
-        }),
-        builtin(prev -> {
-            Seq<Map> maps = Seq.withArrays(Vars.maps.defaultMaps());
-            maps.shuffle();
-            return maps.find(m -> m != prev || maps.size == 1);
-        });
+        none((mode, map) -> null),
+        all((mode, prev) -> next(mode, prev, Vars.maps.defaultMaps(), Vars.maps.customMaps())),
+        custom((mode, prev) -> next(mode, prev, Vars.maps.customMaps().isEmpty() ? Vars.maps.defaultMaps() : Vars.maps.customMaps())),
+        builtin((mode, prev) -> next(mode, prev, Vars.maps.defaultMaps()));
 
         private final MapProvider provider;
 
@@ -494,9 +484,24 @@ public class Maps{
             this.provider = provider;
         }
 
+        @SafeVarargs
+        private static Map next(Gamemode mode, Map prev, Seq<Map>... mapArray){
+            Seq<Map> maps = Seq.withArrays((Object[])mapArray);
+            maps.shuffle();
+
+            return maps.find(m -> (m != prev || maps.size == 1) && valid(mode, m));
+        }
+
+        private static boolean valid(Gamemode mode, Map map){
+            boolean pvp = !map.custom && Structs.contains(pvpMaps, map.file.nameWithoutExtension());
+            if(mode == Gamemode.survival || mode == Gamemode.attack || mode == Gamemode.sandbox) return !pvp;
+            if(mode == Gamemode.pvp) return map.custom || pvp;
+            return true;
+        }
+
         @Override
-        public Map next(@Nullable Map previous){
-            return provider.next(previous);
+        public Map next(Gamemode mode, @Nullable Map previous){
+            return provider.next(mode, previous);
         }
     }
 }
