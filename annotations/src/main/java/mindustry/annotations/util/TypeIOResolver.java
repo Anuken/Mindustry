@@ -25,19 +25,24 @@ public class TypeIOResolver{
                     Seq<Svar> params = meth.params();
                     //2 params, second one is type, first is writer
                     if(params.size == 2 && params.first().tname().toString().equals("arc.util.io.Writes")){
-                        out.writers.put(params.get(1).tname().toString(), type.fullName() + "." + meth.name());
+                        out.writers.put(fix(params.get(1).tname().toString()), type.fullName() + "." + meth.name());
                     }else if(params.size == 1 && params.first().tname().toString().equals("arc.util.io.Reads") && !meth.isVoid()){
                         //1 param, one is reader, returns type
-                        out.readers.put(meth.retn().toString(), type.fullName() + "." + meth.name());
+                        out.readers.put(fix(meth.retn().toString()), type.fullName() + "." + meth.name());
                     }else if(params.size == 2 && params.first().tname().toString().equals("arc.util.io.Reads") && !meth.isVoid() && meth.ret() == meth.params().get(1).mirror()){
                         //2 params, one is reader, other is type, returns type - these are made to reduce garbage allocated
-                        out.mutatorReaders.put(meth.retn().toString(), type.fullName() + "." + meth.name());
+                        out.mutatorReaders.put(fix(meth.retn().toString()), type.fullName() + "." + meth.name());
                     }
                 }
             }
         }
 
         return out;
+    }
+
+    /** makes sure type names don't contain 'gen' */
+    private static String fix(String str){
+        return str.replace("mindustry.gen", "");
     }
 
     /** Information about read/write methods for class types. */

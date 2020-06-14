@@ -21,6 +21,10 @@ public class Smethod extends Selement<ExecutableElement>{
         return false;
     }
 
+    public String descString(){
+        return up().asType().toString() + "#" + super.toString().replace("mindustry.gen.", "");
+    }
+
     public boolean is(Modifier mod){
         return e.getModifiers().contains(mod);
     }

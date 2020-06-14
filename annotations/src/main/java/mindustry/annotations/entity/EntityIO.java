@@ -197,6 +197,8 @@ public class EntityIO{
     }
 
     private void io(String type, String field) throws Exception{
+        type = type.replace("mindustry.gen.", "");
+
         if(BaseProcessor.isPrimitive(type)){
             s(type.equals("boolean") ? "bool" : type.charAt(0) + "", field);
         }else if(instanceOf(type, "mindustry.ctype.Content")){

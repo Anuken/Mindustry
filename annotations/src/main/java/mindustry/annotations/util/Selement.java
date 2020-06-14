@@ -106,6 +106,6 @@ public class Selement<T extends Element>{
 
     @Override
     public boolean equals(Object o){
-        return o != null && o.getClass() == getClass() && e == ((Selement)o).e;
+        return o != null && o.getClass() == getClass() && e.equals(((Selement)o).e);
     }
 }

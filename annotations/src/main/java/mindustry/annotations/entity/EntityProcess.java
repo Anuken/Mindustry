@@ -36,8 +36,8 @@ public class EntityProcess extends BaseProcessor{
     ObjectMap<String, Stype> componentNames = new ObjectMap<>();
     ObjectMap<Stype, Seq<Stype>> componentDependencies = new ObjectMap<>();
     ObjectMap<Selement, Seq<Stype>> defComponents = new ObjectMap<>();
-    ObjectMap<Svar, String> varInitializers = new ObjectMap<>();
-    ObjectMap<Smethod, String> methodBlocks = new ObjectMap<>();
+    ObjectMap<String, String> varInitializers = new ObjectMap<>();
+    ObjectMap<String, String> methodBlocks = new ObjectMap<>();
     ObjectSet<String> imports = new ObjectSet<>();
     Seq<Selement> allGroups = new Seq<>();
     Seq<Selement> allDefs = new Seq<>();
@@ -68,14 +68,14 @@ public class EntityProcess extends BaseProcessor{
                     //add initializer if it exists
                     if(tree.getInitializer() != null){
                         String init = tree.getInitializer().toString();
-                        varInitializers.put(f, init);
+                        varInitializers.put(f.descString(), init);
                     }
                 }
 
                 for(Smethod elem : component.methods()){
                     if(elem.is(Modifier.ABSTRACT) || elem.is(Modifier.NATIVE)) continue;
                     //get all statements in the method, store them
-                    methodBlocks.put(elem, elem.tree().getBody().toString());
+                    methodBlocks.put(elem.descString(), elem.tree().getBody().toString());
                 }
             }
 
@@ -184,6 +184,7 @@ public class EntityProcess extends BaseProcessor{
 
             //look at each definition
             for(Selement<?> type : allDefs){
+
                 EntityDef ann = type.annotation(EntityDef.class);
                 boolean isFinal = ann.isFinal();
 
@@ -248,8 +249,8 @@ public class EntityProcess extends BaseProcessor{
                         }
 
                         //add initializer if it exists
-                        if(varInitializers.containsKey(f)){
-                            fbuilder.initializer(varInitializers.get(f));
+                        if(varInitializers.containsKey(f.descString())){
+                            fbuilder.initializer(varInitializers.get(f.descString()));
                         }
 
                         fbuilder.addModifiers(f.has(ReadOnly.class) ? Modifier.PROTECTED : Modifier.PUBLIC);
@@ -278,7 +279,7 @@ public class EntityProcess extends BaseProcessor{
                         }
                     }
 
-                    //get all utility methods from components
+                    //get all methods from components
                     for(Smethod elem : comp.methods()){
                         methods.get(elem.toString(), Seq::new).add(elem);
                     }
@@ -389,10 +390,12 @@ public class EntityProcess extends BaseProcessor{
                     }
 
                     for(Smethod elem : entry.value){
-                        if(elem.is(Modifier.ABSTRACT) || elem.is(Modifier.NATIVE) || !methodBlocks.containsKey(elem)) continue;
+                        String descStr = elem.descString();
+
+                        if(elem.is(Modifier.ABSTRACT) || elem.is(Modifier.NATIVE) || !methodBlocks.containsKey(descStr)) continue;
 
                         //get all statements in the method, copy them over
-                        String str = methodBlocks.get(elem);
+                        String str = methodBlocks.get(descStr);
                         //name for code blocks in the methods
                         String blockName = elem.up().getSimpleName().toString().toLowerCase().replace("comp", "");
 
@@ -435,13 +438,14 @@ public class EntityProcess extends BaseProcessor{
                     for(FieldSpec spec : builder.fieldSpecs){
                         @Nullable Svar variable = specVariables.get(spec);
                         if(variable != null && variable.isAny(Modifier.STATIC, Modifier.FINAL)) continue;
+                        String desc = variable.descString();
 
                         if(spec.type.isPrimitive()){
                             //set to primitive default
-                            resetBuilder.addStatement("$L = $L", spec.name, variable != null && varInitializers.containsKey(variable) ? varInitializers.get(variable) : getDefault(spec.type.toString()));
+                            resetBuilder.addStatement("$L = $L", spec.name, variable != null && varInitializers.containsKey(desc) ? varInitializers.get(desc) : getDefault(spec.type.toString()));
                         }else{
                             //set to default null
-                            if(!varInitializers.containsKey(variable)){
+                            if(!varInitializers.containsKey(desc)){
                                 resetBuilder.addStatement("$L = null", spec.name);
                             } //else... TODO reset if poolable
                         }
@@ -646,10 +650,11 @@ public class EntityProcess extends BaseProcessor{
                                 builder.addStatement("return -1");
                         }else{
                             Svar variable = compType == null || method.params().size > 0 ? null : compType.fields().find(v -> v.name().equals(method.name()));
-                            if(variable == null || !varInitializers.containsKey(variable)){
+                            String desc = variable == null ? null : variable.descString();
+                            if(variable == null || !varInitializers.containsKey(desc)){
                                 builder.addStatement("return " + getDefault(method.ret().toString()));
                             }else{
-                                String init = varInitializers.get(variable);
+                                String init = varInitializers.get(desc);
                                 builder.addStatement("return " + (init.equals("{}") ? "new " + variable.mirror().toString() : "") + init);
                             }
                         }

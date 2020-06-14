@@ -174,7 +174,7 @@ public class RemoteWriteGenerator{
                 method.addStatement("WRITE.$L($L)", typeName.equals("boolean") ? "bool" : typeName.charAt(0) + "", varName);
             }else{
                 //else, try and find a serializer
-                String ser = serializers.writers.get(typeName, SerializerResolver.locate(elem, var.asType(), true));
+                String ser = serializers.writers.get(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(elem, var.asType(), true));
 
                 if(ser == null){ //make sure a serializer exists!
                     BaseProcessor.err("No @WriteClass method to write class type: '" + typeName + "'", var);

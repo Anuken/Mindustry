@@ -57,6 +57,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, Elevatio
 
         //rotation + offset vector
         Vec2 moveOffset = Tmp.v4.trns(rot, trns);
+        boolean moving = moving();
 
         for(int i = 0; i < legs.length; i++){
             float dstRot = legAngle(rot, i);
@@ -76,7 +77,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, Elevatio
             if(backLeg && type.flipBackLegs) side = !side;
 
             l.moving = move;
-            l.stage = stageF % 1f;
+            l.stage = moving ? stageF % 1f : Mathf.lerpDelta(l.stage, 0f, 0.1f);
 
             if(l.group != group){
 

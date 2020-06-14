@@ -83,7 +83,7 @@ public class RemoteReadGenerator{
                         readBlock.addStatement("$L $L = read.$L()", typeName, varName, pname);
                     }else{
                         //else, try and find a serializer
-                        String ser = serializers.readers.get(typeName, SerializerResolver.locate(entry.element, var.asType(), false));
+                        String ser = serializers.readers.get(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(entry.element, var.asType(), false));
 
                         if(ser == null){ //make sure a serializer exists!
                             BaseProcessor.err("No read method to read class type '" + typeName + "' in method " + entry.targetMethod + "; " + serializers.readers, var);
