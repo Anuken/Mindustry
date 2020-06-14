@@ -287,7 +287,8 @@ public class Administration{
     }
 
     /**
-     * Makes a player an admin. Returns whether this player was already an admin.
+     * Makes a player an admin.
+     * @return whether this player was already an admin.
      */
     public boolean adminPlayer(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
@@ -303,7 +304,8 @@ public class Administration{
     }
 
     /**
-     * Makes a player no longer an admin. Returns whether this player was an admin in the first place.
+     * Makes a player no longer an admin.
+     * @return whether this player was an admin in the first place.
      */
     public boolean unAdminPlayer(String id){
         PlayerInfo info = getCreateInfo(id);

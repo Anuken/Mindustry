@@ -13,10 +13,10 @@ uniform float u_dp;
 uniform vec2 u_offset;
 uniform vec4 u_shieldcolor;
 
-varying vec2 v_texCoord;
+varying vec2 v_texCoords;
 
 void main(){
-    vec2 T = v_texCoord.xy;
+    vec2 T = v_texCoords.xy;
     vec2 coords = (T * u_texsize) + u_offset;
 
     T += vec2(sin(coords.y / 3.0 + u_time / 20.0), sin(coords.x / 3.0 + u_time / 20.0)) / u_texsize;

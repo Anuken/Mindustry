@@ -10,7 +10,7 @@ uniform vec2 u_uv2;
 uniform vec2 u_texsize;
 
 varying vec4 v_color;
-varying vec2 v_texCoord;
+varying vec2 v_texCoords;
 
 bool id(vec4 v){
     return v.a > 0.1;
@@ -31,11 +31,11 @@ bool cont(vec2 T, vec2 v){
 }
 
 void main() {
-    vec2 coords = (v_texCoord.xy - u_uv) / (u_uv2 - u_uv);
-    vec2 t = v_texCoord.xy;
+    vec2 coords = (v_texCoords.xy - u_uv) / (u_uv2 - u_uv);
+    vec2 t = v_texCoords.xy;
     vec2 v = vec2(1.0/u_texsize.x, 1.0/u_texsize.y);
 
-	vec4 c = texture2D(u_texture, v_texCoord.xy);
+	vec4 c = texture2D(u_texture, v_texCoords.xy);
     float alpha = c.a;
 
     c.a *= u_progress;

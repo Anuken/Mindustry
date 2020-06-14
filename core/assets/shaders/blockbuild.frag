@@ -8,7 +8,7 @@ uniform float u_progress;
 uniform float u_time;
 
 varying vec4 v_color;
-varying vec2 v_texCoord;
+varying vec2 v_texCoords;
 
 
 bool id(vec2 coords, vec4 base){
@@ -26,10 +26,10 @@ bool cont(vec2 T, vec2 v){
 
 void main() {
 
-	vec2 t = v_texCoord.xy;
+	vec2 t = v_texCoords.xy;
 
 	vec2 v = vec2(1.0/u_texsize.x, 1.0/u_texsize.y);
-	vec2 coords = (v_texCoord-u_uv) / v;
+	vec2 coords = (v_texCoords-u_uv) / v;
 	float value = coords.x + coords.y;
 
 	vec4 color = texture2D(u_texture, t);

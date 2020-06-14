@@ -171,7 +171,7 @@ allprojects{
         jcenter()
     }
 
-    tasks.withType(Javadoc).all{ enabled = false }
+    //tasks.withType(Javadoc).all{ enabled = false }
 }
 
 project(":desktop"){
