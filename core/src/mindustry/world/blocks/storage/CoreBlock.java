@@ -100,7 +100,18 @@ public class CoreBlock extends StorageBlock{
         public void requestSpawn(Playerc player){
             Call.onPlayerSpawn(tile, player);
         }
-
+        @Override
+        public void draw(Tile tile){
+            Draw.rect(Core.atlas.find(name + "-base"), tile.drawx(), tile.drawy());
+            if(tile.getTeam() == Team.sharded){
+                Draw.rect(Core.atlas.find(name), tile.drawx(), tile.drawy());
+            } else {
+                Draw.color(tile.getTeam().color);
+                Draw.rect(Core.atlas.find(name + "-top"), tile.drawx(), tile.drawy());
+            }
+            Draw.color();
+            Draw.reset();
+        }
         @Override
         public void drawLight(){
             Drawf.light(x, y, 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
