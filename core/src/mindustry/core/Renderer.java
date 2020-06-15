@@ -222,7 +222,7 @@ public class Renderer implements ApplicationListener{
             Draw.draw(Layer.light, lights::draw);
         }
 
-        if(state.rules.drawDarkness){
+        if(enableDarkness){
             Draw.draw(Layer.darkness, blocks::drawDarkness);
         }
 

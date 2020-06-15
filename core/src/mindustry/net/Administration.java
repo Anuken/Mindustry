@@ -293,8 +293,7 @@ public class Administration{
     public boolean adminPlayer(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
 
-        if(info.admin && info.adminUsid != null && info.adminUsid.equals(usid))
-            return false;
+        if(info.admin && info.adminUsid != null && info.adminUsid.equals(usid)) return false;
 
         info.adminUsid = usid;
         info.admin = true;
@@ -310,8 +309,7 @@ public class Administration{
     public boolean unAdminPlayer(String id){
         PlayerInfo info = getCreateInfo(id);
 
-        if(!info.admin)
-            return false;
+        if(!info.admin) return false;
 
         info.admin = false;
         save();

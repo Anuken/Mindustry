@@ -32,10 +32,12 @@ public class Rules{
     public float unitBuildSpeedMultiplier = 1f;
     /** How much health units start with. */
     public float unitHealthMultiplier = 1f;
-    /** How much health blocks start with. */
-    public float blockHealthMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
+    /** How much health blocks start with. */
+    public float blockHealthMultiplier = 1f;
+    /** How much damage blocks (turrets) deal. */
+    public float blockDamageMultiplier = 1f;
     /** Multiplier for buildings resource cost. */
     public float buildCostMultiplier = 1f;
     /** Multiplier for building speed. */
@@ -68,9 +70,6 @@ public class Rules{
     public boolean tutorial = false;
     /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
     public boolean canGameOver = true;
-    /** Whether to draw shadows of blocks at map edges and static blocks.
-     * Do not change unless you know exactly what you are doing.*/
-    public boolean drawDarkness = true;
     /** EXPERIMENTAL building AI. TODO remove */
     public boolean buildAI = true;
     /** Starting items put in cores */
@@ -93,7 +92,7 @@ public class Rules{
     /** special tags for additional info */
     public StringMap tags = new StringMap();
 
-    /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
+    /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){
         return JsonIO.copy(this);
     }

@@ -43,9 +43,8 @@ public class Pixelator implements Disposable{
         Draw.draw(Layer.end, () -> {
             buffer.end();
 
-            Draw.blend(Blending.disabled);
-            Draw.rect(buffer);
-            Draw.blend();
+            Blending.disabled.apply();
+            buffer.blit(Shaders.screenspace);
 
             Core.camera.position.set(px, py);
             renderer.setScale(pre);

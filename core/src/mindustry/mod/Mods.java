@@ -669,7 +669,7 @@ public class Mods implements Loadable{
         return new LoadedMod(sourceFile, zip, mainMod, meta);
     }
 
-    /** Represents a plugin that has been loaded from a jar file.*/
+    /** Represents a mod's state. May be a jar file, folder or zip. */
     public static class LoadedMod implements Publishable, Disposable{
         /** The location of this mod's zip file/folder on the disk. */
         public final Fi file;
@@ -803,7 +803,7 @@ public class Mods implements Loadable{
         }
     }
 
-    /** Plugin metadata information.*/
+    /** Mod metadata information.*/
     public static class ModMeta{
         public String name, displayName, author, description, version, main, minGameVersion;
         public Seq<String> dependencies = Seq.with();
