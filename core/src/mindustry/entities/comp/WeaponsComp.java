@@ -10,11 +10,13 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
+import static mindustry.Vars.*;
+
 @Component
 abstract class WeaponsComp implements Teamc, Posc, Rotc{
     @Import float x, y, rotation;
 
-    /** minimum cursor distance from player, fixes 'cross-eyed' shooting */
+    /** minimum cursor distance from unit, fixes 'cross-eyed' shooting */
     static final float minAimDst = 20f;
     /** temporary weapon sequence number */
     static int sequenceNum = 0;
@@ -24,6 +26,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     @ReadOnly transient float range, aimX, aimY;
     @ReadOnly transient boolean isRotate;
     boolean isShooting;
+    int ammo;
 
     void setWeaponRotation(float rotation){
         for(WeaponMount mount : mounts){
@@ -94,7 +97,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                 mount.targetRotation = angleTo(mount.aimX, mount.aimY);
             }
 
-            if(mount.shoot){
+            if(mount.shoot && (ammo > 0 || !state.rules.unitAmmo)){
                 float rotation = this.rotation - 90;
 
                 //shoot if applicable
@@ -116,11 +119,15 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                     if(mount.weapon.mirror) mount.side = !mount.side;
                     mount.reload = weapon.reload;
                 }
+
+                ammo --;
+                if(ammo < 0) ammo = 0;
             }
         }
     }
 
     private void shoot(Weapon weapon, float x, float y, float aimX, float aimY, float rotation, int side){
+
         float baseX = this.x, baseY = this.y;
 
         weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
