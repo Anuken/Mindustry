@@ -16,7 +16,7 @@ import mindustry.world.*;
  * Does not store game state, just configuration.
  */
 public class Rules{
-    /** Whether every team has infinite resources and instant build speed. */
+    /** Sandbox mode: Enables infinite resources, build range and build speed. */
     public boolean infiniteResources;
     /** Team-specific rules. */
     public TeamRules teams = new TeamRules();

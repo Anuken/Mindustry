@@ -44,6 +44,8 @@ abstract class BuilderComp implements Unitc{
 
         float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange;
 
+        boolean infinite = state.rules.infiniteResources || team().rules().infiniteResources;
+
         Iterator<BuildPlan> it = plans.iterator();
         while(it.hasNext()){
             BuildPlan req = it.next();
@@ -83,7 +85,7 @@ abstract class BuilderComp implements Unitc{
             if(!current.initialized && !current.breaking && Build.validPlace(current.block, team(), current.x, current.y, current.rotation)){
                 boolean hasAll = !Structs.contains(current.block.requirements, i -> !core.items().has(i.item));
 
-                if(hasAll || state.rules.infiniteResources){
+                if(hasAll || infinite){
                     Build.beginPlace(current.block, team(), current.x, current.y, current.rotation);
                 }else{
                     current.stuck = true;
@@ -105,7 +107,7 @@ abstract class BuilderComp implements Unitc{
         }
 
         //if there is no core to build with or no build entity, stop building!
-        if((core == null && !state.rules.infiniteResources) || !(tile.entity instanceof BuildEntity)){
+        if((core == null && !infinite) || !(tile.entity instanceof BuildEntity)){
             return;
         }
 
@@ -148,7 +150,7 @@ abstract class BuilderComp implements Unitc{
     /** @return whether this request should be skipped, in favor of the next one. */
     boolean shouldSkip(BuildPlan request, @Nullable Tilec core){
         //requests that you have at least *started* are considered
-        if(state.rules.infiniteResources || request.breaking || core == null) return false;
+        if(state.rules.infiniteResources || team().rules().infiniteResources || request.breaking || core == null) return false;
         //TODO these are bad criteria
         return (request.stuck && !core.items().has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items().has(i.item)) && !request.initialized);
     }
