@@ -72,7 +72,7 @@ public class ContinuousLaserBulletType extends BulletType{
 
         Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
 
-        Drawf.light(b.x(), b.y(), b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 40, Color.orange, 0.7f);
+        Drawf.light(b.team(), b.x(), b.y(), b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 40, Color.orange, 0.7f);
         Draw.reset();
     }
 

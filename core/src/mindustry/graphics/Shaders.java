@@ -18,7 +18,7 @@ public class Shaders{
     public static BlockBuild blockbuild;
     public static @Nullable ShieldShader shield;
     public static UnitBuild build;
-    public static FogShader fog;
+    public static DarknessShader darkness;
     public static LightShader light;
     public static SurfaceShader water, tar, slag;
     public static PlanetShader planet;
@@ -38,7 +38,7 @@ public class Shaders{
             t.printStackTrace();
         }
         build = new UnitBuild();
-        fog = new FogShader();
+        darkness = new DarknessShader();
         light = new LightShader();
         water = new SurfaceShader("water");
         tar = new SurfaceShader("tar");
@@ -131,9 +131,9 @@ public class Shaders{
 
     }
 
-    public static class FogShader extends LoadShader{
-        public FogShader(){
-            super("fog", "default");
+    public static class DarknessShader extends LoadShader{
+        public DarknessShader(){
+            super("darkness", "default");
         }
     }
 

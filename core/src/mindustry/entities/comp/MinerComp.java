@@ -94,7 +94,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
 
         Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
 
-        Drawf.laser(Core.atlas.find("minelaser"), Core.atlas.find("minelaser-end"), px, py, ex, ey, 0.75f);
+        Drawf.laser(team(), Core.atlas.find("minelaser"), Core.atlas.find("minelaser-end"), px, py, ex, ey, 0.75f);
 
         //TODO hack?
         if(isLocal()){

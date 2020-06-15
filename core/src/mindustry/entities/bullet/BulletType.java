@@ -166,7 +166,7 @@ public abstract class BulletType extends Content{
     }
 
     public void drawLight(Bulletc b){
-        Drawf.light(b, lightRadius, lightColor, lightOpacity);
+        Drawf.light(b.team(), b, lightRadius, lightColor, lightOpacity);
     }
 
     public void init(Bulletc b){

@@ -93,7 +93,7 @@ public class LaserBulletType extends BulletType{
         Draw.reset();
 
         Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
-        Drawf.light(b.x(), b.y(), b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, width * 1.4f * b.fout(), colors[0], 0.6f);
+        Drawf.light(b.team(), b.x(), b.y(), b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, width * 1.4f * b.fout(), colors[0], 0.6f);
     }
 
     @Override

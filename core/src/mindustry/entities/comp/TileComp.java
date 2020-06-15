@@ -758,7 +758,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
             float fract = 1f;
             float opacity = color.a * fract;
             if(opacity > 0.001f){
-                Drawf.light(x, y, block.size * 30f * fract, color, opacity);
+                Drawf.light(team, x, y, block.size * 30f * fract, color, opacity);
             }
         }
     }

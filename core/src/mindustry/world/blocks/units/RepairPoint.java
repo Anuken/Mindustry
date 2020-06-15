@@ -76,7 +76,7 @@ public class RepairPoint extends Block{
                 float len = 5f;
 
                 Draw.color(Color.valueOf("e8ffd7"));
-                Drawf.laser(laser, laserEnd,
+                Drawf.laser(team, laser, laserEnd,
                 x + Angles.trnsx(ang, len), y + Angles.trnsy(ang, len),
                 target.x(), target.y(), strength);
                 Draw.color();

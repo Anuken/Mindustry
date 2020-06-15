@@ -16,7 +16,7 @@ import mindustry.world.*;
  * Does not store game state, just configuration.
  */
 public class Rules{
-    /** Whether ever team has infinite resources and instant build speed. */
+    /** Whether every team has infinite resources and instant build speed. */
     public boolean infiniteResources;
     /** Team-specific rules. */
     public TeamRules teams = new TeamRules();
@@ -76,8 +76,11 @@ public class Rules{
     public Seq<WeatherEntry> weather = new Seq<>(1);
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
-    /** Whether everything is dark. Enables lights. Experimental. */
+    /** Whether ambient lighting is enabled. */
     public boolean lighting = false;
+    /** Whether enemy lighting is visible.
+     * If lighting is enabled and this is false, a fog-of-war effect is partially achieved. */
+    public boolean enemyLights = true;
     /** Ambient light color, used when lighting is enabled. */
     public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
     /** Multiplier for solar panel power output.

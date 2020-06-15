@@ -342,7 +342,7 @@ public class UnitType extends UnlockableContent{
 
     public void drawLight(Unitc unit){
         if(lightRadius > 0){
-            Drawf.light(unit, lightRadius, lightColor, lightOpacity);
+            Drawf.light(unit.team(), unit, lightRadius, lightColor, lightOpacity);
         }
     }
 

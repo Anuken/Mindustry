@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -526,7 +527,7 @@ public class Fx{
 
         color();
 
-        Drawf.light(e.x, e.y, 20f * e.fslope(), Pal.lightFlame, 0.5f);
+        Drawf.light(Team.derelict, e.x, e.y, 20f * e.fslope(), Pal.lightFlame, 0.5f);
     }),
 
     fireSmoke = new Effect(35f, e -> {
