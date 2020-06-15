@@ -62,7 +62,7 @@ public class MendProjector extends Block{
 
         @Override
         public void updateTile(){
-            heat = Mathf.lerpDelta(heat, consValid() || tile.isEnemyCheat() ? 1f : 0f, 0.08f);
+            heat = Mathf.lerpDelta(heat, consValid() || cheating() ? 1f : 0f, 0.08f);
             charge += heat * delta();
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons().optionalValid()), 0.1f);

@@ -533,7 +533,7 @@ public class NetServer implements ApplicationListener{
         float xVelocity, float yVelocity,
         Tile mining,
         boolean boosting, boolean shooting, boolean chatting,
-        @Nullable BuildRequest[] requests,
+        @Nullable BuildPlan[] requests,
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
         NetConnection connection = player.con();
@@ -571,7 +571,7 @@ public class NetServer implements ApplicationListener{
         }
 
         if(requests != null){
-            for(BuildRequest req : requests){
+            for(BuildPlan req : requests){
                 if(req == null) continue;
                 Tile tile = world.tile(req.x, req.y);
                 if(tile == null || (!req.breaking && req.block == null)) continue;
@@ -592,7 +592,7 @@ public class NetServer implements ApplicationListener{
                     connection.rejectedRequests.add(req);
                     continue;
                 }
-                player.builder().requests().addLast(req);
+                player.builder().plans().addLast(req);
             }
         }
 

@@ -54,6 +54,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return state.teams.closestCore(x(), y(), team);
     }
 
+    public @Nullable CoreEntity core(){
+        return team.core();
+    }
+
     public void reset(){
         team = state.rules.defaultTeam;
         admin = typing = false;
@@ -87,8 +91,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         CoreEntity core = closestCore();
 
         if(!dead()){
-            x(unit.x());
-            y(unit.y());
+            set(unit);
             unit.team(team);
             deathTimer = 0;
 

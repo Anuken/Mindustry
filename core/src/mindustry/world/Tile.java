@@ -346,10 +346,6 @@ public class Tile implements Position, QuadTreeObject{
         return block.destructible || block.breakable || block.update;
     }
 
-    public boolean isEnemyCheat(){
-        return team() == state.rules.waveTeam && state.rules.enemyCheat;
-    }
-
     /**
      * Returns the list of all tiles linked to this multiblock, or just itself if it's not a multiblock.
      * This array contains all linked tiles, including this tile itself.

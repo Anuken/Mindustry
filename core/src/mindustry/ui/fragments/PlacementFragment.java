@@ -94,7 +94,7 @@ public class PlacementFragment extends Fragment{
             Block tryRecipe = tile == null ? null : tile.block();
             Object tryConfig = tile == null ? null : tile.config();
 
-            for(BuildRequest req : player.builder().requests()){
+            for(BuildPlan req : player.builder().plans()){
                 if(!req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).contains(Core.input.mouseWorld())){
                     tryRecipe = req.block;
                     tryConfig = req.config;
@@ -222,7 +222,7 @@ public class PlacementFragment extends Fragment{
                         button.resizeImage(Cicon.medium.size);
 
                         button.update(() -> { //color unplacable things gray
-                            Tilec core = player.closestCore();
+                            Tilec core = player.core();
                             Color color = (state.rules.infiniteResources || (core != null && (core.items().has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
@@ -310,7 +310,7 @@ public class PlacementFragment extends Fragment{
                                         line.image(stack.item.icon(Cicon.small)).size(8 * 2);
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
                                         line.labelWrap(() -> {
-                                            Tilec core = player.closestCore();
+                                            Tilec core = player.core();
                                             if(core == null || state.rules.infiniteResources) return "*/*";
 
                                             int amount = core.items().get(stack.item);

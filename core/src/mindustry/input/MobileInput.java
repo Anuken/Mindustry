@@ -48,7 +48,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     private float shiftDeltaX, shiftDeltaY;
 
     /** Place requests to be removed. */
-    private Seq<BuildRequest> removals = new Seq<>();
+    private Seq<BuildPlan> removals = new Seq<>();
     /** Whether or not the player is currently shifting all placed tiles. */
     private boolean selecting;
     /** Whether the player is currently in line-place mode. */
@@ -58,7 +58,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Whether no recipe was available when switching to break mode. */
     private Block lastBlock;
     /** Last placed request. Used for drawing block overlay. */
-    private BuildRequest lastPlaced;
+    private BuildPlan lastPlaced;
     /** Down tracking for panning.*/
     private boolean down = false;
 
@@ -97,7 +97,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         r2.setSize(block.size * tilesize);
         r2.setCenter(x * tilesize + block.offset(), y * tilesize + block.offset());
 
-        for(BuildRequest req : selectRequests){
+        for(BuildPlan req : selectRequests){
             Tile other = req.tile();
 
             if(other == null || req.breaking) continue;
@@ -110,7 +110,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        for(BuildRequest req : player.builder().requests()){
+        for(BuildPlan req : player.builder().plans()){
             Tile other = world.tile(req.x, req.y);
 
             if(other == null || req.breaking) continue;
@@ -126,11 +126,11 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     /** Returns the selection request that overlaps this tile, or null. */
-    BuildRequest getRequest(Tile tile){
+    BuildPlan getRequest(Tile tile){
         r2.setSize(tilesize);
         r2.setCenter(tile.worldx(), tile.worldy());
 
-        for(BuildRequest req : selectRequests){
+        for(BuildPlan req : selectRequests){
             Tile other = req.tile();
 
             if(other == null) continue;
@@ -149,7 +149,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         return null;
     }
 
-    void removeRequest(BuildRequest request){
+    void removeRequest(BuildPlan request){
         selectRequests.remove(request, true);
         if(!request.breaking){
             removals.add(request);
@@ -204,20 +204,20 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //confirm button
         table.button(Icon.ok, Styles.clearPartiali, () -> {
-            for(BuildRequest request : selectRequests){
+            for(BuildPlan request : selectRequests){
                 Tile tile = request.tile();
 
                 //actually place/break all selected blocks
                 if(tile != null){
                     if(!request.breaking){
                         if(validPlace(request.x, request.y, request.block, request.rotation)){
-                            BuildRequest other = getRequest(request.x, request.y, request.block.size, null);
-                            BuildRequest copy = request.copy();
+                            BuildPlan other = getRequest(request.x, request.y, request.block.size, null);
+                            BuildPlan copy = request.copy();
 
                             if(other == null){
                                 player.builder().addBuild(copy);
                             }else if(!other.breaking && other.x == request.x && other.y == request.y && other.block.size == request.block.size){
-                                player.builder().requests().remove(other);
+                                player.builder().plans().remove(other);
                                 player.builder().addBuild(copy);
                             }
                         }
@@ -278,7 +278,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         Lines.stroke(1f);
 
         //draw removals
-        for(BuildRequest request : removals){
+        for(BuildPlan request : removals){
             Tile tile = request.tile();
 
             if(tile == null) continue;
@@ -293,7 +293,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //draw list of requests
-        for(BuildRequest request : selectRequests){
+        for(BuildPlan request : selectRequests){
             Tile tile = request.tile();
 
             if(tile == null) continue;
@@ -333,7 +333,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(mode == placing && block != null){
                 //draw placing
                 for(int i = 0; i < lineRequests.size; i++){
-                    BuildRequest request = lineRequests.get(i);
+                    BuildPlan request = lineRequests.get(i);
                     if(i == lineRequests.size - 1 && request.block.rotate){
                         drawArrow(block, request.x, request.y, request.rotation);
                     }
@@ -376,7 +376,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
-    protected void drawRequest(BuildRequest request){
+    protected void drawRequest(BuildPlan request){
         if(request.tile() == null) return;
         brequest.animScale = request.animScale = Mathf.lerpDelta(request.animScale, 1f, 0.1f);
 
@@ -551,10 +551,10 @@ public class MobileInput extends InputHandler implements GestureListener{
             removeRequest(getRequest(cursor));
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
             //add to selection queue if it's a valid place position
-            selectRequests.add(lastPlaced = new BuildRequest(cursor.x, cursor.y, rotation, block));
+            selectRequests.add(lastPlaced = new BuildPlan(cursor.x, cursor.y, rotation, block));
         }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasRequest(linked)){
             //add to selection queue if it's a valid BREAK position
-            selectRequests.add(new BuildRequest(linked.x, linked.y));
+            selectRequests.add(new BuildPlan(linked.x, linked.y));
         }else if(!canTapPlayer(worldx, worldy) && !tileTapped(linked.entity)){
             tryBeginMine(cursor);
         }
@@ -659,7 +659,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //remove place requests that have disappeared
         for(int i = removals.size - 1; i >= 0; i--){
-            BuildRequest request = removals.get(i);
+            BuildPlan request = removals.get(i);
 
             if(request.animScale <= 0.0001f){
                 removals.remove(i);
@@ -720,7 +720,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             int shiftedY = (int)(shiftDeltaY / tilesize);
 
             if(Math.abs(shiftedX) > 0 || Math.abs(shiftedY) > 0){
-                for(BuildRequest req : selectRequests){
+                for(BuildPlan req : selectRequests){
                     if(req.breaking) continue; //don't shift removal requests
                     req.x += shiftedX;
                     req.y += shiftedY;

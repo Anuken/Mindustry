@@ -154,7 +154,7 @@ public class TypeIO{
         return content.block(read.s());
     }
 
-    public static void writeRequest(Writes write, BuildRequest request){
+    public static void writeRequest(Writes write, BuildPlan request){
         write.b(request.breaking ? (byte)1 : 0);
         write.i(Point2.pack(request.x, request.y));
         if(!request.breaking){
@@ -165,8 +165,8 @@ public class TypeIO{
         }
     }
 
-    public static BuildRequest readRequest(Reads read){
-        BuildRequest currentRequest;
+    public static BuildPlan readRequest(Reads read){
+        BuildPlan currentRequest;
 
         byte type = read.b();
         int position = read.i();
@@ -176,13 +176,13 @@ public class TypeIO{
         }
 
         if(type == 1){ //remove
-            currentRequest = new BuildRequest(Point2.x(position), Point2.y(position));
+            currentRequest = new BuildPlan(Point2.x(position), Point2.y(position));
         }else{ //place
             short block = read.s();
             byte rotation = read.b();
             boolean hasConfig = read.b() == 1;
             Object config = readObject(read);
-            currentRequest = new BuildRequest(Point2.x(position), Point2.y(position), rotation, content.block(block));
+            currentRequest = new BuildPlan(Point2.x(position), Point2.y(position), rotation, content.block(block));
             if(hasConfig){
                 currentRequest.configure(config);
             }
@@ -191,26 +191,26 @@ public class TypeIO{
         return currentRequest;
     }
 
-    public static void writeRequests(Writes write, BuildRequest[] requests){
+    public static void writeRequests(Writes write, BuildPlan[] requests){
         if(requests == null){
             write.s(-1);
             return;
         }
         write.s((short)requests.length);
-        for(BuildRequest request : requests){
+        for(BuildPlan request : requests){
             writeRequest(write, request);
         }
     }
 
-    public static BuildRequest[] readRequests(Reads read){
+    public static BuildPlan[] readRequests(Reads read){
         short reqamount = read.s();
         if(reqamount == -1){
             return null;
         }
 
-        BuildRequest[] reqs = new BuildRequest[reqamount];
+        BuildPlan[] reqs = new BuildPlan[reqamount];
         for(int i = 0; i < reqamount; i++){
-            BuildRequest request = readRequest(read);
+            BuildPlan request = readRequest(read);
             if(request != null){
                 reqs[i] = request;
             }

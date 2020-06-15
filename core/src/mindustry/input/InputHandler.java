@@ -64,10 +64,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected @Nullable Schematic lastSchematic;
     protected GestureDetector detector;
     protected PlaceLine line = new PlaceLine();
-    protected BuildRequest resultreq;
-    protected BuildRequest brequest = new BuildRequest();
-    protected Seq<BuildRequest> lineRequests = new Seq<>();
-    protected Seq<BuildRequest> selectRequests = new Seq<>();
+    protected BuildPlan resultreq;
+    protected BuildPlan brequest = new BuildPlan();
+    protected Seq<BuildPlan> lineRequests = new Seq<>();
+    protected Seq<BuildPlan> selectRequests = new Seq<>();
 
     //methods to override
 
@@ -232,11 +232,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     }
 
-    public Eachable<BuildRequest> allRequests(){
+    public Eachable<BuildPlan> allRequests(){
         return cons -> {
-            for(BuildRequest request : player.builder().requests()) cons.get(request);
-            for(BuildRequest request : selectRequests) cons.get(request);
-            for(BuildRequest request : lineRequests) cons.get(request);
+            for(BuildPlan request : player.builder().plans()) cons.get(request);
+            for(BuildPlan request : selectRequests) cons.get(request);
+            for(BuildPlan request : lineRequests) cons.get(request);
         };
     }
 
@@ -317,7 +317,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Drawf.selected(x, y, block, color);
     }
 
-    public void drawBreaking(BuildRequest request){
+    public void drawBreaking(BuildPlan request){
         if(request.breaking){
             drawBreaking(request.x, request.y);
         }else{
@@ -325,7 +325,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    public boolean requestMatches(BuildRequest request){
+    public boolean requestMatches(BuildPlan request){
         Tile tile = world.tile(request.x, request.y);
         return tile != null && tile.block() instanceof BuildBlock && tile.<BuildEntity>ent().cblock == request.block;
     }
@@ -362,7 +362,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         });
     }
 
-    public void rotateRequests(Seq<BuildRequest> requests, int direction){
+    public void rotateRequests(Seq<BuildPlan> requests, int direction){
         int ox = schemOriginX(), oy = schemOriginY();
 
         requests.each(req -> {
@@ -396,7 +396,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         });
     }
 
-    public void flipRequests(Seq<BuildRequest> requests, boolean x){
+    public void flipRequests(Seq<BuildPlan> requests, boolean x){
         int origin = (x ? schemOriginX() : schemOriginY()) * tilesize;
 
         requests.each(req -> {
@@ -436,18 +436,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     /** Returns the selection request that overlaps this position, or null. */
-    protected BuildRequest getRequest(int x, int y){
+    protected BuildPlan getRequest(int x, int y){
         return getRequest(x, y, 1, null);
     }
 
     /** Returns the selection request that overlaps this position, or null. */
-    protected BuildRequest getRequest(int x, int y, int size, BuildRequest skip){
+    protected BuildPlan getRequest(int x, int y, int size, BuildPlan skip){
         float offset = ((size + 1) % 2) * tilesize / 2f;
         r2.setSize(tilesize * size);
         r2.setCenter(x * tilesize + offset, y * tilesize + offset);
         resultreq = null;
 
-        Boolf<BuildRequest> test = req -> {
+        Boolf<BuildPlan> test = req -> {
             if(req == skip) return false;
             Tile other = req.tile();
 
@@ -464,11 +464,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             return r2.overlaps(r1);
         };
 
-        for(BuildRequest req : player.builder().requests()){
+        for(BuildPlan req : player.builder().plans()){
             if(test.get(req)) return req;
         }
 
-        for(BuildRequest req : selectRequests){
+        for(BuildPlan req : selectRequests){
             if(test.get(req)) return req;
         }
 
@@ -493,14 +493,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.color(Pal.remove);
         Lines.stroke(1f);
 
-        for(BuildRequest req : player.builder().requests()){
+        for(BuildPlan req : player.builder().plans()){
             if(req.breaking) continue;
             if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 drawBreaking(req);
             }
         }
 
-        for(BuildRequest req : selectRequests){
+        for(BuildPlan req : selectRequests){
             if(req.breaking) continue;
             if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 drawBreaking(req);
@@ -533,10 +533,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
     }
 
-    protected void flushSelectRequests(Seq<BuildRequest> requests){
-        for(BuildRequest req : requests){
+    protected void flushSelectRequests(Seq<BuildPlan> requests){
+        for(BuildPlan req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
-                BuildRequest other = getRequest(req.x, req.y, req.block.size, null);
+                BuildPlan other = getRequest(req.x, req.y, req.block.size, null);
                 if(other == null){
                     selectRequests.add(req.copy());
                 }else if(!other.breaking && other.x == req.x && other.y == req.y && other.block.size == req.block.size){
@@ -547,16 +547,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    protected void flushRequests(Seq<BuildRequest> requests){
-        for(BuildRequest req : requests){
+    protected void flushRequests(Seq<BuildPlan> requests){
+        for(BuildPlan req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
-                BuildRequest copy = req.copy();
+                BuildPlan copy = req.copy();
                 player.builder().addBuild(copy);
             }
         }
     }
 
-    protected void drawOverRequest(BuildRequest request){
+    protected void drawOverRequest(BuildPlan request){
         boolean valid = validPlace(request.x, request.y, request.block, request.rotation);
 
         Draw.reset();
@@ -566,7 +566,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.reset();
     }
 
-    protected void drawRequest(BuildRequest request){
+    protected void drawRequest(BuildPlan request){
         request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
 
         if(request.block.saveConfig && request.block.lastConfig != null && !request.hasConfig){
@@ -604,7 +604,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(!flush){
                     tryBreakBlock(wx, wy);
                 }else if(validBreak(tile.x, tile.y) && !selectRequests.contains(r -> r.tile() != null && r.tile() == tile)){
-                    selectRequests.add(new BuildRequest(tile.x, tile.y));
+                    selectRequests.add(new BuildPlan(tile.x, tile.y));
                 }
             }
         }
@@ -612,9 +612,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //remove build requests
         Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
 
-        Iterator<BuildRequest> it = player.builder().requests().iterator();
+        Iterator<BuildPlan> it = player.builder().plans().iterator();
         while(it.hasNext()){
-            BuildRequest req = it.next();
+            BuildPlan req = it.next();
             if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 it.remove();
             }
@@ -622,7 +622,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         it = selectRequests.iterator();
         while(it.hasNext()){
-            BuildRequest req = it.next();
+            BuildPlan req = it.next();
             if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 it.remove();
             }
@@ -643,7 +643,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         lineRequests.clear();
         iterateLine(x1, y1, x2, y2, l -> {
             rotation = l.rotation;
-            BuildRequest req = new BuildRequest(l.x, l.y, l.rotation, block);
+            BuildPlan req = new BuildPlan(l.x, l.y, l.rotation, block);
             req.animScale = 1f;
             lineRequests.add(req);
         });
@@ -898,8 +898,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return validPlace(x, y, type, rotation, null);
     }
 
-    public boolean validPlace(int x, int y, Block type, int rotation, BuildRequest ignore){
-        for(BuildRequest req : player.builder().requests()){
+    public boolean validPlace(int x, int y, Block type, int rotation, BuildPlan ignore){
+        for(BuildPlan req : player.builder().plans()){
             if(req != ignore
                     && !req.breaking
                     && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
@@ -915,18 +915,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void placeBlock(int x, int y, Block block, int rotation){
-        BuildRequest req = getRequest(x, y);
+        BuildPlan req = getRequest(x, y);
         if(req != null){
-            player.builder().requests().remove(req);
+            player.builder().plans().remove(req);
         }
-        player.builder().addBuild(new BuildRequest(x, y, rotation, block));
+        player.builder().addBuild(new BuildPlan(x, y, rotation, block));
     }
 
     public void breakBlock(int x, int y){
         Tile tile = world.tile(x, y);
         //TODO hacky
         if(tile != null && tile.entity != null) tile = tile.entity.tile();
-        player.builder().addBuild(new BuildRequest(tile.x, tile.y));
+        player.builder().addBuild(new BuildPlan(tile.x, tile.y));
     }
 
     public void drawArrow(Block block, int x, int y, int rotation){

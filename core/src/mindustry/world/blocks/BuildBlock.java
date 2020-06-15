@@ -154,7 +154,7 @@ public class BuildBlock extends Block{
                 if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
                     control.input.isBuilding = true;
                 }
-                player.builder().addBuild(new BuildRequest(tile.x, tile.y, tile.rotation(), cblock), false);
+                player.builder().addBuild(new BuildPlan(tile.x, tile.y, tile.rotation(), cblock), false);
             }
         }
 

@@ -17,7 +17,7 @@ public interface Autotiler{
     //holds some static temporary variables, required due to some RoboVM bugs
     class AutotilerHolder{
         static final int[] blendresult = new int[5];
-        static final BuildRequest[] directionals = new BuildRequest[4];
+        static final BuildPlan[] directionals = new BuildPlan[4];
     }
 
     /** slices a texture region:
@@ -44,9 +44,9 @@ public interface Autotiler{
         return region;
     }
 
-    default @Nullable int[] getTiling(BuildRequest req, Eachable<BuildRequest> list){
+    default @Nullable int[] getTiling(BuildPlan req, Eachable<BuildPlan> list){
         if(req.tile() == null) return null;
-        BuildRequest[] directionals = AutotilerHolder.directionals;
+        BuildPlan[] directionals = AutotilerHolder.directionals;
 
         Arrays.fill(directionals, null);
         list.each(other -> {
@@ -78,7 +78,7 @@ public interface Autotiler{
      * [3]: a 4-bit mask with bits 0-3 indicating blend state in that direction (0 being 0 degrees, 1 being 90, etc)
      * [4]: same as [3] but only blends with non-square sprites
      * */
-    default int[] buildBlending(Tile tile, int rotation, BuildRequest[] directional, boolean world){
+    default int[] buildBlending(Tile tile, int rotation, BuildPlan[] directional, boolean world){
         int[] blendresult = AutotilerHolder.blendresult;
         blendresult[0] = 0;
         blendresult[1] = blendresult[2] = 1;
@@ -134,10 +134,10 @@ public interface Autotiler{
         return Point2.equals(x + Geometry.d4(rotation).x,y + Geometry.d4(rotation).y, x2, y2);
     }
 
-    default boolean blends(Tile tile, int rotation, @Nullable BuildRequest[] directional, int direction, boolean checkWorld){
+    default boolean blends(Tile tile, int rotation, @Nullable BuildPlan[] directional, int direction, boolean checkWorld){
         int realDir = Mathf.mod(rotation - direction, 4);
         if(directional != null && directional[realDir] != null){
-            BuildRequest req = directional[realDir];
+            BuildPlan req = directional[realDir];
             if(blends(tile, rotation, req.x, req.y, req.rotation, req.block)){
                 return true;
             }

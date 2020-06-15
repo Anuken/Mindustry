@@ -42,7 +42,7 @@ public class DesktopInput extends InputHandler{
     /** Animation scale for line. */
     private float selectScale;
     /** Selected build request for movement. */
-    private @Nullable BuildRequest sreq;
+    private @Nullable BuildPlan sreq;
     /** Whether player is currently deleting removal requests. */
     private boolean deleting = false, shouldShoot = false;
 
@@ -124,19 +124,19 @@ public class DesktopInput extends InputHandler{
 
         //draw hover request
         if(mode == none && !isPlacing()){
-            BuildRequest req = getRequest(cursorX, cursorY);
+            BuildPlan req = getRequest(cursorX, cursorY);
             if(req != null){
                 drawSelected(req.x, req.y, req.breaking ? req.tile().block() : req.block, Pal.accent);
             }
         }
 
         //draw schematic requests
-        for(BuildRequest request : selectRequests){
+        for(BuildPlan request : selectRequests){
             request.animScale = 1f;
             drawRequest(request);
         }
 
-        for(BuildRequest request : selectRequests){
+        for(BuildPlan request : selectRequests){
             drawOverRequest(request);
         }
 
@@ -144,7 +144,7 @@ public class DesktopInput extends InputHandler{
             //draw things that may be placed soon
             if(mode == placing && block != null){
                 for(int i = 0; i < lineRequests.size; i++){
-                    BuildRequest req = lineRequests.get(i);
+                    BuildPlan req = lineRequests.get(i);
                     if(i == lineRequests.size - 1 && req.block.rotate){
                         drawArrow(block, req.x, req.y, req.rotation);
                     }
@@ -425,7 +425,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
-            BuildRequest req = getRequest(cursorX, cursorY);
+            BuildPlan req = getRequest(cursorX, cursorY);
 
             if(Core.input.keyDown(Binding.break_block)){
                 mode = none;
@@ -444,7 +444,7 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected.entity) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().requests().size == 0 || !player.builder().isBuilding()) && !droppingItem &&
+                if(!tileTapped(selected.entity) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().plans().size == 0 || !player.builder().isBuilding()) && !droppingItem &&
                 !tryBeginMine(selected) && player.miner().mineTile() == null && !Core.scene.hasKeyboard()){
                     isShooting = shouldShoot;
                 }
@@ -466,9 +466,9 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyDown(Binding.select) && mode == none && !isPlacing() && deleting){
-            BuildRequest req = getRequest(cursorX, cursorY);
+            BuildPlan req = getRequest(cursorX, cursorY);
             if(req != null && req.breaking){
-                player.builder().requests().remove(req);
+                player.builder().plans().remove(req);
             }
         }else{
             deleting = false;
@@ -497,7 +497,7 @@ public class DesktopInput extends InputHandler{
 
             if(sreq != null){
                 if(getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null){
-                    player.builder().requests().remove(sreq, true);
+                    player.builder().plans().remove(sreq, true);
                 }
                 sreq = null;
             }

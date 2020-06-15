@@ -174,7 +174,7 @@ public class Teams{
 
         /** @return whether this team is controlled by the AI and builds bases. */
         public boolean hasAI(){
-            return state.rules.attackMode && team == state.rules.waveTeam && state.rules.buildAI;
+            return state.rules.attackMode && team.rules().ai;
         }
 
         @Override

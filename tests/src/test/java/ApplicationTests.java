@@ -492,8 +492,8 @@ public class ApplicationTests{
         d1.set(0f, 0f);
         d2.set(20f, 20f);
 
-        d1.addBuild(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
-        d2.addBuild(new BuildRequest(1, 1, 0, Blocks.copperWallLarge));
+        d1.addBuild(new BuildPlan(0, 0, 0, Blocks.copperWallLarge));
+        d2.addBuild(new BuildPlan(1, 1, 0, Blocks.copperWallLarge));
 
         d1.update();
         d2.update();
@@ -514,8 +514,8 @@ public class ApplicationTests{
         d1.set(10f, 20f);
         d2.set(10f, 20f);
 
-        d1.addBuild(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
-        d2.addBuild(new BuildRequest(1, 1));
+        d1.addBuild(new BuildPlan(0, 0, 0, Blocks.copperWallLarge));
+        d2.addBuild(new BuildPlan(1, 1));
 
         Time.setDeltaProvider(() -> 3f);
         d1.update();
@@ -532,7 +532,7 @@ public class ApplicationTests{
         assertEquals(Blocks.copperWallLarge, world.tile(1, 1).block());
 
         d2.clearBuilding();
-        d2.addBuild(new BuildRequest(1, 1));
+        d2.addBuild(new BuildPlan(1, 1));
         d2.update();
 
         assertEquals(Blocks.air, world.tile(0, 0).block());

@@ -281,7 +281,7 @@ public abstract class Turret extends Block{
 
         /** Consume ammo and return a type. */
         public BulletType useAmmo(){
-            if(tile.isEnemyCheat()) return peekAmmo();
+            if(cheating()) return peekAmmo();
 
             AmmoEntry entry = ammo.peek();
             entry.amount -= ammoPerShot;

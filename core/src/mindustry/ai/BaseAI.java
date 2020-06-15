@@ -14,7 +14,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.production.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 
@@ -48,10 +47,13 @@ public class BaseAI{
 
             for(int i = 0; i < attempts; i++){
                 int range = 150;
-                CoreEntity core = data.cores.random();
+
+                Position pos = randomPosition();
+                //when there are no random positions, do nothing.
+                if(pos == null) return;
 
                 Tmp.v1.rnd(Mathf.random(range));
-                int wx = (int)(core.tileX() + Tmp.v1.x), wy = (int)(core.tileY() + Tmp.v1.y);
+                int wx = (int)(world.toTile(pos.getX()) + Tmp.v1.x), wy = (int)(world.toTile(pos.getY()) + Tmp.v1.y);
                 Tile tile = world.tiles.getc(wx, wy);
 
                 Seq<BasePart> parts = null;
@@ -74,7 +76,17 @@ public class BaseAI{
         }
     }
 
-    boolean tryPlace(BasePart part, int x, int y){
+    /** @return a random position from which to seed building. */
+    private Position randomPosition(){
+        if(data.hasCore()){
+            return data.cores.random();
+        }else if(data.team == state.rules.waveTeam){
+            return spawner.getSpawns().random();
+        }
+        return null;
+    }
+
+    private boolean tryPlace(BasePart part, int x, int y){
         int rotation = Mathf.range(2);
         axis.set((int)(part.schematic.width / 2f), (int)(part.schematic.height / 2f));
         Schematic result = Schematics.rotate(part.schematic, rotation);
@@ -131,7 +143,7 @@ public class BaseAI{
         return true;
     }
 
-    void tryWalls(){
+    private void tryWalls(){
         Block wall = Blocks.copperWall;
         Tile spawn = state.rules.defaultTeam.core() != null ? state.rules.defaultTeam.core().tile : data.team.core().tile;
 

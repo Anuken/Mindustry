@@ -68,7 +68,7 @@ public class Drill extends Block{
     }
 
     @Override
-    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
         if(!req.worldContext) return;
         Tile tile = req.tile();
         if(tile == null) return;

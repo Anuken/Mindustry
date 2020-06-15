@@ -3,6 +3,8 @@ package mindustry.game;
 import arc.graphics.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.serialization.*;
+import arc.util.serialization.Json.*;
 import mindustry.content.*;
 import mindustry.io.*;
 import mindustry.type.*;
@@ -14,18 +16,26 @@ import mindustry.world.*;
  * Does not store game state, just configuration.
  */
 public class Rules{
-    /** Whether the player team has infinite resources. */
+    /** Whether ever team has infinite resources and instant build speed. */
     public boolean infiniteResources;
+    /** Team-specific rules. */
+    public TeamRules teams = new TeamRules();
     /** Whether the waves come automatically on a timer. If not, waves come when the play button is pressed. */
     public boolean waveTimer = true;
     /** Whether waves are spawnable at all. */
     public boolean waves;
-    /** Whether the enemy AI has infinite resources in most of their buildings and turrets. */
-    public boolean enemyCheat;
-    /** Whether the enemy AI has infinite resources in their core only. TODO remove */
-    public boolean enemyInfiniteResources = true;
     /** Whether the game objective is PvP. Note that this enables automatic hosting. */
     public boolean pvp;
+    /** Whether to pause the wave timer until all enemies are destroyed. */
+    public boolean waitEnemies = false;
+    /** Determinates if gamemode is attack mode */
+    public boolean attackMode = false;
+    /** Whether this is the editor gamemode. */
+    public boolean editor = false;
+    /** Whether the tutorial is enabled. False by default. */
+    public boolean tutorial = false;
+    /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
+    public boolean canGameOver = true;
     /** Whether reactors can explode and damage other blocks. */
     public boolean reactorExplosions = true;
     /** How fast unit pads build units. */
@@ -60,18 +70,6 @@ public class Rules{
     public @Nullable Sector sector;
     /** Spawn layout. */
     public Seq<SpawnGroup> spawns = new Seq<>();
-    /** Whether to pause the wave timer until all enemies are destroyed. */
-    public boolean waitEnemies = false;
-    /** Determinates if gamemode is attack mode */
-    public boolean attackMode = false;
-    /** Whether this is the editor gamemode. */
-    public boolean editor = false;
-    /** Whether the tutorial is enabled. False by default. */
-    public boolean tutorial = false;
-    /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
-    public boolean canGameOver = true;
-    /** EXPERIMENTAL building AI. TODO remove */
-    public boolean buildAI = true;
     /** Starting items put in cores */
     public Seq<ItemStack> loadout = Seq.with(ItemStack.with(Items.copper, 100));
     /** Weather events that occur here. */
@@ -92,6 +90,16 @@ public class Rules{
     /** special tags for additional info */
     public StringMap tags = new StringMap();
 
+    /** A team-specific ruleset. */
+    public static class TeamRule{
+        /** Whether to use building AI. */
+        public boolean ai;
+        /** If true, blocks don't require power or resources. */
+        public boolean cheat;
+        /** If true, resources are not consumed when building. */
+        public boolean infiniteResources;
+    }
+
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){
         return JsonIO.copy(this);
@@ -109,6 +117,33 @@ public class Rules{
             return Gamemode.sandbox;
         }else{
             return Gamemode.survival;
+        }
+    }
+
+    /** A simple map for storing TeamRules in an efficient way without hashing. */
+    public static class TeamRules implements Serializable{
+        final TeamRule[] values = new TeamRule[Team.all.length];
+
+        public TeamRule get(Team team){
+            TeamRule out = values[team.uid];
+            if(out == null) values[team.uid] = (out = new TeamRule());
+            return out;
+        }
+
+        @Override
+        public void write(Json json){
+            for(Team team : Team.all){
+                if(values[team.uid] != null){
+                    json.writeValue(team.uid + "", values[team.uid], TeamRule.class);
+                }
+            }
+        }
+
+        @Override
+        public void read(Json json, JsonValue jsonData){
+            for(JsonValue value : jsonData){
+                values[Integer.parseInt(value.name)] = json.readValue(TeamRule.class, value);
+            }
         }
     }
 }

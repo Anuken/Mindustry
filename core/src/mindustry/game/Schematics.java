@@ -246,7 +246,7 @@ public class Schematics implements Loadable{
             Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), -buffer.getHeight());
             Draw.color();
 
-            Seq<BuildRequest> requests = schematic.tiles.map(t -> new BuildRequest(t.x, t.y, t.rotation, t.block).configure(t.config));
+            Seq<BuildPlan> requests = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block).configure(t.config));
 
             Draw.flush();
             //scale each request to fit schematic
@@ -276,8 +276,8 @@ public class Schematics implements Loadable{
     }
 
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
-    public Seq<BuildRequest> toRequests(Schematic schem, int x, int y){
-        return schem.tiles.map(t -> new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y, schem.width, schem.height).configure(t.config))
+    public Seq<BuildPlan> toRequests(Schematic schem, int x, int y){
+        return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y, schem.width, schem.height).configure(t.config))
             .removeAll(s -> !s.block.isVisible() || !s.block.unlockedCur());
     }
 
@@ -558,7 +558,7 @@ public class Schematics implements Loadable{
         int ox = schem.width/2, oy = schem.height/2;
 
         schem.tiles.each(req -> {
-            req.config = BuildRequest.pointConfig(req.config, p -> {
+            req.config = BuildPlan.pointConfig(req.config, p -> {
                 int cx = p.x, cy = p.y;
                 int lx = cx;
 

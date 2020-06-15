@@ -311,16 +311,8 @@ public class Logic implements ApplicationListener{
                     updateWeather();
 
                     for(TeamData data : state.teams.getActive()){
-                        if(data.hasAI() && data.hasCore()){
+                        if(data.hasAI()){
                             data.ai.update();
-                        }
-
-                        //TODO this is terrible
-                        //fills enemy core with resources
-                        if(state.rules.enemyInfiniteResources && state.rules.waves && data.team == state.rules.waveTeam && data.hasCore()){
-                            for(Item item : content.items()){
-                                data.core().items.set(item, data.core().block.itemCapacity);
-                            }
                         }
                     }
                 }

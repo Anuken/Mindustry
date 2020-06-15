@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
     protected static boolean returnValue = false;
-    protected static BuildRequest otherReq;
+    protected static BuildPlan otherReq;
 
     protected final ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     protected final Vec2 t1 = new Vec2(), t2 = new Vec2();
@@ -201,7 +201,7 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
         if(req.config instanceof Point2[]){
             for(Point2 point : (Point2[])req.config){
                 otherReq = null;

@@ -19,6 +19,8 @@ public class EntityIO{
     final static Json json = new Json();
     //suffixes for sync fields
     final static String targetSuf = "_TARGET_", lastSuf = "_LAST_";
+    //replacements after refactoring
+    final static StringMap replacements = StringMap.of("mindustry.entities.units.BuildRequest", "mindustry.entities.units.BuildPlan");
 
     final ClassSerializer serializer;
     final String name;
@@ -198,6 +200,7 @@ public class EntityIO{
 
     private void io(String type, String field) throws Exception{
         type = type.replace("mindustry.gen.", "");
+        type = replacements.get(type, type);
 
         if(BaseProcessor.isPrimitive(type)){
             s(type.equals("boolean") ? "bool" : type.charAt(0) + "", field);

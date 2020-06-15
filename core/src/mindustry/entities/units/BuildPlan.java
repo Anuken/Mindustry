@@ -8,7 +8,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 /** Class for storing build requests. Can be either a place or remove request. */
-public class BuildRequest{
+public class BuildPlan{
     /** Position and rotation of this request. */
     public int x, y, rotation;
     /** Block being placed. If null, this is a breaking request.*/
@@ -31,7 +31,7 @@ public class BuildRequest{
     public float animScale = 0f;
 
     /** This creates a build request. */
-    public BuildRequest(int x, int y, int rotation, Block block){
+    public BuildPlan(int x, int y, int rotation, Block block){
         this.x = x;
         this.y = y;
         this.rotation = rotation;
@@ -40,7 +40,7 @@ public class BuildRequest{
     }
 
     /** This creates a remove request. */
-    public BuildRequest(int x, int y){
+    public BuildPlan(int x, int y){
         this.x = x;
         this.y = y;
         this.rotation = -1;
@@ -48,7 +48,7 @@ public class BuildRequest{
         this.breaking = true;
     }
 
-    public BuildRequest(){
+    public BuildPlan(){
 
     }
 
@@ -74,8 +74,8 @@ public class BuildRequest{
         this.config = pointConfig(this.config, cons);
     }
 
-    public BuildRequest copy(){
-        BuildRequest copy = new BuildRequest();
+    public BuildPlan copy(){
+        BuildPlan copy = new BuildPlan();
         copy.x = x;
         copy.y = y;
         copy.rotation = rotation;
@@ -91,7 +91,7 @@ public class BuildRequest{
         return copy;
     }
 
-    public BuildRequest original(int x, int y, int originalWidth, int originalHeight){
+    public BuildPlan original(int x, int y, int originalWidth, int originalHeight){
         originalX = x;
         originalY = y;
         this.originalWidth = originalWidth;
@@ -107,7 +107,7 @@ public class BuildRequest{
         }
     }
 
-    public BuildRequest set(int x, int y, int rotation, Block block){
+    public BuildPlan set(int x, int y, int rotation, Block block){
         this.x = x;
         this.y = y;
         this.rotation = rotation;
@@ -124,7 +124,7 @@ public class BuildRequest{
         return y*tilesize + block.offset();
     }
 
-    public BuildRequest configure(Object config){
+    public BuildPlan configure(Object config){
         this.config = config;
         this.hasConfig = true;
         return this;

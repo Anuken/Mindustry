@@ -27,7 +27,7 @@ public abstract class NetConnection{
     /** Timestamp of last recieved snapshot. */
     public long lastRecievedClientTime;
     /** Build requests that have been recently rejected. This is cleared every snapshot. */
-    public Seq<BuildRequest> rejectedRequests = new Seq<>();
+    public Seq<BuildPlan> rejectedRequests = new Seq<>();
 
     public boolean hasConnected, hasBegunConnecting, hasDisconnected;
     public float viewWidth, viewHeight, viewX, viewY;

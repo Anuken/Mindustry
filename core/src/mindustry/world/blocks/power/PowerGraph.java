@@ -178,7 +178,7 @@ public class PowerGraph{
     public void update(){
         if(Core.graphics.getFrameId() == lastFrameUpdated){
             return;
-        }else if(!consumers.isEmpty() && consumers.first().tile().isEnemyCheat()){
+        }else if(!consumers.isEmpty() && consumers.first().cheating()){
             //when cheating, just set status to 1
             for(Tilec tile : consumers){
                 tile.power().status = 1f;
