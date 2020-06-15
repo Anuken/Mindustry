@@ -97,6 +97,8 @@ public class Rules{
     public static class TeamRule{
         /** Whether to use building AI. */
         public boolean ai;
+        /** TODO Tier of blocks/designs that the AI uses for building. [0, 1]*/
+        public float aiTier = 0f;
         /** If true, blocks don't require power or resources. */
         public boolean cheat;
         /** If true, resources are not consumed when building. */

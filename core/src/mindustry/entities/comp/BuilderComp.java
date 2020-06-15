@@ -29,7 +29,6 @@ abstract class BuilderComp implements Unitc{
     @Import float x, y, rotation;
 
     Queue<BuildPlan> plans = new Queue<>();
-    transient float buildSpeed = 1f;
     transient boolean building = true;
 
     @Override
@@ -115,9 +114,9 @@ abstract class BuilderComp implements Unitc{
         BuildEntity entity = tile.ent();
 
         if(current.breaking){
-            entity.deconstruct(this, core, 1f / entity.buildCost * Time.delta() * buildSpeed * state.rules.buildSpeedMultiplier);
+            entity.deconstruct(this, core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier);
         }else{
-            if(entity.construct(this, core, 1f / entity.buildCost * Time.delta() * buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
+            if(entity.construct(this, core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
                 if(current.hasConfig){
                     Call.onTileConfig(null, tile.entity, current.config);
                 }
