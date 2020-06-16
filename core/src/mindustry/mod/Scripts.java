@@ -8,9 +8,9 @@ import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
 import mindustry.mod.Mods.*;
-import org.mozilla.javascript.*;
-import org.mozilla.javascript.commonjs.module.*;
-import org.mozilla.javascript.commonjs.module.provider.*;
+import rhino.*;
+import rhino.module.*;
+import rhino.module.provider.*;
 
 import java.io.*;
 import java.net.*;

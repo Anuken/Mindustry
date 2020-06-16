@@ -14,7 +14,7 @@ import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
-import org.mozilla.javascript.*;
+import rhino.*;
 
 import static mindustry.Vars.*;
 

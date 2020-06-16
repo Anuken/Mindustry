@@ -36,6 +36,7 @@ allprojects{
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
+        rhinoVersion = '66ffaf9ba089cc4e6b83cd7a9a397488cd15bf87'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -274,7 +275,7 @@ project(":core"){
         api arcModule("extensions:g3d")
         api arcModule("extensions:fx")
         api arcModule("extensions:arcnet")
-        api "org.mozilla:rhino-runtime:1.7.12"
+        api "com.github.Anuken:rhino:$rhinoVersion"
         if(localArc() && debugged()) api arcModule("extensions:recorder")
 
         compileOnly project(":annotations")
