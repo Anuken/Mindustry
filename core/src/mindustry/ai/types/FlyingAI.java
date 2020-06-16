@@ -46,6 +46,8 @@ public class FlyingAI extends AIController{
         unit.controlWeapons(shoot, shoot);
     }
 
+    //TODO clean up
+
     protected void circle(float circleLength){
         circle(circleLength, unit.type().speed);
     }

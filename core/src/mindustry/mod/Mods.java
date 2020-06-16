@@ -33,13 +33,13 @@ public class Mods implements Loadable{
     private Json json = new Json();
     private @Nullable Scripts scripts;
     private ContentParser parser = new ContentParser();
-    private ObjectMap<String, Array<Fi>> bundles = new ObjectMap<>();
+    private ObjectMap<String, Seq<Fi>> bundles = new ObjectMap<>();
     private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites", "sprites-override");
 
     private int totalSprites;
     private MultiPacker packer;
 
-    private Array<LoadedMod> mods = new Array<>();
+    private Seq<LoadedMod> mods = new Seq<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
     private boolean requiresReload, createdAtlas;
 
@@ -103,8 +103,8 @@ public class Mods implements Loadable{
         packer = new MultiPacker();
 
         eachEnabled(mod -> {
-            Array<Fi> sprites = mod.root.child("sprites").findAll(f -> f.extension().equals("png"));
-            Array<Fi> overrides = mod.root.child("sprites-override").findAll(f -> f.extension().equals("png"));
+            Seq<Fi> sprites = mod.root.child("sprites").findAll(f -> f.extension().equals("png"));
+            Seq<Fi> overrides = mod.root.child("sprites-override").findAll(f -> f.extension().equals("png"));
             packSprites(sprites, mod, true);
             packSprites(overrides, mod, false);
             Log.debug("Packed @ images for mod '@'.", sprites.size + overrides.size, mod.meta.name);
@@ -127,7 +127,7 @@ public class Mods implements Loadable{
         }
     }
 
-    private void packSprites(Array<Fi> sprites, LoadedMod mod, boolean prefix){
+    private void packSprites(Seq<Fi> sprites, LoadedMod mod, boolean prefix){
         for(Fi file : sprites){
             try(InputStream stream = file.read()){
                 byte[] bytes = Streams.copyBytes(stream, Math.max((int)file.length(), 512));
@@ -171,10 +171,11 @@ public class Mods implements Loadable{
             packer.flush(filter, Core.atlas);
 
             //generate new icons
-            for(Array<Content> arr : content.getContentMap()){
+            for(Seq<Content> arr : content.getContentMap()){
                 arr.each(c -> {
                     if(c instanceof UnlockableContent && c.minfo.mod != null){
                         UnlockableContent u = (UnlockableContent)c;
+                        u.load();
                         u.createIcons(packer);
                     }
                 });
@@ -305,16 +306,16 @@ public class Mods implements Loadable{
         }
     }
 
-    private void topoSort(LoadedMod mod, Array<LoadedMod> stack, ObjectSet<LoadedMod> visited){
+    private void topoSort(LoadedMod mod, Seq<LoadedMod> stack, ObjectSet<LoadedMod> visited){
         visited.add(mod);
         mod.dependencies.each(m -> !visited.contains(m), m -> topoSort(m, stack, visited));
         stack.add(mod);
     }
 
     /** @return mods ordered in the correct way needed for dependencies. */
-    private Array<LoadedMod> orderedMods(){
+    private Seq<LoadedMod> orderedMods(){
         ObjectSet<LoadedMod> visited = new ObjectSet<>();
-        Array<LoadedMod> result = new Array<>();
+        Seq<LoadedMod> result = new Seq<>();
         eachEnabled(mod -> {
             if(!visited.contains(mod)){
                 topoSort(mod, result, visited);
@@ -346,7 +347,7 @@ public class Mods implements Loadable{
                 for(Fi file : folder.list()){
                     if(file.name().startsWith("bundle") && file.extension().equals("properties")){
                         String name = file.nameWithoutExtension();
-                        bundles.get(name, Array::new).add(file);
+                        bundles.get(name, Seq::new).add(file);
                     }
                 }
             }
@@ -357,7 +358,7 @@ public class Mods implements Loadable{
         while(bundle != null){
             String str = bundle.getLocale().toString();
             String locale = "bundle" + (str.isEmpty() ? "" : "_" + str);
-            for(Fi file : bundles.get(locale, Array::new)){
+            for(Fi file : bundles.get(locale, Seq::new)){
                 try{
                     PropertiesUtils.load(bundle.getProperties(), file.reader());
                 }catch(Throwable e){
@@ -469,7 +470,7 @@ public class Mods implements Loadable{
                 if(mod.root.child("scripts").exists()){
                     content.setCurrentMod(mod);
                     //if there's only one script file, use it (for backwards compatibility); if there isn't, use "main.js"
-                    Array<Fi> allScripts = mod.root.child("scripts").findAll(f -> f.extEquals("js"));
+                    Seq<Fi> allScripts = mod.root.child("scripts").findAll(f -> f.extEquals("js"));
                     Fi main = allScripts.size == 1 ? allScripts.first() : mod.root.child("scripts").child("main.js");
                     if(main.exists() && !main.isDirectory()){
                         try{
@@ -519,7 +520,7 @@ public class Mods implements Loadable{
             }
         }
 
-        Array<LoadRun> runs = new Array<>();
+        Seq<LoadRun> runs = new Seq<>();
 
         for(LoadedMod mod : orderedMods()){
             if(mod.root.child("content").exists()){
@@ -562,7 +563,7 @@ public class Mods implements Loadable{
     }
 
     /** @return a list of mods and versions, in the format name:version. */
-    public Array<String> getModStrings(){
+    public Seq<String> getModStrings(){
         return mods.select(l -> !l.meta.hidden && l.enabled()).map(l -> l.name + ":" + l.meta.version);
     }
 
@@ -579,9 +580,9 @@ public class Mods implements Loadable{
 
     /** @return the mods that the client is missing.
      * The inputted array is changed to contain the extra mods that the client has but the server doesn't.*/
-    public Array<String> getIncompatibility(Array<String> out){
-        Array<String> mods = getModStrings();
-        Array<String> result = mods.copy();
+    public Seq<String> getIncompatibility(Seq<String> out){
+        Seq<String> mods = getModStrings();
+        Seq<String> result = mods.copy();
         for(String mod : mods){
             if(out.remove(mod)){
                 result.remove(mod);
@@ -590,7 +591,7 @@ public class Mods implements Loadable{
         return result;
     }
 
-    public Array<LoadedMod> list(){
+    public Seq<LoadedMod> list(){
         return mods;
     }
 
@@ -668,7 +669,7 @@ public class Mods implements Loadable{
         return new LoadedMod(sourceFile, zip, mainMod, meta);
     }
 
-    /** Represents a plugin that has been loaded from a jar file.*/
+    /** Represents a mod's state. May be a jar file, folder or zip. */
     public static class LoadedMod implements Publishable, Disposable{
         /** The location of this mod's zip file/folder on the disk. */
         public final Fi file;
@@ -681,11 +682,11 @@ public class Mods implements Loadable{
         /** This mod's metadata. */
         public final ModMeta meta;
         /** This mod's dependencies as already-loaded mods. */
-        public Array<LoadedMod> dependencies = new Array<>();
+        public Seq<LoadedMod> dependencies = new Seq<>();
         /** All missing dependencies of this mod as strings. */
-        public Array<String> missingDependencies = new Array<>();
+        public Seq<String> missingDependencies = new Seq<>();
         /** Script files to run. */
-        public Array<Fi> scripts = new Array<>();
+        public Seq<Fi> scripts = new Seq<>();
         /** Content with intialization code. */
         public ObjectSet<Content> erroredContent = new ObjectSet<>();
         /** Current state of this mod. */
@@ -802,10 +803,10 @@ public class Mods implements Loadable{
         }
     }
 
-    /** Plugin metadata information.*/
+    /** Mod metadata information.*/
     public static class ModMeta{
         public String name, displayName, author, description, version, main, minGameVersion;
-        public Array<String> dependencies = Array.with();
+        public Seq<String> dependencies = Seq.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
 

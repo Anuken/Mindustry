@@ -17,7 +17,7 @@ public class Edgifier{
 
     private static Pixmap edgify(Pixmap in, int chunk){
         Pixmap out = new Pixmap(in.getWidth(), in.getHeight());
-        IntArray side1 = new IntArray(), side2 = new IntArray();
+        IntSeq side1 = new IntSeq(), side2 = new IntSeq();
 
         for(int x = 0; x < in.getWidth(); x += chunk){
             for(int y = 0; y < in.getHeight(); y += chunk){

@@ -32,7 +32,7 @@ public class PayloadConveyor extends Block{
     }
 
     @Override
-    protected TextureRegion[] generateIcons(){
+    protected TextureRegion[] icons(){
         return new TextureRegion[]{Core.atlas.find(name + "-icon")};
     }
 
@@ -56,13 +56,28 @@ public class PayloadConveyor extends Block{
         public int step = -1, stepAccepted = -1;
 
         @Override
+        public Payload takePayload(){
+            Payload t = item;
+            item = null;
+            return t;
+        }
+
+        @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
             Tilec accept = nearby(Geometry.d4(rotation()).x * size, Geometry.d4(rotation()).y * size);
             //next block must be aligned and of the same size
-            if(accept != null && accept.block().size == size &&
-                tileX() + Geometry.d4(rotation()).x * size == accept.tileX() && tileY() + Geometry.d4(rotation()).y * size == accept.tileY()){
+            if(accept != null && (
+                //same size
+                (accept.block().size == size && tileX() + Geometry.d4(rotation()).x * size == accept.tileX() && tileY() + Geometry.d4(rotation()).y * size == accept.tileY()) ||
+
+                //differing sizes
+                (accept.block().size > size &&
+                    (rotation() % 2 == 0 ? //check orientation
+                    Math.abs(accept.y() - y) <= (accept.block().size * tilesize - size * tilesize)/2f : //check Y alignment
+                    Math.abs(accept.x() - x) <= (accept.block().size * tilesize - size * tilesize)/2f   //check X alignment
+                )))){
                 next = accept;
             }else{
                 next = null;
@@ -95,15 +110,25 @@ public class PayloadConveyor extends Block{
                             //move forward.
                             next.handlePayload(this, item);
                             item = null;
+                            moved();
                         }
                     }else if(!blocked){
                         //dump item forward
                         if(item.dump()){
                             item = null;
+                            moved();
                         }
                     }
                 }
             }
+        }
+
+        public void moved(){
+
+        }
+
+        public void drawBottom(){
+            super.draw();
         }
 
         @Override 
@@ -157,7 +182,7 @@ public class PayloadConveyor extends Block{
         @Override
         public boolean acceptPayload(Tilec source, Payload payload){
             //accepting payloads from units isn't supported
-            return this.item == null && progress <= 5f && source != this;
+            return this.item == null && progress <= 5f && source != this && payload.fits();
         }
 
         @Override

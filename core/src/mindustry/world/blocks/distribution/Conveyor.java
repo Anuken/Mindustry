@@ -1,6 +1,5 @@
 package mindustry.world.blocks.distribution;
 
-import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -58,7 +57,7 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         int[] bits = getTiling(req, list);
 
         if(bits == null) return;
@@ -73,8 +72,8 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-0-0")};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{regions[0][0]};
     }
 
     @Override
@@ -83,7 +82,7 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
         Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conveyor || req.block instanceof Junction));
         return cont.get(Geometry.d4(req.rotation)) &&
             cont.get(Geometry.d4(req.rotation - 2)) &&
@@ -138,7 +137,6 @@ public class Conveyor extends Block implements Autotiler{
 
             Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
 
-            //TODO is sprite Z layer clustering necessary? does it create garbage?
             Draw.z(Layer.blockOver);
 
             for(int i = 0; i < len; i++){

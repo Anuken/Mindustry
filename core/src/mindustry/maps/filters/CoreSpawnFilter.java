@@ -21,7 +21,7 @@ public class CoreSpawnFilter extends GenerateFilter{
 
     @Override
     public void apply(Tiles tiles, GenerateInput in){
-        IntArray spawns = new IntArray();
+        IntSeq spawns = new IntSeq();
         for(Tile tile : tiles){
             if(tile.team() == state.rules.defaultTeam && tile.block() instanceof CoreBlock && tile.isCenter()){
                 spawns.add(tile.pos());

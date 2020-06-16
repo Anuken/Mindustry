@@ -23,6 +23,7 @@ public class OverdriveProjector extends Block{
     public float speedBoostPhase = 0.75f;
     public float useTime = 400f;
     public float phaseRangeBoost = 20f;
+    public boolean hasBoost = true;
     public Color baseColor = Color.valueOf("feb380");
     public Color phaseColor = Color.valueOf("ffd59e");
 
@@ -51,9 +52,12 @@ public class OverdriveProjector extends Block{
 
         stats.add(BlockStat.speedIncrease, (int)(100f * speedBoost), StatUnit.percent);
         stats.add(BlockStat.range, range / tilesize, StatUnit.blocks);
+        stats.add(BlockStat.productionTime, useTime / 60f, StatUnit.seconds);
 
-        stats.add(BlockStat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.boostEffect, (int)((speedBoost + speedBoostPhase) * 100f), StatUnit.percent);
+        if(hasBoost){
+            stats.add(BlockStat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
+            stats.add(BlockStat.boostEffect, (int)((speedBoost + speedBoostPhase) * 100f), StatUnit.percent);
+        }
     }
 
     public class OverdriveEntity extends TileEntity{
@@ -63,7 +67,7 @@ public class OverdriveProjector extends Block{
 
         @Override
         public void drawLight(){
-            Drawf.light(x, y, 50f * efficiency(), baseColor, 0.7f * efficiency());
+            Drawf.light(team, x, y, 50f * efficiency(), baseColor, 0.7f * efficiency());
         }
 
         @Override
@@ -71,7 +75,9 @@ public class OverdriveProjector extends Block{
             heat = Mathf.lerpDelta(heat, consValid() ? 1f : 0f, 0.08f);
             charge += heat * Time.delta();
 
-            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons().optionalValid()), 0.1f);
+            if(hasBoost){
+                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons().optionalValid()), 0.1f);
+            }
 
             if(timer(timerUse, useTime) && efficiency() > 0){
                 consume();
@@ -105,8 +111,8 @@ public class OverdriveProjector extends Block{
             Draw.alpha(heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
             Draw.rect(topRegion, x, y);
             Draw.alpha(1f);
-            Lines.stroke((2f * f + 0.2f) * heat);
-            Lines.square(x, y, (1f - f) * 8f);
+            Lines.stroke((2f * f + 0.1f) * heat);
+            Lines.square(x, y, Math.min(1f + (1f - f) * size * tilesize / 2f, size * tilesize/2f));
 
             Draw.reset();
         }

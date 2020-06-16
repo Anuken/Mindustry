@@ -38,7 +38,7 @@ public class Door extends Wall{
     }
 
     @Override
-    public TextureRegion getRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+    public TextureRegion getRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         return req.config == Boolean.TRUE ? openRegion : region;
     }
 

@@ -23,7 +23,7 @@ public class GlobalData{
     private boolean modified;
 
     public void exportData(Fi file) throws IOException{
-        Array<Fi> files = new Array<>();
+        Seq<Fi> files = new Seq<>();
         files.add(Core.settings.getSettingsFile());
         files.addAll(customMapDirectory.list());
         files.addAll(saveDirectory.list());
@@ -85,7 +85,7 @@ public class GlobalData{
         modified = true;
     }
 
-    public boolean hasItems(Array<ItemStack> stacks){
+    public boolean hasItems(Seq<ItemStack> stacks){
         return !stacks.contains(s -> items.get(s.item, 0) < s.amount);
     }
 
@@ -105,7 +105,7 @@ public class GlobalData{
         }
     }
 
-    public void removeItems(Array<ItemStack> stacks){
+    public void removeItems(Seq<ItemStack> stacks){
         for(ItemStack stack : stacks){
             remove(stack.item, stack.amount);
         }
@@ -128,7 +128,7 @@ public class GlobalData{
 
     /** Returns whether or not this piece of content is unlocked yet. */
     public boolean isUnlocked(UnlockableContent content){
-        return content.alwaysUnlocked() || unlocked.contains(content.name);
+        return content.alwaysUnlocked || unlocked.contains(content.name);
     }
 
     /**
@@ -137,7 +137,7 @@ public class GlobalData{
      * Results are not saved until you call {@link #save()}.
      */
     public void unlockContent(UnlockableContent content){
-        if(content.alwaysUnlocked()) return;
+        if(content.alwaysUnlocked) return;
 
         //fire unlock event so other classes can use it
         if(unlocked.add(content.name)){

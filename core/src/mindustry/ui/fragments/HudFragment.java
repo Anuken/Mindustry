@@ -35,6 +35,8 @@ public class HudFragment extends Fragment{
     private Table lastUnlockLayout;
     private boolean shown = true;
     private float dsize = 47.2f;
+    //TODO implement
+    private CoreItemsDisplay coreItems = new CoreItemsDisplay();
 
     private String hudText = "";
     private boolean showHudText;
@@ -52,6 +54,10 @@ public class HudFragment extends Fragment{
         //TODO details and stuff
         Events.on(SectorCaptureEvent.class, e ->{
             showToast("Sector[accent] captured[]!");
+        });
+
+        Events.on(ResetEvent.class, e -> {
+            coreItems.resetUsed();
         });
 
         //TODO tear this all down
@@ -113,7 +119,7 @@ public class HudFragment extends Fragment{
                     select.image().color(Pal.gray).width(4f).fillY();
 
                     float size = Scl.scl(dsize);
-                    Array<Element> children = new Array<>(select.getChildren());
+                    Seq<Element> children = new Seq<>(select.getChildren());
 
                     //now, you may be wondering, why is this necessary? the answer is, I don't know, but it fixes layout issues somehow
                     int index = 0;
@@ -201,6 +207,7 @@ public class HudFragment extends Fragment{
 
             //fps display
             cont.table(info -> {
+                info.touchable(Touchable.disabled);
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps") && shown);
                 info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Scl.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
@@ -211,7 +218,7 @@ public class HudFragment extends Fragment{
                 info.label(() -> ping.get(netClient.getPing())).visible(net::client).left().style(Styles.outlineLabel);
             }).top().left();
         });
-        
+
         parent.fill(t -> {
             t.visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial && shown);
             //minimap
@@ -219,7 +226,8 @@ public class HudFragment extends Fragment{
             t.row();
             //position
             t.label(() -> player.tileX() + "," + player.tileY())
-                .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial);
+                .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial)
+                .touchable(Touchable.disabled);
             t.top().right();
         });
 
@@ -468,7 +476,7 @@ public class HudFragment extends Fragment{
             int cap = col * col - 1;
 
             //get old elements
-            Array<Element> elements = new Array<>(lastUnlockLayout.getChildren());
+            Seq<Element> elements = new Seq<>(lastUnlockLayout.getChildren());
             int esize = elements.size;
 
             //...if it's already reached the cap, ignore everything
@@ -501,6 +509,14 @@ public class HudFragment extends Fragment{
 
             lastUnlockLayout.pack();
         }
+    }
+
+    public void showLaunchDirect(){
+        Image image = new Image();
+        image.getColor().a = 0f;
+        image.setFillParent(true);
+        image.actions(Actions.fadeIn(launchDuration / 60f, Interp.pow2In), Actions.delay(8f / 60f), Actions.remove());
+        Core.scene.add(image);
     }
 
     public void showLaunch(){

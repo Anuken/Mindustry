@@ -103,7 +103,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void drawLight(){
-            Drawf.light(x, y, 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
+            Drawf.light(team, x, y, 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
         }
 
         @Override

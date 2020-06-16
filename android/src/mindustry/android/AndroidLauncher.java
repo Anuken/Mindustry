@@ -1,6 +1,7 @@
 package mindustry.android;
 
 import android.*;
+import android.annotation.*;
 import android.app.*;
 import android.content.*;
 import android.content.pm.*;
@@ -68,7 +69,7 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public org.mozilla.javascript.Context getScriptContext(){
+            public rhino.Context getScriptContext(){
                 return AndroidRhinoContext.enter(getContext().getCacheDir());
             }
 

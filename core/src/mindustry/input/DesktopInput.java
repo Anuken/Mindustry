@@ -13,6 +13,7 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -21,6 +22,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
 import static arc.Core.scene;
@@ -40,7 +42,7 @@ public class DesktopInput extends InputHandler{
     /** Animation scale for line. */
     private float selectScale;
     /** Selected build request for movement. */
-    private @Nullable BuildRequest sreq;
+    private @Nullable BuildPlan sreq;
     /** Whether player is currently deleting removal requests. */
     private boolean deleting = false, shouldShoot = false;
 
@@ -126,19 +128,19 @@ public class DesktopInput extends InputHandler{
 
         //draw hover request
         if(mode == none && !isPlacing()){
-            BuildRequest req = getRequest(cursorX, cursorY);
+            BuildPlan req = getRequest(cursorX, cursorY);
             if(req != null){
                 drawSelected(req.x, req.y, req.breaking ? req.tile().block() : req.block, Pal.accent);
             }
         }
 
         //draw schematic requests
-        for(BuildRequest request : selectRequests){
+        for(BuildPlan request : selectRequests){
             request.animScale = 1f;
             drawRequest(request);
         }
 
-        for(BuildRequest request : selectRequests){
+        for(BuildPlan request : selectRequests){
             drawOverRequest(request);
         }
 
@@ -146,7 +148,7 @@ public class DesktopInput extends InputHandler{
             //draw things that may be placed soon
             if((mode == placing || mode == upgrading) && block != null){
                 for(int i = 0; i < lineRequests.size; i++){
-                    BuildRequest req = lineRequests.get(i);
+                    BuildPlan req = lineRequests.get(i);
                     if(mode == placing && i == lineRequests.size - 1 && req.block.rotate){
                         drawArrow(block, req.x, req.y, req.rotation);
                     }
@@ -206,15 +208,15 @@ public class DesktopInput extends InputHandler{
                     shouldShoot = false;
                 }
             }
-
-            if(Core.input.keyDown(Binding.respawn) && !player.dead() && !player.unit().spawnedByCore()){
-                Call.onUnitClear(player);
-                controlledType = null;
-            }
         }
 
         if(!player.dead() && !state.isPaused() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
             updateMovement(player.unit());
+
+            if(Core.input.keyDown(Binding.respawn) && !player.unit().spawnedByCore()){
+                Call.onUnitClear(player);
+                controlledType = null;
+            }
         }
 
         if(Core.input.keyRelease(Binding.select)){
@@ -440,7 +442,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
-            BuildRequest req = getRequest(cursorX, cursorY);
+            BuildPlan req = getRequest(cursorX, cursorY);
 
             if(Core.input.keyDown(Binding.break_block)){
                 mode = none;
@@ -459,7 +461,7 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected.entity) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().requests().size == 0 || !player.builder().isBuilding()) && !droppingItem &&
+                if(!tileTapped(selected.entity) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().plans().size == 0 || !player.builder().isBuilding()) && !droppingItem &&
                 !tryBeginMine(selected) && player.miner().mineTile() == null && !Core.scene.hasKeyboard()){
                     isShooting = shouldShoot;
                 }
@@ -482,9 +484,9 @@ public class DesktopInput extends InputHandler{
 
         if(Core.input.keyDown(Binding.select)){
             if(mode == none && !isPlacing() && deleting){
-                BuildRequest req = getRequest(cursorX, cursorY);
+                BuildPlan req = getRequest(cursorX, cursorY);
                 if(req != null && req.breaking){
-                    player.builder().requests().remove(req);
+                    player.builder().plans().remove(req);
                 }
             }else if(mode == placing && isPlacing() && Core.input.keyDown(Binding.pick)){
                 mode = upgrading;
@@ -527,7 +529,7 @@ public class DesktopInput extends InputHandler{
 
             if(sreq != null){
                 if(getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null){
-                    player.builder().requests().remove(sreq, true);
+                    player.builder().plans().remove(sreq, true);
                 }
                 sreq = null;
             }
@@ -622,8 +624,18 @@ public class DesktopInput extends InputHandler{
                     pay.pickup(target);
                 }else if(!pay.hasPayload()){
                     Tilec tile = world.entWorld(pay.x(), pay.y());
-                    if(tile != null && tile.team() == unit.team() && tile.block().synthetic() && tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 3){
-                        pay.pickup(tile);
+                    if(tile != null && tile.team() == unit.team() && tile.block().synthetic()){
+                        //pick up block directly
+                        if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2){
+                            pay.pickup(tile);
+                        }else{ //pick up block payload
+                            Payload taken = tile.takePayload();
+                            if(taken != null){
+                                pay.addPayload(taken);
+                                Fx.unitPickup.at(tile);
+                            }
+                        }
+
                     }
                 }
             }

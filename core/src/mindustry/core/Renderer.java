@@ -13,6 +13,7 @@ import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.graphics.g3d.*;
 import mindustry.ui.*;
 
 import static arc.Core.*;
@@ -24,6 +25,7 @@ public class Renderer implements ApplicationListener{
     public final OverlayRenderer overlays = new OverlayRenderer();
     public final LightRenderer lights = new LightRenderer();
     public final Pixelator pixelator = new Pixelator();
+    public PlanetRenderer planets;
 
     public FrameBuffer effectBuffer = new FrameBuffer();
     private Bloom bloom;
@@ -47,6 +49,8 @@ public class Renderer implements ApplicationListener{
 
     @Override
     public void init(){
+        planets = new PlanetRenderer();
+
         if(settings.getBool("bloom")){
             setupBloom();
         }
@@ -96,6 +100,7 @@ public class Renderer implements ApplicationListener{
         minimap.dispose();
         effectBuffer.dispose();
         blocks.dispose();
+        planets.dispose();
         if(bloom != null){
             bloom.dispose();
             bloom = null;
@@ -217,7 +222,7 @@ public class Renderer implements ApplicationListener{
             Draw.draw(Layer.light, lights::draw);
         }
 
-        if(state.rules.drawDarkness){
+        if(enableDarkness){
             Draw.draw(Layer.darkness, blocks::drawDarkness);
         }
 
@@ -226,18 +231,12 @@ public class Renderer implements ApplicationListener{
             Draw.draw(Layer.effect + 0.01f, bloom::render);
         }
 
-        Draw.z(Layer.plans);
         Draw.draw(Layer.plans, overlays::drawBottom);
 
         if(settings.getBool("animatedshields")){
             Draw.drawRange(Layer.shields, 1f, () -> effectBuffer.begin(Color.clear), () -> {
                 effectBuffer.end();
-
-                Draw.shader(Shaders.shield);
-                Draw.color(Pal.accent);
-                Draw.rect(effectBuffer);
-                Draw.color();
-                Draw.shader();
+                effectBuffer.blit(Shaders.shield);
             });
         }
 
@@ -283,7 +282,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public void scaleCamera(float amount){
-        targetscale += amount;
+        targetscale *= (amount / 4) + 1;
         clampScale();
     }
 

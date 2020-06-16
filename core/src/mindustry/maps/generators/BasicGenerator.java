@@ -6,14 +6,15 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.*;
+import mindustry.ai.Astar.*;
 import mindustry.content.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
 public abstract class BasicGenerator implements WorldGenerator{
-    protected static final DistanceHeuristic manhattan = (x1, y1, x2, y2) -> Math.abs(x1 - x2) + Math.abs(y1 - y2);
-    protected static final ShortArray ints1 = new ShortArray(), ints2 = new ShortArray();
+    protected static final ShortSeq ints1 = new ShortSeq(), ints2 = new ShortSeq();
 
     protected Rand rand = new Rand();
 
@@ -123,7 +124,7 @@ public abstract class BasicGenerator implements WorldGenerator{
         });
     }
 
-    public void ores(Array<Block> ores){
+    public void ores(Seq<Block> ores){
         pass((x, y) -> {
             if(floor.asFloor().isLiquid) return;
 
@@ -296,7 +297,7 @@ public abstract class BasicGenerator implements WorldGenerator{
         }
     }
 
-    public void brush(Array<Tile> path, int rad){
+    public void brush(Seq<Tile> path, int rad){
         path.each(tile -> erase(tile.x, tile.y, rad));
     }
 
@@ -312,51 +313,8 @@ public abstract class BasicGenerator implements WorldGenerator{
         }
     }
 
-    public Array<Tile> pathfind(int startX, int startY, int endX, int endY, TileHueristic th, DistanceHeuristic dh){
-        Tile start = tiles.getn(startX, startY);
-        Tile end = tiles.getn(endX, endY);
-        GridBits closed = new GridBits(width, height);
-        IntFloatMap costs = new IntFloatMap();
-        PQueue<Tile> queue = new PQueue<>(tiles.width * tiles.height / 4, Structs.comparingFloat(a -> costs.get(a.pos(), 0f) + dh.cost(a.x, a.y, end.x, end.y)));
-        queue.add(start);
-        boolean found = false;
-        while(!queue.empty()){
-            Tile next = queue.poll();
-            float baseCost = costs.get(next.pos(), 0f);
-            if(next == end){
-                found = true;
-                break;
-            }
-            closed.set(next.x, next.y);
-            for(Point2 point : Geometry.d4){
-                int newx = next.x + point.x, newy = next.y + point.y;
-                if(Structs.inBounds(newx, newy, width, height) && world.getDarkness(newx, newy) <= 1f){
-                    Tile child = tiles.getn(newx, newy);
-                    float newCost = th.cost(child) + baseCost;
-                    if(!closed.get(child.x, child.y)){
-                        closed.set(child.x, child.y);
-                        child.rotation(child.relativeTo(next.x, next.y));
-                        costs.put(child.pos(), newCost);
-                        queue.add(child);
-                    }
-                }
-            }
-        }
-
-        Array<Tile> out = new Array<>();
-
-        if(!found) return out;
-
-        Tile current = end;
-        while(current != start){
-            out.add(current);
-            Point2 p = Geometry.d4(current.rotation());
-            current = tiles.getn(current.x + p.x, current.y + p.y);
-        }
-
-        out.reverse();
-
-        return out;
+    public Seq<Tile> pathfind(int startX, int startY, int endX, int endY, TileHueristic th, DistanceHeuristic dh){
+        return Astar.pathfind(startX, startY, endX, endY, th, dh, tile -> world.getDarkness(tile.x, tile.y) <= 1f);
     }
 
     public void trimDark(){
@@ -373,7 +331,7 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void inverseFloodFill(Tile start){
-        IntArray arr = new IntArray();
+        IntSeq arr = new IntSeq();
         arr.add(start.pos());
         while(!arr.isEmpty()){
             int i = arr.pop();
@@ -396,13 +354,5 @@ public abstract class BasicGenerator implements WorldGenerator{
                 tile.setBlock(tile.floor().wall);
             }
         }
-    }
-
-    public interface DistanceHeuristic{
-        float cost(int x1, int y1, int x2, int y2);
-    }
-
-    public interface TileHueristic{
-        float cost(Tile tile);
     }
 }

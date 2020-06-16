@@ -5,11 +5,11 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
@@ -49,24 +49,28 @@ public class Drawf{
         return z;
     }
 
-    public static void light(float x, float y, float radius, Color color, float opacity){
-        renderer.lights.add(x, y, radius, color, opacity);
+    public static void light(Team team, float x, float y, float radius, Color color, float opacity){
+        if(allowLight(team)) renderer.lights.add(x, y, radius, color, opacity);
     }
 
-    public static void light(Position pos, float radius, Color color, float opacity){
-       light(pos.getX(), pos.getY(), radius, color, opacity);
+    public static void light(Team team, Position pos, float radius, Color color, float opacity){
+       light(team, pos.getX(), pos.getY(), radius, color, opacity);
     }
 
-    public static void light(float x, float y, TextureRegion region, Color color, float opacity){
-        renderer.lights.add(x, y, region, color, opacity);
+    public static void light(Team team, float x, float y, TextureRegion region, Color color, float opacity){
+        if(allowLight(team)) renderer.lights.add(x, y, region, color, opacity);
     }
 
-    public static void light(float x, float y, float x2, float y2){
-        renderer.lights.line(x, y, x2, y2, 30, Color.orange, 0.3f);
+    public static void light(Team team, float x, float y, float x2, float y2){
+        if(allowLight(team)) renderer.lights.line(x, y, x2, y2, 30, Color.orange, 0.3f);
     }
 
-    public static void light(float x, float y, float x2, float y2, float stroke, Color tint, float alpha){
-        renderer.lights.line(x, y, x2, y2, stroke, tint, alpha);
+    public static void light(Team team, float x, float y, float x2, float y2, float stroke, Color tint, float alpha){
+        if(allowLight(team)) renderer.lights.line(x, y, x2, y2, stroke, tint, alpha);
+    }
+
+    private static boolean allowLight(Team team){
+        return team == Team.derelict || team == Vars.player.team() || state.rules.enemyLights;
     }
 
     public static void selected(Tilec tile, Color color){
@@ -156,15 +160,15 @@ public class Drawf{
         Draw.color();
     }
 
-    public static void laser(TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float scale){
-        laser(line, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), scale);
+    public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float scale){
+        laser(team, line, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), scale);
     }
 
-    public static void laser(TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2){
-        laser(line, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), 1f);
+    public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2){
+        laser(team, line, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), 1f);
     }
 
-    public static void laser(TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float rotation, float scale){
+    public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float rotation, float scale){
         Tmp.v1.trns(rotation, 8f * scale * Draw.scl);
 
         Draw.rect(edge, x, y, edge.getWidth() * scale * Draw.scl, edge.getHeight() * scale * Draw.scl, rotation + 180);
@@ -176,7 +180,7 @@ public class Drawf{
         Lines.precise(false);
         Lines.stroke(1f);
 
-        Drawf.light(x, y, x2, y2);
+        light(team, x, y, x2, y2);
     }
 
     public static void tri(float x, float y, float width, float length, float rotation){
@@ -184,9 +188,11 @@ public class Drawf{
         Draw.rect(Core.atlas.find("shape-3"), x, y - oy + length / 2f, width, length, width / 2f, oy, rotation - 90);
     }
 
-    public static void construct(Tilec t, UnitType unit, float rotation, float progress, float speed, float time){
-        TextureRegion region = unit.icon(Cicon.full);
+    public static void construct(Tilec t, UnlockableContent content, float rotation, float progress, float speed, float time){
+        construct(t, content.icon(Cicon.full), rotation, progress, speed, time);
+    }
 
+    public static void construct(Tilec t, TextureRegion region, float rotation, float progress, float speed, float time){
         Shaders.build.region = region;
         Shaders.build.progress = progress;
         Shaders.build.color.set(Pal.accent);
@@ -203,65 +209,5 @@ public class Drawf{
         Lines.lineAngleCenter(t.x() + Mathf.sin(time, 20f, Vars.tilesize / 2f * t.block().size - 2f), t.y(), 90, t.block().size * Vars.tilesize - 4f);
 
         Draw.reset();
-    }
-
-    public static void respawn(Tilec tile, float heat, float progress, float time, UnitType to, @Nullable Playerc player){
-        float x = tile.x(), y = tile.y();
-        progress = Mathf.clamp(progress);
-
-        Draw.color(Pal.darkMetal);
-        Lines.stroke(2f * heat);
-        Fill.poly(x, y, 4, 10f * heat);
-
-        Draw.reset();
-        if(player != null){
-            TextureRegion region = to.icon(Cicon.full);
-
-            Draw.color(0f, 0f, 0f, 0.4f * progress);
-            Draw.rect("circle-shadow", x, y, region.getWidth() / 3f, region.getWidth() / 3f);
-            Draw.color();
-
-            Shaders.build.region = region;
-            Shaders.build.progress = progress;
-            Shaders.build.color.set(Pal.accent);
-            Shaders.build.time = -time / 10f;
-
-            Draw.shader(Shaders.build, true);
-            Draw.rect(region, x, y);
-            Draw.shader();
-
-            Draw.color(Pal.accentBack);
-
-            float pos = Mathf.sin(time, 6f, 8f);
-
-            Lines.lineAngleCenter(x + pos, y, 90, 16f - Math.abs(pos) * 2f);
-
-            Draw.reset();
-        }
-
-        Lines.stroke(2f * heat);
-
-        Draw.color(Pal.accentBack);
-        Lines.poly(x, y, 4, 8f * heat);
-
-        float oy = -7f, len = 6f * heat;
-        Lines.stroke(5f);
-        Draw.color(Pal.darkMetal);
-        Lines.line(x - len, y + oy, x + len, y + oy, CapStyle.none);
-        for(int i : Mathf.signs){
-            Fill.tri(x + len * i, y + oy - Lines.getStroke()/2f, x + len * i, y + oy + Lines.getStroke()/2f, x + (len + Lines.getStroke() * heat) * i, y + oy);
-        }
-
-        Lines.stroke(3f);
-        Draw.color(Pal.accent);
-        Lines.line(x - len, y + oy, x - len + len*2 * progress, y + oy, CapStyle.none);
-        for(int i : Mathf.signs){
-            Fill.tri(x + len * i, y + oy - Lines.getStroke()/2f, x + len * i, y + oy + Lines.getStroke()/2f, x + (len + Lines.getStroke() * heat) * i, y + oy);
-        }
-        Draw.reset();
-
-        if(Vars.net.active() && player != null){
-            tile.block().drawPlaceText(player.name(), tile.tileX(), tile.tileY() - (Math.max((tile.block().size-1)/2, 0)), true);
-        }
     }
 }

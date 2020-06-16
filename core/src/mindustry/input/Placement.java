@@ -13,7 +13,7 @@ public class Placement{
     private static final NormalizeResult result = new NormalizeResult();
     private static final NormalizeDrawResult drawResult = new NormalizeDrawResult();
     private static Bresenham2 bres = new Bresenham2();
-    private static Array<Point2> points = new Array<>();
+    private static Seq<Point2> points = new Seq<>();
 
     //for pathfinding
     private static IntFloatMap costs = new IntFloatMap();
@@ -21,7 +21,7 @@ public class Placement{
     private static IntSet closed = new IntSet();
 
     /** Normalize a diagonal line into points. */
-    public static Array<Point2> pathfindLine(boolean conveyors, int startX, int startY, int endX, int endY){
+    public static Seq<Point2> pathfindLine(boolean conveyors, int startX, int startY, int endX, int endY){
         Pools.freeAll(points);
 
         points.clear();
@@ -37,7 +37,7 @@ public class Placement{
     }
 
     /** Normalize two points into one straight line, no diagonals. */
-    public static Array<Point2> normalizeLine(int startX, int startY, int endX, int endY){
+    public static Seq<Point2> normalizeLine(int startX, int startY, int endX, int endY){
         Pools.freeAll(points);
         points.clear();
         if(Math.abs(startX - endX) > Math.abs(startY - endY)){
@@ -272,13 +272,5 @@ public class Placement{
         int getScaledY(int i){
             return y + (x2 - x > y2 - y ? 0 : i);
         }
-    }
-
-    public interface DistanceHeuristic{
-        float cost(int x1, int y1, int x2, int y2);
-    }
-
-    public interface TileHueristic{
-        float cost(Tile tile, Tile other);
     }
 }

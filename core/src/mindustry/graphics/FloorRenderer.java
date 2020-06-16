@@ -24,7 +24,7 @@ public class FloorRenderer implements Disposable{
     private MultiCacheBatch cbatch;
     private IntSet drawnLayerSet = new IntSet();
     private IntSet recacheSet = new IntSet();
-    private IntArray drawnLayers = new IntArray();
+    private IntSeq drawnLayers = new IntSeq();
     private ObjectSet<CacheLayer> used = new ObjectSet<>();
 
     public FloorRenderer(){

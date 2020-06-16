@@ -21,6 +21,11 @@ public class ResearchBlock extends Block{
         configurable = true;
     }
 
+    @Override
+    public boolean outputsItems(){
+        return false;
+    }
+
     public class ResearchBlockEntity extends TileEntity{
         public @Nullable UnlockableContent researching;
 

@@ -31,12 +31,11 @@ public class LoadDialog extends BaseDialog{
         super(title);
         setup();
 
-        shown(() -> {
-            setup();
-            Time.runTask(2f, () -> Core.scene.setScrollFocus(pane));
-        });
+        shown(this::setup);
+        onResize(this::setup);
 
         addCloseButton();
+        addSetup();
     }
 
     protected void setup(){
@@ -47,15 +46,21 @@ public class LoadDialog extends BaseDialog{
         pane.setFadeScrollBars(false);
         pane.setScrollingDisabled(true, false);
 
-        slots.marginRight(24);
+        slots.marginRight(24).marginLeft(20f);
 
         Time.runTask(2f, () -> Core.scene.setScrollFocus(pane));
 
-        Array<SaveSlot> array = control.saves.getSaveSlots();
+        Seq<SaveSlot> array = control.saves.getSaveSlots();
         array.sort((slot, other) -> -Long.compare(slot.getTimestamp(), other.getTimestamp()));
+
+        int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(470)), 1);
+        int i = 0;
+        boolean any = false;
 
         for(SaveSlot slot : array){
             if(slot.isHidden()) continue;
+
+            any = true;
 
             TextButton button = new TextButton("", Styles.cleart);
             button.getLabel().remove();
@@ -97,8 +102,8 @@ public class LoadDialog extends BaseDialog{
             String color = "[lightgray]";
             TextureRegion def = Core.atlas.find("nomap");
 
-            button.left().add(new BorderImage(def, 4f)).update(i -> {
-                TextureRegionDrawable draw = (TextureRegionDrawable)i.getDrawable();
+            button.left().add(new BorderImage(def, 4f)).update(im -> {
+                TextureRegionDrawable draw = (TextureRegionDrawable)im.getDrawable();
                 if(draw.getRegion().getTexture().isDisposed()){
                     draw.setRegion(def);
                 }
@@ -107,7 +112,7 @@ public class LoadDialog extends BaseDialog{
                 if(draw.getRegion() == def && text != null){
                     draw.setRegion(new TextureRegion(text));
                 }
-                i.setScaling(Scaling.fit);
+                im.setScaling(Scaling.fit);
             }).left().size(160f).padRight(6);
 
             button.table(meta -> {
@@ -128,27 +133,23 @@ public class LoadDialog extends BaseDialog{
 
             modifyButton(button, slot);
 
-            slots.add(button).uniformX().fillX().pad(4).padRight(-4).margin(10f).row();
+            slots.add(button).uniformX().fillX().pad(4).padRight(8f).margin(10f);
+
+            if(++i % maxwidth == 0){
+                slots.row();
+            }
+        }
+
+        if(!any){
+            slots.button("$save.none", () -> {}).disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
         }
 
         cont.add(pane);
-
-        addSetup();
     }
 
     public void addSetup(){
-        boolean valids = false;
-        for(SaveSlot slot : control.saves.getSaveSlots()) if(!slot.isHidden()) valids = true;
 
-        if(!valids){
-            slots.row();
-            slots.button("$save.none", () -> {
-            }).disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
-        }
-
-        slots.row();
-
-        slots.button("$save.import", Icon.add, () -> {
+        buttons.button("$save.import", Icon.add, () -> {
             platform.showFileChooser(true, saveExtension, file -> {
                 if(SaveIO.isSaveValid(file)){
                     try{
@@ -162,7 +163,7 @@ public class LoadDialog extends BaseDialog{
                     ui.showErrorMessage("$save.import.invalid");
                 }
             });
-        }).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
+        }).fillX().margin(10f);
     }
 
     public void runLoadSave(SaveSlot slot){

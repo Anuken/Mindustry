@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import mindustry.game.Rules.*;
 import mindustry.game.Teams.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -55,7 +56,12 @@ public class Team implements Comparable<Team>{
         all[us] = this;
     }
 
-    public Array<Team> enemies(){
+    /** @return the team-specific rules. */
+    public TeamRule rules(){
+        return state.rules.teams.get(this);
+    }
+
+    public Seq<Team> enemies(){
         return state.teams.enemiesOf(this);
     }
 
@@ -75,7 +81,7 @@ public class Team implements Comparable<Team>{
         return state.teams.areEnemies(this, other);
     }
 
-    public Array<CoreEntity> cores(){
+    public Seq<CoreEntity> cores(){
         return state.teams.cores(this);
     }
 

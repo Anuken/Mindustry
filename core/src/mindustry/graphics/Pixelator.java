@@ -26,8 +26,6 @@ public class Pixelator implements Disposable{
         camera.width = (int)camera.width;
         camera.height = (int)camera.height;
 
-        graphics.clear(0f, 0f, 0f, 1f);
-
         px = Core.camera.position.x;
         py = Core.camera.position.y;
         Core.camera.position.set((int)px + ((int)(camera.width) % 2 == 0 ? 0 : 0.5f), (int)py + ((int)(camera.height) % 2 == 0 ? 0 : 0.5f));
@@ -37,7 +35,7 @@ public class Pixelator implements Disposable{
 
         buffer.resize(w, h);
 
-        buffer.begin();
+        buffer.begin(Color.clear);
         renderer.draw();
     }
 
@@ -45,9 +43,8 @@ public class Pixelator implements Disposable{
         Draw.draw(Layer.end, () -> {
             buffer.end();
 
-            Draw.blend(Blending.disabled);
-            Draw.rect(buffer);
-            Draw.blend();
+            Blending.disabled.apply();
+            buffer.blit(Shaders.screenspace);
 
             Core.camera.position.set(px, py);
             renderer.setScale(pre);

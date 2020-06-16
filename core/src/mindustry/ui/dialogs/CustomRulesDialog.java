@@ -35,7 +35,7 @@ public class CustomRulesDialog extends BaseDialog{
 
         banDialog.shown(this::rebuildBanned);
         banDialog.buttons.button("$addall", Icon.add, () -> {
-            rules.bannedBlocks.addAll(content.blocks().select(Block::isBuildable));
+            rules.bannedBlocks.addAll(content.blocks().select(Block::canBeBuilt));
             rebuildBanned();
         }).size(180, 64f);
 
@@ -59,7 +59,7 @@ public class CustomRulesDialog extends BaseDialog{
                 t.add("$empty");
             }
 
-            Array<Block> array = Array.with(rules.bannedBlocks);
+            Seq<Block> array = Seq.with(rules.bannedBlocks);
             array.sort();
 
             int cols = mobile && Core.graphics.isPortrait() ? 1 : mobile ? 2 : 3;
@@ -88,7 +88,7 @@ public class CustomRulesDialog extends BaseDialog{
             dialog.cont.pane(t -> {
                 t.left().margin(14f);
                 int[] i = {0};
-                content.blocks().each(b -> !rules.bannedBlocks.contains(b) && b.isBuildable(), b -> {
+                content.blocks().each(b -> !rules.bannedBlocks.contains(b) && b.canBeBuilt(), b -> {
                     int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
                     t.button(new TextureRegionDrawable(b.icon(Cicon.medium)), Styles.cleari, () -> {
                         rules.bannedBlocks.add(b);
@@ -140,6 +140,7 @@ public class CustomRulesDialog extends BaseDialog{
         number("$rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier);
         number("$rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
         number("$rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
+        number("$rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
 
         main.button("$configure",
             () -> loadoutDialog.show(Blocks.coreShard.itemCapacity, rules.loadout,
@@ -160,7 +161,6 @@ public class CustomRulesDialog extends BaseDialog{
 
         title("$rules.title.enemy");
         check("$rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
-        check("$rules.enemyCheat", b -> rules.enemyCheat = b, () -> rules.enemyCheat);
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
         title("$rules.title.environment");

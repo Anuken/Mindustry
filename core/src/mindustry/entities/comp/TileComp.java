@@ -41,8 +41,8 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     //region vars and initialization
     static final float timeToSleep = 60f * 1;
     static final ObjectSet<Tilec> tmpTiles = new ObjectSet<>();
-    static final Array<Tilec> tempTileEnts = new Array<>();
-    static final Array<Tile> tempTiles = new Array<>();
+    static final Seq<Tilec> tempTileEnts = new Seq<>();
+    static final Seq<Tile> tempTiles = new Seq<>();
     static int sleepingEntities = 0;
     
     @Import float x, y, health;
@@ -50,8 +50,9 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     transient Tile tile;
     transient Block block;
-    transient Array<Tilec> proximity = new Array<>(8);
+    transient Seq<Tilec> proximity = new Seq<>(8);
     transient boolean updateFlow;
+    transient byte dump;
 
     PowerModule power;
     ItemModule items;
@@ -413,9 +414,9 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
      * @return whether the payload was moved successfully
      */
     public boolean dumpPayload(@NonNull Payload todump){
-        int dump = tile.data;
-
         if(proximity.size == 0) return false;
+
+        int dump = this.dump;
 
         for(int i = 0; i < proximity.size; i++){
             Tilec other = proximity.get((i + dump) % proximity.size);
@@ -449,7 +450,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     }
 
     public void dumpLiquid(Liquid liquid){
-        int dump = tile.data;
+        int dump = this.dump;
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -538,13 +539,18 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         return this;
     }
 
+    /** Tries to take the payload. Returns null if no payload is present. */
+    public @Nullable Payload takePayload(){
+        return null;
+    }
+
     /**
      * Tries to put this item into a nearby container, if there are no available
      * containers, it gets added to the block's inventory.
      */
     public void offload(Item item){
-        Array<Tilec> proximity = proximity();
-        int dump = tile.data;
+        int dump = this.dump;
+
         useContent(item);
 
         for(int i = 0; i < proximity.size; i++){
@@ -563,8 +569,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
      * Tries to put this item into a nearby container. Returns success. Unlike #offload(), this method does not change the block inventory.
      */
     public boolean put(Item item){
-        Array<Tilec> proximity = proximity();
-        int dump = tile.data;
+        int dump = this.dump;
         useContent(item);
 
         for(int i = 0; i < proximity.size; i++){
@@ -591,8 +596,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     public boolean dump(Item todump){
         if(!block.hasItems || items.total() == 0 || (todump != null && !items.has(todump))) return false;
 
-        Array<Tilec> proximity = proximity();
-        int dump = tile.data;
+        int dump = this.dump;
 
         if(proximity.size == 0) return false;
 
@@ -627,7 +631,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     }
 
     public void incrementDump(int prox){
-        tile.data = (byte)((tile.data + 1) % prox);
+        dump = (byte)((dump + 1) % prox);
     }
 
     /** Used for dumping items. */
@@ -678,11 +682,11 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         }
     }
 
-    public Array<Tilec> getPowerConnections(Array<Tilec> out){
+    public Seq<Tilec> getPowerConnections(Seq<Tilec> out){
         out.clear();
         if(power == null) return out;
 
-        for(Tilec other : proximity()){
+        for(Tilec other : proximity){
             if(other != null && other.power() != null
             && !(block.consumesPower && other.block().consumesPower && !block.outputsPower && !other.block().outputsPower)
             && !power.links.contains(other.pos())){
@@ -754,7 +758,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
             float fract = 1f;
             float opacity = color.a * fract;
             if(opacity > 0.001f){
-                Drawf.light(x, y, block.size * 30f * fract, color, opacity);
+                Drawf.light(team, x, y, block.size * 30f * fract, color, opacity);
             }
         }
     }
@@ -784,7 +788,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
             Geometry.circle(tileX(), tileY(), range, (x, y) -> {
                 Tilec other = world.ent(x, y);
                 if(other != null && other.block() instanceof PowerNode && ((PowerNode)other.block()).linkValid(other, this) && !PowerNode.insulated(other, this) && !other.proximity().contains(this) &&
-                !(block.outputsPower && proximity().contains(p -> p.power() != null && p.power().graph == other.power().graph))){
+                !(block.outputsPower && proximity.contains(p -> p.power() != null && p.power().graph == other.power().graph))){
                     tempTiles.add(other.tile());
                 }
             });
@@ -1032,7 +1036,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     }
 
     public void collision(Bulletc other){
-        damage(other.damage());
+        damage(other.damage() * other.type().tileDamageMultiplier);
     }
 
     public void removeFromProximity(){

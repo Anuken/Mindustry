@@ -27,8 +27,8 @@ public class PlacementFragment extends Fragment{
     final int rowWidth = 4;
 
     public Category currentCategory = Category.distribution;
-    Array<Block> returnArray = new Array<>();
-    Array<Category> returnCatArray = new Array<>();
+    Seq<Block> returnArray = new Seq<>();
+    Seq<Category> returnCatArray = new Seq<>();
     boolean[] categoryEmpty = new boolean[Category.all.length];
     ObjectMap<Category,Block> selectedBlocks = new ObjectMap<>();
     ObjectFloatMap<Category> scrollPositions = new ObjectFloatMap<>();
@@ -94,7 +94,7 @@ public class PlacementFragment extends Fragment{
             Block tryRecipe = tile == null ? null : tile.block();
             Object tryConfig = tile == null ? null : tile.config();
 
-            for(BuildRequest req : player.builder().requests()){
+            for(BuildPlan req : player.builder().plans()){
                 if(!req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).contains(Core.input.mouseWorld())){
                     tryRecipe = req.block;
                     tryConfig = req.config;
@@ -115,7 +115,7 @@ public class PlacementFragment extends Fragment{
         for(int i = 0; i < blockSelect.length; i++){
             if(Core.input.keyTap(blockSelect[i])){
                 if(i > 9) { //select block directionally
-                    Array<Block> blocks = getByCategory(currentCategory);
+                    Seq<Block> blocks = getByCategory(currentCategory);
                     Block currentBlock = getSelectedBlock(currentCategory);
                     for(int j = 0; j < blocks.size; j++){
                         if(blocks.get(j) == currentBlock){
@@ -157,7 +157,7 @@ public class PlacementFragment extends Fragment{
                         i += (blockSelectSeq - (i != 9 ? 0 : 1)) * 10;
                         blockSelectEnd = true;
                     }
-                    Array<Block> blocks = getByCategory(currentCategory);
+                    Seq<Block> blocks = getByCategory(currentCategory);
                     input.block = (i < blocks.size) ? blocks.get(i) : null;
                     selectedBlocks.put(currentCategory, input.block);
                     blockSelectSeqMillis = Time.millis();
@@ -222,12 +222,12 @@ public class PlacementFragment extends Fragment{
                         button.resizeImage(Cicon.medium.size);
 
                         button.update(() -> { //color unplacable things gray
-                            Tilec core = player.closestCore();
+                            Tilec core = player.core();
                             Color color = (state.rules.infiniteResources || (core != null && (core.items().has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
 
-                            if(state.rules.bannedBlocks.contains(block)){
+                            if(!block.isPlaceable()){
                                 button.forEach(elem -> elem.setColor(Color.darkGray));
                             }
                         });
@@ -276,7 +276,7 @@ public class PlacementFragment extends Fragment{
                             topTable.table(header -> {
                                 String keyCombo = "";
                                 if(!mobile && Core.settings.getBool("blockselectkeys")){
-                                    Array<Block> blocks = getByCategory(currentCategory);
+                                    Seq<Block> blocks = getByCategory(currentCategory);
                                     for(int i = 0; i < blocks.size; i++){
                                         if(blocks.get(i) == lastDisplay && (i + 1) / 10 - 1 < blockSelect.length){
                                             keyCombo = Core.bundle.format("placement.blockselectkeys", Core.keybinds.get(blockSelect[currentCategory.ordinal()]).key.toString())
@@ -310,7 +310,7 @@ public class PlacementFragment extends Fragment{
                                         line.image(stack.item.icon(Cicon.small)).size(8 * 2);
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
                                         line.labelWrap(() -> {
-                                            Tilec core = player.closestCore();
+                                            Tilec core = player.core();
                                             if(core == null || state.rules.infiniteResources) return "*/*";
 
                                             int amount = core.items().get(stack.item);
@@ -324,11 +324,11 @@ public class PlacementFragment extends Fragment{
                                 }
                             }).growX().left().margin(3);
 
-                            if(state.rules.bannedBlocks.contains(lastDisplay) || !player.isBuilder()){
+                            if(!lastDisplay.isPlaceable() || !player.isBuilder()){
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add(!player.isBuilder() ? "$unit.nobuild" : "$banned").width(190f).wrap();
+                                    b.add(!player.isBuilder() ? "$unit.nobuild" : lastDisplay.unplaceableMessage()).width(190f).wrap();
                                     b.left();
                                 }).padTop(2).left();
                             }
@@ -384,7 +384,7 @@ public class PlacementFragment extends Fragment{
 
                     //update category empty values
                     for(Category cat : Category.all){
-                        Array<Block> blocks = getByCategory(cat);
+                        Seq<Block> blocks = getByCategory(cat);
                         categoryEmpty[cat.ordinal()] = blocks.isEmpty();
                     }
 
@@ -415,14 +415,14 @@ public class PlacementFragment extends Fragment{
         });
     }
 
-    Array<Category> getCategories(){
+    Seq<Category> getCategories(){
         returnCatArray.clear();
         returnCatArray.addAll(Category.all);
         returnCatArray.sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.ordinal()], categoryEmpty[c2.ordinal()]));
         return returnCatArray;
     }
 
-    Array<Block> getByCategory(Category cat){
+    Seq<Block> getByCategory(Category cat){
         returnArray.clear();
         for(Block block : content.blocks()){
             if(block.category == cat && block.isVisible() && unlocked(block)){
@@ -432,7 +432,7 @@ public class PlacementFragment extends Fragment{
         returnArray.sort((b1, b2) -> {
             int locked = -Boolean.compare(unlocked(b1), unlocked(b2));
             if(locked != 0) return locked;
-            return Boolean.compare(state.rules.bannedBlocks.contains(b1), state.rules.bannedBlocks.contains(b2));
+            return Boolean.compare(!b1.isPlaceable(), !b2.isPlaceable());
         });
         return returnArray;
     }
@@ -479,6 +479,10 @@ public class PlacementFragment extends Fragment{
 
     /** Returns the block currently being hovered over in the world. */
     Block tileDisplayBlock(){
-        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.drop() != null  && hoverTile.block() == Blocks.air ? hoverTile.overlay().itemDrop != null ? hoverTile.overlay() : hoverTile.floor() : null;
+        return hoverTile == null ? null :
+            hoverTile.block().synthetic() ? hoverTile.block() :
+            hoverTile.drop() != null  && hoverTile.block() == Blocks.air ?
+                hoverTile.overlay().itemDrop != null ? hoverTile.overlay() :
+                hoverTile.floor() : null;
     }
 }

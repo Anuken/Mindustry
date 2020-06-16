@@ -81,8 +81,8 @@ public class Weathers implements ContentList{
                 Core.camera.bounds(Tmp.r2);
                 int total = (int)(Tmp.r1.area() / density * state.intensity());
                 Lines.stroke(0.75f);
-                Draw.color(Color.royal, Color.white, 0.3f);
                 float alpha = Draw.getColor().a;
+                Draw.color(Color.royal, Color.white, 0.3f);
 
                 for(int i = 0; i < total; i++){
                     float scl = rand.random(0.5f, 1f);
@@ -136,8 +136,6 @@ public class Weathers implements ContentList{
                         if(tile != null && tile.floor().liquidDrop == Liquids.water){
                             Draw.tint(Tmp.c1.set(tile.floor().mapColor).mul(1.5f));
                             Draw.rect(splashes[(int)(life * (splashes.length - 1))], x, y);
-                            //Lines.stroke((1f - life) * 2f);
-                            //Lines.circle(x, y, life * 4f);
                         }
                     }
                 }

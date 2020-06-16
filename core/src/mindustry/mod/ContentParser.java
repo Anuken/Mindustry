@@ -7,7 +7,7 @@ import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.mock.*;
-import arc.struct.Array;
+import arc.struct.Seq;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -28,6 +28,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
@@ -102,8 +103,8 @@ public class ContentParser{
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
      * This is done to accomodate binding of content names first.*/
-    private Array<Runnable> reads = new Array<>();
-    private Array<Runnable> postreads = new Array<>();
+    private Seq<Runnable> reads = new Seq<>();
+    private Seq<Runnable> postreads = new Seq<>();
     private ObjectSet<Object> toBeParsed = new ObjectSet<>();
     private LoadedMod currentMod;
     private Content currentContent;
@@ -141,6 +142,11 @@ public class ContentParser{
                     }else if(type == ConsumeLiquid.class){
                         return (T)fromJson(ConsumeLiquid.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
                     }
+                }
+
+                //try to load DrawBlock by instantiating it
+                if(type == DrawBlock.class && jsonData.isString()){
+                    return Reflect.make("mindustry.world.draw." + Strings.capitalize(jsonData.asString()));
                 }
 
                 if(Content.class.isAssignableFrom(type)){
@@ -368,7 +374,7 @@ public class ContentParser{
 
     private void init(){
         for(ContentType type : ContentType.all){
-            Array<Content> arr = Vars.content.getBy(type);
+            Seq<Content> arr = Vars.content.getBy(type);
             if(!arr.isEmpty()){
                 Class<?> c = arr.first().getClass();
                 //get base content class, skipping intermediates
@@ -459,7 +465,7 @@ public class ContentParser{
         }else if(t instanceof NullPointerException){
             builder.append(Strings.parseException(t, true));
         }else{
-            Array<Throwable> causes = Strings.getCauses(t);
+            Seq<Throwable> causes = Strings.getCauses(t);
             for(Throwable e : causes){
                 builder.append("[accent][[").append(e.getClass().getSimpleName().replace("Exception", ""))
                 .append("][] ")
@@ -536,7 +542,7 @@ public class ContentParser{
     private void checkNullFields(Object object){
         if(object instanceof Number || object instanceof String || toBeParsed.contains(object)) return;
 
-        parser.getFields(object.getClass()).values().toArray().each(field -> {
+        parser.getFields(object.getClass()).values().toSeq().each(field -> {
             try{
                 if(field.field.getType().isPrimitive()) return;
 

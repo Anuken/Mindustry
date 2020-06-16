@@ -17,6 +17,7 @@ public class LightningBulletType extends BulletType{
         despawnEffect = Fx.none;
         hitEffect = Fx.hitLancer;
         keepVelocity = false;
+        hittable = false;
     }
 
     @Override

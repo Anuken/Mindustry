@@ -15,7 +15,7 @@ import mindustry.world.blocks.payloads.*;
 abstract class PayloadComp implements Posc, Rotc{
     @Import float x, y, rotation;
 
-    Array<Payload> payloads = new Array<>();
+    Seq<Payload> payloads = new Seq<>();
 
     boolean hasPayload(){
         return payloads.size > 0;
@@ -90,7 +90,7 @@ abstract class PayloadComp implements Posc, Rotc{
         Tilec tile = payload.entity;
         int tx = Vars.world.toTile(x - tile.block().offset()), ty = Vars.world.toTile(y - tile.block().offset());
         Tile on = Vars.world.tile(tx, ty);
-        if(on != null && Build.validPlace(tile.team(), tx, ty, tile.block(), tile.rotation())){
+        if(on != null && Build.validPlace(tile.block(), tile.team(), tx, ty, tile.rotation())){
             int rot = (int)((rotation() + 45f) / 90f) % 4;
             payload.place(on, rot);
 

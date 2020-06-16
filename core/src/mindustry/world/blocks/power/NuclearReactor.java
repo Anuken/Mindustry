@@ -143,7 +143,7 @@ public class NuclearReactor extends PowerGenerator{
         @Override
         public void drawLight(){
             float fract = productionEfficiency;
-            Drawf.light(x, y, (90f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * fract);
+            Drawf.light(team, x, y, (90f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * fract);
         }
 
         @Override

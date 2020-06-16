@@ -23,7 +23,7 @@ public class Net{
     private boolean clientLoaded;
     private @Nullable StreamBuilder currentStream;
 
-    private final Array<Object> packetQueue = new Array<>();
+    private final Seq<Object> packetQueue = new Seq<>();
     private final ObjectMap<Class<?>, Cons> clientListeners = new ObjectMap<>();
     private final ObjectMap<Class<?>, Cons2<NetConnection, Object>> serverListeners = new ObjectMap<>();
     private final IntMap<StreamBuilder> streams = new IntMap<>();

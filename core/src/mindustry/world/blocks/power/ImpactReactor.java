@@ -60,8 +60,8 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name)};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{bottomRegion, region};
     }
 
     public class FusionReactorEntity extends GeneratorEntity{
@@ -115,8 +115,7 @@ public class ImpactReactor extends PowerGenerator{
 
         @Override
         public void drawLight(){
-            float fract = tile.<FusionReactorEntity>ent().warmup;
-            Drawf.light(x, y, (110f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(plasma2).lerp(plasma1, Mathf.absin(7f, 0.2f)), 0.8f * fract);
+            Drawf.light(team, x, y, (110f + Mathf.absin(5, 5f)) * warmup, Tmp.c1.set(plasma2).lerp(plasma1, Mathf.absin(7f, 0.2f)), 0.8f * warmup);
         }
 
         @Override

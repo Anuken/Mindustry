@@ -27,7 +27,7 @@ import arc.util.*;
 public class SoftRoleSlotAssignmentStrategy extends BoundedSlotAssignmentStrategy{
     protected SlotCostProvider slotCostProvider;
     protected float costThreshold;
-    private BooleanArray filledSlots;
+    private BoolSeq filledSlots;
 
     /**
      * Creates a {@code SoftRoleSlotAssignmentStrategy} with the given slot cost provider and no cost threshold.
@@ -46,14 +46,14 @@ public class SoftRoleSlotAssignmentStrategy extends BoundedSlotAssignmentStrateg
         this.slotCostProvider = slotCostProvider;
         this.costThreshold = costThreshold;
 
-        this.filledSlots = new BooleanArray();
+        this.filledSlots = new BoolSeq();
     }
 
     @Override
-    public void updateSlotAssignments(Array<SlotAssignment> assignments){
+    public void updateSlotAssignments(Seq<SlotAssignment> assignments){
 
         // Holds a list of member and slot data for each member.
-        Array<MemberAndSlots> memberData = new Array<>();
+        Seq<MemberAndSlots> memberData = new Seq<>();
 
         // Compile the member data
         int numberOfAssignments = assignments.size;
@@ -146,12 +146,12 @@ public class SoftRoleSlotAssignmentStrategy extends BoundedSlotAssignmentStrateg
     static class MemberAndSlots implements Comparable<MemberAndSlots>{
         FormationMember member;
         float assignmentEase;
-        Array<CostAndSlot> costAndSlots;
+        Seq<CostAndSlot> costAndSlots;
 
         public MemberAndSlots(FormationMember member){
             this.member = member;
             this.assignmentEase = 0f;
-            this.costAndSlots = new Array<>();
+            this.costAndSlots = new Seq<>();
         }
 
         @Override

@@ -4,7 +4,7 @@ import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
 import mindustry.type.*;
 
-import static arc.struct.Array.with;
+import static arc.struct.Seq.with;
 import static mindustry.content.Items.*;
 import static mindustry.content.Planets.starter;
 import static mindustry.type.ItemStack.list;

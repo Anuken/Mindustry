@@ -17,7 +17,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class Conduit extends LiquidBlock implements Autotiler{
     public final int timerFlow = timers++;
@@ -39,7 +39,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     }
 
     @Override
-    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         int[] bits = getTiling(req, list);
 
         if(bits == null) return;
@@ -54,7 +54,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     }
 
     @Override
-    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
         Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conduit || req.block instanceof LiquidJunction));
         return cont.get(Geometry.d4(req.rotation)) &&
             cont.get(Geometry.d4(req.rotation - 2)) &&
@@ -74,8 +74,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find("conduit-bottom"), Core.atlas.find(name + "-top-0")};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{Core.atlas.find("conduit-bottom"), topRegions[0]};
     }
 
     public class ConduitEntity extends LiquidBlockEntity{

@@ -45,6 +45,11 @@ public class LaserTurret extends PowerTurret{
         float bulletLife;
 
         @Override
+        protected void updateCooling(){
+            //do nothing, cooling is irrelevant here
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
 
@@ -63,7 +68,7 @@ public class LaserTurret extends PowerTurret{
                 Liquid liquid = liquids().current();
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-                float used = (tile.isEnemyCheat() ? maxUsed * Time.delta() : Math.min(liquids.get(liquid), maxUsed * Time.delta())) * liquid.heatCapacity * coolantMultiplier;
+                float used = (cheating() ? maxUsed * Time.delta() : Math.min(liquids.get(liquid), maxUsed * Time.delta())) * liquid.heatCapacity * coolantMultiplier;
                 reload -= used;
                 liquids.remove(liquid, used);
 
@@ -80,7 +85,7 @@ public class LaserTurret extends PowerTurret{
                 return;
             }
 
-            if(reload <= 0 && (consValid() || tile.isEnemyCheat())){
+            if(reload <= 0 && (consValid() || cheating())){
                 BulletType type = peekAmmo();
 
                 shoot(type);

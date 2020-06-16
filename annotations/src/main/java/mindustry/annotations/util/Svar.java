@@ -12,6 +12,10 @@ public class Svar extends Selement<VariableElement>{
         super(e);
     }
 
+    public String descString(){
+        return up().asType().toString() + "#" + super.toString().replace("mindustry.gen.", "");
+    }
+
     public JCVariableDecl jtree(){
         return (JCVariableDecl)BaseProcessor.elementu.getTree(e);
     }

@@ -43,8 +43,8 @@ public class MapPreviewLoader extends TextureLoader{
     }
 
     @Override
-    public Array<AssetDescriptor> getDependencies(String fileName, Fi file, TextureParameter parameter){
-        return Array.with(new AssetDescriptor<>("contentcreate", Content.class));
+    public Seq<AssetDescriptor> getDependencies(String fileName, Fi file, TextureParameter parameter){
+        return Seq.with(new AssetDescriptor<>("contentcreate", Content.class));
     }
 
     public static class MapPreviewParameter extends TextureParameter{

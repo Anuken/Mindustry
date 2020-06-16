@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.maps.generators.*;
@@ -16,6 +17,7 @@ import static mindustry.Vars.*;
 public class TODOPlanetGenerator extends PlanetGenerator{
     Simplex noise = new Simplex();
     RidgedPerlin rid = new RidgedPerlin(1, 2);
+    BaseGenerator basegen = new BaseGenerator();
     float scl = 5f;
     float waterOffset = 0.07f;
 
@@ -131,7 +133,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
                 connected.add(to);
                 float nscl = rand.random(20f, 60f);
                 int stroke = rand.random(4, 12);
-                brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + noise(tile.x, tile.y, 1, 1, 1f / nscl) * 60, manhattan), stroke);
+                brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + noise(tile.x, tile.y, 1, 1, 1f / nscl) * 60, Astar.manhattan), stroke);
             }
         }
 
@@ -141,7 +143,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
         float constraint = 1.3f;
         float radius = width / 2f / Mathf.sqrt3;
         int rooms = rand.random(2, 5);
-        Array<Room> array = new Array<>();
+        Seq<Room> array = new Seq<>();
 
         for(int i = 0; i < rooms; i++){
             Tmp.v1.trns(rand.random(360f), rand.random(radius / constraint));
@@ -154,7 +156,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
         //check positions on the map to place the player spawn. this needs to be in the corner of the map
         Room spawn = null;
-        Array<Room> enemies = new Array<>();
+        Seq<Room> enemies = new Seq<>();
         int enemySpawns = rand.chance(0.3) ? 2 : 1;
         int offset = rand.nextInt(360);
         float length = width/2.55f - rand.random(13, 23);
@@ -210,7 +212,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
         inverseFloodFill(tiles.getn(spawn.x, spawn.y));
 
-        Array<Block> ores = Array.with(Blocks.oreCopper, Blocks.oreLead);
+        Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead);
         float poles = Math.abs(sector.tile.v.y);
         float nmag = 0.5f;
         float scl = 1f;
@@ -228,7 +230,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
             ores.add(Blocks.oreThorium);
         }
 
-        FloatArray frequencies = new FloatArray();
+        FloatSeq frequencies = new FloatSeq();
         for(int i = 0; i < ores.size; i++){
             frequencies.add(rand.random(-0.09f, 0.01f) - i * 0.01f);
         }
@@ -281,7 +283,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
         Schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
 
         if(sector.hasEnemyBase()){
-            new BaseGenerator().generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector);
+            basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector);
 
             state.rules.attackMode = true;
         }
@@ -289,4 +291,8 @@ public class TODOPlanetGenerator extends PlanetGenerator{
         state.rules.waves = true;
     }
 
+    @Override
+    public void postGenerate(Tiles tiles){
+        basegen.postGenerate();
+    }
 }

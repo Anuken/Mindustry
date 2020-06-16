@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class MinimapRenderer implements Disposable{
     private static final float baseSize = 16f;
-    private final Array<Unitc> units = new Array<>();
+    private final Seq<Unitc> units = new Seq<>();
     private Pixmap pixmap;
     private Texture texture;
     private TextureRegion region;
@@ -129,7 +129,7 @@ public class MinimapRenderer implements Disposable{
         for(Tile tile : world.tiles){
             pixmap.draw(tile.x, pixmap.getHeight() - 1 - tile.y, colorFor(tile));
         }
-        texture.draw(pixmap, 0, 0);
+        texture.draw(pixmap);
     }
 
     public void update(Tile tile){

@@ -15,8 +15,8 @@ public class LoadoutDialog extends BaseDialog{
     private Runnable hider;
     private Runnable resetter;
     private Runnable updater;
-    private Array<ItemStack> stacks = new Array<>();
-    private Array<ItemStack> originalStacks = new Array<>();
+    private Seq<ItemStack> stacks = new Seq<>();
+    private Seq<ItemStack> originalStacks = new Seq<>();
     private Table items;
     private int capacity;
 
@@ -51,7 +51,7 @@ public class LoadoutDialog extends BaseDialog{
         }).size(210f, 64f);
     }
 
-    public void show(int capacity, Array<ItemStack> stacks, Runnable reseter, Runnable updater, Runnable hider){
+    public void show(int capacity, Seq<ItemStack> stacks, Runnable reseter, Runnable updater, Runnable hider){
         this.originalStacks = stacks;
         reseed();
         this.resetter = reseter;

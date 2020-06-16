@@ -9,8 +9,8 @@ import mindustry.world.consumers.*;
 
 public class PowerGraph{
     private final static Queue<Tilec> queue = new Queue<>();
-    private final static Array<Tilec> outArray1 = new Array<>();
-    private final static Array<Tilec> outArray2 = new Array<>();
+    private final static Seq<Tilec> outArray1 = new Seq<>();
+    private final static Seq<Tilec> outArray2 = new Seq<>();
     private final static IntSet closedSet = new IntSet();
 
     private final ObjectSet<Tilec> producers = new ObjectSet<>();
@@ -178,7 +178,7 @@ public class PowerGraph{
     public void update(){
         if(Core.graphics.getFrameId() == lastFrameUpdated){
             return;
-        }else if(!consumers.isEmpty() && consumers.first().tile().isEnemyCheat()){
+        }else if(!consumers.isEmpty() && consumers.first().cheating()){
             //when cheating, just set status to 1
             for(Tilec tile : consumers){
                 tile.power().status = 1f;

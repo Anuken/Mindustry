@@ -34,7 +34,7 @@ public class Planet extends UnlockableContent{
     /** Generator that will make the planet. Can be null for planets that don't need to be landed on. */
     public @Nullable PlanetGenerator generator;
     /** Array of sectors; directly maps to tiles in the grid. */
-    public @NonNull Array<Sector> sectors;
+    public @NonNull Seq<Sector> sectors;
     /** Radius of this planet's sphere. Does not take into account sattelites. */
     public float radius;
     /** Orbital radius around the sun. Do not change unless you know exactly what you are doing.*/
@@ -45,6 +45,8 @@ public class Planet extends UnlockableContent{
     public float orbitTime;
     /** Time for the planet to perform a full revolution, in seconds. One day. */
     public float rotateTime = 24f * 60f;
+    /** Approx. radius of one sector. */
+    public float sectorApproxRadius;
     /** Whether this planet is tidally locked relative to its parent - see https://en.wikipedia.org/wiki/Tidal_locking */
     public boolean tidalLock = false;
     /** Whether the bloom render effect is enabled. */
@@ -60,9 +62,9 @@ public class Planet extends UnlockableContent{
     /** The root parent of the whole solar system this planet is in. */
     public @NonNull Planet solarSystem;
     /** All planets orbiting this one, in ascending order of radius. */
-    public Array<Planet> children = new Array<>();
+    public Seq<Planet> children = new Seq<>();
     /** Sattelites orbiting this planet. */
-    public Array<Satellite> satellites = new Array<>();
+    public Seq<Satellite> satellites = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
     protected Prov<PlanetMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2);
 
@@ -75,10 +77,12 @@ public class Planet extends UnlockableContent{
         if(sectorSize > 0){
             grid = PlanetGrid.create(sectorSize);
 
-            sectors = new Array<>(grid.tiles.length);
+            sectors = new Seq<>(grid.tiles.length);
             for(int i = 0; i < grid.tiles.length; i++){
                 sectors.add(new Sector(this, grid.tiles[i], new SectorData()));
             }
+
+            sectorApproxRadius = sectors.first().tile.v.dst(sectors.first().tile.corners[0].v);
 
             //read data for sectors
             Fi data = Vars.tree.get("planets/" + name + ".dat");
@@ -96,11 +100,10 @@ public class Planet extends UnlockableContent{
             }
 
             for(Sector sector : sectors){
-                sector.unlocked = true;
                 sector.generate();
             }
         }else{
-            sectors = new Array<>();
+            sectors = new Seq<>();
         }
 
         //total radius is initially just the radius

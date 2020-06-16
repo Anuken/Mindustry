@@ -61,9 +61,7 @@ public abstract class Consume{
     public abstract void build(Tilec tile, Table table);
 
     /** Called when a consumption is triggered manually. */
-    public void trigger(Tilec entity){
-
-    }
+    public void trigger(Tilec entity){}
 
     public abstract String getIcon();
 

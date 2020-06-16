@@ -1,6 +1,5 @@
 package mindustry.world.blocks.distribution;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -48,8 +47,8 @@ public class MassDriver extends Block{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-base"), Core.atlas.find(name)};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{baseRegion, region};
     }
 
     @Override

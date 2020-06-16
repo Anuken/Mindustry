@@ -1,6 +1,5 @@
 package mindustry.ai.types;
 
-import arc.util.*;
 import mindustry.ai.Pathfinder.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -26,13 +25,11 @@ public class GroundAI extends AIController{
         Tilec core = unit.closestEnemyCore();
 
         if(core != null){
-            float dst = unit.dst(core);
-
-            if(dst < unit.range() / 1.1f){
+            if(unit.within(core,unit.range() / 1.1f)){
                 target = core;
             }
 
-            if(dst > unit.range() * 0.5f){
+            if(!unit.within(core, unit.range() * 0.5f)){
                 moveToCore(FlagTarget.enemyCores);
             }
         }
@@ -60,7 +57,7 @@ public class GroundAI extends AIController{
 
         if(tile == targetTile) return;
 
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed * Time.delta()));
+        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
     }
 
     protected void moveAwayFromCore(){
@@ -88,6 +85,6 @@ public class GroundAI extends AIController{
 
         if(tile == targetTile || core == null || unit.within(core, 120f)) return;
 
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed * Time.delta()));
+        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
     }
 }

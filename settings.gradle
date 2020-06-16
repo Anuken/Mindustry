@@ -1,7 +1,3 @@
-if(JavaVersion.current() != JavaVersion.VERSION_1_8){
-    throw new GradleException("!!! YOU MUST USE JAVA 8 TO COMPILE AND RUN MINDUSTRY !!! Read the README. Your version: ${System.properties["java.version"]}")
-}
-
 include 'desktop', 'core', 'server', 'ios', 'annotations', 'tools', 'tests'
 
 def use = { ... names ->
@@ -40,6 +36,7 @@ if(!hasProperty("release")){
         ':Arc:extensions:box2d',
         ':Arc:extensions:g3d',
         ':Arc:extensions:fx',
+        ':Arc:extensions:discord',
         ':Arc:natives',
         ':Arc:natives:natives-desktop',
         ':Arc:natives:natives-android',

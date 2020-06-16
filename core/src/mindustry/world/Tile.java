@@ -23,8 +23,6 @@ public class Tile implements Position, QuadTreeObject{
     /** Tile entity, usually null. */
     public @Nullable Tilec entity;
     public short x, y;
-    /** Extra data. Used for dumping. */
-    public byte data;
     protected @NonNull Block block;
     protected @NonNull Floor floor;
     protected @NonNull Floor overlay;
@@ -246,6 +244,15 @@ public class Tile implements Position, QuadTreeObject{
         setOverlay(overlay);
     }
 
+    /** Sets the block to air. */
+    public void setAir(){
+        setBlock(Blocks.air);
+    }
+
+    public void circle(int radius, Intc2 cons){
+        Geometry.circle(x, y, world.width(), world.height(), radius, cons);
+    }
+
     public void recache(){
         if(!headless && !world.isGenerating()){
             renderer.blocks.floor.recacheTile(this);
@@ -339,10 +346,6 @@ public class Tile implements Position, QuadTreeObject{
         return block.destructible || block.breakable || block.update;
     }
 
-    public boolean isEnemyCheat(){
-        return team() == state.rules.waveTeam && state.rules.enemyCheat;
-    }
-
     /**
      * Returns the list of all tiles linked to this multiblock, or just itself if it's not a multiblock.
      * This array contains all linked tiles, including this tile itself.
@@ -367,7 +370,7 @@ public class Tile implements Position, QuadTreeObject{
      * Returns the list of all tiles linked to this multiblock.
      * This array contains all linked tiles, including this tile itself.
      */
-    public Array<Tile> getLinkedTiles(Array<Tile> tmpArray){
+    public Seq<Tile> getLinkedTiles(Seq<Tile> tmpArray){
         tmpArray.clear();
         getLinkedTiles(tmpArray::add);
         return tmpArray;
@@ -377,7 +380,7 @@ public class Tile implements Position, QuadTreeObject{
      * Returns the list of all tiles linked to this multiblock if it were this block.
      * This array contains all linked tiles, including this tile itself.
      */
-    public Array<Tile> getLinkedTilesAs(Block block, Array<Tile> tmpArray){
+    public Seq<Tile> getLinkedTilesAs(Block block, Seq<Tile> tmpArray){
         tmpArray.clear();
         if(block.isMultiblock()){
             int offsetx = -(block.size - 1) / 2;

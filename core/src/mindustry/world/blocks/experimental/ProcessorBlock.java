@@ -14,7 +14,7 @@ public class ProcessorBlock extends Block{
 
     public class ProcessorEntity extends TileEntity{
         //all tiles in the block network - does not include itself
-        Array<Tilec> network = new Array<>();
+        Seq<Tilec> network = new Seq<>();
 
         @Override
         public boolean onConfigureTileTapped(Tilec other){

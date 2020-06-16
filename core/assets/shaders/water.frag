@@ -1,7 +1,4 @@
-#ifdef GL_ES
-precision highp float;
-precision mediump int;
-#endif
+#define HIGHP
 
 uniform sampler2D u_texture;
 
@@ -9,15 +6,14 @@ uniform vec2 u_campos;
 uniform vec2 u_resolution;
 uniform float u_time;
 
-varying vec4 v_color;
-varying vec2 v_texCoord;
+varying vec2 v_texCoords;
 
 const float mscl = 40.0;
 const float mth = 7.0;
 
 void main(){
 
-	vec2 c = v_texCoord.xy;
+	vec2 c = v_texCoords.xy;
 
 	vec2 v = vec2(1.0/u_resolution.x, 1.0/u_resolution.y);
 	vec2 coords = vec2(c.x / v.x + u_campos.x, c.y / v.y + u_campos.y);

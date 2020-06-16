@@ -13,6 +13,7 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -32,10 +33,8 @@ public class UnitType extends UnlockableContent{
     public boolean flying;
     public @NonNull Prov<? extends Unitc> constructor;
     public @NonNull Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
-    public @Nullable UnitType upgrade;
-    public int tier = 1;
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
-    public float drag = 0.3f, accel = 0.5f, landShake = 0f;
+    public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f;
     public float health = 200f, range = -1, armor = 0f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
@@ -43,11 +42,16 @@ public class UnitType extends UnlockableContent{
     public float sway = 1f;
     public int payloadCapacity = 1;
     public int commandLimit = 24;
+    public float baseElevation = 0f;
 
-    public int legCount = 4;
-    public float legLength = 24f, legSpeed = 0.1f, legTrns = 1f;
+    //TODO document
+    public int legCount = 4, legGroupSize = 2;
+    public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f, maxStretch = 1.75f;
+    public float legSplashDamage = 0f, legSplashRange = 5;
+    public boolean flipBackLegs = true;
 
     public int itemCapacity = 30;
+    public int ammoCapacity = 100;
     public int drillTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
 
@@ -58,22 +62,21 @@ public class UnitType extends UnlockableContent{
     public float lightRadius = 60f, lightOpacity = 0.6f;
     public Color lightColor = Pal.powerLight;
     public boolean drawCell = true, drawItems = true;
+    public int parts = 0;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
 
-    public Array<Weapon> weapons = new Array<>();
-    public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion, occlusionRegion, jointRegion, footRegion, legBaseRegion;
+    public Seq<Weapon> weapons = new Seq<>();
+    public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
+        occlusionRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion;
+    public TextureRegion[] partRegions;
+    public TextureRegion[] partCellRegions;
 
     public UnitType(String name){
         super(name);
 
-        if(EntityMapping.map(name) != null){
-            constructor = EntityMapping.map(name);
-        }else{
-            //TODO fix for mods
-            throw new RuntimeException("Unit has no type: " + name);
-        }
+        constructor = EntityMapping.map(name);
     }
 
     public UnitController createController(){
@@ -83,8 +86,8 @@ public class UnitType extends UnlockableContent{
     public Unitc create(Team team){
         Unitc unit = constructor.get();
         unit.team(team);
-        unit.armor(armor);
         unit.type(this);
+        unit.ammo(ammoCapacity); //fill up on ammo upon creation
         return unit;
     }
 
@@ -119,12 +122,21 @@ public class UnitType extends UnlockableContent{
         region = Core.atlas.find(name);
         legRegion = Core.atlas.find(name + "-leg");
         jointRegion = Core.atlas.find(name + "-joint");
+        baseJointRegion = Core.atlas.find(name + "-joint-base");
         footRegion = Core.atlas.find(name + "-foot");
         legBaseRegion = Core.atlas.find(name + "-leg-base", name + "-leg");
         baseRegion = Core.atlas.find(name + "-base");
         cellRegion = Core.atlas.find(name + "-cell", Core.atlas.find("power-cell"));
         occlusionRegion = Core.atlas.find("circle-shadow");
         shadowRegion = icon(Cicon.full);
+
+        partRegions = new TextureRegion[parts];
+        partCellRegions = new TextureRegion[parts];
+
+        for(int i = 0; i < parts; i++){
+            partRegions[i] = Core.atlas.find(name + "-part" + i);
+            partCellRegions[i] = Core.atlas.find(name + "-cell" + i);
+        }
     }
 
     @Override
@@ -170,7 +182,7 @@ public class UnitType extends UnlockableContent{
         drawOcclusion(unit);
 
         Draw.z(z);
-        drawEngine(unit);
+        if(engineSize > 0) drawEngine(unit);
         drawBody(unit);
         if(drawCell) drawCell(unit);
         drawWeapons(unit);
@@ -321,45 +333,72 @@ public class UnitType extends UnlockableContent{
     public void drawCell(Unitc unit){
         applyColor(unit);
 
-        Draw.color(Color.black, unit.team().color, unit.healthf() + Mathf.absin(Time.time(), Math.max(unit.healthf() * 5f, 1f), 1f - unit.healthf()));
+        Draw.color(cellColor(unit));
         Draw.rect(cellRegion, unit, unit.rotation() - 90);
         Draw.reset();
     }
 
+    public Color cellColor(Unitc unit){
+        return Tmp.c1.set(Color.black).lerp(unit.team().color, unit.healthf() + Mathf.absin(Time.time(), Math.max(unit.healthf() * 5f, 1f), 1f - unit.healthf()));
+    }
+
     public void drawLight(Unitc unit){
         if(lightRadius > 0){
-            Drawf.light(unit, lightRadius, lightColor, lightOpacity);
+            Drawf.light(unit.team(), unit, lightRadius, lightColor, lightOpacity);
         }
     }
 
     public void drawLegs(Legsc unit){
+        //Draw.z(Layer.groundUnit - 0.02f);
+
         Leg[] legs = unit.legs();
 
-
         float ssize = footRegion.getWidth() * Draw.scl * 1.5f;
+        float rotation = unit.baseRotation();
 
         for(Leg leg : legs){
             Drawf.shadow(leg.base.x, leg.base.y, ssize);
         }
 
-        int index = 0;
+        //TODO should be below/above legs
+        if(baseRegion.found()){
+            Draw.rect(baseRegion, unit.x(), unit.y(), rotation);
+        }
 
-        for(Leg leg : legs){
-            boolean flip = index++ >= legs.length/2f;
+        //TODO figure out layering
+        for(int i = 0; i < legs.length; i++){
+            Leg leg = legs[i];
+            float angle = unit.legAngle(rotation, i);
+            boolean flip = i >= legs.length/2f;
             int flips = Mathf.sign(flip);
 
-            Draw.color();
+            Vec2 position = legOffset.trns(angle, legBaseOffset).add(unit);
+
+            Tmp.v1.set(leg.base).sub(leg.joint).inv().setLength(legExtension);
+
+            if(leg.moving && baseElevation > 0){
+                float scl = baseElevation;
+                float elev = Mathf.slope(1f - leg.stage) * scl;
+                Draw.color(shadowColor);
+                Draw.rect(footRegion, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));
+                Draw.color();
+            }
+
+            Draw.rect(footRegion, leg.base.x, leg.base.y, position.angleTo(leg.base));
 
             Lines.stroke(legRegion.getHeight() * Draw.scl * flips);
-            Lines.line(legRegion, unit.x(), unit.y(), leg.joint.x, leg.joint.y, CapStyle.none, 0);
+            Lines.line(legRegion, position.x, position.y, leg.joint.x, leg.joint.y, CapStyle.none, 0);
 
             Lines.stroke(legBaseRegion.getHeight() * Draw.scl * flips);
-            Lines.line(legBaseRegion, leg.joint.x, leg.joint.y, leg.base.x, leg.base.y, CapStyle.none, 0);
+            Lines.line(legBaseRegion, leg.joint.x + Tmp.v1.x, leg.joint.y + Tmp.v1.y, leg.base.x, leg.base.y, CapStyle.none, 0);
 
-            float angle1 = unit.angleTo(leg.joint), angle2 = unit.angleTo(leg.base);
+            if(jointRegion.found()){
+                Draw.rect(jointRegion, leg.joint.x, leg.joint.y);
+            }
 
-            Draw.rect(jointRegion, leg.joint.x, leg.joint.y);
-            Draw.rect(footRegion, leg.base.x, leg.base.y, angle2);
+            if(baseJointRegion.found()){
+                Draw.rect(baseJointRegion, position.x, position.y, rotation);
+            }
         }
 
         Draw.reset();
@@ -375,7 +414,7 @@ public class UnitType extends UnlockableContent{
         float ft = sin*(2.5f + (unit.hitSize()-8f)/2f);
         float boostTrns = e * 2f;
 
-        Floor floor = unit.floorOn();
+        Floor floor = unit.isFlying() ? Blocks.air.asFloor() : unit.floorOn();
 
         if(floor.isLiquid){
             Draw.color(Color.white, floor.mapColor, 0.5f);

@@ -20,7 +20,7 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class JoinDialog extends BaseDialog{
-    Array<Server> servers = new Array<>();
+    Seq<Server> servers = new Seq<>();
     Dialog add;
     Server renaming;
     Table local = new Table();
@@ -417,7 +417,7 @@ public class JoinDialog extends BaseDialog{
 
     @SuppressWarnings("unchecked")
     private void loadServers(){
-        servers = Core.settings.getJson("servers", Array.class, Array::new);
+        servers = Core.settings.getJson("servers", Seq.class, Seq::new);
 
         //load imported legacy data
         if(Core.settings.has("server-list")){

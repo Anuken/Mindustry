@@ -9,7 +9,7 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
-import arc.struct.Array;
+import arc.struct.Seq;
 import arc.struct.EnumSet;
 import arc.struct.*;
 import arc.util.*;
@@ -35,7 +35,7 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Block extends UnlockableContent{
-    public static final int crackRegions = 8, maxCrackSize = 5;
+    public static final int crackRegions = 8, maxCrackSize = 9;
 
     public boolean hasItems;
     public boolean hasLiquids;
@@ -45,6 +45,7 @@ public class Block extends UnlockableContent{
     public boolean consumesPower = true;
     public boolean outputsPower = false;
     public boolean outputsPayload = false;
+    public boolean outputFacing = true;
     public boolean acceptsItems = false;
 
     public int itemCapacity = 10;
@@ -87,6 +88,8 @@ public class Block extends UnlockableContent{
     public boolean insulated = false;
     /** whether the sprite is a full square. */
     public boolean squareSprite = true;
+    /** whether this block absorbs laser attacks. */
+    public boolean absorbLasers = false;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -164,13 +167,14 @@ public class Block extends UnlockableContent{
     public float buildCost;
     /** Whether this block is visible and can currently be built. */
     public BuildVisibility buildVisibility = BuildVisibility.hidden;
+    /** Defines when this block can be placed. */
+    public BuildPlaceability buildPlaceability = BuildPlaceability.always;
     /** Multiplier for speed of building this block. */
     public float buildCostMultiplier = 1f;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
 
     protected Prov<Tilec> entityType = null; //initialized later
-    //TODO move
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
     //TODO move
@@ -178,14 +182,10 @@ public class Block extends UnlockableContent{
     protected TextureRegion[] variantRegions, editorVariantRegions;
     public TextureRegion region, editorIcon;
 
-    //TODO remove completely
-    protected TextureRegion[] cacheRegions = {};
-    protected Array<String> cacheRegionStrings = new Array<>();
-
     //TODO move
     public static TextureRegion[][] cracks;
-    protected static final Array<Tile> tempTiles = new Array<>();
-    protected static final Array<Tilec> tempTileEnts = new Array<>();
+    protected static final Seq<Tile> tempTiles = new Seq<>();
+    protected static final Seq<Tilec> tempTileEnts = new Seq<>();
 
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
@@ -194,11 +194,9 @@ public class Block extends UnlockableContent{
 
     public Block(String name){
         super(name);
-        this.solid = false;
         initEntity();
     }
 
-    //TODO rename to draw() once class refactoring is done.
     public void drawBase(Tile tile){
         //delegates to entity unless it is null
         if(tile.entity != null){
@@ -300,7 +298,7 @@ public class Block extends UnlockableContent{
     public void setStats(){
         stats.add(BlockStat.size, "@x@", size, size);
         stats.add(BlockStat.health, health, StatUnit.none);
-        if(isBuildable()){
+        if(canBeBuilt()){
             stats.add(BlockStat.buildTime, buildCost / 60, StatUnit.seconds);
             stats.add(BlockStat.buildCost, new ItemListValue(false, requirements));
         }
@@ -346,7 +344,7 @@ public class Block extends UnlockableContent{
     }
 
     /** @return a possible replacement for this block when placed in a line by the player. */
-    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
         return this;
     }
 
@@ -358,7 +356,7 @@ public class Block extends UnlockableContent{
         return null;
     }
 
-    public void drawRequest(BuildRequest req, Eachable<BuildRequest> list, boolean valid){
+    public void drawRequest(BuildPlan req, Eachable<BuildPlan> list, boolean valid){
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
         Draw.alpha(1f);
@@ -369,7 +367,7 @@ public class Block extends UnlockableContent{
         Draw.reset();
     }
 
-    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         TextureRegion reg = getRequestRegion(req, list);
         Draw.rect(reg, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
 
@@ -378,15 +376,15 @@ public class Block extends UnlockableContent{
         }
     }
 
-    public TextureRegion getRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+    public TextureRegion getRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         return icon(Cicon.full);
     }
 
-    public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
 
     }
 
-    public void drawRequestConfigCenter(BuildRequest req, Object content, String region){
+    public void drawRequestConfigCenter(BuildPlan req, Object content, String region){
         Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
         if(color == null) return;
 
@@ -395,7 +393,7 @@ public class Block extends UnlockableContent{
         Draw.color();
     }
 
-    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
 
     }
 
@@ -411,6 +409,23 @@ public class Block extends UnlockableContent{
 
     public boolean isAccessible(){
         return (hasItems && itemCapacity > 0);
+    }
+
+    /** Iterate through ever grid position taken up by this block. */
+    public void iterateTaken(int x, int y, Intc2 placer){
+        if(isMultiblock()){
+            int offsetx = -(size - 1) / 2;
+            int offsety = -(size - 1) / 2;
+
+            for(int dx = 0; dx < size; dx++){
+                for(int dy = 0; dy < size; dy++){
+                    placer.get(dx + offsetx + x, dy + offsety + y);
+                }
+            }
+
+        }else{
+            placer.get(x, y);
+        }
     }
 
     /** Never use outside of the editor! */
@@ -432,13 +447,13 @@ public class Block extends UnlockableContent{
         return editorVariantRegions;
     }
 
-    protected TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name)};
+    protected TextureRegion[] icons(){
+        return new TextureRegion[]{region};
     }
 
     public TextureRegion[] getGeneratedIcons(){
         if(generatedIcons == null){
-            generatedIcons = generateIcons();
+            generatedIcons = icons();
         }
         return generatedIcons;
     }
@@ -475,6 +490,15 @@ public class Block extends UnlockableContent{
         return buildVisibility.visible() && !isHidden();
     }
 
+    public boolean isPlaceable(){
+        return isVisible() && buildPlaceability.placeable() && !state.rules.bannedBlocks.contains(this);
+    }
+
+    /** @return a message detailing why this block can't be placed. */
+    public String unplaceableMessage(){
+        return state.rules.bannedBlocks.contains(this) ? Core.bundle.get("banned") : buildPlaceability.message();
+    }
+
     public boolean isFloor(){
         return this instanceof Floor;
     }
@@ -491,7 +515,7 @@ public class Block extends UnlockableContent{
         return id == 0;
     }
 
-    public boolean isBuildable(){
+    public boolean canBeBuilt(){
         return buildVisibility != BuildVisibility.hidden && buildVisibility != BuildVisibility.debugOnly;
     }
 
@@ -554,19 +578,6 @@ public class Block extends UnlockableContent{
         }
     }
 
-    /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #re(int)}.
-     * DO NOT USE. This will eventually be removed. */
-    protected int re(String suffix){
-        cacheRegionStrings.add(name + suffix);
-        return cacheRegionStrings.size - 1;
-    }
-
-    /** Returns an internally cached region by ID.
-     * DO NOT USE. This will eventually be removed*/
-    protected TextureRegion re(int id){
-        return cacheRegions[id];
-    }
-
     @Override
     public void displayInfo(Table table){
         ContentDisplay.displayBlock(table, this);
@@ -610,11 +621,6 @@ public class Block extends UnlockableContent{
     @Override
     public void load(){
         region = Core.atlas.find(name);
-
-        cacheRegions = new TextureRegion[cacheRegionStrings.size];
-        for(int i = 0; i < cacheRegions.length; i++){
-            cacheRegions[i] = Core.atlas.find(cacheRegionStrings.get(i));
-        }
 
         if(cracks == null || (cracks[0][0].getTexture() != null && cracks[0][0].getTexture().isDisposed())){
             cracks = new TextureRegion[maxCrackSize][crackRegions];

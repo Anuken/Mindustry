@@ -30,7 +30,7 @@ public class SectorTests{
 
     @TestFactory
     DynamicTest[] testZoneValidity(){
-        Array<DynamicTest> out = new Array<>();
+        Seq<DynamicTest> out = new Seq<>();
         if(world == null) world = new World();
 
         for(SectorPreset zone : content.sectors()){
@@ -57,7 +57,7 @@ public class SectorTests{
                     }
                 }
 
-                Array<SpawnGroup> spawns = state.rules.spawns;
+                Seq<SpawnGroup> spawns = state.rules.spawns;
 
                 int bossWave = 0;
                 outer:

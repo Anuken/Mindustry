@@ -20,7 +20,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ItemBridge extends Block{
-    private static BuildRequest otherReq;
+    private static BuildPlan otherReq;
 
     public final int timerTransport = timers++;
     public int range;
@@ -50,7 +50,7 @@ public class ItemBridge extends Block{
     }
 
     @Override
-    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
         otherReq = null;
         list.each(other -> {
             if(other.block == this && req != other && req.config instanceof Point2 && ((Point2)req.config).equals(other.x - req.x, other.y - req.y)){
@@ -112,7 +112,7 @@ public class ItemBridge extends Block{
             return false;
         }
 
-        return other.block() == this && (other.team() == tile.team() || tile.block() != this) && (!checkDouble || other.<ItemBridgeEntity>ent().link != tile.pos());
+        return other.block() == tile.block() && (other.team() == tile.team() || tile.block() != this) && (!checkDouble || other.<ItemBridgeEntity>ent().link != tile.pos());
     }
 
     public Tile findLink(int x, int y){
@@ -280,35 +280,15 @@ public class ItemBridge extends Block{
 
                 if(rel == rel2) return false;
             }else{
-                return source.block() instanceof ItemBridge && ((ItemBridgeEntity)source).link == tile.pos() && items.total() < itemCapacity;
+                return source.block() instanceof ItemBridge && linkValid(source.tile(), tile) && items.total() < itemCapacity;
             }
 
             return items.total() < itemCapacity;
         }
 
-
         @Override
         public boolean canDumpLiquid(Tilec to, Liquid liquid){
-            Tile other = world.tile(link);
-            if(!linkValid(tile, other)){
-                Tile edge = Edges.getFacingEdge(to.tile(), tile);
-                int i = relativeTo(edge.x, edge.y);
-
-                IntSetIterator it = incoming.iterator();
-
-                while(it.hasNext){
-                    int v = it.next();
-                    if(relativeTo(Point2.x(v), Point2.y(v)) == i){
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            int rel = relativeTo(other.x, other.y);
-            int rel2 = relativeTo(to.tileX(), to.tileY());
-
-            return rel != rel2;
+            return checkDump(to);
         }
 
         @Override
@@ -322,7 +302,7 @@ public class ItemBridge extends Block{
                 int rel2 = relativeTo(Edges.getFacingEdge(source, this));
 
                 if(rel == rel2) return false;
-            }else if(!(source.block() instanceof ItemBridge && ((ItemBridgeEntity)source).link == tile.pos())){
+            }else if(!(source.block() instanceof ItemBridge && linkValid(source.tile(), tile))){
                 return false;
             }
 
@@ -331,6 +311,10 @@ public class ItemBridge extends Block{
 
         @Override
         public boolean canDump(Tilec to, Item item){
+            return checkDump(to);
+        }
+
+        protected boolean checkDump(Tilec to){
             Tile other = world.tile(link);
             if(!linkValid(tile, other)){
                 Tile edge = Edges.getFacingEdge(to.tile(), tile);

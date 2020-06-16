@@ -1,6 +1,7 @@
 package mindustry.world;
 
 import arc.func.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 
@@ -51,6 +52,13 @@ public class Tiles implements Iterable<Tile>{
     /** @return a tile at coordinates; throws an exception if out of bounds */
     public @NonNull Tile getn(int x, int y){
         if(x < 0 || x >= width || y < 0 || y >= height) throw new IllegalArgumentException(x + ", " + y + " out of bounds: width=" + width + ", height=" + height);
+        return array[y*width + x];
+    }
+
+    /** @return a tile at coordinates, clamped. */
+    public @NonNull Tile getc(int x, int y){
+        x = Mathf.clamp(x, 0, width - 1);
+        y = Mathf.clamp(y, 0, height - 1);
         return array[y*width + x];
     }
 

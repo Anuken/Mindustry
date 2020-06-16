@@ -3,7 +3,7 @@ package mindustry.server;
 import arc.*;
 import arc.files.*;
 import arc.struct.*;
-import arc.struct.Array.*;
+import arc.struct.Seq.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.Timer;
@@ -85,7 +85,7 @@ public class ServerControl implements ApplicationListener{
         registerCommands();
 
         Core.app.post(() -> {
-            Array<String> commands = new Array<>();
+            Seq<String> commands = new Seq<>();
 
             if(args.length > 0){
                 commands.addAll(Strings.join(" ", args).split(","));
@@ -134,7 +134,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             //set next map to be played
-            Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(state.map);
+            Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(lastMode, state.map);
             nextMapOverride = null;
             if(map != null){
                 Call.onInfoMessage((state.rules.pvp
@@ -209,19 +209,6 @@ public class ServerControl implements ApplicationListener{
             }
 
             if(lastTask != null) lastTask.cancel();
-            
-            Map result;
-            if(arg.length > 0){
-                result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
-
-                if(result == null){
-                    err("No map with name &y'@'&lr found.", arg[0]);
-                    return;
-                }
-            }else{
-                result = maps.getShuffleMode().next(state.map);
-                info("Randomized next map to be @.", result.name());
-            }
 
             Gamemode preset = Gamemode.survival;
 
@@ -232,6 +219,19 @@ public class ServerControl implements ApplicationListener{
                     err("No gamemode '@' found.", arg[1]);
                     return;
                 }
+            }
+            
+            Map result;
+            if(arg.length > 0){
+                result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
+
+                if(result == null){
+                    err("No map with name &y'@'&lr found.", arg[0]);
+                    return;
+                }
+            }else{
+                result = maps.getShuffleMode().next(preset, state.map);
+                info("Randomized next map to be @.", result.name());
             }
 
             info("Loading map...");
@@ -616,7 +616,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("bans", "List all banned IPs and IDs.", arg -> {
-            Array<PlayerInfo> bans = netServer.admins.getBanned();
+            Seq<PlayerInfo> bans = netServer.admins.getBanned();
 
             if(bans.size == 0){
                 info("No ID-banned players have been found.");
@@ -627,7 +627,7 @@ public class ServerControl implements ApplicationListener{
                 }
             }
 
-            Array<String> ipbans = netServer.admins.getBannedIPs();
+            Seq<String> ipbans = netServer.admins.getBannedIPs();
 
             if(ipbans.size == 0){
                 info("No IP-banned players have been found.");
@@ -699,7 +699,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("admins", "List all admins.", arg -> {
-            Array<PlayerInfo> admins = netServer.admins.getAdmins();
+            Seq<PlayerInfo> admins = netServer.admins.getAdmins();
 
             if(admins.size == 0){
                 info("No admins have been found.");
@@ -879,7 +879,7 @@ public class ServerControl implements ApplicationListener{
     private void play(boolean wait, Runnable run){
         inExtraRound = true;
         Runnable r = () -> {
-            Array<Playerc> players = new Array<>();
+            Seq<Playerc> players = new Seq<>();
             for(Playerc p : Groups.player){
                 players.add(p);
                 p.clearUnit();
@@ -897,7 +897,7 @@ public class ServerControl implements ApplicationListener{
 
                 p.reset();
                 if(state.rules.pvp){
-                    p.team(netServer.assignTeam(p, new ArrayIterable<>(players)));
+                    p.team(netServer.assignTeam(p, new SeqIterable<>(players)));
                 }
                 netServer.sendWorldData(p);
             }

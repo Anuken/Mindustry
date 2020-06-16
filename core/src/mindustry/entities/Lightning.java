@@ -14,7 +14,7 @@ import static mindustry.Vars.*;
 public class Lightning{
     private static final Rand random = new Rand();
     private static final Rect rect = new Rect();
-    private static final Array<Unitc> entities = new Array<>();
+    private static final Seq<Unitc> entities = new Seq<>();
     private static final IntSet hit = new IntSet();
     private static final int maxChain = 8;
     private static final float hitRange = 30f;
@@ -32,7 +32,7 @@ public class Lightning{
         random.setSeed(seed);
         hit.clear();
 
-        Array<Vec2> lines = new Array<>();
+        Seq<Vec2> lines = new Seq<>();
         bhit = false;
 
         for(int i = 0; i < length / 2; i++){

@@ -123,8 +123,8 @@ public abstract class Turret extends Block{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find("block-" + size), Core.atlas.find(name)};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{baseRegion, region};
     }
 
     @Override
@@ -139,7 +139,7 @@ public abstract class Turret extends Block{
     }
 
     public class TurretEntity extends TileEntity implements ControlBlock{
-        public Array<AmmoEntry> ammo = new Array<>();
+        public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float reload, rotation = 90, recoil, heat;
         public int shotCounter;
@@ -281,7 +281,7 @@ public abstract class Turret extends Block{
 
         /** Consume ammo and return a type. */
         public BulletType useAmmo(){
-            if(tile.isEnemyCheat()) return peekAmmo();
+            if(cheating()) return peekAmmo();
 
             AmmoEntry entry = ammo.peek();
             entry.amount -= ammoPerShot;

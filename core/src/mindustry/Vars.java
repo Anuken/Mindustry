@@ -1,6 +1,5 @@
 package mindustry;
 
-import arc.Application.*;
 import arc.*;
 import arc.assets.*;
 import arc.files.*;
@@ -62,11 +61,9 @@ public class Vars implements Loadable{
     /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?template=bug_report.md";
     /** list of built-in servers.*/
-    public static final Array<String> defaultServers = Array.with();
+    public static final Seq<String> defaultServers = Seq.with();
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
-    /** whether to enable editing of units in the editor */
-    public static final boolean enableUnitEditing = false;
     /** max chat message length */
     public static final int maxTextLength = 150;
     /** max player name length in bytes */
@@ -83,6 +80,8 @@ public class Vars implements Loadable{
     public static final float turnDuration = 5 * Time.toMinutes;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.05f;
+    /** launch animation duration */
+    public static final float launchDuration = 140f;
     /** tile used in certain situations, instead of null */
     public static Tile emptyTile;
     /** for map generator dialog */
@@ -134,6 +133,9 @@ public class Vars implements Loadable{
     public static boolean clearSectors = false;
     /** whether any light rendering is enabled */
     public static boolean enableLight = true;
+    /** Whether to draw shadows of blocks at map edges and static blocks.
+     * Do not change unless you know exactly what you are doing.*/
+    public static boolean enableDarkness = true;
     /** application data directory, equivalent to {@link Settings#getDataDirectory()} */
     public static Fi dataDirectory;
     /** data subdirectory used for screenshots */
@@ -178,6 +180,7 @@ public class Vars implements Loadable{
     public static BeControl becontrol;
     public static AsyncCore asyncCore;
     public static TeamIndexProcess teamIndex;
+    public static BaseRegistry bases;
 
     public static Universe universe;
     public static World world;
@@ -250,13 +253,14 @@ public class Vars implements Loadable{
         spawner = new WaveSpawner();
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
+        bases = new BaseRegistry();
 
         state = new GameState();
         data = new GlobalData();
 
-        mobile = Core.app.getType() == ApplicationType.Android || Core.app.getType() == ApplicationType.iOS || testMobile;
-        ios = Core.app.getType() == ApplicationType.iOS;
-        android = Core.app.getType() == ApplicationType.Android;
+        mobile = Core.app.isMobile() || testMobile;
+        ios = Core.app.isIOS();
+        android = Core.app.isAndroid();
 
         modDirectory.mkdirs();
 
@@ -270,7 +274,7 @@ public class Vars implements Loadable{
         String[] tags = {"[green][D][]", "[royal][I][]", "[yellow][W][]", "[scarlet][E][]", ""};
         String[] stags = {"&lc&fb[D]", "&lg&fb[I]", "&ly&fb[W]", "&lr&fb[E]", ""};
 
-        Array<String> logBuffer = new Array<>();
+        Seq<String> logBuffer = new Seq<>();
         Log.setLogger((level, text) -> {
             String result = text;
             String rawText = Log.format(stags[level.ordinal()] + "&fr " + text);

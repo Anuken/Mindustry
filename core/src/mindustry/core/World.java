@@ -235,6 +235,11 @@ public class World{
             }
         });
 
+        //postgenerate for bases
+        if(sector.preset == null){
+            sector.planet.generator.postGenerate(tiles);
+        }
+
         //reset rules
         setSectorRules(sector);
 
@@ -522,7 +527,7 @@ public class World{
 
         @Override
         public void end(){
-            Array<GenerateFilter> filters = map.filters();
+            Seq<GenerateFilter> filters = map.filters();
 
             if(!filters.isEmpty()){
                 //input for filter queries

@@ -1,7 +1,7 @@
 package mindustry.annotations;
 
 import arc.files.*;
-import arc.struct.Array;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.Log;
 import arc.util.Log.*;
@@ -126,12 +126,12 @@ public abstract class BaseProcessor extends AbstractProcessor{
         write(builder, null);
     }
 
-    public static void write(TypeSpec.Builder builder, Array<String> imports) throws Exception{
+    public static void write(TypeSpec.Builder builder, Seq<String> imports) throws Exception{
         JavaFile file = JavaFile.builder(packageName, builder.build()).skipJavaLangImports(true).build();
 
         if(imports != null){
             String rawSource = file.toString();
-            Array<String> result = new Array<>();
+            Seq<String> result = new Seq<>();
             for (String s : rawSource.split("\n", -1)) {
                 result.add(s);
                 if (s.startsWith("package ")) {
@@ -152,22 +152,22 @@ public abstract class BaseProcessor extends AbstractProcessor{
         }
     }
 
-    public Array<Selement> elements(Class<? extends Annotation> type){
-        return Array.with(env.getElementsAnnotatedWith(type)).map(Selement::new);
+    public Seq<Selement> elements(Class<? extends Annotation> type){
+        return Seq.with(env.getElementsAnnotatedWith(type)).map(Selement::new);
     }
 
-    public Array<Stype> types(Class<? extends Annotation> type){
-        return Array.with(env.getElementsAnnotatedWith(type)).select(e -> e instanceof TypeElement)
+    public Seq<Stype> types(Class<? extends Annotation> type){
+        return Seq.with(env.getElementsAnnotatedWith(type)).select(e -> e instanceof TypeElement)
             .map(e -> new Stype((TypeElement)e));
     }
 
-    public Array<Svar> fields(Class<? extends Annotation> type){
-        return Array.with(env.getElementsAnnotatedWith(type)).select(e -> e instanceof VariableElement)
+    public Seq<Svar> fields(Class<? extends Annotation> type){
+        return Seq.with(env.getElementsAnnotatedWith(type)).select(e -> e instanceof VariableElement)
         .map(e -> new Svar((VariableElement)e));
     }
 
-    public Array<Smethod> methods(Class<? extends Annotation> type){
-        return Array.with(env.getElementsAnnotatedWith(type)).select(e -> e instanceof ExecutableElement)
+    public Seq<Smethod> methods(Class<? extends Annotation> type){
+        return Seq.with(env.getElementsAnnotatedWith(type)).select(e -> e instanceof ExecutableElement)
         .map(e -> new Smethod((ExecutableElement)e));
     }
 

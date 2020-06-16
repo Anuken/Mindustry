@@ -2,7 +2,6 @@ package mindustry.world.blocks.experimental;
 
 import arc.graphics.g2d.*;
 import arc.util.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -19,10 +18,6 @@ public class BlockLoader extends PayloadAcceptor{
     public float loadTime = 2f;
     public int itemsLoaded = 5;
     public float liquidsLoaded = 5f;
-
-    public @Load(value = "@-top", fallback = "factory-top") TextureRegion topRegion;
-    public @Load(value = "@-out", fallback = "factory-out") TextureRegion outRegion;
-    public @Load(value = "@-in", fallback = "factory-in") TextureRegion inRegion;
 
     public BlockLoader(String name){
         super(name);
@@ -49,7 +44,7 @@ public class BlockLoader extends PayloadAcceptor{
     }
 
     @Override
-    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(region, req.drawx(), req.drawy());
         Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
         Draw.rect(topRegion, req.drawx(), req.drawy());
@@ -76,7 +71,7 @@ public class BlockLoader extends PayloadAcceptor{
 
             //draw input
             for(int i = 0; i < 4; i++){
-                if(blends(this, i) && i != rotation()){
+                if(blends(i) && i != rotation()){
                     Draw.rect(inRegion, x, y, i * 90);
                 }
             }

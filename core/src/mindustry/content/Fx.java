@@ -8,17 +8,17 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.*;
-import mindustry.world.blocks.experimental.BlockLauncher.*;
 
+import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
-import static mindustry.Vars.*;
+import static mindustry.Vars.tilesize;
 
 public class Fx{
     public static final Effect
@@ -103,30 +103,33 @@ public class Fx{
         Fill.circle(x, y, e.fslope() * 1.5f * size);
     }),
 
-    blockTransfer = new Effect(25f, e -> {
-        if(!(e.data instanceof LaunchedBlock)) return;
+    pointBeam = new Effect(25f, e -> {
+        if(!(e.data instanceof Position)) return;
 
-        LaunchedBlock l = e.data();
+        Position pos = e.data();
 
-        Block block = l.block;
-        Position to = Tmp.v3.set(l.x * tilesize, l.y * tilesize).add(block.offset(), block.offset());
+        Draw.color(e.color);
+        Draw.alpha(e.fout());
+        Lines.stroke(1.5f);
+        Lines.line(e.x, e.y, pos.getX(), pos.getY());
+    }),
 
-        Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.linear);
-        float x = Tmp.v1.x, y = Tmp.v1.y;
-
-        Draw.rect(block.icon(Cicon.full), x, y);
+    pointHit = new Effect(8f, e -> {
+        color(Color.white, e.color, e.fin());
+        stroke(e.fout() * 1f + 0.2f);
+        Lines.circle(e.x, e.y, e.fin() * 6f);
     }),
 
     lightning = new Effect(10f, 500f, e -> {
-        if(!(e.data instanceof Array)) return;
-        Array<Vec2> lines = e.data();
+        if(!(e.data instanceof Seq)) return;
+        Seq<Vec2> lines = e.data();
 
         stroke(3f * e.fout());
         color(e.color, Color.white, e.fin());
-        beginLine();
 
-        linePoint(e.x, e.y);
+        beginLine();
         lines.each(Lines::linePoint);
+        linePoint(e.x, e.y);
         endLine();
 
         int i = 0;
@@ -180,6 +183,12 @@ public class Fx{
         Fill.circle(e.x, e.y, (1f + 6f * e.rotation) - e.fin()*2f);
     }),
 
+    rocketSmokeLarge = new Effect(220, e -> {
+        color(Color.gray);
+        alpha(Mathf.clamp(e.fout()*1.6f - Interp.pow3In.apply(e.rotation)*1.2f));
+        Fill.circle(e.x, e.y, (1f + 6f * e.rotation * 1.3f) - e.fin()*2f);
+    }),
+
     magmasmoke = new Effect(110, e -> {
         color(Color.gray);
         Fill.circle(e.x, e.y, e.fslope() * 6f);
@@ -220,7 +229,7 @@ public class Fx{
 
     unitLandSmall = new Effect(30, e -> {
         color(Tmp.c1.set(e.color).mul(1.1f));
-        randLenVectors(e.id, 6, 12f * e.finpow(), (x, y) -> {
+        randLenVectors(e.id, (int)(6 * e.rotation), 12f * e.finpow() * e.rotation, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 3f + 0.1f);
         });
     }).ground(),
@@ -518,7 +527,7 @@ public class Fx{
 
         color();
 
-        Drawf.light(e.x, e.y, 20f * e.fslope(), Pal.lightFlame, 0.5f);
+        Drawf.light(Team.derelict, e.x, e.y, 20f * e.fslope(), Pal.lightFlame, 0.5f);
     }),
 
     fireSmoke = new Effect(35f, e -> {
@@ -876,8 +885,9 @@ public class Fx{
 
     lancerLaserShootSmoke = new Effect(26f, e -> {
         color(Color.white);
+        float length = e.data == null ? 70f : (Float)e.data;
 
-        randLenVectors(e.id, 7, 70f, e.rotation, 0f, (x, y) -> {
+        randLenVectors(e.id, 7, length, e.rotation, 0f, (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 9f);
         });
 
@@ -905,6 +915,16 @@ public class Fx{
 
         randLenVectors(e.id, 2, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> {
             Drawf.tri(e.x + x, e.y + y, e.fslope() * 3f + 1, e.fslope() * 3f + 1, Mathf.angle(x, y));
+        });
+
+    }),
+
+    sparkShoot = new Effect(12f, e -> {
+        color(Color.white, e.color, e.fin());
+        stroke(e.fout() * 1.2f + 0.6f);
+
+        randLenVectors(e.id, 7, 25f * e.finpow(), e.rotation, 3f, (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 5f + 0.5f);
         });
 
     }),
@@ -1164,7 +1184,7 @@ public class Fx{
     ripple = new Effect(30, e -> {
         color(Tmp.c1.set(e.color).mul(1.5f));
         stroke(e.fout() + 0.4f);
-        Lines.circle(e.x, e.y, 2f + e.fin() * 4f);
+        Lines.circle(e.x, e.y, (2f + e.fin() * 4f) * e.rotation);
     }).ground(),
 
     bubble = new Effect(20, e -> {

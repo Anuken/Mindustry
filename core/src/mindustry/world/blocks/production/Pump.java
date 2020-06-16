@@ -55,8 +55,8 @@ public class Pump extends LiquidBlock{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name)};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region};
     }
 
     @Override

@@ -23,7 +23,7 @@ public class Drill extends Block{
     public float hardnessDrillMultiplier = 50f;
 
     protected final ObjectIntMap<Item> oreCount = new ObjectIntMap<>();
-    protected final Array<Item> itemArray = new Array<>();
+    protected final Seq<Item> itemArray = new Seq<>();
 
     /** Maximum tier of blocks this drill can mine. */
     public int tier;
@@ -69,7 +69,7 @@ public class Drill extends Block{
     }
 
     @Override
-    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
         if(!req.worldContext) return;
         Tile tile = req.tile();
         if(tile == null) return;
@@ -139,7 +139,7 @@ public class Drill extends Block{
         super.setStats();
 
         stats.add(BlockStat.drillTier, table -> {
-            Array<Block> list = content.blocks().select(b -> b.isFloor() && b.asFloor().itemDrop != null && b.asFloor().itemDrop.hardness <= tier);
+            Seq<Block> list = content.blocks().select(b -> b.isFloor() && b.asFloor().itemDrop != null && b.asFloor().itemDrop.hardness <= tier);
 
             table.table(l -> {
                 l.left();
@@ -165,8 +165,8 @@ public class Drill extends Block{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region, rotatorRegion, topRegion};
     }
 
     @Override
@@ -287,12 +287,14 @@ public class Drill extends Block{
                 return;
             }
 
-            if(dominantItems > 0 && progress >= drillTime + hardnessDrillMultiplier * dominantItem.hardness && items.total() < itemCapacity){
+            float delay = drillTime + hardnessDrillMultiplier * dominantItem.hardness;
+
+            if(dominantItems > 0 && progress >= delay && items.total() < itemCapacity){
                 offload(dominantItem);
                 useContent(dominantItem);
 
-                index++;
-                progress = 0f;
+                index ++;
+                progress %= delay;
 
                 drillEffect.at(getX() + Mathf.range(size), getY() + Mathf.range(size), dominantItem.color);
             }

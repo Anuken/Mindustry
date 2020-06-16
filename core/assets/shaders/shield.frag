@@ -1,7 +1,4 @@
-#ifdef GL_ES
-precision highp float;
-precision highp int;
-#endif
+#define HIGHP
 
 #define MAX_HITS 64
 #define HIT_RADIUS 12.0
@@ -14,12 +11,12 @@ uniform vec2 u_texsize;
 uniform float u_time;
 uniform float u_dp;
 uniform vec2 u_offset;
+uniform vec4 u_shieldcolor;
 
-varying vec4 v_color;
-varying vec2 v_texCoord;
+varying vec2 v_texCoords;
 
 void main(){
-    vec2 T = v_texCoord.xy;
+    vec2 T = v_texCoords.xy;
     vec2 coords = (T * u_texsize) + u_offset;
 
     T += vec2(sin(coords.y / 3.0 + u_time / 20.0), sin(coords.x / 3.0 + u_time / 20.0)) / u_texsize;
@@ -32,7 +29,7 @@ void main(){
        		(texture2D(u_texture, T + vec2(0, step) * v).a > 0.0 || texture2D(u_texture, T + vec2(0, -step) * v).a > 0.0 ||
        		texture2D(u_texture, T + vec2(step, 0) * v).a > 0.0 || texture2D(u_texture, T + vec2(-step, 0) * v).a > 0.0)){
 
-		gl_FragColor = mix(v_color, vec4(1.0), si);
+		gl_FragColor = mix(u_shieldcolor, vec4(1.0), si);
 	}else{
 
 	    if(color.a > 0.0){

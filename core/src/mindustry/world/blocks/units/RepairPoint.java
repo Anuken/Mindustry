@@ -1,6 +1,5 @@
 package mindustry.world.blocks.units;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -14,10 +13,10 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class RepairPoint extends Block{
-    private static Rect rect = new Rect();
+    private static final Rect rect = new Rect();
 
     public int timerTarget = timers++;
 
@@ -56,8 +55,8 @@ public class RepairPoint extends Block{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-base"), Core.atlas.find(name)};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{baseRegion, region};
     }
 
     public class RepairPointEntity extends TileEntity{
@@ -77,7 +76,7 @@ public class RepairPoint extends Block{
                 float len = 5f;
 
                 Draw.color(Color.valueOf("e8ffd7"));
-                Drawf.laser(laser, laserEnd,
+                Drawf.laser(team, laser, laserEnd,
                 x + Angles.trnsx(ang, len), y + Angles.trnsy(ang, len),
                 target.x(), target.y(), strength);
                 Draw.color();

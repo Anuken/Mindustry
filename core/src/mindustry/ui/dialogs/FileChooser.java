@@ -254,7 +254,7 @@ public class FileChooser extends BaseDialog{
     }
 
     public class FileHistory{
-        private Array<Fi> history = new Array<>();
+        private Seq<Fi> history = new Seq<>();
         private int index;
 
         public FileHistory(){

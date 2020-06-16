@@ -14,7 +14,7 @@ import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
-import org.mozilla.javascript.*;
+import rhino.*;
 
 import static mindustry.Vars.*;
 
@@ -36,8 +36,8 @@ public interface Platform{
     default void viewListingID(String mapid){}
 
     /** Steam: Return external workshop maps to be loaded.*/
-    default Array<Fi> getWorkshopContent(Class<? extends Publishable> type){
-        return new Array<>(0);
+    default Seq<Fi> getWorkshopContent(Class<? extends Publishable> type){
+        return new Seq<>(0);
     }
 
     /** Steam: Open workshop for maps.*/

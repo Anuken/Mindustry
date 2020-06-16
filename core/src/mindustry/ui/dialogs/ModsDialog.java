@@ -93,7 +93,9 @@ public class ModsDialog extends BaseDialog{
                     t.button("$mod.import.github", Icon.github, bstyle, () -> {
                         dialog.hide();
 
-                        ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
+                        ui.showTextInput("$mod.import.github", "", 64, Core.settings.getString("lastmod", "Anuken/ExampleMod"), text -> {
+                            Core.settings.put("lastmod", text);
+
                             ui.loadfrag.show();
                             Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
                                 Core.net.httpGet(loc.getHeader("Location"), result -> {

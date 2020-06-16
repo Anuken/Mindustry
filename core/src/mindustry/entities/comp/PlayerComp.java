@@ -54,6 +54,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return state.teams.closestCore(x(), y(), team);
     }
 
+    public @Nullable CoreEntity core(){
+        return team.core();
+    }
+
     public void reset(){
         team = state.rules.defaultTeam;
         admin = typing = false;
@@ -80,15 +84,14 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Override
     public void update(){
-        if(unit.dead() || !unit.isAdded()){
+        if(!unit.isValid()){
             clearUnit();
         }
 
         CoreEntity core = closestCore();
 
         if(!dead()){
-            x(unit.x());
-            y(unit.y());
+            set(unit);
             unit.team(team);
             deathTimer = 0;
 
@@ -149,7 +152,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     boolean dead(){
-        return unit.isNull() || unit.dead() || !unit.isAdded();
+        return unit.isNull() || !unit.isValid();
     }
 
     String uuid(){

@@ -12,7 +12,7 @@ public class BranchTreeLayout implements TreeLayout{
     public float gapBetweenLevels = 10;
     public float gapBetweenNodes = 10f;
 
-    private final FloatArray sizeOfLevel = new FloatArray();
+    private final FloatSeq sizeOfLevel = new FloatSeq();
     private float boundsLeft = Float.MAX_VALUE;
     private float boundsRight = Float.MIN_VALUE;
     private float boundsTop = Float.MAX_VALUE;

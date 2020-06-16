@@ -69,6 +69,8 @@ public class SchematicsDialog extends BaseDialog{
             });
 
             rebuildPane[0] = () -> {
+                int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
+
                 t.clear();
                 int i = 0;
                 String regex = "[`~!@#$%^&*()-_=+[{]}|;:'\",<.>/?]";
@@ -150,7 +152,7 @@ public class SchematicsDialog extends BaseDialog{
 
                     sel[0].getStyle().up = Tex.pane;
 
-                    if(++i % (mobile ? Core.graphics.isPortrait() ? 2 : 3 : 4) == 0){
+                    if(++i % maxwidth == 0){
                         t.row();
                     }
                 }
@@ -330,13 +332,13 @@ public class SchematicsDialog extends BaseDialog{
             cont.add(new SchematicImage(schem)).maxSize(800f);
             cont.row();
 
-            Array<ItemStack> arr = schem.requirements();
+            Seq<ItemStack> arr = schem.requirements();
             cont.table(r -> {
                 int i = 0;
                 for(ItemStack s : arr){
                     r.image(s.item.icon(Cicon.small)).left();
                     r.label(() -> {
-                        Tilec core = player.closestCore();
+                        Tilec core = player.core();
                         if(core == null || state.rules.infiniteResources || core.items().has(s.item, s.amount)) return "[lightgray]" + s.amount + "";
                         return (core.items().has(s.item, s.amount) ? "[lightgray]" : "[scarlet]") + Math.min(core.items().get(s.item), s.amount) + "[lightgray]/" + s.amount;
                     }).padLeft(2).left().padRight(4);
