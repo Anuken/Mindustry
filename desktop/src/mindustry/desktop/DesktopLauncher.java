@@ -60,7 +60,6 @@ public class DesktopLauncher extends ClientLauncher{
             try{
                 DiscordRPC.initialize(discordID, true, "1127400");
                 Log.info("Initialized Discord rich presence.");
-
                 Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::shutdown));
             }catch(Throwable t){
                 useDiscord = false;
