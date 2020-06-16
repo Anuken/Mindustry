@@ -479,6 +479,10 @@ public class PlacementFragment extends Fragment{
 
     /** Returns the block currently being hovered over in the world. */
     Block tileDisplayBlock(){
-        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.drop() != null  && hoverTile.block() == Blocks.air ? hoverTile.overlay().itemDrop != null ? hoverTile.overlay() : hoverTile.floor() : null;
+        return hoverTile == null ? null :
+            hoverTile.block().synthetic() ? hoverTile.block() :
+            hoverTile.drop() != null  && hoverTile.block() == Blocks.air ?
+                hoverTile.overlay().itemDrop != null ? hoverTile.overlay() :
+                hoverTile.floor() : null;
     }
 }

@@ -171,7 +171,11 @@ allprojects{
         jcenter()
     }
 
-    //tasks.withType(Javadoc).all{ enabled = false }
+    tasks.withType(JavaCompile){
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+        options.encoding = "UTF-8"
+    }
 }
 
 project(":desktop"){
