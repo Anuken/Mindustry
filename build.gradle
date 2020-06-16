@@ -190,13 +190,14 @@ project(":desktop"){
         implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
+        implementation arcModule("extensions:discord")
 
         if(debugged()) implementation project(":debug")
 
         implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
         implementation arcModule("backends:backend-sdl")
-        implementation 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
+        //implementation 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
     }
 }
 

@@ -4,22 +4,23 @@ import arc.*;
 import arc.Files.*;
 import arc.backend.sdl.*;
 import arc.backend.sdl.jni.*;
+import arc.discord.*;
+import arc.discord.DiscordRPC.*;
 import arc.files.*;
 import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
-import club.minnced.discord.rpc.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.desktop.steam.*;
 import mindustry.game.EventType.*;
-import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.type.*;
+import mindustry.gen.*;
 
 import java.io.*;
 import java.net.*;
@@ -56,11 +57,10 @@ public class DesktopLauncher extends ClientLauncher{
 
         if(useDiscord){
             try{
-                DiscordEventHandlers handlers = new DiscordEventHandlers();
-                DiscordRPC.INSTANCE.Discord_Initialize(discordID, handlers, true, "1127400");
+                DiscordRPC.initialize(discordID, true, "1127400");
                 Log.info("Initialized Discord rich presence.");
 
-                Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC.INSTANCE::Discord_Shutdown));
+                Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::shutdown));
             }catch(Throwable t){
                 useDiscord = false;
                 Log.err("Failed to initialize discord.", t);
@@ -282,7 +282,7 @@ public class DesktopLauncher extends ClientLauncher{
 
             presence.largeImageKey = "logo";
 
-            DiscordRPC.INSTANCE.Discord_UpdatePresence(presence);
+            DiscordRPC.updatePresence(presence);
         }
 
         if(steam){
