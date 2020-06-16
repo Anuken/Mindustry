@@ -10,10 +10,12 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.game.Teams.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.production.*;
+import mindustry.world.blocks.storage.*;
 
 import static mindustry.Vars.*;
 
@@ -23,6 +25,7 @@ public class BaseAI{
     private static final float step = 5;
     private static final int attempts = 5;
     private static final float emptyChance = 0.01f;
+    private final static int timerStep = 0, timerSpawn = 1;
 
     private static int correct = 0, incorrect = 0;
 
@@ -30,16 +33,27 @@ public class BaseAI{
     private boolean triedWalls;
 
     TeamData data;
-    Interval timer = new Interval();
+    Interval timer = new Interval(4);
 
     public BaseAI(TeamData data){
         this.data = data;
     }
 
     public void update(){
+        if(timer.get(timerSpawn, 60) && data.hasCore()){
+            CoreBlock block = (CoreBlock)data.core().block;
+
+            //create AI core unit
+            if(!Groups.unit.contains(u -> u.team() == data.team && u.type() == block.unitType)){
+                Unitc unit = block.unitType.create(data.team);
+                unit.set(data.core());
+                unit.add();
+                Fx.spawn.at(unit);
+            }
+        }
 
         //only schedule when there's something to build.
-        if(data.blocks.isEmpty() && timer.get(step)){
+        if(data.blocks.isEmpty() && timer.get(timerStep, step)){
             if(!triedWalls){
                 tryWalls();
                 triedWalls = true;

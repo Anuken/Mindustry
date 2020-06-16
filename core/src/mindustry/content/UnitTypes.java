@@ -487,6 +487,10 @@ public class UnitTypes implements ContentList{
         }};
 
         alpha = new UnitType("alpha"){{
+            //TODO maybe these should be changed
+            defaultController = BuilderAI::new;
+            isCounted = false;
+
             flying = true;
             mineSpeed = 2f;
             buildSpeed = 0.5f;
@@ -513,7 +517,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.15f;
+                    tileDamageMultiplier = 0.1f;
                 }};
             }});
         }};
