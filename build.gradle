@@ -197,7 +197,6 @@ project(":desktop"){
         implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
         implementation arcModule("backends:backend-sdl")
-        //implementation 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
     }
 }
 
