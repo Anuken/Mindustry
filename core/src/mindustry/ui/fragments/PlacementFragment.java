@@ -115,7 +115,7 @@ public class PlacementFragment extends Fragment{
         for(int i = 0; i < blockSelect.length; i++){
             if(Core.input.keyTap(blockSelect[i])){
                 if(i > 9) { //select block directionally
-                    Seq<Block> blocks = getByCategory(currentCategory);
+                    Seq<Block> blocks = getUnlockedByCategory(currentCategory);
                     Block currentBlock = getSelectedBlock(currentCategory);
                     for(int j = 0; j < blocks.size; j++){
                         if(blocks.get(j) == currentBlock){
@@ -140,7 +140,7 @@ public class PlacementFragment extends Fragment{
                     }
                 }else if(blockSelectEnd || Time.timeSinceMillis(blockSelectSeqMillis) > Core.settings.getInt("blockselecttimeout")){ //1st number of combo, select category
                     //select only visible categories
-                    if(!getByCategory(Category.all[i]).isEmpty()){
+                    if(!getUnlockedByCategory(Category.all[i]).isEmpty()){
                         currentCategory = Category.all[i];
                         if(input.block != null){
                             input.block = getSelectedBlock(currentCategory);
@@ -158,6 +158,7 @@ public class PlacementFragment extends Fragment{
                         blockSelectEnd = true;
                     }
                     Seq<Block> blocks = getByCategory(currentCategory);
+                    if(!unlocked(blocks.get(i))) return true;
                     input.block = (i < blocks.size) ? blocks.get(i) : null;
                     selectedBlocks.put(currentCategory, input.block);
                     blockSelectSeqMillis = Time.millis();
@@ -203,7 +204,8 @@ public class PlacementFragment extends Fragment{
                     ButtonGroup<ImageButton> group = new ButtonGroup<>();
                     group.setMinCheckCount(0);
 
-                    for(Block block : getByCategory(currentCategory)){
+                    for(Block block : getUnlockedByCategory(currentCategory)){
+                        if(!unlocked(block)) continue;
                         if(index++ % rowWidth == 0){
                             blockTable.row();
                         }
@@ -384,7 +386,7 @@ public class PlacementFragment extends Fragment{
 
                     //update category empty values
                     for(Category cat : Category.all){
-                        Seq<Block> blocks = getByCategory(cat);
+                        Seq<Block> blocks = getUnlockedByCategory(cat);
                         categoryEmpty[cat.ordinal()] = blocks.isEmpty();
                     }
 
@@ -423,6 +425,16 @@ public class PlacementFragment extends Fragment{
     }
 
     Seq<Block> getByCategory(Category cat){
+        returnArray.clear();
+        for(Block block : content.blocks()){
+            if(block.category == cat && block.isVisible()){
+                returnArray.add(block);
+            }
+        }
+        return returnArray;
+    }
+
+    Seq<Block> getUnlockedByCategory(Category cat){
         returnArray.clear();
         for(Block block : content.blocks()){
             if(block.category == cat && block.isVisible() && unlocked(block)){
