@@ -374,7 +374,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             int tileY = tileY(Core.input.mouseY());
             if(block != null){
                 for(int i = 0; i < lineRequests.size; i++){
-                    BuildRequest request = lineRequests.get(i);
+                    BuildPlan request = lineRequests.get(i);
                     request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
                 }
             }
