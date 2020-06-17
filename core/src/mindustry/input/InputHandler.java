@@ -662,7 +662,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 Block upgrade = block.upgrade(tile, forced);
                 if(upgrade == null || !validPlace(x, y, upgrade, tile.rotation()) || tile.pos() != Point2.pack(x, y)) continue;
 
-                BuildRequest req = new BuildRequest(x, y, tile.rotation(), upgrade);
+                BuildPlan req = new BuildPlan(x, y, tile.rotation(), upgrade);
                 req.animScale = 1f;
                 lineRequests.add(req);
             }
