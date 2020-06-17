@@ -73,7 +73,7 @@ public class Rules{
     /** Spawn layout. */
     public Seq<SpawnGroup> spawns = new Seq<>();
     /** Starting items put in cores */
-    public Seq<ItemStack> loadout = Seq.with(ItemStack.with(Items.copper, 100));
+    public Seq<ItemStack> loadout = ItemStack.list(Items.copper, 100);
     /** Weather events that occur here. */
     public Seq<WeatherEntry> weather = new Seq<>(1);
     /** Blocks that cannot be placed. */
