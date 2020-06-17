@@ -7,6 +7,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -98,6 +99,27 @@ public class UnitType extends UnlockableContent{
     public void update(Unitc unit){}
 
     public void landed(Unitc unit){}
+
+    public void display(Unitc unit, Table table){
+        table.table(t -> {
+            t.left();
+            t.add(new Image(icon(Cicon.medium))).size(8 * 4);
+            t.labelWrap(localizedName).left().width(190f).padLeft(5);
+        }).growX().left();
+        table.row();
+
+        table.table(bars -> {
+            bars.defaults().growX().height(18f).pad(4);
+
+            bars.add(new Bar("blocks.health", Pal.health, unit::healthf).blink(Color.white));
+            bars.row();
+
+            if(state.rules.unitAmmo){
+                bars.add(new Bar("blocks.ammo", Pal.ammo, () -> (float)unit.ammo() / ammoCapacity));
+                bars.row();
+            }
+        }).growX();
+    }
 
     @Override
     public void displayInfo(Table table){

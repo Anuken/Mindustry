@@ -4,6 +4,8 @@ import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
@@ -11,11 +13,12 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
-public class Tile implements Position, QuadTreeObject{
+public class Tile implements Position, QuadTreeObject, Displayable{
     static final ObjectSet<Tilec> tileSet = new ObjectSet<>();
 
     /** Tile traversal cost. */
@@ -581,6 +584,17 @@ public class Tile implements Position, QuadTreeObject{
         if(block.isStatic()){
             recache();
         }
+    }
+
+    @Override
+    public void display(Table table){
+        Block toDisplay = overlay.itemDrop != null ? overlay : floor;
+
+        table.table(t -> {
+            t.left();
+            t.add(new Image(toDisplay.getDisplayIcon(this))).size(8 * 4);
+            t.labelWrap(toDisplay.getDisplayName(this)).left().width(190f).padLeft(5);
+        }).growX().left();
     }
 
     @Override

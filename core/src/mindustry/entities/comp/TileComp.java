@@ -9,6 +9,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -37,7 +38,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Tilec.class}, isFinal = false, genio = false, serialize = false)
 @Component
-abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTreeObject{
+abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTreeObject, Displayable{
     //region vars and initialization
     static final float timeToSleep = 60f * 1;
     static final ObjectSet<Tilec> tmpTiles = new ObjectSet<>();
@@ -910,7 +911,18 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         return block.icon(Cicon.medium);
     }
 
+    @Override
     public void display(Table table){
+        //display the block stuff
+        //TODO duplicated code?
+        table.table(t -> {
+            t.left();
+            t.add(new Image(block.getDisplayIcon(tile))).size(8 * 4);
+            t.labelWrap(block.getDisplayName(tile)).left().width(190f).padLeft(5);
+        }).growX().left();
+
+        table.row();
+
         table.table(bars -> {
             bars.defaults().growX().height(18f).pad(4);
 
@@ -926,12 +938,13 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
             if(items != null){
                 table.row();
+                table.left();
                 table.table(l -> {
                     Bits current = new Bits();
-                    l.left();
 
                     Runnable rebuild = () -> {
                         l.clearChildren();
+                        l.left();
                         for(Item item : content.items()){
                             if(items.hasFlowItem(item)){
                                 l.image(item.icon(Cicon.small)).padRight(3f);
@@ -950,7 +963,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
                             }
                         }
                     });
-                });
+                }).left();
             }
 
             if(liquids != null){

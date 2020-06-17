@@ -9,7 +9,6 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
-import arc.struct.Seq;
 import arc.struct.EnumSet;
 import arc.struct.*;
 import arc.util.*;
