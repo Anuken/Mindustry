@@ -22,7 +22,7 @@ public class Scripts implements Disposable{
         ".awt", "socket", "classloader", "oracle", "invoke", "arc.events", "java.util.function", "java.util.stream");
     private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.");
     private final Context context;
-    private Scriptable scope;
+    private final Scriptable scope;
     private boolean errored;
     private LoadedMod currentMod = null;
     private Seq<EventHandle> events = new Seq<>();

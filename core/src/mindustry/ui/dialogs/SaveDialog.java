@@ -44,7 +44,7 @@ public class SaveDialog extends LoadDialog{
 
     void save(SaveSlot slot){
 
-        ui.loadfrag.show("$saveload");
+        ui.loadfrag.show("$saving");
 
         Time.runTask(5f, () -> {
             hide();

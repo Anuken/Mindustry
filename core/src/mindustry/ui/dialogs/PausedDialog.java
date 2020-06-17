@@ -120,7 +120,7 @@ public class PausedDialog extends BaseDialog{
             return;
         }
 
-        ui.loadAnd("$saveload", () -> {
+        ui.loadAnd("$saving", () -> {
             try{
                 control.saves.getCurrent().save();
             }catch(Throwable e){

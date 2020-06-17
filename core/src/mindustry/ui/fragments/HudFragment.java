@@ -308,7 +308,7 @@ public class HudFragment extends Fragment{
         //'saving' indicator
         parent.fill(t -> {
             t.bottom().visible(() -> control.saves.isSaving());
-            t.add("$saveload").style(Styles.outlineLabel);
+            t.add("$saving").style(Styles.outlineLabel);
         });
 
         parent.fill(p -> {
