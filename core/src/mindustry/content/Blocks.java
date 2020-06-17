@@ -79,7 +79,7 @@ public class Blocks implements ContentList{
     //units
     groundFactory, airFactory, navalFactory,
     additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
-    repairPoint,
+    repairPoint, resupplyPoint,
 
     //campaign
     launchPad, launchPadLarge, coreSilo, dataProcessor,
@@ -1752,6 +1752,15 @@ public class Blocks implements ContentList{
             repairSpeed = 0.5f;
             repairRadius = 65f;
             powerUse = 1f;
+        }};
+
+        resupplyPoint = new ResupplyPoint("resupply-point"){{
+            requirements(Category.units, BuildVisibility.ammoOnly, ItemStack.with(Items.lead, 20, Items.copper, 15, Items.silicon, 15));
+
+            size = 2;
+            range = 80f;
+
+            consumes.item(Items.copper, 1);
         }};
 
         //endregion

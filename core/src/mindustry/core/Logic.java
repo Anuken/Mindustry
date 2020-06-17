@@ -98,6 +98,9 @@ public class Logic implements ApplicationListener{
                 SectorDamage.apply(state.rules.sector.getTurnsPassed());
                 state.rules.sector.setTurnsPassed(0);
             }
+
+            //enable infinite ammo for wave team by default
+            state.rules.waveTeam.rules().infiniteAmmo = true;
         });
 
         //TODO dying takes up a turn (?)

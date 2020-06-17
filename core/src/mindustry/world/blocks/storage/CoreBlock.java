@@ -17,6 +17,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.units.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
@@ -24,6 +25,13 @@ import static mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
     public UnitType unitType = UnitTypes.alpha;
+
+    public final int timerResupply = timers++;
+
+    public int ammoAmount = 5;
+    public float resupplyRate = 10f;
+    public float resupplyRange = 60f;
+    public Item resupplyItem = Items.copper;
 
     public CoreBlock(String name){
         super(name);
@@ -99,6 +107,15 @@ public class CoreBlock extends StorageBlock{
 
         public void requestSpawn(Playerc player){
             Call.onPlayerSpawn(tile, player);
+        }
+
+        @Override
+        public void updateTile(){
+
+            //resupply nearby units
+            if(items.has(resupplyItem) && timer(timerResupply, resupplyRate) && ResupplyPoint.resupply(this, resupplyRange, ammoAmount, resupplyItem.color)){
+                items.remove(resupplyItem, 1);
+            }
         }
 
         @Override

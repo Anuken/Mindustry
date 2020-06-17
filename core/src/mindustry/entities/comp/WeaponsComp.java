@@ -97,7 +97,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                 mount.targetRotation = angleTo(mount.aimX, mount.aimY);
             }
 
-            if(mount.shoot && (ammo > 0 || !state.rules.unitAmmo)){
+            if(mount.shoot && (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo)){
                 float rotation = this.rotation - 90;
 
                 //shoot if applicable
@@ -118,10 +118,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
 
                     if(mount.weapon.mirror) mount.side = !mount.side;
                     mount.reload = weapon.reload;
-                }
 
-                ammo --;
-                if(ammo < 0) ammo = 0;
+                    ammo --;
+                    if(ammo < 0) ammo = 0;
+                }
             }
         }
     }

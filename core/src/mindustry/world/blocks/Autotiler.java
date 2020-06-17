@@ -163,9 +163,16 @@ public interface Autotiler{
 
     /** @return whether this tile is looking at the other tile, or the other tile is looking at this one.
      * If the other tile does not rotate, it is always considered to be facing this one. */
-    default boolean lookingAt(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+    default boolean lookingAtEither(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
         || (!otherblock.rotatedOutput(otherx, othery) || Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
+    }
+
+    /** @return whether this tile is looking at the other tile. */
+    default boolean lookingAt(Tile tile, int rotation, int otherx, int othery, Block otherblock){
+        Tile facing = Edges.getFacingEdge(otherblock, otherx, othery, tile);
+        return facing != null &&
+            Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, facing.x, facing.y);
     }
 
     boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock);

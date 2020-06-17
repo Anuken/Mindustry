@@ -105,6 +105,8 @@ public class Rules{
         public boolean cheat;
         /** If true, resources are not consumed when building. */
         public boolean infiniteResources;
+        /** If true, this team has infinite unit ammo. */
+        public boolean infiniteAmmo;
     }
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */

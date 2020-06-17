@@ -155,6 +155,7 @@ public class CustomRulesDialog extends BaseDialog{
         main.row();
 
         title("$rules.title.unit");
+        check("$rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
         number("$rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
         number("$rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("$rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier);
