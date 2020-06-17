@@ -410,10 +410,7 @@ public class PlacementFragment extends Fragment{
     }
 
     Seq<Category> getCategories(){
-        returnCatArray.clear();
-        returnCatArray.addAll(Category.all);
-        returnCatArray.sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.ordinal()], categoryEmpty[c2.ordinal()]));
-        return returnCatArray;
+        return returnCatArray.clear().addAll(Category.all).sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.ordinal()], categoryEmpty[c2.ordinal()]));
     }
 
     Seq<Block> getByCategory(Category cat){
@@ -421,18 +418,11 @@ public class PlacementFragment extends Fragment{
     }
 
     Seq<Block> getUnlockedByCategory(Category cat){
-        return returnArray.selectFrom(content.blocks(), block -> block.category == cat && block.isVisible() && unlocked(block)).sort((b1, b2) -> {
-            int locked = -Boolean.compare(unlocked(b1), unlocked(b2));
-            if(locked != 0) return locked;
-            return Boolean.compare(!b1.isPlaceable(), !b2.isPlaceable());
-        });
+        return returnArray.selectFrom(content.blocks(), block -> block.category == cat && block.isVisible() && unlocked(block)).sort((b1, b2) -> Boolean.compare(!b1.isPlaceable(), !b2.isPlaceable()));
     }
 
     Block getSelectedBlock(Category cat){
-        if(selectedBlocks.get(cat) == null){
-            selectedBlocks.put(cat, getByCategory(cat).find(this::unlocked));
-        }
-        return selectedBlocks.get(cat);
+        return selectedBlocks.get(cat, () -> getByCategory(cat).find(this::unlocked));
     }
 
     boolean unlocked(Block block){
