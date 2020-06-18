@@ -230,6 +230,7 @@ public class World{
         loadGenerator(size, size, tiles -> {
             if(sector.preset != null){
                 sector.preset.generator.generate(tiles);
+                sector.preset.rules.get(state.rules); //apply extra rules
             }else{
                 sector.planet.generator.generate(tiles, sector);
             }

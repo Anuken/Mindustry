@@ -25,6 +25,9 @@ public class SectorPresets implements ContentList{
             alwaysUnlocked = true;
             conditionWave = 5;
             launchPeriod = 5;
+            rules = r -> {
+                r.winWave = 30;
+            };
         }};
 
         saltFlats = new SectorPreset("saltFlats", starter, 101){{

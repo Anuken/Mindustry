@@ -9,7 +9,6 @@ import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.async.*;
 import arc.util.serialization.*;
 import club.minnced.discord.rpc.*;
 import com.codedisaster.steamworks.*;
@@ -63,7 +62,8 @@ public class DesktopLauncher extends ClientLauncher{
                 Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC.INSTANCE::Discord_Shutdown));
             }catch(Throwable t){
                 useDiscord = false;
-                Log.err("Failed to initialize discord.", t);
+                Log.err("Failed to initialize discord. Enable debug logging for details.");
+                Log.debug("Discord init error: \n@\n", Strings.getStackTrace(t));
             }
         }
 
@@ -114,7 +114,7 @@ public class DesktopLauncher extends ClientLauncher{
         loadError = true;
         Log.err(e);
         try(OutputStream s = new FileOutputStream(new File("steam-error-log-" + System.nanoTime() + ".txt"))){
-            String log = Strings.parseException(e, true);
+            String log = Strings.neatError(e);
             s.write(log.getBytes());
         }catch(Exception e2){
             Log.err(e2);

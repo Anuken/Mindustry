@@ -542,7 +542,7 @@ public class ApplicationTests{
 
     @Test
     void allBlockTest(){
-        Tiles tiles = world.resize(256*2 + 20, 10);
+        Tiles tiles = world.resize(256*3 + 20, 10);
 
         world.beginMapLoad();
         for(int x = 0; x < tiles.width; x++){
