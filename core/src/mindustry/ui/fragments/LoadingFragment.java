@@ -21,13 +21,11 @@ public class LoadingFragment extends Fragment{
             t.visible(false);
             t.touchable(Touchable.enabled);
             t.add().height(133f).row();
-            //t.image().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
-            t.add(new WarningBar()).growX().height(30f);
+            t.add(new WarningBar()).growX().height(24f);
             t.row();
             t.add("$loading").name("namelabel").pad(10f).style(Styles.techLabel);
             t.row();
-            t.add(new WarningBar()).growX().height(30f);
-            //t.image().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
+            t.add(new WarningBar()).growX().height(24f);
             t.row();
 
             bar = t.add(new Bar()).pad(3).size(500f, 40f).visible(false).get();

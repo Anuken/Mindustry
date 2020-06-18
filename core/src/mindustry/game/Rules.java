@@ -62,10 +62,10 @@ public class Rules{
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
     public float waveSpacing = 60 * 60 * 2;
-    /** How many times longer a boss wave takes. */
-    public float bossWaveMultiplier = 3f;
     /** How many times longer a launch wave takes. */
     public float launchWaveMultiplier = 2f;
+    /** Wave after which the player 'wins'. Used in sectors. Use a value <= 0 to disable. */
+    public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
     /** Sector for saves that have them.*/

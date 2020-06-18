@@ -27,7 +27,10 @@ public class WarningBar extends Element{
             rx + barWidth, y
             );
         }
+        Lines.stroke(3f);
+        Lines.line(x, y, x + width, y);
+        Lines.line(x, y + height, x + width, y + height);
 
-        Draw.color();
+        Draw.reset();
     }
 }
