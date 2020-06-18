@@ -160,7 +160,9 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         smat.addRequestLobbyListResultCountFilter(32);
         smat.requestLobbyList();
         lobbyCallback = callback;
-        lobbyDoneCallback = done;
+
+        //after the steam lobby is done discovering, look for local network servers.
+        lobbyDoneCallback = () -> provider.discoverServers(callback, done);
     }
 
     @Override
