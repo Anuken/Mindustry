@@ -128,33 +128,35 @@ public class Pathfinder implements Runnable{
             if(net.client()) return;
             try{
 
-                queue.run();
+                if(state.isPlaying()){
+                    queue.run();
 
-                //total update time no longer than maxUpdate
-                for(Flowfield data : threadList){
-                    updateFrontier(data, maxUpdate / threadList.size);
+                    //total update time no longer than maxUpdate
+                    for(Flowfield data : threadList){
+                        updateFrontier(data, maxUpdate / threadList.size);
 
-                    //remove flowfields that have 'timed out' so they can be garbage collected and no longer waste space
-                    if(data.target.refreshRate() > 0 && Time.timeSinceMillis(data.lastUpdateTime) > fieldTimeout){
-                        //make sure it doesn't get removed twice
-                        data.lastUpdateTime = Time.millis();
+                        //remove flowfields that have 'timed out' so they can be garbage collected and no longer waste space
+                        if(data.target.refreshRate() > 0 && Time.timeSinceMillis(data.lastUpdateTime) > fieldTimeout){
+                            //make sure it doesn't get removed twice
+                            data.lastUpdateTime = Time.millis();
 
-                        Team team = data.team;
+                            Team team = data.team;
 
-                        Core.app.post(() -> {
-                            //remove its used state
-                            if(fieldMap[team.uid] != null){
-                                fieldMap[team.uid].remove(data.target);
-                                fieldMapUsed[team.uid].remove(data.target);
-                            }
-                            //remove from main thread list
-                            mainList.remove(data);
-                        });
+                            Core.app.post(() -> {
+                                //remove its used state
+                                if(fieldMap[team.uid] != null){
+                                    fieldMap[team.uid].remove(data.target);
+                                    fieldMapUsed[team.uid].remove(data.target);
+                                }
+                                //remove from main thread list
+                                mainList.remove(data);
+                            });
 
-                        queue.post(() -> {
-                            //remove from this thread list with a delay
-                            threadList.remove(data);
-                        });
+                            queue.post(() -> {
+                                //remove from this thread list with a delay
+                                threadList.remove(data);
+                            });
+                        }
                     }
                 }
 

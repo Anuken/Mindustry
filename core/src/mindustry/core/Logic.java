@@ -132,10 +132,10 @@ public class Logic implements ApplicationListener{
         if(!state.isCampaign()){
             for(TeamData team : state.teams.getActive()){
                 if(team.hasCore()){
-                    Tilec entity = team.core();
-                    entity.items().clear();
+                    TileEntity entity = team.core();
+                    entity.items.clear();
                     for(ItemStack stack : state.rules.loadout){
-                        entity.items().add(stack.item, stack.amount);
+                        entity.items.add(stack.item, stack.amount);
                     }
                 }
             }

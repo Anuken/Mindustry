@@ -4,8 +4,6 @@ import arc.*;
 import arc.Files.*;
 import arc.backend.sdl.*;
 import arc.backend.sdl.jni.*;
-import arc.discord.*;
-import arc.discord.DiscordRPC.*;
 import arc.files.*;
 import arc.func.*;
 import arc.math.*;
@@ -13,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.async.*;
 import arc.util.serialization.*;
+import club.minnced.discord.rpc.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -32,7 +31,8 @@ import static mindustry.Vars.*;
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 
-    boolean useDiscord = OS.is64Bit && !OS.hasProp("nodiscord"), loadError = false;
+    //discord RPC is only enabled on linux right now
+    boolean useDiscord = OS.is64Bit && !OS.isARM && !OS.hasProp("nodiscord"), loadError = false;
     Throwable steamError;
 
     public static void main(String[] arg){
@@ -58,9 +58,9 @@ public class DesktopLauncher extends ClientLauncher{
 
         if(useDiscord){
             try{
-                DiscordRPC.initialize(discordID, true, "1127400");
+                DiscordRPC.INSTANCE.Discord_Initialize(discordID, null, true, "1127400");
                 Log.info("Initialized Discord rich presence.");
-                Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::shutdown));
+                Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC.INSTANCE::Discord_Shutdown));
             }catch(Throwable t){
                 useDiscord = false;
                 Log.err("Failed to initialize discord.", t);
@@ -282,7 +282,7 @@ public class DesktopLauncher extends ClientLauncher{
 
             presence.largeImageKey = "logo";
 
-            DiscordRPC.updatePresence(presence);
+            DiscordRPC.INSTANCE.Discord_UpdatePresence(presence);
         }
 
         if(steam){

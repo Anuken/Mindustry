@@ -190,7 +190,7 @@ project(":desktop"){
         implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
-        implementation arcModule("extensions:discord")
+        implementation 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
 
         if(debugged()) implementation project(":debug")
 
