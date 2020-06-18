@@ -29,8 +29,6 @@ import static mindustry.Vars.*;
 
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
-
-    //discord RPC is only enabled on linux right now
     boolean useDiscord = OS.is64Bit && !OS.isARM && !OS.hasProp("nodiscord"), loadError = false;
     Throwable steamError;
 
