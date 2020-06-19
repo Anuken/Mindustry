@@ -42,7 +42,7 @@ public class ItemTurret extends Turret{
             @Override
             public void build(Tilec tile, Table table){
                 MultiReqImage image = new MultiReqImage();
-                content.items().each(i -> filter.get(i) && (!state.isCampaign() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
+                content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
                     () -> tile != null && !((ItemTurretEntity)tile).ammo.isEmpty() && ((ItemEntry)((ItemTurretEntity)tile).ammo.peek()).item == item)));
 
                 table.add(image).size(8 * 4);

@@ -426,7 +426,7 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean unlocked(Block block){
-        return !state.isCampaign() || data.isUnlocked(block);
+        return block.unlockedNow();
     }
 
     boolean hasInfoBox(){

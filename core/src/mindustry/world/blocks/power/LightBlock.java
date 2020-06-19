@@ -24,7 +24,7 @@ public class LightBlock extends Block{
         configurable = true;
         saveConfig = true;
 
-        config(Integer.class, (tile, value) -> ((LightEntity)tile).color = value);
+        config(Integer.class, (LightEntity tile, Integer value) -> tile.color = value);
     }
 
     public class LightEntity extends TileEntity{

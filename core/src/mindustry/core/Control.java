@@ -459,9 +459,6 @@ public class Control implements ApplicationListener, Loadable{
 
         input.updateState();
 
-        //autosave global data if it's modified
-        data.checkSave();
-
         music.update();
         loops.update();
         Time.updateGlobal();

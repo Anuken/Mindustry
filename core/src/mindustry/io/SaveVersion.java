@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
+import mindustry.content.TechTree.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -73,6 +74,11 @@ public abstract class SaveVersion extends SaveFileReader{
         //prepare campaign data for writing
         if(state.isCampaign()){
             state.secinfo.prepare();
+        }
+
+        //flush tech node progress
+        for(TechNode node : TechTree.all){
+            node.save();
         }
 
         writeStringMap(stream, StringMap.of(

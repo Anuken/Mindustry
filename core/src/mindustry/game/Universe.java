@@ -24,6 +24,7 @@ public class Universe{
         load();
     }
 
+    /** Update regardless of whether the player is in the campaign. */
     public void updateGlobal(){
         //currently only updates one solar system
         updatePlanet(Planets.sun);
@@ -40,6 +41,7 @@ public class Universe{
         }
     }
 
+    /** Update planet rotations, global time and relevant state. */
     public void update(){
         secondCounter += Time.delta() / 60f;
 
@@ -119,9 +121,11 @@ public class Universe{
         }
 
         //calculate passive item generation
+        //TODO make exports only update for sector with items
+        //TODO items should be added directly to cores!
         int[] exports = getTotalExports();
         for(int i = 0; i < exports.length; i++){
-            data.addItem(content.item(i), exports[i]);
+            //data.addItem(content.item(i), exports[i]);
         }
 
         Events.fire(new TurnEvent());

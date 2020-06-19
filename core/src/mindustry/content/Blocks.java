@@ -1848,6 +1848,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 200, Items.lead, 100));
 
             size = 3;
+            alwaysUnlocked = true;
         }};
 
         //endregion campaign

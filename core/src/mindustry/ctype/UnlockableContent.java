@@ -1,13 +1,14 @@
 package mindustry.ctype;
 
 import arc.*;
-import arc.util.ArcAnnotate.*;
-import mindustry.annotations.Annotations.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
-import mindustry.*;
+import arc.util.ArcAnnotate.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
-import mindustry.ui.Cicon;
+import mindustry.ui.*;
+
+import static mindustry.Vars.*;
 
 /** Base interface for an unlockable content type. */
 public abstract class UnlockableContent extends MappableContent{
@@ -63,12 +64,12 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     public final boolean unlocked(){
-        return Vars.data.isUnlocked(this);
+        return data.isUnlocked(this);
     }
 
-    /** @return whether this content is unlocked, or the player is in a custom game. */
-    public final boolean unlockedCur(){
-        return Vars.data.isUnlocked(this) || !Vars.state.isCampaign();
+    /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */
+    public final boolean unlockedNow(){
+        return data.isUnlocked(this) || !state.isCampaign();
     }
 
     public final boolean locked(){

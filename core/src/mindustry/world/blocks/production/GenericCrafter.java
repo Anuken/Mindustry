@@ -116,14 +116,12 @@ public class GenericCrafter extends Block{
                 consume();
 
                 if(outputItem != null){
-                    useContent(outputItem.item);
                     for(int i = 0; i < outputItem.amount; i++){
                         offload(outputItem.item);
                     }
                 }
 
                 if(outputLiquid != null){
-                    useContent(outputLiquid.liquid);
                     handleLiquid(this, outputLiquid.liquid, outputLiquid.amount);
                 }
 

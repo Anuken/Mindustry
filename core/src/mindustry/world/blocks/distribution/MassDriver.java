@@ -42,8 +42,8 @@ public class MassDriver extends Block{
         hasPower = true;
         outlineIcon = true;
         //point2 is relative
-        config(Point2.class, (tile, point) -> ((MassDriverEntity)tile).link = Point2.pack(point.x + tile.tileX(), point.y + tile.tileY()));
-        config(Integer.class, (tile, point) -> ((MassDriverEntity)tile).link = point);
+        config(Point2.class, (MassDriverEntity tile, Point2 point) -> tile.link = Point2.pack(point.x + tile.tileX(), point.y + tile.tileY()));
+        config(Integer.class, (MassDriverEntity tile, Integer point) -> tile.link = point);
     }
 
     @Override

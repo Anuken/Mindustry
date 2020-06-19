@@ -28,12 +28,11 @@ public class Door extends Wall{
         solidifes = true;
         consumesTap = true;
 
-        config(Boolean.class, (entity, open) -> {
-            DoorEntity door = (DoorEntity)entity;
-            door.open = open;
-            pathfinder.updateTile(door.tile());
-            (open ? closefx : openfx).at(door);
-            Sounds.door.at(door);
+        config(Boolean.class, (DoorEntity entity, Boolean open) -> {
+            entity.open = open;
+            pathfinder.updateTile(entity.tile());
+            (open ? closefx : openfx).at(entity);
+            Sounds.door.at(entity);
         });
     }
 

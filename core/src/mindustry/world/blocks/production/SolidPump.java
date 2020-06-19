@@ -43,11 +43,11 @@ public class SolidPump extends Pump{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("efficiency", entity -> new Bar(() ->
+        bars.add("efficiency", (SolidPumpEntity entity) -> new Bar(() ->
         Core.bundle.formatFloat("bar.pumpspeed",
-        ((SolidPumpEntity)entity).lastPump / Time.delta() * 60, 1),
+        entity.lastPump / Time.delta() * 60, 1),
         () -> Pal.ammo,
-        () -> ((SolidPumpEntity)entity).warmup));
+        () -> entity.warmup));
     }
 
     @Override
@@ -124,7 +124,6 @@ public class SolidPump extends Pump{
                 liquids.add(result, maxPump);
                 lastPump = maxPump;
                 warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
-                if(timer(timerContentCheck, 10)) useContent(result);
                 if(Mathf.chance(delta() * updateEffectChance))
                     updateEffect.at(getX() + Mathf.range(size * 2f), getY() + Mathf.range(size * 2f));
             }else{

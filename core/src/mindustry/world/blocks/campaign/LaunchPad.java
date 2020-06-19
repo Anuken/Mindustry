@@ -177,7 +177,8 @@ public class LaunchPad extends Block{
             //actually launch the items upon removal
             if(team() == Vars.state.rules.defaultTeam){
                 for(ItemStack stack : stacks){
-                    Vars.data.addItem(stack.item, stack.amount);
+                    //TODO where do the items go?
+                    //Vars.data.addItem(stack.item, stack.amount);
                     Events.fire(new LaunchItemEvent(stack));
                 }
             }

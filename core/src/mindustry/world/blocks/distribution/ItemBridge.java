@@ -44,9 +44,9 @@ public class ItemBridge extends Block{
         canOverdrive = false;
 
         //point2 config is relative
-        config(Point2.class, (tile, i) -> ((ItemBridgeEntity)tile).link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
+        config(Point2.class, (ItemBridgeEntity tile, Point2 i) -> tile.link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
         //integer is not
-        config(Integer.class, (tile, i) -> ((ItemBridgeEntity)tile).link = i);
+        config(Integer.class, (ItemBridgeEntity tile, Integer i) -> tile.link = i);
     }
 
     @Override

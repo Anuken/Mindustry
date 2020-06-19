@@ -29,9 +29,7 @@ public class MessageBlock extends Block{
         solid = true;
         destructible = true;
 
-        config(String.class, (tile, text) -> {
-            MessageBlockEntity entity = (MessageBlockEntity)tile;
-
+        config(String.class, (MessageBlockEntity tile, String text) -> {
             if(net.server() && text.length() > maxTextLength){
                 throw new ValidateException(player, "Player has gone above text limit.");
             }
@@ -51,8 +49,8 @@ public class MessageBlock extends Block{
                 }
             }
 
-            entity.message = result.toString();
-            entity.lines = entity.message.split("\n");
+            tile.message = result.toString();
+            tile.lines = tile.message.split("\n");
         });
     }
 

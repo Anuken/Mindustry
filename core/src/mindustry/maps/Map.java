@@ -80,7 +80,6 @@ public class Map implements Comparable<Map>, Publishable{
 
     public void setHighScore(int score){
         Core.settings.put("hiscore" + file.nameWithoutExtension(), score);
-        Vars.data.modified();
     }
 
     /** Returns the result of applying this map's rules to the specified gamemode.*/

@@ -18,7 +18,6 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -552,8 +551,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     public void offload(Item item){
         int dump = this.dump;
 
-        useContent(item);
-
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
             Tilec other = proximity.get((i + dump) % proximity.size);
@@ -571,7 +568,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
      */
     public boolean put(Item item){
         int dump = this.dump;
-        useContent(item);
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -812,14 +808,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     /** Called when a unit that spawned at this tile is removed. */
     public void unitRemoved(Unitc unit){
-    }
-
-    /** Call when some content is produced. This unlocks the content if it is applicable. */
-    public void useContent(UnlockableContent content){
-        //only unlocks content in zones
-        if(!headless && team() == player.team() && state.isCampaign()){
-            logic.handleContent(content);
-        }
     }
 
     /** Called when arbitrary configuration is applied to a tile. */

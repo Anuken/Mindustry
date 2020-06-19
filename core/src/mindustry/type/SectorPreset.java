@@ -48,7 +48,7 @@ public class SectorPreset extends UnlockableContent{
     }
 
     public boolean canUnlock(){
-        return data.isUnlocked(this) || !requirements.contains(r -> !r.complete());
+        return unlocked() || !requirements.contains(r -> !r.complete());
     }
 
     public Seq<ItemStack> getLaunchCost(){
@@ -74,7 +74,6 @@ public class SectorPreset extends UnlockableContent{
     public void setLaunched(){
         updateObjectives(() -> {
             Core.settings.put(name + "-launched", true);
-            data.modified();
         });
     }
 
@@ -84,7 +83,6 @@ public class SectorPreset extends UnlockableContent{
         if(value < wave){
             updateObjectives(() -> {
                 Core.settings.put(name + "-wave", wave);
-                data.modified();
             });
         }
     }
@@ -133,7 +131,6 @@ public class SectorPreset extends UnlockableContent{
 
         stacks.sort();
         launchCost = stacks;
-        data.modified();
     }
 
     /** Whether this zone has met its condition; if true, the player can leave. */
@@ -148,7 +145,6 @@ public class SectorPreset extends UnlockableContent{
 
     @Override
     public void init(){
-
         for(ItemStack stack : startingItems){
             defaultStartingItems.add(new ItemStack(stack.item, stack.amount));
         }

@@ -69,11 +69,11 @@ public class CoreBlock extends StorageBlock{
     public void setStats(){
         super.setStats();
 
-        bars.add("capacity", e ->
+        bars.add("capacity", (CoreEntity e) ->
             new Bar(
-                () -> Core.bundle.format("bar.capacity", ui.formatAmount(((CoreEntity)e).storageCapacity)),
+                () -> Core.bundle.format("bar.capacity", ui.formatAmount(e.storageCapacity)),
                 () -> Pal.items,
-                () -> e.items().total() / (float)(((CoreEntity)e).storageCapacity * content.items().count(i -> i.type == ItemType.material))
+                () -> e.items().total() / ((float)e.storageCapacity * content.items().count(i -> i.type == ItemType.material))
             ));
 
         bars.add("units", e ->

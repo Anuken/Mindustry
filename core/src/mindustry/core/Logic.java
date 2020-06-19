@@ -6,7 +6,6 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -112,13 +111,6 @@ public class Logic implements ApplicationListener{
             }
         });*/
 
-    }
-
-    /** Handles the event of content being used by either the player or some block. */
-    public void handleContent(UnlockableContent content){
-        if(!headless){
-            data.unlockContent(content);
-        }
     }
 
     /** Adds starting items, resets wave time, and sets state to playing. */
@@ -251,8 +243,9 @@ public class Logic implements ApplicationListener{
         Time.runTask(30f, () -> {
             for(Tilec entity : state.teams.playerCores()){
                 for(Item item : content.items()){
-                    data.addItem(item, entity.items().get(item));
-                    Events.fire(new LaunchItemEvent(new ItemStack(item, entity.items().get(item))));
+                    //TODO where do the items go?
+                    //data.addItem(item, entity.items().get(item));
+                    //Events.fire(new LaunchItemEvent(new ItemStack(item, entity.items().get(item))));
                 }
                 entity.tile().remove();
             }

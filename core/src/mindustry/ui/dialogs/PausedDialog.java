@@ -40,11 +40,12 @@ public class PausedDialog extends BaseDialog{
             cont.button("$back", Icon.left, this::hide).colspan(2).width(dw * 2 + 20f);
 
             cont.row();
-            if(state.isCampaign()){
-                cont.button("$techtree", Icon.tree, ui.tech::show);
-            }else{
-                cont.button("$database", Icon.book, ui.database::show);
-            }
+            //if(state.isCampaign()){
+            //    cont.button("$techtree", Icon.tree, ui.tech::show);
+            //}else{
+            //    cont.button("$database", Icon.book, ui.database::show);
+            //}
+            cont.button("placeholder", Icon.warning, () -> ui.showInfo("go away"));
             cont.button("$settings", Icon.settings, ui.settings::show);
 
             if(!state.rules.tutorial){

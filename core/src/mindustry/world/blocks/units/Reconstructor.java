@@ -41,7 +41,7 @@ public class Reconstructor extends UnitBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, ((ReconstructorEntity)entity)::fraction));
+        bars.add("progress", (ReconstructorEntity entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
     }
 
     @Override

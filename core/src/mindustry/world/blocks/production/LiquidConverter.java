@@ -45,7 +45,6 @@ public class LiquidConverter extends GenericCrafter{
             if(cons.valid()){
                 float use = Math.min(cl.amount * edelta(), liquidCapacity - liquids.get(outputLiquid.liquid));
 
-                useContent(outputLiquid.liquid);
                 progress += use / cl.amount;
                 liquids.add(outputLiquid.liquid, use);
                 if(progress >= craftTime){

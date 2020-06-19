@@ -1,25 +1,27 @@
 package mindustry.world.blocks.campaign;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.*;
+import arc.scene.style.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.io.*;
-import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
+import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
-import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.storage.*;
+import mindustry.world.consumers.*;
 
 import static mindustry.Vars.*;
 
-public class ResearchBlock extends StorageBlock{
+public class ResearchBlock extends Block{
     public float researchSpeed = 1f;
     public @Load("@-top") TextureRegion topRegion;
 
@@ -31,7 +33,11 @@ public class ResearchBlock extends StorageBlock{
         hasPower = true;
         hasItems = true;
         configurable = true;
-        itemCapacity = 0;
+        itemCapacity = 100;
+
+        //TODO requirements shrink as time goes on
+        consumes.add(new ConsumeItemDynamic((ResearchBlockEntity entity) -> entity.researching != null ? entity.researching.requirements : ItemStack.empty));
+        config(TechNode.class, ResearchBlockEntity::setTo);
     }
 
     @Override
@@ -40,33 +46,100 @@ public class ResearchBlock extends StorageBlock{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile, Team team){
-        if(tile == null) return false;
+    public void setBars(){
+        super.setBars();
 
-        //only allow placing next to cores
-        for(Point2 edge : Edges.getEdges(size)){
-            Tile other = tile.getNearby(edge);
-            if(other != null && other.block() instanceof CoreBlock && other.team() == team){
-                return true;
-            }
-        }
-        return false;
+        bars.add("progress", (ResearchBlockEntity e) -> new Bar("bar.progress", Pal.ammo, () -> e.researching == null ? 0f : e.researching.progress / e.researching.time));
     }
 
-    @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid){
-        boolean hasCore = canPlaceOn(world.tile(x, y), player.team());
-        if(!hasCore){
-            drawPlaceText(Core.bundle.get("bar.corereq"), x, y, valid);
-        }
-    }
+    public class ResearchBlockEntity extends TileEntity{
+        public @Nullable TechNode researching;
 
-    public class ResearchBlockEntity extends StorageBlockEntity{
-        public @Nullable UnlockableContent researching;
+        public double[] accumulator;
+        public double[] totalAccumulator;
 
         @Override
         public void updateTile(){
+            if(researching != null){
+                double totalTicks = researching.time * 60.0;
+                double amount = researchSpeed * edelta() / totalTicks;
 
+                double maxProgress = checkRequired(amount, false);
+
+                for(int i = 0; i < researching.requirements.length; i++){
+                    int reqamount = Math.round(state.rules.buildCostMultiplier * researching.requirements[i].amount);
+                    accumulator[i] += Math.min(reqamount * maxProgress, reqamount - totalAccumulator[i] + 0.00001); //add min amount progressed to the accumulator
+                    totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * maxProgress, reqamount);
+                }
+
+                maxProgress = checkRequired(maxProgress, true);
+
+                float increment = (float)(maxProgress * researching.time);
+                researching.progress += increment;
+
+                //check if it has been researched
+                if(researching.progress >= researching.time){
+                    data.unlockContent(researching.content);
+
+                    setTo(null);
+                }
+            }
+        }
+
+        private double checkRequired(double amount, boolean remove){
+            double maxProgress = amount;
+
+            for(int i = 0; i < researching.requirements.length; i++){
+                int ramount = researching.requirements[i].amount;
+                int required = (int)(accumulator[i]); //calculate items that are required now
+
+                if(!items.has(researching.requirements[i].item) && ramount > 0){
+                    maxProgress = 0f;
+                }else if(required > 0){ //if this amount is positive...
+                    //calculate how many items it can actually use
+                    int maxUse = Math.min(required, items.get(researching.requirements[i].item));
+                    //get this as a fraction
+                    double fraction = maxUse / (double)required;
+
+                    //move max progress down if this fraction is less than 1
+                    maxProgress = Math.min(maxProgress, maxProgress * fraction);
+
+                    accumulator[i] -= maxUse;
+
+                    //remove stuff that is actually used
+                    if(remove){
+                        items.remove(researching.requirements[i].item, maxUse);
+                    }
+                }
+                //else, no items are required yet, so just keep going
+            }
+
+            return maxProgress;
+        }
+
+        private void setTo(@Nullable TechNode value){
+            researching = value;
+            if(value != null){
+                accumulator = new double[researching.requirements.length];
+                totalAccumulator = new double[researching.requirements.length];
+            }
+        }
+
+        @Override
+        public void display(Table table){
+            super.display(table);
+
+            TextureRegionDrawable reg = new TextureRegionDrawable();
+
+            table.row();
+            table.table(t -> {
+                t.image().update(i -> {
+                    i.setDrawable(researching == null ? Icon.cancel : reg.set(researching.content.icon(Cicon.medium)));
+                    i.setScaling(Scaling.fit);
+                    i.setColor(researching == null ? Color.lightGray : Color.white);
+                }).size(32).pad(3);
+                t.label(() -> researching == null ? "$none" : researching.content.localizedName).color(Color.lightGray);
+            }).left().padTop(4);
         }
 
         @Override
@@ -85,14 +158,25 @@ public class ResearchBlock extends StorageBlock{
 
         @Override
         public boolean acceptItem(Tilec source, Item item){
-            //research blocks can only transfer items to the core
-            return linkedCore != null && super.acceptItem(source, item);
+            return items.get(item) < getMaximumAccepted(item);
+        }
+
+        @Override
+        public int getMaximumAccepted(Item item){
+            if(researching == null) return 0;
+            for(int i = 0; i < researching.requirements.length; i++){
+                if(researching.requirements[i].item == item) return researching.requirements[i].amount;
+            }
+            return 0;
         }
 
         @Override
         public boolean configTapped(){
-            //TODO select target
-            Vars.ui.tech.show();
+            //configure with tech node
+            ui.tech.show(node -> {
+                configure(node);
+                ui.tech.hide();
+            });
 
             return false;
         }
@@ -102,8 +186,8 @@ public class ResearchBlock extends StorageBlock{
             super.write(write);
 
             if(researching != null){
-                write.b(researching.getContentType().ordinal());
-                write.s(researching.id);
+                write.b(researching.content.getContentType().ordinal());
+                write.s(researching.content.id);
             }else{
                 write.b(-1);
             }
@@ -115,7 +199,7 @@ public class ResearchBlock extends StorageBlock{
 
             byte type = read.b();
             if(type != -1){
-                researching = Vars.content.getByID(ContentType.all[type], read.s());
+                setTo(TechTree.get(content.getByID(ContentType.all[type], read.s())));
             }else{
                 researching = null;
             }

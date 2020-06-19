@@ -33,17 +33,9 @@ public class BlockForge extends PayloadAcceptor{
         hasPower = true;
         rotate = true;
 
-        config(Block.class, (tile, block) -> ((BlockForgeEntity)tile).recipe = block);
+        config(Block.class, (BlockForgeEntity tile, Block block) -> tile.recipe = block);
 
-        consumes.add(new ConsumeItemDynamic(e -> {
-            BlockForgeEntity entity = (BlockForgeEntity)e;
-
-            if(entity.recipe != null){
-                return entity.recipe.requirements;
-            }
-
-            return ItemStack.empty;
-        }));
+        consumes.add(new ConsumeItemDynamic((BlockForgeEntity e) -> e.recipe != null ? e.recipe.requirements : ItemStack.empty));
     }
 
     @Override

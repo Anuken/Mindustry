@@ -1,5 +1,6 @@
 package mindustry.content;
 
+import arc.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
@@ -11,12 +12,15 @@ import mindustry.world.*;
 import static mindustry.content.Blocks.*;
 
 public class TechTree implements ContentList{
+    private static ObjectMap<UnlockableContent, TechNode> map = new ObjectMap<>();
+
     public static Seq<TechNode> all;
     public static TechNode root;
 
     @Override
     public void load(){
         TechNode.context = null;
+        map = new ObjectMap<>();
         all = new Seq<>();
 
         root = node(coreShard, () -> {
@@ -312,6 +316,14 @@ public class TechTree implements ContentList{
         return node(block, () -> {});
     }
 
+    public static @Nullable TechNode get(UnlockableContent content){
+        return map.get(content);
+    }
+
+    public static TechNode getNotNull(UnlockableContent content){
+        return map.getThrow(content, () -> new RuntimeException(content + " does not have a tech node"));
+    }
+
     public static class TechNode{
         private static TechNode context;
 
@@ -325,12 +337,14 @@ public class TechTree implements ContentList{
         public ItemStack[] requirements;
         /** Extra objectives needed to research this. TODO implement */
         public Objective[] objectives = {};
-        /** Research turns required to research this content. */
-        public int turns = 3; //TODO keep track of turns that have been used so far
+        /** Time required to research this content, in seconds. */
+        public float time = 60; //TODO implement
         /** Nodes that depend on this node. */
         public final Seq<TechNode> children = new Seq<>();
+        /** Research progress, in seconds. */
+        public float progress;
 
-        TechNode(TechNode ccontext, UnlockableContent content, ItemStack[] requirements, Runnable children){
+        TechNode(@Nullable TechNode ccontext, UnlockableContent content, ItemStack[] requirements, Runnable children){
             if(ccontext != null){
                 ccontext.children.add(this);
             }
@@ -339,7 +353,9 @@ public class TechTree implements ContentList{
             this.content = content;
             this.requirements = requirements;
             this.depth = parent == null ? 0 : parent.depth + 1;
+            this.progress = Core.settings.getFloat("research-" + content.name, 0f);
 
+            map.put(content, this);
             context = this;
             children.run();
             context = ccontext;
@@ -348,6 +364,11 @@ public class TechTree implements ContentList{
 
         TechNode(UnlockableContent content, ItemStack[] requirements, Runnable children){
             this(context, content, requirements, children);
+        }
+
+        /** Flushes research progress to settings. */
+        public void save(){
+            Core.settings.put("research-" + content.name, progress);
         }
     }
 }

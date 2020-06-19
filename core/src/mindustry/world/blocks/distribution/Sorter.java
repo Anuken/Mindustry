@@ -28,8 +28,8 @@ public class Sorter extends Block{
         unloadable = false;
         saveConfig = true;
 
-        config(Item.class, (tile, item) -> ((SorterEntity)tile).sortItem = item);
-        configClear(tile -> ((SorterEntity)tile).sortItem = null);
+        config(Item.class, (SorterEntity tile, Item item) -> tile.sortItem = item);
+        configClear((SorterEntity tile) -> tile.sortItem = null);
     }
 
     @Override

@@ -25,8 +25,8 @@ public class LiquidSource extends Block{
         outputsLiquid = true;
         saveConfig = true;
 
-        config(Liquid.class, (tile, l) -> ((LiquidSourceEntity)tile).source = l);
-        configClear(tile -> ((LiquidSourceEntity)tile).source = null);
+        config(Liquid.class, (LiquidSourceEntity tile, Liquid l) -> tile.source = l);
+        configClear((LiquidSourceEntity tile) -> tile.source = null);
     }
 
     @Override

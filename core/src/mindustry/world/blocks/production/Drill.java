@@ -86,11 +86,8 @@ public class Drill extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("drillspeed", e -> {
-            DrillEntity entity = (DrillEntity)e;
-
-            return new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(entity.lastDrillSpeed * 60 * entity.timeScale(), 2)), () -> Pal.ammo, () -> entity.warmup);
-        });
+        bars.add("drillspeed", (DrillEntity e) ->
+             new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(e.lastDrillSpeed * 60 * e.timeScale(), 2)), () -> Pal.ammo, () -> e.warmup));
     }
 
     public Item getDrop(Tile tile){
@@ -285,7 +282,6 @@ public class Drill extends Block{
 
             if(dominantItems > 0 && progress >= delay && items.total() < itemCapacity){
                 offload(dominantItem);
-                useContent(dominantItem);
 
                 index ++;
                 progress %= delay;

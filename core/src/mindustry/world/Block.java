@@ -388,12 +388,12 @@ public class Block extends UnlockableContent{
     }
 
     /** Configure when a null value is passed.*/
-    public void configClear(Cons<Tilec> cons){
-        configurations.put(void.class, (tile, value) -> cons.get((Tilec)tile));
+    public <E extends Tilec> void configClear(Cons<E> cons){
+        configurations.put(void.class, (tile, value) -> cons.get((E)tile));
     }
 
     /** Listen for a config by class type. */
-    public <T> void config(Class<T> type, Cons2<Tilec, T> config){
+    public <T, E extends Tilec> void config(Class<T> type, Cons2<E, T> config){
         configurations.put(type, config);
     }
 

@@ -13,8 +13,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Pump extends LiquidBlock{
-    public final int timerContentCheck = timers++;
-
     /** Pump amount, total. */
     protected float pumpAmount = 1f;
 
@@ -113,10 +111,6 @@ public class Pump extends LiquidBlock{
             if(cons.valid() && liquidDrop != null){
                 float maxPump = Math.min(liquidCapacity - liquids.total(), tiles * pumpAmount * delta() / size / size) * efficiency();
                 liquids.add(liquidDrop, maxPump);
-            }
-
-            if(liquids.currentAmount() > 0f && timer(timerContentCheck, 10)){
-                useContent(liquids.current());
             }
 
             dumpLiquid(liquids.current());
