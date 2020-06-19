@@ -181,6 +181,9 @@ public class CoreBlock extends StorageBlock{
             Draw.reset();
         }
 
+        @Override
+        public void drawTeam(){
+            //
 
         public boolean isContainer(Tilec tile){
             return tile instanceof StorageBlockEntity && (((StorageBlockEntity)tile).linkedCore == this || ((StorageBlockEntity)tile).linkedCore == null);
