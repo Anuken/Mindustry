@@ -10,6 +10,7 @@ import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -32,6 +33,9 @@ public class CoreBlock extends StorageBlock{
     public float resupplyRate = 10f;
     public float resupplyRange = 60f;
     public Item resupplyItem = Items.copper;
+
+    public @Load("@-base") TextureRegion baseRegion;
+    public @Load("@-top") TextureRegion topRegion;
 
     public CoreBlock(String name){
         super(name);
@@ -161,6 +165,18 @@ public class CoreBlock extends StorageBlock{
 
             for(CoreEntity other : state.teams.cores(team)){
                 other.storageCapacity = storageCapacity;
+            }
+        }
+
+        @Override
+        public void draw(){
+            if(team == Team.sharded){
+                Draw.rect(block.region, x, y, block.rotate ? rotdeg() : 0);
+            }else{
+                Draw.rect(baseRegion, x, y, block.rotate ? rotdeg() : 0);
+                Draw.color(team.color);
+                Draw.rect(topRegion, x, y, block.rotate ? rotdeg() : 0);
+                Draw.color();
             }
         }
 
