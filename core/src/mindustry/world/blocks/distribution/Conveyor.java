@@ -337,7 +337,7 @@ public class Conveyor extends Block implements Autotiler{
 
             for(int i = 0; i < amount; i++){
                 int val = read.i();
-                byte id = (byte)(val >> 24);
+                short id = (short)(((byte)(val >> 24)) & 0xff);
                 float x = (float)((byte)(val >> 16)) / 127f;
                 float y = ((float)((byte)(val >> 8)) + 128f) / 255f;
                 if(i < capacity){

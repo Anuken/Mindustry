@@ -235,6 +235,7 @@ public class BlockRenderer implements Disposable{
 
             if(block != Blocks.air){
                 block.drawBase(tile);
+                Draw.reset();
                 Draw.z(Layer.block);
 
                 if(entity != null){

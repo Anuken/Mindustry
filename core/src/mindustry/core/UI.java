@@ -382,37 +382,6 @@ public class UI implements ApplicationListener, Loadable{
         }}.show();
     }
 
-    public void showExceptions(String text, String... messages){
-        loadfrag.hide();
-        new Dialog(""){{
-
-            setFillParent(true);
-            cont.margin(15);
-            cont.add("$error.title").colspan(2);
-            cont.row();
-            cont.image().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
-            cont.row();
-            cont.add(text).colspan(2).wrap().growX().center().get().setAlignment(Align.center);
-            cont.row();
-
-            //cont.pane(p -> {
-                for(int i = 0; i < messages.length; i += 2){
-                    String btext = messages[i];
-                    String details = messages[i + 1];
-                    Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(details).color(Color.lightGray).left()), true);
-
-                    cont.add(btext).right();
-                    cont.button("$details", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().left();
-                    cont.row();
-                    cont.add(col).colspan(2).pad(2);
-                    cont.row();
-                }
-            //}).colspan(2);
-
-            cont.button("$ok", this::hide).size(300, 50).fillX().colspan(2);
-        }}.show();
-    }
-
     public void showText(String titleText, String text){
         showText(titleText, text, Align.center);
     }

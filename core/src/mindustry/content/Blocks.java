@@ -1845,7 +1845,7 @@ public class Blocks implements ContentList{
         }};
 
         dataProcessor = new ResearchBlock("data-processor"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 200, Items.lead, 100));
 
             size = 3;
         }};

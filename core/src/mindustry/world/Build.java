@@ -86,7 +86,7 @@ public class Build{
         }
 
         if(type.isMultiblock()){
-            if((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>ent().cblock == type)) && tile.block().size == type.size && type.canPlaceOn(tile) && tile.interactable(team)){
+            if((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>ent().cblock == type)) && tile.block().size == type.size && type.canPlaceOn(tile, team) && tile.interactable(team)){
                 return true;
             }
 
@@ -95,7 +95,7 @@ public class Build{
                 return false;
             }
 
-            if(!type.canPlaceOn(tile)){
+            if(!type.canPlaceOn(tile, team)){
                 return false;
             }
 
@@ -124,7 +124,7 @@ public class Build{
                 && (!type.requiresWater || tile.floor().liquidDrop == Liquids.water)
                 && (((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>ent().cblock == type))
                 && !(type == tile.block() && rotation == tile.rotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
-                && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);
+                && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile, team);
         }
     }
 
