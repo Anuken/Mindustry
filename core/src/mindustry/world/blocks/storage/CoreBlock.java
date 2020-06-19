@@ -199,7 +199,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void drawTeam(){
-            //
+            //no
         }
 
         public boolean isContainer(Tilec tile){
