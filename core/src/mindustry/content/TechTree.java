@@ -24,6 +24,17 @@ public class TechTree implements ContentList{
         all = new Seq<>();
 
         root = node(coreShard, () -> {
+            node(Items.lead, () -> {
+
+            });
+
+            node(Items.copper, () -> {
+
+            });
+        });
+
+        if(false)
+        root = node(coreShard, () -> {
 
             node(conveyor, () -> {
 
@@ -338,7 +349,7 @@ public class TechTree implements ContentList{
         /** Extra objectives needed to research this. TODO implement */
         public Objective[] objectives = {};
         /** Time required to research this content, in seconds. */
-        public float time = 60; //TODO implement
+        public float time = 60;
         /** Nodes that depend on this node. */
         public final Seq<TechNode> children = new Seq<>();
         /** Research progress, in seconds. */

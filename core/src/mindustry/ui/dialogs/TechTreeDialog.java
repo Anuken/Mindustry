@@ -130,17 +130,25 @@ public class TechTreeDialog extends BaseDialog{
         LayoutNode[] children = node.children;
         LayoutNode[] leftHalf = Arrays.copyOfRange(node.children, 0, Mathf.ceil(node.children.length/2f));
         LayoutNode[] rightHalf = Arrays.copyOfRange(node.children, Mathf.ceil(node.children.length/2f), node.children.length);
+
         node.children = leftHalf;
         new BranchTreeLayout(){{
             gapBetweenLevels = gapBetweenNodes = spacing;
             rootLocation = TreeLocation.top;
         }}.layout(node);
-        node.children = rightHalf;
 
-        new BranchTreeLayout(){{
-            gapBetweenLevels = gapBetweenNodes = spacing;
-            rootLocation = TreeLocation.bottom;
-        }}.layout(node);
+        float lastY = node.y;
+
+        if(rightHalf.length > 0){
+
+            node.children = rightHalf;
+            new BranchTreeLayout(){{
+                gapBetweenLevels = gapBetweenNodes = spacing;
+                rootLocation = TreeLocation.bottom;
+            }}.layout(node);
+
+            shift(leftHalf, node.y - lastY);
+        }
 
         node.children = children;
 
@@ -156,6 +164,13 @@ public class TechTreeDialog extends BaseDialog{
         }
         bounds = new Rect(minx, miny, maxx - minx, maxy - miny);
         bounds.y += nodeSize*1.5f;
+    }
+
+    void shift(LayoutNode[] children, float amount){
+        for(LayoutNode node : children){
+            node.y += amount;
+            if(node.children != null && node.children.length > 0) shift(node.children, amount);
+        }
     }
 
     void copyInfo(LayoutNode node){
