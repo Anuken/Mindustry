@@ -183,8 +183,6 @@ public class Control implements ApplicationListener, Loadable{
 
         Core.input.setCatch(KeyCode.back, true);
 
-        data.load();
-
         Core.settings.defaults(
         "ip", "localhost",
         "color-0", playerColors[8].rgba(),
@@ -480,7 +478,7 @@ public class Control implements ApplicationListener, Loadable{
                 for(Tilec tile : state.teams.cores(player.team())){
                     for(Item item : content.items()){
                         if(tile.items().has(item)){
-                            data.unlockContent(item);
+                            item.unlock();
                         }
                     }
                 }

@@ -61,27 +61,32 @@ public class ResearchBlock extends Block{
         @Override
         public void updateTile(){
             if(researching != null){
-                double totalTicks = researching.time * 60.0;
-                double amount = researchSpeed * edelta() / totalTicks;
-
-                double maxProgress = checkRequired(amount, false);
-
-                for(int i = 0; i < researching.requirements.length; i++){
-                    int reqamount = Math.round(state.rules.buildCostMultiplier * researching.requirements[i].amount);
-                    accumulator[i] += Math.min(reqamount * maxProgress, reqamount - totalAccumulator[i] + 0.00001); //add min amount progressed to the accumulator
-                    totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * maxProgress, reqamount);
-                }
-
-                maxProgress = checkRequired(maxProgress, true);
-
-                float increment = (float)(maxProgress * researching.time);
-                researching.progress += increment;
-
-                //check if it has been researched
-                if(researching.progress >= researching.time){
-                    data.unlockContent(researching.content);
-
+                //don't research something that is already researched
+                if(researching.content.unlocked()){
                     setTo(null);
+                }else{
+                    double totalTicks = researching.time * 60.0;
+                    double amount = researchSpeed * edelta() / totalTicks;
+
+                    double maxProgress = checkRequired(amount, false);
+
+                    for(int i = 0; i < researching.requirements.length; i++){
+                        int reqamount = Math.round(state.rules.buildCostMultiplier * researching.requirements[i].amount);
+                        accumulator[i] += Math.min(reqamount * maxProgress, reqamount - totalAccumulator[i] + 0.00001); //add min amount progressed to the accumulator
+                        totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * maxProgress, reqamount);
+                    }
+
+                    maxProgress = checkRequired(maxProgress, true);
+
+                    float increment = (float)(maxProgress * researching.time);
+                    researching.progress += increment;
+
+                    //check if it has been researched
+                    if(researching.progress >= researching.time){
+                        researching.content.unlocked();
+
+                        setTo(null);
+                    }
                 }
             }
         }

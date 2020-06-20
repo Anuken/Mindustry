@@ -170,7 +170,6 @@ public class Vars implements Loadable{
     public static Net net;
     public static ContentLoader content;
     public static GameState state;
-    public static CampaignData data;
     public static EntityCollisions collisions;
     public static DefaultWaves defaultWaves;
     public static mindustry.audio.LoopControl loops;
@@ -256,7 +255,6 @@ public class Vars implements Loadable{
         bases = new BaseRegistry();
 
         state = new GameState();
-        data = new CampaignData();
 
         mobile = Core.app.isMobile() || testMobile;
         ios = Core.app.isIOS();

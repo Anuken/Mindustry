@@ -200,6 +200,12 @@ public class ContentLoader{
         return contentMap;
     }
 
+    public void each(Cons<Content> cons){
+        for(Seq<Content> seq : contentMap){
+            seq.each(cons);
+        }
+    }
+
     public <T extends MappableContent> T getByName(ContentType type, String name){
         if(contentNameMap[type.ordinal()] == null){
             return null;

@@ -201,7 +201,7 @@ public class Units{
 
     /** Iterates over all units in a rectangle. */
     public static void nearby(Team team, float x, float y, float width, float height, Cons<Unitc> cons){
-        teamIndex.tree(team).intersect(height, x, y, width, cons);
+        teamIndex.tree(team).intersect(x, y, width, height, cons);
     }
 
     /** Iterates over all units in a circle around this position. */

@@ -13,7 +13,7 @@ import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
-/** Updates the campaign universe. Has no relevance to other gamemodes. */
+/** Updates and handles state of the campaign universe. Has no relevance to other gamemodes. */
 public class Universe{
     private long seconds;
     private float secondCounter;

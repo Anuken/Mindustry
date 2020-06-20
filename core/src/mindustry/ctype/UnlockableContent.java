@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
@@ -20,12 +21,15 @@ public abstract class UnlockableContent extends MappableContent{
     public boolean alwaysUnlocked = false;
     /** Icons by Cicon ID.*/
     protected TextureRegion[] cicons = new TextureRegion[mindustry.ui.Cicon.all.length];
+    /** Unlock state. Loaded from settings. Do not modify outside of the constructor. */
+    protected boolean unlocked;
 
     public UnlockableContent(String name){
         super(name);
 
         this.localizedName = Core.bundle.get(getContentType() + "." + this.name + ".name", this.name);
         this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
+        this.unlocked = Core.settings.getBool(name + "-unlocked", false);
     }
 
     public String displayDescription(){
@@ -63,13 +67,24 @@ public abstract class UnlockableContent extends MappableContent{
         return false;
     }
 
+    /** Makes this piece of content unlocked; if it already unlocked, nothing happens. */
+    public void unlock(){
+        if(!unlocked()){
+            unlocked = true;
+            Core.settings.put(name + "-unlocked", true);
+
+            onUnlock();
+            Events.fire(new UnlockEvent(this));
+        }
+    }
+
     public final boolean unlocked(){
-        return data.isUnlocked(this);
+        return unlocked || alwaysUnlocked;
     }
 
     /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */
     public final boolean unlockedNow(){
-        return data.isUnlocked(this) || !state.isCampaign();
+        return unlocked || alwaysUnlocked || !state.isCampaign();
     }
 
     public final boolean locked(){

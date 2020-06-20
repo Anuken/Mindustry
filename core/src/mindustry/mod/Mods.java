@@ -452,7 +452,6 @@ public class Mods implements Loadable{
         content.init();
         content.load();
         content.loadColors();
-        data.load();
         Core.atlas.getTextures().each(t -> t.setFilter(Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest));
         requiresReload = false;
 
