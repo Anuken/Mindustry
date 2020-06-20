@@ -24,17 +24,6 @@ public class TechTree implements ContentList{
         all = new Seq<>();
 
         root = node(coreShard, () -> {
-            node(Items.lead, () -> {
-
-            });
-
-            node(Items.copper, () -> {
-
-            });
-        });
-
-        if(false)
-        root = node(coreShard, () -> {
 
             node(conveyor, () -> {
 

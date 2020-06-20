@@ -92,7 +92,9 @@ public class Scripts implements Disposable{
                 //inject script info into file (TODO maybe rhino handles this?)
                 context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1, null);
             }
-            context.evaluateString(scope, script, file, 1, null);
+            context.evaluateString(scope,
+            "(function(){\n" +script + "\n})();",
+            file, 0, null);
             return true;
         }catch(Throwable t){
             if(currentMod != null){
