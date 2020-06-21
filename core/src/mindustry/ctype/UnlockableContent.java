@@ -29,7 +29,7 @@ public abstract class UnlockableContent extends MappableContent{
 
         this.localizedName = Core.bundle.get(getContentType() + "." + this.name + ".name", this.name);
         this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
-        this.unlocked = Core.settings.getBool(name + "-unlocked", false);
+        this.unlocked = Core.settings != null && Core.settings.getBool(name + "-unlocked", false);
     }
 
     public String displayDescription(){

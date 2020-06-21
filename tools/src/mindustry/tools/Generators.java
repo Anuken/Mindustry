@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.tools.ImagePacker.*;
@@ -115,6 +116,28 @@ public class Generators{
                     }
                 }
 
+                Image shardTeamTop = null;
+
+                if(block.teamRegion.found()){
+                    Image teamr = ImagePacker.get(block.teamRegion);
+
+                    for(Team team : Team.all){
+                        if(team.hasPalette){
+                            Image out = new Image(teamr.width, teamr.height);
+                            teamr.each((x, y) -> {
+                                int color = teamr.getColor(x, y).rgba8888();
+                                int index = color == 0xffffffff ? 0 : color == 0xdcc6c6ff ? 1 : color == 0x9d7f7fff ? 2 : -1;
+                                out.draw(x, y, index == -1 ? teamr.getColor(x, y) : team.palette[index]);
+                            });
+                            out.save(block.name + "-team-" + team.name);
+
+                            if(team == Team.sharded){
+                                shardTeamTop = out;
+                            }
+                        }
+                    }
+                }
+
                 if(regions.length == 0){
                     continue;
                 }
@@ -164,9 +187,14 @@ public class Generators{
                         }else{
                             image.draw(last);
                         }
+
+                        //draw shard (default team top) on top of first sprite
+                        if(i == 1 && shardTeamTop != null){
+                            image.draw(shardTeamTop);
+                        }
                     }
 
-                    if(!(regions.length == 1 && regions[0] == Core.atlas.find(block.name))){
+                    if(!(regions.length == 1 && regions[0] == Core.atlas.find(block.name) && shardTeamTop == null)){
                         image.save("block-" + block.name + "-full");
                     }
 

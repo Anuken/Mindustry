@@ -741,6 +741,16 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     public void draw(){
         Draw.rect(block.region, x, y, block.rotate ? rotdeg() : 0);
+
+        drawTeamTop();
+    }
+
+    public void drawTeamTop(){
+        if(block.teamRegion.found()){
+            if(block.teamRegions[team.uid] == block.teamRegion) Draw.color(team.color);
+            Draw.rect(block.teamRegions[team.uid], x, y);
+            Draw.color();
+        }
     }
 
     public void drawLight(){
@@ -761,7 +771,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     }
 
     public void drawTeam(){
-        Draw.color(team().color);
+        Draw.color(team.color);
         Draw.rect("block-border", x - block.size * tilesize / 2f + 4, y - block.size * tilesize / 2f + 4);
         Draw.color();
     }

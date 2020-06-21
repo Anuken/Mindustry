@@ -357,7 +357,7 @@ public class TechTree implements ContentList{
             this.content = content;
             this.requirements = requirements;
             this.depth = parent == null ? 0 : parent.depth + 1;
-            this.progress = Core.settings.getFloat("research-" + content.name, 0f);
+            this.progress = Core.settings == null ? 0 : Core.settings.getFloat("research-" + content.name, 0f);
 
             map.put(content, this);
             context = this;
