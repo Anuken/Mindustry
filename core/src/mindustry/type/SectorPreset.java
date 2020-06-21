@@ -5,11 +5,10 @@ import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
-import mindustry.game.*;
 import mindustry.game.Objectives.*;
+import mindustry.game.*;
 import mindustry.maps.generators.*;
 
 import static mindustry.Vars.*;
@@ -23,12 +22,6 @@ public class SectorPreset extends UnlockableContent{
     public Cons<Rules> rules = rules -> {};
     public int conditionWave = Integer.MAX_VALUE;
     public int launchPeriod = 10;
-    public Schematic loadout = Loadouts.basicShard;
-
-    protected Seq<ItemStack> baseLaunchCost = new Seq<>();
-    protected Seq<ItemStack> startingItems = new Seq<>();
-    protected Seq<ItemStack> launchCost;
-    protected Seq<ItemStack> defaultStartingItems = new Seq<>();
 
     public SectorPreset(String name, Planet planet, int sector){
         super(name);
@@ -51,40 +44,9 @@ public class SectorPreset extends UnlockableContent{
         return unlocked() || !requirements.contains(r -> !r.complete());
     }
 
-    public Seq<ItemStack> getLaunchCost(){
-        if(launchCost == null){
-            updateLaunchCost();
-        }
-        return launchCost;
-    }
-
-    public Seq<ItemStack> getStartingItems(){
-        return startingItems;
-    }
-
-    public void resetStartingItems(){
-        startingItems.clear();
-        defaultStartingItems.each(stack -> startingItems.add(new ItemStack(stack.item, stack.amount)));
-    }
-
     public boolean hasLaunched(){
+        //TODO implement
         return Core.settings.getBool(name + "-launched", false);
-    }
-
-    public void setLaunched(){
-        updateObjectives(() -> {
-            Core.settings.put(name + "-launched", true);
-        });
-    }
-
-    public void updateWave(int wave){
-        int value = Core.settings.getInt(name + "-wave", 0);
-
-        if(value < wave){
-            updateObjectives(() -> {
-                Core.settings.put(name + "-wave", wave);
-            });
-        }
     }
 
     public void updateObjectives(Runnable closure){
@@ -101,36 +63,13 @@ public class SectorPreset extends UnlockableContent{
     }
 
     public int bestWave(){
+        //TODO implement
         return Core.settings.getInt(name + "-wave", 0);
     }
 
     /** @return whether initial conditions to launch are met. */
     public boolean isLaunchMet(){
         return bestWave() >= conditionWave;
-    }
-
-    public void updateLaunchCost(){
-        Seq<ItemStack> stacks = new Seq<>();
-
-        Cons<ItemStack> adder = stack -> {
-            for(ItemStack other : stacks){
-                if(other.item == stack.item){
-                    other.amount += stack.amount;
-                    return;
-                }
-            }
-            stacks.add(new ItemStack(stack.item, stack.amount));
-        };
-
-        for(ItemStack stack : baseLaunchCost) adder.get(stack);
-        for(ItemStack stack : startingItems) adder.get(stack);
-
-        for(ItemStack stack : stacks){
-            if(stack.amount < 0) stack.amount = 0;
-        }
-
-        stacks.sort();
-        launchCost = stacks;
     }
 
     /** Whether this zone has met its condition; if true, the player can leave. */
@@ -141,13 +80,6 @@ public class SectorPreset extends UnlockableContent{
 
     public boolean canConfigure(){
         return true;
-    }
-
-    @Override
-    public void init(){
-        for(ItemStack stack : startingItems){
-            defaultStartingItems.add(new ItemStack(stack.item, stack.amount));
-        }
     }
 
     @Override

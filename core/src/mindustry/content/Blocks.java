@@ -1836,13 +1836,15 @@ public class Blocks implements ContentList{
             consumes.power(6f);
         }};
 
+        //TODO remove later
+        /*
         coreSilo = new CoreLauncher("core-silo"){{
             requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
             size = 5;
             itemCapacity = 500;
 
             consumes.items(ItemStack.with(Items.copper, 500));
-        }};
+        }};*/
 
         dataProcessor = new ResearchBlock("data-processor"){{
             requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 200, Items.lead, 100));

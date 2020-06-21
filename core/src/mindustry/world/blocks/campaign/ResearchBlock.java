@@ -83,7 +83,7 @@ public class ResearchBlock extends Block{
 
                     //check if it has been researched
                     if(researching.progress >= researching.time){
-                        researching.content.unlocked();
+                        researching.content.unlock();
 
                         setTo(null);
                     }

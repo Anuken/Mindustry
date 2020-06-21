@@ -71,6 +71,12 @@ public class TechTree implements ContentList{
                 });
             });
 
+            node(coreFoundation, () -> {
+                node(coreNucleus, () -> {
+
+                });
+            });
+
             node(duo, () -> {
                 node(scatter, () -> {
                     node(hail, () -> {
