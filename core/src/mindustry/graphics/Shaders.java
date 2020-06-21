@@ -203,8 +203,8 @@ public class Shaders{
             super(frag, "screenspace");
 
             Core.assets.load("sprites/noise.png", Texture.class).loaded = t -> {
-                ((Texture)t).setFilter(TextureFilter.Linear);
-                ((Texture)t).setWrap(TextureWrap.Repeat);
+                ((Texture)t).setFilter(TextureFilter.linear);
+                ((Texture)t).setWrap(TextureWrap.repeat);
             };
         }
 

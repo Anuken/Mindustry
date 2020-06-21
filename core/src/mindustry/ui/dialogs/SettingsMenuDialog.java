@@ -338,7 +338,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             graphics.checkPref("animatedshields", !mobile);
         }
         if(!ios){
-            graphics.checkPref("bloom", !mobile, val -> renderer.toggleBloom(val));
+            graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
         }else{
             Core.settings.put("bloom", false);
         }
@@ -351,14 +351,14 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         graphics.checkPref("linear", true, b -> {
             for(Texture tex : Core.atlas.getTextures()){
-                TextureFilter filter = b ? TextureFilter.Linear : TextureFilter.Nearest;
+                TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
                 tex.setFilter(filter, filter);
             }
         });
 
         if(Core.settings.getBool("linear")){
             for(Texture tex : Core.atlas.getTextures()){
-                TextureFilter filter = TextureFilter.Linear;
+                TextureFilter filter = TextureFilter.linear;
                 tex.setFilter(filter, filter);
             }
         }

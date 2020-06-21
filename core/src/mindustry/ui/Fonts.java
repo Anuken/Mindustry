@@ -127,8 +127,8 @@ public class Fonts{
                     scaled.add(parameter.fontParameters);
                 }
 
-                parameter.fontParameters.magFilter = TextureFilter.Linear;
-                parameter.fontParameters.minFilter = TextureFilter.Linear;
+                parameter.fontParameters.magFilter = TextureFilter.linear;
+                parameter.fontParameters.minFilter = TextureFilter.linear;
                 parameter.fontParameters.packer = UI.packer;
                 return super.loadSync(manager, fileName, file, parameter);
             }
@@ -175,7 +175,7 @@ public class Fonts{
         atlas.disposePixmap(texture);
 
         page.setDirty(true);
-        page.updateTexture(TextureFilter.Linear, TextureFilter.Linear, false);
+        page.updateTexture(TextureFilter.linear, TextureFilter.linear, false);
     }
 
     public static TextureRegionDrawable getGlyph(BitmapFont font, char glyph){

@@ -29,7 +29,7 @@ public class SchematicsDialog extends BaseDialog{
     public SchematicsDialog(){
         super("$schematics");
         Core.assets.load("sprites/schematic-background.png", Texture.class).loaded = t -> {
-            ((Texture)t).setWrap(TextureWrap.Repeat);
+            ((Texture)t).setWrap(TextureWrap.repeat);
         };
 
         shouldPause = true;

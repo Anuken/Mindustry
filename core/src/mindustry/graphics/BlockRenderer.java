@@ -44,7 +44,7 @@ public class BlockRenderer implements Disposable{
             shadowEvents.clear();
             lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
 
-            shadows.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            shadows.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
             shadows.resize(world.width(), world.height());
             shadows.begin();
             Core.graphics.clear(Color.white);
@@ -62,7 +62,7 @@ public class BlockRenderer implements Disposable{
             Draw.color();
             shadows.end();
 
-            dark.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            dark.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
             dark.resize(world.width(), world.height());
             dark.begin();
             Core.graphics.clear(Color.white);

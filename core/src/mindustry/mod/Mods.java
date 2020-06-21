@@ -165,7 +165,7 @@ public class Mods implements Loadable{
                 }
             }
 
-            TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
+            TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.linear : TextureFilter.nearest;
 
             //flush so generators can use these sprites
             packer.flush(filter, Core.atlas);
@@ -452,7 +452,7 @@ public class Mods implements Loadable{
         content.init();
         content.load();
         content.loadColors();
-        Core.atlas.getTextures().each(t -> t.setFilter(Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest));
+        Core.atlas.getTextures().each(t -> t.setFilter(Core.settings.getBool("linear") ? TextureFilter.linear : TextureFilter.nearest));
         requiresReload = false;
 
         loadIcons();

@@ -474,16 +474,6 @@ public class Control implements ApplicationListener, Loadable{
         if(state.isGame()){
             input.update();
 
-            if(state.isCampaign()){
-                for(Tilec tile : state.teams.cores(player.team())){
-                    for(Item item : content.items()){
-                        if(tile.items().has(item)){
-                            item.unlock();
-                        }
-                    }
-                }
-            }
-
             if(state.rules.tutorial){
                 tutorial.update();
             }
