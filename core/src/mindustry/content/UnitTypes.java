@@ -575,19 +575,15 @@ public class UnitTypes implements ContentList{
             }
         }};
         
-        /*
-        chaosArray = new UnitType("chaos-array", GroundUnit::new){{
-            maxVelocity = 0.68f;
-            speed = 0.12f;
-            drag = 0.4f;
-            mass = 5f;
+        chaosArray = new UnitType("chaos-array"){{
+            speed = 0.68f;
             hitsize = 20f;
-            rotatespeed = 0.06f;
             health = 3000;
-            weapons.add(new Weapon("chaos"){{
-                length = 8f;
+            weapons.add(
+            new Weapon("chaos"){{
+                shootY = 8f;
                 reload = 50f;
-                width = 17f;
+                x = 17f;
                 alternate = true;
                 recoil = 3f;
                 shake = 2f;
@@ -597,34 +593,34 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.flakSurge;
                 shootSound = Sounds.shootBig;
-            }});
+            }}
+            );
         }};
 
-        eradicator = new UnitType("eradicator", GroundUnit::new){{
-            maxVelocity = 0.68f;
-            speed = 0.12f;
-            drag = 0.4f;
-            mass = 5f;
+        eradicator = new UnitType("eradicator"){{
+            speed = 0.68f;
             hitsize = 20f;
-            rotatespeed = 0.06f;
             health = 9000;
-            weapons.add(new Weapon("eradication"){{
-                length = 13f;
+            weapons.add(
+            new Weapon("eradication"){{
+                shootY = 13f;
                 reload = 30f;
-                width = 22f;
+                x = 22f;
                 alternate = true;
+                inaccuracy = 3f;
                 recoil = 3f;
                 shake = 2f;
-                inaccuracy = 3f;
                 shots = 4;
                 spacing = 0f;
                 shotDelay = 3;
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.standardThoriumBig;
                 shootSound = Sounds.shootBig;
-            }});
+            }}
+            );
         }};
-
+        
+        /*
         lich = new UnitType("lich", HoverUnit::new){{
             health = 6000;
             mass = 20f;

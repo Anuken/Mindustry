@@ -130,18 +130,20 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
 
         float baseX = this.x, baseY = this.y;
 
-        weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
-
         BulletType ammo = weapon.bullet;
         float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1f;
 
         sequenceNum = 0;
         if(weapon.shotDelay > 0.01f){
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
-                Time.run(sequenceNum * weapon.shotDelay, () -> bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl));
+                Time.run(sequenceNum * weapon.shotDelay, () -> {
+                    bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl);
+                    weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
+                });
                 sequenceNum++;
             });
         }else{
+            weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy), lifeScl));
         }
 

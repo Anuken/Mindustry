@@ -1729,6 +1729,7 @@ public class Blocks implements ContentList{
 
             upgrades = new UnitType[][]{
                 {UnitTypes.revenant, UnitTypes.lich},
+                {UnitTypes.fortress, UnitTypes.chaosArray},
             };
         }};
 
@@ -1744,6 +1745,7 @@ public class Blocks implements ContentList{
 
             upgrades = new UnitType[][]{
                 {UnitTypes.lich, UnitTypes.reaper},
+                {UnitTypes.chaosArray, UnitTypes.eradicator},
             };
         }};
 
