@@ -112,6 +112,7 @@ public class Weathers implements ContentList{
                 Tmp.r1.grow(padding);
                 Core.camera.bounds(Tmp.r2);
                 int total = (int)(Tmp.r1.area() / density * state.intensity()) / 2;
+                Lines.stroke(0.75f);
 
                 float t = Time.time() / 22f;
 
@@ -141,7 +142,6 @@ public class Weathers implements ContentList{
                             Draw.color(Color.royal, Color.white, 0.3f);
                             Draw.alpha(Mathf.slope(life) * state.opacity());
 
-                            Lines.stroke(1f);
                             float space = 45f;
                             for(int j : new int[]{-1, 1}){
                                 Tmp.v1.trns(90f + j*space, 1f + 5f * life);

@@ -480,13 +480,11 @@ public class Mods implements Loadable{
                         }catch(Throwable e){
                             Core.app.post(() -> {
                                 Log.err("Error loading main script @ for mod @.", main.name(), mod.meta.name);
-                                e.printStackTrace();
+                                Log.err(e);
                             });
                         }
                     }else{
-                        Core.app.post(() -> {
-                            Log.err("No main.js found for mod @.", mod.meta.name);
-                        });
+                        Core.app.post(() -> Log.err("No main.js found for mod @.", mod.meta.name));
                     }
                 }
             });

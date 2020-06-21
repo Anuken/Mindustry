@@ -206,15 +206,14 @@ public class Drill extends Block{
     }
 
     public class DrillEntity extends TileEntity{
-        float progress;
-        int index;
-        float warmup;
-        float timeDrilled;
-        float lastDrillSpeed;
+        public float progress;
+        public int index;
+        public float warmup;
+        public float timeDrilled;
+        public float lastDrillSpeed;
 
-        int dominantItems;
-        Item dominantItem;
-
+        public int dominantItems;
+        public Item dominantItem;
 
         @Override
         public boolean shouldConsume(){
