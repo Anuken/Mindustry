@@ -1,7 +1,7 @@
 
 sprites.png
 size: 2048,2048
-format: RGBA8888
+format: rgba8888
 filter: nearest,nearest
 repeat: none
 core-silo
@@ -539,7 +539,7 @@ reaper-cell
 
 sprites2.png
 size: 2048,2048
-format: RGBA8888
+format: rgba8888
 filter: nearest,nearest
 repeat: none
 data-processor
@@ -5774,7 +5774,7 @@ beam-weapon
 
 sprites3.png
 size: 2048,1024
-format: RGBA8888
+format: rgba8888
 filter: nearest,nearest
 repeat: none
 rubble-1-0
@@ -6060,7 +6060,7 @@ scorch-9-2
 
 sprites4.png
 size: 2048,512
-format: RGBA8888
+format: rgba8888
 filter: nearest,nearest
 repeat: none
 char1
@@ -7431,7 +7431,7 @@ water-edge
 
 sprites5.png
 size: 2048,1024
-format: RGBA8888
+format: rgba8888
 filter: nearest,nearest
 repeat: none
 additive-reconstructor-icon-editor
@@ -9544,7 +9544,7 @@ white-tree-icon-editor
 
 sprites6.png
 size: 2048,1024
-format: RGBA8888
+format: rgba8888
 filter: nearest,nearest
 repeat: none
 alpha-bg

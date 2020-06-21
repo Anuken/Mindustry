@@ -110,7 +110,7 @@ public class Fonts{
 
     /** Called from a static context for use in the loading screen.*/
     public static void loadDefaultFont(){
-        UI.packer = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
+        UI.packer = new PixmapPacker(2048, 2048, Format.rgba8888, 2, true);
         FileHandleResolver resolver = new InternalFileHandleResolver();
         Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
         Core.assets.setLoader(BitmapFont.class, null, new FreetypeFontLoader(resolver){

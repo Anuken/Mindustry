@@ -66,7 +66,7 @@ public class MinimapRenderer implements Disposable{
             texture.dispose();
         }
         setZoom(4f);
-        pixmap = new Pixmap(world.width(), world.height(), Format.RGBA8888);
+        pixmap = new Pixmap(world.width(), world.height(), Format.rgba8888);
         texture = new Texture(pixmap);
         region = new TextureRegion(texture);
     }
